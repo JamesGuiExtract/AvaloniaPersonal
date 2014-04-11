@@ -117,6 +117,12 @@
     <Compile Include="Controls\AngularRedactionToolStripButton.Designer.cs">
       <DependentUpon>AngularRedactionToolStripButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\OneToOneZoomToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\OneToOneZoomToolStripButton.Designer.cs">
+      <DependentUpon>OneToOneZoomToolStripButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\DockableWindowToolStripButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -336,6 +342,12 @@
     </Compile>
     <Compile Include="MenuItems\CloseImageToolStripMenuItem.Designer.cs">
       <DependentUpon>CloseImageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\OneToOneZoomToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\OneToOneZoomToolStripMenuItem.Designer.cs">
+      <DependentUpon>OneToOneZoomToolStripMenuItem.cs</DependentUpon>
     </Compile>
     <Compile Include="MenuItems\EnlargeSelectionToolStripMenuItem.cs">
       <SubType>Component</SubType>
@@ -664,9 +676,9 @@
       <DependentUpon>BackgroundProcessStatusLabel.cs</DependentUpon>
     </Compile>
     <Compile Include="StatusStripItems\LayerObjectSelectionStatusLabel.Designer.cs">
-	  <DependentUpon>LayerObjectSelectionStatusLabel.cs</DependentUpon>
+      <DependentUpon>LayerObjectSelectionStatusLabel.cs</DependentUpon>
     </Compile>
-	<Compile Include="StatusStripItems\ImageViewerStatusStrip.cs">
+    <Compile Include="StatusStripItems\ImageViewerStatusStrip.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="StatusStripItems\ImageViewerStatusStrip.Designer.cs">
@@ -1027,6 +1039,8 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\MagnifierWindowButton.png" />
+    <EmbeddedResource Include="Resources\OneToOneZoomButton.png" />
+    <EmbeddedResource Include="Resources\OneToOneZoomButtonSmall.png" />
     <Content Include="Resources\WordHighlightButtonSmall.png" />
     <Content Include="Resources\WordRedactionButtonSmall.png" />
   </ItemGroup>

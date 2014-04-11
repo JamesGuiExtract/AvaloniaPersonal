@@ -565,6 +565,30 @@ namespace Extract.Imaging.Forms
             "Fit to width";
 
         /// <summary>
+        /// Constant string for the one-to-one zoom button image.
+        /// </summary>
+        public const string _ONE_TO_ONE_ZOOM_BUTTON_IMAGE =
+            "Resources.OneToOneZoomButton.png";
+
+        /// <summary>
+        /// Constant string for a small versoin of the one-to-one zoom button image.
+        /// </summary>
+        public const string _ONE_TO_ONE_ZOOM_BUTTON_IMAGE_SMALL =
+            "Resources.OneToOneZoomButtonSmall.png";
+
+        /// <summary>
+        /// Constant string for the one-to-one zoom button text.
+        /// </summary>
+        public const string _ONE_TO_ONE_ZOOM_BUTTON_TEXT =
+            "One-to-one zoom";
+
+        /// <summary>
+        /// Constant string for the one-to-one zoom button tool tip text.
+        /// </summary>
+        public const string _ONE_TO_ONE_ZOOM_BUTTON_TOOL_TIP =
+            "One-to-one zoom";
+
+        /// <summary>
         /// Constant string for the fit to page button image.
         /// </summary>
         public const string _FIT_TO_PAGE_BUTTON_IMAGE =
@@ -965,6 +989,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public const string _FIT_TO_WIDTH_MENU_ITEM_TEXT =
             "Fit to &width";
+
+        /// <summary>
+        /// Constant string for the one-to-one zoom menu item text.
+        /// </summary>
+        public const string _ONE_TO_ONE_ZOOM_MENU_ITEM_TEXT =
+            "&One-to-one zoom";
 
         /// <summary>
         /// Constant string for the open image menu item text.

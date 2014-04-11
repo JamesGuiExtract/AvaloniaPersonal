@@ -14,6 +14,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Data;
+using System.Data.OleDb;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
@@ -116,6 +118,19 @@ namespace Extract.FileActionManager.Utilities
         static readonly Color _SELECTION_BORDER_COLOR = Color.Red;
 
         /// <summary>
+        /// The maximum number of threads that should be used for searching
+        /// </summary>
+        static int _MAX_THREADS_FOR_DATA_SEARCH = 4;
+
+        /// <summary>
+        /// The default <see cref="FileFilter"/> to use when displaying the content of a directory
+        /// rather than the contents of a database.
+        /// </summary>
+        static readonly string _DEFAULT_FILE_FILTER =
+            "*.bmp;*.rle;*.dib;*.rst;*.gp4;*.mil;*.cal;*.cg4;*.flc;*.fli;*.gif;*.jpg;*.jpeg;" +
+            "*.pcx;*.pct;*.png;*.tga;*.tif;*.tiff;*.pdf";
+
+        /// <summary>
         /// The default value for <see cref="MaxFilesToDisplay"/>.
         /// </summary>
         public static readonly int DefaultMaxFilesToDisplay = 1000;
@@ -124,11 +139,6 @@ namespace Extract.FileActionManager.Utilities
         /// The method a limited subset should be selected from the overall set of files.
         /// </summary>
         public static readonly SubsetType DefaultSubsetType = SubsetType.Top;
-
-        /// <summary>
-        /// The maximum number of threads that should be used for searching
-        /// </summary>
-        internal static int _MAX_THREADS_FOR_DATA_SEARCH = 4;
 
         #endregion Constants
 
@@ -290,6 +300,17 @@ namespace Extract.FileActionManager.Utilities
         #region Fields
 
         /// <summary>
+        /// A semicolon delimited list of file extensions that should be displayed when operating on
+        /// the contents of <see cref="SourceDirectory"/> rather than <see cref="FileProcessingDB"/>.
+        /// </summary>
+        string _fileFilter = _DEFAULT_FILE_FILTER;
+
+        /// <summary>
+        /// An <see cref="ImageCodecs"/> instance to use to gather data from image files.
+        /// </summary>
+        ImageCodecs _codecs;
+
+        /// <summary>
         /// Saves/restores window state info
         /// </summary>
         FormStateManager _formStateManager;
@@ -439,6 +460,11 @@ namespace Extract.FileActionManager.Utilities
         bool _processingCmdKey;
 
         /// <summary>
+        /// Indicates whether the search feature is licensed.
+        /// </summary>
+        bool _searchIsLicensed;
+
+        /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
         readonly bool _inDesignMode;
@@ -487,14 +513,16 @@ namespace Extract.FileActionManager.Utilities
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI35711", _OBJECT_NAME);
 
+                _searchIsLicensed = LicenseUtilities.IsLicensed(LicenseIdName.FileInspectorSearch);
+
                 // License SandDock before creating the form.
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
                 MaxFilesToDisplay = DefaultMaxFilesToDisplay;
                 SubsetType = DefaultSubsetType;
-
-                FileProcessingDB = new FileProcessingDB();
                 FileSelector = new FAMFileSelector();
+                // Do not initialize FileProcessingDB here. A value of null will be used to indicate
+                // that the FFI is not operating in database mode.
 
                 InitializeComponent();
 
@@ -515,11 +543,6 @@ namespace Extract.FileActionManager.Utilities
                 _searchModifierComboBox.InitializeWithReadableEnum<SearchModifier>(false);
                 _searchTypeComboBox.InitializeWithReadableEnum<SearchType>(false);
 
-                // Settings PopuSize to 1 for the dockable window prevents it from popuping over
-                // other windows when hovering while collapsed. (I found this behavior to be
-                // confusing)
-                _searchDockableWindow.PopupSize = 1;
-
                 LayerObject.SelectionPen = ExtractPens.GetThickDashedPen(_SELECTION_BORDER_COLOR);
 
                 // This prevents the "missing image" icon from showing up for rows that aren't flagged.
@@ -537,7 +560,55 @@ namespace Extract.FileActionManager.Utilities
         #region Properties
 
         /// <summary>
-        /// Gets the <see cref="FileProcessingDB"/> whose files are being inspected.
+        /// Gets whether this instance should display the files in a
+        /// <see cref="FileProcessingDB"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance is to display the files in a database;
+        /// <see langword="false"/> if it is to display the contents of a directory or file list.
+        /// </value>
+        public bool UseDatabaseMode
+        {
+            get
+            {
+                return FileProcessingDB != null;
+            }
+
+            set
+            {
+                try 
+	            {	        
+		            if (value != UseDatabaseMode)
+                    {
+                        if (value)
+                        {
+                            FileProcessingDB = new FileProcessingDB();
+                        }
+                        else
+                        {
+                            FileProcessingDB.CloseAllDBConnections();
+                            FileProcessingDB = null;
+                        }
+
+                        if (IsHandleCreated)
+                        {
+                            ResetFileSelectionSettings();
+                            ResetSearch();
+                            InitializeContextMenu();
+                            GenerateFileList(false);
+                        }
+                    }
+	            }
+	            catch (Exception ex)
+	            {
+		            throw ex.AsExtract("ELI36783");
+	            }
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="FileProcessingDB"/> whose files are being inspected when this
+        /// instance is being used to inspect files from a database. Will be <see langword="null"/>
+        /// if the instance is being used to inspect files from a directory or file list.
         /// </summary>
         /// <value>
         /// The <see cref="FileProcessingDB"/> whose files are being inspected.
@@ -569,12 +640,27 @@ namespace Extract.FileActionManager.Utilities
         {
             get
             {
-                return FileProcessingDB.DatabaseServer;
+                return (FileProcessingDB == null) ? "" : FileProcessingDB.DatabaseServer;
             }
 
             set
             {
-                FileProcessingDB.DatabaseServer = value;
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(value) && FileProcessingDB == null)
+                    {
+                        FileProcessingDB = new FileProcessingDB();
+                    }
+
+                    if (FileProcessingDB != null)
+                    {
+                        FileProcessingDB.DatabaseServer = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36784");
+                }
             }
         }
 
@@ -588,12 +674,76 @@ namespace Extract.FileActionManager.Utilities
         {
             get
             {
-                return FileProcessingDB.DatabaseName;
+                return (FileProcessingDB == null) ? "" : FileProcessingDB.DatabaseName;
             }
 
             set
             {
-                FileProcessingDB.DatabaseName = value;
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(value) && FileProcessingDB == null)
+                    {
+                        FileProcessingDB = new FileProcessingDB();
+                    }
+
+                    if (FileProcessingDB != null)
+                    {
+                        FileProcessingDB.DatabaseName = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36785");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the directory being inspected by this instance. Used when
+        /// <see cref="FileProcessingDB"/> is <see langword="null"/>.
+        /// </summary>
+        /// <value>
+        /// The directory being inspected by this instance.
+        /// </value>
+        public string SourceDirectory
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
+        /// Gets or sets whether files in subdirectories of <see cref="SourceDirectory"/> are to be
+        /// included.
+        /// </summary>
+        /// <value><see langword="true"/> if files in subdirectories of
+        /// <see cref="SourceDirectory"/> are to be included; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Recursive
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a semicolon delimited list of file extensions that should be displayed when
+        /// inspecting the contents of <see cref="SourceDirectory"/> rather than
+        /// <see cref="FileProcessingDB"/>.
+        /// </summary>
+        /// <value>
+        /// A semicolon delimited list of file extensions that should be displayed when inspecting
+        /// the contents of <see cref="SourceDirectory"/> rather than <see cref="FileProcessingDB"/>.
+        /// </value>
+        public string FileFilter
+        {
+            get
+            {
+                return _fileFilter;
+            }
+
+            set
+            {
+                _fileFilter = value;
             }
         }
 
@@ -628,6 +778,30 @@ namespace Extract.FileActionManager.Utilities
         #region Methods
 
         /// <summary>
+        /// Shows a dialog allowing the user to select which database to log into.
+        /// </summary>
+        /// <param name="requireAdminLogOn"><see langword="true"/> if admin credentials are to be
+        /// required to connect to the database; otherwise, <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if the user logged into a selected database;
+        /// otherwise, <see langword="false"/>.</returns>
+        public bool ShowSelectDB(bool requireAdminLogOn)
+        {
+            try
+            {
+                if (FileProcessingDB == null)
+                {
+                    FileProcessingDB = new FileProcessingDB();
+                }
+
+                return FileProcessingDB.ShowSelectDB("Select database", false, requireAdminLogOn);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36786");
+            }
+        }
+
+        /// <summary>
         /// Resets all changes to file selection back to the default (no conditions, top 1000 files).
         /// </summary>
         public void ResetFileSelectionSettings()
@@ -650,8 +824,6 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         public void ResetSearch()
         {
-            Recordset queryResults = null;
-
             try
             {
                 ClearSearchResults();
@@ -664,32 +836,25 @@ namespace Extract.FileActionManager.Utilities
                 _fuzzySearchCheckBox.Checked = false;
 
                 // Populate all pre-defined search terms from the database's FieldSearch table.
-                queryResults = FileProcessingDB.GetResultsForQuery(
+                using (var queryResults = GetResultsForQuery(
                     "SELECT [FieldName], [AttributeQuery] FROM [FieldSearch] WHERE [Enabled] = 1 " +
-                    "ORDER BY [FieldName]");
-                while (!queryResults.EOF)
+                    "ORDER BY [FieldName]"))
                 {
-                    string fieldName = (string)queryResults.Fields["FieldName"].Value;
-                    string attributeQuery = (string)queryResults.Fields["AttributeQuery"].Value;
+                    foreach (var row in queryResults.Rows.OfType<DataRow>())
+                    {
+                        string fieldName = (string)row["FieldName"];
+                        string attributeQuery = (string)row["AttributeQuery"];
 
-                    _dataSearchQueries[fieldName] = attributeQuery;
+                        _dataSearchQueries[fieldName] = attributeQuery;
 
-                    int index = _dataSearchTermsDataGridView.Rows.Add(fieldName, "");
-                    _dataSearchTermsDataGridView.Rows[index].Cells[0].ReadOnly = true;
-
-                    queryResults.MoveNext();
+                        int index = _dataSearchTermsDataGridView.Rows.Add(fieldName, "");
+                        _dataSearchTermsDataGridView.Rows[index].Cells[0].ReadOnly = true;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35772");
-            }
-            finally
-            {
-                if (queryResults != null)
-                {
-                    queryResults.Close();
-                }
             }
         }
 
@@ -708,14 +873,14 @@ namespace Extract.FileActionManager.Utilities
                 // Ensure any previous background operation is canceled first.
                 CancelBackgroundOperation();
 
-                if (!FileProcessingDB.IsConnected)
+                if (FileProcessingDB != null && !FileProcessingDB.IsConnected)
                 {
                     FileProcessingDB.ResetDBConnection(false);
-                    
-                    // After connecting, make sure the context menu options match whether the
-                    // connection is now in admin mode.
-                    InitializeContextMenu();
                 }
+
+                // After connecting, make sure the context menu options match whether the
+                // connection is now in admin mode.
+                InitializeContextMenu();
 
                 UpdateFileSelectionSummary();
 
@@ -731,19 +896,39 @@ namespace Extract.FileActionManager.Utilities
                     : null;
 
                 _fileListDataGridView.Rows.Clear();
+                _fileSelectionCount = 0;
 
                 // If generating a new file list, the previous search results don't apply anymore.
                 // Unheck show search results until a new search is run.
                 _showOnlyMatchesCheckBox.Checked = false;
                 _showOnlyMatchesCheckBox.Enabled = false;
 
-                string query = FileSelector.BuildQuery(FileProcessingDB,
-                    "[FAMFile].[ID], [FAMFile].[FileName], [FAMFile].[Pages]",
-                    " ORDER BY [FAMFile].[ID]");
+                if (FileProcessingDB != null)
+                {
+                    string query = FileSelector.BuildQuery(FileProcessingDB,
+                        "[FAMFile].[ID], [FAMFile].[FileName], [FAMFile].[Pages]",
+                        " ORDER BY [FAMFile].[ID]");
 
-                // Run the query on a background thread so the UI remains responsive as rows are loaded.
-                StartBackgroundOperation(() =>
-                    RunDatabaseQuery(query, flaggedFileNames, _queryCanceler.Token));
+                    // Run the query on a background thread so the UI remains responsive as rows are
+                    // loaded.
+                    StartBackgroundOperation(() =>
+                        RunDatabaseQuery(query, flaggedFileNames, _queryCanceler.Token));
+                }
+                else
+                {
+                    var fileFilter = string.IsNullOrWhiteSpace(FileFilter)
+                        ? null
+                        : new Interfaces.FileFilter(null, FileFilter, false);
+
+                    var fileEnumerable = Directory.EnumerateFiles(SourceDirectory, "*",
+                        Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
+                        .Where(fileName => fileFilter == null || fileFilter.FileMatchesFilter(fileName));
+
+                    // Run the enumeration on a background thread so the UI remains responsive as
+                    // rows are loaded.
+                    StartBackgroundOperation(() =>
+                        RunFileEnumeration(fileEnumerable, flaggedFileNames, _queryCanceler.Token));
+                }
             }
             catch (Exception ex)
             {
@@ -757,8 +942,6 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         public void InitializeContextMenu()
         {
-            Recordset queryResults = null;
-
             try
             {
                 // Dispose of any previous context menu option.
@@ -772,39 +955,31 @@ namespace Extract.FileActionManager.Utilities
 
                 // Populate context menu options for all enabled items available with the current
                 // log-on mode from the database's FileHandler table.
-                queryResults = FileProcessingDB.GetResultsForQuery(
+                using (var queryResults = GetResultsForQuery(
                     "SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], " +
                         "[SupportsErrorHandling], [Blocking] " +
                     "FROM [FileHandler] WHERE [Enabled] = 1 " +
                     (InAdminMode ? "" : "AND [AdminOnly] = 0 ") +
-                    "ORDER BY [AppName]");
-
-                while (!queryResults.EOF)
+                    "ORDER BY [AppName]"))
                 {
-                    // Create an FileHandlerItem instance representing the settings of this item.
-                    var fileHandlerItem = new FileHandlerItem();
-                    fileHandlerItem.Name = (string)queryResults.Fields["AppName"].Value;
-                    fileHandlerItem.ApplicationPath =
-                        (string)queryResults.Fields["ApplicationPath"].Value;
-                    if (!(queryResults.Fields[2].Value is System.DBNull))
+                    foreach (var row in queryResults.Rows.OfType<DataRow>())
                     {
-                        fileHandlerItem.Arguments =
-                            (string)(queryResults.Fields["Arguments"].Value ?? string.Empty);
+                        // Create an FileHandlerItem instance representing the settings of this item.
+                        var fileHandlerItem = new FileHandlerItem();
+                        fileHandlerItem.Name = (string)row["AppName"];
+                        fileHandlerItem.ApplicationPath = (string)row["ApplicationPath"].ToString();
+                        fileHandlerItem.Arguments = (string)row["Arguments"].ToString();
+                        fileHandlerItem.AllowMultipleFiles = (bool)row["AllowMultipleFiles"];
+                        fileHandlerItem.SupportsErrorHandling = (bool)row["SupportsErrorHandling"];
+                        fileHandlerItem.Blocking = (bool)row["Blocking"];
+
+                        // Create a context menu option and add a handler for it.
+                        var menuItem = new ToolStripMenuItem(fileHandlerItem.Name);
+                        menuItem.Click += HandleFileHandlerMenuItem_Click;
+
+                        _fileHandlerItems.Add(menuItem, fileHandlerItem);
+                        newContextMenuStrip.Items.Add(menuItem);
                     }
-                    fileHandlerItem.AllowMultipleFiles =
-                        (bool)queryResults.Fields["AllowMultipleFiles"].Value;
-                    fileHandlerItem.SupportsErrorHandling =
-                        (bool)queryResults.Fields["SupportsErrorHandling"].Value;
-                    fileHandlerItem.Blocking = (bool)queryResults.Fields["Blocking"].Value;
-
-                    // Create a context menu option and add a handler for it.
-                    var menuItem = new ToolStripMenuItem(fileHandlerItem.Name);
-                    menuItem.Click += HandleFileHandlerMenuItem_Click;
-
-                    _fileHandlerItems.Add(menuItem, fileHandlerItem);
-                    newContextMenuStrip.Items.Add(menuItem);
-
-                    queryResults.MoveNext();
                 }
 
                 // Add feature menu options
@@ -879,13 +1054,6 @@ namespace Extract.FileActionManager.Utilities
             {
                 throw ex.AsExtract("ELI35821");
             }
-            finally
-            {
-                if (queryResults != null)
-                {
-                    queryResults.Close();
-                }
-            }
         }
 
         #endregion Methods
@@ -903,33 +1071,22 @@ namespace Extract.FileActionManager.Utilities
             {
                 base.OnLoad(e);
 
-#if DEBUG
-                if (_searchSplitContainer.Location != Point.Empty)
+                // If not using a FAM DB, the admin mode and logout options are not applicable.
+                if (FileProcessingDB == null)
                 {
-                    UtilityMethods.ShowMessageBox(
-                        "For some reason with this form, if _searchSplitContainer is not " +
-                        "initialized last in InitializeComponent, the components on the form " +
-                        "get re-arranged when the form is displayed outside of the designer. " +
-                        "Move the initialization of _searchSplitContainer and it's two panels " +
-                        "to just above the FAMFileInspectorForm itself below after making " +
-                        "changes in the designer.", "Incorrect layout detected", true);
+                    _databaseToolStripMenuItem.Text = "File";
+                    _adminModeToolStripMenuItem.Visible = false;
+                    _logoutToolStripMenuItem.Visible = false;
+                    _databaseMenuToolStripSeparator.Visible = false;
                 }
-#endif
 
-                // Search capability is available only as a separately licensed feature.
-                if (!LicenseUtilities.IsLicensed(LicenseIdName.FileInspectorSearch))
+                if (!_searchIsLicensed)
                 {
-                    // Removing the entire dock container seems is the only sure-fire way I can find
-                    // to prevent the tab from showing.
-                    _searchSplitContainer.Panel2.Controls.Remove(_dockContainer);
-                    _showOnlyMatchesCheckBox.Visible = false;
-                    _fileListDataGridView.Dock = DockStyle.Fill;
-                }
-                else if (!_searchDockableWindow.IsOpen)
-                {
-                    // If this application was run without search licensed, the form state manager
-                    // will remember that the search pane was closed. Force it open.
-                    _searchDockableWindow.Open();
+                    // Search is not licensed; Hide the pane and remove the control to display it.
+                    _resultsSplitContainer.Panel1Collapsed = true;
+                    _resultsTableLayoutPanel.RowCount = 1;
+                    _resultsTableLayoutPanel.Controls.Remove(_collapsedSearchPanel);
+                    _resultsTableLayoutPanel.RowStyles[0] = new RowStyle(SizeType.AutoSize);
                 }
 
                 // Establish image viewer connections prior to calling base.OnLoad which will
@@ -1126,6 +1283,12 @@ namespace Extract.FileActionManager.Utilities
                     _formStateManager = null;
                 }
 
+                if (_codecs != null)
+                {
+                    _codecs.Dispose();
+                    _codecs = null;
+                }
+
                 if (_fileHandlerItems != null)
                 {
                     foreach (ToolStripMenuItem menuItem in _fileHandlerItems.Keys)
@@ -1189,88 +1352,26 @@ namespace Extract.FileActionManager.Utilities
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="T:DockableWindow.Closing"/> event for all
-        /// <see cref="DockableWindow"/>s on the form.
+        /// Handles the <see cref="DockControl.DockSituationChanged"/> event.
         /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="TD.SandDock.DockControlClosingEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleDockWindow_Closing(object sender, DockControlClosingEventArgs e)
+        /// <param name="sender">The object that sent the 
+        /// <see cref="DockControl.DockSituationChanged"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="DockControl.DockSituationChanged"/> event.</param>
+        void HandleThumbnailDockableWindowDockSituationChanged(object sender, EventArgs e)
         {
             try
             {
-                // In order to allow the close (X) button to be used to "close" the dockable window
-                // but still have a tab available to re-open them, cancel the close and collapse the
-                // pane instead.
-                e.Cancel = true;
-
-                // [DotNetRCAndUtils:1059]
-                // If the control is currently floating, re-dock it before collapsing it, otherwise
-                // the floating window will still be visible (but with a blank interior) and may
-                // generate an unhandled exception when clicked.
-                if (e.DockControl.DockSituation == DockSituation.Floating)
-                {
-                    e.DockControl.OpenDocked();
-                }
-                
-                e.DockControl.Collapsed = true;
+                // Don't keep loading thumbnails if _thumbnailDockableWindow is closed.
+                // [FlexIDSCore:5015]
+                // If the window is collapsed it means it is set to auto-hide. It is likely the user
+                // will want to check on them in this configuration, so go ahead and load them.
+                _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen ||
+                    _thumbnailDockableWindow.Collapsed;
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35714");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="T:DockableWindow.AutoHidePopupOpened"/> event for all
-        /// <see cref="DockableWindow"/>s on the form.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleDockableWindow_AutoHidePopupOpened(object sender, EventArgs e)
-        {
-            try
-            {
-                var dockableWindow = (DockableWindow)sender;
-
-                // If a collapsed window has been opened via mouse press, immediately un-collapse it
-                // rather than allow it to temporarily popup over all other windows.
-                // Ignore if the mouse isn't down (meaning SandDock timer related to hover is
-                // triggering).
-                if (dockableWindow.Collapsed &&
-                    (Control.MouseButtons.HasFlag(System.Windows.Forms.MouseButtons.Left)))
-                {
-                    dockableWindow.Collapsed = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35715");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="T:SandDockManager.DockControlActivated"/> event of the
-        /// <see cref="_sandDockManager"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="TD.SandDock.DockControlEventArgs"/> instance containing
-        /// the event data.</param>
-        void HandleSandDockManager_DockControlActivated(object sender, DockControlEventArgs e)
-        {
-            try
-            {
-                // If a collapsed window has been activated, immediately un-collapse it rather than
-                // allow it to temporarily popup over all other windows.
-                if (e.DockControl.Collapsed)
-                {
-                    e.DockControl.Collapsed = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35716");
+                ExtractException.Display("ELI36787", ex);
             }
         }
 
@@ -1284,11 +1385,25 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                if (FileSelector.Configure(FileProcessingDB, "Select the files to be listed",
-                    "SELECT [Filename] FROM [FAMFile]"))
+                if (UseDatabaseMode)
                 {
-                    ClearSearchResults();
-                    GenerateFileList(false);
+                    if (FileSelector.Configure(FileProcessingDB, "Select the files to be listed",
+                        "SELECT [Filename] FROM [FAMFile]"))
+                    {
+                        ClearSearchResults();
+                        GenerateFileList(false);
+                    }
+                }
+                else if (!string.IsNullOrWhiteSpace(SourceDirectory))
+                {
+                    using (var directoryForm = new DirectorySelectionForm(this))
+                    {
+                        if (directoryForm.ShowDialog(this) == DialogResult.OK)
+                        {
+                            ClearSearchResults();
+                            GenerateFileList(false);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -2243,6 +2358,44 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the
+        /// <see cref="_openSearchPaneButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleOpenSearchPaneButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SearchPaneVisible = true;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36775");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the
+        /// <see cref="_closeSearchPaneButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleCloseSearchPaneButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SearchPaneVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36776");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -2257,7 +2410,75 @@ namespace Extract.FileActionManager.Utilities
         {
             get
             {
-                return FileProcessingDB.LoggedInAsAdmin;
+                return FileProcessingDB != null && FileProcessingDB.LoggedInAsAdmin;
+            }
+        }
+
+        /// <summary>
+        /// Gets the codecs used to encode and decode images.
+        /// </summary>
+        /// <value>The codecs used to encode and decode images.</value>
+        ImageCodecs Codecs
+        {
+            get
+            {
+                if (_codecs == null)
+                {
+                    _codecs = new ImageCodecs();
+                }
+
+                return _codecs;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the search is pane visible.
+        /// </summary>
+        /// <value><see langword="true"/> if the search pane visible; otherwise, 
+        /// <see langword="false"/>.
+        /// </value>
+        bool SearchPaneVisible
+        {
+            get
+            {
+                return !_resultsSplitContainer.Panel1Collapsed;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_searchIsLicensed)
+                    {
+                        _resultsSplitContainer.Panel1Collapsed = !value;
+
+                        // If the visibility of the _collapsedSearchPanel does not coincide with
+                        // the current SearchPaneVisible state, display/hide it as appropriate.
+                        if (value != (_resultsTableLayoutPanel.RowCount == 1))
+                        {
+                            if (value)
+                            {
+                                // Hide _collapsedSearchPanel
+                                _resultsTableLayoutPanel.RowCount = 1;
+                                _resultsTableLayoutPanel.Controls.Remove(_collapsedSearchPanel);
+                                _resultsTableLayoutPanel.RowStyles[0] = new RowStyle(SizeType.AutoSize);
+                            }
+                            else
+                            {
+                                // Show _collapsedSearchPanel
+                                _resultsTableLayoutPanel.RowCount = 2;
+                                _resultsTableLayoutPanel.Controls.Add(_collapsedSearchPanel);
+                                _resultsTableLayoutPanel.Controls.SetChildIndex(_collapsedSearchPanel, 0);
+                                _resultsTableLayoutPanel.RowStyles[0] = new RowStyle(SizeType.Absolute, 21);
+                                _resultsTableLayoutPanel.RowStyles[1] = new RowStyle(SizeType.AutoSize);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36777");
+                }
             }
         }
 
@@ -2273,8 +2494,15 @@ namespace Extract.FileActionManager.Utilities
             {
                 if (!_copyFileNamesEnabled.HasValue)
                 {
-                    _copyFileNamesEnabled =
-                        FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerCopyNames);
+                    if (FileProcessingDB != null)
+                    {
+                        _copyFileNamesEnabled =
+                            FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerCopyNames);
+                    }
+                    else
+                    {
+                        _copyFileNamesEnabled = true;
+                    }
                 }
 
                 return _copyFileNamesEnabled.Value;
@@ -2294,8 +2522,15 @@ namespace Extract.FileActionManager.Utilities
             {
                 if (!_copyFilesEnabled.HasValue)
                 {
-                    _copyFilesEnabled =
-                        FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerCopyFiles);
+                    if (FileProcessingDB != null)
+                    {
+                        _copyFilesEnabled =
+                            FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerCopyFiles);
+                    }
+                    else
+                    {
+                        _copyFilesEnabled = true;
+                    }
                 }
 
                 return _copyFilesEnabled.Value;
@@ -2315,8 +2550,15 @@ namespace Extract.FileActionManager.Utilities
             {
                 if (!_copyFilesAndDataEnabled.HasValue)
                 {
-                    _copyFilesAndDataEnabled =
-                        FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerCopyFilesAndData);
+                    if (FileProcessingDB != null)
+                    {
+                        _copyFilesAndDataEnabled =
+                            FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerCopyFilesAndData);
+                    }
+                    else
+                    {
+                        _copyFilesAndDataEnabled = true;
+                    }
                 }
 
                 return _copyFilesAndDataEnabled.Value;
@@ -2335,7 +2577,7 @@ namespace Extract.FileActionManager.Utilities
             {
                 if (!_reportsEnabled.HasValue)
                 {
-                    _reportsEnabled =
+                    _reportsEnabled = UseDatabaseMode &&
                         FileProcessingDB.IsFeatureEnabled(ExtractFeatures.RunDocumentSpecificReports);
                 }
 
@@ -2554,6 +2796,49 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets the results for the specified query from <see cref="FileProcessingDB"/> if
+        /// <see cref="UseDatabaseMode"/> or from an alternate settings database otherwise.
+        /// <para><b>NOTE</b></para>
+        /// The caller is responsible for disposing of the returned <see cref="DataTable"/>.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>A <see cref="DataTable"/> with the results of the specified query.</returns>
+        DataTable GetResultsForQuery(string query)
+        {
+            DataTable queryResults = new DataTable();
+            queryResults.Locale = CultureInfo.CurrentCulture;
+            Recordset adoRecordset = null;
+
+            try
+            {
+                if (UseDatabaseMode)
+                {
+                    // Populate all pre-defined search terms from the database's FieldSearch table.
+                    adoRecordset = FileProcessingDB.GetResultsForQuery(query);
+
+                    // Convert the ADODB Recordset to a DataTable.
+                    using (OleDbDataAdapter adapter = new System.Data.OleDb.OleDbDataAdapter())
+                    {
+                        adapter.Fill(queryResults, adoRecordset);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36788");
+            }
+            finally
+            {
+                if (adoRecordset != null)
+                {
+                    adoRecordset.Close();
+                }
+            }
+
+            return queryResults;
+        }
+
+        /// <summary>
         /// Runs a database query to build the file list on a background thread.
         /// </summary>
         /// <param name="query">The query used to generate the file list.</param>
@@ -2563,16 +2848,67 @@ namespace Extract.FileActionManager.Utilities
         /// after adding each file to the list to ensure the operation hasn't been canceled.</param>
         void RunDatabaseQuery(string query, string[] flaggedFileNames, CancellationToken cancelToken)
         {
-            Recordset queryResults = null;
-
             try
             {
-                queryResults = FileProcessingDB.GetResultsForQuery(query);
-
-                _fileSelectionCount = 0;
-
                 // If there are any query results, populate _resultsDataGridView.
-                while (!queryResults.EOF)
+                using (var queryResults = GetResultsForQuery(query))
+                {
+                    foreach (var row in queryResults.Rows.OfType<DataRow>())
+                    {
+                        // Abort if the user cancelled.
+                        cancelToken.ThrowIfCancellationRequested();
+
+                        // Populate up to MaxFilesToDisplay in the file list, but iterate all
+                        // results to obtain the overall number of files selected.
+                        if (_fileSelectionCount < MaxFilesToDisplay)
+                        {
+                            // Retrieve the fields necessary for the results table.
+                            string fileName = (string)row["FileName"];
+                            var fileData = new FAMFileData(fileName);
+
+                            Bitmap flagValue =
+                                (flaggedFileNames != null && flaggedFileNames.Contains(fileName))
+                                ? Resources.FlagImage
+                                : null;
+
+                            string directory = Path.GetDirectoryName(fileName);
+                            fileName = Path.GetFileName(fileName);
+                            int pageCount = (int)row["Pages"];
+
+                            // Invoke the new row to be added on the UI thread.
+                            this.SafeBeginInvoke("ELI35725", () =>
+                            {
+                                _fileListDataGridView.Rows.Add(flagValue, fileName, pageCount,
+                                    fileData, directory);
+                            });
+                        }
+
+                        _fileSelectionCount++;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35726");
+            }
+        }
+
+        /// <summary>
+        /// Enumerates the files in <see paramref="fileEnumerable"/> to build the file list on a
+        /// background thread.
+        /// </summary>
+        /// <param name="fileEnumerable">The <see cref="IEnumerable{T}"/> of <see cref="string"/>s
+        /// containing the files to be in the file list.</param>
+        /// <param name="flaggedFileNames">If not <see langword="null"/>, indicates files for which
+        /// should be marked as flagged in the newly popluated list.</param>
+        /// <param name="cancelToken">The <see cref="CancellationToken"/> that should be checked
+        /// after adding each file to the list to ensure the operation hasn't been canceled.</param>
+        void RunFileEnumeration(IEnumerable<string> fileEnumerable, string[] flaggedFileNames,
+            CancellationToken cancelToken)
+        {
+            try
+            {
+                foreach (var filePath in fileEnumerable)
                 {
                     // Abort if the user cancelled.
                     cancelToken.ThrowIfCancellationRequested();
@@ -2582,40 +2918,43 @@ namespace Extract.FileActionManager.Utilities
                     if (_fileSelectionCount < MaxFilesToDisplay)
                     {
                         // Retrieve the fields necessary for the results table.
-                        string fileName = (string)queryResults.Fields["FileName"].Value;
-                        var fileData = new FAMFileData(fileName);
+                        var fileData = new FAMFileData(filePath);
 
                         Bitmap flagValue =
-                            (flaggedFileNames != null && flaggedFileNames.Contains(fileName))
+                            (flaggedFileNames != null && flaggedFileNames.Contains(filePath))
                             ? Resources.FlagImage
                             : null;
 
-                        string directory = Path.GetDirectoryName(fileName);
-                        fileName = Path.GetFileName(fileName);
-                        int pageCount = (int)queryResults.Fields["Pages"].Value;
-
-                        // Invoke the new row to be added on the UI thread.
-                        this.SafeBeginInvoke("ELI35725", () =>
+                        string directory = Path.GetDirectoryName(filePath);
+                        string fileName = Path.GetFileName(filePath);
+                        
+                        // Obtain the page count for the file.
+                        int pageCount = 0;
+                        try
                         {
-                            _fileListDataGridView.Rows.Add(flagValue, fileName, pageCount, fileData,
-                                directory);
+                            using (var reader = Codecs.CreateReader(filePath))
+                            {
+                                pageCount = reader.PageCount;
+                            }
+                        }
+                        // If we fail to get the page count for a file, just ignore the exception.
+                        // This is not a critical error (the file may not even be an image).
+                        catch { }
+                        
+                        // Invoke the new row to be added on the UI thread.
+                        this.SafeBeginInvoke("ELI36789", () =>
+                        {
+                            _fileListDataGridView.Rows.Add(
+                                flagValue, fileName, pageCount, fileData, directory);
                         });
                     }
 
-                    queryResults.MoveNext();
                     _fileSelectionCount++;
                 }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35726");
-            }
-            finally
-            {
-                if (queryResults != null)
-                {
-                    queryResults.Close();
-                }
+                ex.ExtractDisplay("ELI36790");
             }
         }
 
@@ -3326,9 +3665,22 @@ namespace Extract.FileActionManager.Utilities
 
             if (fileData != null && File.Exists(fileData.FileName))
             {
-                // Open the image associated with fileData and highlight all search terms found int
-                // it.
-                OpenImage(fileData);
+                try
+                {
+                    // Open the image associated with fileData and highlight all search terms found int
+                    // it.
+                    OpenImage(fileData);
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI36791");
+
+                    // https://extract.atlassian.net/browse/ISSUE-12142
+                    // Just display text stating the image could not be opened rather than popping
+                    // up an exception.
+                    _overlayTextCanceler = OverlayText.ShowText(_imageViewer, "Failed to open image",
+                        Font, Color.FromArgb(100, Color.Red), null, 0);
+                }
             }
             else // either there no current row or no file available, close any open image.
             {
@@ -3422,10 +3774,31 @@ namespace Extract.FileActionManager.Utilities
 
                     try
                     {
+                        // Because the ImageViewer has code to open the image associated with uss
+                        // files, which can be confusing in context of the FFI.
+                        if (Path.GetExtension(fileData.FileName).Equals(
+                            ".uss", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _imageViewer.CloseImage();
+                            var ee = new ExtractException("ELI36792", "USS files cannot be opened as images.");
+                            ee.AddDebugData("Filename", fileData.FileName, false);
+                            throw ee;
+                        }
+
                         _imageViewer.OpenImage(fileData.FileName, false, false);
 
                         // Display highlights for all search terms found in the selected file.
                         ShowMatchHighlights(fileData);
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI36793");
+
+                        // https://extract.atlassian.net/browse/ISSUE-12142
+                        // Just display text stating the image could not be opened rather than popping
+                        // up an exception.
+                        _overlayTextCanceler = OverlayText.ShowText(_imageViewer, 
+                            "Failed to open image", Font, Color.FromArgb(100, Color.Red), null, 0);
                     }
                     finally
                     {
@@ -3567,11 +3940,25 @@ namespace Extract.FileActionManager.Utilities
         {
             ShowConnectionState();
 
-            string summaryText = FileSelector.GetSummaryString();
-            _selectFilesSummaryLabel.Text = "Listing ";
-            _selectFilesSummaryLabel.Text +=
-                summaryText.Substring(0, 1).ToLower(CultureInfo.CurrentCulture);
-            _selectFilesSummaryLabel.Text += summaryText.Substring(1);
+            if (FileProcessingDB != null)
+            {
+                string summaryText = FileSelector.GetSummaryString();
+                _selectFilesSummaryLabel.Text = "Listing ";
+                _selectFilesSummaryLabel.Text +=
+                    summaryText.Substring(0, 1).ToLower(CultureInfo.CurrentCulture);
+                _selectFilesSummaryLabel.Text += summaryText.Substring(1);
+            }
+            else if (!string.IsNullOrWhiteSpace(SourceDirectory))
+            {
+                _selectFilesSummaryLabel.Text =
+                    "Showing files in the directory: " + SourceDirectory;
+                _selectFilesSummaryLabel.Text += Recursive
+                    ? "\r\nFiles in subdirectories are included."
+                    : "\r\nFiles in subdirectories are not included.";
+                _selectFilesSummaryLabel.Text += string.IsNullOrWhiteSpace(FileFilter)
+                    ? "\r\nShowing all files regardless of type."
+                    : "\r\nShowing files of type: " + FileFilter;
+            }
         }
 
         /// <summary>
@@ -3580,16 +3967,20 @@ namespace Extract.FileActionManager.Utilities
         void ShowConnectionState()
         {
             Text = _APPLICATION_TITLE;
-            if (FileProcessingDB.IsConnected)
-            {
-                Text = DatabaseName + " on " + DatabaseServer + " - " + Text;
-                if (InAdminMode)
-                {
-                    Text += " (Admin mode)";
-                }
-            }
 
-            _adminModeToolStripMenuItem.Enabled = FileProcessingDB.IsConnected && !InAdminMode;
+            if (UseDatabaseMode)
+            {
+                if (FileProcessingDB.IsConnected)
+                {
+                    Text = DatabaseName + " on " + DatabaseServer + " - " + Text;
+                    if (InAdminMode)
+                    {
+                        Text += " (Admin mode)";
+                    }
+                }
+
+                _adminModeToolStripMenuItem.Enabled = FileProcessingDB.IsConnected && !InAdminMode;
+            }
         }
 
         #endregion Private Members

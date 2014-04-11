@@ -33,9 +33,21 @@ namespace Extract.FileActionManager.Utilities
             int _splitterDistance;
 
             /// <summary>
-            /// The distance of the search splitter from the top of the form in client pixels.
+            /// The distance of the main data pane splitter from the top of the form in client
+            /// pixels.
             /// </summary>
-            int _searchSplitterDistance;
+            int _dataSplitterDistance;
+
+            /// <summary>
+            /// The distance of the results pane splitter from the top of the results section in
+            /// client pixels.
+            /// </summary>
+            int _resultsSplitterDistance;
+
+            /// <summary>
+            /// Indicates whether the search pane is currently visible.
+            /// </summary>
+            bool _searchPaneVisible;
 
             #endregion Fields
 
@@ -83,7 +95,11 @@ namespace Extract.FileActionManager.Utilities
                 try
                 {
                     _splitterDistance = _fileInspector._splitContainer.SplitterDistance;
-                    _searchSplitterDistance = _fileInspector._searchSplitContainer.SplitterDistance;
+                    _dataSplitterDistance = _fileInspector._dataSplitContainer.SplitterDistance;
+                    _resultsSplitterDistance = _fileInspector._resultsSplitContainer.SplitterDistance;
+                    // If not licensed, treat as visible so that default behavior after being
+                    // licensed will be to display the search pane.
+                    _searchPaneVisible = !_fileInspector._searchIsLicensed || _fileInspector.SearchPaneVisible;
 
                     base.SaveState();
                 }
@@ -108,10 +124,17 @@ namespace Extract.FileActionManager.Utilities
                         _fileInspector._splitContainer.SplitterDistance = _splitterDistance;
                     }
 
-                    if (_searchSplitterDistance > 0)
+                    if (_dataSplitterDistance > 0)
                     {
-                        _fileInspector._searchSplitContainer.SplitterDistance = _searchSplitterDistance;
+                        _fileInspector._dataSplitContainer.SplitterDistance = _dataSplitterDistance;
                     }
+
+                    if (_resultsSplitterDistance > 0)
+                    {
+                        _fileInspector._resultsSplitContainer.SplitterDistance = _resultsSplitterDistance;
+                    }
+
+                    _fileInspector.SearchPaneVisible = _searchPaneVisible;
                 }
                 catch (Exception ex)
                 {
@@ -143,14 +166,26 @@ namespace Extract.FileActionManager.Utilities
                     splitter.SetAttribute("Distance",
                         _splitterDistance.ToString(CultureInfo.InvariantCulture));
 
-                    // Get the search splitter as XML
-                    XmlElement searchSplitter = document.CreateElement("SearchSplitter");
-                    searchSplitter.SetAttribute("Distance",
-                        _searchSplitterDistance.ToString(CultureInfo.InvariantCulture));
+                    // Get the data splitter as XML
+                    XmlElement dataSplitter = document.CreateElement("DataSplitter");
+                    dataSplitter.SetAttribute("Distance",
+                        _dataSplitterDistance.ToString(CultureInfo.InvariantCulture));
+
+                    // Get the results splitter as XML
+                    XmlElement resultsSplitter = document.CreateElement("ResultsSplitter");
+                    resultsSplitter.SetAttribute("Distance",
+                        _resultsSplitterDistance.ToString(CultureInfo.InvariantCulture));
+
+                    // Get the search pane as XML
+                    XmlElement search = document.CreateElement("Search");
+                    search.SetAttribute("Visible",
+                        _searchPaneVisible.ToString(CultureInfo.InvariantCulture));
 
                     // Append the XML together
                     dataWindow.AppendChild(splitter);
-                    dataWindow.AppendChild(searchSplitter);
+                    dataWindow.AppendChild(dataSplitter);
+                    dataWindow.AppendChild(resultsSplitter);
+                    dataWindow.AppendChild(search);
                     parentNode.AppendChild(dataWindow);
 
                     return parentNode;
@@ -188,11 +223,30 @@ namespace Extract.FileActionManager.Utilities
                                 _fileInspector._splitContainer.SplitterDistance);
                         }
 
-                        XPathNavigator searchSplitter = dataWindow.SelectSingleNode("SearchSplitter");
-                        if (searchSplitter != null)
+                        XPathNavigator dataSplitter = dataWindow.SelectSingleNode("DataSplitter");
+                        if (dataSplitter != null)
                         {
-                            _searchSplitterDistance = GetAttribute<int>(searchSplitter, "Distance",
-                                _fileInspector._searchSplitContainer.SplitterDistance);
+                            _dataSplitterDistance = GetAttribute<int>(dataSplitter, "Distance",
+                                _fileInspector._dataSplitContainer.SplitterDistance);
+                        }
+
+                        XPathNavigator resultsSplitter = dataWindow.SelectSingleNode("ResultsSplitter");
+                        if (resultsSplitter != null)
+                        {
+                            _resultsSplitterDistance = GetAttribute<int>(resultsSplitter, "Distance",
+                                _fileInspector._resultsSplitContainer.SplitterDistance);
+                        }
+
+                        XPathNavigator search = dataWindow.SelectSingleNode("Search");
+                        if (search != null)
+                        {
+                            _searchPaneVisible = GetAttribute<bool>(search, "Visible",
+                                _fileInspector.SearchPaneVisible);
+                        }
+                        else
+                        {
+                            _searchPaneVisible = true;
+                            _fileInspector.SearchPaneVisible = true;
                         }
                     }
 

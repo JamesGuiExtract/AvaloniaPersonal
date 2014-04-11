@@ -152,6 +152,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             this.dockContainer1 = new TD.SandDock.DockContainer();
+            this._oneToOneZoomToolStripButton = new Extract.Imaging.Forms.OneToOneZoomToolStripButton();
+            this._oneToOneZoomToolStripMenuItem = new Extract.Imaging.Forms.OneToOneZoomToolStripMenuItem();
             toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
             this._toolStripContainer.ContentPanel.SuspendLayout();
@@ -163,7 +165,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._basicTools.SuspendLayout();
             this._viewCommands.SuspendLayout();
             this._navigationTools.SuspendLayout();
-            this._thumbnailDockableWindow.SuspendLayout();
+            this._thumbnailDockableWindow.SuspendLayout(); 
             this.dockContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -184,7 +186,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // 
             this._toolStripContainer.ContentPanel.ContextMenuStrip = this._contextMenu;
             this._toolStripContainer.ContentPanel.Controls.Add(this._imageViewer);
-            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(566, 440);
+            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(566, 401);
             this._toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._toolStripContainer.LeftToolStripPanelVisible = false;
             this._toolStripContainer.Location = new System.Drawing.Point(0, 0);
@@ -456,6 +458,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.toolStripSeparator7,
             this._fitToWidthToolStripMenuItem,
             this._fitToPageToolStripMenuItem,
+            this._oneToOneZoomToolStripMenuItem,
             this.toolStripSeparator4,
             this._rotateCounterclockwiseToolStripMenuItem,
             this._rotateClockwiseToolStripMenuItem,
@@ -753,6 +756,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._thumbnailsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._thumbnailsToolStripButton.Name = "_thumbnailsToolStripButton";
             this._thumbnailsToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._thumbnailsToolStripButton.Text = "Show/Hide thumbnails";
             // 
             // _viewCommands
             // 
@@ -766,6 +770,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.toolStripSeparator8,
             this._fitToPageToolStripButton,
             this._fitToWidthToolStripButton,
+            this._oneToOneZoomToolStripButton,
             this.toolStripSeparator9,
             this._previousTileToolStripButton,
             this._nextTileToolStripButton,
@@ -774,7 +779,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._rotateClockwiseToolStripButton});
             this._viewCommands.Location = new System.Drawing.Point(3, 63);
             this._viewCommands.Name = "_viewCommands";
-            this._viewCommands.Size = new System.Drawing.Size(390, 39);
+            this._viewCommands.Size = new System.Drawing.Size(426, 39);
             this._viewCommands.TabIndex = 8;
             // 
             // _zoomInToolStripButton
@@ -973,6 +978,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // 
             this._imageViewerStatusStrip.Location = new System.Drawing.Point(0, 542);
             this._imageViewerStatusStrip.Name = "_imageViewerStatusStrip";
+            this._imageViewerStatusStrip.ShowBackgroundProcessStatus = false;
             this._imageViewerStatusStrip.Size = new System.Drawing.Size(792, 24);
             this._imageViewerStatusStrip.TabIndex = 2;
             this._imageViewerStatusStrip.Text = "_imageViewerStatusStrip";
@@ -1018,6 +1024,25 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.dockContainer1.Name = "dockContainer1";
             this.dockContainer1.Size = new System.Drawing.Size(226, 542);
             this.dockContainer1.TabIndex = 3;
+            // 
+            // _oneToOneZoomToolStripButton
+            // 
+            this._oneToOneZoomToolStripButton.BaseToolTipText = "One-to-one zoom";
+            this._oneToOneZoomToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._oneToOneZoomToolStripButton.Enabled = false;
+            this._oneToOneZoomToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._oneToOneZoomToolStripButton.ImageViewer = null;
+            this._oneToOneZoomToolStripButton.Name = "_oneToOneZoomToolStripButton";
+            this._oneToOneZoomToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._oneToOneZoomToolStripButton.Text = "One-to-one zoom";
+            // 
+            // _oneToOneZoomToolStripMenuItem
+            // 
+            this._oneToOneZoomToolStripMenuItem.Enabled = false;
+            this._oneToOneZoomToolStripMenuItem.ImageViewer = null;
+            this._oneToOneZoomToolStripMenuItem.Name = "_oneToOneZoomToolStripMenuItem";
+            this._oneToOneZoomToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+            this._oneToOneZoomToolStripMenuItem.Text = "&One-to-one zoom";
             // 
             // ExtractImageViewerForm
             // 
@@ -1137,6 +1162,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         private Forms.ZoomNextToolStripMenuItem _zoomNextContextMenuItem;
         private Forms.AngularHighlightToolStripMenuItem _angularHighlightContextMenuItem;
         private Forms.RectangularHighlightToolStripMenuItem _rectangularHighlightContextMenuItem;
+        private Forms.OneToOneZoomToolStripButton _oneToOneZoomToolStripButton;
+        private Forms.OneToOneZoomToolStripMenuItem _oneToOneZoomToolStripMenuItem;
     }
 }
 

@@ -1920,6 +1920,51 @@ namespace Extract.Imaging.Forms
                 }
 
                 // [DataEntry:837]
+                // The scoll position must be adjusted by the factor of change in the ScaleFactor. 
+                double factorOfScaleChange = ScaleFactor / initialScaleFactor;
+                scrollPosition = (int)(scrollPosition * factorOfScaleChange);
+                ScrollPosition = new Point(0, scrollPosition);
+            }
+            finally
+            {
+                _updatingFitMode = false;
+            }
+        }
+
+        /// <summary>
+        /// Scales image so each pixel in the image is displayed in a single corresponding physical
+        /// pixel on the monitor.
+        /// </summary>
+        void ShowOneToOneZoom()
+        {
+            // Calls that adjust the fit mode can cause some recursion that is not infinite, but
+            // that is unnecessary.
+            if (_updatingFitMode)
+            {
+                return;
+            }
+
+            try
+            {
+                _updatingFitMode = true;
+
+                // Set the fit mode, preserving the scroll position
+                int scrollPosition = ScrollPosition.Y;
+                double initialScaleFactor = ScaleFactor;
+
+                base.SizeMode = RasterPaintSizeMode.Normal;
+                ScaleFactor = 1.0;
+
+                // [DataEntry:837]
+                // If a zero-size rectangle has been specified (as is the case with a minimized
+                // window), zooming is not possible and would throw an exception if attempted.
+                if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
+                {
+                    // Zoom the specified rectangle
+                    base.ZoomToRectangle(DisplayRectangle);
+                }
+
+                // [DataEntry:837]
                 // The scoll position must be ajusted by the factor of change in the ScaleFactor. 
                 double factorOfScaleChange = ScaleFactor / initialScaleFactor;
                 scrollPosition = (int)(scrollPosition * factorOfScaleChange);
@@ -1943,6 +1988,7 @@ namespace Extract.Imaging.Forms
             {
                 case FitMode.FitToPage:     ShowFitToPage(); break;
                 case FitMode.FitToWidth:    ShowFitToWidth(); break;
+                case FitMode.OneToOneZoom:  ShowOneToOneZoom(); break;
             }
         }
 

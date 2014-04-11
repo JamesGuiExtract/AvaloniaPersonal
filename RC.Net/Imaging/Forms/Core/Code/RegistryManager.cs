@@ -121,6 +121,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         const string _NO_FIT_VALUE = "2";
 
+        /// <summary>
+        /// Value to store in the registry for one-to-one fit mode.
+        /// </summary>
+        const string _ONE_TO_ONE_ZOOM_VALUE = "3";
+
         #endregion RegistryManager Values
 
         #endregion RegistryManager Constants
@@ -216,6 +221,10 @@ namespace Extract.Imaging.Forms
                 {
                     return FitMode.FitToWidth;
                 }
+                else if (registryValue == _ONE_TO_ONE_ZOOM_VALUE)
+                {
+                    return FitMode.OneToOneZoom;
+                }
                 else
                 {
                     return FitMode.None;
@@ -236,6 +245,9 @@ namespace Extract.Imaging.Forms
                             break;
                         case FitMode.FitToWidth:
                             registryValue = _FIT_TO_WIDTH_VALUE;
+                            break;
+                        case FitMode.OneToOneZoom:
+                            registryValue = _ONE_TO_ONE_ZOOM_VALUE;
                             break;
                         default:
                             throw new ExtractException("ELI23224", "Unexpected fit mode.");

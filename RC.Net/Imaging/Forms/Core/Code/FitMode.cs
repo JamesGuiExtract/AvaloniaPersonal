@@ -20,6 +20,12 @@ namespace Extract.Imaging.Forms
         /// Image is scaled so the width of the image fills the visible area and the original 
         /// proportions of the image are maintained.
         /// </summary>
-        FitToWidth
+        FitToWidth,
+
+        /// <summary>
+        /// Image is scaled so each pixel in the image is displayed in a single corresponding
+        /// physical pixel on the monitor.
+        /// </summary>
+        OneToOneZoom
     }
 }

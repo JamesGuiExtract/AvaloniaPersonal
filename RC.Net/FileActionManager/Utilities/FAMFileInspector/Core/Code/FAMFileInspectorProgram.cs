@@ -35,6 +35,23 @@ namespace Extract.FileActionManager.Utilities
         static string _databaseName;
 
         /// <summary>
+        /// The directory being inspected by this instance (rather than a database).
+        /// </summary>
+        static string _directory;
+
+        /// <summary>
+        /// A semicolon delimited list of file extensions that should be displayed when
+        /// inspecting the contents of <see cref="P:SourceDirectory"/> rather than
+        /// <see cref="FileProcessingDB"/>.
+        /// </summary>
+        static string _fileFilter;
+
+        /// <summary>
+        /// Indicates if files in subdirectories of <see cref="_directory"/> should be included.
+        /// </summary>
+        static bool _recursive;
+
+        /// <summary>
         /// The name of the action when limiting the initial file selection based on a file action
         /// status condition.
         /// </summary>
@@ -98,6 +115,18 @@ namespace Extract.FileActionManager.Utilities
                     famFileInspectorForm.DatabaseServer = _databaseServer;
                     famFileInspectorForm.DatabaseName = _databaseName;
                 }
+                else if (!string.IsNullOrWhiteSpace(_directory))
+                {
+                    famFileInspectorForm.SourceDirectory = _directory;
+                    famFileInspectorForm.Recursive = _recursive;
+
+                    // Check that _fileFilter is not null which is a separate case from being empty
+                    // since it indicates the command line option was used.
+                    if (_fileFilter != null)
+                    {
+                        famFileInspectorForm.FileFilter = _fileFilter;
+                    }
+                }
 
                 if (_fileCount.HasValue)
                 {
@@ -108,6 +137,12 @@ namespace Extract.FileActionManager.Utilities
                     famFileInspectorForm.SubsetType = _subsetType.Value;
                 }
 
+                if (!string.IsNullOrWhiteSpace(famFileInspectorForm.SourceDirectory))
+                {
+                    Application.Run(famFileInspectorForm);
+                    return;
+                }
+
                 bool loggedIn = false;
                 while (!loggedIn)
                 {
@@ -115,8 +150,7 @@ namespace Extract.FileActionManager.Utilities
                     {
                         // Don't show the database selection prompt if one has been specified.
                         if (!string.IsNullOrWhiteSpace(famFileInspectorForm.DatabaseName) ||
-                            famFileInspectorForm.FileProcessingDB.ShowSelectDB(
-                                        "Select database", false, false))
+                            famFileInspectorForm.ShowSelectDB(false))
                         {
                             // Checks schema
                             famFileInspectorForm.FileProcessingDB.ResetDBConnection(true);
@@ -306,11 +340,22 @@ namespace Extract.FileActionManager.Utilities
                         ShowUsage("Unable to parse file count: \"" + args[i] + "\"");
                     }
                 }
-                else if (!_fileCount.HasValue && i == 0)
+                else if (argument.Equals("/directory", StringComparison.OrdinalIgnoreCase))
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        ShowUsage("Directory expected.");
+                        return false;
+                    }
+
+                    _directory = args[i];
+                }
+                else if (i == 0)
                 {
                     _databaseServer = argument;
                 }
-                else if (!_fileCount.HasValue && i == 1)
+                else if (!string.IsNullOrWhiteSpace(_databaseServer) && i == 1)
                 {
                     _databaseName = argument;
                 }
@@ -391,6 +436,21 @@ namespace Extract.FileActionManager.Utilities
                         _actionStatus = "F";
                     }
                 }
+                else if (argument.Equals("/filefilter", StringComparison.OrdinalIgnoreCase))
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        ShowUsage("File filter list expected.");
+                        return false;
+                    }
+
+                    _fileFilter = args[i];
+                }
+                else if (argument.Equals("/r", StringComparison.OrdinalIgnoreCase))
+                {
+                    _recursive = true;
+                }
                 else
                 {
                     ShowUsage("Unrecognized command-line argument: \"" + argument + "\"");
@@ -398,17 +458,41 @@ namespace Extract.FileActionManager.Utilities
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(_databaseServer) != string.IsNullOrWhiteSpace(_databaseName))
+            if (!string.IsNullOrWhiteSpace(_directory))
             {
-                ShowUsage("A database server cannot be specified without a database name.");
-                return false;
+                if (!string.IsNullOrWhiteSpace(_databaseServer) || !string.IsNullOrWhiteSpace(_databaseName))
+                {
+                    ShowUsage("A directory can be specified only in the absence of a database.");
+                }
             }
-
-            if (string.IsNullOrWhiteSpace(_actionName) != string.IsNullOrWhiteSpace(_actionStatus))
+            else
             {
-                ShowUsage("The action and status command-line arguments must be used together " +
-                    " and cannot be specified without a database server and name.");
-                return false;
+                if (string.IsNullOrWhiteSpace(_databaseServer) != string.IsNullOrWhiteSpace(_databaseName))
+                {
+                    ShowUsage("A database server cannot be specified without a database name.");
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(_actionName) != string.IsNullOrWhiteSpace(_actionStatus))
+                {
+                    ShowUsage("The action and status command-line arguments must be used together " +
+                        " and cannot be specified without a database server and name.");
+                    return false;
+                }
+
+                if (_recursive)
+                {
+                    ShowUsage("The /r (recursive) paramater cannot be used without the /directory parameter");
+                    return false;
+                }
+
+                // Check that _fileFilter is not null which is a separate case from being empty
+                // since it indicates the command line option was used.
+                if (_fileFilter != null)
+                {
+                    ShowUsage("The /filefilter paramater cannot be used without the /directory parameter");
+                    return false;
+                }
             }
 
             return true;
@@ -437,8 +521,9 @@ namespace Extract.FileActionManager.Utilities
             }
 
             usage.Append(Environment.GetCommandLineArgs()[0]);
-            usage.AppendLine(" /? | [/filecount <count>] | <ServerName> <DatabaseName> " +
-                "[/action <actionName> /status <statusName>] [/query <queryFileName>] " +
+            usage.AppendLine(" /? | [<ServerName> <DatabaseName> [/action <actionName> " +
+                "/status <statusName>] [/query <queryFileName>] | /directory <directory> " +
+                "[/filefilter <filefilter>] [/r]] " +
                 "[/filecount [top|bottom|random] <count>]");
             usage.AppendLine();
             usage.AppendLine("ServerName: The name of the database server to connect to.");
@@ -455,6 +540,14 @@ namespace Extract.FileActionManager.Utilities
             usage.AppendLine();
             usage.AppendLine("/query <queryFileName>: An file containing an SQL query to be " +
                 "used to limit the initial file selection.");
+            usage.AppendLine();
+            usage.AppendLine("/directory <directory>: A directory to inspect (rather than a database).");
+            usage.AppendLine();
+            usage.AppendLine("/filefilter <filefilter>: A semicolon// delimited specification of file " +
+                "filters that should limit the files to be inspected within the specified directory.");
+            usage.AppendLine();
+            usage.AppendLine("/r: Specifies that files in subdirectories to the specified directory " +
+                "should be included.");
             usage.AppendLine();
             usage.AppendLine("/filecount [top|bottom|random] <count>: Specifies number of files that may be " +
                 "displayed in the file list at once and, optionally, how the subset should be selected from " +

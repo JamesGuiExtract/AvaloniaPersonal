@@ -87,6 +87,7 @@ namespace Extract.FileActionManager.Utilities
                                 // affecting an outside caller still using it (DBAdmin), duplicate
                                 // the connection settings rather that using the passed in
                                 // FileProcessingDB directly.
+                                _fileInspectorForm.UseDatabaseMode = true;
                                 _fileInspectorForm.FileProcessingDB.DuplicateConnection(fileProcessingDB);
                                 _fileInspectorForm.InitializeContextMenu();
 
@@ -135,6 +136,7 @@ namespace Extract.FileActionManager.Utilities
                         {
                             // A new form is needed.
                             _fileInspectorForm = new FAMFileInspectorForm();
+                            _fileInspectorForm.UseDatabaseMode = true;
 
                             // Because the FileProcessingDB may be re-configured to connect to
                             // a new DB from within this app and because we don't want that

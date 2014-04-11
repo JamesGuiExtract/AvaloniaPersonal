@@ -143,6 +143,12 @@
     <Compile Include="BrowseButton.Designer.cs">
       <DependentUpon>BrowseButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="BetterSplitContainer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BetterSplitContainer.Designer.cs">
+      <DependentUpon>BetterSplitContainer.cs</DependentUpon>
+    </Compile>
     <Compile Include="FileBrowser.cs" />
     <Compile Include="InfoTip.cs">
       <SubType>UserControl</SubType>

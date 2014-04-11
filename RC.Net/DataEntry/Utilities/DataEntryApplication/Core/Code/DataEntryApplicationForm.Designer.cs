@@ -22,6 +22,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._documentTypeLabel = new System.Windows.Forms.Label();
             this._documentTypeComboBox = new System.Windows.Forms.ComboBox();
             this._scrollPanel = new Extract.DataEntry.Utilities.DataEntryApplication.DataEntryScrollPanel();
+            this._dockContainer = new TD.SandDock.DockContainer();
+            this._magnifierDockableWindow = new TD.SandDock.DockableWindow();
+            this._magnifierControl = new Extract.Imaging.Forms.MagnifierControl();
+            this._sandDockManager = new TD.SandDock.SandDockManager();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
@@ -33,6 +37,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._fitToPageToolStripMenuItem = new Extract.Imaging.Forms.FitToPageToolStripMenuItem();
             this._fitToWidthToolStripMenuItem = new Extract.Imaging.Forms.FitToWidthToolStripMenuItem();
+            this._oneToOneZoomToolStripMenuItem = new Extract.Imaging.Forms.OneToOneZoomToolStripMenuItem();
             this._toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this._zoomInToolStripMenuItem = new Extract.Imaging.Forms.ZoomInToolStripMenuItem();
             this._zoomOutToolStripMenuItem = new Extract.Imaging.Forms.ZoomOutToolStripMenuItem();
@@ -104,15 +109,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._backgroundProgressStatusLabel = new Extract.Imaging.Forms.BackgroundProcessStatusLabel();
             this._resolutionToolStripStatusLabel = new Extract.Imaging.Forms.ResolutionToolStripStatusLabel();
             this._mousePositionToolStripStatusLabel = new Extract.Imaging.Forms.MousePositionToolStripStatusLabel();
-            this._sandDockManager = new TD.SandDock.SandDockManager();
-            this._magnifierDockableWindow = new TD.SandDock.DockableWindow();
-            this._dockContainer = new TD.SandDock.DockContainer();
-            this._magnifierControl = new Extract.Imaging.Forms.MagnifierControl();
             ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).BeginInit();
             this._splitContainer.Panel1.SuspendLayout();
             this._splitContainer.Panel2.SuspendLayout();
             this._splitContainer.SuspendLayout();
             this._documentTypePanel.SuspendLayout();
+            this._dockContainer.SuspendLayout();
+            this._magnifierDockableWindow.SuspendLayout();
             this._toolStripContainer.TopToolStripPanel.SuspendLayout();
             this._toolStripContainer.SuspendLayout();
             this._menuStrip.SuspendLayout();
@@ -122,50 +125,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._basicCommandsImageViewerToolStrip.SuspendLayout();
             this._pageNavigationImageViewerToolStrip.SuspendLayout();
             this._statusStrip.SuspendLayout();
-            this._magnifierDockableWindow.SuspendLayout();
-            this._dockContainer.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // _sandDockManager
-            // 
-            this._sandDockManager.DockSystemContainer = this;
-            this._sandDockManager.OwnerForm = this;
-            // 
-            // _magnifierControl
-            // 
-            this._magnifierControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._magnifierControl.ImageViewer = null;
-            this._magnifierControl.Location = new System.Drawing.Point(0, 0);
-            this._magnifierControl.Name = "_magnifierControl";
-            this._magnifierControl.Size = new System.Drawing.Size(1097, 182);
-            this._magnifierControl.TabIndex = 1;
-            // 
-            // _magnifierDockableWindow
-            // 
-            this._magnifierDockableWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this._magnifierDockableWindow.Collapsed = true;
-            this._magnifierDockableWindow.Controls.Add(this._magnifierControl);
-            this._magnifierDockableWindow.DockingRules.AllowTab = false;
-            this._magnifierDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
-            this._magnifierDockableWindow.Guid = new System.Guid("25fa87c7-8272-45c9-9ec8-f2f81c20e9eb");
-            this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 18);
-            this._magnifierDockableWindow.Name = "_magnifierDockableWindow";
-            this._magnifierDockableWindow.Size = new System.Drawing.Size(1097, 182);
-            this._magnifierDockableWindow.TabIndex = 0;
-            this._magnifierDockableWindow.Text = "Magnifier";
-            // 
-            // _dockContainer
-            // 
-            this._dockContainer.ContentSize = 200;
-            this._dockContainer.Controls.Add(this._magnifierDockableWindow);
-            this._dockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
-            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
-                        ((TD.SandDock.DockControl)(this._magnifierDockableWindow))}, this._magnifierDockableWindow)))});
-            this._dockContainer.Location = new System.Drawing.Point(0, 66);
-            this._dockContainer.Manager = this._sandDockManager;
-            this._dockContainer.Name = "_dockContainer";
-            this._dockContainer.Size = new System.Drawing.Size(1097, 204);
-            this._dockContainer.TabIndex = 1;
             // 
             // _splitContainer
             // 
@@ -237,13 +197,53 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._scrollPanel.Size = new System.Drawing.Size(181, 457);
             this._scrollPanel.TabIndex = 0;
             // 
+            // _dockContainer
+            // 
+            this._dockContainer.ContentSize = 200;
+            this._dockContainer.Controls.Add(this._magnifierDockableWindow);
+            this._dockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._magnifierDockableWindow))}, this._magnifierDockableWindow)))});
+            this._dockContainer.Location = new System.Drawing.Point(0, 66);
+            this._dockContainer.Manager = this._sandDockManager;
+            this._dockContainer.Name = "_dockContainer";
+            this._dockContainer.Size = new System.Drawing.Size(1097, 204);
+            this._dockContainer.TabIndex = 1;
+            // 
+            // _magnifierDockableWindow
+            // 
+            this._magnifierDockableWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this._magnifierDockableWindow.Collapsed = true;
+            this._magnifierDockableWindow.Controls.Add(this._magnifierControl);
+            this._magnifierDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
+            this._magnifierDockableWindow.Guid = new System.Guid("25fa87c7-8272-45c9-9ec8-f2f81c20e9eb");
+            this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 18);
+            this._magnifierDockableWindow.Name = "_magnifierDockableWindow";
+            this._magnifierDockableWindow.Size = new System.Drawing.Size(1097, 162);
+            this._magnifierDockableWindow.TabIndex = 0;
+            this._magnifierDockableWindow.Text = "Magnifier";
+            // 
+            // _magnifierControl
+            // 
+            this._magnifierControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._magnifierControl.ImageViewer = null;
+            this._magnifierControl.Location = new System.Drawing.Point(0, 0);
+            this._magnifierControl.Name = "_magnifierControl";
+            this._magnifierControl.Size = new System.Drawing.Size(1097, 162);
+            this._magnifierControl.TabIndex = 1;
+            // 
+            // _sandDockManager
+            // 
+            this._sandDockManager.DockSystemContainer = this._splitContainer.Panel2;
+            this._sandDockManager.OwnerForm = this;
+            // 
             // _imageViewer
             // 
             this._imageViewer.AutoOcr = false;
             this._imageViewer.AutoZoomScale = 0;
             this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
-            this._imageViewer.MinimumAngularHighlightHeight = 1;
+            this._imageViewer.MinimumAngularHighlightHeight = 4;
             this._imageViewer.Name = "_imageViewer";
             this._imageViewer.OcrTradeoff = Extract.Imaging.OcrTradeoff.Accurate;
             this._imageViewer.RedactionMode = false;
@@ -346,6 +346,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._fitToPageToolStripMenuItem,
             this._fitToWidthToolStripMenuItem,
+            this._oneToOneZoomToolStripMenuItem,
             this._toolStripSeparator3,
             this._zoomInToolStripMenuItem,
             this._zoomOutToolStripMenuItem,
@@ -363,7 +364,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._fitToPageToolStripMenuItem.ImageViewer = null;
             this._fitToPageToolStripMenuItem.Name = "_fitToPageToolStripMenuItem";
             this._fitToPageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._fitToPageToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this._fitToPageToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this._fitToPageToolStripMenuItem.Text = "Fit to &page";
             // 
             // _fitToWidthToolStripMenuItem
@@ -373,13 +374,22 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._fitToWidthToolStripMenuItem.ImageViewer = null;
             this._fitToWidthToolStripMenuItem.Name = "_fitToWidthToolStripMenuItem";
             this._fitToWidthToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._fitToWidthToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this._fitToWidthToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this._fitToWidthToolStripMenuItem.Text = "Fit to &width";
+            // 
+            // _oneToOneZoomToolStripMenuItem
+            // 
+            this._oneToOneZoomToolStripMenuItem.Enabled = false;
+            this._oneToOneZoomToolStripMenuItem.ImageViewer = null;
+            this._oneToOneZoomToolStripMenuItem.Name = "_oneToOneZoomToolStripMenuItem";
+            this._oneToOneZoomToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._oneToOneZoomToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this._oneToOneZoomToolStripMenuItem.Text = "&One-to-one zoom";
             // 
             // _toolStripSeparator3
             // 
             this._toolStripSeparator3.Name = "_toolStripSeparator3";
-            this._toolStripSeparator3.Size = new System.Drawing.Size(151, 6);
+            this._toolStripSeparator3.Size = new System.Drawing.Size(167, 6);
             // 
             // _zoomInToolStripMenuItem
             // 
@@ -388,7 +398,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomInToolStripMenuItem.ImageViewer = null;
             this._zoomInToolStripMenuItem.Name = "_zoomInToolStripMenuItem";
             this._zoomInToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._zoomInToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this._zoomInToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this._zoomInToolStripMenuItem.Text = "Zoom in";
             // 
             // _zoomOutToolStripMenuItem
@@ -398,13 +408,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomOutToolStripMenuItem.ImageViewer = null;
             this._zoomOutToolStripMenuItem.Name = "_zoomOutToolStripMenuItem";
             this._zoomOutToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._zoomOutToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this._zoomOutToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this._zoomOutToolStripMenuItem.Text = "Zoom out";
             // 
             // _toolStripSeparator4
             // 
             this._toolStripSeparator4.Name = "_toolStripSeparator4";
-            this._toolStripSeparator4.Size = new System.Drawing.Size(151, 6);
+            this._toolStripSeparator4.Size = new System.Drawing.Size(167, 6);
             // 
             // _zoomPreviousToolStripMenuItem
             // 
@@ -413,7 +423,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomPreviousToolStripMenuItem.ImageViewer = null;
             this._zoomPreviousToolStripMenuItem.Name = "_zoomPreviousToolStripMenuItem";
             this._zoomPreviousToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._zoomPreviousToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this._zoomPreviousToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this._zoomPreviousToolStripMenuItem.Text = "Zoom previous";
             // 
             // _zoomNextToolStripMenuItem
@@ -423,7 +433,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomNextToolStripMenuItem.ImageViewer = null;
             this._zoomNextToolStripMenuItem.Name = "_zoomNextToolStripMenuItem";
             this._zoomNextToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._zoomNextToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this._zoomNextToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this._zoomNextToolStripMenuItem.Text = "Zoom next";
             // 
             // _rotateToolStripMenuItem
@@ -766,7 +776,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._redoToolStripButton,
             this._nextInvalidToolStripButton,
             this._nextUnviewedToolStripButton});
-            this._dataEntryOperationsToolStrip.Location = new System.Drawing.Point(162, 24);
+            this._dataEntryOperationsToolStrip.Location = new System.Drawing.Point(3, 63);
             this._dataEntryOperationsToolStrip.Name = "_dataEntryOperationsToolStrip";
             this._dataEntryOperationsToolStrip.Size = new System.Drawing.Size(147, 39);
             this._dataEntryOperationsToolStrip.TabIndex = 1;
@@ -823,7 +833,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._miscImageToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._toggleShowAllHighlightsButton,
             this._magnifierToolStripButton});
-            this._miscImageToolStrip.Location = new System.Drawing.Point(309, 24);
+            this._miscImageToolStrip.Location = new System.Drawing.Point(75, 102);
             this._miscImageToolStrip.Name = "_miscImageToolStrip";
             this._miscImageToolStrip.Size = new System.Drawing.Size(75, 39);
             this._miscImageToolStrip.TabIndex = 2;
@@ -861,7 +871,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._angularHighlightToolStripButton,
             this._rectangularHighlightToolStripButton,
             this._wordHighlightToolStripButton});
-            this._basicCommandsImageViewerToolStrip.Location = new System.Drawing.Point(384, 24);
+            this._basicCommandsImageViewerToolStrip.Location = new System.Drawing.Point(3, 141);
             this._basicCommandsImageViewerToolStrip.Name = "_basicCommandsImageViewerToolStrip";
             this._basicCommandsImageViewerToolStrip.Size = new System.Drawing.Size(219, 39);
             this._basicCommandsImageViewerToolStrip.TabIndex = 0;
@@ -937,7 +947,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._pageNavigationToolStripTextBox,
             this._nextPageToolStripButton,
             this._lastPageToolStripButton});
-            this._pageNavigationImageViewerToolStrip.Location = new System.Drawing.Point(603, 24);
+            this._pageNavigationImageViewerToolStrip.Location = new System.Drawing.Point(3, 180);
             this._pageNavigationImageViewerToolStrip.Name = "_pageNavigationImageViewerToolStrip";
             this._pageNavigationImageViewerToolStrip.Size = new System.Drawing.Size(224, 39);
             this._pageNavigationImageViewerToolStrip.TabIndex = 0;
@@ -999,9 +1009,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
             this._viewCommandsImageViewerToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(827, 24);
+            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(3, 219);
             this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
-            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(270, 39);
+            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(339, 39);
             this._viewCommandsImageViewerToolStrip.TabIndex = 0;
             // 
             // _statusStrip
@@ -1023,7 +1033,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._userActionToolStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this._userActionToolStripStatusLabel.ImageViewer = null;
             this._userActionToolStripStatusLabel.Name = "_userActionToolStripStatusLabel";
-            this._userActionToolStripStatusLabel.Size = new System.Drawing.Size(670, 19);
+            this._userActionToolStripStatusLabel.Size = new System.Drawing.Size(765, 19);
             this._userActionToolStripStatusLabel.Spring = true;
             this._userActionToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -1033,7 +1043,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._backgroundProgressStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this._backgroundProgressStatusLabel.ImageViewer = null;
             this._backgroundProgressStatusLabel.Name = "_backgroundProgressStatusLabel";
-            this._backgroundProgressStatusLabel.Size = new System.Drawing.Size(5, 17);
+            this._backgroundProgressStatusLabel.Size = new System.Drawing.Size(117, 19);
+            this._backgroundProgressStatusLabel.Text = "(Background status)";
             this._backgroundProgressStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _resolutionToolStripStatusLabel
@@ -1043,7 +1054,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._resolutionToolStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this._resolutionToolStripStatusLabel.ImageViewer = null;
             this._resolutionToolStripStatusLabel.Name = "_resolutionToolStripStatusLabel";
-            this._resolutionToolStripStatusLabel.Size = new System.Drawing.Size(120, 19);
+            this._resolutionToolStripStatusLabel.Size = new System.Drawing.Size(60, 19);
             this._resolutionToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _mousePositionToolStripStatusLabel
@@ -1053,7 +1064,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._mousePositionToolStripStatusLabel.DisplayOption = Extract.Imaging.Forms.MousePositionDisplayOption.Registry;
             this._mousePositionToolStripStatusLabel.ImageViewer = null;
             this._mousePositionToolStripStatusLabel.Name = "_mousePositionToolStripStatusLabel";
-            this._mousePositionToolStripStatusLabel.Size = new System.Drawing.Size(175, 19);
+            this._mousePositionToolStripStatusLabel.Size = new System.Drawing.Size(90, 19);
             this._mousePositionToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // DataEntryApplicationForm
@@ -1061,7 +1072,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1097, 591);
-            //this.Controls.Add(this._dockContainer);
             this.Controls.Add(this._toolStripContainer);
             this.Controls.Add(this._statusStrip);
             this.Controls.Add(this._splitContainer);
@@ -1074,6 +1084,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._splitContainer.ResumeLayout(false);
             this._documentTypePanel.ResumeLayout(false);
             this._documentTypePanel.PerformLayout();
+            this._dockContainer.ResumeLayout(false);
+            this._magnifierDockableWindow.ResumeLayout(false);
             this._toolStripContainer.TopToolStripPanel.ResumeLayout(false);
             this._toolStripContainer.TopToolStripPanel.PerformLayout();
             this._toolStripContainer.ResumeLayout(false);
@@ -1092,8 +1104,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._pageNavigationImageViewerToolStrip.PerformLayout();
             this._statusStrip.ResumeLayout(false);
             this._statusStrip.PerformLayout();
-            this._magnifierDockableWindow.ResumeLayout(false);
-            this._dockContainer.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1192,6 +1202,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private TD.SandDock.DockableWindow _magnifierDockableWindow;
         private TD.SandDock.DockContainer _dockContainer;
         private Imaging.Forms.MagnifierControl _magnifierControl;
+        private Imaging.Forms.OneToOneZoomToolStripMenuItem _oneToOneZoomToolStripMenuItem;
     }
 }
 

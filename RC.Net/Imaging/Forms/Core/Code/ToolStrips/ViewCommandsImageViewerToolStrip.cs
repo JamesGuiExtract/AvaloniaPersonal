@@ -48,6 +48,7 @@ namespace Extract.Imaging.Forms
                 new ToolStripSeparator(),
                 new FitToPageToolStripButton(),
                 new FitToWidthToolStripButton(),
+                new OneToOneZoomToolStripButton(),
                 new ToolStripSeparator(),
                 new RotateCounterclockwiseToolStripButton(),
                 new RotateClockwiseToolStripButton()};

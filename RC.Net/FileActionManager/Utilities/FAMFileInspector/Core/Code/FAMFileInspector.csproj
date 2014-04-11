@@ -76,6 +76,12 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="DirectorySelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DirectorySelectionForm.Designer.cs">
+      <DependentUpon>DirectorySelectionForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="FAMFileData.cs" />
     <Compile Include="FAMFileInspector.FormStateManager.cs">
       <SubType>Form</SubType>
@@ -92,6 +98,9 @@
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DirectorySelectionForm.resx">
+      <DependentUpon>DirectorySelectionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FAMFileInspectorForm.resx">
       <DependentUpon>FAMFileInspectorForm.cs</DependentUpon>
@@ -126,6 +135,10 @@
     <ProjectReference Include="..\..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
       <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
       <Name>Extract.Imaging.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
+      <Name>Extract.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
@@ -227,15 +240,15 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
       <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
-      <Name>Extract</Name>
+      <Name>Extract.Drawing</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
       <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
-      <Name>Extract</Name>
+      <Name>Extract.Imaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
       <Project>{E610E652-0891-40D4-B5CA-A622B87C7979}</Project>
-      <Name>Extract</Name>
+      <Name>Extract.Imaging.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
@@ -251,10 +264,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\FAMFileInspector.ico" />
+    <EmbeddedResource Include="Resources\FAMFileInspector.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\preview_128_hot.png" />
+    <EmbeddedResource Include="Resources\preview_128_hot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Expand.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

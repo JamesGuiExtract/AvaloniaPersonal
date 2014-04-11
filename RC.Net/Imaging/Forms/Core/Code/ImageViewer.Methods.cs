@@ -4206,6 +4206,11 @@ namespace Extract.Imaging.Forms
                         ShowFitToWidth();
                         break;
 
+                    case FitMode.OneToOneZoom:
+
+                        ShowOneToOneZoom();
+                        break;
+
                     case FitMode.None:
 
                         // [DataEntry:837]
