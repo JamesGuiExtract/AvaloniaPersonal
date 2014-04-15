@@ -451,7 +451,7 @@
 		<row><td>HELP</td><td>INSTALLDIR</td><td>Help</td><td/><td>0</td><td/></row>
 		<row><td>INPUT_FUNNEL_BIN</td><td>INPUT_FUNNEL_DIR</td><td>Bin</td><td/><td>0</td><td/></row>
 		<row><td>INPUT_FUNNEL_DIR</td><td>EXTRACT_SYSTEMS</td><td>INPUTF~1|InputFunnelComponents</td><td/><td>0</td><td/></row>
-		<row><td>INSTALLDIR</td><td>MY_PRODUCT_NAME1</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>INSTALLDIR</td><td>EXTRACT_SYSTEMS</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>LocalAppDataFolder</td><td>TARGETDIR</td><td>.:LocalA~1|LocalAppData</td><td/><td>0</td><td/></row>
 		<row><td>MY_PRODUCT_NAME1</td><td>EXTRACT_SYSTEMS</td><td>IDShield</td><td/><td>0</td><td/></row>
 		<row><td>MyPicturesFolder</td><td>TARGETDIR</td><td>.:MyPict~1|MyPictures</td><td/><td>0</td><td/></row>

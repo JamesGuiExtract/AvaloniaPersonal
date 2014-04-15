@@ -77,17 +77,17 @@ Dlg_SdWelcome:
 Dlg_SdLicense:
 	nResult = SdLicense2(szTitle, "", "", "License.txt", FALSE);
 	if nResult = BACK goto Dlg_SdWelcome;
-
+/*
 Dlg_SdAskDestPath:    	
     nResult = SdAskDestPath(szTitle, szMsg, INSTALLDIR, 0);
     if (nResult = BACK) goto Dlg_SdLicense;
-
+*/
 Dlg_SetupType:
     szTitle = "";
     szMsg   = "";
     nResult = SetupType(szTitle, szMsg, "", nSetupType, 0);
     if (nResult = BACK) then
-        goto Dlg_SdAskDestPath;
+        goto Dlg_SdLicense;
     else
         nSetupType = nResult;
         if (nSetupType != CUSTOM) then

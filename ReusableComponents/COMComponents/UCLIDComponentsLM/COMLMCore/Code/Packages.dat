@@ -86,9 +86,8 @@ LabDE,0
 
 FLEX Index / ID Shield Utilities,0
 -    Create Searchable PDF,6079
-// Do not place the Disable USB counters line in the copy of this file placed in license generator folder
-//-    Disable USB Counters (locked to PC),6072
--    Disable USB Key Serial Numbers,6071
+-    Disable USB Counters (locked to PC) <DevOnly>,6072
+-    Disable USB Key Serial Numbers <RWOnly>,6071
 -    Enhance OCR,6052
 -    File Inspector Search,6084
 -    FTP/SFTP file transfer,6083
@@ -111,8 +110,8 @@ ID Shield for Laserfiche,0
 NetDMS Integration,0
 -    NetDMS Components,6110
 
-Other,0
--    FLEX Index Rule Writing (Simple Rules passwords!),$RuleWritingCore:6027:6046:$OCROnClient
--    ID Shield Rule Writing (Simple Rules passwords!),$RuleWritingCore:6026:6046:$IDShield:$OCROnClient
--    Rule Development Toolkit,$RuleDevelopmentToolkit:6078:$LabDEServer
--    Scansoft OEM OCR,6080
+Other<RWOnly>,0
+-    FLEX Index Rule Writing (Simple Rules passwords!) <DevOnly>,$RuleWritingCore:6027:6046:$OCROnClient
+-    ID Shield Rule Writing (Simple Rules passwords!) <DevOnly>,$RuleWritingCore:6026:6046:$IDShield:$OCROnClient
+-    Rule Development Toolkit <RWOnly>,$RuleDevelopmentToolkit:6078:$LabDEServer
+-    Scansoft OEM OCR <DevOnly>,6080

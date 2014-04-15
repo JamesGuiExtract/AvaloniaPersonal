@@ -61,6 +61,10 @@ NetDMSRootDir=$(PDRootDir)\AFIntegrations\NetDMS
 
 LabDEBuildDir=$(PDRootDir)\DataEntry\LabDE\Build
 
+DeveloperLicensing=I:\Common\Engineering\SecureClients\COMLicense_Developer\Current
+RuleWriterLicensing=I:\Common\Engineering\SecureClients\COMLicense_RuleWriters\Current
+SupportLicensing=I:\Common\Engineering\SecureClients\COMLicense\Current
+
 # determine the name of the release output directory based upon the build
 # configuration that is being built
 !IF "$(BuildConfig)" == "Release"
@@ -82,6 +86,7 @@ AttributeCoreTarget=DoEverythingNoGet
 !ENDIF
 
 BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
+Replace=$(BinariesFolder)\ReplaceString
 
 #############################################################################
 # B U I L D    T A R G E T S
@@ -238,6 +243,22 @@ CreateSharepointInstall:
 	@CD $(PDRootDir)\AFIntegrations\Sharepoint\Build
 	@nmake /F FlexIDSSP.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" BuildAfterAF
 	@CD \Engineering\ProductDevelopment\AttributeFinder\Build
+	
+UpdateLicenseFiles:
+	@IF "$(Branch)"=="" (
+		@Echo Updating Licensing Files...
+		@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDComponentsLM\COMLMCore\Code\*.dat" "$(BinariesFolder)"
+		@Copy "$(BinariesFolder)\Components.dat" "$(DeveloperLicensing)"
+		@Copy "$(BinariesFolder)\Packages.dat" "$(DeveloperLicensing)"
+		$(Replace) "$(BinariesFolder)\Packages.dat" ".*<DevOnly>.*\r?\n" "" /e
+		$(Replace) "$(BinariesFolder)\Components.dat" ".*<DevOnly>.*\r?\n" "" /e
+		@Copy "$(BinariesFolder)\Components.dat" "$(RuleWriterLicensing)"
+		@Copy "$(BinariesFolder)\Packages.dat" "$(RuleWriterLicensing)"
+		$(Replace) "$(BinariesFolder)\Packages.dat" ".*<RWOnly>.*\r?\n" "" /e
+		$(Replace) "$(BinariesFolder)\Components.dat" ".*<RWOnly>.*\r?\n" "" /e
+		@Copy "$(BinariesFolder)\Components.dat" "$(SupportLicensing)"
+		@Copy "$(BinariesFolder)\Packages.dat" "$(SupportLicensing)"
+	)
 	
 CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CreateSharepointInstall
 

@@ -92,7 +92,7 @@ Dlg_SdFeatureTree:
 				
 				// Uninstall Crystal Reports
 				UninstallCrystalReports12();
-				UninstallInstallSQLCE ();
+				UninstallSQLCE ();
 				
 				// Register the shell extension
 				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");

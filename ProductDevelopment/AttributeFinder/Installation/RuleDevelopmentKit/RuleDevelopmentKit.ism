@@ -452,7 +452,7 @@
 		<row><td>HELP</td><td>INSTALLDIR</td><td>Help</td><td/><td>0</td><td/></row>
 		<row><td>IDSHIELD</td><td>EXTRACT_SYSTEMS</td><td>IDShield</td><td/><td>0</td><td/></row>
 		<row><td>IDSHIELD_BIN</td><td>IDSHIELD</td><td>bin</td><td/><td>0</td><td/></row>
-		<row><td>INSTALLDIR</td><td>FLEX_INDEX</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>INSTALLDIR</td><td>EXTRACT_SYSTEMS</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>LocalAppDataFolder</td><td>TARGETDIR</td><td>.:LocalA~1|LocalAppData</td><td/><td>0</td><td/></row>
 		<row><td>MyPicturesFolder</td><td>TARGETDIR</td><td>.:MyPict~1|MyPictures</td><td/><td>0</td><td/></row>
 		<row><td>PersonalFolder</td><td>TARGETDIR</td><td>.:Personal</td><td/><td>0</td><td/></row>

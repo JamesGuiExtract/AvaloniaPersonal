@@ -443,7 +443,7 @@
 		<row><td>GlobalAssemblyCache</td><td>TARGETDIR</td><td>.:Global~1|GlobalAssemblyCache</td><td/><td>0</td><td/></row>
 		<row><td>INPUT_FUNNEL_BIN</td><td>INPUT_FUNNEL_DIR</td><td>Bin</td><td/><td>0</td><td/></row>
 		<row><td>INPUT_FUNNEL_DIR</td><td>EXTRACT_SYSTEMS</td><td>INPUTF~1|InputFunnelComponents</td><td/><td>0</td><td/></row>
-		<row><td>INSTALLDIR</td><td>FLEX_INDEX_SDK</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>INSTALLDIR</td><td>EXTRACT_SYSTEMS</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>LocalAppDataFolder</td><td>TARGETDIR</td><td>.:LocalA~1|LocalAppData</td><td/><td>0</td><td/></row>
 		<row><td>MyPicturesFolder</td><td>TARGETDIR</td><td>.:MyPict~1|MyPictures</td><td/><td>0</td><td/></row>
 		<row><td>PersonalFolder</td><td>TARGETDIR</td><td>.:Personal</td><td/><td>0</td><td/></row>

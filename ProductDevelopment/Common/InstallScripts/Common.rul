@@ -83,7 +83,7 @@
     prototype BOOL CheckProductKeyInstalled(STRING, STRING, BYREF STRING, BOOL);
     prototype InstallSQLCE();
     prototype DetectDotNET_40();
-    prototype UninstallInstallSQLCE();
+    prototype UninstallSQLCE();
     prototype InstallDotNetService(STRING);
     prototype UninstallDotNetService(STRING);    
 	prototype BOOL AreOtherExtractProductsInstalled();
@@ -98,6 +98,7 @@
 	prototype InstallReadme();
 	prototype RunRegisterAll();
 	prototype UnRegisterAll();
+	prototype UninstallSQLCEWithoutPrompt();
 
     // your global variables
     BOOL gbInstalled;
@@ -509,6 +510,7 @@ begin
 	// Change the root for the registry
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);     
 
+	szSPLevel = "";
 	nType = REGDB_NUMBER;
 	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 1 || 
 			((RegDBGetKeyValueEx(REG_PATH_SQL_COMPACT_EDITION, "ServicePackLevel", nType, 
@@ -516,6 +518,9 @@ begin
 			szSPLevel != "2") ||
 			RegDBKeyExist(SQL_COMPACT_35_SP2_32_INSTALLER_KEY) < 1 ||
 			RegDBKeyExist(SQL_COMPACT_35_SP2_64_INSTALLER_KEY) < 1 ) then
+
+		// This will uninstall previous version if installed
+		UninstallSQLCEWithoutPrompt();
 			
 		SdShowMsg("Setup is Installing SQL Compact Edition", TRUE);
 
@@ -567,14 +572,14 @@ end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Function: UninstallInstallSQLCE
+// Function: UninstallSQLCE
 //
 //  Purpose: This function uninstalls the SQL Server Compact Edition.
 //	Returns 0 if no errors
 ///////////////////////////////////////////////////////////////////////////////
-function UninstallInstallSQLCE()
-STRING szProgram, szCmdLine;
-int nResult, svServiceState;
+function UninstallSQLCE()
+STRING ;
+int nResult;
 begin  
 	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) = 1) then
 		// Ask user if they wish to unintall SQL Server CE
@@ -583,15 +588,32 @@ begin
 			" will cause those applications to work incorrectly." , MB_YESNO );
 
 		if (nResult = IDYES) then
-			SdShowMsg("Setup is Uninstalling SQL Compact Edition", TRUE);
-	    	// If 64 bit OS install 64 version of SSCE	
-			if ( SYSINFO.bIsWow64 ) then    
-				LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID_64 + " /qb",LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);			 
-			endif;
+			UninstallSQLCEWithoutPrompt();
+		endif;
+	endif;
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UninstallSQLCEWithoutPrompt
+//
+//  Purpose: This function uninstalls the SQL Server Compact Edition without
+// 		     prompting the user to uninstall.
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function UninstallSQLCEWithoutPrompt()
+STRING szProgram, szCmdLine;
+int nResult, svServiceState;
+begin  
+	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) = 1) then
+		SdShowMsg("Setup is Uninstalling SQL Compact Edition", TRUE);
+    	// If 64 bit OS install 64 version of SSCE	
+		if ( SYSINFO.bIsWow64 ) then    
+			LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID_64 + " /qb",LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);			 
+		endif;
 	
-	    	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID + " /qb", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
-	    	SdShowMsg("Setup is Uninstalling SQL Compact Edition", FALSE);
-	  	endif;
+    	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID + " /qb", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
+    	SdShowMsg("Setup is Uninstalling SQL Compact Edition", FALSE);
 	endif;
 end;
 
