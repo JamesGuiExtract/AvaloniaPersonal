@@ -76,6 +76,8 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._townRangeSectionTable = new Extract.DataEntry.DataEntryTable();
             this._townRangeSectionColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._descriptionColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this.hiddenGrantorTextBox = new Extract.DataEntry.DataEntryTextBox();
+            this.hiddenGranteeTextBox = new Extract.DataEntry.DataEntryTextBox();
             _pageLabel = new System.Windows.Forms.Label();
             _docTypeLabel = new System.Windows.Forms.Label();
             _bookLabel = new System.Windows.Forms.Label();
@@ -282,7 +284,6 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this._granteeTable.DefaultCellStyle = dataGridViewCellStyle2;
             this._granteeTable.Location = new System.Drawing.Point(3, 209);
-            this._granteeTable.MinimumNumberOfRows = 1;
             this._granteeTable.Name = "_granteeTable";
             this._granteeTable.ParentDataEntryControl = null;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -293,7 +294,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._granteeTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this._granteeTable.Size = new System.Drawing.Size(611, 93);
+            this._granteeTable.Size = new System.Drawing.Size(600, 93);
             this._granteeTable.TabIndex = 6;
             // 
             // _granteeNameColumn
@@ -306,9 +307,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._granteeNameColumn.PersistAttribute = false;
             this._granteeNameColumn.ValidationErrorMessage = "Name (including optional \"DEC\'D\" flag) cannot be empty and cannot exceed 32 chars" +
     ".";
-            this._granteeNameColumn.ValidationPattern = ".";
-            this._granteeNameColumn.ValidationQuery = "<Query ValidValue=\'True\'>\r\n\t<Expression>\r\n\t\t<Attribute>../Formatted</Attribute>.L" +
-    "ength &lt;= 32\r\n\t</Expression>\r\n</Query>";
+            this._granteeNameColumn.ValidationQuery = resources.GetString("_granteeNameColumn.ValidationQuery");
             // 
             // _granteeDeceasedColumn
             // 
@@ -327,8 +326,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             // _granteeFormattedColumn
             // 
             this._granteeFormattedColumn.AttributeName = "Formatted";
-            this._granteeFormattedColumn.AutoUpdateQuery = "<Query StringList=\' \'><Attribute>../Name</Attribute><Expression>(<Attribute>../De" +
-    "ceased</Attribute> == \'\') ? \'\' : (\'DEC\'\'D\')</Expression></Query>";
+            this._granteeFormattedColumn.AutoUpdateQuery = resources.GetString("_granteeFormattedColumn.AutoUpdateQuery");
             this._granteeFormattedColumn.HeaderText = "Formatted";
             this._granteeFormattedColumn.Name = "_granteeFormattedColumn";
             this._granteeFormattedColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
@@ -363,7 +361,6 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this._grantorTable.DefaultCellStyle = dataGridViewCellStyle5;
             this._grantorTable.Location = new System.Drawing.Point(3, 97);
-            this._grantorTable.MinimumNumberOfRows = 1;
             this._grantorTable.Name = "_grantorTable";
             this._grantorTable.ParentDataEntryControl = null;
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -374,7 +371,8 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._grantorTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
-            this._grantorTable.Size = new System.Drawing.Size(611, 93);
+            this._grantorTable.ShowCellToolTips = false;
+            this._grantorTable.Size = new System.Drawing.Size(600, 93);
             this._grantorTable.TabIndex = 5;
             // 
             // _grantorNameColumn
@@ -387,9 +385,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._grantorNameColumn.PersistAttribute = false;
             this._grantorNameColumn.ValidationErrorMessage = "Name (including optional \"DEC\'D\" flag) cannot be empty and cannot exceed 32 chars" +
     ".";
-            this._grantorNameColumn.ValidationPattern = ".";
-            this._grantorNameColumn.ValidationQuery = "<Query ValidValue=\'True\'>\r\n\t<Expression>\r\n\t\t<Attribute>../Formatted</Attribute>.L" +
-    "ength &lt;= 32\r\n\t</Expression>\r\n</Query>";
+            this._grantorNameColumn.ValidationQuery = resources.GetString("_grantorNameColumn.ValidationQuery");
             // 
             // _grantorDeceasedColumn
             // 
@@ -408,8 +404,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             // _grantorFormattedColumn
             // 
             this._grantorFormattedColumn.AttributeName = "Formatted";
-            this._grantorFormattedColumn.AutoUpdateQuery = "<Query StringList=\' \'><Attribute>../Name</Attribute><Expression>(<Attribute>../De" +
-    "ceased</Attribute> == \'\') ? \'\' : (\'DEC\'\'D\')</Expression></Query>";
+            this._grantorFormattedColumn.AutoUpdateQuery = resources.GetString("_grantorFormattedColumn.AutoUpdateQuery");
             this._grantorFormattedColumn.HeaderText = "Formatted";
             this._grantorFormattedColumn.Name = "_grantorFormattedColumn";
             this._grantorFormattedColumn.ValidationErrorMessage = "Invalid value";
@@ -457,7 +452,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._subdivisionTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
-            this._subdivisionTable.Size = new System.Drawing.Size(611, 93);
+            this._subdivisionTable.Size = new System.Drawing.Size(600, 93);
             this._subdivisionTable.TabIndex = 7;
             // 
             // _blockColumn
@@ -545,7 +540,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this._townRangeSectionTable.DefaultCellStyle = dataGridViewCellStyle11;
-            this._townRangeSectionTable.Location = new System.Drawing.Point(3, 433);
+            this._townRangeSectionTable.Location = new System.Drawing.Point(-8, 433);
             this._townRangeSectionTable.Name = "_townRangeSectionTable";
             this._townRangeSectionTable.ParentDataEntryControl = null;
             dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -582,17 +577,53 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._descriptionColumn.ValidationQuery = "<Query ValidValue=\'True\'>\r\n<Expression><Attribute>.</Attribute>.Length &lt;= 32</" +
     "Expression>\r\n</Query>";
             // 
+            // hiddenGrantorTextBox
+            // 
+            this.hiddenGrantorTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.hiddenGrantorTextBox.AttributeName = "Gtr";
+            this.hiddenGrantorTextBox.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.hiddenGrantorTextBox.Location = new System.Drawing.Point(593, 97);
+            this.hiddenGrantorTextBox.Name = "hiddenGrantorTextBox";
+            this.hiddenGrantorTextBox.PersistAttribute = false;
+            this.hiddenGrantorTextBox.ShortcutsEnabled = false;
+            this.hiddenGrantorTextBox.Size = new System.Drawing.Size(10, 20);
+            this.hiddenGrantorTextBox.SupportsSwiping = false;
+            this.hiddenGrantorTextBox.TabIndex = 23;
+            this.hiddenGrantorTextBox.TabStop = false;
+            this.hiddenGrantorTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this.hiddenGrantorTextBox.ValidationErrorMessage = "Grantor must be defined if Document Type is not VOID";
+            this.hiddenGrantorTextBox.ValidationQuery = resources.GetString("hiddenGrantorTextBox.ValidationQuery");
+            // 
+            // hiddenGranteeTextBox
+            // 
+            this.hiddenGranteeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.hiddenGranteeTextBox.AttributeName = "Gte";
+            this.hiddenGranteeTextBox.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.hiddenGranteeTextBox.Location = new System.Drawing.Point(593, 209);
+            this.hiddenGranteeTextBox.Name = "hiddenGranteeTextBox";
+            this.hiddenGranteeTextBox.PersistAttribute = false;
+            this.hiddenGranteeTextBox.ShortcutsEnabled = false;
+            this.hiddenGranteeTextBox.Size = new System.Drawing.Size(10, 20);
+            this.hiddenGranteeTextBox.SupportsSwiping = false;
+            this.hiddenGranteeTextBox.TabIndex = 24;
+            this.hiddenGranteeTextBox.TabStop = false;
+            this.hiddenGranteeTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this.hiddenGranteeTextBox.ValidationErrorMessage = "Grantee must be defined if Document Type is not VOID";
+            this.hiddenGranteeTextBox.ValidationQuery = resources.GetString("hiddenGranteeTextBox.ValidationQuery");
+            // 
             // LincolnPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.Controls.Add(this._granteeTable);
+            this.Controls.Add(this.hiddenGranteeTextBox);
+            this.Controls.Add(this._grantorTable);
+            this.Controls.Add(this.hiddenGrantorTextBox);
             this.Controls.Add(this._townRangeSectionTable);
             this.Controls.Add(_townRangeSectionLabel);
             this.Controls.Add(this._subdivisionTable);
             this.Controls.Add(_subdivisionLabel);
             this.Controls.Add(_grantorLabel);
-            this.Controls.Add(this._grantorTable);
             this.Controls.Add(_granteeLabel);
-            this.Controls.Add(this._granteeTable);
             this.Controls.Add(this._dateOfInstrumentTextBox);
             this.Controls.Add(_dateOfInstrumentLabel);
             this.Controls.Add(this._dateFiledTextBox);
@@ -635,9 +666,6 @@ namespace Extract.DataEntry.DEP.Lincoln
         private DataEntryTable _grantorTable;
         private DataEntryTable _subdivisionTable;
         private DataEntryTable _townRangeSectionTable;
-        private DataEntryTableColumn _grantorNameColumn;
-        private DataEntryTableColumn _grantorDeceasedColumn;
-        private DataEntryTableColumn _grantorFormattedColumn;
         private DataEntryTableColumn _blockColumn;
         private DataEntryTableColumn _lotColumn;
         private DataEntryTableColumn _subdivisionOtherColumn;
@@ -645,8 +673,13 @@ namespace Extract.DataEntry.DEP.Lincoln
         private DataEntryTableColumn _unitColumn;
         private DataEntryTableColumn _townRangeSectionColumn;
         private DataEntryTableColumn _descriptionColumn;
+        private DataEntryTextBox hiddenGrantorTextBox;
         private DataEntryTableColumn _granteeNameColumn;
         private DataEntryTableColumn _granteeDeceasedColumn;
         private DataEntryTableColumn _granteeFormattedColumn;
+        private DataEntryTableColumn _grantorNameColumn;
+        private DataEntryTableColumn _grantorDeceasedColumn;
+        private DataEntryTableColumn _grantorFormattedColumn;
+        private DataEntryTextBox hiddenGranteeTextBox;
     }
 }
