@@ -10,6 +10,7 @@ const unsigned long gulFOLDER_LISTENER_BUF_SIZE	 = 65536;
 const string gstrTIME_BETWEEN_LISTENING_RESTARTS_KEY = "FEL_TimeBetweenListeningRestarts";
 const unsigned long gulDEFAULT_TIME_BETWEEN_RESTARTS = 5000; // 5 seconds
 const unsigned long gulTIME_TO_WAIT_FOR_THREAD_EXIT = 10000; // 10 seconds
+const unsigned long gulTIME_TO_WAIT_FOR_CHANGES = 30000; // 30 seconds
 
 //-------------------------------------------------------------------------------------------------
 FolderEventsListener::FolderEvent::FolderEvent(EFileEventType nEvent, string strFileNameNew, string strFileNameOld)
@@ -154,8 +155,26 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 		ASSERT_RESOURCE_ALLOCATION("ELI30306", lpFileBuffer != __nullptr);
 		_lastCodePos = "70";
 
+		bool bDone = false;
+
 		do
 		{
+			// Update the number of start attempts
+			nListeningStartAttemptCount++;
+
+			// make sure the folder is valid , this is faster than
+			// going through all the setup and then it doesn't 
+			if (!isValidFolder(fl->m_strFolderToListenTo))
+			{
+				if (nListeningStartAttemptCount <=1)
+				{
+					UCLIDException ue("ELI36810", "Listening folder is not accessible. Retrying...");
+					ue.addDebugInfo("Folder", fl->m_strFolderToListenTo);
+					ue.log();
+				}
+				continue;
+			}
+
 			// Setup events for changes
 			Win32Event eventFileChangesReady;
 
@@ -183,7 +202,6 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 
 			// Indicates whether listenting started correctly this iteration.
 			bool bListeningStarted = false;
-			nListeningStartAttemptCount++;
 
 			try
 			{
@@ -206,9 +224,9 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 					}
 					ueStart.log();
 
+					// Reset the number of start attempts
 					nListeningStartAttemptCount = 0;
 
-					bool bDone = false;
 					do
 					// There are many flags that can be specified other than FILE_NOTIFY_CHANGE_FILE_NAME
 					{
@@ -219,7 +237,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 						_lastCodePos = "100";
 
 						// Wait for changes or a kill signal
-						DWORD dwWaitResult = WaitForMultipleObjects( 2, (HANDLE *)&handles, FALSE, INFINITE );
+						DWORD dwWaitResult = WaitForMultipleObjects( 2, (HANDLE *)&handles, FALSE, gulTIME_TO_WAIT_FOR_CHANGES );
 						_lastCodePos = "110";
 
 						if ( dwWaitResult == WAIT_OBJECT_0 )
@@ -255,6 +273,19 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 							// Check to see if Kill thread event was signaled
 							bDone = fl->m_eventKillThreads.isSignaled();
 							_lastCodePos = "170";
+						}
+						else if ( dwWaitResult == WAIT_TIMEOUT)
+						{
+							_lastCodePos = "175";
+
+							// Check that the folder is valid (if the network connection is 
+							// no longer valid this will return false)
+							if (!isValidFolder(fl->m_strFolderToListenTo))
+							{
+								UCLIDException ue("ELI36799", "Listening folder is not accessible.");
+								ue.addDebugInfo("Folder", fl->m_strFolderToListenTo);
+								throw ue;
+							}
 						}
 						else
 						{
@@ -311,7 +342,8 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 				ueStop.log();
 			}
 		}
-		while (fl->m_eventKillThreads.wait( ulTimeBetweenRestarts ) == WAIT_TIMEOUT );
+		while ((!bDone && (nListeningStartAttemptCount <= 1)) || 
+			fl->m_eventKillThreads.wait( ulTimeBetweenRestarts ) == WAIT_TIMEOUT );
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI12780");
 	
