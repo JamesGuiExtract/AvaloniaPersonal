@@ -57,6 +57,7 @@ CopyFilesToExtractLMInstall:
     @XCOPY "$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\FieldActivationUtility\*.*" "$(LMInstallFilesRootDir)\FieldActivation" /v /y
     $(VerifyDir) "$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\FieldActivationUtility" "$(LMInstallFilesRootDir)\FieldActivation"
     @COPY /v  "$(BinariesFolder)\USBLicenseKeyManager.exe" "$(LMInstallFilesRootDir)\NonSelfRegCC"
+	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\MergeModules\*.*" "$(MERGE_MODULE_DIR)" /v /y /s
 
 BuildExtractLMInstall:CopyFilesToExtractLMInstall
     @ECHO Building Extract Systems LM installation...
