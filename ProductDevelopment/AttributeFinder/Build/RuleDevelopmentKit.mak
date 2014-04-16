@@ -164,6 +164,7 @@ CopyTestFiles:
 	@XCOPY "$(AFRootDirectory)\AFDataScorers\AFDataScorersTest\TestFiles\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFDataScorers\AFDataScorersTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFOutputHandlers\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFOutputHandlers\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFPreProcessors\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFPreProcessors\AutomatedTest\" /s /e /y /I
+	@XCOPY "$(AFRootDirectory)\AFPreProcessors\InteractiveTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFPreProcessors\InteractiveTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFSelectors\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFSelectors\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFSplitters\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFSplitters\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFSplitters\AFSplittersTest\TestFiles\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFSplitters\AFSplittersTest\TestFiles\" /s /e /y /I
@@ -174,6 +175,11 @@ CopyTestFiles:
 	@XCOPY "$(AFRootDirectory)\AFValueModifiers\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFValueModifiers\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\InputValidators\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\InputValidators\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\IndustrySpecific\Redaction\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\AutomatedTest\" /s /e /y /I
+	@XCOPY "$(AFRootDirectory)\IndustrySpecific\Redaction\InteractiveTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\InteractiveTest\" /s /e /y /I
+	@XCOPY "$(AFRootDirectory)\IndustrySpecific\DataEntry\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\DataEntry\AutomatedTest\" /s /e /y /I
+	@XCOPY "$(AFRootDirectory)\IndustrySpecific\DataEntry\InteractiveTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\DataEntry\InteractiveTest\" /s /e /y /I
+	@XCOPY "$(AFRootDirectory)\IndustrySpecific\LabResults\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\AutomatedTest\" /s /e /y /I
+	@XCOPY "$(AFRootDirectory)\IndustrySpecific\County\CountyTester\TestFiles\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\County\CountyTester\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringAutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringAutomatedTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringSearcherTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringSearcherTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\RasterZoneTester\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\RasterZoneTester\TestFiles\" /s /e /y /I
@@ -183,7 +189,7 @@ CopyTestFiles:
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\ESFileSuppliers\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\ESFileSuppliers\AutomatedTest\" /s /e /y /I
-	@XCOPY "$(RCDotNetDir)\FileActionManager\FileProcessors\Core\Testing\*.*" "$(TestingFilesDirectory)\FileActionManager\FileProcessors\Core\Testing\" /s /e /y /I
+	@XCOPY "$(RCDotNetDir)\FileActionManager\FileProcessors\Core\Testing\*.*" "$(TestingFilesDirectory)\RC.Net\FileActionManager\FileProcessors\Core\Testing\" /s /e /y /I
 	@XCOPY "$(RCDotNetDir)\AttributeFinder\Rules\Core\AutomatedTest\*.*" "$(TestingFilesDirectory)\RC.Net\AttributeFinder\Rules\Core\AutomatedTest\" /s /e /y /I
 
 DoEverythingNoGet: DoEverything
