@@ -86,6 +86,7 @@ CopyFilesToInstallFolder:
 	@COPY /v "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
 	@COPY /v "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
 	@COPY /v "$(BinariesFolder)\DataEntryApplication.LabDE.resources" "$(LabDEInstallFiles)\NonSelfRegFiles"
+	@COPY /v  "$(BinariesFolder)\Obfuscated\AlternateTestNameManager.plugin" "$(LabDEInstallFiles)\LabDEFolder"
 	@XCOPY "$(LabDEDir)\Reports\*.*" "$(LabDEInstallFiles)\Reports" /v /s /e /y
 # Make .nl files to register the COM .NET files
 	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\LabDE.nl"
