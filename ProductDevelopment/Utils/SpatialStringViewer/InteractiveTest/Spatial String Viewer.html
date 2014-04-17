@@ -13,6 +13,50 @@
 <hr>
 
 <ol>
+    <li><h2>Toolbar</h2>
+    <ul>
+        <li>Confirm that a <b>Page navigation</b> toolbar is visible under the menu bar.
+	<li>Confirm that proper enable / disable behavior of navigation buttons depending 
+	on the number of pages in the image.
+	<li>Confirm that proper enable / disable behavior of navigation buttons depending 
+	on the active page.
+	<li>Confirm that entering a page number too big for the open file automatically 
+	reverts the edit box to the previous value.
+	<li>Confirm that entering a <b>0</b> page number automatically reverts the edit 
+	box to the previous value.
+	<li>Confirm that the edit box is wide enough for at least a 1000-page file.
+	<li><b>[JIRA #11994]</b> Confirm that entering a <b>negative</b> page number 
+	automatically reverts the edit box to the previous value.
+    </ul>
+<p>
+    <li><h2>Page Bar</h2>
+    <ul>
+        <li>Confirm that the left side of the application window shows the page number of 
+	the character after the cursor.</li>
+        <li>Confirm that a horizontal line is the delimiter between pages.
+	<li>Confirm that the page bar is wide enough for at least a 1000-page file.
+    </ul></li>
+<p>
+    <li><h2>Drag and Drop</h2>
+    <ul>
+        <li>Confirm that dropping a <b>.uss</b> file on the main dialog opens the .uss file.</li>
+        <li>Confirm that dropping a <b>.txt</b> file on the main dialog opens the .txt file.</li>
+        <li>Confirm that dropping an image file on the main dialog opens the associated <b>.uss</b> 
+	file.</li>
+        <li>Confirm that dropping a three-digit extension image file (such as 123.001) on the main 
+	dialog opens the associated <b>.uss</b> file.</li>
+        <li>Confirm that dropping a double extension file on the main dialog opens the associated 
+	<b>.uss</b> file.  An example is dropping 123.tif.voa and expecting 123.tif.uss to 
+	open.</li>
+        <li>Confirm that dropping a double extension file (such as 123.001.voa) on the main 
+	dialog opens the associated <b>.uss</b> file.</li>
+<p>
+        <li>Confirm that dropping an image file that does not have a corresponding <b>.uss</b> file 
+	displays a meaningful error message.</li>
+        <li>Confirm that dropping a double extension file that does not have a corresponding 
+	<b>.uss</b> file displays a meaningful error message.</li>
+    </ul></li>
+<p>
     <li><h2>File Menu</h2>
     <ul>
         <li><u><b>Open</b></u>
@@ -52,25 +96,6 @@
         </ul></li>
     </ul></li>
 <p>
-    <li><h2>Drag and Drop</h2>
-    <ul>
-        <li>Confirm that dropping a <b>.uss</b> file on the main dialog opens the .uss file.</li>
-        <li>Confirm that dropping a <b>.txt</b> file on the main dialog opens the .txt file.</li>
-        <li>Confirm that dropping an image file on the main dialog opens the associated <b>.uss</b> 
-	file.</li>
-        <li>Confirm that dropping a three-digit extension image file (such as 123.001) on the main 
-	dialog opens the associated <b>.uss</b> file.</li>
-        <li>Confirm that dropping a double extension file on the main dialog opens the associated 
-	<b>.uss</b> file.  An example is dropping 123.tif.voa and expecting 123.tif.uss to open.</li>
-        <li>Confirm that dropping a double extension file (such as 123.001.voa) on the main dialog 
-	opens the associated <b>.uss</b> file.</li>
-<p>
-        <li>Confirm that dropping an image file that does not have a corresponding <b>.uss</b> file 
-	displays a meaningful error message.</li>
-        <li>Confirm that dropping a double extension file that does not have a corresponding <b>.uss</b> 
-	file displays a meaningful error message.</li>
-    </ul></li>
-<p>
     <li><h2>Tools Menu</h2>
     <ul>
         <li><u><b>Find</b></u>
@@ -80,7 +105,7 @@
             <li>Confirm that the <b>Find what:</b> edit box is editable.</li>
             <li>Confirm that the <b>Find</b> button searches the main read-only edit box for the
             text contained in the local edit box.</li>
-            <li>Confirm that a <b>No match found</b> message box is displayed when no match is
+            <li>Confirm that a <b>No matches found</b> message box is displayed when no match is
             found.</li>
             <li>If a match is found
             <ul>
@@ -174,7 +199,7 @@
         <li><u><b>Font Size Distribution</b></u>
         <ul>
             <li>Confirm that the <b>Font Size Distribution</b> menu item displays the <b>Font
-            Size Distribution</b> dialog.</li>
+            Sizes</b> dialog.</li>
             <li>Confirm that the total number of non-whitespace characters is displayed at the
             top of the dialog.</li>
             <li>Confirm that the <b>Font Size</b> column displays a list of font sizes in sorted
@@ -205,6 +230,9 @@
         position.</li>
         <li>Confirm that the page number is -1 at the end of the document.</li>
 <p>
+        <li>Confirm that the <b>Page Con:</b> item displays the average character confidence 
+	on the active page.</li>
+<p>
         <li>Confirm that the <b>Start Pos:</b> item displays the index of the character at the
         beginning of the selected text.</li>
         <li>Confirm that if no text is selected it displays the zero-based index of the character
@@ -219,13 +247,18 @@
         selected text.</li>
         <li>Confirm that if no text is selected, it displays the character confidence of the 
         character following the cursor.</li>
-    <p>
+<p>
         <li>Confirm that the <b>%</b> item displays the percentage of the document before the
         current cursor position.</li>
         <li>Confirm that the value is 0% at the beginning of the document.</li>
         <li>Confirm that the value is 100% at the end of the document.</li>
-    <p>
+<p>
         <li>Confirm that the status bar is displayed correctly during window resize events.</li>
+<p>
+   	<LI><b>[JIRA #11982]</b> Confirm that the Status Bar is properly initialized after 
+	opening a file.
+	<li><b>[JIRA #11992]</b> Confirm that the status bar is properly initialized immediately 
+	after opening a USS file via double-click.
     </ul></li>
 <p>
     <li><h2>Help Menu</h2>
@@ -266,6 +299,39 @@
 <p>
    	<LI><b>[LegacyRC #6256]</b> Confirm that the <b>USS File Viewer</b> can successfully  
 	find characters that are not included in a specified font range.
+<p>
+   	<LI><b>[JIRA #11993]</b> Confirm that an exception is not displayed if the window is 
+	minimized while the cursor is at the beginning of the document.
+<p>
+   	<LI><b>[JIRA #11995]</b> Confirm that resizing the window to its minimum size still 
+	displays the menu bar, toolbar, status bar and some text.
+<p>
+   	<LI><b>[JIRA #12004, #12008]</b> Invalid Index Exception
+	<ul>
+		<li>Open 1000-page USS file from 
+		<b>I:\Common\Testing\Test_Images\ManyPage Images.</b>
+		<li>Move scroll bar near or to the bottom of the document.
+		<li>Press <b>Page Down</b> one or more times to reach the very end of 
+		the document.
+		<li>Confirm that no exception is displayed.
+<p>
+		<li>Open USS Viewer
+		<li>Use <b>File - Open</b> to select <b>TestImage002.tif.uss</b> from 
+		Demo_IDShield.
+		<li>Click before the first character in the file.
+		<li>Press <b>Page Down</b> several times to reach the bottom of the document.
+		<li>Confirm that no exception is displayed.
+	</ul>
+<p>
+   	<LI><b>[JIRA #12007]</b> Page Down
+	<ul>
+		<li>Open USS Viewer
+		<li>Use <b>File - Open</b> to select <b>TestImage002.tif.uss</b> from 
+		Demo_IDShield.
+		<li><b>Do not</b> click before the first character in the file.
+		<li>Press <b>Page Down</b> several times to reach the bottom of the document.
+		<li>Confirm that the scroll position changes and no exception is displayed.
+	</ul>
     </ul></li>
 </ol>
 </body>
