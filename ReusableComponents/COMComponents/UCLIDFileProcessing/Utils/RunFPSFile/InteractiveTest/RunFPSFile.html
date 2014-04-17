@@ -22,14 +22,15 @@
 		<b>RunFPSFile.exe &lt;FPSFile&gt; &lt;SourceDocName&gt; [/ignoreDB] 
 		[/queue] [/priority <i>numericvalue</i>] [/process] [/forceprocessing] 
 		[/ef &lt;filename&gt;]</b>
-    		<li>Confirm that an error message is displayed if only an input FPS file is 
+    		<li>Confirm that an error message is displayed if only an input FPS file 
+		is defined.</li>
+    		<li>Confirm that an error message is displayed if only a source image is 
 		defined.</li>
-    		<li>Confirm that an error message is displayed if only a source image is defined.</li>
     		<li>Confirm that an error message is displayed if no switches are defined.</li>
 		<li>Confirm that a non-default icon is provided.
 <p>
-  	   	<LI><b>[LegacyRC #5755]</b> Confirm that <b>RunFPSFile</b> properly handles relative 
-		paths to the source document.
+  	   	<LI><b>[LegacyRC #5755]</b> Confirm that <b>RunFPSFile</b> properly handles 
+		relative paths to the source document.
 <p>
     		<li><b>/ignoreDB</b> switch
 		<ul>
@@ -37,8 +38,8 @@
 			switch is also used.
 			<li>Confirm that an error message is displayed if the <b>/queue</b> 
 			switch is also used.
-			<li>Confirm that an error message is displayed if the <b>/forceprocessing</b> 
-			switch is also used.
+			<li>Confirm that an error message is displayed if the 
+			<b>/forceprocessing</b> switch is also used.
 			<li>Confirm that an error message is displayed if the <b>/priority</b> 
 			switch is also used.
 		</ul>
@@ -46,8 +47,9 @@
 		<ul>
 			<li>Confirm that an error message is displayed if the <b>/ignoreDB</b> 
 			switch is also used.
-			<li>Confirm that an error message is displayed if the <b>/forceprocessing</b> 
-			switch is also used (without the <b>/queue</b> switch).
+			<li>Confirm that an error message is displayed if the 
+			<b>/forceprocessing</b> switch is also used (without the <b>/queue</b> 
+			switch).
 			<li>Confirm that an error message is displayed if the <b>/priority</b> 
 			switch is also used (without the <b>/queue</b> switch).
 		</ul>
@@ -170,15 +172,22 @@
   	<ul>
 		<li><b>[LegacyRC #5697]</b> Confirm that processing a file <b>ignores</b> any 
 		scheduled processing settings in the associated FPS file.
-    <p>
-        <li><b>[LegacyRC #5813]</b>
-        <!-- fixed v 8.1.0.1 -->
-        <ul>
-            <li>Create a database configured to autocreate actions.
-            <li>Confirm that <b>RunFPSFile</b> supports the use of the &lt;FPSFileDir&gt; tag.
-            <li>Confirm that <b>RunFPSFile</b> can be used with autocreated actions (i.e. 
-            <b>Compute_$UserName()</b>).
-        </ul>
+<p>
+	        <li><b>[LegacyRC #5813]</b>
+        	<!-- fixed v 8.1.0.1 -->
+	        <ul>
+        	    	<li>Create a database configured to autocreate actions.
+            		<li>Confirm that <b>RunFPSFile</b> supports the use of the 
+			&lt;FPSFileDir&gt; tag.
+            		<li>Confirm that <b>RunFPSFile</b> can be used with autocreated 
+			actions (i.e. <b>Compute_$UserName()</b>).
+        	</ul>
+<p>
+	        <li><b>[JIRA #11256]</b> Autocreated Action Names Or Tags Using FPSFileDir
+	        <ul>
+        	    	<li>Confirm that <b>RunFPSFile</b> will successfully process a 
+			Demo_IDShield image using <b>Compute Redactions.fps</b>.
+        	</ul>
   	</ul>
 </ol>
 </body>
