@@ -94,6 +94,8 @@
 			<b>Subdivision/Block or Lot or Other or Unit</b> is defined.
 			<li>The <b>Description</b> field cannot be specified if 
 			<b>Subdivision/Block or Lot or Other or Unit</b> is defined.
+			<li>At least one <b>Grantor</b> must be present.
+			<li>At least one <b>Grantee</b> must be present.
 			<li>The <b>Grantor</b> field is limited to <b>32</b> characters 
 			if <b>Deceased?</b> is false.
 			<li>The <b>Grantor</b> field is limited to <b>26</b> characters 
@@ -107,7 +109,24 @@
 <p>
 	<li><h3>Auto-Update Queries</h3></li>
 	<ul>
-		<li>TBD
+		<li><u>VOID Document Types and Grantor / Grantee</u>
+		<ul>
+			<li>Open a document with <b>VOID</b> doc type.
+			<li>Confirm that no warnings are displayed when the other fields are 
+			properly blank.
+			<li>Add some <b>Grantor</b> text.
+			<li>Confirm that a warning icon is displayed.
+			<li>Delete the <b>Grantor</b> text and confirm that the warning is 
+			automatically cleared.
+			<li>Repeat the test and confirm that <b>Undo</b> of the changes 
+			clears the warning.
+			<li>Add some <b>Grantee</b> text.
+			<li>Confirm that a warning icon is displayed.
+			<li>Delete the <b>Grantee</b> text and confirm that the warning is 
+			automatically cleared.
+			<li>Repeat the test and confirm that <b>Undo</b> of the changes 
+			clears the warning.
+		</ul>
        	</ul>
 <p>
 	<LI><h3>Miscellaneous</h3>
