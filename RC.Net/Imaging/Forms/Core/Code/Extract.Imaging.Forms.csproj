@@ -84,7 +84,7 @@
     </Reference>
     <Reference Include="Leadtools.ImageProcessing.Color, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-	  <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.ImageProcessing.Color.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.ImageProcessing.Color.dll</HintPath>
     </Reference>
     <Reference Include="Leadtools.WinForms, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
@@ -352,6 +352,18 @@
     </Compile>
     <Compile Include="MenuItems\CloseImageToolStripMenuItem.Designer.cs">
       <DependentUpon>CloseImageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\RotateAllDocumentPagesCounterclockwiseToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\RotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Designer.cs">
+      <DependentUpon>RotateAllDocumentPagesCounterclockwiseToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\RotateAllDocumentPagesClockwiseToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\RotateAllDocumentPagesClockwiseToolStripMenuItem.Designer.cs">
+      <DependentUpon>RotateAllDocumentPagesClockwiseToolStripMenuItem.cs</DependentUpon>
     </Compile>
     <Compile Include="MenuItems\OneToOneZoomToolStripMenuItem.cs">
       <SubType>Component</SubType>
@@ -715,6 +727,12 @@
     <Compile Include="StatusStripItems\UserActionToolStripStatusLabel.Designer.cs">
       <DependentUpon>UserActionToolStripStatusLabel.cs</DependentUpon>
     </Compile>
+    <Compile Include="StatusStripItems\ZoomLevelToolStripStatusLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StatusStripItems\ZoomLevelToolStripStatusLabel.Designer.cs">
+      <DependentUpon>ZoomLevelToolStripStatusLabel.cs</DependentUpon>
+    </Compile>
     <Compile Include="TextLayerObject.cs" />
     <Compile Include="ThumbnailViewer.cs">
       <SubType>UserControl</SubType>
@@ -1052,6 +1070,8 @@
     <EmbeddedResource Include="Resources\OneToOneZoomButton.png" />
     <EmbeddedResource Include="Resources\OneToOneZoomButtonSmall.png" />
     <EmbeddedResource Include="Resources\InvertColorsButton.png" />
+    <EmbeddedResource Include="Resources\RotateAllDocumentPagesClockwiseButtonSmall.png" />
+    <EmbeddedResource Include="Resources\RotateAllDocumentPagesCounterclockwiseButtonSmall.png" />
     <Content Include="Resources\WordHighlightButtonSmall.png" />
     <Content Include="Resources\WordRedactionButtonSmall.png" />
   </ItemGroup>

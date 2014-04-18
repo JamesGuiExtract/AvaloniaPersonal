@@ -1,15 +1,15 @@
 using Extract.Licensing;
 using Leadtools;
 using Leadtools.Drawing;
+using Leadtools.ImageProcessing.Color;
 using Leadtools.WinForms;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
-using System.Windows.Forms;
-using System.Collections.Generic;
-using Leadtools.ImageProcessing.Color;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Extract.Imaging.Forms
 {
@@ -30,6 +30,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         static readonly RasterImage _LOADING_IMAGE = GetLoadingImage();
 
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
         static readonly string _OBJECT_NAME = typeof(ThumbnailViewer).ToString();
 
         #endregion Constants
@@ -52,25 +55,21 @@ namespace Extract.Imaging.Forms
         bool _active = true;
 
         /// <summary>
-        /// 
+        /// Indicates whether the colors of the thumbnails are currently inverted.
         /// </summary>
         bool _invertColors;
 
         /// <summary>
-        /// 
-        /// </summary>
-        bool _pendingInvertColors;
-
-        /// <summary>
-        /// The current pagenumber of the <see cref="ImageViewer"/>
+        /// The current page number of the <see cref="ImageViewer"/>
         /// </summary>
         int _currentPage;
 
         /// <summary>
-        /// 
+        /// Maintain the original view perspectives for each thumbnail that is loaded so that
+        /// orientation can be applied in an "absolute" way rather than a relative to the current
+        /// thumbnail orientation.
         /// </summary>
         List<RasterViewPerspective> _originalViewPerspectives = new List<RasterViewPerspective>();
-        List<int> _pendingViewPerspectives = new List<int>();
 
         #endregion Fields
 
@@ -94,15 +93,6 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion Constructors
-
-        #region Events
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public event EventHandler<PageChangedEventArgs> ThumbnailLoaded;
-
-        #endregion Events
 
         #region Properties
 
@@ -129,12 +119,6 @@ namespace Extract.Imaging.Forms
 
                         if (_active && _imageViewer.IsImageAvailable)
                         {
-                            if (_pendingInvertColors)
-                            {
-                                InvertAllLoadedThumbnails();
-                                _pendingInvertColors = false;
-                            }
-
                             // If _imageList hasn't been initialized, do it now.
                             if (_imageList == null || _imageList.Items.Count == 0)
                             {
@@ -157,46 +141,6 @@ namespace Extract.Imaging.Forms
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI30743", ex);
-                }
-            }
-        }
-
-
-
-        /// <summary>
-        /// Gets or sets a value indicating whether [invert colors].
-        /// </summary>
-        /// <value>
-        /// 	<see langword="true"/> if [invert colors]; otherwise, <see langword="false"/>.
-        /// </value>
-        public bool InvertColors
-        {
-            get
-            {
-                return _invertColors;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _invertColors)
-                    {
-                        _invertColors = value;
-
-                        if (Active && _imageViewer.IsImageAvailable)
-                        {
-                            InvertAllLoadedThumbnails();
-                        }
-                        else if (_imageViewer.IsImageAvailable)
-                        {
-                            _pendingInvertColors = true;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI36794");
                 }
             }
         }
@@ -248,8 +192,6 @@ namespace Extract.Imaging.Forms
 
             // Dispose and clear the thumbnails
             DisposeThumbnails();
-
-            _pendingInvertColors = false;
         }
 
         /// <summary>
@@ -283,14 +225,10 @@ namespace Extract.Imaging.Forms
         /// </summary>
         void LoadDefaultThumbnails()
         {
+            // Store the original view perspective for later reference when rotating thumbnails.
             _originalViewPerspectives =
                 Enumerable.Range(0, _imageViewer.PageCount)
                 .Select(i => new RasterViewPerspective())
-                .ToList();
-
-            _pendingViewPerspectives =
-                Enumerable.Range(0, _imageViewer.PageCount)
-                .Select(i => 0)
                 .ToList();
 
             // Create a default entry for each page
@@ -375,22 +313,23 @@ namespace Extract.Imaging.Forms
                     {
                         item.Image = image;
 
-                        if (InvertColors)
+                        // The thumbnail viewer should respect the InvertColors property of the
+                        // ImageViewer.
+                        if (ImageViewer.InvertColors)
                         {
                             var invertCommand = new InvertCommand();
                             invertCommand.Run(item.Image);
                         }
 
                         _originalViewPerspectives[i] = item.Image.ViewPerspective;
-                        if (_pendingViewPerspectives[i] != 0)
+
+                        if (ImageViewer.IsImageAvailable)
                         {
-                            item.Image.RotateViewPerspective(_pendingViewPerspectives[i]);
-                            _pendingViewPerspectives[i] = 0;
+                            var pageData = ImageViewer.ImagePageData[i];
+                            item.Image.RotateViewPerspective(pageData.Orientation);
                         }
 
                         item.Invalidate();
-
-                        OnThumbnailLoaded(i + 1);
                     }
                 }
             }
@@ -451,38 +390,6 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        /// <summary>
-        /// Sets the thumbnail orientation.
-        /// </summary>
-        /// <param name="pageNumber">The page number.</param>
-        /// <param name="orientation">The orientation.</param>
-        /// <param name="absolute"></param>
-        public void SetThumbnailOrientation(int pageNumber, int orientation, bool absolute)
-        {
-            try
-            {
-                int index = pageNumber - 1;
-                RasterImageListItem item = _imageList.Items[index];
-                if (_originalViewPerspectives[index] != 0)
-                {
-                    if (absolute)
-                    {
-                        item.Image.ViewPerspective = _originalViewPerspectives[index];
-                    }
-                    item.Image.RotateViewPerspective(orientation);
-                    item.Invalidate();
-                }
-                else
-                {
-                    _pendingViewPerspectives[index] = orientation;
-                }    
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI0");
-            }
-        }
-
         #endregion Methods
 
         #region Event Handlers
@@ -529,6 +436,62 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 ExtractException.Display("ELI27919", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="E:ImageViewer.InvertColorsStatusChanged"/> event of the
+        /// <see cref="_imageViewer"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleImageViewerInvertColorsStatusChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // The thumbnail viewer should keep it's color inversion state in sync with
+                // the ImageViewer InvertColors property.
+                InvertColors = _imageViewer.InvertColors;
+            }
+            catch (Exception ex)
+            {
+                // This is intentionally not a displayed exception since this event is not directly
+                // raised by a user action.
+                throw ex.AsExtract("ELI36800");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="E:ImageViewer.NonDisplayedPageOrientationChanged"/> and
+        /// <see cref="E:ImageViewer.OrientationChanged"/> events of the <see cref="_imageViewer"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.OrientationChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleImageViewerOrientationChanged(object sender, OrientationChangedEventArgs e)
+        {
+            try
+            {
+                int index = e.PageNumber - 1;
+
+                // The existence of a non-zero entry in _originalViewPerspectives for the page
+                // indicates that the thumbnail has been loaded. If the thumbnail has not been
+                // loaded, don't apply the orientation change since it will cause the placeholder
+                // "Loading" image to be rotaded.
+                if (Active && _originalViewPerspectives[index] != 0)
+                {
+                    RasterImageListItem item = _imageList.Items[index];
+                    item.Image.ViewPerspective = _originalViewPerspectives[index];
+                    item.Image.RotateViewPerspective(e.Orientation);
+                    item.Invalidate();
+                }
+            }
+            catch (Exception ex)
+            {
+                // This is intentionally not a displayed exception since this event is not directly
+                // raised by a user action.
+                throw ex.AsExtract("ELI36813");
             }
         }
 
@@ -634,6 +597,11 @@ namespace Extract.Imaging.Forms
                     {
                         _imageViewer.ImageFileChanged -= HandleImageViewerImageFileChanged;
                         _imageViewer.PageChanged -= HandleImageViewerPageChanged;
+                        _imageViewer.InvertColorsStatusChanged -=
+                            HandleImageViewerInvertColorsStatusChanged;
+                        _imageViewer.OrientationChanged -= HandleImageViewerOrientationChanged;
+                        _imageViewer.NonDisplayedPageOrientationChanged -=
+                            HandleImageViewerOrientationChanged;
                     }
 
                     // Store the new image viewer
@@ -642,8 +610,17 @@ namespace Extract.Imaging.Forms
                     // Register for events
                     if (_imageViewer != null)
                     {
+                        // The thumbnail viewer should keep it's color inversion state in sync with
+                        // the ImageViewer InvertColors property.
+                        InvertColors = _imageViewer.InvertColors;
+
                         _imageViewer.ImageFileChanged += HandleImageViewerImageFileChanged;
                         _imageViewer.PageChanged += HandleImageViewerPageChanged;
+                        _imageViewer.InvertColorsStatusChanged +=
+                            HandleImageViewerInvertColorsStatusChanged;
+                        _imageViewer.OrientationChanged += HandleImageViewerOrientationChanged;
+                        _imageViewer.NonDisplayedPageOrientationChanged +=
+                            HandleImageViewerOrientationChanged;
                     }
                 }
                 catch (Exception ex)
@@ -657,6 +634,40 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion IImageViewerControl Members
+
+        #region Private Members
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the colors of the thumbnails are currently
+        /// inverted.
+        /// </summary>
+        /// <value><see langword="true"/> if thumbnail colors are currently inverted; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool InvertColors
+        {
+            get
+            {
+                return _invertColors;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _invertColors)
+                    {
+                        _invertColors = value;
+
+                        InvertAllLoadedThumbnails();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36794");
+                }
+            }
+        }
 
         /// <summary>
         /// Inverts all currently loaded thumbnails.
@@ -676,17 +687,6 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        /// <summary>
-        /// Raises the <see cref="E:ThumbnailLoaded"/> event.
-        /// </summary>
-        /// <param name="pageNumber"></param>
-        void OnThumbnailLoaded(int pageNumber)
-        {
-            var eventHandler = ThumbnailLoaded;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new PageChangedEventArgs(pageNumber));
-            }
-        }
+        #endregion Private Members
     }
 }

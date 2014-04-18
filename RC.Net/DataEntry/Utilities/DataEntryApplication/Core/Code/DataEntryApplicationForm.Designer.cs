@@ -47,6 +47,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._rotateCounterclockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripMenuItem();
             this._rotateClockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateClockwiseToolStripMenuItem();
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateAllDocumentPagesCounterclockwiseToolStripMenuItem();
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateAllDocumentPagesClockwiseToolStripMenuItem();
             this._gotoPageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._firstPageToolStripMenuItem = new Extract.Imaging.Forms.FirstPageToolStripMenuItem();
             this._previousPageToolStripMenuItem = new Extract.Imaging.Forms.PreviousPageToolStripMenuItem();
@@ -107,6 +109,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._statusStrip = new System.Windows.Forms.StatusStrip();
             this._userActionToolStripStatusLabel = new Extract.Imaging.Forms.UserActionToolStripStatusLabel();
             this._backgroundProgressStatusLabel = new Extract.Imaging.Forms.BackgroundProcessStatusLabel();
+            this._zoomLevelToolStripStatusLabel = new Extract.Imaging.Forms.ZoomLevelToolStripStatusLabel();
             this._resolutionToolStripStatusLabel = new Extract.Imaging.Forms.ResolutionToolStripStatusLabel();
             this._mousePositionToolStripStatusLabel = new Extract.Imaging.Forms.MousePositionToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).BeginInit();
@@ -441,7 +444,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._rotateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._rotateCounterclockwiseToolStripMenuItem,
-            this._rotateClockwiseToolStripMenuItem});
+            this._rotateClockwiseToolStripMenuItem,
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem,
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem});
             this._rotateToolStripMenuItem.Name = "_rotateToolStripMenuItem";
             this._rotateToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             this._rotateToolStripMenuItem.Text = "&Rotate";
@@ -465,6 +470,26 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rotateClockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
             this._rotateClockwiseToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this._rotateClockwiseToolStripMenuItem.Text = "Rotate clockwise";
+            // 
+            // _rotateAllDocumentPagesCounterclockwiseToolStripMenuItem
+            // 
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Enabled = false;
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Image")));
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.ImageViewer = null;
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Name = "_rotateAllDocumentPagesCounterclockwiseToolStripMenuItem";
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Text = "Rotate all pages counterclockwise";
+            // 
+            // _rotateAllDocumentPagesClockwiseToolStripMenuItem
+            // 
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Enabled = false;
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_rotateAllDocumentPagesClockwiseToolStripMenuItem.Image")));
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.ImageViewer = null;
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Name = "_rotateAllDocumentPagesClockwiseToolStripMenuItem";
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Text = "Rotate all pages clockwise";
+
             // 
             // _gotoPageToolStripMenuItem
             // 
@@ -1020,6 +1045,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._userActionToolStripStatusLabel,
             this._backgroundProgressStatusLabel,
+            this._zoomLevelToolStripStatusLabel,
             this._resolutionToolStripStatusLabel,
             this._mousePositionToolStripStatusLabel});
             this._statusStrip.Location = new System.Drawing.Point(0, 567);
@@ -1047,6 +1073,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._backgroundProgressStatusLabel.Size = new System.Drawing.Size(117, 19);
             this._backgroundProgressStatusLabel.Text = "(Background status)";
             this._backgroundProgressStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // _zoomLevelToolStripStatusLabel
+            // 
+            this._zoomLevelToolStripStatusLabel.AutoSize = false;
+            this._zoomLevelToolStripStatusLabel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+            this._zoomLevelToolStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this._zoomLevelToolStripStatusLabel.ImageViewer = null;
+            this._zoomLevelToolStripStatusLabel.Name = "_zoomLevelToolStripStatusLabel";
+            this._zoomLevelToolStripStatusLabel.Size = new System.Drawing.Size(50, 19);
+            this._zoomLevelToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _resolutionToolStripStatusLabel
             // 
@@ -1134,6 +1170,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private Extract.Imaging.Forms.UserActionToolStripStatusLabel _userActionToolStripStatusLabel;
         private Extract.Imaging.Forms.BackgroundProcessStatusLabel _backgroundProgressStatusLabel;
         private Extract.Imaging.Forms.ResolutionToolStripStatusLabel _resolutionToolStripStatusLabel;
+        private Extract.Imaging.Forms.ZoomLevelToolStripStatusLabel _zoomLevelToolStripStatusLabel;
         private Extract.Imaging.Forms.MousePositionToolStripStatusLabel _mousePositionToolStripStatusLabel;
         private System.Windows.Forms.MenuStrip _menuStrip;
         private System.Windows.Forms.ToolStripMenuItem _fileToolStripMenuItem;
@@ -1204,6 +1241,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private TD.SandDock.DockContainer _dockContainer;
         private Imaging.Forms.MagnifierControl _magnifierControl;
         private Imaging.Forms.OneToOneZoomToolStripMenuItem _oneToOneZoomToolStripMenuItem;
+        private Imaging.Forms.RotateAllDocumentPagesClockwiseToolStripMenuItem _rotateAllDocumentPagesClockwiseToolStripMenuItem;
+        private Imaging.Forms.RotateAllDocumentPagesCounterclockwiseToolStripMenuItem _rotateAllDocumentPagesCounterclockwiseToolStripMenuItem;
     }
 }
 

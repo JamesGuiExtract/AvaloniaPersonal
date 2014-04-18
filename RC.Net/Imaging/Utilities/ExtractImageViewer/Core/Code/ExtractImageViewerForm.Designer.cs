@@ -107,9 +107,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this._fitToWidthToolStripMenuItem = new Extract.Imaging.Forms.FitToWidthToolStripMenuItem();
             this._fitToPageToolStripMenuItem = new Extract.Imaging.Forms.FitToPageToolStripMenuItem();
+            this._oneToOneZoomToolStripMenuItem = new Extract.Imaging.Forms.OneToOneZoomToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this._rotateCounterclockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripMenuItem();
             this._rotateClockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateClockwiseToolStripMenuItem();
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateAllDocumentPagesCounterclockwiseToolStripMenuItem();
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateAllDocumentPagesClockwiseToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this._firstPageToolStripMenuItem = new Extract.Imaging.Forms.FirstPageToolStripMenuItem();
             this._previousPageToolStripMenuItem = new Extract.Imaging.Forms.PreviousPageToolStripMenuItem();
@@ -135,6 +138,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this._fitToPageToolStripButton = new Extract.Imaging.Forms.FitToPageToolStripButton();
             this._fitToWidthToolStripButton = new Extract.Imaging.Forms.FitToWidthToolStripButton();
+            this._oneToOneZoomToolStripButton = new Extract.Imaging.Forms.OneToOneZoomToolStripButton();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this._previousTileToolStripButton = new Extract.Imaging.Forms.PreviousTileToolStripButton();
             this._nextTileToolStripButton = new Extract.Imaging.Forms.NextTileToolStripButton();
@@ -152,8 +156,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             this.dockContainer1 = new TD.SandDock.DockContainer();
-            this._oneToOneZoomToolStripButton = new Extract.Imaging.Forms.OneToOneZoomToolStripButton();
-            this._oneToOneZoomToolStripMenuItem = new Extract.Imaging.Forms.OneToOneZoomToolStripMenuItem();
+            this.toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
+            this._invertColorsToolStripButton = new Extract.Imaging.Forms.InvertColorsToolStripButton();
             toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
             this._toolStripContainer.ContentPanel.SuspendLayout();
@@ -165,7 +169,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._basicTools.SuspendLayout();
             this._viewCommands.SuspendLayout();
             this._navigationTools.SuspendLayout();
-            this._thumbnailDockableWindow.SuspendLayout(); 
+            this._thumbnailDockableWindow.SuspendLayout();
             this.dockContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -186,13 +190,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // 
             this._toolStripContainer.ContentPanel.ContextMenuStrip = this._contextMenu;
             this._toolStripContainer.ContentPanel.Controls.Add(this._imageViewer);
-            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(566, 401);
+            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(748, 440);
             this._toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._toolStripContainer.LeftToolStripPanelVisible = false;
             this._toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this._toolStripContainer.Name = "_toolStripContainer";
             this._toolStripContainer.RightToolStripPanelVisible = false;
-            this._toolStripContainer.Size = new System.Drawing.Size(566, 542);
+            this._toolStripContainer.Size = new System.Drawing.Size(748, 542);
             this._toolStripContainer.TabIndex = 0;
             this._toolStripContainer.TabStop = false;
             this._toolStripContainer.Text = "toolStripContainer1";
@@ -201,9 +205,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // 
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._menuStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._fileCommands);
+            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._navigationTools);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._basicTools);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommands);
-            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._navigationTools);
             // 
             // _contextMenu
             // 
@@ -217,7 +221,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._angularHighlightContextMenuItem,
             this._rectangularHighlightContextMenuItem});
             this._contextMenu.Name = "_contextMenu";
-            this._contextMenu.Size = new System.Drawing.Size(189, 170);
+            this._contextMenu.Size = new System.Drawing.Size(189, 148);
             // 
             // _zoomWindowContextMenuItem
             // 
@@ -282,14 +286,18 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // _imageViewer
             // 
             this._imageViewer.AllowDrop = true;
+            this._imageViewer.AutoOcr = false;
+            this._imageViewer.AutoZoomScale = 0;
             this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._imageViewer.FrameColor = System.Drawing.Color.Transparent;
+            this._imageViewer.InvertColors = false;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
             this._imageViewer.MinimumAngularHighlightHeight = 16;
             this._imageViewer.MinimumSize = new System.Drawing.Size(5, 5);
             this._imageViewer.Name = "_imageViewer";
+            this._imageViewer.OcrTradeoff = Extract.Imaging.OcrTradeoff.Accurate;
             this._imageViewer.RedactionMode = false;
-            this._imageViewer.Size = new System.Drawing.Size(566, 440);
+            this._imageViewer.Size = new System.Drawing.Size(748, 440);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.Text = "imageViewer1";
             this._imageViewer.UseDefaultShortcuts = true;
@@ -304,7 +312,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.viewToolStripMenuItem});
             this._menuStrip.Location = new System.Drawing.Point(0, 0);
             this._menuStrip.Name = "_menuStrip";
-            this._menuStrip.Size = new System.Drawing.Size(566, 24);
+            this._menuStrip.Size = new System.Drawing.Size(748, 24);
             this._menuStrip.TabIndex = 0;
             this._menuStrip.Text = "menuStrip1";
             // 
@@ -462,6 +470,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.toolStripSeparator4,
             this._rotateCounterclockwiseToolStripMenuItem,
             this._rotateClockwiseToolStripMenuItem,
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem,
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem,
             this.toolStripSeparator5,
             this._firstPageToolStripMenuItem,
             this._previousPageToolStripMenuItem,
@@ -566,6 +576,16 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._fitToPageToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this._fitToPageToolStripMenuItem.Text = "Fit to &page";
             // 
+            // _oneToOneZoomToolStripMenuItem
+            // 
+            this._oneToOneZoomToolStripMenuItem.Enabled = false;
+            this._oneToOneZoomToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_oneToOneZoomToolStripMenuItem.Image")));
+            this._oneToOneZoomToolStripMenuItem.ImageViewer = null;
+            this._oneToOneZoomToolStripMenuItem.Name = "_oneToOneZoomToolStripMenuItem";
+            this._oneToOneZoomToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._oneToOneZoomToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+            this._oneToOneZoomToolStripMenuItem.Text = "&One-to-one zoom";
+            // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
@@ -590,6 +610,25 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._rotateClockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
             this._rotateClockwiseToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this._rotateClockwiseToolStripMenuItem.Text = "Rotate clockwise";
+            // 
+            // _rotateAllDocumentPagesCounterclockwiseToolStripMenuItem
+            // 
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Enabled = false;
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_rotateCounterclockwiseToolStripMenuItem.Image")));
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.ImageViewer = null;
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Name = "_rotateAllDocumentPagesCounterclockwiseToolStripMenuItem";
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
+            this._rotateAllDocumentPagesCounterclockwiseToolStripMenuItem.Text = "Rotate all pages counterclockwise";
+            // 
+            // _rotateAllDocumentPagesClockwiseToolStripMenuItem
+            // 
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Enabled = false;
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_rotateClockwiseToolStripMenuItem.Image")));
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.ImageViewer = null;
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Name = "_rotateAllDocumentPagesClockwiseToolStripMenuItem";
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
+            this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Text = "Rotate all pages clockwise";
             // 
             // toolStripSeparator5
             // 
@@ -681,11 +720,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._deleteLayerObjectsToolStripButton,
             this.toolStripSeparator11,
             this._extractImageToolStripButton,
+            this.toolStripSeparator16,
+            this._invertColorsToolStripButton,
             this.toolStripSeparator13,
             this._thumbnailsToolStripButton});
             this._basicTools.Location = new System.Drawing.Point(332, 24);
             this._basicTools.Name = "_basicTools";
-            this._basicTools.Size = new System.Drawing.Size(234, 39);
+            this._basicTools.Size = new System.Drawing.Size(325, 39);
             this._basicTools.TabIndex = 5;
             // 
             // _zoomWindowToolStripButton
@@ -853,6 +894,17 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._fitToWidthToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._fitToWidthToolStripButton.Text = "Fit to width";
             // 
+            // _oneToOneZoomToolStripButton
+            // 
+            this._oneToOneZoomToolStripButton.BaseToolTipText = "One-to-one zoom";
+            this._oneToOneZoomToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._oneToOneZoomToolStripButton.Enabled = false;
+            this._oneToOneZoomToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._oneToOneZoomToolStripButton.ImageViewer = null;
+            this._oneToOneZoomToolStripButton.Name = "_oneToOneZoomToolStripButton";
+            this._oneToOneZoomToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._oneToOneZoomToolStripButton.Text = "One-to-one zoom";
+            // 
             // toolStripSeparator9
             // 
             this.toolStripSeparator9.Name = "toolStripSeparator9";
@@ -978,7 +1030,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // 
             this._imageViewerStatusStrip.Location = new System.Drawing.Point(0, 542);
             this._imageViewerStatusStrip.Name = "_imageViewerStatusStrip";
-            this._imageViewerStatusStrip.Size = new System.Drawing.Size(792, 24);
+            this._imageViewerStatusStrip.ShowBackgroundProcessStatus = false;
+            this._imageViewerStatusStrip.Size = new System.Drawing.Size(974, 24);
             this._imageViewerStatusStrip.TabIndex = 2;
             this._imageViewerStatusStrip.Text = "_imageViewerStatusStrip";
             // 
@@ -1018,36 +1071,33 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.dockContainer1.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
             ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
                         ((TD.SandDock.DockControl)(this._thumbnailDockableWindow))}, this._thumbnailDockableWindow)))});
-            this.dockContainer1.Location = new System.Drawing.Point(566, 0);
+            this.dockContainer1.Location = new System.Drawing.Point(748, 0);
             this.dockContainer1.Manager = this._sandDockManager;
             this.dockContainer1.Name = "dockContainer1";
             this.dockContainer1.Size = new System.Drawing.Size(226, 542);
             this.dockContainer1.TabIndex = 3;
             // 
-            // _oneToOneZoomToolStripButton
+            // toolStripSeparator16
             // 
-            this._oneToOneZoomToolStripButton.BaseToolTipText = "One-to-one zoom";
-            this._oneToOneZoomToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._oneToOneZoomToolStripButton.Enabled = false;
-            this._oneToOneZoomToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._oneToOneZoomToolStripButton.ImageViewer = null;
-            this._oneToOneZoomToolStripButton.Name = "_oneToOneZoomToolStripButton";
-            this._oneToOneZoomToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._oneToOneZoomToolStripButton.Text = "One-to-one zoom";
+            this.toolStripSeparator16.Name = "toolStripSeparator16";
+            this.toolStripSeparator16.Size = new System.Drawing.Size(6, 39);
             // 
-            // _oneToOneZoomToolStripMenuItem
+            // _invertColorsToolStripButton
             // 
-            this._oneToOneZoomToolStripMenuItem.Enabled = false;
-            this._oneToOneZoomToolStripMenuItem.ImageViewer = null;
-            this._oneToOneZoomToolStripMenuItem.Name = "_oneToOneZoomToolStripMenuItem";
-            this._oneToOneZoomToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this._oneToOneZoomToolStripMenuItem.Text = "&One-to-one zoom";
+            this._invertColorsToolStripButton.BaseToolTipText = "Invert image colors";
+            this._invertColorsToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._invertColorsToolStripButton.Enabled = false;
+            this._invertColorsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._invertColorsToolStripButton.ImageViewer = null;
+            this._invertColorsToolStripButton.Name = "_invertColorsToolStripButton";
+            this._invertColorsToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._invertColorsToolStripButton.Text = "Invert image colors";
             // 
             // ExtractImageViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(792, 566);
+            this.ClientSize = new System.Drawing.Size(974, 566);
             this.Controls.Add(this._toolStripContainer);
             this.Controls.Add(this.dockContainer1);
             this.Controls.Add(this._imageViewerStatusStrip);
@@ -1163,6 +1213,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         private Forms.RectangularHighlightToolStripMenuItem _rectangularHighlightContextMenuItem;
         private Forms.OneToOneZoomToolStripButton _oneToOneZoomToolStripButton;
         private Forms.OneToOneZoomToolStripMenuItem _oneToOneZoomToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator16;
+        private Forms.InvertColorsToolStripButton _invertColorsToolStripButton;
+        private Imaging.Forms.RotateAllDocumentPagesClockwiseToolStripMenuItem _rotateAllDocumentPagesClockwiseToolStripMenuItem;
+        private Imaging.Forms.RotateAllDocumentPagesCounterclockwiseToolStripMenuItem _rotateAllDocumentPagesCounterclockwiseToolStripMenuItem;
     }
 }
 

@@ -511,6 +511,13 @@ namespace Extract.Imaging.Forms
             "Resources.RotateClockwiseButtonSmall.png";
 
         /// <summary>
+        /// Constant string for a small version of the rotate all document pages clockwise button
+        /// image.
+        /// </summary>
+        public const string _ROTATE_ALL_DOC_PAGES_CLOCKWISE_BUTTON_IMAGE_SMALL =
+            "Resources.RotateAllDocumentPagesClockwiseButtonSmall.png";
+
+        /// <summary>
         /// Constant string for the rotate clockwise button text.
         /// </summary>
         public const string _ROTATE_CLOCKWISE_BUTTON_TEXT =
@@ -521,6 +528,18 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public const string _ROTATE_CLOCKWISE_BUTTON_TOOL_TIP =
             "Rotate clockwise";
+
+        /// <summary>
+        /// Constant string for the rotate all document pages clockwise button text.
+        /// </summary>
+        public const string _ROTATE_ALL_DOC_PAGESCLOCKWISE_BUTTON_TEXT =
+            "Rotate all pages clockwise";
+
+        /// <summary>
+        /// Constant string for the rotate all document pages clockwise button tool tip text.
+        /// </summary>
+        public const string _ROTATE_ALL_DOC_PAGESCLOCKWISE_BUTTON_TOOL_TIP =
+            "Rotate all pages clockwise";
 
         /// <summary>
         /// Constant string for the rotate counterclockwise button image.
@@ -535,6 +554,13 @@ namespace Extract.Imaging.Forms
             "Resources.RotateCounterclockwiseButtonSmall.png";
 
         /// <summary>
+        /// Constant string for a small version of the rotate all document pages counterclockwise
+        /// button image.
+        /// </summary>
+        public const string _ROTATE_ALL_DOC_PAGES_COUNTERCLOCKWISE_BUTTON_IMAGE_SMALL =
+            "Resources.RotateAllDocumentPagesCounterclockwiseButtonSmall.png";
+
+        /// <summary>
         /// Constant string for the rotate counterclockwise button text.
         /// </summary>
         public const string _ROTATE_COUNTERCLOCKWISE_BUTTON_TEXT =
@@ -545,6 +571,18 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public const string _ROTATE_COUNTERCLOCKWISE_BUTTON_TOOL_TIP =
             "Rotate counterclockwise";
+
+        /// <summary>
+        /// Constant string for the rotate all document pages counterclockwise button text.
+        /// </summary>
+        public const string _ROTATE_ALL_DOC_PAGES_COUNTERCLOCKWISE_BUTTON_TEXT =
+            "Rotate all pages counterclockwise";
+
+        /// <summary>
+        /// Constant string for the rotate all document pages counterclockwise button tool tip text.
+        /// </summary>
+        public const string _ROTATE_ALL_DOC_PAGES_COUNTERCLOCKWISE_BUTTON_TOOL_TIP =
+            "Rotate all pages counterclockwise";
 
         /// <summary>
         /// 
@@ -889,10 +927,22 @@ namespace Extract.Imaging.Forms
             "Rotate clockwise";
 
         /// <summary>
+        /// Constant string for the rotate all document pages clockwise menu item text.
+        /// </summary>
+        public const string _ROTATE_ALL_DOC_PAGES_CLOCKWISE_MENU_ITEM_TEXT =
+            "Rotate all pages clockwise";
+
+        /// <summary>
         /// Constant string for the rotate counterclockwise menu item text.
         /// </summary>
         public const string _ROTATE_COUNTERCLOCKWISE_MENU_ITEM_TEXT =
             "Rotate counterclockwise";
+
+        /// <summary>
+        /// Constant string for the rotate all document pages counterclockwise menu item text.
+        /// </summary>
+        public const string _ROTATE_ALL_DOC_PAGES_COUNTERCLOCKWISE_MENU_ITEM_TEXT =
+            "Rotate all pages counterclockwise";
 
         /// <summary>
         /// Constant string for the print image menu item text.

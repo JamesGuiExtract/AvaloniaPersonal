@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -14,6 +15,7 @@ namespace Extract.Imaging.Forms
     /// <para/>
     /// <see cref="UserActionToolStripStatusLabel"/>,
     /// <see cref="BackgroundProcessStatusLabel"/>,
+    /// <see cref="ZoomLevelToolStripStatusLabel"/>,
     /// <see cref="ResolutionToolStripStatusLabel"/>, and
     /// <see cref="MousePositionToolStripStatusLabel"/>.
     /// </summary>
@@ -29,6 +31,8 @@ namespace Extract.Imaging.Forms
             typeof(ImageViewerStatusStrip).ToString();
 
         #endregion Constants
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="ImageViewerStatusStrip"/> class.
@@ -53,6 +57,7 @@ namespace Extract.Imaging.Forms
                 ToolStripStatusLabel[] statusStripItems = new ToolStripStatusLabel[]{
                                                     new UserActionToolStripStatusLabel(),
                                                     new BackgroundProcessStatusLabel(),
+                                                    new ZoomLevelToolStripStatusLabel(),
                                                     new ResolutionToolStripStatusLabel(),
                                                     new MousePositionToolStripStatusLabel()};
 
@@ -76,5 +81,31 @@ namespace Extract.Imaging.Forms
                 throw ExtractException.AsExtractException("ELI23125", ex);
             }
         }
+
+        #endregion Constructors
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="BackgroundProcessStatusLabel"/>
+        /// should be visible.
+        /// </summary>
+        /// <value><see langword="true"/> if the <see cref="BackgroundProcessStatusLabel"/> should
+        /// be visibile; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool ShowBackgroundProcessStatus
+        {
+            get
+            {
+                return Items.OfType<BackgroundProcessStatusLabel>().Single().Visible;
+            }
+
+            set
+            {
+                Items.OfType<BackgroundProcessStatusLabel>().Single().Visible = value;
+            }
+        }
+
+        #endregion Properties
     }
 }

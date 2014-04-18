@@ -113,12 +113,19 @@ namespace Extract.Imaging.Forms
         private readonly int _orientation;
 
         /// <summary>
+        /// The page number of the affected image.
+        /// </summary>
+        private readonly int _pageNumber;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="OrientationChangedEventArgs"/> class.
         /// </summary>
         /// <param name="orientation">The orientation that was changed to.</param>
-        public OrientationChangedEventArgs(int orientation)
+        /// <param name="pageNumber">The page number of the affected image.</param>
+        public OrientationChangedEventArgs(int orientation, int pageNumber)
         {
             _orientation = orientation;
+            _pageNumber = pageNumber;
         }
 
         /// <summary>
@@ -130,6 +137,17 @@ namespace Extract.Imaging.Forms
             get
             {
                 return _orientation;
+            }
+        }
+
+        /// <summary>
+        /// Gets the page number of the affected image.
+        /// </summary>
+        public int PageNumber
+        {
+            get
+            {
+                return _pageNumber;
             }
         }
     }

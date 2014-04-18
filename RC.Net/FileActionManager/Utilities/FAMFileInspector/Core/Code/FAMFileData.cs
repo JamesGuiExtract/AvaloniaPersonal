@@ -1,6 +1,8 @@
 ﻿using Extract.Imaging;
+using Extract.Imaging.Forms;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -17,15 +19,6 @@ namespace Extract.FileActionManager.Utilities
     /// </summary>
     internal class FAMFileData : IComparable<FAMFileData>
     {
-        #region Fields
-
-        /// <summary>
-        /// 
-        /// </summary>
-        List<PageState> _pageData = new List<PageState>();
-
-        #endregion Fields
-
         #region Constructors
 
         /// <summary>
@@ -47,17 +40,6 @@ namespace Extract.FileActionManager.Utilities
         #endregion Constructors
 
         #region Properties
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool Dirty
-        {
-            get
-            {
-                return PageData.Any(page => page.Dirty);
-            }
-        }
 
         /// <summary>
         /// Gets or sets the name of the file to which this instance pertains.
@@ -87,8 +69,9 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets a value indicating whether this <see cref="FAMFileData"/> has been flagged.
         /// </summary>
+        /// <value><see langword="true"/> if flagged; otherwise, <see langword="false"/>.</value>
         public bool Flagged
         {
             get;
@@ -235,14 +218,13 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Gets the collection of states of the pages as of the time they were last viewed in the
+        /// <see cref="FAMFileInspectorForm"/>.
         /// </summary>
-        public List<PageState> PageData
+        public ReadOnlyCollection<ImagePageData> ImagePageData
         {
-            get
-            {
-                return _pageData;
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -253,19 +235,8 @@ namespace Extract.FileActionManager.Utilities
         /// </value>
         public int PageCount
         {
-            get
-            {
-                return _pageData.Count;
-            }
-
-            set
-            {
-                if (value != _pageData.Count)
-                {
-                    _pageData = 
-                        Enumerable.Range(0, value).Select(i => new PageState()).ToList();
-                }
-            }
+            get;
+            set;
         }
 
         #endregion Properties
@@ -393,46 +364,6 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35746");
-            }
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    internal class PageState
-    {
-        bool _dirty;
-        int _orientation;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool Dirty
-        {
-            get
-            {
-                return _dirty;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Orientation
-        {
-            get
-            {
-                return _orientation;
-            }
-
-            set
-            {
-                if (value != _orientation)
-                {
-                    _orientation = value;
-                    _dirty = true;
-                }
             }
         }
     }

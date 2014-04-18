@@ -49,7 +49,16 @@ namespace Extract.Imaging.Forms
             {
                 if (base.ImageViewer != null && base.ImageViewer.IsImageAvailable)
                 {
-                    base.ImageViewer.SelectRotateCounterclockwise();
+                    // https://extract.atlassian.net/browse/ISSUE-12145
+                    // Rotate all document pages if the button click occured with the ctrl key down.
+                    if (Control.ModifierKeys.HasFlag(Keys.Control))
+                    {
+                        ImageViewer.SelectRotateAllDocumentPagesCounterclockwise();
+                    }
+                    else
+                    {
+                        ImageViewer.SelectRotateCounterclockwise();
+                    }
                 }
             }
             catch (Exception ex)

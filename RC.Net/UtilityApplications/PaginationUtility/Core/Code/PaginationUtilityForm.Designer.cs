@@ -551,6 +551,7 @@
             this._imageViewerStatusStrip.Dock = System.Windows.Forms.DockStyle.None;
             this._imageViewerStatusStrip.Location = new System.Drawing.Point(0, 0);
             this._imageViewerStatusStrip.Name = "_imageViewerStatusStrip";
+            this._imageViewerStatusStrip.ShowBackgroundProcessStatus = false;
             this._imageViewerStatusStrip.Size = new System.Drawing.Size(529, 24);
             this._imageViewerStatusStrip.TabIndex = 0;
             // 

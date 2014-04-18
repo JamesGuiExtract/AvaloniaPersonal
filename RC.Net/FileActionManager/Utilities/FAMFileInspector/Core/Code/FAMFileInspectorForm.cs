@@ -31,7 +31,6 @@ using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
-using Leadtools.WinForms;
 
 namespace Extract.FileActionManager.Utilities
 {
@@ -519,12 +518,12 @@ namespace Extract.FileActionManager.Utilities
                 // License SandDock before creating the form.
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
+                // Do not initialize FileProcessingDB here. A value of null will be used to indicate
+                // that the FFI is not operating in database mode.
                 MaxFilesToDisplay = DefaultMaxFilesToDisplay;
                 SubsetType = DefaultSubsetType;
                 FileSelector = new FAMFileSelector();
-                // Do not initialize FileProcessingDB here. A value of null will be used to indicate
-                // that the FFI is not operating in database mode.
-
+                
                 InitializeComponent();
 
                 // Turn off the tab stop on the page navigation text box.
@@ -580,6 +579,8 @@ namespace Extract.FileActionManager.Utilities
 	            {	        
 		            if (value != UseDatabaseMode)
                     {
+                        // The existence of FileProcessingDB is what indicates if the application is
+                        // being run in database mode.
                         if (value)
                         {
                             FileProcessingDB = new FileProcessingDB();
@@ -590,6 +591,8 @@ namespace Extract.FileActionManager.Utilities
                             FileProcessingDB = null;
                         }
 
+                        // If the form had already been created, ensure all mode-related settings
+                        // have been reset.
                         if (IsHandleCreated)
                         {
                             ResetFileSelectionSettings();
@@ -874,7 +877,7 @@ namespace Extract.FileActionManager.Utilities
                 // Ensure any previous background operation is canceled first.
                 CancelBackgroundOperation();
 
-                if (FileProcessingDB != null && !FileProcessingDB.IsConnected)
+                if (UseDatabaseMode && !FileProcessingDB.IsConnected)
                 {
                     FileProcessingDB.ResetDBConnection(false);
                 }
@@ -903,7 +906,7 @@ namespace Extract.FileActionManager.Utilities
                 _showOnlyMatchesCheckBox.Checked = false;
                 _showOnlyMatchesCheckBox.Enabled = false;
 
-                if (FileProcessingDB != null)
+                if (UseDatabaseMode)
                 {
                     string query = FileSelector.BuildQuery(FileProcessingDB,
                         "[FAMFile].[ID], [FAMFile].[FileName], [FAMFile].[Pages]",
@@ -1069,12 +1072,18 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                // Establish image viewer connections prior to calling base.OnLoad which will
+                // potentially remove some IImageViewerControls.
+                _imageViewer.EstablishConnections(this);
+
                 base.OnLoad(e);
 
-                // Temp hack.
+                // https://extract.atlassian.net/browse/ISSUE-12159
+                // Temporary hack to fix situation where the thumbnail pane would obscure the image
+                // viewer on load.
                 if (!_thumbnailDockableWindow.Collapsed)
                 {
-                    this.SafeBeginInvoke("ELI0", () =>
+                    this.SafeBeginInvoke("ELI36818", () =>
                         {
                             _thumbnailViewerToolStripButton.PerformClick();
                             _thumbnailViewerToolStripButton.PerformClick();
@@ -1090,18 +1099,24 @@ namespace Extract.FileActionManager.Utilities
                     _databaseMenuToolStripSeparator.Visible = false;
                 }
 
+                // Search capability is available only as a separately licensed feature.
+                // If search is not licensed hide the pane and remove the control to display it.
                 if (!_searchIsLicensed)
                 {
-                    // Search is not licensed; Hide the pane and remove the control to display it.
                     _resultsSplitContainer.Panel1Collapsed = true;
                     _resultsTableLayoutPanel.RowCount = 1;
                     _resultsTableLayoutPanel.Controls.Remove(_collapsedSearchPanel);
                     _resultsTableLayoutPanel.RowStyles[0] = new RowStyle(SizeType.AutoSize);
                 }
-
-                // Establish image viewer connections prior to calling base.OnLoad which will
-                // potentially remove some IImageViewerControls.
-                _imageViewer.EstablishConnections(this);
+                // Ensure the pane used to allow the user to open the search pane is not displayed
+                // if the search pane is visible.
+                else if (!_inDesignMode &&  SearchPaneVisible && 
+                    (_resultsTableLayoutPanel.RowCount == 2))
+                {
+                    _resultsTableLayoutPanel.RowCount = 1;
+                    _resultsTableLayoutPanel.Controls.Remove(_collapsedSearchPanel);
+                    _resultsTableLayoutPanel.RowStyles[0] = new RowStyle(SizeType.AutoSize);
+                }
 
                 _imageViewer.Shortcuts[Keys.F3] = _nextLayerObjectToolStripButton.PerformClick;
                 _imageViewer.Shortcuts[Keys.Shift | Keys.F3] =
@@ -1395,13 +1410,16 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                // Indicates if the user confirmed their selection in the appropriate file
+                // selection dialog.
+                bool selectionConfirmed = false;
+
                 if (UseDatabaseMode)
                 {
                     if (FileSelector.Configure(FileProcessingDB, "Select the files to be listed",
                         "SELECT [Filename] FROM [FAMFile]"))
                     {
-                        ClearSearchResults();
-                        GenerateFileList(false);
+                        selectionConfirmed = true;
                     }
                 }
                 else if (!string.IsNullOrWhiteSpace(SourceDirectory))
@@ -1410,10 +1428,17 @@ namespace Extract.FileActionManager.Utilities
                     {
                         if (directoryForm.ShowDialog(this) == DialogResult.OK)
                         {
-                            ClearSearchResults();
-                            GenerateFileList(false);
+                            selectionConfirmed = true;
                         }
                     }
+                }
+
+                // If the file selection was confirmed, update the file list and clear any existing
+                // search results.
+                if (selectionConfirmed)
+                {
+                    ClearSearchResults();
+                    GenerateFileList(false);
                 }
             }
             catch (Exception ex)
@@ -2397,126 +2422,6 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI36776");
-            }
-        }
-
-        /// <summary>
-        /// Handles the Click event of the HandleInvertColorsButton control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleInvertColorsButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                _thumbnailViewer.InvertColors = _invertColorsToolStripButton.Checked;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI36795");
-            }
-        }
-
-        bool _resettingOrientation = false;
-
-        /// <summary>
-        /// Handles the PageChanged event of the HandleImageViewer control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleImageViewer_PageChanged(object sender, Imaging.Forms.PageChangedEventArgs e)
-        {
-            DataGridViewRow currentRow = _fileListDataGridView.CurrentRow;
-
-            if (currentRow != null)
-            {
-                FAMFileData fileData = currentRow.GetFileData();
-                PageState pageState = fileData.PageData[_imageViewer.PageNumber - 1];
-                _lastOrientation = pageState.Orientation;
-
-                try
-                {
-                    _resettingOrientation = true;
-                    if (_imageViewer.Orientation != pageState.Orientation)
-                    {
-                        _imageViewer.Rotate(pageState.Orientation - _imageViewer.Orientation, false, true);
-                    }
-
-                    if (_invertColorsToolStripButton.Checked)
-                    {
-                        _imageViewer.InvertColors();
-                    }
-                }
-                finally
-                {
-                    _resettingOrientation = false;
-                }
-
-                SetThumbnailOrientation(e.PageNumber, pageState.Orientation, true);
-            }
-        }
-
-        int _lastOrientation = 0;
-
-        /// <summary>
-        /// Handles the OrientationChanged event of the _imageViewer control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.OrientationChangedEventArgs"/> instance containing the event data.</param>
-        void HandleImageViewer_OrientationChanged(object sender, Imaging.Forms.OrientationChangedEventArgs e)
-        {
-            DataGridViewRow currentRow = _fileListDataGridView.CurrentRow;
-
-            if (currentRow != null && !_resettingOrientation)
-            {
-                FAMFileData fileData = currentRow.GetFileData();
-                PageState pageState;
-
-                if (Control.ModifierKeys.HasFlag(Keys.Control))
-                {
-                    int orientationChange = ((e.Orientation - _lastOrientation) + 360) % 360;
-
-                    for (int page = 1; page <= _imageViewer.PageCount; page++)
-                    {
-                        if (page == _imageViewer.PageNumber)
-                        {
-                            continue;
-                        }
-
-                        pageState = fileData.PageData[page - 1];
-
-                        pageState.Orientation += orientationChange;
-                        SetThumbnailOrientation(page, orientationChange, false);
-                    }
-                }
-
-                pageState = fileData.PageData[_imageViewer.PageNumber - 1];
-                pageState.Orientation = e.Orientation;
-
-                SetThumbnailOrientation(_imageViewer.PageNumber, e.Orientation, true);
-
-                toolStripButton1.Enabled = fileData.Dirty; // Save button
-            }
-
-            _lastOrientation = e.Orientation;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void HandleThumbnailViewer_ThumbnailLoaded(object sender, PageChangedEventArgs e)
-        {
-            DataGridViewRow currentRow = _fileListDataGridView.CurrentRow;
-
-            if (currentRow != null)
-            {
-                FAMFileData fileData = currentRow.GetFileData();
-                PageState pageState = fileData.PageData[e.PageNumber - 1];
-                SetThumbnailOrientation(e.PageNumber, pageState.Orientation, true);
             }
         }
 
@@ -3783,7 +3688,6 @@ namespace Extract.FileActionManager.Utilities
                 _overlayTextCanceler = null;
             }
 
-            toolStripButton1.Enabled = false; // Save button
             FAMFileData fileData = (currentRow == null) ? null : currentRow.GetFileData();
 
             if (fileData != null && File.Exists(fileData.FileName))
@@ -3793,8 +3697,6 @@ namespace Extract.FileActionManager.Utilities
                     // Open the image associated with fileData and highlight all search terms found int
                     // it.
                     OpenImage(fileData);
-
-                    toolStripButton1.Enabled = fileData.Dirty; // Save button
                 }
                 catch (Exception ex)
                 {
@@ -3911,6 +3813,17 @@ namespace Extract.FileActionManager.Utilities
                         }
 
                         _imageViewer.OpenImage(fileData.FileName, false, false);
+
+                        // Maintain the ImagePageData when changing documents so that the image
+                        // orientations are remembered if the document is re-opened.
+                        if (fileData.ImagePageData == null)
+                        {
+                            fileData.ImagePageData = _imageViewer.ImagePageData;
+                        }
+                        else
+                        {
+                            _imageViewer.ImagePageData = fileData.ImagePageData;
+                        }
 
                         // Display highlights for all search terms found in the selected file.
                         ShowMatchHighlights(fileData);
@@ -4138,20 +4051,6 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 _adminModeToolStripMenuItem.Enabled = FileProcessingDB.IsConnected && !InAdminMode;
-            }
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="pageNumber">The page number.</param>
-        /// <param name="orientation"></param>
-        /// <param name="absolute"></param>
-        void SetThumbnailOrientation(int pageNumber, int orientation, bool absolute)
-        {
-            if (_thumbnailViewer.Active)
-            {
-                _thumbnailViewer.SetThumbnailOrientation(pageNumber, orientation, absolute);
             }
         }
 

@@ -22,15 +22,15 @@
         {
             System.Windows.Forms.GroupBox groupBox1;
             System.Windows.Forms.Label label1;
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FAMFileInspectorForm));
             this._selectFilesSummaryLabel = new System.Windows.Forms.Label();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
@@ -82,18 +82,18 @@
             this._imageViewerStatusStrip = new System.Windows.Forms.StatusStrip();
             this._layerObjectSelectionStatusLabel = new Extract.Imaging.Forms.StatusStripItems.LayerObjectSelectionStatusLabel();
             this._imageViewerErrorStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this._zoomLevelToolStripStatusLabel = new Extract.Imaging.Forms.ZoomLevelToolStripStatusLabel();
             this._resolutionToolStripStatusLabel = new Extract.Imaging.Forms.ResolutionToolStripStatusLabel();
             this._mousePositionToolStripStatusLabel = new Extract.Imaging.Forms.MousePositionToolStripStatusLabel();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
+            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
+            this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
             this._highlightNavigationToolStrip = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this._previousLayerObjectToolStripButton = new Extract.Imaging.Forms.PreviousLayerObjectToolStripButton();
             this._nextLayerObjectToolStripButton = new Extract.Imaging.Forms.NextLayerObjectToolStripButton();
             this._imageViewerToolsToolStrip = new System.Windows.Forms.ToolStrip();
             this.zoomWindowToolStripButton1 = new Extract.Imaging.Forms.ZoomWindowToolStripButton();
             this.panToolStripButton1 = new Extract.Imaging.Forms.PanToolStripButton();
-            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
-            this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
             this._generalImageToolStrip = new System.Windows.Forms.ToolStrip();
             this._printImageToolStripButton = new Extract.Imaging.Forms.PrintImageToolStripButton();
             this._thumbnailViewerToolStripButton = new Extract.Imaging.Forms.ThumbnailViewerToolStripButton();
@@ -106,7 +106,7 @@
             this.RightToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
-            this.dockContainer1 = new TD.SandDock.DockContainer();
+            this._dockContainer = new TD.SandDock.DockContainer();
             groupBox1 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
             groupBox1.SuspendLayout();
@@ -144,7 +144,7 @@
             this._imageViewerToolsToolStrip.SuspendLayout();
             this._generalImageToolStrip.SuspendLayout();
             this._thumbnailDockableWindow.SuspendLayout();
-            this.dockContainer1.SuspendLayout();
+            this._dockContainer.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -500,36 +500,36 @@
             this._dataSearchTermsDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._dataSearchTermsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._dataSearchTermsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this._dataSearchTermsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._dataSearchTermsDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._dataSearchFieldColumn,
             this._dataSearchValueColumn});
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._dataSearchTermsDataGridView.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._dataSearchTermsDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this._dataSearchTermsDataGridView.Location = new System.Drawing.Point(3, 33);
             this._dataSearchTermsDataGridView.Name = "_dataSearchTermsDataGridView";
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._dataSearchTermsDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._dataSearchTermsDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._dataSearchTermsDataGridView.Size = new System.Drawing.Size(462, 51);
             this._dataSearchTermsDataGridView.TabIndex = 4;
             this._dataSearchTermsDataGridView.Visible = false;
@@ -574,36 +574,36 @@
             this._textSearchTermsDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._textSearchTermsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._textSearchTermsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this._textSearchTermsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._textSearchTermsDataGridView.ColumnHeadersVisible = false;
             this._textSearchTermsDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._textSearchTermsColumn});
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._textSearchTermsDataGridView.DefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._textSearchTermsDataGridView.DefaultCellStyle = dataGridViewCellStyle5;
             this._textSearchTermsDataGridView.Location = new System.Drawing.Point(3, 33);
             this._textSearchTermsDataGridView.Name = "_textSearchTermsDataGridView";
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._textSearchTermsDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._textSearchTermsDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this._textSearchTermsDataGridView.Size = new System.Drawing.Size(462, 51);
             this._textSearchTermsDataGridView.TabIndex = 4;
             // 
@@ -699,14 +699,14 @@
             this._fileListDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._fileListDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._fileListDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this._fileListDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._fileListDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._fileListFlagColumn,
@@ -714,25 +714,25 @@
             this._fileListPagesColumn,
             this._fileListMatchesColumn,
             this._fileListFolderColumn});
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._fileListDataGridView.DefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._fileListDataGridView.DefaultCellStyle = dataGridViewCellStyle8;
             this._fileListDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this._fileListDataGridView.Location = new System.Drawing.Point(3, 26);
             this._fileListDataGridView.Name = "_fileListDataGridView";
-            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle18.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._fileListDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._fileListDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this._fileListDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this._fileListDataGridView.Size = new System.Drawing.Size(461, 63);
             this._fileListDataGridView.TabIndex = 1;
@@ -820,10 +820,10 @@
             // 
             // _imageToolStripContainer.TopToolStripPanel
             // 
-            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._navigationToolsImageViewerToolStrip);
-            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._highlightNavigationToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._imageViewerToolsToolStrip);
+            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._navigationToolsImageViewerToolStrip);
+            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._generalImageToolStrip);
             // 
             // _imageViewerStatusStrip
@@ -832,6 +832,7 @@
             this._imageViewerStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._layerObjectSelectionStatusLabel,
             this._imageViewerErrorStripStatusLabel,
+            this._zoomLevelToolStripStatusLabel,
             this._resolutionToolStripStatusLabel,
             this._mousePositionToolStripStatusLabel});
             this._imageViewerStatusStrip.Location = new System.Drawing.Point(0, 0);
@@ -854,9 +855,19 @@
             this._imageViewerErrorStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this._imageViewerErrorStripStatusLabel.ForeColor = System.Drawing.Color.Red;
             this._imageViewerErrorStripStatusLabel.Name = "_imageViewerErrorStripStatusLabel";
-            this._imageViewerErrorStripStatusLabel.Size = new System.Drawing.Size(435, 19);
+            this._imageViewerErrorStripStatusLabel.Size = new System.Drawing.Size(385, 19);
             this._imageViewerErrorStripStatusLabel.Spring = true;
             this._imageViewerErrorStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // _zoomLevelToolStripStatusLabel
+            // 
+            this._zoomLevelToolStripStatusLabel.AutoSize = false;
+            this._zoomLevelToolStripStatusLabel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+            this._zoomLevelToolStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this._zoomLevelToolStripStatusLabel.ImageViewer = null;
+            this._zoomLevelToolStripStatusLabel.Name = "_zoomLevelToolStripStatusLabel";
+            this._zoomLevelToolStripStatusLabel.Size = new System.Drawing.Size(50, 19);
+            this._zoomLevelToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _resolutionToolStripStatusLabel
             // 
@@ -881,40 +892,45 @@
             this._imageViewer.AutoOcr = false;
             this._imageViewer.AutoZoomScale = 0;
             this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._imageViewer.InvertColors = false;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
             this._imageViewer.MinimumAngularHighlightHeight = 4;
             this._imageViewer.Name = "_imageViewer";
             this._imageViewer.OcrTradeoff = Extract.Imaging.OcrTradeoff.Accurate;
             this._imageViewer.RedactionMode = false;
-            this._imageViewer.Size = new System.Drawing.Size(739, 182);
+            this._imageViewer.Size = new System.Drawing.Size(739, 260);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
-            this._imageViewer.OrientationChanged += new System.EventHandler<Extract.Imaging.Forms.OrientationChangedEventArgs>(this.HandleImageViewer_OrientationChanged);
-            this._imageViewer.PageChanged += new System.EventHandler<Extract.Imaging.Forms.PageChangedEventArgs>(this.HandleImageViewer_PageChanged);
+            // 
+            // _navigationToolsImageViewerToolStrip
+            // 
+            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(171, 0);
+            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
+            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
+            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
+            // 
+            // _viewCommandsImageViewerToolStrip
+            // 
+            this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(3, 39);
+            this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
+            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(348, 39);
+            this._viewCommandsImageViewerToolStrip.TabIndex = 1;
             // 
             // _highlightNavigationToolStrip
             // 
             this._highlightNavigationToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._highlightNavigationToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._highlightNavigationToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._highlightNavigationToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1,
             this._previousLayerObjectToolStripButton,
             this._nextLayerObjectToolStripButton});
             this._highlightNavigationToolStrip.Location = new System.Drawing.Point(3, 0);
             this._highlightNavigationToolStrip.Name = "_highlightNavigationToolStrip";
-            this._highlightNavigationToolStrip.Size = new System.Drawing.Size(111, 39);
+            this._highlightNavigationToolStrip.Size = new System.Drawing.Size(84, 39);
             this._highlightNavigationToolStrip.TabIndex = 4;
-            // 
-            // toolStripButton1
-            // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Enabled = false;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(36, 36);
-            this.toolStripButton1.Text = "Save";
             // 
             // _previousLayerObjectToolStripButton
             // 
@@ -941,14 +957,13 @@
             // _imageViewerToolsToolStrip
             // 
             this._imageViewerToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._imageViewerToolsToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._imageViewerToolsToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._imageViewerToolsToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zoomWindowToolStripButton1,
             this.panToolStripButton1});
-            this._imageViewerToolsToolStrip.Location = new System.Drawing.Point(114, 0);
+            this._imageViewerToolsToolStrip.Location = new System.Drawing.Point(87, 0);
             this._imageViewerToolsToolStrip.Name = "_imageViewerToolsToolStrip";
-            this._imageViewerToolsToolStrip.Size = new System.Drawing.Size(75, 39);
+            this._imageViewerToolsToolStrip.Size = new System.Drawing.Size(84, 39);
             this._imageViewerToolsToolStrip.TabIndex = 3;
             // 
             // zoomWindowToolStripButton1
@@ -971,38 +986,17 @@
             this.panToolStripButton1.Name = "panToolStripButton1";
             this.panToolStripButton1.Size = new System.Drawing.Size(36, 36);
             // 
-            // _navigationToolsImageViewerToolStrip
-            // 
-            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._navigationToolsImageViewerToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(189, 0);
-            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
-            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(224, 39);
-            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
-            // 
-            // _viewCommandsImageViewerToolStrip
-            // 
-            this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._viewCommandsImageViewerToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(3, 39);
-            this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
-            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(339, 39);
-            this._viewCommandsImageViewerToolStrip.TabIndex = 1;
-            // 
             // _generalImageToolStrip
             // 
             this._generalImageToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._generalImageToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._generalImageToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._generalImageToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._printImageToolStripButton,
             this._thumbnailViewerToolStripButton,
             this._invertColorsToolStripButton});
-            this._generalImageToolStrip.Location = new System.Drawing.Point(342, 39);
+            this._generalImageToolStrip.Location = new System.Drawing.Point(351, 39);
             this._generalImageToolStrip.Name = "_generalImageToolStrip";
-            this._generalImageToolStrip.Size = new System.Drawing.Size(111, 39);
+            this._generalImageToolStrip.Size = new System.Drawing.Size(120, 39);
             this._generalImageToolStrip.TabIndex = 0;
             // 
             // _printImageToolStripButton
@@ -1043,17 +1037,14 @@
             // 
             this._thumbnailViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._thumbnailViewer.ImageViewer = this._imageViewer;
-            this._thumbnailViewer.InvertColors = false;
             this._thumbnailViewer.Location = new System.Drawing.Point(0, 0);
             this._thumbnailViewer.Name = "_thumbnailViewer";
             this._thumbnailViewer.Size = new System.Drawing.Size(215, 320);
             this._thumbnailViewer.TabIndex = 0;
-            this._thumbnailViewer.ThumbnailLoaded += new System.EventHandler<Extract.Imaging.Forms.PageChangedEventArgs>(this.HandleThumbnailViewer_ThumbnailLoaded);
             // 
             // _invertColorsToolStripButton
             // 
             this._invertColorsToolStripButton.BaseToolTipText = "Invert image colors";
-            this._invertColorsToolStripButton.CheckOnClick = true;
             this._invertColorsToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._invertColorsToolStripButton.Enabled = false;
             this._invertColorsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -1061,7 +1052,6 @@
             this._invertColorsToolStripButton.Name = "_invertColorsToolStripButton";
             this._invertColorsToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._invertColorsToolStripButton.Text = "Invert image colors";
-            this._invertColorsToolStripButton.Click += new System.EventHandler(this.HandleInvertColorsButton_Click);
             // 
             // _sandDockManager
             // 
@@ -1106,19 +1096,19 @@
             // 
             this.ContentPanel.Size = new System.Drawing.Size(515, 582);
             // 
-            // dockContainer1
+            // _dockContainer
             // 
-            this.dockContainer1.ContentSize = 215;
-            this.dockContainer1.Controls.Add(this._thumbnailDockableWindow);
-            this.dockContainer1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.dockContainer1.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
+            this._dockContainer.ContentSize = 215;
+            this._dockContainer.Controls.Add(this._thumbnailDockableWindow);
+            this._dockContainer.Dock = System.Windows.Forms.DockStyle.Right;
+            this._dockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
             ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
                         ((TD.SandDock.DockControl)(this._thumbnailDockableWindow))}, this._thumbnailDockableWindow)))});
-            this.dockContainer1.Location = new System.Drawing.Point(992, 0);
-            this.dockContainer1.Manager = this._sandDockManager;
-            this.dockContainer1.Name = "dockContainer1";
-            this.dockContainer1.Size = new System.Drawing.Size(219, 362);
-            this.dockContainer1.TabIndex = 4;
+            this._dockContainer.Location = new System.Drawing.Point(992, 0);
+            this._dockContainer.Manager = this._sandDockManager;
+            this._dockContainer.Name = "_dockContainer";
+            this._dockContainer.Size = new System.Drawing.Size(219, 362);
+            this._dockContainer.TabIndex = 4;
             // 
             // FAMFileInspectorForm
             // 
@@ -1126,7 +1116,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1211, 362);
-            this.Controls.Add(this.dockContainer1);
+            this.Controls.Add(this._dockContainer);
             this.Controls.Add(this._splitContainer);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this._menuStrip;
@@ -1183,7 +1173,7 @@
             this._generalImageToolStrip.ResumeLayout(false);
             this._generalImageToolStrip.PerformLayout();
             this._thumbnailDockableWindow.ResumeLayout(false);
-            this.dockContainer1.ResumeLayout(false);
+            this._dockContainer.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1242,6 +1232,7 @@
         private System.Windows.Forms.CheckBox _caseSensitiveSearchCheckBox;
         private System.Windows.Forms.CheckBox _regexSearchCheckBox;
         private System.Windows.Forms.CheckBox _fuzzySearchCheckBox;
+        private Imaging.Forms.ZoomLevelToolStripStatusLabel _zoomLevelToolStripStatusLabel;
         private Imaging.Forms.ResolutionToolStripStatusLabel _resolutionToolStripStatusLabel;
         private Imaging.Forms.MousePositionToolStripStatusLabel _mousePositionToolStripStatusLabel;
         private System.Windows.Forms.Panel _searchPanel;
@@ -1254,7 +1245,7 @@
         private System.Windows.Forms.DataGridView _fileListDataGridView;
         private System.Windows.Forms.CheckBox _showOnlyMatchesCheckBox;
         private System.Windows.Forms.TableLayoutPanel _resultsTableLayoutPanel;
-        private TD.SandDock.DockContainer dockContainer1;
+        private TD.SandDock.DockContainer _dockContainer;
         private TD.SandDock.DockableWindow _thumbnailDockableWindow;
         private Imaging.Forms.ThumbnailViewer _thumbnailViewer;
         private Imaging.Forms.ThumbnailViewerToolStripButton _thumbnailViewerToolStripButton;
@@ -1263,7 +1254,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn _fileListPagesColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _fileListMatchesColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _fileListFolderColumn;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
         private Imaging.Forms.InvertColorsToolStripButton _invertColorsToolStripButton;
 
     }

@@ -1,10 +1,8 @@
 using System;
 using System.ComponentModel;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace Extract.Imaging.Forms
 {
@@ -37,6 +35,71 @@ namespace Extract.Imaging.Forms
         #region Overrides
 
         /// <summary>
+        /// Gets or sets the image viewer to which the <see cref="InvertColorsToolStripButton"/> 
+        /// is connected.
+        /// </summary>
+        /// <value>The image viewer to which the <see cref="InvertColorsToolStripButton"/> is 
+        /// connected. <see langword="null"/> if connection should be disconnected.</value>
+        /// <returns>The image viewer to which the <see cref="InvertColorsToolStripButton"/> is 
+        /// connected. <see langword="null"/> if no connections are established.</returns>
+        [Browsable(false)]
+        public override ImageViewer ImageViewer
+        {
+            get
+            {
+                return base.ImageViewer;
+            }
+            set
+            {
+                try
+                {
+                    // Unregister from previously subscribed-to events
+                    if (base.ImageViewer != null)
+                    {
+                        base.ImageViewer.InvertColorsStatusChanged -= HandleInvertColorsStatusChanged;
+                    }
+
+                    // Call the base class set property
+                    base.ImageViewer = value;
+
+                    // Set the checked state
+                    SetCheckedState();
+
+                    // Register for events
+                    if (base.ImageViewer != null)
+                    {
+                        base.ImageViewer.InvertColorsStatusChanged += HandleInvertColorsStatusChanged;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException ee = new ExtractException("ELI36801",
+                        "Unable to establish connection to image viewer.", ex);
+                    ee.AddDebugData("Image viewer", value, false);
+                    throw ee;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="E:ImageViewer.InvertColorsStatusChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleInvertColorsStatusChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // Set the state of the toggle depending on the state of ImageViewer.InvertColors.
+                SetCheckedState();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36802");
+            }
+        }
+
+        /// <summary>
         /// Retrieves an array of the shortcut keys associated with the button.
         /// </summary>
         /// <returns>Retrieves an array of the shortcut keys associated with the button. 
@@ -60,14 +123,14 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                if (base.ImageViewer != null && base.ImageViewer.IsImageAvailable)
+                if (ImageViewer != null && ImageViewer.IsImageAvailable)
                 {
-                    base.ImageViewer.InvertColors();
+                    ImageViewer.InvertColors = !ImageViewer.InvertColors;
                 }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI0");
+                ex.ExtractDisplay("ELI36803");
             }
             finally
             {
@@ -76,5 +139,22 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion InvertColorsToolStripButton Events
+
+        #region Private Members
+
+        /// <summary>
+        /// Sets the state of the toggle depending on the state of
+        /// <see cref="P:ImageViewer.InvertColors"/>.
+        /// </summary>
+        void SetCheckedState()
+        {
+            if (base.ImageViewer != null)
+            {
+                // If the ImageViewer is currently inverting colors, set the button as checked.
+                base.Checked = base.ImageViewer.InvertColors;
+            }
+        }
+
+        #endregion Private Members
     }
 }

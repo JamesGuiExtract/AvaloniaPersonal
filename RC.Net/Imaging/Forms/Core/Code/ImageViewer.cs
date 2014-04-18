@@ -19,7 +19,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Permissions;
 using System.Windows.Forms;
-using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.Imaging.Forms
 {
@@ -239,6 +238,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <seealso cref="UseAntiAliasing"/>
         bool _useAntiAliasing = true;
+
+        /// <summary>
+        /// Indicates whether images should be displayed with inverted colors.
+        /// </summary>
+        bool  _invertColors = false;
 
         /// <summary>
         /// The collection of shortcut keys and shortcut handlers during times when no interactive 
@@ -558,6 +562,12 @@ namespace Extract.Imaging.Forms
         public event EventHandler<OrientationChangedEventArgs> OrientationChanged;
 
         /// <summary>
+        /// Occurs when the orientation of a page of the loaded document other than the one that is
+        /// currently displayed changes.
+        /// </summary>
+        public event EventHandler<OrientationChangedEventArgs> NonDisplayedPageOrientationChanged;
+
+        /// <summary>
         /// Occurs when a new cursor tool is activated.
         /// </summary>
         /// <seealso cref="ImageViewer.CursorTool"/>
@@ -568,6 +578,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <seealso cref="ImageViewer.FitMode"/>
         public event EventHandler<FitModeChangedEventArgs> FitModeChanged;
+
+        /// <summary>
+        /// Occurs when the <see cref="InvertColors"/> property changes.
+        /// </summary>
+        public event EventHandler<EventArgs> InvertColorsStatusChanged;
 
         /// <summary>
         /// Occurs when the currently visible page changes.
@@ -1054,6 +1069,46 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Gets or sets whether images should be displayed with inverted colors.
+        /// </summary>
+        /// <value><see langword="true"/> if images should be displayed with inverted colors;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        [DefaultValue(true)]
+        public bool InvertColors
+        {
+            get
+            {
+                return _invertColors;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_invertColors != value)
+                    {
+                        // If an image is currently loaded, invert the colors whether or not value
+                        // it true; if _invertColors is true, we need to invert the colors again to
+                        // get back to "normal".
+                        if (IsImageAvailable)
+                        {
+                            InvertImageColors();
+                        }
+
+                        _invertColors = value;
+
+                        OnInvertColorsStatusChanged(new EventArgs());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36798");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the first available page is being displayed. This will
         /// take into account navigation across document boundaries if there are extended navigation
         /// event handlers.
@@ -1467,7 +1522,7 @@ namespace Extract.Imaging.Forms
                         IsImageAvailable && value.Count == PageCount);
 
                     _imagePages = new List<ImagePageData>(value);
-                    SetZoomInfo(_imagePages[PageNumber - 1].ZoomInfo, false);
+                    SetZoomInfo(_imagePages[PageNumber - 1].ZoomInfo, false, true, true);
                 }
                 catch (Exception ex)
                 {
@@ -1511,7 +1566,7 @@ namespace Extract.Imaging.Forms
                 try
                 {
                     // Set the zoom info and update the zoom history
-                    SetZoomInfo(value, true);
+                    SetZoomInfo(value, true, true, true);
                 }
                 catch (Exception e)
                 {
@@ -1658,13 +1713,9 @@ namespace Extract.Imaging.Forms
 
                         // This page has been viewed before, restore the previous zoom setting
                         // [DotNetRCAndUtils #107]
-                        SetZoomInfo(zoomInfo, false);
+                        SetZoomInfo(zoomInfo, false, false, false);
 
-                        if (_fitMode == FitMode.None)
-                        {
-                            SetZoomInfo(zoomInfo, false);
-                        }
-                        else
+                        if (_fitMode != FitMode.None)
                         {
                             ShowFitMode(_fitMode);
 
@@ -1771,6 +1822,12 @@ namespace Extract.Imaging.Forms
                         Rotate(orientation, false, false);
                     }
 
+                    // Ensure the loaded image conforms to the current InvertColors property value.
+                    if (InvertColors)
+                    {
+                        InvertImageColors();
+                    }
+
                     // Disable adding highlights
                     AllowHighlight = false;
                 }
@@ -1808,8 +1865,16 @@ namespace Extract.Imaging.Forms
                 _orientation = _imagePages[pageNumber - 1].Orientation;
                 ImageMethods.RotateImageByDegrees(image, _orientation);
 
-                base.Image = image;
+                // The page number needs to be set before loading the page because events that
+                // trigger as the image is set may need the page number.
                 _pageNumber = pageNumber;
+                base.Image = image;
+
+                // Ensure the loaded page conforms to the current InvertColors property value.
+                if (InvertColors)
+                {
+                    InvertImageColors();
+                }
             }
             catch (Exception)
             {
@@ -3466,6 +3531,20 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Raises the <see cref="OrientationChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="OrientationChangedEventArgs"/> that contains the event 
+        /// data.</param>
+        void OnNonDisplayedPageOrientationChanged(OrientationChangedEventArgs e)
+        {
+            var eventHandler = NonDisplayedPageOrientationChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, e);
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="CursorToolChanged"/> event.
         /// </summary>
         /// <param name="e">An <see cref="CursorToolChangedEventArgs"/> that contains the event 
@@ -3487,6 +3566,20 @@ namespace Extract.Imaging.Forms
         void OnFitModeChanged(FitModeChangedEventArgs e)
         {
             var eventHandler = FitModeChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="InvertColorsStatusChanged"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
+        void OnInvertColorsStatusChanged(EventArgs e)
+        {
+            var eventHandler = InvertColorsStatusChanged;
             if (eventHandler != null)
             {
                 eventHandler(this, e);
@@ -3916,9 +4009,21 @@ namespace Extract.Imaging.Forms
             {
                 base.OnSizeChanged(e);
 
-                // [DotNetRCAndUtils:781]
-                // Ensure the current fit mode is applied properly after the window is resized.
-                ShowFitMode(_fitMode);
+                if (IsImageAvailable)
+                {
+                    // [DotNetRCAndUtils:781]
+                    // Ensure the current fit mode is applied properly after the window is resized.
+                    ShowFitMode(_fitMode);
+
+                    // Since the zoom level may have changed it is appropriate to update the zoom
+                    // (and raise ZoomChanged).
+                    // However, there are frequent SizeChanged events that happen when images are
+                    // being loaded. For the most part these are not zoom levels that the user knows
+                    // about or would want to return to, thus don't update zoom history. There
+                    // is a least one exception that I don't think is important enough to worry
+                    // about (see https://extract.atlassian.net/browse/ISSUE-12153)
+                    UpdateZoom(false, true);
+                }
             }
             catch (Exception ex)
             {

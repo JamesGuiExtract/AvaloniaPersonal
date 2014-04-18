@@ -6,6 +6,7 @@ using Leadtools;
 using Leadtools.Annotations;
 using Leadtools.Drawing;
 using Leadtools.ImageProcessing;
+using Leadtools.ImageProcessing.Color;
 using Leadtools.WinForms;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_RASTERANDOCRMGMTLib;
-using Leadtools.ImageProcessing.Color;
 
 namespace Extract.Imaging.Forms
 {
@@ -1693,7 +1693,7 @@ namespace Extract.Imaging.Forms
             }
 
             // Apply the new zoom setting
-            SetZoomInfo(zoomInfo, true);
+            SetZoomInfo(zoomInfo, true, true, true);
         }
 
         /// <summary>
@@ -1724,7 +1724,7 @@ namespace Extract.Imaging.Forms
                 ZoomInfo zoomInfo = _imagePages[_pageNumber - 1].ZoomPrevious();
 
                 // Set the new zoom setting without updating the zoom history
-                SetZoomInfo(zoomInfo, false, true);
+                SetZoomInfo(zoomInfo, false, true, true);
             }
             catch (Exception e)
             {
@@ -1760,7 +1760,7 @@ namespace Extract.Imaging.Forms
                 ZoomInfo zoomInfo = _imagePages[_pageNumber - 1].ZoomNext();
 
                 // Set the new zoom setting without updating the zoom history
-                SetZoomInfo(zoomInfo, false, true);
+                SetZoomInfo(zoomInfo, false, true, true);
             }
             catch (Exception e)
             {
@@ -1836,7 +1836,7 @@ namespace Extract.Imaging.Forms
                 UpdateZoom(updateZoomHistory, raiseZoomChanged);
 
                 // Raise the OrientationChanged event
-                OnOrientationChanged(new OrientationChangedEventArgs(_orientation));
+                OnOrientationChanged(new OrientationChangedEventArgs(_orientation, _pageNumber));
             }
             catch (Exception e)
             {
@@ -1845,6 +1845,54 @@ namespace Extract.Imaging.Forms
                 ee.AddDebugData("Rotation", angle, false);
                 ee.AddDebugData("Page number", _pageNumber, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Rotates all document pages the specified number of degrees.
+        /// </summary>
+        /// <param name="angle">The angle to rotate the image in degrees. Must be a multiple of 
+        /// 90.</param>
+        /// <param name="updateZoomHistory"><see langword="true"/> if the zoom history should be
+        /// updated; <see langword="false"/> if it should not.</param>
+        /// <param name="raiseZoomChanged"><see langword="true"/> if the <see cref="ZoomChanged"/> 
+        /// event should be raised; <see langword="false"/> if it should not.</param>
+        /// <event cref="ZoomChanged"><paramref name="raiseZoomChanged"/> was 
+        /// <see langword="true"/>.</event>
+        public void RotateAllDocumentPages(int angle, bool updateZoomHistory, bool raiseZoomChanged)
+        {
+            try
+            {
+                // Ensure an image is open
+                ExtractException.Assert("ELI36814", "No image is open.", IsImageAvailable);
+
+                // Ensure the angle is valid
+                ExtractException.Assert("ELI36815", "Rotation angle must be a multiple of 90.",
+                    angle % 90 == 0);
+
+                for (int nPage = 1; nPage <= PageCount; nPage++)
+                {
+                    if (nPage == PageNumber)
+                    {
+                        // Rotate the currently visible page, raising related events as appropriate.
+                        Rotate(angle, updateZoomHistory, raiseZoomChanged);
+                    }
+                    else
+                    {
+                        // For pages not currently visible, update the ImagePageData orientation
+                        // which will trigger the image to be displayed with the correct rotation
+                        // the next time the page is opened.
+                        ImagePageData pageData = _imagePages[nPage - 1];
+                        pageData.Orientation = (pageData.Orientation + angle + 360) % 360;
+
+                        OnNonDisplayedPageOrientationChanged(
+                            new OrientationChangedEventArgs(pageData.Orientation, nPage));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36811");
             }
         }
 
@@ -2478,12 +2526,12 @@ namespace Extract.Imaging.Forms
                 if (zoomInfo.ScaleFactor > _MAX_ZOOM_IN_SCALE_FACTOR)
                 {
                     zoomInfo.ScaleFactor = _MAX_ZOOM_IN_SCALE_FACTOR;
-                    SetZoomInfo(zoomInfo, false);
+                    SetZoomInfo(zoomInfo, false, true, true);
                 }
                 else if (zoomInfo.ScaleFactor < _MAX_ZOOM_OUT_SCALE_FACTOR)
                 {
                     zoomInfo.ScaleFactor = _MAX_ZOOM_OUT_SCALE_FACTOR;
-                    SetZoomInfo(zoomInfo, false);
+                    SetZoomInfo(zoomInfo, false, true, true);
                 }
             }
 
@@ -2923,7 +2971,7 @@ namespace Extract.Imaging.Forms
 
                 // Set the center point
                 zoomInfo.Center = newCenter;
-                SetZoomInfo(zoomInfo, true);
+                SetZoomInfo(zoomInfo, true, true, false);
             }
         }
 
@@ -4251,33 +4299,44 @@ namespace Extract.Imaging.Forms
         /// <param name="zoomInfo">The new zoom info.</param>
         /// <param name="updateZoomHistory"><see langword="true"/> if the zoom history should be 
         /// updated; <see langword="false"/> if it should not be updated.</param>
-        /// <event cref="ZoomChanged">Method was successful.</event>
-        void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory)
-        {
-            SetZoomInfo(zoomInfo, updateZoomHistory, true);
-        }
-
-        /// <summary>
-        /// Sets the zoom info and optionally updates the zoom history.
-        /// </summary>
-        /// <param name="zoomInfo">The new zoom info.</param>
-        /// <param name="updateZoomHistory"><see langword="true"/> if the zoom history should be 
-        /// updated; <see langword="false"/> if it should not be updated.</param>
         /// <param name="raiseZoomChanged"><see langword="true"/> if the <see cref="ZoomChanged"/> 
         /// event should be raised if an image is open; <see langword="false"/> if it should not 
         /// be raised.</param>
+        /// <param name="overrideOrientation"><see langword="true"/> if <see paramref="zoomInfo"/>
+        /// should override any difference in orientation with the page's current orientation by
+        /// restoring the orientation of the <see paramref="zoomInfo"/>; <see langword="false"/> if
+        /// the page's orientation should be kept.
+        /// NOTE: In the case <see langword="false"/> is used and the orientations differ, zoom
+        /// history will be updated and the <see cref="ZoomChanged"/> event will be raised
+        /// regardless of the values of <see paramref="updateZoomHistory"/> and
+        /// <see paramref="raiseZoomChanged"/>.</param>
         /// <event cref="ZoomChanged">Method was successful.</event>
-        void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory, bool raiseZoomChanged)
+        void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory, bool raiseZoomChanged,
+            bool overrideOrientation)
         {
             // [FlexIDSCore:4850, 4861]
             // If the current orientation differs from the orientation specified in zoomInfo,
             // rotate the image accordingly.
             // Use _orientation field here since the Orientation getter asserts that these
             // orientation values are equal... but this is where we make them equal.
-            int orientationDelta = zoomInfo.Orientation - _orientation;
+            int orientationDelta = (zoomInfo.Orientation - _orientation + 360) % 360;
             if (orientationDelta != 0)
             {
-                Rotate(orientationDelta, false, false);
+                if (overrideOrientation)
+                {
+                    // Since the zoom history is being restored, really nothing has changed. No need
+                    // to update zoom history or raise events.
+                    Rotate(orientationDelta, false, false);
+                }
+                else
+                {
+                    // Zoom history is not going to override the current orientation, therefore the
+                    // current orientation is "new" and we should update the zoom history and raise
+                    // the zoom changed event (regardless of whether the passed in updateZoomHistory
+                    // and raiseZoomChanged are new).
+                    updateZoomHistory = true;
+                    raiseZoomChanged = true;
+                }
             }
 
             if (_fitMode == FitMode.None)
@@ -4359,8 +4418,14 @@ namespace Extract.Imaging.Forms
             // Rotate clockwise
             _mainShortcuts[Keys.R | Keys.Control] = SelectRotateClockwise;
 
+            // Rotate all document pages clockwise
+            _mainShortcuts[Keys.R | Keys.Alt] = SelectRotateAllDocumentPagesClockwise;
+
             // Rotate counterclockwise
             _mainShortcuts[Keys.R | Keys.Control | Keys.Shift] = SelectRotateCounterclockwise;
+
+            // Rotate all document pages counterclockwise
+            _mainShortcuts[Keys.R | Keys.Alt | Keys.Shift] = SelectRotateAllDocumentPagesCounterclockwise;
 
             // Delete selected highlights
             _mainShortcuts[Keys.Delete] = SelectRemoveSelectedLayerObjects;
@@ -4438,6 +4503,22 @@ namespace Extract.Imaging.Forms
                 // Assign a new tracking update call and refresh to draw the new highlight.
                 _trackingUpdateCall = ((e) => UpdateTracking(e, mouseX, mouseY));
                 Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Inverts the colors in the currently loaded image.
+        /// </summary>
+        void InvertImageColors()
+        {
+            try
+            {
+                var invertCommand = new InvertCommand();
+                invertCommand.Run(base.Image);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36804");
             }
         }
 
@@ -4992,7 +5073,7 @@ namespace Extract.Imaging.Forms
                         new ZoomInfo(transformedPoints[0], scaleFactor, Orientation);
 
                     SetFitMode(FitMode.None, false, false, false);
-                    SetZoomInfo(magnifiedZoom, false, false);
+                    SetZoomInfo(magnifiedZoom, false, false, true);
 
                     // Convert the center point back into client coordinates now that the image is
                     // zoomed so that we have a reference point for the center of the area to be
@@ -5090,7 +5171,7 @@ namespace Extract.Imaging.Forms
                 }
                 else if (originalZoom.HasValue)
                 {
-                    SetZoomInfo(originalZoom.Value, false, false);
+                    SetZoomInfo(originalZoom.Value, false, false, true);
                 }
 
                 // [FlexIDS:4524]
@@ -5644,6 +5725,24 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Rotates all pages in the document 90 degrees clockwise.
+        /// </summary>
+        public void SelectRotateAllDocumentPagesClockwise()
+        {
+            try
+            {
+                if (base.Image != null)
+                {
+                    RotateAllDocumentPages(90, true, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI36809", ex);
+            }
+        }
+
+        /// <summary>
         /// Rotates the image 90 degrees counterclockwise.
         /// </summary>
         public void SelectRotateCounterclockwise()
@@ -5663,18 +5762,21 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// 
+        /// Rotates all pages in the document 90 degrees counterclockwise.
         /// </summary>
-        public void InvertColors()
+        public void SelectRotateAllDocumentPagesCounterclockwise()
         {
             try
             {
-                var invertCommand = new InvertCommand();
-                invertCommand.Run(base.Image);
+                if (base.Image != null)
+                {
+                    // Rotate 270 degrees
+                    RotateAllDocumentPages(270, true, true);
+                }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI0");
+                ExtractException.Display("ELI36808", ex);
             }
         }
 
