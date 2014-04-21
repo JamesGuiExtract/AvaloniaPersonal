@@ -1940,8 +1940,11 @@
 		<col def="I2">Order</col>
 		<col def="I2">ISSetupLocation</col>
 		<col def="S255">ISReleaseFlags</col>
-		<row><td>_1692D718_46D7_4AE3_9772_ABF3C86BE538_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.1600.1 (x86).prq</td><td/><td/><td/></row>
-		<row><td>_9F174DA5_E0A2_4267_8419_7D41646209D7_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.1600.1 (x64).prq</td><td/><td/><td/></row>
+		<row><td>_1692D718_46D7_4AE3_9772_ABF3C86BE538_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.1600.1 (x86).prq</td><td>3</td><td/><td/></row>
+		<row><td>_4C481AFF_C46F_4889_BA84_97EEFCD86722_</td><td>Microsoft .NET Framework 4.0 Full.prq</td><td>0</td><td/><td/></row>
+		<row><td>_9F174DA5_E0A2_4267_8419_7D41646209D7_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.1600.1 (x64).prq</td><td>4</td><td/><td/></row>
+		<row><td>_E4D2626A_156E_4FB7_890D_9EF6B89973F3_</td><td>Microsoft .NET Framework 3.5 SP1 (Windows Feature).prq</td><td/><td/><td/></row>
+		<row><td>_F1FA3999_5BEC_413C_87AF_E34062E5E1C7_</td><td>Microsoft .NET Framework 3.5 SP1.prq</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ISSetupType">
