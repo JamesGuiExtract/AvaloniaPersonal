@@ -123,6 +123,18 @@ private:
 	// the accuracy/speed tradeoff setting for recognition.
 	// set from the registry.
 	RMTRADEOFF m_eTradeoff;
+
+	// Specifies whether kRecSetImgDespeckleMode should be called with TRUE or FALSE.
+	bool m_bEnableDespeckleMode;
+
+	// Specifies whether kRecForceDespeckleImg should be called on each image page.
+	bool m_bForceDespeckle;
+
+	// When kRecForceDespeckleImg is called, the DESPECKLE_METHOD to use.
+	DESPECKLE_METHOD m_eForceDespeckleMethod;
+
+	// When kRecForceDespeckleImg is called, the level to use.
+	long m_nForceDespeckleLevel;
 	
 	// true if failed pages should be skipped; false if failed pages should fail the document.
 	bool m_bSkipPageOnFailure;

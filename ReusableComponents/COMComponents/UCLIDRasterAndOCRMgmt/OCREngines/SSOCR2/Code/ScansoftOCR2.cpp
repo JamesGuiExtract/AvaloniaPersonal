@@ -109,6 +109,10 @@ CScansoftOCR2::CScansoftOCR2()
   m_uiMaxOcrPageFailurePercentage(25),
   m_uiMaxOcrPageFailureNumber(10),
   m_uiDecompositionMethods(1),
+  m_bEnableDespeckleMode(true),
+  m_bForceDespeckle(true),
+  m_eForceDespeckleMethod(DESPECKLE_PEPPERANDSALT),
+  m_nForceDespeckleLevel(2),
   m_eFilter(kNoFilter),
   m_bFilterContainsAlpha(true),
   m_bFilterContainsNumeral(true),
@@ -989,10 +993,6 @@ void CScansoftOCR2::init()
 		THROW_UE_ON_ERROR("ELI03416", "Unable to set image rotation mode in the OCR engine!",
 			kRecSetImgRotation(0, ROT_AUTO));
 
-		// enable automatic image-despeckling omde
-		THROW_UE_ON_ERROR("ELI03417", "Unable to set image despeckling mode in the OCR engine!",
-			kRecSetImgDespeckleMode(0, TRUE));
-
 		// enable to the progress monitor for progress status updates and monitoring timeout status
 		THROW_UE_ON_ERROR("ELI09029", "Unable to set the Progress Monitor Callback!",
 			kRecSetCBProgMon(0, ProgressMon, NULL));
@@ -1025,6 +1025,26 @@ void CScansoftOCR2::init()
 
 		// Get the maximum number of pages that can fail without failing the document
 		m_uiMaxOcrPageFailureNumber = m_apCfg->getMaxOcrPageFailureNumber();
+
+		// https://extract.atlassian.net/browse/ISSUE-12160
+		// Get the despeckling options to use.
+		unsigned long ulDespeckleMode = m_apCfg->getDespeckleMode();
+
+		// Bit 0
+		m_bEnableDespeckleMode = ((ulDespeckleMode & 1) == 1);
+
+		// Bit 1
+		m_bForceDespeckle = ((ulDespeckleMode & 2) == 2);
+
+		// Bits 2-6
+		m_eForceDespeckleMethod = (DESPECKLE_METHOD)((ulDespeckleMode >> 2) & 0x1F);
+
+		// Bits 7+
+		m_nForceDespeckleLevel = (long)(ulDespeckleMode >> 7);
+
+		// Enable automatic image-despeckling mode per the low-bit of m_apCfg->getDespeckleMode().
+		THROW_UE_ON_ERROR("ELI03417", "Unable to set image despeckling mode in the OCR engine!",
+			kRecSetImgDespeckleMode(0, m_bEnableDespeckleMode ? TRUE : FALSE));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26100")
 }
@@ -1664,6 +1684,12 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	// rotate the image
 	THROW_UE_ON_ERROR("ELI12723", "Unable to rotate image.",
 		kRecRotateImg(0, m_hPage, imgRotate));
+
+	if (m_bForceDespeckle)
+	{
+		THROW_UE_ON_ERROR("ELI36823", "Unable to despeckle image.",
+			kRecForceDespeckleImg(0, m_hPage, pZone, m_eForceDespeckleMethod, m_nForceDespeckleLevel));
+	}
 	
 	// create zones for handwriting recognition
 	if(bDetectHandwriting)

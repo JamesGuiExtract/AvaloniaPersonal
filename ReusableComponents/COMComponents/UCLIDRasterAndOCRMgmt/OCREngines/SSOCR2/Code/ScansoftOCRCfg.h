@@ -50,6 +50,16 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the maximum number of pages that can fail without failing the document.
 	unsigned long getMaxOcrPageFailureNumber();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Gets a value specifying the despeckling options to use before OCR'ing an image.
+	//			Bit 0 (low bit): kRecSetImgDespeckleMode (0 = FALSE, 1 = TRUE)
+	//			Bit 1: 1 = call kRecForceDespeckleImg, 0 = don't call.
+	//			Bits 2 - 6: DESPECKLE_METHOD for kRecForceDespeckleImg.
+	//			Bits 7+: Level for kRecForceDespeckleImg.
+	//			Default of 355 =
+	//				kRecSetImgDespeckleMode = TRUE
+	//				kRecForceDespeckleImg(DESPECKLE_PEPPERANDSALT, 2)
+	unsigned long getDespeckleMode();
 	
 private:
 	// pointer to the persistence manager for registry access

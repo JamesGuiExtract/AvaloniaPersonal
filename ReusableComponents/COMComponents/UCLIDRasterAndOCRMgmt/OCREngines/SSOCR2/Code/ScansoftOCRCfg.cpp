@@ -21,6 +21,7 @@ const string& gstrZONE_ORDERING = "ZoneOrdering";
 const string& gstrSKIP_PAGE_ON_FAILURE = "SkipPageOnFailure";
 const string& gstrMAX_OCR_PAGE_FAILURE_PERCENTAGE = "MaxOcrPageFailurePercentage";
 const string& gstrMAX_OCR_PAGE_FAILURE_NUMBER = "MaxOcrPageFailureNumber";
+const string& gstrDESPECKLE_MODE = "DespeckleMode";
 
 const string& gstrDEFAULT_TRADEOFF = asString((long)TO_ACCURATE);
 const string& gstrDEFAULT_PRIMARY_DECOMPOSITION_METHOD = asString(kAutoDecomposition);
@@ -33,6 +34,12 @@ const string& gstrDEFAULT_ZONE_ORDERING = "1";
 const string& gstrDEFAULT_SKIP_PAGE_ON_FAILURE = "0";
 const string& gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE = "25";
 const string& gstrDEFAULT_MAX_OCR_PAGE_FAILURE_NUMBER = "10";
+const string& gstrDEFAULT_DESPECKLE_MODE = "355";
+// Bit 0 (low bit): kRecSetImgDespeckleMode (0 = FALSE, 1 = TRUE)
+// Bit 1: 1 = call kRecForceDespeckleImg, 0 = don't call.
+// Bits 2 - 6: DESPECKLE_METHOD for kRecForceDespeckleImg.
+// Bits 7+: Level for kRecForceDespeckleImg.
+// Default of 355 = kRecSetImgDespeckleMode = TRUE, kRecForceDespeckleImg(DESPECKLE_PEPPERANDSALT, 2)
 
 //-------------------------------------------------------------------------------------------------
 ScansoftOCRCfg::ScansoftOCRCfg()
@@ -206,5 +213,17 @@ unsigned long ScansoftOCRCfg::getMaxOcrPageFailureNumber()
 
 	return asUnsignedLong(m_pCfgMgr->getKeyValue(gstrROOT_REGISTRY_FOLDER,
 		gstrMAX_OCR_PAGE_FAILURE_NUMBER, gstrDEFAULT_MAX_OCR_PAGE_FAILURE_NUMBER));
+}
+//-------------------------------------------------------------------------------------------------
+unsigned long ScansoftOCRCfg::getDespeckleMode()
+{
+	if (!m_pCfgMgr->keyExists(gstrROOT_REGISTRY_FOLDER, gstrDESPECKLE_MODE))
+	{
+		m_pCfgMgr->setKeyValue(gstrROOT_REGISTRY_FOLDER, gstrDESPECKLE_MODE,
+			gstrDEFAULT_DESPECKLE_MODE);
+	}
+
+	return asUnsignedLong(m_pCfgMgr->getKeyValue(gstrROOT_REGISTRY_FOLDER,
+		gstrDESPECKLE_MODE, gstrDEFAULT_DESPECKLE_MODE));
 }
 //-------------------------------------------------------------------------------------------------
