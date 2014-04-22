@@ -113,7 +113,7 @@ CopyComponentVersionFile:
 
 BuildFlexIndexSDKInstall: BuildAttributeFinderCore CopyFilesToInstallFolder
     @ECHO Building UCLID FlexIndex SDK installation...
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DevEnvDir);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(NUANCE_API_DIR);$(LEADTOOLS_API_DIR);$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DevEnvDir);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(FlexIndexSDKInstallRootDir)\UCLID FlexIndex SDK.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(FlexIndexSDKInstallRootDir)\UCLID FlexIndex SDK.ism"
 
@@ -182,7 +182,7 @@ CreateDemoShieldInstall:
 		
 BuildIDShieldInstall: 
     @ECHO Building Extract Systems IDShield installation...
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(NUANCE_API_DIR);$(LEADTOOLS_API_DIR);$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(IDShieldInstallRootDir)\IDShield.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(IDShieldInstallRootDir)\IDShield.ism"
 
@@ -224,7 +224,7 @@ CreateNetDMSInstall:
 	
 BuildExtractUninstaller:
 	@ECHO Creating ExtractUninstaller...
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(NUANCE_API_DIR);$(LEADTOOLS_API_DIR);;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet
 	$(SetProductVerScript) "$(CommonDirectory)\ExtractUninstaller\ExtractUninstaller.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(CommonDirectory)\ExtractUninstaller\ExtractUninstaller.ism"
 	
