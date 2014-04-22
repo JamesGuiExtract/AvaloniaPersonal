@@ -19,7 +19,7 @@ start /wait "" "%~dp0..\LabDE\Setup" /s /f1%LABDE_ISS% /f2nul
 
 :: Check registry for the uninstall for LabDE as verification that it installed
 IF EXIST "%TEMP%\LabDEInstalled.reg" DEL "%TEMP%\LabDEInstalled.reg"
-@regedit /e "%TEMP%\LabDEInstalled.reg" LABDE_KEY
+@regedit /e "%TEMP%\LabDEInstalled.reg" %LABDE_KEY%
 IF NOT EXIST "%TEMP%\LabDEInstalled.reg" (
 	@ECHO There was a error installing LabDE
 	GOTO END

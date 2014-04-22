@@ -19,7 +19,7 @@ start /wait "" "%~dp0..\FlexIndex\Setup" /s /f1%FLEXINDEX_ISS% /f2nul
 
 :: Check registry for the uninstall for FlexIndex as verification that it installed
 IF EXIST "%TEMP%\FlexIndexInstalled.reg" DEL "%TEMP%\FlexIndexInstalled.reg"
-@regedit /e "%TEMP%\FlexIndexInstalled.reg" FLEXINDEX_KEY
+@regedit /e "%TEMP%\FlexIndexInstalled.reg" %FLEXINDEX_KEY%
 IF NOT EXIST "%TEMP%\FlexIndexInstalled.reg" (
 	@ECHO There was a error installing FLEX Index
 	GOTO END

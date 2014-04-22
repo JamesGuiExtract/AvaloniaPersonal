@@ -28,7 +28,7 @@ start /wait "" "%~dp0..\LabDE\Setup" /s /w /f1%LABDE_ISS% /f2nul
 
 :: Check registry for the uninstall for LabDE as verification that it installed
 IF EXIST "%TEMP%\LabDEInstalled.reg" DEL "%TEMP%\LabDEInstalled.reg"
-@regedit /e "%TEMP%\LabDEInstalled.reg" LABDE_KEY
+@regedit /e "%TEMP%\LabDEInstalled.reg" %LABDE_KEY%
 IF NOT EXIST "%TEMP%\LabDEInstalled.reg" (
 	@ECHO There was a error installing LabDE
 	GOTO END
@@ -41,7 +41,7 @@ start /wait "" "%~dp0..\IDShield\Setup" /s /w /f1%IDSHIELD_ISS% /f2nul
 
 :: Check registry for the uninstall for ID Shield as verification that it installed
 IF EXIST "%TEMP%\IDShieldInstalled.reg" DEL "%TEMP%\IDShieldInstalled.reg"
-@regedit /e "%TEMP%\IDShieldInstalled.reg" IDSHIELD_KEY
+@regedit /e "%TEMP%\IDShieldInstalled.reg" %IDSHIELD_KEY%
 IF NOT EXIST "%TEMP%\IDShieldInstalled.reg" (
 	@ECHO There was a error installing ID Shield
 	GOTO END
@@ -54,7 +54,7 @@ start /wait "" "%~dp0..\FlexIndex\Setup" /s /w /f1%FLEXINDEX_ISS% /f2nul
 
 :: Check registry for the uninstall for FlexIndex as verification that it installed
 IF EXIST "%TEMP%\FlexIndexInstalled.reg" DEL "%TEMP%\FlexIndexInstalled.reg"
-@regedit /e "%TEMP%\FlexIndexInstalled.reg" FLEXINDEX_KEY
+@regedit /e "%TEMP%\FlexIndexInstalled.reg" %FLEXINDEX_KEY%
 IF NOT EXIST "%TEMP%\FlexIndexInstalled.reg" (
 	@ECHO There was a error installing FLEX Index
 	GOTO END

@@ -19,7 +19,7 @@ start /wait "" "%~dp0..\IDShield\Setup" /s /f1%ISSFILE% /f2nul
 
 :: Check registry for the uninstall for ID Shield as verification that it installed
 IF EXIST "%TEMP%\IDShieldInstalled.reg" DEL "%TEMP%\IDShieldInstalled.reg"
-@regedit /e "%TEMP%\IDShieldInstalled.reg" IDSHIELD_KEY
+@regedit /e "%TEMP%\IDShieldInstalled.reg" %IDSHIELD_KEY%
 IF NOT EXIST "%TEMP%\IDShieldInstalled.reg" (
 	@ECHO There was a error installing ID Shield
 	GOTO END
