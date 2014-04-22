@@ -710,18 +710,8 @@ namespace Extract.Imaging.Forms
                     _displayAnnotations = false;
                 }
 
-                // Turn off _useAntiAliasing if bitonal support is locked
-                if (RasterSupport.IsLocked(RasterSupportType.Bitonal))
-                {
-                    _useAntiAliasing = false;
-                }
-                else
-                {
-                    // Turn on anti-aliasing
-                    RasterPaintProperties properties = PaintProperties;
-                    properties.PaintDisplayMode |= RasterPaintDisplayModeFlags.ScaleToGray;
-                    PaintProperties = properties;
-                }
+                // Turn on anti-aliasing
+                UseAntiAliasing = true;
 
                 // Set the fit mode
                 SetFitMode(RegistryManager.FitMode, false, false, true);
@@ -1044,7 +1034,7 @@ namespace Extract.Imaging.Forms
 
                             // Turn on anti-aliasing
                             RasterPaintProperties properties = PaintProperties;
-                            properties.PaintDisplayMode |= RasterPaintDisplayModeFlags.ScaleToGray;
+                            properties.PaintDisplayMode |= RasterPaintDisplayModeFlags.Bicubic;
                             PaintProperties = properties;
                         }
                     }
@@ -1052,7 +1042,7 @@ namespace Extract.Imaging.Forms
                     {
                         // Turn off anti-aliasing
                         RasterPaintProperties properties = PaintProperties;
-                        properties.PaintDisplayMode &= ~RasterPaintDisplayModeFlags.ScaleToGray;
+                        properties.PaintDisplayMode &= ~RasterPaintDisplayModeFlags.Bicubic;
                         PaintProperties = properties;
                     }
 

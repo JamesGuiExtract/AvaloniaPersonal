@@ -169,7 +169,8 @@ public:
 	STDMETHOD(ContainsCharacterOutsideFontRange)(long nFontMin, long nFontMax, VARIANT_BOOL* pbResult);
 	STDMETHOD(GetFirstCharPositionOfPage)(long nPageNum, long *pFirstCharPos);
 	STDMETHOD(GetOriginalImageLetterArray)(long* pnNumLetters, void** ppLetters);
-	STDMETHOD(RemoveText)(ISpatialString* pTextToRemove, long* nPos);
+	STDMETHOD(RemoveText)(ISpatialString* pTextToRemove, long nPage, ILongRectangle *pRect,
+		long* nPos);
 	STDMETHOD(InsertBySpatialPosition)(ISpatialString *pString,
 		VARIANT_BOOL vbAllowOverlappingInsertion, VARIANT_BOOL* pbStringWasInserted);
 	STDMETHOD(SetSurroundingWhitespace)(ISpatialString *pString, long nPos, long* pnNewPos);

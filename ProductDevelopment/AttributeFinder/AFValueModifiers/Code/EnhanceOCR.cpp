@@ -212,6 +212,9 @@ CEnhanceOCR::~CEnhanceOCR()
 		m_ipSRICA =__nullptr;
 		m_ipPreferredFormatParser = __nullptr;
 		m_ipOCREngine = __nullptr;
+
+		m_vecHighConfRects.clear();
+		m_vecResults.clear();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI36457");
 }
@@ -1092,9 +1095,9 @@ ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage)
 			vector<ILongRectanglePtr> vecRectsToEnhance;
 			if (bHasSpatialInfo)
 			{
-				vector<ILongRectanglePtr> &vecHighConfZones = removeHighConfidenceText(ipPageText);
+				m_vecHighConfRects = removeHighConfidenceText(ipPageText);
 
-				vecRectsToEnhance = prepareImagePage(ipPageText, vecHighConfZones);
+				vecRectsToEnhance = prepareImagePage(ipPageText, m_vecHighConfRects);
 			}
 			else
 			{
@@ -1102,7 +1105,14 @@ ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage)
 			}
 
 			// Initialize zones for each area identified for enhancement.
-			vector<ZoneData> vecZonesToEnhance = createZonesFromRects(vecRectsToEnhance, ipSearcher);
+			// Expand the processing zone a bit as this tends to produce better OCR results. Also,
+			// the filter used to prepare the image may have removed some pixels around the edges
+			// that SRICA won't see.
+			// Expand a little more horizontally (with respect to the text orientation) than
+			// vertically as expanding vertically too much may pick up content from lines above or
+			// below.
+			vector<ZoneData> vecZonesToEnhance =
+				createZonesFromRects(vecRectsToEnhance, ipSearcher, CSize(4, 2));
 
 			enhanceOCR(vecZonesToEnhance);
 
@@ -1252,15 +1262,17 @@ void CEnhanceOCR::enhanceOCR(vector<ZoneData> &zones)
 	set<ILongRectanglePtr> setActiveRects;
 	for each (ZoneData zoneData in zones)
 	{
-		setActiveRects.insert(zoneData.m_ipRect);
+		setActiveRects.insert(zoneData.m_ipProcessingRect);
 	}
 
 	// Keeps track of which rects now meet m_nConfidenceCriteria and should not be processed by any
 	// subsequent filters.
 	vector<ILongRectanglePtr> vecRectsMeetingConfidenceCriteria;
+	bool bAreAnyZonesLeftToProcess = true;
 
 	// Iterate through each filter in the configured filter package.
-	for (long nFilterIndex = 0; nFilterIndex < m_nFilterCount; nFilterIndex++)
+	for (long nFilterIndex = 0; bAreAnyZonesLeftToProcess && nFilterIndex < m_nFilterCount;
+		 nFilterIndex++)
 	{
 		// Preparing the image page is counted as one progress item, so we can count an item as
 		// completed even at the start of the first loop. Each additional filter pass is another
@@ -1306,6 +1318,7 @@ void CEnhanceOCR::enhanceOCR(vector<ZoneData> &zones)
 		// Iterate each zone using the OCR'd text from this filter to improve the previously
 		// existing text if possible.
 		long nZoneCount = zones.size();
+		bAreAnyZonesLeftToProcess = false;
 		for (long nZone = 0; nZone < nZoneCount; nZone++)
 		{
 			ZoneData &zoneData = zones[nZone];
@@ -1319,7 +1332,8 @@ void CEnhanceOCR::enhanceOCR(vector<ZoneData> &zones)
 
 			// Get the newly OCR'd text and use it to populate a new ZoneData instance.
 			ZoneData OCRAttemptData;
-			ISpatialStringPtr ipOCRResult = ipSearcher->GetDataInRegion(zoneData.m_ipRect, VARIANT_FALSE);
+			ISpatialStringPtr ipOCRResult =
+				ipSearcher->GetDataInRegion(zoneData.m_ipRect, VARIANT_FALSE);
 			populateResults(OCRAttemptData.m_vecResults, ipOCRResult, false);
 
 			// If this is the first filter and neither the original text or newly OCR'd text have
@@ -1348,7 +1362,11 @@ void CEnhanceOCR::enhanceOCR(vector<ZoneData> &zones)
 			// area to a list of areas that won't be processed by any further filters.
 			if (bNowMeetsConfidenceCriteria)
 			{
-				vecRectsMeetingConfidenceCriteria.push_back(zoneData.m_ipRect);
+				vecRectsMeetingConfidenceCriteria.push_back(zoneData.m_ipProcessingRect);
+			}
+			else
+			{
+				bAreAnyZonesLeftToProcess = true;
 			}
 		}
 	}
@@ -1508,6 +1526,7 @@ ISpatialStringSearcherPtr CEnhanceOCR::setCurrentPage(IAFDocumentPtr ipDoc, long
 	m_nAvgPageCharWidth = 0;
 	m_ipSpatialStringSearcher = __nullptr;
 	m_vecResults.clear();
+	m_vecHighConfRects.clear();
 
 	ISpatialStringPtr ipDocText = ipDoc->Text;
 	ASSERT_RESOURCE_ALLOCATION("ELI36523", ipDocText != __nullptr);
@@ -1785,7 +1804,7 @@ void CEnhanceOCR::prepareImagePage(vector<ILongRectanglePtr> &vecRectsToEnhance)
 }
 //--------------------------------------------------------------------------------------------------
 vector<ILongRectanglePtr> CEnhanceOCR::prepareImagePage(ISpatialStringPtr ipLowConfidenceText, 
-													   vector<ILongRectanglePtr> vecZonesToIgnore)
+														vector<ILongRectanglePtr> vecZonesToIgnore)
 {
 	removeBlackBorders(&m_apPageBitmap->m_hBitmap);
 
@@ -1796,9 +1815,15 @@ vector<ILongRectanglePtr> CEnhanceOCR::prepareImagePage(ISpatialStringPtr ipLowC
 		sizeof(BITMAPHANDLE), 16, CRF_FIXEDPALETTE, NULL, NULL, 0, NULL, NULL);
 	throwExceptionIfNotSuccess(nRes, "ELI36541", "Image processing error");
 
+	set<ILongRectanglePtr> setAreaToPrepare;
+	if (!m_bProcessFullDoc)
+	{
+		setAreaToPrepare.insert(getPageRect());
+	}
+
 	// Apply the first filter to the entire image. The default of medium-45 will remove most
 	// extraneous pixel content to make it easier to identify content zones.
-	generateFilteredImage(m_pFilters[0], __nullptr);
+	generateFilteredImage(m_pFilters[0], m_bProcessFullDoc ? __nullptr : &setAreaToPrepare);
 	
 	// Identify the image areas to enhance. The provided low confidence text should be the basis of
 	// such areas; other will be identified via pixel content of the image.
@@ -2175,7 +2200,7 @@ vector<ILongRectanglePtr> CEnhanceOCR::getRectsToEnhance(ISpatialStringPtr ipLow
 	// Provide the low quality text as the document text so that the SRICA object doesn't bother
 	// processing areas of high-confidence text.
 	IAFDocumentPtr ipAFTempDoc(CLSID_AFDocument);
-	ipAFTempDoc->Text = ipLowQualityText;
+	ipAFTempDoc->Text = asCppBool(ipLowQualityText->HasSpatialInfo()) ? ipLowQualityText : ipPageZone;
 	ipAFTempDoc->Text->SourceDocName = strFilteredImageName.c_str();
 
 	ipSRICA->ModifyValue(ipTempAttribute, ipAFTempDoc, __nullptr);
@@ -2198,27 +2223,43 @@ vector<ILongRectanglePtr> CEnhanceOCR::getRectsToEnhance(ISpatialStringPtr ipLow
 		ILongRectanglePtr ipImageRect = ipAttributeValue->GetOriginalImageBounds();
 		ASSERT_RESOURCE_ALLOCATION("ELI36565", ipImageRect != __nullptr);
 
-		// Expand the zone a bit as this tends to produce better OCR results. Also, the filter used
-		// to prepare the image may have removed some pixels around the edges that SRICA won't see.
-		// Expand a little more horizontally (with respect to the text orientation) than vertically
-		// as expanding vertically too much may pick up content from lines above or below.
-		if (m_ipCurrentPageInfo->Orientation == kRotNone ||
-			m_ipCurrentPageInfo->Orientation == kRotDown)
-		{
-			ipImageRect->Expand(4, 2);
-			ipImageRect->Offset(-2, -1);
-		}
-		else
-		{
-			ipImageRect->Expand(2, 4);
-			ipImageRect->Offset(-1, -2);
-		}
-		ipImageRect->Clip(0, 0, m_ipCurrentPageInfo->Width, m_ipCurrentPageInfo->Height);
-
 		vecRectsToEnhance.push_back(ipImageRect);
 	}
 
 	return vecRectsToEnhance;
+}
+//--------------------------------------------------------------------------------------------------
+ILongRectanglePtr CEnhanceOCR::inflateRect(ILongRectanglePtr ipRect, long nWidth, long nHeight)
+{
+	CRect rect;
+	ipRect->GetBounds(&rect.left, &rect.top, &rect.right, &rect.bottom);
+	
+	if (m_ipCurrentPageInfo->Orientation == kRotNone ||
+		m_ipCurrentPageInfo->Orientation == kRotDown)
+	{
+		rect.InflateRect(nWidth, nHeight);
+	}
+	else
+	{
+		rect.InflateRect(nHeight, nWidth);
+	}
+
+	if (nWidth > 0 || nHeight > 0)
+	{
+		rect.IntersectRect(rect, CRect(0, 0, m_ipCurrentPageInfo->Width, m_ipCurrentPageInfo->Height));
+	}
+
+	if (nWidth < 0 || nHeight < 0)
+	{
+		rect.NormalizeRect();
+	}
+
+	ILongRectanglePtr ipExpandedRect(CLSID_LongRectangle);
+	ASSERT_RESOURCE_ALLOCATION("ELI36737", ipExpandedRect != __nullptr);
+
+	ipExpandedRect->SetBounds(rect.left, rect.top, rect.right, rect.bottom);
+
+	return ipExpandedRect;
 }
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::loadImagePageWithSpecifiedRectsOnly(vector<ILongRectanglePtr> &vecRectsToEnhance)
@@ -2246,7 +2287,7 @@ void CEnhanceOCR::loadImagePageWithSpecifiedRectsOnly(vector<ILongRectanglePtr> 
 }
 //--------------------------------------------------------------------------------------------------
 vector<CEnhanceOCR::ZoneData> CEnhanceOCR::createZonesFromRects(vector<ILongRectanglePtr> vecRects,
-															  ISpatialStringSearcherPtr ipSearcher)
+	ISpatialStringSearcherPtr ipSearcher, CSize sizeExpandProcessingRect/* = CSize()*/)
 {
 	// Iterate each input rect to create a corresponding zone.
 	vector<ZoneData> vecZonesToEnhance;
@@ -2263,12 +2304,35 @@ vector<CEnhanceOCR::ZoneData> CEnhanceOCR::createZonesFromRects(vector<ILongRect
 		if (asCppBool(ipOriginalText->HasSpatialInfo()))
 		{
 			ipOriginalText->Trim(" \t\r\n", " \t\r\n");
+
+			// https://extract.atlassian.net/browse/ISSUE-12088
+			// It seems EnhanceOCR frequently replaces properly found curly braces with incorrect
+			// chars. For now, simply ignore zones where a matching pair of curly braces are found.
+			long nOpeningBracePos = ipOriginalText->FindFirstInstanceOfString("{", 0);
+			if (nOpeningBracePos >=0 &&
+				ipOriginalText->FindFirstInstanceOfString("{", nOpeningBracePos) >= 0)
+			{
+				continue;
+			}
 		}
 
 		// Create the ZoneData instance.
 		ZoneData zone;
 		zone.m_ipOriginalText = ipOriginalText;
 		zone.m_ipRect = ipRect;
+
+		if (sizeExpandProcessingRect.cx == 0 && sizeExpandProcessingRect.cy == 0)
+		{
+			zone.m_ipProcessingRect = ipRect;
+		}
+		else
+		{
+			// If sizeExpandProcessingRect has been specified, process an area the specified amount
+			// larger than m_ipRect.
+			zone.m_ipProcessingRect = inflateRect(ipRect,
+				sizeExpandProcessingRect.cx / 2, sizeExpandProcessingRect.cx / 2);
+		}
+
 		populateResults(zone.m_vecResults, ipOriginalText, true);
 		updateZoneData(zone, true, 1.0); // true = this is the original zone.
 
@@ -2318,6 +2382,16 @@ ISpatialStringSearcherPtr CEnhanceOCR::OCRFilteredImage()
 			ipSearcher->InitSpatialStringSearcher(ipOCRText, VARIANT_TRUE);
 			// Include any chars whose midpoints fall within the specified region.
 			ipSearcher->SetUseMidpointsOnly(VARIANT_TRUE);
+
+			// https://extract.atlassian.net/browse/ISSUE-12088
+			// Though high confidence text is excluded at the beginning of prepareImagePage, the
+			// zones it produces to process may still end up including some area where high
+			// confidence text was. To avoid modifying any high confidence text, configure the
+			// searcher to ignore these regions.
+			for each (ILongRectanglePtr ipRect in m_vecHighConfRects)
+			{
+				ipSearcher->ExcludeDataInRegion(ipRect);
+			}
 
 			return ipSearcher;
 		}
@@ -2508,7 +2582,7 @@ bool CEnhanceOCR::applyOCRAttempt(ZoneData& zoneData, ZoneData& OCRAttemptData)
 }
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::populateResults(vector<OCRResult*>& vecResults, ISpatialStringPtr ipText,
-								 bool bIsOriginal)
+								  bool bIsOriginal)
 {
 	if (ipText != __nullptr && asCppBool(ipText->HasSpatialInfo()))
 	{
@@ -2663,6 +2737,8 @@ CEnhanceOCR::OCRResult* CEnhanceOCR::mergeResults(const OCRResult& existingResul
 		const CPPLetter *pBestLetter = __nullptr;
 		// The confidence of pBestLetter;
 		long nBestConfidence = 0;
+		// The center position of pBestLetter;
+		unsigned long nBestPos = 0;
 		// The OCRResult pBestLetter is originally from. 
 		OCRResult *pSourceResult = __nullptr;
 		// Indicates whether the initial candidate letter is from the existing result.
@@ -2679,6 +2755,9 @@ CEnhanceOCR::OCRResult* CEnhanceOCR::mergeResults(const OCRResult& existingResul
 					(i == 1) ? newResult :
 						bOriginalCandidateFoundInExistingResult ? newResult : existingResult;
 
+			// nLetterIndex will be set to the index of the letter in the currentResult currently
+			// being explored as a candidate.
+			long nLetterIndex = -1;
 			// nLetterPos will be set to the x-coordinate mid-point of any letter currently being
 			// explored as a candidate.
 			long nLetterPos = -1;
@@ -2688,17 +2767,21 @@ CEnhanceOCR::OCRResult* CEnhanceOCR::mergeResults(const OCRResult& existingResul
 			// pMergedOCRResult.
 			if (i < 2)
 			{
-				nLetterPos = currentResult.AdvanceTo(nXPos);
+				nLetterIndex = currentResult.AdvanceToPos(nXPos);
+				nLetterPos = currentResult.GetPos(nLetterIndex);
 				while (nLetterPos >= 0 && pLastSpatialLetter != __nullptr &&
 					   nLetterPos <= (long)pLastSpatialLetter->m_ulRight)
 				{
-					long nNextPos = currentResult.AdvanceToNext(nLetterPos);
+					long nNextIndex = currentResult.AdvanceToNextPos(nLetterPos);
+					long nNextPos = currentResult.GetPos(nNextIndex);
 					if (nNextPos > nLetterPos)
 					{
+						nLetterIndex = nNextIndex;
 						nLetterPos = nNextPos;
 					}
 					else
 					{
+						nLetterIndex = -1;
 						nLetterPos = -1;
 						break;
 					}
@@ -2709,10 +2792,12 @@ CEnhanceOCR::OCRResult* CEnhanceOCR::mergeResults(const OCRResult& existingResul
 			// letters might qualify instead of the candidate.
 			else if (pBestLetter != __nullptr)
 			{
-				long nNextPos = currentResult.AdvanceToNext(nXPos);
+				long nNextIndex = currentResult.AdvanceToNextPos(nXPos);
+				long nNextPos = currentResult.GetPos(nNextIndex);
 				if (nNextPos > nXPos && nNextPos <= (long)pBestLetter->m_ulRight)
 				{
 					nXPos = nNextPos;
+					nLetterIndex = nNextIndex;					
 					nLetterPos = nNextPos;
 				}
 				else
@@ -2727,15 +2812,19 @@ CEnhanceOCR::OCRResult* CEnhanceOCR::mergeResults(const OCRResult& existingResul
 				break;
 			}
 
-			// Get the CPPLetter at nLetterPos.
-			const CPPLetter *pLetter = currentResult.GetLetter(nLetterPos);
+			// Do not consider this letter if no letter was found for this x-coordinate.
+			if (nLetterIndex == -1)
+			{
+				continue;
+			}
+
+			// Get the CPPLetter at nLetterIndex.
+			const CPPLetter *pLetter = currentResult.GetLetter(nLetterIndex);
 
 			// Do not consider this letter if any of the following are true:
-			// - No letter was found for this x-coordinate.
 			// - The letter found is > 50% overlapping with the last letter added to pMergedOCRResult.
 			// - The letter is the same as the last letter added to pMergedOCRResult.
-			if (pLetter == __nullptr ||
-				(pLastLetter != __nullptr && pLastSpatialLetter != __nullptr && 
+			if ((pLastLetter != __nullptr && pLastSpatialLetter != __nullptr && 
 					nLetterPos < (long)pLastSpatialLetter->m_ulRight) ||
 				(pLetter == pLastLetter))
 			{
@@ -2750,15 +2839,20 @@ CEnhanceOCR::OCRResult* CEnhanceOCR::mergeResults(const OCRResult& existingResul
 				{
 					pBestLetter = __nullptr;
 				}
+				// Do not consider this letter if pBestLetter is spatial while this one is not and
+				// pBestLetter is at least 50% overlapping with this whitespace.
+				else if (pBestLetter->m_bIsSpatial && !pLetter->m_bIsSpatial &&
+						 nBestPos >= pLetter->m_ulLeft && nBestPos <= pLetter->m_ulRight)
+				{
+					continue;
+				}
 				// Do not consider this letter if either of the following are true:
-				// - pBestLetter is spatial and this one is not
 				// - pBestLetter is to the left of this this letter
 				// - The best candidate is a word character that already exceeds the specified
 				//		confidence threshold. Continuing to try to correct text that is already of
 				//		a decent confidence doesn't tend to make things better (and often makes it
 				//		worse.)
-				else if (pBestLetter->m_bIsSpatial && !pLetter->m_bIsSpatial ||
-						 nLetterPos > (long)pBestLetter->m_ulRight ||
+				else if (nLetterPos > (long)pBestLetter->m_ulRight ||
 						 (isWordChar(pBestLetter->m_usGuess1) && nBestConfidence > m_nConfidenceCriteria))
 				{
 					continue;
@@ -2767,12 +2861,13 @@ CEnhanceOCR::OCRResult* CEnhanceOCR::mergeResults(const OCRResult& existingResul
 
 			// At this point pLetter will be the best candidate as long is it has a higher
 			// confidence than any existing candidate.
-			long nConfidence = currentResult.GetConfidence(nLetterPos);
+			long nConfidence = currentResult.GetConfidence(nLetterIndex);
 			if (pBestLetter == __nullptr || nConfidence > nBestConfidence)
 			{
 				nBestConfidence = nConfidence;
+				nBestPos = nLetterPos;
 				pBestLetter = pLetter;
-				pSourceResult = currentResult.GetSourceResult(nLetterPos);
+				pSourceResult = currentResult.GetSourceResult(nLetterIndex);
 				if (i == 0)
 				{
 					bOriginalCandidateFoundInExistingResult = true;
@@ -2798,7 +2893,8 @@ CEnhanceOCR::OCRResult* CEnhanceOCR::mergeResults(const OCRResult& existingResul
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::applyZoneResults(ISpatialStringPtr ipOriginalText, const ZoneData& zoneData)
 {
-	ISpatialStringPtr ipZoneResult = __nullptr;
+	IIUnknownVectorPtr ipResultsVector(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI36733", ipResultsVector != __nullptr);
 
 	// If the zone has a preferred result, unless the current result has a much higher confidence,
 	// use the preferred result.
@@ -2807,9 +2903,12 @@ void CEnhanceOCR::applyZoneResults(ISpatialStringPtr ipOriginalText, const ZoneD
 			zoneData.m_pPreferredResult->m_nOverallConfidence + gnPREFERRED_FORMAT_CONF_BIAS)
 	{
 		// Remove any extra whitespace characters that may have resulted from merging results.
-		zoneData.m_pPreferredResult->TrimWhiteSpace();
-		ipZoneResult = zoneData.m_pPreferredResult->ToSpatialString(
+		zoneData.m_pPreferredResult->TrimExtraWhiteSpace();
+		ISpatialStringPtr ipResult = zoneData.m_pPreferredResult->ToSpatialString(
 			m_strSourceDocName, m_nCurrentPage, m_ipPageInfoMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI36739", ipResult != __nullptr);
+
+		ipResultsVector->PushBack(ipResult);
 	}
 	else
 	{
@@ -2817,53 +2916,66 @@ void CEnhanceOCR::applyZoneResults(ISpatialStringPtr ipOriginalText, const ZoneD
 		for each (OCRResult *pResultLine in zoneData.m_vecResults)
 		{
 			// Remove any extra whitespace characters that may have resulted from merging results.
-			pResultLine->TrimWhiteSpace();
+			pResultLine->TrimExtraWhiteSpace();
 
-			if (ipZoneResult == __nullptr)
-			{
-				ipZoneResult = pResultLine->ToSpatialString(
-					m_strSourceDocName, m_nCurrentPage, m_ipPageInfoMap);
-			}
-			else
-			{
-				ipZoneResult->AppendString("\r\n");
-				ipZoneResult->Append(pResultLine->ToSpatialString(
-					m_strSourceDocName, m_nCurrentPage, m_ipPageInfoMap));
-			}
+			ISpatialStringPtr ipResult = pResultLine->ToSpatialString(
+				m_strSourceDocName, m_nCurrentPage, m_ipPageInfoMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI36738", ipResult != __nullptr);
+
+			ipResultsVector->PushBack(ipResult);
 		}
 	}
 
-	// If ipZoneResult is non-empty, apply it to ipOriginalText.
-	if (ipZoneResult != __nullptr && asCppBool(ipZoneResult->HasSpatialInfo()))
+	// https://extract.atlassian.net/browse/ISSUE-12088
+	// Apply each result from a zone separately to avoid cases where multiple lines of text are
+	// inserted within what was a single line of text (moves text from a lower line into the line
+	// above).
+	long nCount = ipResultsVector->Size();
+	for (long nResult = 0; nResult < nCount; nResult++)
 	{
-		// If original text was empty, just add ipZoneResult to it.
-		if (!asCppBool(ipOriginalText->HasSpatialInfo()))
-		{
-			ipOriginalText->Append(ipZoneResult);
-		}
-		// If this zone did not have previously have any value, insert ipZoneResult into
-		// ipOriginalText using it's spatial location to determine where it should be inserted.
-		else if (!asCppBool(zoneData.m_ipOriginalText->HasSpatialInfo()))
-		{
-			ipOriginalText->InsertBySpatialPosition(ipZoneResult, VARIANT_FALSE);
-		}
-		// If this zone had a previous value, remove the previous value and insert ipZoneResult in
-		// its place.
-		else
-		{
-			long nPos = ipOriginalText->RemoveText(zoneData.m_ipOriginalText);
+		ISpatialStringPtr ipResult = ipResultsVector->At(nResult);
+		ASSERT_RESOURCE_ALLOCATION("ELI36734", ipResult != __nullptr);
 
-			if (nPos != -1)
+		// If ipZoneResult is non-empty, apply it to ipOriginalText.
+		if (asCppBool(ipResult->HasSpatialInfo()))
+		{
+			// If original text was empty, just add ipResult to it.
+			if (!asCppBool(ipOriginalText->HasSpatialInfo()))
 			{
-				nPos = ipOriginalText->SetSurroundingWhitespace(ipZoneResult, nPos);
-				ipOriginalText->Insert(nPos, ipZoneResult);
+				ipOriginalText->Append(ipResult);
 			}
-			// Since ipOriginalText may have been modified by other zones, it is possible it no
-			// longer constains the original zone text. In this case, just insert ipZoneResult
-			// according to spatial location.
+			// If this zone did not have previously have any value, insert ipResult into
+			// ipOriginalText using it's spatial location to determine where it should be inserted.
+			else if (!asCppBool(zoneData.m_ipOriginalText->HasSpatialInfo()))
+			{
+				ipOriginalText->InsertBySpatialPosition(ipResult, VARIANT_FALSE);
+			}
+			// If this zone had a previous value, remove the previous value and insert ipResult in
+			// its place.
 			else
 			{
-				ipOriginalText->InsertBySpatialPosition(ipZoneResult, VARIANT_FALSE);
+				ILongRectanglePtr ipBounds = ipResult->GetOCRImageBounds();
+				ASSERT_RESOURCE_ALLOCATION("ELI36731", ipBounds != __nullptr);
+
+				// https://extract.atlassian.net/browse/ISSUE-12088
+				// Only remove text within the bounds of the replacement text to avoid removing
+				// chars that shouldn't be removed and inserting replacement text in an
+				// inappropriate location.
+				long nPos = ipOriginalText->RemoveText(
+					zoneData.m_ipOriginalText, m_nCurrentPage, ipBounds);
+
+				if (nPos != -1)
+				{
+					nPos = ipOriginalText->SetSurroundingWhitespace(ipResult, nPos);
+					ipOriginalText->Insert(nPos, ipResult);
+				}
+				// Since ipOriginalText may have been modified by other zones, it is possible it no
+				// longer constains the original zone text. In this case, just insert ipResult
+				// according to spatial location.
+				else
+				{
+					ipOriginalText->InsertBySpatialPosition(ipResult, VARIANT_FALSE);
+				}
 			}
 		}
 	}
@@ -3115,7 +3227,7 @@ long CEnhanceOCR::OCRResult::CompareVerticalArea(const OCRResult &other) const
 
 	for each (const CPPLetter &letter in m_vecLetters)
 	{
-		if (other.GetInsertionPosition(&letter, false) != -1)
+		if (other.GetInsertionPosition(&letter, false, false) != -1)
 		{
 			// Other result spatially overlaps with this one.
 			return 0;
@@ -3134,59 +3246,60 @@ long CEnhanceOCR::OCRResult::CompareVerticalArea(const OCRResult &other) const
 	}
 }
 //--------------------------------------------------------------------------------------------------
-long CEnhanceOCR::OCRResult::AdvanceTo(long nXPos) const
+long CEnhanceOCR::OCRResult::AdvanceToPos(long nXPos) const
 { 
 	// Return the horizontal midpoint of the letter at nXPos.
-	long nIndex = GetIndexOfPos(nXPos);
-	if (nIndex >= 0)
-	{
-		return (m_vecLetters[nIndex].m_ulLeft + m_vecLetters[nIndex].m_ulRight) / 2;
-	}
-	else
-	{
-		return -1;
-	}
+	return GetIndexOfPos(nXPos);
 }
 //--------------------------------------------------------------------------------------------------
-long CEnhanceOCR::OCRResult::AdvanceToNext(long nXPos) const
+long CEnhanceOCR::OCRResult::AdvanceToNextPos(long nXPos) const
 { 
-	// Return the horizontal midpoint of the letter after the one at nXPos (or the next to the right
-	// of nXPos if there is no letter at nXPos).
-	long nResultPos = -1;
+	// Return the index of the letter after the one at nXPos (or the next to the right of nXPos if
+	// there is no letter at nXPos).
+	long nResultIndex = -1;
 	for (long i = (long)m_vecLetters.size() - 2; i >= 0; i--) 
 	{
 		if ((long)m_vecLetters[i].m_ulLeft <= nXPos && (long)m_vecLetters[i].m_ulRight >= nXPos)
 		{
-			// We found the letter at this pos. Use the midpoint of the next letter.
-			i++;
-			return (m_vecLetters[i].m_ulLeft + m_vecLetters[i].m_ulRight) / 2;
+			// We found the letter at this pos. Return the index of the next letter.
+			return i + 1;
 		}
 		else if ((long)m_vecLetters[i].m_ulLeft > nXPos)
 		{
-			// As long as the left position is to the right of nXPos, keep incrementing nResultPos
+			// As long as the left position is to the right of nXPos, make this the tentative result
 			// in case there is no letter at nXPos.
-			nResultPos = (long)(m_vecLetters[i].m_ulLeft + m_vecLetters[i].m_ulRight) / 2;
+			nResultIndex = i;
 		}
 	}
 
-	return nResultPos;
+	return nResultIndex;
 }
 //--------------------------------------------------------------------------------------------------
-long CEnhanceOCR::OCRResult::GetConfidence(long nXPos) const
+const CPPLetter* CEnhanceOCR::OCRResult::GetLetter(long nIndex) const
 {
-	// Return the confidence of the letter at nXPos.
-	long nIndex = GetIndexOfPos(nXPos);
+	// Return a pointer the CPPLetter at nXPos.
 	if (nIndex >= 0)
 	{
-		return GetConfidenceByIndex(nIndex);
+		return &m_vecLetters[nIndex];
 	}
 	else
 	{
-		return 0;
+		return __nullptr;
 	}
 }
 //--------------------------------------------------------------------------------------------------
-long CEnhanceOCR::OCRResult::GetConfidenceByIndex(long nIndex) const
+long CEnhanceOCR::OCRResult::GetPos(long nIndex) const
+{
+	// Return the confidence of the letter at this index.
+	if (m_vecLetters.empty() || nIndex < 0)
+	{
+		return -1;
+	}
+
+	return (long)(m_vecLetters[nIndex].m_ulLeft + m_vecLetters[nIndex].m_ulRight) / 2;
+}
+//--------------------------------------------------------------------------------------------------
+long CEnhanceOCR::OCRResult::GetConfidence(long nIndex) const
 {
 	// Return the confidence of the letter at this index.
 	if (m_vecLetters.empty() || nIndex < 0)
@@ -3202,38 +3315,9 @@ long CEnhanceOCR::OCRResult::GetConfidenceByIndex(long nIndex) const
 	return nConfidence;
 }
 //--------------------------------------------------------------------------------------------------
-bool CEnhanceOCR::OCRResult::AllCharsMeetConfidenceCriteria(long nConfidence)
+CEnhanceOCR::OCRResult* CEnhanceOCR::OCRResult::GetSourceResult(long nIndex) const
 {
-	// Do all spatial chars have a confidence of at least nConfidence?
-	for (size_t i = 0; i < m_vecLetters.size(); i++)
-	{
-		if (m_vecLetters[i].m_bIsSpatial && GetConfidenceByIndex(i) < nConfidence)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-//--------------------------------------------------------------------------------------------------
-const CPPLetter* CEnhanceOCR::OCRResult::GetLetter(long nXPos) const
-{
-	// Return a pointer the CPPLetter at nXPos.
-	long nIndex = GetIndexOfPos(nXPos);
-	if (nIndex >= 0)
-	{
-		return &m_vecLetters[nIndex];
-	}
-	else
-	{
-		return __nullptr;
-	}
-}
-//--------------------------------------------------------------------------------------------------
-CEnhanceOCR::OCRResult* CEnhanceOCR::OCRResult::GetSourceResult(long nXPos) const
-{
-	// Return a pointer the original OCRResult instance of the letter at nXPos.
-	long nIndex = GetIndexOfPos(nXPos);
+	// Return a pointer the original OCRResult instance of the letter at nIndex.
 	if (nIndex >= 0)
 	{
 		return m_vecSourceResults[nIndex];
@@ -3242,6 +3326,20 @@ CEnhanceOCR::OCRResult* CEnhanceOCR::OCRResult::GetSourceResult(long nXPos) cons
 	{
 		return __nullptr;
 	}
+}
+//--------------------------------------------------------------------------------------------------
+bool CEnhanceOCR::OCRResult::AllCharsMeetConfidenceCriteria(long nConfidence)
+{
+	// Do all spatial chars have a confidence of at least nConfidence?
+	for (size_t i = 0; i < m_vecLetters.size(); i++)
+	{
+		if (m_vecLetters[i].m_bIsSpatial && GetConfidence(i) < nConfidence)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::OCRResult::AddLetter(CPPLetter newLetter, CEnhanceOCR::OCRResult *pSourceResult)
@@ -3259,16 +3357,14 @@ void CEnhanceOCR::OCRResult::AddLetter(CPPLetter newLetter, CEnhanceOCR::OCRResu
 	updateStats();
 }
 //--------------------------------------------------------------------------------------------------
-void CEnhanceOCR::OCRResult::TrimWhiteSpace()
+void CEnhanceOCR::OCRResult::TrimExtraWhiteSpace()
 {
-	// Removes whitespace that doesn't appear to belong due to the proximity of the spatial chars to
-	// either side.
+	// Removes any duplicated whitespace created by merging two results together.
 	set<long> lettersToKeep;
-	long nPendingWhitespace = -1;
-	long nGapAllowance = m_nAverageCharWidth / 2 + 1;
-	CPPLetter *pPrevSpatialLetter = __nullptr;
+	CPPLetter *pLastLetter = __nullptr;
 
 	long nLetterCount = m_vecLetters.size();
+	unsigned short usLastLetter = 0;
 	for (long nPos = 0; nPos < nLetterCount; nPos ++)
 	{
 		const CPPLetter& letter = m_vecLetters[nPos];
@@ -3278,25 +3374,14 @@ void CEnhanceOCR::OCRResult::TrimWhiteSpace()
 			continue;
 		}
 
-		if (letter.m_bIsSpatial)
+		if (pLastLetter != __nullptr &&
+			(letter.m_usGuess1 == pLastLetter->m_usGuess1) && letter.m_usGuess1 == 32/*space*/)
 		{
-			if (nPendingWhitespace != -1)
-			{
-				if (pPrevSpatialLetter != __nullptr && 
-					pPrevSpatialLetter->m_ulRight + nGapAllowance < letter.m_ulLeft)
-				{
-					lettersToKeep.insert(nPendingWhitespace);
-					nPendingWhitespace = -1;
-				}
-			}
+			continue;
+		}
 
-			pPrevSpatialLetter = (CPPLetter *)&letter;
-			lettersToKeep.insert(nPos);
-		}
-		else
-		{
-			nPendingWhitespace = nPos;
-		}
+		lettersToKeep.insert(nPos);
+		pLastLetter = (CPPLetter *)&letter;
 	}
 
 	for (long nPos = nLetterCount - 1; nPos >= 0; nPos--)
@@ -3346,6 +3431,7 @@ bool CEnhanceOCR::OCRResult::populateLetters(CPPLetter *pLetters, long nNumLette
 {
 	CRect rectLastSpatial;
 	vector<CPPLetter> vecNonSpatialLetters;
+	CPPLetter *pLastLetter = __nullptr;
 	bool bResultValid = true;
 	long nInsertionIndex = -1;
 	long nPage = -1;
@@ -3354,6 +3440,19 @@ bool CEnhanceOCR::OCRResult::populateLetters(CPPLetter *pLetters, long nNumLette
 	{
 		CPPLetter &letter = pLetters[i];
 		char c = (char)letter.m_usGuess1;
+
+		//https://extract.atlassian.net/browse/ISSUE-12088
+		// If the OCR has added a double letter by adding the same letter twice with the same
+		// spatial info, divide the spatial info so the first character gets the left half of the
+		// spatial area and the second letter gets the right half.
+		if (pLastLetter != __nullptr && letter == *pLastLetter)
+		{
+			unsigned long ulMidpoint = (letter.m_ulLeft + letter.m_ulRight) / 2;
+			pLastLetter->m_ulRight = ulMidpoint;
+			letter.m_ulLeft = ulMidpoint + 1;
+		}
+
+		pLastLetter = &letter;
 
 		// Pretend as if any chars specified in strCharsToIgnore don't exist in pLetters; tread as
 		// whitespace instead.
@@ -3380,7 +3479,7 @@ bool CEnhanceOCR::OCRResult::populateLetters(CPPLetter *pLetters, long nNumLette
 			}
 			else
 			{
-				nInsertionIndex = GetInsertionPosition(&letter, nInsertionIndex != -1);
+				nInsertionIndex = GetInsertionPosition(&letter, nInsertionIndex != -1, true);
 				if (nInsertionIndex == -2)
 				{
 					bResultValid = false;
@@ -3536,8 +3635,8 @@ long CEnhanceOCR::OCRResult::GetIndexOfPos(long nXPos) const
 	return -1;
 }
 //--------------------------------------------------------------------------------------------------
-long CEnhanceOCR::OCRResult::GetInsertionPosition(const CPPLetter *pLetter, 
-												 bool bProbablySameLine) const
+long CEnhanceOCR::OCRResult::GetInsertionPosition(const CPPLetter *pLetter, bool bProbablySameLine,
+												  bool bIsLastChar) const
 {
 	// If nothing has yet been added to this result, the letter should go at index 0.
 	if (m_vecLetters.empty())
@@ -3564,7 +3663,7 @@ long CEnhanceOCR::OCRResult::GetInsertionPosition(const CPPLetter *pLetter,
 			continue;
 		}
 
-		if (ulHorizontalMidpoint < pComparisonLetter->m_ulRight)
+		if (bIsLastChar && ulHorizontalMidpoint < pComparisonLetter->m_ulRight)
 		{
 			// If the new letter doesn't fall to the right of all others, this likely indicates it
 			// is in a new line of text.
@@ -3575,8 +3674,11 @@ long CEnhanceOCR::OCRResult::GetInsertionPosition(const CPPLetter *pLetter,
 		// when determining where to insert chars.
 		else if (isWordChar(pComparisonLetter->m_usGuess1))
 		{
-			rectLastSpatial.SetRect(pComparisonLetter->m_ulLeft, pComparisonLetter->m_ulTop,
-				pComparisonLetter->m_ulRight, pComparisonLetter->m_ulBottom);
+			rectLastSpatial.UnionRect(rectLastSpatial,
+				CRect(pComparisonLetter->m_ulLeft,
+					pComparisonLetter->m_ulTop,
+					pComparisonLetter->m_ulRight,
+					pComparisonLetter->m_ulBottom));
 		}
 	}
 

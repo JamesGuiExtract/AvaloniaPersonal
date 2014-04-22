@@ -446,7 +446,7 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_PREFERRED_FORMAT_BROWSE,311,190,15,14
     LTEXT           "Prevent enhancement from adding any of the following characters:",IDC_STATIC,8,208,281,8
     EDITTEXT        IDC_EDIT_CHARS_TO_IGNORE,7,220,318,12,ES_AUTOHSCROLL
-    CONTROL         "Ouput filtered images alongside original (debug)",IDC_CHK_OUTPUT_FILTERED_IMAGES,
+    CONTROL         "Output filtered images alongside original (debug)",IDC_CHK_OUTPUT_FILTERED_IMAGES,
                     "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,7,236,288,10
     LTEXT           "NOTE: When the processing machine is not licensed for Enhance OCR, this rule object will ""run"" but not attempt to enhance the text. The text from the uss file will be used as-is.",IDC_STATIC,7,249,326,16
 END

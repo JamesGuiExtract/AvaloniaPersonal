@@ -29,14 +29,6 @@ namespace Extract.Imaging
         /// </summary>
         volatile bool _disposed;
 
-        /// <summary>
-        /// <see langword="true"/> if PDF documents should be loaded as bitonal images; 
-        /// <see langword="false"/> if PDF documents should be loaded in full color depth.
-        /// </summary>
-        /// <remarks>Leadtools does not support anti-aliasing for non-bitonal PDF documents.
-        /// </remarks>
-        readonly bool _loadPdfAsBitonal;
-
         #endregion Fields
 
         #region Constructors
@@ -50,9 +42,6 @@ namespace Extract.Imaging
             {
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28485",
                     _OBJECT_NAME);
-
-                // Load pdfs as bitonal images if bitonal support is unlocked
-                _loadPdfAsBitonal = !RasterSupport.IsLocked(RasterSupportType.Bitonal);
             }
             catch (Exception ex)
             {
@@ -77,7 +66,7 @@ namespace Extract.Imaging
             {
                 codecs = GetCodecs();
 
-                return new ImageReader(fileName, codecs, _loadPdfAsBitonal);
+                return new ImageReader(fileName, codecs);
             }
             catch (Exception ex)
             {

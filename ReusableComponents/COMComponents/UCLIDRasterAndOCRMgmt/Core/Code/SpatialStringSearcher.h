@@ -56,6 +56,7 @@ public:
 	STDMETHOD(GetLeftWord)(ILongRectangle* ipRect, ISpatialString** ipReturnString);
 	STDMETHOD(GetRightWord)(ILongRectangle* ipRect, ISpatialString** ipReturnString);
 	STDMETHOD(SetUseMidpointsOnly)(VARIANT_BOOL newVal);
+	STDMETHOD(ExcludeDataInRegion)(ILongRectangle *pRect);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -102,6 +103,9 @@ private:
 		// Variables
 		////////////
 		long m_lLeft, m_lRight, m_lTop, m_lBottom;
+
+		// Indicates whether this entity should be excluded from search results.
+		bool m_bExcluded;
 	};
 	// used internally by SpatialStringSearcher to represent the string 
 	// LocalLetter basically just wraps ILetter

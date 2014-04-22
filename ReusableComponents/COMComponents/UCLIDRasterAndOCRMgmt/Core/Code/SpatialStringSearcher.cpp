@@ -23,7 +23,8 @@ CSpatialStringSearcher::LocalEntity::LocalEntity(long lLeft, long lTop, long lRi
 : m_lLeft(lLeft),
 m_lTop(lTop),
 m_lRight(lRight),
-m_lBottom(lBottom)
+m_lBottom(lBottom),
+m_bExcluded(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -333,9 +334,9 @@ STDMETHODIMP CSpatialStringSearcher::GetDataOutOfRegion(ILongRectangle *ipRect, 
 
 		*ipReturnString = (ISpatialString*) ipNewStr.Detach();
 
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07790");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialStringSearcher::ExtendDataInRegion(ILongRectangle *pRect, 
@@ -383,10 +384,10 @@ STDMETHODIMP CSpatialStringSearcher::ExtendDataInRegion(ILongRectangle *pRect,
 
 		// Return the string
 		*ppFound = (ISpatialString*) ipFound.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29539");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialStringSearcher::GetLeftWord(ILongRectangle *pRect, ISpatialString **ppReturnString)
@@ -563,9 +564,10 @@ STDMETHODIMP CSpatialStringSearcher::SetIncludeDataOnBoundary(VARIANT_BOOL bIncl
 		{
 			m_bIncludeDataOnBoundary = false;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07791");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialStringSearcher::SetBoundaryResolution(ESpatialEntity eResolution)
@@ -595,6 +597,32 @@ STDMETHODIMP CSpatialStringSearcher::SetUseMidpointsOnly(VARIANT_BOOL newVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36398");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialStringSearcher::ExcludeDataInRegion(ILongRectangle *pRect)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ILongRectanglePtr ipRect(pRect);
+		ASSERT_ARGUMENT("ELI36740", ipRect != __nullptr);
+
+		validateLicense();
+
+		// Exclude all characters in the region.
+		vector<int> vecLetterIndices;		
+		getUnsortedLettersInRegion(ipRect, vecLetterIndices);
+
+		size_t nCount = vecLetterIndices.size();
+		for (size_t i = 0; i < nCount; i++)
+		{
+			m_vecLetters[vecLetterIndices[i]].m_bExcluded = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36741");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1004,7 +1032,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 			for (unsigned long ui = 0; ui < m_vecLetters.size(); ui++)
 			{
 				LocalLetter& rLetter = m_vecLetters[ui];
-				if (!rLetter.letter.m_bIsSpatial)
+				if (rLetter.m_bExcluded || !rLetter.letter.m_bIsSpatial)
 				{
 					continue;
 				}
@@ -1031,7 +1059,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 					for (unsigned int uiLetter = rWord.m_uiStart; uiLetter < rWord.m_uiEnd; uiLetter++)
 					{
 						LocalLetter& rLetter = m_vecLetters[uiLetter];
-						if (!rLetter.letter.m_bIsSpatial)
+						if (rLetter.m_bExcluded || !rLetter.letter.m_bIsSpatial)
 						{
 							continue;
 						}
@@ -1055,7 +1083,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 						uiLetter < rLine.m_uiEnd; uiLetter++)
 					{
 						LocalLetter& rLetter = m_vecLetters[uiLetter];
-						if (!rLetter.letter.m_bIsSpatial)
+						if (rLetter.m_bExcluded || !rLetter.letter.m_bIsSpatial)
 						{
 							continue;
 						}

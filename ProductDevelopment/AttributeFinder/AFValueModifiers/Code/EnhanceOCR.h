@@ -159,35 +159,35 @@ class ATL_NO_VTABLE CEnhanceOCR :
 		// Returns < 1 if the other result is below or vertically in line with this result or empty.
 		long CompareVerticalArea(const OCRResult &other) const;
 		
-		// Returns the x-coordinate of the mid-point of any letter nXPos intersects with.
-		long AdvanceTo(long nXPos) const;
+		// Returns the index of any letter nXPos intersects with.
+		long AdvanceToPos(long nXPos) const;
 
-		// Returns the x-coordinate of the mid-point of the next letter after nXPos.
-		long AdvanceToNext(long nXPos) const;
-
-		// Returns the confidence of any letter nXPos intersects with, or -1 otherwise.
-		long GetConfidence(long nXPos) const;
+		// Returns the index of the next letter after nXPos.
+		long AdvanceToNextPos(long nXPos) const;
 
 		// Returns the confidence of the letter at the specified index.
-		long GetConfidenceByIndex(long nIndex) const;
+		const CPPLetter* GetLetter(long nIndex) const;
+
+		// Returns the X-axis mid-point of the letter at the specified index.
+		long GetPos(long nIndex) const;
+
+		// Returns the confidence of the letter at the specified index.
+		long GetConfidence(long nIndex) const;
+
+		// Returns a pointer to the original OCRResult of the letter at the specified index or
+		// __nullptr if this is an original OCR result.
+		OCRResult* GetSourceResult(long nIndex) const;
 
 		// Indicates if all characters in the result meet the configured confidence criteria.
 		bool AllCharsMeetConfidenceCriteria(long nConfidence);
-
-		// Returns a pointer to the CPPLetter nXPos intersects with, or __nullptr otherwise.
-		const CPPLetter* GetLetter(long nXPos) const;
-
-		// Returns a pointer to the original OCRResult of any letter nXPos intersects with is from,
-		// or __nullptr if this is an original OCR result.
-		OCRResult* GetSourceResult(long nXPos) const;
 
 		// Adds a new letter to this result. pSourceResult should specify the result the letter
 		// originally came from.
 		void AddLetter(CPPLetter newLetter, OCRResult *pSourceResult);
 
-		// Removes unnecessary whitespace characters from the result that may have resulted from
-		// merging results.
-		void TrimWhiteSpace();
+		// Removes extra whitespace characters from the result that may have resulted from merging
+		// results.
+		void TrimExtraWhiteSpace();
 
 		// Returns the string value of the result.
 		string ToString() const;
@@ -238,10 +238,14 @@ private:
 
 		// A positive number indicates the position in this result in which the specified character
 		// should be added.
+		// bIsLastChar indicates if this character is known to fall sequentially after all other
+		// characters currently in the result; setting this to true will reduce the chances that
+		// GetInsertionPosition will incorrectly decide the character belongs on a new line.
 		// -1 indicates the letter is on a separate line and belongs in a separate result.
 		// -2 indicates the letter appears to overlap with a letter already in the result and likely
 		// indicates incorrectly OCR'd text.
-		long GetInsertionPosition(const CPPLetter *pLetter, bool bProbablySameLine) const;		
+		long GetInsertionPosition(const CPPLetter *pLetter, bool bProbablySameLine,
+			bool bIsLastChar) const;
 	};
 
 	// Represents all OCR text in a given image area. May contain more than one OCRResult instance.
@@ -249,6 +253,14 @@ private:
 	{
 		// The area of the current page represented by this instance.
 		ILongRectanglePtr m_ipRect;
+
+		// The image area to be processed for this zone. If different from m_ipRect, only the
+		// resulting text within m_ipRect will be used.
+		ILongRectanglePtr m_ipProcessingRect;
+
+		// The area of the current page to process and OCR (may include surrounding text for OCR
+		// context)
+		ILongRectanglePtr m_ipImageProcessingRect;
 
 		// The original OCR text from this zone.
 		ISpatialStringPtr m_ipOriginalText;
@@ -387,6 +399,9 @@ private:
 	// The spatial string searcher used to locate original document text in specified areas.
 	ISpatialStringSearcherPtr m_ipSpatialStringSearcher;
 
+	// Rectangles describing areas containing high-confidence text on the current page.
+	vector<ILongRectanglePtr> m_vecHighConfRects;
+
 	// A holding area for the OCRResults generated during processing since the m_vecSourceResults
 	// may refer back to previously generated results.
 	vector<unique_ptr<OCRResult>> m_vecResults;
@@ -477,14 +492,21 @@ private:
 	// text as hints for areas that need enhancement.
 	vector<ILongRectanglePtr> getRectsToEnhance(ISpatialStringPtr ipLowQualityText);
 
+	// Inflates the specified by nWidth on the left and right sides and nHeight on the top and
+	// bottom. (nWidth of 1 makes the rect 2 pixels wider as per CRect::InflateRect)
+	ILongRectanglePtr inflateRect(ILongRectanglePtr ipRect, long nWidth, long nHeight);
+
 	// Re-loads the image into m_apPageBitmap, but with only the specified rects. (the rest of the
 	// image will be blank).
 	void loadImagePageWithSpecifiedRectsOnly(vector<ILongRectanglePtr> &vecRectsToEnhance);
 
 	// Create ZoneData instance for each specified rect in the current image page. ipSearcher is
 	// used to retrieve the original text for each zone.
-	vector<ZoneData> createZonesFromRects(
-		vector<ILongRectanglePtr> vecRects, ISpatialStringSearcherPtr ipSearcher);
+	// sizeExpandProcessingRect can be used to expand the area of pixels processed to include extra
+	// the area around the zone which can improve OCR results. (though only the text within the
+	// original rects will be used)
+	vector<ZoneData> createZonesFromRects(vector<ILongRectanglePtr> vecRects,
+		ISpatialStringSearcherPtr ipSearcher, CSize sizeExpandProcessingRect = CSize());
 
 	// OCRs the current filtered image and returns a spatial string searcher that can be used to
 	// retrieve the text found in a particular image area.

@@ -56,20 +56,10 @@ namespace Extract.Imaging
         readonly RasterImageFormat _format;
 
         /// <summary>
-        /// Whether pdf should load as bitonal or not
-        /// </summary>
-        readonly bool _loadPdfAsBitonal;
-
-        /// <summary>
         /// <see langword="true"/> if the image is a portable document format (PDF) file;
         /// <see langword="false"/> if the image is not a PDF file.
         /// </summary>
         public bool IsPdf { get; private set; }
-
-        /// <summary>
-        /// The command used to modify PDF files back to 1 bit per pixel after loading
-        /// </summary>
-        ColorResolutionCommand _bitonalConversionCommand;
 
         /// <summary>
         /// Image pages that have been cached for this reader.
@@ -95,9 +85,7 @@ namespace Extract.Imaging
         /// </summary>
         /// <param name="fileName">The name of the file to read.</param>
         /// <param name="codecs">Used when decoding the image file.</param>
-        /// <param name="loadPdfAsBitonal">Whether or not the PDF should be loaded as a bitonal
-        /// image or not.</param>
-        internal ImageReader(string fileName, RasterCodecs codecs, bool loadPdfAsBitonal)
+        internal ImageReader(string fileName, RasterCodecs codecs)
         {
             try
             {
@@ -106,7 +94,6 @@ namespace Extract.Imaging
 
                 _fileName = fileName;
                 _codecs = codecs;
-                _loadPdfAsBitonal = loadPdfAsBitonal;
 
                 // Prevent write access while reading
                 FileShare sharing = RegistryManager.LockFiles
@@ -243,12 +230,6 @@ namespace Extract.Imaging
                                 pageNumber, pageNumber),
                                 false);
 
-                        // If loading PDF as bitonal and this file is a PDF, set bits per pixel to 1
-                        if (_loadPdfAsBitonal && IsPdf)
-                        {
-                            ConvertToBitonalImage(image);
-                        }
-
                         _loadedImages[pageNumber] = image;
                     }
                 }
@@ -295,13 +276,6 @@ namespace Extract.Imaging
                                 pageNumber, pageNumber),
                                 false);
 
-                        // If loading PDF as bitonal and this file is a PDF, set bits per pixel
-                        // to 1
-                        if (_loadPdfAsBitonal && IsPdf)
-                        {
-                            ConvertToBitonalImage(image);
-                        }
-
                         return image;
                     }
                 }
@@ -314,26 +288,6 @@ namespace Extract.Imaging
                 ee.AddDebugData("Page number", pageNumber, false);
                 throw ee;
             }
-        }
-
-        /// <summary>
-        /// Converts the specified <see cref="RasterImage"/> to a bitonal image.
-        /// </summary>
-        /// <param name="image">The <see cref="RasterImage"/> to convert to a bitonal
-        /// image.</param>
-        void ConvertToBitonalImage(RasterImage image)
-        {
-            if (_bitonalConversionCommand == null)
-            {
-                _bitonalConversionCommand = new ColorResolutionCommand();
-                _bitonalConversionCommand.Mode = ColorResolutionCommandMode.InPlace;
-                _bitonalConversionCommand.BitsPerPixel = 1;
-                _bitonalConversionCommand.DitheringMethod = RasterDitheringMethod.FloydStein;
-                _bitonalConversionCommand.PaletteFlags = ColorResolutionCommandPaletteFlags.Fixed;
-                _bitonalConversionCommand.Colors = 0;
-            }
-
-            _bitonalConversionCommand.Run(image);
         }
 
         /// <summary>

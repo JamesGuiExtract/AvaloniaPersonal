@@ -3870,6 +3870,9 @@ void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatia
 		throw ue;
 	}
 
+	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = ipString->GetPageInfo(nPage);
+	ASSERT_RESOURCE_ALLOCATION("ELI36732", ipPageInfo != __nullptr);
+
 	ILongRectanglePtr ipBounds = ipString->GetOCRImageBounds();
 	long nLeft;
 	long nTop;
@@ -3881,9 +3884,15 @@ void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatia
 	set<long> setExistingWS;
 	set<long> setLettersToRemove;
 	bool bExistingLF = false;
+	long nAvgWidth = ipString->GetAverageCharWidth();
 	// How much space should be allowed between the inserted chars and any existing, neighboring
 	// spatial chars before a space character should be inserted between them.
-	long nSpaceAllowance = ipString->GetAverageCharWidth() / 2 + 1;
+	long nNewSpaceAllowance = nAvgWidth / 2 + 1;
+	// How much space should be allowed between the inserted chars and any existing, neighboring
+	// spatial chars before existing space characters are removed.
+	// https://extract.atlassian.net/browse/ISSUE-12088
+	// Allow for less of a gap before removing existing spaces.
+	long nDelSpaceAllowance = nNewSpaceAllowance / 2;
 
 	// Start at the insertion position and work backwards looking for whitespace following the
 	// last preceeding spatial character. 
@@ -3913,7 +3922,7 @@ void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatia
 				}
 			}
 			// Check for a new word based on the spatial info of the string to be inserted
-			else if ((long)prevLetter.m_ulRight + nSpaceAllowance < nLeft)
+			else if ((long)prevLetter.m_ulRight + nNewSpaceAllowance < nLeft)
 			{
 				if (setExistingWS.empty())
 				{
@@ -3924,7 +3933,7 @@ void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatia
 			}
 			// Spatially ipString appears to be part of the preceeding word; remove any intervening
 			// whitespace chars.
-			else
+			else if ((long)prevLetter.m_ulRight + nDelSpaceAllowance >= nLeft)
 			{
 				setLettersToRemove.insert(setExistingWS.begin(), setExistingWS.end());
 			}
@@ -3978,7 +3987,7 @@ void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatia
 				}
 			}
 			// Check for a new word based on the spatial info of the string to be inserted
-			else if ((long)nextLetter.m_ulLeft - nSpaceAllowance > nRight)
+			else if ((long)nextLetter.m_ulLeft - nNewSpaceAllowance > nRight)
 			{
 				if (setExistingWS.empty())
 				{
@@ -3989,7 +3998,7 @@ void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatia
 			}
 			// Spatially ipString appears to be part of the following word; remove any intervening
 			// whitespace chars.
-			else
+			else if ((long)nextLetter.m_ulLeft - nDelSpaceAllowance <= nRight)
 			{
 				setLettersToRemove.insert(setExistingWS.begin(), setExistingWS.end());
 			}

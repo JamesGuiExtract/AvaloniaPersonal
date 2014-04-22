@@ -1207,9 +1207,17 @@ library UCLID_RASTERANDOCRMGMTLib
 		// PROMISE: Removes all characters from pTextToRemove that match characters in this string
 		//			(including the letter font coordinates and confidence). Non-white space
 		//			characters are removed only if they fall between matching spatial characters.
+		// ARGS:	pTextToRemove - The text to remove
+		//			nPage - If > 0, only text from pTextToRemove that is on this page will be
+		//				removed.
+		//			pRect - if not NULL, only chars from pTextToRemove whose midpoints are within
+		//				this rect will be removed.
+		//			NOTE: nPage and pRect may both be NULL, both be specified, or be specified
+		//				independently.
 		// RETURNS: The positon of the first character removed or -1 if no characters were removed.
 		[id(101), helpstring("method RemoveText")] HRESULT
-			RemoveText([in] ISpatialString* pTextToRemove, [out, retval] long* nPos);
+			RemoveText([in] ISpatialString* pTextToRemove, [in] long nPage,
+			[in] ILongRectangle *pRect, [out, retval] long* nPos);
 		//-----------------------------------------------------------------------------------------
 		// REQUIRE: GetMode() == kSpatialMode
 		//			pString->GetMode() == kSpatialMode
@@ -1453,6 +1461,13 @@ library UCLID_RASTERANDOCRMGMTLib
 		// PROMISE: If VARIANT_TRUE, only the midpoint of the characters/words/lines will be tested
 		// for inclusion/exclusion rather than using the entire area.
 		[id(9), helpstring("method SetUseMidpointsOnly")] HRESULT SetUseMidpointsOnly([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Any text within the specified region will not be returned by subsquent calls
+		// to either GetDataInRegion or GetDataOutOfRegion.
+		// NOTE: At this time calls to ExtendDataInRegion, GetLeftWord and GetRightWord are not
+		// supported after having excluded data.
+		[id(10), helpstring("method ExcludeDataInRegion")] HRESULT ExcludeDataInRegion(
+			[in] ILongRectangle *pRect);
 	};
 
 	[

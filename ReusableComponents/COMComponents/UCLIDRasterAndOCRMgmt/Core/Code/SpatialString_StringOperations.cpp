@@ -722,7 +722,8 @@ STDMETHODIMP CSpatialString::FindFirstItemInRegExpVector(IVariantVector* pList,
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long* pnPos)
+STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long nPage, 
+										ILongRectangle *pRect, long* pnPos)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -742,6 +743,17 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long* pnP
 		{
 			UCLIDException ue("ELI36414", "RemoveText requires a spatial string.");
 			throw ue;
+		}
+
+		// If specified, initialize a CRect instance specifying the area in which text may be
+		// removed.
+		CRect rect;
+		if (pRect != __nullptr)
+		{
+			ILongRectanglePtr ipRect(pRect);
+			ASSERT_RESOURCE_ALLOCATION("ELI36730", ipRect != __nullptr);
+
+			ipRect->GetBounds(&rect.left, &rect.top, &rect.right, &rect.bottom);
 		}
 
 		long nNumLettersToRemove = 0;
@@ -767,10 +779,35 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long* pnP
 
 			CPPLetter &letterToRemove = pLettersToRemove[i];
 
+			if (letterToRemove.m_bIsSpatial)
+			{
+				// If this letter is not on a specified page, ignore it.
+				if (nPage > 0)
+				{
+					if (letterToRemove.m_usPageNumber != nPage)
+					{
+						bLastLetterRemoved = false;
+						continue;
+					}
+				}
+
+				// If this letter is not within a specified region, ignore it.
+				if (!rect.IsRectEmpty())
+				{
+					CPoint ptMiddleOfLetter(
+						(letterToRemove.m_ulLeft + letterToRemove.m_ulRight) / 2,
+						(letterToRemove.m_ulTop + letterToRemove.m_ulBottom) / 2);
+
+					if (!rect.PtInRect(ptMiddleOfLetter))
+					{
+						continue;
+					}
+				}
+			}
 			// If the next letter to remove is non-spatial, it should be removed only if the
 			// preceding spatial character was removed. (otherwise there is no good way of telling
 			// one non-spatial character from another).
-			if (!letterToRemove.m_bIsSpatial)
+			else
 			{
 				if (bLastLetterRemoved && letterToRemove == m_vecLetters[nPosition])
 				{
