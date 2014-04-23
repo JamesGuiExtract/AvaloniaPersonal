@@ -85,6 +85,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="AssemblyQualifiedNameParser.cs" />
     <Compile Include="ReadableEnum.cs" />
     <Compile Include="CollectionMethods.cs" />
     <Compile Include="CommentedTextFileReader.cs" />
