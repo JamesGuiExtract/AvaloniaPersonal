@@ -387,8 +387,9 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			// If the destination file name exists before Nuance tries to open it, it will throw an error.
 			deleteFile(strTempOutputFileName);
 
-			THROW_UE_ON_ERROR("ELI34294", "Unable to set image conversion method.",
-				kRecSetImgConvMode(0, CNV_AUTO));
+			// https://extract.atlassian.net/browse/ISSUE-12162
+			// At one point in time, kRecSetImgConvMode(0, CNV_AUTO) was called here, but this
+			// strips color information which we now want to preserve.
 
 			HIMGFILE hInputImage;
 			THROW_UE_ON_ERROR("ELI34295", "Unable to open source image file.",
@@ -546,8 +547,11 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 							strOwnerPassword, nPermissions, true));
 					}
 
+					nBitsPerPixel = fileInfo.BitsPerPixel;					
+
 					// Set output format
-					nType = FILE_RAS_PDF_G4;
+					nType = (nBitsPerPixel == 1) ? FILE_RAS_PDF_G4 : FILE_RAS_PDF_JPEG;
+					nQFactor = getCompressionFactor(nType);
 
 					// This flag will cause the out put image to have the same( or nearly the same ) 
 					// dimensions as original input file

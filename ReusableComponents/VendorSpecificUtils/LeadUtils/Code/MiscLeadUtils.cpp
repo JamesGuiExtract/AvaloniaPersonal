@@ -51,6 +51,9 @@ const int giDEFAULT_PDF_RESOLUTION = 300;
 // The maximum opacity (ie. completely opaque)
 L_INT giMAX_OPACITY = 255;
 
+const COLORREF gCOLOR_BLACK = RGB(0,0,0);
+const COLORREF gCOLOR_WHITE = RGB(255,255,255);
+
 // The tolerance for confirmImageAreas that indicates how many pixels away an image area can be
 // compared to where it is expected to be and within that tolerance what percent of pixels can be
 // something other than the expected value.
@@ -99,6 +102,11 @@ void pageZoneToAnnRect(const PageRasterZone& rZone, ANNRECT& rect);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To encrypt the specified string using the PdfSecurity keys
 string encryptString(const string& strString);
+//-------------------------------------------------------------------------------------------------
+// Callback function for L_AnnEnumerate that will burn redactions into the image.
+// For each rect or redact annotation object get the color and if the
+// color is either black or white, burn the annotation into the image
+L_INT EXT_CALLBACK burnRedactions(HANNOBJECT hObject, L_VOID* pUserData);
 
 //-------------------------------------------------------------------------------------------------
 // Exported classes
@@ -377,6 +385,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 
 		// Check if outputting a PDF file
 		bool bOutputIsPdf = isPDFFile(strOutputImageName);
+		bool bForcedBurnOfAnnotations = false;
 
 		char* pszInputFile = (char*) strImageFileName.c_str();
 
@@ -414,18 +423,8 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		BrushCollection brushes;
 		PenCollection pens;
 
-		// If output is a PDF, write to temporary tif and convert at the end
-		string strOutputWorking = strOutputImageName;
-		unique_ptr<TemporaryFileName> pPDFOut(__nullptr);
-		if (bOutputIsPdf)
-		{
-			pPDFOut.reset(new TemporaryFileName(true, __nullptr, ".tif"));
-			strOutputWorking = pPDFOut->getName();
-		}
-
 		// loop to allow for multiple attempts to fill an image area (P16 #2593)
 		bool bSuccessful = false;
-		bool bAnnotationsAppliedToDocument = false;
 		_lastCodePos = "40";
 
 		// [FlexIDSCore:4963]
@@ -445,7 +444,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 			// Write the output to a temporary file so that the creation of the
 			// redacted image appears as an atomic operation [FlexIDSCore #3547]
 			TemporaryFileName tempOutFile(true, NULL,
-				getExtensionFromFullPath(strOutputWorking).c_str(), true);
+				getExtensionFromFullPath(strOutputImageName).c_str(), true);
 
 			// Flag to indicate if any annotations been applied, if so then
 			// L_AnnSetTag will need to be called to reset them
@@ -453,7 +452,8 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 
 			// Declare objects outside of try scope so that they can be released if an exception
 			// is thrown
-			HANNOBJECT hContainer = NULL; // Annotation container for redactions
+			HANNOBJECT hContainer = __nullptr; // Annotation container for redactions
+			ANNENUMCALLBACK pfnBurnAnnotationsCallBack = __nullptr; // Callback for burnRedactions
 			_lastCodePos = "50";
 			try
 			{
@@ -493,13 +493,18 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						loadImagePage(strImageFileName, hBitmap, fileInfo, lfo, false);
 						_lastCodePos = "70_A_Page#" + strPageNumber;
 
-						// [FlexIDSCore:5054]
-						// The output format will not be the same as the input format for PDFs.
-						// Ensure we are saving in the correct format.
-						if (bOutputIsPdf)
+						// https://extract.atlassian.net/browse/ISSUE-12096
+						// We are no longer outputing PDFs as bitonal by having first converted them
+						// to tiff images. But ensure we don't save PDFs in an uncompressed format
+						// (FILE_RAS_PDF) because the resulting files are enormous. Change
+						// FILE_RAS_PDF to FILE_RAS_PDF_G4 or FILE_RAS_PDF_JPEG depending on whether
+						// the image is bitonal.
+						if (fileInfo.Format == FILE_RAS_PDF ||
+							(bOutputIsPdf && !isPDF(fileInfo.Format)))
 						{
-							fileInfo.Format = FILE_CCITT_GROUP4;
-							fileInfo.BitsPerPixel = 1;
+							fileInfo.Format = (fileInfo.BitsPerPixel == 1) 
+								? FILE_RAS_PDF_G4
+								: FILE_RAS_PDF_JPEG;
 						}
 
 						bool bLoadExistingAnnotations = bRetainAnnotations
@@ -510,7 +515,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						if (bApplyAsAnnotations || bLoadExistingAnnotations)
 						{
 							ANNRECT rect = {0, 0, fileInfo.Width, fileInfo.Height};
-							nRet = L_AnnCreateContainer( NULL, &rect, FALSE, &hContainer );
+							nRet = L_AnnCreateContainer(NULL, &rect, FALSE, &hContainer );
 							throwExceptionIfNotSuccess(nRet, "ELI14581",
 								"Could not create annotation container.");
 
@@ -542,12 +547,41 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 
 									if (hFirst != __nullptr)
 									{
-										// Insert the existing annotations from File Container
-										// into the main container. This destroys the File Container.
-										nRet = L_AnnInsert(hContainer, hFileContainer, TRUE);
-										throwExceptionIfNotSuccess( nRet, "ELI14632", 
-											"Could not insert existing annotation objects.");
-										bAnnotationsAppliedToPage = true;
+										// https://extract.atlassian.net/browse/ISSUE-5411
+										// If the retain annotations setting is being used but the
+										// output is PDF, existing redaction annotations should be
+										// burned into the image.
+										if (bOutputIsPdf)
+										{
+											// Setup the callback function for the annotation enumeration
+											pfnBurnAnnotationsCallBack = (ANNENUMCALLBACK)
+												MakeProcInstance((FARPROC) burnRedactions, hInst);
+
+											// Burn the redaction annotations into the image
+											nRet = L_AnnEnumerate(hFileContainer, pfnBurnAnnotationsCallBack,
+												(L_VOID*) &hBitmap, ANNFLAG_RECURSE, NULL);
+											throwExceptionIfNotSuccess(nRet, "ELI36838",
+												"Could not burn annotations into the image.");
+
+											// Free the callback proc instance
+											FreeProcInstance((FARPROC) burnRedactions);
+											pfnBurnAnnotationsCallBack = __nullptr;
+
+											nRet = L_AnnDestroy(hFileContainer, 0);
+											throwExceptionIfNotSuccess(nRet, "ELI36839",
+												"Unable to destroy annotation container.");
+
+											bForcedBurnOfAnnotations = true;
+										}
+										else
+										{
+											// Insert the existing annotations from File Container
+											// into the main container. This destroys the File Container.
+											nRet = L_AnnInsert(hContainer, hFileContainer, TRUE);
+											throwExceptionIfNotSuccess( nRet, "ELI14632", 
+												"Could not insert existing annotation objects.");
+											bAnnotationsAppliedToPage = true;
+										}
 									}
 									else
 									{
@@ -606,6 +640,15 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 								if (ltDC.m_hDC == NULL)
 								{
 									ltDC.createFromBitmapHandle(hBitmap);
+								}
+
+								// https://extract.atlassian.net/browse/ISSUE-5411
+								// If the output is PDF and the apply as annotations setting is
+								// being used, force the annotations to be burned instead.
+								if (bOutputIsPdf && bApplyAsAnnotations)
+								{
+									bForcedBurnOfAnnotations = true;
+									bApplyAsAnnotations = false;
 								}
 
 								_lastCodePos = "70_D_Page#" + strPageNumber;
@@ -714,9 +757,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 								saveImagePage(hBitmap, tempOutFile.getName(), fileInfo, sfOptions);
 							}
 
-							// Set annotations added to document flag [FlexIDSCore #3131]
-							bAnnotationsAppliedToDocument = true;
-
 							// Clear any previously defined annotations
 							// If not done, any annotations applied to this page may be applied to 
 							// successive pages [FlexIDSCore #2216]
@@ -810,7 +850,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 
 				// Since save was successful, copy the temp file to the output file
 				// [FlexIDSCore #3547]
-				copyFile(tempOutFile.getName(), strOutputWorking);
+				copyFile(tempOutFile.getName(), strOutputImageName);
 				break;
 			}
 		}
@@ -831,7 +871,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 			// to PDF.
 			if (bConfirmApplication)
 			{
-				confirmImageAreas(strOutputWorking, rvecZones, bApplyAsAnnotations);
+				confirmImageAreas(strOutputImageName, rvecZones, bApplyAsAnnotations);
 
 				// If any redaction text was skipped in order to be able to confirm the zones, the
 				// fillImageArea call will need to be repeated, this time with bConfirmApplication
@@ -848,21 +888,15 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 				}
 			}
 
-			if (bOutputIsPdf)
+			if (bOutputIsPdf && bForcedBurnOfAnnotations)
 			{
-				convertTIFToPDF(pPDFOut->getName(), strOutputImageName,
-					bAnnotationsAppliedToDocument, strUserPassword, strOwnerPassword, nPermissions);
-
-				if(bAnnotationsAppliedToDocument)
-				{
-					// Log application trace if annotations added to the document and
-					// output is a PDF [FlexIDSCore #3131 - JDS - 12/18/2008] 
-					UCLIDException uex("ELI23594",
-						"Application trace: Burned annotations into a PDF.");
-					uex.addDebugInfo("Input Image File", strImageFileName);
-					uex.addDebugInfo("Output Image File", strOutputImageName);
-					uex.log();
-				}
+				// Log application trace if annotations added to the document and
+				// output is a PDF [FlexIDSCore #3131 - JDS - 12/18/2008] 
+				UCLIDException uex("ELI23594",
+					"Application trace: Burned annotations into a PDF.");
+				uex.addDebugInfo("Input Image File", strImageFileName);
+				uex.addDebugInfo("Output Image File", strOutputImageName);
+				uex.log();
 			}
 		}
 	}
@@ -2515,3 +2549,44 @@ void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28128");
 }
 //-------------------------------------------------------------------------------------------------
+// Callback function for L_AnnEnumerate that will burn redactions into the image.
+// For each rect or redact annotation object get the color and if the
+// color is either black or white, burn the annotation into the image
+L_INT EXT_CALLBACK burnRedactions(HANNOBJECT hObject, L_VOID* pUserData)
+{
+	L_INT nRet = SUCCESS;
+	try
+	{
+		// Get the bitmap handle
+		pBITMAPHANDLE pbmp = (pBITMAPHANDLE) pUserData;
+
+		// Get the annotation type
+		L_UINT ObjectType;
+		nRet = L_AnnGetType(hObject, &ObjectType);
+		throwExceptionIfNotSuccess(nRet, "ELI36833", "Failed to get annotation type.");
+
+		// If the type is either rect or redact then get the color
+		if (ObjectType == ANNOBJECT_RECT || ObjectType == ANNOBJECT_REDACT)
+		{
+			// Get the color
+			COLORREF color;
+			nRet = L_AnnGetBackColor(hObject, &color);
+			throwExceptionIfNotSuccess(nRet, "ELI36834", "Failed to get annotation color.");
+
+			// If the color is black or white then "burn" the annotation into image
+			if (color == gCOLOR_BLACK || color == gCOLOR_WHITE)
+			{
+				// Burn the annotation into the image
+				nRet = L_AnnRealize(pbmp, NULL, hObject, FALSE);
+				throwExceptionIfNotSuccess(nRet, "ELI36835", "Failed to burn annotation into image.");
+			}
+		}
+	}
+	catch(UCLIDException& uex)
+	{
+		uex.log();
+		return nRet;
+	}
+
+	return nRet;
+}
