@@ -108,16 +108,17 @@ BOOL CESConvertToPDFApp::InitInstance()
 			{
 				// Validate and initiate licensing
 				validateLicense(); 
-				licenseOCREngine();
 
-				applyOCRSettings();
+				// If the output does not need to be PDF/A compliant and does not need security,
+				// the RecPDF API can be used to try to add searchable text without touching the
+				// source image (if the source image is a PDF).
+				bool bUseRecPDFAPI =
+					!m_bPDFA && m_strUserPassword.empty() && m_strOwnerPassword.empty();
+				// Otherwise, use the legacy RecAPI which will re-build the document (convert/modify
+				// the images.
+				bool bUseLegacyAPI = !bUseRecPDFAPI;
 
-				bool bUseRecDFAPI = !applySecuritySettings();
-				bool bUseLegacyAPI = !bUseRecDFAPI;
-
-				// Use RecDFAPI when possible as it allows for images to be preserved without
-				// altering them in any way. Cannot be used if security settings are to be used.
-				if (bUseRecDFAPI)
+				if (bUseRecPDFAPI)
 				{
 					try
 					{
@@ -191,7 +192,7 @@ int CESConvertToPDFApp::ExitInstance()
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::applyOCRSettings()
+void CESConvertToPDFApp::applySettings()
 {
 	// OCR should be accurate rather than fast.
 	setIntSetting("Kernel.OcrMgr.PDF.TradeOff", TO_ACCURATE);
@@ -201,13 +202,6 @@ void CESConvertToPDFApp::applyOCRSettings()
 	
 	// OCR should be performed only on images.
 	setIntSetting("Kernel.OcrMgr.PDF.ProcessingMode", PDF_PM_GRAPHICS_ONLY);
-}
-//-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
-{
-	// ensure engine resources are released when
-	// mainEngineMemoryReleaser goes out of scope.
-	MainRecMemoryReleaser mainEngineMemoryReleaser;
 
 	// Preserve the original resolution in the output PDF.
 	setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".LoadOriginalDPI", true);
@@ -221,6 +215,72 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 	{
 		setIntSetting(strOUTPUT_SETTINGS_CLASS + ".Compatibility", R2ID_PDFA2A);
 	}
+
+	if (!m_strUserPassword.empty() || !m_strOwnerPassword.empty())
+	{
+		// If either password is defined, enable 128 bit security
+		setIntSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.Type", R2ID_PDFSECURITY128BITS);
+
+		// If there is a user password defined, set it
+		if (!m_strUserPassword.empty())
+		{
+			setStringSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.UserPassword", m_strUserPassword);
+		}
+		// If there is an owner password defined, set it and the associated permissions
+		if (!m_strOwnerPassword.empty())
+		{
+			// Set the owner password
+			setStringSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.OwnerPassword", m_strOwnerPassword);
+
+			// Get security settings
+
+			// Allow printing if either high quality or low quality is specified
+			bool bAllowHighQuality = isPdfSecuritySettingEnabled(giAllowHighQualityPrinting);
+			bool bAllowPrinting = bAllowHighQuality
+				|| isPdfSecuritySettingEnabled(giAllowLowQualityPrinting);
+
+			// Allow adding/modifying annotations if either allow modifications or
+			// allow adding/modifying annotations is specified
+			bool bAllowDocModify = isPdfSecuritySettingEnabled(giAllowDocumentModifications);
+			bool bAllowAddModifyAnnot = bAllowDocModify ||
+				isPdfSecuritySettingEnabled(giAllowAddingModifyingAnnotations);
+
+			// Allow form fill in if either adding/modifying annotations is allowed or
+			// filling in forms is specified
+			bool bAllowForms = bAllowAddModifyAnnot
+				|| isPdfSecuritySettingEnabled(giAllowFillingInFields);
+
+			// Allow extraction for accessibility if either content copying or accessibility
+			// is specified
+			bool bAllowCopy = isPdfSecuritySettingEnabled(giAllowContentCopying);
+			bool bAllowExtract = bAllowCopy
+				|| isPdfSecuritySettingEnabled(giAllowContentCopyingForAccessibility);
+
+			// Set the security settings
+			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnablePrint", bAllowPrinting);
+			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnablePrintQ", bAllowHighQuality);
+			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableModify", bAllowDocModify);
+			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableCopy", bAllowCopy);
+			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableExtract", bAllowExtract);
+			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableAdd", bAllowAddModifyAnnot);
+			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableForms", bAllowForms);
+			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableAssemble",
+				isPdfSecuritySettingEnabled(giAllowDocumentAssembly));
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
+{
+	// initialize the RecAPI license
+	// NOTE: this is separate from the Extract licensing which occurred earlier
+	licenseOCREngine();
+
+	// ensure engine resources are released when
+	// mainEngineMemoryReleaser goes out of scope.
+	MainRecMemoryReleaser mainEngineMemoryReleaser;
+
+	applySettings();
 
 	// Create a temporary output PDF file. This file will be copied to the final output location
 	// once the process is complete.
@@ -241,7 +301,7 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 	rc = kRecGetImgFilePageCount(hInputFile, &nPageCount);
 	throwExceptionIfNotSuccess(rc, "ELI36757", "Unable to get page count.", m_strInputFile);
 
-	// The returned HPAGE instaces wil have OCR text that can be applied to an output document.
+	// The returned HPAGE instaces will have OCR text that can be applied to an output document.
 	HPAGE *pPages = getOCRedPages(hInputFile, nPageCount);
 
 	if (bUseRecDFAPI)
@@ -296,66 +356,6 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 
 	// Make sure the file can be read
 	waitForFileToBeReadable(m_strOutputFile);
-}
-//-------------------------------------------------------------------------------------------------
-bool CESConvertToPDFApp::applySecuritySettings()
-{
-	if (m_strUserPassword.empty() && m_strOwnerPassword.empty())
-	{
-		return false;	
-	}
-
-	// If either password is defined, enable 128 bit security
-	setIntSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.Type", R2ID_PDFSECURITY128BITS);
-
-	// If there is a user password defined, set it
-	if (!m_strUserPassword.empty())
-	{
-		setStringSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.UserPassword", m_strUserPassword);
-	}
-	// If there is an owner password defined, set it and the associated permissions
-	if (!m_strOwnerPassword.empty())
-	{
-		// Set the owner password
-		setStringSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.OwnerPassword", m_strOwnerPassword);
-
-		// Get security settings
-
-		// Allow printing if either high quality or low quality is specified
-		bool bAllowHighQuality = isPdfSecuritySettingEnabled(giAllowHighQualityPrinting);
-		bool bAllowPrinting = bAllowHighQuality
-			|| isPdfSecuritySettingEnabled(giAllowLowQualityPrinting);
-
-		// Allow adding/modifying annotations if either allow modifications or
-		// allow adding/modifying annotations is specified
-		bool bAllowDocModify = isPdfSecuritySettingEnabled(giAllowDocumentModifications);
-		bool bAllowAddModifyAnnot = bAllowDocModify ||
-			isPdfSecuritySettingEnabled(giAllowAddingModifyingAnnotations);
-
-		// Allow form fill in if either adding/modifying annotations is allowed or
-		// filling in forms is specified
-		bool bAllowForms = bAllowAddModifyAnnot
-			|| isPdfSecuritySettingEnabled(giAllowFillingInFields);
-
-		// Allow extraction for accessibility if either content copying or accessibility
-		// is specified
-		bool bAllowCopy = isPdfSecuritySettingEnabled(giAllowContentCopying);
-		bool bAllowExtract = bAllowCopy
-			|| isPdfSecuritySettingEnabled(giAllowContentCopyingForAccessibility);
-
-		// Set the security settings
-		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnablePrint", bAllowPrinting);
-		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnablePrintQ", bAllowHighQuality);
-		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableModify", bAllowDocModify);
-		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableCopy", bAllowCopy);
-		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableExtract", bAllowExtract);
-		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableAdd", bAllowAddModifyAnnot);
-		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableForms", bAllowForms);
-		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableAssemble",
-			isPdfSecuritySettingEnabled(giAllowDocumentAssembly));
-	}
-
-	return true;
 }
 //-------------------------------------------------------------------------------------------------
 HIMGFILE CESConvertToPDFApp::openImageFile(const string& strFileName)

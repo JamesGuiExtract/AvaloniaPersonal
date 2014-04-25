@@ -377,16 +377,17 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 					break;
 
 				case kFileType_Pdf:
-					// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
-					// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
-					// FF_PDF_SUPERB.
-					IMG_INFO imgInfo = {0};
-					IMF_FORMAT imgFormat;
-					RECERR rc = kRecGetImgFilePageInfo(0, hInputImage, 0, &imgInfo, &imgFormat);
-					throwExceptionIfNotSuccess(rc,
-						"ELI36840", "Failed to indentify image format.", strInputFileName);
-					nFormat = imgInfo.BitsPerPixel == 1 ? FF_PDF_SUPERB : FF_PDF_GOOD;
-					strExt = ".pdf";
+					{
+						// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
+						// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
+						// FF_PDF_SUPERB.
+						IMG_INFO imgInfo = {0};
+						IMF_FORMAT imgFormat;
+						THROW_UE_ON_ERROR("ELI36840", "Failed to indentify image format.",
+							kRecGetImgFilePageInfo(0, hInputImage, 0, &imgInfo, &imgFormat));
+						nFormat = imgInfo.BitsPerPixel == 1 ? FF_PDF_SUPERB : FF_PDF_GOOD;
+						strExt = ".pdf";
+					}
 					break;
 
 				case kFileType_Jpg:

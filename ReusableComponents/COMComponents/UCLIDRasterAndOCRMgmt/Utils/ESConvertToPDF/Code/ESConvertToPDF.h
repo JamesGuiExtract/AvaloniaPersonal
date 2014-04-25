@@ -69,11 +69,8 @@ private:
 	string m_strExceptionLogFile;
 
 	//---------------------------------------------------------------------------------------------
-	// Applies the settings that govern OCR.
-	void applyOCRSettings();
-	//---------------------------------------------------------------------------------------------
-	// Applies the configured output security settings.
-	bool applySecuritySettings();
+	// Applies RecAPI settings for OCR, format and security based on the command-line params.
+	void applySettings();
 	//---------------------------------------------------------------------------------------------
 	// Executes the conversion to searchable PDF. If bUseRecDFAPI = true, the RecAPI will be used
 	// exclusively which means each image will be converted (modified) into the output document.
