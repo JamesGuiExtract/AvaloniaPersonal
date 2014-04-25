@@ -17,6 +17,7 @@
     #define UCLID_DIR "\\UCLID Software\\CommonComponents"
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
     #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition\\v3.5"
+    #define REG_PATH_SQL_COMPACT_EDITION_32_on_64 "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SQL Server Compact Edition\\v3.5"
     #define SQL_COMPACT_EDITION_GUID "{3A9FC03D-C685-4831-94CF-4EDFD3749497}"
     #define SQL_COMPACT_EDITION_GUID_64 "{D4AD39AD-091E-4D33-BB2B-59F6FCB8ADC3}"
     #define REG_PATH_DOT_NET_VER_2_0 "\\SOFTWARE\\Microsoft\\.NETFramework\\policy\\v2.0"
@@ -98,7 +99,13 @@
 	prototype InstallReadme();
 	prototype RunRegisterAll();
 	prototype UnRegisterAll();
-	prototype UninstallSQLCEWithoutPrompt();
+	prototype UninstallSQLCEWithoutPrompt(BOOL);
+	prototype UninstallSQLCE32bit();
+	prototype UninstallSQLCE64bit();
+	prototype BOOL IsCorrectSQLCEInstalled(STRING);
+	prototype BOOL Is64BitSQLCEInstalled();
+	prototype BOOL Is32BitSQLCEInstalled();
+	
 
     // your global variables
     BOOL gbInstalled;
@@ -512,15 +519,11 @@ begin
 
 	szSPLevel = "";
 	nType = REGDB_NUMBER;
-	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 1 || 
-			((RegDBGetKeyValueEx(REG_PATH_SQL_COMPACT_EDITION, "ServicePackLevel", nType, 
-			szSPLevel, nSize) = 0 ) && 
-			szSPLevel != "2") ||
-			RegDBKeyExist(SQL_COMPACT_35_SP2_32_INSTALLER_KEY) < 1 ||
-			RegDBKeyExist(SQL_COMPACT_35_SP2_64_INSTALLER_KEY) < 1 ) then
+	if (!IsCorrectSQLCEInstalled(REG_PATH_SQL_COMPACT_EDITION) ||
+			( SYSINFO.bIsWow64 && !IsCorrectSQLCEInstalled(REG_PATH_SQL_COMPACT_EDITION_32_on_64))) then
 
 		// This will uninstall previous version if installed
-		UninstallSQLCEWithoutPrompt();
+		UninstallSQLCEWithoutPrompt(FALSE);
 			
 		SdShowMsg("Setup is Installing SQL Compact Edition", TRUE);
 
@@ -528,12 +531,16 @@ begin
 		// 32bit needs to be installed even on 64 bit
 		szProgram = "msiexec";
 		szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x86-ENU.msi" + " /qb";
-		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
+		if (!Is32BitSQLCEInstalled()) then
+			LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
+		endif;
 
 		// If 64 bit OS install 64 version of SSCE	
 		if ( SYSINFO.bIsWow64 ) then
 			szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x64-ENU.msi" + " /qb";
-			LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
+			if (!Is64BitSQLCEInstalled()) then
+				LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
+			endif;
 		endif;
 		SdShowMsg("Setup is Installing SQL Compact Edition", FALSE);
 		//if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 0  ) then
@@ -578,17 +585,16 @@ end;
 //	Returns 0 if no errors
 ///////////////////////////////////////////////////////////////////////////////
 function UninstallSQLCE()
-STRING ;
 int nResult;
 begin  
-	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) = 1) then
+	if (Is32BitSQLCEInstalled() || Is64BitSQLCEInstalled()) then
 		// Ask user if they wish to unintall SQL Server CE
 		nResult = MessageBox("Do you wish to uninstall SQL Compact Edition?" + 
 			"\r\nOther installed applications may use this and uninstalling " + 
 			" will cause those applications to work incorrectly." , MB_YESNO );
 
 		if (nResult = IDYES) then
-			UninstallSQLCEWithoutPrompt();
+			UninstallSQLCEWithoutPrompt(TRUE);
 		endif;
 	endif;
 end;
@@ -599,23 +605,157 @@ end;
 //
 //  Purpose: This function uninstalls the SQL Server Compact Edition without
 // 		     prompting the user to uninstall.
-//	Returns 0 if no errors
+//
 ///////////////////////////////////////////////////////////////////////////////
-function UninstallSQLCEWithoutPrompt()
+function UninstallSQLCEWithoutPrompt(bUninstallAll)
+STRING szProgram, szCmdLine, szRegPathToUse32Bit;
+int nResult, svServiceState;
+begin 
+	if (SYSINFO.bIsWow64) then
+		szRegPathToUse32Bit = REG_PATH_SQL_COMPACT_EDITION_32_on_64;
+	else
+		szRegPathToUse32Bit = REG_PATH_SQL_COMPACT_EDITION;
+	endif;
+	
+	if (Is32BitSQLCEInstalled() && (bUninstallAll || !IsCorrectSQLCEInstalled(szRegPathToUse32Bit))) then
+		UninstallSQLCE32bit();
+	endif;
+	
+	if (SYSINFO.bIsWow64 &&  Is64BitSQLCEInstalled() && (bUninstallAll || 
+			!IsCorrectSQLCEInstalled(REG_PATH_SQL_COMPACT_EDITION))) then
+		UninstallSQLCE64bit();
+	endif;
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UninstallSQLCE32bit
+//
+//  Purpose: This function uninstalls the32 bit SQL Server Compact Edition without
+// 		     prompting the user to uninstall if the correct version is not already
+//			 installed
+//
+///////////////////////////////////////////////////////////////////////////////
+function UninstallSQLCE32bit()
 STRING szProgram, szCmdLine;
 int nResult, svServiceState;
 begin  
-	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) = 1) then
-		SdShowMsg("Setup is Uninstalling SQL Compact Edition", TRUE);
-    	// If 64 bit OS install 64 version of SSCE	
-		if ( SYSINFO.bIsWow64 ) then    
-			LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID_64 + " /qb",LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);			 
-		endif;
-	
-    	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID + " /qb", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
-    	SdShowMsg("Setup is Uninstalling SQL Compact Edition", FALSE);
+	if (!Is32BitSQLCEInstalled()) then
+		return 0;
 	endif;
+	
+	SdShowMsg("Setup is Uninstalling SQL Compact Edition 32 Bit", TRUE);
+
+	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID + " /qb", 
+		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
+	
+	SdShowMsg("Setup is Uninstalling SQL Compact Edition 32 Bit", FALSE);
 end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UninstallSQLCE64bit
+//
+//  Purpose: This function uninstalls the 64 bit SQL Server Compact Edition without
+// 		     prompting the user to uninstall if the correct version is not already
+//			 installed
+//
+///////////////////////////////////////////////////////////////////////////////
+function UninstallSQLCE64bit()
+STRING szProgram, szCmdLine;
+int nResult, svServiceState;
+begin  
+	if (!Is64BitSQLCEInstalled()) then
+		return 0;
+	endif;
+	
+	SdShowMsg("Setup is Uninstalling SQL Compact Edition 64 Bit", TRUE);
+		
+   	// If 64 bit OS install 64 version of SSCE	
+	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID_64 + " /qb",
+		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);			 
+	
+   	SdShowMsg("Setup is Uninstalling SQL Compact Edition 64 Bit", FALSE);
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   IsCorrectSQLCEInstalled
+//
+//  EVENT:      Checks the keys for the correct version
+//	Returns:	True if correct version is installed
+//	Arguments:  szRegPathForSQLCE - is the base path to check for the correct version
+//					and correct service pack
+//
+///////////////////////////////////////////////////////////////////////////////
+function BOOL IsCorrectSQLCEInstalled(szRegPathForSQLCE)
+STRING szSPLevel, szVersion;
+int nSize, nType;
+BOOL rtnValue;
+begin
+	REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 
+	rtnValue = RegDBKeyExist ( szRegPathForSQLCE ) = 1;
+		
+	rtnValue = rtnValue && RegDBGetKeyValueEx(szRegPathForSQLCE, "Version", nType, 
+			szVersion, nSize) = 0;
+	rtnValue = rtnValue && RegDBGetKeyValueEx(szRegPathForSQLCE, "ServicePackLevel", nType, 
+			szSPLevel, nSize) = 0;
+	rtnValue = rtnValue && (szVersion = "3.5.8080.0");
+	rtnValue = rtnValue && (szSPLevel = "2");
+	REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_USE_DEFAULT_OPTIONS;
+	return rtnValue;
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   Is64BitSQLCEInstalled
+//
+//	Returns:	True if 64 bit SQL CE is installed
+//
+///////////////////////////////////////////////////////////////////////////////
+function BOOL Is64BitSQLCEInstalled()
+STRING szVersion;
+BOOL rtnValue;
+int nSize, nType;
+begin
+	if (!SYSINFO.bIsWow64) then
+		return FALSE;
+	endif;
+	REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY;
+	rtnValue = RegDBKeyExist(REG_PATH_SQL_COMPACT_EDITION) = 1;
+	rtnValue = rtnValue && RegDBGetKeyValueEx(REG_PATH_SQL_COMPACT_EDITION, "Version", nType, 
+			szVersion, nSize) = 0;
+	REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_USE_DEFAULT_OPTIONS;
+	return rtnValue;
+
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   Is32BitSQLCEInstalled
+//
+//	Returns:	True if SQL CE is installed
+//
+///////////////////////////////////////////////////////////////////////////////	
+function BOOL Is32BitSQLCEInstalled()
+STRING szVersion, szKeyToUse;
+BOOL rtnValue;
+int nSize, nType;
+begin
+	REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY;
+	if (SYSINFO.bIsWow64) then
+		szKeyToUse = REG_PATH_SQL_COMPACT_EDITION_32_on_64;
+	else
+		szKeyToUse = REG_PATH_SQL_COMPACT_EDITION;
+	endif;
+	
+	rtnValue = RegDBKeyExist(szKeyToUse) = 1;
+	rtnValue = rtnValue && RegDBGetKeyValueEx(szKeyToUse, "Version", nType, 
+			szVersion, nSize) = 0;
+	REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_USE_DEFAULT_OPTIONS;
+	return rtnValue;
+end;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //
