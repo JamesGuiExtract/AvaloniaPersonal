@@ -14,3 +14,9 @@ void addPageSizeDebugInfo(UCLIDException& ue, HIMGFILE hImgFile, int iPageIndex)
 //          which returned the value of rc.
 void loadScansoftRecErrInfo(UCLIDException& ue, RECERR rc);
 //-------------------------------------------------------------------------------------------------
+// PROMISE: If rc != REC_OK, and exception with the specified strELICode and strErrorDescription is
+//			created and thrown. If strImageFileName or iPageIndex are specified, they are added as
+//			debug info.
+void throwExceptionIfNotSuccess(RECERR rc, const string& strELICode,
+	const string& strErrorDescription, const string& strFileName = "", int iPageIndex = 0);
+//-------------------------------------------------------------------------------------------------

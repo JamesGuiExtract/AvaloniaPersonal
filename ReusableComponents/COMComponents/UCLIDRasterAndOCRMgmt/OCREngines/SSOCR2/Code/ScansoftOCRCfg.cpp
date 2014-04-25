@@ -34,12 +34,12 @@ const string& gstrDEFAULT_ZONE_ORDERING = "1";
 const string& gstrDEFAULT_SKIP_PAGE_ON_FAILURE = "0";
 const string& gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE = "25";
 const string& gstrDEFAULT_MAX_OCR_PAGE_FAILURE_NUMBER = "10";
-const string& gstrDEFAULT_DESPECKLE_MODE = "355";
+const string& gstrDEFAULT_DESPECKLE_MODE = "353";
 // Bit 0 (low bit): kRecSetImgDespeckleMode (0 = FALSE, 1 = TRUE)
 // Bit 1: 1 = call kRecForceDespeckleImg, 0 = don't call.
 // Bits 2 - 6: DESPECKLE_METHOD for kRecForceDespeckleImg.
 // Bits 7+: Level for kRecForceDespeckleImg.
-// Default of 355 = kRecSetImgDespeckleMode = TRUE, kRecForceDespeckleImg(DESPECKLE_PEPPERANDSALT, 2)
+// Example: 355 = kRecSetImgDespeckleMode = TRUE, kRecForceDespeckleImg(DESPECKLE_PEPPERANDSALT, 2)
 
 //-------------------------------------------------------------------------------------------------
 ScansoftOCRCfg::ScansoftOCRCfg()

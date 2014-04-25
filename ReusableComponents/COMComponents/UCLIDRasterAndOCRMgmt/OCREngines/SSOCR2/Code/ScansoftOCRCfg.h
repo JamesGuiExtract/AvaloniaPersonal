@@ -56,9 +56,10 @@ public:
 	//			Bit 1: 1 = call kRecForceDespeckleImg, 0 = don't call.
 	//			Bits 2 - 6: DESPECKLE_METHOD for kRecForceDespeckleImg.
 	//			Bits 7+: Level for kRecForceDespeckleImg.
-	//			Default of 355 =
+	//			Example: 355 =
 	//				kRecSetImgDespeckleMode = TRUE
 	//				kRecForceDespeckleImg(DESPECKLE_PEPPERANDSALT, 2)
+	//			Default = 353 (kRecSetImgDespeckleMode = TRUE)
 	unsigned long getDespeckleMode();
 	
 private:

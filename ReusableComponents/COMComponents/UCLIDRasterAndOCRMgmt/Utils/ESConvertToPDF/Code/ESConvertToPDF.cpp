@@ -14,6 +14,7 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <RecAPIPlus.h>
+#include <Recpdf.h>
 #include <StringCSIS.h>
 #include <cppUtil.h>
 #include <PdfSecurityValues.h>
@@ -53,8 +54,8 @@ const ModuleDescriptionType gREQUIRED_MODULES[giNUM_REQUIRED_MODULES] =
 	{INFO_XOCR,	  "XOCR standard page parse"}
 };
 
-// RecAPI output converter
-const char* pszOutputFormat = "Converters.Text.PDFImageOnText";
+// RecAPI settings class that has the settings that govern PDF output.
+string strOUTPUT_SETTINGS_CLASS = "Kernel.Imf.PDF";
 
 //-------------------------------------------------------------------------------------------------
 // Message map
@@ -105,11 +106,45 @@ BOOL CESConvertToPDFApp::InitInstance()
 			// get valid arguments
 			if(getAndValidateArguments(__argc, __argv) )
 			{
-				// validate licensing
+				// Validate and initiate licensing
 				validateLicense(); 
+				licenseOCREngine();
 
-				// do the work
-				convertToSearchablePDF();
+				applyOCRSettings();
+
+				bool bUseRecDFAPI = !applySecuritySettings();
+				bool bUseLegacyAPI = !bUseRecDFAPI;
+
+				// Use RecDFAPI when possible as it allows for images to be preserved without
+				// altering them in any way. Cannot be used if security settings are to be used.
+				if (bUseRecDFAPI)
+				{
+					try
+					{
+						try
+						{
+							convertToSearchablePDF(true);
+						}
+						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36761");
+					}
+					catch (UCLIDException &ue)
+					{
+						UCLIDException ueOuter("ELI36762",
+							"Application trace: Convert to searchable failed. Attempting legacy method...",
+							ue);
+						ueOuter.addDebugInfo("Filename", m_strInputFile);
+						ueOuter.log();
+						
+						bUseLegacyAPI = true;
+					}
+				}
+
+				// If RecPDF API could not be used, or conversion using RecAPI failed, use the
+				// legacy RecAPI instead.
+				if (bUseLegacyAPI)
+				{
+					convertToSearchablePDF(false);
+				}
 
 				// remove the original file if that option was specified
 				if(m_bRemoveOriginal)
@@ -156,46 +191,133 @@ int CESConvertToPDFApp::ExitInstance()
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::convertToSearchablePDF()
+void CESConvertToPDFApp::applyOCRSettings()
 {
-	// initialize the RecAPI license
-	// NOTE: this is separate from the Extract licensing which occurred earlier
-	licenseOCREngine();
+	// OCR should be accurate rather than fast.
+	setIntSetting("Kernel.OcrMgr.PDF.TradeOff", TO_ACCURATE);
 
+	// Use the more accurate 3-way voting engine (rather than the default 2-way voting engine).
+	setBoolSetting("Kernel.OcrMgr.PreferAccurateEngine", true);
+	
+	// OCR should be performed only on images.
+	setIntSetting("Kernel.OcrMgr.PDF.ProcessingMode", PDF_PM_GRAPHICS_ONLY);
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
+{
 	// ensure engine resources are released when
 	// mainEngineMemoryReleaser goes out of scope.
 	MainRecMemoryReleaser mainEngineMemoryReleaser;
 
-	// set the output format of the document
-	RECERR rc = RecSetOutputFormat(0, pszOutputFormat);
-	if (rc != REC_OK)
+	// Preserve the original resolution in the output PDF.
+	setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".LoadOriginalDPI", true);
+
+	// If output is to be PDF/A compliant then need to set the PDF/A compatibility mode
+	// Adding searchable text with the RecPDFAPI breaks 1a and 1b compliance, but we seem to be
+	// 2a compliant. (confirmed using:
+	// http://www.datalogics.com/products/callas/callaspdfA-onlinedemo.asp, though the RecPDFAPI
+	// does not make any claims with regards to PDF/A compliance.)
+	if (m_bPDFA)
 	{
-		UCLIDException ue("ELI18580", "Unable to set output format.");
-		loadScansoftRecErrInfo(ue, rc);
-		throw ue;
+		setIntSetting(strOUTPUT_SETTINGS_CLASS + ".Compatibility", R2ID_PDFA2A);
 	}
 
-	string strOutputFormat = pszOutputFormat;
+	// Create a temporary output PDF file. This file will be copied to the final output location
+	// once the process is complete.
+	TemporaryFileName tfnDocument(true, "", ".pdf", true);
 
-	// Use the more accurate 3-way voting engine (rather than the default 2-way voting engine).
-	setBoolSetting("Kernel.OcrMgr.PreferAccurateEngine", true);
+	// open the input image file
+	HIMGFILE hInputFile = openImageFile(m_strInputFile);
+
+	// ensure that the memory for the input file is released when the object goes out of scope
+	RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileReleaser(hInputFile);
+
+	IMG_INFO imgInfo = {0};
+	IMF_FORMAT imgFormat;
+	RECERR rc = kRecGetImgFilePageInfo(0, hInputFile, 0, &imgInfo, &imgFormat);
+	throwExceptionIfNotSuccess(rc, "ELI36759", "Failed to indentify image format.", m_strInputFile);
+
+	int nPageCount;
+	rc = kRecGetImgFilePageCount(hInputFile, &nPageCount);
+	throwExceptionIfNotSuccess(rc, "ELI36757", "Unable to get page count.", m_strInputFile);
+
+	// The returned HPAGE instaces wil have OCR text that can be applied to an output document.
+	HPAGE *pPages = getOCRedPages(hInputFile, nPageCount);
+
+	if (bUseRecDFAPI)
+	{
+		// https://extract.atlassian.net/browse/ISSUE-11940
+		// If the source document was a PDF, the OCR text can be added to the original document
+		// without touching the images at all (preventing any possible degradation in quality).
+		if (imgFormat >= FF_PDF_MIN && imgFormat <= FF_PDF_MRC_LOSSLESS)
+		{
+			copyFile(m_strInputFile, tfnDocument.getName());
+		}
+		else
+		{
+			// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
+			// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
+			// FF_PDF_SUPERB.
+			IMF_FORMAT outFormat = imgInfo.BitsPerPixel == 1 ? FF_PDF_SUPERB : FF_PDF_GOOD;
+
+			// Save all the document pages into a new output document.
+			addPagesToOutput(pPages, tfnDocument.getName().c_str(), outFormat, nPageCount);
+		}
+
+		// Apply the OCR from pages to the output document.
+		applySearchableTextWithRecAPI(tfnDocument.getName().c_str(), pPages, nPageCount);
+	}
+	else
+	{
+		// If not using RecAPI, use the RecAPI to convert to searchable PDF.
+		RECERR rc = kRecSetDTXTFormat(0, DTXT_PDFIOT);
+		throwExceptionIfNotSuccess(rc, "ELI36845", "Unable to set direct text format.", m_strInputFile);
+
+		setIntSetting("Kernel.DTxt.PDF.BWFormat", 2); // TIF_G4
+		setIntSetting("Kernel.DTxt.PDF.BWQuality", IMF_IMAGEQUALITY_SUPERB);
+
+		// IMF_IMAGEQUALITY_SUPERB was causing unacceptable growth in PDF size in some cases for
+		// color documents. For the time being, unless a document is bitonal, use
+		// IMF_IMAGEQUALITY_GOOD rather than IMF_IMAGEQUALITY_SUPERB.
+		setIntSetting("Kernel.DTxt.PDF.ColorQuality", IMF_IMAGEQUALITY_GOOD);
+
+		// kRecConvert2DTXT is going to expect that there is not already a file in the output
+		// location.
+		deleteFile(tfnDocument.getName().c_str());
+
+		rc = kRecConvert2DTXT(0, pPages, nPageCount, tfnDocument.getName().c_str());
+		throwExceptionIfNotSuccess(rc, "ELI36846", "Failed to output document.", m_strInputFile);
+	}
+
+	freePageData(pPages, nPageCount);
+
+	// Copy the temporary output file to its final output location.
+	copyFile(tfnDocument.getName(), m_strOutputFile);
+
+	// Make sure the file can be read
+	waitForFileToBeReadable(m_strOutputFile);
+}
+//-------------------------------------------------------------------------------------------------
+bool CESConvertToPDFApp::applySecuritySettings()
+{
+	if (m_strUserPassword.empty() && m_strOwnerPassword.empty())
+	{
+		return false;	
+	}
 
 	// If either password is defined, enable 128 bit security
-	if (!m_strUserPassword.empty() || !m_strOwnerPassword.empty())
-	{
-		setIntSetting(strOutputFormat + ".PDFSecurity.Type", R2ID_PDFSECURITY128BITS);
-	}
+	setIntSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.Type", R2ID_PDFSECURITY128BITS);
 
 	// If there is a user password defined, set it
 	if (!m_strUserPassword.empty())
 	{
-		setStringSetting(strOutputFormat + ".PDFSecurity.UserPassword", m_strUserPassword);
+		setStringSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.UserPassword", m_strUserPassword);
 	}
 	// If there is an owner password defined, set it and the associated permissions
 	if (!m_strOwnerPassword.empty())
 	{
 		// Set the owner password
-		setStringSetting(strOutputFormat + ".PDFSecurity.OwnerPassword", m_strOwnerPassword);
+		setStringSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.OwnerPassword", m_strOwnerPassword);
 
 		// Get security settings
 
@@ -222,36 +344,34 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 			|| isPdfSecuritySettingEnabled(giAllowContentCopyingForAccessibility);
 
 		// Set the security settings
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrint", bAllowPrinting);
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrintQ", bAllowHighQuality);
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableModify", bAllowDocModify);
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableCopy", bAllowCopy);
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableExtract", bAllowExtract);
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableAdd", bAllowAddModifyAnnot);
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableForms", bAllowForms);
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableAssemble",
+		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnablePrint", bAllowPrinting);
+		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnablePrintQ", bAllowHighQuality);
+		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableModify", bAllowDocModify);
+		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableCopy", bAllowCopy);
+		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableExtract", bAllowExtract);
+		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableAdd", bAllowAddModifyAnnot);
+		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableForms", bAllowForms);
+		setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableAssemble",
 			isPdfSecuritySettingEnabled(giAllowDocumentAssembly));
 	}
 
-	// If output is to be PDF/A compliant then need to set the PDF/A compatibility mode
-	if (m_bPDFA)
-	{
-		setIntSetting(strOutputFormat + ".Compatibility", R2ID_PDFA);
-	}
-
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+HIMGFILE CESConvertToPDFApp::openImageFile(const string& strFileName)
+{
 	// Get the retry count and timeout
 	int iRetryCount(-1), iRetryTimeout(-1);
 	getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
 
-	// open the input image file
 	HIMGFILE hInputFile = NULL;
 	int iNumRetries = 0;
-	rc = kRecOpenImgFile(m_strInputFile.c_str(), &hInputFile, IMGF_READ, FF_SIZE);
+	RECERR rc = kRecOpenImgFile(strFileName.c_str(), &hInputFile, IMGF_READ, FF_SIZE);
 	while (rc != REC_OK)
 	{
 		// Increment the retry count and try again
 		iNumRetries++;
-		rc = kRecOpenImgFile(m_strInputFile.c_str(), &hInputFile, IMGF_READ, FF_SIZE);
+		rc = kRecOpenImgFile(strFileName.c_str(), &hInputFile, IMGF_READ, FF_SIZE);
 
 		// If opened successfully, log an application trace and break from the loop
 		if(rc == REC_OK)
@@ -291,140 +411,163 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 		}
 	}
 
-	// ensure that the memory for the input file is released when the object goes out of scope
-	RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileReleaser(hInputFile);
-
-	// get the page count
-	int iPages;
-	rc = kRecGetImgFilePageCount(hInputFile, &iPages);
-	if(rc != REC_OK)
+	return hInputFile;
+}
+//-------------------------------------------------------------------------------------------------
+HPAGE* CESConvertToPDFApp::getOCRedPages(HIMGFILE hInputFile, int nPageCount)
+{
+	HPAGE *pPages = new HPAGE[nPageCount];
+	for(int i = 0; i < nPageCount; i++)  
 	{
-		// log an error
-		UCLIDException ue("ELI18614", "Unable to get page count.");
-		loadScansoftRecErrInfo(ue, rc);
-		ue.addDebugInfo("Input filename", m_strInputFile);
-		throw ue;
-	}
+		HPAGE& hPage = pPages[i];
 
-	// create temporary OmniPage document file.
-	// file will be automatically deleted when tfnDocument goes out of scope.
-	TemporaryFileName tfnDocument(true, "", ".opd", true);
+		// load the ith page
+		loadPageFromImageHandle(m_strInputFile, hInputFile, i, &hPage);
 
-	// [LegacyRCAndUtils:6184]
-	// At times the outputDocumentMemoryReleaser destructor is throwning an exception and I'm
-	// wondering if something it was using was already destructed by the time it went out of scope
-	// (though I can't see what that would be). Perhaps by constructing later (and thus destroying
-	// it sooner) will prevent the issue. Also adding a new scope for outputDocumentMemoryReleaser
-	// here to make it clear that it should go out of scope before tfnDocument.
-	{
-		HDOC hDoc;
-		rc = RecCreateDoc(0, tfnDocument.getName().c_str(), &hDoc, 0);
-		if (rc != REC_OK)
+		try
 		{
-			UCLIDException ue("ELI18586", "Unable to create output document.");
-			loadScansoftRecErrInfo(ue, rc);
-			throw ue;
-		}
-
-		// ensure the output document is closed when the memory releaser object goes out of scope
-		RecMemoryReleaser<RECDOCSTRUCT> outputDocumentMemoryReleaser(hDoc);
-
-		// iterate through each page
-		HPAGE hPage;
-		for(int i=0; i<iPages; i++)  
-		{
-			// load the ith page
-			loadPageFromImageHandle(m_strInputFile, hInputFile, i, &hPage);
-
 			try
 			{
-				try
+				// recognize the text on this page
+				RECERR rc = kRecRecognize(0, hPage, 0);
+				if (rc != REC_OK && rc != NO_TXT_WARN && rc != ZONE_NOTFOUND_ERR)
 				{
-					// Because zones recognized as "black" have the undesireble side-effect of
-					// rendering as black in the output, do not process any zones recognized as
-					// black
-					// See: http://nuance-community.custhelp.com/posts/ab79d13e82
-					RECERR rc = kRecLocateZones(0, hPage);
+					// log an error
+					UCLIDException ue("ELI18589", "Unable to recognize text on page.");
+					loadScansoftRecErrInfo(ue, rc);
+					ue.addDebugInfo("Input filename", m_strInputFile);
+					ue.addDebugInfo("Page number", i+1);
 
-					int nZoneCount;
-					rc = kRecGetOCRZoneCount(hPage, &nZoneCount);
-					
-					for (int j = 0; j < nZoneCount; j++)
+					// add page size information [P13 #4603]
+					if(rc == IMG_SIZE_ERR)
 					{
-						ZONEDATA zoneData = {0};
-						rc = kRecGetOCRZoneData(hPage, II_ORIGINAL, &zoneData, j);
-
-						// If zone is "black", make the OCR engine to ignore it.
-						if (zoneData.color == 0)
-						{
-							ZONE zone = {0};
-							rc = kRecGetOCRZoneInfo(hPage, II_ORIGINAL, &zone, j);
-
-							zone.fm = FM_NO_OCR;
-							rc = kRecUpdateOCRZone(hPage, II_ORIGINAL, &zone, j);
-						}
+						addPageSizeDebugInfo(ue, hInputFile, i);
 					}
 
-					// recognize the text on this page
-					rc = kRecRecognize(0, hPage, 0);
-					if (rc != REC_OK && rc != NO_TXT_WARN && rc != ZONE_NOTFOUND_ERR)
-					{
-						// log an error
-						UCLIDException ue("ELI18589", "Unable to recognize text on page.");
-						loadScansoftRecErrInfo(ue, rc);
-						ue.addDebugInfo("Input filename", m_strInputFile);
-						ue.addDebugInfo("Page number", i+1);
-
-						// add page size information [P13 #4603]
-						if(rc == IMG_SIZE_ERR)
-						{
-							addPageSizeDebugInfo(ue, hInputFile, i);
-						}
-
-						throw ue;
-					}
+					throw ue;
 				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18628");
 			}
-			catch(UCLIDException ue)
-			{
-				// [LegacyRCAndUtils:6363]
-				// Rather than abort the entire conversion of OCR fails on a given page, simply
-				// log the exception and let the conversion complete (albeit without searchable text
-				// on this page.
-				ue.log();
-			}
-
-			// add this page to the output document
-			// NOTE: After this call, the memory allocated for hPage is now managed by the engine.
-			// It is important not to release it.
-			rc = RecInsertPage(0, hDoc, hPage, i);
-			if (rc != REC_OK)
-			{
-				// log an error
-				UCLIDException ue("ELI18788", "Unable to add page to output document.");
-				loadScansoftRecErrInfo(ue, rc);
-				ue.addDebugInfo("Input filename", m_strInputFile);
-				ue.addDebugInfo("Page number", i+1);
-				throw ue;
-			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18628");
 		}
-
-		// convert document to searchable pdf
-		rc = RecConvert2Doc(0, hDoc, m_strOutputFile.c_str());
-		if (rc != REC_OK)
+		catch(UCLIDException ue)
 		{
-			// log an error
-			UCLIDException ue("ELI18590", "Unable to convert document to searchable pdf.");
-			loadScansoftRecErrInfo(ue, rc);
-			ue.addDebugInfo("Input filename", m_strInputFile);
-			ue.addDebugInfo("Output filename", m_strOutputFile);
-			throw ue;
+			// [LegacyRCAndUtils:6363]
+			// Rather than abort the entire conversion of OCR fails on a given page, simply
+			// log the exception and let the conversion complete (albeit without searchable text
+			// on this page.
+			ue.log();
 		}
 	}
 
-	// Make sure the file can be read
-	waitForFileToBeReadable(m_strOutputFile);
+	return pPages;
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::addPagesToOutput(HPAGE *pPages, const string& strOutputPDF, 
+										  IMF_FORMAT outFormat, int nPageCount)
+{
+	// Add each page to the output document.
+	for(int i = 0; i < nPageCount; i++)  
+	{
+		HPAGE hPage = pPages[i];
+
+		RECERR rc = kRecSaveImgFA(0, strOutputPDF.c_str(), outFormat, hPage, II_CURRENT, true);
+		throwExceptionIfNotSuccess(rc, "ELI36753", "Failed to save document page.",
+			m_strInputFile, i + 1);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::freePageData(HPAGE *pPages, int nPageCount)
+{
+	for(int i = 0; i < nPageCount; i++)  
+	{
+		HPAGE& hPage = pPages[i];
+		RECERR rc = kRecFreeImg(hPage);
+		if (rc != REC_OK)
+		{
+			UCLIDException ue("ELI36749", 
+				"Application trace: Unable to release page image. Possible memory leak.");
+			loadScansoftRecErrInfo(ue, rc);
+			ue.log();
+		}
+	}
+
+	delete pPages;
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::applySearchableTextWithRecAPI(const string& strImageFile, HPAGE *pages, 
+													   int nPageCount)
+{
+	RECERR rc = rPdfInit();
+	throwExceptionIfNotSuccess(rc, "ELI36754", "Unable to initialize PDF processing engine.");
+
+	RPDF_DOC pdfDoc;
+	rc = rPdfOpen(strImageFile.c_str(), __nullptr, &pdfDoc);
+	throwExceptionIfNotSuccess(rc, "ELI36744", "Failed to open document as PDF.", m_strInputFile);
+
+	RPDF_OPERATION op;
+	rc = rPdfOpStart(&op);
+	throwExceptionIfNotSuccess(rc, "ELI36745", "Failed to start PDF operation.", m_strInputFile);
+
+	rc = rPdfOpAddFile(op, pdfDoc);
+	throwExceptionIfNotSuccess(rc, "ELI36746", "Failed to initialize PDF operation.", m_strInputFile);
+
+	rc = rPdfOpMergeTextToPages(op, pdfDoc, 0, pages, nPageCount);
+	throwExceptionIfNotSuccess(rc, "ELI36747", "Failed to add searchable PDF text.", m_strInputFile);
+
+	rc = rPdfOpExecute(op);
+	throwExceptionIfNotSuccess(rc, "ELI36748", "Failed to execute PDF operation.", m_strInputFile);
+
+	rc = rPdfClose(pdfDoc);
+	throwExceptionIfNotSuccess(rc, "ELI36750", "Failed to close PDF document.", m_strInputFile);
+
+	rc = rPdfQuit();
+	throwExceptionIfNotSuccess(rc, "ELI36751", "Failed to shut down PDF processing engine.",
+		m_strInputFile);
+
+	// RecPDF API calls to add searchable text can result in corrupted images:
+	// https://extract.atlassian.net/browse/ISSUE-12163
+	// Validate the output file can be read.
+	validatePDF(strImageFile.c_str());
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::validatePDF(const string& strFileName)
+{
+	int i = 0;
+	try
+	{
+		try
+		{
+			HIMGFILE hFile = openImageFile(strFileName);
+
+			// ensure that the memory for the input file is released when the object goes out of scope
+			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileReleaser(hFile);
+
+			int nPageCount;
+			RECERR rc = kRecGetImgFilePageCount(hFile, &nPageCount);
+			throwExceptionIfNotSuccess(rc, "ELI36842", "Unable to get page count.", m_strInputFile);
+
+			for(i = 0; i < nPageCount; i++)  
+			{
+				HPAGE hPage;
+				loadPageFromImageHandle(m_strInputFile, hFile, i, &hPage);
+
+				RECERR rc = kRecFreeImg(hPage);
+				if (rc != REC_OK)
+				{
+					UCLIDException ue("ELI36841",
+						"Application trace: Unable to release page image. Possible memory leak.");
+					loadScansoftRecErrInfo(ue, rc);
+					ue.log();
+				}
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36843");
+	}
+	catch (UCLIDException &ue)
+	{
+		UCLIDException uexOuter("ELI36844", "Output PDF validation failed", ue);
+		throw uexOuter;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 bool CESConvertToPDFApp::displayUsage(const string& strFileName, const string& strErrMsg)

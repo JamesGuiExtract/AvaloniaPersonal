@@ -359,6 +359,13 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			// initialize the Nuance engine and any necessary licensing thereof
 			initNuanceEngineAndLicense();
 
+			HIMGFILE hInputImage;
+			THROW_UE_ON_ERROR("ELI34295", "Unable to open source image file.",
+				kRecOpenImgFile(strInputFileName.c_str(), &hInputImage, IMGF_READ, FF_SIZE));
+
+			// Ensure that the memory stored for the image file is released
+			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
+
 			// Set format and temp file extension based on the ouput type. If the extension doesn't
 			// match the format, the nuance engine will throw and error when saving.
 			string strExt;
@@ -370,7 +377,15 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 					break;
 
 				case kFileType_Pdf:
-					nFormat = FF_PDF_SUPERB;
+					// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
+					// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
+					// FF_PDF_SUPERB.
+					IMG_INFO imgInfo = {0};
+					IMF_FORMAT imgFormat;
+					RECERR rc = kRecGetImgFilePageInfo(0, hInputImage, 0, &imgInfo, &imgFormat);
+					throwExceptionIfNotSuccess(rc,
+						"ELI36840", "Failed to indentify image format.", strInputFileName);
+					nFormat = imgInfo.BitsPerPixel == 1 ? FF_PDF_SUPERB : FF_PDF_GOOD;
 					strExt = ".pdf";
 					break;
 
@@ -390,13 +405,6 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			// https://extract.atlassian.net/browse/ISSUE-12162
 			// At one point in time, kRecSetImgConvMode(0, CNV_AUTO) was called here, but this
 			// strips color information which we now want to preserve.
-
-			HIMGFILE hInputImage;
-			THROW_UE_ON_ERROR("ELI34295", "Unable to open source image file.",
-				kRecOpenImgFile(strInputFileName.c_str(), &hInputImage, IMGF_READ, FF_SIZE));
-
-			// Ensure that the memory stored for the image file is released
-			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
 
 			// Don't use RecMemoryReleaser on the output image because we will need to manually
 			// close it at the end of this method to be able to copy it to its permanent location.

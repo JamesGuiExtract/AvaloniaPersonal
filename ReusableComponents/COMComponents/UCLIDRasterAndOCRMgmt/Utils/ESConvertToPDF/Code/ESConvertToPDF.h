@@ -69,8 +69,41 @@ private:
 	string m_strExceptionLogFile;
 
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: Converts the image file strInputFile into a searchable PDF at strOutputFile.
-	void convertToSearchablePDF();
+	// Applies the settings that govern OCR.
+	void applyOCRSettings();
+	//---------------------------------------------------------------------------------------------
+	// Applies the configured output security settings.
+	bool applySecuritySettings();
+	//---------------------------------------------------------------------------------------------
+	// Executes the conversion to searchable PDF. If bUseRecDFAPI = true, the RecAPI will be used
+	// exclusively which means each image will be converted (modified) into the output document.
+	// If bUseRecDFAPI = false, the RecPDF API will be used. The RecPDF API has the advantage of
+	// being able to insert text without touching the image if the source document is a PDF itself.
+	// However, the RecPDFAPI is not able to be used in cases where the output document requires
+	// security.
+	void convertToSearchablePDF(bool bUseRecDFAPI);
+	//---------------------------------------------------------------------------------------------
+	// Opens the specified image file for reading.
+	HIMGFILE openImageFile(const string& strFileName);
+	//---------------------------------------------------------------------------------------------
+	// Retrieves and OCR's the pages from the specified hInputFile.
+	HPAGE* getOCRedPages(HIMGFILE hInputFile, int nPageCount);
+	//---------------------------------------------------------------------------------------------
+	// Adds the specified pages to the strOutputPDF in the specified outFormat. The images are
+	// converted/modified (no way around this).
+	void addPagesToOutput(HPAGE *pPages, const string& strOutputPDF, IMF_FORMAT outFormat,
+		int nPageCount);
+	//---------------------------------------------------------------------------------------------
+	// Applies the searchable text in pages to the specified strImageFile using the RecPDF API.
+	void applySearchableTextWithRecAPI(const string& strImageFile, HPAGE *pages, int nPageCount);
+	//---------------------------------------------------------------------------------------------
+	// Validates that the specified PDF can be read. Added use in response to issue where RecPDF
+	// API call can result in corrupted images:
+	// https://extract.atlassian.net/browse/ISSUE-12163
+	void validatePDF(const string& strFileName);
+	//---------------------------------------------------------------------------------------------
+	// Frees the HPAGE instances.
+	void freePageData(HPAGE *pPages, int nPageCount);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Displays usage information for this executable and an error message if specified.
 	//          Returns false.

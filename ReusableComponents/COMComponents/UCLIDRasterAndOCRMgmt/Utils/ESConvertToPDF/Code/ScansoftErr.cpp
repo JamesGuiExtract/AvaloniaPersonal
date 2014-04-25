@@ -74,3 +74,21 @@ void loadScansoftRecErrInfo(UCLIDException& ue, RECERR rc)
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void throwExceptionIfNotSuccess(RECERR rc, const string& strELICode,
+	const string& strErrorDescription, const string& strFileName/* = ""*/, int iPageIndex/* = 0*/)
+{
+	if (rc != REC_OK)
+	{
+		UCLIDException ue(strELICode, strErrorDescription);
+		loadScansoftRecErrInfo(ue, rc);
+		if (!strFileName.empty())
+		{
+			ue.addDebugInfo("Filename", strFileName);
+		}
+		if (iPageIndex > 0)
+		{
+			ue.addDebugInfo("Page", iPageIndex);
+		}
+		throw ue;
+	}
+}
