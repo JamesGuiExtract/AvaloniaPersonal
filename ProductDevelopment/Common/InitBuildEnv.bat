@@ -4,7 +4,7 @@ SET BUILD_VSS_ROOT=%BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%
 SET VAULT_SERVER=EngSvr.extract.local
 SET VAULT_REPOSITORY="Extract"
 
-SET NUANCE_API_DIR=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Nuance_18\bin
+SET NUANCE_API_DIR=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Nuance_19\bin
 SET LEADTOOLS_API_DIR=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_17\Bin
 
 SET PATH=%windir%;%windir%\System32;I:\Common\Engineering\Tools\Utils;%VAULT_DIR%;%NUANCE_API_DIR%;%LEADTOOLS_API_DIR%;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\SafeNetUltraPro\Bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Inlite_5_7\bin
