@@ -16,7 +16,7 @@ using System.Threading;
 namespace DEPProjectTemplateInstaller
 {
     /// <summary>
-    /// 
+    /// Allows creation of a Visual Studio template for a DEP project.
     /// </summary>
     public partial class DEPProjectTemplateInstallerForm : Form
     {
@@ -73,13 +73,19 @@ namespace DEPProjectTemplateInstaller
                 }
             }
 
+            // Remove any directory that may have been left over from a failed installation attempt.
+            if (Directory.Exists(installDir))
+            {
+                Directory.Delete(installDir, true);
+            }
+
             InstallTemplateFiles(sourceDir, installDir);
 
             ApplyTemplateName(templateName, installDir);
 
             if (_sourceRadioButton.Checked && File.Exists(_sourceProjectTextBox.Text))
             {
-                CopyTargetProjectFiles(installDir);
+                CopySourceProjectFiles(installDir);
             }
 
             if (File.Exists(installZip))
@@ -199,11 +205,11 @@ namespace DEPProjectTemplateInstaller
         }
 
         /// <summary>
-        /// Copies the target project files into the new template and renames members to match the
+        /// Copies the source project files into the new template and renames members to match the
         /// template name.
         /// </summary>
         /// <param name="templateDir">The template directory.</param>
-        void CopyTargetProjectFiles(string templateDir)
+        void CopySourceProjectFiles(string templateDir)
         {
             string sourceProjectDir = Path.GetDirectoryName(_sourceProjectTextBox.Text);
             string oldProjectName =
@@ -214,12 +220,14 @@ namespace DEPProjectTemplateInstaller
             string newDesignerFile =
                 Path.Combine(templateDir, _DEP_TEMPLATE) + "Panel.Designer.cs";
             File.Copy(designerFile, newDesignerFile, true);
+            MakeWritable(newDesignerFile);
             ReplaceText(newDesignerFile, oldProjectName, "$safeprojectname$");
 
             string resxFile = Directory.GetFiles(sourceProjectDir, "*.resx").Single();
             string newResxFile =
                 Path.Combine(templateDir, _DEP_TEMPLATE) + "Panel.resx";
             File.Copy(resxFile, newResxFile, true);
+            MakeWritable(newResxFile);
         }
 
         static void CopyDirectory(string source, string destination, bool recursive)
@@ -251,9 +259,24 @@ namespace DEPProjectTemplateInstaller
                 }
                 else
                 {
-                    // Copy the file
-                    File.Copy(element, destination + Path.GetFileName(element), true);
+                    // Copy the file and make it writable.
+                    string destFileName = destination + Path.GetFileName(element);
+                    File.Copy(element, destFileName, true);
+                    MakeWritable(destFileName);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Removes the readonly property from the the specified file (if present).
+        /// </summary>
+        /// <param name="fileName">The element.</param>
+        static void MakeWritable(string fileName)
+        {
+            FileAttributes attributes = File.GetAttributes(fileName);
+            if (attributes.HasFlag(FileAttributes.ReadOnly))
+            {
+                File.SetAttributes(fileName, attributes & ~FileAttributes.ReadOnly);
             }
         }
 
