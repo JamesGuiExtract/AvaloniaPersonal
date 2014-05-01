@@ -15,6 +15,8 @@
 //              outputDir - The path to the EAV output dir
 //
 // Example inputFile: K:\Common\Engineering\Sample Files\AtPac\CA - Siskiyou\Set001\IndexData\sis_extract.txt
+// Stanislaus example: K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set011\IndexData\stan_multi_info.txt
+// Contra Costa example: K:\Common\Engineering\Sample Files\AtPac\CA - ContraCosta\Set020\IndexData\ccc_multi_info.txt
 //--------------------------------------------------------------------------------------------------
 
 function main(args) {
@@ -46,8 +48,10 @@ function main(args) {
         setCopyImage(fields);
 
         if (fields.length > 5) {
-            if (fields[5].match(/^(?:(?:REF[#]?|EF|F|RE|RERF|RF)\s?)?[-\x20\d]{5}/i)) {
+            if (fields[5].match(/^(?:(?:REF[#]?|EF|F|RE|RERF|RF)\s?)[-\x20\d]{5,}$/i)) {
                 makeEAVS_REFERENCE(fields);
+            } else if (fields[5].match(/^(?:(?:APN[#]?|PIN|PN)\s?)[-\x20\d]{5,}/i)) {
+              makeEAVS_PIN(fields);
             } else {
                 makeEAVS_PARTIES(fields);
             }
@@ -120,7 +124,7 @@ function main(args) {
     function writeAttr(fname, aname, avalue, atype, indent) {
         if (avalue!=undefined && avalue!="" && !(/^0+$/.test(avalue))) {
             if (fso.fileExists(fname)) {
-                indent = "\n"+indent;
+                indent = "\r\n"+indent;
             }
             appendText(fname, indent+aname+"|"+avalue+(atype? "|"+atype : ""));
         }
@@ -153,9 +157,14 @@ function main(args) {
         var letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
         attrType = letters.charAt(attrType);
         var fname = getEAVName(fields[0]+fields[1].replace(/-\d{2}$/,""), "PIN");
-        if (fields[4].trim() != '-') {
+        if (fields[5].match(/^(?:(?:APN[#]?|PIN|PN)\s?)[-\x20\d]{5,}/i)) {
+          var val = fields[5].trim()
+        } else {
+          var val = fields[4].trim()
+        }
+        if (val != '-') {
             try {
-                writeAttr(fname, "PIN", fields[4].trim(), attrType, "");
+                writeAttr(fname, "PIN", val, attrType, "");
             }
             catch(err) {
                 handleScriptError("ParseSiskiyouAtPacIndexData_5", "Error!", err, "Index Data Line", fields);
