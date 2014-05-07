@@ -1,0 +1,181 @@
+<HTML>
+
+<HEAD>
+<TITLE>MN - Hennepin DEP Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> DEP Testing - MN - Hennepin <br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>DEP Layout</h3>
+       	<ul>
+		<LI>Confirm that the DEP includes a <b>Document Number</b> edit box.
+		<ul>
+			<li>Confirm that swiping is supported.
+		</ul>
+		<LI>Confirm that the DEP includes a <b>Document Name</b> edit box.
+		<ul>
+			<li>Confirm that swiping is not supported.
+		</ul>
+		<LI>Confirm that the DEP includes a <b>Land Type</b> edit box.
+		<ul>
+			<li>Confirm that swiping is not supported.
+		</ul>
+		<li>Confirm that the DEP includes a <b>Trans Type</b> drop-down combo box 
+		with the following entries.
+		<ul>
+			<li>(blank)
+			<li>Y
+		</ul>
+		<li>Confirm that swiping is not supported.
+		<li>Confirm that the DEP includes a <b>Recorded</b> group box.
+		<ul>
+			<li>individual edit boxes for:
+			<ul>
+				<li>Date
+				<li>Time
+			</ul>
+			<li>Confirm that swiping into each individual cell is supported.
+		</ul>
+		<li>Confirm that the DEP includes a <b>References</b> table with 
+		headings for:
+		<ul>
+			<li>Document Number
+			<li>Document Type
+			<li>Confirm that swiping is only supported into the 
+			<b>Document Number</b> cell.
+		</ul>
+		<li>Confirm that the DEP includes a <b>Grantors</b> table with 
+		headings for:
+		<ul>
+			<li>First
+			<li>Middle
+			<li>Last / Company
+			<li>Code
+		</ul>
+		<li>Confirm that swiping of a person is supported.
+		<li>Confirm that swiping of a company is supported.
+		<li>Confirm that the DEP includes a <b>Grantees</b> table with 
+		headings for:
+		<ul>
+			<li>First
+			<li>Middle
+			<li>Last / Company
+			<li>Code
+		</ul>
+		<li>Confirm that swiping of a person is supported.
+		<li>Confirm that swiping of a company is supported.
+		<li>Confirm that the DEP includes a <b>Legal Description</b> group box.
+		<ul>
+			<li>a <b>Subdivision</b> table with column headings for:
+			<ul>
+				<li>Lot
+				<li>Block
+				<li>Subdivision
+			</ul>
+			<li>Confirm that swiping of a <b>Subdivision</b> type legal 
+			description is supported.
+			<li>a <b>Condo</b> table with column headings for:
+			<ul>
+				<li>Unit
+				<li>Building
+				<li>Condominium
+			</ul>
+			<li>Confirm that swiping of a <b>Condo</b> type legal 
+			description is supported.
+			<li>a <b>Section / Township / Range</b> table with column 
+			headings for:
+			<ul>
+				<li>Section
+				<li>Township
+				<li>Range
+			</ul>
+			<li>Confirm that swiping of a <b>Section/Township/Range</b> type 
+			legal description is supported.
+			<li>an <b>Other</b> table with column headings for:
+			<ul>
+				<li>Land
+				<li>Tract
+			</ul>
+			<li>Confirm that swiping of an <b>Other</b> type legal 
+			description is supported.
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Validation</h3></li>
+	<UL>
+		<li>Confirm that the following validations exist along with meaningful 
+		error messages.
+		<ul>
+			<li><u>Document Number</u>
+			<ul>
+				<li>7-digit number
+				<li>8-digit number
+			</ul>
+			<li><u>Document Name</u>
+			<ul>
+				<li>must not be blank
+			</ul>
+			<li><u>Land Type</u>
+			<ul>
+				<li><b>T</b>
+				<li>(blank)
+			</ul>
+			<li><u>Trans Title</u>
+			<ul>
+				<li>(blank)
+				<li>Y
+			</ul>
+			<li><u>Recorded Date</u>
+			<ul>
+				<li>any valid date
+			</ul>
+			<li><u>Recorded Time</u>
+			<ul>
+				<li>any valid time
+			</ul>
+			<li><u>References - Document Number</u>
+			<ul>
+				<li>leading <b>T</b> followed by 7 or 8 digits
+			</ul>
+			<li><u>References - Document Type</u>
+			<ul>
+				<li>must not be blank
+			</ul>
+			<li><u>Grantors</u>
+			<ul>
+				<li>at least one must be defined
+			</ul>
+			<li><u>Grantees</u>
+			<ul>
+				<li>at least one must be defined
+			</ul>
+			<li><u>Legal Description</u>
+			<ul>
+				<li>N/A
+			</ul>
+			<li><u>Notes</u>
+			<ul>
+				<li>N/A
+			</ul>
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Auto-Update Queries</h3></li>
+	<ul>
+		<li>TBD
+       	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+       	<ul>
+		<LI>TBD
+	</ul>
+</OL>
+</BODY>
+</HTML>
