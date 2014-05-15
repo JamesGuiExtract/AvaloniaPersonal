@@ -1,9 +1,6 @@
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;AFCore.dat
-UCLIDAFDataScorersTest.EntityNameDataScorerTester.1;;..\..\..\AFDataScorers\AFDataScorersTest\TestFiles\TestEntityNameDataScorer.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFPreProcessors\AutomatedTest\LocateImageRegion\IDShieldTester.dat
-UCLIDAFSplittersTest.EntityNameSplitterTester.1;;..\..\..\AFSplitters\AFSplittersTest\TestFiles\TestEntityNameSplitter.dat
 UCLIDAFUtilsTest.MERSTester.1;;..\..\..\AFUtils\AFUtilsTest\TestFiles\TestMERS.dat
-UCLIDAFUtilsTest.EntityFinderTester.1;;..\..\..\AFUtils\AFUtilsTest\TestFiles\TestEntityFinder.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\ImageRegionWithLines\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\BoxFinder\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\LocateImageRegion\IDShieldTester.dat
