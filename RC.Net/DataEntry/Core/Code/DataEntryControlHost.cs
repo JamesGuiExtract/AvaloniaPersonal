@@ -1556,12 +1556,13 @@ namespace Extract.DataEntry
                         // page and create a SpatialPageInfo entry for each page.
                         for (int page = 1; page <= _imageViewer.PageCount; page++)
                         {
-                            SetImageViewerPageNumber(page);
+                            var pageProperties = _imageViewer.GetPageProperties(page);
 
                             _errorIconSizes[page] = new Size(
-                                (int)(_ERROR_ICON_SIZE * _imageViewer.ImageDpiX),
-                                (int)(_ERROR_ICON_SIZE * _imageViewer.ImageDpiY));
+                                (int)(_ERROR_ICON_SIZE * pageProperties.XResolution),
+                                (int)(_ERROR_ICON_SIZE * pageProperties.YResolution));
                         }
+
                         SetImageViewerPageNumber(1);
                     }
 

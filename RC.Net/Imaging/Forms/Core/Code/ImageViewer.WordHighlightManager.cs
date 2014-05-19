@@ -75,7 +75,15 @@ namespace Extract.Imaging.Forms
             /// Set when the background worker is inactive or doesn't currently have operation to
             /// perform.
             /// </summary>
-            ManualResetEvent _backgroundWorkerIdle = new ManualResetEvent(true); 
+            ManualResetEvent _backgroundWorkerIdle = new ManualResetEvent(true);
+
+            /// <summary>
+            /// Indicates whether the background worker thread is alive. This will indicate as soon
+            /// as the background worker thread method exits, as opposed to _backgroundWorker.IsBusy
+            /// which will continue to indicate true until the complete thread shutdown process is
+            /// complete.
+            /// </summary>
+            volatile bool _backgroundWorkerThreadAlive = false;
 
             /// <summary>
             /// An event to signal the background worker that a new operation is available to
@@ -772,6 +780,7 @@ namespace Extract.Imaging.Forms
             void HandleDeletingLayerObjects(object sender, DeletingLayerObjectsEventArgs e)
             {
                 bool restartLoading = false;
+                bool operationAborted = false;
 
                 try
                 {
@@ -787,6 +796,7 @@ namespace Extract.Imaging.Forms
 
                     if (!_backgroundWorkerIdle.WaitOne(1000))
                     {
+                        operationAborted = true;
                         new ExtractException("ELI31375",
                             "Application trace: Word highlight background operation aborted.").Log();
                     }
@@ -811,8 +821,22 @@ namespace Extract.Imaging.Forms
                         foreach (int page in affectedPages)
                         {
                             HashSet<LayerObject> pageHighlights;
+                            bool removalSucceeded = _wordHighlights.TryRemove(page, out pageHighlights);
                             ExtractException.Assert("ELI31363", "Internal error.",
-                                _wordHighlights.TryRemove(page, out pageHighlights));
+                                removalSucceeded || operationAborted);
+                            if (!removalSucceeded)
+                            {
+                                // https://extract.atlassian.net/browse/ISSUE-12188
+                                // Fixes to ensure _backgroundWorkerIdle is not set just before the
+                                // background worker is to clear highlight data should prevent
+                                // situations where highlights have been removed between the
+                                // initialization of deletedWordHighlights and here. But in the
+                                // fail-safe that the background thread did not exit immediately,
+                                // quietly abort handling of the deleted highlights as they likely
+                                // have been removed by ClearData if operationAborted is true and we
+                                // are here.
+                                return;
+                            }
                             highlightsFromAffectedPages.AddRange(pageHighlights);
 
                             // No longer consider any of these highlights as loaded.
@@ -1068,10 +1092,6 @@ namespace Extract.Imaging.Forms
                             // Signal any currently running operation to cancel.
                             // (including OCR operations).
                             CancelRunningOperation(true);
-
-                            // In case the background thread is currently waiting on the next
-                            // operation, set _operationAvailable to end the wait.
-                            _operationAvailable.Set();
                         }
                         else if (_clearData)
                         {
@@ -1161,7 +1181,11 @@ namespace Extract.Imaging.Forms
                 }
                 else
                 {
-                    _backgroundWorker.RunWorkerAsync();
+                    lock (_lock)
+                    {
+                        _backgroundWorkerThreadAlive = true;
+                        _backgroundWorker.RunWorkerAsync();
+                    }
                 }
             }
 
@@ -1175,11 +1199,38 @@ namespace Extract.Imaging.Forms
                 // Cancel any currently running operation except for OCR
                 CancelRunningOperation(false);
 
-                // Schedule the new operation.
-                _pendingOperation = operation;
-
                 // Signal the _backgroundWorker that an operation is available.
-                _operationAvailable.Set();
+                SignalOperationAvailable(operation);
+            }
+
+            /// <summary>
+            /// Signals the operation available.
+            /// </summary>
+            /// <param name="operation">The <see cref="Action"/> to perform on the
+            /// <see cref="_backgroundWorker"/>, or <see langword="null"/> to trigger the thread to
+            /// check if it should exit.</param>
+            void SignalOperationAvailable(Action operation)
+            {
+                // Lock so that we don't check _backgroundWorkerThreadAlive just as the
+                // _backgroundWorker is exiting and reset _backgroundWorkerIdle just after it has
+                // been set at the end of the thread.
+                lock (_lock)
+                {
+                    // If the operation is null, still need to signal the thread if
+                    // _backgroundWorkerThreadAlive so that it stops waiting on the next event.
+                    if ((operation != null) || _backgroundWorkerThreadAlive)
+                    {
+                        _pendingOperation = operation;
+                        _operationAvailable.Set();
+
+                        // https://extract.atlassian.net/browse/ISSUE-12188
+                        // Indicate that the background thread is busy immediately when signaled that an
+                        // operation is available. That way when threads are waiting on
+                        // _backgroundWorkerIdle to proceed, they wait even if only clearing data and not
+                        // actually running an operation.
+                        _backgroundWorkerIdle.Reset();
+                    }
+                }
             }
 
             /// <summary>
@@ -1202,7 +1253,12 @@ namespace Extract.Imaging.Forms
                     _ocrCanceler.Cancel();
                 }
 
-                _pendingOperation = null;
+                // https://extract.atlassian.net/browse/ISSUE-12188
+                // If the background thread is currently waiting on the next operation, this
+                // will to end the wait and allow the background thread to exit.
+                // _backgroundWorkerIdle will be reset until any pending data cleanup has
+                // occured.
+                SignalOperationAvailable(null);
             }
 
             /// <summary>
@@ -1264,8 +1320,6 @@ namespace Extract.Imaging.Forms
                                     continue;
                                 }
 
-                                _backgroundWorkerIdle.Reset();
-
                                 currentOperation = _pendingOperation;
                                 _pendingOperation = null;
 
@@ -1312,7 +1366,11 @@ namespace Extract.Imaging.Forms
                 finally
                 {
                     // If the background worker has been stopped, consider the background worker idle.
-                    _backgroundWorkerIdle.Set();
+                    lock (_lock)
+                    {
+                        _backgroundWorkerIdle.Set();
+                        _backgroundWorkerThreadAlive = false;
+                    }
                 }
             }
 
@@ -2161,70 +2219,97 @@ namespace Extract.Imaging.Forms
             /// <param name="method">The <see cref="Action"/> to execute in the UI thread.</param>
             void ExecuteInUIThread(Action method)
             {
-                // To avoid scheduling to the UI unnecessarilly, check cancelation token first.
-                _cancelToken.ThrowIfCancellationRequested();
+                // Indicates if the method has been started in the UI thread.
+                bool started = false;
 
-                // Keep track of the fact that the method was scheduled to execute.
-                Interlocked.Increment(ref _executeInUIReferenceCount);
+                try
+                {
+                    // To avoid scheduling to the UI unnecessarilly, check cancelation token first.
+                    _cancelToken.ThrowIfCancellationRequested();
 
-                // Assign a local copy of the _cancelToken to check inside the invoke call so that
-                // even if the worker thread is running a different operation by the time occurs
-                // and, therefore, _cancelToken is now set to a different token, the Invoke can stil
-                // know if the operation that launched it has been cancelled.
-                CancellationToken cancelToken = _cancelToken;
+                    // Keep track of the fact that the method was scheduled to execute.
+                    Interlocked.Increment(ref _executeInUIReferenceCount);
 
-                // Invoke to avoid modifying the imageViewer from outside the UI thread. Use begin
-                // invoke so the operation isn't executed in the middle of another UI event.
-                IAsyncResult result = SafeImageViewerBeginInvoke(() => 
-                    {
-                        try
+                    // Assign a local copy of the _cancelToken to check inside the invoke call so that
+                    // even if the worker thread is running a different operation by the time occurs
+                    // and, therefore, _cancelToken is now set to a different token, the Invoke can stil
+                    // know if the operation that launched it has been cancelled.
+                    CancellationToken cancelToken = _cancelToken;
+
+                    // Invoke to avoid modifying the imageViewer from outside the UI thread. Use begin
+                    // invoke so the operation isn't executed in the middle of another UI event.
+                    IAsyncResult result = SafeImageViewerBeginInvoke(() =>
                         {
                             // If the task was cancelled before invoked or no image is loaded do not
-                            // execute the method.
-                            if (!cancelToken.IsCancellationRequested &&
-                                _imageViewer.IsImageAvailable)
+                            // decrement _executeInUIReferenceCount (so that it can be decremented
+                            // in the worker thread before we get to this point).
+                            lock (_lock)
+                            {
+                                if (cancelToken.IsCancellationRequested ||
+                                    _imageViewer == null ||
+                                    !_imageViewer.IsImageAvailable)
+                                {
+                                    return;
+                                }
+
+                                started = true;
+                            }
+
+                            try
                             {
                                 method();
                             }
-                        }
-                        catch (Exception ex)
+                            catch (Exception ex)
+                            {
+                                ex.ExtractDisplay("ELI32209");
+                            }
+                            finally
+                            {
+                                // By decrementing _UIOperationReferenceCount as part of the invoke, we'll
+                                // have record of whether the method was called, even if the blocking here
+                                // was cancelled.
+                                Interlocked.Decrement(ref _executeInUIReferenceCount);
+                            }
+                        });
+
+                    // If a null result was returned, the image viewer was destoryed; ignore the call.
+                    if (result == null)
+                    {
+                        return;
+                    }
+
+                    WaitHandle[] waitHandles = new WaitHandle[] 
+                    {
+                        result.AsyncWaitHandle,
+                        _cancelToken.WaitHandle
+                    };
+
+                    // For thread safety of fields modified in the background thread don't return until
+                    // the method has been executed (or the operation has been canceled.
+                    WaitHandle.WaitAny(waitHandles);
+
+                    // Close the wait handle if it is no longer needed.
+                    if (result.IsCompleted)
+                    {
+                        result.AsyncWaitHandle.Close();
+                    }
+
+                    // If cancelled, end task immediately so it doesn't touch any fields used in the
+                    // invoke.
+                    _cancelToken.ThrowIfCancellationRequested();
+                }
+                finally
+                {
+                    // If canceled before starting the method on the UI thread, immediately
+                    // decrement _executeInUIReferenceCount. The method will never be run.
+                    lock (_lock)
+                    {
+                        if (!started)
                         {
-                            ex.ExtractDisplay("ELI32209");
-                        }
-                        finally
-                        {
-                            // By decrementing _UIOperationReferenceCount as part of the invoke, we'll
-                            // have record of whether the method was called, even if the blocking here
-                            // was cancelled.
                             Interlocked.Decrement(ref _executeInUIReferenceCount);
                         }
-                    });
-
-                // If a null result was returned, the image viewer was destoryed; ignore the call.
-                if (result == null)
-                {
-                    return;
+                    }
                 }
-
-                WaitHandle[] waitHandles = new WaitHandle[] 
-                {
-                    result.AsyncWaitHandle,
-                    _cancelToken.WaitHandle
-                };
-
-                // For thread safety of fields modified in the background thread don't return until
-                // the method has been executed (or the operation has been canceled.
-                WaitHandle.WaitAny(waitHandles);
-
-                // Close the wait handle if it is no longer needed.
-                if (result.IsCompleted)
-                {
-                    result.AsyncWaitHandle.Close();
-                }
-
-                // If cancelled, end task immediately so it doesn't touch any fields used in the
-                // invoke.
-                _cancelToken.ThrowIfCancellationRequested();
             }
 
             /// <summary>

@@ -9,20 +9,6 @@ namespace Extract.Imaging
     /// </summary>
     public class ImagePageProperties
     {
-        #region Fields
-
-        /// <summary>
-        /// The width of the image in pixels.
-        /// </summary>
-        readonly int _width;
-
-        /// <summary>
-        /// The height of the image in pixels.
-        /// </summary>
-        readonly int _height;
-
-        #endregion Fields
-
         #region Constructors
 
         /// <summary>
@@ -30,8 +16,10 @@ namespace Extract.Imaging
         /// </summary>
         internal ImagePageProperties(CodecsImageInfo imageInfo)
         {
-            _width = imageInfo.Width;
-            _height = imageInfo.Height;
+            Width = imageInfo.Width;
+            Height = imageInfo.Height;
+            XResolution = imageInfo.XResolution;
+            YResolution = imageInfo.YResolution;
         }
 
         #endregion Constructors
@@ -44,10 +32,8 @@ namespace Extract.Imaging
         /// <value>The width of the image in pixels.</value>
         public int Width
         {
-            get
-            {
-                return _width;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -56,10 +42,28 @@ namespace Extract.Imaging
         /// <value>The height of the image in pixels.</value>
         public int Height
         {
-            get
-            {
-                return _height;
-            }
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the horizontal DPI of the image.
+        /// </summary>
+        /// <value>The horizontal DPI of the image.</value>
+        public int XResolution
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the vertical DPI of the image.
+        /// </summary>
+        /// <value>The horizontal DPI of the image.</value>
+        public int YResolution
+        {
+            get;
+            private set;
         }
 
         #endregion Properties
@@ -77,8 +81,8 @@ namespace Extract.Imaging
         {
             try
             {
-                return rectangle.Left >= 0 && rectangle.Top >= 0 && rectangle.Width <= _width &&
-                    rectangle.Height <= _height;
+                return rectangle.Left >= 0 && rectangle.Top >= 0 && rectangle.Width <= Width &&
+                    rectangle.Height <= Height;
             }
             catch (Exception ex)
             {
