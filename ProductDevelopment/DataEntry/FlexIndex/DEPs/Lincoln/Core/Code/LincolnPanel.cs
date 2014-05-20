@@ -39,13 +39,13 @@ namespace Extract.DataEntry.DEP.Lincoln
 
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
-                    LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI0", _OBJECT_NAME);
+                    LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI36847", _OBJECT_NAME);
 
                 InitializeComponent();
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI0", ex);
+                throw ExtractException.AsExtractException("ELI36848", ex);
             }
         }
     }
