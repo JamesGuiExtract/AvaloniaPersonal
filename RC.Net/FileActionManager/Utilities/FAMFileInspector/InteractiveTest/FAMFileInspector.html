@@ -36,6 +36,49 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 		</ul>
   	</ul>
 <p>
+  	<li><h2>Command-Line Operation</h2></li>
+  	<ul>
+    		<li>Confirm that <b>FAM File Inspector.exe /?</b> displays a usage message.
+    		<li><b>[DotNetRC #1097, #1101, #1103, JIRA #12134]</b>Confirm that 
+		parameters and options are available as follows.
+		<ul>
+			<li>ServerName
+			<li>DatabaseName
+			<li>/action &lt;actionName&gt;
+			<li>/status &lt;statusName&gt;
+			<li>/query &lt;queryFileName&gt;
+			<li>/directory &lt;directory&gt;
+			<li>/filefilter &lt;filefilter&gt;
+			<li>/r
+			<li>/filecount [top|bottom|random] &lt;count&gt;
+		</ul>
+<p>
+		<li>Confirm that <b>ServerName</b> and <b>DatabaseName</b> are required 
+		if not using the <b>/directory</b> option.
+		<li>Confirm that a meaningful error message is presented if 
+		an incorrect action name is used.
+		<li>Confirm that a meaningful error message is presented if 
+		an incorrect status is used.
+		<li>Confirm that a <b>/query</b> argument can be used without /action 
+		and /status.
+		<li>Confirm that the parameter following <b>/query</b> is a 
+		fully-qualified path to a text file containing a SQL query.
+		<li>Confirm that a meaningful error message is presented if the 
+		query is not fully formed.
+		<li>Confirm that <b>/filecount</b> can be used with each of the following 
+		options.
+		<ul>
+			<li>&lt;none&gt;
+			<li>top
+			<li>bottom
+			<li>random
+		</ul>
+		<li>Confirm that <b>/directory</b> can be used with <b>/filefilter</b>.
+		<li>Confirm that <b>/directory</b> can be used without <b>/filefilter</b>.
+		<li>Confirm that <b>/directory</b> can be used with <b>/r</b>.
+		<li>Confirm that <b>/directory</b> can be used without <b>/r</b>.
+  	</ul>
+<p>
   	<li><h2>General User Interface</h2></li>
   	<ul>
 		<li><b>Main Window</b>
@@ -198,6 +241,13 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			displays the last-selected image in the Image Window.
 			<li>Deselect an image from a multiple selection and confirm that the 
 			deselected image is shown in the Image Window.
+	  	   	<LI><b>[JIRA #12142]</b> Image Window Status Strip
+        		<ul>
+				<li>Confirm that image resolution is displayed in the 
+				status bar.
+				<li>Confirm that cursor location is displayed in the 
+				status bar.
+			</ul>
 		</ul>
   	</ul>
 <p>
@@ -709,27 +759,6 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			running in <b>non-Admin</b> mode.
         	</ul>
 <p>
-  	   	<LI><b>[DotNetRC #1097, #1101, #1103]</b> FAM File Inspector Options
-        	<ul>
-			<li>Confirm that the following command-line options are supported.
-			<ul>
-				<li>&lt;ServerName&gt;
-				<li>&lt;DBName&gt;
-				<li>/Action &lt;ActionName&gt;
-				<li>/Status &lt;ActionStatus&gt;
-				<li>/Query &lt;QueryFileName&gt;
-				<li>/filecount [top|bottom|random] &lt;count&gt;
-			</ul>
-			<li>Confirm that a meaningful error message is presented if 
-			an incorrect action name is used.
-			<li>Confirm that a meaningful error message is presented if 
-			an incorrect status is used.
-			<li>Confirm that the parameter following <b>/query</b> is a 
-			fully-qualified path to a text file containing a SQL query.
-			<li>Confirm that a meaningful error message is presented if the 
-			query is not fully formed.
-        	</ul>
-<p>
   	   	<LI><b>[DotNetRC #1098]</b> FAM File Inspector Copying Files and Data
         	<ul>
 			<li>Confirm that the following context menu options are supported.
@@ -749,6 +778,23 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			information to the Clipboard such that copies of each of the 
 			selected files along with associated USS, VOA, and XML files can 
 			be pasted into an Explorer window or as email attachments.
+        	</ul>
+<p>
+  	   	<LI><b>[JIRA #12142]</b> UI Changes
+        	<ul>
+			<li>Confirm that window splitters such as between the file selection 
+			and file search panes have visible grip handles.
+			<li>Confirm that failing to open a selected file no longer displays 
+			an exception.
+			<ul>
+				<li>Confirm that an exception is logged.
+				<li>Confirm that <b>Failed to open image</b> text is 
+				displayed in the image viewer.
+				<li>Confirm that a <b>red X</b> button is provided to 
+				hide the <b>Search</b> pane.
+				<li>Confirm that a <b>+</b> button is provided to 
+				show the <b>Search</b> pane.
+			</ul>
         	</ul>
   	</ul>
 </ol>
