@@ -766,7 +766,7 @@ namespace Extract.AttributeFinder.Rules
                     try
                     {
                         // The path is already expanded, so there is no need to provide _pathTags.
-                        return tempDatabaseConnectionInfo.OpenConnection();
+                        return tempDatabaseConnectionInfo.OpenConnection(false);
                     }
                     catch
                     {
@@ -783,7 +783,7 @@ namespace Extract.AttributeFinder.Rules
                 }
                 else
                 {
-                    return DatabaseConnectionInfo.OpenConnection(_pathTags);
+                    return DatabaseConnectionInfo.OpenConnection(false, _pathTags);
                 }
             }
 

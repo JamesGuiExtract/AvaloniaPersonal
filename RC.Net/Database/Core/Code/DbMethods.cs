@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -167,17 +168,38 @@ namespace Extract.Database
         /// </summary>
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
         /// <param name="query">The query to execute.</param>
-        /// <returns>A string array representing the results of the query where each
-        /// value is a separate row and where the values are delimited by tabs.</returns>
-        public static string[] ExecuteDBQuery(DbConnection dbConnection, string query)
+        /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
+        public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query)
         {
             try
             {
-                return ExecuteDBQuery(dbConnection, query, null, "\t");
+                return ExecuteDBQuery(dbConnection, query, null);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI34571");
+            }
+        }
+
+        /// <summary>
+        /// Gets the query results as a string array.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        /// <param name="query">The query to execute.</param>
+        /// <returns>A string array representing the results of the query where each
+        /// value is a separate row and where the values are delimited by tabs.</returns>
+        public static string[] GetQueryResultsAsStringArray(DbConnection dbConnection, string query)
+        {
+            try
+            {
+                using (DataTable resultsTable = ExecuteDBQuery(dbConnection, query))
+                {
+                    return resultsTable.ToStringArray("\t");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36989");
             }
         }
 
@@ -190,18 +212,15 @@ namespace Extract.Database
         /// <param name="parameters">Parameters to be used in the query. They key for each parameter
         /// must begin with the appropriate symbol ("@" for T-SQL and SQL CE, ":" for Oracle) and
         /// that key should appear in the <see paramref="query"/>.</param>
-        /// <param name="columnSeparator">The string that should delimit each column's value.</param>
-        /// <returns>A string array representing the results of the query where each
-        /// value is a separate row and where the values are delimited by
-        /// <see paramref="columnSeparator"/></returns>
-        public static string[] ExecuteDBQuery(DbConnection dbConnection, string query,
-            Dictionary<string, string> parameters, string columnSeparator)
+        /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
+        public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query,
+            Dictionary<string, string> parameters)
         {
             try
             {
                 using (var command = DBMethods.CreateDBCommand(dbConnection, query, parameters))
                 {
-                    return ExecuteDBQuery(command, columnSeparator);
+                    return ExecuteDBQuery(command);
                 }
             }
             catch (Exception ex)
@@ -211,16 +230,43 @@ namespace Extract.Database
         }
 
         /// <summary>
+        /// Gets the query results as a string array.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        /// <param name="query">The query to execute.</param>
+        /// <param name="parameters">Parameters to be used in the query. They key for each parameter
+        /// must begin with the appropriate symbol ("@" for T-SQL and SQL CE, ":" for Oracle) and
+        /// that key should appear in the <see paramref="query"/>.</param>
+        /// <param name="columnSeparator">The string used to separate multiple column results.
+        /// (Will not be included in any result with less than 2 columns)</param>
+        /// <returns>A string array representing the results of the query where each
+        /// value is a separate row and where the values are delimited by
+        /// <see paramref="columnSeparator"/>.</returns>
+        public static string[] GetQueryResultsAsStringArray(DbConnection dbConnection, string query,
+            Dictionary<string, string> parameters, string columnSeparator)
+        {
+            try
+            {
+                using (DataTable resultsTable = ExecuteDBQuery(dbConnection, query, parameters))
+                {
+                    return resultsTable.ToStringArray(columnSeparator);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36978");
+            }
+        }
+
+
+        /// <summary>
         /// Executes a query against the specified database connection and returns the
         /// result as a string array.
         /// </summary>
         /// <param name="dbCommand">The <see cref="DbCommand"/> defining the query to be applied.
         /// </param>
-        /// <param name="columnSeparator">The string used to separate multiple column results.
-        /// (Will not be included in any result with less than 2 columns)</param>
-        /// <returns>An array of <see cref="string"/>s, each representing a result row from the
-        /// query.</returns>
-        public static string[] ExecuteDBQuery(DbCommand dbCommand, string columnSeparator)
+        /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
+        public static DataTable ExecuteDBQuery(DbCommand dbCommand)
         {
             try
             {
@@ -231,50 +277,20 @@ namespace Extract.Database
                 ExtractException.Assert("ELI26151", "Null argument exception!", dbCommand != null);
 
                 using (DbDataReader sqlReader = dbCommand.ExecuteReader())
+                using (DataSet dataSet = new DataSet())
                 {
-                    List<string> results = new List<string>();
+                    dataSet.Locale = CultureInfo.CurrentCulture;
+                    // Use a DataSet to turn off enforcement of constaints primarily for backward
+                    // compatibility-- the old ExecuteDBQuery method that returned a string array
+                    // did not enforce constraints.
+                    DataTable dataTable = new DataTable();
+                    dataTable.Locale = CultureInfo.CurrentCulture;
+                    dataSet.Tables.Add(dataTable);
+                    dataSet.EnforceConstraints = false;
 
-                    // Loop throw each row of the results.
-                    while (sqlReader.Read())
-                    {
-                        StringBuilder result = new StringBuilder();
+                    dataTable.Load(sqlReader);
 
-                        // Keep track of all column delimiters that are appended. They are
-                        // only added once it is confirmed that there is more data in the
-                        // row.
-                        StringBuilder pendingColumnDelimiters = new StringBuilder();
-
-                        for (int i = 0; i < sqlReader.FieldCount; i++)
-                        {
-                            // If not the first column result, a column separator may be needed.
-                            if (i > 0)
-                            {
-                                pendingColumnDelimiters.Append(columnSeparator);
-                            }
-
-                            // Append a result only if there is a value to append.
-                            if (!sqlReader.IsDBNull(i))
-                            {
-                                string columnValue = sqlReader.GetValue(i).ToString();
-
-                                if (!string.IsNullOrEmpty(columnValue))
-                                {
-                                    // If there is data to write, go ahead and commit all pending
-                                    // column delimiters.
-                                    result.Append(pendingColumnDelimiters.ToString());
-
-                                    // Reset the pending column delimiters
-                                    pendingColumnDelimiters = new StringBuilder();
-
-                                    result.Append(columnValue);
-                                }
-                            }
-                        }
-
-                        results.Add(result.ToString());
-                    }
-
-                    return results.ToArray();
+                    return dataTable;
                 }
             }
             catch (Exception ex)
@@ -301,6 +317,123 @@ namespace Extract.Database
                 }
 
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Returns the data in <see paramref="dataTable"/> as a string array.
+        /// </summary>
+        /// <param name="dataTable">The <see cref="DataTable"/> containing the data to return as a
+        /// string array.</param>
+        /// <param name="columnSeparator">The string used to separate multiple column results.
+        /// (Will not be included in any result with less than 2 columns)</param>
+        /// <returns></returns>
+        public static string[] ToStringArray(this DataTable dataTable, string columnSeparator)
+        {
+            try
+            {
+                List<string> results = new List<string>();
+
+                // Loop throw each row of the results.
+                for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
+                {
+                    StringBuilder result = new StringBuilder();
+
+                    // Keep track of all column delimiters that are appended. They are only added
+                    // once it is confirmed that there is more data in the row.
+                    StringBuilder pendingColumnDelimiters = new StringBuilder();
+
+                    for (int columnIndex = 0; columnIndex < dataTable.Columns.Count; columnIndex++)
+                    {
+                        // If not the first column result, a column separator may be needed.
+                        if (columnIndex > 0)
+                        {
+                            pendingColumnDelimiters.Append(columnSeparator);
+                        }
+
+                        string columnValue = dataTable.Rows[rowIndex][columnIndex].ToString();
+
+                        if (!string.IsNullOrEmpty(columnValue))
+                        {
+                            // If there is data to write, go ahead and commit all pending
+                            // column delimiters.
+                            result.Append(pendingColumnDelimiters.ToString());
+
+                            // Reset the pending column delimiters
+                            pendingColumnDelimiters = new StringBuilder();
+
+                            result.Append(columnValue);
+                        }
+                    }
+
+                    results.Add(result.ToString());
+                }
+
+                return results.ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36979");
+            }
+        }
+
+        /// <summary>
+        /// Adds the specified <see paramref="data"/> to a <see cref="DataTable"/>.
+        /// </summary>
+        /// <param name="data">A string array representing the rows of data to add to the table. The
+        /// column delimiters are assumed to be tab characters.
+        /// </param>
+        /// <returns>A <see cref="DataTable"/> with the data from <see paramref="data"/>.</returns>
+        public static DataTable ToDataTable(this string[] data)
+        {
+            try 
+	        {	        
+		        return data.ToDataTable("\t");
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.AsExtract("ELI36980");
+	        }
+        }
+
+        /// <summary>
+        /// Adds the specified <see paramref="data"/> to a <see cref="DataTable"/>.
+        /// </summary>
+        /// <param name="data">A string array representing the rows of data to add to the table. The
+        /// column delimiters are assumed to be tab characters.
+        /// </param>
+        /// <param name="columnSeparator">The string used to separate multiple columns in the
+        /// <see paramref="data"/>.</param>
+        /// <returns>A <see cref="DataTable"/> with the data from <see paramref="data"/>.</returns>
+        public static DataTable ToDataTable(this string[] data, string columnSeparator)
+        {
+            try
+            {
+                DataTable dataTable = new DataTable();
+                dataTable.Locale = CultureInfo.CurrentCulture;
+                if (data.Length == 0)
+                {
+                    return dataTable;
+                }
+
+                int columnCount = 
+                    data.Max(row =>
+                        Enumerable.Range(0, row.Length - 1)
+                        .Count(index => row.IndexOf(columnSeparator, index) >= 0) + 1);
+                for (int i = 0; i < columnCount; i++)
+                {
+                    dataTable.Columns.Add();
+                }
+                foreach (string row in data)
+                {
+                    dataTable.Rows.Add(row.Split('\t'));
+                }
+
+                return dataTable;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36981");
             }
         }
 

@@ -2858,7 +2858,9 @@ namespace Extract.FileActionManager.Utilities
             }
             finally
             {
-                if (adoRecordset != null)
+                // If the recordset is not currently closed, close it. Some queries that do not
+                // produce results will potentially result in a recordset that is closed right away.
+                if (adoRecordset != null && adoRecordset.State != 0)
                 {
                     adoRecordset.Close();
                 }

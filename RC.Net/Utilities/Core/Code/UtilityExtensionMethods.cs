@@ -1,5 +1,6 @@
 ﻿using Extract.Licensing;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -24,6 +25,66 @@ namespace Extract.Utilities
         const int _DEFAULT_BUFFER = 8192;
 
         #endregion Constants
+
+        #region Methods
+
+        /// <summary>
+        /// Converts a <see langword="string"/> to a <see langword="bool"/> where "0" and "1" are
+        /// recognized as well as "true" and "false".
+        /// </summary>
+        /// <param name="value">The <see langword="string"/> to be converted.</param>
+        /// <returns>The <see langword="bool"/> equivalent.</returns>
+        public static bool ToBoolean(this string value)
+        {
+            try
+            {
+                if (value == "1")
+                {
+                    return true;
+                }
+                else if (value == "0")
+                {
+                    return false;
+                }
+
+                return bool.Parse(value);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36996");
+            }
+        }
+
+        /// <summary>
+        /// Converts to type.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static object ConvertToType(this string value, Type type)
+        {
+            try
+            {
+                if (type == typeof(bool))
+                {
+                    return value.ToBoolean();
+                }
+                else
+                {
+                    var converter = TypeDescriptor.GetConverter(type);
+                    return converter.ConvertFromString(value);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI36923");
+                ee.AddDebugData("Type", type.Name, false);
+                ee.AddDebugData("Value", value, false);
+                throw ee;
+            }
+        }
+
+        #endregion Methods
 
         #region Helper Methods
 

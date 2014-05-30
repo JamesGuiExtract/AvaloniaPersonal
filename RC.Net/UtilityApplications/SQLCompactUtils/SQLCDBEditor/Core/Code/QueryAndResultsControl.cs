@@ -1850,7 +1850,7 @@ namespace Extract.SQLCDBEditor
             // key is not set, set it manually.
             if (table.PrimaryKey.Length == 0)
             {
-                string[] primaryKeyColumns = DBMethods.ExecuteDBQuery(_connection,
+                string[] primaryKeyColumns = DBMethods.GetQueryResultsAsStringArray (_connection,
                     "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.INDEXES WHERE TABLE_NAME = '"
                     + Name + "' AND PRIMARY_KEY = 1");
 
@@ -2170,11 +2170,8 @@ namespace Extract.SQLCDBEditor
                 {
                     try
                     {
-                        using (DbCommand parameterQuery = DBMethods.CreateDBCommand(
-                            connection, queries[i], null))
-                        {
-                            availableValues = DBMethods.ExecuteDBQuery(parameterQuery, ",");
-                        }
+                        availableValues = DBMethods.GetQueryResultsAsStringArray(
+                            connection, queries[i], null, ",");
                     }
                     // Ignore any exceptions. A free-form edit box will be provided to enter the
                     // paramter value.
@@ -2537,8 +2534,8 @@ namespace Extract.SQLCDBEditor
                 try
                 {
                     // Get the up-to-date list.
-                    string[] newAvailableValuesList =
-                        DBMethods.ExecuteDBQuery(_connection, _parameterQueries[i], null, ",");
+                    string[] newAvailableValuesList = DBMethods.GetQueryResultsAsStringArray(
+                        _connection, _parameterQueries[i], null, ",");
 
                     // If the list has changed, update the items and auto-complete list of the
                     // ComboBox.

@@ -1286,7 +1286,7 @@ namespace Extract.SQLCDBEditor
             {
                 // Create adapter for the list of tables.
                 HashSet<string> tableNames = new HashSet<string>(
-                    DBMethods.ExecuteDBQuery(_connection,
+                    DBMethods.GetQueryResultsAsStringArray(_connection,
                         "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"));
 
                 _tableList.AddRange(tableNames

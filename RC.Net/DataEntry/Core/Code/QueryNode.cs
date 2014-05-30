@@ -1,4 +1,5 @@
 ﻿using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -149,36 +150,6 @@ namespace Extract.DataEntry
     }
 
     #endregion Enums
-
-    #region Extension Methods
-
-    /// <summary>
-    /// Extension methods used by the query framework
-    /// </summary>
-    static class ExtensionMethods
-    {
-        /// <summary>
-        /// Converts a <see langword="string"/> to a <see langword="bool"/> where "0" and "1" are
-        /// recognized as well as "true" and "false".
-        /// </summary>
-        /// <param name="value">The <see langword="string"/> to be converted.</param>
-        /// <returns>The <see langword="bool"/> equivalent.</returns>
-        public static bool ToBoolean(this string value)
-        {
-            if (value == "1")
-            {
-                return true;
-            }
-            else if (value == "0")
-            {
-                return false;
-            }
-
-            return bool.Parse(value);
-        }
-    }
-
-    #endregion Extension Methods
 
     #region NamedQueryReferences
 

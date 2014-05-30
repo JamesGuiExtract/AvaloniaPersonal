@@ -3,6 +3,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Microsoft.Data.ConnectionUI;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -103,6 +104,12 @@ namespace Extract.Database
         /// </summary>
         string _lastConnectionStringValue;
 
+        /// <summary>
+        /// Indicates if the connection information has changed since the last
+        /// <see cref="ConnectionChanged"/> event.
+        /// </summary>
+        bool _connectionHasChanged;
+
         #endregion Fields
 
         #region Constructors
@@ -141,6 +148,15 @@ namespace Extract.Database
         }
 
         #endregion Constructors
+
+        #region Events
+
+        /// <summary>
+        /// Raised when the connection information has been changed.
+        /// </summary>
+        public event EventHandler<EventArgs> ConnectionChanged;
+
+        #endregion Events
 
         #region Properties
 
@@ -286,6 +302,17 @@ namespace Extract.Database
             set;
         }
 
+        /// <summary>
+        /// Gets all available data sources.
+        /// </summary>
+        public ICollection<DataSource> DataSources
+        {
+            get
+            {
+                return _connectionDialog.DataSources;
+            }
+        }
+
         #endregion Properties
 
         #region Overrides
@@ -306,6 +333,27 @@ namespace Extract.Database
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI34765");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.Leave"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        protected override void OnLeave(EventArgs e)
+        {
+            try
+            {
+                base.OnLeave(e);
+
+                if (_connectionHasChanged)
+                {
+                    OnConnectionChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36983");
             }
         }
 
@@ -347,6 +395,11 @@ namespace Extract.Database
         {
             try
             {
+                // Don't raise the ConnectionChanged event for every keystroke while the connection
+                // string is being edited; just keep track of the fact that it has changed and raise
+                // the event when the _connectionStringTextBox loses focus.
+                _connectionHasChanged = true;
+
                 // Do not allow any edits that remove some but not all of the password mask.
                 // The password must be edited with the configure connection button.
                 if (!string.IsNullOrEmpty(_password))
@@ -440,6 +493,7 @@ namespace Extract.Database
                     DatabaseConnectionInfo.SaveConnectionDialogConfiguration(_connectionDialog);
 
                     UpdateUI();
+                    OnConnectionChanged();
                 }
             }
             catch (Exception ex)
@@ -616,6 +670,20 @@ namespace Extract.Database
             else
             {
                 _errorProvider.SetError(_dataSourceTextBox, "Data source has not been selected.");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ConnectionChanged"/> event.
+        /// </summary>
+        void OnConnectionChanged()
+        {
+            _connectionHasChanged = false;
+
+            var eventHandler = ConnectionChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
             }
         }
 

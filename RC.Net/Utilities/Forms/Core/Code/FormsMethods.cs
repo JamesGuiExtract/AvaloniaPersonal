@@ -843,7 +843,7 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <param name="control">The root of all <see cref="Control"/>s to be returned.</param>
         /// <returns>The enumeration of all <see cref="Control"/>s.</returns>
-        static IEnumerable<Control> GetAllControls(Control control)
+        public static IEnumerable<Control> GetAllControls(Control control)
         {
             yield return control;
 
@@ -1006,6 +1006,17 @@ namespace Extract.Utilities.Forms
         public static Control GetFocusedControl(this ContainerControl containerControl)
         {
             return FormsMethods.GetFocusedControl(containerControl);
+        }
+
+        /// <summary>
+        /// Gets an enumeration of <see paramref="control"/> and all child controls in order of
+        /// <see cref="Control.TabIndex"/>.
+        /// </summary>
+        /// <param name="form">The <see cref="Form"/> for which all controls are needed.</param>
+        /// <returns>The enumeration of all <see cref="Control"/>s.</returns>
+        public static IEnumerable<Control> GetAllControls(this Form form)
+        {
+            return FormsMethods.GetAllControls(form);
         }
     }
 

@@ -4457,8 +4457,6 @@ namespace Extract.DataEntry
         /// </summary>
         void InitializeSmartTagManager()
         {
-            DbCommand queryCommand = null;
-
             try
             {
                 // DataEntry SmartTags require a database connection.
@@ -4474,9 +4472,8 @@ namespace Extract.DataEntry
                 }
 
                 // DataEntry SmartTags require a 'SmartTag' table.
-                queryCommand = DBMethods.CreateDBCommand(_dbConnection,
-                        "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SmartTag'", null);
-                string[] queryResults = DBMethods.ExecuteDBQuery(queryCommand, "\t");
+                string[] queryResults = DBMethods.GetQueryResultsAsStringArray(_dbConnection,
+                    "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SmartTag'");
                 if (queryResults.Length == 0)
                 {
                     if (_smartTagManager != null)
@@ -4488,12 +4485,9 @@ namespace Extract.DataEntry
                     return;
                 }
 
-
                 // Retrieve the smart tags...
-                queryCommand.Dispose();
-                queryCommand = DBMethods.CreateDBCommand(
-                        _dbConnection, "SELECT TagName, TagValue FROM [SmartTag]", null);
-                queryResults = DBMethods.ExecuteDBQuery(queryCommand, "\t");
+                queryResults = DBMethods.GetQueryResultsAsStringArray(_dbConnection,
+                    "SELECT TagName, TagValue FROM [SmartTag]");
 
                 // And put them into a dictionary that the SmartTagManager can use
                 Dictionary<string, string> smartTags = new Dictionary<string, string>();
@@ -4521,13 +4515,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28902", ex);
-            }
-            finally
-            {
-                if (queryCommand != null)
-                {
-                    queryCommand.Dispose();
-                }
             }
         }
 

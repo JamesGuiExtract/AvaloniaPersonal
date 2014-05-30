@@ -494,7 +494,7 @@ namespace Extract.AttributeFinder.Rules
             using (DbConnection dbConnection = string.IsNullOrWhiteSpace(
                     _databaseConnectionControl.DatabaseConnectionInfo.ConnectionString)
                 ? null
-                : _databaseConnectionControl.DatabaseConnectionInfo.OpenConnection())
+                : _databaseConnectionControl.DatabaseConnectionInfo.OpenConnection(true))
             {
                 AttributeStatusInfo.InitializeForQuery(sourceAttributes,
                     firstAttribute.Value.SourceDocName, dbConnection, null);

@@ -169,13 +169,9 @@ namespace Extract.DataEntry
                 {
                     DateTime startTime = DateTime.Now;
 
-                    // Create a database command using the query.
-                    using (DbCommand dbCommand = DBMethods.CreateDBCommand(
-                        DatabaseConnection, sqlQuery.ToString(), parameters))
-                    {
-                        // Execute the query.
-                        queryResults = DBMethods.ExecuteDBQuery(dbCommand, ", ");
-                    }
+                    // Execute the query.
+                    queryResults = DBMethods.GetQueryResultsAsStringArray(
+                        DatabaseConnection, sqlQuery.ToString(), parameters, ", ");
 
                     if (AllowCaching && !FlushCache)
                     {
