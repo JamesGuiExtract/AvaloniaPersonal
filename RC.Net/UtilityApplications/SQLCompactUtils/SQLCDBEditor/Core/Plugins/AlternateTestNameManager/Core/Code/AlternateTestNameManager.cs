@@ -339,7 +339,7 @@ namespace Extract.SQLCDBEditor.Plugins
                             "UPDATE [CandidateAlternateTestName] " +
                             "SET [Ignore] = 1 " +
                             "WHERE [TestCode] = @TestCode AND [Name] = @Name",
-                            parameters, "");
+                            parameters);
 
                         _pluginManager.RefreshQueryResults();
 
@@ -409,7 +409,7 @@ namespace Extract.SQLCDBEditor.Plugins
                     parameters.Add("@TestCode", testCode);
                     parameters.Add("@Name", name);
 
-                    string[] examples = DBMethods.ExecuteDBQuery(_connection,
+                    string[] examples = DBMethods.GetQueryResultsAsStringArray(_connection,
                         "SELECT [Filename], [Page], [StartX], [StartY], [EndX], [EndY], [Height] " +
                             "FROM [CandidateAlternateTestName] " +
                             "WHERE [TestCode] = @TestCode and [Name] = @Name", parameters, "|");
