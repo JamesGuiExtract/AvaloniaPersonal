@@ -286,11 +286,11 @@ namespace Extract.SQLCDBEditor.Plugins
 
                         DBMethods.ExecuteDBQuery(_connection,
                             "INSERT INTO [AlternateTestName] ([TestCode], [Name]) VALUES " +
-                                "(@TestCode, @Name)", parameters, "");
+                                "(@TestCode, @Name)", parameters);
 
                         DBMethods.ExecuteDBQuery(_connection,
                             "DELETE FROM [CandidateAlternateTestName] " +
-                            "WHERE [TestCode] = @TestCode AND [Name] = @Name", parameters, "");
+                            "WHERE [TestCode] = @TestCode AND [Name] = @Name", parameters);
 
                         _pluginManager.RefreshQueryResults();
 
