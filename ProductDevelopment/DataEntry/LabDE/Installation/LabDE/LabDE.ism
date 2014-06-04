@@ -3815,11 +3815,11 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>NewShortcut1</td><td>newfolder2</td><td>##ID_STRING15##</td><td>Help</td><td>[INSTALLDIR]SQLCDBEditor</td><td>"[EXTRACT_SYSTEMS_COMMON_APP_DATA]ESFAMService\ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut1</td><td>newfolder2</td><td>##ID_STRING15##</td><td>Help</td><td>[COMMON_COMPONENTS]SQLCDBEditor.exe</td><td>"[EXTRACT_SYSTEMS_COMMON_APP_DATA]ESFAMService\ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut10</td><td>newfolder1</td><td>##ID_STRING12##</td><td>Help</td><td>[COMMON_COMPONENTS]UserLicense.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut11</td><td>newfolder1</td><td>##ID_STRING13##</td><td>Help</td><td>[COMMON_COMPONENTS]USBLicenseKeyManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut12</td><td>newfolder2</td><td>##ID_STRING16##</td><td>Help</td><td>[INSTALLDIR]PaginationUtility.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut13</td><td>newfolder2</td><td>##ID_STRING17##</td><td>Help</td><td>[INSTALLDIR]FAMFileInspector.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut12</td><td>newfolder2</td><td>##ID_STRING16##</td><td>Help</td><td>[COMMON_COMPONENTS]PaginationUtility.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut13</td><td>newfolder2</td><td>##ID_STRING17##</td><td>Help</td><td>[COMMON_COMPONENTS]FAMFileInspector.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut14</td><td>newfolder2</td><td>##ID_STRING18##</td><td>Help</td><td>[COMMON_COMPONENTS]EmailFile</td><td>/c</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut15</td><td>newfolder2</td><td>##ID_STRING19##</td><td>Help</td><td>[COMMON_COMPONENTS]ConvertFPSFile.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut16</td><td>newfolder2</td><td>##ID_STRING20##</td><td>Help</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
@@ -3832,7 +3832,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut5</td><td>newfolder2</td><td>##ID_STRING7##</td><td>Help</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut6</td><td>newfolder2</td><td>##ID_STRING8##</td><td>Help</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut7</td><td>newfolder1</td><td>##ID_STRING9##</td><td>Help</td><td>[LABDE_HELP]LabDE.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut8</td><td>newfolder1</td><td>##ID_STRING10##</td><td>Help</td><td>[COMMON_COMPONENTS]processfiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut8</td><td>newfolder1</td><td>##ID_STRING10##</td><td>Help</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut9</td><td>newfolder1</td><td>##ID_STRING11##</td><td>Help</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
 
