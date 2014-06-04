@@ -432,53 +432,31 @@ namespace Extract.FileActionManager.Conditions
         {
             try
             {
-                // If there are invalid settings, prompt and return without closing.
-                if (WarnIfInvalid())
-                {
-                    return;
-                }
+                bool schemaAvailable = _schemaInfoUpdateComplete.WaitOne(0);
 
-                // Apply the UI values to the Settings instance.
-                Settings.UseFAMDBConnection = _useFAMDbRadioButton.Checked;
-                Settings.DatabaseConnectionInfo =
-                    new DatabaseConnectionInfo(_databaseConnectionControl.DatabaseConnectionInfo);
-                Settings.UseQuery = _tableOrQueryComboBox.SelectedIndex == 1;
-                Settings.Table = _tableComboBox.Text;
-                Settings.Query = _queryTextBox.Text;
-                Settings.CheckFields = _checkFieldsRadioButton.Checked;
-                if (Settings.CheckFields)
+                // If schema info is in the process of being updated, wait for the update to
+                // complete so that we can use it for validation of the settings.
+                if (schemaAvailable)
                 {
-                    Settings.RowCountCondition = _checkFieldsRowCountComboBox.ToEnumValue<
-                        DatabaseContentsConditionRowCount>();
+                    ApplySettings(true);
                 }
                 else
                 {
-                    Settings.RowCountCondition = _doNotCheckFieldsRowCountComboBox.ToEnumValue<
-                        DatabaseContentsConditionRowCount>();
+                    ThreadingMethods.RunInBackgroundThread("ELI36998", () =>
+                    {
+                        // Convert seconds to milliseconds for the wait
+                        bool updateCompleted =
+                            _schemaInfoUpdateComplete.WaitOne(_SCHEMA_UPDATE_TIMEOUT * 1000);
+                        this.SafeBeginInvoke("ELI36999", () => ApplySettings(updateCompleted));
+                    });
+
+                    Enabled = false;
+                    return;
                 }
-                Settings.SearchModifier =
-                    _searchModifierComboBox.ToEnumValue<DatabaseContentsConditionSearchModifier>();
-
-                IUnknownVector searchFields = new IUnknownVector();
-                foreach (var row in _fieldsDataGridView.Rows.OfType<DataGridViewRow>()
-                    .Where(row => !row.IsNewRow))
-                {
-                    IVariantVector fieldVector = new VariantVector();
-                    fieldVector.PushBack((row.Cells[0].Value ?? "").ToString());
-                    fieldVector.PushBack((row.Cells[1].Value ?? "").ToString());
-                    fieldVector.PushBack((bool)(row.Cells[2].Value ?? false));
-                    fieldVector.PushBack((bool)(row.Cells[3].Value ?? false));
-
-                    searchFields.PushBack(fieldVector);
-                }
-
-                Settings.SearchFields = searchFields;
-
-                DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI36965");
+                ex.ExtractDisplay("ELI36997");
             }
         }
 
@@ -1271,19 +1249,79 @@ namespace Extract.FileActionManager.Conditions
         }
 
         /// <summary>
+        /// Applies the options configured in the UI to the <see cref="Settings"/>.
+        /// </summary>
+        /// <param name="schemaAvailable"><see langword="true"/> if schema info from the DB/query
+        /// have been gathered and should be used to validate the settings; otherwise,
+        /// <see langword="false"/></param>
+        void ApplySettings(bool schemaAvailable)
+        {
+            try
+            {
+                Enabled = true;
+
+                // If there are invalid settings, prompt and return without closing.
+                if (WarnIfInvalid(schemaAvailable))
+                {
+                    return;
+                }
+
+                // Apply the UI values to the Settings instance.
+                Settings.UseFAMDBConnection = _useFAMDbRadioButton.Checked;
+                Settings.DatabaseConnectionInfo =
+                    new DatabaseConnectionInfo(_databaseConnectionControl.DatabaseConnectionInfo);
+                Settings.UseQuery = _tableOrQueryComboBox.SelectedIndex == 1;
+                Settings.Table = _tableComboBox.Text;
+                Settings.Query = _queryTextBox.Text;
+                Settings.CheckFields = _checkFieldsRadioButton.Checked;
+                if (Settings.CheckFields)
+                {
+                    Settings.RowCountCondition = _checkFieldsRowCountComboBox.ToEnumValue<
+                        DatabaseContentsConditionRowCount>();
+                }
+                else
+                {
+                    Settings.RowCountCondition = _doNotCheckFieldsRowCountComboBox.ToEnumValue<
+                        DatabaseContentsConditionRowCount>();
+                }
+                Settings.SearchModifier =
+                    _searchModifierComboBox.ToEnumValue<DatabaseContentsConditionSearchModifier>();
+
+                IUnknownVector searchFields = new IUnknownVector();
+                foreach (var row in _fieldsDataGridView.Rows.OfType<DataGridViewRow>()
+                    .Where(row => !row.IsNewRow))
+                {
+                    IVariantVector fieldVector = new VariantVector();
+                    fieldVector.PushBack((row.Cells[0].Value ?? "").ToString());
+                    fieldVector.PushBack((row.Cells[1].Value ?? "").ToString());
+                    fieldVector.PushBack((bool)(row.Cells[2].Value ?? false));
+                    fieldVector.PushBack((bool)(row.Cells[3].Value ?? false));
+
+                    searchFields.PushBack(fieldVector);
+                }
+
+                Settings.SearchFields = searchFields;
+
+                DialogResult = DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36965");
+            }
+        }
+
+        /// <summary>
         /// Displays a warning message if the user specified settings are invalid.
         /// </summary>
+        /// <param name="schemaAvailable"><see langword="true"/> if schema info from the DB/query
+        /// have been gathered and should be used to validate the settings; otherwise,
+        /// <see langword="false"/></param>
         /// <returns><see langword="true"/> if the settings are invalid; <see langword="false"/> if
         /// the settings are valid.</returns>
-        bool WarnIfInvalid()
+        bool WarnIfInvalid(bool schemaAvailable)
         {
             ExtractException.Assert("ELI36977",
                 "Query condition settings have not been provided.", Settings != null);
-
-            // If schema info is in the process of being updated, wait for the update to complete
-            // so that we can use it for validation of the settings. (Convert seconds to
-            // milliseconds for the wait)
-            bool canCheckSchema = _schemaInfoUpdateComplete.WaitOne(_SCHEMA_UPDATE_TIMEOUT * 1000);
 
             // Validate than a database has been specified.
             if (_specifiedDbRadioButton.Checked &&
@@ -1321,7 +1359,7 @@ namespace Extract.FileActionManager.Conditions
             }
 
             // Validate than a valid table name has been specified (if possible).
-            if (canCheckSchema && !useQuery && _tableComboBox.Items.Count > 0 &&
+            if (schemaAvailable && !useQuery && _tableComboBox.Items.Count > 0 &&
                 !_tableComboBox.Items
                     .OfType<string>()
                     .Any(name =>
@@ -1377,7 +1415,7 @@ namespace Extract.FileActionManager.Conditions
                         return true;
                     }
 
-                    if (canCheckSchema && _fieldNames != null && _fieldNames.Length > 0)
+                    if (schemaAvailable && _fieldNames != null && _fieldNames.Length > 0)
                     {
                         string stringValue = cell.Value.ToString();
                         int ordinal;

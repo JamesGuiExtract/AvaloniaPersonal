@@ -536,7 +536,7 @@ namespace Extract.FileActionManager.Utilities
             usage.AppendLine();
             usage.AppendLine("/status <statusName>: The target status when limiting the " +
                 "initial file selection based on a file action status condition. Must be used " +
-                "in conjuntion with the /status argument.");
+                "in conjuntion with the /action argument.");
             usage.AppendLine();
             usage.AppendLine("/query <queryFileName>: An file containing an SQL query to be " +
                 "used to limit the initial file selection.");

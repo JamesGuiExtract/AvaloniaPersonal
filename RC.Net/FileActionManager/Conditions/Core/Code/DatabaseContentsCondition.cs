@@ -1260,14 +1260,15 @@ namespace Extract.FileActionManager.Conditions
             {
                 // DatabaseContentsConditionSettingsDialog will provide more detailed validation
                 // of the settings. This call only ensures the basic settings are in place.
-                if (!UseFAMDBConnection && DatabaseConnectionInfo.DataProvider == null ||
-                    string.IsNullOrWhiteSpace(DatabaseConnectionInfo.ConnectionString))
+                if (!UseFAMDBConnection &&
+                    (DatabaseConnectionInfo.DataProvider == null ||
+                    string.IsNullOrWhiteSpace(DatabaseConnectionInfo.ConnectionString)))
                 {
                     return false;
                 }
 
-                if ((UseQuery && string.IsNullOrWhiteSpace(Table)) ||
-                    (!UseQuery && string.IsNullOrWhiteSpace(Query)))
+                if ((UseQuery && string.IsNullOrWhiteSpace(Query)) ||
+                    (!UseQuery && string.IsNullOrWhiteSpace(Table)))
                 {
                     return false;
                 }
