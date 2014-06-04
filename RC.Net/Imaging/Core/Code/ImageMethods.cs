@@ -4,6 +4,7 @@ using Extract.Utilities;
 using Leadtools;
 using Leadtools.ImageProcessing;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -34,6 +35,13 @@ namespace Extract.Imaging
 #endif
 
         #endregion Constants
+
+        /// <summary>
+        /// <see cref="ColorResolutionCommand"/> instances for each BitsPerPixel value a caller of
+        /// <see cref="ConvertBitsPerPixel"/> has needed to convert to.
+        /// </summary>
+        static Dictionary<int, ColorResolutionCommand> _bitsPerPixelConversionCommands =
+            new Dictionary<int, ColorResolutionCommand>();
 
         /// <overloads>Generates a thumbnail of a specified scale size from a specified
         /// original image.</overloads>
@@ -790,6 +798,34 @@ namespace Extract.Imaging
                 throw ex.AsExtract("ELI35640");
             }
         }
+
+        /// <summary>
+        /// Converts the bits-per-pixel of the specified <see cref="RasterImage"/> to a new value.
+        /// </summary>
+        /// <param name="image">The <see cref="RasterImage"/> to convert.</param>
+        /// <param name="bitsPerPixel">The new bits-per-pixel.</param>
+        public static void ConvertBitsPerPixel(RasterImage image, int bitsPerPixel)
+        {
+            try
+            {
+                ColorResolutionCommand colorConversionCommand = null;
+                if (!_bitsPerPixelConversionCommands.TryGetValue(bitsPerPixel, out colorConversionCommand))
+                {
+                    colorConversionCommand = new ColorResolutionCommand();
+                    colorConversionCommand.Mode = ColorResolutionCommandMode.InPlace;
+                    colorConversionCommand.BitsPerPixel = bitsPerPixel;
+                    colorConversionCommand.DitheringMethod = RasterDitheringMethod.FloydStein;
+                    colorConversionCommand.PaletteFlags = ColorResolutionCommandPaletteFlags.Fixed;
+                    _bitsPerPixelConversionCommands[bitsPerPixel] = colorConversionCommand;
+                }
+
+                colorConversionCommand.Run(image);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37000");
+            }
+        }
     }
 
     /// <summary>
@@ -870,6 +906,16 @@ namespace Extract.Imaging
             {
                 throw ex.AsExtract("ELI32179");
             }
+        }
+
+        /// <summary>
+        /// Converts the bits-per-pixel of the specified <see cref="RasterImage"/> to a new value.
+        /// </summary>
+        /// <param name="image">The <see cref="RasterImage"/> to convert.</param>
+        /// <param name="bitsPerPixel">The new bits-per-pixel.</param>
+        public static void ConvertBitsPerPixel(this RasterImage image, int bitsPerPixel)
+        {
+            ImageMethods.ConvertBitsPerPixel(image, bitsPerPixel);
         }
     }
 }

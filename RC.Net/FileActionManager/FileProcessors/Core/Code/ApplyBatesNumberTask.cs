@@ -726,6 +726,16 @@ namespace Extract.FileActionManager.FileProcessors
                     // Load the image page
                     image = reader.ReadPage(pageNumber);
 
+                    // https://extract.atlassian.net/browse/ISSUE-12168
+                    // To avoid an error from RasterImagePainter.CreateGraphics below, the image
+                    // must first be converted to 24 bits-per-pixel.
+                    int? originalBitsPerPixel = null;
+                    if (image.BitsPerPixel != 24)
+                    {
+                        originalBitsPerPixel = image.BitsPerPixel;
+                        image.ConvertBitsPerPixel(24);
+                    }
+
                     // Compute the anchor point for the text
                     Point anchorPoint = GetAnchorPoint(_format.PageAnchorAlignment,
                         _format.HorizontalInches, _format.VerticalInches, image);
@@ -767,6 +777,12 @@ namespace Extract.FileActionManager.FileProcessors
                     // Draw the Bates number on the image
                     DrawingMethods.DrawString(batesNumber, rg.Graphics,
                         rg.Graphics.Transform, pixelFont, 0, 0F, bounds, null, null);
+
+                    // Restore the original bit-depth.
+                    if (originalBitsPerPixel.HasValue)
+                    {
+                        image.ConvertBitsPerPixel(originalBitsPerPixel.Value);
+                    }
 
                     // Save the image page (use append to add it to the end of the file)
                     writer.AppendImage(image);

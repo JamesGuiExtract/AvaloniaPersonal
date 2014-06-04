@@ -434,14 +434,18 @@ namespace Extract.FileActionManager.Conditions
             {
                 bool schemaAvailable = _schemaInfoUpdateComplete.WaitOne(0);
 
-                // If schema info is in the process of being updated, wait for the update to
-                // complete so that we can use it for validation of the settings.
                 if (schemaAvailable)
                 {
                     ApplySettings(true);
                 }
                 else
                 {
+                    // If schema info is in the process of being updated, wait for the update to
+                    // complete so that we can use it for validation of the settings. This wait must
+                    // happen on another thread which invokes ApplySettings on this UI thread when
+                    // complete because _schemaInfoUpdateComplete is set in the BackgroundWorker
+                    // RunWorkerCompleted event handler which also needs to run in the UI thread
+                    // (and thus would be blocked if we waited on this thread).
                     ThreadingMethods.RunInBackgroundThread("ELI36998", () =>
                     {
                         // Convert seconds to milliseconds for the wait
@@ -450,6 +454,9 @@ namespace Extract.FileActionManager.Conditions
                         this.SafeBeginInvoke("ELI36999", () => ApplySettings(updateCompleted));
                     });
 
+                    // Disable the UI while waiting for the schema info update to complete so that
+                    // the user doesn't change anything or click OK again before ApplySettings gets
+                    // invoked.
                     Enabled = false;
                     return;
                 }
@@ -1258,6 +1265,9 @@ namespace Extract.FileActionManager.Conditions
         {
             try
             {
+                // In case we had been waiting on a schema update operation, the UI would have been
+                // disabled. Re-enable it now so that if there are validation errors that prevent
+                // applying the settings they are able to use the UI.
                 Enabled = true;
 
                 // If there are invalid settings, prompt and return without closing.
