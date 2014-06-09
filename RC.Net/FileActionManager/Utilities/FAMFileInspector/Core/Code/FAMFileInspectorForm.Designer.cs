@@ -866,7 +866,7 @@
             this._zoomLevelToolStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this._zoomLevelToolStripStatusLabel.ImageViewer = null;
             this._zoomLevelToolStripStatusLabel.Name = "_zoomLevelToolStripStatusLabel";
-            this._zoomLevelToolStripStatusLabel.Size = new System.Drawing.Size(50, 19);
+            this._zoomLevelToolStripStatusLabel.Size = new System.Drawing.Size(80, 19);
             this._zoomLevelToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _resolutionToolStripStatusLabel

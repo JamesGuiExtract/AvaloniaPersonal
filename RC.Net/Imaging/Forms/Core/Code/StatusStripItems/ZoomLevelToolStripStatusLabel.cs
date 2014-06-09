@@ -70,7 +70,7 @@ namespace Extract.Imaging.Forms
 
                 // Set the label to fixed width and the text alignment to right
                 base.AutoSize = false;
-                base.Width = 50;
+                base.Width = 80;
                 base.TextAlign = ContentAlignment.MiddleLeft;
             }
             catch (Exception ex)
@@ -95,9 +95,12 @@ namespace Extract.Imaging.Forms
             }
             else
             {
+                NumberFormatInfo format =
+                    new CultureInfo(CultureInfo.InvariantCulture.LCID).NumberFormat;
+                format.PercentGroupSeparator = "";
+
                 // Set the text based on the current zoom level of the open image
-                base.Text = string.Format(CultureInfo.CurrentCulture, "{0:P0}",
-                    _imageViewer.ScaleFactor);
+                base.Text = string.Format(format, "Zoom: {0:P0}", _imageViewer.ScaleFactor);
             }
         }
 

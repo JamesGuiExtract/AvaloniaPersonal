@@ -6,6 +6,8 @@
 #include <UCLIDException.h>
 #include <COMUtils.h>
 #include <StringCSIS.h>
+#include <Misc.h>
+#include <CommentedTextFileReader.h>
 
 #include <list>
 #include <stack>
@@ -70,6 +72,12 @@ const string gstrFUNC_PAD_VALUE_PARAMS = "source, character, length";
 
 const string gstrFUNC_RANDOM_ALPHA_NUMERIC = "RandomAlphaNumeric";
 const string gstrFUNC_RANDOM_ALPHA_NUMERIC_PARAMS = "num digits";
+
+const string gstrFUNC_RANDOM_ENTRY_FROM_LIST_FILE = "RandomEntryFromListFile";
+const string gstrFUNC_RANDOM_ENTRY_FROM_LIST_FILE_PARAMS = "filename";
+
+const string gstrFUNC_RANDOM_ENTRY_FROM_LIST = "RandomEntryFromList";
+const string gstrFUNC_RANDOM_ENTRY_FROM_LIST_PARAMS = "item, item, ...";
 
 const string gstrFUNC_REPLACE = "Replace";
 const string gstrFUNC_REPLACE_PARAMS = "source, search, replacement";
@@ -139,6 +147,12 @@ TextFunctionExpander::TextFunctionExpander()
 			g_mapParameters[gstrFUNC_PROCESS_ID] = gstrFUNC_PROCESS_ID_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_RANDOM_ALPHA_NUMERIC);
 			g_mapParameters[gstrFUNC_RANDOM_ALPHA_NUMERIC] = gstrFUNC_RANDOM_ALPHA_NUMERIC_PARAMS;
+			// So that "RandomEntryFromList" is not found as part of "RandomEntryFromListFile",
+			// "RandomEntryFromListFile" must come first in this list.
+			g_vecFunctions.push_back(gstrFUNC_RANDOM_ENTRY_FROM_LIST_FILE);
+			g_mapParameters[gstrFUNC_RANDOM_ENTRY_FROM_LIST_FILE] = gstrFUNC_RANDOM_ENTRY_FROM_LIST_FILE_PARAMS;
+			g_vecFunctions.push_back(gstrFUNC_RANDOM_ENTRY_FROM_LIST);
+			g_mapParameters[gstrFUNC_RANDOM_ENTRY_FROM_LIST] = gstrFUNC_RANDOM_ENTRY_FROM_LIST_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_REPLACE);
 			g_mapParameters[gstrFUNC_REPLACE] = gstrFUNC_REPLACE_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_RIGHT);
@@ -373,6 +387,14 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 					else if (currentScope.strFunction == gstrFUNC_RANDOM_ALPHA_NUMERIC)
 					{
 						strFuncResult += expandRandomAlphaNumeric(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_RANDOM_ENTRY_FROM_LIST_FILE)
+					{
+						strFuncResult += expandRandomEntryFromListFile(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_RANDOM_ENTRY_FROM_LIST)
+					{
+						strFuncResult += expandRandomEntryFromList(currentScope.vecExpandedArgs);
 					}
 					else if (currentScope.strFunction == gstrFUNC_USER_NAME)
 					{
@@ -870,6 +892,56 @@ const string TextFunctionExpander::expandRandomAlphaNumeric(const string &str) c
 
 	// Return a random string of nLength containing only upper case letters and digits
 	return ms_Rand.getRandomString(nLength, true, false, true);
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandRandomEntryFromList(vector<string>& vecParameters) const
+{
+	if (vecParameters.size() < 2)
+	{
+		throw UCLIDException("ELI37006", "RandomEntryFromList function requires at least two values.");
+	}
+
+	try
+	{
+		try
+		{
+			long index = ms_Rand.uniform(vecParameters.size());
+			return vecParameters[index];
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37007");
+	}
+	catch(UCLIDException &ue)
+	{
+		UCLIDException uex("ELI37008",
+			"Unable to parse random entry from file list.", ue);
+		throw uex;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandRandomEntryFromListFile(const string &str) const
+{
+	if (str.empty())
+	{
+		throw UCLIDException("ELI37003", "RandomEntryFromListFile function requires a filename.");
+	}
+
+	try
+	{
+		try
+		{
+			vector<string> vecLines = convertFileToLines(str);
+			
+			long index = ms_Rand.uniform(vecLines.size());
+			return vecLines[index];
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37005");
+	}
+	catch(UCLIDException &ue)
+	{
+		UCLIDException uex("ELI37004",
+			"Unable to parse random entry from file list.", ue);
+		throw uex;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandUserName(const string& str) const

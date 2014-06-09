@@ -94,6 +94,8 @@ private:
 	const string expandEnv(const string& str) const;
 	const string expandNow(const string& str) const;
 	const string expandRandomAlphaNumeric(const string& str) const;
+	const string expandRandomEntryFromList(vector<string>& vecParameters) const;
+	const string expandRandomEntryFromListFile(const string &str) const;
 	const string expandUserName(const string& str) const;
 	const string expandFullUserName(const string& str) const;
 	const string expandTrimAndConsolidateWS(const string& str) const;
