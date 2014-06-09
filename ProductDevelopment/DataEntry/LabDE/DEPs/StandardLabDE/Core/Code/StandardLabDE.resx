@@ -217,9 +217,10 @@
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
 			</value>
   </data>
-  <metadata name="_testName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="_testName.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_testName.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE EpicCode = SUBSTRING(&lt;Attribute&gt;../EpicCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;</value>
@@ -240,12 +241,12 @@
 	&lt;MissingTests/&gt;
 &lt;/Query&gt;</value>
   </data>
-  <metadata name="_orderCode.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_orderCode.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_componentDate.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_componentDate.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_componentDate.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;&lt;Expression&gt;
 	(&lt;Expression Name='Value'&gt;
@@ -310,9 +311,9 @@
 		: '' 
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
-  <metadata name="_componentName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_componentName.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_componentName.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND LabTest.TestCode = SUBSTRING(&lt;Attribute&gt;TestCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest, AlternateTestName, LabOrderTest WHERE LabTest.TestCode = AlternateTestName.TestCode AND LabTest.TestCode = LabOrderTest.TestCode AND LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND AlternateTestName.Name = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,50)&lt;/SQL&gt;&lt;/Query&gt;
@@ -321,24 +322,24 @@
   <data name="_componentName.ValidationQuery" xml:space="preserve">
     <value>&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.OfficialName&lt;/SQL&gt;</value>
   </data>
-  <metadata name="_testCode.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_testCode.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_testCode.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25) AND OfficialName = SUBSTRING(&lt;Attribute&gt;..&lt;/Attribute&gt;,1,255)&lt;/SQL&gt;</value>
   </data>
   <data name="_testCode.ValidationQuery" xml:space="preserve">
     <value>&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.TestCode&lt;/SQL&gt;</value>
   </data>
-  <metadata name="_componentValue.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_componentValue.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_componentUnits.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_componentUnits.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_componentRefRange.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_componentRefRange.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_componentRefRange.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;&lt;RegEx Pattern='(?&amp;lt;=^\s*\[)[\s\S]*(?=\]\s*$)'&gt;&lt;Attribute Name='Range'&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;RegEx Pattern='(?&amp;lt;=^\s*\()[\s\S]*(?=\)\s*$)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;&lt;/Query&gt;
@@ -352,11 +353,11 @@
 	&lt;Expression Name='Value'&gt;
 		(&lt;Attribute&gt;../Value&lt;/Attribute&gt; matches '(?i)\bPOS(ITIVE)?\b') ? '&amp;gt;0'
 		: (&lt;Attribute&gt;../Value&lt;/Attribute&gt; matches '(?i)\bNEG(ATIVE)?\b') ? '0'
-		: &lt;RegEx Pattern='^[\s&amp;gt;&amp;lt;/=]{0,5}?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+$|^\s*(((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+-?){2}\s*$'&gt;
+		: &lt;RegEx Pattern='^([\s&amp;gt;&amp;lt;]{0,3}(/|OR)?[\s=]{0,3})?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+$|^\s*(((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+-?){2}\s*$'&gt;
 			&lt;Attribute&gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace(' ','')
 	&lt;/Expression&gt;
 	&lt;!--Attempt to parse the minimum value as a value that may be equal--&gt;
-	&lt;RegEx Name='TempValueMin' Pattern='(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?&amp;lt;=&amp;gt;/?=)[\d\.]+)'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='TempValueMin' Pattern='(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?&amp;lt;=&amp;gt;(/|OR)?=)[\d\.]+)'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
 	&lt;!--Bias 0 = must be less than, Bias 1 = may be equal to, Bias 2 = must be greater than--&gt;
 	&lt;Expression Name='ValueMinBias'&gt;(&lt;TempValueMin/&gt; == '') ? 2 : 1&lt;/Expression&gt;
 	&lt;!--If not parsed as a value that may be equal, parse as one that must be greater--&gt;
@@ -365,7 +366,7 @@
 		: &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;)[\d\.]+'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
 	&lt;/Expression&gt;
 	&lt;!--Attempt to parse the maximum value as a value that may be equal--&gt;
-	&lt;RegEx Name='TempValueMax' Pattern='(^([\d\.]+)$)|((?&amp;lt;=\d+-)[\d\.]+)|((?&amp;lt;=&amp;lt;/?=)[\d\.]+)'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='TempValueMax' Pattern='(^([\d\.]+)$)|((?&amp;lt;=\d+-)[\d\.]+)|((?&amp;lt;=&amp;lt;(/|OR)?=)[\d\.]+)'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
 	&lt;!--Bias 0 = must be less than, Bias 1 = may be equal to, Bias 2 = must be greater than--&gt;
 	&lt;Expression Name='ValueMaxBias'&gt;(&lt;TempValueMax/&gt; == '') ? 0 : 1&lt;/Expression&gt;
 	&lt;!--If not parsed as a value that may be equal, parse as one that must be less--&gt;
@@ -378,11 +379,11 @@
 	&lt;Expression Name='Range'&gt;
 		(&lt;Attribute&gt;../Range&lt;/Attribute&gt; matches '(?i)\bPOS(ITIVE)?\b') ? '&amp;gt;0'
 		: (&lt;Attribute&gt;../Range&lt;/Attribute&gt; matches '(?i)\bNEG(ATIVE)?\b') ? '0'
-		: &lt;RegEx Pattern='^[\s&amp;gt;&amp;lt;/=]{0,5}?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+$|^\s*(((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+-?){2}\s*$'&gt;
+		: &lt;RegEx Pattern='^([\s&amp;gt;&amp;lt;]{0,3}(/|OR)?[\s=]{0,3})?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+$|^\s*(((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+-?){2}\s*$'&gt;
 			&lt;Attribute&gt;../Range&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace(' ','')
 	&lt;/Expression&gt;
 	&lt;!--Attempt to parse the minimum range as a value that may be equal--&gt;
-	&lt;RegEx Name='TempRangeMin' Pattern='(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?&amp;lt;=&amp;gt;/?=)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='TempRangeMin' Pattern='(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?&amp;lt;=&amp;gt;(/|OR)?=)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
 	&lt;!--Bias 0 = must be less than, Bias 1 = may be equal to, Bias 2 = must be greater than--&gt;
 	&lt;Expression Name='RangeMinBias'&gt;(&lt;TempRangeMin/&gt; == '') ? 2 : 1&lt;/Expression&gt;
 	&lt;!--If not parsed as a value that may be equal, parse as one that must be greater--&gt;
@@ -391,7 +392,7 @@
 		: &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;)[\d\.]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
 	&lt;/Expression&gt;
 	&lt;!--Attempt to parse the maximum value as a value that may be equal--&gt;
-	&lt;RegEx Name='TempRangeMax' Pattern='(^([\d\.]+)$)|((?&amp;lt;=\d+-)[\d\.]+)|((?&amp;lt;=&amp;lt;/?=)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='TempRangeMax' Pattern='(^([\d\.]+)$)|((?&amp;lt;=\d+-)[\d\.]+)|((?&amp;lt;=&amp;lt;(/|OR)?=)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
 	&lt;!--Bias 0 = must be less than, Bias 1 = may be equal to, Bias 2 = must be greater than--&gt;
 	&lt;Expression Name='RangeMaxBias'&gt;(&lt;TempRangeMax/&gt; == '') ? 0 : 1&lt;/Expression&gt;
 	&lt;!--If not parsed as a value that may be equal, parse as one that must be less--&gt;
@@ -459,33 +460,33 @@
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <metadata name="_componentOriginalName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_componentOriginalName.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_epicPatientFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_epicPatientFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_epicPatientMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_epicPatientMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_epicPatientLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_epicPatientLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_epicPatientSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_epicPatientSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_patientFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_patientFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_patientMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_patientMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_patientLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_patientLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_patientSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_patientSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_patientBirthDate.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Expression&gt;
 	(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt; matches '^\d{1,2}[-/\\]\d{1,2}[-/\\](\d{2}|\d{4})$')
@@ -517,36 +518,36 @@
 		&lt;/Expression&gt;
 &lt;/Expression&gt;</value>
   </data>
-  <metadata name="_orderingPhysicianLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_orderingPhysicianLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_orderingPhysicianFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_orderingPhysicianFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_orderingPhysicianMiddleName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_orderingPhysicianMiddleName.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_orderingPhysicianCodeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_orderingPhysicianCodeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_orderingPhysicianCodeColumn.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%') ORDER BY Code&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
   <data name="_orderingPhysicianCodeColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%' ) ORDER BY Code&lt;/SQL&gt;</value>
   </data>
-  <metadata name="_physicianLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_physicianLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_physicianFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_physicianFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_physicianMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_physicianMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_physicianCode.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_physicianCode.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_physicianCode.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%') ORDER BY Code&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
