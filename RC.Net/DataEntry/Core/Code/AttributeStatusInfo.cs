@@ -675,9 +675,22 @@ namespace Extract.DataEntry
             {
                 if (EnableTrace)
                 {
-                    if (attribute != null)
+                    if (attribute == null)
                     {
-                        category += " [" + ((Control)GetOwningControl(attribute)).Name + "]";
+                        category += " [] ()";
+                    }
+                    else
+                    {
+                        Control owningControl = GetOwningControl(attribute) as Control;
+                        if (owningControl == null)
+                        {
+                            category += " []";
+                        }
+                        else
+                        {
+                            category += " [" + owningControl.Name + "]";
+                        }
+
                         category += " (" + attribute.Name + ")";
                     }
 

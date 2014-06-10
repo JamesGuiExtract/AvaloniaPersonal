@@ -689,6 +689,12 @@ namespace Extract.DataEntry
 
                 IUnknownVector results = RunFormattingRule(rule, inputText, attributeName);
 
+                AttributeStatusInfo.Trace("FormattingRuleResult", null,
+                    results
+                        .ToIEnumerable<IAttribute>()
+                        .Select(attribute => attribute.Value.String)
+                        .ToArray());
+
                 // Choose the appropriate resulting attribute based on selectionMode
                 int resultsCount = results.Size();
                 if (resultsCount > 0)
@@ -701,6 +707,8 @@ namespace Extract.DataEntry
                     {
                         return (IAttribute)results.At(resultsCount - 1);
                     }
+
+                    AttributeStatusInfo.Trace("FormattingRuleResult", null, "No result selected");
                 }
 
                 // No attribute could be found using the supplied parameters.

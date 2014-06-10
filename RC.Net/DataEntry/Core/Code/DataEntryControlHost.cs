@@ -4655,6 +4655,8 @@ namespace Extract.DataEntry
                 // complete.
                 ControlUpdateReferenceCount++;
 
+                AttributeStatusInfo.Trace("SwipedText", GetActiveAttribute(false), ocrText.String);
+
                 using (new TemporaryWaitCursor())
                 {
                     // If a swipe did not produce any results usable by the control,
@@ -7481,6 +7483,8 @@ namespace Extract.DataEntry
         /// <param name="message">The message to be displayed to the user.</param>
         void ShowUserNotificationTooltip(string message)
         {
+            AttributeStatusInfo.Trace("TooltipNotification", null, message);
+
             // Re-create the tooltip every time-- otherwise sometimes the text of the tooltip
             // doesn't seem to be properly updated and/or the tooltip will disappear really quickly.
             if (_userNotificationTooltip != null)
