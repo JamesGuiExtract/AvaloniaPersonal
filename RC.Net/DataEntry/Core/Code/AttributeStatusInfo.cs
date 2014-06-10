@@ -203,6 +203,11 @@ namespace Extract.DataEntry
         [ThreadStatic]
         static UndoManager _undoManager;
 
+        /// <summary>
+        /// Indicates whether trace statements will be output.
+        /// </summary>
+        static bool _enableTrace;
+
         #endregion static fields
 
         #region Instance fields
@@ -614,6 +619,81 @@ namespace Extract.DataEntry
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether trace statements will be output.
+        /// </summary>
+        /// <value><see langword="true"/> to output trace statements; otherwise, 
+        /// <see langword="false"/>.
+        /// </value>
+        public static bool EnableTrace
+        {
+            get
+            {
+                return _enableTrace;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _enableTrace)
+                    {
+                        if (value &&
+                            !LicenseUtilities.IsLicensed(LicenseIdName.RuleDevelopmentToolkitObjects))
+                        {
+                            var ee = new ExtractException("ELI37010",
+                                "An RDT license is required to enable trace.");
+                            ee.Log();
+                            return;
+                        }
+
+                        _enableTrace = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI37011");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Outputs <see paramref="traceLines"/> if tracing is enabled.
+        /// </summary>
+        /// <param name="category">The category <see paramref="traceLines"/> should be associated
+        /// with.</param>
+        /// <param name="attribute">The <see cref="IAttribute"/> the trace line pertains to.</param>
+        /// <param name="traceLines">The lines to output. If any specified line constains carriage
+        /// returns it will automatically be split into separate lines.</param>
+        [ComVisible(false)]
+        public static void Trace(string category, IAttribute attribute,
+            params string[] traceLines)
+        {
+            try
+            {
+                if (EnableTrace)
+                {
+                    if (attribute != null)
+                    {
+                        category += " [" + ((Control)GetOwningControl(attribute)).Name + "]";
+                        category += " (" + attribute.Name + ")";
+                    }
+
+                    // Ensure each supplied line is actually a separate line.
+                    foreach (string queryLine in traceLines
+                        .SelectMany(line => line.Split('\n')))
+                    {
+                        System.Diagnostics.Trace.WriteLine(
+                            string.IsNullOrEmpty(queryLine) ? "[EMPTY]" : queryLine, category);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37009");
+            }
         }
 
         /// <summary>
@@ -3048,6 +3128,11 @@ namespace Extract.DataEntry
         void OnAttributeValueModified(IAttribute attribute, bool incrementalUpdate,
             bool acceptSpatialInfo, bool spatialInfoChanged)
         {
+            if (!incrementalUpdate)
+            {
+                AttributeStatusInfo.Trace("FieldUpdated", attribute, attribute.Value.String);
+            }
+
             var eventHandler = AttributeValueModified;
             bool alreadyRaisingAttributeValueModified = _raisingAttributeValueModified;
 

@@ -563,6 +563,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 AttributeStatusInfo.DisableValidationQueries =
                     _applicationConfig.Settings.DisableValidationQueries;
 
+                AttributeStatusInfo.EnableTrace =
+                    _applicationConfig.Settings.EnableTrace;
+
                 // Since SpotIR compatibility is not required for data entry applications, avoid the
                 // performance hit it exacts.
                 Highlight.SpotIRCompatible = false;
