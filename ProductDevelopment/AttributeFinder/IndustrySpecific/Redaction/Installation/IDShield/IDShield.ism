@@ -437,7 +437,7 @@
 		<row><td>CommonFiles64Folder</td><td>TARGETDIR</td><td>.:Common64</td><td/><td>0</td><td/></row>
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
-		<row><td>EXEMPTION_CODES_DIR</td><td>INSTALLDIR</td><td>EXEMPT~1|ExemptionCodes</td><td/><td>0</td><td/></row>
+		<row><td>EXEMPTION_CODES_DIR</td><td>ID_SHIELD</td><td>EXEMPT~1|ExemptionCodes</td><td/><td>0</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>FILE_PROCESSING_COMPONENTS</td><td>COMMON_COMPONENTS</td><td>FILEPR~1|FileProcessingComponents</td><td/><td>0</td><td/></row>
@@ -449,6 +449,7 @@
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
 		<row><td>GlobalAssemblyCache</td><td>TARGETDIR</td><td>.:Global~1|GlobalAssemblyCache</td><td/><td>0</td><td/></row>
 		<row><td>HELP</td><td>INSTALLDIR</td><td>Help</td><td/><td>0</td><td/></row>
+		<row><td>ID_SHIELD</td><td>INSTALLDIR</td><td>IDSHIE~1|ID Shield</td><td/><td>0</td><td/></row>
 		<row><td>INPUT_FUNNEL_BIN</td><td>INPUT_FUNNEL_DIR</td><td>Bin</td><td/><td>0</td><td/></row>
 		<row><td>INPUT_FUNNEL_DIR</td><td>EXTRACT_SYSTEMS</td><td>INPUTF~1|InputFunnelComponents</td><td/><td>0</td><td/></row>
 		<row><td>INSTALLDIR</td><td>EXTRACT_SYSTEMS</td><td>.</td><td/><td>0</td><td/></row>
