@@ -18,6 +18,8 @@
 
 #include <io.h>
 
+#include <stack>
+
 using namespace std;
 
 #ifdef _DEBUG
@@ -52,6 +54,7 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 		m_zName = _T("");
 		m_zType = _T("");
 		m_zValue = _T("");
+		m_zAttributePath = _T("");
 		//}}AFX_DATA_INIT
 		// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 		m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -200,6 +203,7 @@ void CEAVGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_VALUE, m_editValue);
 	DDX_Control(pDX, IDC_EDIT_TYPE, m_editType);
 	DDX_Control(pDX, IDC_EDIT_NAME, m_editName);
+	DDX_Control(pDX, IDC_EDIT_ATTRIBUTE_PATH, m_editAttributePath);
 	DDX_Control(pDX, IDC_LIST_DISPLAY, m_listAttributes);
 	DDX_Control(pDX, IDC_BTN_UP, m_btnUp);
 	DDX_Control(pDX, IDC_BTN_ADD, m_btnAdd);
@@ -210,6 +214,7 @@ void CEAVGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_NAME, m_zName);
 	DDX_Text(pDX, IDC_EDIT_TYPE, m_zType);
 	DDX_Text(pDX, IDC_EDIT_VALUE, m_zValue);
+	DDX_Text(pDX, IDC_EDIT_ATTRIBUTE_PATH, m_zAttributePath);
 	DDX_Control(pDX, IDC_BTN_MERGE, m_btnMerge);
 }
 //-------------------------------------------------------------------------------------------------
@@ -1130,6 +1135,8 @@ void CEAVGeneratorDlg::updateButtons()
 		::convertNormalStringToCppString(strValue);
 		m_zValue = strValue.c_str();
 
+		m_zAttributePath = getAttributePath(iSelectedItemIndex).c_str();
+
 		// First item cannot move up
 		m_btnUp.EnableWindow( asMFCBool(iSelectedItemIndex != 0) );
 
@@ -1142,6 +1149,7 @@ void CEAVGeneratorDlg::updateButtons()
 		m_zName = "";
 		m_zValue = "";
 		m_zType = "";
+		m_zAttributePath = "";
 
 		// Disable the up and down arrows
 		m_btnUp.EnableWindow(FALSE);
@@ -1844,5 +1852,69 @@ void CEAVGeneratorDlg::moveSubAttributes(int nInsertAfter, int nMoveFrom, unsign
 		nInsertAt++;
 		nMoveFrom++;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+string CEAVGeneratorDlg::getAttributePath(int iIndex)
+{
+	string strAttributePath = "";
+
+	if (iIndex < 0 )
+	{
+		return strAttributePath;
+	}
+
+	stack<string> stackOfNames;
+
+	stackOfNames.push(getName(iIndex));
+	int iLevel = getLevel(iIndex);
+
+	// get the strings for all the higher levels
+	while (iLevel > 0 && iIndex > 0)
+	{
+		iIndex--;
+		int iCurrLevel = getLevel(iIndex);
+		if (iCurrLevel < iLevel)
+		{
+			iLevel = iCurrLevel;
+			stackOfNames.push(getName(iIndex));
+		}
+	}
+	
+	// build path from the stack
+	while (stackOfNames.size() > 0)
+	{
+		if (!strAttributePath.empty())
+		{
+			// append /
+			strAttributePath += "/";
+		}
+		strAttributePath += stackOfNames.top();
+		stackOfNames.pop();
+	}
+	return strAttributePath;
+}
+//-------------------------------------------------------------------------------------------------
+int CEAVGeneratorDlg::getLevel(int iIndex)
+{
+	// Get the text for the current item
+	string currText = m_listAttributes.GetItemText(iIndex, NAME_COLUMN);
+	
+	// Number of leading periods indicates level - periods are only allowed at the front of a name
+	int iLastPeriod = currText.find_last_of(".");
+
+	// if no periods are found this is a top level so return 0 otherwise add 1 to pos to get level
+	return (iLastPeriod == string::npos ) ? 0 : iLastPeriod + 1;
+}
+//-------------------------------------------------------------------------------------------------
+string CEAVGeneratorDlg::getName(int iIndex)
+{
+	// Get the Name and type text
+	string currText = m_listAttributes.GetItemText(iIndex, NAME_COLUMN);
+
+	// remove any leading .'s
+	int iPosOfFirstNonPeriod = currText.find_first_not_of(".");
+
+	// return the string without the leading .'s
+	return (iPosOfFirstNonPeriod != string::npos ) ? currText.substr(iPosOfFirstNonPeriod) : currText;
 }
 //-------------------------------------------------------------------------------------------------

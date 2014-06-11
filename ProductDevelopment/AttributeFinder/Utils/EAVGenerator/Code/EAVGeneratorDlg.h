@@ -32,6 +32,7 @@ public:
 	CEdit	m_editValue;
 	CEdit	m_editType;
 	CEdit	m_editName;
+	CEdit	m_editAttributePath;
 	CListCtrl	m_listAttributes;
 	CImageButtonWithStyle	m_btnUp;
 	CButton	m_btnAdd;
@@ -43,6 +44,7 @@ public:
 	CString	m_zType;
 	CString	m_zValue;
 	CButton m_btnMerge;
+	CString m_zAttributePath;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -305,6 +307,15 @@ private:
 
 	// PURPOSE: To convert the specified spatial mode to a string
 	string getModeAsString(ESpatialStringMode eMode);
+
+	// PURPOSE: To return the attribute path in the parameter strAttributePath at the index iIndex
+	string getAttributePath(int iIndex);
+
+	// PURPOSE: To return the attribute level of the attribute at index iIndex
+	int getLevel(int iIndex);
+
+	// PURPOSE: To return the name of the attribute at index iIndex
+	string getName(int iIndex);
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
