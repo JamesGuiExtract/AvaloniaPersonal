@@ -22,10 +22,11 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 	<li>Confirm that you are logged in to the test machine as a user that has a <b>Full 
 	Name</b>.  Note that the <b>Administrator</b> account does not have a Full Name.
 	<li>Add the CommonComponents folder to the system path.
-	<li>Navigate to <b>C:\ProgramData\ExtractSystems\TestingFiles\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
+	<li>Navigate to <b>C:\ProgramData\ExtractSystems\TestingFiles\ReusableComponents\ 
+	BaseUtils\InteractiveTest\</b>.</li> 
         <li>Run <b>TestFunctionExpanderTest.bat</b>. The test will create files in the directory 
-	<b>C:\ProgramData\ExtractSystems\TestingFiles\ReusableComponents\BaseUtils\InteractiveTest\</b>. 
-	and a few files under <b>H:\</b>.</li>
+	<b>C:\ProgramData\ExtractSystems\TestingFiles\ReusableComponents\BaseUtils\ 
+	InteractiveTest\</b> and a few files under <b>H:\</b>.</li>
 	<li>Review <b>testResults.txt</b> and note any <b>not created</b> items.
 	<li>Review the testing results for the <u>Specific Functions</u> discussed below.  These 
 	functions are not well suited for automated testing.
@@ -34,8 +35,8 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 <ul>
 	<li><b>$FullUserName()</b>
 	<ul>
-		<li>Confirm that a <b>15_&lt;FullUserName&gt;.xml</b> file exists for the logged in 
-		user.
+		<li>Confirm that a <b>15_&lt;FullUserName&gt;.xml</b> file exists for the 
+		logged in user.
 <p>
   	   	<LI><b>[LegacyRC #5672]</b> $FullUserName() arguments
 	       	<ul>
@@ -71,29 +72,41 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 			<li>An <b>Year2Digit_***.xml</b> file.
 			<li>An <b>Year4Digit_***.xml</b> file.
 	       	</ul>
-		<li>Confirm that $Now() without parameters expands to the current date and time in a 
-		<b>YYYY-MM-DD-HH-MM-SS-mmm</b> format where <b>mmm</b> is a three-digit, zero-padded 
-		millisecond count.
+		<li>Confirm that $Now() without parameters expands to the current date and 
+		time in a <b>YYYY-MM-DD-HH-MM-SS-mmm</b> format where <b>mmm</b> is a 
+		three-digit, zero-padded millisecond count.
 	</ul>
 	<li><b>$ProcessID()</b>
     	<ul>
-		<li>Confirm that a <b>20_Test&nbsp;&nbsp;Image.tif.PID_??????.xml</b> file exists.
-        	<li>Confirm that the $ProcessID() function returns the correct ID (compare with the ID 
-        	shown in the Task Manager).</li>
+		<li>Confirm that a <b>20_Test&nbsp;&nbsp;Image.tif.PID_??????.xml</b> file 
+		exists.
+        	<li>Confirm that the $ProcessID() function returns the correct ID (compare 
+		with the ID shown in the Task Manager).</li>
 	</ul>
 	<li><b>$RandomAlphaNumeric()</b>
 	<ul>
 		<li>Confirm that a <b>17_???.xml</b> file exists where <b>???</b> indicates 3 
 		random alphanumeric characters.
 	</ul>
+	<li><b>$RandomEntryFromList()</b>
+	<ul>
+		<li>Confirm that a <b>24_????.xml</b> file exists where <b>????</b> indicates 4 
+		identical alphabetic characters.
+	</ul>
+	<li><b>$RandomEntryFromListFile()</b>
+	<ul>
+		<li>Confirm that a <b>23_???.xml</b> file exists where <b>???</b> indicates 3 
+		identical alphabetic characters.
+	</ul>
 	<li><b>$ThreadID()</b>
     	<ul>
-		<li>Confirm that a <b>21_Test&nbsp;&nbsp;Image.tif.TID_??????.xml</b> file exists.
+		<li>Confirm that a <b>21_Test&nbsp;&nbsp;Image.tif.TID_??????.xml</b> file 
+		exists.
 	</ul>
 	<li><b>$UserName()</b>
 	<ul>
-		<li>Confirm that a <b>18_&lt;UserName&gt;.xml</b> file exists for the logged in 
-		user.  The user name is expected to be a single word.
+		<li>Confirm that a <b>18_&lt;UserName&gt;.xml</b> file exists for the logged 
+		in user.  The user name is expected to be a single word.
 	</ul>
 </ul>
 <p>
@@ -103,7 +116,6 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 	under drive <b>H:\</b> as created by the test.</li>
 	<li>Remove the drive mapping for <b>H:\</b>.</li>
 </ol>
-<p>
 <p>
 <h3>Test Text Function Expander utility</h3>
 <ul>
