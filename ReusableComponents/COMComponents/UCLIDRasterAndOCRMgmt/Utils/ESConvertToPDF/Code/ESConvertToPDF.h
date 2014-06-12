@@ -11,6 +11,7 @@
 
 #include <UCLIDException.h>
 #include <KernelAPI.h>
+#include <Recpdf.h>
 
 #include <string>
 
@@ -39,6 +40,8 @@ public:
 	DECLARE_MESSAGE_MAP()
 
 private:
+
+	friend class CRecAPIManager;
 
 	// user-specified input filename to convert into a searchable pdf
 	string m_strInputFile;
@@ -80,27 +83,18 @@ private:
 	// security.
 	void convertToSearchablePDF(bool bUseRecDFAPI);
 	//---------------------------------------------------------------------------------------------
-	// Opens the specified image file for reading.
-	HIMGFILE openImageFile(const string& strFileName);
-	//---------------------------------------------------------------------------------------------
-	// Retrieves and OCR's the pages from the specified hInputFile.
-	HPAGE* getOCRedPages(HIMGFILE hInputFile, int nPageCount);
-	//---------------------------------------------------------------------------------------------
 	// Adds the specified pages to the strOutputPDF in the specified outFormat. The images are
 	// converted/modified (no way around this).
 	void addPagesToOutput(HPAGE *pPages, const string& strOutputPDF, IMF_FORMAT outFormat,
 		int nPageCount);
 	//---------------------------------------------------------------------------------------------
 	// Applies the searchable text in pages to the specified strImageFile using the RecPDF API.
-	void applySearchableTextWithRecAPI(const string& strImageFile, HPAGE *pages, int nPageCount);
+	void applySearchableTextWithRecAPI(RPDF_DOC pdfDoc, HPAGE *pages, int nStartPage, int nPageCount);
 	//---------------------------------------------------------------------------------------------
 	// Validates that the specified PDF can be read. Added use in response to issue where RecPDF
 	// API call can result in corrupted images:
 	// https://extract.atlassian.net/browse/ISSUE-12163
 	void validatePDF(const string& strFileName);
-	//---------------------------------------------------------------------------------------------
-	// Frees the HPAGE instances.
-	void freePageData(HPAGE *pPages, int nPageCount);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Displays usage information for this executable and an error message if specified.
 	//          Returns false.

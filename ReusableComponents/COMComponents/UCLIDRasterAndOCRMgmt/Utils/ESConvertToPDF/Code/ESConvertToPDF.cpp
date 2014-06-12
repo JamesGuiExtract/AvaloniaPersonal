@@ -4,15 +4,14 @@
 #include "stdafx.h"
 #include "ESConvertToPDF.h"
 #include "ScansoftErr.h"
-#include "RecMemoryReleaser.h"
+#include "RecAPIManager.h"
 #include "OcrMethods.h"
-
 #include <UCLIDException.h>
 #include <UCLIDExceptionDlg.h>
 #include <TemporaryFileName.h>
-#include <OCRConstants.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <OCRConstants.h>
 #include <RecAPIPlus.h>
 #include <Recpdf.h>
 #include <StringCSIS.h>
@@ -28,34 +27,16 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-// add license management password function
-DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
-
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
 
-// constants for the required RecAPI modules
-const int giNUM_REQUIRED_MODULES = 13;
-const ModuleDescriptionType gREQUIRED_MODULES[giNUM_REQUIRED_MODULES] = 
-{
-	{INFO_API,    "API main OCR module"},
-	{INFO_MOR,    "MOR multi-lingual omnifont recognition"},
-	{INFO_DOT,    "DOT 9-pin draft dot-matrix recognition"},
-	{INFO_DCM,    "DCM legacy page-layout decomposition"},
-	{INFO_IMG,    "IMG image handling"},
-	{INFO_IMF,    "IMF image file I/O"},
-	{INFO_CHR,    "CHR character set and code page handling"},
-	{INFO_MTX,    "MTC M/TEXT omnifont recognition"},
-	{INFO_MAT,    "MAT matrix matching recognition"},
-	{INFO_PLUS2W, "PLUS2W 2-way voting omnifont recognition"},
-	{INFO_FRX,    "FRX FireWorx omnifont recognition"},
-	{INFO_PLUS3W, "PLUS3W 3-way voting omnifont recognition"},
-	{INFO_XOCR,	  "XOCR standard page parse"}
-};
+// The number of pages that should be processed before freeing all memory from the Nuance RecAPI
+// to prevent excessive usage of memory on large documents.
+const int g_nPAGE_BATCH_SIZE = 10;
 
-// RecAPI settings class that has the settings that govern PDF output.
-string strOUTPUT_SETTINGS_CLASS = "Kernel.Imf.PDF";
+// add license management password function
+DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 //-------------------------------------------------------------------------------------------------
 // Message map
@@ -192,143 +173,104 @@ int CESConvertToPDFApp::ExitInstance()
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::applySettings()
-{
-	// OCR should be accurate rather than fast.
-	setIntSetting("Kernel.OcrMgr.PDF.TradeOff", TO_ACCURATE);
-
-	// Use the more accurate 3-way voting engine (rather than the default 2-way voting engine).
-	setBoolSetting("Kernel.OcrMgr.PreferAccurateEngine", true);
-	
-	// OCR should be performed only on images.
-	setIntSetting("Kernel.OcrMgr.PDF.ProcessingMode", PDF_PM_GRAPHICS_ONLY);
-
-	// Preserve the original resolution in the output PDF.
-	setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".LoadOriginalDPI", true);
-
-	// If output is to be PDF/A compliant then need to set the PDF/A compatibility mode
-	// Adding searchable text with the RecPDFAPI breaks 1a and 1b compliance, but we seem to be
-	// 2a compliant. (confirmed using:
-	// http://www.datalogics.com/products/callas/callaspdfA-onlinedemo.asp, though the RecPDFAPI
-	// does not make any claims with regards to PDF/A compliance.)
-	if (m_bPDFA)
-	{
-		setIntSetting(strOUTPUT_SETTINGS_CLASS + ".Compatibility", R2ID_PDFA2A);
-	}
-
-	if (!m_strUserPassword.empty() || !m_strOwnerPassword.empty())
-	{
-		// If either password is defined, enable 128 bit security
-		setIntSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.Type", R2ID_PDFSECURITY128BITS);
-
-		// If there is a user password defined, set it
-		if (!m_strUserPassword.empty())
-		{
-			setStringSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.UserPassword", m_strUserPassword);
-		}
-		// If there is an owner password defined, set it and the associated permissions
-		if (!m_strOwnerPassword.empty())
-		{
-			// Set the owner password
-			setStringSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.OwnerPassword", m_strOwnerPassword);
-
-			// Get security settings
-
-			// Allow printing if either high quality or low quality is specified
-			bool bAllowHighQuality = isPdfSecuritySettingEnabled(giAllowHighQualityPrinting);
-			bool bAllowPrinting = bAllowHighQuality
-				|| isPdfSecuritySettingEnabled(giAllowLowQualityPrinting);
-
-			// Allow adding/modifying annotations if either allow modifications or
-			// allow adding/modifying annotations is specified
-			bool bAllowDocModify = isPdfSecuritySettingEnabled(giAllowDocumentModifications);
-			bool bAllowAddModifyAnnot = bAllowDocModify ||
-				isPdfSecuritySettingEnabled(giAllowAddingModifyingAnnotations);
-
-			// Allow form fill in if either adding/modifying annotations is allowed or
-			// filling in forms is specified
-			bool bAllowForms = bAllowAddModifyAnnot
-				|| isPdfSecuritySettingEnabled(giAllowFillingInFields);
-
-			// Allow extraction for accessibility if either content copying or accessibility
-			// is specified
-			bool bAllowCopy = isPdfSecuritySettingEnabled(giAllowContentCopying);
-			bool bAllowExtract = bAllowCopy
-				|| isPdfSecuritySettingEnabled(giAllowContentCopyingForAccessibility);
-
-			// Set the security settings
-			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnablePrint", bAllowPrinting);
-			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnablePrintQ", bAllowHighQuality);
-			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableModify", bAllowDocModify);
-			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableCopy", bAllowCopy);
-			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableExtract", bAllowExtract);
-			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableAdd", bAllowAddModifyAnnot);
-			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableForms", bAllowForms);
-			setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".PDFSecurity.EnableAssemble",
-				isPdfSecuritySettingEnabled(giAllowDocumentAssembly));
-		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
 void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 {
 	// initialize the RecAPI license
 	// NOTE: this is separate from the Extract licensing which occurred earlier
 	licenseOCREngine();
 
-	// ensure engine resources are released when
-	// mainEngineMemoryReleaser goes out of scope.
-	MainRecMemoryReleaser mainEngineMemoryReleaser;
+	// https://extract.atlassian.net/browse/ISSUE-12184
+	// When using bUseRecDFAPI, a new CRecAPIManager instance will be generated and used after
+	// every [g_nPAGE_BATCH_SIZE] pages to ensure that memory usage is not excessive when processing
+	// large documents.
+	unique_ptr<CRecAPIManager> apRecAPIManager(new CRecAPIManager(this, m_strInputFile));
 
-	applySettings();
+	IMG_INFO imgInfo = {0};
+	IMF_FORMAT imgFormat;
+	apRecAPIManager->getImageInfo(imgInfo, imgFormat);
+	int nPageCount = apRecAPIManager->getPageCount();
 
 	// Create a temporary output PDF file. This file will be copied to the final output location
 	// once the process is complete.
 	TemporaryFileName tfnDocument(true, "", ".pdf", true);
-
-	// open the input image file
-	HIMGFILE hInputFile = openImageFile(m_strInputFile);
-
-	// ensure that the memory for the input file is released when the object goes out of scope
-	RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileReleaser(hInputFile);
-
-	IMG_INFO imgInfo = {0};
-	IMF_FORMAT imgFormat;
-	RECERR rc = kRecGetImgFilePageInfo(0, hInputFile, 0, &imgInfo, &imgFormat);
-	throwExceptionIfNotSuccess(rc, "ELI36759", "Failed to indentify image format.", m_strInputFile);
-
-	int nPageCount;
-	rc = kRecGetImgFilePageCount(hInputFile, &nPageCount);
-	throwExceptionIfNotSuccess(rc, "ELI36757", "Unable to get page count.", m_strInputFile);
-
-	// The returned HPAGE instaces will have OCR text that can be applied to an output document.
-	HPAGE *pPages = getOCRedPages(hInputFile, nPageCount);
+	RPDF_DOC pdfDoc;
 
 	if (bUseRecDFAPI)
 	{
+		RECERR rc = rPdfInit();
+		throwExceptionIfNotSuccess(rc, "ELI36754", "Unable to initialize PDF processing engine.");
+
+		// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
+		// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
+		// FF_PDF_SUPERB.
+		IMF_FORMAT outFormat = imgInfo.BitsPerPixel == 1 ? FF_PDF_SUPERB : FF_PDF_GOOD;
+
 		// https://extract.atlassian.net/browse/ISSUE-11940
 		// If the source document was a PDF, the OCR text can be added to the original document
 		// without touching the images at all (preventing any possible degradation in quality).
-		if (imgFormat >= FF_PDF_MIN && imgFormat <= FF_PDF_MRC_LOSSLESS)
+		bool bSourceIsPDF = (imgFormat >= FF_PDF_MIN) && (imgFormat <= FF_PDF_MRC_LOSSLESS);
+		if (bSourceIsPDF)
 		{
 			copyFile(m_strInputFile, tfnDocument.getName());
+
+			rc = rPdfOpen(tfnDocument.getName().c_str(), __nullptr, &pdfDoc);
+			throwExceptionIfNotSuccess(rc, "ELI36744", "Failed to open document as PDF.", m_strInputFile);
 		}
-		else
+
+		for (int i = 0; i < nPageCount; i += g_nPAGE_BATCH_SIZE)
 		{
-			// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
-			// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
-			// FF_PDF_SUPERB.
-			IMF_FORMAT outFormat = imgInfo.BitsPerPixel == 1 ? FF_PDF_SUPERB : FF_PDF_GOOD;
+			if (i != 0)
+			{
+				// Free all RecAPI memory and re-initialize the API for the next g_nPAGE_BATCH_SIZE
+				// pages.
+				apRecAPIManager.reset(new CRecAPIManager(this, m_strInputFile));
+			}
 
-			// Save all the document pages into a new output document.
-			addPagesToOutput(pPages, tfnDocument.getName().c_str(), outFormat, nPageCount);
+			int nPagesToProcess = min(g_nPAGE_BATCH_SIZE, nPageCount - i);
+
+			// The returned HPAGE instaces will have OCR text that can be applied to an output document.
+			HPAGE *pPages = apRecAPIManager->getOCRedPages(i, nPagesToProcess);
+			
+			if (!bSourceIsPDF)
+			{
+				// Save all the document pages into a new output document.
+				addPagesToOutput(pPages, tfnDocument.getName().c_str(), outFormat, nPagesToProcess);
+				
+				// If this is not the first set of pages, the pdfDoc instance used for the last set
+				// needs to be closed before initializing for the next set of pages.
+				if (i != 0)
+				{
+					rc = rPdfClose(pdfDoc);
+					throwExceptionIfNotSuccess(rc, "ELI37020",
+						"Failed to close PDF document.", m_strInputFile);
+				}
+				
+				rc = rPdfOpen(tfnDocument.getName().c_str(), __nullptr, &pdfDoc);
+				throwExceptionIfNotSuccess(rc, "ELI37021",
+					"Failed to open document as PDF.", m_strInputFile);
+
+			}
+
+			// Apply the OCR from pages to the output document.
+			applySearchableTextWithRecAPI(pdfDoc, pPages, i, nPagesToProcess);
 		}
 
-		// Apply the OCR from pages to the output document.
-		applySearchableTextWithRecAPI(tfnDocument.getName().c_str(), pPages, nPageCount);
+		rc = rPdfClose(pdfDoc);
+		throwExceptionIfNotSuccess(rc, "ELI36750", "Failed to close PDF document.", m_strInputFile);
+
+		rc = rPdfQuit();
+		throwExceptionIfNotSuccess(rc, "ELI36751", "Failed to shut down PDF processing engine.",
+			m_strInputFile);
+
+		// RecPDF API calls to add searchable text can result in corrupted images:
+		// https://extract.atlassian.net/browse/ISSUE-12163
+		// Validate the output file can be read.
+		validatePDF(tfnDocument.getName().c_str());
 	}
 	else
 	{
+		HPAGE *pPages = apRecAPIManager->getOCRedPages(0, nPageCount);
+
 		// If not using RecAPI, use the RecAPI to convert to searchable PDF.
 		RECERR rc = kRecSetDTXTFormat(0, DTXT_PDFIOT);
 		throwExceptionIfNotSuccess(rc, "ELI36845", "Unable to set direct text format.", m_strInputFile);
@@ -349,117 +291,11 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 		throwExceptionIfNotSuccess(rc, "ELI36846", "Failed to output document.", m_strInputFile);
 	}
 
-	freePageData(pPages, nPageCount);
-
 	// Copy the temporary output file to its final output location.
 	copyFile(tfnDocument.getName(), m_strOutputFile);
 
 	// Make sure the file can be read
 	waitForFileToBeReadable(m_strOutputFile);
-}
-//-------------------------------------------------------------------------------------------------
-HIMGFILE CESConvertToPDFApp::openImageFile(const string& strFileName)
-{
-	// Get the retry count and timeout
-	int iRetryCount(-1), iRetryTimeout(-1);
-	getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
-
-	HIMGFILE hInputFile = NULL;
-	int iNumRetries = 0;
-	RECERR rc = kRecOpenImgFile(strFileName.c_str(), &hInputFile, IMGF_READ, FF_SIZE);
-	while (rc != REC_OK)
-	{
-		// Increment the retry count and try again
-		iNumRetries++;
-		rc = kRecOpenImgFile(strFileName.c_str(), &hInputFile, IMGF_READ, FF_SIZE);
-
-		// If opened successfully, log an application trace and break from the loop
-		if(rc == REC_OK)
-		{
-			UCLIDException ue("ELI28853", "Application Trace: Opened image after retrying.");
-			ue.addDebugInfo("Number of retries", iNumRetries);
-			ue.addDebugInfo("Image Name", m_strInputFile);
-			ue.log();
-
-			// Exit the while loop
-			break;
-		}
-		// Check if the error is not IMF_OPEN_ERROR, if not then throw an exception
-		else if (rc != IMF_OPEN_ERR)
-		{
-			UCLIDException ue("ELI18587", "Unable to open input file.");
-			loadScansoftRecErrInfo(ue, rc);
-			ue.addDebugInfo("Input filename", m_strInputFile);
-			throw ue;
-		}
-
-		// Check the retry count
-		if(iNumRetries < iRetryCount)
-		{
-			// Sleep and retry
-			Sleep(iRetryTimeout);
-		}
-		else
-		{
-			// Reached max retry count, throw an exception
-			UCLIDException ue("ELI28854", "Unable to open input file after retrying.");
-			loadScansoftRecErrInfo(ue, rc);
-			ue.addDebugInfo("Image Name", m_strInputFile);
-			ue.addDebugInfo("Number of retries", iNumRetries);
-			ue.addDebugInfo("Max number of retries", iRetryCount);
-			throw ue;
-		}
-	}
-
-	return hInputFile;
-}
-//-------------------------------------------------------------------------------------------------
-HPAGE* CESConvertToPDFApp::getOCRedPages(HIMGFILE hInputFile, int nPageCount)
-{
-	HPAGE *pPages = new HPAGE[nPageCount];
-	for(int i = 0; i < nPageCount; i++)  
-	{
-		HPAGE& hPage = pPages[i];
-
-		// load the ith page
-		loadPageFromImageHandle(m_strInputFile, hInputFile, i, &hPage);
-
-		try
-		{
-			try
-			{
-				// recognize the text on this page
-				RECERR rc = kRecRecognize(0, hPage, 0);
-				if (rc != REC_OK && rc != NO_TXT_WARN && rc != ZONE_NOTFOUND_ERR)
-				{
-					// log an error
-					UCLIDException ue("ELI18589", "Unable to recognize text on page.");
-					loadScansoftRecErrInfo(ue, rc);
-					ue.addDebugInfo("Input filename", m_strInputFile);
-					ue.addDebugInfo("Page number", i+1);
-
-					// add page size information [P13 #4603]
-					if(rc == IMG_SIZE_ERR)
-					{
-						addPageSizeDebugInfo(ue, hInputFile, i);
-					}
-
-					throw ue;
-				}
-			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18628");
-		}
-		catch(UCLIDException ue)
-		{
-			// [LegacyRCAndUtils:6363]
-			// Rather than abort the entire conversion of OCR fails on a given page, simply
-			// log the exception and let the conversion complete (albeit without searchable text
-			// on this page.
-			ue.log();
-		}
-	}
-
-	return pPages;
 }
 //-------------------------------------------------------------------------------------------------
 void CESConvertToPDFApp::addPagesToOutput(HPAGE *pPages, const string& strOutputPDF, 
@@ -476,58 +312,21 @@ void CESConvertToPDFApp::addPagesToOutput(HPAGE *pPages, const string& strOutput
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::freePageData(HPAGE *pPages, int nPageCount)
+void CESConvertToPDFApp::applySearchableTextWithRecAPI(RPDF_DOC pdfDoc, HPAGE *pages,
+													   int nStartPage, int nPageCount)
 {
-	for(int i = 0; i < nPageCount; i++)  
-	{
-		HPAGE& hPage = pPages[i];
-		RECERR rc = kRecFreeImg(hPage);
-		if (rc != REC_OK)
-		{
-			UCLIDException ue("ELI36749", 
-				"Application trace: Unable to release page image. Possible memory leak.");
-			loadScansoftRecErrInfo(ue, rc);
-			ue.log();
-		}
-	}
-
-	delete pPages;
-}
-//-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::applySearchableTextWithRecAPI(const string& strImageFile, HPAGE *pages, 
-													   int nPageCount)
-{
-	RECERR rc = rPdfInit();
-	throwExceptionIfNotSuccess(rc, "ELI36754", "Unable to initialize PDF processing engine.");
-
-	RPDF_DOC pdfDoc;
-	rc = rPdfOpen(strImageFile.c_str(), __nullptr, &pdfDoc);
-	throwExceptionIfNotSuccess(rc, "ELI36744", "Failed to open document as PDF.", m_strInputFile);
-
 	RPDF_OPERATION op;
-	rc = rPdfOpStart(&op);
-	throwExceptionIfNotSuccess(rc, "ELI36745", "Failed to start PDF operation.", m_strInputFile);
+	RECERR rc = rPdfOpStart(&op);
+	throwExceptionIfNotSuccess(rc, "ELI37016", "Failed to start PDF operation.", m_strInputFile);
 
 	rc = rPdfOpAddFile(op, pdfDoc);
-	throwExceptionIfNotSuccess(rc, "ELI36746", "Failed to initialize PDF operation.", m_strInputFile);
+	throwExceptionIfNotSuccess(rc, "ELI37017", "Failed to initialize PDF operation.", m_strInputFile);
 
-	rc = rPdfOpMergeTextToPages(op, pdfDoc, 0, pages, nPageCount);
-	throwExceptionIfNotSuccess(rc, "ELI36747", "Failed to add searchable PDF text.", m_strInputFile);
+	rc = rPdfOpMergeTextToPages(op, pdfDoc, nStartPage, pages, nPageCount);
+	throwExceptionIfNotSuccess(rc, "ELI37018", "Failed to add searchable PDF text.", m_strInputFile);
 
 	rc = rPdfOpExecute(op);
-	throwExceptionIfNotSuccess(rc, "ELI36748", "Failed to execute PDF operation.", m_strInputFile);
-
-	rc = rPdfClose(pdfDoc);
-	throwExceptionIfNotSuccess(rc, "ELI36750", "Failed to close PDF document.", m_strInputFile);
-
-	rc = rPdfQuit();
-	throwExceptionIfNotSuccess(rc, "ELI36751", "Failed to shut down PDF processing engine.",
-		m_strInputFile);
-
-	// RecPDF API calls to add searchable text can result in corrupted images:
-	// https://extract.atlassian.net/browse/ISSUE-12163
-	// Validate the output file can be read.
-	validatePDF(strImageFile.c_str());
+	throwExceptionIfNotSuccess(rc, "ELI37019", "Failed to execute PDF operation.", m_strInputFile);
 }
 //-------------------------------------------------------------------------------------------------
 void CESConvertToPDFApp::validatePDF(const string& strFileName)
@@ -537,19 +336,14 @@ void CESConvertToPDFApp::validatePDF(const string& strFileName)
 	{
 		try
 		{
-			HIMGFILE hFile = openImageFile(strFileName);
+			CRecAPIManager recAPIManager(this, strFileName);
 
-			// ensure that the memory for the input file is released when the object goes out of scope
-			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileReleaser(hFile);
-
-			int nPageCount;
-			RECERR rc = kRecGetImgFilePageCount(hFile, &nPageCount);
-			throwExceptionIfNotSuccess(rc, "ELI36842", "Unable to get page count.", m_strInputFile);
+			int nPageCount = recAPIManager.getPageCount();
 
 			for(i = 0; i < nPageCount; i++)  
 			{
 				HPAGE hPage;
-				loadPageFromImageHandle(m_strInputFile, hFile, i, &hPage);
+				loadPageFromImageHandle(m_strInputFile, recAPIManager.m_hFile, i, &hPage);
 
 				RECERR rc = kRecFreeImg(hPage);
 				if (rc != REC_OK)
@@ -868,64 +662,6 @@ void CESConvertToPDFApp::licenseOCREngine()
 		UCLIDException ue("ELI18566", "Unable to load OCR engine license file.");
 		loadScansoftRecErrInfo(ue, rc);
 		throw ue;
-	}
-
-	// initialize RecAPI Plus
-	rc = RecInitPlus("Extract Systems", "ESConvertToPDF");
-	if (rc != REC_OK)
-	{
-		// build an exception to store this error information
-		UCLIDException ue("ELI18567", "Unable to initialize OCR engine.");
-		loadScansoftRecErrInfo(ue, rc);
-
-		// check if this is only a warning
-		if(rc == API_INIT_WARN)
-		{
-			// this is only a warning, no need to throw an exception yet
-			bool bThrowException = false;
-
-			// get information about the initialized modules
-			LPKRECMODULEINFO pModules;
-			size_t size;
-			RECERR rc = kRecGetModulesInfo(&pModules, &size);
-
-			// ensure the modules were retrieved
-			if(rc != REC_OK)
-			{
-				// add this error information to the original
-				UCLIDException uexOuter("ELI18569", "Unable to get OCR module information.", ue);
-				loadScansoftRecErrInfo(uexOuter, rc);
-				
-				// throw all exception information together
-				throw uexOuter;
-			}
-
-			// check if required modules are present
-			for(int i=0; i<giNUM_REQUIRED_MODULES; i++)
-			{
-				// module is present if the version number is non-zero
-				if(pModules[gREQUIRED_MODULES[i].eModule].Version <= 0)
-				{
-					// add the debug information about this module
-					ue.addDebugInfo("Missing module", gREQUIRED_MODULES[i].strModuleDescription);
-
-					// set the flag to throw an exception
-					bThrowException = true;
-				}
-			}
-
-			// throw an exception if at least one required module is not present,
-			// otherwise it is okay to ignore the API_INIT_WARN.
-			if(bThrowException)
-			{
-				throw ue;
-			}
-		}
-		else
-		{
-			// this wasn't a warning. it's an error.
-			throw ue;
-		}
 	}
 }
 //-------------------------------------------------------------------------------------------------

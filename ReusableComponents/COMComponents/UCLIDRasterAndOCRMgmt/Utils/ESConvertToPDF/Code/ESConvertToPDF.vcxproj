@@ -74,6 +74,7 @@
       <ProgramDatabaseFile>.\..\debug\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Bscmake>
       <OutputFile>.\..\debug\$(ProjectName).bsc</OutputFile>
@@ -110,10 +111,7 @@
   <ItemGroup>
     <ClCompile Include="ESConvertToPDF.cpp" />
     <ClCompile Include="OcrMethods.cpp" />
-    <ClCompile Include="RecMemoryReleaser.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="RecAPIManager.cpp" />
     <ClCompile Include="ScansoftErr.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -123,7 +121,7 @@
   <ItemGroup>
     <ClInclude Include="ESConvertToPDF.h" />
     <ClInclude Include="OcrMethods.h" />
-    <ClInclude Include="RecMemoryReleaser.h" />
+    <ClInclude Include="RecAPIManager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ScansoftErr.h" />
     <ClInclude Include="stdafx.h" />
