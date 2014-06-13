@@ -28,6 +28,8 @@ runrules 17Test_RandomAlphaNumeric.rsd "Test  Image.tif"
 runrules 18Test_UserName.rsd "Test  Image.tif"
 runrules 20Test_ProcessId.rsd "Test  Image.tif"
 runrules 21Test_ThreadId.rsd "Test  Image.tif"
+runrules 23Test_RandomEntryFromListFile.rsd "Test  Image.tif"
+runrules 24Test_RandomEntryFromList.rsd "Test  Image.tif"
 pause
 
 :: Write results of test to "testResults.txt"
