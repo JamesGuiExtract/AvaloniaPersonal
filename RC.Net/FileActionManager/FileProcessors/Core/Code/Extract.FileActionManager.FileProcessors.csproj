@@ -72,8 +72,6 @@
     <Reference Include="edtFTPnetPRO, Version=7.3.1.20, Culture=neutral, PublicKeyToken=0dce1ad63760d80b, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\EnterpriseDT\Bin\edtFTPnetPRO.dll</HintPath>
     </Reference>
-    <Reference Include="Extract.AttributeFinder, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Imaging.Forms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
     <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.dll</HintPath>
     </Reference>
@@ -205,6 +203,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
+      <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
+      <Name>Extract.AttributeFinder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
@@ -224,6 +226,10 @@
     <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
       <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
       <Name>Extract.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
+      <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
+      <Name>Extract.Imaging.Forms</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
       <Project>{E610E652-0891-40D4-B5CA-A622B87C7979}</Project>
