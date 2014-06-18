@@ -7159,10 +7159,13 @@ namespace Extract.DataEntry
             {
                 // Find the first attribute that doesn't pass validation.
                 IAttribute firstInvalidAttribute = null;
-                if (AttributeStatusInfo.GetDataValidity(currentlySelectedAttribute.Last())
-                    != DataValidity.Valid)
+                IAttribute currentAttribute = currentlySelectedAttribute.Last();
+                DataValidity validity = AttributeStatusInfo.GetDataValidity(currentAttribute);
+                if (validity == DataValidity.Invalid ||
+                    (validity == DataValidity.ValidationWarning &&
+                        _invalidDataSaveMode != InvalidDataSaveMode.AllowWithWarnings))
                 {
-                    firstInvalidAttribute = currentlySelectedAttribute.Last();
+                    firstInvalidAttribute = currentAttribute;
                 }
                 else
                 {
