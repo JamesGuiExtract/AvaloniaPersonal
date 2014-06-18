@@ -13,15 +13,6 @@ namespace Extract.FileActionManager.Utilities
     /// </summary>
     static class FAMFileInspectorProgram
     {
-        #region Constants
-
-        /// <summary>
-        /// The name of this object.
-        /// </summary>
-        static readonly string _OBJECT_NAME = typeof(FAMFileInspectorProgram).ToString();
-        
-        #endregion Constants
-
         #region Fields
 
         /// <summary>
@@ -99,7 +90,7 @@ namespace Extract.FileActionManager.Utilities
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
-                    "ELI35709", _OBJECT_NAME);
+                    "ELI35709", "FAMFileInspectorProgram");
 
                 // Parse the command-line arguments to initialize the program settings.
                 if (!ParseArgs(args))
