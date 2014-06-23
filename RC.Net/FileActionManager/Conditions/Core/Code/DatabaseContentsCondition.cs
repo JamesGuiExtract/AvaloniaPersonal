@@ -1141,18 +1141,26 @@ namespace Extract.FileActionManager.Conditions
 
                 queryResults = GetTableOrQueryResults(pFileRecord, pathTags, pFPDB);
 
-                if (queryResults.Rows.Count == 0)
-                {
-                    return false;
-                }
-                else if (CheckFields)
+                if (CheckFields)
                 {
                     return CheckQueryResultFields(queryResults, pFileRecord, pathTags, pFPDB);
                 }
                 else
                 {
-                    // If not checking field values, as long as at least one row was returned,
-                    // consider the condition as met.
+                    // If not checking field values, the condition's result depends only upon
+                    // queryResults.Rows.Count. 
+                    switch (RowCountCondition)
+                    {
+                        case DatabaseContentsConditionRowCount.Zero:
+                            return queryResults.Rows.Count == 0;
+
+                        case DatabaseContentsConditionRowCount.AtLeastOne:
+                            return queryResults.Rows.Count > 0;
+
+                        case DatabaseContentsConditionRowCount.ExactlyOne:
+                            return queryResults.Rows.Count == 1;
+                    }
+
                     return true;
                 }
             }
