@@ -2003,27 +2003,15 @@ namespace Extract.Imaging.Forms
             {
                 _updatingFitMode = true;
 
-                // Set the fit mode, preserving the scroll position
-                int scrollPosition = ScrollPosition.Y;
-                double initialScaleFactor = ScaleFactor;
-
+                ZoomInfo zoomInfo = GetZoomInfo();
                 base.SizeMode = RasterPaintSizeMode.Normal;
                 ScaleFactor = 1.0;
 
-                // [DataEntry:837]
-                // If a zero-size rectangle has been specified (as is the case with a minimized
-                // window), zooming is not possible and would throw an exception if attempted.
-                if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
-                {
-                    // Zoom the specified rectangle
-                    base.ZoomToRectangle(DisplayRectangle);
-                }
+                // https://extract.atlassian.net/browse/ISSUE-12261
+                // Ensure the image is still centered at the same spot as before.
+                CenterAtPoint(zoomInfo.Center, false, false);
 
-                // [DataEntry:837]
-                // The scoll position must be ajusted by the factor of change in the ScaleFactor. 
-                double factorOfScaleChange = ScaleFactor / initialScaleFactor;
-                scrollPosition = (int)(scrollPosition * factorOfScaleChange);
-                ScrollPosition = new Point(0, scrollPosition);
+                UpdateZoom(true, true);
             }
             finally
             {
