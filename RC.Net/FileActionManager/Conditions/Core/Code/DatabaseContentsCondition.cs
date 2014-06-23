@@ -1159,9 +1159,10 @@ namespace Extract.FileActionManager.Conditions
 
                         case DatabaseContentsConditionRowCount.ExactlyOne:
                             return queryResults.Rows.Count == 1;
-                    }
 
-                    return true;
+                        default:
+                            throw new ExtractException("ELI37085", "Internal logic error.");
+                    }
                 }
             }
             catch (Exception ex)
