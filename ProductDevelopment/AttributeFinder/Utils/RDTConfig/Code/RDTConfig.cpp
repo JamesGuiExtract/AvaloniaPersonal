@@ -60,7 +60,7 @@ BOOL CRDTConfigApp::InitInstance()
 
 	try
 	{
-		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 		{
 			// Set up the exception handling aspect
 			static UCLIDExceptionDlg exceptionDlg;
