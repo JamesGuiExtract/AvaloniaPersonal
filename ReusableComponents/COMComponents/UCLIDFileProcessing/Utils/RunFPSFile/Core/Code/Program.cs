@@ -219,7 +219,7 @@ namespace Extract.FileActionManager.RunFPSFile
                 return false;
             }
 
-            if (args.Length < 3 || args.Length > 8)
+            if (args.Length < 3 || args.Length > 10)
             {
                 ShowUsage("Invalid number of command-line arguments.");
                 return false;
