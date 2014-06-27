@@ -406,6 +406,18 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
 				ASSERT_ARGUMENT("ELI05874", ipAFDoc != __nullptr);
 
+				// https://extract.atlassian.net/browse/ISSUE-12265
+				// Ensure the dimensions (in pixels) of each page as reported by the OCR engine
+				// match the page dimensions to be used by the rules so that redactions appear where
+				// they are supposed to appear.
+				if (nStackSize == 1)
+				{
+					ISpatialStringPtr ipDocText(ipAFDoc->Text);
+					ASSERT_RESOURCE_ALLOCATION("ELI37086", ipDocText != __nullptr);
+
+					ipDocText->ValidatePageDimensions();
+				}
+
 				// If any counters are set decrement them here
 				decrementCounters(ipAFDoc->Text);
 

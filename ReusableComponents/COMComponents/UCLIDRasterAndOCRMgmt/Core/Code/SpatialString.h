@@ -175,6 +175,7 @@ public:
 		VARIANT_BOOL vbAllowOverlappingInsertion, VARIANT_BOOL* pbStringWasInserted);
 	STDMETHOD(SetSurroundingWhitespace)(ISpatialString *pString, long nPos, long* pnNewPos);
 	STDMETHOD(TranslateToNewPageInfo)(ILongToObjectMap* pPageInfoMap);
+	STDMETHOD(ValidatePageDimensions)();
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);

@@ -1780,6 +1780,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (_imageViewer.IsImageAvailable)
                 {
+                    // https://extract.atlassian.net/browse/ISSUE-12265
+                    // Ensure the dimensions (in pixels) of each page as reported by the OCR engine
+                    // match the page dimensions to be used by the image viewer so that redactions
+                    // appear where they are supposed to appear.
+                    if (_imageViewer.OcrData != null)
+                    {
+                        _imageViewer.OcrData.SpatialString.ValidatePageDimensions();
+                    }
+
                     _documentLoadCount++;
 
                     // [DataEntry:693]

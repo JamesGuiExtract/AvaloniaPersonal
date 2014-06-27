@@ -999,13 +999,28 @@ void CScansoftOCR2::init()
 
 		// get settings manager
 		HSETTING hSetting;
-		THROW_UE_ON_ERROR("ELI16766", "Unable to get OCR settings manager",
+		THROW_UE_ON_ERROR("ELI16766", "Unable to get OCR setting.",
 			kRecSettingGetHandle(NULL, "Kernel.OcrMgr.PreferAccurateEngine", &hSetting, NULL) );
 
 		// enable or disable third recognition pass
 		m_bRunThirdRecPass = m_apCfg->getPerformThirdRecognitionPass();
 		THROW_UE_ON_ERROR("ELI16767", "Unable to set third recognition pass option",
 			kRecSettingSetInt(0, hSetting, m_bRunThirdRecPass) );
+
+		// https://extract.atlassian.net/browse/ISSUE-12265
+		// It appears up thru Nuance v18, either the LoadOriginalDPI must not have been available, 
+		// must have defaulted to false, or must not have worked. Previous versions of Nuance appear
+		// to have always assumed DPI of 300x300 (which matches LeadTools code that is forcing a DPI
+		// of 300x300). But starting with version 19, the DPI was being set by the image file which
+		// can mean it conflicts with how LeadTools loads, displays and saves these images.
+		// For the time being, force to 300 DPI to maintain consistency with previous versions.
+		THROW_UE_ON_ERROR("ELI37096", "Unable to get OCR setting.",
+			kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.LoadOriginalDPI", &hSetting, NULL) );
+		THROW_UE_ON_ERROR("ELI37097", "", kRecSettingSetInt(0, hSetting, FALSE));
+
+		THROW_UE_ON_ERROR("ELI37098", "Unable to get OCR setting.",
+			kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.Resolution", &hSetting, NULL) );
+		THROW_UE_ON_ERROR("ELI37099", "", kRecSettingSetInt(0, hSetting, 300));
 
 		// get the timeout length
 		m_nTimeoutLength = m_apCfg->getTimeoutLength();

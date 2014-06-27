@@ -1249,6 +1249,11 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			image.
 		[id(104), helpstring("method TranslateToNewPageInfo")] HRESULT TranslateToNewPageInfo(
 			[in] ILongToObjectMap* pPageInfoMap);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Validates the dimensions (in pixels) of each page as reported by the OCR
+		//			engine match the page dimensions to be used by the rules and verification
+		//			interface.
+		[id(105), helpstring("method ValidatePageDimensions")] HRESULT ValidatePageDimensions();
 	};
 
 	[

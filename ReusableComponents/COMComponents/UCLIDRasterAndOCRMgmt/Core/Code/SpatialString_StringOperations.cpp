@@ -6,6 +6,7 @@
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <COMUtils.h>
+#include <MiscLeadUtils.h>
 
 #include <set>
 
@@ -1118,3 +1119,57 @@ STDMETHODIMP CSpatialString::TranslateToNewPageInfo(ILongToObjectMap* pPageInfoM
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36427")
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::ValidatePageDimensions()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Validate only if we are looking at spatial text that came from OCR'ing the document
+		// itself rather than a spatial string that is passed from elsewhere.
+		if (m_eMode == kSpatialMode && !m_strOCREngineVersion.empty())
+		{
+			long nPageCount = getNumberOfPagesInImage(m_strSourceDocName);
+
+			// For each page that exists (according to LeadTools), check the page dimensions to see
+			// that they match the dimensions reported by the OCR engine.
+			for (long nPage = 1; nPage <= nPageCount; nPage++)
+			{
+				// Ignore pages for which we don't have OCR content.
+				if (!m_ipPageInfoMap->Contains(nPage))
+				{
+					continue;
+				}
+
+				UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo =
+					m_ipPageInfoMap->GetValue(nPage);
+				ASSERT_RESOURCE_ALLOCATION("ELI37091", ipPageInfo != __nullptr);
+
+				if (ipPageInfo != __nullptr)
+				{
+					int nLTWidth = 0;
+					int nLTHeight = 0;
+					getImagePixelHeightAndWidth(
+						m_strSourceDocName, nLTHeight, nLTWidth, nPage);
+					
+					if (abs(ipPageInfo->Width - nLTWidth) > 1 || abs(ipPageInfo->Height - nLTHeight) > 1)
+					{
+						UCLIDException ue("ELI37089", "Mis-matched coordinate systems detected.");
+						ue.addDebugInfo("Page", nPage);
+						ue.addDebugInfo("Width", nLTWidth);
+						ue.addDebugInfo("Height", nLTHeight);
+						ue.addDebugInfo("OCR Width", ipPageInfo->Width);
+						ue.addDebugInfo("OCR Height", ipPageInfo->Height);
+						throw ue;
+					}
+				}
+			}
+		}
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37090")
+}
