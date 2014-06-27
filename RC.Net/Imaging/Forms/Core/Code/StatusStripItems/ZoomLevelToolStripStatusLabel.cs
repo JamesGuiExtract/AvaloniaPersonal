@@ -84,7 +84,7 @@ namespace Extract.Imaging.Forms
         #region ZoomLevelToolStripStatusLabel Methods
 
         /// <summary>
-        /// 
+        /// Sets the zoom level status label depending on the current state of the image viewer.
         /// </summary>
         void SetLabelText()
         {
@@ -134,7 +134,27 @@ namespace Extract.Imaging.Forms
         #region ZoomLevelToolStripStatusLabel Event Handlers
 
         /// <summary>
-        /// Handles the PageChanged event of the _imageViewer control.
+        /// Handles the <see cref="T:ImageViewer.ImageFileChanged"/> event of the
+        /// <see cref="_imageViewer"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.ImageFileChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        {
+            try
+            {
+                SetLabelText();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37101");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:ImageViewer.PageChanged"/> event of the
+        /// <see cref="_imageViewer"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance
@@ -152,7 +172,8 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the zoom changed.
+        /// Handles the <see cref="T:ImageViewer.ZoomChanged"/> event of the
+        /// <see cref="_imageViewer"/>.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="Extract.Imaging.Forms.ZoomChangedEventArgs"/> instance
@@ -197,6 +218,7 @@ namespace Extract.Imaging.Forms
                     {
                         _imageViewer.PageChanged -= HandlePageChanged;
                         _imageViewer.ZoomChanged -= HandleZoomChanged;
+                        _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                     }
 
                     // Store the new image viewer internally
@@ -207,6 +229,7 @@ namespace Extract.Imaging.Forms
                     {
                         _imageViewer.PageChanged += HandlePageChanged;
                         _imageViewer.ZoomChanged += HandleZoomChanged;
+                        _imageViewer.ImageFileChanged += HandleImageFileChanged;
                     }
 
                     // Set the text based on the state of the image viewer

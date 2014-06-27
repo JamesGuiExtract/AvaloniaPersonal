@@ -1148,23 +1148,20 @@ STDMETHODIMP CSpatialString::ValidatePageDimensions()
 					m_ipPageInfoMap->GetValue(nPage);
 				ASSERT_RESOURCE_ALLOCATION("ELI37091", ipPageInfo != __nullptr);
 
-				if (ipPageInfo != __nullptr)
-				{
-					int nLTWidth = 0;
-					int nLTHeight = 0;
-					getImagePixelHeightAndWidth(
-						m_strSourceDocName, nLTHeight, nLTWidth, nPage);
+				int nLTWidth = 0;
+				int nLTHeight = 0;
+				getImagePixelHeightAndWidth(
+					m_strSourceDocName, nLTHeight, nLTWidth, nPage);
 					
-					if (abs(ipPageInfo->Width - nLTWidth) > 1 || abs(ipPageInfo->Height - nLTHeight) > 1)
-					{
-						UCLIDException ue("ELI37089", "Mis-matched coordinate systems detected.");
-						ue.addDebugInfo("Page", nPage);
-						ue.addDebugInfo("Width", nLTWidth);
-						ue.addDebugInfo("Height", nLTHeight);
-						ue.addDebugInfo("OCR Width", ipPageInfo->Width);
-						ue.addDebugInfo("OCR Height", ipPageInfo->Height);
-						throw ue;
-					}
+				if (abs(ipPageInfo->Width - nLTWidth) > 1 || abs(ipPageInfo->Height - nLTHeight) > 1)
+				{
+					UCLIDException ue("ELI37089", "Mis-matched coordinate systems detected.");
+					ue.addDebugInfo("Page", nPage);
+					ue.addDebugInfo("Width", nLTWidth);
+					ue.addDebugInfo("Height", nLTHeight);
+					ue.addDebugInfo("OCR Width", ipPageInfo->Width);
+					ue.addDebugInfo("OCR Height", ipPageInfo->Height);
+					throw ue;
 				}
 			}
 		}
