@@ -1128,10 +1128,29 @@ STDMETHODIMP CSpatialString::ValidatePageDimensions()
 		// Check license
 		validateLicense();
 
+		// https://extract.atlassian.net/browse/ISSUE-12276
+		// If PDF support is not initialized prior to checking for the file info of a PDF, the DPI
+		// used (and thus image dimensions) will not correspond to the dimensions that actually get
+		// used; this method will indicate a problem when there is none.
+		initPDFSupport();
+
 		// Validate only if we are looking at spatial text that came from OCR'ing the document
 		// itself rather than a spatial string that is passed from elsewhere.
 		if (m_eMode == kSpatialMode && !m_strOCREngineVersion.empty())
 		{
+			// To avoid the possibility of false-positive errors on images such as tifs where
+			// disputes in DPI between LeadTools and Nuance are not known to occur, only validate
+			// PDF files.
+			// Otherwise, one example where such a false-positive has been found to occur is:
+			// \\engsvr\internal\PVCS_JIRA\JIRA\ISSUE-12276\Power of Attorney\0025.tif
+			// This is because the second page is shorter than the first and Nuance and LT don't
+			// agree on whether to include that extra space. However, the DPI is the same between
+			// the two, so there isn't truely a problem.
+			if (!isPDF(m_strSourceDocName))
+			{
+				return S_OK;
+			}
+
 			long nPageCount = getNumberOfPagesInImage(m_strSourceDocName);
 
 			// For each page that exists (according to LeadTools), check the page dimensions to see
@@ -1152,8 +1171,11 @@ STDMETHODIMP CSpatialString::ValidatePageDimensions()
 				int nLTHeight = 0;
 				getImagePixelHeightAndWidth(
 					m_strSourceDocName, nLTHeight, nLTWidth, nPage);
-					
-				if (abs(ipPageInfo->Width - nLTWidth) > 1 || abs(ipPageInfo->Height - nLTHeight) > 1)
+	
+				// Allow for a couple pixels difference in height/width as sometimes seems to occur
+				// but that doesn't seem to imply different DPIs being used (which would cause
+				// highlights/redactions to be misplaced).
+				if (abs(ipPageInfo->Width - nLTWidth) > 2 || abs(ipPageInfo->Height - nLTHeight) > 2)
 				{
 					UCLIDException ue("ELI37089", "Mis-matched coordinate systems detected.");
 					ue.addDebugInfo("Page", nPage);

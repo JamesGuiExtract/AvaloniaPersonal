@@ -5,6 +5,7 @@
 #include "LeadToolsBitmapFreeer.h"
 #include "LeadToolsFormatHelpers.h"
 #include "ExtractZoneAsImage.h"
+#include "LocalPDFOptions.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -423,6 +424,9 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		BrushCollection brushes;
 		PenCollection pens;
 
+		// Keep track of the dimensions of each page for use for PDFs in the confirmImageAreas call.
+		map<int, pair<int, int>> mapPageResolutions;
+
 		// loop to allow for multiple attempts to fill an image area (P16 #2593)
 		bool bSuccessful = false;
 		_lastCodePos = "40";
@@ -493,6 +497,8 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						loadImagePage(strImageFileName, hBitmap, fileInfo, lfo, false);
 						_lastCodePos = "70_A_Page#" + strPageNumber;
 
+						mapPageResolutions[i] = pair<int, int>(fileInfo.XResolution, fileInfo.YResolution);
+						
 						// https://extract.atlassian.net/browse/ISSUE-12096
 						// We are no longer outputing PDFs as bitonal by having first converted them
 						// to tiff images. But ensure we don't save PDFs in an uncompressed format
@@ -871,7 +877,8 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 			// to PDF.
 			if (bConfirmApplication)
 			{
-				confirmImageAreas(strOutputImageName, rvecZones, bApplyAsAnnotations);
+				confirmImageAreas(
+					strOutputImageName, mapPageResolutions, rvecZones, bApplyAsAnnotations);
 
 				// If any redaction text was skipped in order to be able to confirm the zones, the
 				// fillImageArea call will need to be repeated, this time with bConfirmApplication
@@ -888,23 +895,33 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 				}
 			}
 
-			if (bOutputIsPdf && bForcedBurnOfAnnotations)
+			if (bOutputIsPdf)
 			{
-				// Log application trace if annotations added to the document and
-				// output is a PDF [FlexIDSCore #3131 - JDS - 12/18/2008] 
-				UCLIDException uex("ELI23594",
-					"Application trace: Burned annotations into a PDF.");
-				uex.addDebugInfo("Input Image File", strImageFileName);
-				uex.addDebugInfo("Output Image File", strOutputImageName);
-				uex.log();
+				if (!strOwnerPassword.empty() || !strUserPassword.empty())
+				{
+					createSecurePDF(
+						strOutputImageName, strUserPassword, strOwnerPassword, nPermissions);
+				}
+				
+				if (bForcedBurnOfAnnotations)
+				{
+					// Log application trace if annotations added to the document and
+					// output is a PDF [FlexIDSCore #3131 - JDS - 12/18/2008] 
+					UCLIDException uex("ELI23594",
+						"Application trace: Burned annotations into a PDF.");
+					uex.addDebugInfo("Input Image File", strImageFileName);
+					uex.addDebugInfo("Output Image File", strOutputImageName);
+					uex.log();
+				}
 			}
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25288");
 }
 //-------------------------------------------------------------------------------------------------
-void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& rvecZones,
-					 bool bAppiedAsAnnotations)
+void confirmImageAreas(const string& strImageFileName,
+					   const map<int, pair<int, int>>& mapPageResolutions,
+					   vector<PageRasterZone>& rvecZones, bool bAppiedAsAnnotations)
 {
 	try
 	{
@@ -958,6 +975,14 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 
 			// Set the load option for the current page
 			lfo.PageNumber = i;
+
+			// https://extract.atlassian.net/browse/ISSUE-12275
+			// Ensure the page is loaded in the same DPI as was used when drawing the image areas.
+			// NOTE: This applies only for PDF documents.
+			CLocalPDFOptions localPDFOptions;
+			localPDFOptions.m_pdfOptions.nXResolution = mapPageResolutions.at(i).first;
+			localPDFOptions.m_pdfOptions.nYResolution = mapPageResolutions.at(i).second;
+			localPDFOptions.ApplyPDFOptions("ELI37113", "Failed to apply PDF options.");
 
 			// Set FILEINFO_FORMATVALID (this will speed up the L_LoadBitmap calls)
 			fileInfo = GetLeadToolsSizedStruct<FILEINFO>(FILEINFO_FORMATVALID);
@@ -1514,9 +1539,8 @@ bool skipImageAreaConfirmation()
 	return bSkipImageAreaConfirmation;
 }
 //-------------------------------------------------------------------------------------------------
-void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnnotations,
-					 const string& strUserPassword, const string& strOwnerPassword,
-					 int nPermissions)
+void createSecurePDF(const string& strPDF, const string& strUserPassword,
+					 const string& strOwnerPassword, int nPermissions)
 {
 	try
 	{
@@ -1526,18 +1550,18 @@ void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnn
 			string strEXEPath = getLeadUtilsDirectory();
 			strEXEPath += gstrCONVERTER_EXE_NAME.c_str();
 
+			// ImageFormatConverter doesn't accept input/output documents being the same... so start
+			// by moving the source document to a temporary file name.
+			TemporaryFileName strTempOutput(true, __nullptr, ".pdf");
+			moveFile(strPDF, strTempOutput.getName(), true);
+
 			// Provide image paths and output type
 			string strArguments = "\"";
-			strArguments += strTIF.c_str();
+			strArguments += strTempOutput.getName();
 			strArguments += "\" \"";
 			strArguments += strPDF.c_str();
 			strArguments += "\" ";
 			strArguments += gstrCONVERT_TO_PDF_OPTION;
-			if (bRetainAnnotations)
-			{
-				strArguments += " ";
-				strArguments += gstrCONVERT_RETAIN_ANNOTATIONS;
-			}
 
 			bool bSecurityAdded = false;
 			if (!strUserPassword.empty())
@@ -1568,41 +1592,7 @@ void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnn
 	}
 	catch(UCLIDException& ue)
 	{
-		ue.addDebugInfo("Tif To Convert", strTIF);
 		ue.addDebugInfo("PDF Destination", strPDF);
-		ue.addDebugInfo("Retain Annotations", bRetainAnnotations ? "True" : "False");
-		throw ue;
-	}
-}
-//-------------------------------------------------------------------------------------------------
-void convertPDFToTIF(const string& strPDF, const string& strTIF)
-{
-	try
-	{
-		try
-		{
-			// Build path to ImageFormatConverter application
-			string strEXEPath = getLeadUtilsDirectory();
-			strEXEPath += gstrCONVERTER_EXE_NAME.c_str();
-
-			// Provide image paths and output type
-			string strArguments = "\"";
-			strArguments += strPDF.c_str();
-			strArguments += "\" \"";
-			strArguments += strTIF.c_str();
-			strArguments += "\" ";
-			strArguments += gstrCONVERT_TO_TIF_OPTION.c_str();
-
-			// Run the EXE with arguments and appropriate wait time (P13 #4415)
-			// Use infinite wait time (P13 #4634)
-			runExeWithProcessKiller(strEXEPath, true, strArguments);
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25221")
-	}
-	catch(UCLIDException& ue)
-	{
-		ue.addDebugInfo("PDF To Convert", strPDF);
-		ue.addDebugInfo("Tif Destination", strTIF);
 		throw ue;
 	}
 }

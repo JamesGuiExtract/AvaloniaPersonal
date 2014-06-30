@@ -167,6 +167,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="LineRect.cpp" />
+    <ClCompile Include="LocalPDFOptions.cpp" />
     <ClCompile Include="MiscLeadUtils.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -193,6 +194,7 @@
     <ClInclude Include="LeadToolsFormatHelpers.h" />
     <ClInclude Include="LeadUtils.h" />
     <ClInclude Include="LineRect.h" />
+    <ClInclude Include="LocalPDFOptions.h" />
     <ClInclude Include="MiscLeadUtils.h" />
     <ClInclude Include="PasteImage.h" />
     <ClInclude Include="resource.h" />

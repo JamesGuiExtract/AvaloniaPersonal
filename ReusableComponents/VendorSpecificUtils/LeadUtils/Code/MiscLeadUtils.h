@@ -232,14 +232,19 @@ LEADUTILS_API void fillImageArea(const string& strImageFileName,
 // PROMISE: To confirm that image areas (i.e. redactions) have been filled properly per the
 //			specified rvecZones. This function checks the border and fill color of the zones. It
 //			assumes no text has been applied to the redatctions.
-// ARGS:	rvecZones- FillAreaStructs defining the image zones which should now be filled.
+// ARGS:	mapPageResolutions- Contains the source page dimensions that should be used to find and
+//			confirm any output image areas. Used because if the destination file type was PDF, it
+//			may be opened in a different DPI than the source image.
+//			(See https://extract.atlassian.net/browse/ISSUE-12275)
+//			rvecZones- FillAreaStructs defining the image zones which should now be filled.
 //			bAppiedAsAnnotations- true if the image areas are filled as annotations, false if the
 //			image areas should be burned into the images area itself. When true, the areas will be
 //			tested by burning them into a temporary copy of the image. Therefore, this function may
 //			produce an exception even if the annotations have been applied correctly if the burn-in
 //			process fails.
-LEADUTILS_API void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& rvecZones,
-					 bool bAppiedAsAnnotations);
+LEADUTILS_API void confirmImageAreas(const string& strImageFileName,
+	const map<int, pair<int, int>> &mapPageResolutions, vector<PageRasterZone>& rvecZones,
+	bool bAppiedAsAnnotations);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To take a vector of image file names and combine them into a multipage file with
 //			the name of strOutputFileName
@@ -329,19 +334,10 @@ LEADUTILS_API bool isLeadToolsSerialized();
 // PROMISE: Returns true if any calls to confirmImageAreas from fillImageArea should be skipped.
 LEADUTILS_API bool skipImageAreaConfirmation();
 //-------------------------------------------------------------------------------------------------
-// PURPOSE: To convert a TIF image into a PDF image.  This function does not return 
-//			until the conversion is complete.  If the TIF was from TemporaryFileName, auto-deletion 
-//			when the variable goes out of scope is acceptable.
-//			If bRetainAnnotations is true then any redaction type annotations in the tif will
-//			be burned into the PDF [FIDSC #3131 - JDS - 12/17/2008].
-LEADUTILS_API void convertTIFToPDF(const string& strTIF, const string& strPDF,
-								   bool bRetainAnnotations = false,
-								   const string& strUserPassword = "",
+// PURPOSE: To add PDF security to an output document. This function does not return  until the
+//			conversion is complete.
+LEADUTILS_API void createSecurePDF(const string& strPDF, const string& strUserPassword = "",
 								   const string& strOwnerPassword = "", int nPermissions = 0);
-//-------------------------------------------------------------------------------------------------
-// PURPOSE: To convert a PDF image into a TIF image.  This function does not return 
-//			until the conversion is complete.
-LEADUTILS_API void convertPDFToTIF(const string& strPDF, const string& strTIF);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To calculate the 4 corner points of the raster zone given in rZone
 //			aPoints[0] = point above start point
