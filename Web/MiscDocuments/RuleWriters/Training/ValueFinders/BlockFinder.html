@@ -18,6 +18,14 @@
 	</ul>
 
 <hr>
+	<h3>Note</h3>
+	<ul>
+		<li><p>The option, 'Find blocks containing at least __ of the clue(s) defined below', works a little differently than you might expect. For example, if your source text is 'A, B, A, A' and you specify the blockfinder must find blocks containing at least three of the clues 'A', 'B', and 'C', it will actually find the 'A' clue three times and thus grab the 'A, B, A, A' block - even though it doesn't contain 'B' or 'C' at all.</p>
+        <p>The workaround so that it will only grab a given clue once, is to do a regex pattern like '<code>A[\s\S]*\z</code>'. This clue could only find an 'A' at most one time.</p>
+        </li>
+	</ul>
+
+<hr>
 	<h3>Exercises</h3>
 	<ol>
 		<li>TBD.</li>
