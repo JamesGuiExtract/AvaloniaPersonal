@@ -1053,7 +1053,7 @@ namespace Extract.FileActionManager.FileProcessors
             this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "ViewImageTaskForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "(Waiting for file)";
+            this.Text = "View Image";
             imageViewerToolStripContainer.BottomToolStripPanel.ResumeLayout(false);
             imageViewerToolStripContainer.BottomToolStripPanel.PerformLayout();
             imageViewerToolStripContainer.ContentPanel.ResumeLayout(false);

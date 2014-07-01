@@ -33,6 +33,11 @@ namespace Extract.FileActionManager.FileProcessors
             FileSystemMethods.ApplicationDataPath, "ImageViewerTask", "ImageViewerTaskForm.xml");
 
         /// <summary>
+        /// The title to display for the view image task form.
+        /// </summary>
+        const string _FORM_TASK_TITLE = "View Image";
+
+        /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(ViewImageTaskForm).ToString();
@@ -153,7 +158,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             if (_imageViewer.IsImageAvailable)
             {
-                Text = Path.GetFileName(_currentFileName);
+                Text = Path.GetFileName(_currentFileName) + " - " + _FORM_TASK_TITLE;
 
                 _tagFileToolStripButton.Enabled = true;
                 _tagFileToolStripButton.FileId = _currentFileId;
@@ -163,7 +168,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             else
             {
-                Text = " (Waiting for file)";
+                Text = "(Waiting for file) - " + _FORM_TASK_TITLE;
 
                 _tagFileToolStripButton.Enabled = false;
 
@@ -232,6 +237,20 @@ namespace Extract.FileActionManager.FileProcessors
                 // Disable open/close image
                 _imageViewer.Shortcuts[Keys.O | Keys.Control] = null;
                 _imageViewer.Shortcuts[Keys.F4 | Keys.Control] = null;
+
+                // Disable shortcuts for tools that aren't available:
+                _imageViewer.Shortcuts[Keys.Escape] = null;
+                _imageViewer.Shortcuts[Keys.H] = null;
+
+                // Disable shortcuts for tile navagation
+                _imageViewer.Shortcuts[Keys.OemPeriod] = null;
+                _imageViewer.Shortcuts[Keys.Oemcomma] = null;
+
+                // Disable shortcuts for layer object navagation
+                _imageViewer.Shortcuts[Keys.F3] = null;
+                _imageViewer.Shortcuts[Keys.Control | Keys.OemPeriod] = null;
+                _imageViewer.Shortcuts[Keys.F3 | Keys.Shift] = null;
+                _imageViewer.Shortcuts[Keys.Control | Keys.Oemcomma] = null;
 
                 // Save and commit
                 _imageViewer.Shortcuts[Keys.Tab | Keys.Control] = GoToNextDocument;
