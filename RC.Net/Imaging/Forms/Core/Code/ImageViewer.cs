@@ -4000,7 +4000,14 @@ namespace Extract.Imaging.Forms
                     // about or would want to return to, thus don't update zoom history. There
                     // is a least one exception that I don't think is important enough to worry
                     // about (see https://extract.atlassian.net/browse/ISSUE-12153)
-                    UpdateZoom(false, true);
+                    //
+                    // https://extract.atlassian.net/browse/ISSUE-12284
+                    // Don't raise the zoom changed events that occur as a result of the
+                    // PaintToGraphics method (magnifier). Handles that check certain properties
+                    // such ScaleFactor during PaintToGraphics will get inaccurate values that
+                    // pertain to the control being painted (the magnifier) rather than the main
+                    // image viewer.
+                    UpdateZoom(false, !_paintingToGraphics);
                 }
             }
             catch (Exception ex)
