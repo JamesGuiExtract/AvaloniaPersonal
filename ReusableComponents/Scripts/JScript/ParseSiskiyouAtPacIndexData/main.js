@@ -42,7 +42,7 @@ function main(args) {
     var csvlines = readAllText(inputFile).split(/\n/).map(function(s){return s.trim()});
     for (var i=0; i < csvlines.length; i++) {
         handleDebug("CSVLine", i);
-        var fields = csvlines[i].split(/\s*,\s*/);
+        var fields = csvlines[i].split(",").map(function(s){return s.trim()});
 
         // Update map of images to copy
         setCopyImage(fields);
@@ -56,11 +56,16 @@ function main(args) {
                 makeEAVS_PARTIES(fields);
             }
         } else {
-            makeEAVS_PIN(fields);
+            try {
+                makeEAVS_PIN(fields);
+            } catch(err) {
+                handleScriptError("ParseSiskiyouAtPacIndexData_1", "Error parsing record!", err, "Fields", fields.join("|"));
+                throw err;
+            }
         }
     }
     
-    copyImages(imagesToCopy);
+    //copyImages(imagesToCopy);
 
     // Update map of images to destinations based on doc-type(s)
     function setCopyImage(fields) {
