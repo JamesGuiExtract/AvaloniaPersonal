@@ -168,6 +168,19 @@ void CEditWithPageIndicators::UpdatePageRuler()
         // Get the first character of the last line since just interested in the page number
 		// all the characters on the last line will have the same page number
 		nLastPos =  LineIndex(nLastVisibleLine);
+
+		// https://extract.atlassian.net/browse/ISSUE-12008
+		// getPageAtPos will look for the next spatial letter starting at nLastPos... if nLastPos is
+		// not spatial and there are no subsequent spatial letters, keep moving to previous lines
+		// until one constains a spatial letter.
+		CString szText;
+		GetWindowText(szText);
+		string strText = (LPCTSTR)szText;
+		while (nLastPos != nFirstPos && !containsNonWhitespaceChars(strText.substr(nLastPos)))
+		{
+			nLastVisibleLine--;
+			nLastPos =  LineIndex(nLastVisibleLine);
+		}
 	
 		int nCurrPage = getPageAtPos(nFirstPos);
 		int nTopPage = nCurrPage;
