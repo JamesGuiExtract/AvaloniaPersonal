@@ -704,9 +704,9 @@ void createDirectory(const string& strDirectory, bool bSetPermissionsToAllUsers)
 					// code block above, and one of the threads may have executed the CreateDirectory()
 					// call above, and the second thread's CreateDirectory call will fail because the
 					// directly already exists.  So, when the create directory call fails, before
-					// throwing an exception, just double check to make sure that the directory still
-					// does not exist.
-					if (!directoryExists(strTempDir))
+					// throwing an exception, double-check that the reason for failure is not
+					// because the directory already existed.
+					if (errorCode != ERROR_ALREADY_EXISTS && !directoryExists(strTempDir.c_str()))
 					{
 						string strMessage = "The directory \"";
 						strMessage += strDirectory;
@@ -834,28 +834,24 @@ bool getAllSubDirsAndDeleteAllFiles(const string &strDirectory, vector<string> &
 //--------------------------------------------------------------------------------------------------
 bool directoryExists(const string &strDir)
 {
-	// first store the current working directory
-	char buf[MAX_PATH] = {0};
-	if (GetCurrentDirectory(MAX_PATH, buf) == 0)
+	// Re-written for: https://extract.atlassian.net/browse/ISSUE-12288
+	DWORD dwAttributes = GetFileAttributes(strDir.c_str());
+	if (dwAttributes == INVALID_FILE_ATTRIBUTES)
 	{
-		UCLIDException ue("ELI00260", "Unable to get current directory.");
-		ue.addWin32ErrorInfo();
-		throw ue;
+		// Conceivably, the directory actually does exist, but we just don't have access to read the
+		// directory's attributes in this case. Per Remy Lebeau's comment here:
+		// http://stackoverflow.com/questions/8233842/how-to-check-if-directory-exist-using-c-and-winapi
+		// we could call GetLastError to try to determine if perhaps it exists but we just don't have
+		// access, but:
+		// A) In the context of the software, it isn't likely to matter whether it exists or we can't
+		//	access it. In either case it essentially doesn't exist as far as our code is concerned.
+		// B) It doesn't seem clear to me that it we can use the GetLastError codes to reliably know
+		//	whether it exists or there is some other problem anyway. i.e., what is the full set of
+		//	error codes we would need to account for?
+		return false;
 	}
 
-	// change the working directory to strDir, just to find out if strDir exists
-	bool bRet = (SetCurrentDirectory(strDir.c_str()) != 0);
-	
-	// restore the previous working directory
-	if (SetCurrentDirectory(buf) == 0)
-	{
-		UCLIDException ue("ELI00261", "Unable to set directory.");
-		ue.addWin32ErrorInfo();
-		ue.addDebugInfo("Directory to set", buf);
-		throw ue;
-	}
-
-	return bRet;
+	return (dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 //--------------------------------------------------------------------------------------------------
 string getClosestNonExistentUniqueFileName(const string& strOriginalFileName)
