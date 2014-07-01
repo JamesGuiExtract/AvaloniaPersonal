@@ -65,7 +65,7 @@ function main(args) {
         }
     }
     
-    //copyImages(imagesToCopy);
+    copyImages(imagesToCopy);
 
     // Update map of images to destinations based on doc-type(s)
     function setCopyImage(fields) {
