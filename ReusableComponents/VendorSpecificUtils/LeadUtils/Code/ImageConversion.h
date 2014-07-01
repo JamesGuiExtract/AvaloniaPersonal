@@ -7,3 +7,4 @@
 const std::string gstrCONVERTER_EXE_NAME = "ImageFormatConverter.exe";
 const std::string gstrCONVERT_TO_TIF_OPTION = "/tif";
 const std::string gstrCONVERT_TO_PDF_OPTION = "/pdf";
+const std::string gstrCONVERT_RETAIN_ANNOTATIONS = "/retain";

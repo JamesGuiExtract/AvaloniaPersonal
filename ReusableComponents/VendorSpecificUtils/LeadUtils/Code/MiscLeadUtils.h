@@ -334,6 +334,20 @@ LEADUTILS_API bool isLeadToolsSerialized();
 // PROMISE: Returns true if any calls to confirmImageAreas from fillImageArea should be skipped.
 LEADUTILS_API bool skipImageAreaConfirmation();
 //-------------------------------------------------------------------------------------------------
+// PURPOSE: To convert a TIF image into a PDF image.  This function does not return 
+//			until the conversion is complete.  If the TIF was from TemporaryFileName, auto-deletion 
+//			when the variable goes out of scope is acceptable.
+//			If bRetainAnnotations is true then any redaction type annotations in the tif will
+//			be burned into the PDF [FIDSC #3131 - JDS - 12/17/2008].
+LEADUTILS_API void convertTIFToPDF(const string& strTIF, const string& strPDF,
+								   bool bRetainAnnotations = false,
+								   const string& strUserPassword = "",
+								   const string& strOwnerPassword = "", int nPermissions = 0);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To convert a PDF image into a TIF image.  This function does not return 
+//			until the conversion is complete.
+LEADUTILS_API void convertPDFToTIF(const string& strPDF, const string& strTIF);
+//-------------------------------------------------------------------------------------------------
 // PURPOSE: To add PDF security to an output document. This function does not return  until the
 //			conversion is complete.
 LEADUTILS_API void createSecurePDF(const string& strPDF, const string& strUserPassword = "",

@@ -1539,6 +1539,99 @@ bool skipImageAreaConfirmation()
 	return bSkipImageAreaConfirmation;
 }
 //-------------------------------------------------------------------------------------------------
+void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnnotations,
+					 const string& strUserPassword, const string& strOwnerPassword,
+					 int nPermissions)
+{
+	try
+	{
+		try
+		{
+			// Build path to ImageFormatConverter application
+			string strEXEPath = getLeadUtilsDirectory();
+			strEXEPath += gstrCONVERTER_EXE_NAME.c_str();
+
+			// Provide image paths and output type
+			string strArguments = "\"";
+			strArguments += strTIF.c_str();
+			strArguments += "\" \"";
+			strArguments += strPDF.c_str();
+			strArguments += "\" ";
+			strArguments += gstrCONVERT_TO_PDF_OPTION;
+			if (bRetainAnnotations)
+			{
+				strArguments += " ";
+				strArguments += gstrCONVERT_RETAIN_ANNOTATIONS;
+			}
+
+			bool bSecurityAdded = false;
+			if (!strUserPassword.empty())
+			{
+				strArguments += " /user \"";
+				strArguments += encryptString(strUserPassword);
+				strArguments += "\"";
+				bSecurityAdded = true;
+			}
+			if (!strOwnerPassword.empty())
+			{
+				strArguments += " /owner \"";
+				strArguments += encryptString(strOwnerPassword);
+				strArguments += "\" ";
+				strArguments += asString(nPermissions);
+				bSecurityAdded = true;
+			}
+			if (bSecurityAdded)
+			{
+				strArguments += " /enc";
+			}
+
+			// Run the EXE with arguments and appropriate wait time (P13 #4415)
+			// Use infinite wait time (P13 #4634)
+			runExtractEXE( strEXEPath, strArguments, INFINITE );
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25223");
+	}
+	catch(UCLIDException& ue)
+	{
+		ue.addDebugInfo("Tif To Convert", strTIF);
+		ue.addDebugInfo("PDF Destination", strPDF);
+		ue.addDebugInfo("Retain Annotations", bRetainAnnotations ? "True" : "False");
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void convertPDFToTIF(const string& strPDF, const string& strTIF)
+{
+	try
+	{
+		try
+		{
+			// Build path to ImageFormatConverter application
+			string strEXEPath = getLeadUtilsDirectory();
+			strEXEPath += gstrCONVERTER_EXE_NAME.c_str();
+
+			// Provide image paths and output type
+			string strArguments = "\"";
+			strArguments += strPDF.c_str();
+			strArguments += "\" \"";
+			strArguments += strTIF.c_str();
+			strArguments += "\" ";
+			strArguments += gstrCONVERT_TO_TIF_OPTION.c_str();
+
+			// Run the EXE with arguments and appropriate wait time (P13 #4415)
+			// Use infinite wait time (P13 #4634)
+			runExeWithProcessKiller(strEXEPath, true, strArguments);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25221")
+	}
+	catch(UCLIDException& ue)
+	{
+		ue.addDebugInfo("PDF To Convert", strPDF);
+		ue.addDebugInfo("Tif Destination", strTIF);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 void createSecurePDF(const string& strPDF, const string& strUserPassword,
 					 const string& strOwnerPassword, int nPermissions)
 {
@@ -1588,7 +1681,7 @@ void createSecurePDF(const string& strPDF, const string& strUserPassword,
 			// Use infinite wait time (P13 #4634)
 			runExtractEXE( strEXEPath, strArguments, INFINITE );
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25223");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37114");
 	}
 	catch(UCLIDException& ue)
 	{
