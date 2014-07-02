@@ -102,15 +102,18 @@
 <p>
     	<li><b>Enable logging in the Entity Finder object</b> 
     	<ul>
-        	<li>Modify <b>.\TestingFiles\ProductDevelopment\AttributeFinder\AFUtils\AFUtilsTest\TestFiles\TestEntityFinder.dat</b> 
+        	<li>Modify <b>.\TestingFiles\ProductDevelopment\AttributeFinder\AFUtils
+		\AFUtilsTest\TestFiles\TestEntityFinder.dat</b> 
         	to comment out all of the <b>&lt;FILE&gt;</b> lines except for one.
-        	<li>Modify <b>.\TestingFiles\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\All\AFCore.tcl</b> 
+        	<li>Modify <b>.\TestingFiles\ProductDevelopment\AttributeFinder\AFCore
+		\AutomatedTest\All\AFCore.tcl</b> 
         	to comment out all lines except for the line starting with 
         	<b>UCLIDAFUtilsTest.EntityFinderTester.1;;</b>.
 <p>
         	<li>Confirm that the checkbox is <b>checked</b>.</li>
         	<li>Exercise <b>Run All Tests</b> from the RDT Start menu.</li>
-        	<li>Confirm that <b>EFALog.dat</b> is updated in the <b>CommonComponents</b> folder.</li>
+        	<li>Confirm that <b>EFALog.dat</b> is updated in the <b>CommonComponents</b> 
+		folder.</li>
 <p>
         	<li>Confirm that the checkbox is <b>unchecked</b>.</li>
         	<li>Exercise <b>Run All Tests</b> from the RDT Start menu.</li>
@@ -120,7 +123,8 @@
 <p>
     	<li><b>Enable logging in the Entity Name Data Scorer object</b> 
     	<ul>
-        	<li> Modify <b>.\TestingFiles\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\All\AFCore.tcl</b> 
+        	<li> Modify <b>.\TestingFiles\ProductDevelopment\AttributeFinder\AFCore
+		\AutomatedTest\All\AFCore.tcl</b> 
         	to comment out all lines except for the line starting with 
         	<b>UCLIDAFDataScorersTest.EntityNameDataScorerTester.1;;</b>.
 <p>
@@ -131,14 +135,15 @@
 <p>
         	<li>Confirm that the checkbox is <b>unchecked</b>.</li>
         	<li>Exercise <b>Run All Tests</b> from the RDT Start menu.</li>
-        	<li>Confirm that <b>gstrENDSLog.dat</b> is not updated in the <b>CommonComponents</b> 
-		folder.</li>
+        	<li>Confirm that <b>gstrENDSLog.dat</b> is not updated in the 
+		<b>CommonComponents</b> folder.</li>
     	</ul>
 <p>
-    	<li><b>Add document tag with RuleID for rule that captured data when using the Grantor-Grantee 
-	Finder</b> 
+    	<li><b>Add document tag with RuleID for rule that captured data when using 
+	the Grantor-Grantee Finder</b> 
     	<ul>
-        	<li>This option is no longer used since <b>Grantor-Grantee Finder</b> is obsolete.
+        	<li>This option is no longer used since <b>Grantor-Grantee Finder</b> is 
+		obsolete.
     	</ul>
 <p>
     	<li><b>Enable Auto Scrolling of the Test Logger window as test runs</b>
@@ -150,8 +155,8 @@
 <p>
         	<li>Confirm that the checkbox is <b>unchecked</b>.</li>
         	<li>Execute a long-running test in the <b>Test Harness</b>.</li>
-        	<li>Confirm that the <b>Test Result Logger</b> window does not automatically scroll up 
-        	as the test runs.</li>
+        	<li>Confirm that the <b>Test Result Logger</b> window does not automatically 
+		scroll up as the test runs.</li>
     	</ul>
 <p>
     	<li><b>Display X, Y percentages in Image Viewer or Extract Image Viewer</b> 
@@ -228,6 +233,7 @@
         	<b>TestingFiles2</b>.</li>
         	<li>Make some changes to TCL or DAT files, perhaps similar to those described 
         	above for logging in the Entity Finder object.
+		<li><b>[JIRA #7486]</b> Confirm that the <b>Browse</b> button works correctly.
         	<li>Use <b>RDTConfig.exe</b> to modify the root folder setting.
         	<li>Exercise the changed file(s) and confirm that the expected results are seen.
         	<li>Restore the previous root folder.
@@ -236,7 +242,7 @@
 <p>
     	<li><b>Full path to component data folder</b> 
     	<ul>
-        	<li>TBD.</li>
+		<li><b>[JIRA #7486]</b> Confirm that the <b>Browse</b> button works correctly.
     	</ul>
 <p>
     	<li><b>Diff tool command line</b> 
