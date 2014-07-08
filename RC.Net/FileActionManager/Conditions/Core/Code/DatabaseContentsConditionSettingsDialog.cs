@@ -1228,7 +1228,7 @@ namespace Extract.FileActionManager.Conditions
             {
                 fileProcessingDB.ConnectLastUsedDBThisProcess();
                 var connectionStringBuilder = new DbConnectionStringBuilder();
-                connectionStringBuilder.ConnectionString = fileProcessingDB.CurrentConnectionString;
+                connectionStringBuilder.ConnectionString = fileProcessingDB.ConnectionString;
                 connectionStringBuilder.Add("Timeout", _SCHEMA_UPDATE_TIMEOUT);
                 _schemaInfoDbConnection = new OleDbConnection(connectionStringBuilder.ConnectionString);
                 _schemaInfoDbConnection.Open();

@@ -1880,24 +1880,7 @@ namespace Extract.FileActionManager.Conditions
             {
                 if (_dbConnection == null)
                 {
-                    // https://extract.atlassian.net/browse/ISSUE-12312
-                    // fileProcessingDB may not yet have a DB connection (and thus 
-                    // CurrentConnectionString is empty) if the DB connection has not yet been used
-                    // on this thread.
-                    // The long term fix for this issue will be that the CurrentConnectionString
-                    // property will use the same createConnectionString/
-                    // updateConnectionStringProperties code used in getDBConnection to generate the
-                    // connection string in the case that there is no current connection but the
-                    // database and server have been specified. However, since such a change
-                    // involves touching core database code, for the time being the use this hack to
-                    // force a database connection when needed.
-                    if (!fileProcessingDB.IsConnected)
-                    {
-                        bool temp = false;
-                        fileProcessingDB.HasTags(ref temp);
-                    }
-
-                    _dbConnection = new OleDbConnection(fileProcessingDB.CurrentConnectionString);
+                    _dbConnection = new OleDbConnection(fileProcessingDB.ConnectionString);
                     _dbConnection.Open();
                 }
 

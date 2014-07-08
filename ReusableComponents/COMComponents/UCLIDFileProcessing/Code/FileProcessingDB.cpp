@@ -2761,7 +2761,7 @@ STDMETHODIMP CFileProcessingDB::GetFileCount(VARIANT_BOOL bUseOracleSyntax, LONG
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35760")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::get_CurrentConnectionString(BSTR* pbstrConnectionString)
+STDMETHODIMP CFileProcessingDB::get_ConnectionString(BSTR* pbstrConnectionString)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -2771,7 +2771,15 @@ STDMETHODIMP CFileProcessingDB::get_CurrentConnectionString(BSTR* pbstrConnectio
 
 		ASSERT_ARGUMENT("ELI35945", pbstrConnectionString != __nullptr);
 
-		*pbstrConnectionString = _bstr_t(m_strCurrentConnectionString.c_str()).Detach();
+		// https://extract.atlassian.net/browse/ISSUE-12312
+		// Because each thread establishes its own DB connections (which modified the previously
+		// existing m_strCurrentConnectionString), m_strCurrentConnectionString could not be used
+		// to reliably obtain the connection string across all threads. Instead generate the
+		// connection string that would be used whether or not we are currently connected.
+		string strConnectionString = createConnectionString(
+			m_strDatabaseServer, m_strDatabaseName, m_strAdvConnStrProperties);
+
+		*pbstrConnectionString = _bstr_t(strConnectionString.c_str()).Detach();
 
 		return S_OK;
 	}

@@ -1245,9 +1245,11 @@ library UCLID_FILEPROCESSINGLib
 		// RETURNS: The file count.
 		[id(111)] HRESULT GetFileCount(VARIANT_BOOL bUseOracleSyntax, [out,retval] LONGLONG* pnFileCount);
 		//-----------------------------------------------------------------------------------------
-		// RETURNS: If connected, the connection string used to connect; otherwise, NULL
-		[propget, id(112), helpstring("property CurrentConnectionString")]
-			HRESULT CurrentConnectionString([out, retval] BSTR* pbstrConnectionString);
+		// RETURNS: The connection string used to connect based on the current database server,
+		//			name and advanced connection string properties.
+		// NOTE:	Throws an exception if the database server and name have not been specified.
+		[propget, id(112), helpstring("property ConnectionString")]
+			HRESULT ConnectionString([out, retval] BSTR* pbstrConnectionString);
 		//-----------------------------------------------------------------------------------------
 		// RETURNS: VARIANT_TRUE if the whether the user has entered valide admin credentials.
 		[propget, id(113), helpstring("property LoggedInAsAdmin")]

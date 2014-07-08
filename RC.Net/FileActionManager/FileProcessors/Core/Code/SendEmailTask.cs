@@ -1086,7 +1086,7 @@ namespace Extract.FileActionManager.FileProcessors
                         {
                             if (fileProcessingDB != null)
                             {
-                                _dbConnection = new OleDbConnection(fileProcessingDB.CurrentConnectionString);
+                                _dbConnection = new OleDbConnection(fileProcessingDB.ConnectionString);
                                 _dbConnection.Open();
                             }
 

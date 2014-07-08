@@ -238,7 +238,7 @@ public:
 	STDMETHOD(ShowSelectDB)(BSTR bstrPrompt, VARIANT_BOOL bAllowCreation,
 		VARIANT_BOOL bRequireAdminLogin, VARIANT_BOOL* pbConnected);
 	STDMETHOD(GetFileCount)(VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
-	STDMETHOD(get_CurrentConnectionString)(BSTR* pbstrConnectionString);
+	STDMETHOD(get_ConnectionString)(BSTR* pbstrConnectionString);
 	STDMETHOD(get_LoggedInAsAdmin)(VARIANT_BOOL* pbLoggedInAsAdmin);
 	STDMETHOD(IsFeatureEnabled)(BSTR bstrFeatureName, VARIANT_BOOL* pbFeatureIsEnabled);
 	STDMETHOD(DuplicateConnection)(IFileProcessingDB *pConnectionSource);
@@ -350,9 +350,6 @@ private:
 
 	// This string should always contain the current status string
 	string m_strCurrentConnectionStatus;
-
-	// This connection string that was used to connect to the DB.
-	string m_strCurrentConnectionString;
 
 	// The connection string used on the last successful login. Used to ensure credentials
 	// are not carried over from one DB to another.
