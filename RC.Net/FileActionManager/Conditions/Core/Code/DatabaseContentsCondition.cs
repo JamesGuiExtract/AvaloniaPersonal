@@ -441,6 +441,13 @@ namespace Extract.FileActionManager.Conditions
                             int errorAllowance = expandedValue.Length / 3;
                             int whiteSpaceAllowance = expandedValue.Length / 2;
 
+                            // https://extract.atlassian.net/browse/ISSUE-12321
+                            // The value to be searched needs to be escaped for regex, otherwise the
+                            // value will be treated as a regex. The expansion should happen after
+                            // determining the error allowance so that escape chars aren't factored
+                            // into the error allowance.
+                            expandedValue = Regex.Escape(expandedValue);
+
                             _valueRegex = new DotNetRegexParser();
                             _valueRegex.IgnoreCase = !_caseSensitive;
                             _valueRegex.Pattern = string.Format(CultureInfo.InvariantCulture,
