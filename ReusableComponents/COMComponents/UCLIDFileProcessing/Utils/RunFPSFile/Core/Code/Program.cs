@@ -84,7 +84,9 @@ namespace Extract.FileActionManager.RunFPSFile
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        [STAThread]
+        // https://extract.atlassian.net/browse/ISSUE-12316
+        // Do not initialize this thread as [STAThread] as multithread COM objects are created then
+        // used on different threads which can lead to lockups if this thread is STA.
         static void Main(string[] args)
         {
             try
