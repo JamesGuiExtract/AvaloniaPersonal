@@ -1,0 +1,1 @@
+del ..\Output\*.txt
