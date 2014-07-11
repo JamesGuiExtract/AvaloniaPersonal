@@ -124,6 +124,67 @@
         </ul></li>
     </UL></li>
 <p>
+    	<LI><h2>[JIRA #12236] Enable Trace</h2>
+    	<UL>
+		<li><u>Setup</u>
+		<ul>
+	        	<LI>Add an entry to the <b>Demo_FLEXIndex\DataEntry 
+			Solution\DemoFlexIndex.config</b> file as follows.
+			<ul>
+				<li>&lt;Extract.DataEntry.Utilities.DataEntryApplication.
+				Properties.Settings&gt;
+				<li>&lt;setting name="EnableTrace" serializeAs="String"&gt;
+				<li>&lt;value&gt;True&lt;/value&gt;
+				<li>&lt;/setting&gt;
+				<li>&lt;/Extract.DataEntry.Utilities.DataEntryApplication.
+				Properties.Settings&gt;
+			</ul>
+			<li>Run the <b>Dbgview.exe</b> utility found in the 
+			<b>I:\users\Steve_Kurth\Public\Utilities</b> folder.
+		</ul>
+		<li><u>Function</u>
+		<ul>
+			<li>Specify <b>*</b> in the <b>Include:</b> field and verify 
+			<b>Example01.tif</b>.
+			<li>Swipe some text into the <b>Parcel Number</b> field.
+			<li>Confirm that appropriate entries are logged for FieldUpdated and
+			SwipedText.
+			<li>Swipe a different <b>Zip</b> into the found <b>Return Address</b> 
+			cell.
+			<li>Confirm that appropriate entries are logged for SwipedText, 
+			FieldUpdated, AutoUpdateQuery and ValidationQuery.
+			<li>Restore the correct zip code via <b>Ctrl+Z</b>.
+			<li>Confirm that appropriate entries are logged for FieldUpdated, 
+			ValidationQuery and ValidationResult.
+			<li>Confirm that the logged text also includes the following information:
+			<ul>
+				<li>Time
+				<li>Control Name (surrounded by square brackets)
+				<li>Attribute Name (surrounded by parentheses)
+				<li>Query text
+				<li>Results of updates and queries
+			</ul>
+<p>
+			<li>Modify the filter settings to be <b>*[_returnAddressTable]</b>.
+			<li>Repeat some of the above actions and confirm that the only new 
+			log entries are associated with <b>Return Address</b>.
+<p>
+			<li>Modify the filter settings to be <b>Validation*(ZipCode)</b>.
+			<li>Repeat some of the above actions and confirm that the only new 
+			log entries are ValidationQuery and ValidationResult items for 
+			<b>ZipCode</b>.
+<p>
+			<li>Modify the filter settings to be 
+			<b>Validation*[_returnAddressTable]</b>.
+			<li>Confirm that results are logged for ZipCode, City and State.
+		</ul>
+		<li><u>Miscellaneous</u>
+		<ul>
+			<li>Confirm that an <b>RDT</b> license is required to get meaningful 
+			output from the utility.
+		</ul>
+    	</UL></li>
+<p>
     	<LI><h2>Contents of XML Output</h2>
     	<UL>
         	<LI>TBD</li>
