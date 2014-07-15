@@ -1,0 +1,530 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.9.0.34 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.9.0.34 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>SCRs fixed for 9.9</h3>
+    	<ul>
+  	   	<LI><b>[Issue #6523]</b> Add Redaction Interactive Tests to RDT Installation
+        	<ul>
+            		<li>Folder exists?
+			<li>Tests run?
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #6777]</b> Verification Word Redaction Tool Error
+        	<ul>
+            		<li>Exercise <b>Demo_IDShield</b>.
+			<li>Use <b>Find + Redact</b> tool to redact <b>\w+</b> 
+			expression.
+			<li>Quickly save active document and the next document.
+			<li>Navigate quickly between the three recent documents with 
+			the Word reddaction tool active.
+			<li>Confirm that no errors are logged or displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #7091]</b> FAM Service Database is not installed
+        	<ul>
+            		<li>From a clean machine, install a SQL CE version earlier than 
+			<b>SQL CE SP2</b>.
+			<li>Install <b>ID Shield</b>.
+			<li>Confirm that <b>ESFAMService.sdf</b> is properly installed.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #7264]</b> Add DynamicFileEncryption to RDT Installation
+        	<ul>
+            		<li><b>.\ProductDevelopment\AttributeFinder\AFPreProcessors
+			\InteractiveTest\DynamicFileListEncryptionTest</b> folder exists?
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #7540]</b> Silent Installs Should Install .NET
+        	<ul>
+            		<li>Test on clean <b>Windows 7</b> machine.
+            		<li>Test on clean <b>Windows 8</b> or <b>Server 2012</b> machine.
+			<ul>
+				<li>The machine must have internet access.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #7594, #12083]</b> Add Files to RDT Installation
+        	<ul>
+            		<li><b>.\RC.Net\FileActionManager\FileProcessors\Core\Testing</b> 
+			folder exists?
+			<li>Populated subfolders exist for:
+			<ul>
+				<li>FTP
+				<li>Apply Bates Number
+				<li>Modify PDF File
+			</ul>
+            		<li><b>.\ProductDevelopment\AttributeFinder\IndustrySpecific\ 
+			DataEntry</b> folder exists?
+            		<li><b>.\ProductDevelopment\AttributeFinder\IndustrySpecific\ 
+			LabResults</b> folder exists?
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #11940, #12124, #12184]</b> Convert To Searchable PDF 
+		Image Compression Error
+        	<ul>
+            		<li>Exercise conversion to searchable PDF for 
+			<b>\\engsvr\internal\PVCS_JIRA\JIRA\ISSUE-12184\45068(o4)awd.pdf</b>.
+			<li>Confirm that conversion is successful.
+			<li>Convert an image that is corrupt and confirm that the backup 
+			conversion method is attempted.
+			<li>Convert a PDF input image and confirm that the output is 
+			identical.
+			<li>Confirm that no <b>Idle Process Timeout</b> errors are noted.
+			<li>Process Dallas PDFs as a service with the service user in the 
+			<b>Performance log users</b> group.
+			<ul>
+				<li>Confirm that no errors are seen.
+				<li>Confirm no extra redactions in the outout.
+			</ul>
+			<li>Process Dallas PDFs as a service with the service user <b>not</b> 
+			in the <b>Performance log users</b> group.
+			<ul>
+				<li>Confirm that an <b>Application Trace</b> is logged 
+				that CPU usage could not be read.
+				<li>Confirm that idle processes are not killed.
+			</ul>
+            		<li>Exercise the <b>Core: Convert to searchable PDF</b> task with 
+			color images.
+			<li>Confirm that the output files have identical pixel content.
+			<li>Confirm that <b>PDF/A</b> output can be created.
+			<li>Confirm that <b>PDF security</b> can be applied.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12026]</b> Installation Should Not Ask For Custom Location
+        	<ul>
+            		<li>Confirm no prompt in <b>FLEX Index</b>.
+            		<li>Confirm no prompt in <b>ID Shield</b>.
+            		<li>Confirm no prompt in <b>LabDE</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12082]</b> Update USB Key Drivers
+        	<ul>
+            		<li>Confirm the following versions:
+			<ul>
+				<li>.\Program Files\Common Files\SafeNet Sentinel\Sentinel 
+				System Driver\SetupSysDriver.exe = <b>7.5.8</b>
+				<li>.\Program Files\Common Files\SafeNet Sentinel\Sentinel 
+				Protection Server\WinNT\spnsrvnt.exe = <b>7.6.1.0</b>
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12088]</b> Enhance OCR Reduces Capture Rate
+        	<ul>
+            		<li>Exercise UW Transplant rules against Set009.
+			<li>Confirm that 9.9 capture rate using <b>Core: Enhance OCR</b> 
+			is equal or better than the previous results using 9.5.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12089]</b> Synchronized Licensing DAT Files
+        	<ul>
+            		<li>Confirm that separate licensing folders exist under 
+			<b>I:\Common\Engineering\Tools\SecureClients</b>.
+			<ul>
+				<li>COMLicense
+				<li>COMLicense_Developer
+				<li>COMLicense_RuleWriter
+			</ul>
+			<li>Confirm that the <b>COMLicense</b> folder contains the usual 
+			packages to be deployed to customers.
+			<li>Confirm that the <b>COMLicense</b> folder does not contain 
+			the following packages.
+			<ul>
+				<li>Disable USB Counters
+				<li>Disable USB Serial Numbers
+				<li>ID Shield Office
+				<li>ID Shield for Laserfiche
+				<li>Other
+				<ul>
+					<li>FLEX Index Rule Writing (Simple Rules password)
+					<li>ID Shield Rule Writing (Simple Rules password)
+					<li>Rule Development Toolkit
+					<li>Scansoft OEM OCR
+				</ul>
+			</ul>
+			<li>Confirm that the <b>COMLicense_RuleWriter</b> folder contains 
+			the usual packages to be deployed to customers.
+			<li>Confirm that the <b>COMLicense_RuleWriter</b> folder also contains 
+			the following packages.
+			<ul>
+				<li>Disable USB Serial Numbers
+				<li>ID Shield Office
+				<li>ID Shield for Laserfiche
+				<li>Other
+				<ul>
+					<li>Rule Development Toolkit
+				</ul>
+			</ul>
+			<li>Confirm that the <b>COMLicense_RuleWriter</b> folder does not contain 
+			the following packages.
+			<ul>
+				<li>Disable USB Counters
+				<li>Other
+				<ul>
+					<li>FLEX Index Rule Writing (Simple Rules password)
+					<li>ID Shield Rule Writing (Simple Rules password)
+					<li>Scansoft OEM OCR
+				</ul>
+			</ul>
+			<li>Confirm that the <b>COMLicense_Developer</b> folder contains 
+			all of the above packages.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12096]</b> Create Redacted Image and Color PDFs
+        	<ul>
+            		<li>Exercise <b>Redaction: Create Redacted Image</b> with a 
+			color PDF.
+			<li>Confirm that the output image is also a color PDF.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12100, #12166]</b> Nuance Version 19
+        	<ul>
+            		<li>OCR an image.
+			<li>Use USS File Viewer to confirm that the OCR Engine Version 
+			is <b>Nuance 19.11</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #121xx]</b> TBD
+        	<ul>
+            		<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12122, #12261]</b> 1:1 Zoom Button
+        	<ul>
+            		<li>
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12134]</b> FAM File Inspector In Directory Mode
+        	<ul>
+            		<li>Confirm that a <b>/directory</b> option allows the user to 
+			inspect files in a specified folder without using a database.
+			<li>Confirm proper behavior of the <b>/filefilter</b> option.
+			<li>Confirm proper behavior of the <b>/r</b> option.
+			<li>Confirm that the usage message reflects these enhancements.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12137]</b> Confirm that <b>AlternateTestName.plugin</b> 
+		is installed to the <b>.\Extract Systems\LabDE</b> folder.
+<p>
+  	   	<LI><b>[Issue #12139]</b> Confirm that older versions of SQL CE are 
+		uninstalled before our software installs SQL CE.
+<p>
+  	   	<LI><b>[Issue #12142]</b> FAM File Inspector UI Enhancements
+        	<ul>
+            		<li>Confirm that splitters now have visible grip handles.
+			<li>Confirm that a message is displayed instead of an exception 
+			when an image cannot be opened.
+			<li>Confirm that an exception is logged when an image cannot 
+			be opened.
+			<li>Confirm that the search pane can be shown or hidden but not 
+			floated.
+			<li>Confirm that the Image Window status bar includes information 
+			about resolution and zoom.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12160]</b> Nuance 19 And Halftone Regions
+        	<ul>
+            		<li>Exercise UW Set009 and Set010 images.
+			<li>Compare capture rates with different settings for 
+			<b>kRecSetImgDespeckleMode</b>.
+			<ul>
+				<li>352: FALSE
+				<li>353: TRUE
+				<li>354: FALSE + ForceDespeckleImg
+				<li>355:  TRUE + ForceDespeckleImg
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12161]</b> Parameterized SQL Queries
+        	<ul>
+            		<li>Install both SQL CE 3.5 and SQL CE 4.0.
+			<li>Confirm that data entry verification works.
+			<li>Uninstall and reinstall SQL CE 3.5.
+			<li>Confirm that data entry verification still works.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12162]</b> Confirm that <b>Image Format Converter</b> 
+		properly retains color when outputting to PDF format.
+<p>
+  	   	<LI><b>[Issue #12168]</b> Confirm that <b>Bates Numbers</b> are correctly 
+		applied during a Server Sanity test.
+<p>
+  	   	<LI><b>[Issue #12176]</b> Missing Links In Documentation
+        	<ul>
+            		<li>Confirm that all hyperlinks in the <b>New Features for 9.8</b> 
+			are correct in the <b>Installation</b> Help files.
+            		<li>Confirm that all hyperlinks in the <b>New Features for 9.9</b> 
+			are correct in the <b>Installation</b> Help files.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12181]</b> Confirm that all Start Menu links for LabDE 
+		Utilities work properly.
+<p>
+  	   	<LI><b>[Issue #12188]</b> Internal Error with Demo_Hennepin
+        	<ul>
+            		<li>Exercise verification using the <b>Word Highlight</b> tool 
+			with lots of rapid page and/or document changes.
+			<li>Confirm that <b>Internal Error</b> exceptions are not seen.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12193]</b> Database Contents Condition
+        	<ul>
+            		<li><u>User Interface</u>
+			<ul>
+				<li>Confirm that a radio button is defined for <b>Use the 
+				FAM database connection</b>.
+				<li>Confirm that this is the default option.
+				<li>Confirm that a radio button is defined for <b>Use the 
+				specified database connection</b>.
+				<ul>
+					<li>Confirm that an associated <b>Data source</b> edit 
+					box is defined.
+					<li>Confirm that an associated <b>Data source</b> 
+					multi-line edit box is defined.
+					<li>Confirm that an associated <b>tag selector</b> 
+					button is defined.
+					<li>Confirm that the usual set of functions is 
+					available plus the following
+					<ul>
+						<li>&lt;ActionName&gt;
+						<li>&lt;DatabaseName&gt;
+						<li>&lt;DatabaseServerName&gt;
+					</ul>
+					<li>Confirm that a <b>Configure connection</b> button 
+					is defined.
+					<li>Confirm that the above controls are enabled only 
+					when the appropriate radio button is selected.
+				</ul>
+				<li>Confirm that a drop-down combo box defines the elements 
+				to be considered for when a condition is met.
+				<ul>
+					<li>Database table (the default)
+					<li>SQL Query
+				</ul>
+				<li>Confirm that the following combo box is pre-populated 
+				with FAM database table names when using the FAM database 
+				connection.
+				<li>Confirm that the following combo box is empty when the 
+				specified database connection is not completely defined.
+				<li>Confirm that the following combo box is pre-populated 
+				with appropriate table names when the specified database 
+				connection is completely defined.
+				<li>Confirm that the combo box of table names is not present 
+				when <b>SQL Query</b> is selected.
+				<li>Confirm that a multi-line edit box is enabled for 
+				definition of the SQL Query.
+				<li>Confirm that an associated <b>tag selector</b> button is 
+				also enabled when SQL Query is selected.
+				<li>Confirm that the usual set of functions is 
+				available plus the following
+				<ul>
+					<li>&lt;ActionName&gt;
+					<li>&lt;DatabaseName&gt;
+					<li>&lt;DatabaseServerName&gt;
+				</ul>
+			</ul>
+            		<li><u>Functionality</u>
+			<ul>
+				<li>Confirm expected behavior for the condition as a both 
+				a <b>Skip Condition</b> and a <b>Task Condition</b> for 
+				each of the following combinations.
+				<ul>
+					<li>FAM Database, Table, Zero rows
+					<li>FAM Database, Table, Exactly one row
+					<li>FAM Database, Table, At least one row
+					<li>FAM Database, Query, Zero rows
+					<li>FAM Database, Query, Exactly one row
+					<li>FAM Database, Query, At least one row
+					<li>Specified Database, Table, Zero rows
+					<li>Specified Database, Table, Exactly one row
+					<li>Specified Database, Table, At least one row
+					<li>Specified Database, Query, Zero rows
+					<li>Specified Database, Query, Exactly one row
+					<li>Specified Database, Query, At least one row
+				</ul>
+				<li>Confirm expected behavior for the condition as both a 
+				<b>Skip Condition</b> and a <b>Task Condition</b> for each 
+				of the following combinations.  Use a mixture of the above 
+				combinations.  Include <b>Case-sensitive</b> and 
+				<b>Fuzzy</b> options.
+				<ul>
+					<li>Zero rows with Any of the following values
+					<li>Zero rows with All of the following values
+					<li>Zero rows with None of the following values
+					<li>Exactly one row with Any of the following values
+					<li>Exactly one row with All of the following values
+					<li>Exactly one row with None of the following values
+					<li>At least one row with Any of the following values
+					<li>At least one row with All of the following values
+					<li>At least one row with None of the following values
+				</ul>
+			</ul>
+            		<li><u>Advanced</u>
+			<ul>
+				<li>Confirm expected behavior when including Data Entry 
+				Queries.
+				<li>Confirm expected behavior when including path tags and 
+				functions.
+				<li>Confirm that the database cannot be modified via 
+				<b>UPDATE</b>.
+				<li>Confirm that the database cannot be modified via 
+				<b>DROP TABLE</b>.
+				<li>Confirm that the condition runs correctly in parallel.
+				<li>Confirm that external changes in the database are 
+				correctly reflected as changed results.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12194]</b> VOA Viewer Shows Path To Selected Attribute
+        	<ul>
+            		<li>Confirm that a read-only edit box is provided for <b>Selected 
+			attribute path</b>.
+            		<li>Confirm that a read-only edit box is provided for <b>Current 
+			file name</b>.
+			<li>Confirm that each item is properly updated when files and 
+			selected attributes are changed.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12196]</b> Confirm proper text in the usage message for 
+		<b>FAM File Inspector</b>.
+<p>
+  	   	<LI><b>[Issue #12211]</b> Add $RandomEntry() Functions
+        	<ul>
+            		<li>Exercise the <b>Specific Functions</b> section of the 
+			<b>Text Function Expansion</b> checklist.
+			<li>Confirm that the <b>$RandomEntryFromList()</b> test passes.
+			<li>Confirm that the <b>$RandomEntryFromListFile()</b> test passes.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12217]</b> Confirm that the memory leak tests for 
+		<b>Redaction: Create Redacted Text</b> correctly skip only redacted output 
+		files.
+<p>
+  	   	<LI><b>[Issue #12218]</b> Confirm that modifying a <b>Skip Condition</b> 
+		in a previously saved FPS sets the dirty flag.
+<p>
+  	   	<LI><b>[Issue #12222, #12223]</b> Database Contents Condition
+        	<ul>
+            		<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12227]</b> Verification: Background OCR Gets Stuck and 
+		Leads to an Exception
+        	<ul>
+            		<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12231]</b> Confirm that <b>Extract Image Viewer</b> 
+		includes a <b>Zoom:</b> prefix in the appropriate status bar pane.
+<p>
+  	   	<LI><b>[Issue #12232]</b> ID Shield Verification - Exception on Form Close 
+		If An Exception On Document Load
+        	<ul>
+            		<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12236]</b> Trace Output With Data Entry Verification 
+		Framework
+        	<ul>
+            		<li>Add the following lines to a suitable DEP config file
+			<ul>
+				<li>&lt;setting name="EnableTrace" serializeAs="String"&gt;
+				<li>&lt;value&gt;True&lt;/value&gt;
+				<li>&lt;/setting&gt;
+			</ul>
+			<li>Note that the above lines must be added to the 
+			<b>&lt;Extract.DataEntry.Utilities. 
+			DataEntryApplication.Properties.Settings&gt;</b> section.
+			<li>Run <b>DbgView.exe</b> from Steve's Public Utilities folder.
+			<li>Set the utility <b>filter/highlight</b> settings as follows 
+			and confirm that expected results are displayed in the viewer.
+			Note that specific control and attribute names depend on the 
+			actual DEP being tested.
+			<ul>
+				<li><b>*</b> - all results
+				<li><b>*Result [*] (*)</b> - all <b>AutoUpdateResult</b> 
+				and <b>ValidationResult</b> result items for all controls.
+				<li><b>* [_granteeTable] (*)</b> - all results from the 
+				<b>_granteeTable</b> control.
+				<li><b>* [*] (Name)</b> - all results from any control that 
+				deal with a <b>Name</b> attribute.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12238]</b> Automated Test Failures
+        	<ul>
+            		<li>Finding Rule Condition
+			<li>Translate Values Or Types Output Handler
+			<li>Conditional Value Finder
+			<li>REPM Value Finder
+			<li>Select Page Region Value Finder
+			<li>OCR Image Area
+			<li>Translate Values Or Types Value Modifier
+			<li>Query Based Attribute Selector
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12240]</b> National Rule Set
+        	<ul>
+            		<li>Confirm that <b>Document Classification</b> tests pass.
+            		<li>Confirm that <b>Redaction</b> tests pass.
+            		<li>Confirm that <b>Indexing</b> tests pass.
+        	</ul>
+<p>
+  	   	<LI><b>[Issue #12241]</b> Confirm that VOA files have been removed from 
+		the <b>Redaction NRS</b> folders.
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
