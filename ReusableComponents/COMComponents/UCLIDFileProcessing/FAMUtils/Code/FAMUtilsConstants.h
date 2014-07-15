@@ -52,6 +52,7 @@ static const string gstrEMAIL_USE_SSL = "EmailUseSSL";
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";
 static const string gstrFEATURE_FILE_HANDLER_COPY_FILES = "Files: Copy files";
 static const string gstrFEATURE_FILE_HANDLER_COPY_FILES_AND_DATA = "Files: Copy files and data";
+static const string gstrFEATURE_FILE_HANDLER_OPEN_FILE_LOCATION = "Files: Open file location";
 static const string gstrFEATURE_FILE_RUN_DOCUMENT_SPECIFIC_REPORTS = "Reports: Run document specific";
 
 // Default Settings

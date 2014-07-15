@@ -90,7 +90,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 116;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 117;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -746,6 +746,37 @@ int UpdateToSchemaVersion116(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36075");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion117(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 117;
+
+		if (pnNumSteps != __nullptr)
+		{
+			// This update does not require transferring any data.
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(
+			string("INSERT INTO [Feature] "
+			"([Enabled], [FeatureName], [FeatureDescription], [AdminOnly]) "
+			"VALUES(1, '") + gstrFEATURE_FILE_HANDLER_OPEN_FILE_LOCATION.c_str() + "', "
+			"'Allows the containing folder of document to be opened in Windows file explorer.', 1)");
+		
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+		
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37136");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -5640,7 +5671,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 113:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion114);
 				case 114:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion115);
 				case 115:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion116);
-				case 116:	break;
+				case 116:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion117);
+				case 117:	break;
 
 				default:
 					{

@@ -16,6 +16,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
@@ -338,45 +339,48 @@ namespace Extract.FileActionManager.Utilities
         /// <see cref="_fileListDataGridView"/> and the <see cref="FileHandlerItem"/> that defines the
         /// option's behavior.
         /// </summary>
-        Dictionary<ToolStripMenuItem, FileHandlerItem> _fileHandlerItems =
-            new Dictionary<ToolStripMenuItem, FileHandlerItem>();
+        Dictionary<ToolStripMenuItem, FileHandlerItem> _fileHandlerItems;
 
         /// <summary>
         /// Maps context menu options to a DocumentName based <see cref="ExtractReport"/> for the
         /// currently selected file.
         /// </summary>
-        Dictionary<ToolStripMenuItem, ExtractReport> _reportMenuItems =
-            new Dictionary<ToolStripMenuItem, ExtractReport>();
+        Dictionary<ToolStripMenuItem, ExtractReport> _reportMenuItems;
 
         /// <summary>
         /// Context menu option that is a parent to all menu items in <see cref="_reportMenuItems"/>.
         /// </summary>
-        ToolStripMenuItem _reportMainMenuItem = new ToolStripMenuItem("Reports");
+        ToolStripMenuItem _reportMainMenuItem;
 
         /// <summary>
         /// Context menu option to copy selected file names as text.
         /// </summary>
-        ToolStripMenuItem _copyFileNamesMenuItem = new ToolStripMenuItem("Copy filename(s)");
+        ToolStripMenuItem _copyFileNamesMenuItem;
 
         /// <summary>
         /// Context menu option to copy selected files as files.
         /// </summary>
-        ToolStripMenuItem _copyFilesMenuItem = new ToolStripMenuItem("Copy file(s)");
+        ToolStripMenuItem _copyFilesMenuItem;
 
         /// <summary>
         /// Context menu option to copy selected files and associated data as files.
         /// </summary>
-        ToolStripMenuItem _copyFilesAndDataMenuItem = new ToolStripMenuItem("Copy file(s) and data");
+        ToolStripMenuItem _copyFilesAndDataMenuItem;
+
+        /// <summary>
+        /// Context menu option to open the file location in windows explorer.
+        /// </summary>
+        ToolStripMenuItem _openFileLocationMenuItem;
 
         /// <summary>
         /// Context menu option that allows rows in the file list to be flagged.
         /// </summary>
-        ToolStripMenuItem _setFlagMenuItem = new ToolStripMenuItem("Set flag");
+        ToolStripMenuItem _setFlagMenuItem;
 
         /// <summary>
         /// Context menu option that allows the flagged rows in the file list to be cleared.
         /// </summary>
-        ToolStripMenuItem _clearFlagMenuItem = new ToolStripMenuItem("Clear flag");
+        ToolStripMenuItem _clearFlagMenuItem;
 
         /// <summary>
         /// A <see cref="Task"/> that performs database query operations on a background thread.
@@ -433,21 +437,27 @@ namespace Extract.FileActionManager.Utilities
         DataGridViewRow[] _lastSelectedRows;
 
         /// <summary>
-        /// Indicates whether the option to enable selected file names to be copied as text is
+        /// Indicates whether the option to copy selected file names to be copied as text is
         /// enabled.
         /// </summary>
         bool? _copyFileNamesEnabled;
 
         /// <summary>
-        /// Indicates whether the option to enable selected files to be copied as files is enabled.
+        /// Indicates whether the option to copy selected files to be copied as files is enabled.
         /// </summary>
         bool? _copyFilesEnabled;
 
         /// <summary>
-        /// Indicates whether the option to enable selected files as well as associated data files
+        /// Indicates whether the option to copy selected files as well as associated data files
         /// to be copied as files is enabled.
         /// </summary>
         bool? _copyFilesAndDataEnabled;
+
+        /// <summary>
+        /// Indicates whether the option to open the file location of the selected file in windows
+        /// explorer is enabled.
+        /// </summary>
+        bool? _openFileLocationEnabled;
 
         /// <summary>
         /// Indicates whether reports are available to be run as a context menu option.
@@ -947,12 +957,19 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                // Dispose of any previous context menu option.
-                if (_fileListDataGridView.ContextMenuStrip != null)
-                {
-                    _fileListDataGridView.ContextMenuStrip.Dispose();
-                    _fileListDataGridView.ContextMenuStrip = null;
-                }
+                // Dispose of the previous context menu.
+                DisposeContextMenu();
+
+                // Re-create new context menu items.
+                _fileHandlerItems = new Dictionary<ToolStripMenuItem, FileHandlerItem>();
+                _copyFileNamesMenuItem = new ToolStripMenuItem("Copy filename(s)");
+                _copyFilesMenuItem = new ToolStripMenuItem("Copy file(s)");
+                _copyFilesAndDataMenuItem = new ToolStripMenuItem("Copy file(s) and data");
+                _openFileLocationMenuItem = new ToolStripMenuItem("Open file location");
+                _reportMenuItems = new Dictionary<ToolStripMenuItem, ExtractReport>();
+                _reportMainMenuItem = new ToolStripMenuItem("Reports");
+                _setFlagMenuItem = new ToolStripMenuItem("Set flag");
+                _clearFlagMenuItem = new ToolStripMenuItem("Clear flag");
 
                 var newContextMenuStrip = new ContextMenuStrip();
 
@@ -1007,6 +1024,12 @@ namespace Extract.FileActionManager.Utilities
                 {
                     featureMenuItems.Add(_copyFilesAndDataMenuItem);
                     _copyFilesAndDataMenuItem.Click += HandleCopyFilesAndData;
+                }
+
+                if (OpenFileLocationEnabled)
+                {
+                    featureMenuItems.Add(_openFileLocationMenuItem);
+                    _openFileLocationMenuItem.Click += HandleOpenFileLocation;
                 }
 
                 if (featureMenuItems.Count > 0)
@@ -1154,9 +1177,9 @@ namespace Extract.FileActionManager.Utilities
             {
                 _processingCmdKey = true;
 
-                if (keyData.HasFlag(Keys.Tab))
+                if (keyData == Keys.Tab || keyData == (Keys.Shift | Keys.Tab))
                 {
-                    bool forward = !keyData.HasFlag(Keys.Shift);
+                    bool forward = keyData == Keys.Tab;
 
                     // Use the tab key to navigate rows as long as either the file list has focus or
                     // none of the other tab stops do.
@@ -1314,39 +1337,7 @@ namespace Extract.FileActionManager.Utilities
                     _codecs = null;
                 }
 
-                if (_fileHandlerItems != null)
-                {
-                    foreach (ToolStripMenuItem menuItem in _fileHandlerItems.Keys)
-                    {
-                        menuItem.Dispose();
-                    }
-
-                    _fileHandlerItems = null;
-                }
-
-                if (_reportMenuItems != null)
-                {
-                    CollectionMethods.ClearAndDisposeKeysAndValues(_reportMenuItems);
-                    _reportMenuItems = null;
-                }
-
-                if (_reportMainMenuItem != null)
-                {
-                    _reportMainMenuItem.Dispose();
-                    _reportMainMenuItem = null;
-                }
-
-                if (_setFlagMenuItem != null)
-                {
-                    _setFlagMenuItem.Dispose();
-                    _setFlagMenuItem = null;
-                }
-
-                if (_clearFlagMenuItem != null)
-                {
-                    _clearFlagMenuItem.Dispose();
-                    _clearFlagMenuItem = null;
-                }
+                DisposeContextMenu();
 
                 if (components != null)
                 {
@@ -1918,6 +1909,24 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_openFileLocationMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleOpenFileLocation(object sender, EventArgs e)
+        {
+            try
+            {
+                OpenFileLocation();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37137");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="ToolStripItem.Click"/> event of the
         /// <see cref="_setFlagMenuItem"/>.
         /// </summary>
@@ -2045,6 +2054,12 @@ namespace Extract.FileActionManager.Utilities
                     {
                         app.Key.Enabled = true;
                     }
+                }
+
+                // Open file location should be available for single selection only.
+                if (_openFileLocationMenuItem != null)
+                {
+                    _openFileLocationMenuItem.Enabled = (selectionCount == 1);
                 }
 
                 // Report context menu options should be available for single selection only.
@@ -2512,10 +2527,10 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Gets a value indicating whether the option to enable selected file names to be copied
+        /// Gets a value indicating whether the option to copy selected file names to be copied
         /// as text is enabled.
         /// </summary>
-        /// <value><see langword="true"/> if the option to enable selected file names to be copied
+        /// <value><see langword="true"/> if the option to copy selected file names to be copied
         /// as text is enabled; otherwise, <see langword="false"/>.</value>
         bool CopyFileNamesEnabled
         {
@@ -2539,10 +2554,10 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Gets a value indicating whether the option to enable selected files to be copied as
+        /// Gets a value indicating whether the option to copy selected files to be copied as
         /// files is enabled.
         /// </summary>
-        /// <value><see langword="true"/> if the option to enable selected files to be copied as
+        /// <value><see langword="true"/> if the option to copy selected files to be copied as
         /// files is enabled; otherwise, <see langword="false"/>.
         /// </value>
         bool CopyFilesEnabled
@@ -2567,10 +2582,10 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Gets a value indicating whether the option to enable selected files as well as
+        /// Gets a value indicating whether the option to copy selected files as well as
         /// associated data files to be copied as files is enabled.
         /// </summary>
-        /// <value><see langword="true"/> if the option to enable selected files as well as
+        /// <value><see langword="true"/> if the option to copy selected files as well as
         /// associated data files to be copied as files is enabled.; otherwise,
         /// <see langword="false"/>.</value>
         bool CopyFilesAndDataEnabled
@@ -2591,6 +2606,33 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 return _copyFilesAndDataEnabled.Value;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the option to open a file location in Windows file
+        /// explorer is enabled.
+        /// </summary>
+        /// <value><see langword="true"/> if the option to open a file location in Windows file
+        /// explorer is enabled.; otherwise, <see langword="false"/>.</value>
+        bool OpenFileLocationEnabled
+        {
+            get
+            {
+                if (!_openFileLocationEnabled.HasValue)
+                {
+                    if (FileProcessingDB != null)
+                    {
+                        _openFileLocationEnabled =
+                            FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerOpenFileLocation);
+                    }
+                    else
+                    {
+                        _openFileLocationEnabled = true;
+                    }
+                }
+
+                return _openFileLocationEnabled.Value;
             }
         }
 
@@ -2728,6 +2770,45 @@ namespace Extract.FileActionManager.Utilities
                             dataFileName.StartsWith(fileName + ".", StringComparison.OrdinalIgnoreCase))))
                 .ToArray());
             Clipboard.SetFileDropList(fileCollection);
+        }
+
+        /// <summary>
+        /// Opens the specified file location in windows explorer and selects the file if it exists.
+        /// If neither the file nor the directory it is supposed to reside in are found, an error is
+        /// displayed.
+        /// </summary>
+        void OpenFileLocation()
+        {
+            string fileName = GetSelectedFileNames().Single();
+            string argument = null;
+
+            if (File.Exists(fileName))
+            {
+                argument = "/select," + fileName.Quote();
+            }
+            else
+            {
+                string directory = Path.GetDirectoryName(fileName);
+                if (Directory.Exists(directory))
+                {
+                    argument = "/root," + directory.Quote();
+                }
+                else
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "Neither the file nor its containing directory could be found.",
+                        "File not found.", true);
+                    return;
+                }
+            }
+            
+            using (var process = new Process())
+            {
+                process.StartInfo = new ProcessStartInfo("explorer.exe", argument);
+                process.StartInfo.UseShellExecute = true;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+                process.Start();
+            }
         }
 
         /// <summary>
@@ -4003,6 +4084,7 @@ namespace Extract.FileActionManager.Utilities
             _copyFileNamesEnabled = null;
             _copyFilesEnabled = null;
             _copyFilesAndDataEnabled = null;
+            _openFileLocationEnabled = null;
             _reportsEnabled = null;
         }
 
@@ -4053,6 +4135,76 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 _adminModeToolStripMenuItem.Enabled = FileProcessingDB.IsConnected && !InAdminMode;
+            }
+        }
+
+        /// <summary>
+        /// Disposes the context menu items.
+        /// </summary>
+        void DisposeContextMenu()
+        {
+            if (_fileListDataGridView.ContextMenuStrip != null)
+            {
+                _fileListDataGridView.ContextMenuStrip.Dispose();
+                _fileListDataGridView.ContextMenuStrip = null;
+            }
+
+            if (_fileHandlerItems != null)
+            {
+                foreach (ToolStripMenuItem menuItem in _fileHandlerItems.Keys)
+                {
+                    menuItem.Dispose();
+                }
+
+                _fileHandlerItems = null;
+            }
+
+            if (_copyFileNamesMenuItem != null)
+            {
+                _copyFileNamesMenuItem.Dispose();
+                _copyFileNamesMenuItem = null;
+            }
+
+            if (_copyFilesMenuItem != null)
+            {
+                _copyFilesMenuItem.Dispose();
+                _copyFilesMenuItem = null;
+            }
+
+            if (_copyFilesAndDataMenuItem != null)
+            {
+                _copyFilesAndDataMenuItem.Dispose();
+                _copyFilesAndDataMenuItem = null;
+            }
+
+            if (_openFileLocationMenuItem != null)
+            {
+                _openFileLocationMenuItem.Dispose();
+                _openFileLocationMenuItem = null;
+            }
+
+            if (_reportMenuItems != null)
+            {
+                CollectionMethods.ClearAndDisposeKeysAndValues(_reportMenuItems);
+                _reportMenuItems = null;
+            }
+
+            if (_reportMainMenuItem != null)
+            {
+                _reportMainMenuItem.Dispose();
+                _reportMainMenuItem = null;
+            }
+
+            if (_setFlagMenuItem != null)
+            {
+                _setFlagMenuItem.Dispose();
+                _setFlagMenuItem = null;
+            }
+
+            if (_clearFlagMenuItem != null)
+            {
+                _clearFlagMenuItem.Dispose();
+                _clearFlagMenuItem = null;
             }
         }
 

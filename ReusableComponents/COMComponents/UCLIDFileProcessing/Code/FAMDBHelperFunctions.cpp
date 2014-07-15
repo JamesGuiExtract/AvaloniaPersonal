@@ -60,6 +60,10 @@ vector<string> getFeatureDefinitionQueries()
 		"Allows documents and associated data to be copied or dragged as files from a file list.", 1);
 	vecFeatureDefinitions.push_back((LPCTSTR)zSQL);
 
+	zSQL.Format(zSQLTemplate, 1, gstrFEATURE_FILE_HANDLER_OPEN_FILE_LOCATION.c_str(),
+		"Allows the containing folder of document to be opened in Windows file explorer.", 1);
+	vecFeatureDefinitions.push_back((LPCTSTR)zSQL);
+
 	zSQL.Format(zSQLTemplate, 1, gstrFEATURE_FILE_RUN_DOCUMENT_SPECIFIC_REPORTS.c_str(),
 		"Allows document specific reports to be run.", 1);
 	vecFeatureDefinitions.push_back((LPCTSTR)zSQL);

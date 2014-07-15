@@ -1626,6 +1626,7 @@ vector<string> CFileProcessingDB::getFeatureNames()
 	vecFeatureNames.push_back(gstrFEATURE_FILE_HANDLER_COPY_NAMES);
 	vecFeatureNames.push_back(gstrFEATURE_FILE_HANDLER_COPY_FILES);
 	vecFeatureNames.push_back(gstrFEATURE_FILE_HANDLER_COPY_FILES_AND_DATA);
+	vecFeatureNames.push_back(gstrFEATURE_FILE_HANDLER_OPEN_FILE_LOCATION);
 	vecFeatureNames.push_back(gstrFEATURE_FILE_RUN_DOCUMENT_SPECIFIC_REPORTS);
 
 	return vecFeatureNames;
