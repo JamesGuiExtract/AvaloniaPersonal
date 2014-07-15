@@ -83,7 +83,7 @@
             <li>Confirm presence of the selectable path to the <b>Original Source 
             Document:</b>.</li>
             <li>Confirm selectable presence of the <b>OCR Engine Version</b>.</li>
-            <LI>Confirm that the OCR Engine version for a new USS file is <b>Nuance 18.00</b>.</li>
+            <LI>Confirm that the OCR Engine version for a new USS file is <b>Nuance 19.11</b>.</li>
 <p>
             <li>Confirm presence of a list box for <b>Page Information:</b>.</li>
             <li>Confirm presence of columns for <b>Page #</b>, <b>Height</b>, <b>Width</b>, 
@@ -306,7 +306,7 @@
    	<LI><b>[JIRA #11995]</b> Confirm that resizing the window to its minimum size still 
 	displays the menu bar, toolbar, status bar and some text.
 <p>
-   	<LI><b>[JIRA #12004, #12008]</b> Invalid Index Exception
+   	<LI><b>[JIRA #12004, #12008, #12280]</b> Invalid Index Exception
 	<ul>
 		<li>Open 1000-page USS file from 
 		<b>I:\Common\Testing\Test_Images\ManyPage Images.</b>
@@ -320,6 +320,11 @@
 		Demo_IDShield.
 		<li>Click before the first character in the file.
 		<li>Press <b>Page Down</b> several times to reach the bottom of the document.
+		<li>Confirm that no exception is displayed.
+<p>
+		<li>Open USS Viewer
+		<li>Use <b>File - Open</b> to select 
+		<b>M:\PVCS_JIRA\JIRA\ISSUE-12280\05536.tif.uss</b>.
 		<li>Confirm that no exception is displayed.
 	</ul>
 <p>
