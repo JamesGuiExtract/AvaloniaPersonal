@@ -68,7 +68,8 @@
         <ul>
             <li>Zoom window
             <li>Pan
-            <li>Highlighter
+            <li>Angular highlight
+            <li>Rectangular highlight
             <li>Delete highlights
         </ul>
         <li>Confirm that all are initially disabled.
@@ -82,10 +83,13 @@
         <li>Confirm that <b>P</b> performs the same function.
         <li>Confirm that the pan tool works as expected.
     <p>
-        <li>Confirm that <b>Highlighter</b> brings up the highlight tool.
-        <li>Confirm that selecting Highlighter again switches to the other highlight tool.
-        <li>Confirm that <b>H</b> performs the same function.
-        <li>Confirm that the angular and rectangular highlight tools work as expected.
+        <li>Confirm that <b>Angular highlight</b> brings up the angular highlight tool.
+        <li>Confirm that the angular highlight tool works as expected.
+        <li>Confirm that <b>H</b> switches between highlight tools.
+    <p>
+        <li>Confirm that <b>Rectangular highlight</b> brings up the rectangular highlight tool.
+        <li>Confirm that the rectangular highlight tool works as expected.
+        <li>Confirm that <b>H</b> switches between highlight tools.
     <p>
         <li>Confirm that <b>Delete highlights</b> brings up the delete tool.
         <li>Confirm that <b>D</b> performs the same function.
@@ -95,30 +99,34 @@
     <li><b>View menu</b>
     <ul>
         <li>Confirm that the View menu contains the following items:
-        <ul>
-            <li>Zoom in
-            <li>Zoom out
-            <li>Zoom previous
-            <li>Zoom next
-            <li>Previous tile
-            <li>Next tile
-            <li>Fit to width
-            <li>Fit to page
-            <li>Rotate counterclockwise
-            <li>Rotate clockwise
-            <li>First page
-            <li>Previous page
-            <li>Next page
-            <li>Last page
-        </ul>
-        <li>Confirm that with no image open, only Fit to width and Fit to page are enabled.
+	<ul>
+            	<li>Zoom in
+            	<li>Zoom out
+            	<li>Zoom previous
+            	<li>Zoom next
+            	<li>Previous tile
+            	<li>Next tile
+            	<li>Fit to width
+            	<li>Fit to page
+		<li>One-to-one zoom
+            	<li>Rotate counterclockwise
+            	<li>Rotate clockwise
+            	<li>Rotate all pages counterclockwise
+            	<li>Rotate all pages clockwise
+            	<li>First page
+            	<li>Previous page
+            	<li>Next page
+            	<li>Last page
+	</ul>
+        <li>Confirm that with no image open, only Fit to width, Fit to page, and One-to-one 
+	zoom are enabled.
         <li>Open an image.
     <p>
         <li>Confirm that the <b>Zoom in</b> menu item, <b>F7</b>, and <b>Ctrl++</b> all zoom in on
         the document.
         <li>Confirm that there is a limit on how far in you can zoom.
     <p>
-        <li>Confirm that the <b>Zoom ou</b> menu item, <b>F8</b>, and <b>Ctrl+-</b> all zoom out on
+        <li>Confirm that the <b>Zoom out</b> menu item, <b>F8</b>, and <b>Ctrl+-</b> all zoom out on
         the document.
         <li>Confirm that there is a limit on how far out you can zoom.
     <p>
@@ -138,11 +146,16 @@
         to width.
         <li>Confirm that the <b>Fit to page</b> menu item and <b>P</b> both adjust the zoom to fit
         to page.
+        <li>Confirm that the <b>One-to-one zoom</b> menu item adjusts the zoom to <b>100%</b>.
     <p>
-        <li>Confirm that the <b>Rotate counterclockwise</b> menu item and <b>Ctrl+Shift+R</b> both
-        rotate the image counterclockwise.
-        <li>Confirm that the <b>Rotate clockwise</b> menu item and <b>Ctrl+R</b> both rotate the
-        image clockwise.
+        <li>Confirm that the <b>Rotate counterclockwise</b> menu item and <b>Ctrl+Shift+R</b> 
+	each rotate the displayed page counterclockwise.
+        <li>Confirm that the <b>Rotate clockwise</b> menu item and <b>Ctrl+R</b> each rotate 
+	the displayed page clockwise.
+        <li>Confirm that the <b>Rotate all pages counterclockwise</b> menu item and 
+	<b>Alt+Shift+R</b> each rotate all pages of the image counterclockwise.
+        <li>Confirm that the <b>Rotate all pages clockwise</b> menu item and <b>Alt+R</b> each 
+	rotate all pages of the image clockwise.
     <p>
         <li>Confirm that <b>First page/Ctrl+Home</b>, <b>Previous page/PgUp</b>, <b>Next 
         page/PgDn</b>, and <b>Last page/Ctrl+End</b> all function as expected.
@@ -154,21 +167,22 @@
         buttons, and that the tooltip text for each button contains the name of the tool and the
         appropriate keyboard shortcut:
         <ul>
-            <li>Open toolstrip:
+            <li><u>Open</u> toolstrip:
             <ul>
                 <li>Open image
                 <li>Print image
             </ul>
-            <li>Tools toolstrip:
+            <li><u>Tools</u> toolstrip:
             <ul>
                 <li>Zoom window
                 <li>Pan
                 <li>Highlighter
                 <li>Delete objects
                 <li>Open subimage in new ImageViewer
+                <li>Invert image colors
                 <li>Show/Hide thumbnails
             </ul>
-            <li>Page navigation toolstrip:
+            <li><u>Page navigation</u> toolstrip:
             <ul>
                 <li>Go to first page
                 <li>Go to previous page
@@ -176,7 +190,7 @@
                 <li>Go to next page
                 <li>Go to last page
             </ul>
-            <li>Zoom toolstrip:
+            <li><u>Zoom</u> toolstrip:
             <ul>
                 <li>Zoom in
                 <li>Zoom out
@@ -184,6 +198,7 @@
                 <li>Zoom next
                 <li>Fit to page
                 <li>Fit to width
+		<li>One-to-one zoom
                 <li>Previous tile
                 <li>Next tile
                 <li>Rotate counterclockwise
@@ -202,9 +217,38 @@
             <li>Confirm that toolstrip locations are persisted.
             <li>Confirm that toolstrip locations can be reset using the /reset flag on the command
             line.
+<p>
+		<li><b>One-to-one Zoom</b>
+		<ul>
+			<li>Confirm that the <b>One-to-one zoom</b> button works as 
+			expected.
+			<li>Confirm that the <b>Zoom Level</b> status pane displays 
+			<b>Zoom: 100%</b>.
+			<li>Confirm that <b>One-to-one zoom</b> persists across documents.
+			<li><b>[JIRA #12261]</b>
+			<ul>
+				<li>Open an image.
+				<li>Turn off any fit-mode setting.
+				<li>Zoom in to the middle of the document and confirm that the 
+				zoom level is greater than 100%.
+				<li>Note that text at the approximate center of the view.
+				<li>Click the <b>One-to-one zoom</b> button.
+				<li>Confirm that the zoom level changes to 100%.
+				<li>Confirm that the same text remains at the approximate 
+				center of the view.
+			</ul>
+		</ul>
+<p>
+		<li><b>Invert Image Colors</b>
+		<ul>
+			<li>Confirm that the <b>Invert image colors</b> button works as expected 
+			for every page in the document.
+			<li>Confirm that the thumbnail views also reflect the changed colors.
+			<li>Confirm that the inverted image colors persist across documents.
+		</ul>
         </ul>
     <p>
-        <li>Subimages
+        <li><b>Subimages</b>
         <ul>
             <li>Select the subimage tool.
             <li>Confirm that the tool can be used to select a region of an image to be displayed in
@@ -221,7 +265,7 @@
             instances.
         </ul>
     <p>
-        <li>Thumbnails
+        <li><b>Thumbnails</b>
         <ul>
             <li>Confirm that when the image viewer is initally opened, the thumbnail viewer is
             visible.
@@ -240,35 +284,62 @@
         </ul>
     </ul>
 <p>
+    	<li><b>Status Bar</b>
+    	<ul>
+        	<li><u>No File Open</u>
+		<ul>
+			<li>Confirm that <b>four</b> panes are defined.
+			<li>Confirm that no text is displayed in any pane.
+		</ul>
+        	<li><u>File Open</u>
+		<ul>
+			<li>Confirm that <b>four</b> panes are defined
+			<ul>
+				<li>Status
+				<li>Zoom:
+				<li>Image Resolution
+				<li>Cursor Position
+			</ul>
+			<li>Confirm that the text in the <b>Status</b> pane changes depending 
+			on the active tool.
+			<li>Confirm that the text in the <b>Zoom</b> pane is prefixed with 
+			<b>Zoom:</b>.
+			<li>Confirm that the zoom level changes when the fit mode is changed.
+		</ul>
+    	</ul>
+<p>
     <li><b>Other</b>
     <ul>
         <li>Right-click in the image viewer and confirm that the context menu contains the
         following items:
         <ul>
-            <li>Zoom window
-            <li>Pan
-            <li>Zoom previous
-            <li>Zoom next
-            <li>Angular highlight
-            <li>Rectangular highlight
+            	<li>Zoom window
+            	<li>Pan
+            	<li>Zoom previous
+            	<li>Zoom next
+            	<li>Angular highlight
+            	<li>Rectangular highlight
         </ul>
         <li>Confirm that they work as expected.
     <p>
         <li>Display page percentage in status bar.  
         <ul>
-            <li>Use <b>RegEdit</b> to remove the <b>DisplayPercentageEnabled</b> key under 
-            HKEY_CURRENT_USER/Software/Extract Systems/InputFunnel/InputReceivers/SpotRecIR. 
-            <li>Open an image file in the Image Viewer and confirm that the rightmost pane in the
-            status bar displays the current coordinate location of the cursor in the format 
-            <b>X : <i>nn</i></b> and <b>Y : <i>nn</i></b>.
-            <li>Using <b>RDTConfig</b>, check the <b>Display image window percentages</b> checkbox.
-            <li>Open an image file and confirm that the rightmost pane in the status bar displays
-            the current location of the cursor in both coordinates and percentages in the format
-            <b>X : <i>nn</i>, <i>pp</i>%</b> and <b>Y : <i>nn</i>, <i>pp</i>%</b>.
-            <li>Close the Image Viewer.
-            <li>Using <b>RDTConfig</b>, uncheck the <b>Display image window percentages</b> checkbox.
-            <li>Open an image file and confirm that percentages are no longer displayed 
-            in the status bar.
+            	<li>Use <b>RegEdit</b> to remove the <b>DisplayPercentageEnabled</b> key under 
+            	HKEY_CURRENT_USER/Software/Extract Systems/InputFunnel/InputReceivers/SpotRecIR. 
+            	<li>Open an image file in the Image Viewer and confirm that the rightmost pane 
+		in the status bar displays the current coordinate location of the cursor in 
+		the format <b>X : <i>nn</i></b> and <b>Y : <i>nn</i></b>.
+            	<li>Using <b>RDTConfig</b>, check the <b>Display image window percentages</b> 
+		checkbox.
+            	<li>Open an image file and confirm that the rightmost pane in the status bar 
+		displays the current location of the cursor in both coordinates and 
+		percentages in the format <b>X : <i>nn</i>, <i>pp</i>%</b> and 
+		<b>Y : <i>nn</i>, <i>pp</i>%</b>.
+            	<li>Close the Image Viewer.
+            	<li>Using <b>RDTConfig</b>, uncheck the <b>Display image window percentages</b> 
+		checkbox.
+            	<li>Open an image file and confirm that percentages are no longer displayed 
+            	in the status bar.
         </ul>
     <p>
         <li>Annotation display
@@ -424,7 +495,7 @@
     <ul>
         <li>Make a local copy of the
         <b>ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\InteractiveTest</b> 
-        folder from SourceVault.
+        folder from Vault.
         <li>Confirm that various <b>Script_&lt;Description&gt;.txt</b> files are present.
     </ul>
 <p>
@@ -468,7 +539,7 @@
         <li>Script_CenterOnTempHighlight.txt
     </ul>
 <p>
-    <li>Confirm that a meaningful error is presented if a nonexistant script file is specified.
+    <li>Confirm that a meaningful error is presented if a nonexistent script file is specified.
     <li>Confirm that a meaningful error is presented if a script attempts to hide an invalid 
     control id.
     <li>Confirm that when buttons are hidden, the associated menu items and shortcut keys are also
@@ -498,15 +569,6 @@
         without error. 
     </ul>
 <p>
-    <li><b>[LegacyRC #4480]</b> Incorrect deskew stored for small deskew angles.   
-    <ul>
-        <li>Open <b>Patricia.rsd</b> and start the Rule Tester utility. 
-        <li>Open <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\Document Classification\County Document\Affidavit of Death\0002.tif</b> and recognize all of the text in the image. 
-        <li>Execute the rules from the <b>Rule Tester</b>. 
-        <li>Review the found attributes and confirm that the highlights are 
-        properly aligned with the text. 
-    </ul>
-<p>
 
     <li><b>[FlexIDSCore #2994]</b> Right-to-left highlighting
     <ul>
@@ -524,7 +586,8 @@
 
     <li><b>[LegacyRC #4621, #4627]</b> Image Viewer does not properly handle corrupt images.
     <ul>
-        <li>Save <b>(#4621) B03307AABMB.TIF (Image A)</b> and <b>(#4627) 00002.tif (Image B)</b> locally.
+        <li>Save <b>(#4621) B03307AABMB.TIF (Image A)</b> and 
+	<b>(#4627) 00002.tif (Image B)</b> locally.
         <li>Right-click on <b>Image A</b> and <b>Open With Image Viewer</b>.
         <li>Verify that Image Viewer <b>displays</b> an exception showing that 
         it failed to load the file.
@@ -823,6 +886,17 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
             when it reappears.</lI>
         </ul></li>
     </ul>    
+<p>
+	<li><b>JIRA</b>
+    	<ul>
+        	<li><b>[JIRA #12115]</b> Confirm that color PDFs are displayed in full color.
+        	<li><b>[JIRA #12264]</b> Invalid File Format
+    		<ul>
+			<li>Confirm that 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12264\bank of america.pdf</b> can be 
+			displayed in the viewer.
+    		</ul>
+    	</ul>
 </ul>
 
 <!-- *********************************************** -->
