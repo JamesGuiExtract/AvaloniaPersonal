@@ -268,7 +268,7 @@ GetAllFiles: GetEngineering
 
 DoBuilds: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore
 
-DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos
+DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos UpdateLicenseFiles
     @ECHO.
     @DATE /T
     @TIME /T
