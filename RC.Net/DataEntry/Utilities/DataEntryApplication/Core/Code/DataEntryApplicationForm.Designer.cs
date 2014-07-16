@@ -130,6 +130,46 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
+            // _sandDockManager
+            // 
+            this._sandDockManager.DockSystemContainer = this;
+            this._sandDockManager.OwnerForm = this;
+            // 
+            // _magnifierControl
+            // 
+            this._magnifierControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._magnifierControl.ImageViewer = null;
+            this._magnifierControl.Location = new System.Drawing.Point(0, 0);
+            this._magnifierControl.Name = "_magnifierControl";
+            this._magnifierControl.Size = new System.Drawing.Size(1097, 162);
+            this._magnifierControl.TabIndex = 1;
+            // 
+            // _magnifierDockableWindow
+            // 
+            this._magnifierDockableWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this._magnifierDockableWindow.Collapsed = true;
+            this._magnifierDockableWindow.Controls.Add(this._magnifierControl);
+            this._magnifierDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
+            this._magnifierDockableWindow.Guid = new System.Guid("25fa87c7-8272-45c9-9ec8-f2f81c20e9eb");
+            this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 18);
+            this._magnifierDockableWindow.Name = "_magnifierDockableWindow";
+            this._magnifierDockableWindow.Size = new System.Drawing.Size(1097, 162);
+            this._magnifierDockableWindow.TabIndex = 0;
+            this._magnifierDockableWindow.Text = "Magnifier";
+            // 
+            // _dockContainer
+            // 
+            this._dockContainer.ContentSize = 200;
+            this._dockContainer.Controls.Add(this._magnifierDockableWindow);
+            this._dockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._magnifierDockableWindow))}, this._magnifierDockableWindow)))});
+            this._dockContainer.Location = new System.Drawing.Point(0, 66);
+            this._dockContainer.Manager = this._sandDockManager;
+            this._dockContainer.Name = "_dockContainer";
+            this._dockContainer.Size = new System.Drawing.Size(1097, 204);
+            this._dockContainer.TabIndex = 1;
+            // 
             // _splitContainer
             // 
             this._splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -199,46 +239,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._scrollPanel.Name = "_scrollPanel";
             this._scrollPanel.Size = new System.Drawing.Size(181, 457);
             this._scrollPanel.TabIndex = 0;
-            // 
-            // _dockContainer
-            // 
-            this._dockContainer.ContentSize = 200;
-            this._dockContainer.Controls.Add(this._magnifierDockableWindow);
-            this._dockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
-            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
-                        ((TD.SandDock.DockControl)(this._magnifierDockableWindow))}, this._magnifierDockableWindow)))});
-            this._dockContainer.Location = new System.Drawing.Point(0, 66);
-            this._dockContainer.Manager = this._sandDockManager;
-            this._dockContainer.Name = "_dockContainer";
-            this._dockContainer.Size = new System.Drawing.Size(1097, 204);
-            this._dockContainer.TabIndex = 1;
-            // 
-            // _magnifierDockableWindow
-            // 
-            this._magnifierDockableWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this._magnifierDockableWindow.Collapsed = true;
-            this._magnifierDockableWindow.Controls.Add(this._magnifierControl);
-            this._magnifierDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
-            this._magnifierDockableWindow.Guid = new System.Guid("25fa87c7-8272-45c9-9ec8-f2f81c20e9eb");
-            this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 18);
-            this._magnifierDockableWindow.Name = "_magnifierDockableWindow";
-            this._magnifierDockableWindow.Size = new System.Drawing.Size(1097, 162);
-            this._magnifierDockableWindow.TabIndex = 0;
-            this._magnifierDockableWindow.Text = "Magnifier";
-            // 
-            // _magnifierControl
-            // 
-            this._magnifierControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._magnifierControl.ImageViewer = null;
-            this._magnifierControl.Location = new System.Drawing.Point(0, 0);
-            this._magnifierControl.Name = "_magnifierControl";
-            this._magnifierControl.Size = new System.Drawing.Size(1097, 162);
-            this._magnifierControl.TabIndex = 1;
-            // 
-            // _sandDockManager
-            // 
-            this._sandDockManager.DockSystemContainer = this._splitContainer.Panel2;
-            this._sandDockManager.OwnerForm = this;
             // 
             // _imageViewer
             // 
