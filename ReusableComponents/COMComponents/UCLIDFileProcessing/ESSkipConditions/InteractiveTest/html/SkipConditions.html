@@ -307,6 +307,36 @@
 					<b>07c_SDF.fps</b> is executed in the batch file.
 				</ul>
 			</ul>
+            		<li><u>Miscellaneous</u>
+			<ul>
+				<li><b>[JIRA #12223]</b> Confirm that saving a condition works 
+				using the following basic settings.
+				<ul>
+					<li>FAM database connection
+					<li>Database table - select any table
+					<li>Contains at least one row
+				</ul>
+				<li><b>[JIRA #12312]</b> Sporadic Errors With DB Contents 
+				Condition.
+				<ul>
+					<li>Create a <b>Test</b> database with <b>Test</b>, 
+					<b>True</b>, and <b>False</b> actions.
+					<li>Add tags: <b>One</b> and <b>Two</b>.
+					<li>Make a local copy of 
+					<b>M:\PVCS_JIRA\JIRA\ISSUE-12312\TestCondition.fps</b> 
+					in a folder that contains several hundred image files 
+					such as .\IDS_Sanity\Images3.
+					<li>Modify the <b>Processing Setup</b> tab to 
+					enable only the first two tasks that tag files.
+					<li>Process the files to tag files.
+					<li>Modify the <b>Processing Setup</b> tab to 
+					enable only the third task that exercises the 
+					DB Contents Condition.
+					<li>Process the files to exercise the condition.
+					<li>Confirm that all files process successfully and 
+					that no errors have been logged.
+				</ul>
+			</ul>
 		</ul>
 <p>
       		<li>Confirm the droplist for the Select Condition dialog includes: 
