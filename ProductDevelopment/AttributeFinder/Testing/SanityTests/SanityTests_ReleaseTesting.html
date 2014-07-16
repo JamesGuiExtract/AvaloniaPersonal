@@ -1,0 +1,87 @@
+<html>
+
+<head>
+<title>File Action Manager Sanity Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css" />
+</head>
+
+<body>
+
+<h1>FAM Sanity Test - Release Testing<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif" />
+</h1>
+<hr>
+	<h2>Goals</h2>
+	<ul>
+		<li>Exercise fundamental software behavior before a version release.
+		<li>Confirm that software installation works as expected.
+		<li>Confirm that for <b>each</b> Start Menu item, the expected application 
+		starts.
+		<li>Confirm that queuing and processing work correctly for <b>each</b> demo.
+		<li>Confirm that verification works correctly for <b>each</b> demo.
+	</ul>
+<p>
+	<h2>Installation</h2>
+	<ul>
+		<li>Confirm that Extract Systems software installs correctly on a clean VM 
+		or test machine.
+		<li>Confirm that Extract Systems software installs correctly as a version 
+		upgrade.
+		<li>Confirm that software installs correctly via <b>Silent Install</b>.
+		<li>Confirm that software installs correctly via <b>Launch.exe</b>.
+		<li>Confirm that SQL Server Express and Extract Systems LM each install 
+		correctly.
+	</ul>
+<p>
+	<h2>Start Menu</h2>
+	<ul>
+		<li>Confirm that each application and utility launch without error from 
+		the <b>FLEX Index</b> Start Menu.
+		<li>Confirm that each application and utility launch without error from 
+		the <b>ID Shield</b> Start Menu.
+		<li>Confirm that each application and utility launch without error from 
+		the <b>LabDE</b> Start Menu.
+	</ul>
+<p>
+	<h2>Demos - Processing</h2>
+	<ul>
+		<li>Copy Demo_FLEXIndex, Demo_IDShield, and Demo_LabDE folders to the 
+		test machine.
+		<li><b>Install</b> each demo by exercising the associated <b>CleanAll</b> 
+		batch files.
+		<li>Use <b>SQL Server Management Server</b> to exercise <b>I:\Common\Testing
+		\Product Testing\IDShield_Sanity\CreateDomainLogin_AddForDemoDBs.sql</b> 
+		to allow Domain Users to access the demo databases.
+		<li>Exercise queuing and processing for each demo.
+		<li>Confirm that no errors were logged.
+	</ul>
+<p>
+	<h2>Demos - Verification</h2>
+	<ul>
+		<li>Create separate Client licenses for each product. Additional separate 
+		licenses for utilities and ignoring the USB key are also allowed.
+		<li>Log in to the test machine as a domain user.
+		<li>Exercise verification for <b>Demo_FLEXIndex</b>
+		<ul>
+			<li>Confirm good results found for each image.
+			<li>Confirm swiping success for each field with each swiping tool.
+			<li>Confirm a successful <b>save and commit</b>.
+			<li>Confirm successful exercise of each toolbar button.
+		</ul>
+		<li>Exercise verification for <b>Demo_IDShield</b>
+		<ul>
+			<li>Confirm good results found for each image.
+			<li>Confirm swiping success for each field with each swiping tool.
+			<li>Confirm a successful <b>save and commit</b>.
+			<li>Confirm successful exercise of each toolbar button.
+		</ul>
+		<li>Exercise verification for <b>Demo_LabDE</b>
+		<ul>
+			<li>Confirm good results found for each image.
+			<li>Confirm swiping success for each field with each swiping tool.
+			<li>Confirm a successful <b>save and commit</b>.
+			<li>Confirm successful exercise of each toolbar button.
+		</ul>
+	</ul>
+</body>
+</html>
