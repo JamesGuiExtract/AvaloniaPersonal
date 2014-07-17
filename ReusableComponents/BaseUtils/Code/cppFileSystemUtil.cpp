@@ -1222,17 +1222,17 @@ string getTextFileContentsAsString(const string& strTextFileName)
 		size_t length = (size_t) ifs.tellg();
 		ifs.seekg (0, ios::beg);
 
-		unique_ptr<char[]> buffer(new char[length+1]);
+		unique_ptr<unsigned char[]> buffer(new unsigned char[length+1]);
 		memset((void*)&buffer[0], 0, length+1);
 
 		// read data as a block:
-		ifs.read (&buffer[0], length);
+		ifs.read((char*)&buffer[0], length);
 
 		// close the file
 		ifs.close();
 
 		// return the string
-		return string(&buffer[0]);
+		return string(reinterpret_cast<const char*>(&buffer[0]));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32445");
 }
@@ -1792,6 +1792,10 @@ EFileType getFileType(const string& strFileName)
 	else if (strExt == ".xml")
 	{
 		return kXMLFile;
+	}
+	else if (strExt == ".csv")
+	{
+		return kCSVFile;
 	}
 	else if (strExt == ".doc" || strExt == ".xls"
 			|| strExt == ".csv" || strExt == ".ppt"

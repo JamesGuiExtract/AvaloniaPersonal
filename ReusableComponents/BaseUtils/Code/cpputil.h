@@ -49,7 +49,8 @@ enum EFileType
 	kImageFile,
 	kVOAFile,
 	kEAVFile,
-	kXMLFile
+	kXMLFile,
+	kCSVFile
 };
 
 //--------------------------------------------------------------------------------------------------

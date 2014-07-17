@@ -166,7 +166,7 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		ISpatialStringPtr ipSS = __nullptr;
 
 		EFileType eFileType = getFileType(strInputFileName);
-		if (eFileType == kTXTFile || eFileType == kXMLFile)
+		if (eFileType == kTXTFile || eFileType == kXMLFile || eFileType == kCSVFile)
 		{
 			// If a text file, load as "indexed" text.
 			ipSS.CreateInstance(CLSID_SpatialString);

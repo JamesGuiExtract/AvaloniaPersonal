@@ -1050,7 +1050,7 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName)
 	// Loop through each charater of the file.
 	for (size_t i = 0; i < length; i++)
 	{
-		char c = text[i];
+		unsigned char c = text[i];
 		CPPLetter& letter = vecLetters[i];
 
 		// Specify the character.

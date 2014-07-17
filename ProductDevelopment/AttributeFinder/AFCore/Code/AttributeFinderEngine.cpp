@@ -236,7 +236,7 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			_lastCodePos = "14";
 			
 			// If this is a text file, load the file as "indexed" text.
-			if (eFileType == kTXTFile || eFileType == kXMLFile)
+			if (eFileType == kTXTFile || eFileType == kXMLFile || eFileType == kCSVFile)
 			{
 				ISpatialStringPtr ipText = ipAFDoc->Text;
 				ASSERT_RESOURCE_ALLOCATION("ELI31687", ipText != __nullptr);
