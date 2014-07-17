@@ -904,7 +904,7 @@ void CAutomatedRuleSetTester::interpretLine(const string& strLineText,
 			strInputFile = getAndValidateAbsolutePath(strCurrentDatFileName, vecTokens[2]);
 
 			EFileType eFileType = getFileType(strInputFile);
-			if (eFileType == kTXTFile || eFileType == kXMLFile || eFileType == kCSVFile)
+			if (eFileType == kUSSFile || eFileType == kTXTFile)
 			{
 				strImageFile = getPathAndFileNameWithoutExtension(strInputFile);
 				strTextFile = strInputFile;
