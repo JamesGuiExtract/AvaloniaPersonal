@@ -1,0 +1,72 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.9.1 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE 9.9.1 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> Advanced Health
+   	<LI><b>SCRs:</b> 12343
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>While exercising Data Entry verification, the magnifier window 
+		does not work.
+	</ul>
+<p>
+   	<LI><b>Customer:</b> AARP
+   	<LI><b>SCRs:</b> 12344
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>Input files provided by the customer are CSV format.
+		<li>CSV files cannot be processed by <b>Core: OCR document</b>.
+		<li>CSV files cannot be processed by <b>Core: Execute rules</b>.
+		<li>A workaround is to rename them as TXT files but then exceptions 
+		are thrown by the Image Viewer when selecting an attribute.
+	</ul>
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<OL>
+	<LI><b>Demo_LabDE</b>
+	<ul>
+		<li>Confirm that verification works properly <b>without</b> the Magnifier 
+		Window.
+		<li>Confirm that verification works properly <b>with</b> the Magnifier 
+		Window.
+       	</ul>
+<p>
+	<LI><b>Processing CSV Files</b>
+	<ul>
+		<LI>Confirm that CSV files can be processed by <b>Core: OCR document</b> 
+		without error.
+		<LI>Confirm that CSV files can be processed by <b>Core: Execute rules</b> 
+		without error.
+		<li>Review files in the <b>M:\PVCS_JIRA\JIRA\ISSUE-12345</b> folder.
+		<ul>
+			<li>Open <b>aarpmagazine.2.txt.uss</b> and confirm that the 
+			(old-style) USS file displays an unusual character code in the 
+			Character Info dialog for the double-quote characters around 
+			<b>The Steve Harvey Show</b>.
+			<li>Open a new USS file generated for <b>aarpmagazine.2.csv</b> 
+			and confirm that the (new-style) USS file does not display an unusual 
+			character code in the Character Info dialog for the double-quote 
+			characters around <b>The Steve Harvey Show</b>.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>Other</b>
+	<ul>
+		<LI>Exercise the <b>Sanity Test - Release Testing</b> checklist.
+       	</ul>
+</OL>
+</BODY>
+</HTML>
