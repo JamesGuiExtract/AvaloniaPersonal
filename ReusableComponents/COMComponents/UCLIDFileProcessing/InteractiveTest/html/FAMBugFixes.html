@@ -25,26 +25,29 @@
     	<li><b>[LegacyRC #5610]</b> FAM processing threads must grab file before stopping
     	<ul>
         	<li>Create a database and enqueue a small (~20) number of files.</li>
-        	<li>Configure an .fps file with a verification task. Set it up to use a large number of
-        	threads to processing (at least twice as many threads as there are files to process).</li>
+        	<li>Configure an .fps file with a verification task. Set it up to use a large 
+		number of threads to processing (at least twice as many threads as there 
+		are files to process).</li>
         	<li>Start processing, then immediately stop.</li>
-        	<li>Confirm that processing stops immediately and that the initially idle threads do not
-        	have to grab files first.</li>
+        	<li>Confirm that processing stops immediately and that the initially idle 
+		threads do not have to grab files first.</li>
     	</ul></li>
 <p>    
     	<li><b>[LegacyRC #5835]</b> FAM pause button
     	<!-- fixed v 8.1.0.18 -->
     	<ul>
-        	<li>Set up an .fps file with at least one processing task and a number of files already
-        	queued.</li>
-        	<li>Press the play button and then (as quickly as possible) hit the pause button.</li>
+        	<li>Set up an .fps file with at least one processing task and a number of 
+		files already queued.</li>
+        	<li>Press the play button and then (as quickly as possible) hit the pause 
+		button.</li>
         	<li>Confirm that processing is correctly paused.</li>
     	</ul></li>
 <p>
     	<li><b>[LegacyRC #5922]</b> Processing with multiple FAMs
     	<ul>
         	<li>Queue several copies of the ID Shield demo images.</li>
-        	<li>Modify <b>Compute Redactions.fps</b> to include a 20 second sleep and no queueing.</li>
+        	<li>Modify <b>Compute Redactions.fps</b> to include a 20 second sleep and 
+		no queueing.</li>
         	<li>Open and run 5 instances of Compute Redactions.fps.</li>
         	<li>Confirm that no deadlock exceptions are seen.</li>
     	</ul></li>
@@ -53,22 +56,25 @@
     	<ul>
         	<li>Create several copies of the ID Shield demo images.</li>
         	<li>Add a 20 second sleep to <b>Compute Redactions.fps</b>.</li>
-        	<li>Open <b>5</b> instances of Compute Redactions.fps. Disable queueing in <b>4</b> of
-        	them.</li>
-        	<li>Run all 5. When processing has finished, confirm that the summary tab of the DB 
-		Admin displays the correct statistics.</li>
+        	<li>Open <b>5</b> instances of Compute Redactions.fps. Disable queueing in 
+		<b>4</b> of them.</li>
+        	<li>Run all 5. When processing has finished, confirm that the summary tab 
+		of the DB Admin displays the correct statistics.</li>
 <p>
         	<li>Reset all files to pending.</li>
-        	<li>Create a single FAM instance with a single "Set file action status in db" task.</li>
-        	<li>Run that FAM. While it is running, refresh the summary tab of the DB Admin.</li>
-        	<li>Confirm that the statistics are correctly reported when processing has finished.</li>
+        	<li>Create a single FAM instance with a single <b>Set file action status 
+		in db</b> task.</li>
+        	<li>Run that FAM. While it is running, refresh the summary tab of the DB 
+		Admin.</li>
+        	<li>Confirm that the statistics are correctly reported when processing has 
+		finished.</li>
     	</ul></li>
 <p>
     	<li><b>[LegacyRC #5924]</b> Queueing from multiple FAMs
     	<ul>
         	<li>Create a folder containing ~10,000 images.</li>
-        	<li>Open 6 FAM instances configured to queue all the images in the image folder to the 
-		same database.</li>
+        	<li>Open 6 FAM instances configured to queue all the images in the image 
+		folder to the same database.</li>
         	<li>Run them all. Confirm that all files are queued and no errors are seen.</li>
 <p>
         	<li>Clear the database.</li>
@@ -79,14 +85,14 @@
 <p>
     	<li><b>[LegacyRC #5926]</b> More database testing
     	<ul>
-        	<li>Set up a database and FPS file with enough files queued to process for a couple 
-        	hours.</li>
-        	<Li>Confirm that no unusual errors are seen processing with multiple FAM instances 
-		on the same machine using the same database.</li>
-        	<li>Confirm that no unusual errors are seen processing with multiple FAM instances 
-		on the same machine using different databases.</li>
-        	<li>Confirm that no unusual errors are seen processing with multiple FAM instances on
-        	separate test machines pointing at the same database.</li>
+        	<li>Set up a database and FPS file with enough files queued to process for a 
+		couple hours.</li>
+        	<Li>Confirm that no unusual errors are seen processing with multiple FAM 
+		instances on the same machine using the same database.</li>
+        	<li>Confirm that no unusual errors are seen processing with multiple FAM 
+		instances on the same machine using different databases.</li>
+        	<li>Confirm that no unusual errors are seen processing with multiple FAM 
+		instances on separate test machines pointing at the same database.</li>
     	</ul></li>
 <p>
    	<LI><b>[LegacyRC #6120]</b> Database Concurrency
@@ -130,6 +136,24 @@
 		<li>Restart the FAM.
 		<li>Confirm that the stuck files revert to <b>Pending</b> and then are 
 		processed.
+       	</ul>
+<p>
+   	<LI><b>[JIRA #12288]</b> Reliability Testing For CreateDirectory and DirectoryExists
+       	<ul>
+		<li>Make a local copy of the <b>M:\PVCS_JIRA\JIRA\ISSUE-12288</b> folder.
+		<li>Replace the local <b>ESFAMService.sdf</b> with the file in the ISSUE 
+		folder. Update the paths to the FPS files to use the local testing folder.
+		<li>Create a <b>Test</b> database with actions: <b>ISSUE12288</b>, 
+		<b>ISSUE12288b</b> and <b>ISSUE12288c</b>.
+		<li>Execute <b>QueueForTest.fps</b> via FAM. Close the FPS file when it has 
+		finished queuing the files.
+		<li>Confirm that files are <b>Pending</b> for the <b>ISSUE12288</b> action.
+		<li>Execute <b>DeleteStats.fps</b> via FAM and <b>DeleteFolderStats.fps</b> 
+		via FAM.
+		<li>Start the FAM service.
+		<li>Let files process for awhile and confirm that no errors are logged.
+		<li>Stop the FAM service.
+		<li>Close the FPS files.
        	</ul>
 </ul>
 </body> 
