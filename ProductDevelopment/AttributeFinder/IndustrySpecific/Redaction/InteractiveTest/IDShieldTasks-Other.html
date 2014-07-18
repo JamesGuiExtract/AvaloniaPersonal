@@ -67,11 +67,12 @@
             <ul>
                 <li>Output .xml files are created without error.</li>
                 <li>.xml files contain a <b>CurrentRevisions</b> node.</li>
-                <li>.xml files contain a <b>DocumentInfo</b> node if a Document Type was found.</li>
+                <li>.xml files contain a <b>DocumentInfo</b> node if a Document Type was 
+		found.</li>
                 <li>.xml files correctly indicate the enabled/disabled state of redactions.</li>
             </ul></li>
-            <li>Verify the images, using the line-fitting feature to create at least one multi-zone
-            redaction. Rerun the Create Metadata task. Confirm that
+            <li>Verify the images, using the line-fitting feature to create at least one 
+		multi-zone redaction. Rerun the Create Metadata task. Confirm that
             <ul>
                 <li>Output .xml files are created without error.</li>
                 <li>The multi-zone redaction was handled correctly in the .xml output.</li>
@@ -167,16 +168,16 @@
                     <li>Entries modified</li>
                 </ul></li>
             </ul></li>
-            <li>Rerun the verification task. This time, be sure to use the history navigation feature
-            to go back and edit some documents. Rerun the .xml task. Confirm that
-            <ul>
-                <li>All appropriate nodes are present.</li>
-                <li>The total verification time in the .xml correctly reflects the time spent looking 
-                at documents in history.</li>
-                <li>The date/time formats are the same in all nodes.</li>
-                <li>The various session nodes appear in the .xml in the order that they were 
-                created.</li>
-            </ul></li>
+            <li>Rerun the verification task. This time, be sure to use the history navigation 
+		feature to go back and edit some documents. Rerun the .xml task. Confirm that
+            	<ul>
+                	<li>All appropriate nodes are present.</li>
+                	<li>The total verification time in the .xml correctly reflects the 
+			time spent looking at documents in history.</li>
+                	<li>The date/time formats are the same in all nodes.</li>
+                	<li>The various session nodes appear in the .xml in the order that 
+			they were created.</li>
+           	</ul></li>
         </ul></li>
 <p>
         <li><b>Miscellaneous</b>
@@ -195,134 +196,147 @@
     <UL>
         <li><b>User Interface</b>
         <ul>
-            <li>Use the Add button to select <b>Redaction: Create redacted image</b> as the task.</li>
-            <li>Confirm that <b>The Task must be configured</b> label does not appear on the 
-            <b>Select Task</b> dialog.</li>
-            <li>Confirm that clicking <b>Configure...</b> displays the <b>Configure Redaction: 
-            Create redacted image</b> dialog.</li>
+            	<li>Use the Add button to select <b>Redaction: Create redacted image</b> as 
+		the task.</li>
+            	<li>Confirm that <b>The Task must be configured</b> label does not appear on 
+		the <b>Select Task</b> dialog.</li>
+            	<li>Confirm that clicking <b>Configure...</b> displays the <b>Configure 
+		Redaction: Create redacted image</b> dialog.</li>
 <p>
-            <li>Confirm that the dialog contains a <b>Data categories to redact</b> group box.</li>
-            <li>Confirm that the group box contains an <b>All</b> radio button.</li>
-            <li>Confirm that the group box contains a <b>Selected</b> radio button.</li>
-            <li>Confirm that this radio button is checked by default.</li>
-            <li>Confirm that this radio button has the following associated check boxes:
-            <ul>
-                <li>High confidence data - checked by default</li>
-                <li>Medium confidence data - checked by default</li>
-                <li>Low confidence data - checked by default</li>
-                <li>Manual redactions - checked by default</li>
-                <li>Other (separate names with commas - unchecked by default</li>
-                <li>Confirm that the <b>Other</b> check box includes an edit box that is enabled
-                only when the check box is checked.</li>
-            </ul></li>
-            <li>Confirm that the check boxes associated with this radio button are enabled only
-            when this radio button is selected.</li>
+            	<li>Confirm that the dialog contains a <b>Data categories to redact</b> group 
+		box.</li>
+            	<li>Confirm that the group box contains an <b>All</b> radio button.</li>
+            	<li>Confirm that the group box contains a <b>Selected</b> radio button.</li>
+            	<li>Confirm that this radio button is checked by default.</li>
+            	<li>Confirm that this radio button has the following associated check boxes:
+            	<ul>
+                	<li>High confidence data - checked by default</li>
+                	<li>Medium confidence data - checked by default</li>
+                	<li>Low confidence data - checked by default</li>
+                	<li>Manual redactions - checked by default</li>
+                	<li>Other (separate names with commas - unchecked by default</li>
+                	<li>Confirm that the <b>Other</b> check box includes an edit box that 
+			is enabled only when the check box is checked.</li>
+            	</ul></li>
+            	<li>Confirm that the check boxes associated with this radio button are enabled 
+		only when this radio button is selected.</li>
 <p>
-            <LI>Confirm that the dialog includes an <b>ID Shield data file location</b> group box.</li>
-            <LI>Confirm that the group box (by default) includes text describing default settings.</li>
-            <LI>Confirm that the group box text changes when the settings are changed.</li>
-            <LI>Confirm that the group box includes a <b>Customize...</b> button.</li>
-            <LI>Confirm that clicking the <b>Customize...</b> button displays a <b>Specify ID
-            Shield data file path</b> dialog.</li>
-            <LI>Confirm that the dialog includes an edit box for the path.</li>
-            <LI>Confirm that the default path is <b>&lt;SourceDocName&gt;.voa</b>.</li>
-            <LI>Confirm that the dialog includes an associated <b>Tag selector</b> button.</li>
-            <li>Confirm that the <b>Tag selector</b> button displays a drop-down list 2 
-            <b>&lt;&gt;</b> tags and 20 <b>$</b> functions.</li>
-            <LI>Confirm that the dialog includes an associated <b>...</b> (browse) button.</li>
-            <LI>Confirm that the browse button displays an Open dialog to select a <b>VOA</b> 
-            file.</li>
-            <LI>Confirm that the dialog includes a <b>Reset</b> button.</li>
-            <LI>Confirm that the <b>Reset</b> button modifies the data file path back to the
-            default.</li>
+            	<LI>Confirm that the dialog includes an <b>ID Shield data file location</b> 
+		group box.</li>
+            	<LI>Confirm that the group box (by default) includes text describing default 
+		settings.</li>
+            	<LI>Confirm that the group box text changes when the settings are changed.</li>
+            	<LI>Confirm that the group box includes a <b>Customize...</b> button.</li>
+            	<LI>Confirm that clicking the <b>Customize...</b> button displays a <b>Specify 
+		ID Shield data file path</b> dialog.</li>
+            	<LI>Confirm that the dialog includes an edit box for the path.</li>
+            	<LI>Confirm that the default path is <b>&lt;SourceDocName&gt;.voa</b>.</li>
+            	<LI>Confirm that the dialog includes an associated <b>Tag selector</b> button.</li>
+            	<li>Confirm that the <b>Tag selector</b> button displays a drop-down list 2 
+            	<b>&lt;&gt;</b> tags and 20 <b>$</b> functions.</li>
+            	<LI>Confirm that the dialog includes an associated <b>...</b> (browse) button.</li>
+            	<LI>Confirm that the browse button displays an Open dialog to select a <b>VOA</b> 
+            	file.</li>
+            	<LI>Confirm that the dialog includes a <b>Reset</b> button.</li>
+            	<LI>Confirm that the <b>Reset</b> button modifies the data file path back to the
+            	default.</li>
 <p>
-            <LI>Confirm that the configuration dialog includes an <b>Output file</b> group box.</li>
-            <LI>Confirm that the group box includes an edit box for the path.</li>
-            <LI>Confirm that the default path is 
-            <b>$InsertBeforeExt(&lt;SourceDocName&gt;,.redacted)</b>.</li>
-            <LI>Confirm that the group box includes an associated <b>Tag selector</b> button.</li>
-            <li>Confirm that the <b>Tag selector</b> button displays a drop-down list of 2 
-            <b>&lt;&gt;</b> tags and 20 <b>$</b> functions.</li>
-            <LI>Confirm that the group box includes an associated <b>...</b> (browse) button.</li>
-            <LI><b>[FlexIDSCore #3757]</b> 
-            <!-- fixed v 8.0.0.50 -->
-            Confirm that the Open dialog allows selection of a <b>PDF</b> output file.</li>
-            <LI>Confirm that the group box includes a <b>Retain any previously existing redactions
-            in the output file</b> radio button.</li>
-            <LI>Confirm that the group box includes an <b>Output only redactions from this 
-            session</b> radio button which is selected by default.</li>
-            <LI>Confirm that the group box includes a <b>Retain existing annotations in output file
-            (tiff only)</b> check box.</li>
-            <LI>Confirm that the group box includes an <b>Apply redactions as  annotations in 
-            output file (tiff only)</b> check box.</li>
-            <LI>Confirm that the group box includes an <b>Enable PDF security</b> check box.</li>
-            <LI>Confirm that all three check boxes are unchecked by default.</li>
-            <li>Confirm that the <b>Enable PDF security</b> check box has an associated 
-            <b>Settings...</b> button.</li>
+            	<LI>Confirm that the configuration dialog includes an <b>Output file</b> group 
+		box.</li>
+            	<LI>Confirm that the group box includes an edit box for the path.</li>
+            	<LI>Confirm that the default path is 
+            	<b>$InsertBeforeExt(&lt;SourceDocName&gt;,.redacted)</b>.</li>
+            	<LI>Confirm that the group box includes an associated <b>Tag selector</b> 
+		button.</li>
+            	<li>Confirm that the <b>Tag selector</b> button displays a drop-down list of 2 
+            	<b>&lt;&gt;</b> tags and 20 <b>$</b> functions.</li>
+            	<LI>Confirm that the group box includes an associated <b>...</b> (browse) 
+		button.</li>
+            	<LI><b>[FlexIDSCore #3757]</b> Confirm that the Open dialog allows selection 
+		of a <b>PDF</b> output file.</li>
+            	<LI>Confirm that the group box includes a <b>Retain any previously existing 
+		redactions in the output file</b> radio button.</li>
+            	<LI>Confirm that the group box includes an <b>Output only redactions from this 
+            	session</b> radio button which is selected by default.</li>
+            	<LI>Confirm that the group box includes a <b>Retain existing annotations in 
+		output file (tiff only)</b> check box.</li>
+            	<LI>Confirm that the group box includes an <b>Apply redactions as annotations 
+		in output file (tiff only)</b> check box.</li>
+            	<LI>Confirm that the group box includes an <b>Enable PDF security</b> check 
+		box.</li>
+            	<LI>Confirm that all three check boxes are unchecked by default.</li>
+            	<li>Confirm that the <b>Enable PDF security</b> check box has an associated 
+            	<b>Settings...</b> button.</li>
 <p>
-            <li>Confirm that clicking the <b>Settings...</b> button displays a <b>Configure Pdf 
-            Security Settings</b> dialog.</li>
-            <li>Confirm that the dialog includes a <b>User password</b> group box.</li>
-            <li>Confirm that the group box contains an <b>Enable user password</b> check box.</li>
-            <li>Confirm that the check box is checked by default and disabled.</li>
-            <li>Confirm that two associated edit boxes are included: one for the password and one
-            for confirming the password.</li>
-            <li>Confirm that the edit boxes are enabled only when the check box is checked.</li>
-            <li>Confirm that red error icons are displayed to the right of the edit boxes if
-            matching passwords have not been entered.</li>
+            	<li>Confirm that clicking the <b>Settings...</b> button displays a <b>Configure 
+		Pdf Security Settings</b> dialog.</li>
+            	<li>Confirm that the dialog includes a <b>User password</b> group box.</li>
+            	<li>Confirm that the group box contains an <b>Enable user password</b> check 
+		box.</li>
+            	<li>Confirm that the check box is checked by default and disabled.</li>
+            	<li>Confirm that two associated edit boxes are included: one for the password 
+		and one for confirming the password.</li>
+            	<li>Confirm that the edit boxes are enabled only when the check box is 
+		checked.</li>
+            	<li>Confirm that red error icons are displayed to the right of the edit boxes 
+		if matching passwords have not been entered.</li>
 <p>
-            <li>Confirm that the dialog includes an <b>Owner password</b> group box.</li>
-            <li>Confirm that the group box contains an <b>Enable owner password</b> check box.</li>
-            <li>Confirm that the check box is checked by default and disabled.</li>
-            <li>Confirm that two associated edit boxes are included: one for the password and one 
-            for confirming the password.</li>
-            <li>Confirm that the edit boxes are enabled only when the check box is checked.</li>
-            <li>Confirm that red error icons are displayed to the right of the edit boxes if
-            matching passwords have not been entered.</li>
-            <li>Confirm that the associated check boxes are only enabled if matching owner 
-            passwords have been entered.</li>
+            	<li>Confirm that the dialog includes an <b>Owner password</b> group box.</li>
+            	<li>Confirm that the group box contains an <b>Enable owner password</b> check 
+		box.</li>
+            	<li>Confirm that the check box is checked by default and disabled.</li>
+            	<li>Confirm that two associated edit boxes are included: one for the password 
+		and one for confirming the password.</li>
+            	<li>Confirm that the edit boxes are enabled only when the check box is 
+		checked.</li>
+            	<li>Confirm that red error icons are displayed to the right of the edit boxes 
+		if matching passwords have not been entered.</li>
+            	<li>Confirm that the associated check boxes are only enabled if matching owner 
+            	passwords have been entered.</li>
 <p>
-            <li>Confirm that the group box contains an <b>Allow printing in low level quality</b>
-            check box.</li>
-            <li>Confirm that the group box contains an <b>Allow document modifications</b> check
-            box.</li>
-            <li>Confirm that the group box contains an <b>Allow copying / extraction of text and 
-            graphics including support to users with disabilities</b> check box.</li>
-            <li>Confirm that the group box contains an <b>Allow addition or modification of text 
-            annotations and filling in form fields</b> check box.</li>
-            <li>Confirm that the group box contains an <b>Allow filling in existing form fields</b>
-            check box.</li>
-            <li>Confirm that the group box contains an <b>Allow access to text and graphics to
-            support users with disabilities</b> check box.</li>
-            <li>Confirm that the group box contains an <b>Allow assembling of document</b> check
-            box.</li>
-            <li>Confirm that the group box contains an <b>Allow printing of a high resolution 
-            faithful print out</b> check box.</li>
+            	<li>Confirm that the group box contains an <b>Allow printing in low level 
+		quality</b> check box.</li>
+            	<li>Confirm that the group box contains an <b>Allow document modifications</b> 
+		check box.</li>
+            	<li>Confirm that the group box contains an <b>Allow copying / extraction of 
+		text and graphics including support to users with disabilities</b> check box.</li>
+            	<li>Confirm that the group box contains an <b>Allow addition or modification of 
+		text annotations and filling in form fields</b> check box.</li>
+            	<li>Confirm that the group box contains an <b>Allow filling in existing form 
+		fields</b> check box.</li>
+            	<li>Confirm that the group box contains an <b>Allow access to text and graphics 
+		to support users with disabilities</b> check box.</li>
+            	<li>Confirm that the group box contains an <b>Allow assembling of document</b> 
+		check box.</li>
+            	<li>Confirm that the group box contains an <b>Allow printing of a high resolution 
+		faithful print out</b> check box.</li>
 <p>
-            <li>Confirm that selecting high resolution printing also selects and disables low
-            resolution printing.</li>
-            <li>Confirm that selecting <b>Allow document modifications</b> also selects and 
-            disables <b>addition or modification of text annotations</b> and <b>filling in existing
-            form fields</b>.</li>
-            <li>Confirm that selecting <b>Allow copying / extraction of text...</b> also selects
-            and disables <b>access to text and graphics to support users with disabilities</b>.</li>
-            <li>Confirm that selecting <b>Allow addition or modification of text annotations...</b>
-            also selects and disables <b>filling in existing form fields</b>.</li>
+            	<li>Confirm that selecting high resolution printing also selects and disables low
+            	resolution printing.</li>
+            	<li>Confirm that selecting <b>Allow document modifications</b> also selects and 
+            	disables <b>addition or modification of text annotations</b> and <b>filling in 
+		existing form fields</b>.</li>
+            	<li>Confirm that selecting <b>Allow copying / extraction of text...</b> also 
+		selects and disables <b>access to text and graphics to support users with 
+		disabilities</b>.</li>
+            	<li>Confirm that selecting <b>Allow addition or modification of text 
+		annotations...</b> also selects and disables <b>filling in existing form 
+		fields</b>.</li>
 <p>
-            <li>Confirm that all of the check boxes are unchecked by default.</li>
+            	<li>Confirm that all of the check boxes are unchecked by default.</li>
 <p>
-            <LI>Confirm that the configuration dialog includes a <b>Redaction text and color
-            settings...</b> button.</li>
-            <li>Confirm that the <b>Redaction text and color settings</b> dialog includes the
-            following elements.
-            <ul>
-                <li>A group box for <b>Text to place in redaction zones</b>.</li>
-                <li>A combo box for <b>Redaction text</b>.</li>
-                <li>An associated <b>tag selector</b>
-                <ul>
-                    <li><b>&lt;ExemptionCodes&gt;</b></li>
-                    <li><b>&lt;FieldType&gt;</b></li>
-                </ul></li>
+            	<LI>Confirm that the configuration dialog includes a <b>Redaction text and color 
+		settings...</b> button.</li>
+            	<li>Confirm that the <b>Redaction text and color settings</b> dialog includes the
+            	following elements.
+            	<ul>
+                	<li>A group box for <b>Text to place in redaction zones</b>.</li>
+                	<li>A combo box for <b>Redaction text</b>.</li>
+                	<li>An associated <b>tag selector</b>
+                	<ul>
+                    		<li><b>&lt;ExemptionCodes&gt;</b></li>
+                    		<li><b>&lt;FieldType&gt;</b></li>
+                	</ul></li>
                 <li>An associated read-only edit box for <b>Sample text that uses the above 
                 pattern</b>.</li>
                 <li>Confirm that the edit box updates with combo box changes.</li>
@@ -385,7 +399,8 @@
                 <li>Confirm that existing redactions can be discarded.</li>
                 <li>Confirm that existing annotations can be retained.</li>
                 <li>Confirm that existing annotations can be discarded.</li>
-                <li>Confirm that redactions can be applied as either black or white annotations.</li>
+                <li>Confirm that redactions can be applied as either black or white 
+		annotations.</li>
                 <li>Confirm that redaction boxes can include text.</li>
                 <li>Confirm that the text is completely contained within the redactions.</li>
                 <li>Confirm that <b>replace strings</b> can be applied to the redaction text.</li>
@@ -427,80 +442,81 @@
 <p>
         <li><b>Annotation Support</b>
         <UL>
-            <LI>Confirm that the <b>Demo_IDShield</b> rules and database are available.</li>
-            <li>Confirm that the FPS files and TIF images are available from 
-            <b>.\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\InteractiveTest</b>.</li>
+            	<LI>Confirm that the <b>Demo_IDShield</b> rules and database are available.</li>
+            	<li>Confirm that the FPS files and TIF images are available from 
+            	<b>.\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction
+		\InteractiveTest</b>.</li>
 <p>
-            <li>Exercise <b>ComputeVOAs.fps</b>.</li>
-            <li>Confirm that each TIF has a corresponding USS file and VOA file.</li>
-            <li>Delete any pre-existing <b>.redacted</b> images.</li>
+            	<li>Exercise <b>ComputeVOAs.fps</b>.</li>
+            	<li>Confirm that each TIF has a corresponding USS file and VOA file.</li>
+            	<li>Delete any pre-existing <b>.redacted</b> images.</li>
 <p>
-            <li>Exercise <b>RedactApply.fps</b>.
-            <ul>
-                <li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
-                configured not to display TIF annotations.
-                <ul>
-                    <li>Confirm that the redactions are not visible.</li>
-                    <li>Confirm that the pre-existing annotations are not visible.</li>
-                </ul></li>
-                <li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
-                configured to display TIF annotations.
-                <ul>
-                    <li>Confirm that the redactions are visible.</li>
-                    <li>Confirm that the pre-existing annotations are not visible.</li>
-                </ul></li>
-                <li>Delete the <b>.redacted</b> images.</li>
-            </ul></li>
+            	<li>Exercise <b>RedactApply.fps</b>.
+            	<ul>
+                	<li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
+			configured not to display TIF annotations.
+                	<ul>
+                    		<li>Confirm that the redactions are not visible.</li>
+                    		<li>Confirm that the pre-existing annotations are not visible.</li>
+                	</ul></li>
+                	<li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
+                	configured to display TIF annotations.
+                	<ul>
+                    		<li>Confirm that the redactions are visible.</li>
+                    		<li>Confirm that the pre-existing annotations are not visible.</li>
+                	</ul></li>
+                	<li>Delete the <b>.redacted</b> images.</li>
+            	</ul></li>
 <p>
-            <li>Exercise <b>RedactNoAnno.fps</b>.
-            <ul>
-                <li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
-                configured not to display TIF annotations.
-                <ul>
-                    <li>Confirm that the redactions are visible.</li>
-                    <li>Confirm that the pre-existing annotations are not visible.</li>
-                </ul></li>
-                <li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
-                configured to display TIF annotations.
-                <ul>
-                    <li>Confirm that the redactions are visible.</li>
-                    <li>Confirm that the pre-existing annotations are not visible.</li>
-                </ul></li>
-                <li>Delete the <b>.redacted</b> images.</li>
-            </ul></li>
+            	<li>Exercise <b>RedactNoAnno.fps</b>.
+            	<ul>
+                	<li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
+                	configured not to display TIF annotations.
+                	<ul>
+                    		<li>Confirm that the redactions are visible.</li>
+                    		<li>Confirm that the pre-existing annotations are not visible.</li>
+                	</ul></li>
+                	<li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
+                	configured to display TIF annotations.
+                	<ul>
+                    		<li>Confirm that the redactions are visible.</li>
+                    		<li>Confirm that the pre-existing annotations are not visible.</li>
+                	</ul></li>
+                	<li>Delete the <b>.redacted</b> images.</li>
+            	</ul></li>
 <p>
-            <li>Exercise <b>RedactRetain.fps</b>.
-            <ul>
-                <li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
-                configured not to display TIF annotations.
-                <ul>
-                    <li>Confirm that the redactions are visible.</li>
-                    <li>Confirm that the pre-existing annotations are not visible.</li>
-                </ul></li>
-                <li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
-                configured to display TIF annotations.
-                <ul>
-                    <li>Confirm that the redactions are visible.</li>
-                    <li>Confirm that the pre-existing annotations are visible.</li>
-                </ul></li>
-                <li>Delete the <b>.redacted</b> images.</li>
-            </ul></li>
+            	<li>Exercise <b>RedactRetain.fps</b>.
+            	<ul>
+                	<li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
+                	configured not to display TIF annotations.
+                	<ul>
+                    		<li>Confirm that the redactions are visible.</li>
+                    		<li>Confirm that the pre-existing annotations are not visible.</li>
+                	</ul></li>
+                	<li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
+                	configured to display TIF annotations.
+                	<ul>
+                    		<li>Confirm that the redactions are visible.</li>
+                    		<li>Confirm that the pre-existing annotations are visible.</li>
+                	</ul></li>
+                	<li>Delete the <b>.redacted</b> images.</li>
+            	</ul></li>
 <p>
-            <li>Exercise <b>RedactRetainApply.fps</b>.
-            <ul>
-                <li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
-                configured not to display TIF annotations.
-                <ul>
-                    <li>Confirm that the redactions are not visible.</li>
-                    <li>Confirm that the pre-existing annotations are not visible.</li>
-                </ul></li>
-                <li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
-                configured  to display TIF annotations.
-                <ul>
-                    <li>Confirm that the redactions are visible.</li>
-                    <li>Confirm that the pre-existing annotations are visible.</li>
-                </ul></li>
-            </ul></li>
+            	<li>Exercise <b>RedactRetainApply.fps</b>.
+            	<ul>
+                	<li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
+                	configured not to display TIF annotations.
+                	<ul>
+                    		<li>Confirm that the redactions are not visible.</li>
+                    		<li>Confirm that the pre-existing annotations are not visible.</li>
+                	</ul></li>
+                	<li>Review the <b>.redacted</b> images using <b>ExtractImageViewer.exe</b> 
+                	configured  to display TIF annotations.
+                	<ul>
+                    		<li>Confirm that the redactions are visible.</li>
+                    		<li>Confirm that the pre-existing annotations are visible.</li>
+                	</ul></li>
+            	</ul></li>
         </ul></li>
 <p>
         <li><b>PDF Security Functionality</b>
@@ -564,20 +580,20 @@
                 </ul></li>
             </ul></li>
         </ul></li>
-    <p>
-        <li><b>[FlexIDSCore #4549]</b> Auto-adjust case on redaction over blank zones
-        <ul>
-            <li>Confirm that the auto-adjust case setting does not cause the task to fail
-            when redacting attributes over blank regions in the document.</li>
-        </ul></li>
-        <li><b>[FlexIDSCore #4609]</b>
-        <ul>
-            <li>In the ID Shield demo, run the Compute FPS file.</li>
-            <li>Run a Create Redacted Image task on all the images.</li>
-            <li>Verify the images.</li>
-            <li>Open the VOA file for an image that contains both a clue and some redacted data and
-            confirm that all attributes have distinct IDs.</li>
-        </ul></li>
+<p>
+    	<li><b>[FlexIDSCore #4549]</b> Auto-adjust case on redaction over blank zones
+    	<ul>
+            	<li>Confirm that the auto-adjust case setting does not cause the task to fail 
+		when redacting attributes over blank regions in the document.</li>
+     	</ul></li>
+     	<li><b>[FlexIDSCore #4609]</b>
+     	<ul>
+            	<li>In the ID Shield demo, run the Compute FPS file.</li>
+            	<li>Run a Create Redacted Image task on all the images.</li>
+            	<li>Verify the images.</li>
+            	<li>Open the VOA file for an image that contains both a clue and some redacted 
+		data and confirm that all attributes have distinct IDs.</li>
+     	</ul></li>
     </UL></li>
 <p>
     <li><h2>Redaction: Create redacted text</h2>

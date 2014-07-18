@@ -565,15 +565,33 @@
                 	<li>Run ID Shield verification via RunFPS on a machine where the current user 
 			has never used RunFPS.</li>
                 	<li>Confirm that the toolstrips are loaded correctly.</li>
-                	<li>Delete the user.config file under <b>C:\Users\[Username]\AppData\Local\[ApplicationName]_Application\[GibberishFolderName]\[VersionString]</b>.  Note that this path may be incorrect.</li>
-                	<li>Open verification in the application whose config file has been deleted.</li>
+                	<li>Delete the user.config file under 
+			<b>C:\Users\[Username]\AppData\Local\[ApplicationName]_Application
+			\[GibberishFolderName]\[VersionString]</b>.  
+			Note that this path may be incorrect.</li>
+                	<li>Open verification in the application whose config file has been 
+			deleted.</li>
                 	<li>Confirm that the toolstrips are loaded correctly.</li>
             	</ul></li>
         </ul></li>
 <p>
    	<li><b>Current (10.0 release cycle) bugs</b>
         <ul>
-		<li>TBD
+	     	<li><b>[JIRA #12265]</b> Bad Redaction Coordinates For PDF
+     		<ul>
+            		<li>Process and verify the image at 
+			<b>\\engsvr\internal\PVCS_JIRA\JIRA\ISSUE-12265\</b>.
+	            	<li>Review the redacted output image.
+            		<li>Confirm that all redactions are in their proper places.
+	     	</ul></li>
+	     	<li><b>[JIRA #12284]</b> Zoom Status Label
+     		<ul>
+            		<li>Verify an image.
+	            	<li>Confirm that the Magnifier Window is open and the Thumbnail 
+			Window is closed.
+        	    	<li>Stop and restart verification.
+            		<li>Confirm that the Zoom status label is correct.
+	     	</ul></li>
         </ul></li>
 </ul>
 </HTML>
