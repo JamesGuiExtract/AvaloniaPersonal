@@ -50,10 +50,12 @@
             		<li>In the Database tab of the FAM, hit the Refresh button and confirm that 
 			it connects to the database without error.</li>
             		<li>Start processing.
-			<li>Confirm that a few files complete the <b>OCR</b> and <b>Redact images</b> 
-			tasks.
-			<li>Copy the files from the <b>Images</b> folder to the <b>Images2</b> folder.
-			<li>Confirm that files are also being queued from the <b>Images2</b> folder.
+			<li>Confirm that a few files complete the <b>OCR</b> and <b>Redact 
+			images</b> tasks.
+			<li>Copy the files from the <b>Images</b> folder to the <b>Images2</b> 
+			folder.
+			<li>Confirm that files are also being queued from the <b>Images2</b> 
+			folder.
 			<li>Confirm that the files from <b>Images2</b> are being processed with a 
 			higher priority.</li>
       			<li>Confirm that <b>Bates numbers</b> appear on the output images as 
@@ -69,8 +71,8 @@
 		<ul>
 			<li><b>User authentication</b> - Use <b>Compute.fps</b> to test.
 			<ul>
-                		<li>Run DB Admin <b>as Administrator</b> and connect to the database 
-				<b>sanity_test</b>.</li>
+                		<li>Run DB Admin <b>as Administrator</b> and connect to the 
+				database <b>sanity_test</b>.</li>
                 		<li>When prompted to update the database to the current schema, 
 				click <b>No</b>.</li>
                 		<li>Confirm that <b>only</b> the following menu items are enabled.
@@ -78,9 +80,10 @@
                     			<li>Database - <b>Clear</b>, <b>Update database schema</b>, 
 					<b>Logout</b>, and <b>Exit</b>.</li>
                     			<li>Tools - <b>Check for new components</b>, <b>Recalculate 
-					summary statistics</b>, and <b>File Action Manager</b>.</li>
-                    			<li>Help - <b>File Action Manager Help</b> and <b>About this 
-					application</b>.</li>
+					summary statistics</b>, and <b>File Action 
+					Manager</b>.</li>
+                    			<li>Help - <b>File Action Manager Help</b> and <b>About 
+					this application</b>.</li>
                 		</ul></li>
                 		<li>Select the <b>Database - Update database schema</b> menu 
 				item.</li>
@@ -169,7 +172,8 @@
 			<li>Skip a few files during verification.
 			<li>Tag some files during verification.
 			<li>Provide comments for some files during verification.
-			<li>Confirm that reports correctly indicate which files were <b>skipped</b>.
+			<li>Confirm that reports correctly indicate which files were 
+			<b>skipped</b>.
 			<li>Confirm that reports correctly indicate which files were <b>tagged</b>.
 			<li>Confirm that reports correctly indicate which <b>comments</b> are 
 			defined.
@@ -210,7 +214,7 @@
 		</ul>
 	</ul>
 <p>
-	<li><h2>PDF/A conversion and PDF security</h2>
+	<li><h2>PDF/A conversion, PDF security, Searchable PDFs</h2>
 	<ul>
 		<li>Exercise <b>Core: Convert to searchable PDF</b> and enable PDF/A conversion.
 		<li>Confirm that PDF/A-compliant files are created.
@@ -219,6 +223,9 @@
 		(Note: The user password = "user", the owner password = "owner" if you are testing
 		the files created by the <b>Verify.fps</b>.
 		<li>Confirm that other security settings are also applied as expected.
+		<li><b>[JIRA #11940]</b> Review some of the <b>searchable PDF</b> output 
+		files and confirm that redactions and text elements are properly placed in 
+		the file.
 	</ul>
 <p>
 	<li><h2>File Encryption and Decryption</h2>
