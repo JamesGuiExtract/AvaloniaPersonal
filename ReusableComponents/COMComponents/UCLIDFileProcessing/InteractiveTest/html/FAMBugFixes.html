@@ -12,16 +12,6 @@
 <hr>
 
 <ul>
-    	<LI><b>[FlexIDSCore #3073]</b> Running rule set causes FAM to crash
-    	<!-- fixed v 9.0.0.118 -->
-    	<ul>
-        	<li>Prepare a test database</li>
-        	<li>Modify the associated Crash.fps</li>
-        	<li>Queue the associated MTG image</li>
-        	<li>Exercise the associated RSD file</li>
-        	<li>Confirm that the FAM <b>does not</b> crash.</li>
-    	</ul></li>
-<p>
     	<li><b>[LegacyRC #5610]</b> FAM processing threads must grab file before stopping
     	<ul>
         	<li>Create a database and enqueue a small (~20) number of files.</li>
@@ -109,10 +99,12 @@
 		<b>Task Manager</b>.
 		<li>Confirm that one or more files is stuck in <b>Processing</b> 
 		status.
+		<li>Confirm that an entry remains in the <b>ActiveFAM</b> table.
 		<li>Restart processing in less than 24 hours.  Confirm that the stuck files 
 		remain stuck in <b>Processing</b> status.
 		<li>Restart processing after more than 24 hours.  Confirm that the stuck 
-		files have reverted to <b>Pending</b> status.
+		files remain in <b>Processing</b> status.
+		<li>Confirm that the <b>ActiveFAM</b> table entry has been removed.
        	</ul>
 <p>
    	<LI><b>[LegacyRC #6190]</b> FAM Crash On Close
