@@ -127,10 +127,9 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Use a ProcessName check for design mode because LicenseUsageMode.UsageMode 
-                // isn't always accruate.
-                _inDesignMode = Process.GetCurrentProcess().ProcessName.Equals(
-                    "devenv", StringComparison.CurrentCultureIgnoreCase);
+                // Because LicenseUsageMode.UsageMode isn't always accurate, this will be re-checked
+                // in OnDataGridViewChanged.
+                _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
 
                 // Load licenses in design mode
                 if (_inDesignMode)
@@ -747,6 +746,20 @@ namespace Extract.DataEntry
             try
             {
                 base.OnDataGridViewChanged();
+
+                // _inDesignMode does not seem to get set correctly at least some of the time for
+                // DataEntryTableRow and DataEntryTableColumn. When assigned to a table, set 
+                // _inDesignMode if the table's InDesignMode property is true (which does seem to be
+                // reliable.
+                if (!_inDesignMode && DataGridView != null)
+                {
+                    var parentDataEntryTable = DataGridView as DataEntryTableBase;
+
+                    if (parentDataEntryTable != null)
+                    {
+                        _inDesignMode = parentDataEntryTable.InDesignMode;
+                    }
+                }
 
                 // Initialize the validator and auto-complete/item list in for cell.
                 UpdateCellValidatorTemplates();

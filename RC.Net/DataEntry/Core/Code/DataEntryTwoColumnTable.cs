@@ -77,11 +77,6 @@ namespace Extract.DataEntry
         /// </summary>
         Collection<DataEntryTableRow> _rows = new Collection<DataEntryTableRow>();
 
-        /// <summary>
-        /// Specifies whether the current instance is running in design mode
-        /// </summary>
-        bool _inDesignMode;
-
         #endregion Fields
 
         #region Constructors
@@ -94,15 +89,6 @@ namespace Extract.DataEntry
         {
             try
             {
-                _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
-
-                // Load licenses in design mode
-                if (_inDesignMode)
-                {
-                    // Load the license files from folder
-                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-                }
-
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI24491", _OBJECT_NAME);
@@ -400,7 +386,7 @@ namespace Extract.DataEntry
 
                 // If we are not in design mode and the control is being made visible for the first
                 // time, verify the table is properly configured and create the context menu.
-                if (!_inDesignMode)
+                if (!InDesignMode)
                 {
                     ExtractException.Assert("ELI24375",
                         "Table swiping is enabled, but no table formatting rule was specified!",
@@ -818,7 +804,7 @@ namespace Extract.DataEntry
                 {
                     // If not in design mode and a formatting rule is specified, attempt to load an
                     // attribute finding rule.
-                    if (!_inDesignMode && _tableFormattingRule == null &&
+                    if (!InDesignMode && _tableFormattingRule == null &&
                         !string.IsNullOrEmpty(_tableFormattingRuleFileName))
                     {
                         _tableFormattingRule = (IRuleSet)new RuleSetClass();

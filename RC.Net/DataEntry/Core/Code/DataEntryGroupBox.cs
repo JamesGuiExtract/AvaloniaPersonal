@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -509,6 +510,40 @@ namespace Extract.DataEntry
         }
 
         #endregion Unused IDataEntryControl Members
+
+        #region Overrides
+
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                try
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-964
+                    // I'm not sure of the exact sequence of calls, but unless child data entry
+                    // controls are dis-associated with this group box before disposing, it leads to
+                    // infinite recursion in the designer when group boxes are deleted.
+                    foreach (var dataEntryControl in Controls.OfType<IDataEntryControl>())
+                    {
+                        dataEntryControl.ParentDataEntryControl = null;
+                    }
+
+                    if (components != null)
+                    {
+                        components.Dispose();
+                        components = null;
+                    }
+                }
+                catch { }
+            }
+            base.Dispose(disposing);
+        }
+
+        #endregion Overrides
 
         #region Private Members
 

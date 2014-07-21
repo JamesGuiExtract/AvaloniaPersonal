@@ -118,10 +118,9 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Use a ProcessName check for design mode because LicenseUsageMode.UsageMode 
-                // isn't always accruate.
-                _inDesignMode = Process.GetCurrentProcess().ProcessName.Equals(
-                    "devenv", StringComparison.CurrentCultureIgnoreCase);
+                // Because LicenseUsageMode.UsageMode isn't always accurate, this will be re-checked
+                // in OnDataGridViewChanged.
+                _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
 
                 // Load licenses in design mode
                 if (_inDesignMode)
@@ -723,14 +722,18 @@ namespace Extract.DataEntry
             {
                 base.OnDataGridViewChanged();
 
-                // If a valid grid has been specified and combo boxes are being used, ensure a
-                // validation list has been specified.
-                if (base.DataGridView != null && _useComboBoxCells)
+                // _inDesignMode does not seem to get set correctly at least some of the time for
+                // DataEntryTableRow and DataEntryTableColumn. When assigned to a table, set 
+                // _inDesignMode if the table's InDesignMode property is true (which does seem to be
+                // reliable.
+                if (!_inDesignMode && DataGridView != null)
                 {
-                    string[] autoCompleteValues = _validatorTemplate.GetAutoCompleteValues();
+                    var parentDataEntryTable = DataGridView as DataEntryTableBase;
 
-                    ExtractException.Assert("ELI25578", "Auto-complete query must be specified " +
-                        "for ComboBox cells!", _inDesignMode || autoCompleteValues != null);
+                    if (parentDataEntryTable != null)
+                    {
+                        _inDesignMode = parentDataEntryTable.InDesignMode;
+                    }
                 }
             }
             catch (Exception ex)

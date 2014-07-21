@@ -438,6 +438,20 @@ namespace Extract.DataEntry
         #region Properties
 
         /// <summary>
+        /// Gets a value indicating whether the current instance is running in design mode.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if in design mode; otherwise, <see langword="false"/>.
+        /// </value>
+        internal bool InDesignMode
+        {
+            get
+            {
+                return _inDesignMode;
+            }
+        }
+
+        /// <summary>
         /// Indicates whether the table has any dependent <see cref="IDataEntryControl"/>s.
         /// </summary>
         /// <returns><see langword="true"/> if the table has dependent controls, 

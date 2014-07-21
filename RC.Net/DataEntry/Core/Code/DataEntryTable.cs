@@ -149,11 +149,6 @@ namespace Extract.DataEntry
         Point? _rowMouseDownPoint;
 
         /// <summary>
-        /// Specifies whether the current instance is running in design mode.
-        /// </summary>
-        readonly bool _inDesignMode;
-
-        /// <summary>
         /// A lazily instantiated <see cref="MiscUtils"/> instance to use for converting 
         /// IPersistStream implementations to/from a stringized byte stream.
         /// </summary>
@@ -196,15 +191,6 @@ namespace Extract.DataEntry
         {
             try
             {
-                _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
-
-                // Load licenses in design mode
-                if (_inDesignMode)
-                {
-                    // Load the license files from folder
-                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-                }
-
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI24490", _OBJECT_NAME);
@@ -503,7 +489,7 @@ namespace Extract.DataEntry
 
                 // If we are not in design mode and the control is being made visible for the first
                 // time, verify the table is properly configured and create the context menu.
-                if (!_inDesignMode)
+                if (!InDesignMode)
                 {
                     ExtractException.Assert("ELI24222",
                         "A DataEntryTable must have an AttributeName specified!",
@@ -2368,7 +2354,7 @@ namespace Extract.DataEntry
                 {
                     // If not in design mode and a formatting rule is specified, attempt to load an
                     // attribute finding rule.
-                    if (!_inDesignMode && _rowFormattingRule == null &&
+                    if (!InDesignMode && _rowFormattingRule == null &&
                         !string.IsNullOrEmpty(_rowFormattingRuleFileName))
                     {
                         _rowFormattingRule = (IRuleSet)new RuleSetClass();
