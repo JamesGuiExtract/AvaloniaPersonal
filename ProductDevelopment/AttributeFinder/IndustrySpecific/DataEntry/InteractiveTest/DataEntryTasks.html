@@ -23,9 +23,11 @@
             		<li>Confirm that an associated browse <b>...</b> button is defined.</b></li>
 			<li>Confirm that clicking the browse button displays an <b>Open</b> dialog.
 			<ul>
-				<li>Confirm that <b>Configuration files (*.config)</b> can be selected.
+				<li>Confirm that <b>Configuration files (*.config)</b> can be 
+				selected.
 				<li>Confirm that <b>All files (*.*)</b> can be selected.
-				<li>Confirm that <b>Configuration files (*.config)</b> is the default.
+				<li>Confirm that <b>Configuration files (*.config)</b> is the 
+				default.
 			</ul>
             		<li>Confirm that the selected file is displayed in the edit box.</li>
 <p>
@@ -49,17 +51,24 @@
 				<li>Confirm that the found <b>ReturnAddress - City</b> attribute 
 				is displayed as valid.
 				<li>Modify the <b>55117</b> entry in the <b>ZipCode</b> to be 
-				<b>St. Paul</b>.
-				<li>Reprocess and re-verify <b>Example04.tif</b>.
-				<li>Confirm that the found <b>ReturnAddress - City</b> attribute 
-				is displayed as valid.
+				<b>Brainerd</b> instead of <b>St. Paul</b>.
 			</ul>
+			<li>Reprocess and re-verify <b>Example04.tif</b>.
+			<li>Confirm that the found <b>ReturnAddress - City</b> attribute 
+			is still displayed as valid.
+			<li>Manually edit the <b>City</b> to <b>Baxter</b>.
+			<li>Confirm that <b>Zip Code</b> automatically updates to 
+			<b>56425</b>.
+			<li>Manually edit the <b>City</b> to <b>Brainerd</b>.
+			<li>Confirm that <b>Zip Code</b> is unchanged.
+			<li>Manually edit the <b>City</b> to <b>Perham</b>.
+			<li>Confirm that <b>Zip Code</b> automatically updates to 
+			<b>56573</b>.
+			<li>Manually edit the <b>Zip Code</b> to <b>55117</b>.
+			<li>Confirm that <b>Zip Code</b> is now invalid.
+			<li>Manually edit the <b>City</b> to <b>Brainerd</b>.
+			<li>Confirm that <b>Zip Code</b> is now valid.
         	</ul></li>
-<p>
-		<li><b>Specified DEPs</b>
-		<ul>
-			<li>TBD
-		</ul></li>
 	</UL></li>
 </UL>
 </HTML>
