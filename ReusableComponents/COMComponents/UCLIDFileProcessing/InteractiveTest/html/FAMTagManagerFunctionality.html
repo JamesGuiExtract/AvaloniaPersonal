@@ -13,12 +13,15 @@ File Action Manager - FAM Tag Manager Functionality<br>
 <ul>
 	<li><b>Setup</b></li>
 	<ul>
-		<li>Recursively get the folder <b>FAM Tag Manager Functionality</b> from source control. 
+		<li>Recursively get the folder <b>FAM Tag Manager Functionality</b> from source 
+		control. 
 		It is located at:<br>
-		<i>$\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing\InteractiveTest\FAM 
-		Tag Manager Functionality</i><br>
+		<i>$\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing
+		\InteractiveTest\FAM Tag Manager Functionality</i><br>
 		<li>Create a <b>FAM_Condition</b> database.
 		<li>Add a <b>Test</b> action.
+		<li>Use <b>SQL Server Management Studio</b> to add <b>db_datareader</b> and 
+		<b>db_datawriter</b> permissions for <b>Domain Users</b> to the database.
 	</ul>
 <p>
 	<li><b>&ltFPSFileDir&gt Functionality</b></li>
@@ -61,8 +64,8 @@ File Action Manager - FAM Tag Manager Functionality<br>
 			<li>Open the file named <b>Queue_In_Parent_Dir.fps</b> and run it. This FPS 
 			file is located in <i>FAM Tag Manager Functionality\Main</i>.</li>
 			<li>Look at the <b>Files added or updated in the queue recently</b> display 
-			area of the Queue log and confirm that FPSParentDir01.tif and FPSParentDir02.tif 
-			were both added to the list.</li>
+			area of the Queue log and confirm that FPSParentDir01.tif and 
+			FPSParentDir02.tif were both added to the list.</li>
 		</ul>
 		<li>Add an action called <b>Sibling</b> to the database</li>
 		<ul>
@@ -79,8 +82,8 @@ File Action Manager - FAM Tag Manager Functionality<br>
 		<li><u>Files from dynamic list</u>
 		<ul>
 			<li>Add an action called <b>Dynamic</b> to the Database</li>
-			<li>Open the file named <b>Test_FPSDir_DynamicList.fps</b> and run it. This FPS 
-			file is located in <i>FAM Tag Manager Functionality\Main</i>.</li>
+			<li>Open the file named <b>Test_FPSDir_DynamicList.fps</b> and run it. 
+			This FPS file is located in <i>FAM Tag Manager Functionality\Main</i>.</li>
 			<li>Look at the <b>Files added or updated in the queue recently</b> display 
 			area of the Queue log and confirm that FPSDir01.tif, FPSSubDir01.tif, 
 			FPSParentDir01.tif, and FPSSiblingDir01.tif were all added to the list.</li>
@@ -95,7 +98,8 @@ File Action Manager - FAM Tag Manager Functionality<br>
 			<li>Open the file named <b>Test_Copy.fps</b> and run it. This FPS file 
 			is located in <i>FAM Tag Manager Functionality\Main</i>.</li>
 			<li>Look in <b>FAM Tag Manager Functionality\Main\Sub</b> and confirm that 
-			two files, named FPSDir01COPY.TIF and FPSDir02COPY.TIF have been created.</li>
+			two files, named FPSDir01COPY.TIF and FPSDir02COPY.TIF have been 
+			created.</li>
 		</ul>
 <p>
 		<li><u>Redaction: Create Redacted Image</u></li>
@@ -138,6 +142,8 @@ File Action Manager - FAM Tag Manager Functionality<br>
 	<ul>
 		<li><u>File Existence Condition</u>
 		<ul>
+			<li>Delete <b>FAM Tag Manager Functionality\FPSParentDir02.tif.voa</b>, 
+			if present.
 			<li>Add an action called <b>SkipExist</b> to the database.</li>
 			<li>Open the file named <b>Test_SkipExistence.fps</b> and run it. This 
 			FPS file is located in <i>FAM Tag Manager Functionality\Main</i>.</li>
@@ -161,6 +167,7 @@ File Action Manager - FAM Tag Manager Functionality<br>
 	<ul>
   	   	<LI><b>[LegacyRC #5644]</b> Auto-create action exception
 	       	<ul>
+			<li>Login as a non-admin Domain User.
 	  	   	<LI>Prepare a FAM to use an <b>ExtractData_$FullUserName()</b> action.
 			<LI>Confirm that the user name contains a space.
 	  	   	<LI>Exercise the FAM.
