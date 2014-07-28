@@ -231,6 +231,7 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 				<li>Zoom next
 				<li>Fit to page
 				<li>Fit to width
+				<li>One-to-one zoom
 				<li>Rotate counterclockwise
 				<li>Rotate clockwise
 				<li>Print image
@@ -399,6 +400,7 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 				<li>Copy filename(s) Ctrl + C
 				<li>Copy file(s)
 				<li>Copy file(s) and data
+				<li>Open file location
 				<li><u>Separator</u>
 				<li>Reports
 				<li><u>Separator</u>
@@ -427,6 +429,10 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			information to the Clipboard such that copies of each of the 
 			selected files along with associated USS, VOA, and XML files can 
 			be pasted into an Explorer window or as email attachments.
+			<li>Confirm that <b>Open file location</b> opens a new Windows 
+			Explorer instance and displays the contents of the appropriate folder.
+			<li>Confirm that <b>Open file location</b> is only enabled when a 
+			single file is selected.
 <p>
 			<li>Confirm that each available report displays properly and uses 
 			the selected file as the required parameter.
@@ -814,6 +820,17 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			<li>Add a search for a nonsense word or expression such as ~*.
 			<li>Confirm that no search results are returned.
 			<li>Confirm that the displayed zoom percentage is also cleared.
+        	</ul>
+<p>
+  	   	<LI><b>[JIRA #12310]</b> Page Navigation
+        	<ul>
+			<li>Inspect some files such that some of the files have multiple pages.
+			<li>Select a multi-page image.
+			<li>Highlight the text in the page navigation control and type a page 
+			number other than <b>1</b>.
+			<li>Press <b>ENTER</b>.
+			<li>Confirm that the selected page is displayed.
+			<li>Confirm that the selected document does not change.
         	</ul>
   	</ul>
 </ol>
