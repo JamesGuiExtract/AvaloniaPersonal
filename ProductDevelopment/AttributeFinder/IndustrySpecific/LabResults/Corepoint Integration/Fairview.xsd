@@ -282,6 +282,27 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
+							<xs:element name="DefaultComponentCode" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="DefaultComponentName" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="DefaultComponentValue" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>

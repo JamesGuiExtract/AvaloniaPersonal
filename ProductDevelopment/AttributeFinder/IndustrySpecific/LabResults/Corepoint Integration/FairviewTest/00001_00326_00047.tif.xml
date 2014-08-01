@@ -16,13 +16,13 @@
 		<Name>
 			<FullText>GOODBURN, JAMES W</FullText>
 			<Last>
-				<FullText>GOODBURN</FullText>
+				<FullText>GOODBURN-FromScan</FullText>
 			</Last>
 			<First>
-				<FullText>JAMES</FullText>
+				<FullText>JAMES-FromScan</FullText>
 			</First>
 			<Middle>
-				<FullText>W</FullText>
+				<FullText>W-FromScan</FullText>
 			</Middle>
 			<Suffix>
 				<FullText/>
@@ -59,13 +59,13 @@
 			<FullText>111111111</FullText>
 		</OrderNumber>
 		<Name>
-			<FullText/>
+			<FullText>TXP EXTERNAL LAB RESULT</FullText>
 		</Name>
 		<OrderCode>
-			<FullText>OUTSIDE_LABS</FullText>
+			<FullText>LAB72000</FullText>
 		</OrderCode>
 		<EpicCode>
-			<FullText/>
+			<FullText>LAB72000</FullText>
 		</EpicCode>
 		<CollectionDate>
 			<FullText>04/21/2014</FullText>
@@ -901,6 +901,15 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<DefaultComponentCode>
+			<FullText/>
+		</DefaultComponentCode>
+		<DefaultComponentName>
+			<FullText/>
+		</DefaultComponentName>
+		<DefaultComponentValue>
+			<FullText/>
+		</DefaultComponentValue>
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
@@ -908,13 +917,13 @@
 			<FullText>222222222</FullText>
 		</OrderNumber>
 		<Name>
-			<FullText/>
+			<FullText>TXP EXTERNAL LAB RESULT</FullText>
 		</Name>
 		<OrderCode>
-			<FullText>OUTSIDE_LABS</FullText>
+			<FullText>LAB72000</FullText>
 		</OrderCode>
 		<EpicCode>
-			<FullText/>
+			<FullText>LAB72000</FullText>
 		</EpicCode>
 		<CollectionDate>
 			<FullText>04/21/2014</FullText>
@@ -1021,6 +1030,15 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<DefaultComponentCode>
+			<FullText/>
+		</DefaultComponentCode>
+		<DefaultComponentName>
+			<FullText/>
+		</DefaultComponentName>
+		<DefaultComponentValue>
+			<FullText/>
+		</DefaultComponentValue>
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
@@ -1028,13 +1046,13 @@
 			<FullText>333333333</FullText>
 		</OrderNumber>
 		<Name>
-			<FullText/>
+			<FullText>TXP EXTERNAL LAB RESULT</FullText>
 		</Name>
 		<OrderCode>
-			<FullText>OUTSIDE_LABS</FullText>
+			<FullText>LAB72000</FullText>
 		</OrderCode>
 		<EpicCode>
-			<FullText/>
+			<FullText>LAB72000</FullText>
 		</EpicCode>
 		<CollectionDate>
 			<FullText>04/21/2014</FullText>
@@ -1087,6 +1105,283 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<DefaultComponentCode>
+			<FullText/>
+		</DefaultComponentCode>
+		<DefaultComponentName>
+			<FullText/>
+		</DefaultComponentName>
+		<DefaultComponentValue>
+			<FullText/>
+		</DefaultComponentValue>
+	</Test>
+	<Test>
+		<FullText/>
+		<OrderNumber>
+			<FullText>444444444</FullText>
+		</OrderNumber>
+		<Name>
+			<FullText>TXP EXTERNAL CARDIAC RESULT</FullText>
+		</Name>
+		<OrderCode>
+			<FullText>LAB72002</FullText>
+		</OrderCode>
+		<EpicCode>
+			<FullText>LAB72002</FullText>
+		</EpicCode>
+		<CollectionDate>
+			<FullText>04/21/2014</FullText>
+		</CollectionDate>
+		<CollectionTime>
+			<FullText>09:00</FullText>
+		</CollectionTime>
+		<ResultDate>
+			<FullText>04/21/2014</FullText>
+		</ResultDate>
+		<ResultTime>
+			<FullText/>
+		</ResultTime>
+		<LabInfo>
+			<FullText/>
+			<LabCode>
+				<FullText>70</FullText>
+			</LabCode>
+			<LabIdentifier>
+				<FullText>ARUP Laboratories</FullText>
+			</LabIdentifier>
+		</LabInfo>
+		<Comment>
+			<FullText>Verified by Steve N. Kurth on 07/31/2014.</FullText>
+		</Comment>
+		<DefaultComponentCode>
+			<FullText>80568</FullText>
+		</DefaultComponentCode>
+		<DefaultComponentName>
+			<FullText>See Scan TXP Cardiac (External)</FullText>
+		</DefaultComponentName>
+		<DefaultComponentValue>
+			<FullText>See Scanned Report</FullText>
+		</DefaultComponentValue>
+	</Test>
+	<Test>
+		<FullText/>
+		<OrderNumber>
+			<FullText>555555555</FullText>
+		</OrderNumber>
+		<Name>
+			<FullText>TXP EXTERNAL CULTURE RESULT</FullText>
+		</Name>
+		<OrderCode>
+			<FullText>LAB72001</FullText>
+		</OrderCode>
+		<EpicCode>
+			<FullText>LAB72001</FullText>
+		</EpicCode>
+		<CollectionDate>
+			<FullText>04/21/2014</FullText>
+		</CollectionDate>
+		<CollectionTime>
+			<FullText>09:00</FullText>
+		</CollectionTime>
+		<ResultDate>
+			<FullText>04/21/2014</FullText>
+		</ResultDate>
+		<ResultTime>
+			<FullText/>
+		</ResultTime>
+		<LabInfo>
+			<FullText/>
+			<LabCode>
+				<FullText>70</FullText>
+			</LabCode>
+			<LabIdentifier>
+				<FullText>ARUP Laboratories</FullText>
+			</LabIdentifier>
+		</LabInfo>
+		<Comment>
+			<FullText>Verified by Steve N. Kurth on 07/31/2014.</FullText>
+		</Comment>
+		<DefaultComponentCode>
+			<FullText>80567</FullText>
+		</DefaultComponentCode>
+		<DefaultComponentName>
+			<FullText>See Scan TXP Culture (External)</FullText>
+		</DefaultComponentName>
+		<DefaultComponentValue>
+			<FullText>See Scanned Report</FullText>
+		</DefaultComponentValue>
+	</Test>
+	<Test>
+		<FullText/>
+		<OrderNumber>
+			<FullText>666666666</FullText>
+		</OrderNumber>
+		<Name>
+			<FullText>TXP EXTERNAL PATHOLOGY RESULT</FullText>
+		</Name>
+		<OrderCode>
+			<FullText>LAB72004</FullText>
+		</OrderCode>
+		<EpicCode>
+			<FullText>LAB72004</FullText>
+		</EpicCode>
+		<CollectionDate>
+			<FullText>04/21/2014</FullText>
+		</CollectionDate>
+		<CollectionTime>
+			<FullText>09:00</FullText>
+		</CollectionTime>
+		<ResultDate>
+			<FullText>04/21/2014</FullText>
+		</ResultDate>
+		<ResultTime>
+			<FullText/>
+		</ResultTime>
+		<LabInfo>
+			<FullText/>
+			<LabCode>
+				<FullText>70</FullText>
+			</LabCode>
+			<LabIdentifier>
+				<FullText>ARUP Laboratories</FullText>
+			</LabIdentifier>
+		</LabInfo>
+		<Comment>
+			<FullText>Verified by Steve N. Kurth on 07/31/2014.</FullText>
+		</Comment>
+		<DefaultComponentCode>
+			<FullText>80566</FullText>
+		</DefaultComponentCode>
+		<DefaultComponentName>
+			<FullText>See Scan TXP Pathology (External)</FullText>
+		</DefaultComponentName>
+		<DefaultComponentValue>
+			<FullText>See Scanned Report</FullText>
+		</DefaultComponentValue>
+	</Test>
+	<Test>
+		<FullText/>
+		<OrderNumber>
+			<FullText>777777777</FullText>
+		</OrderNumber>
+		<Name>
+			<FullText>TXP EXTERNAL PFT RESULT</FullText>
+		</Name>
+		<OrderCode>
+			<FullText>LAB72003</FullText>
+		</OrderCode>
+		<EpicCode>
+			<FullText>LAB72003</FullText>
+		</EpicCode>
+		<CollectionDate>
+			<FullText>04/21/2014</FullText>
+		</CollectionDate>
+		<CollectionTime>
+			<FullText>09:00</FullText>
+		</CollectionTime>
+		<ResultDate>
+			<FullText>04/21/2014</FullText>
+		</ResultDate>
+		<ResultTime>
+			<FullText/>
+		</ResultTime>
+		<LabInfo>
+			<FullText/>
+			<LabCode>
+				<FullText>70</FullText>
+			</LabCode>
+			<LabIdentifier>
+				<FullText>ARUP Laboratories</FullText>
+			</LabIdentifier>
+		</LabInfo>
+		<Comment>
+			<FullText>Verified by Steve N. Kurth on 07/31/2014.</FullText>
+		</Comment>
+		<DefaultComponentCode>
+			<FullText>80569</FullText>
+		</DefaultComponentCode>
+		<DefaultComponentName>
+			<FullText>See Scan TXP Pulmonary (External)</FullText>
+		</DefaultComponentName>
+		<DefaultComponentValue>
+			<FullText>See Scanned Report</FullText>
+		</DefaultComponentValue>
+	</Test>
+	<Test>
+		<FullText/>
+		<OrderNumber>
+			<FullText>888888888</FullText>
+		</OrderNumber>
+		<Name>
+			<FullText>TXP EXTERNAL PFT RESULT</FullText>
+		</Name>
+		<OrderCode>
+			<FullText>LAB72003</FullText>
+		</OrderCode>
+		<EpicCode>
+			<FullText>LAB72003</FullText>
+		</EpicCode>
+		<CollectionDate>
+			<FullText>04/21/2014</FullText>
+		</CollectionDate>
+		<CollectionTime>
+			<FullText>09:00</FullText>
+		</CollectionTime>
+		<ResultDate>
+			<FullText>04/21/2014</FullText>
+		</ResultDate>
+		<ResultTime>
+			<FullText/>
+		</ResultTime>
+		<LabInfo>
+			<FullText/>
+			<LabCode>
+				<FullText>70</FullText>
+			</LabCode>
+			<LabIdentifier>
+				<FullText>ARUP Laboratories</FullText>
+			</LabIdentifier>
+		</LabInfo>
+		<Comment>
+			<FullText>Verified by Steve N. Kurth on 08/01/2014.</FullText>
+		</Comment>
+		<Component>
+			<FullText>See Scan TXP Pulmonary (External)</FullText>
+			<TestCode>
+				<FullText>80569</FullText>
+			</TestCode>
+			<Value>
+				<FullText>Test Value</FullText>
+			</Value>
+			<Units>
+				<FullText/>
+			</Units>
+			<Range>
+				<FullText/>
+			</Range>
+			<Flag>
+				<FullText/>
+			</Flag>
+			<Status>
+				<FullText>F</FullText>
+			</Status>
+			<OriginalName>
+				<FullText>S</FullText>
+			</OriginalName>
+			<Comment>
+				<FullText>Test comment
+Test comment line 2</FullText>
+			</Comment>
+		</Component>
+		<DefaultComponentCode>
+			<FullText>80569</FullText>
+		</DefaultComponentCode>
+		<DefaultComponentName>
+			<FullText>See Scan TXP Pulmonary (External)</FullText>
+		</DefaultComponentName>
+		<DefaultComponentValue>
+			<FullText>See Scanned Report</FullText>
+		</DefaultComponentValue>
 	</Test>
 	<LabInfo>
 		<FullText>N/A</FullText>
