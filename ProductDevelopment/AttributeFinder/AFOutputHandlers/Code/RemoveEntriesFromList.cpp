@@ -16,7 +16,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ STDMETHODIMP CRemoveEntriesFromList::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_IPersistStream
 	};
@@ -392,7 +392,7 @@ STDMETHODIMP CRemoveEntriesFromList::Load(IStream *pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -437,7 +437,7 @@ STDMETHODIMP CRemoveEntriesFromList::Save(IStream *pStream, BOOL fClearDirty)
 			::writeObjectToStream( ipPersistentObj, pStream, "ELI09914", fClearDirty );
 		}
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -562,7 +562,7 @@ STDMETHODIMP CRemoveEntriesFromList::raw_IsConfigured(VARIANT_BOOL * bConfigured
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRemoveEntriesFromList::get_InstanceGUID(GUID *pVal)
 {

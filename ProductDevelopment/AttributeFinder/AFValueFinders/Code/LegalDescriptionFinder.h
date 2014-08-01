@@ -5,7 +5,7 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 #include <string>
 #include <vector>
@@ -22,8 +22,8 @@ class ATL_NO_VTABLE CLegalDescriptionFinder :
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CLegalDescriptionFinder();
@@ -42,7 +42,7 @@ BEGIN_COM_MAP(CLegalDescriptionFinder)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_CATEGORY_MAP(CLegalDescriptionFinder)
@@ -75,7 +75,7 @@ END_CATEGORY_MAP()
 
 // ILegalDescriptionFinder
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:	

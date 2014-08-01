@@ -21,7 +21,7 @@ namespace Extract.AttributeFinder.Rules
     [CLSCompliant(false)]
     public interface IValueConditionSelector : IAttributeSelector, ICategorizedComponent,
         IConfigurableObject, ICopyableObject, ILicensedComponent, IPersistStream,
-        IMustBeConfiguredObject, IIdentifiableRuleObject
+        IMustBeConfiguredObject, IIdentifiableObject
     {
         /// <summary>
         /// Gets or sets the <see cref="IAFCondition"/> to be used to determine whether an attribute
@@ -41,7 +41,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("005AC4A8-10FD-4872-A635-ED976205F479")]
     [CLSCompliant(false)]
-    public class ValueConditionSelector : IdentifiableRuleObject, IValueConditionSelector
+    public class ValueConditionSelector : IdentifiableObject, IValueConditionSelector
     {
         #region Constants
 
@@ -353,7 +353,7 @@ namespace Extract.AttributeFinder.Rules
                 {
                     Condition = (IAFCondition)reader.ReadIPersistStream();
 
-                    // Load the GUID for the IIdentifiableRuleObject interface.
+                    // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
 
@@ -387,7 +387,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

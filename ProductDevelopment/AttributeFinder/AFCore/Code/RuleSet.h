@@ -5,7 +5,7 @@
 #include "resource.h"       // main symbols
 #include "RuleSetEditor.h"
 #include "SafeNetLicenseMgr.h"
-#include "IdentifiableRuleObject.h"
+#include "IdentifiableObject.h"
 
 #include <afxmt.h>
 
@@ -26,8 +26,8 @@ class ATL_NO_VTABLE CRuleSet :
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IRuleSetUI, &IID_IRuleSetUI, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	public CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	public CIdentifiableObject
 {
 public:
 	CRuleSet();
@@ -45,7 +45,7 @@ BEGIN_COM_MAP(CRuleSet)
 	COM_INTERFACE_ENTRY(IRuleSetUI)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 public:
@@ -110,7 +110,7 @@ public:
 	STDMETHOD(raw_Clone)(IUnknown * * pObject);
 	STDMETHOD(raw_CopyFrom)(IUnknown * pObject);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

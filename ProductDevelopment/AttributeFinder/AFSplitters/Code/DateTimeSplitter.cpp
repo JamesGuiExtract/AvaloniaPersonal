@@ -18,7 +18,7 @@
 //   * Added saving of m_bSplitDefaults
 // Version 3:
 //   * Added m_lMinTwoDigitYear and m_bTwoDigitYearBeforeCurrentYear
-// Version 4: Added CIdentifiableRuleObject
+// Version 4: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 4;
 
 const long glDEFAULT_TWO_DIGIT_YEAR = 1970;
@@ -60,7 +60,7 @@ STDMETHODIMP CDateTimeSplitter::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_ICategorizedComponent,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -758,7 +758,7 @@ STDMETHODIMP CDateTimeSplitter::Load(IStream *pStream)
 
 		if (nDataVersion >= 4)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -806,7 +806,7 @@ STDMETHODIMP CDateTimeSplitter::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -827,7 +827,7 @@ STDMETHODIMP CDateTimeSplitter::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDateTimeSplitter::get_InstanceGUID(GUID *pVal)
 {

@@ -25,7 +25,7 @@ namespace Extract.AttributeFinder.Rules
     [CLSCompliant(false)]
     public interface IRSDDataScorer : IDataScorer, ICategorizedComponent,
         IConfigurableObject, ICopyableObject, ILicensedComponent, IPersistStream,
-        IMustBeConfiguredObject, IIdentifiableRuleObject
+        IMustBeConfiguredObject, IIdentifiableObject
     {
         /// <summary>
         /// Gets or sets the name of the RSD file used to generate the score.
@@ -59,7 +59,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("BC49A13B-A88D-4853-B2D2-D1C6A3345379")]
     [CLSCompliant(false)]
-    public class RSDDataScorer : IdentifiableRuleObject, IRSDDataScorer
+    public class RSDDataScorer : IdentifiableObject, IRSDDataScorer
     {
         #region Constants
 
@@ -509,7 +509,7 @@ namespace Extract.AttributeFinder.Rules
                     _preparedExpression = reader.ReadString();
                     _variableNames = reader.ReadStringArray();
 
-                    // Load the GUID for the IIdentifiableRuleObject interface.
+                    // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
 
@@ -546,7 +546,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

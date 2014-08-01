@@ -16,7 +16,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ STDMETHODIMP COutputToVOA::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IMustBeConfiguredObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -315,7 +315,7 @@ STDMETHODIMP COutputToVOA::Load(IStream *pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -348,7 +348,7 @@ STDMETHODIMP COutputToVOA::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -397,7 +397,7 @@ STDMETHODIMP COutputToVOA::raw_IsConfigured(VARIANT_BOOL * pbValue)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP COutputToVOA::get_InstanceGUID(GUID *pVal)
 {

@@ -334,6 +334,26 @@ static const string gstrCREATE_FEATURE_TABLE =
 	"[FeatureDescription] [nvarchar](max),"
 	"[AdminOnly] [bit] NOT NULL DEFAULT 1)";
 
+static const string gstrCREATE_WORK_ITEM_GROUP_TABLE =
+	"CREATE TABLE [dbo].[WorkItemGroup]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_WorkItemGroup] PRIMARY KEY CLUSTERED,"
+	"[FileID] [int] NOT NULL,"
+	"[ActionID] [int] NOT NULL,"
+	"[StringizedSettings] [nvarchar](MAX) NULL,"
+	"[UPI] [nvarchar](450) NULL, "
+	"[NumberOfWorkItems] [int] NOT NULL)";
+
+static const string gstrCREATE_WORK_ITEM_TABLE =
+	"CREATE TABLE [dbo].[WorkItem]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_WorkItem] PRIMARY KEY CLUSTERED ,"
+	"[WorkItemGroupID] [int] NOT NULL,"
+	"[Status] [nchar](1) NOT NULL,"
+	"[Input] [nvarchar](MAX) NULL,"
+	"[Output] [nvarchar](MAX) NULL,"
+	"[UPI] [nvarchar](450) NULL,"
+	"[Sequence] [int] NOT NULL,"
+	"[StringizedException] [nvarchar](MAX) NULL)";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -387,6 +407,22 @@ static const string gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX =
 static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX =
 	"CREATE NONCLUSTERED INDEX "
 	"[IX_QueuedActionStatusChange] ON [QueuedActionStatusChange]([ChangeStatus], [ActionID], [FileID])";
+
+static const string gstrCREATE_WORK_ITEM_GROUP_UPI_INDEX =
+	"CREATE NONCLUSTERED INDEX "
+	"[IX_WorkItemGroupUPI] ON [WorkItemGroup]([UPI])";
+
+static const string gstrCREATE_WORK_ITEM_UPI_INDEX =
+	"CREATE NONCLUSTERED INDEX "
+	"[IX_WorkItemUPI] ON [WorkItem]([UPI])";
+
+static const string gstrCREATE_WORK_ITEM_STATUS_INDEX =
+	"CREATE NONCLUSTERED INDEX "
+	"[IX_WorkItemStatus] ON [WorkItem]([Status])";
+
+static const string gstrCREATE_WORK_ITEM_ID_STATUS_INDEX = 
+	"CREATE NONCLUSTERED INDEX [IX_WorkItemStatusID] ON [dbo].[WorkItem]"
+	"([ID] ASC,	[Status] ASC)";
 
 	// Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
@@ -763,6 +799,27 @@ static const string gstrADD_QUEUED_ACTION_STATUS_CHANGE_USER_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+static const string gstrADD_WORK_ITEM_GROUP_FAMFILE_FK = 
+	"ALTER TABLE [dbo].[WorkItemGroup]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_WorkItemGroup_FAMFile] FOREIGN KEY([FileID])"
+	"REFERENCES [dbo].[FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_WORK_ITEM_GROUP_ACTION_FK = 
+	"ALTER TABLE [dbo].[WorkItemGroup]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_WorkItemGroup_Action] FOREIGN KEY([ActionID])"
+	"REFERENCES [dbo].[Action] ([ID])"
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_WORK_ITEM__WORK_ITEM_GROUP_FK =
+	"ALTER TABLE [dbo].[WorkItem]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_WorkItem_WorkItemGroup] FOREIGN KEY([WorkItemGroupID])"
+	"REFERENCES [dbo].[WorkItemGroup] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_NAME_VAL = "<LockName>";
 static const string gstrDB_LOCK_QUERY = 
@@ -1111,3 +1168,94 @@ const string gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE = "SELECT COUNT(*) AS \"" +
 // Queries for all currently enabled features.
 const string gstrGET_ENABLED_FEATURES_QUERY = "SELECT [FeatureName], [AdminOnly] FROM [" +
 	gstrDB_FEATURE + "] WHERE [Enabled] = 1";
+
+
+const string gstrGET_WORK_ITEM_TO_PROCESS = 
+"		DECLARE @OutputTableVar table ( \r\n"
+"		[ID] [int] NOT NULL,\r\n"
+"		[WorkItemGroupID] [int] NOT NULL,\r\n"
+"		[ActionID] [int] NOT NULL, \r\n"
+"		[Status] [nchar](1) NOT NULL,\r\n"
+"		[Input] [text] NULL,\r\n"
+"		[Output] [text] NULL,\r\n"
+"		[UPI] [nvarchar](512) NULL,\r\n"	
+"		[FileName] [nvarchar](255) NULL,\r\n"
+"		[StringizedException] [nvarchar](MAX) NULL\r\n"
+"	); \r\n"
+"	SET NOCOUNT ON \r\n"
+"	BEGIN TRY \r\n"
+"		UPDATE TOP(1) [dbo].WorkItem Set Status = 'R', UPI = '<UPI>'  \r\n"
+"		OUTPUT DELETED.ID, DELETED.WorkItemGroupID, WorkItemGroup.ActionID, INSERTED.Status, DELETED.[Input], "
+"			DELETED.[Output], INSERTED.UPI, FAMFile.FileName, DELETED.StringizedException INTO @OutputTableVar  \r\n"
+"		FROM  WorkItem INNER JOIN WorkItemGroup ON WorkItemGroup.ID = WorkItem.WorkItemGroupID "
+"		INNER JOIN FAMFile ON FAMFile.ID = WorkItemGroup.FileID "
+"	WHERE WorkItem.ID IN ( "
+"		SELECT TOP (1) WorkItem.ID "
+"		FROM WorkItem "
+"		INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
+"		INNER JOIN FAMFile ON FAMFile.ID = WorkItemGroup.FileID "
+"		INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND  "
+"				FileActionStatus.ActionID = <ActionID> "
+"		WHERE STATUS = 'P' "
+"			AND WorkItemGroup.ActionID = <ActionID> "
+"			AND ('<GroupUPI>' = '' OR WorkItemGroup.UPI = '<GroupUPI>') "
+"		ORDER BY FileActionStatus.Priority DESC, FAMFile.ID ASC "
+"		) "
+"		SET NOCOUNT OFF \r\n"
+"	END TRY \r\n"
+"	BEGIN CATCH\r\n"
+
+	// Ensure NOCOUNT is set to OFF
+"	SET NOCOUNT OFF\r\n"
+
+	// Get the error message, severity and state
+"		DECLARE @ErrorMessage NVARCHAR(4000);\r\n"
+"		DECLARE @ErrorSeverity INT;\r\n"
+"		DECLARE @ErrorState INT;\r\n"
+
+"	SELECT \r\n"
+"		@ErrorMessage = ERROR_MESSAGE(),\r\n"
+"		@ErrorSeverity = ERROR_SEVERITY(),\r\n"
+"		@ErrorState = ERROR_STATE();\r\n"
+
+	// Check for state of 0 (cannot raise error with state 0, set to 1)
+"	IF @ErrorState = 0\r\n"
+"		SELECT @ErrorState = 1\r\n"
+
+	// Raise the error so that it will be caught at the outer scope
+"	RAISERROR (@ErrorMessage,\r\n"
+"		@ErrorSeverity,\r\n"
+"		@ErrorState\r\n"
+"	);\r\n"
+
+"	END CATCH\r\n"
+"	SELECT * FROM @OutputTableVar ;\r\n";
+
+const string gstrADD_WORK_ITEM_GROUP_QUERY = 
+	"INSERT INTO [dbo].WorkItemGroup (FileID, ActionID, StringizedSettings, UPI, "
+	"NumberOfWorkItems) "
+	"OUTPUT INSERTED.ID ";
+
+const string gstrADD_WORK_ITEM_QUERY =
+	"INSERT INTO [dbo].WorkItem (WorkItemGroupID, Status, Input, Output, UPI, Sequence)  VALUES ";
+
+const string gstrRESET_ORPHANED_WORK_ITEM_QUERY =
+	"UPDATE dbo.WorkItem SET [Status] = 'P' "
+	"FROM dbo.WorkItem AS wi LEFT JOIN dbo.ActiveFAM af "
+	"ON wi.UPI = af.UPI "
+	"WHERE [Status] = 'R' AND af.UPI IS NULL";
+
+const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE = 
+	"SELECT [WorkItem].ID "
+    "  ,[WorkItemGroupID] "
+    "  ,[Status] "
+    "  ,[Input] "
+    "  ,[Output] "
+    "  ,[WorkItem].UPI "
+    "  ,[Sequence] "
+	"  ,[stringizedException] "
+	"  ,[FileName] "
+	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
+	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
+	"WHERE WorkItemGroupID = <WorkItemGroupID> "
+	"AND [Sequence] >= <StartSequence> AND [Sequence] < <EndSequence>";

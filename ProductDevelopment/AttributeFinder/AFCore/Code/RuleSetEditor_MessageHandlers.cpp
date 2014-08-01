@@ -168,7 +168,7 @@ void CRuleSetEditor::OnFileSave()
 							VARIANT_TRUE)))
 					{
 						// [FlexIDSCore:4872]
-						// If the ruleset re-generated IdentifiableRuleObject GUIDs, the references
+						// If the ruleset re-generated IdentifiableObject GUIDs, the references
 						// to the rule object interface pointers need to be updated.
 						refreshUIFromRuleSet();
 					}
@@ -220,7 +220,7 @@ void CRuleSetEditor::OnFileSaveas()
 		if (asCppBool(m_ipRuleSet->SaveTo(bstrFileName, VARIANT_TRUE)))
 		{
 			// [FlexIDSCore:4872]
-			// If the ruleset re-generated IdentifiableRuleObject GUIDs, the references
+			// If the ruleset re-generated IdentifiableObject GUIDs, the references
 			// to the rule object interface pointers need to be updated.
 			refreshUIFromRuleSet();
 		}

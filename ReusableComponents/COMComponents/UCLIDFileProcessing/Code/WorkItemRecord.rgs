@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFileProcessing.WorkItemRecord.1 = s 'WorkItemRecord Class'
+	{
+		CLSID = s '{B568515C-5F5F-4D3B-A161-C1E35E5866C1}'
+	}
+	UCLIDFileProcessing.WorkItemRecord = s 'WorkItemRecord Class'
+	{
+		CLSID = s '{B568515C-5F5F-4D3B-A161-C1E35E5866C1}'
+		CurVer = s 'UCLIDFileProcessing.WorkItemRecord.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B568515C-5F5F-4D3B-A161-C1E35E5866C1} = s 'WorkItemRecord Class'
+		{
+			ProgID = s 'UCLIDFileProcessing.WorkItemRecord.1'
+			VersionIndependentProgID = s 'UCLIDFileProcessing.WorkItemRecord'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{5FBC9199-D162-4F14-BAD9-090F6AB576C5}'
+		}
+	}
+}

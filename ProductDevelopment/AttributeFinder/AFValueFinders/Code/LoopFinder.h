@@ -5,7 +5,7 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 #include <comsvcs.h>
 
 
@@ -23,8 +23,8 @@ class ATL_NO_VTABLE CLoopFinder :
 	public IDispatchImpl<IMustBeConfiguredObject, &__uuidof(IMustBeConfiguredObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
 	public IPersistStream,
 	public ISpecifyPropertyPagesImpl<CLoopFinder>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CLoopFinder();
@@ -51,7 +51,7 @@ public:
 		COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 		COM_INTERFACE_ENTRY(IPersistStream)
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-		COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+		COM_INTERFACE_ENTRY(IIdentifiableObject)
 	END_COM_MAP()
 
 	BEGIN_PROP_MAP(CLoopFinder)
@@ -105,7 +105,7 @@ public:
 	STDMETHOD(get_LoopType)(ELoopType *pVal);
 	STDMETHOD(put_LoopType)(ELoopType newVal);
 
-	// IIdentifiableRuleObject
+	// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

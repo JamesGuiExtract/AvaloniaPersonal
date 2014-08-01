@@ -824,7 +824,7 @@ STDMETHODIMP CEnhanceOCR::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -891,7 +891,7 @@ STDMETHODIMP CEnhanceOCR::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICategorizedComponent,
 			&IID_ICopyableObject,
 			&IID_ILicensedComponent,
-			&IID_IIdentifiableRuleObject
+			&IID_IIdentifiableObject
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -906,7 +906,7 @@ STDMETHODIMP CEnhanceOCR::InterfaceSupportsErrorInfo(REFIID riid)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CEnhanceOCR::get_InstanceGUID(GUID *pVal)
 {

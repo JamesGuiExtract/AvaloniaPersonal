@@ -1177,8 +1177,12 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 		// Handle single-task case
 		if (bSingleTask)
 		{
+			// Clone the object before adding
+			ICopyableObjectPtr ipCopyObj = ipObject;
+			ASSERT_RESOURCE_ALLOCATION("ELI37121", ipCopyObj != __nullptr);
+
 			// Retrieve File Processor and description
-			IObjectWithDescriptionPtr	ipNewFP = ipObject;
+			IObjectWithDescriptionPtr	ipNewFP = ipCopyObj;
 			ASSERT_RESOURCE_ALLOCATION( "ELI13497", ipNewFP != __nullptr );
 			string	strDescription( ipNewFP->GetDescription() );
 
@@ -1207,8 +1211,12 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 			// Add each File Processor to the list and the vector
 			for (int i = 0; i < iCount; i++, iIndex++)
 			{
+				// Clone the object before adding
+				ICopyableObjectPtr ipCopyObj = ipPastedFPs->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI37120", ipCopyObj != __nullptr);
+
 				// Retrieve File Processor and description
-				IObjectWithDescriptionPtr	ipNewFP = ipPastedFPs->At( i );
+				IObjectWithDescriptionPtr	ipNewFP = ipCopyObj->Clone();
 				ASSERT_RESOURCE_ALLOCATION( "ELI13499", ipNewFP != __nullptr );
 				string	strDescription( ipNewFP->GetDescription() );
 

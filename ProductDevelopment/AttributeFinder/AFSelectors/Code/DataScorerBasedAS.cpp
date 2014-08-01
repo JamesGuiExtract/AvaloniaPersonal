@@ -13,7 +13,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ STDMETHODIMP CDataScorerBasedAS::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IPersistStream,
 		&IID_ILicensedComponent,
 		&IID_IAttributeSelector,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IMustBeConfiguredObject
 	};
 
@@ -141,7 +141,7 @@ STDMETHODIMP CDataScorerBasedAS::Load(IStream * pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -200,7 +200,7 @@ STDMETHODIMP CDataScorerBasedAS::Save(IStream * pStream, BOOL fClearDirty)
 		}
 		writeObjectToStream(ipObj, pStream, "ELI29283", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 		
 		// Clear the flag as specified
@@ -725,7 +725,7 @@ STDMETHODIMP CDataScorerBasedAS::put_AndSecondCondition(VARIANT_BOOL newVal)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDataScorerBasedAS::get_InstanceGUID(GUID *pVal)
 {

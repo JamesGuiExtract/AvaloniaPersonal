@@ -6,6 +6,7 @@
 #include "resource.h"
 
 #include <Win32CriticalSection.h>
+#include <Win32Semaphore.h>
 #include <Win32Event.h>
 #include <UCLIDException.h>
 
@@ -70,6 +71,33 @@ public:
 	UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr m_ipTaskExecutor;
 	UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr m_ipErrorTaskExecutor;
 };
+
+//-------------------------------------------------------------------------------------------------
+// WorkItemThreadData class
+//-------------------------------------------------------------------------------------------------
+class WorkItemThreadData
+{
+public:
+	WorkItemThreadData(CFileProcessingMgmtRole* pFPMgmtRole, long nActionID, Win32Semaphore &rSemaphore, IFileProcessingDB *pDB,
+		bool bProcessForCurrentUPIOnly);
+	~WorkItemThreadData();
+
+	CFileProcessingMgmtRole* m_pFPMgmtRole;
+	long m_nActionID;
+	IFileProcessingDB *m_pDB;
+	Win32Semaphore &m_rSemaphore;
+
+	bool m_bProcessForCurrentUPIOnly;
+
+	Win32Event m_threadStartedEvent;
+	Win32Event m_threadEndedEvent;
+	static Win32Event ms_threadStopProcessing;
+	
+	// Used when no work items are returned and the thread that locks this mutex
+	// then enters polling loop until work items are available or stop has been initiated
+	static CMutex ms_mutexForWorkItemIdle;
+};
+
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingMgmtRole
@@ -179,6 +207,9 @@ private:
 	// and waits for them to complete.  When they are done processing, then
 	// some status updates are sent to the UI
 	static UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void* pData);
+
+	// Thread procedure which processes single work items
+	static UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData);
 
 	// Thread procedure which initiates the stopping of processing asynchronously
 	static UINT handleStopRequestAsynchronously(void* pData);
@@ -318,6 +349,12 @@ private:
 	// The name of the FPS file that is running (this value is set in the Start method)
 	string m_strFpsFile;
 
+	// contains the Semaphore used for parallelized task processing if it is created
+	unique_ptr<Win32Semaphore> m_upParallelSemaphore;
+
+	// vector to hold the data for the work item threads;
+	vector<WorkItemThreadData *> m_vecWorkItemThreads;
+
 	///////////
 	// Methods
 	///////////
@@ -385,6 +422,8 @@ private:
 
 	void releaseProcessingThreadDataObjects();
 
+	void releaseWorkItemThreadDataObjects();
+
 	// this method will return a new IIUnknownVector of FileProcessingTasks with the same number
 	// and type of processors as the input.  The FileProcessingTasks in the output will
 	// be copies of their input counterpart
@@ -424,6 +463,21 @@ private:
 	// Gets the stack size for any processing thread based on the MinStackSize value for all
 	// FileProcessingTasks to be run.
 	unsigned long getProcessingThreadStackSize();
+
+	// Creates the sempaphores used for processing, before processing the workItem thread or 
+	// file processing thread needs to get this semaphore. The nNumberOfCounts will be the number
+	// threads (workItem or fileProcessing) that can process at the same time
+	void createProcessingSemaphore(long nNumberOfCounts);
+
+	// Checks all task for a parallelizable task, if one is found, sets up the m_vecWorkItemThreadData
+	// for initializing the threads and returns true, if no tasks are parallelizable returns false
+	bool setupWorkItemThreadData(long nNumberOfThreads, long lActionID, bool bProcessForCurrentUPIOnly);
+
+	// Starts workItemThreads using the contents of the m_vecWorkItemThreadData. If this vector is 
+	// empty no threads will be created
+	void startWorkItemThreads(unsigned long ulStackSize);
+
+	void signalWorkItemThreadsToStopAndWait();
 	
 	void validateLicense();
 };

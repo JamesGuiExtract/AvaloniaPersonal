@@ -71,6 +71,12 @@ STDMETHODIMP COCRFileProcessorPP::Apply(void)
 				// save the check box state
 				ipOCR->UseCleanedImage = 
 					asVariantBool((m_checkUseCleanImage.GetCheck() == BST_CHECKED));
+			
+				// Update the Parallelize property
+				IParallelizableTaskPtr ipParallelTask(ipOCR);
+				ASSERT_RESOURCE_ALLOCATION("ELI37140", ipParallelTask != __nullptr);
+
+				ipParallelTask->Parallelize = asVariantBool(m_checkParallelize.GetCheck() == BST_CHECKED);
 
 				// save page selections
 				if (!savePageSelections(ipOCR))
@@ -104,10 +110,18 @@ LRESULT COCRFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			m_radioSpecificPages = GetDlgItem(IDC_RADIO_OCR_SPECIFIED);
 			m_editSpecificPages = GetDlgItem(IDC_EDIT_PAGE_NUMBERS);
 			m_checkUseCleanImage = GetDlgItem(IDC_CHECK_OCR_USE_CLEAN);
+			m_checkParallelize = GetDlgItem(IDC_CHECK_PARALLEL);
 
 			// set the status of the check box
 			m_checkUseCleanImage.SetCheck(
 				(ipOCR->UseCleanedImage == VARIANT_TRUE) ? BST_CHECKED : BST_UNCHECKED);
+
+			// Setup the Parallelize field
+			IParallelizableTaskPtr ipParallelTask(ipOCR);
+			ASSERT_RESOURCE_ALLOCATION("ELI37139", ipParallelTask != __nullptr);
+
+			m_checkParallelize.EnableWindow(TRUE);
+			m_checkParallelize.SetCheck(asBSTChecked(ipParallelTask->Parallelize));
 
 			UCLID_FILEPROCESSORSLib::EOCRFPPageRangeType ePageRangeType = ipOCR->OCRPageRangeType;
 			switch (ePageRangeType)

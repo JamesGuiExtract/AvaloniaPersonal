@@ -19,7 +19,7 @@
 //            data version
 //   * NOTE:
 //            data version is read from file in version 1 but not saved, this is an error
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ STDMETHODIMP CChangeCase::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_ILicensedComponent,
 		&IID_IOutputHandler,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IPersistStream
 	};
 
@@ -346,7 +346,7 @@ STDMETHODIMP CChangeCase::Load(IStream *pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -380,7 +380,7 @@ STDMETHODIMP CChangeCase::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -400,7 +400,7 @@ STDMETHODIMP CChangeCase::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CChangeCase::get_InstanceGUID(GUID *pVal)
 {

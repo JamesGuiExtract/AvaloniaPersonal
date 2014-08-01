@@ -19,7 +19,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 4: Added CIdentifiableRuleObject
+// Version 4: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 4;
 
 //-------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ STDMETHODIMP CRemoveSubAttributes::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -573,7 +573,7 @@ STDMETHODIMP CRemoveSubAttributes::Load(IStream *pStream)
 
 		if (nDataVersion >= 4)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -636,7 +636,7 @@ STDMETHODIMP CRemoveSubAttributes::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		writeObjectToStream(ipObj, pStream, "ELI13325", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 		
 		// Clear the flag as specified
@@ -658,7 +658,7 @@ STDMETHODIMP CRemoveSubAttributes::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRemoveSubAttributes::get_InstanceGUID(GUID *pVal)
 {

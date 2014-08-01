@@ -18,7 +18,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ STDMETHODIMP CTranslateValue::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ILicensedComponent,
 		&IID_IOutputHandler,
 		&IID_IMustBeConfiguredObject,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IPersistStream
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -688,7 +688,7 @@ STDMETHODIMP CTranslateValue::Load(IStream *pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -734,7 +734,7 @@ STDMETHODIMP CTranslateValue::Save(IStream *pStream, BOOL fClearDirty)
 			::writeObjectToStream(ipObj, pStream, "ELI09927", fClearDirty);
 		}
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -754,7 +754,7 @@ STDMETHODIMP CTranslateValue::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CTranslateValue::get_InstanceGUID(GUID *pVal)
 {

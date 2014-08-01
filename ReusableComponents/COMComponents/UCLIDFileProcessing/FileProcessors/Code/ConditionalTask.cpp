@@ -25,7 +25,7 @@ extern CComModule _Module;
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+const unsigned long gnCurrentVersion = 2;
 
 //--------------------------------------------------------------------------------------------------
 // CConditionalTask
@@ -92,7 +92,9 @@ STDMETHODIMP CConditionalTask::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
 		&IID_IMustBeConfiguredObject,
-		&IID_IConditionalTask
+		&IID_IConditionalTask,
+		&IID_IParallelizableTask,
+		&IID_IIdentifiableObject
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -719,6 +721,11 @@ STDMETHODIMP CConditionalTask::Load(IStream *pStream)
 		readObjectFromStream( ipFalseObj, pStream, "ELI16187" );
 		m_ipTasksForFalse = ipFalseObj;
 
+		if (nDataVersion > 1)
+		{
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -764,6 +771,9 @@ STDMETHODIMP CConditionalTask::Save(IStream *pStream, BOOL fClearDirty)
 		ASSERT_RESOURCE_ALLOCATION( "ELI16192", ipFalseObj != __nullptr );
 		writeObjectToStream( ipFalseObj, pStream, "ELI16193", fClearDirty );
 
+		// Save the GUID for the IIdentifiableObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -779,6 +789,79 @@ STDMETHODIMP CConditionalTask::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IParallelizableTask Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConditionalTask::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, long nActionID,
+		IFAMTagManager* pFAMTM, IFileProcessingDB* pDB, IProgressStatus *pProgressStatus)
+{
+	try
+	{
+		// This does not create work items
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37146");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConditionalTask::get_Parallelize(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// check all contained objects to determine if this parallelizable
+		bool bParallelizable = containsParallelizableTask(m_ipTasksForFalse);
+
+		if (!bParallelizable)
+		{
+			bParallelizable = containsParallelizableTask(m_ipTasksForTrue);
+		}
+
+		*pVal = asVariantBool(bParallelizable);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37147");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConditionalTask::put_Parallelize(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// The conditional task is only parallelizable if it contains a parallelizable task
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37148");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConditionalTask::get_InstanceGUID(GUID * pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		*pVal = getGUID();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37149");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -833,3 +916,20 @@ void CConditionalTask::notifyClipboardCopiedForTask(const IIUnknownVectorPtr& ip
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27262");
 }
 //-------------------------------------------------------------------------------------------------
+bool CConditionalTask::containsParallelizableTask(IIUnknownVectorPtr ipTaskList)
+{
+	long nSize = ipTaskList->Size();
+	for (long i = 0; i < nSize; i++ )
+	{
+		IParallelizableTaskPtr ipTask = ipTaskList->At(i);
+		if (ipTask != __nullptr)
+		{
+			// Only one needs to be parallelizable.
+			if (ipTask->Parallelize == VARIANT_TRUE)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}

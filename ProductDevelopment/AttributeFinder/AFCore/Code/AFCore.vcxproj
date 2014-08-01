@@ -344,7 +344,6 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="IdentifiableRuleObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AFCore.def" />
@@ -428,7 +427,6 @@
     <ClInclude Include="TesterDlgInputPage.h" />
     <ClInclude Include="TesterDlgRulesetPage.h" />
     <ClInclude Include="TesterDlgSettingsPage.h" />
-    <ClInclude Include="IdentifiableRuleObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj">

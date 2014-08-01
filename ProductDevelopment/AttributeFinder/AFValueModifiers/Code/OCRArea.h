@@ -5,7 +5,7 @@
 #include "resource.h"       // main symbols
 
 #include <AFCategories.h>
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 #include <string>
 
@@ -25,8 +25,8 @@ class ATL_NO_VTABLE COCRArea :
 	public IPersistStream,
 	public ISupportErrorInfo,
 	public ISpecifyPropertyPagesImpl<COCRArea>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	COCRArea();
@@ -47,7 +47,7 @@ BEGIN_COM_MAP(COCRArea)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(COCRArea)
@@ -94,7 +94,7 @@ public:
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(/*[in]*/ REFIID riid);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

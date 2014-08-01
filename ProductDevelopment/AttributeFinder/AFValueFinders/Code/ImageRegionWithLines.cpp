@@ -12,7 +12,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 const int gnMIN_ZONE_HEIGHT = 20;
 const int gnMIN_ZONE_WIDTH = 20;
@@ -669,7 +669,7 @@ STDMETHODIMP CImageRegionWithLines::Load(IStream *pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -719,7 +719,7 @@ STDMETHODIMP CImageRegionWithLines::Save(IStream *pStream, BOOL fClearDirty)
 		ASSERT_RESOURCE_ALLOCATION("ELI18953", ipLineUtilStream != __nullptr);
 		writeObjectToStream(ipLineUtilStream, pStream, "ELI18954", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -786,7 +786,7 @@ STDMETHODIMP CImageRegionWithLines::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_IMustBeConfiguredObject,
 			&IID_ILicensedComponent,
-			&IID_IIdentifiableRuleObject
+			&IID_IIdentifiableObject
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -801,7 +801,7 @@ STDMETHODIMP CImageRegionWithLines::InterfaceSupportsErrorInfo(REFIID riid)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CImageRegionWithLines::get_InstanceGUID(GUID *pVal)
 {

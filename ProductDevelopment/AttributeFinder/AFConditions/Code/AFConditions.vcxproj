@@ -132,7 +132,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\AFCppUtils\Code;..\..\AFCore\Code;..\..\AFUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\AFCppUtils\Code;..\..\AFCore\Code;..\..\AFUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -162,11 +162,16 @@
       <ImportLibrary>.\..\Debug/UCLIDAFConditions.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <RegisterOutput>true</RegisterOutput>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Debug/AFConditions.bsc</OutputFile>
     </Bscmake>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AFConditions.cpp">
@@ -269,6 +274,9 @@
     <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj">
       <Project>{4a3a15dd-5c9d-4921-8d7e-3baf065fe984}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj">
+      <Project>{7f591058-6dc9-4787-ae25-5a45ae78e3fa}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\AFCore\Code\AFCore.vcxproj">
       <Project>{83c2c49f-e325-4abf-b4eb-8125ee2dd4fa}</Project>

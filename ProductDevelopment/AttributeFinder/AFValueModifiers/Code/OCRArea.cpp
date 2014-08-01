@@ -19,7 +19,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 // Version 1:
 //   filter options, custom filter characters, detect handwriting, return unrecognized characters,
 //   and clear if no text found
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
 // default filter for new OCRArea objects (all the filter options except kCustomFilter)
@@ -68,7 +68,7 @@ STDMETHODIMP COCRArea::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_ILicensedComponent,
 			&IID_IMustBeConfiguredObject,
-			&IID_IIdentifiableRuleObject,
+			&IID_IIdentifiableObject,
 			&IID_IPersistStream
 		};
 
@@ -481,7 +481,7 @@ STDMETHODIMP COCRArea::Load(IStream* pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 		
@@ -524,7 +524,7 @@ STDMETHODIMP COCRArea::Save(IStream* pStream, BOOL fClearDirty)
 		HANDLE_HRESULT(ipStream->Write(data.getData(), nDataLength, NULL), "ELI18533", 
 			"Unable to write object to stream.", ipStream, __uuidof(IStream));
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -546,7 +546,7 @@ STDMETHODIMP COCRArea::GetSizeMax(ULARGE_INTEGER* pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP COCRArea::get_InstanceGUID(GUID *pVal)
 {

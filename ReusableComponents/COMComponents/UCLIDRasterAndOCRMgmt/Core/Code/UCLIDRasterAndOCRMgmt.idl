@@ -1254,6 +1254,17 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			engine match the page dimensions to be used by the rules and verification
 		//			interface.
 		[id(105), helpstring("method ValidatePageDimensions")] HRESULT ValidatePageDimensions();
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Creates the SpatialString from the SpatialStrings in the Strings vector
+		// REQUIRE: GetMode() == kSpatialMode for all strings in pStrings vector
+		//			If the strings are on different pages 
+		//				All pages in order
+		//				All page numbers have been set for each SpatialString in pStrings
+		//			There can be consecutive SpatialStrings that are on the same page but
+		//			the PageInfo must be the same. Consecutive strings on the same page
+		//			will be place on separate lines
+		[id(106), helpstring("method CreateFromSpatialStrings")] HRESULT CreateFromSpatialStrings
+			([in] IIUnknownVector* pStrings);
 	};
 
 	[

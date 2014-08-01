@@ -16,7 +16,7 @@ using std::vector;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
@@ -794,7 +794,7 @@ STDMETHODIMP CMoveAndModifyAttributes::Load(IStream *pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -841,7 +841,7 @@ STDMETHODIMP CMoveAndModifyAttributes::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -863,7 +863,7 @@ STDMETHODIMP CMoveAndModifyAttributes::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMoveAndModifyAttributes::get_InstanceGUID(GUID *pVal)
 {

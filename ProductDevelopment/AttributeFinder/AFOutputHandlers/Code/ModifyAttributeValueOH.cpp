@@ -21,7 +21,7 @@
 //            Attribute Type
 //            Set Attribute Value
 //            Set Attribute Type
-// Version 5: Added CIdentifiableRuleObject
+// Version 5: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 5;
 
 //-------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ STDMETHODIMP CModifyAttributeValueOH::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 
 	for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -733,7 +733,7 @@ STDMETHODIMP CModifyAttributeValueOH::Load(IStream *pStream)
 
 		if (nDataVersion >= 5)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -777,7 +777,7 @@ STDMETHODIMP CModifyAttributeValueOH::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -799,7 +799,7 @@ STDMETHODIMP CModifyAttributeValueOH::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CModifyAttributeValueOH::get_InstanceGUID(GUID *pVal)
 {

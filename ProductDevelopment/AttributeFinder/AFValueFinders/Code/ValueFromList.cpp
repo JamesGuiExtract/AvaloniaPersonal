@@ -16,7 +16,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ STDMETHODIMP CValueFromList::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IPersistStream
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -579,7 +579,7 @@ STDMETHODIMP CValueFromList::Load(IStream *pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -624,7 +624,7 @@ STDMETHODIMP CValueFromList::Save(IStream *pStream, BOOL fClearDirty)
 			::writeObjectToStream( ipPersistentObj, pStream, "ELI09924", fClearDirty );
 		}
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -644,7 +644,7 @@ STDMETHODIMP CValueFromList::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CValueFromList::get_InstanceGUID(GUID *pVal)
 {

@@ -1668,6 +1668,21 @@ library UCLID_COMUTILSLib
 			[in] IIUnknownVector *pDataToInit);
 	}
 
+	[
+		object,
+		uuid(9B270563-F873-4F63-A460-2D701E73F4F7),
+		dual,
+		helpstring("IIdentifiableObject Interface"),
+		pointer_default(unique)
+	]
+	interface IIdentifiableObject : IDispatch
+	{
+		//---------------------------------------------------------------------------------------------
+		// PROMISE: Will return a GUID that uniquely identifies this instance. An instance is
+		// considered a unique persistence of a object of which there may be multiple copies in
+		// memory if the object has been loaded from different callers.
+		[propget, id(1), helpstring("property InstanceGUID")] HRESULT InstanceGUID([out, retval] GUID *pGUID);
+	};
 	//---------------------------------------------------------------------------------------------
 	//-C O C L A S S E S --------------------------------------------------------------------------
 	//---------------------------------------------------------------------------------------------

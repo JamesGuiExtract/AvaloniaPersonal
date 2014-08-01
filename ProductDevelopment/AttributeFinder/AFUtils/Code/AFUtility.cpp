@@ -844,7 +844,7 @@ STDMETHODIMP CAFUtility::raw_GetFormattedFunctionNames(IVariantVector** ppFuncti
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFUtility::StartProfilingRule(BSTR bstrName, BSTR bstrType,
-	IIdentifiableRuleObject *pRuleObject, long nSubID, long* pnHandle)
+	IIdentifiableObject *pRuleObject, long nSubID, long* pnHandle)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1659,7 +1659,7 @@ ISpatialStringPtr CAFUtility::getReformattedName(string& strFormat,
 
 			if (bScopeCloseExpected && !bFoundScopeClose)
 			{
-				UCLIDException ue("ELI36224", "A format string scope was not properly closed.");
+				UCLIDException ue("ELI37168", "A format string scope was not properly closed.");
 				throw ue;
 			}
 
@@ -2186,7 +2186,7 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 		for (size_t ui = 0; ui < nCount; ui++)
 		{
 			ISpatialStringPtr ipValue = ipValues->At(ui);
-			ASSERT_RESOURCE_ALLOCATION("ELI36247", ipValue != __nullptr);
+			ASSERT_RESOURCE_ALLOCATION("ELI37167", ipValue != __nullptr);
 
 			if (ipNewString == nullptr)
 			{

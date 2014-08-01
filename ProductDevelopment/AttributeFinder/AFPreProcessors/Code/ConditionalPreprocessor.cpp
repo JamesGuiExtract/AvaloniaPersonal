@@ -19,7 +19,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ STDMETHODIMP CConditionalPreprocessor::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -321,7 +321,7 @@ STDMETHODIMP CConditionalPreprocessor::Load(IStream *pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -364,7 +364,7 @@ STDMETHODIMP CConditionalPreprocessor::Save(IStream *pStream, BOOL fClearDirty)
 		ASSERT_RESOURCE_ALLOCATION("ELI10844", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI10857", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -513,7 +513,7 @@ STDMETHODIMP CConditionalPreprocessor::raw_Clone(IUnknown* *pObject)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConditionalPreprocessor::get_InstanceGUID(GUID *pVal)
 {

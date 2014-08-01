@@ -5,7 +5,7 @@
 #include "AFValueFinders.h"
 #include "..\..\AFCore\Code\AFCategories.h"
 
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 #include <string>
 #include <vector>
@@ -26,8 +26,8 @@ class ATL_NO_VTABLE CImageRegionWithLines :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public ISpecifyPropertyPagesImpl<CImageRegionWithLines>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CImageRegionWithLines();
@@ -51,7 +51,7 @@ public:
 		COM_INTERFACE_ENTRY(ICategorizedComponent)
 		COM_INTERFACE_ENTRY(ICopyableObject)
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-		COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+		COM_INTERFACE_ENTRY(IIdentifiableObject)
 	END_COM_MAP()
 
 	BEGIN_PROP_MAP(CImageRegionWithLines)
@@ -105,7 +105,7 @@ public:
 	STDMETHOD(raw_Clone)(IUnknown* *pObject);
 	STDMETHOD(raw_CopyFrom)(IUnknown *pObject);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

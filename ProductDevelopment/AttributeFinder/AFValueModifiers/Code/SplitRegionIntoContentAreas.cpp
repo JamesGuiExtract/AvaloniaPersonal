@@ -35,7 +35,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //
 // Version 4:
 // Added m_nRequiredHorizontalSeparation;
-// Version 5: Added CIdentifiableRuleObject
+// Version 5: Added CIdentifiableObject
 const unsigned long gnCurrentVersion				= 5;
 const unsigned int gnDEFAULT_CHAR_WIDTH_PIXELS		= 25;
 const unsigned int gnDEFAULT_CHAR_HEIGHT_PIXELS		= 60;
@@ -839,7 +839,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::Load(IStream *pStream)
 
 		if (nDataVersion >= 5)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -891,7 +891,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::Save(IStream *pStream, BOOL fClearDir
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -959,7 +959,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::InterfaceSupportsErrorInfo(REFIID rii
 			&IID_ICopyableObject,
 			&IID_IMustBeConfiguredObject,
 			&IID_ILicensedComponent,
-			&IID_IIdentifiableRuleObject
+			&IID_IIdentifiableObject
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -1355,7 +1355,7 @@ bool operator < (const CRect& first, const CRect& second)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSplitRegionIntoContentAreas::get_InstanceGUID(GUID *pVal)
 {

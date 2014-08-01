@@ -295,10 +295,10 @@ STDMETHODIMP CSpatialString::UpdatePageNumber(long nPageNumber)
 				// Shallow copy because the PageInfo instances themselves are immutable and don't
 				// need to be cloned.
 				IShallowCopyablePtr ipSourcePageInfoMap(getPageInfoMap());
-				ASSERT_RESOURCE_ALLOCATION("ELI36304", ipSourcePageInfoMap != __nullptr);
+				ASSERT_RESOURCE_ALLOCATION("ELI37165", ipSourcePageInfoMap != __nullptr);
 		
 				m_ipPageInfoMap = ipSourcePageInfoMap->ShallowCopy();
-				ASSERT_RESOURCE_ALLOCATION("ELI36305", m_ipPageInfoMap != __nullptr);
+				ASSERT_RESOURCE_ALLOCATION("ELI37166", m_ipPageInfoMap != __nullptr);
 		 
 				m_ipPageInfoMap->RenameKey( nCurrentPageNumber, nPageNumber );
 

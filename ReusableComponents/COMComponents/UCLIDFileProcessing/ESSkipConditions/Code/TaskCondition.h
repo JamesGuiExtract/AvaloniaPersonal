@@ -3,6 +3,7 @@
 #pragma once
 #include "resource.h"       // main symbols
 #include "ESSkipConditions.h"
+#include "IdentifiableObject.h"
 #include "..\..\Code\FPCategories.h"
 
 #include <string>
@@ -22,7 +23,10 @@ class ATL_NO_VTABLE CTaskCondition :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public ISpecifyPropertyPagesImpl<CTaskCondition>
+	public ISpecifyPropertyPagesImpl<CTaskCondition>,
+	public IDispatchImpl<IParallelizableTask, &__uuidof(IParallelizableTask), &LIBID_UCLID_FILEPROCESSINGLib, /* wMajor = */ 1>,
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	public CIdentifiableObject
 {
 public:
 	CTaskCondition();
@@ -47,6 +51,8 @@ public:
 		COM_INTERFACE_ENTRY(ICopyableObject)
 		COM_INTERFACE_ENTRY(ILicensedComponent)
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+		COM_INTERFACE_ENTRY(IParallelizableTask)
+		COM_INTERFACE_ENTRY(IIdentifiableObject)
 	END_COM_MAP()
 
 	BEGIN_PROP_MAP(CTaskCondition)
@@ -93,6 +99,14 @@ public:
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
+	// IParallelizableTask Methods
+	STDMETHOD(raw_ProcessWorkItem)(IWorkItemRecord *pWorkItem, long nActionID,
+		IFAMTagManager* pFAMTM,  IFileProcessingDB* pDB, IProgressStatus *pProgressStatus);
+	STDMETHOD(get_Parallelize)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_Parallelize)(VARIANT_BOOL newVal);
+	
+	// IIdentifiableObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 private:
 	/////////////////
 	// Variables

@@ -4,7 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 #include <string>
 
@@ -22,8 +22,8 @@ class ATL_NO_VTABLE CModifyAttributeValueOH :
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public ISpecifyPropertyPagesImpl<CModifyAttributeValueOH>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CModifyAttributeValueOH();
@@ -43,7 +43,7 @@ BEGIN_COM_MAP(CModifyAttributeValueOH)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CModifyAttributeValueOH)
@@ -100,7 +100,7 @@ END_CATEGORY_MAP()
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

@@ -28,7 +28,7 @@
 //            regular expression flag
 //   * NOTE:
 //            new flag located immediately after Case Sensitive flag
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ STDMETHODIMP CReplaceStrings::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IMustBeConfiguredObject,
 		&IID_IDocumentPreprocessor,
 		&IID_IOutputHandler,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IPersistStream
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -606,7 +606,7 @@ STDMETHODIMP CReplaceStrings::Load(IStream *pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -654,7 +654,7 @@ STDMETHODIMP CReplaceStrings::Save(IStream *pStream, BOOL fClearDirty)
 			::writeObjectToStream(ipObj, pStream, "ELI09925", fClearDirty);
 		}
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -696,7 +696,7 @@ STDMETHODIMP CReplaceStrings::raw_Process(IAFDocument* pDocument, IProgressStatu
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CReplaceStrings::get_InstanceGUID(GUID *pVal)
 {

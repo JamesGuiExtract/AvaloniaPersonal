@@ -20,7 +20,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 6: Added CIdentifiableRuleObject
+// Version 6: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 6;
 const EPMReturnMatchType eDEFAULT_RETURN_MATCH_TYPE = kReturnFirstMatch;
 
@@ -1001,7 +1001,7 @@ STDMETHODIMP CSPMFinder::Load(IStream *pStream)
 
 		if (nDataVersion >= 6)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -1076,7 +1076,7 @@ STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		writeObjectToStream(ipObj, pStream, "ELI09921", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -1096,7 +1096,7 @@ STDMETHODIMP CSPMFinder::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSPMFinder::get_InstanceGUID(GUID *pVal)
 {

@@ -56,6 +56,7 @@ private:
 	ATLControls::CButton m_radioSpecificPages;
 	ATLControls::CEdit m_editSpecificPages;
 	ATLControls::CButton m_checkUseCleanImage;
+	ATLControls::CButton m_checkParallelize;
 
 	///////////
 	// Methods

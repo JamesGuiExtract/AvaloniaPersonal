@@ -11,7 +11,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CTaskCondition
@@ -218,7 +218,9 @@ STDMETHODIMP CTaskCondition::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICategorizedComponent,
 			&IID_IMustBeConfiguredObject,
 			&IID_ILicensedComponent,
-			&IID_ISpecifyPropertyPages
+			&IID_ISpecifyPropertyPages,
+			&IID_IParallelizableTask,
+			&IID_IIdentifiableObject
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -337,6 +339,11 @@ STDMETHODIMP CTaskCondition::Load(IStream *pStream)
 		readObjectFromStream(ipTaskStream, ipStream, "ELI20142");
 		m_ipTask = ipTaskStream;
 		
+		if (nDataVersion > 1)
+		{
+			loadGUID(ipStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -379,6 +386,8 @@ STDMETHODIMP CTaskCondition::Save(IStream *pStream, BOOL fClearDirty)
 		IPersistStreamPtr ipTaskStream = m_ipTask;
 		ASSERT_RESOURCE_ALLOCATION("ELI20143", ipTaskStream != __nullptr);
 		writeObjectToStream(ipTaskStream, ipStream, "ELI20144", fClearDirty);
+
+		saveGUID(ipStream);
 
 		// Clear the flag as specified
 		if (fClearDirty == TRUE)
@@ -515,7 +524,73 @@ STDMETHODIMP CTaskCondition::raw_GetComponentDescription(BSTR *pbstrComponentDes
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+// IParallelizableTask Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, long nActionID,
+		IFAMTagManager* pFAMTM, IFileProcessingDB* pDB, IProgressStatus *pProgressStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		// Check license
+		validateLicense();
 
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37153");	
+}
+
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::get_Parallelize(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		IParallelizableTaskPtr ipTask(m_ipTask);
+		*pVal = (ipTask == __nullptr) ? VARIANT_FALSE : ipTask->Parallelize;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37150");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::put_Parallelize(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// This is only parallelizable if the contained task is parallelizable
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37151");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::get_InstanceGUID(GUID * pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		*pVal = getGUID();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37152");
+}
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------

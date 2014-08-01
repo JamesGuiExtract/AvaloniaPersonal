@@ -23,7 +23,7 @@
 //-------------------------------------------------------------------------------------------------
 // Version 4: Added m_bAddCapturesAsSubAttributes
 // Version 5: Added m_bFirstMatchOnly
-// Version 6: Added CIdentifiableRuleObject
+// Version 6: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 6;
 
 //-------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ STDMETHODIMP CRegExprRule::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -422,7 +422,7 @@ STDMETHODIMP CRegExprRule::Load(IStream *pStream)
 
 		if (nDataVersion >= 6)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -461,7 +461,7 @@ STDMETHODIMP CRegExprRule::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -714,7 +714,7 @@ STDMETHODIMP CRegExprRule::raw_Clone(IUnknown* *pObject)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRegExprRule::get_InstanceGUID(GUID *pVal)
 {

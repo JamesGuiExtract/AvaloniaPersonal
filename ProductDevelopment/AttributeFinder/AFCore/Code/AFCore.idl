@@ -311,7 +311,7 @@ library UCLID_AFCORELib
 		// PROMISE: If bClearDirty  == VARIANT_TRUE, the internal dirty flag's
 		//			value is set to false.  If bClearDirty == VARIANT_FALSE
 		//			then the internal dirty flag's value is unchanged.
-		// RETURNS: VARIANT_TRUE if the IdentifiableRuleObject GUIDs were regenerated which causes
+		// RETURNS: VARIANT_TRUE if the IdentifiableObject GUIDs were regenerated which causes
 		//			the member interface pointers to be regenerated. In the case that the caller
 		//			has stored these pointers, they should be refreshed.
 		[id(2), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, 
@@ -704,21 +704,21 @@ library UCLID_AFCORELib
 		[id(1), helpstring("method SelectAttributes")] HRESULT SelectAttributes( [in] IIUnknownVector *pAttrIn, [in] IAFDocument *pAFDoc, [out, retval] IIUnknownVector **pAttrOut);
 	};
 
-	[
-		object,
-		uuid(9B270563-F873-4F63-A460-2D701E73F4F7),
-		dual,
-		helpstring("IIdentifiableRuleObject Interface"),
-		pointer_default(unique)
-	]
-	interface IIdentifiableRuleObject : IDispatch
-	{
-		//---------------------------------------------------------------------------------------------
-		// PROMISE: Will return a GUID that uniquely identifies this instance. An instance is
-		// considered a unique persistence of a rule of which there may be multiple copies in
-		// memory if the ruleset has been loaded from different callers.
-		[propget, id(1), helpstring("property InstanceGUID")] HRESULT InstanceGUID([out, retval] GUID *pGUID);
-	};
+	//[
+	//	object,
+	//	uuid(9B270563-F873-4F63-A460-2D701E73F4F7),
+	//	dual,
+	//	helpstring("IIdentifiableObject Interface"),
+	//	pointer_default(unique)
+	//]
+	//interface IIdentifiableObject : IDispatch
+	//{
+	//	//---------------------------------------------------------------------------------------------
+	//	// PROMISE: Will return a GUID that uniquely identifies this instance. An instance is
+	//	// considered a unique persistence of a rule of which there may be multiple copies in
+	//	// memory if the ruleset has been loaded from different callers.
+	//	[propget, id(1), helpstring("property InstanceGUID")] HRESULT InstanceGUID([out, retval] GUID *pGUID);
+	//};
 
 	//---------------------------------------------------------------------------------------------
 	/////////////////

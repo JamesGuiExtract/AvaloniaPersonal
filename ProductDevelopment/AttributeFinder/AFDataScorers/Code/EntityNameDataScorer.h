@@ -8,7 +8,7 @@
 #include <IConfigurationSettingsPersistenceMgr.h>
 #include <CachedObjectFromFile.h>
 #include <RegExLoader.h>
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 #include <vector>
 using namespace std;
@@ -25,8 +25,8 @@ class ATL_NO_VTABLE CEntityNameDataScorer :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IDataScorer, &IID_IDataScorer, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CEntityNameDataScorer();
@@ -45,7 +45,7 @@ BEGIN_COM_MAP(CEntityNameDataScorer)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_CATEGORY_MAP(CEntityNameDataScorer)
@@ -76,7 +76,7 @@ END_CATEGORY_MAP()
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

@@ -24,7 +24,7 @@
 //            Attribute Type
 //            Set Attribute Value
 //            Set Attribute Type
-// Version 5: Added CIdentifiableRuleObject
+// Version 5: Added CIdentifiableObject
 // Version 6: Rule is now named "Run object on attributes"
 //			  Added UseAttributeSelector and AttributeSelector
 const unsigned long gnCurrentVersion = 6;
@@ -72,7 +72,7 @@ STDMETHODIMP CRunObjectOnQuery::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 
 	for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -600,7 +600,7 @@ STDMETHODIMP CRunObjectOnQuery::Load(IStream *pStream)
 
 		if (nDataVersion >= 5)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -655,7 +655,7 @@ STDMETHODIMP CRunObjectOnQuery::Save(IStream *pStream, BOOL fClearDirty)
 			writeObjectToStream(ipSelector, pStream, "ELI33699", fClearDirty);
 		}
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -677,7 +677,7 @@ STDMETHODIMP CRunObjectOnQuery::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRunObjectOnQuery::get_InstanceGUID(GUID *pVal)
 {

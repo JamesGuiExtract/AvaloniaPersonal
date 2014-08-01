@@ -12,7 +12,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ STDMETHODIMP CSpatialContentBasedAS::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IPersistStream,
 		&IID_ILicensedComponent,
 		&IID_IAttributeSelector,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IMustBeConfiguredObject
 	};
 
@@ -113,7 +113,7 @@ STDMETHODIMP CSpatialContentBasedAS::Load(IStream * pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -148,7 +148,7 @@ STDMETHODIMP CSpatialContentBasedAS::Save(IStream * pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -485,7 +485,7 @@ STDMETHODIMP CSpatialContentBasedAS::put_IncludeNonSpatial(VARIANT_BOOL newVal)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialContentBasedAS::get_InstanceGUID(GUID *pVal)
 {

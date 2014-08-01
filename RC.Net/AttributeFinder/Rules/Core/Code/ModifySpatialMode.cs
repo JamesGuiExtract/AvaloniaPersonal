@@ -70,7 +70,7 @@ namespace Extract.AttributeFinder.Rules
     [CLSCompliant(false)]
     public interface IModifySpatialMode : IAttributeModifyingRule, IOutputHandler,
         IDocumentPreprocessor, ICategorizedComponent, IConfigurableObject, ICopyableObject,
-        ILicensedComponent, IPersistStream, IIdentifiableRuleObject
+        ILicensedComponent, IPersistStream, IIdentifiableObject
     {
         /// <summary>
         /// Gets or sets a value indicating whether performing the modification of spatial info
@@ -131,7 +131,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("095B4B5C-0C07-4E43-BA2E-D13885860FEF")]
     [CLSCompliant(false)]
-    public class ModifySpatialMode : IdentifiableRuleObject, IModifySpatialMode
+    public class ModifySpatialMode : IdentifiableObject, IModifySpatialMode
     {
         #region Constants
 
@@ -570,7 +570,7 @@ namespace Extract.AttributeFinder.Rules
                     ModifySpatialModeAction = (ModifySpatialModeAction)reader.ReadInt32();
                     ModifyRecursively = reader.ReadBoolean();
 
-                    // Load the GUID for the IIdentifiableRuleObject interface.
+                    // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
 
@@ -607,7 +607,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

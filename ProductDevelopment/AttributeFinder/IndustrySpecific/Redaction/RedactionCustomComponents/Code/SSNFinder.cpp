@@ -23,7 +23,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //   no persistent options
 // Version 2:
 //   added subattribute name, spatial subattribute, and clear if none found options
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 3;
 
 // minimum and maximum digits contained in the first, second, and third part of a found SSN
@@ -504,7 +504,7 @@ STDMETHODIMP CSSNFinder::Load(IStream* pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 		
@@ -542,7 +542,7 @@ STDMETHODIMP CSSNFinder::Save(IStream* pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -562,7 +562,7 @@ STDMETHODIMP CSSNFinder::GetSizeMax(ULARGE_INTEGER* pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSSNFinder::get_InstanceGUID(GUID *pVal)
 {

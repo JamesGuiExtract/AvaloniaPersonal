@@ -8,7 +8,7 @@
 #include "DocTypeInterpreter.h"
 #include "DocPageCache.h"
 
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 #include <string>
 #include <vector>
@@ -31,8 +31,8 @@ class ATL_NO_VTABLE CDocumentClassifier :
 	public IDispatchImpl<IDocumentClassificationUtils, &IID_IDocumentClassificationUtils, &LIBID_UCLID_AFUTILSLib>,
 	public IPersistStream,
 	public ISpecifyPropertyPagesImpl<CDocumentClassifier>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CDocumentClassifier();
@@ -57,7 +57,7 @@ BEGIN_COM_MAP(CDocumentClassifier)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(IDocumentClassificationUtils)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CDocumentClassifier)
@@ -118,7 +118,7 @@ public:
 		/*[in]*/ VARIANT_BOOL bAllowMultiplyClassified,
 		/*[out, retval]*/ IVariantVector** ppTypes);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

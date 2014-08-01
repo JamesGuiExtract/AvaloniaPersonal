@@ -26,7 +26,7 @@
 //			   text, text from a ReOCR of the region, or just the spatial region with
 //			   specified text assigned to it.
 // Version 5 - Modified behavior as per [FlexIDSCore #4011] 
-// Version 6 - Added CIdentifiableRuleObject
+// Version 6 - Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 6;
 
 // add license management password function
@@ -91,7 +91,7 @@ STDMETHODIMP CSelectPageRegion::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -959,7 +959,7 @@ STDMETHODIMP CSelectPageRegion::Load(IStream *pStream)
 
 		if (nDataVersion >= 6)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -1035,7 +1035,7 @@ STDMETHODIMP CSelectPageRegion::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -1242,7 +1242,7 @@ STDMETHODIMP CSelectPageRegion::raw_Clone(IUnknown** ppObject)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::get_InstanceGUID(GUID *pVal)
 {

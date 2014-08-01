@@ -23,7 +23,7 @@ namespace Extract.AttributeFinder.Rules
     [CLSCompliant(false)]
     public interface IDataQueryRuleObject : IOutputHandler, ICategorizedComponent,
         IConfigurableObject, ICopyableObject, ILicensedComponent, IPersistStream,
-        IMustBeConfiguredObject, IIdentifiableRuleObject
+        IMustBeConfiguredObject, IIdentifiableObject
     {
         /// <summary>
         /// Gets or sets the data query.
@@ -83,7 +83,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("9AA5818D-D2A2-4A58-90FE-D86D229C136D")]
     [CLSCompliant(false)]
-    public class DataQueryRuleObject : IdentifiableRuleObject, IDataQueryRuleObject
+    public class DataQueryRuleObject : IdentifiableObject, IDataQueryRuleObject
     {
         #region Constants
 
@@ -486,7 +486,7 @@ namespace Extract.AttributeFinder.Rules
                     DataProviderName = reader.ReadString();
                     DataConnectionString = reader.ReadString();
 
-                    // Load the GUID for the IIdentifiableRuleObject interface.
+                    // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
 
@@ -523,7 +523,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

@@ -90,7 +90,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 117;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 118;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -777,6 +777,39 @@ int UpdateToSchemaVersion117(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37136");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion118(_ConnectionPtr ipConnection, long *pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	int nNewSchemaVersion = 118;
+
+	if (pnNumSteps != __nullptr)
+	{
+		*pnNumSteps += 3;
+		return nNewSchemaVersion;
+	}
+
+	vector<string> vecQueries;
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_TABLE);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_TABLE);
+	vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_ACTION_FK);
+	vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAMFILE_FK);
+	vecQueries.push_back(gstrADD_WORK_ITEM__WORK_ITEM_GROUP_FK);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_UPI_INDEX);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_STATUS_INDEX);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_ID_STATUS_INDEX);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_UPI_INDEX);
+
+	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+	// Add default value for AllowRestartableProcessing.
+	vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+		+ gstrALLOW_RESTARTABLE_PROCESSING + "', '0')");
+
+	executeVectorOfSQL(ipConnection, vecQueries);
+
+	return nNewSchemaVersion;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -5671,8 +5704,9 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 113:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion114);
 				case 114:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion115);
 				case 115:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion116);
-				case 116:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion117);
-				case 117:	break;
+				case 116:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion117);
+				case 117:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion118);
+				case 118:	break;
 
 				default:
 					{
@@ -6251,6 +6285,686 @@ bool CFileProcessingDB::IsFeatureEnabled_Internal(bool bDBLocked, BSTR bstrFeatu
 			*pbFeatureIsEnabled = asVariantBool(bFeatureEnabled);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36077");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+bool CFileProcessingDB::GetWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, 
+	long nStartPos, long nCount, IIUnknownVector **ppWorkItems)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI36869",  ppWorkItems != __nullptr);
+
+			// Convert the nWorkItemGroupID to a string
+			string strWorkItemGroupID = asString(nWorkItemGroupID);
+
+			// Setup query of workItems for the given work group id and sequence number in the range
+			// nStartPos to nStartPos + 1
+			string strWorkItemSQL = gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE;
+			replaceVariable(strWorkItemSQL, "<WorkItemGroupID>", strWorkItemGroupID);
+			replaceVariable(strWorkItemSQL, "<StartSequence>", asString(nStartPos));
+			replaceVariable(strWorkItemSQL, "<EndSequence>", asString(nStartPos + nCount));
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipWorkItemSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI36870", ipWorkItemSet != __nullptr);
+
+				// Execute the query get the set of WorkItems
+				ipWorkItemSet->Open(strWorkItemSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
+				IIUnknownVectorPtr ipWorkItems(CLSID_IUnknownVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI36876", ipWorkItems != __nullptr);
+
+				while (!asCppBool(ipWorkItemSet->adoEOF))
+				{
+					// Get the fields from the file set
+					FieldsPtr ipFields = ipWorkItemSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI36871", ipFields != __nullptr);
+
+					// Get the file record from the fields
+					UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem(CLSID_WorkItemRecord);
+					ASSERT_RESOURCE_ALLOCATION("ELI36872", ipWorkItem != __nullptr);
+
+					// Get and return the appropriate file record
+					ipWorkItem = getWorkItemFromFields(ipFields);
+					ASSERT_RESOURCE_ALLOCATION("ELI36873", ipWorkItem != __nullptr);
+
+					ipWorkItems->PushBack(ipWorkItem); 
+					
+					// Go to next record in recordset
+					ipWorkItemSet->MoveNext();
+				}
+
+				*ppWorkItems = ipWorkItems.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI36874");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36875");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWorkItemGroupID, 
+	WorkItemGroupStatus *pWorkGroupStatus, EWorkItemStatus *pStatus)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI36880",  pStatus != __nullptr);
+
+			// Convert the nWorkItemGroupID to a string
+			string strWorkItemGroupID = asString(nWorkItemGroupID);
+
+			// Setup query to get the count of each WorkItem status for the given WorkGroupID
+			string strWorkItemSQL = "SELECT Status, Count(ID) as Total FROM WorkItem " 
+				" GROUP BY WorkItemGroupID, Status HAVING WorkItemGroupID = " + strWorkItemGroupID;
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipWorkItemSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI36881", ipWorkItemSet != __nullptr);
+
+				// Execute the query to find the file in the database
+				ipWorkItemSet->Open(strWorkItemSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+				FieldsPtr ipFields = ipWorkItemSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI36884", ipFields != __nullptr);
+				pWorkGroupStatus->WorkGroupID = nWorkItemGroupID;
+
+				// Zero the totals in the Work group status structure
+				pWorkGroupStatus->lCompletedCount = 0;
+				pWorkGroupStatus->lFailedCount = 0;
+				pWorkGroupStatus->lPendingCount = 0;
+				pWorkGroupStatus->lProcessingCount = 0;
+				pWorkGroupStatus->lTotal = 0;
+
+				// Transfer the count of each status to the WorkGroupStatus structure
+				long lTotal = 0;
+				while (!asCppBool(ipWorkItemSet->adoEOF))
+				{
+					string strStatus = getStringField(ipFields, "Status");
+					long lCount = getLongField(ipFields, "Total");
+					lTotal =+ lCount;
+					switch (strStatus[0])
+					{
+					case 'P': 
+						pWorkGroupStatus->lPendingCount =lCount;
+						break;
+					case 'R':
+						pWorkGroupStatus->lProcessingCount = lCount;
+						break;
+					case 'F':
+						pWorkGroupStatus->lFailedCount = lCount;
+						break;
+					case 'C':
+						pWorkGroupStatus->lCompletedCount = lCount;
+						break;
+					}
+
+					ipWorkItemSet->MoveNext();
+				}
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipWorkItemGroupSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37102", ipWorkItemGroupSet != __nullptr);
+
+				// Setup query to get the expected number of work items for the given WokrItemGroupID
+				string strWorkItemGroupSQL = "SELECT NumberOfWorkItems FROM WorkItemGroup WHERE ID = " + strWorkItemGroupID; 
+				
+				ipWorkItemGroupSet->Open(strWorkItemGroupSQL.c_str() , _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+				if (ipWorkItemGroupSet->adoEOF == VARIANT_TRUE)
+				{
+					UCLIDException ue("ELI37103", "Work item group not found.");
+					throw ue;
+				}
+
+				// Set the total field of the WorkGroupStatus to the expected number of work items
+				ipFields = ipWorkItemGroupSet->Fields;
+				pWorkGroupStatus->lTotal = getLongField(ipFields, "NumberOfWorkItems");
+
+				// Set the status based on the remaining items to process
+				if (pWorkGroupStatus->lProcessingCount > 0)
+				{
+					*pStatus = kWorkUnitProcessing;
+				}
+				else if (pWorkGroupStatus->lPendingCount > 0 ||
+					pWorkGroupStatus->lTotal != lTotal)
+				{
+					*pStatus = kWorkUnitPending;
+				}
+				else if (pWorkGroupStatus->lFailedCount > 0)
+				{
+					*pStatus = kWorkUnitFailed;
+				}
+				else 
+				{
+					*pStatus = kWorkUnitComplete;
+				}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI36882");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36883");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFileID, long nActionID, 
+	BSTR stringizedTask, long nNumberOfWorkItems, long *pnWorkItemGroupID)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI37093",  pnWorkItemGroupID != __nullptr);
+
+			// Open a recordset that contain only the record (if it exists) with the given filename
+			string strAddWorkItemGroupSQL = gstrADD_WORK_ITEM_GROUP_QUERY;
+
+			// Add the values to the query
+			strAddWorkItemGroupSQL += " VALUES(" + asString(nFileID) + ", " + asString(nActionID) +
+				", '" + asString(stringizedTask) + "', '" +
+				m_strUPI + "', " + asString(nNumberOfWorkItems) + ")";
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+				
+				*pnWorkItemGroupID = -1;
+				try
+				{
+					// see if group already exists
+					executeCmdQuery(ipConnection, "Select ID FROM WorkItemGroup WHERE FileID = " + asString(nFileID)
+						+ " AND ActionID = " + asString (nActionID) + " AND StringizedSettings = '" + 
+						asString(stringizedTask) + "'", false, pnWorkItemGroupID);
+
+				}
+				catch(...)
+				{
+					// this is expected if the record does not exist
+				}
+
+				// There is an existing record so return with the id
+				if ( *pnWorkItemGroupID >=0 )
+				{
+					return true;
+				}
+
+				// Create new WorkItemGroup and WorkItem records
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+
+				executeCmdQuery(ipConnection, strAddWorkItemGroupSQL, false, pnWorkItemGroupID);
+
+				tg.CommitTrans();
+				
+			END_CONNECTION_RETRY(ipConnection, "ELI37094");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37095");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::AddWorkItems_Internal(bool bDBLocked, long nWorkItemGroupID, 
+	IIUnknownVector *pWorkItems)
+{
+	try
+	{
+		try
+		{
+			IIUnknownVectorPtr ipWorkItems(pWorkItems);
+			ASSERT_ARGUMENT("ELI36905",  ipWorkItems != __nullptr);
+						
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Get the last sequence number
+				string strWorkItemQuery = 
+					"SELECT COALESCE(MAX(Sequence), 0) as LastSequence FROM WorkItem WHERE WorkItemGroupID = " + 
+					asString(nWorkItemGroupID);
+
+				_RecordsetPtr ipWorkItemCountSet =
+					ipConnection->Execute(strWorkItemQuery.c_str(), NULL, adCmdText);
+				ASSERT_RESOURCE_ALLOCATION("ELI37109", ipWorkItemCountSet != __nullptr);
+
+				int nNextSequence = 0;
+				if (ipWorkItemCountSet->adoEOF != VARIANT_TRUE)
+				{
+					FieldsPtr ipFields = ipWorkItemCountSet->Fields;
+					nNextSequence = getLongField(ipFields, "LastSequence");
+				}
+	
+				// Create new WorkItemGroup and WorkItem records
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+
+				string strWorkItemGroupID = asString(nWorkItemGroupID);
+
+				string strWorkItemSQL = gstrADD_WORK_ITEM_QUERY;
+
+				int iTotalItems = ipWorkItems->Size();
+				for (int i = 0; i < iTotalItems; i++)
+				{
+					UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = ipWorkItems->At(i);
+					ASSERT_RESOURCE_ALLOCATION("ELI36909", ipWorkItem != __nullptr);
+
+					// Add the WorkItems - this could be made more efficient by putting multiple
+					// records in the VALUES statement
+					string strStatus;
+					switch (ipWorkItem->Status)
+					{
+					case kWorkUnitPending:
+						strStatus = "P";
+						break;
+					case kWorkUnitProcessing:
+						strStatus = "R";
+						break;
+					case kWorkUnitFailed:
+						strStatus = "F";
+						break;
+					case kWorkUnitComplete:
+						strStatus = "C";
+						break;
+					}
+					strWorkItemSQL += (i==0) ? "": ", ";
+					strWorkItemSQL += " (" + strWorkItemGroupID + ", '" + strStatus +
+						"', '" + asString(ipWorkItem->Input) + "', '" + asString(ipWorkItem->Output) +
+						"', '" + asString(ipWorkItem->UPI) + "', " + asString(nNextSequence) + ")";
+
+					nNextSequence++;
+				}
+				executeCmdQuery(ipConnection, strWorkItemSQL);
+
+				tg.CommitTrans();
+				
+			END_CONNECTION_RETRY(ipConnection, "ELI36907");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36908");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkItemToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToUPI,
+	IWorkItemRecord **ppWorkItem)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI37039",  ppWorkItem != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = 
+					setWorkItemToProcessing(bDBLocked, nActionID, asCppBool(vbRestrictToUPI), ipConnection);
+
+				*ppWorkItem = (IWorkItemRecord *)ipWorkItem.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37038");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37037");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::NotifyWorkItemFailed_Internal(bool bDBLocked, long nWorkItemID, BSTR stringizedException)
+{
+
+	try
+	{
+		try
+		{
+			string strUpdateToFailed = "UPDATE WorkItem SET Status = 'F', [stringizedException] = '" +
+				asString(stringizedException) + "' WHERE ID = " + asString(nWorkItemID);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+
+				executeCmdQuery(ipConnection, strUpdateToFailed);
+
+				tg.CommitTrans();
+				
+			END_CONNECTION_RETRY(ipConnection, "ELI36913");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36914");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::NotifyWorkItemCompleted_Internal(bool bDBLocked, long nWorkItemID)
+{
+	try
+	{
+		try
+		{
+			string strUpdateToComplete = "UPDATE WorkItem SET Status = 'C' WHERE ID = " + asString(nWorkItemID);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+
+				executeCmdQuery(ipConnection, strUpdateToComplete);
+
+				tg.CommitTrans();
+				
+			END_CONNECTION_RETRY(ipConnection, "ELI36915");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36916");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkGroupData_Internal(bool bDBLocked, long nWorkItemGroupID, 
+	long *pnNumberOfWorkItems, BSTR *pstringizedTask)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI36900",  pstringizedTask != __nullptr);
+
+			// Convert the nWorkItemGroupID to a string
+			string strWorkItemGroupID = asString(nWorkItemGroupID);
+
+			// Setup query to get the WorkItemGroup record
+			string strWorkItemGroupSQL = "SELECT * FROM WorkItemGroup WHERE ID = " + strWorkItemGroupID;
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipWorkItemGroupSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI36901", ipWorkItemGroupSet != __nullptr);
+
+				// Execute the query to get the WorkItemGroup record
+				ipWorkItemGroupSet->Open(strWorkItemGroupSQL.c_str(), 
+					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
+				// Should only be one record
+				if (!asCppBool(ipWorkItemGroupSet->adoEOF))
+				{
+					// Get the fields from the file set
+					FieldsPtr ipFields = ipWorkItemGroupSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI36902", ipFields != __nullptr);
+					
+					*pstringizedTask = _bstr_t(getStringField(ipFields, "StringizedSettings").c_str()).Detach();
+
+					*pnNumberOfWorkItems = getLongField(ipFields, "NumberOfWorkItems");
+				}
+				else
+				{
+					*pnNumberOfWorkItems = 0;
+				}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI36903");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36904");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SaveWorkItemOutput_Internal(bool bDBLocked, long WorkItemID, BSTR strWorkItemOutput)
+{
+	try
+	{
+		try
+		{
+			string strUpdateQuery = "UPDATE WorkItem SET [Output] = '" + asString(strWorkItemOutput) + 
+				"' WHERE ID = " + asString(WorkItemID);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+
+				executeCmdQuery(ipConnection, strUpdateQuery);
+
+				tg.CommitTrans();
+				
+			END_CONNECTION_RETRY(ipConnection, "ELI36921");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36922");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID, long nActionID, 
+	BSTR stringizedTask, long nNumberOfWorkItems, long *pnWorkItemGroupID)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI37104",  pnWorkItemGroupID != __nullptr);
+
+			// Setup the query to get the WorkItemGroupID that has matching FileID, ActionID, stringizedTask and 
+			// NumberOfWorkItems 
+			string strWorkItemGroupSQL = "Select * FROM WorkItemGroup WHERE FileID = " + asString(nFileID)
+						+ " AND ActionID = " + asString (nActionID) + " AND StringizedSettings = '" + 
+						asString(stringizedTask) + "' AND NumberOfWorkItems = " + asString(nNumberOfWorkItems);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipWorkItemGroupSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37105", ipWorkItemGroupSet != __nullptr);
+
+				// Execute the query to get the WorkItemID if it exists
+				ipWorkItemGroupSet->Open(strWorkItemGroupSQL.c_str(), 
+					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
+				if (!asCppBool(ipWorkItemGroupSet->adoEOF))
+				{
+					// Get the fields from the file set
+					FieldsPtr ipFields = ipWorkItemGroupSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI37106", ipFields != __nullptr);
+
+					*pnWorkItemGroupID = getLongField(ipFields, "ID");
+
+					// Check that there are the correct number of work items in the WorkItem table
+					string strWorkItemQuery = 
+						"SELECT COUNT(ID) as WorkItemCount FROM WorkItem WHERE WorkItemGroupID = " + 
+						asString(*pnWorkItemGroupID) + " GROUP BY WorkItemGroupID";
+
+					_RecordsetPtr ipWorkItemCountSet =
+						ipConnection->Execute(strWorkItemQuery.c_str(), NULL, adCmdText);
+
+					if (ipWorkItemCountSet != __nullptr && ipWorkItemCountSet->adoEOF != VARIANT_TRUE)
+					{
+						ipFields = ipWorkItemCountSet->Fields;
+						long nCount = getLongField(ipFields, "WorkItemCount");
+						
+						if (nCount != nNumberOfWorkItems)
+						{
+							*pnWorkItemGroupID = 0;
+						}
+					}
+					else
+					{
+						*pnWorkItemGroupID = 0;
+					}
+				}
+				else
+				{
+					*pnWorkItemGroupID = 0;
+				}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37107");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37108");
 	}
 	catch(UCLIDException &ue)
 	{

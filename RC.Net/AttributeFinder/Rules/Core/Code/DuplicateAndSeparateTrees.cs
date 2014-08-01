@@ -23,7 +23,7 @@ namespace Extract.AttributeFinder.Rules
     [CLSCompliant(false)]
     public interface IDuplicateAndSeparateTrees : IOutputHandler, ICategorizedComponent,
         IConfigurableObject, ICopyableObject, ILicensedComponent, IPersistStream,
-        IMustBeConfiguredObject, IIdentifiableRuleObject
+        IMustBeConfiguredObject, IIdentifiableObject
     {
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("DC265266-BFDE-4D45-AF91-CFEA253040E2")]
     [CLSCompliant(false)]
-    public class DuplicateAndSeparateTrees : IdentifiableRuleObject, IDuplicateAndSeparateTrees
+    public class DuplicateAndSeparateTrees : IdentifiableObject, IDuplicateAndSeparateTrees
     {
         #region Constants
 
@@ -75,7 +75,7 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// <para><b>Version 2</b></para>
-        /// Added IdentifiableRuleObject inheritance
+        /// Added IdentifiableObject inheritance
         /// </summary>
         const int _CURRENT_VERSION = 2;
 
@@ -451,7 +451,7 @@ namespace Extract.AttributeFinder.Rules
 
                     if (reader.Version >= 2)
                     {
-                        // Load the GUID for the IIdentifiableRuleObject interface.
+                        // Load the GUID for the IIdentifiableObject interface.
                         LoadGuid(stream);
                     }
                 }
@@ -487,7 +487,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

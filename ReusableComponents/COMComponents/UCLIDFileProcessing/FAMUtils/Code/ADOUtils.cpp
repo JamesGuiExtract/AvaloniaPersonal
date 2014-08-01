@@ -162,9 +162,14 @@ string getStringField( const FieldsPtr& ipFields, const string& strFieldName )
 			// get the value
 			variant_t vtItem = ipItem->Value;
 
-			// If the value is not a bstr throw an exception
-			if ( vtItem.vt != VT_BSTR )
+			// If the value is NULL return an empty string
+			if (vtItem.vt == VT_NULL)
 			{
+				return "";
+			}
+			else if ( vtItem.vt != VT_BSTR )
+			{
+				// If the value is not a bstr throw an exception
 				UCLIDException ue("ELI15289", "Value is not a string type.");
 				ue.addDebugInfo("Type", vtItem.vt);
 				throw ue;

@@ -16,7 +16,7 @@
 // Version 3: Added TreatNameListAsRegex, m_eValueMergeMode, m_ipValueMergePriority,
 //			  m_bTreatValueListAsRegexTypeFromName, PreserveType, TypeMergePriority and
 //			  TreatTypeListAsRegex
-// Version 4: Added CIdentifiableRuleObject
+// Version 4: Added CIdentifiableObject
 const unsigned long gnCurrentVersion			= 4;
 const unsigned long gnDEFAULT_OVERLAP_PERCENT	= 75;
 
@@ -859,7 +859,7 @@ STDMETHODIMP CMergeAttributes::Load(IStream *pStream)
 
 		if (nDataVersion >= 4)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -934,7 +934,7 @@ STDMETHODIMP CMergeAttributes::Save(IStream *pStream, BOOL fClearDirty)
 		ASSERT_RESOURCE_ALLOCATION("ELI33053", ipTypeMergePriority != __nullptr);
 		writeObjectToStream(ipTypeMergePriority, pStream, "ELI33054", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface (version 4)
+		// Save the GUID for the IIdentifiableObject interface (version 4)
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -1170,7 +1170,7 @@ STDMETHODIMP CMergeAttributes::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_IMustBeConfiguredObject,
 			&IID_ILicensedComponent,
-			&IID_IIdentifiableRuleObject
+			&IID_IIdentifiableObject
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -1183,7 +1183,7 @@ STDMETHODIMP CMergeAttributes::InterfaceSupportsErrorInfo(REFIID riid)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMergeAttributes::get_InstanceGUID(GUID *pVal)
 {

@@ -4,7 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CEliminateDuplicates
@@ -17,8 +17,8 @@ class ATL_NO_VTABLE CEliminateDuplicates :
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CEliminateDuplicates();
@@ -36,7 +36,7 @@ BEGIN_COM_MAP(CEliminateDuplicates)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_CATEGORY_MAP(CEliminateDuplicates)
@@ -68,7 +68,7 @@ public:
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

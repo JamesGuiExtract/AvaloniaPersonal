@@ -110,7 +110,6 @@
     <Compile Include="ExtractOcrTextInImageAreaSettingsDialog.Designer.cs">
       <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="IdentifiableRuleObject.cs" />
     <Compile Include="InputFinder.cs" />
     <Compile Include="ModifySpatialMode.cs" />
     <Compile Include="ModifySpatialModeSettingsDialog.cs">

@@ -19,7 +19,7 @@ using namespace std;
 // History : m_bApplyModifyingRules is added in version 2
 //         : m_ipDocPreprocessor is added in version 3
 //		   : m_bIgnoreErrors, m_bIgnorePreprocessorErrors, m_bIgnoreModifierErrors: version 4
-//		   : CIdentifiableRuleObject: version 5
+//		   : CIdentifiableObject: version 5
 const unsigned long gnCurrentVersion = 5;
 const long nNUM_PROGRESS_ITEMS_PER_VALUE_MODIFYING_RULE = 1;
 
@@ -846,7 +846,7 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 
 		if (nDataVersion >= 5)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -916,7 +916,7 @@ STDMETHODIMP CAttributeRule::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		writeObjectToStream( ipPersistentObj, pStream, "ELI09909", fClearDirty );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -966,7 +966,7 @@ STDMETHODIMP CAttributeRule::raw_IsLicensed(VARIANT_BOOL * pbValue)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeRule::get_InstanceGUID(GUID *pVal)
 {

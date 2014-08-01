@@ -2,6 +2,7 @@
 using System;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
+using UCLID_COMUTILSLib;
 
 namespace Extract.AttributeFinder.Rules
 {
@@ -69,7 +70,7 @@ namespace Extract.AttributeFinder.Rules
                 if (_profilingActive.Value)
                 {
                     _handle = _afUtility.StartProfilingRule(
-                        name, type, (IIdentifiableRuleObject)ruleObject, subID);
+                        name, type, (IIdentifiableObject)ruleObject, subID);
                 }
             }
             catch (Exception ex)

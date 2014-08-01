@@ -385,8 +385,6 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 		fl->m_eventDispatchThreadStarted.signal();
 		try
 		{
-			vector<FolderEvent> vecEvents;
-
 			while ( fl->m_eventKillThreads.wait(1000) == WAIT_TIMEOUT )
 			{
 				while(fl->m_queEvents.getSize() > 0)
@@ -397,38 +395,17 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 					}
 					FolderEvent event;
 					fl->m_queEvents.getTopAndPop(event);
-					vecEvents.push_back(event);
-				}
-
-				unsigned int i;
-				for(i = 0; i < vecEvents.size(); i++)
-				{
-					if(fl->m_eventKillThreads.isSignaled())
-					{
-						break;
-					}
-
-					FolderEvent event = vecEvents[i];
 
 					if(event.m_nEvent == kFileAdded || event.m_nEvent == kFileModified || event.m_nEvent == kFileRenamed)
 					{
 						if(!fl->fileReadyForAccess(event.m_strFileNameNew))
 						{
+							fl->m_queEvents.push(event);
 							continue;	
 						}
 					}
 
 					fl->dispatchEvent(event);
-					vecEvents.erase(vecEvents.begin() + i);
-					i--;
-				}
-
-				// [LegacyRCAndUtils:5258]
-				// Call swap to free excess capacity so that after processing a large number
-				// of events, the capacity allocated for FolderEvents in the vector is released.
-				if (vecEvents.empty() && vecEvents.capacity() > 1000)
-				{
-					vecEvents.swap(vector<FolderEvent>());
 				}
 			}
 		}

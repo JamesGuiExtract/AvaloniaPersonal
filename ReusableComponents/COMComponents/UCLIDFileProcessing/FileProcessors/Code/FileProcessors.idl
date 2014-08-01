@@ -459,6 +459,7 @@ library UCLID_FILEPROCESSORSLib
 		interface ICategorizedComponent;
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;
+		interface IParallelizableTask;
 	};
 	[
 		uuid(545E87D3-C76F-4098-9D36-FBF91DD39F2B),

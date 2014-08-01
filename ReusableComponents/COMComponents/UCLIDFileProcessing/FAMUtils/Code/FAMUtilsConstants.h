@@ -47,6 +47,7 @@ static const string gstrEMAIL_USERNAME = "EmailUsername";
 static const string gstrEMAIL_PASSWORD = "EmailPassword";
 static const string gstrEMAIL_TIMEOUT = "EmailTimeout";
 static const string gstrEMAIL_USE_SSL = "EmailUseSSL";
+static const string gstrALLOW_RESTARTABLE_PROCESSING = "AllowRestartableProcessing";
 
 // Feature names
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";
@@ -83,3 +84,4 @@ static const string gstrQUERY_FILES_WITH_TAGS = "SELECT <SelectFileValues> FROM 
 
 static const string gstrMAIN_DB_LOCK = "Main";
 static const string gstrUSER_COUNTER_DB_LOCK = "UserCounter";
+static const string gstrWORKITEM_DB_LOCK = "WorkItem";

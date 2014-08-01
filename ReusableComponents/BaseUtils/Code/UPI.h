@@ -24,6 +24,7 @@ public:
 	unsigned long getProcessID() const;
 	const std::string& getStartDate() const;
 	const std::string& getStartTime() const;
+	const std::string& getProcessSemaphoreName() const;
 
 	// get the UPI associated with the currently executing process
 	static const UPI& getCurrentProcessUPI();
@@ -35,4 +36,5 @@ private:
 	unsigned long m_ulProcessID;
 	std::string m_strStartDate;
 	std::string m_strStartTime;
+	std::string m_strProcessSemaphoreName;
 };

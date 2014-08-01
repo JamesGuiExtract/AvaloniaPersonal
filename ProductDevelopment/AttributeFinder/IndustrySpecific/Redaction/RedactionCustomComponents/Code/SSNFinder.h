@@ -5,7 +5,7 @@
 #include "resource.h"       // main symbols
 
 #include <AFCategories.h>
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 #include <string>
 #include <list>
@@ -32,8 +32,8 @@ class ATL_NO_VTABLE CSSNFinder :
 	public IPersistStream,
 	public ISupportErrorInfo,
 	public ISpecifyPropertyPagesImpl<CSSNFinder>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CSSNFinder();
@@ -54,7 +54,7 @@ BEGIN_COM_MAP(CSSNFinder)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CSSNFinder)
@@ -99,7 +99,7 @@ public:
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(/*[in]*/ REFIID riid);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

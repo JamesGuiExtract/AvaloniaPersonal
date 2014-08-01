@@ -687,3 +687,114 @@ STDMETHODIMP CSpatialString::LoadFromMultipleFiles(IVariantVector *pvecFiles, BS
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		IIUnknownVectorPtr ipStrings(pStrings);
+		ASSERT_RESOURCE_ALLOCATION("ELI37129", ipStrings != __nullptr);
+
+		// Need to verify that each SpatialString in the vector
+		// has mode kSpatialMode and calculate the final size of the string
+		long lSize = ipStrings->Size();
+		long lTotalStringSize = 0;
+		for (long i = 0; i < lSize; i++)
+		{
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStr = ipStrings->At(i);
+			lTotalStringSize += ipStr->Size;
+			if (i > 0)
+			{
+				lTotalStringSize += 4;
+			}
+			if (ipStr->GetMode() != kSpatialMode)
+			{
+				UCLIDException ue("ELI37130", "All strings should be spatial.");
+				ue.addDebugInfo("String number", i+1);
+				throw ue;
+			}
+		}
+		m_eMode = kSpatialMode;
+		m_strString.reserve(lTotalStringSize + 1);
+		m_vecLetters.reserve(lTotalStringSize);
+		m_ipPageInfoMap.CreateInstance(CLSID_LongToObjectMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI37132", m_ipPageInfoMap != __nullptr);
+		long nPos = 0;
+		long nLastProcessedPage = 0;
+		for (long i = 0; i < lSize; i++)
+		{
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStr = ipStrings->At(i); 
+			long nCurrPage = ipStr->GetFirstPageNumber();
+			if (nCurrPage != ipStr->GetLastPageNumber())
+			{
+				UCLIDException ue("ELI37163", "Single page Spatial strings expected.");
+				throw ue;
+			}
+			
+			// if the current page is < than the last processed page throw an exception
+            if (nCurrPage < nLastProcessedPage)
+			{
+				UCLIDException ue("ELI37156", "Pages must be in order.");
+				ue.addDebugInfo("Current Page", nCurrPage);
+				ue.addDebugInfo("Last Processed Page", nLastProcessedPage);
+				throw ue;
+			}
+
+			if (i == 0)
+			{
+				m_strSourceDocName = ipStr->SourceDocName;
+			}
+			else if (nCurrPage == nLastProcessedPage)
+			{
+				// will be adding string on the start of a new line
+				m_strString += "\r\n";
+
+				// Get the letters from the string
+				vector<CPPLetter> vecLetters;
+				getNonSpatialLetters("\r\n", vecLetters);
+				m_vecLetters.insert(m_vecLetters.end(),vecLetters.begin(), vecLetters.end());
+				nPos += 2;
+			}
+			else if (nCurrPage != nLastProcessedPage)
+			{
+				m_strString += "\r\n\r\n";
+
+				// Get the letters from the string
+				vector<CPPLetter> vecLetters;
+				getNonSpatialLetters("\r\n\r\n", vecLetters);
+				m_vecLetters.insert(m_vecLetters.end(),vecLetters.begin(), vecLetters.end());
+				nPos += 4;
+			}
+
+			// Add the string to the m_strString object
+			m_strString += asString(ipStr->String);
+
+			// Acc the page letter object to the m_vecLetters
+			CPPLetter *letters = NULL;
+			long nNumLetters = 0;
+			ipStr->GetOCRImageLetterArray(&nNumLetters, (void**)&letters);
+
+			m_vecLetters.resize(nPos + nNumLetters);
+			long lCopySize = sizeof(CPPLetter) * nNumLetters;
+			memcpy_s(&(m_vecLetters[nPos]), lCopySize, letters, lCopySize);
+
+			// Add the pageInfo objects
+			if (nCurrPage != nLastProcessedPage)
+			{
+				m_ipPageInfoMap->Set(nCurrPage, ipStr->GetPageInfo(nCurrPage));
+			}
+			nCurrPage = nLastProcessedPage;
+
+			nPos += nNumLetters;
+		}
+
+		m_ipPageInfoMap->SetReadonly();
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37128");
+}

@@ -67,6 +67,8 @@ static const string gstrDB_FIELD_SEARCH = "FieldSearch";
 static const string gstrDB_LAUNCH_APP= "LaunchApp"; // No long exists, but keep for schema updates
 static const string gstrDB_FILE_HANDLER= "FileHandler";
 static const string gstrDB_FEATURE= "Feature";
+static const string gstrWORK_ITEM="WorkItem";
+static const string gstrWORK_ITEM_GROUP="WorkItemGroup";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -242,6 +244,19 @@ public:
 	STDMETHOD(get_LoggedInAsAdmin)(VARIANT_BOOL* pbLoggedInAsAdmin);
 	STDMETHOD(IsFeatureEnabled)(BSTR bstrFeatureName, VARIANT_BOOL* pbFeatureIsEnabled);
 	STDMETHOD(DuplicateConnection)(IFileProcessingDB *pConnectionSource);
+	STDMETHOD(CreateWorkItemGroup)(long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
+			long *pnWorkItemGroupID);
+	STDMETHOD(AddWorkItems)(long nWorkItemGroupID, IIUnknownVector *pWorkItems);
+	STDMETHOD(GetWorkItemsForGroup)(long nWorkItemGroupID, long nStartPos, long nCount, IIUnknownVector **pWorkItems);
+	STDMETHOD(GetWorkItemGroupStatus)(long nWorkItemGroupID, WorkItemGroupStatus *pWorkGroupStatus,
+		EWorkItemStatus *pStatus);
+	STDMETHOD(GetWorkItemToProcess)(long nActionID, VARIANT_BOOL vbRestrictToUPI, IWorkItemRecord **ppWorkItem);
+	STDMETHOD(NotifyWorkItemFailed)(long nWorkItemID, BSTR stringizedException);
+	STDMETHOD(NotifyWorkItemCompleted)(long nWorkItemID);
+	STDMETHOD(GetWorkGroupData)(long WorkItemGroupID, long *pnNumberOfWorkItems, BSTR *pstringizedTask);
+	STDMETHOD(SaveWorkItemOutput)(long WorkItemID, BSTR strWorkItemOutput);
+	STDMETHOD(FindWorkItemGroup)(long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
+			long *pnWorkItemGroupID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -307,7 +322,7 @@ private:
 	// This contains the UniqueProcess Identifier (UPI)
 	string m_strUPI;
 
-	// This contains the ID for the registered UPI in the ProcessFAM table in the DB
+	// This contains the ID for the registered UPI in the ActiveFAM table in the DB
 	// If 0 there is not a registered UPI
 	int m_nUPIID;
 
@@ -320,6 +335,7 @@ private:
 	// called on the same thread Unlock even though both calls originate from the same thread.
 	static CSemaphore ms_semaphoreMainLock;
 	static CSemaphore ms_semaphoreUserCounterLock;
+	static CSemaphore ms_semaphoreWorkItemLock;
 	map<string, CSemaphore*> m_mapDbLocks;
 
 	// Machine username
@@ -419,6 +435,11 @@ private:
 
 	// Flag indicating whether to store FTP event history
 	bool m_bStoreFTPEventHistory;
+
+	// If this is true work item groups and work items will not be deleted
+	// when file processing is changed to Pending - also orphaned processing work items will
+	// be reset to pending when files are reverted.
+	bool m_bAllowRestartableProcessing;
 
 	IMiscUtilsPtr m_ipMiscUtils;
 
@@ -926,6 +947,10 @@ private:
 		long *pnStepCount, IProgressStatusPtr ipProgressStatus,
 		map<string, long> &rmapProductSpecificVersions);
 
+	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr getWorkItemFromFields(const FieldsPtr& ipFields);
+	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr setWorkItemToProcessing(bool bDBLocked, long nActionID, 
+		bool bRestrictToUPI, const _ConnectionPtr &ipConnection);
+
 	void validateLicense();
 
 	// Internal implementation methods
@@ -1034,6 +1059,19 @@ private:
 	bool IsAnyFAMActive_Internal(bool bDBLocked, VARIANT_BOOL* pvbFAMIsActive);
 	bool GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
 	bool IsFeatureEnabled_Internal(bool bDBLocked, BSTR bstrFeatureName, VARIANT_BOOL* pbFeatureIsEnabled);
+	bool CreateWorkItemGroup_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR stringizedTask,
+		long nNumberOfWorkItems, long *pnWorkItemGroupID);
+	bool AddWorkItems_Internal(bool bDBLocked, long nWorkItemGroupID, IIUnknownVector *pWorkItems);
+	bool GetWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, long nStartPos, long nCount, IIUnknownVector **ppWorkItems);
+	bool GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWorkItemGroupID,
+		WorkItemGroupStatus *pWorkGroupStatus, EWorkItemStatus *pStatus);
+	bool GetWorkItemToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToUPI, IWorkItemRecord **ppWorkItem);
+	bool NotifyWorkItemFailed_Internal(bool bDBLocked, long nWorkItemID, BSTR strizedException);
+	bool NotifyWorkItemCompleted_Internal(bool bDBLocked, long nWorkItemID);
+	bool GetWorkGroupData_Internal(bool bDBLocked, long WorkItemGroupID, long *pnNumberOfWorkItems, BSTR *pstringizedTask);
+	bool SaveWorkItemOutput_Internal(bool bDBLocked, long WorkItemID, BSTR strWorkItemOutput);
+	bool FindWorkItemGroup_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
+			long *pnWorkItemGroupID);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

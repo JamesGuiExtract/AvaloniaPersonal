@@ -506,7 +506,7 @@ library UCLID_AFUTILSLib
 		// Starts a profiling timer on a call to a rule object.
 		// StopProfilingRule should be called with the returned handle to stop the timer.
 		[id(31), helpstring("method StartProfilingRule")] HRESULT StartProfilingRule(
-			[in] BSTR bstrName, [in] BSTR bstrType,	[in] IIdentifiableRuleObject *pRuleObject,
+			[in] BSTR bstrName, [in] BSTR bstrType,	[in] IIdentifiableObject *pRuleObject,
 			[in] long nSubID, [out, retval] long* pnHandle);
 		//-----------------------------------------------------------------------------------------
 		// Stops a profiling timer on the object call identified by the handle.

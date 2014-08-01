@@ -99,6 +99,7 @@ IDR_FAMTagManager       REGISTRY                "FAMTagManager.rgs"
 IDR_FAMDBUTILS          REGISTRY                "FAMDBUtils.rgs"
 IDR_FILEPROCESSINGTASKEXECUTOR REGISTRY                "FileProcessingTaskExecutor.rgs"
 IDR_FAMFILESELECTOR     REGISTRY                "FAMFileSelector.rgs"
+IDR_WORKITEMRECORD		REGISTRY				"WorkItemRecord.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -23,7 +23,7 @@ namespace Extract.AttributeFinder.Rules
     [CLSCompliant(false)]
     public interface IExtractOcrTextInImageArea : IAttributeModifyingRule, ICategorizedComponent,
         IConfigurableObject, ICopyableObject, ILicensedComponent, IPersistStream,
-        IIdentifiableRuleObject
+        IIdentifiableObject
     {
         /// <summary>
         /// Gets or sets whether the original document OCR results should be used instead of the OCR
@@ -72,7 +72,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("FF9E81A6-EBE7-4C95-A968-E836A255C37B")]
     [CLSCompliant(false)]
-    public class ExtractOcrTextInImageArea : IdentifiableRuleObject, IExtractOcrTextInImageArea
+    public class ExtractOcrTextInImageArea : IdentifiableObject, IExtractOcrTextInImageArea
     {
         #region Constants
 
@@ -502,7 +502,7 @@ namespace Extract.AttributeFinder.Rules
                     IncludeTextOnBoundary = reader.ReadBoolean();
                     SpatialEntityType = (ESpatialEntity)reader.ReadInt32();
 
-                    // Load the GUID for the IIdentifiableRuleObject interface.
+                    // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
 
@@ -539,7 +539,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

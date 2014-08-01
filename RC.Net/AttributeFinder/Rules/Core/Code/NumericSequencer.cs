@@ -1,5 +1,6 @@
 ﻿using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Extract.AttributeFinder.Rules
     [Guid("5643B027-B38A-4CC0-954E-EDA53FC34857")]
     [CLSCompliant(false)]
     public interface INumericSequencer : IAttributeModifyingRule, ICategorizedComponent, IConfigurableObject,
-        ICopyableObject, ILicensedComponent, IPersistStream, IIdentifiableRuleObject
+        ICopyableObject, ILicensedComponent, IPersistStream, IIdentifiableObject
     {
         /// <summary>
         /// Gets or sets a value indicating whether to expand hyphenated ranges, or contract
@@ -82,7 +83,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("361CE46B-0B83-4C8A-A955-6005BACE9F0F")]
     [CLSCompliant(false)]
-    public partial class NumericSequencer : IdentifiableRuleObject, INumericSequencer
+    public partial class NumericSequencer : IdentifiableObject, INumericSequencer
     {
         #region Constants
 
@@ -94,7 +95,7 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// <para><b>Version 2</b></para>
-        /// Added IdentifiableRuleObject inheritance
+        /// Added IdentifiableObject inheritance
         /// </summary>
         const int _CURRENT_VERSION = 2;
 
@@ -492,7 +493,7 @@ namespace Extract.AttributeFinder.Rules
 
                     if (reader.Version >= 2)
                     {
-                        // Load the GUID for the IIdentifiableRuleObject interface.
+                        // Load the GUID for the IIdentifiableObject interface.
                         LoadGuid(stream);
                     }
                 }
@@ -533,7 +534,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

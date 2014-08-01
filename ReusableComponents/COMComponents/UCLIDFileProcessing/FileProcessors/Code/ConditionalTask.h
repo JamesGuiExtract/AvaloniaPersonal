@@ -4,6 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "FileProcessors.h"
+#include "IdentifiableObject.h"
 #include "..\..\..\UCLIDFileProcessing\Code\FPCategories.h"
 
 #include <map>
@@ -29,7 +30,10 @@ class ATL_NO_VTABLE CConditionalTask :
 	public IDispatchImpl<IClipboardCopyable, &__uuidof(IClipboardCopyable), &LIBID_UCLID_COMUTILSLib, 1>,
 	public IDispatchImpl<IMustBeConfiguredObject, &__uuidof(IMustBeConfiguredObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
 	public IDispatchImpl<ILicensedComponent, &__uuidof(ILicensedComponent), &LIBID_UCLID_COMLMLib, /* wMajor = */ 1>,
-	public ISpecifyPropertyPagesImpl<CConditionalTask>
+	public ISpecifyPropertyPagesImpl<CConditionalTask>,
+	public IDispatchImpl<IParallelizableTask, &__uuidof(IParallelizableTask), &LIBID_UCLID_FILEPROCESSINGLib, /* wMajor = */ 1>,
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	public CIdentifiableObject
 {
 public:
 	CConditionalTask();
@@ -50,6 +54,8 @@ public:
 		COM_INTERFACE_ENTRY(IPersistStream)
 		COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+		COM_INTERFACE_ENTRY(IParallelizableTask)
+		COM_INTERFACE_ENTRY(IIdentifiableObject)
 	END_COM_MAP()
 
 	BEGIN_PROP_MAP(CConditionalTask)
@@ -112,6 +118,14 @@ public:
 // IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
+	// IParallelizableTask Methods
+	STDMETHOD(raw_ProcessWorkItem)(IWorkItemRecord *pWorkItem, long nActionID,
+		IFAMTagManager* pFAMTM,  IFileProcessingDB* pDB, IProgressStatus *pProgressStatus);
+	STDMETHOD(get_Parallelize)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_Parallelize)(VARIANT_BOOL newVal);
+	
+	// IIdentifiableObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 private:
 
 	//////////////
@@ -146,6 +160,8 @@ private:
 	void notifyClipboardCopiedForTask(const IIUnknownVectorPtr& ipTasks);
 
 	void	validateLicense();
+
+	bool containsParallelizableTask(IIUnknownVectorPtr ipTaskList);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ConditionalTask), CConditionalTask)

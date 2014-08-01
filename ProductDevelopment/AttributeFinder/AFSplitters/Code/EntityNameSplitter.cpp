@@ -24,7 +24,7 @@
 //   * Also saves the Alias choice
 // Version 5:
 //   * Also saves the Trust Name Exchange
-// Version 6: Added CIdentifiableRuleObject
+// Version 6: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 6;
 const string gstrAF_SPLITTERS_PATH = gstrAF_REG_ROOT_FOLDER_PATH + string("\\AFSplitters");
 
@@ -92,7 +92,7 @@ STDMETHODIMP CEntityNameSplitter::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_ICategorizedComponent,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -1221,7 +1221,7 @@ STDMETHODIMP CEntityNameSplitter::Load(IStream *pStream)
 
 		if (nDataVersion >= 6)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -1259,7 +1259,7 @@ STDMETHODIMP CEntityNameSplitter::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -1309,7 +1309,7 @@ STDMETHODIMP CEntityNameSplitter::raw_IsLicensed(VARIANT_BOOL * pbValue)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CEntityNameSplitter::get_InstanceGUID(GUID *pVal)
 {

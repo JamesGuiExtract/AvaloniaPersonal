@@ -23,7 +23,7 @@ namespace Extract.AttributeFinder.Rules
     [CLSCompliant(false)]
     public interface IMultipleCriteriaSelector : IAttributeSelector, ICategorizedComponent,
         IConfigurableObject, ICopyableObject, ILicensedComponent, IPersistStream,
-        IMustBeConfiguredObject, IIdentifiableRuleObject
+        IMustBeConfiguredObject, IIdentifiableObject
     {
         /// <summary>
         /// An <see cref="IUnknownVector"/> of <see cref="IObjectWithDescription"/>s each containing
@@ -73,7 +73,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("C752F09E-5D24-4E65-8250-4811F60D694E")]
     [CLSCompliant(false)]
-    public class MultipleCriteriaSelector : IdentifiableRuleObject, IMultipleCriteriaSelector
+    public class MultipleCriteriaSelector : IdentifiableObject, IMultipleCriteriaSelector
     {
         #region Constants
 
@@ -505,7 +505,7 @@ namespace Extract.AttributeFinder.Rules
                     NegatedSelectors = reader.ReadBooleanArray();
                     SelectExclusively = reader.ReadBoolean();
 
-                    // Load the GUID for the IIdentifiableRuleObject interface.
+                    // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
 
@@ -545,7 +545,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

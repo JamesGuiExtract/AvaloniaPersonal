@@ -31,7 +31,7 @@ struct AttributeData
 // Constants
 //--------------------------------------------------------------------------------------------------
 // Version 2: Added the remove empty attribute hierarchy setting
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 3;
 const bool gbDEFAULT_CASE_SENSITIVE = false;
 const bool gbDEFAULT_DISCARD_NON_MATCH = false;
@@ -632,7 +632,7 @@ STDMETHODIMP CMergeAttributeTrees::Load(IStream *pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -679,7 +679,7 @@ STDMETHODIMP CMergeAttributeTrees::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -848,7 +848,7 @@ STDMETHODIMP CMergeAttributeTrees::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_IMustBeConfiguredObject,
 			&IID_ILicensedComponent,
-			&IID_IIdentifiableRuleObject
+			&IID_IIdentifiableObject
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -861,7 +861,7 @@ STDMETHODIMP CMergeAttributeTrees::InterfaceSupportsErrorInfo(REFIID riid)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMergeAttributeTrees::get_InstanceGUID(GUID *pVal)
 {

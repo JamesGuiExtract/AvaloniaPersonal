@@ -176,6 +176,7 @@ public:
 	STDMETHOD(SetSurroundingWhitespace)(ISpatialString *pString, long nPos, long* pnNewPos);
 	STDMETHOD(TranslateToNewPageInfo)(ILongToObjectMap* pPageInfoMap);
 	STDMETHOD(ValidatePageDimensions)();
+	STDMETHOD(CreateFromSpatialStrings)(IIUnknownVector *pStrings);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);

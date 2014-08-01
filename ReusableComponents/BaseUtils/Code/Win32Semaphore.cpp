@@ -121,3 +121,18 @@ Win32Semaphore::AcquireSemaphoreTimedOut::AcquireSemaphoreTimedOut(	Win32Semapho
 	addDebugInfo("Semaphore.ulCurrentCount", rSemaphore.ulCurrentCount);
 	addDebugInfo("Semaphore.ulMaxCount", rSemaphore.ulMaxCount);
 }
+
+Win32SemaphoreUnLockGuard::Win32SemaphoreUnLockGuard(Win32Semaphore& rSemaphore, DWORD dwMilliSeconds)
+:rSemaphore(rSemaphore)
+{
+	rSemaphore.release();
+}
+
+Win32SemaphoreUnLockGuard::~Win32SemaphoreUnLockGuard()
+{
+	try
+	{
+		rSemaphore.acquire(m_dwTimeoutToAquire);
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI37022");
+}

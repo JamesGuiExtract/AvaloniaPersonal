@@ -10,7 +10,7 @@
 #include <ComponentLicenseIDs.h>
 #include <RuleSetProfiler.h>
 
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ STDMETHODIMP CLoopFinder::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_IMustBeConfiguredObject,
 			&IID_ILicensedComponent,
-			&IID_IIdentifiableRuleObject
+			&IID_IIdentifiableObject
 		};
 		for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
 		{
@@ -513,7 +513,7 @@ STDMETHODIMP CLoopFinder::Load(IStream *pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -573,7 +573,7 @@ STDMETHODIMP CLoopFinder::Save(IStream *pStream, BOOL fClearDirty)
 			writeObjectToStream(ipObj, pStream, "ELI23948", fClearDirty);
 		}
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -900,7 +900,7 @@ STDMETHODIMP CLoopFinder::put_LoopType( ELoopType newVal)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLoopFinder::get_InstanceGUID(GUID *pVal)
 {

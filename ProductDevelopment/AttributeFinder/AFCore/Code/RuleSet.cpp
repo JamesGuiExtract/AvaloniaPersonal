@@ -31,7 +31,7 @@ const unsigned long gnCurrentVersion = 13;
 //	 Added FKB version
 // Version 10:
 //	 Added Ignore preprocessor and output handler error options.
-// Version 11: Added CIdentifiableRuleObject
+// Version 11: Added CIdentifiableObject
 // Version 12: Added m_strPreviousFileName
 // Version 13: Added Comments
 
@@ -236,7 +236,7 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
 		if (bClearDirty == VARIANT_TRUE)
 		{
 			// [FlexIDSCore:4865]
-			// If the filename has changed, in order to prevent the IdentifiableRuleObject GUIDs in a
+			// If the filename has changed, in order to prevent the IdentifiableObject GUIDs in a
 			// copied ruleset from conflicting with the GUIDs in the original ruleset, regenerate the
 			// GUIDs for all rule objects in this ruleset.
 			if (_strcmpi(m_strPreviousFileName.c_str(), asString(strFullFileName).c_str()) != 0)
@@ -1463,7 +1463,7 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 
 		if (m_nVersionNumber >= 11)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -1579,7 +1579,7 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		writeObjectToStream( ipObj, pStream, "ELI09912", fClearDirty );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// clear the flag as specified
@@ -1752,7 +1752,7 @@ STDMETHODIMP CRuleSet::raw_Clone(IUnknown * * pObject)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_InstanceGUID(GUID *pVal)
 {

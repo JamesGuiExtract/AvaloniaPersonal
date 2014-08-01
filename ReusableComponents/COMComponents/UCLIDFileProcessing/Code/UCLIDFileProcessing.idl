@@ -33,6 +33,8 @@ library UCLID_FILEPROCESSINGLib
 	interface IRoleNotifyFAM;
 	interface ISetProcessingSchedule;
 	interface IFileRecord;
+	interface IParallelizableTask;
+	interface IWorkItemRecord;
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S -----------------------------------------------------------------------------------
@@ -145,6 +147,34 @@ library UCLID_FILEPROCESSINGLib
 		kRenameFileOnFtpServer = 3,
 		kGetDirectoryListing = 4
 	}EFTPAction;
+
+	typedef
+		[
+			uuid(67549CC0-38D5-45BE-83BE-39B40FDD2E6A),
+			helpstring("Extract EWorkItemStatus")
+		]
+	enum EWorkItemStatus
+	{
+		kWorkUnitPending = 0,
+		kWorkUnitProcessing = 1,
+		kWorkUnitComplete = 2,
+		kWorkUnitFailed = 3
+	} EWorkItemStatus;
+
+	typedef
+		[
+			uuid("3AC5BFA0-CE9C-4C58-92FE-78806086539E"),
+			helpstring("WorkItemGroup status structure.")
+		]
+	struct WorkItemGroupStatus
+	{
+		[helpstring("Work Group ID")] long WorkGroupID;
+		[helpstring("Pending count for group")] long lPendingCount;
+		[helpstring("Processing count for group")] long lProcessingCount;
+		[helpstring("Failed count for group")] long lFailedCount;
+		[helpstring("Completed count for group")] long lCompletedCount;
+		[helpstring("Total work items")] long lTotal;
+	} WorkItemGroupStatus;
 
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
@@ -528,6 +558,52 @@ library UCLID_FILEPROCESSINGLib
 			[in] IFileRecord* pFileRecord, [in] IFileProcessingDB* pFPDB, 
 			[in] long lActionID, [in] IFAMTagManager* pFAMTagManager, 
 			[out, retval] VARIANT_BOOL* pRetVal);
+	};
+
+	[
+		object,
+		uuid(B4690765-4695-4D25-8F79-3F34C72AC4CB),
+		dual,
+		helpstring("IWorkItemRecord Interface"),
+		pointer_default(unique)
+	]
+	interface IWorkItemRecord : IDispatch
+	{
+		[propget, id(1), helpstring ("property WorkItemID")] HRESULT WorkItemID([out, retval] long *pnWorkItemID);
+		[propput, id(1), helpstring ("property WorkItemID")] HRESULT WorkItemID([in] long nWorkItemID);
+		[propget, id(2), helpstring ("property WorkItemGroupID")] HRESULT WorkItemGroupID([out, retval] long *pnWorkItemGroupID);
+		[propput, id(2), helpstring ("property WorkItemGroupID")] HRESULT WorkItemGroupID([in] long nWorkItemGroupID);
+		[propget, id(3), helpstring ("property Status")] HRESULT Status([out, retval] EWorkItemStatus *pStatus);
+		[propput, id(3), helpstring ("property Status")] HRESULT Status([in] EWorkItemStatus Status);
+		[propget, id(4), helpstring ("property Input")] HRESULT Input([out, retval] BSTR *pInput);
+		[propput, id(4), helpstring ("property Input")] HRESULT Input([in] BSTR Input);
+		[propget, id(5), helpstring ("property Output")] HRESULT Output([out, retval] BSTR *pOutput);
+		[propput, id(5), helpstring ("property Output")] HRESULT Output([in] BSTR Output);
+		[propget, id(6), helpstring ("property UPI")] HRESULT UPI([out, retval] BSTR *pUPI);
+		[propput, id(6), helpstring ("property UPI")] HRESULT UPI([in] BSTR UPI);
+		[propget, id(7), helpstring ("property StringizedException")] HRESULT StringizedException([out, retval] BSTR *pStringizedException);
+		[propput, id(7), helpstring ("property StringizedException")] HRESULT StringizedException([in] BSTR StringizedException);
+		
+		// The FileName will always be populated in methods that return WorkItemRecords.  
+		//(SEE WorkItem related functions on IFileProcessingDB
+		[propget, id(8), helpstring ("property FileName")] HRESULT FileName([out, retval] BSTR *pFileName);
+		[propput, id(8), helpstring ("property FileName")] HRESULT FileName([in] BSTR FileName);
+	}
+
+	[
+		object,
+		uuid(ABE5C40D-E730-4300-BF38-5E7F890B6C59),
+		dual,
+		helpstring("IParallelizableTask Interface"),
+		pointer_default(unique)
+	]
+	interface IParallelizableTask : IDispatch
+	{
+		[id(1), helpstring("method ProcessWorkItem")] HRESULT ProcessWorkItem([in] IWorkItemRecord *pWorkItem,
+			[in] long nActionID, [in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB* pDB, 
+			[in] IProgressStatus *pProgressStatus);
+		[propget, id(2), helpstring("property Parallelize")] HRESULT Parallelize([out,retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property Parallelize")] HRESULT Parallelize([in] VARIANT_BOOL newVal);
 	};
 
 	[
@@ -1265,7 +1341,73 @@ library UCLID_FILEPROCESSINGLib
 		//			to. The connection inherits the same credentials pConnectionSource is using.
 		[id(115), helpstring("method DuplicateConnection")] HRESULT DuplicateConnection(
 			[in] IFileProcessingDB *pConnectionSource);
-};
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Creates the work item group record for the nFileID, nActionID, stringizedTask and
+		//			nNumberOfWorkItems and returns the WorkItemGroupID in pnWorkItemGroupID
+		//			If a record already exists for the nFileID, nActionID, and stringizedTask the
+		//			and the nNumberOfWorkItems matches the found record the  WorkItemGroupID for the
+		//			found record will be returned. 
+		[id(116), helpstring("method CreateWorkItemGroup")] HRESULT CreateWorkItemGroup(
+			[in] long nFileID, [in] long nActionID, [in] BSTR stringizedTask, [in] long nNumberOfWorkItems,
+			[out, retval] long *pnWorkItemGroupID);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Adds the work items in pWorkItems to the WorkItem table with the WorkItemGroupID
+		// NOTE:	The WorkItem records in the pWorkItems vector are not required to have the 
+		//			FileName property set (it will not be used)
+		[id(117), helpstring("method AddWorkItems")] HRESULT AddWorkItems(
+			[in] long nWorkItemGroupID, [in] IIUnknownVector *pWorkItems);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the work items associated with the work group ID
+		//			nCount records will be returned starting at nStartPos, if there not that number
+		//			of records after that start position only the number of records remaining will e returned
+		// NOTE:	The FileName property for all returned WorkItems in ppWorkItems will be set 
+		//			to the current FileName in the database for the FileID in the WorkItemGroup record.
+		[id(118), helpstring("method GetWorkItemsForGroup")] HRESULT GetWorkItemsForGroup(
+			[in] long nWorkItemGroupID, [in] long nStartPos, [in] long nCount, [out, retval] IIUnknownVector** ppWorkItems); 
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the status of the work item group with the nWorkItemGroupID
+		//			The counts of the status for each of the work group items will be returned
+		//			in pWorkGroupStatus
+		[id(119), helpstring("method GetWorkItemGroupStatus")] HRESULT GetWorkItemGroupStatus (
+			[in] long nWorkItemGroupID, [out] WorkItemGroupStatus *pWorkGroupStatus,
+			[out, retval] EWorkItemStatus *pStatus);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a workitem for the nActionID and bstrUPI - if bstrUPI is an empty 
+		//			string the workitem returned will be the next one to be processed for the nActionID
+		//			regardless of the UPI, if vbRestrictToUPI is VARIANT_TRUE only work items for the nActionID and
+		//			the specific UPI of the current process will be returned
+		// NOTE:	The FileName property in the WorkItem returned will be set to the current FileName
+		//			in the database for the FileID for the WorkItemGroup
+		[id(120), helpstring("method GetWorkItemToProcess")] HRESULT GetWorkItemToProcess([in] long nActionID,
+			[in] VARIANT_BOOL vbRestrictToUPI, [out, retval] IWorkItemRecord **ppWorkItem);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the status of the nWorkItemID to failed
+		[id(121), helpstring("method NotifyWorkItemFailed")] HRESULT NotifyWorkItemFailed(
+			[in] long nWorkItemID, [in] BSTR stringizedException);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the status of the nWorkItemID to Completed
+		[id(122), helpstring("method NotifyWorkItemCompleted")] HRESULT NotifyWorkItemCompleted(
+			[in] long nWorkItemID);		
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the number of workItems in pnNumberOfWorkItems and the stringizedTask 
+		//			for the WorkItemGroupID
+		[id(123), helpstring("method GetWorkGroupData")] HRESULT GetWorkGroupData([in] long WorkItemGroupID,
+			[out] long *pnNumberOfWorkItems, [out, retval] BSTR *pstringizedTask);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To save the strWorkItemOutput in the WorkItem table as a string.
+		[id(124), helpstring("method SaveWorkItemOutput")] HRESULT SaveWorkItemOutput([in] long WorkItemID, [in] BSTR strWorkItemOutput);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the WorkItemGroupID if it exists for a work item group that matches
+		//			the other fields if there is no match the return value *pnWorkItmeGroupID = 0
+		// NOTE:	The nNumberOfWorkItems is compared to the both the NumberOfWorkItems field in
+		//			the WorkItemGroup table and the actual number of work items in the WorkItem
+		//			table for a found work group
+		[id(125), helpstring("method FindWorkItemGroup")] HRESULT FindWorkItemGroup(
+			[in] long nFileID, [in] long nActionID, [in] BSTR stringizedTask, [in] long nNumberOfWorkItems,
+			[out, retval] long *pnWorkItemGroupID); 
+	};
 
 	[
 		object,
@@ -1950,5 +2092,12 @@ library UCLID_FILEPROCESSINGLib
 	{
 		[default] interface IFAMFileSelector;
 		interface ILicensedComponent;
+	};
+	[
+		uuid(B568515C-5F5F-4D3B-A161-C1E35E5866C1)
+	]
+	coclass WorkItemRecord
+	{
+		[default] interface IWorkItemRecord;
 	};
 };

@@ -31,7 +31,7 @@
 //   * Removed from save:
 //            collection of Ignore list strings
 // Version 6: Added IgnoreAttributeSplitterErrors
-// Version 7: Added CIdentifiableRuleObject
+// Version 7: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 7;
 
 //-------------------------------------------------------------------------------------------------
@@ -688,7 +688,7 @@ STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 
 		if (nDataVersion >= 7)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -747,7 +747,7 @@ STDMETHODIMP CAttributeFindInfo::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		writeObjectToStream(ipPersistentObj, pStream, "ELI09906", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// clear the flag as specified
@@ -872,7 +872,7 @@ STDMETHODIMP CAttributeFindInfo::raw_IsLicensed(VARIANT_BOOL * pbValue)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeFindInfo::get_InstanceGUID(GUID *pVal)
 {

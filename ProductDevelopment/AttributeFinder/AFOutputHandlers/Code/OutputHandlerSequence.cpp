@@ -13,7 +13,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ STDMETHODIMP COutputHandlerSequence::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IMustBeConfiguredObject,
 		&IID_IPersistStream,
 		&IID_IMultipleObjectHolder,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -325,7 +325,7 @@ STDMETHODIMP COutputHandlerSequence::Load(IStream *pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -365,7 +365,7 @@ STDMETHODIMP COutputHandlerSequence::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		writeObjectToStream(ipObj, pStream, "ELI09913", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -512,7 +512,7 @@ STDMETHODIMP COutputHandlerSequence::raw_IsLicensed(VARIANT_BOOL * pbValue)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP COutputHandlerSequence::get_InstanceGUID(GUID *pVal)
 {

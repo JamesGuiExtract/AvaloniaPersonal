@@ -12,7 +12,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
 // constants moved to the header file so that they would be accessible to both
@@ -73,7 +73,7 @@ STDMETHODIMP CEntityFinder::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IPersistStream
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -306,7 +306,7 @@ STDMETHODIMP CEntityFinder::Load(IStream *pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -339,7 +339,7 @@ STDMETHODIMP CEntityFinder::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -359,7 +359,7 @@ STDMETHODIMP CEntityFinder::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CEntityFinder::get_InstanceGUID(GUID *pVal)
 {

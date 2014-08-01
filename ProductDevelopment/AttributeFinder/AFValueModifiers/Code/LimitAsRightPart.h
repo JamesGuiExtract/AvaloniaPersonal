@@ -5,7 +5,7 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CLimitAsRightPart
@@ -21,8 +21,8 @@ class ATL_NO_VTABLE CLimitAsRightPart :
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IPersistStream,
 	public ISpecifyPropertyPagesImpl<CLimitAsRightPart>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CLimitAsRightPart();
@@ -43,7 +43,7 @@ BEGIN_COM_MAP(CLimitAsRightPart)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CLimitAsRightPart)
@@ -90,7 +90,7 @@ public:
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

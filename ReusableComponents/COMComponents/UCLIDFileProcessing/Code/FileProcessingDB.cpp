@@ -98,6 +98,7 @@ std::string CFileProcessingDB::ms_strCurrDBName = "";
 std::string CFileProcessingDB::ms_strLastUsedAdvConnStr = "";
 CSemaphore CFileProcessingDB::ms_semaphoreMainLock(1);
 CSemaphore CFileProcessingDB::ms_semaphoreUserCounterLock(1);
+CSemaphore CFileProcessingDB::ms_semaphoreWorkItemLock(1);
 CMutex CFileProcessingDB::ms_mutexPingDBLock;
 CMutex CFileProcessingDB::ms_mutexSpecialLoggingLock;
 
@@ -128,7 +129,8 @@ m_bRevertInProgress(false),
 m_bRetryOnTimeout(true),
 m_nActiveActionID(-1),
 m_bLoggedInAsAdmin(false),
-m_bCheckedFeatures(false)
+m_bCheckedFeatures(false),
+m_bAllowRestartableProcessing(false)
 {
 	try
 	{
@@ -152,6 +154,7 @@ m_bCheckedFeatures(false)
 		// Store pointers to the db lock variables.
 		m_mapDbLocks[gstrMAIN_DB_LOCK] = &ms_semaphoreMainLock;
 		m_mapDbLocks[gstrUSER_COUNTER_DB_LOCK] = &ms_semaphoreUserCounterLock;
+		m_mapDbLocks[gstrWORKITEM_DB_LOCK] = &ms_semaphoreWorkItemLock;
 
 		// If PDF support is licensed initialize support
 		// NOTE: no exception is thrown or logged if PDF support is not licensed.
@@ -2863,7 +2866,210 @@ STDMETHODIMP CFileProcessingDB::DuplicateConnection(IFileProcessingDB *pConnecti
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36074")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkItemsForGroup(long nWorkItemGroupID, long nStartPos, long nCount, IIUnknownVector **ppWorkItems)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+	try
+	{
+		validateLicense();
+		
+		if (!GetWorkItemsForGroup_Internal(false, nWorkItemGroupID, nStartPos, nCount, ppWorkItems))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			GetWorkItemsForGroup_Internal(true, nWorkItemGroupID, nStartPos, nCount, ppWorkItems);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36892");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkItemGroupStatus(long nWorkItemGroupID, WorkItemGroupStatus *pWorkGroupStatus, 
+	EWorkItemStatus *pStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!GetWorkItemGroupStatus_Internal(false, nWorkItemGroupID, pWorkGroupStatus, pStatus))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			GetWorkItemGroupStatus_Internal(true, nWorkItemGroupID, pWorkGroupStatus, pStatus);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36893");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::CreateWorkItemGroup(long nFileID, long nActionID,  
+			BSTR stringizedTask, long nNumberOfWorkItems, long *pnWorkItemGroupID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!CreateWorkItemGroup_Internal(false, nFileID, nActionID, stringizedTask, nNumberOfWorkItems, pnWorkItemGroupID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			CreateWorkItemGroup_Internal(true,  nFileID, nActionID, stringizedTask, nNumberOfWorkItems, pnWorkItemGroupID);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37092");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AddWorkItems(long nWorkItemGroupID, IIUnknownVector *pWorkItems)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!AddWorkItems_Internal(false, nWorkItemGroupID, pWorkItems))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			AddWorkItems_Internal(true, nWorkItemGroupID, pWorkItems);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36894");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkItemToProcess(long nActionID, VARIANT_BOOL vbRestrictToUPI, IWorkItemRecord **pWorkItem)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!GetWorkItemToProcess_Internal(false, nActionID, vbRestrictToUPI, pWorkItem))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			GetWorkItemToProcess_Internal(true, nActionID, vbRestrictToUPI, pWorkItem);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36895");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::NotifyWorkItemFailed(long nWorkItemID, BSTR stringizedException)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!NotifyWorkItemFailed_Internal(false, nWorkItemID, stringizedException))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			NotifyWorkItemFailed_Internal(true, nWorkItemID, stringizedException);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36896");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::NotifyWorkItemCompleted(long nWorkItemID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!NotifyWorkItemCompleted_Internal(false, nWorkItemID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			NotifyWorkItemCompleted_Internal(true, nWorkItemID);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36897");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkGroupData(long WorkItemGroupID, long *pnNumberOfWorkItems,
+	BSTR *pstringizedTask)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!GetWorkGroupData_Internal(false, WorkItemGroupID, pnNumberOfWorkItems, pstringizedTask))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			GetWorkGroupData_Internal(true, WorkItemGroupID, pnNumberOfWorkItems, pstringizedTask);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36898");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SaveWorkItemOutput(long WorkItemID, BSTR strWorkItemOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!SaveWorkItemOutput_Internal(false, WorkItemID, strWorkItemOutput))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			SaveWorkItemOutput_Internal(true, WorkItemID, strWorkItemOutput);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36920");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::FindWorkItemGroup(long nFileID, long nActionID,  
+			BSTR stringizedTask, long nNumberOfWorkItems, long *pnWorkItemGroupID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!FindWorkItemGroup_Internal(false, nFileID, nActionID, stringizedTask, nNumberOfWorkItems, pnWorkItemGroupID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			FindWorkItemGroup_Internal(true,  nFileID, nActionID, stringizedTask, nNumberOfWorkItems, pnWorkItemGroupID);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37164");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

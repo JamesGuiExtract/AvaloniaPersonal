@@ -8,6 +8,8 @@
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <ValueRestorer.h>
+#include <Win32Semaphore.h>
+#include <UPI.h>
 
 //-------------------------------------------------------------------------------------------------
 // StandbyThread

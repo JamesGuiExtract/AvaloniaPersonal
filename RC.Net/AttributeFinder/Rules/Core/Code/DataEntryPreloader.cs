@@ -1,7 +1,7 @@
 ﻿using Extract.DataEntry.Utilities.DataEntryApplication;
 using Extract.Interop;
 using Extract.Licensing;
-using Extract.Utilities.Forms;
+using Extract.Utilities;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -21,7 +21,7 @@ namespace Extract.AttributeFinder.Rules
     [CLSCompliant(false)]
     public interface IDataEntryPreloader : IOutputHandler, ICategorizedComponent,
         IConfigurableObject, ICopyableObject, ILicensedComponent, IPersistStream,
-        IMustBeConfiguredObject, IIdentifiableRuleObject
+        IMustBeConfiguredObject, IIdentifiableObject
     {
         /// <summary>
         /// Gets or sets the data entry configuration file defining the data entry configuration
@@ -49,7 +49,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("21FE6DF3-6C14-42C5-9170-4F2CC84EB982")]
     [CLSCompliant(false)]
-    public class DataEntryPreloader : IdentifiableRuleObject, IDataEntryPreloader, IDisposable
+    public class DataEntryPreloader : IdentifiableObject, IDataEntryPreloader, IDisposable
     {
         #region Constants
 
@@ -401,7 +401,7 @@ namespace Extract.AttributeFinder.Rules
                 {
                     ConfigFileName = reader.ReadString();
 
-                    // Load the GUID for the IIdentifiableRuleObject interface.
+                    // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
 
@@ -435,7 +435,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

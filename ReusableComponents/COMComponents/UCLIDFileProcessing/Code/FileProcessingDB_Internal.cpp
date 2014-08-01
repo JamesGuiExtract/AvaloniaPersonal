@@ -181,6 +181,11 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			+ getCurrentUserName() + "' AS UserName, FAMFile.ID, "
 			+ strActionID + " AS ActionID FROM FAMFile WHERE FAMFile.ID IN (" : "";
 
+		// This is used when processing state changes to "U", "C", "F" and if restartable processing
+		// is turned off "P"
+		string strDeleteWorkItemGroup = "DELETE FROM WorkItemGroup WHERE ActionID = " + asString(nActionID)
+			+ " AND FileID IN (";
+
 		// Execute the queries in groups of 10000 File IDs
 		size_t i=0;
 		size_t count = vecSetData.size();
@@ -210,6 +215,11 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			executeCmdQuery(ipConnection, strDeleteLockedFile + strFileIdList);
 			executeCmdQuery(ipConnection, strRemoveSkippedFile + strFileIdList);
 			executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange + strFileIdList);
+			if ((!m_bAllowRestartableProcessing && strState == "P") || strState == "U" 
+                || strState == "C" || strState == "F")
+			{
+				executeCmdQuery(ipConnection, strDeleteWorkItemGroup + strFileIdList);
+			}
 
 			if (!strClearComments.empty())
 			{
@@ -532,6 +542,18 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 			}
 			_lastCodePos = "330";
+
+			// Remove WorkItemGroups when file status changes -- if processing will be allowed to
+			// stop before all work items complete then this will need to be changed to 
+			// only delete if new status is 'U', 'C' or 'F'
+			if ((!m_bAllowRestartableProcessing && strState == "P") || strNewState == "U" || strNewState == "C" || strNewState == "F")
+			{
+				string strDeleteWorkItemGroupQuery = "DELETE FROM WorkItemGroup WHERE FileID = " + asString(nFileID)
+					+ " AND ActionID = " + asString(nActionID);
+				executeCmdQuery(ipConnection, strDeleteWorkItemGroupQuery);
+			}
+
+			_lastCodePos = "340";
 		}
 		else
 		{
@@ -1163,6 +1185,10 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
 		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX);
+		vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_UPI_INDEX);
+		vecQueries.push_back(gstrCREATE_WORK_ITEM_STATUS_INDEX);
+		vecQueries.push_back(gstrCREATE_WORK_ITEM_ID_STATUS_INDEX);
+		vecQueries.push_back(gstrCREATE_WORK_ITEM_UPI_INDEX);
 		
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -1225,6 +1251,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_ACTION_FK);
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_MACHINE_FK);
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_USER_FK);
+		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_ACTION_FK);
+		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_WORK_ITEM__WORK_ITEM_GROUP_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1353,6 +1382,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_FTP_ACCOUNT);
 	vecQueries.push_back(gstrCREATE_FTP_EVENT_HISTORY_TABLE);
 	vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_TABLE);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_TABLE);
 
 	return vecQueries;
 }
@@ -1607,6 +1638,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrEMAIL_PASSWORD] = "";
 	mapDefaultValues[gstrEMAIL_TIMEOUT] = "0";
 	mapDefaultValues[gstrEMAIL_USE_SSL] = "0";
+	mapDefaultValues[gstrALLOW_RESTARTABLE_PROCESSING] = "0";
 	try
 	{
 		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = getSQLServerDateTime(getDBConnection());
@@ -2679,6 +2711,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrDB_FIELD_SEARCH);
 	vecTables.push_back(gstrDB_FILE_HANDLER);
 	vecTables.push_back(gstrDB_FEATURE);
+	vecTables.push_back(gstrWORK_ITEM);
+	vecTables.push_back(gstrWORK_ITEM_GROUP);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -2736,6 +2770,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 		m_iNumberOfRetries = giDEFAULT_RETRY_COUNT;
 		m_dRetryTimeout = gdDEFAULT_RETRY_TIMEOUT;
 		m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
+		m_bAllowRestartableProcessing = false;
 
 		// Only load the settings if the table exists
 		if (doesTableExist(getDBConnection(), "DBInfo"))
@@ -2936,6 +2971,11 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							_lastCodePos = "290";
 
 							m_bStoreFTPEventHistory = getStringField(ipFields, "Value") == "1";
+						}
+						else if (strValue == gstrALLOW_RESTARTABLE_PROCESSING)
+						{
+							_lastCodePos = "300";
+							m_bAllowRestartableProcessing = getStringField(ipFields, "Value") == "1";
 						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
@@ -3806,6 +3846,12 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		string strQuery = "DELETE FROM ActiveFAM WHERE ID = " + asString(nUPIID); 
 		executeCmdQuery(ipConnection, strQuery);
 
+		if (m_bAllowRestartableProcessing)
+		{
+			// Reset any work items that have a status of processing but the FAM is no longer active.
+			executeCmdQuery(ipConnection, gstrRESET_ORPHANED_WORK_ITEM_QUERY);
+		}
+
 		// Set up the logged exception if it is not null
 		if (pUE != __nullptr)
 		{
@@ -4414,7 +4460,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			StopWatch swTransactionRetryTimeout;
 			swTransactionRetryTimeout.start();
 
-			// Retry the transaction until successfull
+			// Retry the transaction until successful
 			while (!bTransactionSuccessful)
 			{
 				// Begin a transaction
@@ -5102,6 +5148,133 @@ void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipCo
 		
 		ipProdSpecificDBMgr->UpdateSchemaForFAMDBVersion(getThisAsCOMPtr(), ipConnection,
 			nFAMSchemaVersion, &(rmapProductSpecificVersions[strId]), pnStepCount, ipProgressStatus);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::getWorkItemFromFields(const FieldsPtr& ipFields)
+{
+	// Make sure the ipFields argument is not NULL
+	ASSERT_ARGUMENT("ELI36878", ipFields != __nullptr);
+
+	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItemRecord(CLSID_WorkItemRecord);
+	ASSERT_RESOURCE_ALLOCATION("ELI36879", ipWorkItemRecord != __nullptr);
+	
+	// Set the file data from the fields collection (set ActionID to 0)
+	ipWorkItemRecord->WorkItemID = getLongField(ipFields, "ID");
+	ipWorkItemRecord->WorkItemGroupID = getLongField(ipFields, "WorkItemGroupID");
+	switch (getStringField(ipFields, "Status")[0])
+	{
+	case 'P': 
+		ipWorkItemRecord->Status = (UCLID_FILEPROCESSINGLib::EWorkItemStatus)kWorkUnitPending;
+		break;
+	case 'R':
+		ipWorkItemRecord->Status = (UCLID_FILEPROCESSINGLib::EWorkItemStatus)kWorkUnitProcessing;
+		break;
+	case 'C':
+		ipWorkItemRecord->Status = (UCLID_FILEPROCESSINGLib::EWorkItemStatus)kWorkUnitComplete;
+		break;
+	case 'F':		
+		ipWorkItemRecord->Status = (UCLID_FILEPROCESSINGLib::EWorkItemStatus)kWorkUnitFailed;
+		break;
+	default:
+		THROW_LOGIC_ERROR_EXCEPTION("ELI36877");
+	};
+
+	ipWorkItemRecord->Input = getStringField(ipFields, "Input").c_str();
+	ipWorkItemRecord->Output = getStringField(ipFields, "Output").c_str();
+	ipWorkItemRecord->UPI = getStringField(ipFields, "UPI").c_str();
+	ipWorkItemRecord->StringizedException = getStringField(ipFields, "StringizedException").c_str();
+	ipWorkItemRecord->FileName = getStringField(ipFields, "FileName").c_str();
+
+	return ipWorkItemRecord;
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::setWorkItemToProcessing(bool bDBLocked, 
+	long nActionID, bool bRestrictToUPI, const _ConnectionPtr &ipConnection)
+{
+	// Declare query string so that if there is an exception the query can be added to debug info
+	string strQuery;
+	try
+	{
+		try
+		{
+			bool bTransactionSuccessful = false;
+
+			// Start the stopwatch to use to check for transaction timeout
+			StopWatch swTransactionRetryTimeout;
+			swTransactionRetryTimeout.start();
+
+			// Set to the query to get workitems to process
+			strQuery = gstrGET_WORK_ITEM_TO_PROCESS;
+			replaceVariable(strQuery, "<ActionID>", asString(nActionID));
+			replaceVariable(strQuery, "<UPI>", m_strUPI);
+			replaceVariable(strQuery, "<GroupUPI>", (bRestrictToUPI) ? m_strUPI:"");
+			
+			UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = __nullptr;
+
+			// Retry the transaction until successful
+			while (!bTransactionSuccessful)
+			{
+				try
+				{
+					// Begin a transaction
+					TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);	
+
+					try
+					{
+						variant_t vtRecordsAffected = 0L;
+						_RecordsetPtr ipWorkItemSet = ipConnection->Execute(strQuery.c_str(), &vtRecordsAffected,  adCmdText);
+						ASSERT_RESOURCE_ALLOCATION("ELI36887", ipWorkItemSet != __nullptr);
+						
+						if (!asCppBool(ipWorkItemSet->adoEOF))
+						{
+							// Get the fields from the file set
+							FieldsPtr ipFields = ipWorkItemSet->Fields;
+							ASSERT_RESOURCE_ALLOCATION("ELI36888", ipFields != __nullptr);
+
+							ipWorkItem = getWorkItemFromFields(ipFields);
+							
+							// Commit the changes to the database
+							tg.CommitTrans();
+						}
+
+						bTransactionSuccessful = true;
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36889");
+				}
+				catch (UCLIDException &ue)
+				{
+					// Check if this is a bad connection
+					if (!isConnectionAlive(ipConnection))
+					{
+						// if the connection is not alive just rethrow the exception 
+						throw ue;
+					}
+
+					// Check to see if the timeout value has been reached
+					if (swTransactionRetryTimeout.getElapsedTime() > m_dGetFilesToProcessTransactionTimeout)
+					{
+						UCLIDException uex("ELI36890", "Application Trace: Transaction retry timed out.", ue);
+						uex.addDebugInfo(gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT, 
+							asString(m_dGetFilesToProcessTransactionTimeout));
+						throw uex;
+					}
+
+					// In the case that the the exception is because the database has gotten into an
+					// inconsistent state (as with LegacyRCAndUtiles:6350), use a small sleep here to
+					// prevent thousands (or millions) of successive failures which may bog down the
+					// DB and burn through table IDs.
+					Sleep(100);
+				}
+			}
+			return ipWorkItem;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36891");
+	}
+	catch (UCLIDException &ue)
+	{
+		ue.addDebugInfo("Record Query", strQuery, true);
+		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------

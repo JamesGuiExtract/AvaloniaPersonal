@@ -20,7 +20,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 const EPMReturnMatchType eDEFAULT_RETURN_MATCH_TYPE = kReturnFirstMatch;
 
@@ -66,7 +66,7 @@ STDMETHODIMP CREPMFinder::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject,
+		&IID_IIdentifiableObject,
 		&IID_IPersistStream
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -747,7 +747,7 @@ STDMETHODIMP CREPMFinder::Load(IStream *pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -801,7 +801,7 @@ STDMETHODIMP CREPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		writeObjectToStream(ipObj, pStream, "ELI33285", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -821,7 +821,7 @@ STDMETHODIMP CREPMFinder::GetSizeMax(ULARGE_INTEGER *pcbSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CREPMFinder::get_InstanceGUID(GUID *pVal)
 {

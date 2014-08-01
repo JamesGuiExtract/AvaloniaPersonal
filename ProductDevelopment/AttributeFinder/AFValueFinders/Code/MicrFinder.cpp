@@ -25,7 +25,7 @@ using namespace::std;
 // Constants
 //-------------------------------------------------------------------------------------------------
 // version 2 - Added rotations to search for
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 static const unsigned long gulCURRENT_VERSION = 3;
 
 // File containing a regex to use for finding the old style routing number near the top of
@@ -500,7 +500,7 @@ STDMETHODIMP CMicrFinder::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICategorizedComponent,
 			&IID_ICopyableObject,
 			&IID_ILicensedComponent,
-			&IID_IIdentifiableRuleObject
+			&IID_IIdentifiableObject
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -705,7 +705,7 @@ STDMETHODIMP CMicrFinder::Load(IStream * pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -753,7 +753,7 @@ STDMETHODIMP CMicrFinder::Save(IStream * pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -1089,7 +1089,7 @@ STDMETHODIMP CMicrFinder::put_Rotate270(VARIANT_BOOL newVal)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMicrFinder::get_InstanceGUID(GUID *pVal)
 {

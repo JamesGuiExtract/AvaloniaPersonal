@@ -11,7 +11,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ STDMETHODIMP CCharacterConfidenceCondition::InterfaceSupportsErrorInfo(REFIID ri
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -312,7 +312,7 @@ STDMETHODIMP CCharacterConfidenceCondition::Load(IStream *pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -358,7 +358,7 @@ STDMETHODIMP CCharacterConfidenceCondition::Save(IStream *pStream, BOOL fClearDi
 		pStream->Write(&nDataLength, sizeof(nDataLength), __nullptr);
 		pStream->Write(data.getData(), nDataLength, __nullptr);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -715,7 +715,7 @@ STDMETHODIMP CCharacterConfidenceCondition::put_IsMet( VARIANT_BOOL newVal)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CCharacterConfidenceCondition::get_InstanceGUID(GUID *pVal)
 {

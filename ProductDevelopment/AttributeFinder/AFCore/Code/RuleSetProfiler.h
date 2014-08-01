@@ -44,7 +44,7 @@ public:
 	// These constructors start profiling a call for the object described in the parameters.
 	CRuleSetProfiler(const string& strName, const string& strType, const GUID& guid, int nSubID = 0);
 	CRuleSetProfiler(const string& strName, const string& strType,
-		UCLID_AFCORELib::IIdentifiableRuleObjectPtr ipIdentifiableRuleObject, int nSubID = 0);
+		UCLID_COMUTILSLib::IIdentifiableObjectPtr ipIdentifiableObject, int nSubID = 0);
 	
 	~CRuleSetProfiler();
 
@@ -76,7 +76,7 @@ private:
 		// Implement not equal to assist in checking for handle collisions.
 		bool operator!= (const ProfilerID& other) const;
 
-		// The InstanceGUID from the IIdentifiableRuleObject the CRuleSetProfiler is associated with.
+		// The InstanceGUID from the IIdentifiableObject the CRuleSetProfiler is associated with.
 		GUID m_GUID;
 
 		// If there are more than one CRuleSetProfilers associated with a rule object, this identifies
@@ -168,7 +168,7 @@ private:
 	if (CRuleSetProfiler::ms_bEnabled) \
 	{ \
 		upProfiler.reset(new CRuleSetProfiler(strName, strType, \
-			UCLID_AFCORELib::IIdentifiableRuleObjectPtr(object), nSubID)); \
+			UCLID_COMUTILSLib::IIdentifiableObjectPtr(object), nSubID)); \
 	}
 
 // Use this macro in code to add profiling data for something other than a rule object.

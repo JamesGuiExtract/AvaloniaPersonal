@@ -142,7 +142,7 @@ public:
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, IAFDocument *pDoc, BSTR *pbstrOutput);
 	STDMETHOD(RemoveMetadataAttributes)(IIUnknownVector* pvecAttributes);
 	STDMETHOD(StartProfilingRule)(BSTR bstrName, BSTR bstrType,
-		IIdentifiableRuleObject *pRuleObject, long nSubID, long* pnHandle);
+		IIdentifiableObject *pRuleObject, long nSubID, long* pnHandle);
 	STDMETHOD(StopProfilingRule)(long nHandle);
 	STDMETHOD(ValidateAsExplicitPath)(BSTR bstrEliCode, BSTR bstrFilename);
 	STDMETHOD(GetNewRegExpParser)(IAFDocument *pDoc, IRegularExprParser **ppRegExParser);

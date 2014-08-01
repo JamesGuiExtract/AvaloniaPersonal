@@ -5,7 +5,7 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 #include <vector>
 
@@ -23,8 +23,8 @@ class ATL_NO_VTABLE COutputHandlerSequence :
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMultipleObjectHolder, &IID_IMultipleObjectHolder, &LIBID_UCLID_COMUTILSLib>,
 	public ISpecifyPropertyPagesImpl<COutputHandlerSequence>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	COutputHandlerSequence();
@@ -45,7 +45,7 @@ BEGIN_COM_MAP(COutputHandlerSequence)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IMultipleObjectHolder)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(COutputHandlerSequence)
@@ -91,7 +91,7 @@ public:
 	STDMETHOD(raw_GetObjectType)(/*[out, retval]*/BSTR *pstrObjectType);
 	STDMETHOD(raw_GetRequiredIID)(/*[out, retval]*/ IID *riid);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

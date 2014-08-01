@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="DataCache.cs" />
     <Compile Include="DateTimeMethods.cs" />
+    <Compile Include="IdentifiableObject.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -135,6 +136,10 @@
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
       <Name>Extract.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj">
+      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
+      <Name>Extract.Interop</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>

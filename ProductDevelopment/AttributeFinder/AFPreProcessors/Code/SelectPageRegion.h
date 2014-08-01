@@ -6,7 +6,7 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 
 #include <MiscLeadUtils.h>
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 #include <string>
 #include <vector>
@@ -28,8 +28,8 @@ class ATL_NO_VTABLE CSelectPageRegion :
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IPersistStream,
 	public ISpecifyPropertyPagesImpl<CSelectPageRegion>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CSelectPageRegion();
@@ -51,7 +51,7 @@ BEGIN_COM_MAP(CSelectPageRegion)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CSelectPageRegion)
@@ -132,7 +132,7 @@ public:
 	STDMETHOD(raw_Clone)(/*[out, retval]*/ IUnknown* *pObject);
 	STDMETHOD(raw_CopyFrom)(/*[in]*/ IUnknown *pObject);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

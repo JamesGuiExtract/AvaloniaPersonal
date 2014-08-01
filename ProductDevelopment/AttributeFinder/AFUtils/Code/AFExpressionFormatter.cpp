@@ -47,7 +47,7 @@ void CAFExpressionFormatter::FinalRelease()
 		m_ipAFDocument = __nullptr;
 		m_ipAFUtility = __nullptr;
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI36206");
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI37169");
 }
 
 //--------------------------------------------------------------------------------------------------

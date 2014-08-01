@@ -27,6 +27,7 @@ UPI::UPI(const string& strUPI)
 			m_ulProcessID = asUnsignedLong(vecTokens[2]);
 			m_strStartDate = vecTokens[3];
 			m_strStartTime = vecTokens[4];
+			m_strProcessSemaphoreName = "Local\\" + asString(vecTokens);
 		}
 		else
 		{
@@ -56,6 +57,7 @@ UPI& UPI::operator=(const UPI& upiToAssign)
 	m_ulProcessID = upiToAssign.m_ulProcessID;
 	m_strStartDate = upiToAssign.m_strStartDate;
 	m_strStartTime = upiToAssign.m_strStartTime;
+	m_strProcessSemaphoreName = upiToAssign.m_strProcessSemaphoreName;
 
 	return *this;
 }
@@ -88,6 +90,10 @@ const string& UPI::getStartTime() const
 const string& UPI::getStartDate() const
 {
 	return m_strStartDate;
+}
+const std::string& UPI::getProcessSemaphoreName() const
+{
+	return m_strProcessSemaphoreName;
 }
 //-------------------------------------------------------------------------------------------------
 const UPI& UPI::getCurrentProcessUPI()

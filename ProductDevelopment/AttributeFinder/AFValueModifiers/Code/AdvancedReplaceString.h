@@ -7,7 +7,7 @@
 #include "..\..\AFCore\Code\StringLoader.h"
 
 #include <CachedObjectFromFile.h>
-#include <IdentifiableRuleObject.h>
+#include <IdentifiableObject.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CAdvancedReplaceString
@@ -24,8 +24,8 @@ class ATL_NO_VTABLE CAdvancedReplaceString :
 	public IDispatchImpl<IDocumentPreprocessor, &IID_IDocumentPreprocessor, &LIBID_UCLID_AFCORELib>,
 	public IPersistStream,
 	public ISpecifyPropertyPagesImpl<CAdvancedReplaceString>,
-	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
-	private CIdentifiableRuleObject
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	private CIdentifiableObject
 {
 public:
 	CAdvancedReplaceString();
@@ -47,7 +47,7 @@ BEGIN_COM_MAP(CAdvancedReplaceString)
 	COM_INTERFACE_ENTRY(IDocumentPreprocessor)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
-	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CAdvancedReplaceString)
@@ -104,7 +104,7 @@ public:
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
-// IIdentifiableRuleObject
+// IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:

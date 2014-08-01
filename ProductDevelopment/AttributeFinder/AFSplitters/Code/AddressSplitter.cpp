@@ -16,7 +16,7 @@
 //   * Saves the version only.
 // Version 2:
 //   * Saves the Combined Name Address setting
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ STDMETHODIMP CAddressSplitter::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_ICategorizedComponent,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableRuleObject
+		&IID_IIdentifiableObject
 	};
 
 	for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -283,7 +283,7 @@ STDMETHODIMP CAddressSplitter::Load(IStream *pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -320,7 +320,7 @@ STDMETHODIMP CAddressSplitter::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -371,7 +371,7 @@ STDMETHODIMP CAddressSplitter::put_CombinedNameAddress(VARIANT_BOOL newVal)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAddressSplitter::get_InstanceGUID(GUID *pVal)
 {

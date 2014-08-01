@@ -1,5 +1,6 @@
 ﻿using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -17,7 +18,7 @@ namespace Extract.AttributeFinder.Rules
     [Guid("C65C9DFD-E43A-42A4-9A6F-5FEA604C2ED6")]
     [CLSCompliant(false)]
     public interface IInputFinder : IAttributeFindingRule, ICategorizedComponent,
-        ICopyableObject, ILicensedComponent, IPersistStream, IIdentifiableRuleObject
+        ICopyableObject, ILicensedComponent, IPersistStream, IIdentifiableObject
     {
     }
 
@@ -28,7 +29,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("26F84085-12B8-48EC-A654-5A47508A3DF9")]
     [CLSCompliant(false)]
-    public class InputFinder : IdentifiableRuleObject, IInputFinder
+    public class InputFinder : IdentifiableObject, IInputFinder
     {
         #region Constants
 
@@ -241,7 +242,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    // Load the GUID for the IIdentifiableRuleObject interface.
+                    // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
 
@@ -273,7 +274,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.WriteTo(stream);
                 }
 
-                // Save the GUID for the IIdentifiableRuleObject interface.
+                // Save the GUID for the IIdentifiableObject interface.
                 SaveGuid(stream);
 
                 if (clearDirty)

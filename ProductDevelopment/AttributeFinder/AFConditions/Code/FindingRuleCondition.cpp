@@ -11,7 +11,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added CIdentifiableRuleObject
+// Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
 //--------------------------------------------------------------------------------------------------
@@ -310,7 +310,7 @@ STDMETHODIMP CFindingRuleCondition::Load(IStream *pStream)
 
 		if (nDataVersion >= 2)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -350,7 +350,7 @@ STDMETHODIMP CFindingRuleCondition::Save(IStream *pStream, BOOL fClearDirty)
 		ASSERT_RESOURCE_ALLOCATION("ELI18264", ipRuleStream != __nullptr);
 		writeObjectToStream(ipRuleStream, pStream, "ELI18265", fClearDirty);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -418,7 +418,7 @@ STDMETHODIMP CFindingRuleCondition::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_IMustBeConfiguredObject,
 			&IID_ILicensedComponent,
-			&IID_IIdentifiableRuleObject
+			&IID_IIdentifiableObject
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -433,7 +433,7 @@ STDMETHODIMP CFindingRuleCondition::InterfaceSupportsErrorInfo(REFIID riid)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFindingRuleCondition::get_InstanceGUID(GUID *pVal)
 {

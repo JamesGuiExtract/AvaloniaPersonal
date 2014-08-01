@@ -132,7 +132,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;EXPORT_UCLIDCOMUtils_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -197,6 +197,7 @@
     </ClCompile>
     <ClCompile Include="COMMutex.cpp" />
     <ClCompile Include="DoublePoint.cpp" />
+    <ClCompile Include="IdentifiableObject.cpp" />
     <ClCompile Include="IUnknownVector.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -400,6 +401,8 @@
     <ClInclude Include="ClipboardObjectManager.h" />
     <ClInclude Include="COMMutex.h" />
     <ClInclude Include="DoublePoint.h" />
+    <ClInclude Include="ComUtilsExport.h" />
+    <ClInclude Include="IdentifiableObject.h" />
     <ClInclude Include="IUnknownVector.h" />
     <ClInclude Include="LongPoint.h" />
     <ClInclude Include="LongRectangle.h" />

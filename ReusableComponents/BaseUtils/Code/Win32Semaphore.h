@@ -48,4 +48,15 @@ private:
 	Win32Semaphore& rSemaphore;
 };
 
+class EXPORT_BaseUtils Win32SemaphoreUnLockGuard
+{
+public:
+	Win32SemaphoreUnLockGuard(Win32Semaphore& rSemaphore, DWORD dwAquireTimeout = INFINITE);
+	~Win32SemaphoreUnLockGuard();
+
+private:
+	Win32Semaphore& rSemaphore;
+	DWORD m_dwTimeoutToAquire;
+};
+
 #endif // WIN32_SEMAPHORE_HPP

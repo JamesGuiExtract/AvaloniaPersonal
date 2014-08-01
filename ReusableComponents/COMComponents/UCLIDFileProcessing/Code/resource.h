@@ -243,6 +243,7 @@
 #define IDC_DB_NAME_LABEL               2045
 #define IDC_ADV_PROP_LABEL              2046
 #define IDC_DB_GROUP_BOX                2047
+#define IDR_WORKITEMRECORD				2048
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -286,9 +287,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2048
+#define _APS_NEXT_RESOURCE_VALUE        2049
 #define _APS_NEXT_COMMAND_VALUE         32814
-#define _APS_NEXT_CONTROL_VALUE         2048
-#define _APS_NEXT_SYMED_VALUE           2048
+#define _APS_NEXT_CONTROL_VALUE         2049
+#define _APS_NEXT_SYMED_VALUE           2049
 #endif
 #endif

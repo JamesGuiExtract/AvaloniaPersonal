@@ -73,7 +73,7 @@ CRuleSetProfiler::CRuleSetProfiler(const CRuleSetProfiler& source)
 }
 //--------------------------------------------------------------------------------------------------
 CRuleSetProfiler::CRuleSetProfiler(const string& strName, const string& strType,
-	UCLID_AFCORELib::IIdentifiableRuleObjectPtr ipIdentifiableRuleObject, int nSubID/* = 0*/)
+	UCLID_COMUTILSLib::IIdentifiableObjectPtr ipIdentifiableObject, int nSubID/* = 0*/)
 : m_bActive(false)
 , m_strName(strName)
 , m_strType(strType)
@@ -82,14 +82,14 @@ CRuleSetProfiler::CRuleSetProfiler(const string& strName, const string& strType,
 {
 	try
 	{
-		if (ipIdentifiableRuleObject == __nullptr)
+		if (ipIdentifiableObject == __nullptr)
 		{
-			// If this isn't an ipIdentifiableRuleObject, it can't be profiled.
+			// If this isn't an ipIdentifiableObject, it can't be profiled.
 			return;
 		}
 
 		// Initialize the ID
-		m_ID.m_GUID = ipIdentifiableRuleObject->InstanceGUID;
+		m_ID.m_GUID = ipIdentifiableObject->InstanceGUID;
 		m_ID.m_nSubID = nSubID; 
 
 		if (m_strType.empty())
@@ -105,7 +105,7 @@ CRuleSetProfiler::CRuleSetProfiler(const string& strName, const string& strType,
 			else
 			{
 				// Else, if the object is a categorized component, use the component description.
-				ICategorizedComponentPtr ipCategorizedComponent(ipIdentifiableRuleObject);
+				ICategorizedComponentPtr ipCategorizedComponent(ipIdentifiableObject);
 				if (ipCategorizedComponent != __nullptr)
 				{
 					m_strType = asString(ipCategorizedComponent->GetComponentDescription());

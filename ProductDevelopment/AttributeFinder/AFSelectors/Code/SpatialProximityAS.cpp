@@ -13,7 +13,7 @@
 // Constants
 //--------------------------------------------------------------------------------------------------
 // Version 2: Added m_bTargetsMustContainReferences
-// Version 3: Added CIdentifiableRuleObject
+// Version 3: Added CIdentifiableObject
 const unsigned long gnCurrentVersion	= 3;
 const CRect grectNULL					= CRect(0, 0, 0, 0);
 
@@ -485,7 +485,7 @@ STDMETHODIMP CSpatialProximityAS::Load(IStream *pStream)
 
 		if (nDataVersion >= 3)
 		{
-			// Load the GUID for the IIdentifiableRuleObject interface.
+			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
 
@@ -541,7 +541,7 @@ STDMETHODIMP CSpatialProximityAS::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-		// Save the GUID for the IIdentifiableRuleObject interface.
+		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
 		// Clear the flag as specified
@@ -722,7 +722,7 @@ STDMETHODIMP CSpatialProximityAS::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_IMustBeConfiguredObject,
 			&IID_ILicensedComponent,
-			&IID_IIdentifiableRuleObject
+			&IID_IIdentifiableObject
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -735,7 +735,7 @@ STDMETHODIMP CSpatialProximityAS::InterfaceSupportsErrorInfo(REFIID riid)
 }
 
 //-------------------------------------------------------------------------------------------------
-// IIdentifiableRuleObject
+// IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialProximityAS::get_InstanceGUID(GUID *pVal)
 {
