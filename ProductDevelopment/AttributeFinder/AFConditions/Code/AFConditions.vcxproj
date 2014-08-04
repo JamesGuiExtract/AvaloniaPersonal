@@ -79,7 +79,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\AFCppUtils\Code;..\..\AFCore\Code;..\..\AFUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\AFCppUtils\Code;..\..\AFCore\Code;..\..\AFUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>

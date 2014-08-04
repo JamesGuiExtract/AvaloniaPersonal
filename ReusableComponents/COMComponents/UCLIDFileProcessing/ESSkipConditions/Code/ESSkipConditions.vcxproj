@@ -146,7 +146,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\FAMUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\FAMUtils\Code;..\..\..\UCLIDCOMUtils\Core\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

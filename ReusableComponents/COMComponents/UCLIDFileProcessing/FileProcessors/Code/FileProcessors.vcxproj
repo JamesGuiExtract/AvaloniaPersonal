@@ -130,7 +130,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\UCLIDFileProcessing\Code;..\..\..\..\APIs\LeadTools_17\Include;..\..\FAMUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\UCLIDFileProcessing\Code;..\..\..\..\APIs\LeadTools_17\Include;..\..\FAMUtils\Code;..\..\..\UCLIDCOMUtils\Core\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
