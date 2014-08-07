@@ -1,0 +1,334 @@
+<HTML>
+
+<HEAD>
+<TITLE>FAM Parallelization Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE Feature Testing<br>FAM Parallelization<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>Goals and Setup</h2>
+       	<ul>
+		<li>Install one or more of FLEX Index, ID Shield or LabDE as 
+		<b>local admin</b>.
+		<li>Prepare local copies of the appropriate testing files / folders.
+       		<li>Create a <b>PARALLEL</b> database with a <b>Test</b> action.
+		<ul>
+			<li>Set the <b>Auto-revert timeout</b> to <b>5</b> minutes.
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>General Testing</h2>
+       	<ul>
+		<li><u>ON versus OFF</u>
+		<ul>
+	        	<li>Process a single large document with <b>parallelization OFF</b> 
+			and the FPS file configured to use a specified number of threads. 
+			Record the processing time.
+			<ul>
+				<li><b>1</b> thread:  time = 
+				<li><b>2</b> threads: time = 
+				<li><b>3</b> threads: time = 
+				<li><b>4</b> threads: time = 
+				<li><b>5</b> threads: time = 
+				<li><b>6</b> threads: time = 
+			</ul>
+	        	<li>Process a single large document with <b>parallelization ON</b> 
+			and the FPS file configured to use a specified number of threads. 
+			Record the processing time.
+			<ul>
+				<li><b>1</b> thread:  time = 
+				<li><b>2</b> threads: time = 
+				<li><b>3</b> threads: time = 
+				<li><b>4</b> threads: time = 
+				<li><b>5</b> threads: time = 
+				<li><b>6</b> threads: time = 
+			</ul>
+			<li>Confirm that the processing time decreases in proportion to the 
+			number of threads used.
+			<li>Confirm that processing time no longer decreases when the number 
+			of threads is greater than the number of cores on the processing machine.
+		</ul>
+<p>
+		<li><u>PDF Documents</u>
+		<ul>
+	        	<li>Prepare a set of <b>PDF</b> documents, some small and some 
+			large.
+			<li>Confirm that all images process successfully with parallelization 
+			ON.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>ISSUE-12361: Test Blank Pages</b>
+       	<ul>
+  	   	<LI>Exercise parallelized OCR for the documents in 
+		<b>M:\PVCS_JIRA\JIRA\ISSUE-12361</b>.
+		<li>Confirm that each file OCRs without error.
+		<li>Confirm that the associated USS files show correct OCR results for 
+		each page beyond the blank pages.
+       	</ul>
+<p>
+	<LI><b>ISSUE-12362: Test OCR On Docs Where Pages Fail To OCR</b>
+       	<ul>
+  	   	<LI>Exercise parallelized OCR for the documents in 
+		<b>M:\PVCS_JIRA\JIRA\ISSUE-12362</b>.
+		<li>Confirm that each file OCRs without failure of an entire file.
+		<ul>
+			<li>Logged exceptions for failures on specified pages are okay.
+		</ul>
+		<li>Confirm that the associated USS files show correct OCR results for 
+		each page beyond the failed pages.
+       	</ul>
+<p>
+	<LI><b>ISSUE-12363: Test With Specified Pages Option</b>
+       	<ul>
+  	   	<LI>Exercise parallelized OCR for the documents in 
+		<b>M:\PVCS_JIRA\JIRA\ISSUE-12363</b>.
+		<li>Confirm that each file OCRs just pages <b>4</b>, <b>8</b>, and <b>12</b>.
+		<ul>
+			<li>Logged exceptions for failures on specified pages are okay.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>ISSUE-12364: Test Where Num Pages = Batch Size</b>
+       	<ul>
+  	   	<LI>Exercise parallelized OCR for the documents in 
+		<b>M:\PVCS_JIRA\JIRA\ISSUE-12364</b>.
+		<li>Exercise <b>QueueAndOCR-199.fps</b>.
+		<ul>
+			<li>Confirm proper operation.
+		</ul>
+		<li>Exercise <b>QueueAndOCR-200.fps</b>.
+		<ul>
+			<li>Confirm proper operation.
+		</ul>
+		<li>Exercise <b>QueueAndOCR-201.fps</b>.
+		<ul>
+			<li>Confirm proper operation.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>ISSUE-12365: Test DB Efficiency With No Processing Work Units</b>
+       	<ul>
+  	   	<LI><u>Single-Page Documents</u>
+		<ul>
+			<li>Create a large set of single-page images.
+			<li>Measure OCR processing time required on version 9.9.
+			<li>Measure OCR processing time required with parallelization 
+			on (but inactive) on version 10.
+		</ul>
+  	   	<LI><u>Multiple FAMs</u>
+		<ul>
+			<li>Prepare a set of images for verification.
+			<li>Add a new action to the database.
+			<li>Prepare a single-threaded FAM to process images in parallel 
+			using the new action.
+			<li>Start processing with many instances of the single-threaded 
+			FAM. Note that no actual processing is taking place.
+			<li>Confirm that database responsiveness is still acceptable for 
+			the verification activity.
+			<li>Confirm that database responsiveness is still acceptable for 
+			queuing files.
+			<li>Confirm that database responsiveness is still acceptable for 
+			running reports.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>ISSUE-12366: Test Multiple Parallelizable Tasks In Same FPS File</b>
+       	<ul>
+  	   	<LI>Use source files from <b>M:\PVCS_JIRA\JIRA\ISSUE-12366</b>.
+		<li><u>General</u>
+		<ul>
+			<li>Exercise <b>QueueAndThreePartOCR.fps</b>
+			<li>Confirm that three output USS files have appropriate 
+			contents: first 60 pages, second 60 pages, last 60 pages.
+			<li>Note the approximate processing times required for each 
+			USS file by examining END-Part1.txt, END-Part2.txt and 
+			END-Part3.txt.
+			<li>Delete the USS files and clear the database.
+		</ul>
+		<li><u>AllowRestartableProcessing = ON</u>
+		<ul>
+			<li>Confirm proper database setting.
+			<li>Start processing <b>QueueAndThreePartOCR.fps</b>
+			<li>Stop processing before the first OCR task has finished.
+			<li>Restart processing.
+			<li>Stop processing during the second OCR task.
+			<li>Confirm that the processing time required to finish the 
+			first USS file is reduced since previous intermediate results 
+			were retained.
+			<li>Restart processing.
+			<li>Confirm that the first OCR task fails because intermediate 
+			results cannot be found.
+		</ul>
+		<li><u>AllowRestartableProcessing = OFF</u>
+		<ul>
+			<li>Confirm proper database setting.
+			<li>Start processing <b>QueueAndThreePartOCR.fps</b>.
+			<li>Stop processing before all tasks have finished.
+			<li>Confirm that all tasks finish before processing actually 
+			stops.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>ISSUE-12367: Test Parallelized Task Within Condition</b>
+       	<ul>
+  	   	<LI>Clear the database.
+  	   	<LI>Use source files from <b>M:\PVCS_JIRA\JIRA\ISSUE-12367</b>.
+		<li>Exercise <b>QueueAndConditionallyOCR.fps</b>.
+		<li>Confirm that OCR results <b>are</b> available.
+		<li>Clear the database and delete any output files.
+		<li>Exercise <b>QueueAndConditionallyDoNotOCR.fps</b>.
+		<li>Confirm that OCR results <b>are not</b> available.
+		<li>Clear the database and delete any output files.
+		<li>Exercise <b>QueueAndTaskCondition.fps</b>, clearing the database 
+		and deleting any output files between runs.
+		<ul>
+			<li>Configure <b>AllowRestartableProcessing = OFF</b>.
+			<li>Stop processing during OCR.
+			<li>Confirm that OCR finishes completely.
+			<li>Confirm that the task condition is <b>met</b>.
+<p>
+			<li>Configure <b>AllowRestartableProcessing = ON</b>.
+			<li>Stop processing during OCR.
+			<li>Confirm that OCR does not finish completely.
+			<li>Confirm that the task condition is <b>not met</b>.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>ISSUE-12368: Test Temporary Work Files Are Cleaned Up</b>
+       	<ul>
+  	   	<LI>Process a single large document with parallelization ON.
+		<li>Confirm that USS files are generated for each individual page during 
+		processing.
+		<li>Confirm that the intermediate USS files are deleted after OCR is 
+		complete.
+       	</ul>
+<p>
+	<LI><b>ISSUE-12369: Test OCR Memory Usage And Speed Versus Non-Parallelized</b>
+       	<ul>
+  	   	<LI>Use source files from <b>M:\PVCS_JIRA\JIRA\ISSUE-12369</b>.
+  	   	<LI>Confirm that <b>parallelization = OFF</b>.
+		<li>Exercise <b>QueueAndOCRVeryLargeDocs.fps</b> with <b>LogProcessStats.exe</b> 
+		and note the processing time.
+		<li>Clear the database and delete any output files.
+  	   	<LI>Confirm that <b>parallelization = ON</b>.
+		<li>Exercise <b>QueueAndOCRVeryLargeDocs.fps</b> with <b>LogProcessStats.exe</b> 
+		and note the processing time.
+		<li>Confirm that the two processing times are approximately equal.
+		<li>Confirm that peak memory usages for the two tests are approximately equal.
+<p>
+		<li>Clear the database and delete any output files.
+		<li>Add copies of the 30+ test images from Demo_IDShield to the testing folder.
+		<li>Exercise <b>QueueAndOCRWithA.fps</b>.
+		<ul>
+			<li>Confirm that <b>A-0050pages.tif</b> is processed ahead of the 
+			<b>Demo_IDShield</b> images.
+			<li>Record the total processing (clock) time for the image set.
+		</ul>
+		<li>Exercise <b>QueueAndOCRWithZ.fps</b>.
+		<ul>
+			<li>Confirm that <b>Z-0050pages.tif</b> is processed after the 
+			<b>Demo_IDShield</b> images.
+			<li>Record the total processing (clock) time for the image set.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>ISSUE-12371: Test Stopping FAM With Active Parallelized Processing</b>
+       	<ul>
+  	   	<LI>Use source files from <b>M:\PVCS_JIRA\JIRA\ISSUE-12371</b>.
+  	   	<LI>Use DB Admin to confirm that <b>AllowRestartableProcessing</b> is OFF 
+		in the <b>PARALLEL</b> database.
+		<li>Open <b>ListenAndQueueFile1AndOCR.fps</b> and start processing.
+		<li>Drop <b>File01-150pages.tif</b> into the <b>Work</b> folder.
+		<li>Confirm that processing is active in the FAM.
+		<li>Stop processing for <b>ListenAndQueueFile1AndOCR.fps</b>.
+		<li>Confirm that processing continues because the file has not finished 
+		processing.
+		<li>Open <b>ListenAndQueueFile2AndOCR.fps</b> and start processing.
+		<li>Confirm that this FAM is processing work units.
+		<li>Drop <b>File02-180pages.tif</b> into the <b>Work</b> folder.
+		<li>Confirm that <b>File02-180pages.tif</b> is queued by 
+		<b>ListenAndQueueFile2AndOCR.fps</b>.
+		<li>Confirm that <b>ListenAndQueueFile1AndOCR.fps</b> does not process any 
+		work units for <b>File02-180pages.tif</b>.
+		<li>Confirm that <b>ListenAndQueueFile1AndOCR.fps</b> stops processing 
+		after processing has finished for <b>File01-150pages.tif</b>.
+       	</ul>
+<p>
+	<LI><b>ISSUE-12372: Test That Work Items Are Auto-Reset</b>
+       	<ul>
+  	   	<LI>Use source files from <b>M:\PVCS_JIRA\JIRA\ISSUE-12372</b>.
+  	   	<LI>Run <b>Queue.fps</b>.
+  	   	<LI>Run <b>Process-1.fps</b>.
+		<ul>
+			<li>Confirm that processing begins on the test image.
+		</ul>
+  	   	<LI>Run <b>Process-2.fps</b>.
+		<ul>
+			<li>Confirm that processing begins on the test image.
+		</ul>
+		<li>Force kill <b>Process-2.fps</b>.
+		<li>Confirm that processing continues on <b>Process-1.fps</b>.
+		<li>Confirm that after the auto-revert timeout period is finished, 
+		processing successfully completes on <b>Process-1.fps</b>.
+       	</ul>
+<p>
+	<LI><b>ISSUE-12382: Work Unit Processing With Scheduled Processing and Pause</b>
+       	<ul>
+  	   	<LI>TBD.
+       	</ul>
+<p>
+	<LI><b>ISSUE-12393: Centralized Exception Logging</b>
+       	<ul>
+  	   	<LI>Prepare a large set of multi-page images for parallel processing.
+  	   	<LI>Prepare one test machine for queuing and processing.
+  	   	<LI>Prepare two other test machines for processing.
+		<li>Set the following registry key on the remote test machines with 
+		the <b>IP Address</b> of the central machine.
+		<ul>
+			<li>HKEY_LOCAL_MACHINE\SOFTWARE\Extract Systems\ReusableComponents\
+			BaseUtils\RemoteExceptionServiceAddress
+		</ul>
+		<li>Confirm that exceptions from each test machine are logged to the central 
+		location.
+		<li>Confirm that parallel processing works as expected.
+       	</ul>
+<p>
+	<LI><h2>Miscellaneous</h2>
+       	<ul>
+		<li><b>ISSUE-12398</b> <u>Scheduled Processing</u>
+		<ul>
+			<li>Prepare a set of large images for parallel processing.
+			<li>Configure the FPS file for <b>Scheduled Processing</b> such 
+			that processing is expected to stop for one hour before it is 
+			complete.
+			<li>Modify the <b>AllowRestartableProcessing</b> flag from 
+			<b>DBInfo</b> from 0 to 1.
+			<li>Process the files.
+			<li>Confirm that the file still processing when the Stop Time is 
+			reached continues to process to completion.
+			<li>Confirm that other files do not start processing until after 
+			the Start Time is reached.
+		</ul>
+<p>
+		<li><u>Missing Intermediate Files</u>
+		<ul>
+			<li>Prepare a large image for parallel processing.
+			<li>Process the file.
+			<li>During processing, delete one or more of the intermediate 
+			USS files.
+			<li>Confirm that the file fails processing with a meaningful 
+			exception.
+			<li>Confirm that other intermediate files are automatically deleted.
+		</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>
