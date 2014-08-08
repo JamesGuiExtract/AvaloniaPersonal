@@ -137,7 +137,6 @@
     <ClCompile Include="DialogAdvanced.cpp" />
     <ClCompile Include="DialogSelect.cpp" />
     <ClCompile Include="DotNetUtils.cpp" />
-    <ClCompile Include="FAMDBSemaphore.cpp" />
     <ClCompile Include="FAMHelperFunctions.cpp" />
     <ClCompile Include="FAMUtils.cpp" />
     <ClCompile Include="FileProcessingConfigMgr.cpp" />
@@ -158,7 +157,6 @@
     <ClInclude Include="DialogAdvanced.h" />
     <ClInclude Include="DialogSelect.h" />
     <ClInclude Include="DotNetUtils.h" />
-    <ClInclude Include="FAMDBSemaphore.h" />
     <ClInclude Include="FAMHelperFunctions.h" />
     <ClInclude Include="FAMUtils.h" />
     <ClInclude Include="FAMUtilsConstants.h" />
