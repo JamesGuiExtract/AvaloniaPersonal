@@ -588,6 +588,15 @@ library UCLID_FILEPROCESSINGLib
 		//(SEE WorkItem related functions on IFileProcessingDB
 		[propget, id(8), helpstring ("property FileName")] HRESULT FileName([out, retval] BSTR *pFileName);
 		[propput, id(8), helpstring ("property FileName")] HRESULT FileName([in] BSTR FileName);
+
+		// The BinaryOutput property is used to save a streamable object to the BinaryOutput field 
+		// in the WorkItem table
+		[propget, id(9), helpstring ("property BinaryOutput")] HRESULT BinaryOutput([out, retval] IUnknown **ppBinaryOutput);
+		[propput, id(9), helpstring ("property BinaryOutput")] HRESULT BinaryOutput([in] IUnknown *pBinaryOutput);
+
+		[propget, id(10), helpstring ("property BinaryInput")] HRESULT BinaryInput([out, retval] IUnknown **ppBinaryInput);
+		[propput, id(10), helpstring ("property BinaryInput")] HRESULT BinaryInput([in] IUnknown *pBinaryInput);
+
 	}
 
 	[
@@ -1407,6 +1416,8 @@ library UCLID_FILEPROCESSINGLib
 		[id(125), helpstring("method FindWorkItemGroup")] HRESULT FindWorkItemGroup(
 			[in] long nFileID, [in] long nActionID, [in] BSTR stringizedTask, [in] long nNumberOfWorkItems,
 			[out, retval] long *pnWorkItemGroupID); 
+		[id(126), helpstring("method SaveWorkItemBinaryOutput")] HRESULT SaveWorkItemBinaryOutput(
+			[in] long WorkItemID, [in] IUnknown *pBinaryOutput);
 	};
 
 	[

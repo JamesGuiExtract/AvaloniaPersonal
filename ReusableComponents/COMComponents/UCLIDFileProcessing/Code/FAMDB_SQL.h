@@ -349,7 +349,9 @@ static const string gstrCREATE_WORK_ITEM_TABLE =
 	"[WorkItemGroupID] [int] NOT NULL,"
 	"[Status] [nchar](1) NOT NULL,"
 	"[Input] [nvarchar](MAX) NULL,"
+	"[BinaryInput] [varbinary](MAX) NULL,"
 	"[Output] [nvarchar](MAX) NULL,"
+	"[BinaryOutput] [varbinary](MAX) NULL,"
 	"[UPI] [nvarchar](450) NULL,"
 	"[Sequence] [int] NOT NULL,"
 	"[StringizedException] [nvarchar](MAX) NULL)";
@@ -1180,13 +1182,16 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 "		[Output] [text] NULL,\r\n"
 "		[UPI] [nvarchar](512) NULL,\r\n"	
 "		[FileName] [nvarchar](255) NULL,\r\n"
-"		[StringizedException] [nvarchar](MAX) NULL\r\n"
+"		[StringizedException] [nvarchar](MAX) NULL,\r\n"
+"		[BinaryOutput] [varbinary](MAX) NULL,\r\n"
+"		[BinaryInput] [varbinary](MAX) NULL \r\n"
 "	); \r\n"
 "	SET NOCOUNT ON \r\n"
 "	BEGIN TRY \r\n"
 "		UPDATE TOP(1) [dbo].WorkItem Set Status = 'R', UPI = '<UPI>'  \r\n"
 "		OUTPUT DELETED.ID, DELETED.WorkItemGroupID, WorkItemGroup.ActionID, INSERTED.Status, DELETED.[Input], "
-"			DELETED.[Output], INSERTED.UPI, FAMFile.FileName, DELETED.StringizedException INTO @OutputTableVar  \r\n"
+"			DELETED.[Output], INSERTED.UPI, FAMFile.FileName, DELETED.StringizedException, NULL, "
+"			DELETED.BinaryInput INTO @OutputTableVar  \r\n"
 "		FROM  WorkItem INNER JOIN WorkItemGroup ON WorkItemGroup.ID = WorkItem.WorkItemGroupID "
 "		INNER JOIN FAMFile ON FAMFile.ID = WorkItemGroup.FileID "
 "	WHERE WorkItem.ID IN ( "
@@ -1237,7 +1242,7 @@ const string gstrADD_WORK_ITEM_GROUP_QUERY =
 	"OUTPUT INSERTED.ID ";
 
 const string gstrADD_WORK_ITEM_QUERY =
-	"INSERT INTO [dbo].WorkItem (WorkItemGroupID, Status, Input, Output, UPI, Sequence)  VALUES ";
+	"INSERT INTO [dbo].WorkItem (WorkItemGroupID, Status, Input, BinaryInput, Output, UPI, Sequence)  VALUES ";
 
 const string gstrRESET_ORPHANED_WORK_ITEM_QUERY =
 	"UPDATE dbo.WorkItem SET [Status] = 'P' "
@@ -1255,6 +1260,8 @@ const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE =
     "  ,[Sequence] "
 	"  ,[stringizedException] "
 	"  ,[FileName] "
+	"  ,[BinaryOutput] "
+	"  ,[BinaryInput] "
 	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
 	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
 	"WHERE WorkItemGroupID = <WorkItemGroupID> "

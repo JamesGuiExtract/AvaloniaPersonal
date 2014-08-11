@@ -257,6 +257,7 @@ public:
 	STDMETHOD(SaveWorkItemOutput)(long WorkItemID, BSTR strWorkItemOutput);
 	STDMETHOD(FindWorkItemGroup)(long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
 			long *pnWorkItemGroupID);
+	STDMETHOD(SaveWorkItemBinaryOutput)(long WorkItemID, IUnknown *pBinaryOutput);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1072,6 +1073,7 @@ private:
 	bool SaveWorkItemOutput_Internal(bool bDBLocked, long WorkItemID, BSTR strWorkItemOutput);
 	bool FindWorkItemGroup_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
 			long *pnWorkItemGroupID);
+	bool SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long WorkItemID, IUnknown *pBinaryOutput);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

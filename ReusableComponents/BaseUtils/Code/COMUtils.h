@@ -136,4 +136,16 @@ void EXPORT_BaseUtils readStorageFromFile(IStorage** ppStorage, BSTR bstrFileNam
 void EXPORT_BaseUtils readStreamFromStorage(IStream** ppStream, IStoragePtr ipStorage, 
 	BSTR bstrStreamName);
 
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: Reads a IPersistStream object from a SAFEARRAY
+// PARAMS:  psaData - pointer to a SAFEARRAY that has one dimension and contains BTYE
+IPersistStreamPtr EXPORT_BaseUtils readObjFromSAFEARRAY(SAFEARRAY *psaData);
+
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: Writes the ipObj object to a SAFEARRAY
+// PARAMS:  ipObj - the object to stream to a SAFEARRAY
+// NOTE:	it is the responsibilty of the caller to make sure the SAFEARRAY is destroyed
+//			when it is done being used
+LPSAFEARRAY EXPORT_BaseUtils writeObjToSAFEARRAY(IPersistStreamPtr ipObj);
+
 #endif // COM_UTILS_H

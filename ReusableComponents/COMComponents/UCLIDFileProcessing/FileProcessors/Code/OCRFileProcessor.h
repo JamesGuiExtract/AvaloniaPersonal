@@ -165,7 +165,4 @@ private:
 	// Method that waits for work to complete
 	EFileProcessingResult waitForWorkToComplete(IProgressStatusPtr ipProgressStatus,
 		IFileProcessingDBPtr ipDB, long nWorkGroup, const string &strInputFileName);
-
-	// Deletes the output files for the individual work items
-	void cleanUpIntermediateFiles(long nWorkItemGroupID, IFileProcessingDBPtr ipDB);
 };

@@ -23,6 +23,7 @@ class ATL_NO_VTABLE CWorkItemRecord :
 {
 public:
 	CWorkItemRecord();
+	~CWorkItemRecord();
 
 DECLARE_REGISTRY_RESOURCEID(IDR_WORKITEMRECORD)
 
@@ -65,6 +66,10 @@ public:
 	STDMETHOD(put_StringizedException)(BSTR StringizedException);
 	STDMETHOD(get_FileName)(BSTR *pFileName);
 	STDMETHOD(put_FileName)(BSTR FileName);
+	STDMETHOD(get_BinaryOutput)(IUnknown **ppBinaryOutput);
+	STDMETHOD(put_BinaryOutput)(IUnknown *pBinaryOutput);
+	STDMETHOD(get_BinaryInput)(IUnknown **ppBinaryInput);
+	STDMETHOD(put_BinaryInput)(IUnknown *pBinaryInput);
 
 private:
 
@@ -77,6 +82,8 @@ private:
 	string m_strUPI;
 	string m_strStringizedException;
 	string m_strFileName;
+	IPersistStreamPtr m_ipBinaryOutput;
+	IPersistStreamPtr m_ipBinaryInput;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WorkItemRecord), CWorkItemRecord)

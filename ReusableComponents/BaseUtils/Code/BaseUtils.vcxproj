@@ -385,6 +385,7 @@
     <ClInclude Include="DateUtil.h" />
     <ClInclude Include="DocTagUtils.h" />
     <ClInclude Include="QuickMenuChooser.h" />
+    <ClInclude Include="SafeArrayAccessGuard.h" />
     <ClInclude Include="VectorOperations.h" />
     <ClInclude Include="WindowPersistenceMgr.h" />
     <ClInclude Include="EncryptedFileManager.h" />

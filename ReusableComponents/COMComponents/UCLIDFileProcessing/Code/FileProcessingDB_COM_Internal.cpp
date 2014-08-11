@@ -90,7 +90,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 118;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 119;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -806,6 +806,27 @@ int UpdateToSchemaVersion118(_ConnectionPtr ipConnection, long *pnNumSteps,
 	// Add default value for AllowRestartableProcessing.
 	vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 		+ gstrALLOW_RESTARTABLE_PROCESSING + "', '0')");
+
+	executeVectorOfSQL(ipConnection, vecQueries);
+
+	return nNewSchemaVersion;
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion119(_ConnectionPtr ipConnection, long *pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	int nNewSchemaVersion = 119;
+
+	if (pnNumSteps != __nullptr)
+	{
+		*pnNumSteps += 3;
+		return nNewSchemaVersion;
+	}
+
+	vector<string> vecQueries;
+	vecQueries.push_back(
+		"ALTER TABLE WorkItem ADD [BinaryInput] varbinary(max) NULL, [BinaryOutput] varbinary(max) NULL");
+	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -5706,7 +5727,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 115:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion116);
 				case 116:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion117);
 				case 117:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion118);
-				case 118:	break;
+				case 118:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion119);
+				case 119:	break;
 
 				default:
 					{
@@ -6457,6 +6479,7 @@ bool CFileProcessingDB::GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWo
 				if (ipWorkItemGroupSet->adoEOF == VARIANT_TRUE)
 				{
 					UCLIDException ue("ELI37103", "Work item group not found.");
+					ue.addDebugInfo("WorkItemID", strWorkItemGroupID);
 					throw ue;
 				}
 
@@ -6636,10 +6659,16 @@ bool CFileProcessingDB::AddWorkItems_Internal(bool bDBLocked, long nWorkItemGrou
 						strStatus = "C";
 						break;
 					}
+					string strBinaryInput = "NULL";
+					if (ipWorkItem->BinaryInput != __nullptr)
+					{
+						strBinaryInput = "0x" + asString(m_ipMiscUtils->GetObjectAsStringizedByteStream(ipWorkItem->BinaryInput));
+					}
 					strWorkItemSQL += (i==0) ? "": ", ";
 					strWorkItemSQL += " (" + strWorkItemGroupID + ", '" + strStatus +
-						"', '" + asString(ipWorkItem->Input) + "', '" + asString(ipWorkItem->Output) +
-						"', '" + asString(ipWorkItem->UPI) + "', " + asString(nNextSequence) + ")";
+						"', '" + asString(ipWorkItem->Input) + "', " + strBinaryInput + 
+						", '" + asString(ipWorkItem->Output) + "', '" + asString(ipWorkItem->UPI) + 
+						"', " + asString(nNextSequence) + ")";
 
 					nNextSequence++;
 				}
@@ -6965,6 +6994,72 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 			END_CONNECTION_RETRY(ipConnection, "ELI37107");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37108");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long WorkItemID, 
+	IUnknown *pBinaryOutput)
+{
+	try
+	{
+		try
+		{
+			// The query to select the work item to be updated
+			string strWorkItemQuery = "SELECT * FROM WorkItem WHERE ID = " + asString(WorkItemID);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+				
+				// Create a pointer to a recordset
+				_RecordsetPtr ipWorkItemSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37105", ipWorkItemSet != __nullptr);
+
+				// Execute the query to get the WorkItemID if it exists
+				ipWorkItemSet->Open(strWorkItemQuery.c_str(), 
+					_variant_t((IDispatch *)ipConnection, true),  adOpenDynamic, 
+					adLockOptimistic, adCmdText);
+
+				if (!asCppBool(ipWorkItemSet->adoEOF))
+				{
+					// Get the fields from the file set
+					FieldsPtr ipFields = ipWorkItemSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI37106", ipFields != __nullptr);
+
+					setIPersistObjToField(ipFields, "BinaryOutput", pBinaryOutput);
+
+					ipWorkItemSet->Update();
+				}
+				else
+				{
+					UCLIDException ue("ELI37207", "WorkItem is not longer in database.");
+					ue.addDebugInfo("WorkItemID", WorkItemID);
+					throw ue;
+				}
+
+				tg.CommitTrans();
+				
+			END_CONNECTION_RETRY(ipConnection, "ELI37171");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37172");
 	}
 	catch(UCLIDException &ue)
 	{

@@ -5185,6 +5185,8 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::getWorkItemFromFi
 	ipWorkItemRecord->UPI = getStringField(ipFields, "UPI").c_str();
 	ipWorkItemRecord->StringizedException = getStringField(ipFields, "StringizedException").c_str();
 	ipWorkItemRecord->FileName = getStringField(ipFields, "FileName").c_str();
+	ipWorkItemRecord->BinaryOutput = getIPersistObjFromField(ipFields, "BinaryOutput");
+	ipWorkItemRecord->BinaryInput = getIPersistObjFromField(ipFields, "BinaryInput");
 
 	return ipWorkItemRecord;
 }

@@ -441,6 +441,89 @@ double getDoubleField( const FieldsPtr& ipFields, const string& strFieldName )
 	}
 }
 //-------------------------------------------------------------------------------------------------
+IPersistStreamPtr getIPersistObjFromField(const FieldsPtr& ipFields, const string& strFieldName)
+{
+	// Use double try catch so that the field name can be added to the debug info
+	try
+	{
+		// Make sure ipFields is not NULL
+		ASSERT_ARGUMENT("ELI37208", ipFields != __nullptr );
+
+		try
+		{
+			// Get the Field from the fields list
+			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
+			ASSERT_RESOURCE_ALLOCATION("ELI37209", ipItem != __nullptr );
+
+			// Get the value
+			variant_t vtValue = ipItem->Value;
+
+			// if the value is null return null
+			if (vtValue.vt == VT_NULL)
+			{
+				return __nullptr;
+			}
+			// Make sure the data is an array of bytes
+			if (vtValue.vt != (VT_ARRAY | VT_UI1))
+			{
+				UCLIDException ue("ELI37183", "Must be a SAFEARRAY of Bytes.");
+				throw ue;
+			}
+			SAFEARRAY *psaData = vtValue.parray;
+	
+			return readObjFromSAFEARRAY(psaData);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37211");
+	}
+	catch(UCLIDException& ue)
+	{
+		// Add FieldName to the debug info
+		ue.addDebugInfo("FieldName", strFieldName);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void setIPersistObjToField(const FieldsPtr& ipFields, const string& strFieldName, IPersistStreamPtr ipObj)
+{
+	// Use double try catch so that the field name can be added to the debug info
+	try
+	{
+		// Make user ipFields is not NULL
+		ASSERT_ARGUMENT("ELI37204", ipFields != __nullptr );
+
+		try
+		{
+			// Get the Field from the fields list
+			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
+			ASSERT_RESOURCE_ALLOCATION("ELI37205", ipItem != __nullptr );
+
+			// set the variant type to the given value
+			variant_t vtItem;
+
+            // if the object is null set the field to null
+			if (ipObj == __nullptr)
+			{
+				vtItem.vt = VT_NULL;
+			}
+			else
+			{
+				vtItem.parray = writeObjToSAFEARRAY(ipObj); 
+				vtItem.vt = VT_ARRAY | VT_UI1;			
+			}
+
+			// Set the field to the variant type
+			ipItem->Value = vtItem;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37206");
+	}
+	catch(UCLIDException& ue)
+	{
+		// Add FieldName to the debug info
+		ue.addDebugInfo("FieldName", strFieldName);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection )
 {
 	ASSERT_ARGUMENT("ELI18817", ipDBConnection != __nullptr);

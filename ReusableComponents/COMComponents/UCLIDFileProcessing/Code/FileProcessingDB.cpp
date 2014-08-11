@@ -3070,6 +3070,26 @@ STDMETHODIMP CFileProcessingDB::FindWorkItemGroup(long nFileID, long nActionID,
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37164");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SaveWorkItemBinaryOutput(long WorkItemID, IUnknown *pBinaryOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!SaveWorkItemBinaryOutput_Internal(false, WorkItemID, pBinaryOutput))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+			SaveWorkItemBinaryOutput_Internal(true, WorkItemID, pBinaryOutput);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37171");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

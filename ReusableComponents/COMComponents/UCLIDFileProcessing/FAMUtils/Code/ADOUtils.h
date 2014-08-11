@@ -273,3 +273,13 @@ FAMUTILS_API FieldPtr getNamedField(const FieldsPtr& ipFields, const string& str
 FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& ipDestFields, 
 							  const string& strKeyTable, const string& strKeyCol,
 							  string strKeyValue, bool bAddKey);
+
+// PROMISE: To return the IPersistStreamObj saved in the field with name strFieldName
+// NOTE:	The named field is expected to be a variant_t with type VT_ARRAY | VT_UI1 (SAFEARRAY of bytes) 
+//			that had an object streamed to it.
+FAMUTILS_API IPersistStreamPtr getIPersistObjFromField(const FieldsPtr& ipFields, const string& strFieldName);
+
+// PROMISE: To save the ipObj in a SAFEARRAY and stores it in the field with the name strFieldName
+// NOTE:	This saves to a varbinary field in the database
+FAMUTILS_API void setIPersistObjToField(const FieldsPtr& ipFields, const string& strFieldName, 
+	IPersistStreamPtr ipObj );

@@ -237,41 +237,30 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			// Create the work items
 			long nWorkGroup = createWorkItems(nActionID, ipFileRecord, ipDB);
 			
-			try
+			IProgressStatusPtr ipProgressStatus(pProgressStatus);
+			EWorkItemStatus eGroupStatus;
+			EFileProcessingResult processingResult = 
+				waitForWorkToComplete(ipProgressStatus, ipDB, nWorkGroup, strInputFileName);
+
+			if (processingResult == kProcessingCancelled )
 			{
-				IProgressStatusPtr ipProgressStatus(pProgressStatus);
-				EWorkItemStatus eGroupStatus;
-				EFileProcessingResult processingResult = 
-					waitForWorkToComplete(ipProgressStatus, ipDB, nWorkGroup, strInputFileName);
-
-				if (processingResult == kProcessingCancelled )
-				{
-					*pResult = processingResult;
-					return S_OK;
-				}
-
-				// Stitch the results
-				ipSS = stitchWorkItems(strInputFileName ,nWorkGroup, ipDB);
-
-				if (ipProgressStatus != NULL)
-				{
-					ipProgressStatus->CompleteCurrentItemGroup();
-				}
-
-				if (ipSS == NULL)
-				{
-					*pResult = kProcessingCancelled;
-					return S_OK;
-				}
+				*pResult = processingResult;
+				return S_OK;
 			}
-			catch(...)
+
+			// Stitch the results
+			ipSS = stitchWorkItems(strInputFileName ,nWorkGroup, ipDB);
+
+			if (ipProgressStatus != NULL)
 			{
-				// There was an error and the file will be failed so clean up the intermediate files
-				cleanUpIntermediateFiles(nWorkGroup, ipDB);
-				throw;
+				ipProgressStatus->CompleteCurrentItemGroup();
 			}
-			// file was completed
-			cleanUpIntermediateFiles(nWorkGroup, ipDB);
+
+			if (ipSS == NULL)
+			{
+				*pResult = kProcessingCancelled;
+				return S_OK;
+			}
 		}
 		if (ipSS->Size == 0)
 		{
@@ -736,8 +725,7 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 
 		string strInputFileName = getPathAndFileNameWithoutExtension(strInput);
 		string strExt = getExtensionFromFullPath(strInput);
-		string strOutputFileName = strInputFileName + "." + asString(nActionID) + strExt + ".uss";
-
+		
 		if (strExt.empty() )
 		{
 			UCLIDException ue ("ELI36855", "Invalid input for WorkItem.");
@@ -762,9 +750,9 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 			ipSS->SourceDocName = strInputFileName.c_str();
 		}
 		
-		// Save the output file name in the output
-		ipDB->SaveWorkItemOutput(ipWorkItem->WorkItemID, strOutputFileName.c_str());
-		ipSS->SaveTo(strOutputFileName.c_str(), VARIANT_TRUE, VARIANT_TRUE);
+		// Save output to the database
+		IPersistStreamPtr ipPersistObj = ipSS;
+		ipDB->SaveWorkItemBinaryOutput(ipWorkItem->WorkItemID, ipPersistObj);
 
 		return S_OK;
 	}
@@ -963,19 +951,12 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 				IWorkItemRecordPtr ipWorkItem = ipWorkItems->At(i);
 				ASSERT_RESOURCE_ALLOCATION("ELI36859", ipWorkItem != __nullptr);
 
-				// convert the output field back to a Spatial string
-				ISpatialStringPtr ipOutput(CLSID_SpatialString);
+				// Get the output from the WorkItem record
+				ISpatialStringPtr ipOutput = ipWorkItem->BinaryOutput;
 				ASSERT_RESOURCE_ALLOCATION("ELI37084", ipOutput != __nullptr);
 
-				ipOutput->LoadFrom(ipWorkItem->Output, VARIANT_FALSE);
-
-				string strOutputName = asString(ipWorkItem->Output);
-
-				// Remove the .uss extension
-				strOutputName = getPathAndFileNameWithoutExtension(strOutputName);
-
 				// Get the page number
-				string strExt = getExtensionFromFullPath(strOutputName);
+				string strExt = getExtensionFromFullPath(asString(ipWorkItem->Input));
 				nPageNumber = asLong(strExt.substr(1));
 
 				ipOutput->SourceDocName = strInputFile.c_str();
@@ -1009,41 +990,10 @@ IWorkItemRecordPtr COCRFileProcessor::createWorkItem(string strFileName, int iPa
 	ipWorkItem->Status = kWorkUnitPending;
 	strFileName += "." + asString(iPageNumber);
 	ipWorkItem->Input = strFileName.c_str();
-	
+
 	return ipWorkItem;
 }
 //-------------------------------------------------------------------------------------------------
-void COCRFileProcessor::cleanUpIntermediateFiles(long nWorkItemGroupID, IFileProcessingDBPtr ipDB)
-{
-	IIUnknownVectorPtr ipWorkItems;
-
-	string strOutput = "";
-	string strInputFileName = "";
-
-	// Get lists of the workitems in small groups
-	long nStart = 0;
-	bool bDone = false;
-	while (!bDone)
-	{
-		ipWorkItems = ipDB->GetWorkItemsForGroup(nWorkItemGroupID, nStart, gnMAX_WORK_ITEMS_TO_GET_PER_CALL);
-		ASSERT_RESOURCE_ALLOCATION("ELI37134", ipWorkItems != __nullptr);
-
-		nStart += gnMAX_WORK_ITEMS_TO_GET_PER_CALL;
-
-		long nTotalWorkItems = ipWorkItems->Size();
-		for  (long i = 0; i != nTotalWorkItems; i++ )
-		{
-			IWorkItemRecordPtr ipWorkItem = ipWorkItems->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI37135", ipWorkItem != __nullptr);
-
-			strOutput  = asString(ipWorkItem->Output);
-
-			deleteFile(strOutput);
-		}
-		bDone = nTotalWorkItems < gnMAX_WORK_ITEMS_TO_GET_PER_CALL;
-	}
-}
-
 EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPtr ipProgressStatus,
 	IFileProcessingDBPtr ipDB, long nWorkGroup, const string &strInputFileName)
 {
@@ -1103,3 +1053,4 @@ EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPt
 	}
 	return kProcessingSuccessful;
 }
+//-------------------------------------------------------------------------------------------------

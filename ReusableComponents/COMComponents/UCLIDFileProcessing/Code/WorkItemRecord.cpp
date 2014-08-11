@@ -20,6 +20,15 @@ m_strUPI("")
 {
 }
 
+CWorkItemRecord::~CWorkItemRecord()
+{
+	try
+	{
+		
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI37186");
+}
+
 //-------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
 //-------------------------------------------------------------------------------------------------
@@ -250,3 +259,70 @@ STDMETHODIMP CWorkItemRecord::put_FileName(BSTR FileName)
 
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::get_BinaryOutput(IUnknown **ppBinaryOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		IPersistStreamPtr ipObj = m_ipBinaryOutput;
+		*ppBinaryOutput = (ipObj != __nullptr) ? ipObj.Detach(): __nullptr;
+
+        return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37173");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::put_BinaryOutput(IUnknown *pBinaryOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+        m_ipBinaryOutput = pBinaryOutput;
+		
+		// Throw exception if the object passed in does not implement IPersistStream.
+		if ( pBinaryOutput != __nullptr && m_ipBinaryOutput == __nullptr)
+		{
+			UCLIDException ue("ELI37217", "WorkItem BinaryOutput value should implement IPersistStream");
+			throw ue;
+		}
+
+        return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37174");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::get_BinaryInput(IUnknown **ppBinaryInput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		IPersistStreamPtr ipObj = m_ipBinaryInput;
+		*ppBinaryInput = (ipObj != __nullptr) ? ipObj.Detach(): __nullptr;
+
+        return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37212");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::put_BinaryInput(IUnknown *pBinaryInput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_ipBinaryInput = pBinaryInput;
+		
+		// Throw exception if the object passed in does not implement IPersistStream.
+		if ( pBinaryInput != __nullptr && m_ipBinaryInput == __nullptr)
+		{
+			UCLIDException ue("ELI37217", "WorkItem BinaryInput value should implement IPersistStream");
+			throw ue;
+		}
+
+        return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37213");
+}

@@ -5,6 +5,7 @@
 #include "EncryptedFileManager.h"
 #include "UCLIDException.h"
 #include "TemporaryFileName.h"
+#include "SafeArrayAccessGuard.h"
 
 #include <AtlBase.h>
 #include <objBase.h>
@@ -950,5 +951,99 @@ void readStorageFromEncryptedFile(IStorage** ppStorage, BSTR bstrFileName)
 		ue.addDebugInfo("File name", strFileName);
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+IPersistStreamPtr EXPORT_BaseUtils readObjFromSAFEARRAY(SAFEARRAY *psaData)
+{
+	ASSERT_ARGUMENT("ELI37203", psaData != __nullptr);
+
+	// Verify that the SAFEARRAY is of appropriate type
+	if (psaData->cbElements != sizeof(BYTE))
+	{
+		UCLIDException ue("ELI37201", "SAFEARRAY must have element size of 1.");
+		ue.addDebugInfo("ElementSize", psaData->cbElements);
+		throw ue;
+	}
+	if (psaData->cDims != 1)
+	{
+		UCLIDException ue("ELI37202", "SAFEARRAY must have only 1 diminsion.");
+		ue.addDebugInfo("Diminisions", psaData->cDims);
+		throw ue;
+	}
+
+	SafeArrayAccessGuard<BYTE> saGuard(psaData);
+	BYTE *pBytes = saGuard.AccessData();
+
+	long lowerBound, upperBound;
+	unsigned long ulCount;
+	SafeArrayGetLBound(psaData, 1, &lowerBound);
+	SafeArrayGetUBound(psaData, 1, &upperBound);
+	ulCount = upperBound - lowerBound + 1;
+
+	// create a temporary IStream object
+	IStreamPtr ipStream;
+	HANDLE_HRESULT(CreateStreamOnHGlobal(NULL, TRUE, &ipStream),
+		"ELI37184", "Unable to create stream object!", ipStream, IID_IStream);
+
+	// Write the buffer to the stream
+	ipStream->Write(&(pBytes[lowerBound]), ulCount, NULL);
+
+	// Reset the stream current position to the beginning of the stream
+	LARGE_INTEGER zeroOffset;
+	zeroOffset.QuadPart = 0;
+	ipStream->Seek(zeroOffset, STREAM_SEEK_SET, NULL);
+
+	// Stream the object out of the IStream
+	IPersistStreamPtr ipPersistObj;
+	readObjectFromStream(ipPersistObj, ipStream, "ELI37187");
+
+	ipStream = __nullptr;
+
+	// Done with the data pointer
+	saGuard.UnaccessData();
+
+	// Return the object
+	return ipPersistObj;
+}
+//-------------------------------------------------------------------------------------------------
+LPSAFEARRAY EXPORT_BaseUtils writeObjToSAFEARRAY(IPersistStreamPtr ipObj)
+{
+	// create a temporary IStream object
+	IStreamPtr ipStream;
+	HANDLE_HRESULT(CreateStreamOnHGlobal(NULL, TRUE, &ipStream),
+		"ELI37189", "Unable to create stream object!", ipStream, IID_IStream);
+
+	writeObjectToStream(ipObj, ipStream, "ELI37190", FALSE);
+
+	// Set the stream seek pointer back to the beginning of the stream
+	LARGE_INTEGER disp;
+	disp.QuadPart = 0;
+	ULARGE_INTEGER newPos;
+	ULARGE_INTEGER dataSize;
+	
+	// Get the size of the stream in newPos;
+	ipStream->Seek(disp, STREAM_SEEK_END, &dataSize);
+
+	CComSafeArray<BYTE> saData(dataSize.LowPart, 1);
+
+	ipStream->Seek(disp, STREAM_SEEK_SET, &newPos);
+
+	SafeArrayAccessGuard<BYTE> saGuard(*(saData.GetSafeArrayPtr()));
+	BYTE *pBytes = saGuard.AccessData();
+
+	ULONG ulBytesRead;
+	ipStream->Read(pBytes, dataSize.LowPart, &ulBytesRead);
+
+	if (dataSize.LowPart == ulBytesRead)
+	{
+		saGuard.UnaccessData();
+		return saData.Detach();
+	}
+
+	// The wrong number of bytes was read from the stream
+	UCLIDException ueRead("ELI37191", "Unexpected number of bytes read.");
+	ueRead.addDebugInfo("Expected", dataSize.LowPart);
+	ueRead.addDebugInfo("ActualRead", ulBytesRead);
+	throw ueRead;
 }
 //-------------------------------------------------------------------------------------------------
