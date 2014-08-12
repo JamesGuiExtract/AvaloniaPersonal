@@ -343,6 +343,17 @@ static const string gstrCREATE_WORK_ITEM_GROUP_TABLE =
 	"[UPI] [nvarchar](450) NULL, "
 	"[NumberOfWorkItems] [int] NOT NULL)";
 
+static const string gstrCREATE_WORK_ITEM_TABLE_V118 =
+	"CREATE TABLE [dbo].[WorkItem]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_WorkItem] PRIMARY KEY CLUSTERED ,"
+	"[WorkItemGroupID] [int] NOT NULL,"
+	"[Status] [nchar](1) NOT NULL,"
+	"[Input] [nvarchar](MAX) NULL,"
+	"[Output] [nvarchar](MAX) NULL,"
+	"[UPI] [nvarchar](450) NULL,"
+	"[Sequence] [int] NOT NULL,"
+	"[StringizedException] [nvarchar](MAX) NULL)";
+
 static const string gstrCREATE_WORK_ITEM_TABLE =
 	"CREATE TABLE [dbo].[WorkItem]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_WorkItem] PRIMARY KEY CLUSTERED ,"

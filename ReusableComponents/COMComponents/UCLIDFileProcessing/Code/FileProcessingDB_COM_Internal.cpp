@@ -792,7 +792,7 @@ int UpdateToSchemaVersion118(_ConnectionPtr ipConnection, long *pnNumSteps,
 
 	vector<string> vecQueries;
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_TABLE);
-	vecQueries.push_back(gstrCREATE_WORK_ITEM_TABLE);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_TABLE_V118);
 	vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_ACTION_FK);
 	vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAMFILE_FK);
 	vecQueries.push_back(gstrADD_WORK_ITEM__WORK_ITEM_GROUP_FK);
