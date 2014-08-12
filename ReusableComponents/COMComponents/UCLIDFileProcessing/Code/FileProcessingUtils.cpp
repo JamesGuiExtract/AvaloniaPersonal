@@ -57,3 +57,40 @@ void CFileProcessingUtils::addStatusInComboBox(CComboBox& comboStatus)
 	comboStatus.InsertString(4, "Failed");
 	comboStatus.InsertString(5, "Skipped");
 }
+//-------------------------------------------------------------------------------------------------
+UINT createMTAFileProcessingDBThread(void *pData)
+{
+	// This is a helper function for createMTAFileProcessingDB (below) used to generate a new
+	// IFileProcessingDB instance with a MTA COM server.
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+	ASSERT_RESOURCE_ALLOCATION("ELI37178", ipDB != __nullptr);
+
+	// Pass pointer to newly created instance back to caller.
+	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr *pipDB =
+		(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr *)pData;
+	*pipDB = ipDB;
+
+	CoUninitialize();
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingUtils::createMTAFileProcessingDB()
+{
+	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(__nullptr);
+
+	// Use a separate MTA thread to generate the new instance.
+	CWinThread *pThread = AfxBeginThread(createMTAFileProcessingDBThread, &ipDB);
+	DWORD dwWaitResult = WaitForSingleObject(pThread->m_hThread, 3000);
+	if (dwWaitResult != WAIT_OBJECT_0)
+	{
+		throw UCLIDException("ELI37180", "Unable to obtain DB connection");
+	}
+
+	ASSERT_RESOURCE_ALLOCATION("ELI37181", ipDB != __nullptr);
+		
+	return ipDB;
+}
+//-------------------------------------------------------------------------------------------------

@@ -824,8 +824,8 @@ int UpdateToSchemaVersion119(_ConnectionPtr ipConnection, long *pnNumSteps,
 	}
 
 	vector<string> vecQueries;
-	vecQueries.push_back(
-		"ALTER TABLE WorkItem ADD [BinaryInput] varbinary(max) NULL, [BinaryOutput] varbinary(max) NULL");
+//	vecQueries.push_back(
+//		"ALTER TABLE WorkItem ADD [BinaryInput] varbinary(max) NULL, [BinaryOutput] varbinary(max) NULL");
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
@@ -6318,6 +6318,7 @@ bool CFileProcessingDB::IsFeatureEnabled_Internal(bool bDBLocked, BSTR bstrFeatu
 	}
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, 
 	long nStartPos, long nCount, IIUnknownVector **ppWorkItems)
 {

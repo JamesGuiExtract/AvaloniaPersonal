@@ -21,6 +21,7 @@
 #include <stringCSIS.h>
 #include <ValueRestorer.h>
 #include <VectorOperations.h>
+#include <FAMDBSemaphore.h>
 
 #include <string>
 #include <memory>
@@ -2129,10 +2130,15 @@ void CFileProcessingDB::validateDBSchemaVersion()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLockName)
 {
-	int nMaxWaitTime = -1;
+	// https://extract.atlassian.net/browse/ISSUE-12328
+	// If we can see that this thread already has a lock on this thread, throw an exception rather
+	// than allow a deadlock situation to occur.
+	if (FAMDBSemaphore::ThisThreadHasLock(strLockName))
+	{
+		throw UCLIDException("ELI37214", "Re-entrant DB lock attempted.");
+	}
 
-	// Get the lock variable for the specified lock name
-	CSemaphore* psemaphoreLock = m_mapDbLocks[strLockName];
+	int nMaxWaitTime = -1;
 
 	// Lock insertion string for this process
 	string strAddLockSQL = "INSERT INTO LockTable (LockName, UPI) VALUES ('"
@@ -2146,9 +2152,6 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 	// Keep trying to lock the DB until it is locked by this thread
 	while (true)
 	{
-		// Flag to indicate whether this thread got the semaphore lock needed to lock the database.
-		bool bGotSemaphoreLock = false;
-
 		// Flag to indicate if the connection is in a good state
 		// this will be determined if the TransactionGuard does not throw an exception
 		// this needs to be initialized each time through the loop
@@ -2164,12 +2167,10 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				// Multiple threads should not be able to share the same DB lock. If the database is
 				// currently locked, wait until it is unlocked before attempting to lock it on this
 				// thread.
-				if (!psemaphoreLock->Lock(m_lDBLockTimeout * 1000))
+				if (!FAMDBSemaphore::Lock(strLockName, m_lDBLockTimeout * 1000))
 				{
 					throw UCLIDException("ELI34039", "Timeout waiting for DB lock.");
 				}
-
-				bGotSemaphoreLock = true;
 
 				// Lock while updating the lock table and m_bDBLocked variable
 				CSingleLock lock2(&m_mutex, TRUE);
@@ -2225,8 +2226,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 						// restart this loop.
 						// NOTE: Not sure if the loop does need to be restarted anymore, but since
 						// I don't know the reason it was coded this way, I don't want to change it.
-						bGotSemaphoreLock = false;
-						psemaphoreLock->Unlock();
+						FAMDBSemaphore::Unlock(strLockName);
 
 						// Restart the loop since we don't want to assume this instance will 
 						// get the lock
@@ -2256,7 +2256,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 		}
 		catch(UCLIDException &ue)
 		{
-			if (!bGotSemaphoreLock)
+			if (!FAMDBSemaphore::ThisThreadHasLock(strLockName))
 			{
 				// If we timed out getting the semaphore lock, throw the time out exception.
 				throw;
@@ -2274,7 +2274,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 			}
 
 			// Ensure the semaphore lock is released if we had it.
-			psemaphoreLock->Unlock();
+			FAMDBSemaphore::Unlock(strLockName);
 
 			// If all connections have been intentionally closed, return without error.
 			if (bAllConnectionsClosed)
@@ -2327,8 +2327,6 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection, const string& strLockName)
 {
-	CSemaphore* psemaphoreLock = m_mapDbLocks[strLockName];
-
 	try
 	{
 		try
@@ -2342,14 +2340,14 @@ void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection, const string& strL
 			executeCmdQuery(ipConnection, strDeleteSQL);
 
 			// This releases the semaphore and allows the next thread in.
-			psemaphoreLock->Unlock();
+			FAMDBSemaphore::Unlock(strLockName);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34041");
 	}
 	catch (UCLIDException &ue)
 	{
 		// Even if we failed to remove the lock table entry, allow the next thread to proceed.
-		psemaphoreLock->Unlock();
+		FAMDBSemaphore::Unlock(strLockName);
 
 		throw ue;
 	}

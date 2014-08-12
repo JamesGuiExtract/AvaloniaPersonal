@@ -96,9 +96,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 std::string CFileProcessingDB::ms_strCurrServerName = "";
 std::string CFileProcessingDB::ms_strCurrDBName = "";
 std::string CFileProcessingDB::ms_strLastUsedAdvConnStr = "";
-CSemaphore CFileProcessingDB::ms_semaphoreMainLock(1);
-CSemaphore CFileProcessingDB::ms_semaphoreUserCounterLock(1);
-CSemaphore CFileProcessingDB::ms_semaphoreWorkItemLock(1);
+
 CMutex CFileProcessingDB::ms_mutexPingDBLock;
 CMutex CFileProcessingDB::ms_mutexSpecialLoggingLock;
 
@@ -150,11 +148,6 @@ m_bAllowRestartableProcessing(false)
 		m_strMachineName = getComputerName();
 		m_strFAMUserName = getCurrentUserName();
 		m_lDBLockTimeout = m_regFPCfgMgr.getDBLockTimeout();
-
-		// Store pointers to the db lock variables.
-		m_mapDbLocks[gstrMAIN_DB_LOCK] = &ms_semaphoreMainLock;
-		m_mapDbLocks[gstrUSER_COUNTER_DB_LOCK] = &ms_semaphoreUserCounterLock;
-		m_mapDbLocks[gstrWORKITEM_DB_LOCK] = &ms_semaphoreWorkItemLock;
 
 		// If PDF support is licensed initialize support
 		// NOTE: no exception is thrown or logged if PDF support is not licensed.

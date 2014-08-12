@@ -14,4 +14,8 @@ public:
 
 	// Set the action status inside the combo box
 	static void addStatusInComboBox(CComboBox& comboStatus);
+
+	// Creates an IFileProcessingDB instance in a MTA COM server. Having a MTA instance is important
+	// to avoiding deadlocks: https://extract.atlassian.net/browse/ISSUE-12328
+	static UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr createMTAFileProcessingDB();
 };

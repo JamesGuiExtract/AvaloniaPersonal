@@ -67,11 +67,6 @@ namespace Extract.Redaction
         RedactionFileLoader _voaLoader;
 
         /// <summary>
-        /// Used to see out characters in sensitive data that should be replaced.
-        /// </summary>
-        Regex _regex;
-
-        /// <summary>
         /// Used to generate a random number of characters for <see cref="GetNumberCharactersToAdd"/>.
         /// </summary>
         Random _randomNumberGenerator;
@@ -248,14 +243,6 @@ namespace Extract.Redaction
                 }
 
                 _voaLoader = new RedactionFileLoader(new ConfidenceLevelsCollection(confidenceLevels));
-
-                // If replacing only alpha numeric characters, create a Regex to seek out only alpha
-                // numic characters.
-                if (_settings.RedactionMethod == RedactionMethod.ReplaceCharacters &&
-                    _settings.CharactersToReplace == CharacterClass.Alphanumeric)
-                {
-                    _regex = new Regex("\\w");
-                }
             }
             catch (Exception ex)
             {
@@ -359,28 +346,19 @@ namespace Extract.Redaction
                 // Sort the redaction zones by starting index
                 redactionZones.Sort(SortZones);
 
-                // Create a redacted version of source.String using the calculated redaction zones.
-                string redactedString = CreateRedactions(source.String, redactionZones);
+                // https://extract.atlassian.net/browse/ISSUE-12345
+                // In order to avoid problems with assumptions about character encoding leading to
+                // corruption of high-ANSI chars when converting to/from strings, CreateRedactions
+                // has been modified to use byte arrays as input and output.
+                byte[] sourceFileBytes = File.ReadAllBytes(pFileRecord.Name);
+
+                // Create a redacted version of sourceFileBytes using the calculated redaction zones.
+                byte[] redactedBytes = CreateRedactions(sourceFileBytes, redactionZones);
 
                 // Generate the output file.
                 string outputFileName = pathTags.Expand(_settings.OutputFileName);
 
-                // [FlexIDSCore:4564]
-                // The bytes in the source string (and therefore in redactedString) already contain
-                // any encoding such as utf-8. To prevent File.WriteAllText from attempting to
-                // encode already encoded characters (thus generating nonsense), write the raw
-                // bytes from redactedString to disk using File.WriteAllBytes.
-                // NOTE: This solution presumes the file the text does not use double-byte encoding
-                // such as unicode. However, since the rules framework does not currently processes
-                // unicode files correctly this assumption is, at the moment, acceptable.
-                char[] chars = redactedString.ToArray();
-                long length = chars.LongLength;
-                byte[] bytes = new byte[length];
-                for (long i = 0; i < length; i++)
-                {
-                    bytes[i] = (byte)chars[i];
-                }
-                File.WriteAllBytes(outputFileName, bytes);
+                File.WriteAllBytes(outputFileName, redactedBytes);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
@@ -706,33 +684,44 @@ namespace Extract.Redaction
         /// <para><b>Note:</b></para>
         /// This method requires that the <paramref name="redactionZones"/> do not overlap and
         /// are sorted.
+        /// <para><b>Note2:</b></para>
+        /// https://extract.atlassian.net/browse/ISSUE-12345
+        /// In order to avoid problems with assumptions about character encoding leading to
+        /// corruption of high-ANSI chars when converting to/from strings, CreateRedactions has
+        /// been modified to use byte arrays as input and output.
         /// </summary>
-        /// <param name="sourceString">The <see cref="string"/> to redact.</param>
+        /// <param name="sourceFileBytes">A <see langword="byte"/> array to redact.</param>
         /// <param name="redactionZones">The character indexes to redact where Item1 of each
         /// <see cref="Tuple"/> is the starting index of each zone to redact and
         /// Item2 is the ending index of the zone.</param>
-        /// <returns>A redacted version of <see paramref="sourceString"/>.</returns>
-        string CreateRedactions(string sourceString, List<Tuple<int, int>> redactionZones)
+        /// <returns>A redacted version of <see paramref="sourceFileBytes"/>.</returns>
+        byte[] CreateRedactions(byte[] sourceFileBytes, List<Tuple<int, int>> redactionZones)
         {
             // Set the initial capacity of the SB to the 110% of the source string length. This
             // will reduce the number of times the SB needs to increase its length
-            StringBuilder outputString = new StringBuilder(
-                (int) Math.Round(sourceString.Length * 1.10));
+            List<byte> redactedOutput = new List<byte>(
+                (int)Math.Round(sourceFileBytes.Length * 1.10));
 
-            // Loop through each redactionZone to redact the text in outputString.
+            // Loop through each redactionZone to redact the text into redactedOutput.
             int nextSourceIndex = 0;
             foreach (Tuple<int, int> redactionZone in redactionZones)
             {
                 int length = redactionZone.Item1 - nextSourceIndex;
-                outputString.Append(sourceString.Substring(nextSourceIndex,
-                    length));
+                redactedOutput.AddRange(
+                    sourceFileBytes
+                    .Skip(nextSourceIndex)
+                    .Take(length));
+
                 nextSourceIndex += length;
 
                 // Calculate the text to replace.
                 int lengthToReplace = redactionZone.Item2 - redactionZone.Item1 + 1;
                 nextSourceIndex += lengthToReplace;
-                string textToReplace = sourceString.Substring(redactionZone.Item1, lengthToReplace);
-                string replacementText = string.Empty;
+                IEnumerable<byte> textToReplace =
+                    sourceFileBytes
+                    .Skip(redactionZone.Item1)
+                    .Take(lengthToReplace);
+                byte[] replacementText = null;
 
                 // Calculate the text replacement text.
                 switch (_settings.RedactionMethod)
@@ -749,50 +738,67 @@ namespace Extract.Redaction
                                         replacementLength += GetNumberCharactersToAdd();
                                     }
 
-                                    replacementText = new string(
-                                        _settings.ReplacementCharacter[0], replacementLength);
+                                    replacementText = Enumerable.Repeat<byte>(
+                                        (byte)_settings.ReplacementCharacter[0], replacementLength)
+                                            .ToArray();
                                 }
                             }
                             else
                             {
-                                replacementText = _regex.Replace(
-                                    textToReplace, _settings.ReplacementCharacter ?? "");
+                                replacementText = textToReplace.ToArray();
+
+                                for (int i = 0; i < replacementText.Length; i++)
+                                {
+                                    char c = (char)replacementText[i];
+
+                                    if (char.IsLetterOrDigit(c))
+                                    {
+                                        replacementText[i] = (byte)_settings.ReplacementCharacter[0];
+                                    }
+                                }
                             }
                         }
                         break;
 
                     case RedactionMethod.ReplaceText:
                         {
-                            replacementText = _settings.ReplacementText;
+                            replacementText =
+                                Encoding.Default.GetBytes(_settings.ReplacementText);
                         }
                         break;
 
                     case RedactionMethod.SurroundWithXml:
                         {
-                            StringBuilder replacementBuilder = new StringBuilder(
-                                textToReplace.Length + (_settings.XmlElementName.Length * 2) + 5);
+                            List<byte> replacementTextBuilder = new List<byte>(
+                                textToReplace.Count() + (_settings.XmlElementName.Length * 2) + 5);
 
-                            replacementBuilder.Append("<");
-                            replacementBuilder.Append(_settings.XmlElementName);
-                            replacementBuilder.Append(">");
-                            replacementBuilder.Append(textToReplace);
-                            replacementBuilder.Append("</");
-                            replacementBuilder.Append(_settings.XmlElementName);
-                            replacementBuilder.Append(">");
-                            replacementText = replacementBuilder.ToString();
+                            replacementTextBuilder.Add((byte)'<');
+                            replacementTextBuilder.AddRange(
+                                Encoding.Default.GetBytes(_settings.XmlElementName));
+                            replacementTextBuilder.Add((byte)'>');
+                            replacementTextBuilder.AddRange(textToReplace);
+                            replacementTextBuilder.AddRange(Encoding.Default.GetBytes("</"));
+                            replacementTextBuilder.AddRange(
+                                Encoding.Default.GetBytes(_settings.XmlElementName));
+                            replacementTextBuilder.Add((byte)'>');
+
+                            replacementText = replacementTextBuilder.ToArray();
                         }
                         break;
                 }
 
+                ExtractException.Assert("ELI37176", "Internal logic error.", replacementText != null);
+
                 // Replace the text
-                outputString.Append(replacementText);
-            }
-            if (nextSourceIndex < sourceString.Length)
-            {
-                outputString.Append(sourceString.Substring(nextSourceIndex));
+                redactedOutput.AddRange(replacementText);
             }
 
-            return outputString.ToString();
+            if (nextSourceIndex < sourceFileBytes.Length)
+            {
+                redactedOutput.AddRange(sourceFileBytes.Skip(nextSourceIndex));
+            }
+
+            return redactedOutput.ToArray();
         }
 
         /// <summary>

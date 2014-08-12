@@ -1347,12 +1347,10 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingManager::getFPMDB()
 	// Create FAM Database object if needed
 	if ( m_ipFPMDB == __nullptr )
 	{
-		// Create the FPM Database object
-		UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI34527", ipFAMDBUtils != __nullptr);
-	
-		m_ipFPMDB.CreateInstance(ipFAMDBUtils->GetFAMDBProgId().operator LPCSTR());
-		ASSERT_RESOURCE_ALLOCATION("ELI13982", m_ipFPMDB != __nullptr );
+		// https://extract.atlassian.net/browse/ISSUE-12328
+		// To prevent deadlocks from occuring, ensure the DB instance is hosted in a MTA.
+		m_ipFPMDB = CFileProcessingUtils::createMTAFileProcessingDB();
+		ASSERT_RESOURCE_ALLOCATION("ELI37182", m_ipFPMDB != __nullptr );
 
 		// Tell the Record Manager about the database
 		m_recordMgr.setFPMDB(m_ipFPMDB);

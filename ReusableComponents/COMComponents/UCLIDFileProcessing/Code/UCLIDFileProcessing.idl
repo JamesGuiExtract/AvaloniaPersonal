@@ -936,8 +936,7 @@ library UCLID_FILEPROCESSINGLib
 
 		// PROMISE: To lock the specified database lock
 		// NOTE:	LockDB cannot be called twice on the same thread without first calling
-		//			UnlockDB, otherwise the thread will deadlock. UnlockDB can be called on any
-		//			thread, not just the one that locked the DB.
+		//			UnlockDB; doing so will result in an exception.
 		[id(39), helpstring("method LockDB")] HRESULT LockDB([in] BSTR bstrLockName);
 
 		// PROMISE: To unlock the specified database lock
