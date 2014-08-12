@@ -9,9 +9,11 @@
 
 DWORD FAMDBSemaphore::ms_dwMainLockThread = 0;
 DWORD FAMDBSemaphore::ms_dwCounterLockThread = 0;
+DWORD FAMDBSemaphore::ms_dwWorkItemLockThread = 0;
 
 CSemaphore FAMDBSemaphore::ms_semaphoreMainLock(1);
 CSemaphore FAMDBSemaphore::ms_semaphoreCounterLock(1);
+CSemaphore FAMDBSemaphore::ms_semaphoreWorkItemLock(1);
 
 //--------------------------------------------------------------------------------------------------
 // FAMDBSemaphore
