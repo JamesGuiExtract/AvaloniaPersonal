@@ -42,8 +42,10 @@ namespace Extract.Redaction.Verification
         /// Added "Prompt to save changes before navigating away from uncommitted documents.
         /// Added "Confirm slideshow operator alertness" options.
         /// Added "Set full-page view mode when slideshow is started" option.
+        /// <para>Version 9</para>
+        /// Added tag selection/filtering settings.
         /// </summary>
-        const int _CURRENT_VERSION = 8;
+        const int _CURRENT_VERSION = 9;
         
         #endregion Constants
 

@@ -2,9 +2,9 @@ using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -15,19 +15,63 @@ namespace Extract.FileActionManager.FileProcessors
     /// Represents a file processing task that allows viewing of image files.
     /// </summary>
     [ComVisible(true)]
+    [Guid("2F23BB19-0D6E-4188-A520-DE11B3E9C208")]
+    [CLSCompliant(false)]
+    public interface IViewImageTask : ICategorizedComponent, IConfigurableObject, ICopyableObject,
+        IFileProcessingTask, ILicensedComponent, IPersistStream
+    {
+        /// <summary>
+        /// Gets or sets whether the users are able to apply tags.
+        /// </summary>
+        /// <value>
+        /// Whether the users are able to apply tags.
+        /// </value>
+        bool AllowTags
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets which tags should be available to the users.
+        /// </summary>
+        /// <value>
+        /// A <see cref="FileTagSelectionSettings"/> instance defining which tags should be
+        /// available to the users.
+        /// </value>
+        FileTagSelectionSettings TagSettings
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
+    /// Represents a file processing task that allows viewing of image files.
+    /// </summary>
+    [ComVisible(true)]
     [Guid("B7AEF282-5335-4AF2-AC97-4AF30B1A9043")]
     [ProgId("Extract.FileActionManager.ViewImageTask")]
-    public class ViewImageTask : ICategorizedComponent, ICopyableObject, IFileProcessingTask,
-        ILicensedComponent, IPersistStream
+    public class ViewImageTask : IViewImageTask
     {
         #region Constants
 
+        /// <summary>
+        /// The description of this task
+        /// </summary>
         const string _COMPONENT_DESCRIPTION = "Core: View image";
 
         /// <summary>
         /// Current task version.
+        /// <para><b>Version 2</b></para>
+        /// Added <see cref="AllowTags"/> and <see cref="TagSettings"/>
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
+
+        /// <summary>
+        /// The license id to validate in licensing calls
+        /// </summary>
+        const LicenseIdName _LICENSE_ID = LicenseIdName.ExtractCoreObjects;
         
         #endregion Constants
 
@@ -42,6 +86,21 @@ namespace Extract.FileActionManager.FileProcessors
         /// Object used to mutex around the verification form creation.
         /// </summary>
         static readonly object _lock = new object();
+
+        /// <summary>
+        /// Specifies whether the users are able to apply tags.
+        /// </summary>
+        bool _allowTags = true;
+
+        /// <summary>
+        /// Specifies which tags should be available to the users.
+        /// </summary>
+        FileTagSelectionSettings _tagSettings = new FileTagSelectionSettings();
+
+        /// <summary>
+        /// Indicates whether this task object is dirty or not
+        /// </summary>
+        bool _dirty;
 
         #endregion Fields
 
@@ -71,7 +130,74 @@ namespace Extract.FileActionManager.FileProcessors
         }
         
         #endregion Constructors
-        
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets whether the users are able to apply tags.
+        /// </summary>
+        /// <value>
+        /// Whether the users are able to apply tags.
+        /// </value>
+        public bool AllowTags
+        {
+            get
+            {
+                return _allowTags;
+            }
+
+            set
+            {
+                try 
+	            {	        
+		            if (value != _allowTags)
+                    {
+                        _allowTags = value;
+
+                        _dirty = true;
+                    }
+	            }
+	            catch (Exception ex)
+	            {
+		            throw ex.AsExtract("ELI37257");
+	            }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets which tags should be available to the users.
+        /// </summary>
+        /// <value>
+        /// A <see cref="FileTagSelectionSettings"/> instance defining which tags should be
+        /// available to the users.
+        /// </value>
+        public FileTagSelectionSettings TagSettings
+        {
+            get
+            {
+                return _tagSettings;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _tagSettings)
+                    {
+                        _tagSettings = value;
+
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI37258");
+                }
+            }
+        }
+
+        #endregion Properties
+
         #region Methods
 
         /// <summary>
@@ -102,12 +228,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// Copies the specified <see cref="ViewImageTask"/> instance into this one.
         /// </summary>
         /// <param name="task">The <see cref="ViewImageTask"/> from which to copy.</param>
-        // ViewImageTask is currently not used, but it likely will be in the future and if the
-        // parameter is deleted it causes an infinite loop in CopyFrom(object)
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "task")]
-        public void CopyFrom(ViewImageTask task)
+        void CopyFrom(ViewImageTask task)
         {
-            // No settings to copy.
+            _allowTags = task.AllowTags;
+            _tagSettings = new FileTagSelectionSettings(task.TagSettings);
+
+            _dirty = true;
         }
 
         /// <summary>
@@ -116,7 +242,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <returns>A <see cref="ViewImageTaskForm"/> with the current settings.</returns>
         IVerificationForm CreateViewImageTaskForm()
         {
-            return new ViewImageTaskForm();
+            return new ViewImageTaskForm(this);
         }
         
         #endregion Methods
@@ -133,6 +259,44 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion ICategorizedComponent Members
+
+        #region IConfigurableObject Members
+
+        /// <summary>
+        /// Performs configuration needed to create a valid <see cref="ExtractImageAreaTask"/>.
+        /// </summary>
+        /// <returns><see langword="true"/> if the configuration was successfully updated or
+        /// <see langword="false"/> if configuration was unsuccessful.</returns>
+        public bool RunConfiguration()
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI37241", _COMPONENT_DESCRIPTION);
+
+                // Make a clone to update settings and only copy if ok
+                ViewImageTask cloneOfThis = (ViewImageTask)Clone();
+
+                using (ViewImageTaskSettingsDialog dlg
+                    = new ViewImageTaskSettingsDialog(cloneOfThis))
+                {
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                    {
+                        CopyFrom(dlg.Settings);
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI37242",
+                    "Error configuring" + _COMPONENT_DESCRIPTION + ".", ex);
+            }
+        }
+
+        #endregion IConfigurableObject Members
 
         #region ICopyableObject Members
 
@@ -181,8 +345,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI37040",
-					_COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI37040", _COMPONENT_DESCRIPTION);
 
                 _form.Cancel();
             }
@@ -201,8 +364,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI37042",
-					_COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI37042", _COMPONENT_DESCRIPTION);
 
                 _form.CloseForm();
             }
@@ -255,8 +417,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI37045",
-					_COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI37045", _COMPONENT_DESCRIPTION);
 
                 _form.ShowForm(CreateViewImageTaskForm);
             }
@@ -288,8 +449,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI37047",
-					_COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI37047", _COMPONENT_DESCRIPTION);
 
                 if (bCancelRequested)
                 {
@@ -332,7 +492,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// if the component is not licensed.</returns>
         public bool IsLicensed()
         {
-            return LicenseUtilities.IsLicensed(LicenseIdName.ExtractCoreObjects);
+            return LicenseUtilities.IsLicensed(_LICENSE_ID);
         }
 
         #endregion ILicensedComponent Members
@@ -356,7 +516,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <see cref="HResult.False"/> if changes have not been made.</returns>
         public int IsDirty()
         {
-            return HResult.FromBoolean(false);
+            return HResult.FromBoolean(_dirty);
         }
 
         /// <summary>
@@ -368,7 +528,18 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                // No settings to load
+                using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
+                {
+                    // Read the settings
+                    if (reader.Version >= 2)
+                    {
+                        _allowTags = reader.ReadBoolean();
+                        _tagSettings = FileTagSelectionSettings.ReadFrom(reader);
+                    }
+                }
+
+                // Freshly loaded object is not dirty
+                _dirty = false;
             }
             catch (Exception ex)
             {
@@ -390,7 +561,20 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try 
 	        {
-                // No settings to save.
+                using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
+                {
+                    // Save the settings
+                    writer.Write(_allowTags);
+                    _tagSettings.WriteTo(writer);
+
+                    // Write to the provided IStream.
+                    writer.WriteTo(stream);
+                }
+
+                if (clearDirty)
+                {
+                    _dirty = false;
+                }
 	        }
 	        catch (Exception ex)
 	        {

@@ -1,20 +1,9 @@
-using Extract;
-using Extract.DataEntry;
 using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
-using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -54,9 +43,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <item>2: Added _configFileName</item>
         /// <item>3: Added _inputEventTrackingEnabled</item>
         /// <item>4: Added _countersEnabled</item>
+        /// <item>5: Added file tag selection settings</item>
         /// </list>
         /// </summary>
-        static readonly int _CURRENT_VERSION = 4;
+        static readonly int _CURRENT_VERSION = 5;
 
         #endregion Constants
 
@@ -78,25 +68,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         int _dirty;
 
         /// <summary>
-        /// The name of the DataEntry configuration file to use for the DataEntryApplicationForm.
+        /// Settings for verification.
         /// </summary>
-        string _configFileName;
-
-        /// <summary>
-        /// The name of the DataEntry configuration file to use for the DataEntryApplicationForm
-        /// after evaluation of any path tags/functions.
-        /// </summary>
-        string _expandedConfigFileName;
-
-        /// <summary>
-        /// Specifies whether input event tracking should be logged in the database.
-        /// </summary>
-        bool _inputEventTrackingEnabled;
-
-        /// <summary>
-        /// Specifies whether counts will be recorded for the defined data entry counters.
-        /// </summary>
-        bool _countersEnabled;
+        VerificationSettings _settings;
 
         /// <summary>
         /// The name of the action currently being processd.
@@ -107,6 +81,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The ID of the action being processed.
         /// </summary>
         int _actionID;
+
+        /// <summary>
+        /// The <see cref="FAMTagManager"/> to use to expand path tags and functions.
+        /// </summary>
+        FAMTagManager _tagManager;
 
         // Object for mutexing data entry form manager creation
         static object _lock = new object();
@@ -120,6 +99,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         public ComClass()
         {
+            _settings = new VerificationSettings();
+
             // Mutex over data entry form manager creation
             lock (_lock)
             {
@@ -135,75 +116,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Properties
 
         /// <summary>
-        /// Gets or set the name of the DataEntry configuration file to use for the
-        /// <see cref="DataEntryApplicationForm"/>.
+        /// Gets or sets the <see cref="VerificationSettings"/>.
         /// </summary>
-        /// <value>The name of the DataEntry configuration file to use.</value>
-        /// <returns>The name of the DataEntry configuration file to use.</returns>
-        public string ConfigFileName
+        public VerificationSettings Settings
         {
             get
             {
-                return _configFileName;
+                return _settings;
             }
-
             set
             {
-                _configFileName = value;
-
-                _dirty = HResult.Ok;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether input event tracking should be logged in the database.
-        /// <para><b>Note</b></para>
-        /// Input tracking will only be recorded if this option is <see langword="true"/> and
-        /// the "EnableInputEventTracking" option is set in the database.
-        /// </summary>
-        /// <value><see langword="true"/> to record data from user input, <see langword="false"/>
-        /// otherwise.</value>
-        public bool InputEventTrackingEnabled
-        {
-            get
-            {
-                return _inputEventTrackingEnabled;
-            }
-
-            set
-            {
-                if (_inputEventTrackingEnabled != value)
-                {
-                    _inputEventTrackingEnabled = value;
-
-                    _dirty = HResult.Ok;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether counts will be recorded for the defined data entry counters.
-        /// <para><b>Note</b></para>
-        /// Counter values will only be recorded if this option is <see langword="true"/> and
-        /// the "EnableDataEntryCounters" option is set in the database.
-        /// </summary>
-        /// <value><see langword="true"/> to record counts for the defined counters,
-        /// <see langword="false"/> otherwise.</value>
-        public bool CountersEnabled
-        {
-            get
-            {
-                return _countersEnabled;
-            }
-
-            set
-            {
-                if (_countersEnabled != value)
-                {
-                    _countersEnabled = value;
-
-                    _dirty = HResult.Ok;
-                }
+                _settings = value;
             }
         }
 
@@ -238,27 +161,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </param>
         public void Load(IStream stream)
         {
-            MemoryStream memoryStream = null;
-
             try
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    // Read the settings from the memory stream
-                    if (reader.Version >= 2)
-                    {
-                        _configFileName = reader.ReadString();
-                    }
-
-                    if (reader.Version >= 3)
-                    {
-                        _inputEventTrackingEnabled = reader.ReadBoolean();
-                    }
-
-                    if (reader.Version >= 4)
-                    {
-                        _countersEnabled = reader.ReadBoolean();
-                    }
+                    _settings = VerificationSettings.ReadFrom(reader);
                 }
 
                 _dirty = HResult.False;
@@ -268,13 +175,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Memory leak?  See: [DataEntry:143]
                 throw ExtractException.CreateComVisible("ELI23992", 
                     "Error loading data entry application settings.", ex);
-            }
-            finally
-            {
-                if (memoryStream != null)
-                {
-                    memoryStream.Dispose();
-                }
             }
         }
 
@@ -294,9 +194,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
                     // Save the settings
-                    writer.Write(_configFileName);
-                    writer.Write(_inputEventTrackingEnabled);
-                    writer.Write(_countersEnabled);
+                    _settings.WriteTo(writer);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -403,17 +301,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
                     "ELI26896", _DEFAULT_FILE_ACTION_TASK_NAME);
 
-                if (_inputEventTrackingEnabled || _countersEnabled)
+                if (_settings.InputEventTrackingEnabled || _settings.CountersEnabled)
                 {
                     ExtractException.Assert("ELI29827", "Cannot enable " +
-                        ((_inputEventTrackingEnabled && _countersEnabled) ? "input tracking or data counters" :
-                        _inputEventTrackingEnabled ? "input tracking" : "counters") +
+                        ((_settings.InputEventTrackingEnabled || _settings.CountersEnabled) 
+                            ? "input tracking or data counters"
+                            : _settings.InputEventTrackingEnabled 
+                                ? "input tracking"
+                                : "counters") +
                         " without access to a file processing database!", pDB != null);
                 }
 
                 _fileProcessingDB = pDB;
                 _actionID = nActionID;
-                _expandedConfigFileName = pFAMTM.ExpandTagsAndFunctions(_configFileName, null);
+                _tagManager = pFAMTM;
 
                 // Ask the manager to create and display the data entry form.
                 // [FlexIDSCore:3088]
@@ -619,9 +520,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     copyThis != null);
 
                 // Copy properties here
-                _configFileName = copyThis._configFileName;
-                _inputEventTrackingEnabled = copyThis._inputEventTrackingEnabled;
-                _countersEnabled = copyThis._countersEnabled;
+                _settings = copyThis._settings;
             }
             catch (Exception ex)
             {
@@ -648,12 +547,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     "ELI26900", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 // Create a new configuration form to display the configurable settings to the user.
-                ConfigurationForm configForm = new ConfigurationForm(this);
-
-                // Display the configuration screen.
-                bool savedSettings = configForm.Configure();
-
-                return savedSettings;
+                using (ConfigurationForm configForm = new ConfigurationForm(_settings))
+                {
+                    // Display the configuration screen.
+                    if (configForm.Configure())
+                    {
+                        _settings = configForm.Settings;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -678,7 +584,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                return !string.IsNullOrEmpty(_configFileName);
+                return !string.IsNullOrEmpty(_settings.ConfigFileName);
             }
             catch (Exception ex)
             {
@@ -720,8 +626,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <returns>A <see cref="DataEntryApplicationForm"/> using the current settings.</returns>
         IVerificationForm CreateDataEntryForm()
         {
-            return new DataEntryApplicationForm(_expandedConfigFileName, false, _fileProcessingDB,
-                _actionID, _inputEventTrackingEnabled, _countersEnabled);
+            return new DataEntryApplicationForm(_settings, false, _fileProcessingDB, _actionID, _tagManager);
         }
 
         #endregion Private Methods

@@ -42,7 +42,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     "the application or be specified as the one and only command-line parameter",
                     File.Exists(configFileName));
 
-                mainForm = new DataEntryApplicationForm(configFileName);
+                var settings = new VerificationSettings(configFileName);
+                mainForm = new DataEntryApplicationForm(settings);
 
                 if (mainForm.UseVisualStyles)
                 {

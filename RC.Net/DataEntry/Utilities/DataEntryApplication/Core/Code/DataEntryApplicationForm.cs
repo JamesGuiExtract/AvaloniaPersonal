@@ -166,6 +166,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         RegistrySettings<Settings> _registry;
 
         /// <summary>
+        /// The verificaton task settings.
+        /// </summary>
+        VerificationSettings _settings;
+
+        /// <summary>
         /// Provides the resources used to brand the DataEntryApplication as a specific product.
         /// </summary>
         BrandingResourceManager _brandingResources;
@@ -278,15 +283,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         int _counterStatisticsToken = -1;
 
         /// <summary>
-        /// Specifies whether input event tracking should be logged in the database.
-        /// </summary>
-        readonly bool _inputEventTrackingEnabled;
-
-        /// <summary>
-        /// Specifies whether counts will be recorded for the defined data entry counters.
+        /// Specifies whether counts will be recorded for the defined data entry counters (only if
+        /// enabled both in the task and in the database);
         /// </summary>
         bool _countersEnabled;
-
+        
         /// <summary>
         /// Tracks user input in the file processing database.
         /// </summary>
@@ -502,31 +503,26 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Initializes a new instance of the <see cref="DataEntryApplicationForm"/> class in 
         /// stand alone mode.
         /// </summary>
-        /// <param name="configFileName">The name of the configuration file used to supply settings
-        /// for the <see cref="DataEntryApplicationForm"/>.</param>
-        public DataEntryApplicationForm(string configFileName)
-            : this(configFileName, true, null, 0, false, false)
+        /// <param name="settings">The <see cref="VerificationSettings"/>.</param>
+        public DataEntryApplicationForm(VerificationSettings settings)
+            : this(settings, true, null, 0, null)
         {
         }
 
         /// <summary>
         /// Initializes a new <see cref="DataEntryApplicationForm"/> class.
         /// </summary>
-        /// <param name="configFileName">The name of the configuration file used to supply settings
-        /// for the <see cref="DataEntryApplicationForm"/>.</param>
+        /// <param name="settings">The <see cref="VerificationSettings"/>.</param>
         /// <param name="standAloneMode"><see langref="true"/> if the created as a standalone 
         /// application; <see langref="false"/> if launched via the COM interface.</param>
         /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use or
         /// <see langword="null"/> if no file processing database is being used.</param>
         /// <param name="actionId">The ID of the file processing action currently being used.
         /// </param>
-        /// <param name="inputEventTrackingEnabled"><see langword="true"/> to record data from user
-        /// input, <see langword="false"/> otherwise.</param>
-        /// <param name="countersEnabled"><see langword="true"/> to record counts for the defined
-        /// data entry counters, <see langword="false"/> otherwise.</param>
-        public DataEntryApplicationForm(string configFileName, bool standAloneMode,
-            FileProcessingDB fileProcessingDB, int actionId, bool inputEventTrackingEnabled,
-            bool countersEnabled)
+        /// <param name="tagManager">The <see cref="FAMTagManager"/> used to expand path tags and
+        /// functions.</param>
+        public DataEntryApplicationForm(VerificationSettings settings, bool standAloneMode,
+            FileProcessingDB fileProcessingDB, int actionId, FAMTagManager tagManager)
         {
             try
             {
@@ -544,12 +540,26 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // License SandDock before creating the form
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
+                _settings = settings;
+
+                if (tagManager == null)
+                {
+                    // A FAMTagManager without path tags is better than no tag manager (still can
+                    // be used to expand path functions).
+                    tagManager = new FAMTagManager();
+                }
+
+                string expandedConfigFileName = 
+                    tagManager.ExpandTagsAndFunctions(settings.ConfigFileName, null);
+
                 // Initialize the root directory the DataEntry framework should use when resolving
                 // relative paths.
-                DataEntryMethods.SolutionRootDirectory = Path.GetDirectoryName(configFileName);
+                DataEntryMethods.SolutionRootDirectory =
+                    Path.GetDirectoryName(expandedConfigFileName);
 
                 // Initialize the application settings.
-                _applicationConfig = new ConfigSettings<Settings>(configFileName, false, false);
+                _applicationConfig =
+                    new ConfigSettings<Settings>(expandedConfigFileName, false, false);
 
                 // Initialize the user registry settings.
                 _registry = new RegistrySettings<Settings>(@"Software\Extract Systems\DataEntry");
@@ -571,22 +581,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 Highlight.SpotIRCompatible = false;
 
                 _standAloneMode = standAloneMode;
-                _inputEventTrackingEnabled = inputEventTrackingEnabled;
-                _countersEnabled = countersEnabled;
                 _fileProcessingDb = fileProcessingDB;
                 _actionId = actionId;
 
-                if (_inputEventTrackingEnabled || _countersEnabled)
+                if (settings.InputEventTrackingEnabled || settings.CountersEnabled)
                 {
                     ExtractException.Assert("ELI29828", "Cannot enable " +
-                        ((_inputEventTrackingEnabled && _countersEnabled) ? "input tracking or data counters" :
-                        _inputEventTrackingEnabled ? "input tracking" : "counters") +
+                        ((settings.InputEventTrackingEnabled && settings.CountersEnabled)
+                            ? "input tracking or data counters"
+                            : settings.InputEventTrackingEnabled
+                                ? "input tracking"
+                                : "counters") +
                         " without access to a file processing database!", _fileProcessingDb != null);
                 }
 
                 // Whether to enable data entry counters depends upon the DBInfo setting as
                 // well as the task configuration.
-                if (_countersEnabled)
+                if (_settings.CountersEnabled)
                 {
                     _countersEnabled =
                         _fileProcessingDb.GetDBInfoSetting("EnableDataEntryCounters", true)
@@ -630,6 +641,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             break;
                         }
                     }
+
+                    if (_settings.AllowTags)
+                    {
+                        _tagFileToolStripButton.TagSettings = _settings.TagSettings;
+                    }
+                    else
+                    {
+                        _tagFileToolStripButton.Visible = false;
+                    }
                 }
                 else
                 {
@@ -644,7 +664,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _userPreferences = UserPreferences.FromRegistry();
 
                 // Load all configurations defined in configFileName
-                LoadDataEntryConfigurations(configFileName);
+                LoadDataEntryConfigurations(expandedConfigFileName);
 
                 // If a default configuration exists, use it to begin with.
                 _activeDataEntryConfig = _defaultDataEntryConfig;
@@ -935,7 +955,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // For consistency with other buttons, keep disabled until the file is loaded.
                 _tagFileToolStripButton.Enabled = false;
 
-                if (_inputEventTrackingEnabled && _inputEventTracker == null)
+                if (_settings.InputEventTrackingEnabled && _inputEventTracker == null)
                 {
                     _inputEventTracker = new InputEventTracker(fileProcessingDB, actionID);
                 }
@@ -3271,7 +3291,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _dataEntryControlHost.InvalidItemsFound -= HandleInvalidItemsFound;
                         _dataEntryControlHost.UnviewedItemsFound -= HandleUnviewedItemsFound;
                         _dataEntryControlHost.ItemSelectionChanged -= HandleItemSelectionChanged;
-                        if (_inputEventTrackingEnabled)
+                        if (_settings.InputEventTrackingEnabled)
                         {
                             _dataEntryControlHost.MessageHandled -= HandleMessageFilterMessageHandled;
                         }
@@ -3299,7 +3319,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _dataEntryControlHost.InvalidItemsFound += HandleInvalidItemsFound;
                         _dataEntryControlHost.UnviewedItemsFound += HandleUnviewedItemsFound;
                         _dataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
-                        if (_inputEventTrackingEnabled)
+                        if (_settings.InputEventTrackingEnabled)
                         {
                             _dataEntryControlHost.MessageHandled += HandleMessageFilterMessageHandled;
                         }
@@ -3638,7 +3658,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _imageWindowShortcutsMessageFilter = new ShortcutsMessageFilter(
                         ShortcutsEnabled, _imageViewer.Shortcuts, this);
 
-                    if (_inputEventTrackingEnabled)
+                    if (_settings.InputEventTrackingEnabled)
                     {
                         _imageWindowShortcutsMessageFilter.MessageHandled +=
                             HandleMessageFilterMessageHandled;
@@ -3740,7 +3760,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             if (_imageViewerForm != null)
             {
-                if (_inputEventTrackingEnabled)
+                if (_settings.InputEventTrackingEnabled)
                 {
                     _imageWindowShortcutsMessageFilter.MessageHandled -=
                         HandleMessageFilterMessageHandled;

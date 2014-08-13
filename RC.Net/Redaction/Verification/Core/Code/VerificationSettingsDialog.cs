@@ -1,3 +1,4 @@
+using Extract.FileActionManager.Forms;
 using Extract.Utilities.Forms;
 using System;
 using System.Windows.Forms;
@@ -23,6 +24,16 @@ namespace Extract.Redaction.Verification
         /// The slideshow settings.
         /// </summary>
         SlideshowSettings _slideshowSettings;
+
+        /// <summary>
+        /// Specifies which tags should be available to the users.
+        /// </summary>
+        FileTagSelectionSettings _tagSettings;
+
+        /// <summary>
+        /// The <see cref="FileProcessingDB"/>.
+        /// </summary>
+        FileProcessingDB _fileProcessingDB;
 
         /// <summary>
         /// The verification settings.
@@ -53,11 +64,11 @@ namespace Extract.Redaction.Verification
 
             FAMDBUtils dbUtils = new FAMDBUtils();
             Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
-            FileProcessingDB database = (FileProcessingDB)Activator.CreateInstance(mgrType);
+            _fileProcessingDB = (FileProcessingDB)Activator.CreateInstance(mgrType);
 
-			database.ConnectLastUsedDBThisProcess();
+            _fileProcessingDB.ConnectLastUsedDBThisProcess();
 
-            StrToStrMap actionNameToId = database.GetActions();
+            StrToStrMap actionNameToId = _fileProcessingDB.GetActions();
             VariantVector actionNames = actionNameToId.GetKeys();
             int size = actionNames.Size;
             for (int i = 0; i < size; i++)
@@ -107,10 +118,11 @@ namespace Extract.Redaction.Verification
             bool enableInputTracking = _enableInputEventTrackingCheckBox.Checked;
             bool launchInFullScreenMode = _launchFullScreenCheckBox.Checked;
             SlideshowSettings slideshowSettings = GetSlideshowSettings();
+            bool allowTags = _allowTagsCheckBox.Checked;
 
             return new VerificationSettings(general, feedback, dataFile, useBackdropImage,
                 backdropImage, action, enableInputTracking, launchInFullScreenMode,
-                slideshowSettings);
+                slideshowSettings, allowTags, _tagSettings);
         }
 
         /// <summary>
@@ -268,9 +280,10 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void UpdateControls()
         {
-            // Enable or disable feedback settings
+            // Enable or disable nested settings buttons
             _feedbackSettingsButton.Enabled = _collectFeedbackCheckBox.Checked;
             _slideshowSettingsButton.Enabled = _enableSlideshowCheckBox.Checked;
+            _tagSettingsButton.Enabled = _allowTagsCheckBox.Checked;
 
             // Enable or disable settings
             bool enabled = _backdropImageCheckBox.Checked;
@@ -365,6 +378,10 @@ namespace Extract.Redaction.Verification
                 _fileActionCheckBox.Checked = _settings.ActionStatusSettings.Enabled;
                 _actionNameComboBox.Text = GetInitialActionName();
                 _actionStatusComboBox.Text = GetStringFromActionStatus(_settings.ActionStatusSettings.ActionStatus);
+
+                // Tag settings
+                _allowTagsCheckBox.Checked = _settings.AllowTags;
+                _tagSettings = _settings.TagSettings;
 
                 // Update the UI
                 UpdateControls();
@@ -518,6 +535,50 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException.Display("ELI31039", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
+        /// <see cref="_allowTagsCheckBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleAllowTagsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateControls();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37218");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="_tagSettingsButton"/> <see cref="Control.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleTagSettingsButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                using (FileTagSelectionDialog dialog =
+                    new FileTagSelectionDialog(_tagSettings, _fileProcessingDB))
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        _tagSettings = dialog.Settings;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI37219", ex);
             }
         }
 

@@ -2,7 +2,6 @@
 using Extract.Licensing;
 using Extract.Redaction;
 using Extract.Redaction.Verification;
-using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,6 +56,7 @@ namespace IDShieldOnDemand
                 // Require types is false
                 // Seamless mode is false
                 // Slideshow feature is disabled
+                // Tags will be disabled (no access to database).
                 VerificationSettings settings = new VerificationSettings(
                     new GeneralVerificationSettings(false, false, false, false, false, false),
                     null,
@@ -67,7 +67,9 @@ namespace IDShieldOnDemand
                     false,
                     false,
                     new SlideshowSettings(false, false, "", false, "", EActionStatus.kActionUnattempted,
-                        false, new ObjectWithDescription(), false, false, 1, false));
+                        false, new ObjectWithDescription(), false, false, 1, false),
+                    false,
+                    null);
 
                 _verifyForm = new VerificationTaskForm(settings, new FAMTagManager());
 

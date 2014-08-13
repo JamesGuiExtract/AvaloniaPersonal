@@ -727,8 +727,9 @@ namespace Extract.AttributeFinder.Rules
                     // Spawn a new STA thread with a 4MB stack (swiping rule execution may use more than
                     // the default 1MB stack size).
                     string configFileName = _pathTags.Expand(ConfigFileName);
+                    var settings = new VerificationSettings(configFileName);
                     _uiThread = new Thread(new ThreadStart(() =>
-                        RunUiThread(configFileName)), 0x400000);
+                        RunUiThread(settings)), 0x400000);
                     _uiThread.SetApartmentState(ApartmentState.STA);
                     _uiThread.Start(); 
                 }
@@ -789,8 +790,9 @@ namespace Extract.AttributeFinder.Rules
         /// <para><b>Note</b></para>
         /// Runs on the UI thread.
         /// </summary>
-        /// <param name="configFileName"></param>
-        void RunUiThread(string configFileName)
+        /// <param name="settings">The <see cref="VerificationSettings"/> for the
+        /// <see cref="DataEntryApplicationForm"/>.</param>
+        void RunUiThread(VerificationSettings settings)
         {
             try
             {
@@ -798,7 +800,7 @@ namespace Extract.AttributeFinder.Rules
                 // thread.
                 _uiThreadMiscUtils = new MiscUtils();
 
-                using (var dataEntryApplicationForm = CreateDataEntryApplicationForm(configFileName))
+                using (var dataEntryApplicationForm = CreateDataEntryApplicationForm(settings))
                 {
                     // Now the the DataEntryApplicationForm is created, let the rule execution
                     // thread know that this thread is ready.
@@ -851,11 +853,11 @@ namespace Extract.AttributeFinder.Rules
         /// <para><b>Note</b></para>
         /// Runs on the UI thread. 
         /// </summary>
-        /// <param name="configFileName">The name of the file defining the data entry configuration
-        /// to use.</param>
+        /// <param name="settings">The <see cref="VerificationSettings"/> for the
+        /// <see cref="DataEntryApplicationForm"/>.</param>
         /// <returns>A new invisible <see cref="DataEntryApplicationForm"/> instance.</returns>
         [SuppressMessage("Microsoft.Usage", "CA2219:DoNotRaiseExceptionsInExceptionClauses")]
-        static DataEntryApplicationForm CreateDataEntryApplicationForm(string configFileName)
+        static DataEntryApplicationForm CreateDataEntryApplicationForm(VerificationSettings settings)
         {
             // If the dataEntryApplicationForm were to display exceptions, it would block execution
             // on this thread. Prevent any exceptions from being displayed while attempting to
@@ -867,7 +869,7 @@ namespace Extract.AttributeFinder.Rules
 
             try
             {
-                dataEntryApplicationForm = new DataEntryApplicationForm(configFileName);
+                dataEntryApplicationForm = new DataEntryApplicationForm(settings);
 
                 // We need to load the form for the controls to work, but we don't want the
                 // form to be visible.

@@ -120,13 +120,12 @@ namespace Extract.DataEntry.DEP.StandardLabDE.Test
             CleanUpDataEntryApplicationForm();
 
             // Find the config file
-//            string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-//            string configFileName = Path.Combine(path, "Demo Solution\\StandardLabDE.config");
             string configFileName = 
                 "D:\\Engineering\\binaries\\debug\\Demo Solution\\StandardLabDE.config";
+            var settings = new VerificationSettings(configFileName);
 
             // Create new form
-            _dataEntryApplicationForm = new DataEntryApplicationForm(configFileName);
+            _dataEntryApplicationForm = new DataEntryApplicationForm(settings);
 
             // Get the Image Viewer for this form
             _imageViewer = FormMethods.GetFormComponent<ImageViewer>(_dataEntryApplicationForm);

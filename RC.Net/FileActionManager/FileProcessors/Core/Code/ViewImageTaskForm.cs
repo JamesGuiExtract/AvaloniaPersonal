@@ -6,6 +6,7 @@ using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using TD.SandDock;
 using UCLID_FILEPROCESSINGLib;
@@ -52,6 +53,11 @@ namespace Extract.FileActionManager.FileProcessors
         #region Fields
 
         /// <summary>
+        /// A <see cref="ViewImageTask"/> representing the settings to use in the form.
+        /// </summary>
+        ViewImageTask _settings;
+
+        /// <summary>
         /// The file processing database.
         /// </summary>
         FileProcessingDB _fileDatabase;
@@ -92,7 +98,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewImageTaskForm"/> class.
         /// </summary>
-        public ViewImageTaskForm()
+        /// <param name="settings">A <see cref="ViewImageTask"/> representing the settings to use in
+        /// the form.</param>
+        public ViewImageTaskForm(ViewImageTask settings)
         {
             try
             {
@@ -110,6 +118,10 @@ namespace Extract.FileActionManager.FileProcessors
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
                 InitializeComponent();
+
+                _settings = settings;
+
+                _tagFileToolStripButton.TagSettings = _settings.TagSettings;
 
                 // [FlexIDSCore:4442]
                 // For prefetching purposes, allow the ImageViewer will cache images.
@@ -170,7 +182,11 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 Text = "(Waiting for file) - " + _FORM_TASK_TITLE;
 
-                _tagFileToolStripButton.Enabled = false;
+                // If the database is null, trying to enable the button will trigger an exception.
+                if (_tagFileToolStripButton.Database != null)
+                {
+                    _tagFileToolStripButton.Enabled = true;
+                }
 
                 _nextDocumentToolStripButton.Enabled = false;
                 _nextDocumentToolStripMenuItem.Enabled = false;
@@ -195,8 +211,15 @@ namespace Extract.FileActionManager.FileProcessors
                 _tagFileToolStripButton.Database = database;
 
                 // Check if the tag file toolstrip button should be displayed [FlexIDSCore #3886]
-                if (_fileDatabase != null &&
-                    (_fileDatabase.GetTagNames().Size > 0 || _fileDatabase.AllowDynamicTagCreation()))
+                // If tagging feature is turned on and either
+                // - There are tags available to use (i.e., won't be available if a tag filter
+                //   excludes all available tags)
+                // - Dynamic tag creation is turned on and the "Display all tags" option is selected.
+                //   (i.e., don't allow users the ability to dynamically create tags if there are
+                //   any limits placed on the tags available to use).
+                if (_settings.AllowTags &&
+                    (_settings.TagSettings.GetQualifiedTags(_fileDatabase).Any() ||
+                     (_settings.TagSettings.UseAllTags && _fileDatabase.AllowDynamicTagCreation())))
                 {
                     _tagFileToolStripButton.Visible = true;
                 }
@@ -223,6 +246,12 @@ namespace Extract.FileActionManager.FileProcessors
                 // Establish image viewer connections prior to calling base.OnLoad which will
                 // potentially remove some IImageViewerControls.
                 _imageViewer.EstablishConnections(this);
+
+                // The tag button should not be available if no database is available.
+                if (_tagFileToolStripButton.Database == null)
+                {
+                    _tagFileToolStripButton.Visible = false;
+                }
 
                 base.OnLoad(e);
 

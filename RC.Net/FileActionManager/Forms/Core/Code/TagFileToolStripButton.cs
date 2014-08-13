@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -42,6 +43,11 @@ namespace Extract.FileActionManager.Forms
         /// The database from which to read and write tags.
         /// </summary>
         IFileProcessingDB _database;
+
+        /// <summary>
+        /// Specifies which tags should be available to the users.
+        /// </summary>
+        FileTagSelectionSettings _tagSettings;
 
         #endregion Fields
 
@@ -126,6 +132,37 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
+        /// Gets or sets which tags should be available to the users.
+        /// </summary>
+        /// <value><see langword="true"/> if the tags should be available to the users; otherwise,
+        /// <see langword="false"/>.</value>
+        [Browsable(false)]
+        [CLSCompliant(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public FileTagSelectionSettings TagSettings
+        {
+            get
+            {
+                return _tagSettings;
+            }
+            set
+            {
+                try
+                {
+                    if (_tagSettings != value)
+                    {
+                        _tagSettings = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new ExtractException("ELI28730",
+                        "Unable to set database.", ex);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the parent control of the 
         /// <see cref="TagFileToolStripButton"/> is enabled. 
         /// </summary>
@@ -192,6 +229,10 @@ namespace Extract.FileActionManager.Forms
             // Get the file tags from the database
             StrToStrMap nameToDescription = _database.GetTags();
             FileTag[] tags = GetMapAsFileTagArray(nameToDescription);
+            if (_tagSettings != null)
+            {
+                tags = _tagSettings.GetQualifiedTags(tags).ToArray();
+            }
 
             // Sort the tags alphabetically
             Array.Sort(tags, new FileTagComparer());
@@ -260,7 +301,7 @@ namespace Extract.FileActionManager.Forms
                 // Get the parameters
                 FileTag[] tags = GetFileTags();
                 string[] checkedTags = GetTagsForFileId(_fileId);
-                bool applyNewTags = _database.AllowDynamicTagCreation();
+                bool applyNewTags = _database.AllowDynamicTagCreation() && TagSettings.UseAllTags;
 
                 // Create the drop down
                 dropDown = new FileTagDropDown(tags, checkedTags, applyNewTags);
@@ -296,7 +337,7 @@ namespace Extract.FileActionManager.Forms
 
         #endregion Methods
 
-        #region OnEvents
+        #region Overrides
 
         /// <summary>
         /// Raises the <see cref="Control.Click"/> event.
@@ -331,7 +372,7 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
-        #endregion OnEvents
+        #endregion Overrides
 
         #region Event Handlers
 

@@ -519,6 +519,8 @@ namespace Extract.Redaction.Verification
                     _openImageToolStripSplitButton.Visible = false;
                     _openImageToolStripMenuItem.Visible = false;
 
+                    _tagFileToolStripButton.TagSettings = _settings.TagSettings;
+
                     _imageViewer.OcrLoaded += HandleOcrLoaded;
                 }
 
@@ -2345,6 +2347,9 @@ namespace Extract.Redaction.Verification
                 _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
                 _nextDocumentCommand.Enabled = IsInHistory;
 
+                // The check for a DB is here only to prevent an exception, not as the mechanism to
+                // decide whether the tag feature available; that is done via the Visible property
+                // in StoreDatabase
                 _tagFileToolStripButton.Enabled = _fileDatabase != null;
                 _tagFileToolStripButton.FileId = memento.FileId;
 
@@ -2485,8 +2490,15 @@ namespace Extract.Redaction.Verification
                 _tagFileToolStripButton.Database = database;
 
                 // Check if the tag file toolstrip button should be displayed [FlexIDSCore #3886]
-                if (_fileDatabase.GetTagNames().Size > 0
-                    || _fileDatabase.AllowDynamicTagCreation())
+                // If tagging feature is turned on and either
+                // - There are tags available to use (i.e., won't be available if a tag filter
+                //   excludes all available tags)
+                // - Dynamic tag creation is turned on and the "Display all tags" option is selected.
+                //   (i.e., don't allow users the ability to dynamically create tags if there are
+                //   any limits placed on the tags available to use).
+                if (_settings.AllowTags &&
+                    (_settings.TagSettings.GetQualifiedTags(_fileDatabase).Any() || 
+                     (_settings.TagSettings.UseAllTags && _fileDatabase.AllowDynamicTagCreation())))
                 {
                     _tagFileToolStripButton.Visible = true;
                     _tagFileToolStripSeparator.Visible = true;

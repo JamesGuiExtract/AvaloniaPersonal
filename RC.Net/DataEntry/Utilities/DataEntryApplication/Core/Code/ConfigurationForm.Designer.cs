@@ -37,6 +37,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._enableInputTrackingCheckBox = new System.Windows.Forms.CheckBox();
             this._enableCountersCheckBox = new System.Windows.Forms.CheckBox();
             this._fileNameTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._tagSettingsButton = new System.Windows.Forms.Button();
+            this._allowTagsCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // _label1
@@ -70,43 +72,43 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _okButton
             // 
-            this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(327, 91);
+            this._okButton.Location = new System.Drawing.Point(327, 120);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 6;
+            this._okButton.TabIndex = 8;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             // 
             // _cancelButton
             // 
-            this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(408, 91);
+            this._cancelButton.Location = new System.Drawing.Point(408, 120);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 7;
+            this._cancelButton.TabIndex = 9;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
             // _enableInputTrackingCheckBox
             // 
             this._enableInputTrackingCheckBox.AutoSize = true;
-            this._enableInputTrackingCheckBox.Location = new System.Drawing.Point(15, 53);
+            this._enableInputTrackingCheckBox.Location = new System.Drawing.Point(15, 79);
             this._enableInputTrackingCheckBox.Name = "_enableInputTrackingCheckBox";
             this._enableInputTrackingCheckBox.Size = new System.Drawing.Size(156, 17);
-            this._enableInputTrackingCheckBox.TabIndex = 4;
+            this._enableInputTrackingCheckBox.TabIndex = 6;
             this._enableInputTrackingCheckBox.Text = "Enable input event tracking";
             this._enableInputTrackingCheckBox.UseVisualStyleBackColor = true;
             // 
             // _enableCountersCheckBox
             // 
             this._enableCountersCheckBox.AutoSize = true;
-            this._enableCountersCheckBox.Location = new System.Drawing.Point(15, 77);
+            this._enableCountersCheckBox.Location = new System.Drawing.Point(15, 103);
             this._enableCountersCheckBox.Name = "_enableCountersCheckBox";
             this._enableCountersCheckBox.Size = new System.Drawing.Size(153, 17);
-            this._enableCountersCheckBox.TabIndex = 5;
+            this._enableCountersCheckBox.TabIndex = 7;
             this._enableCountersCheckBox.Text = "Enable data entry counters";
             this._enableCountersCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -121,12 +123,35 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._fileNameTagsButton.TextControl = this._configFileNameTextBox;
             this._fileNameTagsButton.UseVisualStyleBackColor = true;
             // 
+            // _tagSettingsButton
+            // 
+            this._tagSettingsButton.Location = new System.Drawing.Point(245, 52);
+            this._tagSettingsButton.Name = "_tagSettingsButton";
+            this._tagSettingsButton.Size = new System.Drawing.Size(75, 23);
+            this._tagSettingsButton.TabIndex = 5;
+            this._tagSettingsButton.Text = "Settings...";
+            this._tagSettingsButton.UseVisualStyleBackColor = true;
+            this._tagSettingsButton.Click += new System.EventHandler(this.HandleTagSettingsButtonClick);
+            // 
+            // _allowTagsCheckBox
+            // 
+            this._allowTagsCheckBox.AutoSize = true;
+            this._allowTagsCheckBox.Location = new System.Drawing.Point(15, 56);
+            this._allowTagsCheckBox.Name = "_allowTagsCheckBox";
+            this._allowTagsCheckBox.Size = new System.Drawing.Size(217, 17);
+            this._allowTagsCheckBox.TabIndex = 4;
+            this._allowTagsCheckBox.Text = "Allow user to apply tags to the document";
+            this._allowTagsCheckBox.UseVisualStyleBackColor = true;
+            this._allowTagsCheckBox.CheckedChanged += new System.EventHandler(this.HandleAllowTagsCheckBox_CheckedChanged);
+            // 
             // ConfigurationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(495, 126);
+            this.ClientSize = new System.Drawing.Size(495, 155);
             this.ControlBox = false;
+            this.Controls.Add(this._tagSettingsButton);
+            this.Controls.Add(this._allowTagsCheckBox);
             this.Controls.Add(this._fileNameTagsButton);
             this.Controls.Add(this._enableCountersCheckBox);
             this.Controls.Add(this._enableInputTrackingCheckBox);
@@ -155,5 +180,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.CheckBox _enableInputTrackingCheckBox;
         private System.Windows.Forms.CheckBox _enableCountersCheckBox;
         private Extract.Utilities.Forms.PathTagsButton _fileNameTagsButton;
+        private System.Windows.Forms.Button _tagSettingsButton;
+        private System.Windows.Forms.CheckBox _allowTagsCheckBox;
     }
 }

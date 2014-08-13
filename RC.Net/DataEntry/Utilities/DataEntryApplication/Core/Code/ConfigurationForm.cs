@@ -1,7 +1,9 @@
+using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using System;
 using System.Threading;
 using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry.Utilities.DataEntryApplication
 {
@@ -10,33 +12,80 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
     /// </summary>
     public partial class ConfigurationForm : Form
     {
+        #region Fields
+
         /// <summary>
-        /// The <see cref="ComClass"/> instance for which configuration is being performed.
+        /// The <see cref="VerificationSettings"/> instance for which configuration is being
+        /// performed.
         /// </summary>
-        ComClass _comClass;
+        VerificationSettings _settings;
+
+        /// <summary>
+        /// Specifies which tags should be available to the users.
+        /// </summary>
+        FileTagSelectionSettings _tagSettings;
+
+        /// <summary>
+        /// The <see cref="FileProcessingDB"/>.
+        /// </summary>
+        FileProcessingDB _fileProcessingDB;
+
+        #endregion Fields
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="ConfigurationForm"/> instance for the specified
-        /// <see cref="ComClass"/> instance.
+        /// <see cref="VerificationSettings"/> instance.
         /// </summary>
-        /// <param name="comClass">The <see cref="ComClass"/> instance which is to be configured.
+        /// <param name="settings">The <see cref="VerificationSettings"/> instance which is to be
+        /// configured.
         /// </param>
-        public ConfigurationForm(ComClass comClass)
+        public ConfigurationForm(VerificationSettings settings)
         {
             try
             {
-                ExtractException.Assert("ELI25475", "Null argument exception!", comClass != null);
+                ExtractException.Assert("ELI25475", "Null argument exception!", settings != null);
 
                 InitializeComponent();
 
+                FAMDBUtils dbUtils = new FAMDBUtils();
+                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
+                _fileProcessingDB = (FileProcessingDB)Activator.CreateInstance(mgrType);
+
+                _fileProcessingDB.ConnectLastUsedDBThisProcess();
+
                 _fileNameTagsButton.PathTags = new FileActionManagerPathTags();
-                _comClass = comClass;
+                _settings = new VerificationSettings(settings);
+                _tagSettings = _settings.TagSettings;
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI25492", ex);
             }
         }
+
+        #endregion Constructors
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the <see cref="VerificationSettings"/> represented in the configuration dialog.
+        /// </summary>
+        /// <value>
+        /// The <see cref="VerificationSettings"/> represented in the configuration dialog.
+        /// </value>
+        public VerificationSettings Settings
+        {
+            get
+            {
+                return _settings;
+            }
+        }
+
+        #endregion Properties
+
+        #region Methods
 
         /// <summary>
         /// Displays the form to allow the user to specify settings.
@@ -48,29 +97,79 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Initialize the form's controls
-                _configFileNameTextBox.Text = _comClass.ConfigFileName;
-                _enableInputTrackingCheckBox.Checked = _comClass.InputEventTrackingEnabled;
-                _enableCountersCheckBox.Checked = _comClass.CountersEnabled;
+                _configFileNameTextBox.Text = _settings.ConfigFileName;
+                _enableInputTrackingCheckBox.Checked = _settings.InputEventTrackingEnabled;
+                _enableCountersCheckBox.Checked = _settings.CountersEnabled;
+                _allowTagsCheckBox.Checked = _settings.AllowTags;
+                _tagSettingsButton.Enabled = _allowTagsCheckBox.Checked;
 
                 // Display the form modally and wait for the result
                 if (ShowDialog() == DialogResult.OK)
                 {
-                    // The user is applying settings; apply the current form values to the _comClass.
-                    _comClass.ConfigFileName = _configFileNameTextBox.Text;
-                    _comClass.InputEventTrackingEnabled = _enableInputTrackingCheckBox.Checked;
-                    _comClass.CountersEnabled = _enableCountersCheckBox.Checked;
+                    _settings = new VerificationSettings(
+                        _configFileNameTextBox.Text,
+                        _enableInputTrackingCheckBox.Checked,
+                        _enableCountersCheckBox.Checked,
+                        _allowTagsCheckBox.Checked,
+                        _tagSettings);
 
                     return true;
                 }
                 else
                 {
-                    // Configuration was cancelled.  Return without applying the changes.
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI25468", ex);
+                throw ex.AsExtract("ELI25468");
+            }
+        }
+
+        #endregion Methods
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
+        /// <see cref="_allowTagsCheckBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleAllowTagsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _tagSettingsButton.Enabled = _allowTagsCheckBox.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37238");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="_tagSettingsButton"/> <see cref="Control.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleTagSettingsButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                using (FileTagSelectionDialog dialog =
+                    new FileTagSelectionDialog(_settings.TagSettings, _fileProcessingDB))
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        _tagSettings = new FileTagSelectionSettings(dialog.Settings);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37220");
             }
         }
 
@@ -107,6 +206,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException.Display("ELI25477", ex);
             }
         }
+
+        #endregion Event Handlers
+
+        #region Private Members
 
         /// <summary>
         /// Displays an <see cref="OpenFileDialog"/> to allow the user to select a filename to
@@ -161,6 +264,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // If in the UI thread, apply the specified value.
             textBox.Text = value;
         }
+
+        #endregion Private Members
 
         #region Delegates
 
