@@ -1,5 +1,6 @@
 using Extract.Interop;
 using System;
+using Extract.FileActionManager.Forms;
 
 namespace Extract.Redaction
 {
@@ -53,9 +54,19 @@ namespace Extract.Redaction
         readonly bool _launchInFullScreenMode;
 
         /// <summary>
-        /// 
+        /// The slideshow related settings.
         /// </summary>
         readonly SlideshowSettings _slideshowSettings;
+
+        /// <summary>
+        /// Specifies whether the user should be able to apply tags.
+        /// </summary>
+        readonly bool _allowTags;
+
+        /// <summary>
+        /// Specifies which tags should be available to the users.
+        /// </summary>
+        FileTagSelectionSettings _tagSettings;
 
         #endregion Fields
 
@@ -65,7 +76,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
         public VerificationSettings() 
-            : this(null, null, null, false, null, null, false, false, null)
+            : this(null, null, null, false, null, null, false, false, null, true, null)
         {
 
         }
@@ -77,7 +88,8 @@ namespace Extract.Redaction
         public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback, 
             string inputFile, bool useBackdropImage, string backdropImage, 
             SetFileActionStatusSettings actionStatus, bool enableInputTracking,
-            bool launchInFullScreenMode, SlideshowSettings slideshowSettings)
+            bool launchInFullScreenMode, SlideshowSettings slideshowSettings, bool allowTags,
+            FileTagSelectionSettings tagSettings)
         {
             _generalSettings = general ?? new GeneralVerificationSettings();
             _feedbackSettings = feedback ?? new FeedbackSettings();
@@ -88,6 +100,8 @@ namespace Extract.Redaction
             _enableInputTracking = enableInputTracking;
             _launchInFullScreenMode = launchInFullScreenMode;
             _slideshowSettings = slideshowSettings ?? new SlideshowSettings();
+            _allowTags = allowTags;
+            _tagSettings = tagSettings ?? new FileTagSelectionSettings();
         }
 
         #endregion Constructors
@@ -213,6 +227,31 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the user can apply tags.
+        /// </summary>
+        /// <value><see langword="true"/> if user can apply tags; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool AllowTags
+        {
+            get
+            {
+                return _allowTags;
+            }
+        }
+
+        /// <summary>
+        /// Gets the tag settings.
+        /// </summary>
+        public FileTagSelectionSettings TagSettings
+        {
+            get
+            {
+                return _tagSettings;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -238,6 +277,8 @@ namespace Extract.Redaction
                 bool enableInputTracking = false;
                 bool launchInFullScreenMode = false;
                 SlideshowSettings slideshowSettings = null;
+                bool allowTags = true;
+                FileTagSelectionSettings tagSettings = null;
 
                 if (reader.Version < 2)
                 {
@@ -266,10 +307,15 @@ namespace Extract.Redaction
                 {
                     slideshowSettings = SlideshowSettings.ReadFrom(reader);
                 }
+                if (reader.Version >= 9)
+                {
+                    allowTags = reader.ReadBoolean();
+                    tagSettings = FileTagSelectionSettings.ReadFrom(reader);
+                }
 
                 return new VerificationSettings(general, feedback, inputFile, useBackdropImage,
                     backdropImage, actionStatusSettings, enableInputTracking,
-                    launchInFullScreenMode, slideshowSettings);
+                    launchInFullScreenMode, slideshowSettings, allowTags, tagSettings);
             }
             catch (Exception ex)
             {
@@ -297,6 +343,8 @@ namespace Extract.Redaction
                 writer.Write(_backdropImage);
                 writer.Write(_launchInFullScreenMode);
                 _slideshowSettings.WriteTo(writer);
+                writer.Write(_allowTags);
+                _tagSettings.WriteTo(writer);
             }
             catch (Exception ex)
             {
