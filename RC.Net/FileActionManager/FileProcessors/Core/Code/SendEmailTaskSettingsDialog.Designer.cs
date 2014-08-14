@@ -207,6 +207,7 @@
             // 
             // _resetErrorSettingsButton
             // 
+            this._resetErrorSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._resetErrorSettingsButton.Location = new System.Drawing.Point(128, 361);
             this._resetErrorSettingsButton.Name = "_resetErrorSettingsButton";
             this._resetErrorSettingsButton.Size = new System.Drawing.Size(151, 23);
