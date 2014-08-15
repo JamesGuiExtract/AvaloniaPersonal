@@ -405,6 +405,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;
 		interface ILicensedComponent;
+		interface IParallelizableTask;
 		interface IAccessRequired;
 	};
 

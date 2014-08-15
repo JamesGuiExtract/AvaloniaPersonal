@@ -815,11 +815,22 @@ STDMETHODIMP CConditionalTask::get_Parallelize(VARIANT_BOOL *pVal)
 		validateLicense();
 
 		// check all contained objects to determine if this parallelizable
-		bool bParallelizable = containsParallelizableTask(m_ipTasksForFalse);
-
+		// Check the condition object
+		IParallelizableTaskPtr ipParallelTask = m_ipFAMCondition->Object;
+		bool bParallelizable = false;
+		if (ipParallelTask != __nullptr)
+		{
+			bParallelizable = asCppBool(ipParallelTask->Parallelize);
+		}
 		if (!bParallelizable)
 		{
-			bParallelizable = containsParallelizableTask(m_ipTasksForTrue);
+			// Check the false tasks
+			bParallelizable = containsParallelizableTask(m_ipTasksForFalse);
+			if (!bParallelizable)
+			{
+				//check the true tasks
+				bParallelizable = containsParallelizableTask(m_ipTasksForTrue);
+			}
 		}
 
 		*pVal = asVariantBool(bParallelizable);
@@ -921,7 +932,10 @@ bool CConditionalTask::containsParallelizableTask(IIUnknownVectorPtr ipTaskList)
 	long nSize = ipTaskList->Size();
 	for (long i = 0; i < nSize; i++ )
 	{
-		IParallelizableTaskPtr ipTask = ipTaskList->At(i);
+		IObjectWithDescriptionPtr ipOWD = ipTaskList->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI37266", ipOWD != __nullptr);
+
+		IParallelizableTaskPtr ipTask = ipOWD->Object;
 		if (ipTask != __nullptr)
 		{
 			// Only one needs to be parallelizable.

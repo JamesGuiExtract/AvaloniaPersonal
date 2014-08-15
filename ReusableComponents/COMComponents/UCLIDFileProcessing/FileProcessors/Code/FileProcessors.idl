@@ -551,6 +551,7 @@ library UCLID_FILEPROCESSORSLib
 		interface ICategorizedComponent;
 		interface ICopyableObject;
 		interface IFileProcessingTask;
+		interface IParallelizableTask;
 		interface IMustBeConfiguredObject;
 	};
 	[
