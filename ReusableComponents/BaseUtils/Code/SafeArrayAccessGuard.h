@@ -78,6 +78,7 @@ public:
 					throw ue;
 				}
 				m_pData = __nullptr;
+				m_bIsLocked = false;
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37198");
