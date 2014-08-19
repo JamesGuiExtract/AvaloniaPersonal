@@ -242,7 +242,7 @@
             this.Controls.Add(this._cancelButton);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(400, 250);
+            this.MinimumSize = new System.Drawing.Size(468, 250);
             this.Name = "SendEmailTaskSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

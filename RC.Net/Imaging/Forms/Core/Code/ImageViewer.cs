@@ -707,7 +707,12 @@ namespace Extract.Imaging.Forms
                 if (UnlockLeadtools.UnlockDocumentSupport(false) != null)
                 {
                     // Turn off display of annotation if document support is locked
-                    _displayAnnotations = false;
+                    DisplayAnnotations = false;
+                }
+                else
+                {
+                    // Update the annotation behavior based on registry settings
+                    DisplayAnnotations = RegistryManager.DisplayAnnotations;
                 }
 
                 // Turn on anti-aliasing
@@ -3459,9 +3464,6 @@ namespace Extract.Imaging.Forms
             // Update the anti-aliasing behavior based on registry settings
             // [DNRCAU #422]
             UseAntiAliasing = RegistryManager.UseAntiAliasing;
-
-            // Update the annotation behavior based on registry settings
-            DisplayAnnotations = RegistryManager.DisplayAnnotations;
         }
 
         /// <summary>
