@@ -199,18 +199,31 @@ namespace Extract.DataEntry
                     UpdateValue(_defaultQuery);
                 }
 
+                // Keep track of which properties have already been updated so that we can prevent
+                // multiple auto-update queries from running against the same property.
+                var setUpdatedProperties = new HashSet<string>();
+
                 // Attempt an update with all resolved queries.
                 foreach (DataEntryQuery query in _queries)
                 {
+                    // If the query's TargetProperty has already been updated, don't run any other
+                    // queries against that property.
+                    if (!_validationTrigger &&
+                        setUpdatedProperties.Contains(query.TargetProperty))
+                    {
+                        continue;
+                    }
+
                     if (UpdateValue(query))
                     {
                         valueUpdated = true;
 
                         // If this is not a validation trigger, once the attribute has been updated
-                        // don't attempt an update with any remaining queries.
+                        // a particular property, don't attempt to update the property with any
+                        // remaining queries.
                         if (!_validationTrigger)
                         {
-                            break;
+                            setUpdatedProperties.Add(query.TargetProperty);
                         }
                     }
                 }
@@ -463,7 +476,14 @@ namespace Extract.DataEntry
                         return false;
                     }
                 }
-                // A normal auto-update query- apply the query results (if there were any).
+                // If the query is targeting a different property of the control (rather than that
+                // which represents the attribute's value).
+                else if (!string.IsNullOrWhiteSpace(dataEntryQuery.TargetProperty))
+                {
+                    return ApplyQueryResult(queryResult, dataEntryQuery.TargetProperty);
+                }
+                // Otherwise a normal auto-update query; apply the query result to the attribute
+                // value.
                 else
                 {
                     return ApplyQueryResult(queryResult);
@@ -539,6 +559,37 @@ namespace Extract.DataEntry
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Attempts to apply the specified <see cref="QueryResult"/> to the
+        /// <see paramref="propertyName"/> of the UI element representing the target
+        /// <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="queryResult">The <see cref="QueryResult"/> to be applied.</param>
+        /// <param name="propertyName">Then name of the property to apply the value to. Can be a
+        /// nested property such as "OwningColumn.Width".</param>
+        /// <returns><see langword="true"/> if the control's property was updated;
+        /// <see langword="false"/> otherwise.</returns>
+        bool ApplyQueryResult(QueryResult queryResult, string propertyName)
+        {
+            string stringResult = queryResult.ToString();
+
+            if (!string.IsNullOrEmpty(stringResult))
+            {
+                // Check if the query result is the special value to indicate the value be cleared.
+                if (string.Equals(stringResult, _BLANK_VALUE,
+                    StringComparison.CurrentCultureIgnoreCase))
+                {
+                    stringResult = "";
+                }
+
+                AttributeStatusInfo.SetPropertyValue(_targetAttribute, propertyName, stringResult);
+
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

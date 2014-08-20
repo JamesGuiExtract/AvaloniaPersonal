@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
@@ -1245,6 +1246,51 @@ namespace Extract.DataEntry
                 }
 
                 throw ExtractException.AsExtractException("ELI26090", ex);
+            }
+        }
+
+        /// <summary>
+        /// Applies the specified <see paramref="value"/> to the specified
+        /// <see paramref="propertyName"/> of the UI element representing the specified
+        /// <see paramref="attribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element property
+        /// is to be updated.</param>
+        /// <param name="propertyName">The name of the property to update. Can be a nested property
+        /// such as "OwningColumn.Width".</param>
+        /// <param name="value">The <see cref="string"/> representation of the value to apply.
+        /// </param>
+        [ComVisible(false)]
+        public static void SetPropertyValue(IAttribute attribute, string propertyName, string value)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                // These values will be set for each generation in the specified property name.
+                object element = null;
+                Type elementType = null;
+                PropertyInfo property = null;
+
+                foreach (string currentProperty in propertyName.Split('.'))
+                {
+                    // The root element will be the UI element directly associated with the
+                    // attribute.
+                    element = (property == null)
+                        ? statusInfo.OwningControl.GetAttributeUIElement(attribute)
+                        : property.GetValue(element, null);
+
+                    elementType = element.GetType();
+                    property = elementType.GetProperty(currentProperty);
+                }
+
+                // The property we have after looping through all generations is the one for which
+                // we need to apply the value.
+                property.SetValue(element, value.ConvertToType(property.PropertyType), null);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37288");
             }
         }
 

@@ -775,6 +775,20 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets the UI element associated with the specified <see paramref="attribute"/>. This may
+        /// be a type of <see cref="Control"/> or it may also be <see cref="DataGridViewElement"/>
+        /// such as a <see cref="DataGridViewCell"/> if the <see paramref="attribute"/>'s owning
+        /// control is a table control.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element is needed.
+        /// </param>
+        /// <returns>The UI element.</returns>
+        public object GetAttributeUIElement(IAttribute attribute)
+        {
+            return this;
+        }
+
+        /// <summary>
         /// <see cref="DataEntryCopyButton"/> doesn't cache any data.
         /// </summary>
         public void ClearCachedData()

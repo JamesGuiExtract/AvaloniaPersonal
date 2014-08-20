@@ -53,6 +53,16 @@ namespace Extract.DataEntry
         /// </summary>
         string _validationMessageResultName;
 
+        /// <summary>
+        /// Specifies the property that will be updated by this query when used as a AutoUpdateQuery.
+        /// By default the target property is the property that displays the attribute's value such
+        /// as "Text" or "Value". Can be a nested property such as "OwningColumn.Width".
+        /// <para><b>Note</b></para>
+        /// It is not supported to set the <see cref="DefaultQuery"/> attribute to true on a query
+        /// for which <see cref="TargetProperty"/> has been specified.
+        /// </summary>
+        string _targetProperty;
+
         #endregion Fields
 
         #region Constructors
@@ -268,6 +278,24 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets the property that will be updated by this query when used as a AutoUpdateQuery. By
+        /// default the target property is the property that displays the attribute's value such as
+        /// "Text" or "Value". Can be a nested property such as "OwningColumn.Width".
+        /// <para><b>Note</b></para>
+        /// It is not supported to set the <see cref="DefaultQuery"/> attribute to true on a query
+        /// for which <see cref="TargetProperty"/> has been specified.
+        /// </summary>
+        /// <returns>The property that will be updated by this query when used as a AutoUpdateQuery.
+        /// </returns>
+        public string TargetProperty
+        {
+            get
+            {
+                return _targetProperty;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -345,6 +373,19 @@ namespace Extract.DataEntry
                 if (xmlAttribute != null)
                 {
                     _isValidationWarning = xmlAttribute.Value.ToBoolean();
+                }
+
+                // By default auto-update queries update the Text or value property of a control
+                // (depending on control type). Make sure that if the default property (Text/Value)
+                // is manually targeted, it behaves the same as if it were not specified.
+                xmlAttribute = xmlNode.Attributes["TargetProperty"];
+                if (xmlAttribute != null &&
+                    !string.Equals(xmlAttribute.Value, "Text", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(xmlAttribute.Value, "Value", StringComparison.OrdinalIgnoreCase))
+                {
+                    ExtractException.Assert("ELI37287", "The Default and TargetPorperty attributes " +
+                        "may not be used simultaneiously.", !_defaultQuery);
+                    _targetProperty = xmlAttribute.Value;
                 }
             }
             catch (Exception ex)

@@ -2036,6 +2036,48 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets the UI element associated with the specified <see paramref="attribute"/>. This may
+        /// be a type of <see cref="Control"/> or it may also be <see cref="DataGridViewElement"/>
+        /// such as a <see cref="DataGridViewCell"/> if the <see paramref="attribute"/>'s owning
+        /// control is a table control.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element is needed.
+        /// </param>
+        /// <returns>The UI element</returns>
+        public object GetAttributeUIElement(IAttribute attribute)
+        {
+            try
+            {
+                ExtractException.Assert("ELI37289", "Null argument exception", attribute != null);
+
+                object tableElement;
+                if (_attributeMap.TryGetValue(attribute, out tableElement))
+                {
+                    DataGridViewCell cell = tableElement as DataGridViewCell;
+                    if (cell != null)
+                    {
+                        return cell;
+                    }
+
+                    // Attempt to interpret the item as a DataEntryTableRow to get its Attribute.
+                    DataEntryTableRow row = tableElement as DataEntryTableRow;
+                    if (row != null)
+                    {
+                        return row;
+                    }
+                }
+
+                var ee = new ExtractException("ELI37290", "Attribute not mapped to table element");
+                ee.AddDebugData("AttributeName", attribute.Name, false);
+                throw ee;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37291");
+            }
+        }
+
+        /// <summary>
         /// Handles the case that this table's <see cref="ParentDataEntryControl"/> has requested 
         /// that a new <see cref="IAttribute"/> be propagated.  The <see cref="DataEntryTextBox"/> 
         /// will re-map its control appropriately. The <see cref="AttributeStatusInfo"/> instance 

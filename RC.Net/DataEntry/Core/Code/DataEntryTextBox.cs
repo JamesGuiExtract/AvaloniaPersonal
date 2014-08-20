@@ -1324,6 +1324,20 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets the UI element associated with the specified <see paramref="attribute"/>. This may
+        /// be a type of <see cref="Control"/> or it may also be <see cref="DataGridViewElement"/>
+        /// such as a <see cref="DataGridViewCell"/> if the <see paramref="attribute"/>'s owning
+        /// control is a table control.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element is needed.
+        /// </param>
+        /// <returns>The UI element</returns>
+        public object GetAttributeUIElement(IAttribute attribute)
+        {
+            return this;
+        }
+
+        /// <summary>
         /// Processes the supplied <see cref="SpatialString"/> as input.
         /// </summary>
         /// <param name="swipedText">The <see cref="SpatialString"/> representing the

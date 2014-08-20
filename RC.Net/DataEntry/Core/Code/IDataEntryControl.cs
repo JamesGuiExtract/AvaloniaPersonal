@@ -220,6 +220,17 @@ namespace Extract.DataEntry
         void RefreshAttributes(bool spatialInfoUpdated, params IAttribute[] attributes);
 
         /// <summary>
+        /// Gets the UI element associated with the specified <see paramref="attribute"/>. This may
+        /// be a type of <see cref="T:Control"/> or it may also be
+        /// <see cref="T:DataGridViewElement"/> such as a <see cref="T:DataGridViewCell"/> if the
+        /// <see paramref="attribute"/>'s owning control is a table control.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element is needed.
+        /// </param>
+        /// <returns>The UI element</returns>
+        object GetAttributeUIElement(IAttribute attribute);
+
+        /// <summary>
         /// Any data that was cached should be cleared;  This is called when a document is unloaded.
         /// If controls fail to clear COM objects, errors may result if that data is accessed when
         /// a subsequent document is loaded.
