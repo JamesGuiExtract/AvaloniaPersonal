@@ -47,6 +47,7 @@ protected:
 	afx_msg void OnContextInspectFiles();
 	afx_msg void OnContextSetFileActionStatus();
 	afx_msg void OnContextViewFailed();
+	afx_msg void OnContextCopyActionName();
 	virtual BOOL OnInitDialog();
 
 private:

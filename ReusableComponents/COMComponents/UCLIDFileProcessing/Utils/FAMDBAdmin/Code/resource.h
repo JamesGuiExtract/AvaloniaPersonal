@@ -25,6 +25,7 @@
 #define IDR_MANAGE_ACTIONS_ACCELERATORS 141
 #define IDR_MANAGE_LOGIN_USERS_ACCELERATORS 142
 #define IDR_MENU_SUMMARY_CONTEXT        143
+#define IDR_MENU_SUMMARY_ROW_HEADER     144
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
@@ -156,13 +157,14 @@
 #define ID_SUMMARY_MENU_INSPECT_FILES   32803
 #define ID_TOOLS_INSPECTFILES           32804
 #define ID_TOOLS_INSPECT_FILES          32805
+#define ID_SUMMARY_MENU_ROW_HEADER_COPY 32806
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        146
-#define _APS_NEXT_COMMAND_VALUE         32806
+#define _APS_NEXT_COMMAND_VALUE         32807
 #define _APS_NEXT_CONTROL_VALUE         2109
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif

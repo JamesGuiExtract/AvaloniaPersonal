@@ -9,6 +9,7 @@
 #include <ComUtils.h>
 #include <ADOUtils.h>
 #include <TemporaryFileName.h>
+#include <ClipboardManager.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
@@ -134,6 +135,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminSummaryDlg, CPropertyPage)
 	ON_COMMAND(ID_SUMMARY_MENU_SET_ACTION_STATUS, &OnContextSetFileActionStatus)
 	ON_COMMAND(ID_SUMMARY_MENU_VIEW_FAILED, &OnContextViewFailed)
 	ON_COMMAND(ID_SUMMARY_MENU_INSPECT_FILES, &OnContextInspectFiles)
+	ON_COMMAND(ID_SUMMARY_MENU_ROW_HEADER_COPY, &OnContextCopyActionName)
 END_MESSAGE_MAP()
 //--------------------------------------------------------------------------------------------------
 
@@ -291,19 +293,36 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 
 		// Retrieve information about the active cell.
 		LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+		
+		CMenu menu;
+		CMenu *pContextMenu = __nullptr;
+		string strActionStatus;
 
 		// If there is a valid selection...
 		if (pNMItemActivate->iItem >= 0 && pNMItemActivate->iSubItem >= 0)
 		{
-			// If the selected column has an associated action status code... 
-			string strActionStatus = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][0];
+
+			// If the click occured in the row header...
+			if (pNMItemActivate->iSubItem == 0)
+			{
+				string strContextActionName = m_listActions.GetItemText(pNMItemActivate->iItem, 0);
+				m_nContextMenuActionID = m_ipFAMDB->GetActionID(strContextActionName.c_str());
+
+				menu.LoadMenu(IDR_MENU_SUMMARY_ROW_HEADER);
+				pContextMenu = menu.GetSubMenu(0);
+			}
+			// Otherwise, see if the selected column has an associated action status code... 
+			else
+			{
+				strActionStatus = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][0];
+			}
+
+			// If there is an associated action status code... 
 			if (!strActionStatus.empty())
 			{
 				// Prepare file selection info based on the selected action and actions status
 				string strContextActionStatusName = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][1];
 				string strContextActionName = m_listActions.GetItemText(pNMItemActivate->iItem, 0);
-				string strFailedFileCount =
-					(LPCTSTR)m_listActions.GetItemText(pNMItemActivate->iItem, giFAILED_COLUMN);
 
 				m_nContextMenuActionID = m_ipFAMDB->GetActionID(strContextActionName.c_str());
 				EActionStatus esStatus = m_ipFAMDB->AsEActionStatus(strActionStatus.c_str());
@@ -311,9 +330,14 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 				m_ipContextMenuFileSelector->AddActionStatusCondition(m_ipFAMDB,
 					m_nContextMenuActionID, esStatus);
 
-				CMenu menu;
 				menu.LoadMenu(IDR_MENU_SUMMARY_CONTEXT);
-				CMenu *pContextMenu = menu.GetSubMenu(0);
+				pContextMenu = menu.GetSubMenu(0);
+			}
+
+			if (pContextMenu != __nullptr)
+			{
+				string strFailedFileCount =
+					(LPCTSTR)m_listActions.GetItemText(pNMItemActivate->iItem, giFAILED_COLUMN);
 
 				// Enable "View exceptions for failed files" only when there are failed files for
 				// the action.
@@ -484,6 +508,18 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32305");
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::OnContextCopyActionName()
+{
+	try
+	{
+		string strActionName = asString(m_ipFAMDB->GetActionName(m_nContextMenuActionID));
+
+		ClipboardManager clipboardManager(this);
+		clipboardManager.writeText(strActionName);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37286");
 }
 
 //--------------------------------------------------------------------------------------------------
