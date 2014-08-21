@@ -55,6 +55,25 @@
 			</ul>
 		</ul>
 <p>
+       	  	<li><b>Database contents condition</b>.</li>
+		<ul> 
+			<li>Create a <b>FAM_Condition</b> database.
+			<li>Add a <b>DB_Condition</b> action to the database.
+			<li>Run <b>Exercise_DB_Condition.bat</b> from 
+			<b>.\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing
+			\ESSkipConditions\InteractiveTest\FPS</b> and 
+			review the results in the parallel <b>Output</b> folder.
+			<ul>
+				<li>Each TXT file should be named with two or 
+				three characters, followed by an underscore, 
+				followed by <b>PASS</b>.
+				<li>Review TXT contents of any <b>FAIL</b> files.
+				<li>Confirm presence of <b>D:\DBCondition.uex</b>. This 
+				file should be created or updated each time 
+				<b>07c_SDF.fps</b> is executed in the batch file.
+			</ul>
+		</ul>
+<p>
 		<li><b>Document type condition</b>
 		<ul>
 			<li>Confirm that the configuration dialog can be displayed and that settings 
@@ -145,6 +164,19 @@
 			<li>Confirm that the condition can be met <b>once every</b> specified number 
 			of times.
 			<li>Confirm that the condition can be met using <b>FileID modulus</b>.
+		</ul>
+<p>
+		<li><b>Page count condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Exercise the <b>Demo_IDShield</b> images.
+			<li>Confirm that the condition can match for <b>greater than or equal 
+			to</b> a page count.
+			<li>Confirm that the condition can match for <b>less than</b> a page 
+			count.
+			<li>Confirm that the condition can match when not using <b>the page 
+			count from the database</b>.
 		</ul>
 <p>
 		<li><b>Tag condition</b>
