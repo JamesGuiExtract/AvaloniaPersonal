@@ -1,0 +1,256 @@
+<HTML>
+
+<HEAD>
+<TITLE>Testing of 9.9 Features and Enhancements</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE 9.9<br> 
+Features and Enhancements</h1>
+<hr>
+
+<h1>Initial Goals</h1>
+<ul>
+	<li><b>Version 9.9</b>
+	<ul>
+		<li>Convert to Searchable PDF - <b>tested</b>
+		<li>FAM File Inspector enhancement - <b>tested</b>
+		<li>Nuance Version 19 - <b>tested</b>
+		<li>Database Contents condition - <b>tested</b>
+		<li>Minor bug fixes - <b>tested</b>
+	</ul>
+</ul>
+
+<hr>
+
+<h1>General</h1>
+<uL>
+	<li>Master DVDs
+	<ul>
+		<li><b>FLEX Index</b> - completed <b>07/xx/2014</b>
+		<li><b>ID Shield</b> - completed <b>07/xx/2014</b>
+		<li><b>LabDE</b> - completed <b>07/xx/2014</b>
+	</ul>
+	<li>Automated and NRS tests
+	<ul>
+		<li><b>9.9.0.19</b> completed <b>05/19/2014</b>
+		<li><b>9.9.0.28</b> completed <b>06/11/2014</b>
+		<li><b>9.9.0.29</b> completed <b>06/14/2014</b>
+		<li><b>9.9.0.37</b> completed <b>06/28/2014</b>
+		<li><b>9.9.0.40</b> completed <b>07/01/2014</b>
+		<li><b>9.9.0.48</b> completed <b>07/14/2014</b>
+	</ul>
+	<li>Testing <b>GET</b> messages
+	<ul>
+		<li><b>04/10/2014 11:09</b>, <b>9.9.0.4</b>, completed <b>04/11/2014</b>
+		<li><b>04/11/2014  8:29</b>, <b>9.9.0.4</b>, completed <b>04/11/2014</b>
+		<li><b>04/22/2014  3:18</b>, <b>9.9.0.13</b>, completed <b>04/24/2014</b>
+		<li><b>04/16/2014 10:15</b>, <b>9.9.0.13</b>, completed <b>04/24/2014</b>
+		<li><b>04/16/2014  9:08</b>, <b>9.9.0.13</b>, completed <b>04/24/2014</b>
+		<li><b>04/16/2014  2:27</b>, <b>9.9.0.13</b>, completed <b>04/24/2014</b>
+		<li><b>04/11/2014  2:05</b>, <b>9.9.0.13</b>, completed <b>04/25/2014</b>
+		<li><b>04/11/2014  4:39</b>, <b>9.9.0.13</b>, completed <b>04/25/2014</b>
+		<li><b>04/25/2014 10:37</b>, <b>9.9.0.15</b>, completed <b>04/25/2014</b>
+		<li><b>04/21/2014  3:59</b>, <b>9.9.0.16</b>, completed <b>04/28/2014</b>
+		<li><b>04/28/2014  1:49</b>, <b>9.9.0.17</b>, completed <b>04/29/2014</b>
+		<li><b>04/24/2014  9:53</b>, <b>9.9.0.19</b>, completed <b>05/19/2014</b>
+		<li><b>05/19/2014  1:26</b>, <b>9.9.0.20</b>, completed <b>05/20/2014</b>
+		<li><b>04/30/2014 11:44</b>, <b>9.9.0.xx</b>, completed <b>05/20/2014</b>
+		<li><b>04/22/2014  8:34</b>, <b>9.9.0.20</b>, completed <b>05/20/2014</b>
+		<li><b>04/18/2014  5:59</b>, <b>9.9.0.19</b>, completed <b>05/20/2014</b>
+		<li><b>04/24/2014 11:35</b>, <b>9.9.0.23</b>, completed <b>06/03/2014</b>
+		<li><b>06/03/2014 10:41</b>, <b>9.9.0.24</b>, completed <b>06/04/2014</b>
+		<li><b>06/04/2014  2:14</b>, <b>9.9.0.25</b>, completed <b>06/05/2014</b>
+		<li><b>06/04/2014  3:03</b>, <b>9.9.0.25</b>, completed <b>06/05/2014</b>
+		<li><b>06/09/2014 10:08</b>, <b>9.9.0.27</b>, completed <b>06/11/2014</b>
+		<li><b>06/11/2014 10:35</b>, <b>9.9.0.29</b>, completed <b>06/17/2014</b>
+		<li><b>06/10/2014  2:10</b>, <b>9.9.0.29</b>, completed <b>06/17/2014</b>
+		<li><b>06/16/2014  4:34</b>, <b>9.9.0.33</b>, completed <b>06/18/2014</b>
+		<li><b>06/18/2014  3:33</b>, <b>9.9.0.34</b>, completed <b>06/19/2014</b>
+		<li><b>06/24/2014  1:24</b>, <b>9.9.0.39</b>, completed <b>06/26/2014</b>
+		<li><b>04/23/2014  3:23</b>, <b>9.9.0.37</b>, completed <b>06/28/2014</b>
+		<li><b>06/30/2014 11:10</b>, <b>9.9.0.40</b>, completed <b>07/01/2014</b>
+		<li><b>06/26/2014  8:34</b>, <b>9.9.0.40</b>, completed <b>07/01/2014</b>
+		<li><b>06/30/2014  3:00</b>, <b>9.9.0.40</b>, completed <b>07/01/2014</b>
+		<li><b>06/30/2014  4:08</b>, <b>9.9.0.40</b>, completed <b>07/02/2014</b>
+		<li><b>06/23/2014  4:28</b>, <b>9.9.0.40</b>, completed <b>07/02/2014</b>
+		<li><b>07/01/2014  2:30</b>, <b>9.9.0.43</b>, completed <b>07/07/2014</b>
+		<li><b>06/23/2014  9:19</b>, <b>9.9.0.43</b>, completed <b>07/07/2014</b>
+		<li><b>07/09/2014 12:16</b>, <b>9.9.0.46</b>, completed <b>07/09/2014</b>
+		<li><b>07/09/2014  5:29</b>, <b>9.9.0.47</b>, completed <b>07/10/2014</b>
+		<li><b>05/30/2014  2:17</b>, <b>9.9.0.48</b>, completed <b>07/11/2014</b>
+		<li><b>06/23/2014  1:20</b>, <b>9.9.0.48</b>, completed <b>07/11/2014</b>
+		<li><b>06/10/2014  9:40</b>, <b>9.9.0.48</b>, completed <b>07/11/2014</b>
+		<li><b>06/10/2014 11:30</b>, <b>9.9.0.48</b>, completed <b>07/11/2014</b>
+<p>
+		<li><b>04/16/2014  3:38</b>, <b>9.9.0.xx</b>, completed <b>07/xx/2014</b>
+		<li><b>04/22/2014  1:33</b>, <b>9.9.0.xx</b>, completed <b>07/xx/2014</b>
+		<li><b>06/12/2014  4:43</b>, <b>9.9.0.xx</b>, completed <b>07/xx/2014</b>
+		<li><b>06/18/2014  2:03</b>, <b>9.9.0.xx</b>, completed <b>07/xx/2014</b>
+		<li><b>06/26/2014 11:12</b>, <b>9.9.0.xx</b>, completed <b>07/xx/2014</b>
+		<li><b>07/01/2014  5:29</b>, <b>9.9.0.xx</b>, completed <b>07/xx/2014</b>
+		<li><b>07/08/2014  4:04</b>, <b>9.9.0.xx</b>, completed <b>07/xx/2014</b>
+	</ul>
+</uL>
+<hr>
+
+<h1>Features</h1>
+<uL>
+	<li>Testing <b>FAM File Inspector</b>
+	<ul>
+		<li><b>9.9.0.5</b> completed <b>04/14/2014</b>
+		<li><b>9.9.0.29</b> completed <b>06/24/2014</b>
+	</ul>
+	<li>Testing <b>Nuance Version 19</b>
+	<ul>
+		<u>Memory Leak Testing</u>
+		<ul>
+			<li>Core: Rasterize PDF #1 - completed <b>05/20/2014</b>
+			<li>Core: Rasterize PDF #2 - completed <b>05/21/2014</b>
+			<li>Core: Rasterize PDF #3 - completed <b>05/21/2014</b>
+			<li>Core: Modify PDF File #1 - completed <b>05/22/2014</b>
+			<li>Core: Extract Image Area #1 - completed <b>05/22/2014</b>
+			<li>Core: Extract Image Area #2 - completed <b>05/23/2014</b>
+			<li>Core: Extract Image Area #3 - completed <b>05/23/2014</b>
+			<li>Core: Extract Image Area #4 - completed <b>05/27/2014</b>
+			<li>Core: Create Redacted Text #1 - completed <b>05/28/2014</b>
+			<li>Core: Create Redacted Text #2 - completed <b>05/29/2014</b>
+			<li>Core: Create Redacted Text #3 - completed <b>05/30/2014</b>
+			<li>Core: Create Redacted Text #4 - completed <b>06/01/2014</b>
+			<li>Core: Apply Bates Number #1 - completed <b>06/05/2014</b>
+			<li>Core: Apply Bates Number #2 - completed <b>06/05/2014</b>
+			<li>Core: Create Redacted Image #1 - completed <b>06/10/2014</b>
+			<li>Core: Create Redacted Image #2 - completed <b>06/10/2014</b>
+			<li>Core: Create Redacted Image #3 - completed <b>06/11/2014</b>
+			<li>Core: Create Redacted Image #4 - completed <b>06/12/2014</b>
+			<li>Core: Create Redacted Image #5 - completed <b>06/13/2014</b>
+			<li>Core: Create Redacted Image #6 - completed <b>06/14/2014</b>
+			<li>Core: Create Redacted Image #7 - completed <b>06/14/2014</b>
+			<li>Folder File Supplier #1 - completed <b>06/06/2014</b>
+			<li>Folder File Supplier #2 - completed <b>06/07/2014</b>
+			<li>Dynamic List File Supplier #1 - completed <b>06/09/2014</b>
+			<li>Dynamic List File Supplier #2 - completed <b>06/23/2014</b>
+			<li>Core: Create Searchable PDF #1 - completed <b>06/13/2014</b>
+			<li>Core: Create Searchable PDF #2 - completed <b>06/14/2014</b>
+			<li>Core: Create Searchable PDF #3 - completed <b>06/14/2014</b>
+			<li>Core: Create Searchable PDF #4 - completed <b>06/19/2014</b>
+			<li>Core: Create Searchable PDF #5 - completed <b>06/20/2014</b>
+		</ul>
+		<u>Analysis Testing</u>
+		<ul>
+			<li><u>FLEX Index</u>
+			<ul>
+				<li>CA - San Mateo - SouthTech (FLEX Index) - completed 
+				<b>05/01/2014</b>
+				<li>MI - Wayne - ACS (FLEX Index) - completed 
+				<b>05/22/2014</b>
+				<li>PA - Montgomery - IQS (FLEX Index) - completed 
+				<b>06/26/2014</b>
+			</ul>
+			<li><u>ID Shield</u>
+			<ul>
+				<li>LA - Iberville - Cott (ID Shield) - completed 
+				<b>05/01/2014</b>
+				<li>CA - Imperial - BMI (ID Shield) - completed 
+				<b>05/20/2014</b>
+				<li>PA - Carbon (ID Shield) - completed <b>05/28/2014</b>
+				<li>NY - SoS (ID Shield) - completed <b>05/29/2014</b>
+				<li>IL - SoS (ID Shield) - completed <b>05/30/2014</b>
+				<li>NC - Warren - Logan (ID Shield) - completed <b>06/07/2014</b>
+				<li>CA - District - AtPac (ID Shield) - completed <b>06/11/2014</b>
+				<li>CA - Berkeley (ID Shield) - completed <b>06/13/2014</b>
+			</ul>
+			<li><u>LabDE</u>
+			<ul>
+				<li>UW Transplant (LabDE) - completed <b>05/19/2014</b>
+				<li>Northwestern Memorial (LabDE) - completed 
+				<b>06/01/2014</b>
+			</ul>
+		</ul>
+	</ul>
+</uL>
+
+<hr>
+
+<h1>Complete Sanity Tests</h1>
+<ul>
+	<li>Build <b>9.9.0.18</b></a>
+	<ul>
+		<li>Operating System: 64-bit Server 2012 R2
+		<li>Date Started: 04/29/2014
+		<li><b>Date Completed: 05/19/2014</b>
+		<li>Tester: WL
+	</ul>
+</ul>
+
+<hr>
+
+<h1>Other Sanity Tests</h1>
+<uL>
+	<li><b>Server</b>
+	<ul>
+		<li>9.9.0.36, 64-bit Windows 7, DELLQC1, 06/30/2014, WL
+	</ul>
+	<li><b>Workstation</b>
+	<ul>
+		<li>9.9.0.40, 32-bit Server 2008, DELLQC1, 07/07/2014, WL
+	</ul>
+	<li><b>Tasks</b>
+	<ul>
+		<li>N/A
+	</ul>
+ 	<li><b>Suppliers</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Conditions</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Internal</b>
+	<ul>
+		<li>N/A
+	</ul>
+</uL>
+
+<hr>
+
+<h1>Other Checklists</h1>
+<ul>
+	<li><b>FAM File Inspector</b>, completed <b>06/24/2014</b>
+	<li><b>Extract Image Viewer</b>, completed <b>07/xx/2014</b>
+</ul>
+
+<hr>
+
+<h1>Scalability and Stability Testing</h1>
+<uL>
+	<li><b>TBD</b>
+	<ul>
+		<li>Operating System: 64-bit Server 2008 R2, BEAST-W2k8r2-1
+		<li>Date Started: 12/06/2013
+		<li><b>Date Completed: 12/19/2013</b>
+		<li>Tester: WL
+		<li>Status: 
+		<ul>
+			<li>Build <b>9.8.0.xx</b>
+		</ul>
+	</ul>
+</uL>
+
+<hr>
+<h1>Miscellaneous</h1>
+<OL>
+	<li><b>Documentation</b> - Add 9.9 Enhancements
+	<ul>
+		<li>Update Window Captions and Versions - completed <b>05/05/2014</b>
+		<li>Updated for Nuance Version 19 - completed <b>05/05/2014</b>
+		<li>Updated for FAM File Inspector - completed <b>05/22/2014</b>
+		<li>Updated for Database Contents condition - completed <b>07/01/2014</b>
+		<li>Updated for Support - completed <b>07/11/2014</b>
+	</ul>
+</OL>
+</BODY>
+</HTML>
