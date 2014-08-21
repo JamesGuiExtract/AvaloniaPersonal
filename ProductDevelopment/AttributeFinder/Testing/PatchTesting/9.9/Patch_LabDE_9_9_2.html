@@ -1,0 +1,134 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.9.2 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE 9.9.2 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> IN - Jefferson - CSI
+   	<LI><b>SCRs:</b> 12328
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>ID Shield verification hangs at the customer site.
+		<li>Exceptions are eventually logged about DB Timeout errors.
+		<li>Similar exceptions were seen during 9.9 ML testing (#12216)
+	</ul>
+<p>
+   	<LI><b>Customer:</b> AARP
+   	<LI><b>SCRs:</b> 12345, 12349
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>High-ANSI characters are being corrupted by the <b>Redaction: 
+		Create Redacted Text</b> task.
+	</ul>
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<OL>
+	<LI><b>Verification Stress Test</b>
+	<ul>
+		<li><u>Setup</u>
+		<ul>
+			<li>Make and unzip a local copy of 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12328\DBLockingTest.zip</b>.
+			<li>Run <b>DBLockingTest - Make Compatible.vbs</b>
+			<li>Copy DBLockingTest.exe and DBLockingTest.exe.config into 
+			the <b>CommonComponents</b> folder.
+			<li>Prepare <b>Demo_IDShield</b> images for verification.
+			<li>Modify the following registry setting to <b>5</b> (seconds) 
+			instead of 300.
+			<li><b>HKEY_CURRENT_USER\Software\Extract Systems\
+			ReusableComponents\COMComponents\UCLIDFileProcessing\
+			FileProcessingDB\DBLockTimeout</b>
+			<li>Restore the registry setting after testing is completed.
+		</ul>
+		<li><u>Initialize STA</u>
+		<ul>
+			<li>Run <b>DBLockingTest.exe</b> with <b>Initialize MTA = 0</b>.
+			<li>Run the test for a few mintes.
+			<li>Confirm that the <b>DB Lock Timeout</b> errors are not seen.
+			<li>Stop and restart the test several times.
+		</ul>
+		<li><u>Initialize MTA</u>
+		<ul>
+			<li>Run <b>DBLockingTest.exe</b> with <b>Initialize MTA = 1</b>.
+			<li>Run the test for a few mintes.
+			<li>Confirm that the <b>DB Lock Timeout</b> errors are not seen.
+			<li>Stop and restart the test several times.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>Auto Redaction</b>
+	<ul>
+		<LI>Exercise <b>Auto-Redact.fps</b> on <b>CHEDDAR</b> since the DB Lock 
+		Timeout problem was reproduced here using <b>9.9.1.50</b>.
+		<ul>
+			<li>Apply the patch.
+			<li>Reboot CHEDDAR.
+			<li>Open Auto-Redact.fps.
+			<li>Start DB Admin connecting to <b>sanity_test1</b>.
+			<li>Start processing.
+			<li>Confirm that each file processes completely without error.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>Create Redacted Text</b>
+	<ul>
+		<LI>Exercise a local copy of the test files found in 
+		<b>M:\PVCS_JIRA\JIRA\ISSUE-12345</b>.
+		<ul>
+			<li>Create a <b>Test</b> database with a <b>Test</b> action.
+			<li>Exercise <b>Ocr-Rules-Redact.fps</b>.
+			<li>Review the output files.
+			<ul>
+				<li>aarpmagazine.2.redacted.csv
+				<li>aarpmagazine.2.csv.unicode.redacted.txt
+				<li>aarpmagazine.2.csv.redacted.txt
+			</ul>
+			<li>Confirm that original <b>Dr. Jekyll</b> and <b>Mr. Hyde</b> text 
+			is redacted.
+			<li>Confirm that the original, special double-quote characters still 
+			surround the redacted text.
+			<li>Confirm that other <b>special</b> characters are unaffected.
+<p>
+			<li>Clear the database.
+			<li>Exercise <b>Ocr-Rules-Redact2.fps</b>.
+			<li>Review the output files.
+			<ul>
+				<li>aarpmagazine.2.redacted.csv
+				<li>aarpmagazine.2.csv.unicode.redacted.txt
+				<li>aarpmagazine.2.csv.redacted.txt
+			</ul>
+			<li>Confirm that original <b>Dr. Jekyll</b> and <b>Mr. Hyde</b> text 
+			is redacted.
+			<li><b>[ISSUE-12415] NOT FIXED for 9.9.2</b> Confirm that the original, 
+			special double-quote characters are also redacted.
+			<li>Confirm that other <b>special</b> characters are unaffected.
+<p>
+			<li>Clear the database.
+			<li>Exercise <b>Ocr-Rules-Redact3.fps</b>.
+			<li>Review the output file.
+			<ul>
+				<li>test.csv
+			</ul>
+			<li>Confirm that the original <b>Jek&quot;&quot;yll</b> and 
+			<b>Hy&quot;&quot;de</b> text is redacted.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>Other</b>
+	<ul>
+		<LI>Exercise the <b>Sanity Test - Release Testing</b> checklist.
+       	</ul>
+</OL>
+</BODY>
+</HTML>
