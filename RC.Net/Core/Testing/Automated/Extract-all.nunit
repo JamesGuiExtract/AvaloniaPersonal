@@ -1,6 +1,6 @@
 ﻿<NUnitProject>
   <Settings activeconfig="Release"/>
-  <Config name="Debug" binpathtype="Auto" runtimeFramework="any" appbase="D:\Engineering\binaries\debug">
+  <Config name="Debug" binpathtype="Auto" runtimeFramework="any" appbase="C:\Engineering\binaries\debug">
     <assembly path="Extract.DataEntry.Test.dll" />
     <assembly path="Extract.Imaging.Forms.Test.dll" />
     <assembly path="Extract.FileActionManager.Database.Test.dll" />

@@ -255,8 +255,12 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 			else if (ulSectionEnd == ulFuncStart)
 			{
 				// A new function scope comes before anything else.
-				
-				// Find the beginning of the function argument i.e. '('
+				// Find the beginning of the next function argument. i.e., the first '(' after the
+				// next '$')
+				// https://extract.atlassian.net/browse/ISSUE-12410
+				// Added line to ignore parenthesis if not following a $ used to indicate a path tag
+				// func.
+				ulSearchPos = str.find('$', ulSearchPos);
 				ulSearchPos = str.find('(', ulSearchPos);
 				if (ulSearchPos == string::npos)
 				{
@@ -781,7 +785,8 @@ const string TextFunctionExpander::expandReplace(vector<string>& vecParameters) 
 		while (findpos != string::npos)
 		{
 			strSource.replace(findpos, strSearch.length(), strReplace);
-			findpos = csisSource.find(strSearch, findpos + strSearch.length());
+			csisSource = stringCSIS(strSource, false);
+			findpos = csisSource.find(strSearch, findpos + strReplace.length());
 		}
 
 		// Return the result of the string replace

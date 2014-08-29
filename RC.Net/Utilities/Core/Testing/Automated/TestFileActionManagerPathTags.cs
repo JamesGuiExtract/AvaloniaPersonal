@@ -516,6 +516,17 @@ namespace Extract.Utilities.Test
             _fileTags.Expand(sb.ToString());
         }
 
+        /// <summary>
+        /// Tests handling of extra parens that are not part of a path tag function.
+        /// https://extract.atlassian.net/browse/ISSUE-12410
+        /// </summary>
+        [Test, Category("Automated")]
+        public void ExtraParentheses()
+        {
+            string tag = @"($UserName())";
+            Assert.That(_fileTags.Expand(tag).Equals("(" + Environment.UserName + ")"));
+        }
+
         #endregion Tests
     }
 }
