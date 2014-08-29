@@ -190,6 +190,10 @@
     <ClCompile Include="FAMDBUtils.cpp" />
     <ClCompile Include="FAMFileSelector.cpp" />
     <ClCompile Include="FAMTagManager.cpp" />
+    <ClCompile Include="FileSetCondition.cpp" />
+    <ClCompile Include="FileSetConditionDlg.cpp" />
+    <ClCompile Include="SpecifiedFilesCondition.cpp" />
+    <ClCompile Include="SpecifiedFilesConditionDlg.cpp" />
     <ClCompile Include="FilePriorityCondition.cpp" />
     <ClCompile Include="FilePriorityConditionDlg.cpp" />
     <ClCompile Include="FileProcessingAdvQueueDlg.cpp" />
@@ -363,6 +367,10 @@
     <ClInclude Include="FAMDB_SQL_80.h" />
     <ClInclude Include="FAMFileSelector.h" />
     <ClInclude Include="FAMTagManager.h" />
+    <ClInclude Include="FileSetCondition.h" />
+    <ClInclude Include="FileSetConditionDlg.h" />
+    <ClInclude Include="SpecifiedFilesCondition.h" />
+    <ClInclude Include="SpecifiedFilesConditionDlg.h" />
     <ClInclude Include="FilePriorityCondition.h" />
     <ClInclude Include="FilePriorityConditionDlg.h" />
     <ClInclude Include="FilePriorityHelper.h" />

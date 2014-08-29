@@ -14,6 +14,7 @@
 #include <LockGuard.h>
 #include <Win32Event.h>
 #include <StringCSIS.h>
+#include <CsisUtils.h>
 
 #include <string>
 #include <map>
@@ -258,6 +259,10 @@ public:
 	STDMETHOD(FindWorkItemGroup)(long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
 			long *pnWorkItemGroupID);
 	STDMETHOD(SaveWorkItemBinaryOutput)(long WorkItemID, IUnknown *pBinaryOutput);
+	STDMETHOD(GetFileSets)(IVariantVector **pvecIDs);
+	STDMETHOD(AddFileSet)(BSTR bstrFileSetName, IVariantVector *pvecIDs);
+	STDMETHOD(GetFileSetFileIDs)(BSTR bstrFileSetName, IVariantVector **ppvecFileIDs);
+	STDMETHOD(GetFileSetFileNames)(BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -466,6 +471,9 @@ private:
 	// A map of all enabled features to a boolean that indicates whether the feature should be
 	// available for admin users only.
 	map<string, bool> m_mapEnabledFeatures;
+
+	// The file IDs for each defined file set (file set name not case-sensitive)
+	csis_map<vector<int>>::type m_mapFileSets;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods
@@ -1062,6 +1070,7 @@ private:
 	bool FindWorkItemGroup_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
 			long *pnWorkItemGroupID);
 	bool SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long WorkItemID, IUnknown *pBinaryOutput);
+	bool GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

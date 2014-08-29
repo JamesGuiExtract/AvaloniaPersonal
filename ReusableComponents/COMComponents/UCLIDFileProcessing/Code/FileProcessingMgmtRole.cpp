@@ -3171,7 +3171,7 @@ void CFileProcessingMgmtRole::signalWorkItemThreadsToStopAndWait()
 		WorkItemThreadData::ms_threadStopProcessing.signal();
 					
 		// wait for each to stop
-		for (unsigned long i = 0; i < nSize; i++)
+		for (long i = 0; i < nSize; i++)
 		{
 			WorkItemThreadData *p = m_vecWorkItemThreads[i];
 

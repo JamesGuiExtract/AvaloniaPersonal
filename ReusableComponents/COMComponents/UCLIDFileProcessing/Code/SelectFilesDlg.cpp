@@ -11,6 +11,10 @@
 #include "QueryConditionDlg.h"
 #include "FileTagCondition.h"
 #include "FileTagConditionDlg.h"
+#include "SpecifiedFilesCondition.h"
+#include "SpecifiedFilesConditionDlg.h"
+#include "FileSetCondition.h"
+#include "FileSetConditionDlg.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -26,10 +30,6 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-static const int giACTION_STATUS_CONDITION = 0;
-static const int giACTION_PRIORITY_CONDITION = 1;
-static const int giACTION_QUERY_CONDITION = 2;
-static const int giACTION_TAG_CONDITION = 3;
 static const int giACTION_CONJUNCTION_COL_WIDTH = 50;
 
 //-------------------------------------------------------------------------------------------------
@@ -38,11 +38,17 @@ static const int giACTION_CONJUNCTION_COL_WIDTH = 50;
 CSelectFilesDlg::CSelectFilesDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
 								 const string& strSectionHeader, const string& strQueryHeader,
 								 const SelectFileSettings& settings)
-: CDialog(CSelectFilesDlg::IDD),
-m_ipFAMDB(ipFAMDB),
-m_strSectionHeader(strSectionHeader),
-m_strQueryHeader(strQueryHeader),
-m_settings(settings)
+: CDialog(CSelectFilesDlg::IDD)
+, m_ipFAMDB(ipFAMDB)
+, m_strSectionHeader(strSectionHeader)
+, m_strQueryHeader(strQueryHeader)
+, m_settings(settings)
+, m_nActionStatusConditionOption(-1)
+, m_nFileSetConditionOption(-1)
+, m_nPriorityConditionOption(-1)
+, m_nQueryConditionOption(-1)
+, m_nSpecifiedFilesConditionOption(-1)
+, m_nTagConditionOption(-1)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -107,11 +113,20 @@ BOOL CSelectFilesDlg::OnInitDialog()
 		// Set the group box caption
 		m_grpSelectFor.SetWindowText(m_strSectionHeader.c_str());
 
+		IVariantVectorPtr ipFileSets = m_ipFAMDB->GetFileSets();
+		ASSERT_RESOURCE_ALLOCATION("ELI37353", ipFileSets != __nullptr);
+
 		// Populate the available conditions and set the action status condition as the default.
-		m_cmbConditionType.InsertString(giACTION_STATUS_CONDITION, "Action status condition");
-		m_cmbConditionType.InsertString(giACTION_PRIORITY_CONDITION, "Priority condition");
-		m_cmbConditionType.InsertString(giACTION_QUERY_CONDITION, "Query condition");
-		m_cmbConditionType.InsertString(giACTION_TAG_CONDITION, "Tag condition");
+		m_nActionStatusConditionOption = m_cmbConditionType.AddString("Action status condition");
+		if (ipFileSets->Size > 0)
+		{
+			// Only show the file set condition if at least one file set is available.
+			m_nFileSetConditionOption = m_cmbConditionType.AddString("File set condition");
+		}
+		m_nPriorityConditionOption = m_cmbConditionType.AddString("Priority condition");
+		m_nQueryConditionOption = m_cmbConditionType.AddString("Query condition");
+		m_nSpecifiedFilesConditionOption = m_cmbConditionType.AddString("Specified file(s) condition");
+		m_nTagConditionOption = m_cmbConditionType.AddString("Tag condition");
 		m_cmbConditionType.SetCurSel(0);
 
 		// Intialize the list control that displays the configured conditions.
@@ -200,14 +215,35 @@ void CSelectFilesDlg::OnBnClickedBtnAddCondition()
 
 	try
 	{
-		switch (m_cmbConditionType.GetCurSel())
+		int nCurSel = m_cmbConditionType.GetCurSel();
+
+		if (nCurSel == m_nActionStatusConditionOption)
 		{
-			case giACTION_STATUS_CONDITION:		addCondition(new ActionStatusCondition()); break;
-			case giACTION_PRIORITY_CONDITION:	addCondition(new FilePriorityCondition()); break;
-			case giACTION_QUERY_CONDITION:		addCondition(new QueryCondition()); break;
-			case giACTION_TAG_CONDITION:		addCondition(new FileTagCondition()); break;
-		
-			default:	THROW_LOGIC_ERROR_EXCEPTION("ELI33787");
+			addCondition(new ActionStatusCondition());
+		}
+		else if (nCurSel == m_nFileSetConditionOption)
+		{
+			addCondition(new FileSetCondition());
+		}
+		else if (nCurSel == m_nPriorityConditionOption)
+		{
+			addCondition(new FilePriorityCondition());
+		}
+		else if (nCurSel == m_nQueryConditionOption)
+		{
+			addCondition(new QueryCondition());
+		}
+		else if (nCurSel == m_nSpecifiedFilesConditionOption)
+		{
+			addCondition(new SpecifiedFilesCondition());
+		}
+		else if (nCurSel == m_nTagConditionOption)
+		{
+			addCondition(new FileTagCondition());
+		}
+		else
+		{
+			THROW_LOGIC_ERROR_EXCEPTION("ELI33787");
 		}
 
 		setControlsFromSettings();

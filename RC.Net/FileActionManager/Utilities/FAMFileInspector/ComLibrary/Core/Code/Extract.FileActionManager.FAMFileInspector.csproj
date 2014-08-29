@@ -67,6 +67,10 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>

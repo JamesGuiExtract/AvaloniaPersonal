@@ -1417,6 +1417,31 @@ library UCLID_FILEPROCESSINGLib
 			[out, retval] long *pnWorkItemGroupID); 
 		[id(126), helpstring("method SaveWorkItemBinaryOutput")] HRESULT SaveWorkItemBinaryOutput(
 			[in] long WorkItemID, [in] IUnknown *pBinaryOutput);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Returns the name of all file sets currently defined in this instance.
+		// NOTE:	File sets are not currently persisted to the database. Rather, they exist only
+		//			in the current FileProcesingDB instance.
+		[id(127), helpstring("method GetFileSets")] HRESULT GetFileSets(
+			[out, retval] IVariantVector **pvecFileSetNames);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Creates a file set of the specified name consisting of the specified file ids.
+		// NOTE:	File sets are not currently persisted to the database. Rather, they exist only
+		//			in the current FileProcesingDB instance. If a file set already existed by this
+		//			name, it will be replaced.
+		[id(128), helpstring("method AddFileSet")] HRESULT AddFileSet([in] BSTR bstrFileSetName,
+			[in] IVariantVector *pvecIDs);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Returns file IDs in the specified file set.
+		// NOTE:	File sets are not currently persisted to the database. Rather, they exist only
+		//			in the current FileProcesingDB instance.
+		[id(129), helpstring("method GetFileSetFileIDs")] HRESULT GetFileSetFileIDs(
+			[in] BSTR bstrFileSetName, [out, retval] IVariantVector **ppvecFileIDs);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Returns file names in the specified file set.
+		// NOTE:	File sets are not currently persisted to the database. Rather, they exist only
+		//			in the current FileProcesingDB instance.
+		[id(130), helpstring("method GetFileSetFileNames")] HRESULT GetFileSetFileNames(
+			[in] BSTR bstrFileSetName, [out, retval] IVariantVector **ppvecFileNames);
 	};
 
 	[
@@ -2000,6 +2025,12 @@ library UCLID_FILEPROCESSINGLib
 		// REQUIRES: bstrQuery must begin with "SELECT FAMFile.ID FROM FAMFile"
 		[id(8), helpstring("method AddQueryCondition")] HRESULT AddQueryCondition(
 			[in] IFileProcessingDB *pFAMDB, [in] BSTR bstrQuery);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Adds a file set condition to the current settings.
+		// ARGS:	pFAMDB- The IFileProcessingDB the condition relates to.
+		//			bstrFileSet- The file set.
+		[id(9), helpstring("method AddFileSetCondition")] HRESULT AddFileSetCondition(
+			[in] IFileProcessingDB *pFAMDB, [in] BSTR bstrFileSet);
 	};
 
 	//----------------------------------------------------------------------------------------------

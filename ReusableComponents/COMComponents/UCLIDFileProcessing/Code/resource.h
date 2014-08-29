@@ -179,6 +179,8 @@
 #define IDC_CHECK_SEND_ERROR_EMAIL      364
 #define IDC_EDIT_ERROR_EMAIL_RECIPIENTS 365
 #define IDC_BTN_CONFIGURE_ERROR_EMAIL   366
+#define IDC_BTN_DELETE_FILE_NAME        367
+#define IDC_BTN_MODIFY_FILE_NAME        368
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
@@ -243,7 +245,17 @@
 #define IDC_DB_NAME_LABEL               2045
 #define IDC_ADV_PROP_LABEL              2046
 #define IDC_DB_GROUP_BOX                2047
-#define IDR_WORKITEMRECORD				2048
+#define IDR_WORKITEMRECORD              2048
+#define IDC_COMBO_FILE_SET              2050
+#define IDC_RADIO_STATIC_LIST           2052
+#define IDC_LIST_FILENAMES              2054
+#define IDC_RADIO_LIST_FILE             2055
+#define IDC_BTN_ADD_FILE_NAME           2056
+#define IDC_EDIT_LIST_FILE_NAME         2057
+#define IDC_BTN_BROWSE_LIST_FILE        2058
+#define IDC_BTN_BROWSE_FILE_NAME        2059
+#define IDD_DLG_SPECIFIED_FILES_CONDITION 2060
+#define IDD_DLG_FILE_SET_CONDITION      2061
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -287,9 +299,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2049
+#define _APS_NEXT_RESOURCE_VALUE        2062
 #define _APS_NEXT_COMMAND_VALUE         32814
-#define _APS_NEXT_CONTROL_VALUE         2049
-#define _APS_NEXT_SYMED_VALUE           2049
+#define _APS_NEXT_CONTROL_VALUE         2062
+#define _APS_NEXT_SYMED_VALUE           2062
 #endif
 #endif

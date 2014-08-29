@@ -99,7 +99,7 @@ IDR_FAMTagManager       REGISTRY                "FAMTagManager.rgs"
 IDR_FAMDBUTILS          REGISTRY                "FAMDBUtils.rgs"
 IDR_FILEPROCESSINGTASKEXECUTOR REGISTRY                "FileProcessingTaskExecutor.rgs"
 IDR_FAMFILESELECTOR     REGISTRY                "FAMFileSelector.rgs"
-IDR_WORKITEMRECORD		REGISTRY				"WorkItemRecord.rgs"
+IDR_WORKITEMRECORD      REGISTRY                "WorkItemRecord.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -446,6 +446,38 @@ BEGIN
     LTEXT           "Advanced connection properties",IDC_ADV_PROP_LABEL,14,136,104,8
 END
 
+IDD_DLG_SPECIFIED_FILES_CONDITION DIALOGEX 0, 0, 382, 175
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "Specified file(s) condition"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Select all files for which",IDC_GROUP_SELECT,7,7,368,142
+    CONTROL         "The file is in the following list: (wildcards: ? for any single char, * for any text)",IDC_RADIO_STATIC_LIST,
+                    "Button",BS_AUTORADIOBUTTON,15,20,296,10
+    CONTROL         "",IDC_LIST_FILENAMES,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_EDITLABELS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,15,34,302,69
+    PUSHBUTTON      "Add",IDC_BTN_ADD_FILE_NAME,325,33,42,14
+    PUSHBUTTON      "Modify",IDC_BTN_MODIFY_FILE_NAME,325,51,42,14,WS_DISABLED
+    PUSHBUTTON      "Delete",IDC_BTN_DELETE_FILE_NAME,325,70,42,14,WS_DISABLED
+    PUSHBUTTON      "Browse...",IDC_BTN_BROWSE_FILE_NAME,325,89,42,14
+    CONTROL         "The file is listed in this text file:",IDC_RADIO_LIST_FILE,
+                    "Button",BS_AUTORADIOBUTTON,15,110,114,10
+    EDITTEXT        IDC_EDIT_LIST_FILE_NAME,15,124,330,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_LIST_FILE,351,123,15,14
+    DEFPUSHBUTTON   "OK",IDOK,269,154,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,325,154,50,14
+END
+
+IDD_DLG_FILE_SET_CONDITION DIALOGEX 0, 0, 202, 68
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "File set condition"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Select all files contained in the file set",IDC_GROUP_SELECT,7,7,188,35
+    COMBOBOX        IDC_COMBO_FILE_SET,14,19,173,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,91,47,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,145,47,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -528,6 +560,10 @@ BEGIN
         RIGHTMARGIN, 307
         TOPMARGIN, 7
         BOTTOMMARGIN, 306
+    END
+
+    IDD_DIALOG_ADVANCED_TASK_SETTINGS, DIALOG
+    BEGIN
     END
 
     IDD_DLG_STATUS_PROP, DIALOG
@@ -649,6 +685,22 @@ BEGIN
         RIGHTMARGIN, 239
         TOPMARGIN, 7
         BOTTOMMARGIN, 189
+    END
+
+    IDD_DLG_SPECIFIED_FILES_CONDITION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 375
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 168
+    END
+
+    IDD_DLG_FILE_SET_CONDITION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 195
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 61
     END
 END
 #endif    // APSTUDIO_INVOKED

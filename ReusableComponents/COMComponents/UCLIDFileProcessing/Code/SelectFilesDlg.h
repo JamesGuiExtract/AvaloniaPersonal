@@ -79,6 +79,14 @@ private:
 	// The settings chosen in the dialog
 	SelectFileSettings m_settings;
 
+	// The index of each option in the drop down list (not all option may be present in all cases)
+	int m_nActionStatusConditionOption;
+	int m_nFileSetConditionOption;
+	int m_nPriorityConditionOption;
+	int m_nQueryConditionOption;
+	int m_nSpecifiedFilesConditionOption;
+	int m_nTagConditionOption;
+
 	////////////
 	// Methods
 	///////////

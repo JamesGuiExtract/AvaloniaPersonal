@@ -1,8 +1,10 @@
-﻿using Extract.Utilities.Forms;
+﻿using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Utilities
@@ -82,13 +84,8 @@ namespace Extract.FileActionManager.Utilities
                         {
                             _fileInspectorForm.Invoke((MethodInvoker)(() =>
                             {
-                                _fileInspectorForm.UseDatabaseMode = true;
-                                // Because the FileProcessingDB may be re-configured to connect to
-                                // a new DB from within this app and because we don't want that
-                                // affecting an outside caller still using it (DBAdmin), duplicate
-                                // the connection settings rather that using the passed in
-                                // FileProcessingDB directly.
-                                _fileInspectorForm.FileProcessingDB.DuplicateConnection(fileProcessingDB);
+                                InitializeFileProcessingDatabase(fileProcessingDB);
+
                                 _fileInspectorForm.InitializeContextMenu();
 
                                 if (fileSelector == null)
@@ -136,14 +133,7 @@ namespace Extract.FileActionManager.Utilities
                         {
                             // A new form is needed.
                             _fileInspectorForm = new FAMFileInspectorForm();
-                            _fileInspectorForm.UseDatabaseMode = true;
-
-                            // Because the FileProcessingDB may be re-configured to connect to
-                            // a new DB from within this app and because we don't want that
-                            // affecting an outside caller still using it (DBAdmin), duplicate
-                            // the connection settings rather that using the passed in
-                            // FileProcessingDB directly.
-                            _fileInspectorForm.FileProcessingDB.DuplicateConnection(fileProcessingDB);
+                            InitializeFileProcessingDatabase(fileProcessingDB);
 
                             if (fileSelector == null)
                             {
@@ -176,5 +166,38 @@ namespace Extract.FileActionManager.Utilities
         }
 
         #endregion IFAMFileInspector
+
+        #region Private Members
+
+        /// <summary>
+        /// Initializes the <see paramref="fileProcessingDB"/> for use in the FFI.
+        /// </summary>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/></param>
+        static void InitializeFileProcessingDatabase(FileProcessingDB fileProcessingDB)
+        {
+            _fileInspectorForm.UseDatabaseMode = true;
+
+            // Because the FileProcessingDB may be re-configured to connect to
+            // a new DB from within this app and because we don't want that
+            // affecting an outside caller still using it (DBAdmin), duplicate
+            // the connection settings rather that using the passed in
+            // FileProcessingDB directly.
+            _fileInspectorForm.FileProcessingDB.DuplicateConnection(fileProcessingDB);
+
+            // Since file sets likely won't be used in most cases where
+            // connections are duplicated, I am hesitant to add potential
+            // inefficiency to that call to manually copy the file sets (could
+            // be large). Also, the concept of file sets are solidified yet and
+            // they may end up being stored in the DB, in which case a copy
+            // wouldn't be necessary. For now, it needs to be done manually.
+            VariantVector fileSetNames = fileProcessingDB.GetFileSets();
+            foreach (string fileSetName in fileSetNames.ToIEnumerable<string>())
+            {
+                VariantVector fileSetIDs = fileProcessingDB.GetFileSetFileIDs(fileSetName);
+                _fileInspectorForm.FileProcessingDB.AddFileSet(fileSetName, fileSetIDs);
+            }
+        }
+
+        #endregion Private Members
     }
 }

@@ -5,6 +5,7 @@
 #include "SelectFilesDlg.h"
 #include "ActionStatusCondition.h"
 #include "QueryCondition.h"
+#include "FileSetCondition.h"
 
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
@@ -131,6 +132,26 @@ STDMETHODIMP CFAMFileSelector::AddQueryCondition(IFileProcessingDB *pFAMDB, BSTR
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36097");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMFileSelector::AddFileSetCondition(IFileProcessingDB *pFAMDB, BSTR bstrFileSet)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB(pFAMDB);
+		ASSERT_ARGUMENT("ELI37349", ipFAMDB != __nullptr);
+
+		FileSetCondition* pCondition = new FileSetCondition();
+		pCondition->setFileSetName(asString(bstrFileSet));
+		m_settings.addCondition(pCondition);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37350");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMFileSelector::LimitToSubset(VARIANT_BOOL bRandomSubset, VARIANT_BOOL bTopSubset,

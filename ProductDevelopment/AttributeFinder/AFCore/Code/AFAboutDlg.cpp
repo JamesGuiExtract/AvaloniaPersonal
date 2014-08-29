@@ -244,7 +244,7 @@ string CAFAboutDlg::getFKBVersion()
 		// Indicate the component directory location has been overridden via registry key.
 		strResult += "(overridden location) ";
 	}
-	strResult += asString(vecVersions, true, ", ").substr(1);
+	strResult += " " + asString(vecVersions, true, ", ");
 
 	return strResult;
 }

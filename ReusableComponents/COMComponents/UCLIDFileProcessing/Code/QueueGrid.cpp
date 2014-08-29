@@ -45,7 +45,7 @@ CQueueGrid::CQueueGrid()
 		vector<string> vecPriorities;
 		getPrioritiesVector(vecPriorities);
 		m_strPriorities = asString(vecPriorities, false, "\n");
-		m_strPriorities = trim(m_strPriorities, "\n", "") + "\n";
+		m_strPriorities = m_strPriorities += "\n";
 
 		HFONT hFont = (HFONT)GetStockObject(ANSI_VAR_FONT);
 		ASSERT_RESOURCE_ALLOCATION("ELI30499", hFont != __nullptr);

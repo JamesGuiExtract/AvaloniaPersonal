@@ -1272,8 +1272,15 @@ string asString(vector<string> vecLines,
 			}
 			while ( uiWSPos != string::npos );
 		}
+
+		// Add a separator only between items, not before the first item.
+		if (i > 0)
+		{			
+			strString += strSeparator;
+		}
+
 		// Append line to return string with separator
-		strString += strSeparator + strCurrStr;
+		strString += strCurrStr;
 	}
 	return strString;
 }

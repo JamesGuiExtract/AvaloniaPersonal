@@ -3083,6 +3083,123 @@ STDMETHODIMP CFileProcessingDB::SaveWorkItemBinaryOutput(long WorkItemID, IUnkno
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37171");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileSets(IVariantVector **pvecFileSetNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI37339", pvecFileSetNames != __nullptr);
+		
+		IVariantVectorPtr ipFileSetNames(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI37340", ipFileSetNames != __nullptr);
+
+		for (csis_map<vector<int>>::type::iterator iter = m_mapFileSets.begin();
+			 iter != m_mapFileSets.end();
+			 iter++)
+		{
+			ipFileSetNames->PushBack(get_bstr_t(iter->first));
+		}
+
+		*pvecFileSetNames = ipFileSetNames.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37341");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AddFileSet(BSTR bstrFileSetName, IVariantVector *pvecIDs)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		string strFileSetName = asString(bstrFileSetName);
+
+		IVariantVectorPtr ipvecIDs(pvecIDs);
+		ASSERT_ARGUMENT("ELI37342", ipvecIDs != __nullptr);
+
+		vector<int> vecFileIDs;
+		long nCount = ipvecIDs->Size;
+		for (long i = 0; i < nCount; i++)
+		{
+			vecFileIDs.push_back(ipvecIDs->Item[i].lVal);
+		}
+
+		m_mapFileSets[strFileSetName] = vecFileIDs;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37343");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileSetFileIDs(BSTR bstrFileSetName,
+												  IVariantVector **ppvecFileIDs)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI37344", ppvecFileIDs != __nullptr);
+		
+		IVariantVectorPtr ipvecFileIDs(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI37345", ipvecFileIDs != __nullptr);
+
+		string strFileSetName = asString(bstrFileSetName);
+
+		csis_map<vector<int>>::type::iterator iterFileSet = m_mapFileSets.find(strFileSetName);
+		if (iterFileSet == m_mapFileSets.end())
+		{
+			UCLIDException ue("ELI37346", "File set not found");
+			ue.addDebugInfo("Set Name", strFileSetName);
+			throw ue;
+		}
+
+		vector<int>& vecFileIDs = iterFileSet->second;
+
+		for each (int nFileID in vecFileIDs)
+		{
+			ipvecFileIDs->PushBack(nFileID);
+		}
+
+		*ppvecFileIDs = ipvecFileIDs.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37347");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileSetFileNames(BSTR bstrFileSetName,
+													IVariantVector **ppvecFileNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetFileSetFileNames_Internal(false, bstrFileSetName, ppvecFileNames))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			GetFileSetFileNames_Internal(true, bstrFileSetName, ppvecFileNames);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37348");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

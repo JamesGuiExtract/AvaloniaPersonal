@@ -735,7 +735,7 @@ int UpdateToSchemaVersion116(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vector<string> vecQueries;
 		vecQueries.push_back("EXEC sp_rename '" + gstrDB_LAUNCH_APP + "', '" + gstrDB_FILE_HANDLER + "'");
 		vecQueries.push_back(gstrCREATE_FEATURE_TABLE);
-		vector<string> vecFeatureDefinitionQueries = getFeatureDefinitionQueries();
+		vector<string> vecFeatureDefinitionQueries = getFeatureDefinitionQueries(116);
 		vecQueries.insert(vecQueries.end(),
 			vecFeatureDefinitionQueries.begin(), vecFeatureDefinitionQueries.end());
 		
@@ -7072,3 +7072,93 @@ bool CFileProcessingDB::SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long W
 	}
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFileSetName,
+	IVariantVector **ppvecFileNames)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI37332", ppvecFileNames != __nullptr);
+		
+			IVariantVectorPtr ipvecFileNames(CLSID_VariantVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI37333", ipvecFileNames != __nullptr);
+
+			string strFileSetName = asString(bstrFileSetName);
+
+			csis_map<vector<int>>::type::iterator iterFileSet = m_mapFileSets.find(strFileSetName);
+			if (iterFileSet == m_mapFileSets.end())
+			{
+				UCLIDException ue("ELI37334", "File set not found");
+				ue.addDebugInfo("Set Name", strFileSetName);
+				throw ue;
+			}
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+		
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Set up a query to get the filename for every ID in the fileset.
+			vector<int>& vecFileIDs = iterFileSet->second;
+			long nCount = vecFileIDs.size();
+			for (long i = 0; i < nCount;)
+			{
+				string strQuery = "SELECT [FileName] FROM [FAMFile] WHERE [ID] IN (";
+			
+				// Query in batches of 1000 to avoid any one query taking too much time in the DB
+				// for very large file sets.
+				do
+				{
+					if ((i % 1000) > 0)
+					{
+						strQuery += ",";
+					}
+					strQuery += asString(vecFileIDs[i]);
+
+					i++;
+				}
+				while (i < nCount && i % 1000 != 0);
+
+				strQuery += ")";
+
+				_RecordsetPtr ipResultSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37335", ipResultSet != __nullptr);
+
+				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+					adOpenStatic, adLockReadOnly, adCmdText);
+		
+				// Add all filenames to the return vector.
+				while (!asCppBool(ipResultSet->adoEOF))
+				{
+					FieldsPtr ipFields = ipResultSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI37336", ipFields != __nullptr);
+
+					ipvecFileNames->PushBack(getStringField(ipFields, "FileName").c_str());
+
+					ipResultSet->MoveNext();
+				}
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37337");
+
+			*ppvecFileNames = ipvecFileNames.Detach();
+			
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37338");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
