@@ -17,7 +17,7 @@ if(host.indexOf("system32") != -1 && cpu == "amd64") {
 
     var args = WScript.Arguments;
     for(i=0; i<args.length; i++)
-        newCmd += " " + args(i);
+        newCmd += " \"" + args(i) + "\"";
 
 //    WScript.Echo("Running the syswow64 bit version instead...\n  " + newCmd + "\n");
 
