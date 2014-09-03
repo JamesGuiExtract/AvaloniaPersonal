@@ -305,8 +305,7 @@ namespace Extract.Redaction
                 // [FlexIDSCore:4598]
                 // Throw an exception if the OCR data isn't text index data.
                 LongRectangle textBounds = source.GetOCRImageBounds();
-                if (textBounds.Left != 0 ||
-                    textBounds.Top != 0 ||
+                if (textBounds.Top != 0 ||
                     textBounds.Bottom != 2)
                 {
                     throw new ExtractException("ELI32207",
