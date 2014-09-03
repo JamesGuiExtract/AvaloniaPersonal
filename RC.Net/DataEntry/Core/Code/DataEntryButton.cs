@@ -1,3 +1,4 @@
+using Extract.Licensing;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -16,6 +17,15 @@ namespace Extract.DataEntry
     /// </summary>
     public partial class DataEntryButton : Button, IDataEntryControl, IRequiresErrorProvider
     {
+        #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(DataEntryButton).ToString();
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -107,6 +117,33 @@ namespace Extract.DataEntry
         /// </summary>
         bool _persistAttribute;
 
+        /// <summary>
+        /// Indicates whether the button is currently flashing.
+        /// </summary>
+        bool _isFlashing;
+
+        /// <summary>
+        /// A timer used to trigger alternating the background color for the purposes of
+        /// implementing the <see cref="Flash"/> property.
+        /// </summary>
+        Timer _flashTimer = new Timer();
+
+        /// <summary>
+        /// When flashing, keeps track of the normal background color.
+        /// </summary>
+        Color _normalBackgroundColor;
+
+        /// <summary>
+        /// When flashing, keeps track of the background color that should alternate with
+        /// <see cref="_normalBackgroundColor"/>.
+        /// </summary>
+        Color _flashingBackgroundColor;
+
+        /// <summary>
+        /// Specifies whether the current instance is running in design mode
+        /// </summary>
+        bool _inDesignMode;
+
         #endregion Fields
 
         #region Constructors
@@ -119,7 +156,23 @@ namespace Extract.DataEntry
         {
             try
             {
+                _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
+
+                // Load licenses in design mode
+                if (_inDesignMode)
+                {
+                    // Load the license files from folder
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
+
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI37378", _OBJECT_NAME);
+
                 InitializeComponent();
+
+                _flashTimer.Interval = 1000;
+                _flashTimer.Tick += new EventHandler(HandleFlashTimer_Tick);
             }
             catch (Exception ex)
             {
@@ -361,6 +414,55 @@ namespace Extract.DataEntry
             set
             {
                 _persistAttribute = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="DataEntryButton"/> is flashing.
+        /// </summary>
+        /// <value><see langword="true"/> if flashing; otherwise, <see langword="false"/>.
+        /// </value>
+        [Category("Data Entry Button")]
+        [DefaultValue(false)]
+        public bool Flash
+        {
+            get
+            {
+                return _isFlashing;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _isFlashing)
+                    {
+                        _isFlashing = value;
+
+                        if (!_inDesignMode)
+                        {
+                            if (value)
+                            {
+                                // When flashing the button's background color should alternate
+                                // between the previouly specified background color and one that
+                                // is lighter than the specified background color.
+                                _normalBackgroundColor = BackColor;
+                                _flashingBackgroundColor =
+                                    ControlPaint.LightLight(_normalBackgroundColor);
+                                _flashTimer.Enabled = true;
+                            }
+                            else
+                            {
+                                _flashTimer.Enabled = false;
+                                base.BackColor = _normalBackgroundColor;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI37375");
+                }
             }
         }
 
@@ -862,6 +964,105 @@ namespace Extract.DataEntry
         }
 
         #endregion Unused IDataEntryControl Members
+
+        #region Overrides
+
+        /// <summary>
+        /// Gets or sets the background color of the control.
+        /// </summary>
+        /// <returns>A <see cref="T:System.Drawing.Color"/> value representing the background color.
+        /// </returns>
+        public override Color BackColor
+        {
+            get
+            {
+                return base.BackColor;
+            }
+            set
+            {
+                bool flashing = Flash;
+
+                try
+                {
+                    // In order to properly apply a new background color, flashing needs to first be stopped.
+                    if (flashing)
+                    {
+                        Flash = false;
+                    }
+
+                    base.BackColor = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI37376");
+                }
+                finally
+                {
+                    // Resume flashing if it had been flashing.
+                    Flash = flashing;
+                }
+            }
+        }
+
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> if managed resources should be disposed;
+        /// otherwise, <see langword="false"/>.
+        /// </param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null)
+                {
+                    components.Dispose();
+                    components = null;
+                }
+
+                if (_flashTimer != null)
+                {
+                    _flashTimer.Dispose();
+                    _flashTimer = null;
+                }
+            }
+            base.Dispose(disposing);
+        }
+
+        #endregion Overrides
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="Timer.Tick"/> event of the <see cref="_flashTimer"/> control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleFlashTimer_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                // Apply the background color to the base class so as not to get tangled in the
+                // BackColor override which assumes the BackColor change is not coming from the
+                // flashing process.
+                if (base.BackColor == _normalBackgroundColor)
+                {
+                    base.BackColor = _flashingBackgroundColor;
+                }
+                else
+                {
+                    base.BackColor = _normalBackgroundColor;
+                }
+            }
+            catch (Exception ex)
+            {
+                Flash = false;
+                ex.ExtractDisplay("ELI37377");
+            }
+        }
+
+        #endregion Event Handlers
 
         #region Private Members
 
