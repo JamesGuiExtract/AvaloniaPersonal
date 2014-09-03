@@ -70,6 +70,8 @@ public:
 	STDMETHOD(put_BinaryOutput)(IUnknown *pBinaryOutput);
 	STDMETHOD(get_BinaryInput)(IUnknown **ppBinaryInput);
 	STDMETHOD(put_BinaryInput)(IUnknown *pBinaryInput);
+	STDMETHOD(get_FileID)(long* pnFileID);
+	STDMETHOD(put_FileID)(long nFileID);
 
 private:
 
@@ -84,6 +86,7 @@ private:
 	string m_strFileName;
 	IPersistStreamPtr m_ipBinaryOutput;
 	IPersistStreamPtr m_ipBinaryInput;
+	long m_nFileID;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WorkItemRecord), CWorkItemRecord)

@@ -597,6 +597,8 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(10), helpstring ("property BinaryInput")] HRESULT BinaryInput([out, retval] IUnknown **ppBinaryInput);
 		[propput, id(10), helpstring ("property BinaryInput")] HRESULT BinaryInput([in] IUnknown *pBinaryInput);
 
+		[propget, id(11), helpstring ("property FileID")] HRESULT FileID([out, retval] long *pnFileID);
+		[propput, id(11), helpstring ("property FileID")] HRESULT FileID([in] long nFileID);
 	}
 
 	[
@@ -1408,7 +1410,7 @@ library UCLID_FILEPROCESSINGLib
 
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return the WorkItemGroupID if it exists for a work item group that matches
-		//			the other fields if there is no match the return value *pnWorkItmeGroupID = 0
+		//			the other fields if there is no match the return value *pnWorkItemGroupID = 0
 		// NOTE:	The nNumberOfWorkItems is compared to the both the NumberOfWorkItems field in
 		//			the WorkItemGroup table and the actual number of work items in the WorkItem
 		//			table for a found work group

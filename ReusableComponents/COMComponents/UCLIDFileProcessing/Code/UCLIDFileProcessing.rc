@@ -200,7 +200,7 @@ END
 
 IDD_DLG_STATUS_PROP DIALOGEX 0, 0, 292, 294
 STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
-CAPTION "Processing Log"
+CAPTION "Files"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     LTEXT           "Files currently being processed",IDC_STATIC_CURR_PROC,5,5,105,8
@@ -478,6 +478,21 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,145,47,50,14
 END
 
+IDD_DLG_PROCESSING_LOG_PROP DIALOGEX 0, 0, 316, 182
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "Processing Log"
+FONT 8, "MS Sans Serif", 400, 0, 0x0
+BEGIN
+END
+
+IDD_DLG_WORKITEMS_PROP DIALOGEX 0, 0, 316, 182
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "Work Items"
+FONT 8, "MS Sans Serif", 400, 0, 0x0
+BEGIN
+    LTEXT           "Work items currently being processed",IDC_STATIC_CURR_WORKITEMS,7,7,142,8
+    CONTROL         "",IDC_CURRENT_WORKITEM_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,8,20,280,75
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -701,6 +716,22 @@ BEGIN
         RIGHTMARGIN, 195
         TOPMARGIN, 7
         BOTTOMMARGIN, 61
+    END
+
+    IDD_DLG_PROCESSING_LOG_PROP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 175
+    END
+
+    IDD_DLG_WORKITEMS_PROP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 175
     END
 END
 #endif    // APSTUDIO_INVOKED

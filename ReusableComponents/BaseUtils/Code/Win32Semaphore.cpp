@@ -98,7 +98,7 @@ bool Win32Semaphore::isAcquired()
 
 Win32SemaphoreLockGuard::Win32SemaphoreLockGuard(Win32Semaphore& rSemaphore, bool bAcquire, 
 												 DWORD dwMilliSeconds)
-:rSemaphore(rSemaphore)
+:rSemaphore(rSemaphore), m_bDoNotRelease(false)
 {
 	if (bAcquire)
 		rSemaphore.acquire(dwMilliSeconds);
@@ -108,9 +108,17 @@ Win32SemaphoreLockGuard::~Win32SemaphoreLockGuard()
 {
 	try
 	{
-		rSemaphore.release();
+		if (!m_bDoNotRelease)
+		{
+			rSemaphore.release();
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16420");
+}
+
+void Win32SemaphoreLockGuard::NoRelease()
+{
+	m_bDoNotRelease = true;
 }
 
 Win32Semaphore::AcquireSemaphoreTimedOut::AcquireSemaphoreTimedOut(	Win32Semaphore& rSemaphore)

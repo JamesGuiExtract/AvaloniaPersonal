@@ -1,12 +1,14 @@
 #pragma once 
 #include "resource.h"
 #include "FileProcessingRecord.h"
+#include "FPWorkItem.h"
 
 #include <afxmt.h>
 #include <list>
 #include <vector>
 #include <map>
 #include <Win32Event.h>
+#include <Win32Semaphore.h>
 
 using namespace std;
 
@@ -82,7 +84,9 @@ public:
 	//			returned and the task method parameter is untouched.
 	//			In all cases, if pbProcessingActive is not null, when returned the value will
 	//			indicate whether the processing queue is still active.
-	bool pop(FileProcessingRecord& task, bool bWait, bool* pbProcessingActive = __nullptr);
+	//			processSemaphore will always be aquired if this returns true and not aquired if
+	//			this returns false
+	bool pop(FileProcessingRecord& task, bool bWait, Win32Semaphore &processSemaphore, bool* pbProcessingActive = __nullptr);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will return FileProcessingRecord Associated with nTaskId
 	FileProcessingRecord getTask(long nTaskID);
@@ -156,6 +160,23 @@ public:
 	inline void setMaxNumberOfFilesFromDB(long nMaxNumberOfFiles)
 		{ m_nMaxFilesFromDB = nMaxNumberOfFiles; }
 	//---------------------------------------------------------------------------------------------
+	// PROMISE: To retun a work item to process if one is available
+	//			return value will be true if a work item was available
+	//			return value will be false if no work item was avilable
+	bool getWorkItemToProcess(FPWorkItem& workItem, bool bRestrictToUPI = false);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To return a copy of the work item with workitem ID that is in m_mapWorkItems
+	FPWorkItem getWorkItem(long workItemID);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To update the work item record in m_mapWorkItems
+	void updateWorkItem(FPWorkItem &workItem);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Will return an IProgressStatus indicating the progress of the WorkItem with the
+	// specified id.
+	IProgressStatusPtr getWorkItemProgressStatus(long nWorkItemID);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Sets the flag to indicate that work units will processed
+	void enableParallelizable(bool bEnable);
 
 private:
 
@@ -249,14 +270,32 @@ private:
 	bool m_bProcessSkippedFiles;
 	bool m_bSkippedFilesForCurrentUser;
 
+	// Define the workItemMap type - currently only used once by make have same as other tasks
+	typedef map<long, FPWorkItem> workItemMap;
+
+	// Map of work items being proceessed by this FAM
+	workItemMap m_mapWorkItems;
+
+	// Mutexes to use when reading or updating the m_mapWorkItems map
+	CMutex m_mapWorkItemsMutex;
+	CMutex m_mapReadWorkItems;
+
+	// Flag to indicate if the last call to getWorkItemToProcess returned a work item
+	bool m_bWorkItemReturned;
+	bool m_bParallelizableEnabled;
+
 	////////////////
 	// Methods
 	////////////////
 
 	//---------------------------------------------------------------------------------------------
+	void changeState(const FPWorkItem& workItem);
+	//---------------------------------------------------------------------------------------------
 	void changeState(const FileProcessingRecord& task);
 	//---------------------------------------------------------------------------------------------
 	void SendStatusMessage(HWND hWnd, const FileProcessingRecord *pTask, ERecordStatus eOldStatus);
+	//---------------------------------------------------------------------------------------------
+	void SendStatusMessage(HWND hWnd, const FPWorkItem* pWorkItem, EWorkItemStatus eOldStatus);
 	//---------------------------------------------------------------------------------------------
 	// Loads max of nNumToLoad records in the processing queue from the database
 	// returns the number of records loaded
@@ -267,6 +306,12 @@ private:
 	//			record will be returned in task argument and will return true. If nTaskID is not 
 	//			found method will return false.
 	bool getTask(long nTaskID, FileProcessingRecord& task);
+
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Will try to find the nWorkItemID in the m_mapWorkItems map if nWorkItemID is found
+	//			the work item record will be returned in workItem argument and will return true. 
+	//			If nWorkItemID is not found method will return false. 
+	bool getWorkItem(long nWorkItemID, FPWorkItem& workItem);
 
 	// PROMISE: To remove the task from the m_mapTasks if the task is not current or in either the
 	//			pending or finished lists.

@@ -59,15 +59,6 @@ public:
 	void stopProgressUpdates();
 	//---------------------------------------------------------------------------------------------
 
-
-// Dialog Data
-	//{{AFX_DATA(FileProcessingDlgStatusPage)
-	enum { IDD = IDD_DLG_STATUS_PROP };
-	CListCtrl	m_currentFilesList;
-	CListCtrl	m_completedFilesList;
-	CListCtrl	m_failedFilesList;
-	//}}AFX_DATA
-
 // Methods
 	// This method is used to reset the m_bInitialized to false
 	// when the user hide the tab so that when this tab reappears,
@@ -93,6 +84,15 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
+
+	// Dialog Data
+	//{{AFX_DATA(FileProcessingDlgStatusPage)
+	enum { IDD = IDD_DLG_STATUS_PROP };
+	CListCtrl	m_currentFilesList;
+	CListCtrl	m_completedFilesList;
+	CListCtrl	m_failedFilesList;
+	//}}AFX_DATA
+
 	struct StatusUpdateInfo
 	{
 		long FileId;

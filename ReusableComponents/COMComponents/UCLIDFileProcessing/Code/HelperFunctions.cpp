@@ -136,6 +136,77 @@ void resize3LabelsAndLists(CPropertyPage *pPropPage, CListCtrl& rList1, CListCtr
 	pWndLabel3->MoveWindow(rectStatic3);
 }
 //-------------------------------------------------------------------------------------------------
+void resizeLabelAndList(CPropertyPage *pPropPage, CListCtrl& rList, UINT nLabelID, 
+	const int iMinHeightOfLabelArea)
+{
+	// Verify valid property page
+	ASSERT_ARGUMENT("ELI37244", pPropPage != __nullptr);
+
+	// Verify the property sheet pointer is available
+	CWnd *pParent = pPropPage->GetParent();
+	ASSERT_RESOURCE_ALLOCATION("ELI37245", pParent != __nullptr);
+
+	CRect rectPage;
+	pPropPage->GetWindowRect(rectPage);
+
+	// Get current sizes
+	CRect rectList, rectStatic;
+
+	rList.GetWindowRect(rectList);
+
+	// Horizontal adjustment for control spacing
+	rectList.left = rectPage.left + giPADDING_BETWEEN_CONTROLS;
+	rectList.right = rectPage.right - giPADDING_BETWEEN_CONTROLS;
+
+	// Get the label controls and their associated window coordinates
+	CWnd *pWndLabel = pPropPage->GetDlgItem(nLabelID);
+	ASSERT_RESOURCE_ALLOCATION("ELI37246", pWndLabel != __nullptr);
+	pWndLabel->GetWindowRect(&rectStatic);
+
+	// Determine the total height of all the label areas above the list
+	// controls, keeping in mind that controls (e.g. buttons) taller than 
+	// the labels may be placed alongside the labels and we need to still
+	// provide the same spacing between those controls and the neighbouring
+	// controls as we would do with the labels.
+	int iHeightLabelArea = max(rectStatic.Height(), iMinHeightOfLabelArea);
+	UINT iTotalHeightOfGaps = iHeightLabelArea;
+
+	// By default, we want the labels associated with the controls to be closer to
+	// the control than other neighboring controls.  Set the padding between the
+	// labels and their associated controls to half of the standard padding
+	// between controls.
+	const int iPADDING_BETWEEN_LABELS_AND_CONTROLS = giPADDING_BETWEEN_CONTROLS / 2;
+
+	// Compute the total height available to be distributed to all the lists together
+	int iSumOfAllListHeights = rectPage.Height() - 
+		iTotalHeightOfGaps - // for the total height of all the labels (or controls) above the lists
+		giPADDING_BETWEEN_CONTROLS - // for the padding between the labels and the lists above them
+		giPADDING_BETWEEN_CONTROLS - // for the padding below the bottom list
+		giPADDING_BETWEEN_CONTROLS; // for the padding between the labels and the lists below them
+	
+	// The default list height is the total available list height
+	int iDefaultListHeight = iSumOfAllListHeights ;
+
+	// There is only one list so make the bottem list height the default list height
+	int iBottomListHeight = iDefaultListHeight;
+	
+	// Set the bottom list
+	rectList.bottom = rectPage.bottom - giPADDING_BETWEEN_CONTROLS;
+
+	// Set the static text for the top list
+	LONG nLabel1Height = rectStatic.Height();
+	rectStatic.bottom = rectList.top - giPADDING_BETWEEN_CONTROLS;
+	rectStatic.top = rectStatic.bottom - iHeightLabelArea;
+
+	// Map RECTs to Client coordiantes
+	pPropPage->ScreenToClient(rectList);
+	pPropPage->ScreenToClient(rectStatic);
+
+	// Move the controls
+	rList.MoveWindow(rectList);
+	pWndLabel->MoveWindow(rectStatic);
+}
+//-------------------------------------------------------------------------------------------------
 string getMonthDayDateString()
 {
 	// return today's date as MM/DD

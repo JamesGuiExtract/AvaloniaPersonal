@@ -207,6 +207,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="FileProcessingDlgActionPage.cpp" />
+    <ClCompile Include="FileProcessingDlgProcessingPage.cpp" />
     <ClCompile Include="FileProcessingDlgQueueLogPage.cpp" />
     <ClCompile Include="FileProcessingDlgReportPage.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -268,6 +269,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="FPWorkItem.cpp" />
     <ClCompile Include="HelperFunctions.cpp" />
     <ClCompile Include="QueryCondition.cpp" />
     <ClCompile Include="QueryConditionDlg.cpp" />
@@ -299,6 +301,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="WorkItemRecord.cpp" />
+    <ClCompile Include="WorkItemsPage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\FAMDBAdmin.ico" />
@@ -378,6 +381,7 @@
     <ClInclude Include="FileProcessingDB.h" />
     <ClInclude Include="FileProcessingDlg.h" />
     <ClInclude Include="FileProcessingDlgActionPage.h" />
+    <ClInclude Include="FileProcessingDlgProcessingPage.h" />
     <ClInclude Include="FileProcessingDlgQueueLogPage.h" />
     <ClInclude Include="FileProcessingDlgReportPage.h" />
     <ClInclude Include="FileProcessingDlgScopePage.h" />
@@ -395,6 +399,7 @@
     <ClInclude Include="FileSupplyingRecord.h" />
     <ClInclude Include="FileTagCondition.h" />
     <ClInclude Include="FileTagConditionDlg.h" />
+    <ClInclude Include="FPWorkItem.h" />
     <ClInclude Include="FP_UI_Notifications.h" />
     <ClInclude Include="FPAboutDlg.h" />
     <ClInclude Include="FPCategories.h" />
@@ -414,6 +419,7 @@
     <ClInclude Include="TaskGrid.h" />
     <ClInclude Include="TaskInfoDlg.h" />
     <ClInclude Include="WorkItemRecord.h" />
+    <ClInclude Include="WorkItemsPage.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj">

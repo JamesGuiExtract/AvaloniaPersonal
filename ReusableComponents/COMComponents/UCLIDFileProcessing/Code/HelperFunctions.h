@@ -41,6 +41,10 @@ static const std::string gstrCONVERTED_FPS_ACTION_NAME = "Converted____FPS____Ac
 void resize3LabelsAndLists(CPropertyPage *pPropPage, CListCtrl& rList1, CListCtrl& rList2, CListCtrl& rList3,
 	UINT nLabel1ID, UINT nLabel2ID, UINT nLabel3ID, const int iMinHeightOfLabelArea1 = 0, 
 	const int iMinHeightOfLabelArea2 = 0, const int iMinHeightOfLabelArea3 = 0);
+
+// This function will resize a list control and labels to use all the space in the property page
+void resizeLabelAndList(CPropertyPage *pPropPage, CListCtrl& rList, UINT nLabelID, 
+	const int iMinHeightOfLabelArea = 0);
 //-------------------------------------------------------------------------------------------------
 // PROMISE:	To return today's date in MM/DD format
 std::string getMonthDayDateString();

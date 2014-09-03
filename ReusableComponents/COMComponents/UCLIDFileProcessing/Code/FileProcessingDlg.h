@@ -6,12 +6,13 @@
 
 #include "FileProcessingDlgTaskPage.h"
 #include "FileProcessingDlgScopePage.h"
-#include "FileProcessingDlgStatusPage.h"
+#include "FileProcessingDlgProcessingPage.h"
 #include "FileProcessingDlgActionPage.h"
 #include "FileProcessingDlgQueueLogPage.h"
 #include "FileProcessingDlgReportPage.h"
 #include "FileProcessingOptionsDlg.h"
 #include "FileProcessingRecord.h"
+#include "FPWorkItem.h"
 #include "TaskEvent.h"
 #include "FPRecordManager.h"
 #include "DatabaseStatusIconUpdater.h"
@@ -114,6 +115,7 @@ protected:
 	afx_msg LRESULT OnProcessingComplete(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnProcessingCancelling(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnStatusChange(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnWorkItemStatusChange(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnSupplierStatusChange(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnQueueEvent(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam);
@@ -150,7 +152,7 @@ private:
 
 	FileProcessingDlgTaskPage m_propProcessSetupPage;
 	FileProcessingDlgScopePage m_propQueueSetupPage;
-	FileProcessingDlgStatusPage m_propProcessLogPage;
+	FileProcessingDlgProcessingPage m_propProcessingPage;
 	FileProcessingDlgReportPage m_propStatisticsPage;
 	FileProcessingDlgActionPage m_propActionPage;
 	FileProcessingDlgQueueLogPage m_propQueueLogPage;

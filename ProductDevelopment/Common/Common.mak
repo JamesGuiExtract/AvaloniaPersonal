@@ -27,7 +27,7 @@ EngineeringRootDirectory=$(BuildRootDirectory)\Engineering
 ReusableComponentsRootDirectory=$(EngineeringRootDirectory)\ReusableComponents
 CommonDirectory=$(EngineeringRootDirectory)\ProductDevelopment\Common
 FXCopAppDirectory=$(FX_COP)
-MergeModuleDir=C:\InstallShield 2010 Projects\MergeModules
+MergeModuleDir=$(MERGE_MODULE_DIR)
 StrongNameKeyDir=P:\StrongNameKey
 RCNETDir=$(EngineeringRootDirectory)\RC.Net
 

@@ -326,3 +326,29 @@ STDMETHODIMP CWorkItemRecord::put_BinaryInput(IUnknown *pBinaryInput)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37213");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::get_FileID(long* pnFileID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		*pnFileID = m_nFileID;
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37273"); 
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::put_FileID(long nFileID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_nFileID = nFileID;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37274");
+}

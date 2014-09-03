@@ -1102,7 +1102,7 @@ long FileProcessingDlgStatusPage::appendNewRecord(CListCtrl& rListCtrl,
 	// Get the start time.
 	// for the current-files list, the time is the current time.
 	// for the other two lists, the time is the start time associated with
-	// the task object.  For failed error tasks, the start time is assosiated
+	// the task object.  For failed error tasks, the start time is associated
 	// with the time the error task began execution
 	CTime startTime;
 	if (&rListCtrl == &m_currentFilesList)

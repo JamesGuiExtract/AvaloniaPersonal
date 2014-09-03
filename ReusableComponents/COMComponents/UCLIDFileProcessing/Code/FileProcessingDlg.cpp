@@ -181,6 +181,7 @@ BEGIN_MESSAGE_MAP(FileProcessingDlg, CDialog)
 	ON_MESSAGE(FP_PROCESSING_COMPLETE, OnProcessingComplete)
 	ON_MESSAGE(FP_PROCESSING_CANCELLING, OnProcessingCancelling)
 	ON_MESSAGE(FP_STATUS_CHANGE, OnStatusChange)
+	ON_MESSAGE(FP_WORK_ITEM_STATUS_CHANGE, OnWorkItemStatusChange)
 	ON_MESSAGE(FP_SUPPLIER_STATUS_CHANGE, OnSupplierStatusChange)
 	ON_MESSAGE(FP_QUEUE_EVENT, OnQueueEvent)
 	ON_MESSAGE(FP_STATISTICS_UPDATE, OnStatsUpdateMessage)
@@ -397,7 +398,7 @@ void FileProcessingDlg::OnBtnRun()
 
 		// Get the index of the Queue log, process log and statistics page
 		int iQueueLogIndex = m_propSheet.GetPageIndex(&m_propQueueLogPage);
-		int iProcLogIndex = m_propSheet.GetPageIndex(&m_propProcessLogPage);
+		int iProcLogIndex = m_propSheet.GetPageIndex(&m_propProcessingPage);
 		int iStatisticsIndex = m_propSheet.GetPageIndex(&m_propStatisticsPage);
 
 		// Get the index of the current page
@@ -431,7 +432,7 @@ void FileProcessingDlg::OnBtnRun()
 		// If the processing log page is shown, then enable the progress updates
 		if (iProcLogIndex > 0)
 		{
-			m_propProcessLogPage.startProgressUpdates();
+			m_propProcessingPage.startProgressUpdates();
 		}
 
 		// Disable the Process setup page while running
@@ -593,7 +594,7 @@ void FileProcessingDlg::OnBtnStop()
 				// If the processing log page is shown, notify it to stop progress updates
 				if (isPageDisplayed(kProcessingLogPage))
 				{
-					m_propProcessLogPage.stopProgressUpdates();
+					m_propProcessingPage.stopProgressUpdates();
 				}
 
 				// Update the UI
@@ -673,13 +674,13 @@ void FileProcessingDlg::OnBtnAutoScroll()
 		m_toolBar.GetToolBarCtrl().GetButton(nIndex, &button);
 		if (button.fsState & TBSTATE_CHECKED)
 		{
-			m_propProcessLogPage.setAutoScroll(true);
+			m_propProcessingPage.setAutoScroll(true);
 			m_propQueueLogPage.setAutoScroll(true);
 			ma_pCfgMgr->setAutoScrolling(true);
 		}
 		else
 		{
-			m_propProcessLogPage.setAutoScroll(false);
+			m_propProcessingPage.setAutoScroll(false);
 			m_propQueueLogPage.setAutoScroll(false);
 			ma_pCfgMgr->setAutoScrolling(false);
 		}
@@ -960,9 +961,9 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 		{
 			// If the processing log page doesnt exist, these will remain 0 and be used
 			// as a flag for the enabling or disabling the local page.
-			unTotalProcTime = m_propProcessLogPage.getTotalProcTime();
-			m_propProcessLogPage.getLocalStats( nTotalBytes, nTotalDocs, nTotalPages );
-			m_nNumCurrentlyProcessing = m_propProcessLogPage.getCurrentlyProcessingCount();
+			unTotalProcTime = m_propProcessingPage.getTotalProcTime();
+			m_propProcessingPage.getLocalStats( nTotalBytes, nTotalDocs, nTotalPages );
+			m_nNumCurrentlyProcessing = m_propProcessingPage.getCurrentlyProcessingCount();
 		}
 
 		// Cast the wParam objects
@@ -1024,7 +1025,7 @@ LRESULT FileProcessingDlg::OnStatusChange(WPARAM wParam, LPARAM lParam)
 		// Make sure the page is initialized before using it
 		if (isPageDisplayed(kProcessingLogPage))
 		{
-			m_propProcessLogPage.onStatusChange(pTask, eOldStatus);
+			m_propProcessingPage.onStatusChange(pTask, eOldStatus);
 		}
 
 		if(eOldStatus == eNewStatus)
@@ -1080,7 +1081,7 @@ LRESULT FileProcessingDlg::OnClearUI(WPARAM wParam, LPARAM lParam)
 		// Make sure the page is initialized before using it
 		if (isPageDisplayed(kProcessingLogPage))
 		{
-			m_propProcessLogPage.clear();
+			m_propProcessingPage.clear();
 		}
 		// Make sure the page is initialized before using it
 		if (isPageDisplayed(kStatisticsPage))
@@ -1662,6 +1663,28 @@ void FileProcessingDlg::OnSelectFAMMRUPopupMenu(UINT nID)
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32006");
 }
+//-------------------------------------------------------------------------------------------------
+LRESULT FileProcessingDlg::OnWorkItemStatusChange(WPARAM wParam, LPARAM lParam)
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
+
+	try
+	{
+		const FPWorkItem *pWorkItem = (const FPWorkItem*)lParam;
+		EWorkItemStatus eOldStatus = (EWorkItemStatus)wParam;
+		EWorkItemStatus eNewStatus = pWorkItem->m_status;
+
+		// Make sure the page is initialized before using it
+		if (isPageDisplayed(kProcessingLogPage))
+		{
+			m_propProcessingPage.onWorkItemStatusChange(pWorkItem, eOldStatus);
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI37264");
+
+	return 0;
+}
 
 //--------------------------------------------------------------------------------------------------
 // INotifyDBConfigChanged class
@@ -1717,7 +1740,7 @@ void FileProcessingDlg::setRecordManager(FPRecordManager* pRecordMgr)
 	m_pRecordMgr = pRecordMgr;
 
 	m_propStatisticsPage.setRecordManager(pRecordMgr);
-	m_propProcessLogPage.setRecordManager(pRecordMgr);
+	m_propProcessingPage.setRecordManager(pRecordMgr);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::setRunOnInit(bool bRunOnInit)
@@ -1854,7 +1877,7 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	bool bAutoScroll = ma_pCfgMgr->getAutoScrolling();
 	// Set the auto scrolling status to the buttons and log pages
 	m_toolBar.GetToolBarCtrl().CheckButton(IDC_BTN_AUTO_SCROLL, asMFCBool(bAutoScroll) );
-	m_propProcessLogPage.setAutoScroll(bAutoScroll);
+	m_propProcessingPage.setAutoScroll(bAutoScroll);
 	m_propQueueLogPage.setAutoScroll(bAutoScroll);
 
 	// change the menu item label to either "Pause" or "Resume" processing depending upon
@@ -1935,7 +1958,7 @@ void FileProcessingDlg::createPropertyPages()
 
 	// Set the config manager pointer for the pages that need it
 	m_propStatisticsPage.setConfigMgr(ma_pCfgMgr.get());
-	m_propProcessLogPage.setConfigMgr(ma_pCfgMgr.get());
+	m_propProcessingPage.setConfigMgr(ma_pCfgMgr.get());
 	m_propQueueLogPage.setConfigMgr(ma_pCfgMgr.get());
 	
 	// set active page back to the Database tab
@@ -2724,7 +2747,7 @@ CPropertyPage * FileProcessingDlg::getPropertyPage(EDlgTabPage ePage)
 	case kProcessingSetupPage:
 		return &m_propProcessSetupPage;
 	case kProcessingLogPage:
-		return &m_propProcessLogPage;
+		return &m_propProcessingPage;
 	case kStatisticsPage:
 		return &m_propStatisticsPage;
 	default:
@@ -2769,7 +2792,7 @@ void FileProcessingDlg::removePage(EDlgTabPage ePage)
 		m_propProcessSetupPage.ResetInitialized();
 		break;
 	case kProcessingLogPage:
-		m_propProcessLogPage.ResetInitialized();
+		m_propProcessingPage.ResetInitialized();
 		break;
 	case kStatisticsPage:
 		m_propStatisticsPage.ResetInitialized();
@@ -2812,6 +2835,7 @@ void FileProcessingDlg::displayPage(EDlgTabPage ePage)
 		m_propProcessSetupPage.refresh();
 		break;
 	case kProcessingLogPage:
+		m_propProcessingPage.refresh();
 		break;
 	case kStatisticsPage:
 		break;
@@ -2850,7 +2874,7 @@ void FileProcessingDlg::updateUIForProcessingComplete()
 		// progress updates
 		if (isPageDisplayed(kProcessingLogPage))
 		{
-			m_propProcessLogPage.stopProgressUpdates();
+			m_propProcessingPage.stopProgressUpdates();
 		}
 
 		// This takes care of stopping the timer on the next timer tick. 

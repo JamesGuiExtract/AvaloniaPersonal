@@ -44,8 +44,11 @@ public:
 	Win32SemaphoreLockGuard(Win32Semaphore& rSemaphore, bool bAcquire = true, DWORD dwMilliSeconds = INFINITE);
 	~Win32SemaphoreLockGuard();
 
+	// Used to make the destructor not release the semaphore
+	void NoRelease();
 private:
 	Win32Semaphore& rSemaphore;
+	bool m_bDoNotRelease;
 };
 
 class EXPORT_BaseUtils Win32SemaphoreUnLockGuard

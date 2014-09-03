@@ -35,7 +35,8 @@ FPRecordManager::FPRecordManager()
   m_nNumberOfFilesFailed(0),
   m_vecSleepTimes(gnNUMBER_OF_SLEEP_INTERVALS),
   m_bSleepTimeCalculated(false),
-  m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
+  m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB),
+  m_bWorkItemReturned(false)
 {
 	try
 	{
@@ -58,7 +59,7 @@ bool FPRecordManager::push(FileProcessingRecord& task)
 		return false;
 	}
 
-	// Set initial stat of the task to pending
+	// Set initial state of the task to pending
 	task.m_eStatus = kRecordPending;
 	CSingleLock lockGuard(&m_objLock, TRUE);
 	changeState(task);
@@ -171,6 +172,7 @@ void FPRecordManager::remove(const std::string& strFileName)
 }
 //-------------------------------------------------------------------------------------------------
 bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
+						  Win32Semaphore &processSemaphore,
 						  bool* pbProcessingActive/*= __nullptr*/)
 {
 	if (pbProcessingActive != __nullptr)
@@ -235,6 +237,14 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			*pbProcessingActive = true;
 		}
 
+		// If work items are available for processing, they should be processed first - 
+		// the m_bWorkItemReturned flag will be true if the last call to getWorkItemToProcess 
+		// returned a work item to process
+		if (m_bParallelizableEnabled && m_bWorkItemReturned)
+		{
+			continue;
+		}
+
 		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded())
 		{
 			// load from Database;
@@ -286,7 +296,13 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 
 			task = getTask(nTaskID);
 			task.m_eStatus = kRecordCurrent;
+
+			// Aquire the semaphore before calling
+			Win32SemaphoreLockGuard lg(processSemaphore, true);
 			changeState(task);
+
+			// return with the semaphore still aquired
+			lg.NoRelease();
 			return true;
 		}
 
@@ -328,6 +344,10 @@ void FPRecordManager::clear(bool bClearUI)
 	
 	clearEvents();
 	resetSleepIntervals();
+
+	// Reset the work item returned flag
+	m_bWorkItemReturned = false;
+	m_bParallelizableEnabled = false;
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::clearEvents()
@@ -455,6 +475,62 @@ long FPRecordManager::getNumberOfFilesProcessedSuccessfully()
 long FPRecordManager::getNumberOfFilesFailed()
 {
 	return m_nNumberOfFilesFailed;
+}
+//-------------------------------------------------------------------------------------------------
+bool FPRecordManager::getWorkItemToProcess(FPWorkItem& workItem, bool bRestrictToUPI)
+{
+	// need to move the 
+	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = 
+		m_ipFPMDB->GetWorkItemToProcess(m_nActionID, asVariantBool(bRestrictToUPI));
+
+	FPWorkItem newWorkItem(ipWorkItem);
+	
+	workItem = newWorkItem;
+
+	if (ipWorkItem == __nullptr)
+	{
+		m_bWorkItemReturned = false;
+		return false;
+	}
+	// put the new record in the map
+	CSingleLock lockGuard(&m_mapWorkItemsMutex, TRUE);
+	
+	updateWorkItem(newWorkItem);
+	m_bWorkItemReturned = true;
+	
+	return true;	
+}
+//-------------------------------------------------------------------------------------------------
+FPWorkItem FPRecordManager::getWorkItem(long workItemID)
+{
+	CSingleLock lockGuard(&m_mapWorkItemsMutex, TRUE);
+
+	workItemMap::iterator it = m_mapWorkItems.find(workItemID);
+	if(it != m_mapWorkItems.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		UCLIDException ue("ELI37262", "Work item ID not available.");
+		ue.addDebugInfo("Id", workItemID);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+IProgressStatusPtr FPRecordManager::getWorkItemProgressStatus(long nWorkItemID)
+{
+	CSingleLock lg(&m_mapReadWorkItems, TRUE);
+	return m_mapWorkItems[nWorkItemID].m_ipProgressStatus;
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::enableParallelizable(bool bEnable)
+{
+	m_bParallelizableEnabled = bEnable;
+	
+	// Make the default value for true so if there are available work items
+	// they will be processed first before any files get picked up to process
+	m_bWorkItemReturned = true;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -946,3 +1022,66 @@ void FPRecordManager::resetSleepIntervals()
 	m_bSleepTimeCalculated = false;
 }
 //-------------------------------------------------------------------------------------------------
+bool FPRecordManager::getWorkItem(long nWorkItemID, FPWorkItem& workItem)
+{
+	// Lock the mutex for the Task map while reading so it will not be 
+	// updated
+	CSingleLock lg(&m_mapReadWorkItems, TRUE);
+
+	workItemMap::iterator it = m_mapWorkItems.find(nWorkItemID);
+	if(it != m_mapWorkItems.end())
+	{
+		workItem = it->second;
+		return true;
+	}
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::changeState(const FPWorkItem& workItem)
+{
+	// there are only two state changes I am wanting
+	// kWorkUnitPending to kworkUnitProcessing
+	// KWorkUnitProcessing to either kWorkUnitCompleted or kWorkUnitFaild
+	FPWorkItem oldWorkItem;
+	EWorkItemStatus eOldStatus = kWorkUnitPending;
+	EWorkItemStatus newStatus = workItem.m_status;
+	long nWorkItemID = workItem.getWorkItemID();
+
+	// need to move the notify calls here also
+	if (getWorkItem(nWorkItemID, oldWorkItem))
+	{
+		eOldStatus = oldWorkItem.m_status;
+	}
+	else
+	{
+		CSingleLock lg(&m_mapReadWorkItems, TRUE);
+		m_mapWorkItems[nWorkItemID] = workItem;
+	}
+	SendStatusMessage(m_hDlg, &workItem, eOldStatus);
+
+	CSingleLock lg(&m_mapReadWorkItems, TRUE);
+	if (newStatus == kWorkUnitComplete || newStatus == kWorkUnitFailed )
+	{
+		workItemMap::iterator it = m_mapWorkItems.find(workItem.getWorkItemID());
+		if(it != m_mapWorkItems.end())
+		{
+			m_mapWorkItems.erase(it);
+		}
+	}
+	else
+	{
+		m_mapWorkItems[nWorkItemID] = workItem;
+	}
+
+}
+void FPRecordManager::SendStatusMessage(HWND hWnd, const FPWorkItem *pWorkItem,
+	EWorkItemStatus eOldStatus)
+{
+	::SendMessage(hWnd, FP_WORK_ITEM_STATUS_CHANGE, eOldStatus, (LPARAM)pWorkItem);
+}
+
+void FPRecordManager::updateWorkItem(FPWorkItem &workItem)
+{
+	CSingleLock lg(&m_mapWorkItemsMutex, TRUE);
+	changeState(workItem);
+}

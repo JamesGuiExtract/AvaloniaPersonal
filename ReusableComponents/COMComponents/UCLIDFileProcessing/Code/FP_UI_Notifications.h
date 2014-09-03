@@ -20,7 +20,7 @@ const UINT FP_PROCESSING_COMPLETE = WM_USER + 2005;
 //			- removing a record from the being processed list AND adding a record to the 
 //			  failed processing list (for "R" to "F")
 // WPARAM:	Task ID
-// LPARAM:	MAKELPARAM((WORD)eOldStatus, (WORD)eNewStatus)
+// LPARAM:	pointer to FileProcessingRecord 
 const UINT FP_STATUS_CHANGE = WM_USER + 2006;
 //---------------------------------------------------------------------------------------------
 // PURPOSE: To be sent when the processing status of a file supplier has changed.  Status 
@@ -91,5 +91,14 @@ const UINT FP_SCHEDULE_INACTIVE = WM_USER + 2014;
 // WPARAM:	0
 // LPARAM:	0
 const UINT FP_SCHEDULE_ACTIVE = WM_USER + 2015;
+//---------------------------------------------------------------------------------------------
+// PURPOSE: When the processing status of a Work item has changed from "P" to "R", or "R" to "C", 
+//			or "R" to "F", this message is sent to the UI.  
+//			The UI will update the Processing Log page by:
+//			- adding a record to the being processed list (for "P" to "R")
+//			- removing a record from the being processed list AND adding a record to the 
+// WPARAM:	WorkItemID
+// LPARAM:	Pointer to FPWorkItem
+const UINT FP_WORK_ITEM_STATUS_CHANGE = WM_USER + 2016;
 //---------------------------------------------------------------------------------------------
 

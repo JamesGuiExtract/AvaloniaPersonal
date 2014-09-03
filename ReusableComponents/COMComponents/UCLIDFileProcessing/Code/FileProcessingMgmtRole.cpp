@@ -7,6 +7,7 @@
 #include "FileProcessingUtils.h"
 #include "CommonConstants.h"
 #include "HelperFunctions.h"
+#include "FPWorkItem.h"
 
 #include <LicenseMgmt.h>
 #include <COMUtils.h>
@@ -1676,6 +1677,9 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 		CFileProcessingMgmtRole *pFPMgmtRole = pThreadData->m_pFPMgmtRole;
 		ASSERT_RESOURCE_ALLOCATION("ELI37138", pFPMgmtRole != __nullptr);
 
+		FPRecordManager* fprm = pFPMgmtRole->m_pRecordMgr;
+		ASSERT_RESOURCE_ALLOCATION("ELI37374", fprm != __nullptr);
+		
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag(pFPMgmtRole->m_pFAMTagManager);
 
 		long nWorkItemGroupID = -1;
@@ -1688,6 +1692,7 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 		bool bDone = false;
 		bool bHasIdleMutex = false;
 		DWORD dwWaitTime = gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK;
+		FPWorkItem workItem;
 
 		do
 		{
@@ -1698,43 +1703,18 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 					nWorkItemID = -1;
 
 					// If the FAM is stopping want to only process workitems that this FAM is waiting for
-					VARIANT_BOOL vbRestrictToUPI = pThreadData->m_bProcessForCurrentUPIOnly ||
-						asVariantBool(pFPMgmtRole->m_eventManualStopProcessing.isSignaled());
+					bool bRestrictToUPI = pThreadData->m_bProcessForCurrentUPIOnly ||
+						pFPMgmtRole->m_eventManualStopProcessing.isSignaled();
 
-					UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = 
-						ipDB->GetWorkItemToProcess(nActionID, vbRestrictToUPI);
-					if (ipWorkItem != __nullptr)
-					{
-						if (bHasIdleMutex)
-						{
-							pThreadData->ms_mutexForWorkItemIdle.Unlock();
-							bHasIdleMutex = false;
-							dwWaitTime = gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK;
-						}
-						// if the work item group is the same as the last one don't have to 
-						// recreate the task just use the one from the last
-						if (nWorkItemGroupID != ipWorkItem->WorkItemGroupID)
-						{
-							nWorkItemGroupID = ipWorkItem->WorkItemGroupID;
-							ipTask = __nullptr;
-							
-							long nNumberOfWorkItems;
-							_bstr_t bstrStringizedTask = ipDB->GetWorkGroupData(nWorkItemGroupID, &nNumberOfWorkItems);
-							
-							ipTask = ipMiscUtils->GetObjectFromStringizedByteStream(bstrStringizedTask);
-							ASSERT_RESOURCE_ALLOCATION("ELI36868", ipTask != __nullptr);
-						}
-						nWorkItemID = ipWorkItem->WorkItemID;
-						Win32SemaphoreLockGuard lg(pThreadData->m_rSemaphore);
-						ipTask->ProcessWorkItem(ipWorkItem, nActionID, ipFAMTag, ipDB, __nullptr);
-						ipDB->NotifyWorkItemCompleted(nWorkItemID);
-					}
-					else if (pThreadData->ms_threadStopProcessing.isSignaled())
+					//UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = 
+					bool bWorkItemReturned = fprm->getWorkItemToProcess(workItem, bRestrictToUPI);
+					
+					if (!bWorkItemReturned && pThreadData->ms_threadStopProcessing.isSignaled())
 					{
 						// no work items to process
 						break;
 					}
-					else if (!bHasIdleMutex)
+					else if (!bWorkItemReturned && !bHasIdleMutex)
 					{
 						// This is set up so that when there are no workitems available all but one
 						// thread will wait either for processing stop or until it gets the idle mutex
@@ -1760,6 +1740,39 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 							break;
 						}
 					}
+					UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = workItem.getWorkItemRecord();
+
+					if (bWorkItemReturned && ipWorkItem != __nullptr)
+					{
+						if (bHasIdleMutex)
+						{
+							pThreadData->ms_mutexForWorkItemIdle.Unlock();
+							bHasIdleMutex = false;
+							dwWaitTime = gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK;
+						}
+						// if the work item group is the same as the last one don't have to 
+						// recreate the task just use the one from the last
+						if (nWorkItemGroupID != ipWorkItem->WorkItemGroupID)
+						{
+							nWorkItemGroupID = ipWorkItem->WorkItemGroupID;
+							ipTask = __nullptr;
+							
+							long nNumberOfWorkItems;
+							_bstr_t bstrStringizedTask = ipDB->GetWorkGroupData(nWorkItemGroupID, &nNumberOfWorkItems);
+							
+							ipTask = ipMiscUtils->GetObjectFromStringizedByteStream(bstrStringizedTask);
+							ASSERT_RESOURCE_ALLOCATION("ELI36868", ipTask != __nullptr);
+						}
+						nWorkItemID = ipWorkItem->WorkItemID;
+						Win32SemaphoreLockGuard lg(pThreadData->m_rSemaphore);
+						workItem.markAsStarted();
+						fprm->updateWorkItem(workItem);
+						ipTask->ProcessWorkItem(ipWorkItem, nActionID, ipFAMTag, ipDB, workItem.m_ipProgressStatus);
+						ipDB->NotifyWorkItemCompleted(nWorkItemID);
+						workItem.markAsCompleted();
+						fprm->updateWorkItem(workItem);
+					}
+
 					
 					if (bHasIdleMutex)
 					{
@@ -1781,7 +1794,10 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 			{
 				if (nWorkItemID > 0)
 				{
-					ipDB->NotifyWorkItemFailed(nWorkItemID, ue.asStringizedByteStream().c_str());
+					string stringizedException = ue.asStringizedByteStream();
+					ipDB->NotifyWorkItemFailed(nWorkItemID,stringizedException.c_str());
+					workItem.markAsFailed(stringizedException);
+					fprm->updateWorkItem(workItem);
 				}
 				ue.log();
 			}
@@ -1934,9 +1950,13 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 
 		try
 		{
+			// if parallelizable tasks being used manage the semaphore
+			UPI upi = UPI::getCurrentProcessUPI();
+			Win32Semaphore parallelSemaphore(upi.getProcessSemaphoreName());
+		
 			// Check if there are any files available right now.
 			bool bProcessingActive;
-			if (!m_pRecordMgr->pop(task, false, &bProcessingActive))
+			if (!m_pRecordMgr->pop(task, false, parallelSemaphore, &bProcessingActive))
 			{
 				// If not, and processing is no longer active, end the processing loop.
 				if (!bProcessingActive)
@@ -1959,7 +1979,7 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 				{
 					pStandbyThread->CreateThread();
 
-					bGotFile = m_pRecordMgr->pop(task, true);
+					bGotFile = m_pRecordMgr->pop(task, true, parallelSemaphore);
 
 					// Call endStandby so that the standby the thread will exit when all tasks have
 					// responded to the standby call.
@@ -1982,6 +2002,9 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 			// we now have a valid task that we need to process
 			try
 			{
+				// The semaphore has already been aquired
+				Win32SemaphoreLockGuard lg(parallelSemaphore, false);
+
 				// process the task
 				processTask(task, pThreadData);
 			}
@@ -2070,12 +2093,6 @@ EFileProcessingResult CFileProcessingMgmtRole::startFileProcessingChain(FileProc
 		{
 			return kProcessingCancelled;
 		}
-
-		// if parallelizable tasks being used manage the semaphore
-		UPI upi = UPI::getCurrentProcessUPI();
-		Win32Semaphore parallelSemaphore(upi.getProcessSemaphoreName());
-		
-		Win32SemaphoreLockGuard lg(parallelSemaphore);
 
 		// Attempt to process the file
 		EFileProcessingResult eResult = (EFileProcessingResult) ipExecutor->ProcessFile(
@@ -2900,7 +2917,11 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 			if (!bDontStartThreads)
 			{
 				unsigned long ulStackSize = getProcessingThreadStackSize();
-
+				
+				// Start work item threads first so they will start processing existing work items
+				// before processing thread get a file to  process
+				startWorkItemThreads(ulStackSize);
+				
 				// begin the threads to process files in parallel
 				for (int i = 0; i < nNumThreads; i++)
 				{
@@ -2914,9 +2935,6 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 					// wait for the thread to start
 					pThreadData->m_threadStartedEvent.wait();
 				}
-
-				// Start work item threads
-				startWorkItemThreads(ulStackSize);
 			}
 		}
 		catch (...)
@@ -3061,8 +3079,16 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 				// because of the close way it is tied to processing, exceptions will be raised if the file
 				// does not follow the same code-path through push and pop prior to processing.
 				pMgmtRole->m_pRecordMgr->push(task);
-				pMgmtRole->m_pRecordMgr->pop(task, false);
 
+				// if parallelizable tasks being used manage the semaphore
+				UPI upi = UPI::getCurrentProcessUPI();
+				Win32Semaphore parallelSemaphore(upi.getProcessSemaphoreName());
+
+				pMgmtRole->m_pRecordMgr->pop(task, false, parallelSemaphore);
+				
+				// The semaphore has already been aquired
+				Win32SemaphoreLockGuard lg(parallelSemaphore, false);
+				
 				// Process the file
 				pMgmtRole->processTask(task, pThreadData);
 
@@ -3146,6 +3172,11 @@ bool CFileProcessingMgmtRole::setupWorkItemThreadData(long nNumberOfThreads, lon
 			m_vecWorkItemThreads.push_back(threadData);
 
 		}
+		// if the record manager is set, enable parallelizable
+		if (m_pRecordMgr != __nullptr)
+		{
+			m_pRecordMgr->enableParallelizable(true);
+		}
 	}
 	return bParallelize;
 }
@@ -3171,7 +3202,7 @@ void CFileProcessingMgmtRole::signalWorkItemThreadsToStopAndWait()
 		WorkItemThreadData::ms_threadStopProcessing.signal();
 					
 		// wait for each to stop
-		for (long i = 0; i < nSize; i++)
+		for (unsigned long i = 0; i < nSize; i++)
 		{
 			WorkItemThreadData *p = m_vecWorkItemThreads[i];
 
