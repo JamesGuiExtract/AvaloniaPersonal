@@ -11,6 +11,7 @@
 #include <StringTokenizer.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <CsisUtils.h>
 
 #include <vector>
 #include <string>
@@ -513,14 +514,14 @@ void processInputFile(ifstream &inputFile, string &strDelim, int iImageNamePos, 
 		createDirectory(strOutputPath);
 	}
 
-	map<string, vector<string>> mapMultiPageImages;
+	csis_map<vector<string>>::type mapMultiPageImages;
 
 	// read input file
 	while (!inputFile.eof())
 	{
 		string strBuffer;
 		getline(inputFile, strBuffer);
-		if (inputFile.fail())
+		if (inputFile.fail() && !inputFile.eof())
 		{
 			throw UCLIDException("ELI29966", "Error reading from input file.");
 		}
@@ -536,7 +537,6 @@ void processInputFile(ifstream &inputFile, string &strDelim, int iImageNamePos, 
 			if(((int)vecTokens.size() >= iImagePagePos) && ((int)vecTokens.size() >= iImageNamePos))
 			{
 				string strOutputFile = vecTokens[iImageNamePos-1];
-				makeLowerCase(strOutputFile);
 				string strInputFileName = strInputPath + vecTokens[iImagePagePos-1];
 				simplifyPathName(strInputFileName);
 				if (!isAbsolutePath(strInputFileName))
@@ -561,7 +561,7 @@ void processInputFile(ifstream &inputFile, string &strDelim, int iImageNamePos, 
 		}
 	}
 
-	map<string, vector<string> >::iterator mapIter;
+	csis_map<vector<string>>::type::iterator mapIter;
 
 	// cycle through the map and create the multi-page images
 	for(mapIter = mapMultiPageImages.begin(); mapIter != mapMultiPageImages.end(); mapIter++)
