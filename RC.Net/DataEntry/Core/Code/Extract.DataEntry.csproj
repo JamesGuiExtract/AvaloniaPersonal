@@ -179,6 +179,12 @@
       <SubType>Code</SubType>
       <DependentUpon>DataEntryQuery.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataEntryButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DataEntryButton.Designer.cs">
+      <DependentUpon>DataEntryButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataEntryComboBox.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -100,13 +100,8 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="targetAttribute">The <see cref="IAttribute"/> to be updated using the query.
         /// </param>
-        /// <param name="query">The query to use to update the query. Values
-        /// to be used from other <see cref="IAttribute"/>'s values should be inserted into the
-        /// query using curly braces. For example, to have the value reflect the value of a
-        /// sibling attribute named "Source", the query would be specified as "{../Source}".
-        /// If the query matches SQL syntax it will be executed against the
-        /// <see cref="DataEntryControlHost"/>'s database. Every time an attribute specified in the
-        /// query is modified, this query will be re-evaluated and used to update the value.</param>
+        /// <param name="query">. Every time an attribute specified in the query is modified, this
+        /// query will be re-evaluated and used to update the value.</param>
         /// <param name="dbConnection">The compact SQL database to use for auto-update queries that
         /// use a database query (can be <see langword="null"/> if not required).</param>
         /// <param name="validationTrigger"><see langword="true"/> if the trigger should update the

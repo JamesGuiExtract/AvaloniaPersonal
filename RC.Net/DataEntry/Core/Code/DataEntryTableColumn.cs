@@ -311,11 +311,6 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets or sets a query which will cause the column's validation list to be automatically
         /// updated using values from other <see cref="IAttribute"/>'s and/or a database query.
-        /// Values to be used from other <see cref="IAttribute"/>'s values should be inserted into
-        /// the query using curly braces. For example, to have the validation list reflect the value
-        /// of a sibling attribute named "Source", the query would be specified as "{../Source}".
-        /// Text contained withing &lt;SQL&gt; tags will be used as SQL queries against
-        /// <see cref="DataEntryControlHost"/>'s database (after substituting in attribute values).
         /// Every time an attribute specified in the query is modified, this query will be 
         /// re-evaluated and used to update the validation list.
         /// </summary>
@@ -438,12 +433,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets or sets a query which will cause a contained cell's value to automatically be
         /// updated using values from other <see cref="IAttribute"/>'s and/or a database query.
-        /// Values to be used from other <see cref="IAttribute"/>'s values should be inserted into
-        /// the query using curly braces. For example, to have the value reflect the value
-        /// of a sibling attribute named "Source", the query would be specified as
-        /// "{../Source}". If the query matches SQL syntax it will be executed against the
-        /// <see cref="DataEntryControlHost"/>'s database. Every time an attribute specified in the
-        /// query is modified, this query will be re-evaluated and used to update the value.
+        /// Every time an attribute specified in the query is modified, this query will be
+        /// re-evaluated and used to update the value.
         /// </summary>
         /// <value>A query which will cause value to automatically be updated using values
         /// from other <see cref="IAttribute"/>'s and/or a database query.</value>
