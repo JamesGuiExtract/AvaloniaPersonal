@@ -71,7 +71,14 @@ namespace Extract.DataEntry
         /// excessive recalculations as various parts of complex queries are updated.
         /// </summary>
         [ThreadStatic]
-        static Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>> _queriesPendingUpdate;
+        static List<Tuple<AutoUpdateTrigger, DataEntryQuery>> _queriesPendingUpdate;
+
+        /// <summary>
+        /// Keeps track of whether the <see cref="_queriesPendingUpdate"/> are in the processs of
+        /// being evaluated. Do not allow for re-entry to <see cref="ExecuteAllPendingTriggers"/>.
+        /// </summary>
+        [ThreadStatic]
+        static bool _executingPendingTriggers;
 
         #endregion Fields
 
@@ -88,6 +95,7 @@ namespace Extract.DataEntry
             {
                 AttributeStatusInfo.EditEnded += HandleAttributeStatusInfo_EditEnded;
                 AttributeStatusInfo.UndoManager.OperationEnded += HandleUndoManager_OperationEnded;
+                AttributeStatusInfo.QueryDelayEnded += HandleQueryDelayEnded;
             }
             catch (Exception ex)
             {
@@ -122,7 +130,7 @@ namespace Extract.DataEntry
                 // in subsequent verification sessions.
                 if (_queriesPendingUpdate == null)
                 {
-                    _queriesPendingUpdate = new Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
+                    _queriesPendingUpdate = new List<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
                 }
 
                 // Initialize the fields.
@@ -158,7 +166,7 @@ namespace Extract.DataEntry
                 }
 
                 // Attempt to update the value once the query has been loaded.
-                if ((_validationTrigger || !AttributeStatusInfo.PauseAutoUpdateQueries) &&
+                if ((_validationTrigger || !AttributeStatusInfo.BlockAutoUpdateQueries) &&
                     !_validationTrigger || AttributeStatusInfo.ValidationTriggersEnabled)
                 {
                     UpdateValue();
@@ -280,8 +288,12 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Execute all pending AutoUpdateTriggers that fired during an EndEdit call.
-                ExecuteAllPendingTriggers();
+                // Execute all pending AutoUpdateTriggers that fired during an EndEdit call (unless
+                // queries are explicitly paused).
+                if (!AttributeStatusInfo.PauseQueries)
+                {
+                    ExecuteAllPendingTriggers();
+                }
             }
             catch (Exception ex)
             {
@@ -306,6 +318,25 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI36175");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="AttributeStatusInfo.QueryDelayEnded"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        static void HandleQueryDelayEnded(object sender, EventArgs e)
+        {
+            try
+            {
+                // Execute all pending AutoUpdateTriggers that fired while a delay was in effect.
+                ExecuteAllPendingTriggers();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37379");
             }
         }
 
@@ -336,14 +367,27 @@ namespace Extract.DataEntry
                     if (AttributeStatusInfo.EndEditInProgress ||
                         AttributeStatusInfo.UndoManager.InUndoOperation ||
                         AttributeStatusInfo.UndoManager.InRedoOperation ||
+                        AttributeStatusInfo.PauseQueries ||
                         _queriesPendingUpdate.Count > 0)
                     {
-                        // If this query has already been scheduled to be updated, don't schedule
-                        // another update.
-                        if (!_queriesPendingUpdate.Any(
-                                pendingTrigger => pendingTrigger.Item2 == dataEntryQuery))
+                        var alreadyQueuedQuery = _queriesPendingUpdate.SingleOrDefault(
+                            pendingTrigger => pendingTrigger.Item2 == dataEntryQuery);
+
+                        // To ensure computed values are applied before validation is attempted:
+                        // - If the same validation trigger is queued up multiple times, only the
+                        // last instance should be evaluated so as to be sure all data is final
+                        // before determining if valid.
+                        // - If the same auto-update trigger is queued up multiple times, only the
+                        // first instance should be evaluated.
+                        if (_validationTrigger && alreadyQueuedQuery != null)
                         {
-                            _queriesPendingUpdate.Enqueue(
+                            _queriesPendingUpdate.Remove(alreadyQueuedQuery);
+                            alreadyQueuedQuery = null;
+                        }
+
+                        if (alreadyQueuedQuery == null)
+                        {
+                            _queriesPendingUpdate.Add(
                                 new Tuple<AutoUpdateTrigger, DataEntryQuery>(this, dataEntryQuery));
                         }
                     }
@@ -399,7 +443,7 @@ namespace Extract.DataEntry
                 // ... or attributes that are not initialized (in the process of being deleted).
                 if (dataEntryQuery.Disabled || !AttributeStatusInfo.GetStatusInfo(_targetAttribute).IsInitialized ||
                     (_validationTrigger && !AttributeStatusInfo.ValidationTriggersEnabled) ||
-                    (AttributeStatusInfo.PauseAutoUpdateQueries && !_validationTrigger))
+                    (AttributeStatusInfo.BlockAutoUpdateQueries && !_validationTrigger))
                 {
                     return false;
                 }
@@ -444,6 +488,16 @@ namespace Extract.DataEntry
                     if (dataEntryQuery.ValidationListType != ValidationListType.AutoCompleteOnly)
                     {
                         validator.SetValidationQuery(dataEntryQuery, queryResult);
+                    }
+
+                    // Because some fields may not be able to accept the value before being entirely
+                    // initialized (i.e., combo box fields), if a backup value was stored for this
+                    // attribute and the current value of the attribute does not match the backup
+                    // value, restore the backup value. 
+                    if (statusInfo.LastAppliedStringValue != null &&
+                        _targetAttribute.Value.String != statusInfo.LastAppliedStringValue)
+                    {
+                        AttributeStatusInfo.SetValue(_targetAttribute, statusInfo.LastAppliedStringValue, false, true);
                     }
 
                     statusInfo.OwningControl.RefreshAttributes(false, _targetAttribute);
@@ -523,6 +577,17 @@ namespace Extract.DataEntry
                 bool isBlank = string.Equals(stringResult, _BLANK_VALUE,
                     StringComparison.CurrentCultureIgnoreCase);
 
+                if (isBlank)
+                {
+                    stringResult = "";
+                }
+
+                // Keep track of programmatically applied values, in case the field control isn't
+                // yet prepared to accept the value. (i.e. combo box whose item list has not yet
+                // been updated/initialized)
+                var statusInfo = AttributeStatusInfo.GetStatusInfo(_targetAttribute);
+                statusInfo.LastAppliedStringValue = stringResult;
+
                 // Update the attribute's value.
                 if (queryResult.IsSpatial)
                 {
@@ -533,10 +598,6 @@ namespace Extract.DataEntry
                     }
 
                     AttributeStatusInfo.SetValue(_targetAttribute, spatialString, false, true);
-                }
-                else if (isBlank)
-                {
-                    AttributeStatusInfo.SetValue(_targetAttribute, "", false, true);
                 }
                 else
                 {
@@ -594,41 +655,61 @@ namespace Extract.DataEntry
         /// </summary>
         static void ExecuteAllPendingTriggers()
         {
-            // [DataEntry:1292]
-            // Since _queriesPendingUpdate is ThreadStatic, it needs to be constructed as needed
-            // in every thread rather than with a default constructor (otherwise it will be null
-            // in subsequent verification sessions.
-            if (_queriesPendingUpdate == null)
+            if (_executingPendingTriggers)
             {
-                _queriesPendingUpdate = new Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
+                return;
             }
 
-            while (_queriesPendingUpdate.Count > 0)
+            try
             {
-                var pendingTrigger = _queriesPendingUpdate.Dequeue();
-                
-                // Ensure that a field and/or it's autoupdate trigger(s) haven't been deleted or
-                // disposed of since the query modification occured.
-                AutoUpdateTrigger autoUpdateQuery = pendingTrigger.Item1;
-                if (autoUpdateQuery._isDisposed ||
-                    !AttributeStatusInfo.GetStatusInfo(autoUpdateQuery._targetAttribute).IsInitialized)
+                _executingPendingTriggers = true;
+
+                // [DataEntry:1292]
+                // Since _queriesPendingUpdate is ThreadStatic, it needs to be constructed as needed
+                // in every thread rather than with a default constructor (otherwise it will be null
+                // in subsequent verification sessions.
+                if (_queriesPendingUpdate == null)
                 {
-                    continue;
+                    _queriesPendingUpdate = new List<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
                 }
 
-                DataEntryQuery dataEntryQuery = pendingTrigger.Item2;
+                while (_queriesPendingUpdate.Count > 0)
+                {
+                    var pendingTrigger = _queriesPendingUpdate.First();
+                    _queriesPendingUpdate.RemoveAt(0);
+                    
+                    // Ensure that a field and/or it's autoupdate trigger(s) haven't been deleted or
+                    // disposed of since the query modification occured.
+                    AutoUpdateTrigger autoUpdateQuery = pendingTrigger.Item1;
+                    if (autoUpdateQuery._isDisposed ||
+                        !AttributeStatusInfo.GetStatusInfo(autoUpdateQuery._targetAttribute).IsInitialized)
+                    {
+                        continue;
+                    }
 
-                // Always ensure a default query applies updates as part of a full
-                // auto-update trigger to ensure normal auto-update triggers can apply
-                // their updates on top of any default value.
-                if (dataEntryQuery.DefaultQuery)
-                {
-                    autoUpdateQuery.UpdateValue();
+                    DataEntryQuery dataEntryQuery = pendingTrigger.Item2;
+
+                    // Always ensure a default query applies updates as part of a full
+                    // auto-update trigger to ensure normal auto-update triggers can apply
+                    // their updates on top of any default value.
+                    if (dataEntryQuery.DefaultQuery)
+                    {
+                        autoUpdateQuery.UpdateValue();
+                    }
+                    else
+                    {
+                        autoUpdateQuery.UpdateValue(dataEntryQuery);
+                    }
                 }
-                else
-                {
-                    autoUpdateQuery.UpdateValue(dataEntryQuery);
-                }
+            }
+            finally
+            {
+                // Forget all LastAppliedStringValues that are currently being remembered to ensure
+                // that they don't get used later on after the value has been changed to something
+                // else.
+                AttributeStatusInfo.ForgetLastAppliedStringValues();
+
+                _executingPendingTriggers = false;
             }
         }
 

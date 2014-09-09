@@ -159,12 +159,6 @@ namespace Extract.DataEntry
         bool _isActive;
 
         /// <summary>
-        /// Keeps track of a value that was applied or attempted to be applied prior to changing the
-        /// item list when configured as a DropDownList.
-        /// </summary>
-        string _originalValue;
-
-        /// <summary>
         /// To prevent a problem where the value can inadvertenly be changed during a font change,
         /// the value the control has before a font change will be stored.
         /// </summary>
@@ -176,11 +170,6 @@ namespace Extract.DataEntry
         /// <see langword="true"/>.
         /// </summary>
         bool _autoCompleteUpdatePending;
-
-        /// <summary>
-        /// Indicates whether the items in the combo box are currently being updated.
-        /// </summary>
-        bool _updatingComboBoxItems;
 
         /// <summary>
         /// The active <see cref="FontStyle"/> for the control.
@@ -597,10 +586,8 @@ namespace Extract.DataEntry
             {
                 base.OnTextChanged(e);
 
-                // Only apply data if the combo box is currently mapped and we aren't keeping track
-                // of an _originalValue which will be restored later.
-                if (_attribute != null &&
-                    (!string.IsNullOrEmpty(Text) || string.IsNullOrEmpty(_originalValue)))
+                // Only apply data if the combo box is currently mapped
+                if (_attribute != null && !string.IsNullOrEmpty(Text))
                 {
                     AttributeStatusInfo.SetValue(_attribute, Text, true, false);
                 }
@@ -754,30 +741,6 @@ namespace Extract.DataEntry
                         {
                             value = value.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
                         }
-
-                        // [DataEntry:906]
-                        // If the comboBox is configured as a DropDownList and the specified value
-                        // is not currently a possible value, store the value as "_originalValue" so
-                        // it can be restored if a the value is later added as a possible value.
-                        if (DropDownStyle == ComboBoxStyle.DropDownList && !Items.Contains(value))
-                        {
-                            _originalValue = value;
-                        }
-                        // Don't clear the original value if we are currently updating the combo box
-                        // items since the update will require the current value to be cleared and
-                        // then reset.
-                        else if (!_updatingComboBoxItems)
-                        {
-                            _originalValue = null;
-                        }
-                    }
-                    else if (!_updatingComboBoxItems)
-                    {
-                        // [DataEntry:1302]
-                        // If the combo box value is being cleared, clear the _originalValue as well
-                        // so that it does not inappropriately populate the combo box at a later
-                        // time.
-                        _originalValue = null;
                     }
 
                     base.Text = value;
@@ -1390,17 +1353,7 @@ namespace Extract.DataEntry
         /// </summary>
         public void ClearCachedData()
         {
-            try
-            {
-                // [DataEntry:1302]
-                // Ensure _originalValue is reset whenever a document is closed to ensure it does
-                // not inappropriately set the combo box value for subsequent documents.
-                _originalValue = null;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI36355");
-            }
+            // Nothing to do.
         }
 
         /// <summary>
@@ -1690,8 +1643,6 @@ namespace Extract.DataEntry
         {
             try
             {
-                _updatingComboBoxItems = true;
-
                 // If the host reports that an update is in progress, delay updating the auto-complete
                 // list since the update may otherwise result in the auto-complete list being changed
                 // multiple times before the update is over.
@@ -1719,27 +1670,24 @@ namespace Extract.DataEntry
                 if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
                         ref autoCompleteSource, ref autoCompleteCollection, out autoCompleteValues))
                 {
+                    var statusInfo = AttributeStatusInfo.GetStatusInfo(_attribute);
+
                     if (DropDownStyle != ComboBoxStyle.DropDownList)
                     {
                         AutoCompleteMode = autoCompleteMode;
                         AutoCompleteSource = autoCompleteSource;
                         AutoCompleteCustomSource = autoCompleteCollection;
                     }
-                    // [DataEntry:906]
-                    // If the comboBox is configured as a DropDownList and there is already a value in
-                    // in the comboBox, restore it once we are done updating the list items.
-                    else if (string.IsNullOrEmpty(_originalValue) && !string.IsNullOrEmpty(Text))
-                    {
-                        _originalValue = Text;
-                    }
 
                     Items.Clear();
                     Items.AddRange(autoCompleteValues);
 
-                    // Restore the original value
-                    if (!string.IsNullOrEmpty(_originalValue) && Items.Contains(_originalValue))
+                    // If a LastAppliedStringValue is avaliable, use to ensure a value applied
+                    // previously programmatically is correctly set after the Items list has been
+                    // prepared.
+                    if (statusInfo.LastAppliedStringValue != null && Items.Contains(statusInfo.LastAppliedStringValue))
                     {
-                        Text = _originalValue;
+                        Text = statusInfo.LastAppliedStringValue;
                     }
                 }
             }
@@ -1747,10 +1695,6 @@ namespace Extract.DataEntry
             {
                 // This method is called via BeginInvoke, thus it cannot throw out the exception.
                 ex.ExtractDisplay("ELI30629");
-            }
-            finally
-            {
-                _updatingComboBoxItems = false;
             }
         }
 

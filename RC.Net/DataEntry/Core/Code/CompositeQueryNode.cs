@@ -107,6 +107,12 @@ namespace Extract.DataEntry
         /// </summary>
         bool _handlingQueryValueChange;
 
+        /// <summary>
+        /// Indicates whether the query node is currently being evaluated in which case the
+        /// <see cref="QueryValueModified"/> event can be suppressed.
+        /// </summary>
+        bool _evaluating;
+
         #endregion Fields
 
         #region Delegates
@@ -404,6 +410,16 @@ namespace Extract.DataEntry
         /// event data.</param>
         protected virtual void HandleQueryValueModified(object sender, QueryValueModifiedEventArgs e)
         {
+            // To cut down on some of the thrashing of QueryValueModified events (especially when
+            // dealing with nodes with distinct selection mode which will re-evaluate multiple times
+            // during the same evaluation of the parent node, ignore any QueryValueModified events
+            // that occur during the evaluation of this node (because it is already evaluating,
+            // there is not point to handling or forwarding this event).
+            if (_evaluating)
+            {
+                return;
+            }
+
             // [DataEntry:1133]
             // Even when _handlingQueryValueChange is true, clear the CachedResult if the attribute
             // has been modified to ensure any currently executing query returns an accurate result.
@@ -557,6 +573,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                _evaluating = true;
+
                 // If the selection mode is "Distinct" and a distinct result has been applied, the
                 // distinct section defined by this node is currently being evaluated, meaning this
                 // node has been referenced by another node in this distinct section. Return the
@@ -594,6 +612,16 @@ namespace Extract.DataEntry
                             forcedSpatialResult.MergeAsHybridString(resultSet.ForcedSpatialResult);
                         }
                     }
+                }
+
+                // https://extract.atlassian.net/browse/ISSUE-12439
+                // There are cases where child query nodes need to be aware of when the overall
+                // evaluation of their parent is complete, such as when an attribute query node
+                // with a selection mode of distinct is evaluated so that it can know all attributes
+                // that were referenced, not just the most recently evaluated one.
+                foreach (QueryNode childNode in ChildNodes)
+                {
+                    childNode.NotifyParentEvaluationComplete();
                 }
 
                 // [DataEntry:1225]
@@ -702,6 +730,10 @@ namespace Extract.DataEntry
                 ee.AddDebugData("Query node type", GetType().Name, true);
                 ee.AddDebugData("Query", QueryText ?? "null", true);
                 throw ee;
+            }
+            finally
+            {
+                _evaluating = false;
             }
         }
 

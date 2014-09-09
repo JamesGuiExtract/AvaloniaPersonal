@@ -205,6 +205,15 @@ namespace Extract.DataEntry
         static UndoManager _undoManager;
 
         /// <summary>
+        /// Indicates whether auto-update and validation queries should be temporarily prevented
+        /// from updating data. The queries will still be loaded for all attributes, but they will
+        /// not be triggered until un-paused, at which point all queries that would have been
+        /// triggered while paused will executed.
+        /// </summary>
+        [ThreadStatic]
+        static bool _pauseQueries;
+
+        /// <summary>
         /// Indicates whether trace statements will be output.
         /// </summary>
         static bool _enableTrace;
@@ -331,6 +340,14 @@ namespace Extract.DataEntry
         /// in a control that supports tab groups.
         /// </summary>
         List<IAttribute> _tabGroup;
+
+        /// <summary>
+        /// Keeps track of the last string value applied to this attribute programmatically (on load
+        /// or via an auto-update query). Used to help ensure the correct value gets applied to
+        /// fields that may not yet be ready to accept the value (i.e. combo boxes where the list of
+        /// possible values has not yet been set/updated).
+        /// </summary>
+        string _lastAppliedStringValue;
 
         /// <summary>
         /// Indicates whether the attribute has been initialized and has not been deleted.
@@ -523,6 +540,28 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets the last string value applied to this attribute programmatically (on load
+        /// or via an auto-update query). Used to help ensure the correct value gets applied to
+        /// fields that may not yet be ready to accept the value (i.e. combo boxes where the list of
+        /// possible values has not yet been set/updated).
+        /// </summary>
+        /// <value>
+        /// The last string value applied to this attribute programmatically.
+        /// </value>
+        public string LastAppliedStringValue
+        {
+            get
+            {
+                return _lastAppliedStringValue;
+            }
+
+            set
+            {
+                _lastAppliedStringValue = value;
+            }
+        }
+
+        /// <summary>
         /// Indicates whether an <see cref="EndEdit"/> call is currently being processed.
         /// </summary>
         /// <returns><see langword="false"/> if an EndEdit call is currently being processed; otherwise,
@@ -599,15 +638,42 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets or sets a value indicating whether auto-update queries should be temporarily
         /// prevented from updating data. The queries will still be loaded for all attributes, but
-        /// they will not be triggered until un-paused.
+        /// they will not be triggered while while blocked. Un-blocking the queries will not
+        /// execute the queries that would have been triggered while blocked.
         /// </summary>
-        /// <value><see langword="true"/> to pause auto-update queries; otherwise,
+        /// <value><see langword="true"/> to block auto-update queries; otherwise,
         /// <see langword="false"/>.
         /// </value>
-        public static bool PauseAutoUpdateQueries
+        public static bool BlockAutoUpdateQueries
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether auto-update and validation queries should be
+        /// temporarily prevented from updating data. The queries will still be loaded for all
+        /// attributes, but they will not be triggered until un-paused, at which point all queries
+        /// that would have been triggered while paused will executed.
+        /// </summary>
+        /// <value><see langword="true"/> to pause auto-update queries; <see langword="false"/> to
+        /// resume.
+        /// </value>
+        public static bool PauseQueries
+        {
+            get
+            {
+                return _pauseQueries;
+            }
+
+            set
+            {
+                if (value != _pauseQueries)
+                {
+                    _pauseQueries = value;
+                    OnQueryDelayEnded();
+                }
+            }
         }
 
         /// <summary>
@@ -1070,6 +1136,11 @@ namespace Extract.DataEntry
                 if (!statusInfo._initialized)
                 {
                     statusInfo._initialized = true;
+                    
+                    // Keep track of programmatically applied values, in case the field control isn't
+                    // yet prepared to accept the value. (i.e. combo box whose item list has not yet
+                    // been updated/initialized)
+                    statusInfo.LastAppliedStringValue = attribute.Value.String;
 
                     _undoManager.AddMemento(new DataEntryAddedAttributeMemento(attribute));
 
@@ -2544,7 +2615,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> whose tab stop status is being
         /// checked.</param>
-        /// <returns><see langword="true"/> if the attibute currently represents a tab stop,
+        /// <returns><see langword="true"/> if the attribute currently represents a tab stop,
         /// <see langword="false"/> otherwise.</returns>
         [ComVisible(false)]
         public static bool IsAttributeTabStop(IAttribute attribute)
@@ -2662,6 +2733,34 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35390");
+            }
+        }
+
+        /// <summary>
+        /// Forgets all <see cref="LastAppliedStringValue"/>s that are currently being remembered to
+        /// ensure that they don't get used later on after the value has been changed to something else.
+        /// </summary>
+        public static void ForgetLastAppliedStringValues()
+        {
+            try
+            {
+                // LastAppliedStringValues should be remembered throughout the initial loading of a
+                // document regardless of calls into ForgetLastAppliedStringValues.
+                // _undoManager.TrackOperations will be false during document load, so it can be
+                // used as an indication of a loading document.
+                if (!_undoManager.TrackOperations)
+                {
+                    return;
+                }
+
+                foreach (AttributeStatusInfo statusInfo in _statusInfoMap.Values)
+                {
+                    statusInfo.LastAppliedStringValue = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37381");
             }
         }
 
@@ -2966,6 +3065,12 @@ namespace Extract.DataEntry
         /// </summary>
         public event EventHandler<AttributeDeletedEventArgs> AttributeDeleted;
 
+        /// <summary>
+        /// Raised to notify listeners that a delay of query execution that had been in place has
+        /// been removed.
+        /// </summary>
+        public static event EventHandler<EventArgs> QueryDelayEnded;
+
         #endregion Events
 
         #region Private Methods
@@ -3236,6 +3341,18 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="QueryDelayEnded"/> event.
+        /// </summary>
+        static void OnQueryDelayEnded()
+        {
+            var eventHandler = QueryDelayEnded;
+            if (eventHandler != null)
+            {
+                eventHandler(null, new EventArgs());
+            }
+        }
+
         #endregion Private Methods
 
         #region IPersistStream Members
@@ -3418,6 +3535,7 @@ namespace Extract.DataEntry
                 _validator = null;
                 _autoUpdateQuery = null;
                 _validationQuery = null;
+                _lastAppliedStringValue = null;
             }
             catch (Exception ex)
             {

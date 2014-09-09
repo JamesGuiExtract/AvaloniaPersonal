@@ -2155,10 +2155,10 @@ namespace Extract.DataEntry
                     try
                     {
                         // [DataEntry:1186]
-                        // Unless paused, the changes that are undone/redone here may trigger
+                        // Unless blocked, the changes that are undone/redone here may trigger
                         // auto-update queries to fire which then result in data that is not in the
                         // correct state.
-                        AttributeStatusInfo.PauseAutoUpdateQueries = true;
+                        AttributeStatusInfo.BlockAutoUpdateQueries = true;
                         _controlUpdateReferenceCount++;
 
                         // If the smart tag manager is active, de-activate it before the undo/redo
@@ -2215,7 +2215,7 @@ namespace Extract.DataEntry
                                 ExecuteOnIdle("ELI34415", () => 
                                     {
                                         AttributeStatusInfo.UndoManager.EndUndo();
-                                        AttributeStatusInfo.PauseAutoUpdateQueries = false;
+                                        AttributeStatusInfo.BlockAutoUpdateQueries = false;
                                     });
                             }
                             else
@@ -2223,7 +2223,7 @@ namespace Extract.DataEntry
                                 ExecuteOnIdle("ELI34444", () =>
                                     {
                                         AttributeStatusInfo.UndoManager.EndRedo();
-                                        AttributeStatusInfo.PauseAutoUpdateQueries = false;
+                                        AttributeStatusInfo.BlockAutoUpdateQueries = false;
                                     });
                             }
                         });
@@ -2232,7 +2232,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                AttributeStatusInfo.PauseAutoUpdateQueries = false;
+                AttributeStatusInfo.BlockAutoUpdateQueries = false;
 
                 throw ExtractException.AsExtractException("ELI31008", ex);
             }
@@ -2379,6 +2379,11 @@ namespace Extract.DataEntry
                 // Set flag to indicate that a document change is in progress so that highlights
                 // are not redrawn as the spatial info of the controls are updated.
                 _changingData = true;
+
+                // Forget all LastAppliedStringValues that are currently being remembered to ensure
+                // that they don't get used later on after the value has been changed to something
+                // else.
+                AttributeStatusInfo.ForgetLastAppliedStringValues();
 
                 // The UndoManager does not need to track changes until data has been reloaded.
                 AttributeStatusInfo.UndoManager.TrackOperations = false;
@@ -4168,7 +4173,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="selectionState">The <see cref="SelectionState"/> to apply.</param>
         /// <param name="suppressSelectionFinalization"><see langword="true"/> if the highlight
-        /// refresh and raising of <see cref="ItemSelectionChanged"/> should be surpressed;
+        /// refresh and raising of <see cref="ItemSelectionChanged"/> should be suppressed;
         /// otherwise, <see langword="false"/>.</param>
         internal void ApplySelection(SelectionState selectionState, bool suppressSelectionFinalization)
         {
@@ -4324,12 +4329,23 @@ namespace Extract.DataEntry
                         if (_controlUpdateReferenceCount == 0 && value > 0)
                         {
                             AttributeStatusInfo.UndoManager.OperationInProgress = true;
+
+                            // https://extract.atlassian.net/browse/ISSUE-12453
+                            // While a controls are in the midst of updating and attributes are not
+                            // completely initialized/deleted, evaluation of queries can produce
+                            // unexpected results. Delay execution of these queries until the
+                            // update is complete.
+                            AttributeStatusInfo.PauseQueries = true;
                         }
 
                         _controlUpdateReferenceCount = value;
 
                         if (_controlUpdateReferenceCount == 0)
                         {
+                            // Allow any queries that would have triggered during this update to
+                            // execute now.
+                            AttributeStatusInfo.PauseQueries = false;
+
                             OnUpdateEnded(new EventArgs());
 
                             // [DataEntry:1027]
@@ -7444,6 +7460,10 @@ namespace Extract.DataEntry
 
                 ExecuteOnIdle("ELI34419", () => AttributeStatusInfo.UndoManager.TrackOperations = true);
                 ExecuteOnIdle("ELI34420", () => _dirty = false);
+                // Forget all LastAppliedStringValues that are currently being remembered to ensure
+                // that they don't get used later on after the value has been changed to something
+                // else.
+                ExecuteOnIdle("ELI37382", () => AttributeStatusInfo.ForgetLastAppliedStringValues());
             }
             catch (Exception ex)
             {

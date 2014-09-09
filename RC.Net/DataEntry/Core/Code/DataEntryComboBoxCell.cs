@@ -561,18 +561,8 @@ namespace Extract.DataEntry
 
                 if (autoCompleteValues != null)
                 {
-                    // Reseting the item list will clear the value. If requested, preserve the
-                    // original value.
-                    string originalValue = preserveValue ? Value.ToString() : "";
-                 
                     Items.Clear();
                     Items.AddRange(autoCompleteValues);
-
-                    // Restore the original value
-                    if (preserveValue && Items.Contains(originalValue))
-                    {
-                        Value = originalValue;
-                    }
                 }
             }
         }

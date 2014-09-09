@@ -123,15 +123,15 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    var triggerAttributes = new HashSet<IAttribute>();
+                    var registeredAttributes = new HashSet<IAttribute>();
 
                     string queryString = _queryNode._attributeQueryString;
                     foreach (string queryPart in queryString.Split('|'))
                     {
-                        triggerAttributes.UnionWith(Register(queryPart.Trim()));
+                        registeredAttributes.UnionWith(Register(queryPart.Trim()));
                     }
 
-                    return triggerAttributes;
+                    return registeredAttributes;
                 }
                 catch (Exception ex)
                 {
@@ -155,7 +155,7 @@ namespace Extract.DataEntry
                     InitializeStatics();
 
                     HashSet<IAttribute> attributeDomain = new HashSet<IAttribute>();
-                    HashSet<IAttribute> triggerAttributes = new HashSet<IAttribute>();
+                    HashSet<IAttribute> resolvedAttributes = new HashSet<IAttribute>();
 
                     // Divide the reference path into two parts:
                     // part1 = The "up" part; references the lowest attribute in the hierarchy that
@@ -191,12 +191,12 @@ namespace Extract.DataEntry
 
                         // Find all existing attributes matching the refernce path relative to this
                         // root attribute.
-                        foreach (IAttribute triggerAttribute in
+                        foreach (IAttribute attribute in
                             AttributeStatusInfo.ResolveAttributeQuery((rootAttribute == _ROOT_ATTRIBUTE)
                                 ? null
                                 : rootAttribute, queryString))
                         {
-                            triggerAttributes.Add(triggerAttribute);
+                            resolvedAttributes.Add(attribute);
                         }
                     }
 
@@ -235,7 +235,7 @@ namespace Extract.DataEntry
                         _activeRegistrations.Add(registration);
                     }
 
-                    return triggerAttributes;
+                    return resolvedAttributes;
                 }
                 catch (Exception ex)
                 {
@@ -306,7 +306,7 @@ namespace Extract.DataEntry
                                 // For each reference, register the new attribute.
                                 foreach (AttributeQueryNode query in descendantQueries)
                                 {
-                                    query.RegisterTriggerAttribute(e.Attribute);
+                                    query.RegisterAttribute(e.Attribute);
                                 }
                             }
                         }
@@ -413,10 +413,25 @@ namespace Extract.DataEntry
         AttributeReferenceManager _attributeReferenceManager;
 
         /// <summary>
-        /// The attributes defining the result of this query node and which triggers
-        /// <see cref="CompositeQueryNode.QueryValueModified"/> events.
+        /// The attributes that currently define the result of this query node. If this node is
+        /// using the distinct selection mode, it will contain only the current instance to be used
+        /// in evaluation, not the full set of attributes referenced by the _attributeQueryString.
+        /// </summary>
+        HashSet<IAttribute> _resolvedAttributes = new HashSet<IAttribute>();
+
+        /// <summary>
+        /// The attributes that should trigger this node to be re-evaluated by raising the 
+        /// <see cref="CompositeQueryNode.QueryValueModified"/> event. This will always be the full
+        /// set of attributes referenced by the _attributeQueryString.
         /// </summary>
         HashSet<IAttribute> _triggerAttributes = new HashSet<IAttribute>();
+
+        /// <summary>
+        /// All trigger attributes that have been identified since the last call to
+        /// <see cref="NotifyParentEvaluationComplete"/>. This should represent all attributes to
+        /// become _triggerAttributes.
+        /// </summary>
+        HashSet<IAttribute> _newTriggerAttributes = new HashSet<IAttribute>();
 
         /// <summary>
         /// A <see cref="ResultQueryNode"/> which refers to the <see cref="IAttribute"/>(s) which
@@ -559,12 +574,12 @@ namespace Extract.DataEntry
                 {
                     _attributeQueryString = QueryResult.Combine(childQueryResults).ToString();
 
-                    RegisterTriggerAttributes();
+                    RegisterAttributes();
                 }
                 
-                QueryResult results = (_triggerAttributes.Count == 0)
+                QueryResult results = (_resolvedAttributes.Count == 0)
                     ? new QueryResult(this)
-                    : new QueryResult(this, _triggerAttributes.ToArray());
+                    : new QueryResult(this, _resolvedAttributes.ToArray());
 
                 return results;
             }
@@ -589,7 +604,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    UnregisterTriggerAttributes();
+                    UnregisterAttributes();
 
                     if (_rootAttributeResultQuery != null)
                     {
@@ -648,11 +663,8 @@ namespace Extract.DataEntry
             {
                 CachedResult = null;
 
-                ExtractException.Assert("ELI26717", "Mis-matched trigger attribute detected!",
-                    _triggerAttributes.Contains(e.DeletedAttribute));
-
                 // Unregister the attribute as a trigger for all terms it is currently used in.
-                UnregisterTriggerAttribute(e.DeletedAttribute);
+                UnregisterAttribute(e.DeletedAttribute, true);
 
                 if (_triggerUpdate)
                 {
@@ -697,29 +709,29 @@ namespace Extract.DataEntry
         #region Private Members
 
         /// <summary>
-        /// Resolves all existing attributes reference by this node, and register to be assigned any
+        /// Resolves all existing attributes referenced by this node, and registers to be assigned any
         /// added attributes matching the reference path.
         /// </summary>
-        void RegisterTriggerAttributes()
+        void RegisterAttributes()
         {
             try
             {
-                HashSet<IAttribute> newTriggerAttributes = _attributeReferenceManager.Register();
+                HashSet<IAttribute> registeredAttributes = _attributeReferenceManager.Register();
 
-                HashSet<IAttribute> oldTriggerAttributes = new HashSet<IAttribute>(_triggerAttributes
-                    .Where(attribute => !newTriggerAttributes.Contains(attribute)));
+                HashSet<IAttribute> oldAttributes = new HashSet<IAttribute>(_resolvedAttributes
+                    .Where(attribute => !registeredAttributes.Contains(attribute)));
 
-                // Unregister any trigger attributes no longer referenced by this instance.
-                foreach (IAttribute oldAttribute in oldTriggerAttributes)
+                // Unregister any attributes no longer referenced by this instance.
+                foreach (IAttribute oldAttribute in oldAttributes)
                 {
-                    UnregisterTriggerAttribute(oldAttribute);
+                    UnregisterAttribute(oldAttribute, false);
                 }
 
-                // Register the new trigger attributes.
-                foreach (IAttribute newAttribute in newTriggerAttributes
-                    .Where(attribute => !oldTriggerAttributes.Contains(attribute)))
+                // Register the new attributes.
+                foreach (IAttribute newAttribute in registeredAttributes
+                    .Where(attribute => !oldAttributes.Contains(attribute)))
                 {
-                    RegisterTriggerAttribute(newAttribute);
+                    RegisterAttribute(newAttribute);
                 }
             }
             catch (Exception ex)
@@ -729,65 +741,110 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Registers the specified <see cref="IAttribute"/> as a trigger attribute.
+        /// Informs the node that it's parent has completed evaluation. This may be needed to keep
+        /// track of all the different results of <see cref="Evaluate"/> that have occured in the
+        /// course of evaluation the parent. These evaluations may have produced different results
+        /// based on a sibling node with a Distinct selection mode.
         /// </summary>
-        /// <param name="triggerAttribute">The <see cref="IAttribute"/> to be a trigger.</param>
-        void RegisterTriggerAttribute(IAttribute triggerAttribute)
+        internal override void NotifyParentEvaluationComplete()
         {
-            if (!_triggerAttributes.Contains(triggerAttribute))
+            base.NotifyParentEvaluationComplete();
+
+            HashSet<IAttribute> oldTriggerAttributes = new HashSet<IAttribute>(_triggerAttributes
+                .Where(attribute => !_newTriggerAttributes.Contains(attribute)));
+
+            // Unregister any trigger attributes no longer referenced by this instance.
+            foreach (IAttribute oldAttribute in oldTriggerAttributes)
             {
-                AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(triggerAttribute);
+                UnregisterAttribute(oldAttribute, true);
+                _newTriggerAttributes.Remove(oldAttribute);
+            }
 
-                // Handle deletion of the attribute so the query will become unresolved
-                // if the trigger attribute is deleted.
-                statusInfo.AttributeDeleted += HandleAttributeDeleted;
+            _newTriggerAttributes = new HashSet<IAttribute>(_triggerAttributes);
+        }
 
-                _triggerAttributes.Add(triggerAttribute);
+        /// <summary>
+        /// Registers the specified <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to be registered.</param>
+        void RegisterAttribute(IAttribute attribute)
+        {
+            AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+
+            if (!_resolvedAttributes.Contains(attribute))
+            {
+                _resolvedAttributes.Add(attribute);
 
                 CachedResult = null;
 
                 if (_triggerUpdate)
                 {
-                    statusInfo.AttributeValueModified += HandleAttributeValueModified;
-
                     OnQueryValueModified(new QueryValueModifiedEventArgs(false));
                 }
             }
+
+            if (!_triggerAttributes.Contains(attribute))
+            {
+                _triggerAttributes.Add(attribute);
+
+                // Handle deletion of the attribute so the query will become unresolved
+                // if the trigger attribute is deleted.
+                statusInfo.AttributeDeleted += HandleAttributeDeleted;
+
+                if (_triggerUpdate)
+                {
+                    statusInfo.AttributeValueModified += HandleAttributeValueModified;
+                }
+            }
+
+            _newTriggerAttributes.Add(attribute);
         }
 
         /// <summary>
-        /// Unregisters all existing trigger attribute(s).
+        /// Unregisters all currently resolved and trigger attribute(s).
         /// </summary>
-        void UnregisterTriggerAttributes()
+        void UnregisterAttributes()
         {
             _attributeReferenceManager.Unregister();
 
-            foreach (IAttribute triggerAttribute in new List<IAttribute>(_triggerAttributes))
+            // Since we will be removing items from _resolvedAttributes and _triggerAttributes,
+            // iterate a separate array rather than the sets themselves.
+            foreach (IAttribute attribute in
+                _resolvedAttributes.Union(_triggerAttributes).ToArray())
             {
-                UnregisterTriggerAttribute(triggerAttribute);
+                UnregisterAttribute(attribute, true);
             }
         }
 
         /// <summary>
-        /// Un-registers the specified trigger attribute.
+        /// Un-registers the specified <see paramref="attribute"/>.
         /// </summary>
-        /// <param name="triggerAttribute">The <see cref="IAttribute"/> to unregister as a trigger.
+        /// <param name="attribute">The <see cref="IAttribute"/> to unregister.
         /// </param>
-        void UnregisterTriggerAttribute(IAttribute triggerAttribute)
+        /// <param name="unregisterAsTrigger"><see langword="true"/> to prevent this attribute from
+        /// triggering this node to be re-evaluatied, <see langword="false"/> to continue to update
+        /// this node in response to updates of this <see paramref="attribute"/>.</param>
+        void UnregisterAttribute(IAttribute attribute, bool unregisterAsTrigger)
         {
             ExtractException.Assert("ELI28924", "Failed to unregister missing query attribute!",
-                _triggerAttributes.Contains(triggerAttribute));
+                _resolvedAttributes.Contains(attribute) ||
+                _triggerAttributes.Contains(attribute));
 
-            AttributeStatusInfo statusInfo =
-                            AttributeStatusInfo.GetStatusInfo(triggerAttribute);
-            statusInfo.AttributeDeleted -= HandleAttributeDeleted;
+            _resolvedAttributes.Remove(attribute);
 
-            if (_triggerUpdate)
+            if (unregisterAsTrigger)
             {
-                statusInfo.AttributeValueModified -= HandleAttributeValueModified;
-            }
+                _triggerAttributes.Remove(attribute);
 
-            _triggerAttributes.Remove(triggerAttribute);
+                AttributeStatusInfo statusInfo =
+                                AttributeStatusInfo.GetStatusInfo(attribute);
+                statusInfo.AttributeDeleted -= HandleAttributeDeleted;
+
+                if (_triggerUpdate)
+                {
+                    statusInfo.AttributeValueModified -= HandleAttributeValueModified;
+                }
+            }
         }
 
         #endregion Private Members
