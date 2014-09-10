@@ -595,6 +595,16 @@ namespace Extract.DataEntry
         public abstract QueryResult Evaluate();
 
         /// <summary>
+        /// Informs the node that it's parent has completed evaluation. This may be needed to keep
+        /// track of all the different results of <see cref="Evaluate"/> that have occured in the
+        /// course of evaluation the parent. These evaluations may have produced different results
+        /// based on a sibling node with a Distinct selection mode.
+        /// </summary>
+        internal virtual void NotifyParentEvaluationComplete()
+        {
+        }
+
+        /// <summary>
         /// The active distinct <see cref="QueryResult"/> for a node with the selection mode of 
         /// "Distinct" that is currently being evaluated.
         /// </summary>

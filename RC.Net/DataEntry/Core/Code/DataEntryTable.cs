@@ -1758,7 +1758,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                // Any refreshes surpressed above can now occur.
+                // Any refreshes suppressed above can now occur.
                 ExecutePendingRefresh();
 
                 // Since the spatial information for this cell has likely changed, spatial hints need 
@@ -2251,7 +2251,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                // Any refreshes surpressed above can now occur.
+                // Any refreshes suppressed above can now occur.
                 ExecutePendingRefresh();
             }
             catch (Exception ex)
@@ -2901,7 +2901,7 @@ namespace Extract.DataEntry
                 _activeCachedRows[attribute] = (DataEntryTableRow)Rows[rowIndex];
             }
 
-            // Any refreshes surpressed above can now occur.
+            // Any refreshes suppressed above can now occur.
             ExecutePendingRefresh();
         }
 
@@ -3736,7 +3736,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                // Any refreshes surpressed above can now occur.
+                // Any refreshes suppressed above can now occur.
                 ExecutePendingRefresh();
 
                 // Highlights the results of the swipe in the image viewer and propagates the

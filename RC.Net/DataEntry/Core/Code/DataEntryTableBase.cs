@@ -1980,7 +1980,7 @@ namespace Extract.DataEntry
 
                 foreach (IAttribute attribute in attributes)
                 {
-                    // If attribute refreshes are being surpressed, don't refresh now but keep track
+                    // If attribute refreshes are being suppressed, don't refresh now but keep track
                     // of which attributes should be refreshed later.
                     if (_suppressRefreshReferenceCount > 0)
                     {
@@ -2706,7 +2706,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Executes a refresh of all attributes whose refreshes had been surpressed.
+        /// Executes a refresh of all attributes whose refreshes had been suppressed.
         /// Created in response to DataEntry:1188 in which refreshes in the middle of applying
         /// attribute data caused problems.
         /// </summary>

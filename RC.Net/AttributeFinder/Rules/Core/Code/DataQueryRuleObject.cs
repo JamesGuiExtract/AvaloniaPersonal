@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder.Rules
 {
@@ -21,9 +22,9 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("AEF0BBA3-0645-4183-957F-CCC093E1DEDD")]
     [CLSCompliant(false)]
-    public interface IDataQueryRuleObject : IOutputHandler, ICategorizedComponent,
-        IConfigurableObject, ICopyableObject, ILicensedComponent, IPersistStream,
-        IMustBeConfiguredObject, IIdentifiableObject
+    public interface IDataQueryRuleObject : IAttributeFindingRule, IOutputHandler,
+        ICategorizedComponent, IConfigurableObject, ICopyableObject, ILicensedComponent,
+        IPersistStream, IMustBeConfiguredObject, IIdentifiableObject
     {
         /// <summary>
         /// Gets or sets the data query.
@@ -312,6 +313,69 @@ namespace Extract.AttributeFinder.Rules
 
         #endregion Properties
 
+        #region IAttributeFindingRule
+
+        /// <summary>
+        /// Parses the <see paramref="pDocument"/> and returns a vector of found
+        /// <see cref="ComAttribute"/> objects.
+        /// </summary>
+        /// <param name="pDocument">The <see cref="AFDocument"/> to parse.</param>
+        /// <param name="pProgressStatus">The <see cref="ProgressStatus"/> to indicate processing
+        /// progress.</param>
+        /// <returns>An <see cref="IUnknownVector"/> of found <see cref="ComAttribute"/>s.</returns>
+        public IUnknownVector ParseText(AFDocument pDocument, ProgressStatus pProgressStatus)
+        {
+            try
+            {
+                LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI37383", _COMPONENT_DESCRIPTION);
+
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pDocument.Attribute.ReportMemoryUsage();
+
+                // Initialize for use in any embeded path tags/functions.
+                _pathTags.Document = pDocument;
+
+                QueryResult queryResults =
+                    ExecuteQuery(pDocument.Attribute.SubAttributes, pDocument.Text.SourceDocName);
+
+                IUnknownVector returnValue = new IUnknownVector();
+
+                // Iterate all query results and apply the spatial or string value to a new
+                // attribute for each result.
+                foreach (QueryResult result in queryResults)
+                {
+                    IAttribute attribute = new ComAttribute();
+
+                    if (result.IsSpatial)
+                    {
+                        // The query system will have already cloned any spatial values that came
+                        // from other attributes, so the spatial string result can be used directly
+                        // without any side-effects on other attributes.
+                        attribute.Value = result.FirstSpatialStringValue;
+                    }
+                    else
+                    {
+                        attribute.Value.ReplaceAndDowngradeToNonSpatial(result.FirstStringValue);
+                    }
+
+                    returnValue.PushBack(attribute);
+                }
+
+                // So that the garbage collector knows of and properly manages the associated
+                // memory from the created return value.
+                returnValue.ReportMemoryUsage();
+
+                return returnValue;
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI37384", "Failed to evaluate data query.");
+            }
+        }
+
+        #endregion IAttributeFindingRule
+
         #region IOutputHandler
 
         /// <summary>
@@ -328,6 +392,12 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34786", _COMPONENT_DESCRIPTION);
 
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pAttributes.ReportMemoryUsage();
+                pDoc.Text.ReportMemoryUsage();
+
+                // Initialize for use in any embeded path tags/functions.
                 _pathTags.Document = pDoc;
 
                 ExecuteQuery(pAttributes, pDoc.Text.SourceDocName);
@@ -596,6 +666,7 @@ namespace Extract.AttributeFinder.Rules
         [ComVisible(false)]
         static void RegisterFunction(Type type)
         {
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.ValueFindersGuid);
             ComMethods.RegisterTypeInCategory(type, ExtractCategories.OutputHandlersGuid);
         }
 
@@ -608,6 +679,7 @@ namespace Extract.AttributeFinder.Rules
         [ComVisible(false)]
         static void UnregisterFunction(Type type)
         {
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.ValueFindersGuid);
             ComMethods.UnregisterTypeInCategory(type, ExtractCategories.OutputHandlersGuid);
         }
 
