@@ -55,6 +55,8 @@ ExtractLMInstallMediaDir=$(ExtractLMInstallRootDir)\Media\CD-ROM\DiskImages\DISK
 IDShieldInstallRootDir=$(PDRootDir)\AttributeFinder\IndustrySpecific\Redaction\Installation\IDShield
 IDShieldInstallMediaDir=$(IDShieldInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
+InternalUseBuildFilesArchive=M:\ProductDevelopment\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
+
 RedactionDemoBuildDir=$(AFRootDirectory)\Utils\RedactionDemo\Build
 
 NetDMSRootDir=$(PDRootDir)\AFIntegrations\NetDMS
@@ -259,8 +261,20 @@ UpdateLicenseFiles:
 		@Copy "$(BinariesFolder)\Components.dat" "$(SupportLicensing)"
 		@Copy "$(BinariesFolder)\Packages.dat" "$(SupportLicensing)"
 	)
+
+CopyFilesToInternalUse:
+	@ECHO Copy files to archive
+	@IF NOT EXIST "$(InternalUseBuildFilesArchive)\OriginalFiles" @MKDIR "$(InternalUseBuildFilesArchive)\OriginalFiles"
+	@IF NOT EXIST "$(InternalUseBuildFilesArchive)\OriginalFiles" @MKDIR "$(InternalUseBuildFilesArchive)\Obfuscated"
+	@COPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" 
+	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)"
+ 	@COPY  "$(BinariesFolder)\Obfuscated\*.*" "$(InternalUseBuildFilesArchive)\Obfuscated" 
+	@COPY  "$(BinariesFolder)\*.exe" "$(InternalUseBuildFilesArchive)\OriginalFiles"
+	@COPY  "$(BinariesFolder)\*.dll" "$(InternalUseBuildFilesArchive)\OriginalFiles"
+	@COPY  "$(BinariesFolder)\*.xml" "$(InternalUseBuildFilesArchive)\OriginalFiles"
+
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CreateSharepointInstall
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CreateSharepointInstall CopyFilesToInternalUse
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 

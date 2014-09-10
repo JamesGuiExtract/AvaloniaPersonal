@@ -27,7 +27,6 @@ SharePointRootDir=$(BuildRootDirectory)\Engineering\ProductDevelopment\AFIntegra
 PDCommonDir=$(PDRootDir)\Common
 
 SPInstallationDirectory=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\Sharepoint
-InternalUseBuildFilesArchive=P:\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
 
 IDShieldSPClientIntallRoot=$(SharePointRootDir)\Installation\IDShieldSPClient
 
@@ -56,14 +55,7 @@ BuildExtractSharePoint:
  	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(NUANCE_API_DIR);$(LEADTOOLS_API_DIR);;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(DOTFUSCATOR)
 	@devenv Extract.SharePoint.sln /BUILD $(BuildConfig) /USEENV
 	
-CopyOriginalFilesBeforeObfuscating: BuildExtractSharePoint
-	@ECHO Saving orignal assemblies before obfuscating...
-	@IF NOT EXIST "$(BinariesFolder)\OriginalFiles" @MKDIR "$(BinariesFolder)\OriginalFiles"
-	@XCOPY "$(BinariesFolder)\*.dll" "$(BinariesFolder)\OriginalFiles\"
-	@XCOPY "$(BinariesFolder)\*.exe" "$(BinariesFolder)\OriginalFiles\"
-	@XCOPY "$(BinariesFolder)\*.pdb" "$(BinariesFolder)\OriginalFiles\"
-	
-ObfuscateFiles: BuildExtractSharePoint CopyOriginalFilesBeforeObfuscating
+ObfuscateFiles: BuildExtractSharePoint 
 	@ECHO Obfuscating for Extract.SharePoint...
 #	Copy the strong naming key to location dotfuscator xml file expects
 	@IF NOT EXIST "$(StrongNameKeyDir)" @MKDIR "$(StrongNameKeyDir)"
@@ -77,7 +69,7 @@ ObfuscateFiles: BuildExtractSharePoint CopyOriginalFilesBeforeObfuscating
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.SharePoint.Redaction.Utilities.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.SharePoint.Redaction.Utilities.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\RemoveExtractSPColumns.exe" /mapout:"$(BinariesFolder)\Map\mapRemoveExtractSPColumns.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)" $(PDCommonDir)\ObfuscateConfig.xml
 	
-CreateSharePointPackages: BuildExtractSharePoint CopyOriginalFilesBeforeObfuscating ObfuscateFiles
+CreateSharePointPackages: BuildExtractSharePoint ObfuscateFiles
 	@ECHO Creating SharePoint packages...
 	msbuild /t:Package $(SharePointRootDir)\DataCapture\Core\Code\Extract.SharePoint.DataCapture.csproj /p:Configuration=$(BuildConfig)
 	msbuild /t:Package $(SharePointRootDir)\Redaction\Core\Code\Extract.SharePoint.Redaction.csproj /p:Configuration=$(BuildConfig)
@@ -93,8 +85,6 @@ CopyFilesForSPInstallFolder: CreateSharePointPackages BuildIDShieldForSPClientIn
     @ECHO Copying the Sharepoint files to installation directory...
 	@IF NOT EXIST "$(SPInstallationDirectory)" @MKDIR "$(SPInstallationDirectory)"
 	@IF NOT EXIST "$(SPInstallationDirectory)\IDShieldForSPClient" @MKDIR "$(SPInstallationDirectory)\IDShieldForSPClient"
-	@IF NOT EXIST "$(InternalUseBuildFilesArchive)" @MKDIR "$(InternalUseBuildFilesArchive)"
-	@IF NOT EXIST "$(InternalUseBuildFilesArchive)\OriginalFiles" @MKDIR "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	
 	@COPY /v "$(BinariesFolder)\Extract.SharePoint.wsp" "$(SPInstallationDirectory)"
 	@COPY /v "$(BinariesFolder)\Extract.SharePoint.DataCapture.wsp" "$(SPInstallationDirectory)"
@@ -102,11 +92,7 @@ CopyFilesForSPInstallFolder: CreateSharePointPackages BuildIDShieldForSPClientIn
 	@COPY /v "$(SharePointRootDir)\Installation\PowershellScripts\*.ps1" "$(SPInstallationDirectory)"
 	
 	XCOPY "$(SharePointRootDir)\Installation\IDShieldSPClient\Media\CD-ROM\DiskImages\DISK1\*.*" "$(SPInstallationDirectory)\IDShieldForSPClient"
-		
-# Copy pdb and map files to archive
-	@COPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" 
-	@COPY  "$(BinariesFolder)\OriginalFiles\*.*" "$(InternalUseBuildFilesArchive)\OriginalFiles"
-	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" 
+
 
 BuildAfterAF: SetupBuildEnv CopyFilesForSPInstallFolder
     @ECHO.
