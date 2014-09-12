@@ -140,7 +140,7 @@ namespace Extract.DataEntry
                                 // original value; this ensures there is no chance for the new value
                                 // to be overwritten with the original value as happened when the
                                 // _attribute was set prior to calling UpdateItemList.
-                                UpdateItemList(false);
+                                UpdateItemList();
 
                                 _activeValidator.AutoCompleteValuesChanged +=
                                     HandleAutoCompleteValuesChanged;
@@ -536,7 +536,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                UpdateItemList(true);
+                UpdateItemList();
             }
             catch (Exception ex)
             {
@@ -549,11 +549,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Updates the items in the combo box using the validator (if there is one).
         /// </summary>
-        /// <param name="preserveValue">If <see langword="true"/>, as long as the new list contains
-        /// the cell's current value, the current value will be restored before this method exits.
-        /// If <see langword="false"/> the cells value will be cleared assuming a new item list was
-        /// applied.</param>
-        void UpdateItemList(bool preserveValue)
+        void UpdateItemList()
         {
             if (_activeValidator != null)
             {

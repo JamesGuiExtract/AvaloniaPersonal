@@ -2740,9 +2740,10 @@ namespace Extract.DataEntry
         /// Forgets all <see cref="LastAppliedStringValue"/>s that are currently being remembered to
         /// ensure that they don't get used later on after the value has been changed to something else.
         /// </summary>
+        [ComVisible(false)]
         public static void ForgetLastAppliedStringValues()
         {
-            try
+            try 
             {
                 // LastAppliedStringValues should be remembered throughout the initial loading of a
                 // document regardless of calls into ForgetLastAppliedStringValues.
