@@ -21,6 +21,9 @@
 function main(args) {
     handleDebug("Command-Line Arguments", args.join(","));
 
+    if (args.length < 2) {
+        throw new Error(999, "Incorrect usage! Requires two or three arguments. AppendTextFile.js FirstFile SecondFile [InsertMissingNewline]");
+    }
     var firstFile = args[0];
     var secondFile = args[1];
     if (args.length > 2 && args[2].toUpperCase() == "FALSE") {
@@ -156,8 +159,6 @@ if(host.indexOf("system32") != -1 && cpu == "amd64") {
     for(i=0; i<args.length; i++)
         newCmd += " \"" + args(i) + "\"";
 
-//    WScript.Echo("Running the syswow64 bit version instead...\n  " + newCmd + "\n");
-
     // launch the new script and echo all the output
     var exec = shell.Exec(newCmd);
     while(exec.Status == 0) {
@@ -245,12 +246,8 @@ try {
     main(parseCommandLineOptions());
 }
 catch(err) {
-    if (GBoolSaveErrors) {
-        handleScriptError("ELI35991", "Unhandled Error", err);
-    }
-    else {
-        throw err;
-    }
+    handleScriptError("ELI35991", "Unhandled Error", err);
+    WScript.Quit(1);
 }
 
 //--------------------------------------------------------------------------------------------------
