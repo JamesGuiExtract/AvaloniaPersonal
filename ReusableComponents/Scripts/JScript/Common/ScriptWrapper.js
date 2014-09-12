@@ -106,12 +106,8 @@ try {
     main(parseCommandLineOptions());
 }
 catch(err) {
-    if (GBoolSaveErrors) {
-        handleScriptError("ELI35991", "Unhandled Error", err);
-    }
-    else {
-        WScript.Quit(1);
-    }
+    handleScriptError("ELI35991", "Unhandled Error", err);
+    WScript.Quit(1);
 }
 
 //--------------------------------------------------------------------------------------------------
