@@ -284,9 +284,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                                         {
                                             // If the output format is PDF, first output a tif to a
                                             // temporary file, then we will convert to a PDF at the end.
+                                            // Theoretically, this shouldn't be necessary, but I was
+                                            // not otherwise able able to get the LeadTools .Net API
+                                            // to output an acceptable quality color PDF that was not
+                                            // too large (PdfCompressor tended to produce unsightly
+                                            // blocks on areas with light shading and I could not get
+                                            // a reasonably sized output doc without using PdfCompressor.
                                             temporaryFile = new TemporaryFile(true);
-                                            writer = codecs.CreateWriter(temporaryFile.FileName,
-                                                RasterImageFormat.CcittGroup4, false);
+                                            writer = codecs.CreateWriter(temporaryFile.FileName, outputFormat, false);
                                         }
                                         else
                                         {
@@ -383,15 +388,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     using (ImageReader imageReader = codecs.CreateReader(sourceDocumentName))
                     using (RasterImage imagePage = imageReader.ReadPage(1))
                     {
-                        // Output will be PDF if the current document format is PDF or if the
-                        // FileName extension is PDF.
-                        bool isPdf = ImageMethods.IsPdf(imageReader.Format) ||
-                            Path.GetExtension(FileName)
-                                .Equals(".pdf", StringComparison.OrdinalIgnoreCase);
-
-                        // Outputting non-b/w PDFs seems to cause them to be HUGE... to avoid the
-                        // issue, PDFs will always be output as b/w for the time being.
-                        int bitsPerPixel = isPdf ? 1 : imagePage.BitsPerPixel;
+                        int bitsPerPixel = imagePage.BitsPerPixel;
 
                         // The output format should be the first page or the page with the highest
                         // bit depth.
@@ -405,24 +402,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                             conversionCommand.PaletteFlags =
                                     ColorResolutionCommandPaletteFlags.UsePalette;
 
-                            if (isPdf)
-                            {
-                                // Outputting PDFs directly with the Leadtools .Net API produces HUGE
-                                // files (~25x the size they should be). Therefore, image format
-                                // converter will be used to convert from tif. Since it only supports
-                                // monochrome, don't bother converting to color first.
-                                conversionCommand.Order = RasterByteOrder.Rgb;
-                                conversionCommand.SetPalette(new[]
-                                    {
-                                        RasterColor.FromKnownColor(RasterKnownColor.White),
-                                        RasterColor.FromKnownColor(RasterKnownColor.Black),
-                                    });
-                            }
-                            else
-                            {
-                                conversionCommand.Order = imagePage.Order;
-                                conversionCommand.SetPalette(imagePage.GetPalette());
-                            }
+                            conversionCommand.Order = imagePage.Order;
+                            conversionCommand.SetPalette(imagePage.GetPalette());
 
                             outputBitsPerPixel = bitsPerPixel;
                             outputFormat = imageReader.Format;
