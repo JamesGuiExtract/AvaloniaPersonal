@@ -341,7 +341,7 @@ void initNuanceEngineAndLicense()
 //-------------------------------------------------------------------------------------------------
 // Will perform the image conversion
 void nuanceConvertImage(const string strInputFileName, const string strOutputFileName, 
-				  EConverterFileType eOutputType, string strPagesToRemove)
+				  EConverterFileType eOutputType, bool bPreserveColor, string strPagesToRemove)
 {
 	// [LegacyRCAndUtils:6275]
 	// Since we will be using the Nuance engine, ensure we are licensed for it.
@@ -366,14 +366,31 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			// Ensure that the memory stored for the image file is released
 			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
 
+			IMG_INFO imgInfo = {0};
+			IMF_FORMAT imgFormat;
+			THROW_UE_ON_ERROR("ELI36840", "Failed to indentify image format.",
+				kRecGetImgFilePageInfo(0, hInputImage, 0, &imgInfo, &imgFormat));
+
 			// Set format and temp file extension based on the ouput type. If the extension doesn't
 			// match the format, the nuance engine will throw and error when saving.
 			string strExt;
 			switch (eOutputType)
 			{
 				case kFileType_Tif:
-					nFormat = FF_TIFG4;
-					strExt = ".tif";
+					{
+						if (!bPreserveColor)
+						{
+							nFormat = FF_TIFG4;
+							THROW_UE_ON_ERROR("ELI37423", "Unable to set image conversion method.",
+								kRecSetImgConvMode(0, CNV_AUTO));
+							
+						}
+						else
+						{
+							nFormat = (imgInfo.BitsPerPixel == 1) ? FF_TIFG4 : FF_TIFLZW;
+						}
+						strExt = ".tif";
+					}
 					break;
 
 				case kFileType_Pdf:
@@ -381,18 +398,16 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 						// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
 						// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
 						// FF_PDF_SUPERB.
-						IMG_INFO imgInfo = {0};
-						IMF_FORMAT imgFormat;
-						THROW_UE_ON_ERROR("ELI36840", "Failed to indentify image format.",
-							kRecGetImgFilePageInfo(0, hInputImage, 0, &imgInfo, &imgFormat));
-						nFormat = imgInfo.BitsPerPixel == 1 ? FF_PDF_SUPERB : FF_PDF_GOOD;
+						nFormat = (imgInfo.BitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
 						strExt = ".pdf";
 					}
 					break;
 
 				case kFileType_Jpg:
-					nFormat = FF_JPG_SUPERB;
-					strExt = ".jpg";
+					{
+						nFormat = FF_JPG_SUPERB;
+						strExt = ".jpg";
+					}
 					break;
 			}
 
@@ -404,8 +419,9 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			deleteFile(strTempOutputFileName);
 
 			// https://extract.atlassian.net/browse/ISSUE-12162
-			// At one point in time, kRecSetImgConvMode(0, CNV_AUTO) was called here, but this
-			// strips color information which we now want to preserve.
+			// kRecSetImgConvMode(0, CNV_AUTO) should be called (above) only in the case that we are
+			// outputting tif files without preserving color depth, otherwise color information will
+			// be stripped out.
 
 			// Don't use RecMemoryReleaser on the output image because we will need to manually
 			// close it at the end of this method to be able to copy it to its permanent location.
@@ -510,7 +526,7 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 void convertImage(const string strInputFileName, const string strOutputFileName, 
 				  EConverterFileType eOutputType, bool bRetainAnnotations, HINSTANCE hInst,
 				  const string& strUserPassword, const string& strOwnerPassword, long nPermissions,
-				  long nViewPerspective, string strPagesToRemove)
+				  long nViewPerspective, bool bPreserveColor, string strPagesToRemove)
 {
 	HANNOBJECT hFileContainer = NULL;
 	ANNENUMCALLBACK pfnCallBack = NULL;
@@ -542,7 +558,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			// Set type-specific output options
 			L_INT	nType;
 			L_INT   nQFactor = PQ1;
-			int		nBitsPerPixel = 1; 
+			int		nBitsPerPixel = fileInfo.BitsPerPixel; 
 			bool	bBurnAnnotations = false;
 			unique_ptr<PDFSecuritySettings> pSecuritySettings(__nullptr);
 			switch (eOutputType)
@@ -573,7 +589,9 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 			case kFileType_Tif:
 				// Set output format
-				nType = FILE_CCITT_GROUP4;
+				nBitsPerPixel = bPreserveColor ? nBitsPerPixel : 1;
+				nType = (nBitsPerPixel == 1) ? FILE_CCITT_GROUP4 : FILE_TIFLZW;
+				nQFactor = QS;
 				break;
 
 			case kFileType_Jpg:
@@ -876,13 +894,16 @@ void usage()
 					"from the output. The pages can be specified as an individual page number, \n"
 					"a comma-separated list, a range of pages denoted with a hypen, or a \n"
 					"dash followed by a number to indicate the last x pages should be removed. \n"
+					"The optional argument /color will preserve the color depth of the source \n"
+					"image even if the output is a tif image. If this option is not used, all \n"
+					"tif output images will be bitonal regardless of source bit depth. \n"
 					"The optional argument (/ef <filename>) fully specifies the location \n"
 					"of an exception log that will store any thrown exception.  Without \n"
 					"an exception log, any thrown exception will be displayed.\n\n";
 		strUsage += "Usage:\n";
 		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/retain] "
 					"[/user \"<Password>\"] [/owner \"<Password>\" <Permissions>] [/vp [perspective_id]] "
-					"[/am] [/RemovePages \"<Pages>\"] [/ef <filename>]\n"
+					"[/am] [/RemovePages \"<Pages>\"] [/color] [/ef <filename>]\n"
 					"where:\n"
 					"out_type is /pdf, /tif or /jpg,\n"
 					"<Password> is the password to apply (user and/or owner) to the PDF (requires out_type = /pdf).\n"
@@ -927,9 +948,9 @@ BOOL CImageFormatConverterApp::InitInstance()
 					vecParams.push_back( __argv[i]);
 				}
 
-				// Make sure the number of parameters is 3 or 12
+				// Make sure the number of parameters is 3 or 15
 				size_t uiParamCount = vecParams.size();
-				if ((uiParamCount < 3) || (uiParamCount > 14))
+				if ((uiParamCount < 3) || (uiParamCount > 15))
 				{
 					usage();
 					return FALSE;
@@ -983,6 +1004,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 				bool bEncryptedPasswords = false;
 				long nViewPerspective = 0;
 				bool bUseNuance = false;
+				bool bPreserveColor = false;
 				string strPagesToRemove;
 				for (size_t i=3; i < uiParamCount; i++)
 				{
@@ -1076,6 +1098,10 @@ BOOL CImageFormatConverterApp::InitInstance()
 						
 						strPagesToRemove = vecParams[i];
 					}
+					else if (strTemp == "/color")
+					{
+						bPreserveColor = true;
+					}
 					else if (strTemp == "/ef")
 					{
 						i++;
@@ -1145,7 +1171,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 						return FALSE;
 					}
 
-					nuanceConvertImage(strInputName, strOutputName, eOutputType, strPagesToRemove);
+					nuanceConvertImage(strInputName, strOutputName, eOutputType, bPreserveColor,
+						strPagesToRemove);
 				}
 				else
 				{
@@ -1162,7 +1189,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 					// Convert the file
 					convertImage(strInputName, strOutputName, eOutputType, bRetainAnnotations,
 						this->m_hInstance, strUserPassword, strOwnerPassword, nOwnerPermissions,
-						nViewPerspective, strPagesToRemove);
+						nViewPerspective, bPreserveColor, strPagesToRemove);
 				}
 
 				// No UI needed, just return

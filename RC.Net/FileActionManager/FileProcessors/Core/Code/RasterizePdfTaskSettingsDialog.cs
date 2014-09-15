@@ -79,6 +79,15 @@ namespace Extract.FileActionManager.FileProcessors
         /// </value>
         public bool UseAlternateMethod { get; private set; }
 
+        /// <summary>
+        /// Gets or sets whether the color depth of the input document should be preserved in the
+        /// output.
+        /// </summary>
+        /// <value><see langword="true"/> if the output should match the color depth of the source;
+        /// <see langword="false"/> if the output should be a bitonal tif.
+        /// </value>
+        public bool PreserveColorDepth { get; private set; }
+
         #endregion Fields
 
         #region Constructors
@@ -87,7 +96,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Initializes a new instance of the <see cref="RasterizePdfTaskSettingsDialog"/> class.
         /// </summary>
         public RasterizePdfTaskSettingsDialog()
-            : this(null, null, false, true, false, false)
+            : this(null, null, false, true, false, false, false)
         {
         }
 
@@ -104,9 +113,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// updated after conversion.</param>
         /// <param name="useAlternateMethod"><see langword="true"/> to use the alternate method of
         /// rasterization; otherwise, <see langword="false"/>.</param>
+        /// <param name="preserveColorDepth"><see langword="true"/> if the output should match the
+        /// color depth of the source; <see langword="false"/> if the output should be a bitonal
+        /// tif.</param>
         public RasterizePdfTaskSettingsDialog(string pdfFile, string convertedFile,
             bool deletePdf, bool failIfDeleteFails, bool changeSourceDocName,
-            bool useAlternateMethod)
+            bool useAlternateMethod, bool preserveColorDepth)
         {
             try
             {
@@ -127,6 +139,7 @@ namespace Extract.FileActionManager.FileProcessors
                     && changeSourceDocName;
 
                 UseAlternateMethod = useAlternateMethod;
+                PreserveColorDepth = preserveColorDepth;
             }
             catch (Exception ex)
             {
@@ -160,6 +173,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _checkModifySourceDoc.Checked = _checkModifySourceDoc.Enabled
                     && ChangeSourceDocName;
                 _checkUseAltMethod.Checked = UseAlternateMethod;
+                _checkPreserveColor.Checked = PreserveColorDepth;
             }
             catch (Exception ex)
             {
@@ -223,6 +237,7 @@ namespace Extract.FileActionManager.FileProcessors
                 DeletePdf = _checkDeletePdf.Checked;
                 FailIfDeleteFails = _radioFailTask.Checked;
                 UseAlternateMethod = _checkUseAltMethod.Checked;
+                PreserveColorDepth = _checkPreserveColor.Checked;
 
                 DialogResult = DialogResult.OK;
             }

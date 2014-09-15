@@ -76,6 +76,15 @@ namespace Extract.FileActionManager.FileProcessors
         /// <see langword="false"/>.
         /// </value>
         bool UseAlternateMethod { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the color depth of the input document should be preserved in the
+        /// output.
+        /// </summary>
+        /// <value><see langword="true"/> if the output should match the color depth of the source;
+        /// <see langword="false"/> if the output should be a bitonal tif.
+        /// </value>
+        bool PreserveColorDepth { get; set; }
     }
 
     /// <summary>
@@ -101,8 +110,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// Added UseAlternateMethod.
         /// <para><b>Version 3</b></para>
         /// Alternate method now = Nuance
+        /// <para><b>Version 4</b></para>
+        /// PreserveColorDepth
         /// </summary>
-        const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 4;
 
         #endregion Constants
 
@@ -139,6 +150,13 @@ namespace Extract.FileActionManager.FileProcessors
         /// [DotNetRCAndUtils:742], so it is the default.
         /// </summary>
         bool _useAlternateMethod = true;
+
+        /// <summary>
+        /// https://extract.atlassian.net/browse/ISSUE-12467
+        /// Indicates whether the color depth of the input document should be preserved in the
+        /// output. Otherwise the output will be a bitonal tif.
+        /// </summary>
+        bool _preserveColorDepth = false;
 
         /// <summary>
         /// Indicates that settings have been changed, but not saved.
@@ -330,6 +348,27 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Gets or sets whether the color depth of the input document should be preserved in the
+        /// output.
+        /// </summary>
+        /// <value><see langword="true"/> if the output should match the color depth of the source;
+        /// <see langword="false"/> if the output should be a bitonal tif.
+        /// </value>
+        public bool PreserveColorDepth
+        {
+            get
+            {
+                return _preserveColorDepth;
+            }
+
+            set
+            {
+                _dirty |= _preserveColorDepth != value;
+                _preserveColorDepth = value;
+            }
+        }
+
         #endregion IRasterizePdfTask Members
 
         #region ICategorizedComponent Members
@@ -357,8 +396,8 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 using (var dialog = new RasterizePdfTaskSettingsDialog(
-                    _pdfFile, _destinationFile, _deletePdf, _failTask, _changeSourceDocName,
-                    _useAlternateMethod))
+                    PdfFile, DestinationFile, DeletePdfFile, FailTaskIfDeleteFails,
+                    ChangeSourceDocName, UseAlternateMethod, PreserveColorDepth))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
@@ -369,6 +408,7 @@ namespace Extract.FileActionManager.FileProcessors
                         FailTaskIfDeleteFails = dialog.FailIfDeleteFails;
                         ChangeSourceDocName = dialog.ChangeSourceDocName;
                         UseAlternateMethod = dialog.UseAlternateMethod;
+                        PreserveColorDepth = dialog.PreserveColorDepth;
 
                         return true;
                     }
@@ -401,10 +441,10 @@ namespace Extract.FileActionManager.FileProcessors
                 // 1. PDF File is defined
                 // 2. Conversion destination is defined
                 // 3. Either not changing source doc name OR the input file is source doc name 
-                return !string.IsNullOrWhiteSpace(_pdfFile)
-                    && !string.IsNullOrWhiteSpace(_destinationFile)
-                    && (!_changeSourceDocName
-                    || _pdfFile.Equals(FileActionManagerPathTags.SourceDocumentTag, StringComparison.Ordinal));
+                return !string.IsNullOrWhiteSpace(PdfFile)
+                    && !string.IsNullOrWhiteSpace(DestinationFile)
+                    && (!ChangeSourceDocName
+                    || PdfFile.Equals(FileActionManagerPathTags.SourceDocumentTag, StringComparison.Ordinal));
             }
             catch (Exception ex)
             {
@@ -570,8 +610,8 @@ namespace Extract.FileActionManager.FileProcessors
                     Path.GetFullPath(fileName), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
 
                 // Get the source and destination files
-                pdfFile = Path.GetFullPath(tags.Expand(_pdfFile));
-                destFile = Path.GetFullPath(tags.Expand(_destinationFile));
+                pdfFile = Path.GetFullPath(tags.Expand(PdfFile));
+                destFile = Path.GetFullPath(tags.Expand(DestinationFile));
 
                 // Ensure the input file is a PDF
                 if (!ImageMethods.IsPdf(pdfFile))
@@ -583,21 +623,23 @@ namespace Extract.FileActionManager.FileProcessors
 
                 try
                 {
-                    ImageMethods.ConvertPdfToTif(pdfFile, destFile, _useAlternateMethod);
+                    ImageMethods.ConvertPdfToTif(
+                        pdfFile, destFile, UseAlternateMethod, PreserveColorDepth);
                 }
                 catch (Exception ex)
                 {
                     var ee = new ExtractException("ELI35267",
-                        (_useAlternateMethod ? "Alternate" : "Normal") +
+                        (UseAlternateMethod ? "Alternate" : "Normal") +
                         " rasterization method failed; attempting " +
-                        (_useAlternateMethod ? "normal method." : "alternate method."), ex);
+                        (UseAlternateMethod ? "normal method." : "alternate method."), ex);
                     ee.Log();
 
-                    ImageMethods.ConvertPdfToTif(pdfFile, destFile, !_useAlternateMethod);
+                    ImageMethods.ConvertPdfToTif(
+                        pdfFile, destFile, !UseAlternateMethod, PreserveColorDepth);
                 }
 
                 // Delete PDF if specified
-                if (_deletePdf)
+                if (DeletePdfFile)
                 {
                     try
                     {
@@ -606,7 +648,7 @@ namespace Extract.FileActionManager.FileProcessors
                     catch (Exception ex)
                     {
                         var ee = ex.AsExtract("ELI32243");
-                        if (_failTask)
+                        if (FailTaskIfDeleteFails)
                         {
                             throw ee;
                         }
@@ -618,7 +660,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Update the source doc name if specified (Do this as the last step so
                 // that if there is an exception, the database will not be updated on the
                 // task failure).
-                if (_changeSourceDocName)
+                if (ChangeSourceDocName)
                 {
                     pDB.RenameFile(pFileRecord, destFile);
                 }
@@ -655,7 +697,7 @@ namespace Extract.FileActionManager.FileProcessors
         public bool RequiresAdminAccess()
         {
             // This task requires admin access if modifying the SourceDocName
-            return _changeSourceDocName;
+            return ChangeSourceDocName;
         }
 
         #endregion IAccessRequired Members
@@ -726,9 +768,15 @@ namespace Extract.FileActionManager.FileProcessors
                         // the alternate method.
                         _useAlternateMethod = !reader.ReadBoolean();
                     }
-                    else if (reader.Version >= 3)
+                    
+                    if (reader.Version >= 3)
                     {
                         _useAlternateMethod = reader.ReadBoolean();
+                    }
+                   
+                    if (reader.Version >= 4)
+                    {
+                        _preserveColorDepth = reader.ReadBoolean();
                     }
                 }
 
@@ -757,12 +805,13 @@ namespace Extract.FileActionManager.FileProcessors
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
                     // Serialize the settings
-                    writer.Write(_pdfFile);
-                    writer.Write(_destinationFile);
-                    writer.Write(_deletePdf);
-                    writer.Write(_failTask);
-                    writer.Write(_changeSourceDocName);
-                    writer.Write(_useAlternateMethod);
+                    writer.Write(PdfFile);
+                    writer.Write(DestinationFile);
+                    writer.Write(DeletePdfFile);
+                    writer.Write(FailTaskIfDeleteFails);
+                    writer.Write(ChangeSourceDocName);
+                    writer.Write(UseAlternateMethod);
+                    writer.Write(PreserveColorDepth);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -826,11 +875,12 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 _pdfFile = task._pdfFile;
-                _destinationFile = task._destinationFile;
-                _deletePdf = task._deletePdf;
-                _failTask = task._failTask;
-                _changeSourceDocName = task._changeSourceDocName;
-                _useAlternateMethod = task._useAlternateMethod;
+                _destinationFile = task.DestinationFile;
+                _deletePdf = task.DeletePdfFile;
+                _failTask = task.FailTaskIfDeleteFails;
+                _changeSourceDocName = task.ChangeSourceDocName;
+                _useAlternateMethod = task.UseAlternateMethod;
+                _preserveColorDepth = task.PreserveColorDepth;
             }
             catch (Exception ex)
             {

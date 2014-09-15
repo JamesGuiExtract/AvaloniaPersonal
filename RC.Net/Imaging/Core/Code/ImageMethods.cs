@@ -700,7 +700,7 @@ namespace Extract.Imaging
         {
             try
             {
-                ConvertPdfToTif(inputFile, outputFile, false);
+                ConvertPdfToTif(inputFile, outputFile, false, false);
             }
             catch (Exception ex)
             {
@@ -715,17 +715,27 @@ namespace Extract.Imaging
         /// <param name="outputFile">The output file.</param>
         /// <param name="useAlternateMethod"><see langword="true"/> to use the alternate method of
         /// conversion; otherwise <see langword="false"/>.</param>
+        /// <param name="preserveColorDepth"><see langword="true"/> if the output should match the
+        /// color depth of the source; <see langword="false"/> if the output should be a bitonal
+        /// tif.</param>
         public static void ConvertPdfToTif(string inputFile, string outputFile,
-            bool useAlternateMethod)
+            bool useAlternateMethod, bool preserveColorDepth)
         {
             try
             {
                 LicenseUtilities.ValidateLicense(LicenseIdName.PdfReadWriteFeature,
                     "ELI32223", "Convert PDF to TIF");
 
-                var arguments = useAlternateMethod
-                    ? new string[] { inputFile, outputFile, "/tif", "/am" }
-                    : new string[] { inputFile, outputFile, "/tif" };
+                List<string> arguments = new List<string>(new[] { inputFile, outputFile, "/tif" });
+                if (useAlternateMethod)
+                {
+                    arguments.Add("/am");
+                }
+                if (preserveColorDepth)
+                {
+                    arguments.Add("/color");
+                }
+
                 int exitCode = SystemMethods.RunExtractExecutable(_IMAGE_FORMAT_CONVERTER, arguments);
                 
                 // [DotNetRCAndUtils:849]
