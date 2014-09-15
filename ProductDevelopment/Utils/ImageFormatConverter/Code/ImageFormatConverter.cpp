@@ -366,10 +366,20 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			// Ensure that the memory stored for the image file is released
 			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
 
+			int nPageCount = 0;
+			THROW_UE_ON_ERROR("ELI37426", "Unable to get page count.",
+				kRecGetImgFilePageCount(hInputImage, &nPageCount));
+
 			IMG_INFO imgInfo = {0};
 			IMF_FORMAT imgFormat;
-			THROW_UE_ON_ERROR("ELI36840", "Failed to indentify image format.",
-				kRecGetImgFilePageInfo(0, hInputImage, 0, &imgInfo, &imgFormat));
+			int nBitsPerPixel = 1;
+			for (int i = 0; i < nPageCount; i++)
+			{
+				THROW_UE_ON_ERROR("ELI36840", "Failed to indentify image format.",
+					kRecGetImgFilePageInfo(0, hInputImage, i, &imgInfo, &imgFormat));
+
+				nBitsPerPixel = max(nBitsPerPixel, imgInfo.BitsPerPixel);
+			}
 
 			// Set format and temp file extension based on the ouput type. If the extension doesn't
 			// match the format, the nuance engine will throw and error when saving.
@@ -387,7 +397,7 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 						}
 						else
 						{
-							nFormat = (imgInfo.BitsPerPixel == 1) ? FF_TIFG4 : FF_TIFLZW;
+							nFormat = (nBitsPerPixel == 1) ? FF_TIFG4 : FF_TIFLZW;
 						}
 						strExt = ".tif";
 					}
@@ -398,7 +408,7 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 						// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
 						// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
 						// FF_PDF_SUPERB.
-						nFormat = (imgInfo.BitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
+						nFormat = (nBitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
 						strExt = ".pdf";
 					}
 					break;
@@ -430,10 +440,6 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 				kRecOpenImgFile(strTempOutputFileName.c_str(), uphOutputImage.get(), IMGF_RDWR, FF_SIZE));
 
 			bOutputImageOpened = true;
-
-			int nPageCount(0);
-			THROW_UE_ON_ERROR("ELI34297", "Unable to determine page count.",
-				kRecGetImgFilePageCount(hInputImage, &nPageCount));
 
 			if (nPageCount > 1 && eOutputType == kFileType_Jpg)
 			{
