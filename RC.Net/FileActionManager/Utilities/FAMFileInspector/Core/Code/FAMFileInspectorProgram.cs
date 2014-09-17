@@ -267,8 +267,7 @@ namespace Extract.FileActionManager.Utilities
                 {
                     string query = File.ReadAllText(_queryFilename);
 
-                    famFileInspectorForm.FileSelector.AddQueryCondition(
-                        famFileInspectorForm.FileProcessingDB, query);
+                    famFileInspectorForm.FileSelector.AddQueryCondition(query);
                 }
             }
             catch (Exception ex)

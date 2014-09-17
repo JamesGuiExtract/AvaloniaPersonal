@@ -2022,17 +2022,15 @@ library UCLID_FILEPROCESSINGLib
 			 [in] VARIANT_BOOL bUsePercentage, [in] LONG nSubsetSize);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Adds a query condition to the current settings.
-		// ARGS:	pFAMDB- The IFileProcessingDB the condition relates to.
-		//			bstrQuery- The query to use as a condition.
+		// ARGS:	bstrQuery- The query to use as a condition.
 		// REQUIRES: bstrQuery must begin with "SELECT FAMFile.ID FROM FAMFile"
 		[id(8), helpstring("method AddQueryCondition")] HRESULT AddQueryCondition(
-			[in] IFileProcessingDB *pFAMDB, [in] BSTR bstrQuery);
+			[in] BSTR bstrQuery);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Adds a file set condition to the current settings.
-		// ARGS:	pFAMDB- The IFileProcessingDB the condition relates to.
-		//			bstrFileSet- The file set.
+		// ARGS:	bstrFileSet- The file set.
 		[id(9), helpstring("method AddFileSetCondition")] HRESULT AddFileSetCondition(
-			[in] IFileProcessingDB *pFAMDB, [in] BSTR bstrFileSet);
+			[in] BSTR bstrFileSet);
 	};
 
 	//----------------------------------------------------------------------------------------------

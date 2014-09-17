@@ -42,6 +42,18 @@ namespace Extract.FileActionManager.Utilities
         #region Properties
 
         /// <summary>
+        /// Gets or sets the file id of the file to which this instance pertains.
+        /// </summary>
+        /// <value>
+        /// The file id to which this instance pertains.
+        /// </value>
+        public int FileID
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the name of the file to which this instance pertains.
         /// </summary>
         /// <value>

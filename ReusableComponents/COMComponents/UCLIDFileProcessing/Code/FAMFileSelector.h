@@ -39,8 +39,8 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 		BSTR bstrQueryLabel, VARIANT_BOOL* pbNewSettingsApplied);
 	STDMETHOD(AddActionStatusCondition)(IFileProcessingDB *pFAMDB, long nActionID,
 		EActionStatus eStatus);
-	STDMETHOD(AddQueryCondition)(IFileProcessingDB *pFAMDB, BSTR bstrQuery);
-	STDMETHOD(AddFileSetCondition)(IFileProcessingDB *pFAMDB, BSTR bstrFileSet);
+	STDMETHOD(AddQueryCondition)(BSTR bstrQuery);
+	STDMETHOD(AddFileSetCondition)(BSTR bstrFileSet);
 	STDMETHOD(LimitToSubset)(VARIANT_BOOL bRandomSubset, VARIANT_BOOL bTopSubset,
 		VARIANT_BOOL bUsePercentage, LONG nSubsetSize);
 	STDMETHOD(GetSummaryString)(BSTR* pbstrSummaryString);

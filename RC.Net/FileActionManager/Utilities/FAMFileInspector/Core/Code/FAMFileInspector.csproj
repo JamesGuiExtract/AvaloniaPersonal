@@ -94,6 +94,7 @@
       <DependentUpon>FAMFileInspectorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FAMFileInspectorProgram.cs" />
+    <Compile Include="IFAMFileInspectorColumn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>

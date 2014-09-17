@@ -30,7 +30,14 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="fileSelector">The <see cref="IFAMFileSelector"/> specifying the set of
         /// files to be inspected or <see langword="null"/> to inspect all files in the database.
         /// </param>
-        void OpenFAMFileInspector(FileProcessingDB fileProcessingDB, IFAMFileSelector fileSelector);
+        /// <param name="lockFileSelector"><see langword="true"/> if the provided
+        /// <see paramref="fileSelector"/> should not be changeable in the FFI;
+        /// <see langword="false"/> otherwise.</param>
+        /// <param name="customColumns">An <see cref="IIUnknownVector"/> of
+        /// <see cref="IFAMFileInspectorColumn"/> that should be present in the FFI's file list.
+        /// </param>
+        void OpenFAMFileInspector(FileProcessingDB fileProcessingDB, IFAMFileSelector fileSelector,
+            bool lockFileSelector, IIUnknownVector customColumns);
     }
 
     /// <summary>
@@ -71,7 +78,14 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="fileSelector">The <see cref="IFAMFileSelector"/> specifying the set of
         /// files to be inspected or <see langword="null"/> to inspect all files in the database.
         /// </param>
-        public void OpenFAMFileInspector(FileProcessingDB fileProcessingDB, IFAMFileSelector fileSelector)
+        /// <param name="lockFileSelector"><see langword="true"/> if the provided
+        /// <see paramref="fileSelector"/> should not be changeable in the FFI;
+        /// <see langword="false"/> otherwise.</param>
+        /// <param name="customColumns">An <see cref="IIUnknownVector"/> of
+        /// <see cref="IFAMFileInspectorColumn"/> that should be present in the FFI's file list.
+        /// </param>
+        public void OpenFAMFileInspector(FileProcessingDB fileProcessingDB,
+            IFAMFileSelector fileSelector, bool lockFileSelector, IIUnknownVector customColumns)
         {
             try
             {
@@ -100,6 +114,8 @@ namespace Extract.FileActionManager.Utilities
                                     _fileInspectorForm.FileSelector.LimitToSubset(false, true,
                                         false, FAMFileInspectorForm.DefaultMaxFilesToDisplay);
                                 }
+
+                                _fileInspectorForm.LockFileSelector = lockFileSelector;
 
                                 _fileInspectorForm.Restore();
                                 _fileInspectorForm.Activate();
@@ -135,6 +151,15 @@ namespace Extract.FileActionManager.Utilities
                             _fileInspectorForm = new FAMFileInspectorForm();
                             InitializeFileProcessingDatabase(fileProcessingDB);
 
+                            if (customColumns != null)
+                            {
+                                foreach (var column in
+                                    customColumns.ToIEnumerable<IFAMFileInspectorColumn>())
+                                {
+                                    _fileInspectorForm.AddCustomColumn(column);
+                                }
+                            }
+
                             if (fileSelector == null)
                             {
                                 // No provided file selection settings should be interpreted as
@@ -147,6 +172,8 @@ namespace Extract.FileActionManager.Utilities
                                 _fileInspectorForm.FileSelector.LimitToSubset(false, true, false,
                                     FAMFileInspectorForm.DefaultMaxFilesToDisplay);
                             }
+
+                            _fileInspectorForm.LockFileSelector = lockFileSelector;
 
                             Application.Run(_fileInspectorForm);
                         }

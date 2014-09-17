@@ -101,16 +101,13 @@ STDMETHODIMP CFAMFileSelector::AddActionStatusCondition(IFileProcessingDB *pFAMD
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35697");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMFileSelector::AddQueryCondition(IFileProcessingDB *pFAMDB, BSTR bstrQuery)
+STDMETHODIMP CFAMFileSelector::AddQueryCondition(BSTR bstrQuery)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
 		validateLicense();
-
-		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB(pFAMDB);
-		ASSERT_ARGUMENT("ELI36095", ipFAMDB != __nullptr);
 
 		string strQuery = asString(bstrQuery);
 
@@ -134,16 +131,13 @@ STDMETHODIMP CFAMFileSelector::AddQueryCondition(IFileProcessingDB *pFAMDB, BSTR
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36097");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMFileSelector::AddFileSetCondition(IFileProcessingDB *pFAMDB, BSTR bstrFileSet)
+STDMETHODIMP CFAMFileSelector::AddFileSetCondition(BSTR bstrFileSet)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
 		validateLicense();
-
-		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB(pFAMDB);
-		ASSERT_ARGUMENT("ELI37349", ipFAMDB != __nullptr);
 
 		FileSetCondition* pCondition = new FileSetCondition();
 		pCondition->setFileSetName(asString(bstrFileSet));

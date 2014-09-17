@@ -379,7 +379,8 @@ void CFAMDBAdminSummaryDlg::OnContextInspectFiles()
 			throw UCLIDException("ELI35801", "FAMFileInspector instance not found.");
 		}
 
-		m_ipFAMFileInspector->OpenFAMFileInspector(m_ipFAMDB, m_ipContextMenuFileSelector);
+		m_ipFAMFileInspector->OpenFAMFileInspector(
+			m_ipFAMDB, m_ipContextMenuFileSelector, false, __nullptr);
 		
 		// The OpenFAMFileInspector will use and modify the m_ipContextMenuFileSelector passed in.
 		// Since we don't want such changes being reflected in this window, create a new instance to
