@@ -379,34 +379,58 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             using (ImageCodecs codecs = new ImageCodecs())
             {
-                // Iterate through each source document that has at least one page in the output
-                // document.
-                foreach (string sourceDocumentName in PageControls
-                    .Select(pageControl => pageControl.Page.OriginalDocumentName)
-                    .Distinct())
+                // This code was modified per https://extract.atlassian.net/browse/ISSUE-12470 to
+                // look through all pages, not just the first page from each source document.
+
+                // Create a dictionary of original document names of the pages in the output to the
+                // pages from those document(s) that are being used.
+                Dictionary<string, List<int>> documentPages = new Dictionary<string,List<int>>();
+                foreach (PageThumbnailControl pageControl in PageControls)
                 {
-                    using (ImageReader imageReader = codecs.CreateReader(sourceDocumentName))
-                    using (RasterImage imagePage = imageReader.ReadPage(1))
+                    List<int> pageList = null;
+                    if (!documentPages.TryGetValue(pageControl.Page.OriginalDocumentName, out pageList))
                     {
-                        int bitsPerPixel = imagePage.BitsPerPixel;
+                        pageList = new List<int>();
+                        documentPages[pageControl.Page.OriginalDocumentName] = pageList;
+                    }
 
-                        // The output format should be the first page or the page with the highest
-                        // bit depth.
-                        if (conversionCommand == null || bitsPerPixel > conversionCommand.BitsPerPixel)
+                    pageList.Add(pageControl.Page.OriginalPageNumber);
+                }
+
+                // Iterate through all source document pages and use the first page matching the
+                // highest bitdepth as the format to use for the output document.
+                foreach (KeyValuePair<string, List<int>> entry in documentPages)
+                {
+                    string sourceDocumentName = entry.Key;
+
+                    using (ImageReader imageReader = codecs.CreateReader(sourceDocumentName))
+                    {
+                        foreach (int page in entry.Value)
                         {
-                            conversionCommand = new ColorResolutionCommand();
-                            conversionCommand.Mode = ColorResolutionCommandMode.InPlace;
-                            conversionCommand.BitsPerPixel = bitsPerPixel;
-                            conversionCommand.DitheringMethod =
-                                RasterDitheringMethod.FloydStein;
-                            conversionCommand.PaletteFlags =
-                                    ColorResolutionCommandPaletteFlags.UsePalette;
+                            using (RasterImage imagePage = imageReader.ReadPage(page))
+                            {
+                                int bitsPerPixel = imagePage.BitsPerPixel;
 
-                            conversionCommand.Order = imagePage.Order;
-                            conversionCommand.SetPalette(imagePage.GetPalette());
+                                // The output format should be the first page or the page with the
+                                // highest bit depth.
+                                if (conversionCommand == null ||
+                                    bitsPerPixel > conversionCommand.BitsPerPixel)
+                                {
+                                    conversionCommand = new ColorResolutionCommand();
+                                    conversionCommand.Mode = ColorResolutionCommandMode.InPlace;
+                                    conversionCommand.BitsPerPixel = bitsPerPixel;
+                                    conversionCommand.DitheringMethod =
+                                        RasterDitheringMethod.FloydStein;
+                                    conversionCommand.PaletteFlags =
+                                            ColorResolutionCommandPaletteFlags.UsePalette;
 
-                            outputBitsPerPixel = bitsPerPixel;
-                            outputFormat = imageReader.Format;
+                                    conversionCommand.Order = imagePage.Order;
+                                    conversionCommand.SetPalette(imagePage.GetPalette());
+
+                                    outputBitsPerPixel = bitsPerPixel;
+                                    outputFormat = imageReader.Format;
+                                }
+                            }
                         }
                     }
                 }
