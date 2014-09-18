@@ -1190,6 +1190,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_STATUS_INDEX);
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_ID_STATUS_INDEX);
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_UPI_INDEX);
+		vecQueries.push_back(gstrMETADATA_FIELD_VALUE_INDEX);
 		
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -1255,6 +1256,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_ACTION_FK);
 		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_WORK_ITEM__WORK_ITEM_GROUP_FK);
+		vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_METADATA_FIELD_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1385,6 +1388,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE);
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_TABLE);
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_TABLE);
+	vecQueries.push_back(gstrCREATE_METADATA_FIELD);
+	vecQueries.push_back(gstrCREATE_FILE_METADATA_FIELD_VALUE);
 
 	return vecQueries;
 }
@@ -2711,6 +2716,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrDB_FEATURE);
 	vecTables.push_back(gstrWORK_ITEM);
 	vecTables.push_back(gstrWORK_ITEM_GROUP);
+	vecTables.push_back(gstrMETADATA_FIELD);
+	vecTables.push_back(gstrFILE_METADATA_FIELD_VALUE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

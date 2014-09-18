@@ -367,6 +367,18 @@ static const string gstrCREATE_WORK_ITEM_TABLE =
 	"[Sequence] [int] NOT NULL,"
 	"[StringizedException] [nvarchar](MAX) NULL)";
 
+static const string gstrCREATE_METADATA_FIELD =
+	"CREATE TABLE [dbo].[MetadataField] ("
+	"[ID] INT NOT NULL IDENTITY(1,1) CONSTRAINT [PK_MetadataField] PRIMARY KEY CLUSTERED, "
+	"[Name] NVARCHAR(50))";
+
+static const string gstrCREATE_FILE_METADATA_FIELD_VALUE =
+	"CREATE TABLE [dbo].[FileMetadataFieldValue] ("
+	"[ID] INT NOT NULL IDENTITY(1,1) CONSTRAINT [PK_FileMetadataFieldValue] PRIMARY KEY CLUSTERED, "
+	"[FileID] INT NOT NULL, "
+	"[MetadataFieldID] INT NOT NULL, "
+	"[Value] NVARCHAR(MAX))";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -436,6 +448,9 @@ static const string gstrCREATE_WORK_ITEM_STATUS_INDEX =
 static const string gstrCREATE_WORK_ITEM_ID_STATUS_INDEX = 
 	"CREATE NONCLUSTERED INDEX [IX_WorkItemStatusID] ON [dbo].[WorkItem]"
 	"([ID] ASC,	[Status] ASC)";
+
+static const string gstrMETADATA_FIELD_VALUE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_FileMetadataFieldValue] ON [FileMetadataFieldValue]([FileID], [MetadataFieldID])";
 
 	// Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
@@ -830,6 +845,20 @@ static const string gstrADD_WORK_ITEM__WORK_ITEM_GROUP_FK =
 	"ALTER TABLE [dbo].[WorkItem]  "
 	"WITH CHECK ADD  CONSTRAINT [FK_WorkItem_WorkItemGroup] FOREIGN KEY([WorkItemGroupID])"
 	"REFERENCES [dbo].[WorkItemGroup] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_METADATA_FIELD_VALUE_FAMFILE_FK =
+	"ALTER TABLE [FileMetadataFieldValue] "
+	"WITH CHECK ADD CONSTRAINT [FK_FileMetadataFieldValue_FAMFile] FOREIGN KEY([FileID]) "
+	"REFERENCES [FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_METADATA_FIELD_VALUE_METADATA_FIELD_FK =
+	"ALTER TABLE [FileMetadataFieldValue] "
+	"WITH CHECK ADD CONSTRAINT [FK_FileMetadataFieldValue_MetadataField] FOREIGN KEY([MetadataFieldID]) "
+	"REFERENCES [MetadataField] ([ID])  "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 

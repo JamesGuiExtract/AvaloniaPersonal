@@ -70,6 +70,8 @@ static const string gstrDB_FILE_HANDLER= "FileHandler";
 static const string gstrDB_FEATURE= "Feature";
 static const string gstrWORK_ITEM="WorkItem";
 static const string gstrWORK_ITEM_GROUP="WorkItemGroup";
+static const string gstrMETADATA_FIELD="MetadataField";
+static const string gstrFILE_METADATA_FIELD_VALUE="FileMetadataFieldValue";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
