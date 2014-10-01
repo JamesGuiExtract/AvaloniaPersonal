@@ -115,7 +115,7 @@ namespace Extract.FileActionManager.Utilities
                                         false, FAMFileInspectorForm.DefaultMaxFilesToDisplay);
                                 }
 
-                                _fileInspectorForm.LockFileSelector = lockFileSelector;
+                                // TODO: Check to see if lockFileSelector or customColumns have changed.
 
                                 _fileInspectorForm.Restore();
                                 _fileInspectorForm.Activate();

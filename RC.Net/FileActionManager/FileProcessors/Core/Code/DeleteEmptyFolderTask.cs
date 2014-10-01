@@ -394,8 +394,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="nActionID">The ID of the action being processed.</param>
         /// <param name="pFAMTM">The <see cref="FAMTagManager"/> to use if needed.</param>
         /// <param name="pDB">The <see cref="FileProcessingDB"/> in use.</param>
+        /// <param name="pFileRequestHandler">The <see cref="IFileRequestHandler"/> that can be used
+        /// by the task to carry out requests for files to be checked out, released or re-ordered
+        /// in the queue.</param>
         [CLSCompliant(false)]
-        public void Init(int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB)
+        public void Init(int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
+            IFileRequestHandler pFileRequestHandler)
         {
             try
             {

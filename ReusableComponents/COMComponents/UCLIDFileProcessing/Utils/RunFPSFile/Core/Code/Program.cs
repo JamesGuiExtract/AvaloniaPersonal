@@ -146,7 +146,7 @@ namespace Extract.FileActionManager.RunFPSFile
                                     new FileProcessingTaskExecutorClass();
                                 taskExecutor.InitProcessClose(fileRecord,
                                     fileProcessingManager2.FileProcessingMgmtRole.FileProcessors, 0,
-                                    null, tagManager, null, false);
+                                    null, tagManager, null, null, false);
                             }
                             catch (Exception ex)
                             {

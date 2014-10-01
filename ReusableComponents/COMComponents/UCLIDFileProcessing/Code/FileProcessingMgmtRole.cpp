@@ -19,6 +19,7 @@
 #include <FAMHelperFunctions.h>
 #include <Win32Semaphore.h>
 #include <UPI.h>
+#include <ADOUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -209,6 +210,7 @@ STDMETHODIMP CFileProcessingMgmtRole::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ILicensedComponent,
 		&IID_IFileProcessingMgmtRole,
 		&IID_IAccessRequired,
+		&IID_IFileRequestHandler,
 		&IID_IPersistStream
 	};
 
@@ -534,6 +536,124 @@ STDMETHODIMP CFileProcessingMgmtRole::raw_RequiresAdminAccess(VARIANT_BOOL* pbRe
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31247");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IFileRequestHandler
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::CheckoutForProcessing(long nFileID,
+	EActionStatus* pPrevStatus, VARIANT_BOOL* pSucceeded)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI37470", pSucceeded != __nullptr);
+
+		bool bResult = false;
+
+		// Query for an existing record in the lock table.
+		string strLockedFileQuery =
+			"SELECT [UPI] FROM [LockedFile] "
+			"	INNER JOIN [FAMSession] ON [FAMSession].[ID] = [LockedFile].[UPIID] "
+			"	WHERE [FileID] = " + asString(nFileID);
+
+		_RecordsetPtr ipRecords = getFPMDB()->GetResultsForQuery(strLockedFileQuery.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI37471", ipRecords != __nullptr);
+
+		if (ipRecords->adoEOF == VARIANT_FALSE)
+		{
+			// The file is already locked. But is it locked by this process?
+			ipRecords->MoveFirst();
+
+			FieldsPtr ipFields = ipRecords->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI37472", ipFields != __nullptr);
+
+			if (UPI::getCurrentProcessUPI().getUPI() == getStringField(ipFields, "UPI"))
+			{
+				// Already locked (processing) by this process.
+				*pPrevStatus = kActionProcessing;
+				bResult = true;
+			}
+			else
+			{
+				// Another process already has the file.
+				bResult = false;
+			}
+		}
+		else
+		{
+			// No process currently has the field; request the FPRecordManger to lock it for
+			// processing and add it to the internal queue.
+			bResult = m_pRecordMgr->checkoutForProcessing(nFileID, pPrevStatus);
+		}
+		
+		*pSucceeded = asVariantBool(bResult);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37473");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::MoveToFrontOfProcessingQueue(long nFileID, VARIANT_BOOL* pSucceeded)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI37474", pSucceeded != __nullptr);
+
+		bool bResult = m_pRecordMgr->moveToFrontOfQueue(nFileID);
+		
+		*pSucceeded = asVariantBool(bResult);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37475");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::ReleaseFile(long nFileID, VARIANT_BOOL* pSucceeded)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI37476", pSucceeded != __nullptr);
+
+		bool bResult = m_pRecordMgr->remove(nFileID);
+		
+		*pSucceeded = asVariantBool(bResult);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37477");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::SetFallbackStatus(long nFileID, 
+	EActionStatus eaFallbackStatus, VARIANT_BOOL* pSucceeded)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI37478", pSucceeded != __nullptr);
+
+		bool bResult = false;
+
+		FileProcessingRecord task;
+		if (m_pRecordMgr->getTask(nFileID, task))
+		{
+			getFPMDB()->SetFallbackStatus(task.getFileRecord(),
+				(UCLID_FILEPROCESSINGLib::EActionStatus)eaFallbackStatus);
+
+			bResult = true;
+		}
+		
+		*pSucceeded = asVariantBool(bResult);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37479");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2043,18 +2163,28 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 			// Attempt executing the tasks on the current file and mark
 			// the current file as either completed or pending.
 			EFileProcessingResult eResult = startFileProcessingChain(task, pThreadData);
-			if (eResult == kProcessingSuccessful)
+			switch (eResult)
 			{
-				task.markAsCompleted();
-			}
-			else if (eResult == kProcessingSkipped)
-			{
-				task.markAsSkipped();
-			}
-			else
-			{
-				Stop();
-				task.markAsNone();
+				case kProcessingSuccessful:
+					task.markAsCompleted();
+					break;
+
+				case kProcessingSkipped:
+					task.markAsSkipped();
+					break;
+
+				// Delayed indicates that the file did not complete processing and should be
+				// returned to the front of the queue, while the FAM instance should continue
+				// processing.
+				case kProcessingDelayed:
+					m_pRecordMgr->delay(task);
+					break;
+
+				case kProcessingCancelled:
+					Stop();
+					task.markAsNone();
+					break;
+
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI14340");
@@ -2204,13 +2334,20 @@ void CFileProcessingMgmtRole::executeErrorTask(FileProcessingRecord &task,
 	// Run the task
 	UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult = ipExecutor->InitProcessClose(
 		task.getFileRecord(), ipErrorTaskList, 
-		m_pRecordMgr->getActionID(), getFPMDB(), getFAMTagManager(), 
+		m_pRecordMgr->getActionID(), getFPMDB(), getFAMTagManager(), getFileRequestHandler(),
 		task.m_ipProgressStatus, VARIANT_FALSE);
 
 	// Log a cancellation during error task execution
 	if (eResult == kProcessingCancelled)
 	{
 		UCLIDException ue("ELI18060","Application trace: Processing cancelled while executing error task.");
+		ue.addDebugInfo("File", task.getFileName());
+		ue.addDebugInfo("Task", asString(getErrorHandlingTask()->Description));
+		ue.log();
+	}
+	else if (eResult == kProcessingDelayed)
+	{
+		UCLIDException ue("ELI37480","Application trace: Processing delayed while executing error task.");
 		ue.addDebugInfo("File", task.getFileName());
 		ue.addDebugInfo("Task", asString(getErrorHandlingTask()->Description));
 		ue.log();
@@ -2319,6 +2456,13 @@ UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr CFileProcessingMgmtRole::getFAMTagMan
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipTagManager = m_pFAMTagManager;
 	ASSERT_RESOURCE_ALLOCATION("ELI14401", ipTagManager != __nullptr);
 	return ipTagManager;
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr CFileProcessingMgmtRole::getFileRequestHandler()
+{
+	UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr ipFileRequestHandler = this;
+	ASSERT_RESOURCE_ALLOCATION("ELI37481", ipFileRequestHandler != __nullptr);
+	return ipFileRequestHandler;
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingMgmtRole::releaseProcessingThreadDataObjects()
@@ -2907,7 +3051,8 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 						pThreadData->m_ipTaskExecutor;
 					ASSERT_RESOURCE_ALLOCATION("ELI17949", ipExecutor != __nullptr);
 					ipExecutor->Init(copyFileProcessingTasks(m_ipFileProcessingTasks),
-						m_pRecordMgr->getActionID(), getFPMDB(), getFAMTagManager());
+						m_pRecordMgr->getActionID(), getFPMDB(), getFAMTagManager(),
+						getFileRequestHandler());
 				}
 			}
 
@@ -3068,7 +3213,8 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 
 				pThreadData->m_ipTaskExecutor->Init(pMgmtRole->m_ipFileProcessingTasks,
 					pMgmtRole->m_pRecordMgr->getActionID(),
-					pMgmtRole->getFPMDB(), pMgmtRole->getFAMTagManager());
+					pMgmtRole->getFPMDB(), pMgmtRole->getFAMTagManager(),
+					pMgmtRole->getFileRequestHandler());
 
 				// Create a FileProcessingRecord for the file and add it to the record manager's queue.
 				pMgmtRole->getFPMDB()->SetFileStatusToProcessing(
@@ -3202,7 +3348,7 @@ void CFileProcessingMgmtRole::signalWorkItemThreadsToStopAndWait()
 		WorkItemThreadData::ms_threadStopProcessing.signal();
 					
 		// wait for each to stop
-		for (unsigned long i = 0; i < nSize; i++)
+		for (long i = 0; i < nSize; i++)
 		{
 			WorkItemThreadData *p = m_vecWorkItemThreads[i];
 

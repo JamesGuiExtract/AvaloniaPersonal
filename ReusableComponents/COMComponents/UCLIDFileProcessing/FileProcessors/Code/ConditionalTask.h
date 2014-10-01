@@ -106,7 +106,8 @@ public:
 	STDMETHOD(put_TasksForConditionFalse)(IIUnknownVector * newVal);
 
 // IFileProcessingTask
-	STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB *pDB);
+	STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB *pDB,
+		IFileRequestHandler* pFileRequestHandler);
 	STDMETHOD(raw_ProcessFile)(IFileRecord* pFileRecord, long nActionID,
 		IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);
@@ -143,6 +144,9 @@ private:
 
 	// Executor utility to process conditional tasks
 	IFileProcessingTaskExecutorPtr m_ipFAMTaskExecutor;
+
+	// Not used by this class, but passed to child tasks.
+	IFileRequestHandlerPtr m_ipFileRequestHandler;
 
 	IMiscUtilsPtr m_ipMiscUtils;
 

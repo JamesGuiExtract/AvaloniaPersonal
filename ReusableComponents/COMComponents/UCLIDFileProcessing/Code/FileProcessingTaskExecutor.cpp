@@ -89,10 +89,11 @@ void CFileProcessingTaskExecutor::StandbyThread::endStandby()
 // CFileProcessingTaskExecutor
 //--------------------------------------------------------------------------------------------------
 CFileProcessingTaskExecutor::CFileProcessingTaskExecutor() :
-	m_ipCurrentTask(NULL),
+	m_ipCurrentTask(__nullptr),
 	m_bInitialized(false),
-	m_ipDB(NULL),
-	m_ipFAMTagManager(NULL),
+	m_ipDB(__nullptr),
+	m_ipFAMTagManager(__nullptr),
+	m_ipFileRequestHandler(__nullptr),
 	m_eventStandbyRunning(false)
 {
 }
@@ -119,6 +120,7 @@ void CFileProcessingTaskExecutor::FinalRelease()
 		m_ipCurrentTask = __nullptr;
 		m_ipDB = __nullptr;
 		m_ipFAMTagManager = __nullptr;
+		m_ipFileRequestHandler = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26736");
 }
@@ -127,7 +129,7 @@ void CFileProcessingTaskExecutor::FinalRelease()
 // IFileProcessingTaskExecutor
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingTasks, long nActionID,
-	IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager)
+	IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager, IFileRequestHandler* pFileRequestHandler)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -147,8 +149,11 @@ STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingT
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(pFAMTagManager);
 		ASSERT_ARGUMENT("ELI26782", ipFAMTagManager != __nullptr);
 
+		UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr ipFileRequestHandler(pFileRequestHandler);
+		ASSERT_ARGUMENT("ELI37483", ipFileRequestHandler != __nullptr);
+
 		// Call the init method
-		init(ipFileProcessingTasks, nActionID, ipDB, ipFAMTagManager);
+		init(ipFileProcessingTasks, nActionID, ipDB, ipFAMTagManager, ipFileRequestHandler);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17844");
 
@@ -189,8 +194,8 @@ STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(IFileRecord* pFileRecord,
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(IFileRecord* pFileRecord, 
-	IIUnknownVector *pFileProcessingTasks, long nActionID,
-	IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager, 
+	IIUnknownVector *pFileProcessingTasks, long nActionID, IFileProcessingDB *pDB,
+	IFAMTagManager *pFAMTagManager, IFileRequestHandler* pFileRequestHandler,
 	IProgressStatus *pProgressStatus, VARIANT_BOOL bCancelRequested, 
 	EFileProcessingResult *pResult)
 {
@@ -208,6 +213,8 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(IFileRecord* pFileRec
 		ASSERT_ARGUMENT("ELI17863", ipFileProcessingTasks !=  __nullptr);
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(pFAMTagManager);
 		ASSERT_ARGUMENT("ELI17865", ipFAMTagManager !=  __nullptr);
+		UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr ipFileRequestHandler(pFileRequestHandler);
+		ASSERT_ARGUMENT("ELI37484", ipFileRequestHandler != nullptr);
 		ASSERT_ARGUMENT("ELI17866", pResult !=  __nullptr);
 		ASSERT_ARGUMENT("ELI31324", pFileRecord != __nullptr);
 
@@ -216,7 +223,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(IFileRecord* pFileRec
 		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(pDB);
 
 		// Initialize the processing tasks
-		init(ipFileProcessingTasks, nActionID, ipDB, ipFAMTagManager);
+		init(ipFileProcessingTasks, nActionID, ipDB, ipFAMTagManager, ipFileRequestHandler);
 		
 		// Process the tasks
 		try
@@ -579,13 +586,20 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						}
 
 						// Check success flag
-						if (eResult == kProcessingCancelled || eResult == kProcessingSkipped)
+						if (eResult == kProcessingCancelled ||
+							eResult == kProcessingSkipped ||
+							eResult == kProcessingDelayed)
 						{
 							// Processing didn't complete.
 							// Log the fact that processing was cancelled or skipped
 							string strMsg = "Application Trace: Processing ";
-							strMsg += (eResult == kProcessingCancelled ? "cancelled " : "skipped ");
-							strMsg += "while performing ";
+							switch (eResult)
+							{
+								case kProcessingCancelled:	strMsg += "cancelled";	break;
+								case kProcessingSkipped:	strMsg += "skipped";	break;
+								case kProcessingDelayed:	strMsg += "delayed";	break;
+							}
+							strMsg += " while performing ";
 							if (strCurrentTaskName.empty())
 							{
 								// Use the task # as part of the error string.
@@ -606,9 +620,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 							ue.addDebugInfo("User Name", getCurrentUserName());
 							ue.log();
 
-							// Return processing cancelled or skipped
-							return eResult == kProcessingCancelled
-								? kProcessingCancelled : kProcessingSkipped;
+							return (EFileProcessingResult)eResult;
 						}
 					}
 					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI17694");
@@ -656,7 +668,8 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessingTasks,
 									   long actionID,
 									   const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipDB,
-									   const UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr& ipFAMTagManager)
+									   const UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr& ipFAMTagManager,
+									   const UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr& ipFileRequestHandler)
 {
 	try
 	{
@@ -675,8 +688,8 @@ void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessin
 		m_ipFAMTagManager = ipFAMTagManager;
 		ASSERT_ARGUMENT("ELI17702", m_ipFAMTagManager != __nullptr);
 
-		// Store database
 		m_ipDB = ipDB;
+		m_ipFileRequestHandler = ipFileRequestHandler;
 
 		// Build the collection of tasks and initialize each enabled FileProcessingTask
 		int nTaskCount = ipFileProcessingTasks->Size();
@@ -698,7 +711,7 @@ void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessin
 			// Only initialize the processing task if it is enabled
 			if (m_vecProcessingTasks[i]->Enabled)
 			{
-				ipFileProc->Init(actionID, ipFAMTagManager, ipDB);
+				ipFileProc->Init(actionID, ipFAMTagManager, ipDB, m_ipFileRequestHandler);
 			}
 		}
 

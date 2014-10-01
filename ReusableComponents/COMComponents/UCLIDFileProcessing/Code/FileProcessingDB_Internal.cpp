@@ -295,7 +295,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			"COALESCE(ActionStatus, 'U') AS ActionStatus, "
 			"COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID, "
 			"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID "
-			"FROM FAMFile "
+			"FROM FAMFile WITH (ROWLOCK, UPDLOCK)"
 			"LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID " 
 			"	AND SkippedFile.ActionID = " + strActionId + 
 			" LEFT OUTER JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID " + 
@@ -573,13 +573,14 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setStatusForFile(_ConnectionPtr ipConnection, long nFileID, string strAction,
-	EActionStatus eStatus, bool bQueueChangeIfProcessing, EActionStatus *poldStatus)
+	EActionStatus eStatus, bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride,
+	EActionStatus *poldStatus)
 {
 	try
 	{
 		// Change the status for the given file and return the previous state
 		EActionStatus oldStatus = setFileActionState(ipConnection, nFileID, strAction,
-			asStatusString(eStatus), "", false, bQueueChangeIfProcessing);
+			asStatusString(eStatus), "", bAllowQueuedStatusOverride, bQueueChangeIfProcessing);
 
 		if (poldStatus != __nullptr)
 		{
@@ -4251,6 +4252,32 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 	}
 }
 //--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::ensureFAMRegistration(string strActionName)
+{
+	if (!m_bFAMRegistered)
+	{
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+		BEGIN_CONNECTION_RETRY();
+
+		ipConnection = getDBConnection();
+
+		// Re-add a new "Processing" ActiveFAM table entry. (The circumstances where this
+		// code will be used are rare, and not worth finding a way to pass on whether
+		// queuing is active).
+		UnregisterActiveFAM();
+		RegisterActiveFAM(getActionID(ipConnection, strActionName), VARIANT_FALSE, VARIANT_TRUE);
+
+		END_CONNECTION_RETRY(ipConnection, "ELI37456");
+
+		UCLIDException ue("ELI37457",
+			"Application trace: ActiveFAM registration has been restored.");
+		ue.addDebugInfo("UPIID", m_nUPIID);
+		ue.log();
+	}
+}
+//--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isInputEventTrackingEnabled(const _ConnectionPtr& ipConnection)
 {
 	try
@@ -4434,7 +4461,8 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 //--------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 														   const string& strSelectSQL,
-														   long nActionID)
+														   long nActionID,
+														   const string& strAllowedCurrentStatus)
 {
 	// Declare query string so that if there is an exception the query can be added to debug info
 	string strQuery;
@@ -4527,8 +4555,14 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 							// Get the previous state
 							string strFileFromState = getStringField(ipFields, "ASC_From");
 
+							ipFileRecord->FallbackStatus = 
+								(UCLID_FILEPROCESSINGLib::EActionStatus)asEActionStatus(strFileFromState);
+
 							// Make sure the transition is valid
-							if (strFileFromState != "P" && strFileFromState != "S")
+							// Setting to processing if already processing is invalid in all cases.
+							if (strFileFromState == "R" ||
+								(!strAllowedCurrentStatus.empty() &&
+								  strAllowedCurrentStatus.find(strFileFromState) == string::npos))
 							{
 								UCLIDException ue("ELI30405", "Invalid File State Transition!");
 								ue.addDebugInfo("Old Status", asStatusName(strFileFromState));

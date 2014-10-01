@@ -41,14 +41,14 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 // IFileProcessingTaskExecutor
 	STDMETHOD(Init)(IIUnknownVector *pFileProcessingTasks, long nActionID, IFileProcessingDB *pDB,
-		IFAMTagManager *pFAMTagManager);
+		IFAMTagManager *pFAMTagManager, IFileRequestHandler* pFileRequestHandler);
 	STDMETHOD(ProcessFile)(IFileRecord* pFileRecord, long nActionID,
 		IProgressStatus *pProgressStatus, VARIANT_BOOL vbCancelRequested,
 		EFileProcessingResult* pResult);
 	STDMETHOD(InitProcessClose)(IFileRecord* pFileRecord, IIUnknownVector *pFileProcessingTasks, 
 		long nActionID, IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager,
-		IProgressStatus *pProgressStatus, VARIANT_BOOL bCancelRequested,
-		EFileProcessingResult* pResult);
+		IFileRequestHandler* pFileRequestHandler, IProgressStatus *pProgressStatus,
+		VARIANT_BOOL bCancelRequested, EFileProcessingResult* pResult);
 	STDMETHOD(Cancel)();
 	STDMETHOD(Close)();
 	STDMETHOD(GetCurrentTask)(IFileProcessingTask ** ppCurrentTask);
@@ -163,6 +163,7 @@ private:
 
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipDB;
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr m_ipFAMTagManager;
+	UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr m_ipFileRequestHandler;
 	
 	// Text that should prepend any status message to be posted to a ProgressStatus object
 	string m_strStatusMessagePrefix;
@@ -188,7 +189,8 @@ private:
 	void init(const IIUnknownVectorPtr& ipFileProcessingTasks,
 		long actionID,
 		const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipDB,
-		const UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr& ipFAMTagManager);
+		const UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr& ipFAMTagManager,
+		const UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr& ipFileRequestHandler);
 
 	// Internal GetCurrentTask method
 	UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr getCurrentTask();

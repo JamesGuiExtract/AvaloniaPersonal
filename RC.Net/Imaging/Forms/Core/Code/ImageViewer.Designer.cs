@@ -63,7 +63,11 @@ namespace Extract.Imaging.Forms
                     _reader.Dispose();
                     _reader = null;
                 }
-                ImageReaderCache.DisposeCache();
+                if (_imageReaderCache != null)
+                {
+                    _imageReaderCache.Dispose();
+                    _imageReaderCache = null;
+                }
                 if (_codecs != null)
                 {
                     _codecs.Dispose();

@@ -119,26 +119,31 @@ void FPRecordManager::discardProcessingQueue()
 	// Close the queue
 	closeProcessingQueue();
 
+	// To simplify handling delayed files, add them back to the main queue first so we can iterate
+	// one queue to reset all queued files.
+	requeueDelayedTasks();
+
 	// For all of the remaining files re-mark them as pending in the database
 	CSingleLock lockGuard(&m_objLock, TRUE);
 
 	_bstr_t bstrAction = m_strAction.c_str();
 
-	// For all of the remaining files remark them as pending in the database
-	for each ( long l in m_queTaskIds)
+	// For all of the remaining files set them back to their fallback status (usually their status
+	// before lock) in the database.
+	for(TaskIdList::iterator it = m_queTaskIds.begin(); it !=  m_queTaskIds.end(); it++)
 	{
-		if (m_bProcessSkippedFiles)
-		{
-			// Return the state of the file to skipped in the database
-			// Set vbAllowQueuedStatusOverride to true.
-			m_ipFPMDB->SetFileStatusToSkipped( l, bstrAction, VARIANT_FALSE, VARIANT_TRUE);
-		}
-		else
-		{
-			// Return the state of the file to pending in the database
-			// Set vbAllowQueuedStatusOverride to true.
-			m_ipFPMDB->SetFileStatusToPending( l, bstrAction, VARIANT_TRUE);
-		}
+		FileProcessingRecord task = getTask(*it);
+
+		// https://extract.atlassian.net/browse/ISSUE-12449
+		// Now setting the action status back to the fallback status rather than pending or skipped
+		// based upon m_bProcessSkippedFiles. (This may be something other than pending or skipped
+		// in the case IFileRequestManager::CheckoutForProcessing was used).
+		
+		// Set vbAllowQueuedStatusOverride to true.
+		UCLID_FILEPROCESSINGLib::EActionStatus eaOldStatus =
+			(UCLID_FILEPROCESSINGLib::EActionStatus)kActionUnattempted;
+		m_ipFPMDB->SetStatusForFile(task.getFileID(), m_strAction.c_str(),
+			task.getFallbackStatus(), VARIANT_TRUE, VARIANT_TRUE, &eaOldStatus);
 	}
 
 	// Ensure the queue is cleared since we have now reverted the state of all files
@@ -149,6 +154,15 @@ void FPRecordManager::discardProcessingQueue()
 void FPRecordManager::updateTask(FileProcessingRecord& task)
 {
 	CSingleLock lockGuard(&m_objLock, TRUE);
+
+	// If the file was specified to be removed while actively processing, remove this file from the
+	// queue as it comes out of processing.
+	if (m_setRemovedFiles.find(task.getFileID()) != m_setRemovedFiles.end())
+	{
+		task.m_eStatus = kRecordNone;
+		m_setRemovedFiles.erase(task.getFileID());
+	}
+
 	changeState(task);
 }
 //-------------------------------------------------------------------------------------------------
@@ -166,9 +180,95 @@ void FPRecordManager::remove(const std::string& strFileName)
 			changeState(task);
 			// There should only be one instance of any filename in the queue
 			// if that is not the case we will still only delete one
-			break;
+			return;
 		}	
 	}
+
+	// If a file was delayed, it may still be awaiting processing, but not yet be back in
+	// m_queTaskIds. Check m_queDelayedTasks as well.
+	for(it = m_queDelayedTasks.begin(); it !=  m_queDelayedTasks.end(); it++)
+	{
+		FileProcessingRecord task = getTask(*it);
+		if(task.getFileName() == strFileName)
+		{
+			task.m_eStatus = kRecordNone;
+			changeState(task);
+			// There should only be one instance of any filename in the queue
+			// if that is not the case we will still only delete one
+			return;
+		}	
+	}
+}
+//-------------------------------------------------------------------------------------------------
+bool FPRecordManager::remove(const long nFileId)
+{
+	CSingleLock lockGuard(&m_objLock, TRUE);
+
+	TaskIdList::iterator it;
+	for(it = m_queTaskIds.begin(); it !=  m_queTaskIds.end(); it++)
+	{
+		FileProcessingRecord task = getTask(*it);
+		if(task.getFileID() == nFileId)
+		{
+			task.m_eStatus = kRecordNone;
+			changeState(task);
+			// There should only be one instance of any filename in the queue
+			// if that is not the case we will still only delete one
+			return true;
+		}	
+	}
+
+	// If a file was delayed, it may still be awaiting processing, but not yet be back in
+	// m_queTaskIds. Check m_queDelayedTasks as well.
+	for(it = m_queDelayedTasks.begin(); it !=  m_queDelayedTasks.end(); it++)
+	{
+		FileProcessingRecord task = getTask(*it);
+		if(task.getFileID() == nFileId)
+		{
+			task.m_eStatus = kRecordNone;
+			changeState(task);
+			// There should only be one instance of any filename in the queue
+			// if that is not the case we will still only delete one
+			return true;
+		}	
+	}
+
+	// If the file to remove is currently processing, flag it to prevent it from going back into
+	// the queue via a delay call.
+	FileProcessingRecord task;
+	if(getTask(nFileId, task) && task.m_eStatus == kRecordCurrent)
+	{
+		m_setRemovedFiles.insert(nFileId);
+		return true;
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+int FPRecordManager::requeueDelayedTasks()
+{
+	int count = 0;
+	CSingleLock lockGuard(&m_objLock, TRUE);
+
+	// If file 1 is delayed, then 2 is delayed, 1 should come back up for processing before 2...
+	// since we are pushing onto the front of m_queTaskIds rather than the back, m_queDelayedTasks
+	// needs to be iterated in reverse order so that they end up in m_queTaskIds in the correct
+	// order.
+	for(TaskIdList::reverse_iterator it = m_queDelayedTasks.rbegin();
+		it !=  m_queDelayedTasks.rend(); it++)
+	{
+		FileProcessingRecord task = getTask(*it);
+		if (task.m_eStatus != kRecordPending)
+		{
+			THROW_LOGIC_ERROR_EXCEPTION("ELI37488");
+		}
+
+		m_queTaskIds.push_front(*it);
+		count++;
+	}
+
+	m_queDelayedTasks.clear();
+	return count;
 }
 //-------------------------------------------------------------------------------------------------
 bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
@@ -190,7 +290,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 		}
 
 		// this is only used when deciding if the processing is done
-		long nNumFromDB = 0;
+		long nNumTasksLoaded = 0;
 		
 		// Need to make sure that the the queue gets loaded from the db if it is empty but only from one thread at a time
 		CSingleLock lockDBLoad(&m_LoadDBLock, TRUE );
@@ -247,13 +347,27 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 
 		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded())
 		{
+			// nNumberToLoad from the database should be decremented by the number of available
+			// delayed tasks except if there is only one delayed task. In that case, we need to be
+			// sure at least one file is grabbe from the database (if available), so that another
+			// file is processed before the delayed file is back up for processing.
+			nNumberToLoad = (m_queDelayedTasks.size() == 1)
+				? max(nNumberToLoad - m_queDelayedTasks.size(), 1)
+				: nNumberToLoad - m_queDelayedTasks.size();
+			
 			// load from Database;
-			nNumFromDB = loadTasksFromDB(nNumberToLoad);
+			nNumTasksLoaded += loadTasksFromDB(nNumberToLoad);
 
 			// If at least 1 file was loaded, reset the sleep time iterator to min sleep time
-			if (nNumFromDB > 0)
+			if (nNumTasksLoaded > 0)
 			{
 				m_currentSleepTime = m_vecSleepTimes.begin();
+			}
+			else
+			{
+				// No files were loaded from the database. If there are any available delayed files,
+				// put them back into the queue for processing.
+				nNumTasksLoaded += requeueDelayedTasks();
 			}
 		}
 		
@@ -266,7 +380,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			// been closed, then just return false, as there is nothing more
 			// to pop, if the queue is open and m_pKeepProcessingAsAdded is
 			// is false exit and return false
-			if (nNumFromDB == 0 && (!processingQueueIsOpen() || !m_bKeepProcessingAsAdded))
+			if (nNumTasksLoaded == 0 && (!processingQueueIsOpen() || !m_bKeepProcessingAsAdded))
 			{
 				// Discard processing queue so that once one thread exits because no files to process
 				// all threads will exit even if more files get supplied.
@@ -301,6 +415,10 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			Win32SemaphoreLockGuard lg(processSemaphore, true);
 			changeState(task);
 
+			// After grabbing a file, put any delayed files back onto the front of the queue so
+			// that the effect is that a single file was allowed to skip ahead of the delayed file.
+			requeueDelayedTasks();
+
 			// return with the semaphore still aquired
 			lg.NoRelease();
 			return true;
@@ -324,6 +442,69 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
+bool FPRecordManager::checkoutForProcessing(long nFileId, EActionStatus *peaPreviousStatus)
+{
+	ASSERT_ARGUMENT("ELI37489", peaPreviousStatus != __nullptr);
+
+	return loadTaskFromDB(nFileId, peaPreviousStatus);
+}
+//-------------------------------------------------------------------------------------------------
+bool FPRecordManager::moveToFrontOfQueue(long nFileId)
+{
+	CSingleLock lockGuard(&m_objLock, TRUE);
+
+	for (TaskIdList::iterator it = m_queTaskIds.begin(); it != m_queTaskIds.end(); it++)
+	{
+		if(*it == nFileId)
+		{
+			m_queTaskIds.remove(nFileId);
+			m_queTaskIds.push_front(nFileId);
+			return true;
+		}
+	}
+
+	// If a file was delayed, it may still be awaiting processing, but not yet be back in
+	// m_queTaskIds. Check m_queDelayedTasks as well.
+	for (TaskIdList::iterator it = m_queDelayedTasks.begin(); it != m_queDelayedTasks.end(); it++)
+	{
+		if(*it == nFileId)
+		{
+			m_queDelayedTasks.remove(nFileId);
+			m_queTaskIds.push_front(nFileId);
+			return true;
+		}
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::delay(FileProcessingRecord& task)
+{
+	CSingleLock lockGuard(&m_objLock, TRUE);
+	CSingleLock lockGuard2(&m_readTaskMapMutex, TRUE);
+
+	long nFileId = task.getFileID();
+
+	// Only a currently processing task can be delayed.
+	FileProcessingRecord oldTask;
+	if(!getTask(nFileId, oldTask) ||
+		oldTask.m_eStatus != kRecordCurrent)
+	{
+		THROW_LOGIC_ERROR_EXCEPTION("ELI37490");
+	}
+
+	task.m_eStatus = kRecordPending;
+	m_mapTasks[nFileId] = task;
+
+	m_queDelayedTasks.push_back(nFileId);
+	
+	// Normally SendStatusMessage is called by changeState. This is a special transition that I
+	// don't what to have to further complicated changeState to handle. The only thing that needs
+	// to be done outside of updating m_mapTasks is to notify the processing log tab of the
+	// transition.
+	SendStatusMessage(m_hDlg, &task, kRecordCurrent);
+}
+//-------------------------------------------------------------------------------------------------
 void FPRecordManager::clear(bool bClearUI)
 {
 	if(m_hDlg != __nullptr && bClearUI)
@@ -340,7 +521,9 @@ void FPRecordManager::clear(bool bClearUI)
 	}
 
 	m_queTaskIds.clear();
+	m_queDelayedTasks.clear();
 	m_queFinishedTasks.clear();
+	m_setRemovedFiles.clear();
 	
 	clearEvents();
 	resetSleepIntervals();
@@ -408,7 +591,7 @@ long FPRecordManager::getNumberPending()
 {
 	CSingleLock lockGuard(&m_objLock, TRUE);
 	// TODO: Need to return the number of file from the database also
-	return m_queTaskIds.size();
+	return m_queTaskIds.size() + m_queDelayedTasks.size();
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::setMaxStoredRecords(long nMaxStoredRecords)
@@ -647,7 +830,11 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 		_lastCodePos = "170";
 		// this comes after the update because we may be removing the entry we updated e.g. when 0 is 
 		// maxNumStoresRecords
-		if (eOldStatus == kRecordCurrent)
+		// https://extract.atlassian.net/browse/ISSUE-12449
+		// Status change may be kRecordPending -> kRecordNone in the case that remove(id) was called
+		// by CFileProcessingMgmtRole::RemoveFile
+		if (eOldStatus == kRecordCurrent ||
+			(eOldStatus == kRecordPending && eNewStatus == kRecordNone))
 		{
 			_lastCodePos = "180";
 			if (eNewStatus == kRecordComplete ||
@@ -702,20 +889,16 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 				// Reset the file status to skipped or pending depending
 				// on whether skipped files are being processed or pending files
 				// [LRCAU #5396 - 08/11/2009 - JDS]
-				if (m_bProcessSkippedFiles)
-				{
-					// Set the file back to skipped (do not update the skipped table)
-					// Set vbAllowQueuedStatusOverride to true.
-					m_ipFPMDB->SetFileStatusToSkipped(nTaskID, m_strAction.c_str(), VARIANT_FALSE,
-						VARIANT_TRUE);
-					_lastCodePos = "290_A";
-				}
-				else
-				{
-					// Set vbAllowQueuedStatusOverride to true.
-					m_ipFPMDB->SetFileStatusToPending(nTaskID, m_strAction.c_str(), VARIANT_TRUE);
-					_lastCodePos = "290_B";
-				}
+				// https://extract.atlassian.net/browse/ISSUE-12449
+				// Now setting the action status back to whatever it had been (may be other than
+				// pending or skipped in the case of IFileRequestManager::CheckoutForProcessing).
+				
+				// Set vbAllowQueuedStatusOverride to true.
+				UCLID_FILEPROCESSINGLib::EActionStatus eaOldStatus =
+					(UCLID_FILEPROCESSINGLib::EActionStatus)kActionUnattempted;
+				m_ipFPMDB->SetStatusForFile(nTaskID, m_strAction.c_str(), task.getFallbackStatus(),
+					VARIANT_FALSE, VARIANT_TRUE, &eaOldStatus);
+				_lastCodePos = "290";
 			}
 		}
 
@@ -755,7 +938,20 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 					m_queTaskIds.erase(queIt);
 					break;
 				}
-			}					
+			}
+
+			// If a file was delayed, it may still be awaiting processing, but not yet be back in
+			// m_queTaskIds. Check m_queDelayedTasks as well.
+			for(queIt = m_queDelayedTasks.begin(); queIt != m_queDelayedTasks.end(); queIt++)
+			{
+				_lastCodePos = "392";
+				if(*queIt == nTaskID)
+				{	
+					_lastCodePos = "394";
+					m_queDelayedTasks.erase(queIt);
+					break;
+				}
+			}	
 
 			_lastCodePos = "400";
 
@@ -831,6 +1027,29 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 	return nNumFilesAddedToQ;
 }
 //-------------------------------------------------------------------------------------------------
+bool FPRecordManager::loadTaskFromDB(long nFileId, EActionStatus *peaPreviousStatus)
+{
+	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipRecord = m_ipFPMDB->GetFileToProcess(nFileId,
+		m_strAction.c_str());
+
+	if (ipRecord != __nullptr)
+	{
+		// Create task with File ID and name
+		FileProcessingRecord fpTask( ipRecord );
+
+		// Initially, FallbackStatus will be the same as the status before lock.
+		*peaPreviousStatus = (EActionStatus)ipRecord->FallbackStatus;
+
+		return push(fpTask);
+	}
+	else
+	{
+		*peaPreviousStatus = kActionUnattempted;
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
 void FPRecordManager::setFPMDB(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFPMDB)
 {
 	ASSERT_ARGUMENT("ELI14005", ipFPMDB != __nullptr);
@@ -902,9 +1121,10 @@ void FPRecordManager::setNumberOfFilesToProcess(long nNumberOfFiles)
 bool FPRecordManager::removeTaskIfNotCurrentOrInLists(long nTaskID)
 {
 	// [FlexIDSCore:5186]
-	// Before removing task make sure it is not in the pending or finished task list.
+	// Before removing task make sure it is not in the pending, delayed or finished task list.
 	// Even after removing one instance, these lists can conceivably have more than 
 	if (find(m_queTaskIds.begin(), m_queTaskIds.end(), nTaskID) != m_queTaskIds.end() ||
+		find(m_queDelayedTasks.begin(), m_queDelayedTasks.end(), nTaskID) != m_queDelayedTasks.end() ||
 		find(m_queFinishedTasks.begin(), m_queFinishedTasks.end(), nTaskID) != m_queFinishedTasks.end())
 	{
 		// If the taskID to be removed is in the pending list or finished list; don't remove it.

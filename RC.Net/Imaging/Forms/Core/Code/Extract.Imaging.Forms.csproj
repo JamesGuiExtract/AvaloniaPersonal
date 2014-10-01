@@ -272,6 +272,10 @@
       <DependentUpon>ImageViewer.cs</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ImageViewer.ImageReaderCacheCollection.cs">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ImageViewerCursors.cs" />
     <Compile Include="LayerObjectsCollectionEventArguments.cs" />
     <Compile Include="Controls\HighlightToolStripSplitButton.cs">

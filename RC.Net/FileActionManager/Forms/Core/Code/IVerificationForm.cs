@@ -44,6 +44,78 @@ namespace Extract.FileActionManager.Forms
     }
 
     /// <summary>
+    /// Event args for a <see cref="IVerificationForm.FileRequested"/> event.
+    /// </summary>
+    [CLSCompliant(false)]
+    public class FileRequestedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new <see cref="FileRequestedEventArgs"/> instance.
+        /// </summary>
+        /// <param name="fileID">The ID of the file being requested for verification.</param>
+        public FileRequestedEventArgs(int fileID)
+            : base()
+        {
+            FileID = fileID;
+        }
+
+        /// <summary>
+        /// Gets the ID of the file being requested for verification.
+        /// </summary>
+        public int FileID
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether the file is currently "processing" in the verification task
+        /// (waiting on another thread in prefetch).
+        /// </summary>
+        public bool FileIsAvailable
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
+    /// Event args for a <see cref="IVerificationForm.FileDelayed"/> event.
+    /// </summary>
+    [CLSCompliant(false)]
+    public class FileDelayedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new <see cref="FileDelayedEventArgs"/> instance.
+        /// </summary>
+        /// <param name="fileID">The ID of the file whose processing is being delayed.</param>
+        public FileDelayedEventArgs(int fileID)
+            : base()
+        {
+            FileID = fileID;
+        }
+
+        /// <summary>
+        /// Gets the ID of the file whose processing is being delayed.
+        /// </summary>
+        public int FileID
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether the file was currently "processing" in the verification task
+        /// (waiting on another thread in prefetch).
+        /// </summary>
+        public bool FileIsAvailable
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
     /// Delegate for the <see cref="IVerificationForm.Open"/> method.
     /// </summary>
     /// <param name="fileName">Specifies the filename of the document image to open.</param>
@@ -70,6 +142,18 @@ namespace Extract.FileActionManager.Forms
         /// Occurs when a file has completed verification.
         /// </summary>
         event EventHandler<FileCompleteEventArgs> FileComplete;
+
+        /// <summary>
+        /// Raised when the task requests that a specific file be provided ahead of the files
+        /// currently waiting in the task from different threads (prefetched).
+        /// </summary>
+        event EventHandler<FileRequestedEventArgs> FileRequested;
+
+        /// <summary>
+        /// Raised when the task request that processing of a specific file be delayed (returned to
+        /// the FPRecordManager queue).
+        /// </summary>
+        event EventHandler<FileDelayedEventArgs> FileDelayed;
 
         /// <summary>
         /// Gets whether the control styles of the current Windows theme should be used for the
@@ -132,5 +216,12 @@ namespace Extract.FileActionManager.Forms
         /// <returns><see langword="true"/> to standby until the next file is supplied;
         /// <see langword="false"/> to cancel processing.</returns>
         bool Standby();
+
+        /// <summary>
+        /// Delays processing of the current file allowing the next file in the queue to be brought
+        /// up in its place, though if there are no more files in the queue this will cause the same
+        /// file to be re-displayed.
+        /// </summary>
+        void DelayFile();
     }
 }

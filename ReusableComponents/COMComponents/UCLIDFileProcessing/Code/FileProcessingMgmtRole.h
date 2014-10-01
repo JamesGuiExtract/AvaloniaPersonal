@@ -109,7 +109,8 @@ class ATL_NO_VTABLE CFileProcessingMgmtRole :
 	public IPersistStream,
 	public IDispatchImpl<IFileActionMgmtRole, &IID_IFileActionMgmtRole, &LIBID_UCLID_FILEPROCESSINGLib, /*wMajor =*/ 1, /*wMinor =*/ 0>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<IFileProcessingMgmtRole, &IID_IFileProcessingMgmtRole, &LIBID_UCLID_FILEPROCESSINGLib, /*wMajor =*/ 1, /*wMinor =*/ 0>
+	public IDispatchImpl<IFileProcessingMgmtRole, &IID_IFileProcessingMgmtRole, &LIBID_UCLID_FILEPROCESSINGLib, /*wMajor =*/ 1, /*wMinor =*/ 0>,
+	public IDispatchImpl<IFileRequestHandler, &IID_IFileRequestHandler, &LIBID_UCLID_FILEPROCESSINGLib, /*wMajor =*/ 1, /*wMinor =*/ 0>
 {
 public:
 	CFileProcessingMgmtRole();
@@ -125,6 +126,7 @@ BEGIN_COM_MAP(CFileProcessingMgmtRole)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY(IAccessRequired)
+	COM_INTERFACE_ENTRY(IFileRequestHandler)
 END_COM_MAP()
 
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -151,6 +153,14 @@ public:
 
 // IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
+
+// IFileRequestHandler
+	STDMETHOD(CheckoutForProcessing)(long nFileID, EActionStatus* pPrevStatus,
+		VARIANT_BOOL* pSucceeded);
+	STDMETHOD(MoveToFrontOfProcessingQueue)(long nFileID, VARIANT_BOOL* pSucceeded);
+	STDMETHOD(ReleaseFile)(long nFileID, VARIANT_BOOL* pSucceeded);
+	STDMETHOD(SetFallbackStatus)(long nFileID, EActionStatus esFallbackStatus,
+		VARIANT_BOOL* pSucceeded);
 
 // IFileProcessingMgmtRole
 	STDMETHOD(get_FileProcessors)(IIUnknownVector** pVal);
@@ -419,6 +429,8 @@ private:
 
 	// Get FAM Tag Manager pointer for brief use
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr getFAMTagManager();
+
+	UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr getFileRequestHandler();
 
 	void releaseProcessingThreadDataObjects();
 

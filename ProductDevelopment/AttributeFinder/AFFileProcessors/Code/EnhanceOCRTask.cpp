@@ -247,7 +247,7 @@ STDMETHODIMP CEnhanceOCRTask::put_OutputFilteredImages(VARIANT_BOOL newVal)
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CEnhanceOCRTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
-	IFileProcessingDB *pDB)
+	IFileProcessingDB *pDB, IFileRequestHandler* pFileRequestHandler)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	

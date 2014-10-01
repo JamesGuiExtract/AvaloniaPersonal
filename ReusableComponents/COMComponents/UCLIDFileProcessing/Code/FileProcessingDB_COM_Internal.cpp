@@ -27,65 +27,6 @@ using namespace std;
 using namespace ADODB;
 
 //-------------------------------------------------------------------------------------------------
-// PURPOSE:	 The purpose of this macro is to declare and initialize local variables and define the
-//			 beginning of a do...while loop that contains a try...catch block to be used to retry
-//			 the block of code between the BEGIN_CONNECTION_RETRY macro and the END_CONNECTION_RETRY
-//			 macro.  If an exception is thrown within the block of code between the connection retry
-//			 macros the connection passed to END_CONNECTION_RETRY macro will be tested to see if it 
-//			 is a good connection if it is the caught exception is rethrown, if it is no longer a 
-//			 good connection a check is made to see the retry count is equal to maximum retries, if
-//			 not, the exception will be logged if this is the first retry and the connection will be
-//			 reinitialized.  If the number of retires is exceeded the exception will be rethrown.
-// REQUIRES: An ADODB::ConnectionPtr variable to be declared before the BEGIN_CONNECTION_RETRY macro
-//			 is used so it can be passed to the END_CONNECTION_RETRY macro.
-//-------------------------------------------------------------------------------------------------
-#define BEGIN_CONNECTION_RETRY() \
-		int nRetryCount = 0; \
-		bool bRetryExceptionLogged = false; \
-		bool bRetrySuccess = false; \
-		do \
-		{ \
-			CSingleLock retryLock(&m_mutex, TRUE); \
-			try \
-			{\
-				try\
-				{\
-
-//-------------------------------------------------------------------------------------------------
-// PURPOSE:	 To define the end of the block of code to be retried. (see above)
-#define END_CONNECTION_RETRY(ipRetryConnection, strELICode) \
-					bRetrySuccess = true; \
-				}\
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION(strELICode)\
-			} \
-			catch(UCLIDException &ue) \
-			{ \
-				bool bConnectionAlive = isConnectionAlive(ipRetryConnection); \
-				bool bTimeout = ue.getTopText().find("timeout") != string::npos; \
-				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
-					|| nRetryCount >= m_iNumberOfRetries) \
-				{ \
-					throw ue; \
-				}\
-				if (!bRetryExceptionLogged) \
-				{ \
-					UCLIDException uex("ELI32030", bTimeout \
-						? "Application trace: Database query timed out. Re-attemping..." \
-						: "Application trace: Database connection failed. Attempting to reconnect.", \
-							ue); \
-					uex.log(); \
-					bRetryExceptionLogged = true; \
-				} \
-				if (!bConnectionAlive) \
-				{ \
-					reConnectDatabase(); \
-				} \
-				nRetryCount++; \
-			} \
-		} \
-		while (!bRetrySuccess);
-
-//-------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
@@ -1213,7 +1154,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					{
 						// Call setStatusForFile to handle updating all tables related to the status
 						// change, as appropriate.
-						setStatusForFile(ipConnection, nID, strActionName, kActionPending, true);
+						setStatusForFile(ipConnection, nID, strActionName, kActionPending, true, false);
 
 						_lastCodePos = "110";
 
@@ -1952,6 +1893,7 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BSTR strAction,
 												  EActionStatus eStatus,  
 												  VARIANT_BOOL vbQueueChangeIfProcessing,
+												  VARIANT_BOOL vbAllowQueuedStatusOverride,
 												  EActionStatus * poldStatus)
 {
 	try
@@ -1972,7 +1914,8 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 
 			setStatusForFile(ipConnection, nID, asString(strAction), eStatus,
-				asCppBool(vbQueueChangeIfProcessing), poldStatus);
+				asCppBool(vbQueueChangeIfProcessing), asCppBool(vbAllowQueuedStatusOverride),
+				poldStatus);
 
 			tg.CommitTrans();
 
@@ -2004,28 +1947,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			string strActionName = asString(strAction);
 
 			// If the FAM has lost its registration, re-register before continuing with processing.
-			if (!m_bFAMRegistered)
-			{
-				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-				ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-				BEGIN_CONNECTION_RETRY();
-
-				ipConnection = getDBConnection();
-
-				// Re-add a new "Processing" ActiveFAM table entry. (The circumstances where this
-				// code will be used are rare, and not worth finding a way to pass on whether
-				// queuing is active).
-				UnregisterActiveFAM();
-				RegisterActiveFAM(getActionID(ipConnection, strActionName), VARIANT_FALSE, VARIANT_TRUE);
-
-				END_CONNECTION_RETRY(ipConnection, "ELI30377");
-
-				UCLIDException ue("ELI34130",
-					"Application trace: ActiveFAM registration has been restored.");
-				ue.addDebugInfo("UPIID", m_nUPIID);
-				ue.log();
-			}
+			ensureFAMRegistration(strActionName);
 
 			static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
 
@@ -2133,12 +2055,106 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// Update the select statement with the action ID
 				replaceVariable(strSelectSQL, strActionIDPlaceHolder, asString(nActionID));
 
-				// return the vector of file records
-				IIUnknownVectorPtr ipFiles = setFilesToProcessing(bDBLocked, ipConnection, strSelectSQL, nActionID);
+				// Perform all processing related to setting a file as processing.
+				// The previous status of the files to process is expected to be either pending or
+				// skipped.
+				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
+					bDBLocked, ipConnection, strSelectSQL, nActionID, "PS");
 				*pvecFileRecords = ipFiles.Detach();
 			END_CONNECTION_RETRY(ipConnection, "ELI30377");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30644");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction,
+												  IFileRecord** ppFileRecord)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI37460", ppFileRecord != __nullptr);
+		
+			// Set the action name from the parameter
+			string strActionName = asString(strAction);
+
+			// If the FAM has lost its registration, re-register before continuing with processing.
+			ensureFAMRegistration(strActionName);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			string strFileID = asString(nFileID);
+			long nActionID = getActionID(ipConnection, strActionName);
+			string strActionID = asString(nActionID);
+			
+			// Unlike SelectFilesToProcess which will always be selecting files that already exist
+			// in the FileActionStatus table, specific file IDs passed into this method should not
+			// be assumed to exist in the table for the specified action. This query will insert
+			// the row that can be updated by setFilesToProcessing. 
+			string strInsertSQL =
+				"INSERT INTO [FileActionStatus] ([FileID], [ActionID], [ActionStatus], [Priority]) "
+				"SELECT <FileID>, <ActionID>, 'U', [FAMFile].[Priority] "
+				"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
+				"	AND FileActionStatus.ActionID = <ActionID> "
+				"WHERE [FAMFile].[ID] = <FileID> AND ActionStatus IS NULL";
+
+			replaceVariable(strInsertSQL, "<FileID>", strFileID);
+			replaceVariable(strInsertSQL, "<ActionID>", strActionID);
+
+			executeCmdQuery(ipConnection, strInsertSQL);
+
+			// Select the required file info from the database based on the file ID and current action.
+			string strSelectSQL =
+				"SELECT FAMFile.ID, FileName, Pages, FileSize, "
+				"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
+				"COALESCE(ActionStatus, 'U') AS ActionStatus "
+				"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
+				"	AND FileActionStatus.ActionID = <ActionID> "
+				"WHERE [FAMFile].[ID] = <FileID>";
+
+			replaceVariable(strSelectSQL, "<FileID>", strFileID);
+			replaceVariable(strSelectSQL, "<ActionID>", strActionID);
+
+			// Perform all processing related to setting a file as processing.
+			IIUnknownVectorPtr ipFiles = setFilesToProcessing(
+				bDBLocked, ipConnection, strSelectSQL, nActionID, "");
+
+			if (ipFiles->Size() == 0)
+			{
+				// The file was not available in the database.
+				*ppFileRecord = __nullptr;
+			}
+			else
+			{
+				// Return the loaded IFileRecord.
+				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(ipFiles->At(0));
+				ASSERT_RESOURCE_ALLOCATION("ELI37461", ipFileRecord != __nullptr);
+
+				*ppFileRecord = (IFileRecord *)ipFileRecord.Detach();
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37462");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37463");
 	}
 	catch(UCLIDException &ue)
 	{
@@ -5661,7 +5677,9 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 					" WHERE FAMFile.ID = " + asString(nFileId);
 
 				// Perform all processing related to setting a file as processing.
-				setFilesToProcessing(bDBLocked, ipConnection, strSelectSQL, nActionID);
+				// The previous status of the files to process is expected to be either pending or
+				// skipped.
+				setFilesToProcessing(bDBLocked, ipConnection, strSelectSQL, nActionID, "PS");
 
 			END_CONNECTION_RETRY(ipConnection, "ELI30389");
 		}
@@ -7175,6 +7193,83 @@ bool CFileProcessingDB::GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFi
 			
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37338");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* pFileRecord,
+												   EActionStatus eaFallbackStatus)
+{
+	try
+	{
+		try
+		{
+			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(pFileRecord);
+			ASSERT_ARGUMENT("ELI37464", ipFileRecord != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+		
+			long nFileId = ipFileRecord->FileID;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+			// Create a pointer to a recordset
+			_RecordsetPtr ipFileSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI37465", ipFileSet != __nullptr);
+
+			// Query for the existing record in the lock table; it is expected that the UPI will
+			// match the UPI of the current process.
+			string strLockedFileQuery =
+				"SELECT [StatusBeforeLock] FROM [LockedFile] "
+				"	INNER JOIN [FAMSession] ON [FAMSession].[ID] = [LockedFile].[UPIID] "
+				"	WHERE [FileID] = " + asString(nFileId) +
+				"	AND [UPI] = '" + UPI::getCurrentProcessUPI().getUPI() + "'";
+
+			ipFileSet->Open(strLockedFileQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+				adOpenDynamic, adLockOptimistic, adCmdText);
+
+			if (ipFileSet->adoEOF == VARIANT_TRUE)
+			{
+				// Either the file was not locked or was not locked by this process.
+				UCLIDException ue("ELI37466", "Unable to update record not locked by this process");
+				ue.addDebugInfo("Filename", asString(ipFileRecord->Name));
+				throw ue;
+			}
+				
+			FieldsPtr ipFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI37467", ipFields != __nullptr);
+
+			// Update the StatusBeforeLock field in the database so that if this process crashes,
+			// the auto-revert logic will set the file to the desired fallback status.
+			setStringField(ipFields, "StatusBeforeLock", asStatusString(eaFallbackStatus));
+
+			ipFileSet->Update();
+
+			tg.CommitTrans();
+
+			// Update the FallbackStatus of the IFileRecord itself (which is referenced by the
+			// FPRecordManager to determine which status to restore the record to).
+			ipFileRecord->FallbackStatus = (UCLID_FILEPROCESSINGLib::EActionStatus)eaFallbackStatus;
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37468");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37469");
 	}
 	catch(UCLIDException &ue)
 	{

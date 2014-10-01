@@ -120,6 +120,10 @@ public:
 	//			if the m_ipFileRcd is NULL an exception will be thrown
 	UCLID_FILEPROCESSINGLib::EFilePriority getPriority() const;
 	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Returns the EActionStatus the file should be returned to if processing is cancelled
+	//			or the file is otherwise released from processing status.
+	UCLID_FILEPROCESSINGLib::EActionStatus getFallbackStatus() const;
+	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the underlying file record
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecord();
 

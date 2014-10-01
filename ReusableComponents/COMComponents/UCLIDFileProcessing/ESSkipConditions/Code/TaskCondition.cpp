@@ -160,7 +160,8 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecor
 				// Execute the task.
 				// The condition is satisfied if the task completed without exception or cancellation
 				EFileProcessingResult eResult = m_ipFAMTaskExecutor->InitProcessClose(
-					pFileRecord, ipTasks, lActionID, pFPDB, pFAMTM, NULL, VARIANT_FALSE);
+					pFileRecord, ipTasks, lActionID, pFPDB, pFAMTM, __nullptr, __nullptr,
+					VARIANT_FALSE);
 				*pRetVal = asVariantBool(eResult == kProcessingSuccessful);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20162");

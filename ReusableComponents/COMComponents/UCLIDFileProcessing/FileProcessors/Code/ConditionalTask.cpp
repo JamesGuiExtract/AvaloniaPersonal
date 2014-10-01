@@ -32,11 +32,12 @@ const unsigned long gnCurrentVersion = 2;
 //--------------------------------------------------------------------------------------------------
 CConditionalTask::CConditionalTask()
 :	m_bDirty(false),
-	m_ipFAMCondition(NULL),
-	m_ipTasksForTrue(NULL),
-	m_ipTasksForFalse(NULL),
-	m_ipFAMTaskExecutor(NULL),
-	m_ipMiscUtils(NULL)
+	m_ipFAMCondition(__nullptr),
+	m_ipTasksForTrue(__nullptr),
+	m_ipTasksForFalse(__nullptr),
+	m_ipFAMTaskExecutor(__nullptr),
+	m_ipFileRequestHandler(__nullptr),
+	m_ipMiscUtils(__nullptr)
 {
 	try
 	{
@@ -55,6 +56,7 @@ CConditionalTask::~CConditionalTask()
 		m_ipTasksForTrue = __nullptr;
 		m_ipTasksForFalse = __nullptr;
 		m_ipFAMTaskExecutor = __nullptr;
+		m_ipFileRequestHandler = __nullptr;
 		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16610")
@@ -276,13 +278,14 @@ STDMETHODIMP CConditionalTask::raw_IsConfigured(VARIANT_BOOL *pbValue)
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CConditionalTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
-	IFileProcessingDB *pDB)
+	IFileProcessingDB *pDB, IFileRequestHandler* pFileRequestHandler)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		// Not needed... true/false tasks will be initialized/closed per file
+		m_ipFileRequestHandler = pFileRequestHandler;
+		// true/false tasks will be initialized/closed per file
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16580");
 	
@@ -352,8 +355,8 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 			{
 				// Execute true tasks
 				*pResult = m_ipFAMTaskExecutor->InitProcessClose(ipFileRecord, 
-					m_ipTasksForTrue, nActionID, pDB, pTagManager, ipSubProgressStatus,
-					bCancelRequested);
+					m_ipTasksForTrue, nActionID, pDB, pTagManager, m_ipFileRequestHandler,
+					ipSubProgressStatus, bCancelRequested);
 			}
 		}
 		else
@@ -363,8 +366,8 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 			{
 				// Execute false tasks
 				*pResult = m_ipFAMTaskExecutor->InitProcessClose(ipFileRecord, 
-					m_ipTasksForFalse, nActionID, pDB, pTagManager, ipSubProgressStatus,
-					bCancelRequested);
+					m_ipTasksForFalse, nActionID, pDB, pTagManager, m_ipFileRequestHandler,
+					ipSubProgressStatus, bCancelRequested);
 			}
 		}
 

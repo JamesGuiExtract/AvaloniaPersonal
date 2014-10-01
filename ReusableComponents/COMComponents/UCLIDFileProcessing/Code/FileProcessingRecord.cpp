@@ -297,6 +297,16 @@ UCLID_FILEPROCESSINGLib::EFilePriority FileProcessingRecord::getPriority() const
 	return m_lfrFileRcd.Priority;
 }
 //-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::EActionStatus FileProcessingRecord::getFallbackStatus() const
+{
+	if (m_lfrFileRcd.FileRecord == __nullptr)
+	{
+		UCLIDException ue("ELI37482", "File record is not set.");
+		throw ue;
+	}
+	return m_lfrFileRcd.FileRecord->FallbackStatus;
+}
+//-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileRecordPtr FileProcessingRecord::getFileRecord() 
 {
 	return m_lfrFileRcd.getFileRecord();

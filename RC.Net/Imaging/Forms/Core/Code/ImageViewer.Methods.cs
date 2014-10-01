@@ -280,7 +280,7 @@ namespace Extract.Imaging.Forms
                         _validAnnotations = true;
 
                         // Initialize the reader
-                        _reader = ImageReaderCache.GetReader(fileName, Codecs, _cacheImages);
+                        _reader = _imageReaderCache.GetReader(fileName, Codecs, _cacheImages);
 
                         // Get the page count
                         _pageCount = _reader.PageCount;
@@ -322,7 +322,7 @@ namespace Extract.Imaging.Forms
                             _reader = null;
                         }
 
-                        ImageReaderCache.RemoveReader(fileName);
+                        _imageReaderCache.RemoveReader(fileName);
 
                         throw ExtractException.AsExtractException("ELI23376", ex);
                     }
@@ -404,7 +404,7 @@ namespace Extract.Imaging.Forms
                 ExtractException.Assert("ELI30718", "Image caching is disabled.",
                     _cacheImages);
 
-                ImageReaderCache.CacheReader(fileName, Codecs);
+                _imageReaderCache.CacheReader(fileName, Codecs);
             }
             catch (Exception ex)
             {
@@ -426,7 +426,7 @@ namespace Extract.Imaging.Forms
                 // By passing in _reader as the second argument, you are asking the RemoveReader if
                 // it was disposed of as part of the call. AFAIK, this situation shouldn't occur,
                 // but just in case it does, remove this reference.
-                if (ImageReaderCache.RemoveReader(fileName, _reader))
+                if (_imageReaderCache.RemoveReader(fileName, _reader))
                 {
                     _reader = null;
                 }

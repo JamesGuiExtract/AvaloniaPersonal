@@ -143,7 +143,9 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="fileId">The file ID for which the value should be set.</param>
         /// <param name="value">The value to set.</param>
-        void SetValue(int fileId, string value);
+        /// <returns><see langword="true"/> if the values was updated, <see langword="false"/> if
+        /// the new value could not be applied.</returns>
+        bool SetValue(int fileId, string value);
 
         /// <summary>
         /// Retrieves the set of file IDs for which the value needs to be refreshed. This method
@@ -163,5 +165,11 @@ namespace Extract.FileActionManager.Utilities
         /// <returns><see langword="true"/> if the changes were successfully applied; otherwise,
         /// <see langword="false"/>.</returns>
         bool Apply();
+
+        /// <summary>
+        /// Cancels all uncommitted data changes specified via SetValue. (Unused if
+        /// <see cref="RequireOkCancel"/> is <see langword="false"/>.
+        /// </summary>
+        void Cancel();
     }
 }

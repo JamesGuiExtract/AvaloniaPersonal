@@ -67,7 +67,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::InterfaceSupportsErrorInfo(REFIID riid
 // IFileProcessingTask
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFilterIDShieldDataFileTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
-	IFileProcessingDB *pDB)
+	IFileProcessingDB *pDB, IFileRequestHandler* pFileRequestHandler)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	

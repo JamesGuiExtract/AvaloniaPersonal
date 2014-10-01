@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Extract.Imaging.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry
 {
@@ -44,6 +45,8 @@ namespace Extract.DataEntry
     /// </summary>
     public interface IDataEntryApplication
     {
+        #region Properties
+
         /// <summary>
         /// The title of the current DataEntry application.
         /// </summary>
@@ -80,11 +83,29 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets or sets whether highlights for all data mapped to an <see cref="IDataEntryControl"/>
-        /// should be displayed in the <see cref="ImageViewer"/> or whether only highlights relating
-        /// to the currently selected fields should be displayed.
+        /// Get whether highlights for all data mapped to an <see cref="IDataEntryControl"/> should
+        /// be displayed in the <see cref="ImageViewer"/> or whether only highlights relating to the
+        /// currently selected fields should be displayed.
         /// </summary>
         bool ShowAllHighlights
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="FileProcessingDB"/> the <see cref="IDataEntryApplication"/> is
+        /// currently being run against.
+        /// </summary>
+        FileProcessingDB FileProcessingDB
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the name of the action in <see cref="FileProcessingDB"/> that the
+        /// <see cref="IDataEntryApplication"/> is currently being run against.
+        /// </summary>
+        string DatabaseActionName
         {
             get;
         }
@@ -98,6 +119,86 @@ namespace Extract.DataEntry
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets the <see cref="IFileRequestHandler"/> that can be used to carry out requests for
+        /// files to be checked out, released or re-ordered in the queue.
+        /// </summary>
+        IFileRequestHandler FileRequestHandler
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the currently loaded document is dirty.
+        /// </summary>
+        /// <value><see langword="true"/> if dirty; otherwise, <see langword="false"/>.
+        /// </value>
+        bool Dirty
+        {
+            get;
+        }
+
+        #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        /// Saves the data currently displayed to disk.
+        /// </summary>
+        /// <param name="validateData"><see langword="true"/> to ensure the data is conforms to the
+        /// DataEntryControlHost InvalidDataSaveMode before saving, <see langword="false"/> to save
+        /// data without validating.</param>
+        /// <returns><see langword="true"/> if the data was saved, <see langword="false"/> if it was
+        /// not.</returns>
+        bool SaveData(bool validateData);
+
+        /// <summary>
+        /// Delays processing of the current file allowing the next file in the queue to be brought
+        /// up in its place (though if there are no more files in the queue this will cause the same
+        /// file to be re-displayed.
+        /// <para><b>Note</b></para>
+        /// If there are changes in the currently loaded document, they will be disregarded. To
+        /// check for changes and save, use the <see cref="Dirty"/> and <see cref="SaveData"/>
+        /// members first.
+        /// </summary>
+        void DelayFile();
+
+        /// <summary>
+        /// Skips processing for the current file. This is the same as pressing the skip button in
+        /// the UI.
+        /// <para><b>Note</b></para>
+        /// If there are changes in the currently loaded document, they will be disregarded. To
+        /// check for changes and save, use the <see cref="Dirty"/> and <see cref="SaveData"/>
+        /// members first.
+        /// </summary>
+        void SkipFile();
+
+        /// <summary>
+        /// Requests the specified <see paramref="fileID"/> to be the next file displayed. The file
+        /// should be allowed to jump ahead of any other files currently "processing" in the
+        /// verification task on other threads (prefetch).
+        /// <para><b>Note</b></para>
+        /// The requested file will not be shown until the currently displayed file is closed. If
+        /// the requested file needs to replace the currently displayed file immediately,
+        /// <see cref="DelayFile"/> should be called after RequestFile.
+        /// </summary>
+        /// <param name="fileID">The file ID.</param>
+        /// <returns><see langword="true"/> if the file is currently processing in the verification
+        /// task and confirmed to be available,<see langword="false"/> if the task is not currently
+        /// holding the file; the requested file will be expected to the next file in the queue or
+        /// an exception will result.</returns>
+        bool RequestFile(int fileID);
+
+        /// <summary>
+        /// Releases the specified file from the current process's internal queue of files checked
+        /// out for processing. The file will be treated as if processing has been canceled/stopped
+        /// and returned to the current fallback status (status before lock by default).
+        /// </summary>
+        /// <param name="fileID">The ID of the file to release.</param>
+        void ReleaseFile(int fileID);
+
+        #endregion Methods
 
         #region Events
 

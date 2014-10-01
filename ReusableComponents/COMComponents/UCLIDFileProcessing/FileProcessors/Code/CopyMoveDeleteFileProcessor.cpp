@@ -124,7 +124,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_IsLicensed(VARIANT_BOOL * pbValue
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
-	IFileProcessingDB *pDB)
+	IFileProcessingDB *pDB, IFileRequestHandler* pFileRequestHandler)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 

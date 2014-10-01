@@ -64,6 +64,8 @@ public:
 		LONGLONG llFileSize, LONG lPages, EFilePriority ePriority);
 	STDMETHOD(get_Priority)(EFilePriority* pePriority);
 	STDMETHOD(put_Priority)(EFilePriority ePriority);
+	STDMETHOD(get_FallbackStatus)(EActionStatus* peaFallbackStatus);
+	STDMETHOD(put_FallbackStatus)(EActionStatus eaFallbackStatus);
 
 private:
 
@@ -74,6 +76,7 @@ private:
 	long long m_llFileSize;
 	long m_lPages;
 	UCLID_FILEPROCESSINGLib::EFilePriority m_ePriority;
+	UCLID_FILEPROCESSINGLib::EActionStatus m_eaFallbackStatus;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileRecord), CFileRecord)

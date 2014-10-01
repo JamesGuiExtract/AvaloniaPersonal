@@ -342,11 +342,15 @@ namespace Extract.NetDMSCustomComponents
 
         /// <summary>
         /// Called before any file processing starts.
-        /// </summary>  
+        /// </summary>
         /// <param name="nActionID">The ID of the action being processed.</param>
         /// <param name="pFAMTM">The <see cref="FAMTagManager"/> to use if needed.</param>
         /// <param name="pDB">The <see cref="FileProcessingDB"/> in use.</param>
-        public void Init(int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB)
+        /// <param name="pFileRequestHandler">The <see cref="IFileRequestHandler"/> that can be used
+        /// by the task to carry out requests for files to be checked out, released or re-ordered
+        /// in the queue.</param>
+        public void Init(int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
+            IFileRequestHandler pFileRequestHandler)
         {
             try
             {

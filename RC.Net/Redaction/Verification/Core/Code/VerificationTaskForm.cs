@@ -417,6 +417,30 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public event EventHandler<FileCompleteEventArgs> FileComplete;
 
+        /// <summary>
+        /// This event is not raised by <see cref="VerificationTaskForm"/>.
+        /// </summary>
+        public event EventHandler<FileRequestedEventArgs> FileRequested
+        {
+            // Since this event is not currently used by this class but is needed by the 
+            // IVerificationForm interface, define it with an empty implementation to prevent
+            // "unused" warnings during compile.
+            add { }
+            remove { }
+        }
+
+        /// <summary>
+        /// This event is not raised by <see cref="VerificationTaskForm"/>.
+        /// </summary>
+        public event EventHandler<FileDelayedEventArgs> FileDelayed
+        {
+            // Since this event is not currently used by this class but is needed by the 
+            // IVerificationForm interface, define it with an empty implementation to prevent
+            // "unused" warnings during compile.
+            add { }
+            remove { }
+        }
+
         #endregion Events
 
         #region Constructors
@@ -3958,6 +3982,14 @@ namespace Extract.Redaction.Verification
             {
                 throw ex.AsExtract("ELI33933");
             }
+        }
+
+        /// <summary>
+        /// This event is not implemented by <see cref="VerificationTaskForm"/>.
+        /// </summary>
+        public void DelayFile()
+        {
+            throw new ExtractException("ELI37503", "Method not implmented.");
         }
 
         #endregion IVerificationForm Members

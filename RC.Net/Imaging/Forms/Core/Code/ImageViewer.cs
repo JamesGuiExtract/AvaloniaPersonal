@@ -183,6 +183,12 @@ namespace Extract.Imaging.Forms
         readonly RegistrySettings<Properties.Settings> _registry;
 
         /// <summary>
+        /// A thread-safe class for managing a collection of <see cref="ImageReaderCache"/>
+        /// instances for pre-loading and caching an <see cref="ImageReader"/>s for multiple files.
+        /// </summary>
+        ImageReaderCacheCollection _imageReaderCache = new ImageReaderCacheCollection();
+
+        /// <summary>
         /// File name of the currently open image file.
         /// </summary>
         /// <seealso cref="ImageFile"/>

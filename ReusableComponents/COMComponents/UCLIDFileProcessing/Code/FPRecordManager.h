@@ -7,6 +7,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <set>
 #include <Win32Event.h>
 #include <Win32Semaphore.h>
 
@@ -53,6 +54,12 @@ public:
 	//			be only one).  Appropriate messages will be sent
 	void remove(const string& strFileName);
 	//---------------------------------------------------------------------------------------------
+	// PROMISE: Will remove the specified file ID from the queue. Appropriate messages will be sent.
+	bool remove(const long nFileId);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Puts any task that was delayed back on the front of the queue (to be processed next).
+	int requeueDelayedTasks();
+	//---------------------------------------------------------------------------------------------
 	// PROMISE:	To return true if the processing queue is open and to return false otherwise.
 	bool processingQueueIsOpen();
 	//---------------------------------------------------------------------------------------------
@@ -88,8 +95,31 @@ public:
 	//			this returns false
 	bool pop(FileProcessingRecord& task, bool bWait, Win32Semaphore &processSemaphore, bool* pbProcessingActive = __nullptr);
 	//---------------------------------------------------------------------------------------------
+	// PROMISE: Requests that the specified file be locked for processing and added to the queue.
+	//			peaPreviousStatus indicates the status of the file before being set to processing.
+	// RETURNS: true if the file was able to be checked out or it was already checked out, false
+	//			if another process already had the file checked out.
+	bool checkoutForProcessing(long nFileId, EActionStatus *peaPreviousStatus);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Moves the specified file to the front of the queue to ensure it is the next file
+	//			that starts processing.
+	// RETURNS: true if the file was currently checked out for processing and was able to be moved
+	//			to the front. false if the file is either already processing or otherwise not in
+	//			the queue.
+	bool moveToFrontOfQueue(long nFileId);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Temporarily cancels processing of the specified task. The next file in the queue
+	//			(if any) will jump ahead of it. If not released, the delayed file will then be
+	//			processed again after the intervening file.
+	void delay(FileProcessingRecord& task);
+	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will return FileProcessingRecord Associated with nTaskId
 	FileProcessingRecord getTask(long nTaskID);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Will try to find the nTaskID in the m_mapTasks map if nTaskID is found the task
+	//			record will be returned in task argument and will return true. If nTaskID is not 
+	//			found method will return false.
+	bool getTask(long nTaskID, FileProcessingRecord& task);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will return an IProgressStatus indicating the progress of the task with the
 	// specified id.
@@ -213,6 +243,8 @@ private:
 	typedef list<long> TaskIdList;
 	TaskIdList m_queTaskIds;
 	TaskIdList m_queFinishedTasks;
+	TaskIdList m_queDelayedTasks;
+	set<long> m_setRemovedFiles;
 
 	typedef map<long, FileProcessingRecord> TaskMap;
 	TaskMap m_mapTasks;
@@ -223,7 +255,7 @@ private:
 	// the number of bytes in the list
 	LONGLONG m_nNumBytes;
 
-	// Mutex to lock for updating the queTaskIds, m_queFinishedTask
+	// Mutex to lock for updating the m_queTaskIds, m_queDelayedTasks, m_queFinishedTask
 	CMutex m_objLock;
 
 	// Mutex to lock when reading or updating the m_mapTasks object
@@ -300,12 +332,9 @@ private:
 	// Loads max of nNumToLoad records in the processing queue from the database
 	// returns the number of records loaded
 	long loadTasksFromDB(long nNumToLoad);
-
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: Will try to find the nTaskID in the m_mapTasks map if nTaskID is found the task
-	//			record will be returned in task argument and will return true. If nTaskID is not 
-	//			found method will return false.
-	bool getTask(long nTaskID, FileProcessingRecord& task);
+	// Loads specified file from the database. Returns true if the file was loaded.
+	bool loadTaskFromDB(long nFileId, EActionStatus *peaPreviousStatus);
 
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will try to find the nWorkItemID in the m_mapWorkItems map if nWorkItemID is found

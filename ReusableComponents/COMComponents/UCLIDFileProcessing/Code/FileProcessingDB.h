@@ -134,7 +134,8 @@ public:
 		long* pnNumRecordsModified);
 	STDMETHOD(SetStatusForAllFiles)(BSTR strAction, EActionStatus eStatus);
 	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, EActionStatus eStatus, 
-		VARIANT_BOOL vbQueueChangeIfProcessing, EActionStatus* poldStatus);
+		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
+		EActionStatus* poldStatus);
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
 	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
@@ -265,6 +266,8 @@ public:
 	STDMETHOD(AddFileSet)(BSTR bstrFileSetName, IVariantVector *pvecIDs);
 	STDMETHOD(GetFileSetFileIDs)(BSTR bstrFileSetName, IVariantVector **ppvecFileIDs);
 	STDMETHOD(GetFileSetFileNames)(BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
+	STDMETHOD(GetFileToProcess)(long nFileID, BSTR strAction, IFileRecord** ppFileRecord);
+	STDMETHOD(SetFallbackStatus)(IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -617,9 +620,13 @@ private:
 	// If bQueueChangeIfProcessing is true and the file is currently in the processing state on the
 	// specified action, the new state will be queued via the QueuedActionStatusChange table such
 	// that when it is done processing it will be moved into that state.
+	// If bAllowQueuedStatusOverride is true and the QueuedActionStatusChange table has a pending
+	// change for the file, that change will be applied. If bAllowQueuedStatusOverride is false,
+	// the QueuedActionStatusChange will be ignored and the status will be set to strState.
 	// poldStatus will return the previous action status of the document if not null.
 	void setStatusForFile(_ConnectionPtr ipConnection, long nFileID,  string strAction,
-		EActionStatus eStatus, bool bQueueChangeIfProcessing, EActionStatus *poldStatus = __nullptr);
+		EActionStatus eStatus, bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride,
+		EActionStatus *poldStatus = __nullptr);
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
 	void reCalculateStats(_ConnectionPtr ipConnection, long nActionID);
@@ -856,6 +863,10 @@ private:
 	// If there are files to revert and bDBLocked is false an exception will be thrown
 	void revertTimedOutProcessingFAMs(bool bDBLocked, const _ConnectionPtr& ipConnection);
 
+	// Verifies that the current instance is registered via RegisterActiveFAM and registers it if it
+	// is not.
+	void ensureFAMRegistration(string strActionName);
+
 	// Thread function that maintains the LastPingtime in the ActiveFAM table in
 	// the database pData should be a pointer to the database object
 	static UINT maintainLastPingTimeForRevert(void* pData);
@@ -906,7 +917,9 @@ private:
 
 	// Marks all records indicated by the specified query to processing. The processing in this
 	// function includes attempting to auto-revert locked files, recording appropriate entries in
-	// the FAST table and adding an appropriate entry to the locked file table.
+	// the FAST table and adding an appropriate entry to the locked file table. If
+	// strAllowedCurrentStatus is not empty, the function will throw an exception if the current
+	// action status code is not part of the specified string.
 	// REQUIRE:	The query must return the following columns from the FAMFile table:
 	//			SELECT ID, FileName, Pages, FileSize, Priority and the action status for the
 	//			current action from the FileActionStatus table.
@@ -914,7 +927,7 @@ private:
 	//			will be thrown.
 	// RETURNS: A vector of IFileRecords for the files that were set to processing.
 	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
-		const string& strSelectSQL, long nActionID);
+		const string& strSelectSQL, long nActionID, const string& strAllowedCurrentStatus);
 
 	// Gets a set containing the File ID's for all files that are skipped for the specified action
 	set<long> getSkippedFilesForAction(const _ConnectionPtr& ipConnection, long nActionId);
@@ -976,9 +989,11 @@ private:
 		BSTR bstrSkippedFromUserName, long nFromActionID, long * pnNumRecordsModified);
 	bool SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAction,  EActionStatus eStatus);
 	bool SetStatusForFile_Internal(bool bDBLocked, long nID,  BSTR strAction,  EActionStatus eStatus,  
-		VARIANT_BOOL vbQueueChangeIfProcessing, EActionStatus * poldStatus);
+		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
+		EActionStatus * poldStatus);
 	bool GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
+	bool GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction, IFileRecord** ppFileRecord);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
 	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
 	bool CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction);
@@ -1073,6 +1088,66 @@ private:
 			long *pnWorkItemGroupID);
 	bool SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long WorkItemID, IUnknown *pBinaryOutput);
 	bool GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
+	bool SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)
+
+//-------------------------------------------------------------------------------------------------
+// PURPOSE:	 The purpose of this macro is to declare and initialize local variables and define the
+//			 beginning of a do...while loop that contains a try...catch block to be used to retry
+//			 the block of code between the BEGIN_CONNECTION_RETRY macro and the END_CONNECTION_RETRY
+//			 macro.  If an exception is thrown within the block of code between the connection retry
+//			 macros the connection passed to END_CONNECTION_RETRY macro will be tested to see if it 
+//			 is a good connection if it is the caught exception is rethrown, if it is no longer a 
+//			 good connection a check is made to see the retry count is equal to maximum retries, if
+//			 not, the exception will be logged if this is the first retry and the connection will be
+//			 reinitialized.  If the number of retires is exceeded the exception will be rethrown.
+// REQUIRES: An ADODB::ConnectionPtr variable to be declared before the BEGIN_CONNECTION_RETRY macro
+//			 is used so it can be passed to the END_CONNECTION_RETRY macro.
+//-------------------------------------------------------------------------------------------------
+#define BEGIN_CONNECTION_RETRY() \
+		int nRetryCount = 0; \
+		bool bRetryExceptionLogged = false; \
+		bool bRetrySuccess = false; \
+		do \
+		{ \
+			CSingleLock retryLock(&m_mutex, TRUE); \
+			try \
+			{\
+				try\
+				{\
+
+//-------------------------------------------------------------------------------------------------
+// PURPOSE:	 To define the end of the block of code to be retried. (see above)
+#define END_CONNECTION_RETRY(ipRetryConnection, strELICode) \
+					bRetrySuccess = true; \
+				}\
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION(strELICode)\
+			} \
+			catch(UCLIDException &ue) \
+			{ \
+				bool bConnectionAlive = isConnectionAlive(ipRetryConnection); \
+				bool bTimeout = ue.getTopText().find("timeout") != string::npos; \
+				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
+					|| nRetryCount >= m_iNumberOfRetries) \
+				{ \
+					throw ue; \
+				}\
+				if (!bRetryExceptionLogged) \
+				{ \
+					UCLIDException uex("ELI32030", bTimeout \
+						? "Application trace: Database query timed out. Re-attemping..." \
+						: "Application trace: Database connection failed. Attempting to reconnect.", \
+							ue); \
+					uex.log(); \
+					bRetryExceptionLogged = true; \
+				} \
+				if (!bConnectionAlive) \
+				{ \
+					reConnectDatabase(); \
+				} \
+				nRetryCount++; \
+			} \
+		} \
+		while (!bRetrySuccess);

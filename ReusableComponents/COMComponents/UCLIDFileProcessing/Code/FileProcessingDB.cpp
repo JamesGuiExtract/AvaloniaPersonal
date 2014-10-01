@@ -27,66 +27,6 @@
 using namespace std;
 using namespace ADODB;
 
-//-------------------------------------------------------------------------------------------------
-// PURPOSE:	 The purpose of this macro is to declare and initialize local variables and define the
-//			 beginning of a do...while loop that contains a try...catch block to be used to retry
-//			 the block of code between the BEGIN_CONNECTION_RETRY macro and the END_CONNECTION_RETRY
-//			 macro.  If an exception is thrown within the block of code between the connection retry
-//			 macros the connection passed to END_CONNECTION_RETRY macro will be tested to see if it 
-//			 is a good connection if it is the caught exception is rethrown, if it is no longer a 
-//			 good connection a check is made to see the retry count is equal to maximum retries, if
-//			 not, the exception will be logged if this is the first retry and the connection will be
-//			 reinitialized.  If the number of retires is exceeded the exception will be rethrown.
-// REQUIRES: An ADODB::ConnectionPtr variable to be declared before the BEGIN_CONNECTION_RETRY macro
-//			 is used so it can be passed to the END_CONNECTION_RETRY macro.
-//-------------------------------------------------------------------------------------------------
-#define BEGIN_CONNECTION_RETRY() \
-		int nRetryCount = 0; \
-		bool bRetryExceptionLogged = false; \
-		bool bRetrySuccess = false; \
-		do \
-		{ \
-			CSingleLock retryLock(&m_mutex, TRUE); \
-			try \
-			{\
-				try\
-				{\
-
-//-------------------------------------------------------------------------------------------------
-// PURPOSE:	 To define the end of the block of code to be retried. (see above)
-#define END_CONNECTION_RETRY(ipRetryConnection, strELICode) \
-					bRetrySuccess = true; \
-				}\
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION(strELICode)\
-			} \
-			catch(UCLIDException ue) \
-			{ \
-				bool bConnectionAlive = isConnectionAlive(ipRetryConnection); \
-				bool bTimeout = ue.getTopText().find("timeout") != string::npos; \
-				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
-					|| nRetryCount >= m_iNumberOfRetries) \
-				{ \
-					throw ue; \
-				}\
-				if (!bRetryExceptionLogged) \
-				{ \
-					UCLIDException uex("ELI23631", bTimeout \
-						? "Application trace: Database query timed out. Re-attemping..." \
-						: "Application trace: Database connection failed. Attempting to reconnect.", \
-							ue); \
-					uex.log(); \
-					bRetryExceptionLogged = true; \
-				} \
-				if (!bConnectionAlive) \
-				{ \
-					reConnectDatabase(); \
-				} \
-				nRetryCount++; \
-			} \
-		} \
-		while (!bRetrySuccess);
-//-------------------------------------------------------------------------------------------------
-
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
@@ -495,6 +435,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID,  BSTR strAction,  EActionStatus eStatus,  
 												 VARIANT_BOOL vbOverrideProcessing,
+												 VARIANT_BOOL vbAllowQueuedStatusOverride,
 												 EActionStatus *poldStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -504,12 +445,14 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID,  BSTR strAction,  EAc
 		// Check License
 		validateLicense();
 
-		if (!SetStatusForFile_Internal(false, nID, strAction, eStatus, vbOverrideProcessing, poldStatus))
+		if (!SetStatusForFile_Internal(false, nID, strAction, eStatus, vbOverrideProcessing,
+			vbAllowQueuedStatusOverride, poldStatus))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			SetStatusForFile_Internal(true, nID, strAction, eStatus, vbOverrideProcessing, poldStatus);
+			SetStatusForFile_Internal(true, nID, strAction, eStatus, vbOverrideProcessing,
+				vbAllowQueuedStatusOverride, poldStatus);
 		}
 		return S_OK;
 	}
@@ -3199,6 +3142,50 @@ STDMETHODIMP CFileProcessingDB::GetFileSetFileNames(BSTR bstrFileSetName,
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37348");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileToProcess(long nFileID, BSTR strAction,
+												 IFileRecord** ppFileRecord)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetFileToProcess_Internal(false, nFileID, strAction, ppFileRecord))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			GetFileToProcess_Internal(true, nFileID, strAction, ppFileRecord);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37458");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetFallbackStatus(IFileRecord* pFileRecord,
+												  EActionStatus eaFallbackStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!SetFallbackStatus_Internal(false, pFileRecord, eaFallbackStatus))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			SetFallbackStatus_Internal(true, pFileRecord, eaFallbackStatus);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37459");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -164,7 +164,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::put_ActionStatus(long newVal)
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSetActionStatusFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
-	IFileProcessingDB *pDB)
+	IFileProcessingDB *pDB, IFileRequestHandler* pFileRequestHandler)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	
@@ -232,7 +232,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 			// processing, an action status change is queued up so that once processing is
 			// finished, m_eActionStatus will be applied at that time. 
 			ipDB->SetStatusForFile(nFileID, strActionName.c_str(), m_eActionStatus, VARIANT_TRUE,
-				&ePrevStatus);
+				VARIANT_FALSE, &ePrevStatus);
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15116")

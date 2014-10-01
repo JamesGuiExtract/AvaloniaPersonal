@@ -323,13 +323,6 @@ namespace Extract.FileActionManager.Utilities
         FormStateManager _formStateManager;
 
         /// <summary>
-        /// The original location of the <see cref="_refreshFileListButton"/>. This button will be
-        /// moved if the <see cref="_selectFilesButton"/> is hidden; this can be used to restore its
-        /// original position if necessary.
-        /// </summary>
-        Point _originalRefreshFileListButtonPosition;
-
-        /// <summary>
         /// The number of files currently selected by <see cref="FileSelector"/>. Not all may be
         /// displayed.
         /// </summary>
@@ -1251,7 +1244,7 @@ namespace Extract.FileActionManager.Utilities
                 InitializeContextMenu();
 
                 // Set the visibility of the _selectFilesButton according to LockFileSelector.
-                if (LockFileSelector && _selectFilesButton.Visible)
+                if (LockFileSelector)
                 {
                     ExtractException.Assert("ELI37441", "No file selector has been specified.",
                         FileSelector != null);
@@ -1259,13 +1252,7 @@ namespace Extract.FileActionManager.Utilities
                     // If the file filter is locked, hide the "Change..." button and move the
                     // refresh button up.
                     _selectFilesButton.Visible = false;
-                    _originalRefreshFileListButtonPosition = _refreshFileListButton.Location;
                     _refreshFileListButton.Location = _selectFilesButton.Location;
-                }
-                else if (!LockFileSelector && !_selectFilesButton.Visible)
-                {
-                    _refreshFileListButton.Location = _originalRefreshFileListButtonPosition;
-                    _selectFilesButton.Visible = true;
                 }
 
                 GenerateFileList(false);
@@ -1424,6 +1411,8 @@ namespace Extract.FileActionManager.Utilities
                 if (!e.Cancel)
                 {
                     CancelBackgroundOperation();
+
+                    CancelCustomColumnData();
                 }
 
                 base.OnClosing(e);
@@ -4624,17 +4613,38 @@ namespace Extract.FileActionManager.Utilities
                     foreach (KeyValuePair<int, IFAMFileInspectorColumn> customColumn in _customColumns
                         .Where(customColumn => !customColumn.Value.ReadOnly))
                     {
-                        int columnIndex = customColumn.Key;
-                        IFAMFileInspectorColumn column = customColumn.Value;
-
-                        // Refresh each value in the column that requires a refresh.
-                        foreach (int fileId in column.GetValuesToRefresh())
-                        {
-                            DataGridViewRow row = _rowsByFileId[fileId];
-                            row.Cells[columnIndex].Value = column.GetValue(fileId);
-                        }
+                        RefreshCustomColumn(customColumn.Key, customColumn.Value);
                     }
                 });
+            }
+        }
+
+        /// <summary>
+        /// Refreshes all values in the specified <see paramref="column"/> that may have been
+        /// modified programmatically by the <see cref="IFAMFileInspectorColumn"/> implementation.
+        /// </summary>
+        /// <param name="columnIndex">Index of the column.</param>
+        /// <param name="column">The <see cref="IFAMFileInspectorColumn"/> defining the column.
+        /// </param>
+        void RefreshCustomColumn(int columnIndex, IFAMFileInspectorColumn column)
+        {
+            // Refresh each value in the column that requires a refresh.
+            foreach (int fileId in column.GetValuesToRefresh())
+            {
+                DataGridViewRow row = null;
+                if (_rowsByFileId.TryGetValue(fileId, out row))
+                {
+                    string value = column.GetValue(fileId);
+                    var cell = row.Cells[columnIndex];
+                    cell.Value = column.GetValue(fileId);
+
+                    // Refresh the active editing control if it is currently displayed.
+                    if (cell == _fileListDataGridView.CurrentCell &&
+                        _fileListDataGridView.EditingControl != null)
+                    {
+                        _fileListDataGridView.EditingControl.Text = value;
+                    }
+                }
             }
         }
 
@@ -4691,6 +4701,18 @@ namespace Extract.FileActionManager.Utilities
             }
 
             return success;
+        }
+
+        /// <summary>
+        /// Cancels uncommitted data changes in all custom columns.
+        /// </summary>
+        void CancelCustomColumnData()
+        {
+            foreach (IFAMFileInspectorColumn column in _customColumns.Values
+                .Where(column => column.RequireOkCancel))
+            {
+                column.Cancel();
+            }
         }
 
         /// <summary>

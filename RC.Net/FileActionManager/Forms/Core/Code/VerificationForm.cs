@@ -1,5 +1,6 @@
 using Extract.Licensing;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
@@ -86,6 +87,11 @@ namespace Extract.FileActionManager.Forms
         EventWaitHandle _fileLoadedEvent = new ManualResetEvent(false);
 
         /// <summary>
+        /// An event used to hold pre-fetched files while waiting on a requested file.
+        /// </summary>
+        EventWaitHandle _waitRequestedFile = new ManualResetEvent(true);
+
+        /// <summary>
         /// If <see langword="true"/>, the <see cref="_form"/> is in the process of being closed. 
         /// <see cref="ShowDocument"/> should not be called when in this state and any call to 
         /// ShowForm needs to wait for the previous form to finish closing.
@@ -110,6 +116,28 @@ namespace Extract.FileActionManager.Forms
         long _processingFileCount;
 
         /// <summary>
+        /// The ID of the file currently displayed for verification.
+        /// </summary>
+        volatile int _currentFileID = -1;
+
+        /// <summary>
+        /// Specifies the ID of a file that has been requested to be displayed ahead of all others.
+        /// </summary>
+        volatile int _requestedFileID = -1;
+
+        /// <summary>
+        /// The IDs of all files currently being held in the prefetch stage ("processing" in the
+        /// verification task on threads other than the thread for which the currently displayed
+        /// file is running on).
+        /// </summary>
+        HashSet<int> _waitingFileIDs = new HashSet<int>();
+
+        /// <summary>
+        /// The IDs of all files for which a request has been made to delay processing.
+        /// </summary>
+        HashSet<int> _delayedFiles = new HashSet<int>();
+
+        /// <summary>
         /// Used to protect access to <see cref="VerificationForm{TForm}"/>.
         /// </summary>
         static object _lock = new object();
@@ -118,6 +146,12 @@ namespace Extract.FileActionManager.Forms
         /// Used to protect access to assignment and disposal of <see cref="MainForm"/>.
         /// </summary>
         static object _lockFormChange = new object();
+
+        /// <summary>
+        /// Protects access to the objects used to handle requests for a specific file to be
+        /// displayed or to delay processing of specific files.
+        /// </summary>
+        static object _lockFileRequest = new object();
 		
 	    #endregion VerificationForm Fields
 
@@ -346,11 +380,22 @@ namespace Extract.FileActionManager.Forms
                     _fileProcessingEvent.Set();
                 }
 
+                // If currently waiting on a request file, asserts that the requested file is fileID.
+                CheckForRequestedFile(fileID);
+
                 // Attempt to get the lock for the verification UI thread, but don't block at this
-                // point if its not available.
-                haveLock = Monitor.TryEnter(_lock);
+                // point if its not available. Although unlikely, from my reading int appears the
+                // lock could attempt here could allow a new file to sneak past already waiting
+                // files. Therefore, only try for the lock if we know of no currently waiting files.
+                haveLock = _waitingFileIDs.Count == 0 && Monitor.TryEnter(_lock);
+
                 if (!haveLock)
                 {
+                    lock (_lockFileRequest)
+                    {
+                        _waitingFileIDs.Add(fileID);
+                    }
+
                     // Wait until the UI thread has finished loading its document before
                     // pre-fetcthing. Even with multiple cores, disk I/O from the prefectch can
                     // cause the UI thread to load slower.
@@ -361,9 +406,55 @@ namespace Extract.FileActionManager.Forms
                     // faster.
                     MainForm.Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB);
 
-                    // Now request the lock for the verification UI thread again, but this time
-                    // block until it is available.
-                    Monitor.Enter(_lock, ref haveLock);
+                    // Loop in case we need to wait on a requested file or a request has been made
+                    // to delay processing of currently waiting files.
+                    while (!haveLock && IsUIReady)
+                    {
+                        // Now request the lock for the verification UI thread again. We won't get
+                        // out of this loop until we have the lock, the file has been delayed or
+                        // processing is stopped.
+                        Monitor.TryEnter(_lock, 200, ref haveLock);
+
+                        // Check to see if the lock was released in order to release a delayed file.
+                        lock (_lockFileRequest)
+                        {
+                            if (_delayedFiles.Contains(fileID))
+                            {
+                                _waitingFileIDs.Remove(fileID);
+                                _delayedFiles.Remove(fileID);
+                                return EFileProcessingResult.kProcessingDelayed;
+                            }
+                        }
+
+                        // If we have the lock, but a specific file is requested and this is not
+                        // that file, release the lock so that the requested file can get it.
+                        if (haveLock && _requestedFileID != -1 && _requestedFileID != fileID)
+                        {
+                            Monitor.Exit(_lock);
+                            haveLock = false;
+
+                            // In case the requested file is not already waiting, wait until it
+                            // comes in before trying to obtain the lock again.
+                            _waitRequestedFile.WaitOne();
+                        }
+                    }
+                }
+
+                // Needs to be set before file is removed from _waitingFileIDs so RequestFile can
+                // know for sure whether a requested file is available.
+                _currentFileID = fileID;
+
+                // If this file is the currently requested file ID, clear the request so that other
+                // files that are being held are free to continue processing after this one.
+                lock (_lockFileRequest)
+                {
+                    if (fileID == _requestedFileID)
+                    {
+                        _requestedFileID = -1;
+                        _waitRequestedFile.Set();
+                    }
+
+                    _waitingFileIDs.Remove(fileID);
                 }
 
                 _fileLoadedEvent.Reset();
@@ -411,6 +502,8 @@ namespace Extract.FileActionManager.Forms
             }
             finally
             {
+                _currentFileID = -1;
+
                 if (haveLock)
                 {
                     Monitor.Exit(_lock);
@@ -632,6 +725,80 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
+        /// <summary>
+        /// Requests the specified <see paramref="fileID"/> to be the next file displayed. The file
+        /// should be allowed to jump ahead of any other files currently "processing" in the
+        /// verification task on other threads (prefetch).
+        /// </summary>
+        /// <param name="fileID">The file ID.</param>
+        /// <returns><see langword="true"/> if the file is currently processing in the verification
+        /// task and confirmed to be available, <see langword="false"/> if the task is not currently
+        /// holding the file; the requested file will be expected to be the next file in the queue.
+        /// </returns>
+        public bool RequestFile(int fileID)
+        {
+            try
+            {
+                ExtractException.Assert("ELI37492", "Cannot interrupt pending file request.",
+                    _requestedFileID == -1 || _requestedFileID == fileID);
+
+                lock (_lockFileRequest)
+                {
+                    _requestedFileID = fileID;
+                    
+                    if (_currentFileID == fileID || _waitingFileIDs.Contains(fileID))
+                    {
+                        // The form is already holding the requested file. Return true to indicate
+                        // it is available and will be guaranteed to be the next file displayed.
+                        return true;
+                    }
+                    else
+                    {
+                        // If the requested file ID is not one of the currently waiting files, reset
+                        // _waitRequestedFile to force all waiting files to wait until the requested
+                        // file comes in. It is assumed that it has been arranged such that the
+                        // requested file is the next file in the queue.
+                        _waitRequestedFile.Reset();
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37495");
+            }
+        }
+
+        /// <summary>
+        /// Delays processing of the specified <see paramref="fileID"/> if the file is currently
+        /// "processing" in the task, but not currently displayed (in prefetch).
+        /// </summary>
+        /// <param name="fileID">The ID of the file to delay.</param>
+        /// <returns><see langword="true"/> if the file was "processing" but not displayed, thus
+        /// able to be delayed; otherwise <see langword="false"/>.</returns>
+        public bool DelayFile(int fileID)
+        {
+            try
+            {
+                lock (_lockFileRequest)
+                {
+                    if (_waitingFileIDs.Contains(fileID))
+                    {
+                        _delayedFiles.Add(fileID);
+
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37501");
+            }
+        }
+
         #endregion VerificationForm Methods
 
         #region IDisposable Members
@@ -698,6 +865,11 @@ namespace Extract.FileActionManager.Forms
                 {
                     _fileProcessingEvent.Dispose();
                     _fileProcessingEvent = null;
+                }
+                if (_waitRequestedFile != null)
+                {
+                    _waitRequestedFile.Dispose();
+                    _waitRequestedFile = null;
                 }
             }
 
@@ -821,6 +993,44 @@ namespace Extract.FileActionManager.Forms
         {
             // Reset _initializedEvent to indicate the form is no longer initialized
             _initializedEvent.Reset();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IVerificationForm.FileRequested"/> event of
+        /// <see cref="MainForm"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="FileRequestedEventArgs"/> instance containing the event
+        /// data.</param>
+        void HandleMainForm_FileRequested(object sender, FileRequestedEventArgs e)
+        {
+            try
+            {
+                e.FileIsAvailable = RequestFile(e.FileID);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37491");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IVerificationForm.FileDelayed"/> event of
+        /// <see cref="MainForm"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="FileDelayedEventArgs"/> instance containing the event
+        /// data.</param>
+        void HandleMainForm_FileDelayed(object sender, FileDelayedEventArgs e)
+        {
+            try
+            {
+                e.FileIsAvailable = DelayFile(e.FileID);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37502");
+            }
         }
 
         #endregion VerificationForm Event Handlers
@@ -975,6 +1185,8 @@ namespace Extract.FileActionManager.Forms
                 MainForm.FileComplete += HandleFileComplete;
                 MainForm.FormClosing += HandleFormClosing;
                 MainForm.FormClosed += HandleFormClosed;
+                MainForm.FileRequested += HandleMainForm_FileRequested;
+                MainForm.FileDelayed += HandleMainForm_FileDelayed;
 
                 Application.Run(MainForm);
             }
@@ -1149,6 +1361,41 @@ namespace Extract.FileActionManager.Forms
             {
                 // Ensure the thread is set to null so that it will be re-initialized on the next call to Init.
                 _uiThread = null;
+            }
+        }
+
+        /// <summary>
+        /// Asserts that the specified file ID is the currently requested file ID if we are waiting
+        /// on the requested file ID.
+        /// </summary>
+        /// <param name="fileID">The file ID to ensure is the file we are waiting on (if waiting on
+        /// a file).</param>
+        void CheckForRequestedFile(int fileID)
+        {
+            lock (_lockFileRequest)
+            {
+                // Are we waiting on the requested file ID?
+                if (!_waitRequestedFile.WaitOne(0))
+                {
+                    // If the specified file is not the file we are waiting for, display an
+                    // exception and load the file anyway. This ensures verification won't spin
+                    // through all files in the queue looking for a file that isn't there.
+                    if (_requestedFileID == -1)
+                    {
+                        _waitRequestedFile.Set();
+                        var ee = new ExtractException("ELI37496", "Error waiting for requested file.");
+                        ee.Display();
+                    }
+
+                    if (_requestedFileID != fileID)
+                    {
+                        _requestedFileID = -1;
+                        _waitRequestedFile.Set();
+
+                        var ee = new ExtractException("ELI37497", "Requested file not available");
+                        ee.Display();
+                    }
+                }
             }
         }
 

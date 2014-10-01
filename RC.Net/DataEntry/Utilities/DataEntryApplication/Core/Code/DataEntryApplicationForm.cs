@@ -256,6 +256,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         FileProcessingDB _fileProcessingDb;
 
         /// <summary>
+        /// The <see cref="IFileRequestHandler"/> that can be used by the verification task to carry
+        /// out requests for files to be checked out, released or re-ordered in the queue.
+        /// </summary>
+        IFileRequestHandler _fileRequestHandler;
+
+        /// <summary>
         /// The ID of the file being processed.
         /// </summary>
         int _fileId;
@@ -505,7 +511,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="settings">The <see cref="VerificationSettings"/>.</param>
         public DataEntryApplicationForm(VerificationSettings settings)
-            : this(settings, true, null, 0, null)
+            : this(settings, true, null, 0, null, null)
         {
         }
 
@@ -521,8 +527,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </param>
         /// <param name="tagManager">The <see cref="FAMTagManager"/> used to expand path tags and
         /// functions.</param>
+        /// <param name="fileRequestHandler">The <see cref="IFileRequestHandler"/> that can be used
+        /// by the verification task to carry out requests for files to be checked out, released or
+        /// re-ordered in the queue.</param>
         public DataEntryApplicationForm(VerificationSettings settings, bool standAloneMode,
-            FileProcessingDB fileProcessingDB, int actionId, FAMTagManager tagManager)
+            FileProcessingDB fileProcessingDB, int actionId, FAMTagManager tagManager,
+            IFileRequestHandler fileRequestHandler)
         {
             try
             {
@@ -583,6 +593,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _standAloneMode = standAloneMode;
                 _fileProcessingDb = fileProcessingDB;
                 _actionId = actionId;
+                _fileRequestHandler = fileRequestHandler;
 
                 if (settings.InputEventTrackingEnabled || settings.CountersEnabled)
                 {
@@ -1641,6 +1652,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         public event EventHandler<FileCompleteEventArgs> FileComplete;
 
+        /// <summary>
+        /// Raised when the task requests that a specific file be provided ahead of the files
+        /// currently waiting in the task from different threads (prefetched).
+        /// </summary>
+        public event EventHandler<FileRequestedEventArgs> FileRequested;
+
+        /// <summary>
+        /// Raised when the task request that processing of a specific file be delayed (returned to
+        /// the FPRecordManager queue).
+        /// </summary>
+        public event EventHandler<FileDelayedEventArgs> FileDelayed;
+
         #endregion Events
 
         #region Event Handlers
@@ -1690,36 +1713,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Saves the data currently displayed to disk.
-        /// </summary>
-        /// <param name="validateData"><see langword="true"/> to ensure the data is conforms to the
-        /// DataEntryControlHost InvalidDataSaveMode before saving, <see langword="false"/> to save
-        /// data without validating.</param>
-        /// <returns><see langword="true"/> if the data was saved, <see langword="false"/> if it was
-        /// not.</returns>
-        bool SaveData(bool validateData)
-        {
-            if (_activeDataEntryConfig == null ||
-                _dataEntryControlHost == null ||
-                _activeDataEntryConfig.Config.Settings.PreventSave)
-            {
-                return false;
-            }
-            else
-            {
-                bool saved = _dataEntryControlHost.SaveData(validateData);
-
-                if (saved && !_standAloneMode && _fileProcessingDb != null)
-                {
-                    _fileProcessingDb.SetFileActionComment(_fileId, _actionId,
-                            _fileProcessingDBComment);
-                }
-
-                return saved;
-            }
-        }
-
-        /// <summary>
         /// Handles the case that the user requested to skip the current document
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
@@ -1728,17 +1721,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (AttemptSave(false) != DialogResult.Cancel)
-                {
-                    _forcingClose = true;
-
-                    _imageViewer.CloseImage();
-
-                    // Record statistics to database that need to happen when a file is closed.
-                    RecordFileProcessingDatabaseStatistics(false, null);
-
-                    OnFileComplete(EFileProcessingResult.kProcessingSkipped);
-                }
+                AbortProcessing(EFileProcessingResult.kProcessingSkipped, true);
             }
             catch (Exception ex)
             {
@@ -1752,7 +1735,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _forcingClose = false;
             }
         }
-
         /// <summary>
         /// Handles the case that a new image was loaded into the image viewer.
         /// </summary>
@@ -2739,6 +2721,29 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Gets the <see cref="FileProcessingDB"/> this instance is currently being run against.
+        /// </summary>
+        public FileProcessingDB FileProcessingDB
+        {
+            get
+            {
+                return _fileProcessingDb;
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the action in <see cref="FileProcessingDB"/> this instance is currently
+        /// being run against.
+        /// </summary>
+        public string DatabaseActionName
+        {
+            get
+            {
+                return _actionName;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the comment for the current file that is stored in the file processing
         /// database.
         /// </summary>
@@ -2752,6 +2757,240 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             set
             {
                 _fileProcessingDBComment = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IFileRequestHandler"/> that can be used by the verification task to
+        /// carry out requests for files to be checked out, released or re-ordered in the queue.
+        /// </summary>
+        public IFileRequestHandler FileRequestHandler
+        {
+            get
+            {
+                return _fileRequestHandler;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="IDataEntryApplication"/> is dirty.
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if dirty; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Dirty
+        {
+            get
+            {
+                return _dataEntryControlHost != null && _dataEntryControlHost.Dirty;
+            }
+        }
+
+        /// <summary>
+        /// Saves the data currently displayed to disk.
+        /// </summary>
+        /// <param name="validateData"><see langword="true"/> to ensure the data is conforms to the
+        /// DataEntryControlHost InvalidDataSaveMode before saving, <see langword="false"/> to save
+        /// data without validating.</param>
+        /// <returns><see langword="true"/> if the data was saved, <see langword="false"/> if it was
+        /// not.</returns>
+        public bool SaveData(bool validateData)
+        {
+            if (InvokeRequired)
+            {
+                bool saved = false;
+
+                _invoker.Invoke((MethodInvoker)(() =>
+                {
+                    try
+                    {
+                        saved = SaveData(validateData);
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractDisplay("ELI37506");
+                    }
+                }));
+
+                return saved;
+            }
+
+            try
+            {
+                if (_activeDataEntryConfig == null ||
+                        _dataEntryControlHost == null ||
+                        _activeDataEntryConfig.Config.Settings.PreventSave)
+                {
+                    return false;
+                }
+                else
+                {
+                    bool saved = _dataEntryControlHost.SaveData(validateData);
+
+                    if (saved && !_standAloneMode && _fileProcessingDb != null)
+                    {
+                        _fileProcessingDb.SetFileActionComment(_fileId, _actionId,
+                                _fileProcessingDBComment);
+                    }
+
+                    return saved;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37507");
+            }
+        }
+
+        /// <summary>
+        /// Delays processing of the current file allowing the next file in the queue to be brought
+        /// up in its place, though if there are no more files in the queue this will cause the same
+        /// file to be re-displayed.
+        /// <para><b>Note</b></para>
+        /// If there are changes in the currently loaded document, they will be disregarded. To
+        /// check for changes and save, use the <see cref="Dirty"/> and <see cref="SaveData"/>
+        /// members first.
+        /// </summary>
+        public void DelayFile()
+        {
+            if (InvokeRequired)
+            {
+                _invoker.Invoke((MethodInvoker)(() =>
+                {
+                    try
+                    {
+                        DelayFile();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractDisplay("ELI37508");
+                    }
+                }));
+
+                return;
+            }
+
+            try
+            {
+                ExtractException.Assert("ELI37451", "Invalid operation.",
+                    !_standAloneMode && _fileProcessingDb != null);
+
+                if (_imageViewer.IsImageAvailable)
+                {
+                    AbortProcessing(EFileProcessingResult.kProcessingDelayed, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37452");
+            }
+        }
+
+        /// <summary>
+        /// Skips processing for the current file. This is the same as pressing the skip button in
+        /// the UI.
+        /// <para><b>Note</b></para>
+        /// If there are changes in the currently loaded document, they will be disregarded. To
+        /// check for changes and save, use the <see cref="Dirty"/> and <see cref="SaveData"/>
+        /// members first.
+        /// </summary>
+        public void SkipFile()
+        {
+            if (InvokeRequired)
+            {
+                _invoker.Invoke((MethodInvoker)(() =>
+                {
+                    try
+                    {
+                        SkipFile();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractDisplay("ELI37509");
+                    }
+                }));
+
+                return;
+            }
+
+            try
+            {
+                ExtractException.Assert("ELI37453", "Invalid operation.",
+                    !_standAloneMode && _fileProcessingDb != null);
+
+                if (_imageViewer.IsImageAvailable)
+                {
+                    AbortProcessing(EFileProcessingResult.kProcessingSkipped, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37454");
+            }
+        }
+
+        /// <summary>
+        /// Requests the specified <see paramref="fileID"/> to be the next file displayed. The file
+        /// should be allowed to jump ahead of any other files currently "processing" in the
+        /// verification task on other threads (prefetch).
+        /// </summary>
+        /// <param name="fileID">The file ID.</param>
+        /// <returns><see langword="true"/> if the file is currently processing in the verification
+        /// task and confirmed to be available, <see langword="false"/> if the task is not currently
+        /// holding the file; the requested file will be expected to be the next file in the queue.
+        /// </returns>
+        public bool RequestFile(int fileID)
+        {
+            try
+            {
+                ExtractException.Assert("ELI37493", "Invalid operation.", FileProcessingDB != null);
+
+                // Inform the verification form that we need this file.
+                var eventArgs = new FileRequestedEventArgs(fileID);
+                OnFileRequested(eventArgs);
+                bool requestSucceeded = eventArgs.FileIsAvailable;
+
+                // If the the specified file is not actively "processing" in the task (prefetch), move the
+                // file to the front of the FPRecordManager's queue to ensure it is the next file in.
+                if (!requestSucceeded)
+                {
+                    requestSucceeded = FileRequestHandler.MoveToFrontOfProcessingQueue(fileID);
+                }
+
+                return requestSucceeded;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37494");
+            }
+        }
+
+        /// <summary>
+        /// Releases the specified file from the current process's internal queue of files checked
+        /// out for processing. The file will be treated as if processing has been canceled/stopped
+        /// and returned to the current fallback status (status before lock by default).
+        /// <para><b>Note</b></para>
+        /// The requested file will not be shown until the currently displayed file is closed. If
+        /// the requested file needs to replace the currently displayed file immediately,
+        /// <see cref="DelayFile"/> should be called after RequestFile.
+        /// </summary>
+        /// <param name="fileID">The ID of the file to release.</param>
+        /// <returns><see langword="true"/> if the file is currently processing in the verification
+        /// task and confirmed to be available,<see langword="false"/> if the task is not currently
+        /// holding the file; the requested file will be expected to the next file in the queue or
+        /// an exception will result.</returns>
+        public void ReleaseFile(int fileID)
+        {
+            try
+            {
+                FileRequestHandler.ReleaseFile(fileID);
+
+                var eventArgs = new FileDelayedEventArgs(fileID);
+                OnFileDelayed(eventArgs);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37500");
             }
         }
 
@@ -2787,6 +3026,34 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             if (eventHandler != null)
             {
                 eventHandler(this, new FileCompleteEventArgs(fileProcessingResult));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="FileRequested"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="FileRequestedEventArgs"/> instance containing
+        /// the event data.</param>
+        protected virtual void OnFileRequested(FileRequestedEventArgs eventArgs)
+        {
+            var eventHandler = FileRequested;
+            if (eventHandler != null)
+            {
+                eventHandler(this, eventArgs);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="FileDelayed"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="FileDelayedEventArgs"/> instance containing the
+        /// event data.</param>
+        protected virtual void OnFileDelayed(FileDelayedEventArgs eventArgs)
+        {
+            var eventHandler = FileDelayed;
+            if (eventHandler != null)
+            {
+                eventHandler(this, eventArgs);
             }
         }
 
@@ -2924,6 +3191,32 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
 
             return response;
+        }
+
+        /// <summary>
+        /// Aborts processing of the current file and returns the specified
+        /// <see paramref="processingResult"/>. Will prompt for modified data as applicable.
+        /// </summary>
+        /// <param name="processingResult">The <see cref="EFileProcessingResult"/> to return for the
+        /// current file.</param>
+        /// <param name="promptToSave"><see langword="true"/> if a prompt should be displayed about
+        /// whether to save any unsaved changes; otherwise, <see langword="false"/>.</param>
+        void AbortProcessing(EFileProcessingResult processingResult, bool promptToSave)
+        {
+            ExtractException.Assert("ELI37455", "Invalid processing result",
+                processingResult != EFileProcessingResult.kProcessingSuccessful);
+
+            if (!promptToSave || AttemptSave(false) != DialogResult.Cancel)
+            {
+                _forcingClose = true;
+
+                _imageViewer.CloseImage();
+
+                // Record statistics to database that need to happen when a file is closed.
+                RecordFileProcessingDatabaseStatistics(false, null);
+
+                OnFileComplete(processingResult);
+            }
         }
 
         /// <summary>

@@ -16,7 +16,8 @@ m_lActionID(0),
 m_lFileID(0),
 m_llFileSize(0),
 m_lPages(0),
-m_ePriority((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault)
+m_ePriority((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault),
+m_eaFallbackStatus((UCLID_FILEPROCESSINGLib::EActionStatus)kActionPending)
 {
 }
 
@@ -247,5 +248,32 @@ STDMETHODIMP CFileRecord::put_Priority(EFilePriority ePriority)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27653");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::get_FallbackStatus(EActionStatus* peaFallbackStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI37485", peaFallbackStatus != __nullptr);
+
+		*peaFallbackStatus = (EActionStatus) m_eaFallbackStatus;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37486");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::put_FallbackStatus(EActionStatus eaFallbackStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_eaFallbackStatus = (UCLID_FILEPROCESSINGLib::EActionStatus) eaFallbackStatus;
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37487");
 }
 //-------------------------------------------------------------------------------------------------

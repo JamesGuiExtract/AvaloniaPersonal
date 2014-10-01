@@ -35,6 +35,7 @@ library UCLID_FILEPROCESSINGLib
 	interface IFileRecord;
 	interface IParallelizableTask;
 	interface IWorkItemRecord;
+	interface IFileRequestHandler;
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S -----------------------------------------------------------------------------------
@@ -112,7 +113,8 @@ library UCLID_FILEPROCESSINGLib
 	{
 		kProcessingSuccessful = 0,
 		kProcessingCancelled = 1,
-		kProcessingSkipped = 2
+		kProcessingSkipped = 2,
+		kProcessingDelayed = 3
 	}EFileProcessingResult;
 
 	// EFilePriority definition.
@@ -271,12 +273,16 @@ library UCLID_FILEPROCESSINGLib
 		// ARGUMENTS:	nActionID - The ID of the action being processed
 		//				pFAMTM - A FAMTagManager object for expanding filename tags/methods
 		//				pDB - The database being operated upon
+		//				pFileRequestHandler- The IFileRequestHandler that can be used
+        //				by the task to carry out requests for files to be checked out, released or
+		//				re-ordered in the queue.
 		// NOTE:		This may be called multiple times on the same object because the same coClass
 		//				may be being used in multiple threads.  This will happen per processing session
 		//				not per file.
 		//				See note about IFileProcessingTask multithreading above
 		[id(11), helpstring("method Init")] HRESULT Init([in] long nActionID,
-			[in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB* pDB);
+			[in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB* pDB,
+			[in] IFileRequestHandler* pFileRequestHandler);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:		To process the file strFileFullName and output a vector of files either generated
 		//				or the file being processed. 
@@ -289,8 +295,9 @@ library UCLID_FILEPROCESSINGLib
 		//				pFiles vector.
 		// ARGUMENTS:	pFileRecord - The file record of the file to be processed
 		//				pResult - If kProcessingSuccessful, file should be set to Completed,
-		//					if kProcessingCancelled, file should revert to pending, and
-		//					if kProcessingSkipped, file should be set to skipped.
+		//					if kProcessingCancelled file should revert to pending; if kProcessingDelayed,
+		//					the file should remain checked out for processing, but allow the next
+		//					file to go ahead of it. If kProcessingSkipped, file should be set to skipped.
 		//				nActionID - The ID of the action being processed
 		//				pFAMTM - A FAMTagManager object for expanding filename tags/methods
 		//				pDB - The database being operated upon
@@ -719,6 +726,12 @@ library UCLID_FILEPROCESSINGLib
 			[out, retval] EFilePriority* pePriority);
 		[propput, id(8), helpstring("property Priority")] HRESULT Priority(
 			[in] EFilePriority ePriority);
+		// Specifies the EActionStatus a currently processing record will return to if processing
+		// is cancelled. This will be the status before lock unless otherwise updated.
+		[propget, id(9), helpstring("property FallbackStatus")] HRESULT FallbackStatus(
+			[out, retval] EActionStatus* peaFallbackStatus);
+		[propput, id(9), helpstring("property FallbackStatus")] HRESULT FallbackStatus(
+			[in] EActionStatus eaFallbackStatus);
 	};
 
 	[
@@ -826,9 +839,13 @@ library UCLID_FILEPROCESSINGLib
 		//			change to eStatus will be queued in the QueuedActionStatusChange table. If
 		//			VARIANT_FALSE the file action status will be overwritten regardless of its current
 		//			processing state.
+		//			If vbAllowQueuedStatusOverride is VARIANT_TRUE and the QueuedActionStatusChange table
+		//			has a pending change for the file, that change will be applied. If
+		//			vbAllowQueuedStatusOverride is VARIANT_FALSE, the QueuedActionStatusChange will be
+		//			ignored and the status will be set to eStatus.
 		[id(13), helpstring("method SetStatusForFile")] HRESULT SetStatusForFile([in] long nID, [in] BSTR strAction, 
 			[in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
-			[out] EActionStatus* poldStatus);
+			[in] VARIANT_BOOL vbAllowQueuedStatusOverride, [out] EActionStatus* poldStatus);
 
 
 		// -----------------------------------------------------------------------------------------------
@@ -1444,6 +1461,18 @@ library UCLID_FILEPROCESSINGLib
 		//			in the current FileProcesingDB instance.
 		[id(130), helpstring("method GetFileSetFileNames")] HRESULT GetFileSetFileNames(
 			[in] BSTR bstrFileSetName, [out, retval] IVariantVector **ppvecFileNames);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	Gets the specified file for processing. The status for the file will be set to
+		//			'R' in the specified action before this method returns. 
+		[id(131), helpstring("method GetFileToProcess")] HRESULT GetFileToProcess([in] long nFileID,
+			[in] BSTR strAction, [out, retval] IFileRecord** ppFileRecord);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	Applies a new EActionStatus as the fallback status to return to if this
+		//			currently processing file is cancelled before processing completes.
+		// REQUIRE: The specified file must currently be locked for processing by the current
+		//			process.
+		[id(132), helpstring("method SetFallbackStatus")] HRESULT SetFallbackStatus(
+			[in] IFileRecord* pFileRecord, [in] EActionStatus eaFallbackStatus);
 	};
 
 	[
@@ -1730,6 +1759,57 @@ library UCLID_FILEPROCESSINGLib
 
 	[
 		object,
+		uuid(274ED4F6-1CDB-43CB-B73F-C0A8B6737369),
+		dual,
+		nonextensible,
+		helpstring("IFileRequestHandler Interface"),
+		pointer_default(unique)
+	]
+	interface IFileRequestHandler : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Requests that the current instance lock the specified file for processing and
+		//			add it to the current process's set of files to process.
+		// ARGS:	nFileID- The file to checkout
+		//			pPrevStatus- The status of the file in the current action before being checked out.
+		//			pSucceeded- VARIANT_TRUE if the file was able to be checked out (or the current
+		//				process already had it checked out). VARIANT_FALSE if another process already
+		//				had the file checked out.
+		[id(1), helpstring("method CheckoutForProcessing")] HRESULT CheckoutForProcessing(
+			[in] long nFileID, [out] EActionStatus* pPrevStatus, [out, retval] VARIANT_BOOL* pSucceeded);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Moves the specified file to the front of the current process's internal queue
+		//			of files checked out for processing to ensure it is the next file that starts
+		//			processing.
+		// ARGS:	nFileID- The file to process next.
+		//			pSucceeded- VARIANT_TRUE if the file was currently checked out for processing
+		//				by the current instance and was able to be moved to the front. VARIANT_FALSE
+		//				if the file is either already processing or is not checked out for processing
+		//				by the current instance.
+		[id(2), helpstring("method MoveToFrontOfProcessingQueue")] HRESULT MoveToFrontOfProcessingQueue(
+			[in] long nFileID, [out, retval] VARIANT_BOOL* pSucceeded);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Releases the specified file from the current process's internal queue of files
+		//			checked out for processing. The file will be treated as if processing has been
+		//			canceled/stopped and returned to the current fallback status (status before lock
+		//			by default).
+		// ARGS:	nFileID- The file to release.
+		//			pSucceeded- VARIANT_TRUE if the file was currently checked out for processing
+		//				by the current instance and was able to be released. VARIANT_FALSE if the
+		//				file is either already processing or is not checked out for processing by
+		//				the current instance.
+		[id(3), helpstring("method ReleaseFile")] HRESULT ReleaseFile(
+			[in] long nFileID, [out, retval] VARIANT_BOOL* pSucceeded);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Specifies the EActionStatus the specified file will return to if processing is
+		// cancelled or the file is released. This will be the status before lock by default.
+		[id(4), helpstring("method SetFallbackStatus")] HRESULT SetFallbackStatus(
+			[in] long nFileID, [in] EActionStatus eaFallbackStatus,
+			[out, retval] VARIANT_BOOL* pSucceeded);
+	};
+
+	[
+		object,
 		uuid(A6A1C6CE-C0A1-4cbb-811A-FD92CD525731),
 		dual,
 		nonextensible,
@@ -1850,9 +1930,12 @@ library UCLID_FILEPROCESSINGLib
 		//			nActionID- The ID of the action being processed
 		//			pDB- The database being acted upon
 		//			pFAMTagManager- The tag manager to use when required
-		// REQUIRED: Nothing.
+		//			pFileRequestHandler- The IFileRequestHandler that can be used
+        //			by the tasks to carry out requests for files to be checked out, released or
+		//			re-ordered in the queue.
 		[id(1), helpstring("method Init")] HRESULT Init([in] IIUnknownVector* pFileProcessingTasks,
-			[in] long nActionID, [in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager);
+			[in] long nActionID, [in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager,
+			[in] IFileRequestHandler* pFileRequestHandler);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To process the given file
 		// ARGS:	pFileRecord - The file record of the file to process
@@ -1882,8 +1965,8 @@ library UCLID_FILEPROCESSINGLib
 		[id(3), helpstring("method InitProcessClose")] HRESULT InitProcessClose(
 			[in] IFileRecord* pFileRecord, [in] IIUnknownVector* pFileProcessingTasks,
 			[in] long nActionID, [in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager, 
-			[in] IProgressStatus* pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
-			[out, retval] EFileProcessingResult* pResult);
+			[in] IFileRequestHandler* pFileRequestHandler, [in] IProgressStatus* pProgressStatus,
+			[in] VARIANT_BOOL bCancelRequested, [out, retval] EFileProcessingResult* pResult);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To call cancel on the currently running task.
 		//			Notifies the currently executing task (if there is one) the the user has requested for 
@@ -2090,6 +2173,7 @@ library UCLID_FILEPROCESSINGLib
 		[default] interface IFileProcessingMgmtRole;
 		interface IFileActionMgmtRole;
 		interface IAccessRequired;
+		interface IFileRequestHandler;
 	};
 	[
 		uuid(180CE276-B05E-4557-A6AB-3B5FE29587F5),
