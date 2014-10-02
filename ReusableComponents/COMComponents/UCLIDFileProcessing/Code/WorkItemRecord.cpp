@@ -16,7 +16,9 @@ m_nWorkItemGroupID(0),
 m_eWorkItemStatus(kWorkUnitPending),
 m_strInput(""),
 m_strOutput(""),
-m_strUPI("")
+m_strUPI(""),
+m_strWorkGroupUPI(""),
+m_ePriority(kPriorityNormal)
 {
 }
 
@@ -56,6 +58,7 @@ STDMETHODIMP CWorkItemRecord::get_WorkItemID(LONG* pnWorkItemID)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37510", pnWorkItemID != __nullptr);
 		*pnWorkItemID = m_nWorkItemID;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37023"); 
@@ -82,6 +85,7 @@ STDMETHODIMP CWorkItemRecord::get_WorkItemGroupID(LONG* pnWorkItemGroupID)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37511", pnWorkItemGroupID != __nullptr);
 		*pnWorkItemGroupID = m_nWorkItemGroupID;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37025"); 
@@ -108,6 +112,7 @@ STDMETHODIMP CWorkItemRecord::get_Status(EWorkItemStatus *pStatus)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37512", pStatus != __nullptr);
 		*pStatus = m_eWorkItemStatus;
 
 		return S_OK;
@@ -134,6 +139,8 @@ STDMETHODIMP CWorkItemRecord::get_Input(BSTR *pInput)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37513", pInput != __nullptr);
+
 		*pInput = _bstr_t(m_strInput.c_str()).copy();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37029");
@@ -160,6 +167,8 @@ STDMETHODIMP CWorkItemRecord::get_Output(BSTR *pOutput)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37514", pOutput != __nullptr);
+
 		*pOutput = _bstr_t(m_strOutput.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37031");
@@ -186,6 +195,8 @@ STDMETHODIMP CWorkItemRecord::get_UPI(BSTR *pUPI)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37515", pUPI != __nullptr);
+
 		*pUPI = _bstr_t(m_strUPI.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37033");
@@ -212,6 +223,8 @@ STDMETHODIMP CWorkItemRecord::get_StringizedException(BSTR *pStringizedException
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37516", pStringizedException != __nullptr);
+
 		*pStringizedException = _bstr_t(m_strStringizedException.c_str()).Detach();
         
         return S_OK;
@@ -238,6 +251,8 @@ STDMETHODIMP CWorkItemRecord::get_FileName(BSTR *pFileName)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37517", pFileName != __nullptr);
+
 		*pFileName = _bstr_t(m_strFileName.c_str()).Detach();
 	    
         return S_OK;
@@ -265,6 +280,8 @@ STDMETHODIMP CWorkItemRecord::get_BinaryOutput(IUnknown **ppBinaryOutput)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37518", ppBinaryOutput != __nullptr);
+
 		IPersistStreamPtr ipObj = m_ipBinaryOutput;
 		*ppBinaryOutput = (ipObj != __nullptr) ? ipObj.Detach(): __nullptr;
 
@@ -299,6 +316,8 @@ STDMETHODIMP CWorkItemRecord::get_BinaryInput(IUnknown **ppBinaryInput)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37520", ppBinaryInput != __nullptr);
+
 		IPersistStreamPtr ipObj = m_ipBinaryInput;
 		*ppBinaryInput = (ipObj != __nullptr) ? ipObj.Detach(): __nullptr;
 
@@ -333,6 +352,8 @@ STDMETHODIMP CWorkItemRecord::get_FileID(long* pnFileID)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI37519", pnFileID != __nullptr);
+
 		*pnFileID = m_nFileID;
 	
 		return S_OK;
@@ -352,3 +373,61 @@ STDMETHODIMP CWorkItemRecord::put_FileID(long nFileID)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37274");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::get_WorkGroupUPI(BSTR *pUPI)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI37521", pUPI != __nullptr);
+
+		*pUPI = _bstr_t(m_strWorkGroupUPI.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37433");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::put_WorkGroupUPI(BSTR UPI)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_strWorkGroupUPI = asString(UPI);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37434");
+
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::get_Priority(EFilePriority* pePriority)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI37522", pePriority != __nullptr);
+
+		*pePriority = m_ePriority;
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37448");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::put_Priority(EFilePriority ePriority)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_ePriority = ePriority;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37449");
+}
+//-------------------------------------------------------------------------------------------------

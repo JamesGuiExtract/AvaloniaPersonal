@@ -72,6 +72,10 @@ public:
 	STDMETHOD(put_BinaryInput)(IUnknown *pBinaryInput);
 	STDMETHOD(get_FileID)(long* pnFileID);
 	STDMETHOD(put_FileID)(long nFileID);
+	STDMETHOD(get_WorkGroupUPI)(BSTR* pUPI);
+	STDMETHOD(put_WorkGroupUPI)(BSTR UPI);
+	STDMETHOD(get_Priority)(EFilePriority* pePriority);
+	STDMETHOD(put_Priority)(EFilePriority ePriority);
 
 private:
 
@@ -87,6 +91,8 @@ private:
 	IPersistStreamPtr m_ipBinaryOutput;
 	IPersistStreamPtr m_ipBinaryInput;
 	long m_nFileID;
+	string m_strWorkGroupUPI;
+	EFilePriority m_ePriority;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WorkItemRecord), CWorkItemRecord)

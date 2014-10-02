@@ -11,6 +11,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
 #include <FAMUtilsConstants.h>
+#include <UPI.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -36,7 +37,8 @@ FPRecordManager::FPRecordManager()
   m_vecSleepTimes(gnNUMBER_OF_SLEEP_INTERVALS),
   m_bSleepTimeCalculated(false),
   m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB),
-  m_bWorkItemReturned(false)
+  m_bRestrictToCurrentUPI(false),
+  m_eLastFilePriority(kPriorityDefault)
 {
 	try
 	{
@@ -149,6 +151,12 @@ void FPRecordManager::discardProcessingQueue()
 	// Ensure the queue is cleared since we have now reverted the state of all files
 	// [FlexIDSCore #3738]
 	m_queTaskIds.clear();
+
+	// Set the Work Item processing to the current UPI
+	m_bRestrictToCurrentUPI = true;
+	
+	// Discard work items that do not have the file processing in this instance
+	discardWorkItems();
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::updateTask(FileProcessingRecord& task)
@@ -337,19 +345,11 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			*pbProcessingActive = true;
 		}
 
-		// If work items are available for processing, they should be processed first - 
-		// the m_bWorkItemReturned flag will be true if the last call to getWorkItemToProcess 
-		// returned a work item to process
-		if (m_bParallelizableEnabled && m_bWorkItemReturned)
-		{
-			continue;
-		}
-
 		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded())
 		{
 			// nNumberToLoad from the database should be decremented by the number of available
 			// delayed tasks except if there is only one delayed task. In that case, we need to be
-			// sure at least one file is grabbe from the database (if available), so that another
+			// sure at least one file is grabbed from the database (if available), so that another
 			// file is processed before the delayed file is back up for processing.
 			nNumberToLoad = (m_queDelayedTasks.size() == 1)
 				? max(nNumberToLoad - m_queDelayedTasks.size(), 1)
@@ -368,6 +368,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 				// No files were loaded from the database. If there are any available delayed files,
 				// put them back into the queue for processing.
 				nNumTasksLoaded += requeueDelayedTasks();
+				m_eLastFilePriority = kPriorityDefault;
 			}
 		}
 		
@@ -376,6 +377,8 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 		CSingleLock lockGuard(&m_objLock, TRUE);
 		if (m_queTaskIds.size() <= 0)
 		{
+			m_eLastFilePriority = kPriorityDefault;
+
 			// there are no files in the queue for processing.  If the queue has
 			// been closed, then just return false, as there is nothing more
 			// to pop, if the queue is open and m_pKeepProcessingAsAdded is
@@ -398,6 +401,19 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 		}
 		else
 		{
+			long nTaskID = *(m_queTaskIds.begin());
+
+			task = getTask(nTaskID);
+			task.m_eStatus = kRecordCurrent;
+			m_eLastFilePriority = (EFilePriority) task.getPriority();
+
+			// Check for work items to process with higher priority
+			if (workItemsToProcess())
+			{
+				// the work item priority is higher
+				continue;
+			}
+
 			// Only increment the number of files processed if restricting the number
 			// of files to process and a FileProcessingRecord is being returned
 			// [LRCAU #5573]
@@ -405,11 +421,6 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			{
 				m_nNumberOfFilesProcessed++;
 			}
-
-			long nTaskID = *(m_queTaskIds.begin());
-
-			task = getTask(nTaskID);
-			task.m_eStatus = kRecordCurrent;
 
 			// Aquire the semaphore before calling
 			Win32SemaphoreLockGuard lg(processSemaphore, true);
@@ -528,9 +539,14 @@ void FPRecordManager::clear(bool bClearUI)
 	clearEvents();
 	resetSleepIntervals();
 
-	// Reset the work item returned flag
-	m_bWorkItemReturned = false;
 	m_bParallelizableEnabled = false;
+	m_bRestrictToCurrentUPI = false;
+
+	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
+	m_queWorkItemIds.clear();
+	
+	CSingleLock lgReadWorkItems(&m_mapReadWorkItems, TRUE);
+	m_mapWorkItems.clear();
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::clearEvents()
@@ -660,33 +676,46 @@ long FPRecordManager::getNumberOfFilesFailed()
 	return m_nNumberOfFilesFailed;
 }
 //-------------------------------------------------------------------------------------------------
-bool FPRecordManager::getWorkItemToProcess(FPWorkItem& workItem, bool bRestrictToUPI)
+bool FPRecordManager::getWorkItemToProcess(FPWorkItem& workItem)
 {
-	// need to move the 
-	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = 
-		m_ipFPMDB->GetWorkItemToProcess(m_nActionID, asVariantBool(bRestrictToUPI));
+	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
 
-	FPWorkItem newWorkItem(ipWorkItem);
-	
-	workItem = newWorkItem;
+	long nWorkItemsLoaded = 0;
 
-	if (ipWorkItem == __nullptr)
+	// check for available items in the queue
+	if (m_queWorkItemIds.size() <= 0)
 	{
-		m_bWorkItemReturned = false;
+		// get more items
+		nWorkItemsLoaded = loadWorkItemsFromDB(m_nMaxFilesFromDB, 
+			(UCLID_FILEPROCESSINGLib::EFilePriority) m_eLastFilePriority);
+	}
+
+	// if no work items in the queue return false
+	if (m_queWorkItemIds.size() <= 0 )
+	{
 		return false;
 	}
-	// put the new record in the map
-	CSingleLock lockGuard(&m_mapWorkItemsMutex, TRUE);
 	
-	updateWorkItem(newWorkItem);
-	m_bWorkItemReturned = true;
+	// get the next work item on the queue	
+	long workItemID = m_queWorkItemIds.front();
+	// Only lock the mutex for a short time to get the work item record
+	{
+		CSingleLock lockMap(&m_mapReadWorkItems, TRUE);
+		workItem = m_mapWorkItems[workItemID];
+	}
+
+	// Remove from the work item queue because it will be processed
+	m_queWorkItemIds.pop_front();
+
+	// Update the status of the workitem
+	updateWorkItem(workItem);
 	
 	return true;	
 }
 //-------------------------------------------------------------------------------------------------
 FPWorkItem FPRecordManager::getWorkItem(long workItemID)
 {
-	CSingleLock lockGuard(&m_mapWorkItemsMutex, TRUE);
+	CSingleLock lockGuard(&m_mapReadWorkItems, TRUE);
 
 	workItemMap::iterator it = m_mapWorkItems.find(workItemID);
 	if(it != m_mapWorkItems.end())
@@ -710,10 +739,11 @@ IProgressStatusPtr FPRecordManager::getWorkItemProgressStatus(long nWorkItemID)
 void FPRecordManager::enableParallelizable(bool bEnable)
 {
 	m_bParallelizableEnabled = bEnable;
-	
-	// Make the default value for true so if there are available work items
-	// they will be processed first before any files get picked up to process
-	m_bWorkItemReturned = true;
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::setRestrictToUPI(bool bRestrictToUPI)
+{
+	m_bRestrictToCurrentUPI = bRestrictToUPI;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1294,14 +1324,110 @@ void FPRecordManager::changeState(const FPWorkItem& workItem)
 	}
 
 }
+//-------------------------------------------------------------------------------------------------
 void FPRecordManager::SendStatusMessage(HWND hWnd, const FPWorkItem *pWorkItem,
 	EWorkItemStatus eOldStatus)
 {
 	::SendMessage(hWnd, FP_WORK_ITEM_STATUS_CHANGE, eOldStatus, (LPARAM)pWorkItem);
 }
-
+//-------------------------------------------------------------------------------------------------
 void FPRecordManager::updateWorkItem(FPWorkItem &workItem)
 {
-	CSingleLock lg(&m_mapWorkItemsMutex, TRUE);
+	CSingleLock lockMap(&m_queWorkItemsMutex, TRUE);
 	changeState(workItem);
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::discardWorkItems()
+{
+	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
+
+	_bstr_t bstrAllowRestartable = m_ipFPMDB->GetDBInfoSetting("AllowRestartableProcessing", VARIANT_FALSE);
+
+	// If Restartable processing is not enabled then work items in the queue for file that are 
+	// processing in the current UPI should be kept in the queue to be processed. 
+	// If Restartable processing is enabled all of the work items in the queue waiting to be processed
+	// will be cleared
+	bool bKeepCurrentUPI = asString(bstrAllowRestartable) == "0";
+
+	// go through the list of waiting items
+	long nNumberInQueue = m_queWorkItemIds.size();
+	
+	string currUPI = UPI::getCurrentProcessUPI().getUPI();
+	for (int i = 0; i < nNumberInQueue; i ++)
+	{
+		// Get the first Work item on the queue
+		long workItemID = m_queWorkItemIds.front();
+
+		// Take the first work itme off the queue
+		m_queWorkItemIds.pop_front();
+
+		CSingleLock lgMap(&m_mapReadWorkItems, TRUE);
+		FPWorkItem fpRecord = m_mapWorkItems[workItemID];
+		
+		UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItemRecord = fpRecord.getWorkItemRecord();
+		if (bKeepCurrentUPI &&  asString(ipWorkItemRecord->WorkGroupUPI) == currUPI)
+		{
+			// push the item on the back of the list because it should be processed
+			m_queWorkItemIds.push_back(workItemID);
+		}
+		else
+		{
+			// Set the work item back to pending
+			m_ipFPMDB->SetWorkItemToPending(workItemID);
+			
+			// Find the work item in the work item map
+			workItemMap::iterator it = m_mapWorkItems.find(workItemID);
+			if(it != m_mapWorkItems.end())
+			{
+				// Remove the work item from the map
+				m_mapWorkItems.erase(it);
+			}
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+long FPRecordManager::loadWorkItemsFromDB(long nNumToLoad, UCLID_FILEPROCESSINGLib::EFilePriority eMinPriority)
+{
+	long numberWorkItemsLoaded;
+
+	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
+	IIUnknownVectorPtr ipWorkItems = 
+		m_ipFPMDB->GetWorkItemsToProcess(m_nActionID, asVariantBool(m_bRestrictToCurrentUPI), 
+			nNumToLoad, eMinPriority);
+
+	numberWorkItemsLoaded = ipWorkItems->Size();
+
+	// Move the work items to the map and the queue
+	for (long i = 0; i < numberWorkItemsLoaded; i++)
+	{
+		UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = ipWorkItems->At(i);
+
+		FPWorkItem newWorkItem(ipWorkItem);
+	
+		m_queWorkItemIds.push_back(newWorkItem.getWorkItemID());
+		changeState(newWorkItem);
+	}
+	return numberWorkItemsLoaded;
+}
+//-------------------------------------------------------------------------------------------------
+bool FPRecordManager::workItemsToProcess()
+{
+	// if Parallelization is enabled check for work items to process with higher priority
+	if (m_bParallelizableEnabled)
+	{
+		// Check the priority of the task that was just retrieved to the priority of the 
+		// next work item priority
+		CSingleLock lg(&m_queWorkItemsMutex, TRUE);
+		long nWorkItemsAvailable = m_queWorkItemIds.size();
+		if (nWorkItemsAvailable <= 0)
+		{
+			nWorkItemsAvailable = loadWorkItemsFromDB(m_nMaxFilesFromDB, 
+				(UCLID_FILEPROCESSINGLib::EFilePriority) m_eLastFilePriority);
+		}
+		if (nWorkItemsAvailable > 0)
+		{
+			return true;
+		}
+	}
+	return false;
 }

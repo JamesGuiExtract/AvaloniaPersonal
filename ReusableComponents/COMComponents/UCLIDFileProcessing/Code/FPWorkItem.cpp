@@ -134,4 +134,14 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr FPWorkItem::getWorkItemRecord()
 {
 	return m_ipWorkItemRecord;
 }
-
+//-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::EFilePriority FPWorkItem::getPriority()
+{
+	if (m_ipWorkItemRecord == __nullptr)
+	{
+		UCLIDException ue("ELI37450", "Work item record is not set");
+		throw ue;
+	}
+	return m_ipWorkItemRecord->Priority;
+}
+//-------------------------------------------------------------------------------------------------

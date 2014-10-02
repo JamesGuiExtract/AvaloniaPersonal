@@ -78,16 +78,14 @@ public:
 class WorkItemThreadData
 {
 public:
-	WorkItemThreadData(CFileProcessingMgmtRole* pFPMgmtRole, long nActionID, Win32Semaphore &rSemaphore, IFileProcessingDB *pDB,
-		bool bProcessForCurrentUPIOnly);
+	WorkItemThreadData(CFileProcessingMgmtRole* pFPMgmtRole, long nActionID, Win32Semaphore &rSemaphore, 
+		IFileProcessingDB *pDB);
 	~WorkItemThreadData();
 
 	CFileProcessingMgmtRole* m_pFPMgmtRole;
 	long m_nActionID;
 	IFileProcessingDB *m_pDB;
 	Win32Semaphore &m_rSemaphore;
-
-	bool m_bProcessForCurrentUPIOnly;
 
 	Win32Event m_threadStartedEvent;
 	Win32Event m_threadEndedEvent;
@@ -483,7 +481,7 @@ private:
 
 	// Checks all task for a parallelizable task, if one is found, sets up the m_vecWorkItemThreadData
 	// for initializing the threads and returns true, if no tasks are parallelizable returns false
-	bool setupWorkItemThreadData(long nNumberOfThreads, long lActionID, bool bProcessForCurrentUPIOnly);
+	bool setupWorkItemThreadData(long nNumberOfThreads, long lActionID);
 
 	// Starts workItemThreads using the contents of the m_vecWorkItemThreadData. If this vector is 
 	// empty no threads will be created

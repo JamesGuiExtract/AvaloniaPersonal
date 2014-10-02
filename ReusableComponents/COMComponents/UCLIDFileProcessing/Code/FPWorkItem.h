@@ -70,6 +70,9 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the WorkItemRecord
 	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr getWorkItemRecord();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Returns the priority for the work item
+	UCLID_FILEPROCESSINGLib::EFilePriority getPriority();
 
 private:
 	// the UI class must be able to access all these member variables

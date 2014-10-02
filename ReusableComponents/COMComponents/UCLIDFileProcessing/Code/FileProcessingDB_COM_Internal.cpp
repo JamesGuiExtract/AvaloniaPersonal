@@ -6756,7 +6756,8 @@ bool CFileProcessingDB::GetWorkItemToProcess_Internal(bool bDBLocked, long nActi
 				validateDBSchemaVersion();
 
 				UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = 
-					setWorkItemToProcessing(bDBLocked, nActionID, asCppBool(vbRestrictToUPI), ipConnection);
+					setWorkItemToProcessing(bDBLocked, nActionID, asCppBool(vbRestrictToUPI),
+					kPriorityDefault, ipConnection);
 
 				*ppWorkItem = (IWorkItemRecord *)ipWorkItem.Detach();
 
@@ -7024,6 +7025,15 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 						{
 							*pnWorkItemGroupID = 0;
 						}
+						else 
+						{
+							TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+							// need to update the UPI to the current UPI
+							string setUPI = "UPDATE WorkItemGroup SET UPI = '" + m_strUPI + 
+								"' WHERE ID = " + asString(*pnWorkItemGroupID);
+							executeCmdQuery(ipConnection, setUPI);
+							tg.CommitTrans();
+						}
 					}
 					else
 					{
@@ -7270,6 +7280,88 @@ bool CFileProcessingDB::SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* 
 			END_CONNECTION_RETRY(ipConnection, "ELI37468");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37469");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkItemsToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToUPI, 
+			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI37424",  ppWorkItems != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				IIUnknownVectorPtr ipWorkItems = 
+					setWorkItemsToProcessing(bDBLocked, nActionID, nMaxWorkItemsToReturn, 
+						asCppBool(vbRestrictToUPI), eMinPriority, ipConnection);
+
+				*ppWorkItems = (IIUnknownVector *)ipWorkItems.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37425");	
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37418");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SetWorkItemToPending_Internal(bool bDBLocked, long nWorkItemID)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			string strQuery = 	"UPDATE dbo.WorkItem SET [Status] = 'P' FROM dbo.WorkItem ";
+			strQuery = strQuery + "WHERE [ID] = " + asString(nWorkItemID);
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+
+				ipConnection->Execute(strQuery.c_str(), NULL, adCmdText);
+
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37427");	
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37419");
 	}
 	catch(UCLIDException &ue)
 	{

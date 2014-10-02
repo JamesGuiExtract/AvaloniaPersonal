@@ -190,10 +190,8 @@ public:
 	inline void setMaxNumberOfFilesFromDB(long nMaxNumberOfFiles)
 		{ m_nMaxFilesFromDB = nMaxNumberOfFiles; }
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: To retun a work item to process if one is available
-	//			return value will be true if a work item was available
-	//			return value will be false if no work item was avilable
-	bool getWorkItemToProcess(FPWorkItem& workItem, bool bRestrictToUPI = false);
+	// PROMISE: To return a work item to process if one is available
+	bool getWorkItemToProcess(FPWorkItem& workItem);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return a copy of the work item with workitem ID that is in m_mapWorkItems
 	FPWorkItem getWorkItem(long workItemID);
@@ -207,6 +205,10 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Sets the flag to indicate that work units will processed
 	void enableParallelizable(bool bEnable);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Set the flag to only retieve work items for files being processed in the current
+	// instance
+	void setRestrictToUPI(bool bRestrictToUPI);
 
 private:
 
@@ -308,13 +310,26 @@ private:
 	// Map of work items being proceessed by this FAM
 	workItemMap m_mapWorkItems;
 
-	// Mutexes to use when reading or updating the m_mapWorkItems map
-	CMutex m_mapWorkItemsMutex;
-	CMutex m_mapReadWorkItems;
+	typedef list<long> WorkItemIdList;
 
-	// Flag to indicate if the last call to getWorkItemToProcess returned a work item
-	bool m_bWorkItemReturned;
+	// List of work items available for processing - the work item records are in the m_mapWorkItems
+	WorkItemIdList m_queWorkItemIds;
+
+	// Mutexes to use when reading or updating the m_mapWorkItems map
+	CMutex m_queWorkItemsMutex; // protects m_queWorkItemIds
+	CMutex m_mapReadWorkItems; // protects m_mapWorkItems
+
+	// This should be set to the priority of the last file that was marked as current or if there
+	// was no file to mark as current this should be set to kPriorityDefault.  This value is used to 
+	// establish the minimum priority of the work items to be repopulate the work item queue
+	EFilePriority m_eLastFilePriority;
+	
+	// Flag to indicate that parallelization is enabled
 	bool m_bParallelizableEnabled;
+
+	// Flag to indicate that only workitems for files being processed in the current instance 
+	// should be retrieved from the database
+	bool m_bRestrictToCurrentUPI;
 
 	////////////////
 	// Methods
@@ -335,6 +350,9 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Loads specified file from the database. Returns true if the file was loaded.
 	bool loadTaskFromDB(long nFileId, EActionStatus *peaPreviousStatus);
+	// Loads max of nNumToLoad workitems from the database to the workItem processing queue
+	// returns the nubmer of records loaded
+	long loadWorkItemsFromDB(long nNumToLoad, UCLID_FILEPROCESSINGLib::EFilePriority eMinPriority);
 
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will try to find the nWorkItemID in the m_mapWorkItems map if nWorkItemID is found
@@ -359,4 +377,12 @@ private:
 	// PROMISE: To reset the sleep interval values so that they will be recalculated the next
 	//			time they are needed.
 	void resetSleepIntervals();
+
+	// if restartable processing is enabled all work items that have been previously retrieved 
+	// from the database and are not processing will be "returned" to the database (set to pending in the database)
+	// otherwise keep the work items for the files that are being processed by the current instance.
+	void discardWorkItems();
+
+	// returns true if there are workItems to process and false if there are not work items to process
+	bool workItemsToProcess();
 };

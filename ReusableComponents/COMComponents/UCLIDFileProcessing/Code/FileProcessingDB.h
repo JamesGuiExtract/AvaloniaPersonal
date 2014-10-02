@@ -268,6 +268,9 @@ public:
 	STDMETHOD(GetFileSetFileNames)(BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
 	STDMETHOD(GetFileToProcess)(long nFileID, BSTR strAction, IFileRecord** ppFileRecord);
 	STDMETHOD(SetFallbackStatus)(IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);
+	STDMETHOD(GetWorkItemsToProcess)(long nActionID, VARIANT_BOOL vbRestrictToUPI, 
+			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems);
+	STDMETHOD(SetWorkItemToPending)(long nWorkItemID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -960,8 +963,10 @@ private:
 		map<string, long> &rmapProductSpecificVersions);
 
 	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr getWorkItemFromFields(const FieldsPtr& ipFields);
+	IIUnknownVectorPtr setWorkItemsToProcessing(bool bDBLocked, long nActionID, long nNumberToGet,
+		bool bRestrictToUPI, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection);
 	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr setWorkItemToProcessing(bool bDBLocked, long nActionID, 
-		bool bRestrictToUPI, const _ConnectionPtr &ipConnection);
+		bool bRestrictToUPI, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection);
 
 	void validateLicense();
 
@@ -1089,6 +1094,9 @@ private:
 	bool SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long WorkItemID, IUnknown *pBinaryOutput);
 	bool GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
 	bool SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);
+	bool GetWorkItemsToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToUPI, 
+			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems);
+	bool SetWorkItemToPending_Internal(bool bDBLocked, long nWorkItemID);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

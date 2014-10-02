@@ -3187,6 +3187,51 @@ STDMETHODIMP CFileProcessingDB::SetFallbackStatus(IFileRecord* pFileRecord,
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37459");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkItemsToProcess(long nActionID, VARIANT_BOOL vbRestrictToUPI, 
+			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **pWorkItems)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetWorkItemsToProcess_Internal(false, nActionID, vbRestrictToUPI, nMaxWorkItemsToReturn, 
+			eMinPriority, pWorkItems))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+
+			GetWorkItemsToProcess_Internal(true, nActionID, vbRestrictToUPI, nMaxWorkItemsToReturn,
+				eMinPriority, pWorkItems);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37417");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetWorkItemToPending(long nWorkItemID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!SetWorkItemToPending_Internal(false, nWorkItemID))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+
+			SetWorkItemToPending_Internal(true, nWorkItemID);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37420");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

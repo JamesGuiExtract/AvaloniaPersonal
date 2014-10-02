@@ -606,6 +606,14 @@ library UCLID_FILEPROCESSINGLib
 
 		[propget, id(11), helpstring ("property FileID")] HRESULT FileID([out, retval] long *pnFileID);
 		[propput, id(11), helpstring ("property FileID")] HRESULT FileID([in] long nFileID);
+
+		[propget, id(12), helpstring ("property WorkGroupUPI")] HRESULT WorkGroupUPI([out, retval] BSTR *pOutput);
+		[propput, id(12), helpstring ("property WorkGroupUPI")] HRESULT WorkGroupUPI([in] BSTR Input);
+		
+		[propget, id(13), helpstring("property Priority")] HRESULT Priority(
+			[out, retval] EFilePriority* pePriority);
+		[propput, id(13), helpstring("property Priority")] HRESULT Priority(
+			[in] EFilePriority ePriority);
 	}
 
 	[
@@ -1473,6 +1481,22 @@ library UCLID_FILEPROCESSINGLib
 		//			process.
 		[id(132), helpstring("method SetFallbackStatus")] HRESULT SetFallbackStatus(
 			[in] IFileRecord* pFileRecord, [in] EActionStatus eaFallbackStatus);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Gets upto nMaxWorkItemsToReturn from the the database that have a minimum 
+		//			priority of eMinPriority for the given nActionID will be returned in ppWorkItems
+		//			if VBRestrictToUPI is VARIANT_TRUE only work items that are in a work item group
+		//			that is being processed in the current instance.
+		// NOTE:	Work items associated with a work item group with an empty string as the UPI
+		//			will not be included. This is to limit processing of work items that are not 
+		//			associated with a Work item group that is currently active.
+		[id(133), helpstring("method GetWorkItemsToProcess")] HRESULT GetWorkItemsToProcess([in] long nActionID,
+			[in] VARIANT_BOOL vbRestrictToUPI, 
+			[in] long nMaxWorkItemsToReturn,
+			[in] EFilePriority eMinPriority,
+			[out, retval] IIUnknownVector **ppWorkItems);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Sets the work item with nWorkItemID to pending if its previous status is processing
+		[id(134), helpstring("method SetWorkItemToPending")] HRESULT SetWorkItemToPending([in] long nWorkItemID);
 	};
 
 	[

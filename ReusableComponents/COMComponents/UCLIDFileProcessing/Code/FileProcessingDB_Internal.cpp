@@ -547,7 +547,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			// Remove WorkItemGroups when file status changes -- if processing will be allowed to
 			// stop before all work items complete then this will need to be changed to 
 			// only delete if new status is 'U', 'C' or 'F'
-			if ((!m_bAllowRestartableProcessing && strState == "P") || strNewState == "U" || strNewState == "C" || strNewState == "F")
+			if ((!m_bAllowRestartableProcessing && strNewState == "P") || strNewState == "U" || strNewState == "C" || strNewState == "F")
 			{
 				string strDeleteWorkItemGroupQuery = "DELETE FROM WorkItemGroup WHERE FileID = " + asString(nFileID)
 					+ " AND ActionID = " + asString(nActionID);
@@ -555,6 +555,19 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			}
 
 			_lastCodePos = "340";
+
+			// If Restartable processing is enabled and the new state will be pending update the 
+			// WorkItemGroup record (if there is one) to not have a UPI to indicate that the
+			// file has been split into work items but the file is not currently processing in
+			// any FAMs
+			if (m_bAllowRestartableProcessing && strNewState == "P")
+			{
+				// need to update the UPI to the current UPI
+				string setUPI = "UPDATE WorkItemGroup SET UPI = '' WHERE FileID = " + asString(nFileID);
+				executeCmdQuery(ipConnection, setUPI);
+			}
+
+			_lastCodePos = "345";
 		}
 		else
 		{
@@ -3852,16 +3865,13 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		string strQuery = "DELETE FROM ActiveFAM WHERE ID = " + asString(nUPIID); 
 		executeCmdQuery(ipConnection, strQuery);
 
-		if (m_bAllowRestartableProcessing)
-		{
-			// Reset any work items that have a status of processing but the FAM is no longer active.
-			executeCmdQuery(ipConnection, gstrRESET_ORPHANED_WORK_ITEM_QUERY);
-		}
+		// Reset any work items that have a status of processing but the FAM is no longer active.
+		long nNumberWorkItemsReset = executeCmdQuery(ipConnection, gstrRESET_ORPHANED_WORK_ITEM_QUERY);
 
 		// Set up the logged exception if it is not null
 		if (pUE != __nullptr)
 		{
-			bool bAtLeastOneReset = false;
+			bool bAtLeastOneReset = nNumberWorkItemsReset > 0;
 			string strEmailMessage = "";
 
 			map<string, map<string,int>>::iterator itMap = map_StatusCounts.begin();
@@ -3882,7 +3892,8 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 					bAtLeastOneReset = true;
 				}
 			}
-			
+			pUE->addDebugInfo("NumberWorkItemsReset", nNumberWorkItemsReset);
+
 			// Only log the reset exception if one or more files were reset
 			if (bAtLeastOneReset)
 			{
@@ -5227,12 +5238,29 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::getWorkItemFromFi
 	ipWorkItemRecord->BinaryOutput = getIPersistObjFromField(ipFields, "BinaryOutput");
 	ipWorkItemRecord->BinaryInput = getIPersistObjFromField(ipFields, "BinaryInput");
 	ipWorkItemRecord->FileID = getLongField(ipFields, "FileID");
+	ipWorkItemRecord->WorkGroupUPI = getStringField(ipFields, "WorkGroupUPI").c_str();
+	ipWorkItemRecord->Priority = (UCLID_FILEPROCESSINGLib::EFilePriority) getLongField(ipFields, "Priority");
 
 	return ipWorkItemRecord;
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::setWorkItemToProcessing(bool bDBLocked, 
-	long nActionID, bool bRestrictToUPI, const _ConnectionPtr &ipConnection)
+	long nActionID, bool bRestrictToUPI, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection)
+{
+	IIUnknownVectorPtr ipWorkItems = setWorkItemsToProcessing(bDBLocked, nActionID, 1, bRestrictToUPI,
+		kPriorityDefault, ipConnection);
+	ASSERT_RESOURCE_ALLOCATION("ELI37421", ipWorkItems != __nullptr);
+
+	// if the size is not 1 then return a null pointer
+	if (ipWorkItems->Size() != 1)
+	{
+		return __nullptr;
+	}
+	return ipWorkItems->At(0);
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, long nActionID, 
+	long nNumberToGet, bool bRestrictToUPI, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection)
 {
 	// Declare query string so that if there is an exception the query can be added to debug info
 	string strQuery;
@@ -5251,8 +5279,13 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::setWorkItemToProc
 			replaceVariable(strQuery, "<ActionID>", asString(nActionID));
 			replaceVariable(strQuery, "<UPI>", m_strUPI);
 			replaceVariable(strQuery, "<GroupUPI>", (bRestrictToUPI) ? m_strUPI:"");
+			replaceVariable(strQuery, "<MaxWorkItems>", asString(nNumberToGet));
+			replaceVariable(strQuery, "<MinPriority>", asString(eMinPriority));
 			
 			UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = __nullptr;
+
+			IIUnknownVectorPtr ipWorkItems(CLSID_IUnknownVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI37422", ipWorkItems != __nullptr);
 
 			// Retry the transaction until successful
 			while (!bTransactionSuccessful)
@@ -5267,19 +5300,21 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::setWorkItemToProc
 						variant_t vtRecordsAffected = 0L;
 						_RecordsetPtr ipWorkItemSet = ipConnection->Execute(strQuery.c_str(), &vtRecordsAffected,  adCmdText);
 						ASSERT_RESOURCE_ALLOCATION("ELI36887", ipWorkItemSet != __nullptr);
-						
-						if (!asCppBool(ipWorkItemSet->adoEOF))
+
+						while (!asCppBool(ipWorkItemSet->adoEOF))
 						{
 							// Get the fields from the file set
 							FieldsPtr ipFields = ipWorkItemSet->Fields;
 							ASSERT_RESOURCE_ALLOCATION("ELI36888", ipFields != __nullptr);
 
 							ipWorkItem = getWorkItemFromFields(ipFields);
-							
-							// Commit the changes to the database
-							tg.CommitTrans();
-						}
 
+							ipWorkItems->PushBack(ipWorkItem);
+							
+							ipWorkItemSet->MoveNext();
+						}
+						// Commit the changes to the database
+						tg.CommitTrans();
 						bTransactionSuccessful = true;
 					}
 					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36889");
@@ -5309,7 +5344,7 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::setWorkItemToProc
 					Sleep(100);
 				}
 			}
-			return ipWorkItem;
+			return ipWorkItems;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36891");
 	}
