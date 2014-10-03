@@ -530,14 +530,14 @@ begin
 		// Install SQL Compact Edition
 		// 32bit needs to be installed even on 64 bit
 		szProgram = "msiexec";
-		szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x86-ENU.msi" + " /qb";
+		szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x86-ENU.msi" + " /qb-";
 		if (!Is32BitSQLCEInstalled()) then
 			LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 		endif;
 
 		// If 64 bit OS install 64 version of SSCE	
 		if ( SYSINFO.bIsWow64 ) then
-			szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x64-ENU.msi" + " /qb";
+			szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x64-ENU.msi" + " /qb-";
 			if (!Is64BitSQLCEInstalled()) then
 				LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 			endif;
@@ -646,7 +646,7 @@ begin
 	
 	SdShowMsg("Setup is Uninstalling SQL Compact Edition 32 Bit", TRUE);
 
-	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID + " /qb", 
+	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID + " /qb-", 
 		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
 	
 	SdShowMsg("Setup is Uninstalling SQL Compact Edition 32 Bit", FALSE);
@@ -672,7 +672,7 @@ begin
 	SdShowMsg("Setup is Uninstalling SQL Compact Edition 64 Bit", TRUE);
 		
    	// If 64 bit OS install 64 version of SSCE	
-	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID_64 + " /qb",
+	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID_64 + " /qb-",
 		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);			 
 	
    	SdShowMsg("Setup is Uninstalling SQL Compact Edition 64 Bit", FALSE);
@@ -913,7 +913,7 @@ begin
 	szProgram = "msiexec"; 
 	szInstallToRun = SUPPORTDIR ^ "\\Extract Systems FKB.msi";
 	LongPathToQuote(szInstallToRun, TRUE);
-	szCmdLine = " /i " + szInstallToRun + " /qb";;
+	szCmdLine = " /i " + szInstallToRun + " /qb-";;
 	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 	
 	SdShowMsg("Setup is Installing Extract Systems FKB", FALSE);
