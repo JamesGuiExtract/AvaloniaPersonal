@@ -164,8 +164,9 @@ void FPRecordManager::updateTask(FileProcessingRecord& task)
 	CSingleLock lockGuard(&m_objLock, TRUE);
 
 	// If the file was specified to be removed while actively processing, remove this file from the
-	// queue as it comes out of processing.
-	if (m_setRemovedFiles.find(task.getFileID()) != m_setRemovedFiles.end())
+	// queue as it comes out of processing. (If file is active, it is going into, not coming out of
+	// the processing state).
+	if (!task.isActive() && m_setRemovedFiles.find(task.getFileID()) != m_setRemovedFiles.end())
 	{
 		task.m_eStatus = kRecordNone;
 		m_setRemovedFiles.erase(task.getFileID());
@@ -491,23 +492,28 @@ bool FPRecordManager::moveToFrontOfQueue(long nFileId)
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::delay(FileProcessingRecord& task)
 {
-	CSingleLock lockGuard(&m_objLock, TRUE);
-	CSingleLock lockGuard2(&m_readTaskMapMutex, TRUE);
-
-	long nFileId = task.getFileID();
-
-	// Only a currently processing task can be delayed.
-	FileProcessingRecord oldTask;
-	if(!getTask(nFileId, oldTask) ||
-		oldTask.m_eStatus != kRecordCurrent)
+	// SendStatusMessage below needs to happen outside of m_objLock and m_readTaskMapMutex,
+	// otherwise it can deadlock in situations that the UI thread also happens to be waiting on one
+	// of the locks. Therefore, create a separate scope for the locks.
 	{
-		THROW_LOGIC_ERROR_EXCEPTION("ELI37490");
+		CSingleLock lockGuard(&m_objLock, TRUE);
+		CSingleLock lockGuard2(&m_readTaskMapMutex, TRUE);
+
+		long nFileId = task.getFileID();
+
+		// Only a currently processing task can be delayed.
+		FileProcessingRecord oldTask;
+		if(!getTask(nFileId, oldTask) ||
+			oldTask.m_eStatus != kRecordCurrent)
+		{
+			THROW_LOGIC_ERROR_EXCEPTION("ELI37490");
+		}
+
+		task.m_eStatus = kRecordPending;
+		m_mapTasks[nFileId] = task;
+
+		m_queDelayedTasks.push_back(nFileId);
 	}
-
-	task.m_eStatus = kRecordPending;
-	m_mapTasks[nFileId] = task;
-
-	m_queDelayedTasks.push_back(nFileId);
 	
 	// Normally SendStatusMessage is called by changeState. This is a special transition that I
 	// don't what to have to further complicated changeState to handle. The only thing that needs

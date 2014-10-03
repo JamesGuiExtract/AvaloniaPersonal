@@ -214,6 +214,11 @@ void FileProcessingRecord::notifyErrorTaskFailed(const string& strException)
 	m_strErrorTaskException = strException;
 }
 //---------------------------------------------------------------------------------------------
+bool FileProcessingRecord::isActive()
+{
+	return m_stopWatch.isRunning();
+}
+//---------------------------------------------------------------------------------------------
 double FileProcessingRecord::getTaskDuration()
 {
 	return m_stopWatch.getElapsedTime();

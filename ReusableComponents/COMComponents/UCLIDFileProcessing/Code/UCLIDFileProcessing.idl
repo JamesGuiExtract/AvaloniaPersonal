@@ -1830,6 +1830,13 @@ library UCLID_FILEPROCESSINGLib
 		[id(4), helpstring("method SetFallbackStatus")] HRESULT SetFallbackStatus(
 			[in] long nFileID, [in] EActionStatus eaFallbackStatus,
 			[out, retval] VARIANT_BOOL* pSucceeded);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Temporarily prevents new files from being grabbed by the process for
+		// processing. Processing threads will block until ResumeProcessingQueue is called.
+		[id(5), helpstring("method PauseProcessingQueue")] HRESULT PauseProcessingQueue();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Restores normal behavior of processing queue.
+		[id(6), helpstring("method ResumeProcessingQueue")] HRESULT ResumeProcessingQueue();
 	};
 
 	[

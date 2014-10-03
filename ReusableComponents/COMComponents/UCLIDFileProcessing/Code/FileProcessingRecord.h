@@ -82,6 +82,11 @@ public:
 	// executing the error task. (does not change file status)
 	void notifyErrorTaskFailed(const string& strException);
 	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Indicates if the task is actively being processed as indicated by a running
+	// stopwatch. This can be used to distinguish a task that is still marked kRecordCurrent, but
+	// has finished processing and is coming out of the kRecordCurrent state.
+	bool isActive();
+	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To return the number of seconds elapsed during the execution
 	// of this task (regardless of whether the task completed successfully or not)
 	double getTaskDuration();

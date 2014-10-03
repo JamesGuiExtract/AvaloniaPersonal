@@ -296,6 +296,7 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB* pDB, long lAction
 		m_eventManualStopProcessing.reset();
 		m_eventProcessManagerExited.reset();
 		m_eventProcessManagerStarted.reset();
+		m_eventProcessManagerActive.reset();
 		m_eventWatcherThreadExited.reset();
 		m_eventPause.reset();
 		m_eventResume.reset();
@@ -653,6 +654,32 @@ STDMETHODIMP CFileProcessingMgmtRole::SetFallbackStatus(long nFileID,
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37479");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::PauseProcessingQueue()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_eventProcessManagerActive.reset();
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37536");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::ResumeProcessingQueue()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_eventProcessManagerActive.signal();
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37537");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2067,6 +2094,10 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 
 		try
 		{
+			// If PauseProcessingQueue has been called, don't allow the next file to be grabbed
+			// until ResumeProcessingQueue is called.
+			m_eventProcessManagerActive.wait();
+
 			// if parallelizable tasks being used manage the semaphore
 			UPI upi = UPI::getCurrentProcessUPI();
 			Win32Semaphore parallelSemaphore(upi.getProcessSemaphoreName());
@@ -2174,6 +2205,7 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 				// returned to the front of the queue, while the FAM instance should continue
 				// processing.
 				case kProcessingDelayed:
+					task.markAsPending();
 					m_pRecordMgr->delay(task);
 					break;
 
@@ -2701,6 +2733,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 		{
 			// Signal that the process manager has started.
 			pFPM->m_eventProcessManagerStarted.signal();
+			pFPM->m_eventProcessManagerActive.signal();
 			
 			ERunningState eNextRunningState;
 			
@@ -2927,10 +2960,12 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 			ASSERT_RESOURCE_ALLOCATION("ELI28315", ipRoleNotifyFAM != __nullptr);
 			ipRoleNotifyFAM->NotifyProcessingCompleted();
 
+			pFPM->m_eventProcessManagerActive.reset();
 			pFPM->m_eventProcessManagerExited.signal();
 		}
 		catch(...)
 		{
+			pFPM->m_eventProcessManagerActive.reset();
 			pFPM->m_eventProcessManagerExited.signal();
 			throw;
 		}

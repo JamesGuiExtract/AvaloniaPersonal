@@ -159,6 +159,8 @@ public:
 	STDMETHOD(ReleaseFile)(long nFileID, VARIANT_BOOL* pSucceeded);
 	STDMETHOD(SetFallbackStatus)(long nFileID, EActionStatus esFallbackStatus,
 		VARIANT_BOOL* pSucceeded);
+	STDMETHOD(PauseProcessingQueue)();
+	STDMETHOD(ResumeProcessingQueue)();
 
 // IFileProcessingMgmtRole
 	STDMETHOD(get_FileProcessors)(IIUnknownVector** pVal);
@@ -347,6 +349,9 @@ private:
 	// Events used to indicate that the process manager thread has been started or it has exited
 	Win32Event m_eventProcessManagerStarted;
 	Win32Event m_eventProcessManagerExited;
+	// Indicates whether the process manager thread is actively distributing files. Dictated by
+	// PauseProcessingQueue/ResumeProcessingQueue.
+	Win32Event m_eventProcessManagerActive;
 
 	// Event to indicate that the processing is being stopped manually
 	Win32Event m_eventManualStopProcessing;

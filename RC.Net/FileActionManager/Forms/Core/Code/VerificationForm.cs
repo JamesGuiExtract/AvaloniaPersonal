@@ -1,4 +1,5 @@
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -92,6 +93,12 @@ namespace Extract.FileActionManager.Forms
         EventWaitHandle _waitRequestedFile = new ManualResetEvent(true);
 
         /// <summary>
+        /// An event used to awake threads waiting to display files to see if the file to be
+        /// displayed is a file that has been delayed.
+        /// </summary>
+        EventWaitHandle _fileDelayedEvent = new ManualResetEvent(false);
+
+        /// <summary>
         /// If <see langword="true"/>, the <see cref="_form"/> is in the process of being closed. 
         /// <see cref="ShowDocument"/> should not be called when in this state and any call to 
         /// ShowForm needs to wait for the previous form to finish closing.
@@ -126,11 +133,12 @@ namespace Extract.FileActionManager.Forms
         volatile int _requestedFileID = -1;
 
         /// <summary>
-        /// The IDs of all files currently being held in the prefetch stage ("processing" in the
-        /// verification task on threads other than the thread for which the currently displayed
-        /// file is running on).
+        /// The queue of IDs of files currently being held in the prefetch stage ("processing" in
+        /// the verification task on threads other than the thread for which the currently displayed
+        /// file is running on). The files are in ascending order of the time that they entered the
+        /// queue.
         /// </summary>
-        HashSet<int> _waitingFileIDs = new HashSet<int>();
+        List<int> _waitingFileIDQueue = new List<int>();
 
         /// <summary>
         /// The IDs of all files for which a request has been made to delay processing.
@@ -140,7 +148,7 @@ namespace Extract.FileActionManager.Forms
         /// <summary>
         /// Used to protect access to <see cref="VerificationForm{TForm}"/>.
         /// </summary>
-        static object _lock = new object();
+        static BetterLock _lock = new BetterLock();
 
         /// <summary>
         /// Used to protect access to assignment and disposal of <see cref="MainForm"/>.
@@ -300,7 +308,7 @@ namespace Extract.FileActionManager.Forms
         /// verification form is to be run (0 for default)</param>
         public void ShowForm(CreateForm creator, int minStackSize)
         {
-            lock (_lock)
+            using (_lock.GetDisposableScopeLock())
             {
                 try
                 {
@@ -387,13 +395,13 @@ namespace Extract.FileActionManager.Forms
                 // point if its not available. Although unlikely, from my reading int appears the
                 // lock could attempt here could allow a new file to sneak past already waiting
                 // files. Therefore, only try for the lock if we know of no currently waiting files.
-                haveLock = _waitingFileIDs.Count == 0 && Monitor.TryEnter(_lock);
+                haveLock = _waitingFileIDQueue.Count == 0 && _lock.TryLock();
 
                 if (!haveLock)
                 {
                     lock (_lockFileRequest)
                     {
-                        _waitingFileIDs.Add(fileID);
+                        _waitingFileIDQueue.Add(fileID);
                     }
 
                     // Wait until the UI thread has finished loading its document before
@@ -413,35 +421,61 @@ namespace Extract.FileActionManager.Forms
                         // Now request the lock for the verification UI thread again. We won't get
                         // out of this loop until we have the lock, the file has been delayed or
                         // processing is stopped.
-                        Monitor.TryEnter(_lock, 200, ref haveLock);
+                        _lock.Lock(ref haveLock, _fileDelayedEvent);
 
                         // Check to see if the lock was released in order to release a delayed file.
                         lock (_lockFileRequest)
                         {
                             if (_delayedFiles.Contains(fileID))
                             {
-                                _waitingFileIDs.Remove(fileID);
+                                _waitingFileIDQueue.Remove(fileID);
                                 _delayedFiles.Remove(fileID);
+
+                                // If all files requested to be delayed have been delayed, reset
+                                // _fileDelayedEvent so that files stop spinning until the next file
+                                // is needed or delayed.
+                                if (_delayedFiles.Count == 0)
+                                {
+                                    _fileDelayedEvent.Reset();
+                                }
                                 return EFileProcessingResult.kProcessingDelayed;
                             }
                         }
 
-                        // If we have the lock, but a specific file is requested and this is not
-                        // that file, release the lock so that the requested file can get it.
-                        if (haveLock && _requestedFileID != -1 && _requestedFileID != fileID)
+                        if (!haveLock)
                         {
-                            Monitor.Exit(_lock);
+                            // Ensure against a tight loop
+                            Thread.Sleep(100);
+                            continue;
+                        }
+
+                        // If we have the lock, but a specific file is requested and this is not
+                        // that file or there is another waiting file that came in before this one,
+                        // release the lock and remain in this loop so that the appropriate file can
+                        // get through.
+                        if ((_requestedFileID != -1 && _requestedFileID != fileID) ||
+                            (_requestedFileID == -1 && _waitingFileIDQueue[0] != fileID))
+                        {
+                            _lock.Unlock();
                             haveLock = false;
 
-                            // In case the requested file is not already waiting, wait until it
-                            // comes in before trying to obtain the lock again.
-                            _waitRequestedFile.WaitOne();
+                            if (_requestedFileID != -1)
+                            {
+                                // In case the requested file is not already waiting, wait until it
+                                // comes in before trying to obtain the lock again.
+                                _waitRequestedFile.WaitOne();
+                            }
+                            else
+                            {
+                                // Ensure against a tight loop.
+                                Thread.Sleep(100);
+                            }
                         }
                     }
                 }
 
-                // Needs to be set before file is removed from _waitingFileIDs so RequestFile can
-                // know for sure whether a requested file is available.
+                // Needs to be set before file is removed from _waitingFileIDQueue so RequestFile
+                // can know for sure whether a requested file is available.
                 _currentFileID = fileID;
 
                 // If this file is the currently requested file ID, clear the request so that other
@@ -454,7 +488,7 @@ namespace Extract.FileActionManager.Forms
                         _waitRequestedFile.Set();
                     }
 
-                    _waitingFileIDs.Remove(fileID);
+                    _waitingFileIDQueue.Remove(fileID);
                 }
 
                 _fileLoadedEvent.Reset();
@@ -506,7 +540,7 @@ namespace Extract.FileActionManager.Forms
 
                 if (haveLock)
                 {
-                    Monitor.Exit(_lock);
+                    _lock.Unlock();
                 }
 
                 if (Interlocked.Decrement(ref _processingFileCount) == 0)
@@ -562,7 +596,7 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                lock (_lock)
+                using (_lock.GetDisposableScopeLock())
                 {
                     // Close the verification form.  false so any exceptions ending the thread are thrown.
                     EndVerificationApplicationThread(false);
@@ -655,7 +689,7 @@ namespace Extract.FileActionManager.Forms
                         // Lock to prevent a race condition in Standby whereby the form could close
                         // after checking that the UI thread and form are still there but before
                         // accessing the form.
-                        lock (_lock)
+                        using (_lock.GetDisposableScopeLock())
                         lock (_lockFormChange)
                         {
                             // Once in the lock, double-check that the UI is still there and not
@@ -746,7 +780,7 @@ namespace Extract.FileActionManager.Forms
                 {
                     _requestedFileID = fileID;
                     
-                    if (_currentFileID == fileID || _waitingFileIDs.Contains(fileID))
+                    if (_currentFileID == fileID || _waitingFileIDQueue.Contains(fileID))
                     {
                         // The form is already holding the requested file. Return true to indicate
                         // it is available and will be guaranteed to be the next file displayed.
@@ -783,10 +817,13 @@ namespace Extract.FileActionManager.Forms
             {
                 lock (_lockFileRequest)
                 {
-                    if (_waitingFileIDs.Contains(fileID))
+                    if (_waitingFileIDQueue.Contains(fileID))
                     {
                         _delayedFiles.Add(fileID);
 
+                        // Set _fileDelayedEvent to prompt threads with waiting files to see if the
+                        // file each is holding is delayed.
+                        _fileDelayedEvent.Set();
                         return true;
                     }
                 }
@@ -870,6 +907,16 @@ namespace Extract.FileActionManager.Forms
                 {
                     _waitRequestedFile.Dispose();
                     _waitRequestedFile = null;
+                }
+                if (_fileDelayedEvent != null)
+                {
+                    _fileDelayedEvent.Dispose();
+                    _fileDelayedEvent = null;
+                }
+                if (_lock != null)
+                {
+                    _lock.Dispose();
+                    _lock = null;
                 }
             }
 
@@ -1393,6 +1440,7 @@ namespace Extract.FileActionManager.Forms
                         _waitRequestedFile.Set();
 
                         var ee = new ExtractException("ELI37497", "Requested file not available");
+                        ee.AddDebugData("FileID", fileID, false);
                         ee.Display();
                     }
                 }
