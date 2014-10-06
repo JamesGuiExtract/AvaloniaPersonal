@@ -1409,7 +1409,7 @@ namespace Extract.Redaction.Verification
             if (_settings.General.RequireTypes)
             {
                 foreach (RedactionGridViewRow row in _redactionGridView.Rows
-                    .Where(row => !row.ReadOnly))
+                    .Where(row => !row.ReadOnly && row.Redacted))
                 {
                     if (string.IsNullOrEmpty(row.RedactionType))
                     {
@@ -1428,7 +1428,7 @@ namespace Extract.Redaction.Verification
             if (_settings.General.RequireExemptions)
             {
                 foreach (RedactionGridViewRow row in _redactionGridView.Rows
-                    .Where(row => !row.ReadOnly))
+                    .Where(row => !row.ReadOnly && row.Redacted))
                 {
                     // Only prompt for rows that are being redacted [FlexIDSCore #4223]
                     if (row.Redacted && row.Exemptions.IsEmpty)
