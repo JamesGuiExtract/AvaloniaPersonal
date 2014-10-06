@@ -215,6 +215,7 @@
 #define IDS_IDSHIELD_PRODUCT            57608
 #define IDS_UNKNOWN_PRODUCT             57609
 #define IDS_RULETESTER_PRODUCT          57610
+#define ID_INDICATOR_TIME               57611
 
 // Next default values for new objects
 // 

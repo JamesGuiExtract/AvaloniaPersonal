@@ -644,6 +644,7 @@ BEGIN
     IDS_TITLEConditionalRulePP "&Title"
     IDS_HELPFILEConditionalRulePP "Help File Name"
     IDS_DOCSTRINGConditionalRulePP "Your Help String"
+    ID_INDICATOR_TIME       "Last run time: %f seconds"
 END
 
 #endif    // English (United States) resources

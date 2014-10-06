@@ -10,6 +10,7 @@
 #include <SplitterControl.h>
 #include <ResizablePropertySheet.h>
 #include <TLFrame.h>
+#include <StopWatch.h>
 
 #include <string>
 #include <vector>
@@ -171,6 +172,15 @@ private:
 
 	// Whether to display spot recognition or not
 	bool m_bNoSpotRecognition;
+
+	// Stopwatch for timing rule execution
+	StopWatch m_stopWatch;
+
+	// Status bar for displaying rule execution time
+	CStatusBar m_statusBar;
+
+	// Stores last rule execution time
+	CString zLastRunTime;
 
 	//////////
 	// Methods

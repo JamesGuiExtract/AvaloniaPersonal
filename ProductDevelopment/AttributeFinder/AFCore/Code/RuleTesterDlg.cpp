@@ -37,6 +37,11 @@ const int giCONTROL_SPACING = 10;
 // {1EDA97D0-BFBC-46d7-B8D9-40538AE238CD}
 const CLSID CLSID_RuleTesterDlg = { 0x1eda97d0, 0xbfbc, 0x46d7, { 0xb8, 0xd9, 0x40, 0x53, 0x8a, 0xe2, 0x38, 0xcd } };
 const string gstrUNKNOWN_TYPE = "[Unknown Type]";
+const int g_nStatusBarHeight = 18;
+const UINT BASED_CODE indicators[] =
+{
+     ID_INDICATOR_TIME
+};
 
 //-------------------------------------------------------------------------------------------------
 // RuleTesterDlg
@@ -257,6 +262,12 @@ BOOL RuleTesterDlg::OnInitDialog()
 			rectSplitter.top = lPosition;
 			rectSplitter.bottom = rectSplitter.top;
 			m_splitterCtrl.Create(WS_CHILD | WS_VISIBLE, rectSplitter, this, IDC_SPLITTER);
+
+			m_statusBar.Create(this);
+			m_statusBar.GetStatusBarCtrl().SetMinHeight(g_nStatusBarHeight);
+			m_statusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
+			zLastRunTime.Format(ID_INDICATOR_TIME, 0.0);
+			m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_TIME), zLastRunTime);
 
 			// Set flag indicating that controls exist
 			m_bInitialized = true;
@@ -500,8 +511,17 @@ void RuleTesterDlg::OnButtonExecute()
 		IUnknownPtr ipUnknown = ipTempRuleSet;
 		_variant_t varRuleSet = (IUnknown *) ipUnknown;
 
+		m_stopWatch.reset();
+		m_stopWatch.start();
+		
 		m_ipAttributes = getAFEngine()->FindAttributes( ipAFDoc, get_bstr_t( "" ), 
 			-1, varRuleSet, ipVecAttributeNames, VARIANT_TRUE, "", NULL );
+		
+		m_stopWatch.stop();
+		
+		// Format last run time
+		zLastRunTime.Format(ID_INDICATOR_TIME, m_stopWatch.getElapsedTime());
+		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_TIME), zLastRunTime);
 
 		// Refresh the list to display latest results
 		updateList(ipAFDoc);
@@ -1352,7 +1372,7 @@ void RuleTesterDlg::doResize()
 		m_splitterCtrl.GetWindowRect( &rectSplitter );
 		ScreenToClient( &rectSplitter );
 		CRect rectGridCtrl( 1, rectSplitter.bottom + 3,
-			rectSplitter.Width() - 2, rectDlg.Height() - 4);
+			rectSplitter.Width() - 2, rectDlg.Height() - g_nStatusBarHeight - 2);
 		GetDlgItem( IDC_TREE_LIST )->MoveWindow( &rectGridCtrl );
 
 		// Adjust columns in Tree List
@@ -1386,6 +1406,9 @@ void RuleTesterDlg::doResize()
 		rectPropSheet.bottom = rectSplitter.top - 1;
 		m_propSheet.resize(rectPropSheet);
 		m_nCurrentBottomOfPropPage = rectPropSheet.bottom;
+
+		// Resize the status bar
+		m_statusBar.SetPaneInfo(0,ID_INDICATOR_TIME, SBPS_NORMAL, rectDlg.Width());
 
 		// Position the toolbar in the dialog
 		RepositionBars( AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
