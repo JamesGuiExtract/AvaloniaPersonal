@@ -1497,6 +1497,10 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Sets the work item with nWorkItemID to pending if its previous status is processing
 		[id(134), helpstring("method SetWorkItemToPending")] HRESULT SetWorkItemToPending([in] long nWorkItemID);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the failed work items for the group
+		[id(135), helpstring("method GetFailedWorkItemsForGroup")] HRESULT GetFailedWorkItemsForGroup(
+			[in] long nWorkItemGroupID,  [out, retval] IIUnknownVector** ppWorkItems);
 	};
 
 	[

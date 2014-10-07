@@ -3232,6 +3232,27 @@ STDMETHODIMP CFileProcessingDB::SetWorkItemToPending(long nWorkItemID)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37420");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFailedWorkItemsForGroup(long nWorkItemGroupID, IIUnknownVector **ppWorkItems)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetFailedWorkItemsForGroup_Internal(false, nWorkItemGroupID, ppWorkItems))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
+
+			GetFailedWorkItemsForGroup_Internal(true, nWorkItemGroupID, ppWorkItems);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37539");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

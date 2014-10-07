@@ -1943,7 +1943,10 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 					workItem.markAsFailed(stringizedException);
 					fprm->updateWorkItem(workItem);
 				}
-				ue.log();
+				else
+				{
+					ue.log();
+				}
 			}
 		}
 		while (!pThreadData->ms_threadStopProcessing.isSignaled());

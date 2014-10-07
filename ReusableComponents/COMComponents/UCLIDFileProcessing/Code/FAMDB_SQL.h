@@ -1318,3 +1318,23 @@ const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE =
 	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
 	"WHERE WorkItemGroupID = <WorkItemGroupID> "
 	"AND [Sequence] >= <StartSequence> AND [Sequence] < <EndSequence>";
+
+const string gstrGET_FAILED_WORK_ITEM_FOR_GROUP =
+	"SELECT [WorkItem].ID "
+    "  ,[WorkItemGroupID] "
+    "  ,[Status] "
+    "  ,[Input] "
+    "  ,[Output] "
+    "  ,[WorkItem].UPI "
+    "  ,[Sequence] "
+	"  ,[stringizedException] "
+	"  ,[FileName] "
+	"  ,[BinaryOutput] "
+	"  ,[BinaryInput] "
+	"  ,[FileID] "
+	"  ,[WorkItemGroup].[UPI] as WorkGroupUPI "
+	"  ,[Priority] "
+	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
+	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
+	"WHERE WorkItemGroupID = <WorkItemGroupID> "
+	"AND [WorkItem].[Status] = 'F' ";

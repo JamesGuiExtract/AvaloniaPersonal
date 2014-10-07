@@ -144,6 +144,15 @@ private:
 
 	IMiscUtilsPtr m_ipMiscUtils;
 
+	// true if failed pages should be skipped; false if failed pages should fail the document.
+	bool m_bSkipPageOnFailure;
+
+	// The maximum percentage of pages that can fail without failing the document.
+	unsigned long m_uiMaxOcrPageFailurePercentage;
+
+	// The maximum number of pages that can fail without failing the document.
+	unsigned long m_uiMaxOcrPageFailureNumber;
+
 	/////////////
 	// Methods
 	/////////////
@@ -166,4 +175,12 @@ private:
 	// Method that waits for work to complete
 	EFileProcessingResult waitForWorkToComplete(IProgressStatusPtr ipProgressStatus,
 		IFileProcessingDBPtr ipDB, long nWorkGroup, const string &strInputFileName);
+
+	// aggregates all of the exceptions in the work item group into the passed in exception and 
+	// returns the passed in exception.
+	UCLIDException &aggregateWorkItemExceptions(IFileProcessingDBPtr ipDB, long nWorkItemGroupID, UCLIDException &exception);
+
+	// gets the ocr settings from the registry for settings of m_bSkipPageOnFailure, 
+	// m_uiMaxOcrPageFailurePercentage, m_uiMaxOcrPageFailureNumber
+	void getOCRSettings();
 };

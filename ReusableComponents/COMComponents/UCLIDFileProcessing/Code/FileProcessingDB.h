@@ -271,6 +271,7 @@ public:
 	STDMETHOD(GetWorkItemsToProcess)(long nActionID, VARIANT_BOOL vbRestrictToUPI, 
 			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems);
 	STDMETHOD(SetWorkItemToPending)(long nWorkItemID);
+	STDMETHOD(GetFailedWorkItemsForGroup)(long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1097,6 +1098,7 @@ private:
 	bool GetWorkItemsToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToUPI, 
 			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems);
 	bool SetWorkItemToPending_Internal(bool bDBLocked, long nWorkItemID);
+	bool GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

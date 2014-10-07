@@ -15,6 +15,8 @@
 #include <Win32Semaphore.h>
 #include <MiscLeadUtils.h>
 #include <UPI.h>
+#include <RegistryPersistenceMgr.h>
+#include <RegConstants.h>
 
 #include <io.h>
 #include <cmath>
@@ -59,6 +61,11 @@ const int gnMAX_WORK_ITEMS_TO_ADD_PER_CALL = 25;
 // output file
 const int gnMAX_WORK_ITEMS_TO_GET_PER_CALL = 100;
 
+// Default constants for the OCR
+const string& gstrDEFAULT_SKIP_PAGE_ON_FAILURE = "0";
+const string& gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE = "25";
+const string& gstrDEFAULT_MAX_OCR_PAGE_FAILURE_NUMBER = "10";
+
 //--------------------------------------------------------------------------------------------------
 // COCRFileProcessor
 //--------------------------------------------------------------------------------------------------
@@ -70,7 +77,10 @@ COCRFileProcessor::COCRFileProcessor()
   m_bParallelize(false),
   m_bAllowCancelBeforeComplete(false),
   m_CancelEvent(),
-  m_ipMiscUtils(__nullptr)
+  m_ipMiscUtils(__nullptr),
+  m_bSkipPageOnFailure(gstrDEFAULT_SKIP_PAGE_ON_FAILURE == "1"),
+  m_uiMaxOcrPageFailureNumber(asUnsignedLong(gstrDEFAULT_MAX_OCR_PAGE_FAILURE_NUMBER)),
+  m_uiMaxOcrPageFailurePercentage(asUnsignedLong(gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE))
 {
 	try
 	{
@@ -152,6 +162,8 @@ STDMETHODIMP COCRFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 
 		_bstr_t bstrAllowRestartable = pDB->GetDBInfoSetting("AllowRestartableProcessing", VARIANT_FALSE);
 		m_bAllowCancelBeforeComplete = asString(bstrAllowRestartable) == "1";
+		
+		getOCRSettings();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17786");
 
@@ -934,6 +946,11 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 		ISpatialStringPtr ipSS(CLSID_SpatialString);
 		ASSERT_RESOURCE_ALLOCATION("ELI36860", ipSS != __nullptr);
 
+		// Setup the aggregate exception to use if pages fail
+		bool bFailedWorkItem = false;
+		UCLIDException aggregateException("ELI37552", "Application trace: At least one page of document failed to OCR.");
+		string strPages = "";
+
 		// Get lists of the workitems in small groups
 		long nStart = 0;
 		bool bDone = false;
@@ -951,19 +968,42 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 				IWorkItemRecordPtr ipWorkItem = ipWorkItems->At(i);
 				ASSERT_RESOURCE_ALLOCATION("ELI36859", ipWorkItem != __nullptr);
 
-				// Get the output from the WorkItem record
-				ISpatialStringPtr ipOutput = ipWorkItem->BinaryOutput;
-				ASSERT_RESOURCE_ALLOCATION("ELI37084", ipOutput != __nullptr);
-
 				// Get the page number
 				string strExt = getExtensionFromFullPath(asString(ipWorkItem->Input));
 				nPageNumber = asLong(strExt.substr(1));
+
+				UCLID_FILEPROCESSINGLib::EWorkItemStatus eStatus = ipWorkItem->Status;
+
+				// if the status is failed add its info to the aggregate exception and continue with
+				// next work item
+				if (eStatus == kWorkUnitFailed)
+				{
+					UCLIDException workItemException;
+					workItemException.createFromString("ELI37553", 
+						asString(ipWorkItem->GetStringizedException()), false, false);
+					aggregateException.addDebugInfo("Exception History", workItemException);
+					strPages += ((bFailedWorkItem) ? ", " : "") + asString(nPageNumber);
+					bFailedWorkItem = true;
+					continue;
+				}
+
+				// Get the output from the WorkItem record
+				ISpatialStringPtr ipOutput;
+				ipOutput = ipWorkItem->BinaryOutput;
+				ASSERT_RESOURCE_ALLOCATION("ELI37084", ipOutput != __nullptr);
 
 				ipOutput->SourceDocName = strInputFile.c_str();
 
 				ipPagesToStitch->PushBack(ipOutput);
 			}
 			bDone = nWorkItems < gnMAX_WORK_ITEMS_TO_GET_PER_CALL;
+		}
+
+		// Log the aggregate exception if any pages failed
+		if (bFailedWorkItem)
+		{
+			aggregateException.addDebugInfo("Pages that failed", strPages);
+			aggregateException.log();
 		}
 		ipSS->CreateFromSpatialStrings(ipPagesToStitch);
 
@@ -1018,7 +1058,7 @@ EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPt
 	long lLastProcessed = 0;
 
 	// Wait for them to finish
-	while (eAllWorkItemStatus != kWorkUnitComplete)
+	while (eAllWorkItemStatus != kWorkUnitComplete && eAllWorkItemStatus != kWorkUnitFailed)
 	{
 		// this is a polling method and is not the most efficient
 
@@ -1046,11 +1086,61 @@ EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPt
 		}
 		if (eAllWorkItemStatus == kWorkUnitFailed)
 		{
-			UCLIDException ue("ELI36861", "Work group processing failed.");
-			ue.addDebugInfo("FileName", strInputFileName);
-			throw ue;
+			unsigned long totalCount = wigsStatusRecord.lCompletedCount + wigsStatusRecord.lFailedCount;
+			if (!m_bSkipPageOnFailure ||  
+				(m_bSkipPageOnFailure && (wigsStatusRecord.lFailedCount > m_uiMaxOcrPageFailureNumber ||
+				wigsStatusRecord.lFailedCount *100.0 / totalCount > (double)m_uiMaxOcrPageFailurePercentage)))
+			{
+				// need to aggregate the exceptions from the database
+
+				UCLIDException ue("ELI36861", "Failed to OCR Document.");
+				ue.addDebugInfo("FileName", strInputFileName);
+				ue.addDebugInfo("Total Pages", totalCount);
+				ue.addDebugInfo("Failed Pages", wigsStatusRecord.lFailedCount);
+
+				throw aggregateWorkItemExceptions(ipDB, nWorkGroup, ue);
+			}
 		}
 	}
 	return kProcessingSuccessful;
 }
 //-------------------------------------------------------------------------------------------------
+UCLIDException & COCRFileProcessor::aggregateWorkItemExceptions(IFileProcessingDBPtr ipDB, 
+	long nWorkItemGroupID, UCLIDException &exception)
+{
+	IIUnknownVectorPtr ipWorkItems = ipDB->GetFailedWorkItemsForGroup(nWorkItemGroupID);
+	ASSERT_RESOURCE_ALLOCATION("ELI37550", ipWorkItems != __nullptr);
+
+	long nNumberOfItems = ipWorkItems->Size();
+	for (long i = 0; i < nNumberOfItems; i++)
+	{
+		IWorkItemRecordPtr ipWorkItem = ipWorkItems->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI37560", ipWorkItem != __nullptr);
+
+		// Get the exception
+		UCLIDException ue;
+		ue.createFromString("ELI37551", asString(ipWorkItem->GetStringizedException()), false, false);
+		exception.addDebugInfo("Exception History", ue);
+	}
+	return exception;
+}
+//-------------------------------------------------------------------------------------------------
+void COCRFileProcessor::getOCRSettings()
+{
+	// Setup registry manager to OCREngine\SSOCR key
+	RegistryPersistenceMgr regMgr(HKEY_CURRENT_USER, gstrREG_ROOT_KEY + "\\OCREngine\\SSOCR");
+
+	string strValue;
+
+	// Get value of SkipPageOnFailure key
+	strValue = regMgr.getKeyValue("", "SkipPageOnFailure", gstrDEFAULT_SKIP_PAGE_ON_FAILURE);
+	m_bSkipPageOnFailure = strValue == "1";
+
+	// Get value of MaxOcrPageFailureNumber key
+	strValue = regMgr.getKeyValue("", "MaxOcrPageFailureNumber", gstrDEFAULT_MAX_OCR_PAGE_FAILURE_NUMBER);
+	m_uiMaxOcrPageFailureNumber = asUnsignedLong(strValue);
+
+	// Get value of MaxOcrPageFailurePercentage key
+	strValue = regMgr.getKeyValue("", "MaxOcrPageFailurePercentage", gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE);
+	m_uiMaxOcrPageFailurePercentage = asUnsignedLong(strValue);
+}

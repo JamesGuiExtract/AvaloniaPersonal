@@ -6491,7 +6491,7 @@ bool CFileProcessingDB::GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWo
 				{
 					string strStatus = getStringField(ipFields, "Status");
 					long lCount = getLongField(ipFields, "Total");
-					lTotal =+ lCount;
+					lTotal += lCount;
 					switch (strStatus[0])
 					{
 					case 'P': 
@@ -7374,3 +7374,77 @@ bool CFileProcessingDB::SetWorkItemToPending_Internal(bool bDBLocked, long nWork
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID,
+	IIUnknownVector **ppWorkItems)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI37542",  ppWorkItems != __nullptr);
+
+			// Convert the nWorkItemGroupID to a string
+			string strWorkItemGroupID = asString(nWorkItemGroupID);
+
+			// Setup query of failed work items for the given work group id
+			string strWorkItemSQL = gstrGET_FAILED_WORK_ITEM_FOR_GROUP;
+			replaceVariable(strWorkItemSQL, "<WorkItemGroupID>", strWorkItemGroupID);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipWorkItemSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37543", ipWorkItemSet != __nullptr);
+
+				// Execute the query get the set of WorkItems
+				ipWorkItemSet->Open(strWorkItemSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
+				IIUnknownVectorPtr ipWorkItems(CLSID_IUnknownVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI37544", ipWorkItems != __nullptr);
+
+				while (!asCppBool(ipWorkItemSet->adoEOF))
+				{
+					// Get the fields from the file set
+					FieldsPtr ipFields = ipWorkItemSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI37545", ipFields != __nullptr);
+
+					// Get the file record from the fields
+					UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem(CLSID_WorkItemRecord);
+					ASSERT_RESOURCE_ALLOCATION("ELI37546", ipWorkItem != __nullptr);
+
+					// Get and return the appropriate file record
+					ipWorkItem = getWorkItemFromFields(ipFields);
+					ASSERT_RESOURCE_ALLOCATION("ELI37547", ipWorkItem != __nullptr);
+
+					ipWorkItems->PushBack(ipWorkItem); 
+					
+					// Go to next record in recordset
+					ipWorkItemSet->MoveNext();
+				}
+
+				*ppWorkItems = ipWorkItems.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37548");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37549");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
