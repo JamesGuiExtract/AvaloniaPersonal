@@ -101,6 +101,8 @@ private:
 	const string expandTrimAndConsolidateWS(const string& str) const;
 	const string expandThreadId(const string& str) const;
 	const string expandProcessId(const string& str) const;
+	const string expandLowerCase(const string& str) const;
+	const string expandUpperCase(const string& str) const;
 
 	// Contains data pertaining to a function scope in the main loop in expandFunctions.
 	struct expansionScopeData

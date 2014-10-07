@@ -97,6 +97,12 @@ const string gstrFUNC_THREAD_ID_PARAMS = "";
 const string gstrFUNC_PROCESS_ID = "ProcessId";
 const string gstrFUNC_PROCESS_ID_PARAMS = "";
 
+const string gstrFUNC_LOWER_CASE = "LowerCase";
+const string gstrFUNC_LOWER_CASE_PARAMS = "source";
+
+const string gstrFUNC_UPPER_CASE = "UpperCase";
+const string gstrFUNC_UPPER_CASE_PARAMS = "source";
+
 //-------------------------------------------------------------------------------------------------
 // Static initialization
 //-------------------------------------------------------------------------------------------------
@@ -135,6 +141,8 @@ TextFunctionExpander::TextFunctionExpander()
 			g_mapParameters[gstrFUNC_INSERT_BEFORE_EXT] = gstrFUNC_INSERT_BEFORE_EXT_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_LEFT);
 			g_mapParameters[gstrFUNC_LEFT] = gstrFUNC_LEFT_PARAMS;
+			g_vecFunctions.push_back(gstrFUNC_LOWER_CASE);
+			g_mapParameters[gstrFUNC_LOWER_CASE] = gstrFUNC_LOWER_CASE_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_MID);
 			g_mapParameters[gstrFUNC_MID] = gstrFUNC_MID_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_NOW);
@@ -161,6 +169,8 @@ TextFunctionExpander::TextFunctionExpander()
 			g_mapParameters[gstrFUNC_THREAD_ID] = gstrFUNC_THREAD_ID_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_TRIM_AND_CONSOLIDATE_WS);
 			g_mapParameters[gstrFUNC_TRIM_AND_CONSOLIDATE_WS] = gstrFUNC_TRIM_AND_CONSOLIDATE_WS_PARAMS;
+			g_vecFunctions.push_back(gstrFUNC_UPPER_CASE);
+			g_mapParameters[gstrFUNC_UPPER_CASE] = gstrFUNC_UPPER_CASE_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_USER_NAME);
 			g_mapParameters[gstrFUNC_USER_NAME] = gstrFUNC_USER_NAME_PARAMS;
 
@@ -415,6 +425,14 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 					else if (currentScope.strFunction == gstrFUNC_PROCESS_ID)
 					{
 						strFuncResult += expandProcessId(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_LOWER_CASE)
+					{
+						strFuncResult += expandLowerCase(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_UPPER_CASE)
+					{
+						strFuncResult += expandUpperCase(strExpandedArg);
 					}
 					else
 					{
@@ -1192,5 +1210,19 @@ const string TextFunctionExpander::expandProcessId(const string& str) const
 	}
 
 	return asString(GetCurrentProcessId());
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandLowerCase(const string& str) const
+{
+	string strRet = str;
+	makeLowerCase(strRet);
+	return strRet;
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandUpperCase(const string& str) const
+{
+	string strRet = str;
+	makeUpperCase(strRet);
+	return strRet;
 }
 //-------------------------------------------------------------------------------------------------
