@@ -1,0 +1,10 @@
+// Test1 create a value from the database
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// Test2 find two names using a regex rule and split with an RSD file that finds a value for the
+// attributes that have subattributes with values that match a name in the DB
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+// Adds a name to the DB and then essentially repeats Test2, finds more values because of addition
+// Removes the added name to reset the test
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
