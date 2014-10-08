@@ -352,6 +352,14 @@ void CConditionalRulePP::toggleConfigButtons()
 	{
 		bEnable = TRUE;
 	}
+	else
+	{
+		IConfigurableObjectPtr ipConfigurableObject(m_ipRule);
+		if (ipConfigurableObject != __nullptr)
+		{
+			bEnable = TRUE;
+		}
+	}
 	m_btnConfigRule.EnableWindow(bEnable);
 }
 //-------------------------------------------------------------------------------------------------
