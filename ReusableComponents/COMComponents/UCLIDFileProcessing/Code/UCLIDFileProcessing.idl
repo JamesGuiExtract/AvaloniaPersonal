@@ -1501,6 +1501,12 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To return the failed work items for the group
 		[id(135), helpstring("method GetFailedWorkItemsForGroup")] HRESULT GetFailedWorkItemsForGroup(
 			[in] long nWorkItemGroupID,  [out, retval] IIUnknownVector** ppWorkItems);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To apply the specified metadata field value to the specified file. If the file already
+		//			has a value for the field, it will be overwritten.
+		// REQUIRE: bstrMetadataFieldName exists in the MetadataField table.
+		[id(136), helpstring("method SetMetadataFieldValue")] HRESULT SetMetadataFieldValue([in] long nFileID,
+			[in] BSTR bstrMetadataFieldName, [in] BSTR bstrMetadataFieldValue);
 	};
 
 	[

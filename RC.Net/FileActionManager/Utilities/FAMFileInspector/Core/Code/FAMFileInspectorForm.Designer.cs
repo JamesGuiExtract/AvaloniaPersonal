@@ -803,6 +803,7 @@
             this._fileListDataGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleFileListDataGridView_MouseDown);
             this._fileListDataGridView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.HandleFileListDataGridView_MouseMove);
             this._fileListDataGridView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HandleFileListDataGridView_MouseUp);
+            this._fileListDataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(HandleFileListDataGridView_EditingControlShowing);
             // 
             // _fileListFlagColumn
             // 

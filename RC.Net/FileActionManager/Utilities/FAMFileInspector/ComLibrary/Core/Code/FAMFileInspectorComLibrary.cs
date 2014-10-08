@@ -1,6 +1,7 @@
 ﻿using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -33,11 +34,14 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="lockFileSelector"><see langword="true"/> if the provided
         /// <see paramref="fileSelector"/> should not be changeable in the FFI;
         /// <see langword="false"/> otherwise.</param>
+        /// <param name="lockedFileSelectionSummary">If <see paramref="lockFileSelector"/> is
+        /// <see langword="true"/>, can be used to override the summary message of the specified
+        /// filter.</param>
         /// <param name="customColumns">An <see cref="IIUnknownVector"/> of
         /// <see cref="IFAMFileInspectorColumn"/> that should be present in the FFI's file list.
         /// </param>
         void OpenFAMFileInspector(FileProcessingDB fileProcessingDB, IFAMFileSelector fileSelector,
-            bool lockFileSelector, IIUnknownVector customColumns);
+            bool lockFileSelector, string lockedFileSelectionSummary, IIUnknownVector customColumns);
     }
 
     /// <summary>
@@ -81,16 +85,31 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="lockFileSelector"><see langword="true"/> if the provided
         /// <see paramref="fileSelector"/> should not be changeable in the FFI;
         /// <see langword="false"/> otherwise.</param>
+        /// <param name="lockedFileSelectionSummary">If <see paramref="lockFileSelector"/> is
+        /// <see langword="true"/>, can be used to override the summary message of the specified
+        /// filter.</param>
         /// <param name="customColumns">An <see cref="IIUnknownVector"/> of
         /// <see cref="IFAMFileInspectorColumn"/> that should be present in the FFI's file list.
         /// </param>
         public void OpenFAMFileInspector(FileProcessingDB fileProcessingDB,
-            IFAMFileSelector fileSelector, bool lockFileSelector, IIUnknownVector customColumns)
+            IFAMFileSelector fileSelector, bool lockFileSelector, string lockedFileSelectionSummary,
+            IIUnknownVector customColumns)
         {
             try
             {
                 lock (_lock)
                 {
+                    // Since the FFI form can't currently deal with a changed LockFileSelector value
+                    // and it is not currently easy to see if custom columns have changed, re-create
+                    // the form to ensure the form is reflecting the parameters passed in.
+                    if (_fileInspectorForm != null &&
+                        (lockFileSelector != _fileInspectorForm.LockFileSelector ||
+                         customColumns != null || _fileInspectorForm.CustomColumns.Any()))
+                    {
+                        _fileInspectorForm.Dispose();
+                        _fileInspectorForm = null;
+                    }
+
                     // If the file inspector has been created and has not been disposed (closed).
                     if (_fileInspectorForm != null && !_fileInspectorForm.IsDisposed)
                     {
@@ -114,8 +133,6 @@ namespace Extract.FileActionManager.Utilities
                                     _fileInspectorForm.FileSelector.LimitToSubset(false, true,
                                         false, FAMFileInspectorForm.DefaultMaxFilesToDisplay);
                                 }
-
-                                // TODO: Check to see if lockFileSelector or customColumns have changed.
 
                                 _fileInspectorForm.Restore();
                                 _fileInspectorForm.Activate();
@@ -174,6 +191,7 @@ namespace Extract.FileActionManager.Utilities
                             }
 
                             _fileInspectorForm.LockFileSelector = lockFileSelector;
+                            _fileInspectorForm.LockedFileSelectionSummary = lockedFileSelectionSummary;
 
                             Application.Run(_fileInspectorForm);
                         }

@@ -72,7 +72,7 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Gets whether the user should be able to modify the values in this column.
+        /// Gets whether this column is read only.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "ReadOnly")]
         bool ReadOnly
@@ -96,7 +96,7 @@ namespace Extract.FileActionManager.Utilities
 
         /// <summary>
         /// Gets if there is any data that has been modified via <see cref="SetValue"/> that needs
-        /// to be applied. (Not used if <see cref="RequireOkCancel"/> is <see langword="false"/>.
+        /// to be applied. (Not used if <see cref="RequireOkCancel"/> is <see langword="false"/>).
         /// </summary>
         bool Dirty
         {
@@ -104,14 +104,15 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Gets the possible values to offer for a field.  For Text type, will specify values
-        /// for an auto-complete list. Also provides options for a context menu. 
+        /// Gets the possible values to offer for the specified <see paramref="fileId"/>.
         /// </summary>
+        /// <param name="fileId">The file ID for which the possible value choices are needed or -1
+        /// for the complete set of possible values across all files.</param>
         /// <returns>A list of all pre-defined choices to be available for the user to select in
         /// this column. For <see cref="T:FFIColumnType.Combo"/>, at least one value is required for
         /// the column to be usable.</returns>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        IVariantVector GetValueChoices();
+        IVariantVector GetValueChoices(int fileId);
 
         /// <summary>
         /// Specifies values that can be applied via context menu. The returned values will be
@@ -119,17 +120,14 @@ namespace Extract.FileActionManager.Utilities
         /// option name. (This method is not used is <see cref="ReadOnly"/> is
         /// <see langword="true"/>.
         /// </summary>
-        /// <param name="multiple"><see langword="true"/> if the returned choices are valid for more
-        /// than one file at a time, <see langword="false"/> if the returned choices are valid for a
-        /// singly selected file.
-        /// <para><b>Note</b></para>
-        /// The options returned when <see paramref="multiple"/> is true should be a subset of the
-        /// options returned when <see paramref="multiple"/> is false.
-        /// </param>
+        /// <param name="fileIds"><see langword="null"/> to get a list of all possible values to be
+        /// able to apply via the column's context menu across all possible selections; otherwise,
+        /// the values that should be enabled for selection based on the selection of the specified
+        /// <see paramref="fileIds"/>.</param>
         /// <returns>The values that should be specifiable via the context menu for the currently
         /// selected row(s). Can be <see langword="null"/> if context menu options should not be
         /// available for this column.</returns>
-        IVariantVector GetContextMenuChoices(bool multiple);
+        IVariantVector GetContextMenuChoices(HashSet<int> fileIds);
 
         /// <summary>
         /// Gets the value to display for the specified <see paramref="fileId"/>.
@@ -168,7 +166,7 @@ namespace Extract.FileActionManager.Utilities
 
         /// <summary>
         /// Cancels all uncommitted data changes specified via SetValue. (Unused if
-        /// <see cref="RequireOkCancel"/> is <see langword="false"/>.
+        /// <see cref="RequireOkCancel"/> is <see langword="false"/>).
         /// </summary>
         void Cancel();
     }

@@ -3253,6 +3253,28 @@ STDMETHODIMP CFileProcessingDB::GetFailedWorkItemsForGroup(long nWorkItemGroupID
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37539");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetMetadataFieldValue(long nFileID, BSTR bstrMetadataFieldName,
+													  BSTR bstrMetadataFieldValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!SetMetadataFieldValue_Internal(false, nFileID, bstrMetadataFieldName, bstrMetadataFieldValue))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			SetMetadataFieldValue_Internal(true,  nFileID, bstrMetadataFieldName, bstrMetadataFieldValue);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37557");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

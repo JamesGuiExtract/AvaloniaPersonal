@@ -261,7 +261,7 @@ void CFAMDBAdminDlg::OnInspectFiles()
 	
 	try
 	{
-		m_ipFAMFileInspector->OpenFAMFileInspector(m_ipFAMDB, __nullptr, false, __nullptr);
+		m_ipFAMFileInspector->OpenFAMFileInspector(m_ipFAMDB, __nullptr, false, "", __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35799");
 }

@@ -51,6 +51,15 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentResultTime = new Extract.DataEntry.DataEntryTableColumn();
             this._labID = new Extract.DataEntry.DataEntryTextBox();
             this._testComponentTable = new Extract.DataEntry.DataEntryTable();
+            this._componentName = new Extract.DataEntry.DataEntryTableColumn();
+            this._testCode = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentValue = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentUnits = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentCalculatedFlag = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
             this._patientInfoGroupBox = new Extract.DataEntry.DataEntryGroupBox();
             this._patientNameTable = new Extract.DataEntry.DataEntryTable();
             this._patientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
@@ -76,15 +85,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._messageSequenceNumberFile = new Extract.DataEntry.DataEntryTextBox();
             this._filename = new Extract.DataEntry.DataEntryTextBox();
             this._hasCoverPageComboBox = new Extract.DataEntry.DataEntryComboBox();
-            this._componentName = new Extract.DataEntry.DataEntryTableColumn();
-            this._testCode = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentValue = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentUnits = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentCalculatedFlag = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
+            this._duplicateDocumentsButton = new Extract.DataEntry.DEP.UWTransplantCenter.DuplicateDocumentsButton();
             Name = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -358,6 +359,116 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._testComponentTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._testComponentTable.Size = new System.Drawing.Size(581, 288);
             this._testComponentTable.TabIndex = 7;
+            // 
+            // _componentName
+            // 
+            this._componentName.AttributeName = ".";
+            this._componentName.AutoUpdateQuery = resources.GetString("_componentName.AutoUpdateQuery");
+            this._componentName.FillWeight = 80F;
+            this._componentName.HeaderText = "Test Name";
+            this._componentName.Name = "_componentName";
+            this._componentName.SmartHintsEnabled = true;
+            this._componentName.ValidationErrorMessage = "Test name is invalid for the current order";
+            this._componentName.ValidationQuery = resources.GetString("_componentName.ValidationQuery");
+            // 
+            // _testCode
+            // 
+            this._testCode.AttributeName = "TestCode";
+            this._testCode.AutoUpdateQuery = resources.GetString("_testCode.AutoUpdateQuery");
+            this._testCode.FillWeight = 40F;
+            this._testCode.HeaderText = "Code";
+            this._testCode.Name = "_testCode";
+            this._testCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._testCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
+            this._testCode.ValidationErrorMessage = "Test code is invalid for the current order.";
+            this._testCode.ValidationQuery = resources.GetString("_testCode.ValidationQuery");
+            this._testCode.Visible = false;
+            // 
+            // _componentValue
+            // 
+            this._componentValue.AttributeName = "Value";
+            this._componentValue.AutoUpdateQuery = resources.GetString("_componentValue.AutoUpdateQuery");
+            this._componentValue.FillWeight = 40F;
+            this._componentValue.HeaderText = "Value";
+            this._componentValue.Name = "_componentValue";
+            this._componentValue.SmartHintsEnabled = true;
+            this._componentValue.ValidationErrorMessage = "Test value must be specified.";
+            this._componentValue.ValidationPattern = "\\S";
+            // 
+            // _componentUnits
+            // 
+            this._componentUnits.AttributeName = "Units";
+            this._componentUnits.AutoUpdateQuery = "<Expression><Attribute TriggerUpdate=\'False\' Name=\'Units\'>.</Attribute> == \'\'\r\n? " +
+    "<SQL>SELECT [Unit] FROM LabTest WHERE [TestCode] = <Attribute>../TestCode</Attri" +
+    "bute></SQL>\r\n: <Units/>\r\n</Expression>";
+            this._componentUnits.FillWeight = 40F;
+            this._componentUnits.HeaderText = "Units";
+            this._componentUnits.Name = "_componentUnits";
+            this._componentUnits.SmartHintsEnabled = true;
+            this._componentUnits.ValidationCorrectsCase = false;
+            this._componentUnits.ValidationErrorMessage = "Unrecognized unit designation.";
+            this._componentUnits.ValidationQuery = "[BLANK]\r\n<SQL>SELECT Unit FROM Unit ORDER BY Unit</SQL>";
+            // 
+            // _componentRefRange
+            // 
+            this._componentRefRange.AttributeName = "Range";
+            this._componentRefRange.AutoUpdateQuery = resources.GetString("_componentRefRange.AutoUpdateQuery");
+            this._componentRefRange.FillWeight = 65F;
+            this._componentRefRange.FormattingRuleFile = "Rules\\Swiping\\Range.rsd.etf";
+            this._componentRefRange.HeaderText = "Ref. Range";
+            this._componentRefRange.Name = "_componentRefRange";
+            this._componentRefRange.SmartHintsEnabled = true;
+            this._componentRefRange.ValidationErrorMessage = "Value is not allowed.";
+            // 
+            // _componentCalculatedFlag
+            // 
+            this._componentCalculatedFlag.AttributeName = "CalculatedFlag";
+            this._componentCalculatedFlag.AutoUpdateQuery = resources.GetString("_componentCalculatedFlag.AutoUpdateQuery");
+            this._componentCalculatedFlag.FillWeight = 1F;
+            this._componentCalculatedFlag.HeaderText = "CalculatedFlag";
+            this._componentCalculatedFlag.Name = "_componentCalculatedFlag";
+            this._componentCalculatedFlag.PersistAttribute = false;
+            this._componentCalculatedFlag.ValidationErrorMessage = "Invalid value";
+            this._componentCalculatedFlag.Visible = false;
+            // 
+            // _componentFlag
+            // 
+            this._componentFlag.AttributeName = "Flag";
+            this._componentFlag.AutoUpdateQuery = "<Expression>\r\n\t(<Attribute Name=\'CalculatedFlag\'>../CalculatedFlag</Attribute> ==" +
+    " \'?\') ? <Attribute>.</Attribute> :\r\n\t(<CalculatedFlag/> == \'\') ? \'[BLANK]\' :\r\n\t<" +
+    "CalculatedFlag/>\r\n</Expression>";
+            this._componentFlag.FillWeight = 35F;
+            this._componentFlag.HeaderText = "Flag";
+            this._componentFlag.Name = "_componentFlag";
+            this._componentFlag.SmartHintsEnabled = true;
+            this._componentFlag.UseComboBoxCells = true;
+            this._componentFlag.ValidationErrorMessage = "Flag does not correspond with test value and range";
+            this._componentFlag.ValidationQuery = "<Expression>\r\n\t(<Attribute>../CalculatedFlag</Attribute> != \'A\') ? \'[BLANK]\' : \'\'" +
+    "\r\n</Expression>\r\n<Expression>\r\n\t(<Attribute>../CalculatedFlag</Attribute> != \'\')" +
+    " ? \'A\' : \'\'\r\n</Expression>";
+            // 
+            // _componentStatusColumn
+            // 
+            this._componentStatusColumn.AttributeName = "Status";
+            this._componentStatusColumn.AutoUpdateQuery = "<Query Default=\'True\'>F</Query>";
+            this._componentStatusColumn.FillWeight = 30F;
+            this._componentStatusColumn.HeaderText = "Status";
+            this._componentStatusColumn.Name = "_componentStatusColumn";
+            this._componentStatusColumn.UseComboBoxCells = true;
+            this._componentStatusColumn.ValidationErrorMessage = "Invalid value";
+            this._componentStatusColumn.ValidationQuery = "C\r\nF";
+            // 
+            // _componentOriginalName
+            // 
+            this._componentOriginalName.AttributeName = "OriginalName";
+            this._componentOriginalName.AutoUpdateQuery = "<Expression>\r\n(<Attribute Name=\'OriginalName\'>.</Attribute> == \'\') ? <Attribute S" +
+    "patialMode=\'Force\'>..</Attribute> : <OriginalName SpatialMode=\'Force\'/>\r\n</Expre" +
+    "ssion>";
+            this._componentOriginalName.HeaderText = "Test Name On Document";
+            this._componentOriginalName.Name = "_componentOriginalName";
+            this._componentOriginalName.ValidationErrorMessage = "Missing AKA in the Order Mapper Database";
+            this._componentOriginalName.ValidationQuery = "";
+            this._componentOriginalName.Visible = false;
             // 
             // _patientInfoGroupBox
             // 
@@ -702,121 +813,39 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._hasCoverPageComboBox.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n[BLANK]\r\nYes\r\nNo\r\n</Query>";
             this._hasCoverPageComboBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.HandleHasCoverPageComboBox_DrawItem);
             // 
-            // _componentName
+            // _duplicateDocumentsButton
             // 
-            this._componentName.AttributeName = ".";
-            this._componentName.AutoUpdateQuery = resources.GetString("_componentName.AutoUpdateQuery");
-            this._componentName.FillWeight = 80F;
-            this._componentName.HeaderText = "Test Name";
-            this._componentName.Name = "_componentName";
-            this._componentName.SmartHintsEnabled = true;
-            this._componentName.ValidationErrorMessage = "Test name is invalid for the current order";
-            this._componentName.ValidationQuery = resources.GetString("_componentName.ValidationQuery");
-            // 
-            // _testCode
-            // 
-            this._testCode.AttributeName = "TestCode";
-            this._testCode.AutoUpdateQuery = resources.GetString("_testCode.AutoUpdateQuery");
-            this._testCode.FillWeight = 40F;
-            this._testCode.HeaderText = "Code";
-            this._testCode.Name = "_testCode";
-            this._testCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._testCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
-            this._testCode.ValidationErrorMessage = "Test code is invalid for the current order.";
-            this._testCode.ValidationQuery = resources.GetString("_testCode.ValidationQuery");
-            this._testCode.Visible = false;
-            // 
-            // _componentValue
-            // 
-            this._componentValue.AttributeName = "Value";
-            this._componentValue.AutoUpdateQuery = resources.GetString("_componentValue.AutoUpdateQuery");
-            this._componentValue.FillWeight = 40F;
-            this._componentValue.HeaderText = "Value";
-            this._componentValue.Name = "_componentValue";
-            this._componentValue.SmartHintsEnabled = true;
-            this._componentValue.ValidationErrorMessage = "Test value must be specified.";
-            this._componentValue.ValidationPattern = "\\S";
-            // 
-            // _componentUnits
-            // 
-            this._componentUnits.AttributeName = "Units";
-            this._componentUnits.AutoUpdateQuery = "<Expression><Attribute TriggerUpdate=\'False\' Name=\'Units\'>.</Attribute> == \'\'\r\n? " +
-    "<SQL>SELECT [Unit] FROM LabTest WHERE [TestCode] = <Attribute>../TestCode</Attri" +
-    "bute></SQL>\r\n: <Units/>\r\n</Expression>";
-            this._componentUnits.FillWeight = 40F;
-            this._componentUnits.HeaderText = "Units";
-            this._componentUnits.Name = "_componentUnits";
-            this._componentUnits.SmartHintsEnabled = true;
-            this._componentUnits.ValidationCorrectsCase = false;
-            this._componentUnits.ValidationErrorMessage = "Unrecognized unit designation.";
-            this._componentUnits.ValidationQuery = "[BLANK]\r\n<SQL>SELECT Unit FROM Unit ORDER BY Unit</SQL>";
-            // 
-            // _componentRefRange
-            // 
-            this._componentRefRange.AttributeName = "Range";
-            this._componentRefRange.AutoUpdateQuery = resources.GetString("_componentRefRange.AutoUpdateQuery");
-            this._componentRefRange.FillWeight = 65F;
-            this._componentRefRange.FormattingRuleFile = "Rules\\Swiping\\Range.rsd.etf";
-            this._componentRefRange.HeaderText = "Ref. Range";
-            this._componentRefRange.Name = "_componentRefRange";
-            this._componentRefRange.SmartHintsEnabled = true;
-            this._componentRefRange.ValidationErrorMessage = "Value is not allowed.";
-            // 
-            // _componentCalculatedFlag
-            // 
-            this._componentCalculatedFlag.AttributeName = "CalculatedFlag";
-            this._componentCalculatedFlag.AutoUpdateQuery = resources.GetString("_componentCalculatedFlag.AutoUpdateQuery");
-            this._componentCalculatedFlag.FillWeight = 1F;
-            this._componentCalculatedFlag.HeaderText = "CalculatedFlag";
-            this._componentCalculatedFlag.Name = "_componentCalculatedFlag";
-            this._componentCalculatedFlag.PersistAttribute = false;
-            this._componentCalculatedFlag.ValidationErrorMessage = "Invalid value";
-            this._componentCalculatedFlag.Visible = false;
-            // 
-            // _componentFlag
-            // 
-            this._componentFlag.AttributeName = "Flag";
-            this._componentFlag.AutoUpdateQuery = "<Expression>\r\n\t(<Attribute Name=\'CalculatedFlag\'>../CalculatedFlag</Attribute> ==" +
-    " \'?\') ? <Attribute>.</Attribute> :\r\n\t(<CalculatedFlag/> == \'\') ? \'[BLANK]\' :\r\n\t<" +
-    "CalculatedFlag/>\r\n</Expression>";
-            this._componentFlag.FillWeight = 35F;
-            this._componentFlag.HeaderText = "Flag";
-            this._componentFlag.Name = "_componentFlag";
-            this._componentFlag.SmartHintsEnabled = true;
-            this._componentFlag.UseComboBoxCells = true;
-            this._componentFlag.ValidationErrorMessage = "Flag does not correspond with test value and range";
-            this._componentFlag.ValidationQuery = "<Expression>\r\n\t(<Attribute>../CalculatedFlag</Attribute> != \'A\') ? \'[BLANK]\' : \'\'" +
-    "\r\n</Expression>\r\n<Expression>\r\n\t(<Attribute>../CalculatedFlag</Attribute> != \'\')" +
-    " ? \'A\' : \'\'\r\n</Expression>";
-            // 
-            // _componentStatusColumn
-            // 
-            this._componentStatusColumn.AttributeName = "Status";
-            this._componentStatusColumn.AutoUpdateQuery = "<Query Default=\'True\'>F</Query>";
-            this._componentStatusColumn.FillWeight = 30F;
-            this._componentStatusColumn.HeaderText = "Status";
-            this._componentStatusColumn.Name = "_componentStatusColumn";
-            this._componentStatusColumn.UseComboBoxCells = true;
-            this._componentStatusColumn.ValidationErrorMessage = "Invalid value";
-            this._componentStatusColumn.ValidationQuery = "C\r\nF";
-            // 
-            // _componentOriginalName
-            // 
-            this._componentOriginalName.AttributeName = "OriginalName";
-            this._componentOriginalName.AutoUpdateQuery = "<Expression>\r\n(<Attribute Name=\'OriginalName\'>.</Attribute> == \'\') ? <Attribute S" +
-    "patialMode=\'Force\'>..</Attribute> : <OriginalName SpatialMode=\'Force\'/>\r\n</Expre" +
-    "ssion>";
-            this._componentOriginalName.HeaderText = "Test Name On Document";
-            this._componentOriginalName.Name = "_componentOriginalName";
-            this._componentOriginalName.ValidationErrorMessage = "Missing AKA in the Order Mapper Database";
-            this._componentOriginalName.ValidationQuery = "";
-            this._componentOriginalName.Visible = false;
+            this._duplicateDocumentsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._duplicateDocumentsButton.AttributeName = null;
+            this._duplicateDocumentsButton.AutoUpdateQuery = resources.GetString("_duplicateDocumentsButton.AutoUpdateQuery");
+            this._duplicateDocumentsButton.CollectionDate = null;
+            this._duplicateDocumentsButton.CollectionDateMetadataField = "CollectionDate";
+            this._duplicateDocumentsButton.DOB = null;
+            this._duplicateDocumentsButton.FileProcessingDB = null;
+            this._duplicateDocumentsButton.FirstName = null;
+            this._duplicateDocumentsButton.LastName = null;
+            this._duplicateDocumentsButton.Location = new System.Drawing.Point(411, 83);
+            this._duplicateDocumentsButton.Name = "_duplicateDocumentsButton";
+            this._duplicateDocumentsButton.PatientDOBMetadataField = "PatientDOB";
+            this._duplicateDocumentsButton.PatientFirstNameMetadataField = "PatientFirstName";
+            this._duplicateDocumentsButton.PatientLastNameMetadataField = "PatientLastName";
+            this._duplicateDocumentsButton.Size = new System.Drawing.Size(163, 23);
+            this._duplicateDocumentsButton.StapledDocumentOutput = "$DirOf(<SourceDocName>)\\Stapled_<FirstName>_<LastName>_$RandomAlphaNumeric(5).tif";
+            this._duplicateDocumentsButton.StapledIntoMetadataFieldName = "StapledInto";
+            this._duplicateDocumentsButton.StapledIntoMetadataFieldValue = "<StapledDocumentOutput>";
+            this._duplicateDocumentsButton.TabIndex = 11;
+            this._duplicateDocumentsButton.TagForIgnore = "User_Ignore document";
+            this._duplicateDocumentsButton.TagForStaple = null;
+            this._duplicateDocumentsButton.Text = "Duplicate documents...";
+            this._duplicateDocumentsButton.UseVisualStyleBackColor = true;
+            this._duplicateDocumentsButton.ValidationErrorMessage = "Invalid value";
             // 
             // UWTransplantCenterPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.CommentControl = this._operatorComments;
+            this.Controls.Add(this._duplicateDocumentsButton);
             this.Controls.Add(this._hasCoverPageComboBox);
             this.Controls.Add(label2);
             this.Controls.Add(this._filename);
@@ -900,5 +929,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private DataEntryTableColumn _componentFlag;
         private DataEntryTableColumn _componentStatusColumn;
         private DataEntryTableColumn _componentOriginalName;
+        private DuplicateDocumentsButton _duplicateDocumentsButton;
     }
 }

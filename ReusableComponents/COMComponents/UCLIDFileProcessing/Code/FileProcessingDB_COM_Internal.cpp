@@ -7448,3 +7448,60 @@ bool CFileProcessingDB::GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long
 	}
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SetMetadataFieldValue_Internal(bool bDBLocked, long nFileID,
+													   BSTR bstrMetadataFieldName,
+													   BSTR bstrMetadataFieldValue)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			string strQuery =
+				"DECLARE @fieldID INT "
+				"SELECT @fieldID = [ID] FROM [MetadataField] "
+				"	WHERE [Name] = '<MetadataFieldName>' "
+
+				"IF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = <FileID> AND [MetadataFieldID] = @fieldID) "
+				"	UPDATE [FileMetadataFieldValue] SET [Value] = '<MetadataFieldValue>' "
+				"		WHERE [FileID] = <FileID> AND [MetadataFieldID] = @fieldID "
+				"ELSE "
+				"	INSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value]) "
+				"		VALUES (<FileID>, @fieldID, '<MetadataFieldValue>')";
+
+			replaceVariable(strQuery, "<FileID>", asString(nFileID));
+			replaceVariable(strQuery, "<MetadataFieldName>", asString(bstrMetadataFieldName));
+			replaceVariable(strQuery, "<MetadataFieldValue>", asString(bstrMetadataFieldValue));
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+				ipConnection->Execute(strQuery.c_str(), NULL, adCmdText);
+
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37558");	
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37559");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------

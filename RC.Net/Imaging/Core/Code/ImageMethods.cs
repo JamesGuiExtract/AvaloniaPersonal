@@ -9,10 +9,189 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Extract.Imaging
 {
+    /// <summary>
+    /// Encapsulates information about a document page for use in <see cref="ImageMethods"/> methods.
+    /// </summary>
+    public struct ImagePage
+    {
+        #region Fields
+
+        /// <summary>
+        /// The document name this page came from.
+        /// </summary>
+        string _documentName;
+
+        /// <summary>
+        /// The page number of the document this page came from.
+        /// </summary>
+        int _pageNumber;
+
+        /// <summary>
+        /// The orientation of the image page relative to its original orientation in
+        /// degrees.
+        /// </summary>
+        int _imageOrientation;
+        
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImagePage"/> struct.
+        /// </summary>
+        /// <param name="documentName">The document name this page came from.</param>
+        /// <param name="pageNumber">The page number of the document this page came from.</param>
+        /// <param name="imageOrientation">The orientation of the image page relative to its
+        /// original orientation in degrees.</param>
+        public ImagePage(string documentName, int pageNumber, int imageOrientation)
+        {
+            _documentName = documentName;
+            _pageNumber = pageNumber;
+            _imageOrientation = imageOrientation;
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the document name this page came from.
+        /// </summary>
+        /// <value>
+        /// The document name this page came from.
+        /// </value>
+        public string DocumentName
+        {
+            get
+            {
+                return _documentName;
+            }
+        }
+
+        /// <summary>
+        /// Gets the page number of the document this page came from.
+        /// </summary>
+        /// <value>
+        /// The page number of the document this page came from.
+        /// </value>
+        public int PageNumber
+        {
+            get
+            {
+                return _pageNumber;
+            }
+        }
+
+        /// <summary>
+        /// Gets the orientation of the image page relative to its original orientation in
+        /// degrees.
+        /// </summary>
+        /// <value>
+        /// The orientation of the image page relative to its original orientation in
+        /// degrees.
+        /// </value>
+        public int ImageOrientation
+        {
+            get
+            {
+                return _imageOrientation;
+            }
+        }
+
+        #endregion Properties
+
+        #region Overrides
+
+        /// <summary>
+        /// Returns a <see cref="System.String"/> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String"/> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return string.Concat(DocumentName, " (", PageNumber, ")");
+        }
+
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data
+        /// structures like a hash table.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return DocumentName.GetHashCode() ^ PageNumber.GetHashCode() ^ ImageOrientation.GetHashCode();
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
+        /// <returns>
+        /// <see langword="true"/> if the specified <see cref="System.Object"/> is equal to this
+        /// instance; otherwise, <see langword="false"/>.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is ImagePage))
+            {
+                return false;
+            }
+
+            return Equals((ImagePage)obj);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="ImagePage"/> is equal to this instance.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <returns>
+        /// <see langword="true"/> if the specified <see cref="ImagePage"/> is equal to this
+        /// instance; otherwise, <see langword="false"/>.
+        /// </returns>
+        public bool Equals(ImagePage obj)
+        {
+            return this == obj;
+        }
+
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(ImagePage left, ImagePage right)
+        {
+            return left.DocumentName == right.DocumentName
+                && left.PageNumber == right.PageNumber
+                && left.ImageOrientation == right.ImageOrientation;
+        }
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator !=(ImagePage left, ImagePage right)
+        {
+            return !(left == right);
+        }
+
+        #endregion Overrides
+    }
+
     /// <summary>
     /// Contains image manipulation methods.
     /// </summary>
@@ -835,6 +1014,241 @@ namespace Extract.Imaging
             {
                 throw ex.AsExtract("ELI37000");
             }
+        }
+
+        /// <summary>
+        /// Staples the specified <see paramref="imagePages"/> into a new output document having the
+        /// name <see paramref="outputFileName"/>.
+        /// </summary>
+        /// <param name="imagePages">The <see cref="ImagePage"/>s to comprise the output document.
+        /// </param>
+        /// <param name="outputFileName">The filename to use for the output document.</param>
+        public static void StaplePagesAsNewDocument(IEnumerable<ImagePage> imagePages,
+            string outputFileName)
+        {
+            using (ImageCodecs codecs = new ImageCodecs())
+            {
+                ImageWriter writer = null;
+                TemporaryFile temporaryFile = null;
+                var readers = new Dictionary<string, ImageReader>();
+
+                try
+                {
+                    // Determine the format of the output document based on the image page with the
+                    // highest bitdepth.
+                    ColorResolutionCommand conversionCommand;
+                    int outputBitsPerPixel;
+                    RasterImageFormat outputFormat;
+                    InitializeOutputFormat(imagePages,
+                        out conversionCommand, out outputBitsPerPixel, out outputFormat);
+
+                    // Create an ImageWriter to produce the output document.
+                    if (!ImageMethods.IsTiff(outputFormat) &&
+                        Path.GetExtension(outputFileName)
+                            .StartsWith(".tif", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Ensure the default output format can handle color if the
+                        // output is to be in color.
+                        RasterImageFormat defaultFormat = (outputBitsPerPixel == 1)
+                            ? RasterImageFormat.CcittGroup4
+                            : RasterImageFormat.TifLzw;
+
+                        // If the image format is not tif, but the output filename
+                        // has a tif extension, change the format to a tif.
+                        writer = codecs.CreateWriter(outputFileName, defaultFormat, false);
+                    }
+                    else if (ImageMethods.IsPdf(outputFormat) ||
+                                Path.GetExtension(outputFileName)
+                                    .Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // If the output format is PDF, first output a tif to a
+                        // temporary file, then we will convert to a PDF at the end.
+                        // Theoretically, this shouldn't be necessary, but I was
+                        // not otherwise able able to get the LeadTools .Net API
+                        // to output an acceptable quality color PDF that was not
+                        // too large (PdfCompressor tended to produce unsightly
+                        // blocks on areas with light shading and I could not get
+                        // a reasonably sized output doc without using PdfCompressor.
+                        temporaryFile = new TemporaryFile(true);
+                        writer = codecs.CreateWriter(temporaryFile.FileName, outputFormat, false);
+                    }
+                    else
+                    {
+                        writer = codecs.CreateWriter(outputFileName, outputFormat, false);
+                    }
+
+                    // Add each image page the output document
+                    foreach (ImagePage imagePage in imagePages)
+                    {
+                        // Get an image reader for the current page.
+                        ImageReader reader;
+                        if (!readers.TryGetValue(imagePage.DocumentName, out reader))
+                        {
+                            reader = codecs.CreateReader(imagePage.DocumentName);
+                            readers[imagePage.DocumentName] = reader;
+                        }
+
+                        using (RasterImage rasterPage = reader.ReadPage(imagePage.PageNumber))
+                        {
+                            // [DotNetRCAndUtils:969]
+                            // Ensure the format of imagePage is such that it can be
+                            // appended to the writer without error.
+                            SetImageFormat(conversionCommand, rasterPage);
+
+                            // Image must be rotated with forceTrueRotation to true, otherwise
+                            // the output page is not rendered with the correct orientation
+                            // (unclear why).
+                            ImageMethods.RotateImageByDegrees(
+                                rasterPage, imagePage.ImageOrientation, true);
+
+                            writer.AppendImage(rasterPage);
+                        }
+                    }
+
+                    writer.Commit(true);
+
+                    // If the final output is to be a pdf, convert the temporary tif to a
+                    // pdf now.
+                    if (temporaryFile != null)
+                    {
+                        ImageMethods.ConvertTifToPdf(temporaryFile.FileName, outputFileName, true);
+                        temporaryFile.Dispose();
+                    }
+                }
+                finally
+                {
+                    try
+                    {
+                        if (writer != null)
+                        {
+                            writer.Dispose();
+                        }
+
+                        CollectionMethods.ClearAndDispose(readers);
+
+                        if (temporaryFile != null)
+                        {
+                            temporaryFile.Dispose();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI35555");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Initializes the output format parameters based on the page with the highest bitdepth
+        /// from <see paramref="imagePages"/>.
+        /// </summary>
+        /// <param name="imagePages">The <see cref="ImagePage"/>s to be used as a basis for a
+        /// document's format.</param>
+        /// <param name="conversionCommand">The <see cref="ColorResolutionCommand"/> command
+        /// used to convert image pages to the output format.</param>
+        /// <param name="outputBitsPerPixel">The bits per pixel the output should be.</param>
+        /// <param name="outputFormat">The <see cref="RasterImageFormat"/> the output should be.
+        /// </param>
+        static void InitializeOutputFormat(IEnumerable<ImagePage> imagePages,
+            out ColorResolutionCommand conversionCommand, out int outputBitsPerPixel,
+            out RasterImageFormat outputFormat)
+        {
+            conversionCommand = null;
+            outputBitsPerPixel = 0;
+            outputFormat = RasterImageFormat.CcittGroup4;
+
+            using (ImageCodecs codecs = new ImageCodecs())
+            {
+                // This code was modified per https://extract.atlassian.net/browse/ISSUE-12470 to
+                // look through all pages, not just the first page from each source document.
+
+                // Create a dictionary of original document names of the pages in the output to the
+                // pages from those document(s) that are being used.
+                Dictionary<string, List<int>> documentPages = new Dictionary<string, List<int>>();
+                foreach (ImagePage imagePage in imagePages)
+                {
+                    List<int> pageList = null;
+                    if (!documentPages.TryGetValue(imagePage.DocumentName, out pageList))
+                    {
+                        pageList = new List<int>();
+                        documentPages[imagePage.DocumentName] = pageList;
+                    }
+
+                    pageList.Add(imagePage.PageNumber);
+                }
+
+                // Iterate through all source document pages and use the first page matching the
+                // highest bitdepth as the format to use for the output document.
+                foreach (KeyValuePair<string, List<int>> entry in documentPages)
+                {
+                    string sourceDocumentName = entry.Key;
+
+                    using (ImageReader imageReader = codecs.CreateReader(sourceDocumentName))
+                    {
+                        foreach (int page in entry.Value)
+                        {
+                            using (RasterImage imagePage = imageReader.ReadPage(page))
+                            {
+                                int bitsPerPixel = imagePage.BitsPerPixel;
+
+                                // The output format should be the first page or the page with the
+                                // highest bit depth.
+                                if (conversionCommand == null ||
+                                    bitsPerPixel > conversionCommand.BitsPerPixel)
+                                {
+                                    conversionCommand = new ColorResolutionCommand();
+                                    conversionCommand.Mode = ColorResolutionCommandMode.InPlace;
+                                    conversionCommand.BitsPerPixel = bitsPerPixel;
+                                    conversionCommand.DitheringMethod =
+                                        RasterDitheringMethod.FloydStein;
+                                    conversionCommand.PaletteFlags =
+                                            ColorResolutionCommandPaletteFlags.UsePalette;
+
+                                    conversionCommand.Order = imagePage.Order;
+                                    conversionCommand.SetPalette(imagePage.GetPalette());
+
+                                    outputBitsPerPixel = bitsPerPixel;
+                                    outputFormat = imageReader.Format;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the format of <see paramref="imagePage"/> to match
+        /// <see paramref="conversionCommand"/> if it does not already.
+        /// </summary>
+        /// <param name="conversionCommand">The <see cref="ColorResolutionCommand"/> used to apply
+        /// the desired format.</param>
+        /// <param name="rasterImage">The <see cref="RasterImage"/> whose format should be set.</param>
+        static void SetImageFormat(ColorResolutionCommand conversionCommand, RasterImage rasterImage)
+        {
+            // Check to see if conversion is required.
+            if (rasterImage.BitsPerPixel == conversionCommand.BitsPerPixel &&
+                rasterImage.Order == conversionCommand.Order)
+            {
+                var targetPalette = conversionCommand.GetPalette();
+                var imagePalette = rasterImage.GetPalette();
+
+                if (targetPalette == null && imagePalette == null)
+                {
+                    // No conversion is required.
+                    return;
+                }
+
+                if (targetPalette != null && imagePalette != null &&
+                    targetPalette.SequenceEqual(imagePalette))
+                {
+                    // No conversion is required.
+                    return;
+                }
+            }
+
+            conversionCommand.Run(rasterImage);
         }
     }
 

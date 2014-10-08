@@ -585,4 +585,10 @@ ORDER BY LabName
   <metadata name="_orderingPhysicianCodeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_duplicateDocumentsButton.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query TargetProperty='FirstName'&gt;&lt;Attribute&gt;/PatientInfo/Name/First&lt;/Attribute&gt;&lt;/Query&gt;
+&lt;Query TargetProperty='LastName'&gt;&lt;Attribute&gt;/PatientInfo/Name/Last&lt;/Attribute&gt;&lt;/Query&gt;
+&lt;Query TargetProperty='DOB'&gt;&lt;Attribute&gt;/PatientInfo/DOB&lt;/Attribute&gt;&lt;/Query&gt;
+&lt;Query TargetProperty='CollectionDate'&gt;&lt;Expression StringList=','&gt;&lt;Attribute Type='string[]'&gt;/Test/CollectionDate&lt;/Attribute&gt;.?{!string.IsNullOrWhiteSpace(#this)}.distinct()&lt;/Expression&gt;&lt;/Query&gt;</value>
+  </data>
 </root>

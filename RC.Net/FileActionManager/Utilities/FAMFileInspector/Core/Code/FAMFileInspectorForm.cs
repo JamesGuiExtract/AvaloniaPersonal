@@ -401,11 +401,16 @@ namespace Extract.FileActionManager.Utilities
         ToolStripMenuItem _clearFlagMenuItem;
 
         /// <summary>
-        /// A map of context menu options for custom columns to the column index to which the menu
-        /// menu item relates.
+        /// A map of column indices to the associated context sub-menu for specifying custom column
+        /// values.
         /// </summary>
-        Dictionary<ToolStripItem, int> _customColumnMenuItems =
-            new Dictionary<ToolStripItem, int>();
+        Dictionary<ToolStripItem, int> _customColumnMenus;
+
+        /// <summary>
+        /// A separator to use between custom column context menu options and the rest of the
+        /// context menu options.
+        /// </summary>
+        ToolStripSeparator _customMenuSeparator;
 
         /// <summary>
         /// Indicates whether a refresh of custom column values is pending.
@@ -655,6 +660,17 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets the custom columns currently present in the FFI.
+        /// </summary>
+        public IEnumerable<IFAMFileInspectorColumn> CustomColumns
+        {
+            get
+            {
+                return _customColumns.Values;
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="FileProcessingDB"/> whose files are being inspected when this
         /// instance is being used to inspect files from a database. Will be <see langword="null"/>
         /// if the instance is being used to inspect files from a directory or file list.
@@ -700,6 +716,22 @@ namespace Extract.FileActionManager.Utilities
         /// FFI.
         /// </summary>
         public bool LockFileSelector
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the summary message that should override the automatic filter summary
+        /// message.
+        /// <para><b>Note</b></para>
+        /// Valid only when <see cref="LockFileSelector"/> is <see langword="true"/>.
+        /// filter.
+        /// </summary>
+        /// <value>
+        /// The summary message that should override the automatic filter summary message.
+        /// </value>
+        public string LockedFileSelectionSummary
         {
             get;
             set;
@@ -867,9 +899,11 @@ namespace Extract.FileActionManager.Utilities
                 ExtractException.Assert("ELI37428", "Custom FFI columns can only be used when " +
                     "the FFI is running against a FAM database.", UseDatabaseMode);
 
+                // Custom columns will be inserted just before the folder column (which is
+                // auto-fill).
                 int nextCustomColumnIndex = (_customColumns.Count == 0)
-                    ? _fileListDataGridView.ColumnCount
-                    : _customColumns.Keys.Max();
+                    ? _fileListDataGridView.ColumnCount - 1
+                    : _customColumns.Keys.Max() + 1;
 
                 _customColumns[nextCustomColumnIndex] = column;
                 column.FileProcessingDB = FileProcessingDB;
@@ -1050,6 +1084,7 @@ namespace Extract.FileActionManager.Utilities
                 DisposeContextMenu();
 
                 // Re-create new context menu items.
+                _customColumnMenus = new Dictionary<ToolStripItem, int>();
                 _fileHandlerItems = new Dictionary<ToolStripMenuItem, FileHandlerItem>();
                 _copyFileNamesMenuItem = new ToolStripMenuItem("Copy filename(s)");
                 _copyFilesMenuItem = new ToolStripMenuItem("Copy file(s)");
@@ -1159,16 +1194,41 @@ namespace Extract.FileActionManager.Utilities
                 newContextMenuStrip.Items.Add(new ToolStripSeparator());
                 newContextMenuStrip.Items.Add(new ToolStripMenuItem("Cancel"));
 
+                // Adds any context menu options to be able to set value(s) in custom columns for
+                // the currently selected row(s).
+                AddCustomColumnMenus(newContextMenuStrip);
+
                 _fileListDataGridView.ContextMenuStrip = newContextMenuStrip;
 
                 // Handle the opening of the context menu so that the available options can be
                 // enabled/disabled appropriately.
                 newContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
-                newContextMenuStrip.Closed += HandleContextMenuStrip_Closed;
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35821");
+            }
+        }
+
+        /// <summary>
+        /// Gets information about the specified <see paramref="fileId"/>.
+        /// </summary>
+        /// <param name="fileId">The file id.</param>
+        /// <param name="fileName">The filename of the file.</param>
+        /// <param name="pageCount">The page count of the file.</param>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]        
+        public void GetFileInfo(int fileId, out string fileName, out int pageCount)
+        {
+            try
+            {
+                var fileData = _rowsByFileId[fileId].GetFileData();
+                fileName = fileData.FileName;
+                pageCount = fileData.PageCount;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37554");
             }
         }
 
@@ -2051,6 +2111,59 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the <see cref="DataGridView.EditingControlShowing"/> event of the
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridViewEditingControlShowingEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleFileListDataGridView_EditingControlShowing(object sender,
+            DataGridViewEditingControlShowingEventArgs e)
+        {
+            try
+            {
+                int fileID = -1;
+
+                // Check to see if the editing control is being displayed in a custom column.
+                // If so, load the valid value choices for that column.
+                string[] valueChoices = null;
+                IFAMFileInspectorColumn columnDefinition = null;
+                if (_customColumns.TryGetValue(_fileListDataGridView.CurrentCell.ColumnIndex,
+                    out columnDefinition))
+                {
+                    fileID = _fileListDataGridView.CurrentCell.OwningRow.GetFileData().FileID;
+                    valueChoices = columnDefinition
+                        .GetValueChoices(fileID)
+                        .ToIEnumerable<string>()
+                        .ToArray();
+                }
+
+                // If the column is a combo box column, populate the value choices as the combo
+                // box's drop items.
+                var comboBox = e.Control as DataGridViewComboBoxEditingControl;
+                if (comboBox != null)
+                {
+                    comboBox.Items.Clear();
+                    if (valueChoices != null)
+                    {
+                        comboBox.Items.AddRange(valueChoices);
+                    }
+                    // Clearing combo box items will have cleared the value; restore the proper
+                    // value.
+                    comboBox.Text = columnDefinition.GetValue(fileID);
+
+                    return;
+                }
+
+                // Future: Populate the auto-complete list for text box columns.
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37555");
+            }
+        }
+
+        /// <summary>
         /// Handles the case that the option to copy selected file names as text was invoked.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -2264,10 +2377,8 @@ namespace Extract.FileActionManager.Utilities
                     _reportMainMenuItem.Enabled = (selectionCount == 1);
                 }
 
-                // Context menu options pertaining to custom columns are added dynamically with each
-                // display of the context menu such that a custom column could change what options
-                // should be available within and FFI session depending on changing data.
-                AddCustomColumnMenus();
+                // Enable/disable custom column value choices based on the current selection.
+                UpdateCustomColumnMenuEnabledStates();
 
                 // Enable/disable the set/clear flag options depending on the flag status of the
                 // selected rows.
@@ -2278,59 +2389,6 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35822");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="T:ContextMenuStripItem.Closing"/> event of the
-        /// <see cref="_fileListDataGridView"/>'s <see cref="ContextMenuStrip"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="ToolStripDropDownClosedEventArgs"/> instance containing
-        /// the event data.</param>
-        void HandleContextMenuStrip_Closed(object sender, ToolStripDropDownClosedEventArgs e)
-        {
-            try
-            {
-                // Because the context menu is closed before the event handler of the selected
-                // option is called, use BeginInvoke to close and dispose of the custom column
-                // related menu items after the already queued events related to processing the
-                // context menu item click.
-                this.SafeBeginInvoke("ELI37436", () =>
-                {
-                    if (_customColumnMenuItems.Count > 0)
-                    {
-                        // Loop through each custom column menu item to unsubscribe events and dispose.
-                        foreach (KeyValuePair<ToolStripItem, int> menuOption in _customColumnMenuItems)
-                        {
-                            // An index of >= 0 is a sub menu item that needs to be unsubscribed
-                            if (menuOption.Value >= 0)
-                            {
-                                menuOption.Key.Click -= HandleCustomColumnContextMenuItem_Click;
-                            }
-                            // An index of -2 indicates the parent menu item for the column that
-                            // needs to be removed from main context menu.
-                            else if (menuOption.Value == -2)
-                            {
-                                _fileListDataGridView.ContextMenuStrip.Items.Remove(menuOption.Key);
-                            }
-
-                            menuOption.Key.Dispose();
-                        }
-
-                        // Since at least one context menu was added, so was a separator that now
-                        // needs to be removed as well.
-                        ToolStripItem separator = _fileListDataGridView.ContextMenuStrip.Items[0];
-                        _fileListDataGridView.ContextMenuStrip.Items.RemoveAt(0);
-                        separator.Dispose();
-
-                        _customColumnMenuItems.Clear();
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI37437");
             }
         }
 
@@ -2351,7 +2409,7 @@ namespace Extract.FileActionManager.Utilities
                 {
                     // All selected rows that are visible should have the text of the selected menu
                     // option applied as the new cell value.
-                    int columnIndex = _customColumnMenuItems[menuItem];
+                    int columnIndex = _customColumnMenus[menuItem.OwnerItem];
                     foreach (var row in _fileListDataGridView.SelectedRows
                         .OfType<DataGridViewRow>()
                         .Where(row => row.Visible))
@@ -3320,13 +3378,16 @@ namespace Extract.FileActionManager.Utilities
                             fileData.PageCount = (int)row["Pages"];
 
                             var rowValues = new List<object>(new object[] 
-                                { flagValue, fileName, fileData.PageCount, fileData, directory });
+                                { flagValue, fileName, fileData.PageCount, fileData });
 
                             // Add any the row values for any custom columns.
                             foreach (IFAMFileInspectorColumn column in _customColumns.Values)
                             {
                                 rowValues.Add(column.GetValue(fileData.FileID));
                             }
+
+                            // Since the directory column size mode is set to fill, it should be last.
+                            rowValues.Add(directory);
 
                             // Invoke the new row to be added on the UI thread.
                             this.SafeBeginInvoke("ELI35725", () =>
@@ -4437,7 +4498,10 @@ namespace Extract.FileActionManager.Utilities
 
             if (FileProcessingDB != null)
             {
-                string summaryText = FileSelector.GetSummaryString();
+                string summaryText =
+                    (LockFileSelector && !string.IsNullOrWhiteSpace(LockedFileSelectionSummary))
+                        ? LockedFileSelectionSummary
+                        : FileSelector.GetSummaryString();
                 _selectFilesSummaryLabel.Text = "Listing ";
                 _selectFilesSummaryLabel.Text +=
                     summaryText.Substring(0, 1).ToLower(CultureInfo.CurrentCulture);
@@ -4500,8 +4564,10 @@ namespace Extract.FileActionManager.Utilities
             }
 
             // Loop through each custom column definition.
-            foreach (IFAMFileInspectorColumn columnDefinition in _customColumns.Values)
+            foreach (KeyValuePair<int, IFAMFileInspectorColumn> customColumn in _customColumns)
             {
+                int columnIndex = customColumn.Key;
+                IFAMFileInspectorColumn columnDefinition = customColumn.Value;
                 DataGridViewColumn column = null;
                 if (columnDefinition.FFIColumnType == FFIColumnType.Text)
                 {
@@ -4509,9 +4575,16 @@ namespace Extract.FileActionManager.Utilities
                 }
                 else if (columnDefinition.FFIColumnType == FFIColumnType.Combo)
                 {
+                    // Combo box columns should be popluated with all possible value options across
+                    // all circumstances. The ones that are relevant for a specific row will be
+                    // queried at the time the value is edited in order to remove disallowed
+                    // values for that row.
                     var comboBoxColumn = new DataGridViewComboBoxColumn();
-                    var options = columnDefinition.GetValueChoices().ToIEnumerable<object>();
-                    comboBoxColumn.Items.AddRange(options.ToArray());
+                    var options = columnDefinition.GetValueChoices(-1).ToIEnumerable<object>();
+                    if (options != null)
+                    {
+                        comboBoxColumn.Items.AddRange(options.ToArray());
+                    }
 
                     column = comboBoxColumn;
                 }
@@ -4522,8 +4595,9 @@ namespace Extract.FileActionManager.Utilities
 
                 column.HeaderText = columnDefinition.HeaderText;
                 column.ReadOnly = columnDefinition.ReadOnly;
+                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
 
-                _fileListDataGridView.Columns.Add(column);
+                _fileListDataGridView.Columns.Insert(columnIndex, column);
 
                 column.Width = columnDefinition.DefaultWidth;
             }
@@ -4534,7 +4608,9 @@ namespace Extract.FileActionManager.Utilities
         /// dynamically with each display of the context menu such that a custom column could change
         /// what options should be available within and FFI session depending on changing data.
         /// </summary>
-        void AddCustomColumnMenus()
+        /// <param name="contextMenu">The <see cref="ContextMenuStrip"/> to which the menus should
+        /// be added.</param>
+        void AddCustomColumnMenus(ContextMenuStrip contextMenu)
         {
             int menuIndex = 0;
 
@@ -4545,42 +4621,22 @@ namespace Extract.FileActionManager.Utilities
                 int columnIndex = customColumn.Key;
                 IFAMFileInspectorColumn column = customColumn.Value;
                 
-                // First retrieve all options valid for single file selection.
-                var options = column.GetContextMenuChoices(false).ToIEnumerable<string>();
-                if (options.Any())
+                // Retrieve all options that may be valid across all possible selections and add
+                // them to a context sub-menu. Options that are not valid given a specific selection
+                // will be disabled at the time the context menu is diplayed.
+                var options = column.GetContextMenuChoices(null).ToIEnumerable<string>();
+                if (options != null && options.Any())
                 {
                     ToolStripMenuItem columnMenu = new ToolStripMenuItem(column.HeaderText);
 
-                    // Retrieve the options that should be available when multiple files are
-                    // selected.
-                    var multiSelectionOptions =
-                        column.GetContextMenuChoices(true).ToIEnumerable<string>();
-
-                    // Add each option as a sub-menu item for the column where items are disabled
-                    // if they are not available for multiply selected files and multiple files are
-                    // currently selected.
                     foreach (string option in options)
                     {
-                        var subMenuItem = columnMenu.DropDownItems.Add(option);
-                        subMenuItem.Enabled = (_fileListDataGridView.SelectedRows.Count == 1) ||
-                            multiSelectionOptions.Any(enabledOption => option == enabledOption);
-                        if (subMenuItem.Enabled)
-                        {
-                            subMenuItem.Click += HandleCustomColumnContextMenuItem_Click;
-                            _customColumnMenuItems[subMenuItem] = columnIndex;
-                        }
-                        else
-                        {
-                            // -1 indicates a menu item that is not enabled and therefore not
-                            // subscribed to the HandleCustomColumnContextMenuItem_Click event.
-                            _customColumnMenuItems[subMenuItem] = -1;
-                        }
+                        var subMenuItem = (ToolStripMenuItem)columnMenu.DropDownItems.Add(option);
+                        subMenuItem.Click += HandleCustomColumnContextMenuItem_Click;
                     }
 
-                    _fileListDataGridView.ContextMenuStrip.Items.Insert(menuIndex, columnMenu);
-                    // -2 Indicates the parent menu item for the column that will need to be removed
-                    // from _fileListDataGridView.ContextMenuStrip when the context menu is closed.
-                    _customColumnMenuItems[columnMenu] = -2;
+                    contextMenu.Items.Insert(menuIndex, columnMenu);
+                    _customColumnMenus[columnMenu] = columnIndex;
                     menuIndex++;
                 }
             }
@@ -4589,8 +4645,35 @@ namespace Extract.FileActionManager.Utilities
             // context menu options and the standard context menu options.
             if (menuIndex > 0)
             {
-                _fileListDataGridView.ContextMenuStrip.Items.Insert(
-                    menuIndex, new ToolStripSeparator());
+                _customMenuSeparator = new ToolStripSeparator();
+                contextMenu.Items.Insert(menuIndex, _customMenuSeparator);
+            }
+        }
+
+        /// <summary>
+        /// Enables/disables custom column value choices based on the current selection.
+        /// </summary>
+        void UpdateCustomColumnMenuEnabledStates()
+        {
+            HashSet<int> selectedFileIDs = new HashSet<int>(_fileListDataGridView.SelectedRows
+                .OfType<DataGridViewRow>()
+                .Where(row => row.Visible)
+                .Select(row => row.GetFileData().FileID));
+
+            // Loop through each custom column context menu to enable/disable the value choices
+            // based on the current selection,
+            foreach (KeyValuePair<ToolStripItem, int> customMenu in _customColumnMenus)
+            {
+                int columnIndex = customMenu.Value;
+                ToolStripMenuItem customToolStripMenu = (ToolStripMenuItem)customMenu.Key;
+
+                IFAMFileInspectorColumn column = _customColumns[columnIndex];
+                var enabledOptions = column.GetContextMenuChoices(selectedFileIDs);
+
+                foreach (ToolStripItem item in customToolStripMenu.DropDownItems)
+                {
+                    item.Enabled = (enabledOptions != null && enabledOptions.Contains(item.Text));
+                }
             }
         }
 
@@ -4724,6 +4807,25 @@ namespace Extract.FileActionManager.Utilities
             {
                 _fileListDataGridView.ContextMenuStrip.Dispose();
                 _fileListDataGridView.ContextMenuStrip = null;
+            }
+
+            if (_customColumnMenus != null)
+            {
+                foreach (var menuItem in _customColumnMenus.Keys.OfType<ToolStripMenuItem>())
+                {
+                    foreach (ToolStripItem subMenuItem in menuItem.DropDownItems)
+                    {
+                        subMenuItem.Dispose();
+                    }
+                    menuItem.Dispose();
+                }
+                _customColumnMenus = null;
+            }
+
+            if (_customMenuSeparator != null)
+            {
+                _customMenuSeparator.Dispose();
+                _customMenuSeparator = null;
             }
 
             if (_fileHandlerItems != null)

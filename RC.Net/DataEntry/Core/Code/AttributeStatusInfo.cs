@@ -906,6 +906,8 @@ namespace Extract.DataEntry
                 _attributes = attributes;
                 _sourceDocName = sourceDocName;
                 _dbConnection = dbConnection;
+
+                OnDataReset();
             }
             catch (Exception ex)
             {
@@ -3018,6 +3020,11 @@ namespace Extract.DataEntry
         #region Events
 
         /// <summary>
+        /// Raised whenever ResetData is called.
+        /// </summary>
+        public static event EventHandler<EventArgs> DataReset;
+
+        /// <summary>
         /// An event that indicates an attribute is being initialized into an 
         /// <see cref="IDataEntryControl"/>.
         /// <para><b>Note</b></para>
@@ -3112,6 +3119,18 @@ namespace Extract.DataEntry
             for (int i = 0; i < count; i++)
             {
                 MarkAsUnInitialized((IAttribute)subAttributes.At(i));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataReset"/> event.
+        /// </summary>
+        static void OnDataReset()
+        {
+            var eventHandler = AttributeStatusInfo.DataReset;
+            if (eventHandler != null)
+            {
+                eventHandler(null, new EventArgs());
             }
         }
 
