@@ -3,6 +3,19 @@
 @ECHO Uninstalling all Extract Systems applications...
 call "%~dp0UninstallExtract.bat"
 
+:: Setup the paths for the installs
+:: Assumes the internal build location is in SilentInstalls parallel to all the product installs
+:: Assumes release build location has a Other\SilentInstalls folder with the product installs
+::		in a folder parallel to Other and the product folder has the SetupFiles folder which is
+::		the same as the internal build root folder
+SET IDSHIELD_ROOT=%~dp0
+
+:: Replaces the Other\SilentInstalls path if it exists with the Release path 
+CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:Other\SilentInstalls=IDShield\SetupFiles%
+
+:: If replace the SilentInstalls with the product folder 
+CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:SilentInstalls=IDShield%
+
 IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	set ISSFILE="%~dp0IDShield64.iss"
 	set EXTRACT_COMMON=C:\Program Files (x86^)\Extract Systems\CommonComponents
@@ -15,7 +28,7 @@ IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 
 @ECHO.
 @ECHO Installing ID Shield
-start /wait "" "%~dp0..\IDShield\Setup" /s /f1%ISSFILE% /f2nul
+start /wait "" "%IDSHIELD_ROOT%Setup" /s /f1%ISSFILE% /f2nul
 
 :: Check registry for the uninstall for ID Shield as verification that it installed
 IF EXIST "%TEMP%\IDShieldInstalled.reg" DEL "%TEMP%\IDShieldInstalled.reg"

@@ -3,6 +3,26 @@
 @ECHO Uninstalling all Extract Systems applications...
 call "%~dp0UninstallExtract.bat"
 
+:: Setup the paths for the installs
+:: Assumes the internal build location is in SilentInstalls parallel to all the product installs
+:: Assumes release build location has a Other\SilentInstalls folder with the product installs
+::		in a folder parallel to Other and the product folder has the SetupFiles folder which is
+::		the same as the internal build root folder
+SET LABDE_ROOT=%~dp0
+SET FLEXINDEX_ROOT=%~dp0
+SET IDSHIELD_ROOT=%~dp0
+
+:: Replaces the Other\SilentInstalls path if it exists with the Release path 
+CALL SET LABDE_ROOT=%LABDE_ROOT:Other\SilentInstalls=LabDE\SetupFiles%
+CALL SET FLEXINDEX_ROOT=%FLEXINDEX_ROOT:Other\SilentInstalls=FLEXIndex\SetupFiles%
+CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:Other\SilentInstalls=IDShield\SetupFiles%
+
+:: If replace the SilentInstalls with the product folder 
+CALL SET LABDE_ROOT=%LABDE_ROOT:SilentInstalls=LabDE%
+CALL SET FLEXINDEX_ROOT=%FLEXINDEX_ROOT:SilentInstalls=FLEXIndex%
+CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:SilentInstalls=IDShield%
+
+
 IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	set LABDE_ISS="%~dp0LabDE64.iss"
 	set FLEXINDEX_ISS="%~dp0FlexIndex64.iss"
@@ -24,7 +44,7 @@ SET LM_ISS="%~dp0LM.iss"
 
 @ECHO.
 @ECHO Installing LabDE
-start /wait "" "%~dp0..\LabDE\Setup" /s /w /f1%LABDE_ISS% /f2nul
+start /wait "" "%LABDE_ROOT%Setup" /s /w /f1%LABDE_ISS% /f2nul
 
 :: Check registry for the uninstall for LabDE as verification that it installed
 IF EXIST "%TEMP%\LabDEInstalled.reg" DEL "%TEMP%\LabDEInstalled.reg"
@@ -37,7 +57,7 @@ DEL "%TEMP%\LabDEInstalled.reg"
 
 @ECHO.
 @ECHO Installing IDShield
-start /wait "" "%~dp0..\IDShield\Setup" /s /w /f1%IDSHIELD_ISS% /f2nul
+start /wait "" "%IDSHIELD_ROOT%Setup" /s /w /f1%IDSHIELD_ISS% /f2nul
 
 :: Check registry for the uninstall for ID Shield as verification that it installed
 IF EXIST "%TEMP%\IDShieldInstalled.reg" DEL "%TEMP%\IDShieldInstalled.reg"
@@ -50,7 +70,7 @@ DEL "%TEMP%\IDShieldInstalled.reg"
 
 @ECHO.
 @ECHO Installing FlexIndex
-start /wait "" "%~dp0..\FlexIndex\Setup" /s /w /f1%FLEXINDEX_ISS% /f2nul
+start /wait "" "%FLEXINDEX_ROOT%Setup" /s /w /f1%FLEXINDEX_ISS% /f2nul
 
 :: Check registry for the uninstall for FlexIndex as verification that it installed
 IF EXIST "%TEMP%\FlexIndexInstalled.reg" DEL "%TEMP%\FlexIndexInstalled.reg"
@@ -63,7 +83,7 @@ DEL "%TEMP%\FlexIndexInstalled.reg"
 
 @ECHO.
 @ECHO Installing Extract Systems LM
-start /wait "" "%~dp0..\Extract Systems LM\Setup" /s /w /f1%LM_ISS% /f2nul
+start /wait "" "%FLEXINDEX_ROOT%Extract Systems LM\Setup" /s /w /f1%LM_ISS% /f2nul
 
 call "%EXTRACT_COMMON%\RegisterAll.bat" /s
 
