@@ -991,9 +991,19 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 				ipOutput = ipWorkItem->BinaryOutput;
 				ASSERT_RESOURCE_ALLOCATION("ELI37084", ipOutput != __nullptr);
 
-				ipOutput->SourceDocName = strInputFile.c_str();
+				// Prevent blank pages from getting passed to CreateFromSpatialStrings
+				// https://extract.atlassian.net/browse/ISSUE-12448
+				if (ipOutput->GetMode() == kSpatialMode)
+				{
+					ipOutput->SourceDocName = strInputFile.c_str();
 
-				ipPagesToStitch->PushBack(ipOutput);
+					ipPagesToStitch->PushBack(ipOutput);
+				}
+				// Use blank page as entire output if no text is recognized (for SourceDocName and OCREngineVersion)
+				else
+				{
+					ipSS = ipOutput;
+				}
 			}
 			bDone = nWorkItems < gnMAX_WORK_ITEMS_TO_GET_PER_CALL;
 		}
@@ -1004,7 +1014,11 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 			aggregateException.addDebugInfo("Pages that failed", strPages);
 			aggregateException.log();
 		}
-		ipSS->CreateFromSpatialStrings(ipPagesToStitch);
+
+		if (ipPagesToStitch->Size() > 0)
+		{
+			ipSS->CreateFromSpatialStrings(ipPagesToStitch);
+		}
 
 		return ipSS;
 	}
