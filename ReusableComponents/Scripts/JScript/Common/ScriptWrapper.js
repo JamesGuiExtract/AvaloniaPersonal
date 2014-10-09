@@ -275,6 +275,7 @@ function prettyXMLSave(xDoc, strFileName) {
     }
     catch(err) {
         handleScriptError("ELI32526", "Unable to save XML file!", err, "XML Path", strFileName);
+        throw err;
     }
 }
 
