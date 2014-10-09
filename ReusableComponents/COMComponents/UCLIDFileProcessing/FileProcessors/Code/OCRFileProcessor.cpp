@@ -250,7 +250,6 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			long nWorkGroup = createWorkItems(nActionID, ipFileRecord, ipDB);
 			
 			IProgressStatusPtr ipProgressStatus(pProgressStatus);
-			EWorkItemStatus eGroupStatus;
 			EFileProcessingResult processingResult = 
 				waitForWorkToComplete(ipProgressStatus, ipDB, nWorkGroup, strInputFileName);
 

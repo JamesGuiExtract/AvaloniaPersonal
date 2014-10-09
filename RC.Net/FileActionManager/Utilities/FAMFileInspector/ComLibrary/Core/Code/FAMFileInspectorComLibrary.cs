@@ -40,8 +40,11 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="customColumns">An <see cref="IIUnknownVector"/> of
         /// <see cref="IFAMFileInspectorColumn"/> that should be present in the FFI's file list.
         /// </param>
+        /// <param name="owner">If not <see cref="IntPtr.Zero"/>, the FFI will be run as a modal
+        /// window to this specified owner. Otherwise, the FFI will be run non-modally.</param>
         void OpenFAMFileInspector(FileProcessingDB fileProcessingDB, IFAMFileSelector fileSelector,
-            bool lockFileSelector, string lockedFileSelectionSummary, IIUnknownVector customColumns);
+            bool lockFileSelector, string lockedFileSelectionSummary, IIUnknownVector customColumns,
+            IntPtr owner);
     }
 
     /// <summary>
@@ -91,9 +94,11 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="customColumns">An <see cref="IIUnknownVector"/> of
         /// <see cref="IFAMFileInspectorColumn"/> that should be present in the FFI's file list.
         /// </param>
+        /// <param name="owner">If not <see cref="IntPtr.Zero"/>, the FFI will be run as a modal
+        /// window to this specified owner. Otherwise, the FFI will be run non-modally.</param>
         public void OpenFAMFileInspector(FileProcessingDB fileProcessingDB,
             IFAMFileSelector fileSelector, bool lockFileSelector, string lockedFileSelectionSummary,
-            IIUnknownVector customColumns)
+            IIUnknownVector customColumns, IntPtr owner)
         {
             try
             {
@@ -193,7 +198,22 @@ namespace Extract.FileActionManager.Utilities
                             _fileInspectorForm.LockFileSelector = lockFileSelector;
                             _fileInspectorForm.LockedFileSelectionSummary = lockedFileSelectionSummary;
 
-                            Application.Run(_fileInspectorForm);
+                            if (owner == IntPtr.Zero)
+                            {
+                                // Run non-modal.
+                                Application.Run(_fileInspectorForm);
+                            }
+                            else
+                            {
+                                // Run modally to owner.
+                                IWin32Window ownerWindow = Control.FromHandle(owner);
+                                _fileInspectorForm.ShowDialog(ownerWindow);
+
+                                // After calling ShowDialog, the form cannot be re-used. Force
+                                // re-creation for the next OpenFAMFileInspector call.
+                                _fileInspectorForm.Dispose();
+                                _fileInspectorForm = null;
+                            }
                         }
                         catch (Exception ex)
                         {

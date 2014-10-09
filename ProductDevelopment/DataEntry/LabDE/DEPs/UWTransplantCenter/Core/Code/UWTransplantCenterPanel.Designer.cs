@@ -818,12 +818,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._duplicateDocumentsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._duplicateDocumentsButton.AttributeName = null;
             this._duplicateDocumentsButton.AutoUpdateQuery = resources.GetString("_duplicateDocumentsButton.AutoUpdateQuery");
-            this._duplicateDocumentsButton.CollectionDate = null;
             this._duplicateDocumentsButton.CollectionDateMetadataField = "CollectionDate";
-            this._duplicateDocumentsButton.DOB = null;
-            this._duplicateDocumentsButton.FileProcessingDB = null;
-            this._duplicateDocumentsButton.FirstName = null;
-            this._duplicateDocumentsButton.LastName = null;
             this._duplicateDocumentsButton.Location = new System.Drawing.Point(411, 83);
             this._duplicateDocumentsButton.Name = "_duplicateDocumentsButton";
             this._duplicateDocumentsButton.PatientDOBMetadataField = "PatientDOB";

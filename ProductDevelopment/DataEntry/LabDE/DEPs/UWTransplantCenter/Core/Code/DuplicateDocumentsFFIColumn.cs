@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Utilities;
+﻿using ADODB;
+using Extract.FileActionManager.Utilities;
 using Extract.Imaging;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -36,8 +37,9 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
 
         /// <summary>
         /// The value that indicates another user already has the file locked for processing.
+        /// (For use with String.Format where the owning user is specified as the only parameter).
         /// </summary>
-        static readonly string _IN_USE = "In use";
+        static readonly string _IN_USE = "In use ({0})";
 
         /// <summary>
         /// The value that indicates no action should be taken on the file.
@@ -61,14 +63,9 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         static readonly string _CURRENT = "Current document";
 
         /// <summary>
-        /// All actions.
-        /// </summary>
-        static string[] _ALL_FILE_OPTIONS = new[] { _IN_USE, _DO_NOTHING, _STAPLE, _IGNORE, _CURRENT };
-
-        /// <summary>
         /// All possible actions for files that are owned (checked-out) by the current process.
         /// </summary>
-        static string[] _OWNED_FILE_OPTIONS = new[] { _DO_NOTHING, _STAPLE, _IGNORE, _CURRENT };
+        static string[] _ALL_FILE_OPTIONS = new[] { _DO_NOTHING, _STAPLE, _IGNORE, _CURRENT };
 
         #endregion Constants
 
@@ -78,6 +75,11 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// Stores the currently selected action for all files that have been displayed in FFI.
         /// </summary>
         Dictionary<int, string> _currentValues = new Dictionary<int, string>();
+
+        /// <summary>
+        /// The files that are currently checked out for processing in different processes.
+        /// </summary>
+        HashSet<int> _inUseFiles = new HashSet<int>();
 
         /// <summary>
         /// Stores the previous file action status for the current action for all files that have
@@ -474,7 +476,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
 
                 if (fileIds == null)
                 {
-                    choices = _OWNED_FILE_OPTIONS;
+                    choices = _ALL_FILE_OPTIONS;
                 }
                 else
                 {
@@ -521,7 +523,12 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             try
             {
                 string currentValue = null;
-                if (_currentValues.TryGetValue(fileID, out currentValue))
+
+                // Attempt to retrieve the value we already have for this file, except in the case
+                // of a file that has been locked by another user... in that case attempt to check
+                // the file out again in case it has been released by the other user.
+                if (!_inUseFiles.Contains(fileID) &&
+                    _currentValues.TryGetValue(fileID, out currentValue))
                 {
                     return currentValue;
                 }
@@ -534,6 +541,8 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                     if (DataEntryApplication.FileRequestHandler.CheckoutForProcessing(
                         fileID, out previousStatus))
                     {
+                        _inUseFiles.Remove(fileID);
+
                         if (fileID == _currentFileID)
                         {
                             // This is the file currently displayed in verification.
@@ -552,7 +561,8 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                     {
                         // If the file could not be checked out, another process has the file locked
                         // for processing. Mark as in-use.
-                        value = _IN_USE;
+                        _inUseFiles.Add(fileID);
+                        value = GetInUseValue(fileID);
 
                         _previousStatuses[fileID] = EActionStatus.kActionProcessing;
                     }
@@ -751,17 +761,47 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// </returns>
         IEnumerable<string> GetValueChoicesHelper(int fileId)
         {
-            if (fileId == -1)
+            if (_inUseFiles.Contains(fileId))
             {
-                return _ALL_FILE_OPTIONS;
-            }
-            else if (_currentValues[fileId] == _IN_USE)
-            {
-                return new[] { _IN_USE };
+                return new[] { GetInUseValue(fileId) };
             }
             else
             {
-                return _OWNED_FILE_OPTIONS;
+                return _ALL_FILE_OPTIONS;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value for the column that indicates the file is in use. Includes the name of the
+        /// user that currently has the file locked.
+        /// </summary>
+        /// <param name="fileId">The file id.</param>
+        /// <returns>The value for the column that indicates the file is in use.</returns>
+        string GetInUseValue(int fileId)
+        {
+            Recordset adoRecordset = null;
+            try
+            {
+                adoRecordset = FileProcessingDB.GetResultsForQuery(
+                    "SELECT [UserName] FROM [FAMUser] " +
+                    "   INNER JOIN [FAMSession] ON [FAMUserID] = [FAMUser].[ID] " +
+                    "   INNER JOIN [LockedFile] ON [UPIID] = [FAMSession].[ID] " +
+                    "   WHERE [FileID] = " + fileId.ToString(CultureInfo.InvariantCulture));
+
+                string user = adoRecordset.EOF ? "" : (string)adoRecordset.Fields[0].Value;
+                if (string.IsNullOrWhiteSpace(user))
+                {
+                    user = "unknown";
+                }
+
+                return string.Format(CultureInfo.CurrentCulture, _IN_USE, user);
+            }
+            finally
+            {
+                if (adoRecordset != null)
+                {
+                    adoRecordset.Close(); 
+                }
             }
         }
 
@@ -935,6 +975,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         void ClearData()
         {
             _currentValues.Clear();
+            _inUseFiles.Clear();
             _valuesToRefresh.Clear();
             _checkedOutFileIDs.Clear();
             _currentFileID = -1;

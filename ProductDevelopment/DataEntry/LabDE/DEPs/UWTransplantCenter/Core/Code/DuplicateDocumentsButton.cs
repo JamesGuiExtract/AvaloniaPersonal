@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Utilities;
+﻿using ADODB;
+using Extract.FileActionManager.Utilities;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -17,7 +18,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
     /// </summary>
     internal class DuplicateDocumentsButton : DataEntryButton
     {
-        #region Properties
+        #region Fields
 
         /// <summary>
         /// Used to launch a <see cref="FAMFileInspectorForm"/> to display the duplicate documents.
@@ -41,7 +42,27 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// </summary>
         IUnknownVector _ffiCustomColumns = new IUnknownVector();
 
-        #endregion Properties
+        /// <summary>
+        /// The patient first name for the current document.
+        /// </summary>
+        string _firstName;
+
+        /// <summary>
+        /// The patient last name for the current document.
+        /// </summary>
+        string _lastName;
+
+        /// <summary>
+        /// The patient date of birth for the current document.
+        /// </summary>
+        string _dob;
+
+        /// <summary>
+        /// A comma-delimited list of collection dates for the current document.
+        /// </summary>
+        string _collectionDate;
+
+        #endregion Fields
 
         #region Constructors
 
@@ -253,20 +274,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="FileProcessingDB"/> currently being used.
-        /// </summary>
-        /// <value>
-        /// The <see cref="FileProcessingDB"/> currently being used.
-        /// </value>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public FileProcessingDB FileProcessingDB
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the patient first name from the current document.
         /// </summary>
         /// <value>
@@ -276,8 +283,20 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string FirstName
         {
-            get;
-            set;
+            get
+            {
+                return _firstName;
+            }
+
+            set
+            {
+                if (value != _firstName)
+                {
+                    _firstName = value;
+
+                    UpdateFlashingStatus();
+                }
+            }
         }
 
         /// <summary>
@@ -290,8 +309,20 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string LastName
         {
-            get;
-            set;
+            get
+            {
+                return _lastName;
+            }
+
+            set
+            {
+                if (value != _lastName)
+                {
+                    _lastName = value;
+
+                    UpdateFlashingStatus();
+                }
+            }
         }
 
         /// <summary>
@@ -304,8 +335,20 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string DOB
         {
-            get;
-            set;
+            get
+            {
+                return _dob;
+            }
+
+            set
+            {
+                if (value != _dob)
+                {
+                    _dob = value;
+
+                    UpdateFlashingStatus();
+                }
+            }
         }
 
         /// <summary>
@@ -318,8 +361,20 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string CollectionDate
         {
-            get;
-            set;
+            get
+            {
+                return _collectionDate;
+            }
+
+            set
+            {
+                if (value != _collectionDate)
+                {
+                    _collectionDate = value;
+
+                    UpdateFlashingStatus();
+                }
+            }
         }
 
         #endregion Properties
@@ -336,7 +391,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             {
                 base.OnClick(e);
 
-                FileProcessingDB = DataEntryControlHost.DataEntryApplication.FileProcessingDB;
                 string currentFileName = DataEntryControlHost.ImageViewer.ImageFile;
 
                 // Provide the _ffiActionColumn with the necessary information
@@ -362,7 +416,13 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                     LastName, FirstName, DOB, CollectionDate);
 
                 _famFileInspector.OpenFAMFileInspector(
-                    FileProcessingDB, selector, true, selectorSummary, _ffiCustomColumns);
+                    FileProcessingDB, selector, true, selectorSummary, _ffiCustomColumns,
+                    TopLevelControl.Handle);
+
+                // Once the FFI has been opened, stop the button's flashing regardless of whether
+                // they took action; the point was to make them aware of possible duplicates and
+                // they have acknowledged awarness by using the button.
+                Flash = false;
             }
             catch (Exception ex)
             {
@@ -389,6 +449,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 LastName = "";
                 DOB = "";
                 CollectionDate = "";
+                Flash = false;
             }
             catch (Exception ex)
             {
@@ -399,6 +460,22 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         #endregion Event handlers
 
         #region Private members
+
+        /// <summary>
+        /// Gets the <see cref="FileProcessingDB"/> currently being used.
+        /// </summary>
+        /// <value>
+        /// The <see cref="FileProcessingDB"/> currently being used.
+        /// </value>
+        FileProcessingDB FileProcessingDB
+        {
+            get
+            {
+                return (DataEntryControlHost == null)
+                    ? null
+                    : DataEntryControlHost.DataEntryApplication.FileProcessingDB;
+            }
+        }
 
         /// <summary>
         /// Gets a query that will select the file ID of the current document as well as any other
@@ -413,20 +490,20 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                     "SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
                     "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = '{0}' AND [Value] = '{1}' " +
+                    "   WHERE [Name] = '{0}' AND LEN('{1}') > 0 AND [Value] = '{2}' " +
                     "INTERSECT " +
                     "SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
                     "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = '{2}' AND [Value] = '{3}' " +
+                    "   WHERE [Name] = '{3}' AND LEN('{4}') > 0 AND [Value] = '{5}' " +
                     "INTERSECT " +
                     "SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
                     "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = '{4}' AND [Value] = '{5}' ",
-                    PatientFirstNameMetadataField, FirstName,
-                    PatientLastNameMetadataField, LastName,
-                    PatientDOBMetadataField, DOB);
+                    "   WHERE [Name] = '{6}' AND LEN('{7}') > 0 AND [Value] = '{8}' ",
+                    PatientFirstNameMetadataField, FirstName, FirstName,
+                    PatientLastNameMetadataField, LastName, LastName,
+                    PatientDOBMetadataField, DOB, DOB);
 
                 query += " INTERSECT " +
                     "SELECT [FAMFile].[ID] FROM [FAMFile] " +
@@ -450,6 +527,54 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 query = "SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] IN (" + query + ")";
 
                 return query;
+            }
+        }
+
+        /// <summary>
+        /// Updates the flashing status of the button based on whether any other documents appear to
+        /// be potential duplicates of this one.
+        /// </summary>
+        void UpdateFlashingStatus()
+        {
+            Flash = (GetMatchingDocumentCount() > 1);
+        }
+
+        /// <summary>
+        /// Gets the number of apparant duplicate documents in the database.
+        /// </summary>
+        /// <returns>The number of apparant duplicate documents in the database.</returns>
+        int GetMatchingDocumentCount()
+        {
+            Recordset adoRecordset = null;
+
+            try
+            {
+                // Don't bother running query to check for dups if any of these fields are blank--
+                // we already know there will not be any results.
+                if (FileProcessingDB == null ||
+                    string.IsNullOrWhiteSpace(FirstName) ||
+                    string.IsNullOrWhiteSpace(LastName) ||
+                    string.IsNullOrWhiteSpace(DOB) ||
+                    string.IsNullOrWhiteSpace(CollectionDate))
+                {
+                    return 0;
+                }
+                else
+                {
+                    adoRecordset = FileProcessingDB.GetResultsForQuery(DuplicateDocumentsQuery);
+                    return adoRecordset.RecordCount;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37572");
+            }
+            finally
+            {
+                if (adoRecordset != null)
+                {
+                    adoRecordset.Close();
+                }
             }
         }
 

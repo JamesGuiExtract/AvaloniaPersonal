@@ -3381,9 +3381,11 @@ namespace Extract.FileActionManager.Utilities
                                 { flagValue, fileName, fileData.PageCount, fileData });
 
                             // Add any the row values for any custom columns.
-                            foreach (IFAMFileInspectorColumn column in _customColumns.Values)
+                            foreach (int index in _customColumns.Keys)
                             {
-                                rowValues.Add(column.GetValue(fileData.FileID));
+                                string value = GetCustomColumnValue(fileData.FileID, index);
+
+                                rowValues.Add(value);
                             }
 
                             // Since the directory column size mode is set to fill, it should be last.
@@ -3410,6 +3412,32 @@ namespace Extract.FileActionManager.Utilities
             {
                 ex.ExtractDisplay("ELI35726");
             }
+        }
+
+        /// <summary>
+        /// Gets a file's value for a custom column. Ensures in the processes that if the column is
+        /// a combo box column that the item is part of the columns list of possible choices so as
+        /// to avoid errors when applying the column's value.
+        /// </summary>
+        /// <param name="fileId">The file ID for which the value is needed.</param>
+        /// <param name="columnIndex">The column index for which the value is needed.</param>
+        /// <returns>The file's value for the custom column.</returns>
+        string GetCustomColumnValue(int fileId, int columnIndex)
+        {
+            IFAMFileInspectorColumn columnDefinition = _customColumns[columnIndex];
+            string value = columnDefinition.GetValue(fileId);
+
+            if (columnDefinition.FFIColumnType == FFIColumnType.Combo)
+            {
+                var dataGridViewColumn = (DataGridViewComboBoxColumn)
+                    _fileListDataGridView.Columns[columnIndex];
+                if (!dataGridViewColumn.Items.Contains(value))
+                {
+                    dataGridViewColumn.Items.Add(value);
+                }
+            }
+
+            return value;
         }
 
         /// <summary>
@@ -4717,9 +4745,9 @@ namespace Extract.FileActionManager.Utilities
                 DataGridViewRow row = null;
                 if (_rowsByFileId.TryGetValue(fileId, out row))
                 {
-                    string value = column.GetValue(fileId);
+                    string value = GetCustomColumnValue(fileId, columnIndex);
                     var cell = row.Cells[columnIndex];
-                    cell.Value = column.GetValue(fileId);
+                    cell.Value = value;
 
                     // Refresh the active editing control if it is currently displayed.
                     if (cell == _fileListDataGridView.CurrentCell &&
