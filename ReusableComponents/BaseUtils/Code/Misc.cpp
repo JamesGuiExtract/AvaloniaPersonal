@@ -77,7 +77,7 @@ void getStartAndEndPage(const string& strPageRange, int& nStartPage, int& nEndPa
 	// make sure the start page number is less than the end page number
 	if (nStartPage >= nEndPage)
 	{
-		UCLIDException ue("ELI10264", "Start page number must be less than the end page nubmer.");
+		UCLIDException ue("ELI10264", "Start page number must be less than the end page number.");
 		ue.addDebugInfo("Page range", strPageRange);
 		throw ue;
 	}
