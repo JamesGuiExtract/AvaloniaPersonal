@@ -452,6 +452,16 @@ static const string gstrCREATE_WORK_ITEM_ID_STATUS_INDEX =
 static const string gstrMETADATA_FIELD_VALUE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_FileMetadataFieldValue] ON [FileMetadataFieldValue]([FileID], [MetadataFieldID])";
 
+static const string gstrCREATE_FAST_ACTIONID_INDEX = 
+	"CREATE NONCLUSTERED INDEX IX_FileActionStateTransition_ActionID "
+	"ON [dbo].[FileActionStateTransition] ([ActionID]) "
+	"INCLUDE ([ID],[FileID])";
+
+static const string gstrCREATE_FAST_FILEID_ACTIONID_INDEX = 
+	"CREATE NONCLUSTERED INDEX IX_FAST_FILEID_ACTIONID "
+	"ON [dbo].[FileActionStateTransition] ([FileID],[ActionID]) "
+	"INCLUDE ([ID]) ";
+
 	// Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
 	"ALTER TABLE [ActionStatistics]  "

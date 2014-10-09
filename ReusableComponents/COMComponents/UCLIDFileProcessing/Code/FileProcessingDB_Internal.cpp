@@ -1205,6 +1205,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_ID_STATUS_INDEX);
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_UPI_INDEX);
 		vecQueries.push_back(gstrMETADATA_FIELD_VALUE_INDEX);
+		vecQueries.push_back(gstrCREATE_FAST_ACTIONID_INDEX);
+		vecQueries.push_back(gstrCREATE_FAST_FILEID_ACTIONID_INDEX);
 		
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)

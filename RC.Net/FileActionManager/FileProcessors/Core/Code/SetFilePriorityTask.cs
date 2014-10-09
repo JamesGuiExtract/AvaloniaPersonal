@@ -379,6 +379,7 @@ namespace Extract.FileActionManager.FileProcessors
             ProgressStatus pProgressStatus, bool bCancelRequested)
         {
             string fileName = null;
+
             try
             {
                 // Validate the license
@@ -386,8 +387,11 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Create a tag manager and expand the tags in the file name
                 var tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
+                    pFileRecord.Name, pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
                 fileName = tags.Expand(_fileName);
+
+                // Escape any ' in the filename
+                fileName = fileName.Replace("'", "''");
 
                 int count = pDB.SetPriorityForFiles(
                     _FILE_SELECT_QUERY.Replace(_FILE_NAME, fileName), _priority, null);

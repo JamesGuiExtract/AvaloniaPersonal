@@ -31,7 +31,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 120;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 121;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -791,6 +791,27 @@ int UpdateToSchemaVersion120(_ConnectionPtr ipConnection, long *pnNumSteps,
 	vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_FAMFILE_FK);
 	vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_METADATA_FIELD_FK);
 	vecQueries.push_back(gstrMETADATA_FIELD_VALUE_INDEX);
+	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+	executeVectorOfSQL(ipConnection, vecQueries);
+
+	return nNewSchemaVersion;
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion121(_ConnectionPtr ipConnection, long *pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	int nNewSchemaVersion = 121;
+
+	if (pnNumSteps != __nullptr)
+	{
+		*pnNumSteps += 3;
+		return nNewSchemaVersion;
+	}
+
+	vector<string> vecQueries;
+	vecQueries.push_back(gstrCREATE_FAST_ACTIONID_INDEX);
+	vecQueries.push_back(gstrCREATE_FAST_FILEID_ACTIONID_INDEX);
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
@@ -5771,7 +5792,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 117:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion118);
 				case 118:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion119);
 				case 119:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion120);
-				case 120:	break;
+				case 120:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion121);
+				case 121:	break;
 
 				default:
 					{
