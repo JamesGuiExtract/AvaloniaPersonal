@@ -11,17 +11,19 @@ call "%~dp0UninstallExtract.bat"
 SET LABDE_ROOT=%~dp0
 SET FLEXINDEX_ROOT=%~dp0
 SET IDSHIELD_ROOT=%~dp0
+SET EXTRACTLM_ROOT=%~dp0
 
 :: Replaces the Other\SilentInstalls path if it exists with the Release path 
 CALL SET LABDE_ROOT=%LABDE_ROOT:Other\SilentInstalls=LabDE\SetupFiles%
 CALL SET FLEXINDEX_ROOT=%FLEXINDEX_ROOT:Other\SilentInstalls=FLEXIndex\SetupFiles%
 CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:Other\SilentInstalls=IDShield\SetupFiles%
+CALL SET EXTRACTLM_ROOT=%EXTRACTLM_ROOT:Other\SilentInstalls=FLEXIndex\SetupFiles\Extract Systems LM%
 
 :: If replace the SilentInstalls with the product folder 
 CALL SET LABDE_ROOT=%LABDE_ROOT:SilentInstalls=LabDE%
 CALL SET FLEXINDEX_ROOT=%FLEXINDEX_ROOT:SilentInstalls=FLEXIndex%
 CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:SilentInstalls=IDShield%
-
+CALL SET EXTRACTLM_ROOT=%EXTRACTLM_ROOT:SilentInstalls=Extract Systems LM%
 
 IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	set LABDE_ISS="%~dp0LabDE64.iss"
@@ -83,7 +85,7 @@ DEL "%TEMP%\FlexIndexInstalled.reg"
 
 @ECHO.
 @ECHO Installing Extract Systems LM
-start /wait "" "%FLEXINDEX_ROOT%Extract Systems LM\Setup" /s /w /f1%LM_ISS% /f2nul
+start /wait "" "%EXTRACTLM_ROOT%Setup" /s /w /f1%LM_ISS% /f2nul
 
 call "%EXTRACT_COMMON%\RegisterAll.bat" /s
 
