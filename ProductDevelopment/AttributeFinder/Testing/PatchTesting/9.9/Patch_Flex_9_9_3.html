@@ -1,0 +1,77 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.9.3 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE 9.9.3 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> TX - Midland DA
+   	<LI><b>SCRs:</b> 12451, 12467, 12470
+   	<LI><b>Issues:</b>
+	<ul>
+		<li><b>Redaction: Create redacted text</b> failed for text files that 
+		begin with leading whitespace.
+		<li><b>ImageFormatConverter.exe</b> needs an option to force color 
+		preservation when converting from PDF to TIF.
+		<li><b>Core: Rasterize PDF</b> needs an option to <b>Preserve color 
+		depth</b>.
+		<li>Pagination utility does not output a color document when color pages 
+		are included if the first page in the document is not in color.
+	</ul>
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<OL>
+	<LI><b>Redaction: Create redacted text</b>
+	<ul>
+		<li>Confirm that correct output is generated for a text file that begins 
+		with whitespace.
+		<li>Confirm that correct output is generated for a text file that does 
+		not begin with whitespace.
+       	</ul>
+<p>
+	<LI><b>Image Format Converter</b>
+	<ul>
+		<li>Confirm that the <b>/color</b> option forces color to be preserved 
+		when converting a PDF to a TIF.
+		<li>Confirm that color is not preserved by default when converting a 
+		PDF to a TIF.
+		<li>Confirm that the usage message includes the <b>/color</b> option.
+		<li><b>NOT FIXED</b> Confirm that the <b>Help</b> file reflects the change.
+       	</ul>
+<p>
+	<LI><b>Core: Rasterize PDF</b>
+	<ul>
+		<li>Confirm that the property page includes a <b>Preserve color depth</b> 
+		option.
+		<li>Confirm that the option is unchecked by default.
+		<li>Confirm that the <b>Preserve color depth</b> option forces color to 
+		be preserved when converting a PDF to a TIF.
+		<li>Confirm that color is not preserved by default when converting a 
+		PDF to a TIF.
+		<li><b>NOT FIXED</b> Confirm that the <b>Help</b> file reflects the change.
+       	</ul>
+<p>
+	<LI><b>Pagination</b>
+	<ul>
+		<li>Confirm that a color document is produced from all colored input pages.
+		<li>Confirm that a color document is produced from a mix of colored and 
+		uncolored input pages.
+       	</ul>
+<p>
+	<LI><b>Other</b>
+	<ul>
+		<LI>Exercise the <b>Sanity Test - Release Testing</b> checklist.
+       	</ul>
+</OL>
+</BODY>
+</HTML>
