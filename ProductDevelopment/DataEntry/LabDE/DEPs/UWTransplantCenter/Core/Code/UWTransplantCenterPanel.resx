@@ -586,9 +586,19 @@ ORDER BY LabName
     <value>True</value>
   </metadata>
   <data name="_duplicateDocumentsButton.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;Query TargetProperty='FirstName'&gt;&lt;Attribute&gt;/PatientInfo/Name/First&lt;/Attribute&gt;&lt;/Query&gt;
-&lt;Query TargetProperty='LastName'&gt;&lt;Attribute&gt;/PatientInfo/Name/Last&lt;/Attribute&gt;&lt;/Query&gt;
-&lt;Query TargetProperty='DOB'&gt;&lt;Attribute&gt;/PatientInfo/DOB&lt;/Attribute&gt;&lt;/Query&gt;
-&lt;Query TargetProperty='CollectionDate'&gt;&lt;Expression StringList=','&gt;&lt;Attribute Type='string[]'&gt;/Test/CollectionDate&lt;/Attribute&gt;.?{!string.IsNullOrWhiteSpace(#this)}.distinct()&lt;/Expression&gt;&lt;/Query&gt;</value>
+    <value>&lt;Query TargetProperty='FirstName'&gt;&lt;Expression&gt;
+string.IsNullOrWhiteSpace(&lt;Attribute Name='FirstName'&gt;/PatientInfo/Name/First&lt;/Attribute&gt;) ? '[BLANK]' : &lt;FirstName/&gt;
+&lt;/Expression&gt;&lt;/Query&gt;
+&lt;Query TargetProperty='LastName'&gt;&lt;Expression&gt;
+string.IsNullOrWhiteSpace(&lt;Attribute Name='LastName'&gt;/PatientInfo/Name/Last&lt;/Attribute&gt;) ? '[BLANK]' : &lt;LastName/&gt;
+&lt;/Expression&gt;&lt;/Query&gt;
+&lt;Query TargetProperty='DOB'&gt;&lt;Expression&gt;
+string.IsNullOrWhiteSpace(&lt;Attribute Name='DOB'&gt;/PatientInfo/DOB&lt;/Attribute&gt;) ? '[BLANK]' : &lt;DOB/&gt;
+&lt;/Expression&gt;&lt;/Query&gt;
+&lt;Query TargetProperty='CollectionDate'&gt;&lt;Expression&gt;
+string.IsNullOrWhiteSpace(&lt;Expression StringList=',' Name='CollectionDate'&gt;
+	&lt;Attribute Type='string[]'&gt;/Test/CollectionDate&lt;/Attribute&gt;.?{!string.IsNullOrWhiteSpace(#this)}.distinct()&lt;/Expression&gt;)
+	? '[BLANK]' : &lt;CollectionDate/&gt;
+&lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
 </root>

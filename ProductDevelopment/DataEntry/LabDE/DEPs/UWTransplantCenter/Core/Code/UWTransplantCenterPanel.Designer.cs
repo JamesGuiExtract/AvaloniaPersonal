@@ -818,20 +818,13 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._duplicateDocumentsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._duplicateDocumentsButton.AttributeName = null;
             this._duplicateDocumentsButton.AutoUpdateQuery = resources.GetString("_duplicateDocumentsButton.AutoUpdateQuery");
-            this._duplicateDocumentsButton.CollectionDateMetadataField = "CollectionDate";
-            this._duplicateDocumentsButton.Location = new System.Drawing.Point(411, 83);
+            this._duplicateDocumentsButton.FlashColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this._duplicateDocumentsButton.Location = new System.Drawing.Point(388, 83);
             this._duplicateDocumentsButton.Name = "_duplicateDocumentsButton";
-            this._duplicateDocumentsButton.PatientDOBMetadataField = "PatientDOB";
-            this._duplicateDocumentsButton.PatientFirstNameMetadataField = "PatientFirstName";
-            this._duplicateDocumentsButton.PatientLastNameMetadataField = "PatientLastName";
-            this._duplicateDocumentsButton.Size = new System.Drawing.Size(163, 23);
-            this._duplicateDocumentsButton.StapledDocumentOutput = "$DirOf(<SourceDocName>)\\Stapled_<FirstName>_<LastName>_$RandomAlphaNumeric(5).tif";
-            this._duplicateDocumentsButton.StapledIntoMetadataFieldName = "StapledInto";
-            this._duplicateDocumentsButton.StapledIntoMetadataFieldValue = "<StapledDocumentOutput>";
+            this._duplicateDocumentsButton.Size = new System.Drawing.Size(186, 23);
             this._duplicateDocumentsButton.TabIndex = 11;
-            this._duplicateDocumentsButton.TagForIgnore = "User_Ignore document";
             this._duplicateDocumentsButton.TagForStaple = null;
-            this._duplicateDocumentsButton.Text = "Duplicate documents...";
+            this._duplicateDocumentsButton.Text = "0 duplicate documents...";
             this._duplicateDocumentsButton.UseVisualStyleBackColor = true;
             this._duplicateDocumentsButton.ValidationErrorMessage = "Invalid value";
             // 

@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -33,7 +34,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// <summary>
         /// The default width of the column in pixels.
         /// </summary>
-        static readonly int _DEFAULT_WIDTH = 115;
+        static readonly int _DEFAULT_WIDTH = 135;
 
         /// <summary>
         /// The value that indicates another user already has the file locked for processing.
@@ -47,15 +48,26 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         static readonly string _DO_NOTHING = "Do nothing";
 
         /// <summary>
-        /// The value that indicates the document should be stapled into a new, unified document.
+        /// The value that indicates the document should be stapled into a new unified document.
         /// </summary>
         static readonly string _STAPLE = "Staple";
+
+        /// <summary>
+        /// The value that indicates the document should be stapled into a new unified document but
+        /// without the first page of this document.
+        /// </summary>
+        static readonly string _STAPLE_WITHOUT_1ST_PAGE = "Staple w/o 1st page";
 
         /// <summary>
         /// The value indicates the document should be removed from the queue without filing the
         /// document's results.
         /// </summary>
         static readonly string _IGNORE = "Ignore document";
+
+        /// <summary>
+        /// The value indicates the document should be skipped.
+        /// </summary>
+        static readonly string _SKIP = "Skip";
 
         /// <summary>
         /// The value indicates the document should be the one displayed in the verification UI.
@@ -65,7 +77,8 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// <summary>
         /// All possible actions for files that are owned (checked-out) by the current process.
         /// </summary>
-        static string[] _ALL_FILE_OPTIONS = new[] { _DO_NOTHING, _STAPLE, _IGNORE, _CURRENT };
+        static string[] _ALL_FILE_OPTIONS =
+            new[] { _DO_NOTHING, _STAPLE, _STAPLE_WITHOUT_1ST_PAGE, _IGNORE, _SKIP, _CURRENT };
 
         #endregion Constants
 
@@ -134,6 +147,17 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         #endregion Constructors
 
         #region Properties
+
+        /// <summary>
+        /// Gets the original file id.
+        /// </summary>
+        public int OriginalFileId
+        {
+            get
+            {
+                return _originalFileID;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the name of the original file.
@@ -343,6 +367,41 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             }
         }
 
+        /// <summary>
+        /// Indicates whether the specified action for <see paramref="fileID"/> has been changed
+        /// from value that was originally associated with the file when loaded.
+        /// </summary>
+        /// <param name="fileID">The ID of the file.</param>
+        /// <returns><see langword="true"/> if the value has changed; otherwise,
+        /// <see langword="false"/>.</returns>
+        public bool HasValueChanged(int fileID)
+        {
+            try
+            {
+                if (_inUseFiles.Contains(fileID))
+                {
+                    return false;
+                }
+                else if ((fileID == CurrentFileID || fileID == _originalFileID) &&
+                         CurrentFileID != _originalFileID)
+                {
+                    return true;
+                }
+                else if (fileID == CurrentFileID || _currentValues[fileID] == _DO_NOTHING)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37586");
+            }
+        }
+
         #endregion Methods
 
         #region IFAMFileInspectorColumn
@@ -434,6 +493,32 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         }
 
         /// <summary>
+        /// Gets a description of changes that should be displayed to the user in a prompt when
+        /// applying changes. If <see langword="null"/>, no prompt will be displayed when applying
+        /// changed.
+        /// </summary>
+        public string ApplyPrompt
+        {
+            get
+            {
+                return ListOfChanges;
+            }
+        }
+
+        /// <summary>
+        /// Gets a description of changes that should be displayed to the user in a prompt when
+        /// the user is canceling changes. If <see langword="null"/>, no prompt will be displayed
+        /// when canceling except if the FFI is closed via the form's cancel button (red X).
+        /// </summary>
+        public string CancelPrompt
+        {
+            get
+            {
+                return ListOfChanges;
+            }
+        }
+
+        /// <summary>
         /// Gets the possible values to offer for the specified <see paramref="fileID"/>.
         /// </summary>
         /// <param name="fileId">The file ID for which the possible value choices are needed or -1
@@ -457,7 +542,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// Specifies values that can be applied via context menu. The returned values will be
         /// presented as a sub-menu to a context menu option with <see cref="HeaderText"/> as the
         /// option name. (This method is not used is <see cref="ReadOnly"/> is
-        /// <see langword="true"/>.
+        /// <see langword="true"/>).
         /// </summary>
         /// <param name="fileIds"><see langword="null"/> to get a list of all possible values to be
         /// able to apply via the column's context menu across all possible selections; otherwise,
@@ -522,21 +607,16 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         {
             try
             {
-                string currentValue = null;
+                string value = null;
 
                 // Attempt to retrieve the value we already have for this file, except in the case
                 // of a file that has been locked by another user... in that case attempt to check
                 // the file out again in case it has been released by the other user.
-                if (!_inUseFiles.Contains(fileID) &&
-                    _currentValues.TryGetValue(fileID, out currentValue))
-                {
-                    return currentValue;
-                }
-                else
+                if (_inUseFiles.Contains(fileID) || !_currentValues.TryGetValue(fileID, out value))
                 {
                     // This is the first time this file has been loaded into the FFI; initialize
                     // the value.
-                    string value = _DO_NOTHING;
+                    value = _DO_NOTHING;
                     EActionStatus previousStatus = EActionStatus.kActionUnattempted;
                     if (DataEntryApplication.FileRequestHandler.CheckoutForProcessing(
                         fileID, out previousStatus))
@@ -568,9 +648,16 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                     }
 
                     _currentValues[fileID] = value;
-
-                    return value;
                 }
+
+                // If the value is different from what it originally was, indicate that it has
+                // changed with an asterisk.
+                if (HasValueChanged(fileID))
+                {
+                    value += "*";
+                }
+
+                return value;
             }
             catch (Exception ex)
             {
@@ -587,6 +674,10 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         {
             try
             {
+                // If an asterisk was applied to indicate a changed value, do not consider that part
+                // of the actual value.
+                value = value.TrimEnd('*');
+
                 // Check if the value is being set for the first time or changed
                 string currentValue = null;
                 if (!_currentValues.TryGetValue(fileId, out currentValue) || value != currentValue)
@@ -605,6 +696,10 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                     }
 
                     _dirty = true;
+
+                    // Refresh the value in the UI in order to display an asterisk to indicate when
+                    // a value has changed.
+                    _valuesToRefresh.Add(fileId);
                 }
 
                 return true;
@@ -648,11 +743,20 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
 
                 bool delayCurrentFile = false;
 
-                if (GetFileIdsForAction(_STAPLE).Count() == 1)
+                if (GetFileIdsForAction(_STAPLE).Count() + 
+                    GetFileIdsForAction(_STAPLE_WITHOUT_1ST_PAGE).Count() == 1)
                 {
-                    UtilityMethods.ShowMessageBox("At least 2 documents must be set to '" + _STAPLE +
+                    UtilityMethods.ShowMessageBox("At least 2 documents must be set to " + _STAPLE +
                         "' in order create a stapled document.", "Staple error", true);
                     return false;
+                }
+
+                // If no file is specified to be current, but the previous current file is set to
+                // "do nothing", set it as current so that it remains in the UI.
+                if (CurrentFileID == -1 && _originalFileID != -1 &&
+                    _currentValues[_originalFileID] == _DO_NOTHING)
+                {
+                    SetValue(_originalFileID, _CURRENT);
                 }
 
                 // If the currently displayed file is to be changed.
@@ -688,10 +792,29 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
 
                 // Handle files that have been ignored.
                 var ignoredIds = GetFileIdsForAction(_IGNORE);
-                StandardActionProcessor(ignoredIds, TagForIgnore, "", "");
+                StandardActionProcessor(ignoredIds, EActionStatus.kActionCompleted, TagForIgnore, "", "");
+
+                // Handle files that have been skipped.
+                var skippedIds = GetFileIdsForAction(_SKIP);
+                StandardActionProcessor(skippedIds, EActionStatus.kActionSkipped, "", "", "");
 
                 // Handle files that have been stapled.
-                ProcessStapledPages();
+                var stapledIdsWithoutFirstPage = GetFileIdsForAction(_STAPLE_WITHOUT_1ST_PAGE);
+                if (stapledIdsWithoutFirstPage.Any())
+                {
+                    if (MessageBox.Show("You have selected to exclude the first page from " +
+                        stapledIdsWithoutFirstPage.Count().ToString(CultureInfo.CurrentCulture) +
+                        " document(s).\r\n\r\nAre sure you want to exclude these pages?",
+                        "Exclude pages?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button1, 0) == DialogResult.Cancel)
+                    {
+                        return false;
+                    }
+                }
+                var stapledIds = GetFileIdsForAction(_STAPLE).Union(stapledIdsWithoutFirstPage);
+                CreateStapledOutput(stapledIds, stapledIdsWithoutFirstPage);
+                StandardActionProcessor(stapledIds, EActionStatus.kActionCompleted, TagForStaple,
+                    StapledIntoMetadataFieldName, StapledIntoMetadataFieldValue);
 
                 // Any remaining files ("Do nothing") that were checked-out for the purpose of being
                 // locked from other users should be released back to their previous status.
@@ -806,22 +929,28 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         }
 
         /// <summary>
-        /// Processes documents to be stapled as one.
+        /// Staples the specified files into a single unified document.
         /// </summary>
-        void ProcessStapledPages()
+        /// <param name="fileIds">The IDs of the files to staple.</param>
+        /// <param name="fileIdsWithoutFirstPage">The IDs of the files to be stapled, but without
+        /// the their respective first pages.</param>
+        void CreateStapledOutput(IEnumerable<int> fileIds, IEnumerable<int> fileIdsWithoutFirstPage)
         {
-            var stapledIds = GetFileIdsForAction(_STAPLE);
-            if (!stapledIds.Any())
+            // Ensure that fileIds includes all files from fileIdsWithoutFirstPage and that the
+            // documents are stapled in order of file ID (as they appear in the FFI).
+            var allFilesIds = fileIds.Union(fileIdsWithoutFirstPage).OrderBy(id => id);
+
+            if (!allFilesIds.Any())
             {
                 return;
             }
 
-            ExtractException.Assert("ELI37568", "Unable to staple a single document", stapledIds.Count() > 1);
+            ExtractException.Assert("ELI37568", "Unable to staple a single document", allFilesIds.Count() > 1);
 
             string outputFileName = null;
             var imagePages = new List<ImagePage>();
 
-            foreach (int fileId in stapledIds)
+            foreach (int fileId in allFilesIds)
             {
                 string fileName = "";
                 int pageCount = 0;
@@ -834,17 +963,21 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                     _stapledOutputDocument = outputFileName;
                 }
 
+                bool removeFirstPage = fileIdsWithoutFirstPage.Contains(fileId);
+                ExtractException.Assert("ELI37584",
+                    "Unable to exclude page from a single page document",
+                    !removeFirstPage || pageCount > 1);
+
+                var pageRange = removeFirstPage
+                    ? Enumerable.Range(2, pageCount - 1)
+                    : Enumerable.Range(1, pageCount);
+
                 // Compile the pages to output.
-                imagePages.AddRange(Enumerable.Range(1, pageCount)
+                imagePages.AddRange(pageRange
                     .Select(page => new ImagePage(fileName, page, 0)));
             }
 
             ImageMethods.StaplePagesAsNewDocument(imagePages, outputFileName);
-
-            // Sets to complete in the current action, and applies a tag or metadata value as
-            // configured.
-            StandardActionProcessor(stapledIds, TagForStaple,
-                StapledIntoMetadataFieldName, StapledIntoMetadataFieldValue);
         }
 
         /// <summary>
@@ -868,14 +1001,16 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// complete in the current action and applies a tag or metadata value as specified.
         /// </summary>
         /// <param name="fileIds">The file IDs to be acted upon.</param>
+        /// <param name="newStatus">The <see cref="EActionStatus"/> the file should be moved to in
+        /// the currently processing action.</param>
         /// <param name="tagNameToApply">The tag name to apply to these files or
         /// <see langword="null"/> if no tag should be applied.</param>
         /// <param name="metadataFieldName">The metadata field name to apply to set for these files
         /// or <see langword="null"/> if no metadata field should be updated.</param>
         /// <param name="metadataFieldValue">The value to apply for the specified
         /// <see paramref="metadataFieldName"/>.</param>
-        void StandardActionProcessor(IEnumerable<int> fileIds, string tagNameToApply,
-            string metadataFieldName, string metadataFieldValue)
+        void StandardActionProcessor(IEnumerable<int> fileIds, EActionStatus newStatus,
+            string tagNameToApply, string metadataFieldName, string metadataFieldValue)
         {
             foreach (int fileId in fileIds)
             {
@@ -886,8 +1021,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 // Make as complete in the current action.
                 EActionStatus oldStatus;
                 FileProcessingDB.SetStatusForFile(fileId,
-                    DataEntryApplication.DatabaseActionName, EActionStatus.kActionCompleted, true,
-                    false, out oldStatus);
+                    DataEntryApplication.DatabaseActionName, newStatus, true, false, out oldStatus);
 
                 // Apply any specified tag.
                 if (!string.IsNullOrWhiteSpace(tagNameToApply))
@@ -953,6 +1087,55 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Gets a description of the changes the user has made thus far.
+        /// </summary>
+        /// <value>
+        /// A description of the changes the user has made thus far.
+        /// </value>
+        string ListOfChanges
+        {
+            get
+            {
+                StringBuilder message = new StringBuilder();
+
+                if (CurrentFileID != -1 && CurrentFileID != _originalFileID)
+                {
+                    string fileName = "";
+                    int pageCount = 0;
+                    FAMFileInspectorForm.GetFileInfo(CurrentFileID, out fileName, out pageCount);
+
+                    message.Append("Make '");
+                    message.Append(Path.GetFileName(fileName));
+                    message.AppendLine("' the current document.");
+                }
+
+                int stapledDocuments = _currentValues.Values.Count(value =>
+                    value == _STAPLE || value == _STAPLE_WITHOUT_1ST_PAGE);
+                if (stapledDocuments > 0)
+                {
+                    message.AppendLine(string.Format(CultureInfo.CurrentCulture,
+                        "Staple {0} file(s).", stapledDocuments));
+                }
+
+                int ignoredDocuments = _currentValues.Values.Count(value => value == _IGNORE);
+                if (ignoredDocuments > 0)
+                {
+                    message.AppendLine(string.Format(CultureInfo.CurrentCulture,
+                        "Ignore {0} file(s).", ignoredDocuments));
+                }
+
+                int skippedDocuments = _currentValues.Values.Count(value => value == _SKIP);
+                if (skippedDocuments > 0)
+                {
+                    message.AppendLine(string.Format(CultureInfo.CurrentCulture,
+                        "Skip {0} file(s).", skippedDocuments));
+                }
+
+                return message.ToString().TrimEnd(null);
+            }
         }
 
         /// <summary>

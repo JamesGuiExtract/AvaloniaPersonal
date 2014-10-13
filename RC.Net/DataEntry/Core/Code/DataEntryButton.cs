@@ -1,6 +1,7 @@
 using Extract.Licensing;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Linq;
@@ -23,6 +24,11 @@ namespace Extract.DataEntry
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(DataEntryButton).ToString();
+
+        /// <summary>
+        /// The default flash rate in milliseconds.
+        /// </summary>
+        const int _DEFAULT_FLASH_INTERVAL = 500;
 
         #endregion Constants
 
@@ -151,6 +157,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEntryButton"/> class.
         /// </summary>
+        [SuppressMessage("Microsoft.Mobility", "CA1601:DoNotUseTimersThatPreventPowerStateChanges")]
         public DataEntryButton()
             : base()
         {
@@ -169,9 +176,10 @@ namespace Extract.DataEntry
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI37378", _OBJECT_NAME);
 
+                _flashTimer.Interval = _DEFAULT_FLASH_INTERVAL;
+
                 InitializeComponent();
 
-                _flashTimer.Interval = 1000;
                 _flashTimer.Tick += new EventHandler(HandleFlashTimer_Tick);
             }
             catch (Exception ex)
@@ -447,8 +455,9 @@ namespace Extract.DataEntry
                                 // between the previouly specified background color and one that
                                 // is lighter than the specified background color.
                                 _normalBackgroundColor = BackColor;
-                                _flashingBackgroundColor =
-                                    ControlPaint.LightLight(_normalBackgroundColor);
+                                _flashingBackgroundColor = (FlashColor == Color.Empty)
+                                    ? ControlPaint.LightLight(_normalBackgroundColor)
+                                    : FlashColor;
                                 _flashTimer.Enabled = true;
                             }
                             else
@@ -463,6 +472,44 @@ namespace Extract.DataEntry
                 {
                     ex.ExtractDisplay("ELI37375");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the color that should be alternated with <see cref="Control.BackColor"/>
+        /// when <see cref="Flash"/> is <see langword="true"/>. If <see cref="Color.Empty"/>, a
+        /// lighter version of the <see cref="BackColor"/> will be used.
+        /// </summary>
+        /// <value>
+        /// </value>
+        [Category("Data Entry Button")]
+        [DefaultValue("Empty")]
+        public Color FlashColor
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the rate in milliseconds that the button will flash when
+        /// <see cref="Flash"/> is <see langword="true"/>.
+        /// </summary>
+        /// <value>
+        /// The rate in milliseconds that the button will flash when <see cref="Flash"/> is 
+        /// <see langword="true"/>.
+        /// </value>
+        [Category("Data Entry Button")]
+        [DefaultValue(_DEFAULT_FLASH_INTERVAL)]
+        public int FlashInterval
+        {
+            get
+            {
+                return _flashTimer.Interval;
+            }
+
+            set
+            {
+                _flashTimer.Interval = value;
             }
         }
 

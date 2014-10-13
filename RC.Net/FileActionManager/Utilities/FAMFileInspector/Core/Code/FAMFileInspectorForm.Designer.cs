@@ -798,6 +798,7 @@
             this._fileListDataGridView.CurrentCellChanged += new System.EventHandler(this.HandleResultsDataGridView_CurrentCellChanged);
             this._fileListDataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.HandleFileListDataGridView_CurrentCellDirtyStateChanged);
             this._fileListDataGridView.SelectionChanged += new System.EventHandler(this.HandleFileListDataGridView_SelectionChanged);
+            this._fileListDataGridView.SizeChanged += new System.EventHandler(HandleFileListDataGridView_SizeChanged);
             this._fileListDataGridView.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.HandleFileListDataGridView_SortCompare);
             this._fileListDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.HandleFileListDataGridView_KeyDown);
             this._fileListDataGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleFileListDataGridView_MouseDown);

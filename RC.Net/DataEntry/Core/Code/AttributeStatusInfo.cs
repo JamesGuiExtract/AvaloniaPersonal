@@ -637,9 +637,11 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Gets or sets a value indicating whether auto-update queries should be temporarily
-        /// prevented from updating data. The queries will still be loaded for all attributes, but
+        /// prevented from updating text. The queries will still be loaded for all attributes, but
         /// they will not be triggered while while blocked. Un-blocking the queries will not
         /// execute the queries that would have been triggered while blocked.
+        /// Queries that are using the <see cref="DataEntryQuery.TargetProperty"/> property to
+        /// update something other than the control's text/value will continue to execute.
         /// </summary>
         /// <value><see langword="true"/> to block auto-update queries; otherwise,
         /// <see langword="false"/>.

@@ -166,11 +166,7 @@ namespace Extract.DataEntry
                 }
 
                 // Attempt to update the value once the query has been loaded.
-                if ((_validationTrigger || !AttributeStatusInfo.BlockAutoUpdateQueries) &&
-                    !_validationTrigger || AttributeStatusInfo.ValidationTriggersEnabled)
-                {
-                    UpdateValue();
-                }
+                UpdateValue();
             }
             catch (Exception ex)
             {
@@ -438,12 +434,14 @@ namespace Extract.DataEntry
                 // Don't evaluate disabled queries or validation triggers if validation triggers are
                 // not enabled.
                 // [DataEntry:1186]
-                // ... or auto-update queries if auto-update queries are paused.
+                // ... or auto-update queries that are targeting the control's text (and not another property)
+                // if auto-update queries are blocked.
                 // [DataEntry:1271]
                 // ... or attributes that are not initialized (in the process of being deleted).
                 if (dataEntryQuery.Disabled || !AttributeStatusInfo.GetStatusInfo(_targetAttribute).IsInitialized ||
                     (_validationTrigger && !AttributeStatusInfo.ValidationTriggersEnabled) ||
-                    (AttributeStatusInfo.BlockAutoUpdateQueries && !_validationTrigger))
+                    (!_validationTrigger && dataEntryQuery.TargetProperty == null &&
+                        AttributeStatusInfo.BlockAutoUpdateQueries))
                 {
                     return false;
                 }

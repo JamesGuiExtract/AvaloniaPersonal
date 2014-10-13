@@ -3,6 +3,7 @@ using Extract.FileActionManager.Utilities;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using UCLID_COMUTILSLib;
@@ -18,6 +19,61 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
     /// </summary>
     internal class DuplicateDocumentsButton : DataEntryButton
     {
+        #region Constants
+
+        /// <summary>
+        /// Template for the button text.
+        /// </summary>
+        const string _BUTTON_LABEL_TEXT = "{0} duplicate document(s)...";
+
+        /// <summary>
+        /// Default tag to apply to documents that have been ignored.
+        /// </summary>
+        const string _DEFAULT_TAG_FOR_IGNORE = "User_Ignore document";
+
+        /// <summary>
+        /// Default output path for stapled document output.
+        /// </summary>
+        const string _DEFAULT_STAPLED_DOCUMENT_OUTPUT =
+            @"$DirOf(<SourceDocName>)\Stapled_<FirstName>_<LastName>_$Now().tif";
+        
+        /// <summary>
+        /// Default tag to apply to documents that have been stapled.
+        /// </summary>
+        const string _DEFAULT_TAG_FOR_STAPLE = "";
+
+        /// <summary>
+        /// Default metadata field name that should be updated whenever a document is stapled.
+        /// </summary>
+        const string _DEFAULT_STAPLED_INTO_METADATA_FIELD_NAME = "StapledInto";
+
+        /// <summary>
+        /// Default metadata value to be applied.
+        /// </summary>
+        const string _DEFAULT_STAPLED_INTO_METADATA_FIELD_VALUE = "<StapledDocumentOutput>";
+
+        /// <summary>
+        /// Default name of the database metadata field that stores the patient first name.
+        /// </summary>
+        const string _DEFAULT_PATIENT_FIRST_NAME_METADATA_FIELD = "PatientFirstName";
+
+        /// <summary>
+        /// Default name of the database metadata field that stores the patient last name.
+        /// </summary>
+        const string _DEFAULT_PATIENT_LAST_NAME_METADATA_FIELD = "PatientLastName";
+
+        /// <summary>
+        /// Default name of the database metadata field that stores the patient date of birth.
+        /// </summary>
+        const string _DEFAULT_PATIENT_DOB_METADATA_FIELD = "PatientDOB";
+
+        /// <summary>
+        /// Default  name of the database metadata field that stores the document's collection date(s).
+        /// </summary>
+        const string _DEFAULT_COLLECTION_DATE_METADATA_FIELD = "CollectionDate";
+        
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -62,6 +118,12 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// </summary>
         string _collectionDate;
 
+        /// <summary>
+        /// The original <see cref="P:Control.BackColor"/> for the button. Used to restore the color
+        /// after having set it to the <see cref="DataEntryButton.FlashColor"/>.
+        /// </summary>
+        Color _originalBackColor;
+
         #endregion Fields
 
         #region Constructors
@@ -73,11 +135,23 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         {
             try
             {
+                _originalBackColor = BackColor;
+
                 _ffiActionColumn = new DuplicateDocumentsFFIColumn();
                 _ffiStatusColumn = new PreviousStatusFFIColumn(_ffiActionColumn);
 
                 _ffiCustomColumns.PushBack(_ffiActionColumn);
                 _ffiCustomColumns.PushBack(_ffiStatusColumn);
+
+                TagForIgnore = _DEFAULT_TAG_FOR_IGNORE;
+                StapledDocumentOutput = _DEFAULT_STAPLED_DOCUMENT_OUTPUT;
+                TagForStaple = _DEFAULT_TAG_FOR_STAPLE;
+                StapledIntoMetadataFieldName = _DEFAULT_STAPLED_INTO_METADATA_FIELD_NAME;
+                StapledIntoMetadataFieldValue = _DEFAULT_STAPLED_INTO_METADATA_FIELD_VALUE;
+                PatientFirstNameMetadataField = _DEFAULT_PATIENT_FIRST_NAME_METADATA_FIELD;
+                PatientLastNameMetadataField = _DEFAULT_PATIENT_LAST_NAME_METADATA_FIELD;
+                PatientDOBMetadataField = _DEFAULT_PATIENT_DOB_METADATA_FIELD;
+                CollectionDateMetadataField = _DEFAULT_COLLECTION_DATE_METADATA_FIELD;
 
                 // DataReset handler ensures property values aren't carried over from one document
                 // to the next.
@@ -101,7 +175,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// is to be applied to ignored documents.
         /// </value>
         [Category("UW Custom Setting")]
-        [DefaultValue("User_Ignore document")]
+        [DefaultValue(_DEFAULT_TAG_FOR_IGNORE)]
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string TagForIgnore
         {
@@ -125,7 +199,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// The output path for stapled document output.
         /// </value>
         [Category("UW Custom Setting")]
-        [DefaultValue(@"$DirOf(<SourceDocName>)\Stapled_<FirstName>_<LastName>_$RandomAlphaNumeric(5).tif")]
+        [DefaultValue(_DEFAULT_STAPLED_DOCUMENT_OUTPUT)]
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string StapledDocumentOutput
         {
@@ -148,7 +222,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// is to be applied to stapled documents.
         /// </value>
         [Category("UW Custom Setting")]
-        [DefaultValue("")]
+        [DefaultValue(_DEFAULT_TAG_FOR_STAPLE)]
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string TagForStaple
         {
@@ -167,11 +241,11 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// Gets or sets a metadata field name that can be updated whenever a document is stapled.
         /// </summary>
         /// <value>
-        /// A metadata field name that can be updated whenever a document is stapled or
+        /// A metadata field name that should be updated whenever a document is stapled or
         /// <see langword="null"/> if no metadata field is to be updated.
         /// </value>
         [Category("UW Custom Setting")]
-        [DefaultValue("StapledInto")]
+        [DefaultValue(_DEFAULT_STAPLED_INTO_METADATA_FIELD_NAME)]
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string StapledIntoMetadataFieldName
         {
@@ -196,7 +270,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// The metadata value to be applied.
         /// </value>
         [Category("UW Custom Setting")]
-        [DefaultValue("<StapledDocumentOutput>")]
+        [DefaultValue(_DEFAULT_STAPLED_INTO_METADATA_FIELD_VALUE)]
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string StapledIntoMetadataFieldValue
         {
@@ -218,7 +292,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// The name of the database metadata field that stores the patient first name.
         /// </value>
         [Category("UW Custom Setting")]
-        [DefaultValue("PatientFirstName")]
+        [DefaultValue(_DEFAULT_PATIENT_FIRST_NAME_METADATA_FIELD)]
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string PatientFirstNameMetadataField
         {
@@ -233,7 +307,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// The name of the database metadata field that stores the patient last name.
         /// </value>
         [Category("UW Custom Setting")]
-        [DefaultValue("PatientLastName")]
+        [DefaultValue(_DEFAULT_PATIENT_LAST_NAME_METADATA_FIELD)]
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string PatientLastNameMetadataField
         {
@@ -249,7 +323,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// The name of the database metadata field that stores the patient date of birth.
         /// </value>
         [Category("UW Custom Setting")]
-        [DefaultValue("PatientDOB")]
+        [DefaultValue(_DEFAULT_PATIENT_DOB_METADATA_FIELD)]
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string PatientDOBMetadataField
         {
@@ -265,7 +339,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// The name of the database metadata field that stores the document's collection date(s).
         /// </value>
         [Category("UW Custom Setting")]
-        [DefaultValue("CollectionDate")]
+        [DefaultValue(_DEFAULT_COLLECTION_DATE_METADATA_FIELD)]
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string CollectionDateMetadataField
         {
@@ -294,7 +368,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 {
                     _firstName = value;
 
-                    UpdateFlashingStatus();
+                    UpdateButtonState();
                 }
             }
         }
@@ -320,7 +394,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 {
                     _lastName = value;
 
-                    UpdateFlashingStatus();
+                    UpdateButtonState();
                 }
             }
         }
@@ -346,7 +420,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 {
                     _dob = value;
 
-                    UpdateFlashingStatus();
+                    UpdateButtonState();
                 }
             }
         }
@@ -372,7 +446,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 {
                     _collectionDate = value;
 
-                    UpdateFlashingStatus();
+                    UpdateButtonState();
                 }
             }
         }
@@ -409,11 +483,16 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 FAMFileSelector selector = new FAMFileSelector();
                 selector.AddQueryCondition(DuplicateDocumentsQuery);
 
+                // Collection dates are comma delimited, but for ease of use in code to compare
+                // dates no spaces are include. Add spaces to the summary message for better
+                // readability.
+                string collectionDates = CollectionDate.Replace(",", ", ");
+
                 string selectorSummary = string.Format(CultureInfo.CurrentCulture,
                     "Potential duplicate documents for {0}, {1}\r\n" +
                     "DOB: {2}\r\n" +
                     "Collection date(s): {3}",
-                    LastName, FirstName, DOB, CollectionDate);
+                    LastName, FirstName, DOB, collectionDates);
 
                 _famFileInspector.OpenFAMFileInspector(
                     FileProcessingDB, selector, true, selectorSummary, _ffiCustomColumns,
@@ -422,11 +501,36 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 // Once the FFI has been opened, stop the button's flashing regardless of whether
                 // they took action; the point was to make them aware of possible duplicates and
                 // they have acknowledged awarness by using the button.
-                Flash = false;
+                if (Flash)
+                {
+                    Flash = false;
+                    BackColor = FlashColor;
+                }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI37443");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:Control.EnabledChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        protected override void OnEnabledChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnEnabledChanged(e);
+
+                if (Enabled && !KeyFieldsArePopulated)
+                {
+                    Enabled = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37585");
             }
         }
 
@@ -474,6 +578,24 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 return (DataEntryControlHost == null)
                     ? null
                     : DataEntryControlHost.DataEntryApplication.FileProcessingDB;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether all key fields are populated in order to be able to
+        /// query for potential duplicate documents.
+        /// </summary>
+        /// <value><see langword="true"/> if all key fields are populated; otherwise,
+        /// <see langword="false"/>.</value>
+        bool KeyFieldsArePopulated
+        {
+            get
+            {
+                return FileProcessingDB != null &&
+                        !string.IsNullOrWhiteSpace(FirstName) &&
+                        !string.IsNullOrWhiteSpace(LastName) &&
+                        !string.IsNullOrWhiteSpace(DOB) &&
+                        !string.IsNullOrWhiteSpace(CollectionDate);
             }
         }
 
@@ -531,12 +653,28 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         }
 
         /// <summary>
-        /// Updates the flashing status of the button based on whether any other documents appear to
-        /// be potential duplicates of this one.
+        /// Updates the state of the button based on whether key fields have been filled in and
+        /// whether any other documents appear to be potential duplicates of this one.
         /// </summary>
-        void UpdateFlashingStatus()
+        void UpdateButtonState()
         {
-            Flash = (GetMatchingDocumentCount() > 1);
+            BackColor = _originalBackColor;
+
+            int duplicateCount = 0;
+
+            if (KeyFieldsArePopulated)
+            {
+                Enabled = true;
+                duplicateCount = GetMatchingDocumentCount() - 1;
+                Flash = (duplicateCount > 0);
+            }
+            else
+            {
+                Enabled = false;
+                Flash = false;
+            }
+
+            Text = string.Format(CultureInfo.CurrentCulture, _BUTTON_LABEL_TEXT, duplicateCount);
         }
 
         /// <summary>
@@ -551,18 +689,14 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             {
                 // Don't bother running query to check for dups if any of these fields are blank--
                 // we already know there will not be any results.
-                if (FileProcessingDB == null ||
-                    string.IsNullOrWhiteSpace(FirstName) ||
-                    string.IsNullOrWhiteSpace(LastName) ||
-                    string.IsNullOrWhiteSpace(DOB) ||
-                    string.IsNullOrWhiteSpace(CollectionDate))
-                {
-                    return 0;
-                }
-                else
+                if (KeyFieldsArePopulated)
                 {
                     adoRecordset = FileProcessingDB.GetResultsForQuery(DuplicateDocumentsQuery);
                     return adoRecordset.RecordCount;
+                }
+                else
+                {
+                    return 0;
                 }
             }
             catch (Exception ex)

@@ -104,6 +104,26 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets a description of changes that should be displayed to the user in a prompt when
+        /// applying changes. If <see langword="null"/>, no prompt will be displayed when applying
+        /// changed.
+        /// </summary>
+        string ApplyPrompt
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets a description of changes that should be displayed to the user in a prompt when
+        /// the user is canceling changes. If <see langword="null"/>, no prompt will be displayed
+        /// when canceling except if the FFI is closed via the form's cancel button (red X).
+        /// </summary>
+        string CancelPrompt
+        {
+            get;
+        }
+
+        /// <summary>
         /// Gets the possible values to offer for the specified <see paramref="fileId"/>.
         /// </summary>
         /// <param name="fileId">The file ID for which the possible value choices are needed or -1
@@ -118,7 +138,7 @@ namespace Extract.FileActionManager.Utilities
         /// Specifies values that can be applied via context menu. The returned values will be
         /// presented as a sub-menu to a context menu option with <see cref="HeaderText"/> as the
         /// option name. (This method is not used is <see cref="ReadOnly"/> is
-        /// <see langword="true"/>.
+        /// <see langword="true"/>).
         /// </summary>
         /// <param name="fileIds"><see langword="null"/> to get a list of all possible values to be
         /// able to apply via the column's context menu across all possible selections; otherwise,

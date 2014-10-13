@@ -22,6 +22,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -344,7 +345,7 @@ namespace Extract.FileActionManager.Utilities
         /// Indicates whether user should be prompted about uncommited data in custom columns when 
         /// the form is closed.
         /// </summary>
-        bool _promptForDirtyData;
+        bool _explicitDataApplyOrCancel;
         
         /// <summary>
         /// Associates pre-defined search terms from the database's FieldSearch table with their
@@ -1316,6 +1317,8 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 GenerateFileList(false);
+
+                EnsureFileListColumnSizes();
             }
             catch (Exception ex)
             {
@@ -1463,7 +1466,7 @@ namespace Extract.FileActionManager.Utilities
 
                 // Ensure any modified data from custom columns is applied or explicitly disregarded
                 // by the user before allowing the form to close.
-                if (!PromptToApplyCustomColumnChanges())
+                if (!PromptToApplyCustomColumnChanges(true))
                 {
                     e.Cancel = true;
                 }
@@ -1909,6 +1912,27 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.SizeChanged"/> event of the
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleFileListDataGridView_SizeChanged(object sender, System.EventArgs e)
+        {
+            try
+            {
+                base.OnSizeChanged(e);
+
+                EnsureFileListColumnSizes();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37587");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.MouseDown "/> event of the
         /// <see cref="_fileListDataGridView"/>.
         /// </summary>
@@ -2095,7 +2119,6 @@ namespace Extract.FileActionManager.Utilities
                         string stringValue = cell.Value.ToString();
 
                         customColumn.SetValue(fileData.FileID, stringValue);
-                        _promptForDirtyData = true;
 
                         // When a new column value is applied, the column's implementation may
                         // require that other values be updated as a result. Check for values
@@ -2794,7 +2817,12 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                if (ApplyCustomColumnData())
+                // If the user has hit the OK button, they are explicitly intending to apply any
+                // uncommitted changes. Don't prompt about the changes if the column doesn't require
+                // an explicit prompt via the ApplyPrompt property.
+                _explicitDataApplyOrCancel = true;
+
+                if (PromptToApplyCustomColumnChanges(false))
                 {
                     DialogResult = DialogResult.OK;
                     Close();
@@ -2803,6 +2831,10 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI37439");
+            }
+            finally
+            {
+                _explicitDataApplyOrCancel = false;
             }
         }
 
@@ -2817,14 +2849,19 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 // If the user has hit the cancel button, they are explicitly intending to disregard
-                // any uncommitted changes. Don't prompt about uncommitted changes.
-                _promptForDirtyData = false;
-                
+                // any uncommitted changes. Don't prompt about uncommitted changes if the column
+                // doesn't require an explicit prompt via the CancelPrompt property.
+                _explicitDataApplyOrCancel = true;
+
                 Close();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI37440");
+            }
+            finally
+            {
+                _explicitDataApplyOrCancel = true;
             }
         }
 
@@ -3644,6 +3681,8 @@ namespace Extract.FileActionManager.Utilities
 
                     ExtractException.AsAggregateException(exceptionsToAggregate).Display();
                 }
+
+                EnsureFileListColumnSizes();
             }));
         }
 
@@ -3819,6 +3858,8 @@ namespace Extract.FileActionManager.Utilities
                     
                     ExtractException.AsAggregateException(exceptionsToAggregate).Display();
                 }
+
+                EnsureFileListColumnSizes();
             }));
         }
 
@@ -3876,6 +3917,7 @@ namespace Extract.FileActionManager.Utilities
                 row.Visible = false;
             }
             _fileListMatchesColumn.Visible = true;
+            EnsureFileListColumnSizes();
             _fileListDataGridView.Invalidate();
 
             _searchProgressBar.Value = 0;
@@ -4720,9 +4762,8 @@ namespace Extract.FileActionManager.Utilities
                 {
                     _customColumnRefreshPending = false;
                     
-                    // Loop through every custom column that is not read only.
-                    foreach (KeyValuePair<int, IFAMFileInspectorColumn> customColumn in _customColumns
-                        .Where(customColumn => !customColumn.Value.ReadOnly))
+                    // Loop through every custom column
+                    foreach (KeyValuePair<int, IFAMFileInspectorColumn> customColumn in _customColumns)
                     {
                         RefreshCustomColumn(customColumn.Key, customColumn.Value);
                     }
@@ -4762,33 +4803,67 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Prompts to apply custom column changes.
         /// </summary>
+        /// <param name="canceling"><see langword="true"/> if the prompt is being displayed in the
+        /// context of canceling, <see langword="false"/> if it is being displayed in the context of
+        /// applying.</param>
         /// <returns><see langword="true"/> if any prompting or applying of custom column data has
         /// occurred and the form can be closed; <see langword="false"/> if the form should not be
         /// allowed to close.</returns>
-        bool PromptToApplyCustomColumnChanges()
+        bool PromptToApplyCustomColumnChanges(bool canceling)
         {
             bool allowClose = true;
 
-            if (_promptForDirtyData &&
+            bool prompt = !_explicitDataApplyOrCancel ||
+                (canceling && _customColumns.Any(column => 
+                    !string.IsNullOrWhiteSpace(column.Value.CancelPrompt))) ||
+                (!canceling && _customColumns.Any(column => 
+                    !string.IsNullOrWhiteSpace(column.Value.ApplyPrompt)));
+
+            if (prompt &&
                 _customColumns.Values.Any(column => !column.ReadOnly && column.Dirty))
             {
                 using (var messageBox = new CustomizableMessageBox())
                 {
-                    messageBox.Caption = "Apply changes?";
-                    messageBox.Text = "There are uncommitted changes. Apply changes?";
-                    messageBox.AddStandardButtons(MessageBoxButtons.YesNoCancel);
-                    string response = messageBox.Show(this);
-                    if (response == "Yes")
+                    StringBuilder message = new StringBuilder(
+                        canceling 
+                            ? "There are uncommitted changes." 
+                            : "You have selected to:");
+
+                    string customMessages = string.Join("\r\n\r\n", _customColumns
+                        .Select(column => column.Value.CancelPrompt)
+                        .Where(customMessage => !string.IsNullOrWhiteSpace(customMessage)));
+
+                    if (!string.IsNullOrWhiteSpace(customMessages))
                     {
-                        allowClose = ApplyCustomColumnData();
+                        message.AppendLine();
+                        message.AppendLine();
+                        message.AppendLine(customMessages);
+                        message.AppendLine();
                     }
-                    else if (response == "No")
+
+                    message.Append("Apply changes?");
+                    messageBox.Caption = "Apply changes?";
+                    messageBox.Text = message.ToString();
+                    if (canceling)
+                    {
+                        messageBox.AddStandardButtons(MessageBoxButtons.YesNoCancel);
+                    }
+                    else
+                    {
+                        messageBox.AddStandardButtons(MessageBoxButtons.OKCancel);
+                    }
+                    string response = messageBox.Show(this);
+                    if (response == "Cancel")
+                    {
+                        allowClose = false;
+                    }
+                    else if (response == "No") // An option only if canceling.
                     {
                         allowClose = true;
                     }
-                    else if (response == "Cancel")
+                    else  // Yes or OK depending on if canceling.
                     {
-                        allowClose = false;
+                        allowClose = ApplyCustomColumnData();
                     }
                 }
             }
@@ -4823,6 +4898,37 @@ namespace Extract.FileActionManager.Utilities
                 .Where(column => column.RequireOkCancel))
             {
                 column.Cancel();
+            }
+        }
+
+        /// <summary>
+        /// For the most part, the column sizes are fixed with the folder column using all remaining
+        /// space. However, if the left pane is sized such that not even the fixed columns have
+        /// enough room to be displayed, reduce the width of the filename column as well until all
+        /// the remaining columns fit properly within the grid.
+        /// </summary>
+        void EnsureFileListColumnSizes()
+        {
+            int widthOfOtherColumns = _fileListDataGridView.Columns
+                .OfType<DataGridViewColumn>()
+                .Where(column => column.Visible)
+                .Except(new[] { _fileListNameColumn })
+                .Sum(column => column.Width);
+
+            int scrollBarWidth = _fileListDataGridView.Controls
+                .OfType<VScrollBar>()
+                .Where(scrollBar => scrollBar.Visible)
+                .Sum(scrollBar => scrollBar.Width);
+
+            int availableWidth = _fileListDataGridView.ClientSize.Width
+                - _fileListDataGridView.RowHeadersWidth
+                - widthOfOtherColumns
+                - scrollBarWidth
+                - 2; // Seem to need to subtract a couple more pixels to avoid a horizontal scroll bar.
+
+            if (_fileListNameColumn.Width > availableWidth)
+            {
+                _fileListNameColumn.Width = availableWidth;
             }
         }
 
