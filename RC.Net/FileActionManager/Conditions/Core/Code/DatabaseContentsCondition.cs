@@ -435,12 +435,6 @@ namespace Extract.FileActionManager.Conditions
 
                         if (_fuzzy)
                         {
-                            // Intialize _valueRegex as with a fuzzy regex pattern that allows one
-                            // wrong char per 3 chars in the search term and 1 extra whitespace
-                            // char per 2 chars in the search term.
-                            int errorAllowance = expandedValue.Length / 3;
-                            int whiteSpaceAllowance = expandedValue.Length / 2;
-
                             // https://extract.atlassian.net/browse/ISSUE-12321
                             // The value to be searched needs to be escaped for regex, otherwise the
                             // value will be treated as a regex. The expansion should happen after
@@ -450,9 +444,30 @@ namespace Extract.FileActionManager.Conditions
 
                             _valueRegex = new DotNetRegexParser();
                             _valueRegex.IgnoreCase = !_caseSensitive;
-                            _valueRegex.Pattern = string.Format(CultureInfo.InvariantCulture,
-                                "(?~<method=better_fit,error={0:D},xtra_ws={1:D}>{2})",
-                                errorAllowance, whiteSpaceAllowance, expandedValue);
+
+                            if (expandedValue.Length <= 1)
+                            {
+                                // https://extract.atlassian.net/browse/ISSUE-12463
+                                // If the value to be compared is 1 char or less in length, the
+                                // fuzzy syntax will not work and would otherwise be inappropriate
+                                // to use. Just use a literal expression in this case (but don't
+                                // drop into the logic that would use type conversion as we don't
+                                // want an entirely different type of comparison occuring depending
+                                // on the specific data at hand).
+                                _valueRegex.Pattern = @"\A" + expandedValue + @"\z";
+                            }
+                            else
+                            {
+                                // Intialize _valueRegex as with a fuzzy regex pattern that allows one
+                                // wrong char per 3 chars in the search term and 1 extra whitespace
+                                // char per 2 chars in the search term.
+                                int errorAllowance = expandedValue.Length / 3;
+                                int whiteSpaceAllowance = expandedValue.Length / 2;
+
+                                _valueRegex.Pattern = string.Format(CultureInfo.InvariantCulture,
+                                    @"\A(?~<error={0:D},xtra_ws={1:D}>{2})\z",
+                                    errorAllowance, whiteSpaceAllowance, expandedValue);
+                            }
                         }
                         else
                         {
