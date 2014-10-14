@@ -1943,12 +1943,15 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                // If the left mouse button was pressed and the copy files feature is enabled,
-                // prepare for a possible drag operation.
-                if (CopyFilesEnabled && e.Button.HasFlag(MouseButtons.Left))
+                // If the left mouse button was pressed, prepare for a possible drag operation.
+                // https://extract.atlassian.net/browse/ISSUE-12468
+                // Do this regardless of whether CopyFilesEnabled is true because a side effect of
+                // activating a drag and drop operation is that it prevents dragging from selecting
+                // multiple rows. Actual data will be associate with the drag and drop operation
+                // only in the case that CopyFilesEnabled is true.
+                if (e.Button.HasFlag(MouseButtons.Left))
                 {
-                    System.Windows.Forms.DataGridView.HitTestInfo hit =
-                            _fileListDataGridView.HitTest(e.X, e.Y);
+                    DataGridView.HitTestInfo hit = _fileListDataGridView.HitTest(e.X, e.Y);
                     
                     // If a table row was clicked
                     if (hit.RowIndex >= 0)
@@ -2052,11 +2055,19 @@ namespace Extract.FileActionManager.Utilities
                 {
                     _dragDropMouseDownPoint = null;
                     DataObject dragData = new DataObject();
-                    StringCollection fileCollection = new StringCollection();
-                    fileCollection.AddRange(GetSelectedFileNames());
-                    dragData.SetFileDropList(fileCollection);
 
-                    DoDragDrop(dragData, DragDropEffects.Copy);
+                    if (CopyFileNamesEnabled)
+                    {
+                        StringCollection fileCollection = new StringCollection();
+                        fileCollection.AddRange(GetSelectedFileNames());
+                        dragData.SetFileDropList(fileCollection);
+
+                        DoDragDrop(dragData, DragDropEffects.Copy);
+                    }
+                    else
+                    {
+                        DoDragDrop(dragData, DragDropEffects.None);
+                    }
 
                     // If a drag/drop event was started, go ahead and consider the current selection
                     // permanent and eligible to use in the next selection "suppression".
