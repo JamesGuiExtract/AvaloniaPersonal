@@ -689,12 +689,6 @@ namespace Extract.DataEntry
 
                 IUnknownVector results = RunFormattingRule(rule, inputText, attributeName);
 
-                AttributeStatusInfo.Trace("FormattingRuleResult", null,
-                    results
-                        .ToIEnumerable<IAttribute>()
-                        .Select(attribute => attribute.Value.String)
-                        .ToArray());
-
                 // Choose the appropriate resulting attribute based on selectionMode
                 int resultsCount = results.Size();
                 if (resultsCount > 0)
@@ -754,7 +748,16 @@ namespace Extract.DataEntry
                 }
 
                 // Format the data into attribute(s) using the rule.
-                return rule.ExecuteRulesOnText(afDoc, attributeNames, AlternateComponentDataDir, null);
+                IUnknownVector results =
+                    rule.ExecuteRulesOnText(afDoc, attributeNames, AlternateComponentDataDir, null);
+
+                AttributeStatusInfo.Trace("FormattingRuleResult", null,
+                    results
+                        .ToIEnumerable<IAttribute>()
+                        .Select(attribute => attribute.Value.String)
+                        .ToArray());
+
+                return results;
             }
             catch (Exception ex)
             {
