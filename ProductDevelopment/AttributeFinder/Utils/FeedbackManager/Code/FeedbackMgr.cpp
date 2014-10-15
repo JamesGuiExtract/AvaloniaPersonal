@@ -1112,7 +1112,7 @@ void CFeedbackMgr::writeRSDFileName(long lRuleID, const string& strRSDFileName)
 //-------------------------------------------------------------------------------------------------
 void CFeedbackMgr::validateLicense()
 {
-	static const unsigned long THIS_COMPONENT_ID = gnSIMPLE_RULE_OBJECTS;
+	static const unsigned long THIS_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( THIS_COMPONENT_ID, "ELI07917", 
 					"Feedback Manager" );

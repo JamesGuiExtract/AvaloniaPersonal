@@ -9,6 +9,7 @@
 #include <CommentedTextFileReader.h>
 
 #include <string>
+#include <set>
 #include <iostream>
 
 #ifdef _DEBUG
@@ -139,7 +140,7 @@ void processComponentIDFile(const string& strComponentIDFile, string& rstrIdFile
 			CommentedTextFileReader fileReader(fIn);
 
 			unsigned long nOffSet = 0;
-			long i=0;
+			set<int> setMappedIDs;
 
 			while(!fileReader.reachedEndOfStream())
 			{
@@ -186,24 +187,33 @@ void processComponentIDFile(const string& strComponentIDFile, string& rstrIdFile
 						size_t nBeginVal = strLine.find_first_of(gstrNUMBERS, nEndConstant);
 						size_t nEndVal = strLine.find(";", nBeginVal);
 						
-						// Compute the value
-						unsigned long nVal = asUnsignedLong(strLine.substr(nBeginVal,
-							nEndVal - nBeginVal))
-							+ nOffSet;
+						// https://extract.atlassian.net/browse/ISSUE-12454
+						// Make sure the enum values don't change from version to version as
+						// new license components are added by basing them on the constant from
+						// ComponentLicenseIDs.h.
+						unsigned long nComponentId = asUnsignedLong(strLine.substr(nBeginVal,
+							nEndVal - nBeginVal));
+						unsigned long nOffsetComponentId = nComponentId + nOffSet;
+
+						if (setMappedIDs.find(nComponentId) != setMappedIDs.end())
+						{
+							THROW_LOGIC_ERROR_EXCEPTION("ELI37590");
+						}
 
 						// If this is not the first constant then we want to add a , and a newline
-						if (i)
+						if (!setMappedIDs.empty())
 						{
 							rstrIdFileContents += ",\n";
 						}
 
 						// Add the contents to the LicenseID file string
-						rstrIdFileContents += "\t\t\t" + strConst;
+						rstrIdFileContents += "\t\t\t" + strConst + " = " + asString(nComponentId);
 
-						// Add the contents to the MapIdToComponentID file string
-						rstrMapFileContents += gstrMAP_FILE_CASE_STATEMENT1 + asString(i++)
-							+ gstrMAP_FILE_CASE_STATEMENT2 + asString(nVal)
+						// Add the contents to the MapIdToComponentID file
+						rstrMapFileContents += gstrMAP_FILE_CASE_STATEMENT1 + asString(nComponentId)
+							+ gstrMAP_FILE_CASE_STATEMENT2 + asString(nOffsetComponentId)
 							+ gstrMAP_FILE_CASE_STATEMENT3;
+						setMappedIDs.insert(nComponentId);
 					}
 				}
 			}

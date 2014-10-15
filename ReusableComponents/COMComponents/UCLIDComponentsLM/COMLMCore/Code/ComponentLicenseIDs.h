@@ -99,7 +99,12 @@ const unsigned int gnFLEXINDEX_SERVER_OBJECTS			= gnBASE_OFFSET + 23;
 // This package is for simple rule objects to support Waukesha County 
 // rule writing.  Core objects and Ruleset Editor UI are licensed with 
 // separate IDs.
-const unsigned int gnSIMPLE_RULE_OBJECTS				= gnBASE_OFFSET + 24;
+// https://extract.atlassian.net/browse/ISSUE-12454
+// gnSIMPLE_RULE_OBJECTS used to be a separate licensable component, but is now one and the same
+// with gnRULE_WRITING_CORE_OBJECTS. Because of the way GenerateDotNetLicenseIDFiles generates an
+// enum by assiging the ID as the explicit value, gnSIMPLE_RULE_OBJECTS cannot remain a separate
+// entry here alongside gnRULE_WRITING_CORE_OBJECTS.
+// const unsigned int gnSIMPLE_RULE_OBJECTS				= gnBASE_OFFSET + 24;
 const unsigned int gnRULE_WRITING_CORE_OBJECTS			= gnBASE_OFFSET + 24;
 
 // This package is for all components that are only licensed on
