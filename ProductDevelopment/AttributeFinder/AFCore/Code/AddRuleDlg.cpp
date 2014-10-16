@@ -1031,17 +1031,19 @@ void CAddRuleDlg::OnDoubleClickDocumentPreprocessor()
 {
 	try
 	{
-		// update m_upDocPreprocessor based on user input
+		// Update m_upDocPreprocessor based on user input
+		// It's OK to update m_ipRule's preprocessor directly because when m_ipRule represents
+		// an existing rule that is being reconfigured it is a clone, not the original object
 		VARIANT_BOOL vbDirty = m_ipMiscUtils->HandlePlugInObjectDoubleClick(
-			m_ipDocPreprocessor, gbstrRULE_SPECIFIC_DOCUMENT_PREPROCESSOR_DISPLAY_NAME,
+			m_ipRule->RuleSpecificDocPreprocessor, gbstrRULE_SPECIFIC_DOCUMENT_PREPROCESSOR_DISPLAY_NAME,
 			get_bstr_t(AFAPI_DOCUMENT_PREPROCESSORS_CATEGORYNAME), 
 			VARIANT_TRUE, gRequiredInterfaces.ulCount, gRequiredInterfaces.pIIDs);
 
 		// check if m_upDocPreprocessor was modified
 		if (vbDirty == VARIANT_TRUE)
 		{
-			// refresh the preprocessor check box and edit control to reflect changes
-			updatePreprocessorCheckBoxAndEditControl();
+			// Set the preprocessor object based on change
+			setPreprocessor();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16042")
@@ -1084,6 +1086,7 @@ void CAddRuleDlg::OnSize(UINT nType, int cx, int cy)
 			CRect	rectDesc;
 			CRect	rectCombo;
 			CRect	rectUp;
+			CRect	rectIECheck;
 
 			// Get total dialog size
 			GetWindowRect( &rectDlg );
@@ -1103,7 +1106,8 @@ void CAddRuleDlg::OnSize(UINT nType, int cx, int cy)
 			GetDlgItem( IDC_EDIT_DESC )->GetWindowRect( rectDesc );
 			GetDlgItem( IDC_COMBO_RULE )->GetWindowRect( rectCombo );
 			GetDlgItem( IDC_BTN_RULEUP )->GetWindowRect( rectUp );
-
+			GetDlgItem( IDC_CHECK_IGNORE_MODIFIER_ERRORS )->GetWindowRect( rectIECheck );
+			
 			// Compute space between buttons
 			int iDiffX1 = rectCancel.left - rectOK.right;
 
@@ -1121,6 +1125,7 @@ void CAddRuleDlg::OnSize(UINT nType, int cx, int cy)
 			ScreenToClient( &rectDesc );
 			ScreenToClient( &rectCombo );
 			ScreenToClient( &rectUp );
+			ScreenToClient( &rectIECheck );
 
 			///////////////
 			// Do the moves
@@ -1135,10 +1140,19 @@ void CAddRuleDlg::OnSize(UINT nType, int cx, int cy)
 				rectOK.Width(), rectOK.Height(), TRUE );
 			 
 
-			// List and Configuration prompt
-			GetDlgItem( IDC_LIST_RULES )->MoveWindow( rectList.left, rectList.top, 
-				cx - 3*iDiffX1 - rectSelect.Width(), 
-				cy - 2*iDiffX1 - rectOK.Height() - rectList.top, TRUE );
+			// List and Configuration prompt and IE checkbox
+			// Save relative position of ignore modifier errors checkbox
+			int nIESpacing = rectIECheck.top - rectList.bottom;
+
+			// Move the list
+			rectList.InflateRect( 0, 0, 
+				cx - 3*iDiffX1 - rectSelect.Width() - rectList.Width(), 
+				cy - 2*iDiffX1 - rectOK.Height() - rectList.top - rectPrompt.Height() - rectList.Height() );
+			GetDlgItem( IDC_LIST_RULES )->MoveWindow(rectList, TRUE);
+
+			// Move checkbox
+			rectIECheck.MoveToY(rectList.bottom+nIESpacing);
+			GetDlgItem( IDC_CHECK_IGNORE_MODIFIER_ERRORS )->MoveWindow(rectIECheck, TRUE);
 
 			//resize the description column
 			m_listRules.SetColumnWidth(giDESC_LIST_COLUMN, LVSCW_AUTOSIZE_USEHEADER);
