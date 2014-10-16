@@ -233,6 +233,8 @@ namespace Extract.FileActionManager.RunFPSFile
                 ShowUsage("Cannot find FPS file:\r\n" + _fpsFileName);
                 return false;
             }
+            _fpsFileName =
+                FileSystemMethods.GetAbsolutePath(_fpsFileName, Environment.CurrentDirectory);
 
             _sourceDocName = args[1];
             if (!File.Exists(_sourceDocName))
