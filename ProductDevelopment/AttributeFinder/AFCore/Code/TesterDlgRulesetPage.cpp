@@ -187,9 +187,27 @@ void TesterDlgRulesetPage::OnChangeRuleset()
 
 	try
 	{
-		// Enable the ruleset properties button iff there is text in the ruleset path edit box.
-		BOOL bEnablePropertiesBtn = asMFCBool(!getRulesFileName().empty());
+		// Enable the ruleset properties button if there is text in the ruleset path edit box.
+		string strRulesFilename = getRulesFileName();
+		BOOL bEnablePropertiesBtn = asMFCBool(!strRulesFilename.empty());
 		GetDlgItem(IDC_BTN_RULESET_PROPERTIES)->EnableWindow(bEnablePropertiesBtn);
+
+		// Set window title based on rules file name
+		const string strWINDOW_TITLE = "Rule Tester";
+		string strResult;
+
+		if (!strRulesFilename.empty())
+		{
+			strResult = strRulesFilename + " - " + strWINDOW_TITLE;
+		}
+		else
+		{
+			strResult = strWINDOW_TITLE;
+		}
+
+		// update the window caption
+		GetParent()->GetParent()->SetWindowText(strResult.c_str());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34022");
 }
+//-------------------------------------------------------------------------------------------------

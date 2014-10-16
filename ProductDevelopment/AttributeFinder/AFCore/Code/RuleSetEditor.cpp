@@ -574,9 +574,8 @@ void CRuleSetEditor::updateWindowCaption()
 	string strResult;
 	if (!m_strCurrentFileName.empty())
 	{
-		// if a file is currently loaded, then only display the filename and
-		// not the full path.
-		strResult = getFileNameFromFullPath(m_strCurrentFileName);
+		// if a file is currently loaded, then display the the full path.
+		strResult = m_strCurrentFileName;
 		strResult += " - ";
 		strResult += strWINDOW_TITLE;
 	}

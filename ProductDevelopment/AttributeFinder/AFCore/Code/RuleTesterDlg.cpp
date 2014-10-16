@@ -291,6 +291,9 @@ BOOL RuleTesterDlg::OnInitDialog()
 			m_ToolTipCtrl.Create(this,TTS_ALWAYSTIP);
 
 			updateButtonStates();
+
+			// Set title bar text
+			updateWindowCaption();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI04884")
 	}
@@ -1667,5 +1670,37 @@ IInputManagerPtr RuleTesterDlg::getInputManager()
 	IInputManagerSingletonPtr ipInputMgrSingleton(CLSID_InputManagerSingleton);
 	ASSERT_RESOURCE_ALLOCATION("ELI10376", ipInputMgrSingleton != __nullptr);
 	return ipInputMgrSingleton->GetInstance();
+}
+//-------------------------------------------------------------------------------------------------
+void RuleTesterDlg::updateWindowCaption()
+{
+	const string strWINDOW_TITLE = "Rule Tester";
+	
+	// Compute the window caption depending upon the name of the
+	// Currently loaded file, if any
+	string strResult;
+
+	// Get from ruleset tab if in ruleset tab mode
+	if ( m_eMode == kWithRulesetTab )
+	{
+		strResult = m_testerDlgRulesetPage.getRulesFileName();
+	}
+	else
+	{
+		strResult = m_ipRuleSet->FileName;
+	}
+
+	if (!strResult.empty())
+	{
+		strResult += " - ";
+		strResult += strWINDOW_TITLE;
+	}
+	else
+	{
+		strResult = strWINDOW_TITLE;
+	}
+
+	// update the window caption
+	SetWindowText(strResult.c_str());
 }
 //-------------------------------------------------------------------------------------------------

@@ -1541,14 +1541,14 @@ void CRuleSetEditor::OnDoubleClickDocumentPreprocessor()
 {
 	try
 	{
-		// update GlobalOutputHandler based on double-click event
+		// update GlobalDocumentPreprocessor based on double-click event
 		VARIANT_BOOL vbDirty = m_ipMiscUtils->HandlePlugInObjectDoubleClick(m_ipRuleSet->GlobalDocPreprocessor,
 			gbstrDOCUMENT_PREPROCESSOR_DISPLAY_NAME, get_bstr_t(AFAPI_DOCUMENT_PREPROCESSORS_CATEGORYNAME), 
 			VARIANT_TRUE, gRequiredInterfaces.ulCount, gRequiredInterfaces.pIIDs);
 
 		if (vbDirty == VARIANT_TRUE)
 		{
-			// update display of the output handler check box and edit control
+			// update display of the preprocessor check box and edit control
 			updateCheckBoxAndEditControlBasedOnObject(m_ipRuleSet->GlobalDocPreprocessor,
 				m_bDocumentPP, m_zPPDescription, IDC_CHECK_DOCUMENT_PP, IDC_CHECK_IGNORE_PP_ERRORS);
 		}

@@ -279,6 +279,9 @@ private:
 	// PROMISE: Will return an input manager
 	IInputManagerPtr getInputManager();
 	//=============================================================================
+	// PURPOSE: To update the window caption to reflect loaded rules file
+	void updateWindowCaption();
+	//=============================================================================
 };
 
 //{{AFX_INSERT_LOCATION}}
