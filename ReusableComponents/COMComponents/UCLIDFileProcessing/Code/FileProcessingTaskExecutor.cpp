@@ -214,7 +214,9 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(IFileRecord* pFileRec
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(pFAMTagManager);
 		ASSERT_ARGUMENT("ELI17865", ipFAMTagManager !=  __nullptr);
 		UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr ipFileRequestHandler(pFileRequestHandler);
-		ASSERT_ARGUMENT("ELI37484", ipFileRequestHandler != nullptr);
+		// https://extract.atlassian.net/browse/ISSUE-12509
+		// pFileRequestHandler is not currently guaranteed to be available in all execution contexts.
+		// The task is responsible for asserting its existance if needed.
 		ASSERT_ARGUMENT("ELI17866", pResult !=  __nullptr);
 		ASSERT_ARGUMENT("ELI31324", pFileRecord != __nullptr);
 

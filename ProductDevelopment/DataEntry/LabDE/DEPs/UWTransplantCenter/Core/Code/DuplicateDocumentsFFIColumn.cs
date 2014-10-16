@@ -85,6 +85,11 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         #region Fields
 
         /// <summary>
+        /// The <see cref="FileProcessingDB"/> currently being used.
+        /// </summary>
+        IFileProcessingDB _fileProcessingDB;
+
+        /// <summary>
         /// Stores the currently selected action for all files that have been displayed in FFI.
         /// </summary>
         Dictionary<int, string> _currentValues = new Dictionary<int, string>();
@@ -414,8 +419,23 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// </value>
         public IFileProcessingDB FileProcessingDB
         {
-            get;
-            set;
+            get
+            {
+                return _fileProcessingDB;
+            }
+
+            set
+            {
+                _fileProcessingDB = value;
+                if (_fileProcessingDB != null)
+                {
+                    // At the time FileProcessingDB is initialized, ensure we have access to an
+                    // IFileRequestHandler.
+                    ExtractException.Assert("ELI37591",
+                        "Duplicate documents cannot be presented in the current context.",
+                        DataEntryApplication.FileRequestHandler != null);
+                }
+            }
         }
 
         /// <summary>

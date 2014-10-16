@@ -1974,6 +1974,9 @@ library UCLID_FILEPROCESSINGLib
 		//			pFileRequestHandler- The IFileRequestHandler that can be used
         //			by the tasks to carry out requests for files to be checked out, released or
 		//			re-ordered in the queue.
+		//			NOTE: pFileRequestHandler is not currently guaranteed to be available in all
+		//			execution contexts. The task is responsible for asserting its existance if
+		//			needed.
 		[id(1), helpstring("method Init")] HRESULT Init([in] IIUnknownVector* pFileProcessingTasks,
 			[in] long nActionID, [in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager,
 			[in] IFileRequestHandler* pFileRequestHandler);
@@ -1997,6 +2000,12 @@ library UCLID_FILEPROCESSINGLib
 		//			nActionID - The ID of the action being processed
 		//			pDB- The database being acted upon
 		//			pFAMTagManager- The tag manager to use when required
+		//			pFileRequestHandler- The IFileRequestHandler that can be used
+        //			by the tasks to carry out requests for files to be checked out, released or
+		//			re-ordered in the queue.
+		//			NOTE: pFileRequestHandler is not currently guaranteed to be available in all
+		//			execution contexts. The task is responsible for asserting its existance if
+		//			needed.
 		//			pProgressStatus- The ProgressStatus object to update (can be NULL)
 		//			bCancelRequested - VARIANT_TRUE if the user has requested cancellation.  IFileProcessingTaskExecutor
 		//				doesn't act upon this flag, but passes it on to the tasks it executes
