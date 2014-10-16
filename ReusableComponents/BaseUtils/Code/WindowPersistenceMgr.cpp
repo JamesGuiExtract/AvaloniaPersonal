@@ -37,6 +37,8 @@ void WindowPersistenceMgr::SaveWindowPosition()
 		windowPlacement.length = sizeof( WINDOWPLACEMENT );
 		if (m_wnd.GetWindowPlacement(&windowPlacement) != 0)
 		{
+			CRect rect(windowPlacement.rcNormalPosition);
+
 			// Store whether the window is maximized
 			if (windowPlacement.showCmd == SW_SHOWMAXIMIZED)
 			{
@@ -46,8 +48,14 @@ void WindowPersistenceMgr::SaveWindowPosition()
 			{
 				m_registryManager.setKeyValue("", WINDOW_MAXIMIZED, "0");
 			}
-
-			CRect rect(windowPlacement.rcNormalPosition);
+			
+			// If the window is not maximized or minimized, store the actual position on the screen
+			// (Preserves aero-snapped position)
+			if (windowPlacement.showCmd != SW_SHOWMAXIMIZED
+				&& windowPlacement.showCmd != SW_SHOWMINIMIZED)
+			{
+				m_wnd.GetWindowRect(rect);
+			}
 
 			// Format strings to use as registry values
 			CString	zX, zY, zWidth, zHeight;
@@ -72,7 +80,7 @@ void WindowPersistenceMgr::RestoreWindowPosition()
 	{
 		if (createRegistryValues())
 		{
-			// If the regsitry values hadn't yet existed, initialize them with the current window
+			// If the registry values hadn't yet existed, initialize them with the current window
 			// position.
 			SaveWindowPosition();
 		}
@@ -89,10 +97,34 @@ void WindowPersistenceMgr::RestoreWindowPosition()
 			WINDOWPLACEMENT windowPlacement;
 			windowPlacement.length = sizeof(WINDOWPLACEMENT);
 			windowPlacement.showCmd = bMaximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL;
-			windowPlacement.rcNormalPosition = CRect(nLeft, nTop, nLeft + nWidth, nTop + nHeight);
-
+			CRect rect(nLeft, nTop, nLeft + nWidth, nTop + nHeight);
+			
 			// Adjust window position based on retrieved settings
+			windowPlacement.rcNormalPosition = rect;
 			m_wnd.SetWindowPlacement(&windowPlacement);
+
+			// If not maximized, set actual last, non-minimized position (not normal position)
+			if (!bMaximized)
+			{
+				m_wnd.MoveWindow(rect, TRUE);
+				m_wnd.GetWindowPlacement(&windowPlacement);
+
+				// Put top-left corner on screen if it less than zero
+				if (windowPlacement.rcNormalPosition.top < 0)
+				{
+					rect = windowPlacement.rcNormalPosition;
+					rect.MoveToY(0);
+					windowPlacement.rcNormalPosition = rect;
+					m_wnd.SetWindowPlacement(&windowPlacement);
+				}
+				if (windowPlacement.rcNormalPosition.left < 0)
+				{
+					rect = windowPlacement.rcNormalPosition;
+					rect.MoveToX(0);
+					windowPlacement.rcNormalPosition = rect;
+					m_wnd.SetWindowPlacement(&windowPlacement);
+				}
+			}
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31582");
@@ -126,6 +158,53 @@ bool WindowPersistenceMgr::createRegistryValues()
 		m_registryManager.createKey("", WINDOW_SIZE_Y, "");
 	}
 
+	if (!m_registryManager.keyExists("", WINDOW_MAXIMIZED))
+	{
+		bCreatedValues = true;
+		m_registryManager.createKey("", WINDOW_MAXIMIZED, "");
+	}
 	return bCreatedValues;
+}
+//-------------------------------------------------------------------------------------------------
+void WindowPersistenceMgr::moveAnchoredAll(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint)
+{
+	CRect rectWnd, rectControl;
+	m_wnd.GetClientRect(rectWnd);
+	pCtr.GetWindowRect(rectControl);
+	m_wnd.ScreenToClient(rectControl);
+	rectControl.right = rectControl.right + rectWnd.Width() - nOldWidth;
+	rectControl.bottom = rectControl.bottom + rectWnd.Height() - nOldHeight;
+	pCtr.MoveWindow(rectControl, bRepaint);
+}
+//-------------------------------------------------------------------------------------------------
+void WindowPersistenceMgr::moveAnchoredTopRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint)
+{
+	CRect rectWnd, rectControl;
+	m_wnd.GetClientRect(rectWnd);
+	pCtr.GetWindowRect(rectControl);
+	m_wnd.ScreenToClient(rectControl);
+	rectControl.MoveToX(rectControl.left + rectWnd.Width() - nOldWidth);
+	pCtr.MoveWindow(rectControl, bRepaint);
+}
+//-------------------------------------------------------------------------------------------------
+void WindowPersistenceMgr::moveAnchoredBottomLeft(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint)
+{
+	CRect rectWnd, rectControl;
+	m_wnd.GetClientRect(rectWnd);
+	pCtr.GetWindowRect(rectControl);
+	m_wnd.ScreenToClient(rectControl);
+	rectControl.MoveToY(rectControl.top + rectWnd.Height() - nOldHeight);
+	pCtr.MoveWindow(rectControl, bRepaint);
+}
+//-------------------------------------------------------------------------------------------------
+void WindowPersistenceMgr::moveAnchoredBottomLeftRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint)
+{
+	CRect rectWnd, rectControl;
+	m_wnd.GetClientRect(rectWnd);
+	pCtr.GetWindowRect(rectControl);
+	m_wnd.ScreenToClient(rectControl);
+	rectControl.right = rectControl.right + rectWnd.Width() - nOldWidth;
+	rectControl.MoveToY(rectControl.top + rectWnd.Height() - nOldHeight);
+	pCtr.MoveWindow(rectControl, bRepaint);
 }
 //-------------------------------------------------------------------------------------------------

@@ -57,21 +57,12 @@ BOOL CEAVGeneratorDlg::OnInitDialog()
 			m_btnUp.SetIcon(LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON_UP)));
 			m_btnDown.SetIcon(LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON_DOWN)));
 			
-			CRect rectList;
-			m_listAttributes.GetWindowRect(rectList);
-			ScreenToClient(rectList);
-			long nWidth1 = rectList.Width() / 5;
-			long nWidth4 = nWidth1;
-			long nWidth2 = 2 * nWidth1;
-			long nWidth3 = rectList.Width() - nWidth1 - nWidth2 - nWidth4 - 5;
-			
 			// add column headers to the list ctrl
 			m_listAttributes.SetExtendedStyle(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
-			m_listAttributes.InsertColumn(NAME_COLUMN, "Name", LVCFMT_LEFT, nWidth1, NAME_COLUMN);
-			m_listAttributes.InsertColumn(VALUE_COLUMN, "Value", LVCFMT_LEFT, nWidth2, VALUE_COLUMN);
-			m_listAttributes.InsertColumn(TYPE_COLUMN, "Type", LVCFMT_LEFT, nWidth3, TYPE_COLUMN);
-			m_listAttributes.InsertColumn(SPATIALNESS_COLUMN, "Spatialness", LVCFMT_LEFT,
-				nWidth4, SPATIALNESS_COLUMN);
+			m_listAttributes.InsertColumn(NAME_COLUMN, "Name");
+			m_listAttributes.InsertColumn(VALUE_COLUMN, "Value");
+			m_listAttributes.InsertColumn(TYPE_COLUMN, "Type");
+			m_listAttributes.InsertColumn(SPATIALNESS_COLUMN, "Spatialness");
 			
 			// Select the appropriate radio button
 			CheckRadioButton( IDC_RADIO_REPLACE, IDC_RADIO_APPEND, 
@@ -116,6 +107,20 @@ BOOL CEAVGeneratorDlg::OnInitDialog()
 					throw ue;
 				}
 			}
+
+			// Save original window width/height
+			CRect rectDlg;
+			GetClientRect(rectDlg);
+			m_nDefaultW = rectDlg.Width();
+			m_nDefaultH = rectDlg.Height();
+
+			m_bInitialized = true;
+
+			// Resize controls
+			doResize();
+
+			// Restore previous position if available
+			m_wMgr.RestoreWindowPosition();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI06220");
 	}
@@ -151,6 +156,9 @@ void CEAVGeneratorDlg::OnClose()
 		{
 			clearListControl();
 		}
+
+		// Save window position to the registry
+		m_wMgr.SaveWindowPosition();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06219")
 
@@ -1177,5 +1185,26 @@ void CEAVGeneratorDlg::OnNMDblclkListDisplay(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18080");
 	*pResult = 0;
+}
+//-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	try
+	{
+		lpMMI->ptMinTrackSize.x = giEAVGENDLG_MIN_WIDTH;
+		lpMMI->ptMinTrackSize.y = giEAVGENDLG_MIN_HEIGHT;
+		CDialog::OnGetMinMaxInfo(lpMMI);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37588");
+}
+//-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::OnSize(UINT nType, int cx, int cy)
+{
+	try
+	{
+		CDialog::OnSize(nType, cx, cy);
+		doResize();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37589");
 }
 //-------------------------------------------------------------------------------------------------

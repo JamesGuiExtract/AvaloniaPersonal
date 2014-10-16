@@ -5,6 +5,7 @@
 
 #include "..\..\..\..\InputFunnel\IFCore\Code\InputManagerEventHandler.h"
 #include <ImageButtonWithStyle.h>
+#include <WindowPersistenceMgr.h>
 
 #include <memory>
 #include <set>
@@ -45,6 +46,15 @@ public:
 	CString	m_zValue;
 	CButton m_btnMerge;
 	CString m_zAttributePath;
+	CStatic m_labelFilename;
+	CButton m_radioReplace;
+	CButton m_radioAppend;
+	CStatic m_labelAttributePath;
+	CStatic m_currentFilename;
+	CButton m_valueGroup;
+	CStatic m_labelName;
+	CStatic m_labelType;
+	CStatic m_labelValue;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -93,6 +103,7 @@ protected:
 	afx_msg void OnBtnNew();
 	afx_msg void OnBtnOpen();
 	afx_msg void OnBtnSavefile();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnBtnHighlight();
 	afx_msg void OnBtnMerge();
 	afx_msg void OnOK();
@@ -101,6 +112,7 @@ protected:
 	afx_msg void OnBtnSaveas();
 	afx_msg void OnNMClickListDisplay(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMDblclkListDisplay(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	//}}AFX_MSG
 	BOOL OnToolTipNotify(UINT nID, NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
@@ -124,6 +136,10 @@ private:
 	// static constants used to specify whether to open or not open the SRW
 	static const bool gbOPEN_SRW = true;
 	static const bool gbDO_NOT_OPEN_SRW = false;
+
+	// Dialog size bounds
+	static const int giEAVGENDLG_MIN_WIDTH = 638;
+	static const int giEAVGENDLG_MIN_HEIGHT = 608;
 
 	//----------------------------------------------------------------------------------------------
 	// Data
@@ -159,6 +175,17 @@ private:
 
 	// Used to open new instances of the spot recognition window
 	ISRIRUtilsPtr m_ipSRIRUtils;
+	
+	// Whether the dialog controls have been initialized.  This allows
+	// for the controls to be moved and resized before viewing
+	bool m_bInitialized;
+
+	// Initial width and heights used to dock controls
+	int m_nDefaultW;
+	int m_nDefaultH;
+
+	// Window position mgr
+	WindowPersistenceMgr m_wMgr;
 
 	//////////
 	// Methods
@@ -316,6 +343,9 @@ private:
 
 	// PURPOSE: To return the name of the attribute at index iIndex
 	string getName(int iIndex);
+
+	// PURPOSE: To handle moving/resizing the controls
+	void doResize();
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

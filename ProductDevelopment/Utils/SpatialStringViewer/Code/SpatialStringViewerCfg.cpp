@@ -15,6 +15,7 @@ const string& gstrLEFT_POS = "Left";
 const string& gstrTOP_POS = "Top";
 const string& gstrRIGHT_POS = "Right";
 const string& gstrBOTTOM_POS = "Bottom";
+const string& gstrWINDOW_MAXIMIZED = "WindowMaximized";
 
 const string& gstrFIND_FOLDER = gstrROOT_REGISTRY_FOLDER + "\\Find";
 const string& gstrDISTRIBUTION_FOLDER = gstrROOT_REGISTRY_FOLDER + "\\Distribution";
@@ -49,19 +50,33 @@ SpatialStringViewerCfg::~SpatialStringViewerCfg()
 //-------------------------------------------------------------------------------------------------
 void SpatialStringViewerCfg::saveCurrentWindowPosition()
 {
-	// get the current position of the window
-	CRect rect;
-	m_pDlg->GetWindowRect(&rect);
+	WINDOWPLACEMENT windowPlacement;
+	windowPlacement.length = sizeof( WINDOWPLACEMENT );
+	if (m_pDlg->GetWindowPlacement(&windowPlacement) != 0)
+	{
+		// Store whether the window is maximized
+		if (windowPlacement.showCmd == SW_SHOWMAXIMIZED)
+		{
+			m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrWINDOW_MAXIMIZED, "1");
+		}
+		else
+		{
+			m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrWINDOW_MAXIMIZED, "0");
+		}
 
-	// create the necessary entries in the registry
-	m_apCfgMgr->createFolder(gstrROOT_REGISTRY_FOLDER);
-	m_apCfgMgr->createFolder(gstrLAST_POS_FOLDER);
+		// get the current position of the window
+		CRect rect(windowPlacement.rcNormalPosition);
 
-	// store the window position in the registry
-	m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrLEFT_POS, asString(rect.left));
-	m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrTOP_POS, asString(rect.top));
-	m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrRIGHT_POS, asString(rect.right ));
-	m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrBOTTOM_POS, asString(rect.bottom));
+		// create the necessary entries in the registry
+		m_apCfgMgr->createFolder(gstrROOT_REGISTRY_FOLDER);
+		m_apCfgMgr->createFolder(gstrLAST_POS_FOLDER);
+
+		// store the window position in the registry
+		m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrLEFT_POS, asString(rect.left));
+		m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrTOP_POS, asString(rect.top));
+		m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrRIGHT_POS, asString(rect.right ));
+		m_apCfgMgr->setKeyValue(gstrLAST_POS_FOLDER, gstrBOTTOM_POS, asString(rect.bottom));
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void SpatialStringViewerCfg::restoreLastWindowPosition()
@@ -75,8 +90,15 @@ void SpatialStringViewerCfg::restoreLastWindowPosition()
 		rect.top = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrTOP_POS, ""));
 		rect.right = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrRIGHT_POS, ""));
 		rect.bottom = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrBOTTOM_POS, ""));
+		bool bMaximized = asCppBool(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrWINDOW_MAXIMIZED, ""));
 
-		m_pDlg->MoveWindow(&rect);
+		WINDOWPLACEMENT windowPlacement;
+		windowPlacement.length = sizeof(WINDOWPLACEMENT);
+		windowPlacement.showCmd = bMaximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL;
+		windowPlacement.rcNormalPosition = rect;
+
+		// Adjust window position based on retrieved settings
+		m_pDlg->SetWindowPlacement(&windowPlacement);
 	}
 	catch (...)
 	{

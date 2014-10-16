@@ -29,7 +29,18 @@ public:
 
 	// Restores the window to the position & size last stored in the registry.
 	void RestoreWindowPosition();
+	
+	// Moves controls that are anchored to the top right corner of the window
+	void moveAnchoredTopRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint = TRUE);
 
+	// Moves controls that are anchored to the bottom left corner of the window
+	void moveAnchoredBottomLeft(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint = TRUE);
+
+	// Moves controls that are anchored to the bottom, left and right sides of the window
+	void moveAnchoredBottomLeftRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint = TRUE);
+
+	// Moves controls that are anchored to all sides of the window
+	void moveAnchoredAll(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint = TRUE);
 private:
 	
 	// The window for which position information should be saved/restored from the registry

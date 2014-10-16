@@ -42,11 +42,13 @@ const string gstrDEFAULT_NEW_SWIPE_NAME = "Manual";
 //-------------------------------------------------------------------------------------------------
 CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 : CDialog(CEAVGeneratorDlg::IDD, pParent),
+  m_bInitialized(false),
   m_bFileModified(false),
   m_lRefCount(0), 
   m_bReplaceValueText(true),
   m_bEmptyStringOpened(false),
-  m_strCurrentFileName("")
+  m_strCurrentFileName(""),
+  m_wMgr(this, gstrREG_ROOT_KEY+gstrVOAVIEWER_SECTION)
 {
 	try
 	{
@@ -58,7 +60,7 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 		//}}AFX_DATA_INIT
 		// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 		m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-		
+
 		// Initiates the use of singleton input manager.
 		UseSingletonInputManager();
 		ASSERT_RESOURCE_ALLOCATION("ELI06190", getInputManager() != __nullptr);
@@ -72,7 +74,7 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 			// create the key and default to off
 			rpmVOA.createKey(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY,
 				gstrDEFAULT_AUTOOPENIMAGE);
-			
+
 			// set m_bAutoOpenImageEnabled = false;
 			m_bAutoOpenImageEnabled = asCppBool(gstrDEFAULT_AUTOOPENIMAGE);
 		}
@@ -81,7 +83,7 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 			// key exists, so read from the registry
 			string strAutoOpenImageKey = 
 				rpmVOA.getKeyValue(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY,
-					gstrDEFAULT_AUTOOPENIMAGE);
+				gstrDEFAULT_AUTOOPENIMAGE);
 
 			// set the AutoOpenImage value
 			m_bAutoOpenImageEnabled = asCppBool(strAutoOpenImageKey);
@@ -216,12 +218,22 @@ void CEAVGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_VALUE, m_zValue);
 	DDX_Text(pDX, IDC_EDIT_ATTRIBUTE_PATH, m_zAttributePath);
 	DDX_Control(pDX, IDC_BTN_MERGE, m_btnMerge);
+	DDX_Control(pDX, IDC_LABEL_FILENAME, m_labelFilename);
+	DDX_Control(pDX, IDC_RADIO_REPLACE, m_radioReplace);
+	DDX_Control(pDX, IDC_RADIO_APPEND, m_radioAppend);
+	DDX_Control(pDX, IDC_STATIC_ATTRIBUTE_PATH, m_labelAttributePath);
+	DDX_Control(pDX, IDC_STATIC_FILENAME, m_currentFilename);
+	DDX_Control(pDX, IDC_STATIC_GROUP, m_valueGroup);
+	DDX_Control(pDX, IDC_STATIC_NAME, m_labelName);
+	DDX_Control(pDX, IDC_STATIC_TYPE, m_labelType);
+	DDX_Control(pDX, IDC_STATIC_VALUE, m_labelValue);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CEAVGeneratorDlg, CDialog)
 	ON_WM_DROPFILES()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_BTN_ADD, OnBtnAdd)
 	ON_BN_CLICKED(IDC_BTN_COPY, OnBtnCopy)
 	ON_BN_CLICKED(IDC_BTN_DELETE, OnBtnDelete)
@@ -246,6 +258,7 @@ BEGIN_MESSAGE_MAP(CEAVGeneratorDlg, CDialog)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_DISPLAY, &CEAVGeneratorDlg::OnNMClickListDisplay)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_DISPLAY, &CEAVGeneratorDlg::OnNMDblclkListDisplay)
 	ON_BN_CLICKED(IDC_BTN_MERGE, &CEAVGeneratorDlg::OnBtnMerge)
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 
@@ -490,45 +503,6 @@ void CEAVGeneratorDlg::createToolBar()
 
 	// must set TBSTYLE_TOOLTIPS here in order to get tool tips
 	m_apToolBar->ModifyStyle(0, TBSTYLE_TOOLTIPS);
-
-	// We need to resize the dialog to make room for control bars.
-	// First, figure out how big the control bars are.
-	CRect rcClientStart;
-	CRect rcClientNow;
-	GetClientRect(rcClientStart);
-	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST,
-				   0, reposQuery, rcClientNow);
-
-	// Now move all the controls so they are in the same relative
-	// position within the remaining client area as they would be
-	// with no control bars.
-	CPoint ptOffset(rcClientNow.left - rcClientStart.left,
-					rcClientNow.top - rcClientStart.top);
-
-	CRect  rcChild;
-	CWnd* pwndChild = GetWindow(GW_CHILD);
-	while (pwndChild)
-	{
-		pwndChild->GetWindowRect(rcChild);
-		ScreenToClient(rcChild);
-		rcChild.OffsetRect(ptOffset);
-		pwndChild->MoveWindow(rcChild, FALSE);
-		pwndChild = pwndChild->GetNextWindow();
-	}
-
-	// Adjust the dialog window dimensions
-	CRect rcWindow;
-	GetWindowRect(rcWindow);
-	rcWindow.right += rcClientStart.Width() - rcClientNow.Width();
-	rcWindow.bottom += rcClientStart.Height() - rcClientNow.Height();
-	MoveWindow(rcWindow, FALSE);
-
-	// And position the control bars
-	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
-
-	// Refresh display
-	UpdateWindow();
-	Invalidate();
 }
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::deleteTemporaryHighlights()
@@ -1916,5 +1890,76 @@ string CEAVGeneratorDlg::getName(int iIndex)
 
 	// return the string without the leading .'s
 	return (iPosOfFirstNonPeriod != string::npos ) ? currText.substr(iPosOfFirstNonPeriod) : currText;
+}
+//-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::doResize()
+{
+	// if it's minimized, do nothing
+	// Ensure that the dlg's controls are initialized and that window is not minimized
+	if (!m_bInitialized || IsIconic())
+	{
+		return;
+	}
+
+	// Move/resize controls anchored all
+	m_wMgr.moveAnchoredAll(m_listAttributes, m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Resize columns in list control
+	CRect rectDlg, rectControl;
+	GetWindowRect(rectDlg);
+	m_listAttributes.GetClientRect(rectControl);
+
+	LVCOLUMN col0, col1, col2, col3;
+	col0.mask = col1.mask = col2.mask =	col3.mask = LVCF_WIDTH;
+	m_listAttributes.GetColumn(0, &col0);
+	m_listAttributes.GetColumn(1, &col1);
+	m_listAttributes.GetColumn(2, &col2);
+	m_listAttributes.GetColumn(3, &col3);
+		
+	col0.cx = rectControl.Width() / 5;
+	col2.cx = col0.cx;
+	col3.cx = (rectControl.Width()-rectDlg.Width()+giEAVGENDLG_MIN_WIDTH)/6;
+	col1.cx = rectControl.Width() - col0.cx - col2.cx - col3.cx;
+		
+	m_listAttributes.SetColumn(0, &col0);
+	m_listAttributes.SetColumn(1, &col1);
+	m_listAttributes.SetColumn(2, &col2);
+	m_listAttributes.SetColumn(3, &col3);
+		
+	// Move controls anchored top and right
+	m_wMgr.moveAnchoredTopRight(m_btnAdd, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(m_btnCopy, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(m_btnDelete, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(m_btnSplit, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(m_btnMerge, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(m_btnUp, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(m_btnDown, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(m_valueGroup, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(m_radioReplace, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(m_radioAppend, m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Move controls anchored bottom and left
+	m_wMgr.moveAnchoredBottomLeft(m_labelName, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(m_labelValue, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(m_labelType, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(m_labelAttributePath, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(m_labelFilename, m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Move controls anchored bottom, left and right
+	m_wMgr.moveAnchoredBottomLeftRight(m_editName, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeftRight(m_editValue, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeftRight(m_editType, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeftRight(m_editAttributePath, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeftRight(m_currentFilename, m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Update default values
+	GetClientRect(rectDlg);
+	m_nDefaultW = rectDlg.Width();
+	m_nDefaultH = rectDlg.Height();
+
+	// Refresh window
+	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
+	Invalidate();
+	UpdateWindow();
 }
 //-------------------------------------------------------------------------------------------------

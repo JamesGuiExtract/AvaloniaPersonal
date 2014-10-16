@@ -30,6 +30,12 @@
 #define IDC_BTN_HIGHLIGHT               1020
 #define IDC_BTN_MERGE                   1021
 #define IDC_EDIT_ATTRIBUTE_PATH         1022
+#define IDC_STATIC_NAME                 1023
+#define IDC_STATIC_VALUE                1024
+#define IDC_STATIC_TYPE                 1025
+#define IDC_STATIC_GROUP                1026
+#define IDC_STATIC_ATTRIBUTE_PATH       1027
+#define IDC_LABEL_FILENAME              1028
 
 // Next default values for new objects
 // 
@@ -37,7 +43,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        143
 #define _APS_NEXT_COMMAND_VALUE         32774
-#define _APS_NEXT_CONTROL_VALUE         1023
+#define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
