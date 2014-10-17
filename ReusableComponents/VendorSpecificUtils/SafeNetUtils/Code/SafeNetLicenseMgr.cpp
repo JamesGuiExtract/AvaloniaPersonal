@@ -820,6 +820,17 @@ SP_DWORD SafeNetLicenseMgr::decreaseCellValue( DataCell &rCell, SP_DWORD dwAmoun
 			// Make sure amount decrementing is available
 			if ( (dwCurrValue < dwAmount)  )
 			{
+				if (!haveLoggedNoCountsException(rCell))
+				{
+					m_mapLoggedException[rCell.m_dwCellAddr] = true;
+
+					UCLIDException ue("ELI37593", "Not enough counts available. Need to add more counts." );
+					ue.addDebugInfo ( "CounterName", rCell.getCellName() );
+					ue.addDebugInfo ( "CounterValue", dwCurrValue );
+					ue.addDebugInfo ( "AmountToDecrement", dwAmount );
+					ue.log();
+				}
+
 				bool bDone = false;
 				string strMsg = "The " + rCell.getCellName() + " counter has insufficent counts to continue.\r\nPlease update the counter and try again.";
 				string strCaption = rCell.getCellName() + " counter";
@@ -835,7 +846,8 @@ SP_DWORD SafeNetLicenseMgr::decreaseCellValue( DataCell &rCell, SP_DWORD dwAmoun
 						clLock.unlock();
 						if ( timedRetry.DoModal() == IDCANCEL )
 						{
-							UCLIDException ue("ELI19502", "Not enough counts available. Need to add more counts." );
+							UCLIDException ue("ELI19502", "Processing failed due to lack of counts." );
+							ue.addDebugInfo ( "CounterName", rCell.getCellName() );
 							ue.addDebugInfo ( "CounterValue", dwCurrValue );
 							ue.addDebugInfo ( "AmountToDecrement", dwAmount );
 							throw ue;
@@ -845,6 +857,10 @@ SP_DWORD SafeNetLicenseMgr::decreaseCellValue( DataCell &rCell, SP_DWORD dwAmoun
 						dwCurrValue = getCellValue( rCell );
 						if ( dwCurrValue >= dwAmount )
 						{
+							// Reset this variable so that if counts are again depleted, another
+							// exception will be logged.
+							m_mapLoggedException[rCell.m_dwCellAddr] = false;
+
 							// the count is great enough so continue
 							break;
 						}
@@ -1224,5 +1240,17 @@ bool SafeNetLicenseMgr::isHeartBeatThreadRunning()
 
 	// If the Events indicate the thread is running return the status of the thread.
 	 return bIsRunning && WaitForSingleObject(m_htdData.m_hThreadHandle, 0) == WAIT_TIMEOUT;
+}
+//-------------------------------------------------------------------------------------------------
+bool SafeNetLicenseMgr::haveLoggedNoCountsException(DataCell &rCell)
+{
+	bool bHaveLoggedException = false;
+	if (m_mapLoggedException.find(rCell.m_dwCellAddr) == m_mapLoggedException.end())
+	{
+		m_mapLoggedException[rCell.m_dwCellAddr] = false;
+		return false;
+	}
+
+	return m_mapLoggedException[rCell.m_dwCellAddr];
 }
 //-------------------------------------------------------------------------------------------------

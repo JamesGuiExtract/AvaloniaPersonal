@@ -12,6 +12,7 @@
 #include "SafeNetLicenseCfg.h"
 
 #include <string>
+#include <map>
 #include <memory>
 
 //#import "..\..\..\APIs\LeadTools_13\bin\LTCML13N.DLL" no_namespace
@@ -197,6 +198,10 @@ private:
 	// current SafeNetLicenseMgr object.
 	bool m_bLicenseHasBeenObtained;
 
+	// Keeps track of whether we have logged that counts have been deleted, per counter.
+	// NOTE: Protect multi-threaded access with ms_mutex.
+	map<SP_DWORD, bool> m_mapLoggedException;
+
 	//Methods
 
 	// Looks up the alert value for the given data cell and compare against the given value
@@ -212,6 +217,10 @@ private:
 
 	// Returns true if the heartbeat thread is still running
 	bool isHeartBeatThreadRunning();
+
+	// Checks to see if an exception has been logged about deleted counts for the specified counter.
+	// NOTE: Protect multi-threaded access with ms_mutex.
+	bool haveLoggedNoCountsException(DataCell &rCell);
 };
 
 enum SAFENETUTILS_API ECellType
