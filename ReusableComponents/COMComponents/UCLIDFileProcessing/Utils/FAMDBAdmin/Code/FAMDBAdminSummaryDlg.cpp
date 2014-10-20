@@ -122,6 +122,7 @@ void CFAMDBAdminSummaryDlg::DoDataExchange(CDataExchange *pDX)
 	DDX_Control(pDX, IDC_EDIT_FILE_TOTAL, m_editFileTotal);
 	DDX_Control(pDX, IDC_BUTTON_REFRESH_SUMMARY, m_btnRefreshSummary);
 	DDX_Control(pDX, IDC_STATIC_TOTAL_LABEL, m_lblTotals);
+	DDX_Control(pDX, IDC_STATIC_UPDATED, m_staticLastUpdated);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -175,7 +176,7 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 			return;
 		}
 
-		CRect recDlg, recListCtrl, recRefresh, recTotalText, recLabel;
+		CRect recDlg, recListCtrl, recRefresh, recTotalText, recLabel, recLastUpdated;
 
 		// get the summary page rectangle
 		GetClientRect(&recDlg);
@@ -196,6 +197,10 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 		m_btnRefreshSummary.GetWindowRect(&recRefresh);
 		ScreenToClient(&recRefresh);
 
+		// get the last updated label rectangle
+		m_staticLastUpdated.GetWindowRect(&recLastUpdated);
+		ScreenToClient(&recLastUpdated);
+
 		// compute margin
 		int iMargin = recListCtrl.left - recDlg.left;
 
@@ -205,14 +210,15 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 		recRefresh.top = recRefresh.bottom - iHeight;
 
 		// compute the new file totals edit box position
-		iHeight = recTotalText.Height();
-		recTotalText.top = recRefresh.top;
-		recTotalText.bottom = recTotalText.top + iHeight;
+		recTotalText.MoveToY(recRefresh.top+2);
 
 		// compute the new file totals label position
 		iHeight = recLabel.Height();
-		recLabel.top = recRefresh.top + 2; // the file label is offset by 2 pixels to center it
+		recLabel.top = recRefresh.top + 5;
 		recLabel.bottom = recLabel.top + iHeight;
+
+		// compute the last updated text position
+		recLastUpdated.MoveToY(recLabel.top);
 
 		// compute the new list position
 		recListCtrl.right = recDlg.right - iMargin;
@@ -223,6 +229,7 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 		m_editFileTotal.MoveWindow(&recTotalText);
 		m_btnRefreshSummary.MoveWindow(&recRefresh);
 		m_listActions.MoveWindow(&recListCtrl);
+		m_staticLastUpdated.MoveWindow(&recLastUpdated);
 
 		// resize the columns in the list control
 		resizeListColumns();
@@ -714,6 +721,19 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 				break;
 			}
 		}
+
+		SYSTEMTIME st;
+		GetSystemTime(&st);
+		CString cstrMessage;
+	    cstrMessage.Format( "Last Updated: %02d/%02d/%d %02d:%02d:%02d", 
+							st.wMonth,
+							st.wDay,
+							st.wYear,
+							st.wHour,
+							st.wMinute,
+							st.wSecond );
+		CWnd* pWnd = GetDlgItem(IDC_STATIC_UPDATED);
+		pWnd->SetWindowTextA(cstrMessage);
 
 		if (bNegativeProcessingCalculation)
 		{

@@ -80,6 +80,7 @@
 #define ID_RUN_REPORT_OK                2037
 #define IDC_CHECK_RETAIN_ACTIONS        2038
 #define IDC_CAPTION                     2039
+#define IDC_STATIC_UPDATED              2040
 #define IDC_EDIT_FL_SLCT_SMRY_STATUS    2042
 #define IDC_BTN_SLCT_FLS_STATUS         2043
 #define IDC_EDIT_FL_SLCT_SMRY_EXPORT    2044

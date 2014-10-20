@@ -4,6 +4,7 @@
 
 #include <string>
 #include <stack>
+#include "afxwin.h"
 using namespace std;
 
 class CFAMDBAdminSummaryDlg :
@@ -58,6 +59,7 @@ private:
 	CEdit m_editFileTotal;
 	CButton m_btnRefreshSummary;
 	CStatic m_lblTotals;
+	CStatic m_staticLastUpdated;
 
 	bool m_bInitialized;
 
