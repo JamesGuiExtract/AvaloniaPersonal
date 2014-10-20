@@ -559,7 +559,7 @@ void CUSBLicenseKeyManagerDlg::clearCounterValuesList()
 	int nCount = m_listCounterValues.GetItemCount();
 	for (int i = 0; i < nCount; i++)
 	{
-		m_listCounterValues.SetItemText(i, giCOUNTER_VALUE, "0");
+		m_listCounterValues.SetItemText(i, giCOUNTER_VALUE, "N/A");
 	}
 
 	m_listCounterValues.RedrawWindow();
