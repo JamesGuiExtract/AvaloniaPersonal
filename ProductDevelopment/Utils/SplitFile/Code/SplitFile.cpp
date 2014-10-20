@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 		}
 
 		// Output the lines to separate files
-		ifstream inputFile(strInputFile.c_str());
+		ifstream inputFile(strInputFile.c_str(), ifstream::binary);
 		int iFileNumber = 0;
 		int iTotalLines = 0;
 		while ( !inputFile.bad() && !inputFile.eof())
