@@ -610,6 +610,9 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 		// Set the wait cursor
 		CWaitCursor wait;
 
+		// Flag for negative processing number
+		bool bNegativeProcessingCalculation = false;
+
 		// Clear the list control if refreshing all actions
 		if (nActionIDToRefresh < 0)
 		{
@@ -669,6 +672,12 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			long lProcessing = lTotal - (lPending + lCompleted + lSkipped + lFailed);
 			long lUnattempted = (long) llFileCount - lTotal;
 
+			// Set flag if the calculated processing number is negative
+			if (lProcessing < 0)
+			{
+				bNegativeProcessingCalculation = true;
+			}
+
 			// [LegacyRCAndUtils:6106]
 			// Since the file count is obtained in a separate call that the rest of the statistics,
 			// the FileTotal may include files queued since the time when the rest of the stats
@@ -704,6 +713,16 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			{
 				break;
 			}
+		}
+
+		if (bNegativeProcessingCalculation)
+		{
+			MessageBox(
+			"Summary statistics are in a bad state for at least one action."
+			"\r\n\r\n"
+			"In order to recalculate the statistics, stop all active processing "
+			"and select \"Recalculate summary statistics\" from the \"Tools\" menu.",
+			"Invalid summary statistics generated", MB_ICONERROR | MB_OK);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30527");
