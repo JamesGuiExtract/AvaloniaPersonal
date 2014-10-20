@@ -33,8 +33,14 @@ public:
 	// Moves controls that are anchored to the top right corner of the window
 	void moveAnchoredTopRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint = TRUE);
 
+	// Moves controls that are anchored to the top, left and right sides of the window
+	void moveAnchoredTopLeftRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint = TRUE);
+
 	// Moves controls that are anchored to the bottom left corner of the window
 	void moveAnchoredBottomLeft(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint = TRUE);
+
+	// Moves controls anchored the the bottom right corner of the window
+	void moveAnchoredBottomRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint = TRUE);
 
 	// Moves controls that are anchored to the bottom, left and right sides of the window
 	void moveAnchoredBottomLeftRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint = TRUE);

@@ -70,14 +70,12 @@
 #define IDR_MNU_CONTEXT                 235
 #define IDC_EDIT_OH                     235
 #define IDC_BTN_SELECTIV                236
-#define IDC_COMBO_IV                    237
 #define IDC_BTN_SELECTOH                237
 #define IDC_EDIT_DESC                   238
 #define IDC_EDIT_ATTRIBUTE_SPLITTER     239
 #define IDC_PROPERTIES                  240
 #define IDC_BTN_SELECT_ATTRIBUTE_SPLITTER 241
 #define IDC_COMBO_RULE                  242
-#define IDC_BTN_CONFIG_RULE             242
 #define IDC_STATIC_DESC                 243
 #define IDC_CHECK_MODIFY                244
 #define IDC_BTN_CONRULE2                245
@@ -108,7 +106,6 @@
 #define IDC_GRID                        270
 #define IDC_PICTURE                     271
 #define IDC_LIST1                       272
-#define IDC_COUNTER_LIST                272
 #define IDC_LIST_OUTPUTHANDLERS         273
 #define IDC_SPLITTER                    274
 #define IDC_STATIC_FILENAME             275
@@ -158,6 +155,7 @@
 #define IDC_APPICON                     319
 #define IDI_FLEX_DATA_ENTRY             320
 #define IDI_ID_SHIELD                   321
+#define IDC_COMBO_IV                    322
 #define IDC_CHECK_DOCUMENT_PP           323
 #define IDC_CHECK_INPUT_VALIDATOR       324
 #define IDC_CHECK_ATT_SPLITTER          325
@@ -177,7 +175,16 @@
 #define IDC_CHK_PROVIDE_INPUT           339
 #define IDC_EDIT_INPUT_DATA             340
 #define IDC_BTN_BROWSE_DATA_INPUT       341
-#define IDR_ATTRIBUTESTORAGEMANAGER		342
+#define IDR_ATTRIBUTESTORAGEMANAGER     342
+#define IDC_STATIC_CHECK_INPUT_VALIDATOR 343
+#define IDC_STATIC_CHECK_SPLIT          344
+#define IDC_STATIC_IE_SPLIT             345
+#define IDC_STATIC_CHECK_OH             346
+#define IDC_STATIC_IE_OH                347
+#define IDC_BTN_CONFIG_RULE             348
+#define IDC_COUNTER_LIST                349
+#define IDC_STATIC_CHECK_PP             350
+#define IDC_STATIC_CHECK_IE             351
 #define ID_FILE_SAVEAS                  32768
 #define ID_FILE_EXIT                    32769
 #define ID_TOOLS_TEST                   32770
@@ -221,9 +228,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        343
+#define _APS_NEXT_RESOURCE_VALUE        352
 #define _APS_NEXT_COMMAND_VALUE         32800
-#define _APS_NEXT_CONTROL_VALUE         343
+#define _APS_NEXT_CONTROL_VALUE         352
 #define _APS_NEXT_SYMED_VALUE           134
 #endif
 #endif

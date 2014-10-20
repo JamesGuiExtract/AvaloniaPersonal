@@ -66,7 +66,8 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
  m_strCurrentFileName(""),
  m_FRM(".tmp"),
  m_strBinFolder(strBinFolder),
- m_pMRUFilesMenu(__nullptr)
+ m_pMRUFilesMenu(__nullptr),
+ m_wMgr(this, gstrAF_AFCORE_KEY_PATH + "\\RuleSetEditor")
 {
 	try
 	{
@@ -274,6 +275,7 @@ BEGIN_MESSAGE_MAP(CRuleSetEditor, CDialog)
 	ON_STN_DBLCLK(IDC_EDIT_ATTRIBUTE_SPLITTER, &CRuleSetEditor::OnDoubleClickAttributeSplitter)
 	ON_STN_DBLCLK(IDC_EDIT_IV, &CRuleSetEditor::OnDoubleClickInputValidator)
 	ON_STN_DBLCLK(IDC_EDIT_PREPROCESSOR, &CRuleSetEditor::OnDoubleClickDocumentPreprocessor)
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -444,7 +446,14 @@ void CRuleSetEditor::enableEditFeatures(bool bEnable)
 		vecRSDControlIDs.push_back(IDC_CHECK_OUTPUT_HANDLER);
 		vecRSDControlIDs.push_back(IDC_CHECK_IGNORE_PP_ERRORS);
 		vecRSDControlIDs.push_back(IDC_CHECK_IGNORE_AS_ERRORS);
+		vecRSDControlIDs.push_back(IDC_STATIC_CHECK_INPUT_VALIDATOR);
+		vecRSDControlIDs.push_back(IDC_STATIC_CHECK_SPLIT);
+		vecRSDControlIDs.push_back(IDC_STATIC_IE_SPLIT);
+		vecRSDControlIDs.push_back(IDC_STATIC_CHECK_OH);
+		vecRSDControlIDs.push_back(IDC_STATIC_IE_OH);
 		vecRSDControlIDs.push_back(IDC_CHECK_IGNORE_OH_ERRORS);
+		vecRSDControlIDs.push_back(IDC_STATIC_CHECK_PP);
+		vecRSDControlIDs.push_back(IDC_STATIC_CHECK_IE);
 	}
 	
 	// Show/Hide the controls that should only be shown in edit-mode
@@ -1259,38 +1268,23 @@ void CRuleSetEditor::setStatusBarText()
 		strSelectedCounters = "NONE";
 	}
 
-	int iWidth;
-	CRect clientRect;
-	GetClientRect(clientRect);
-
-	// Set width of counters status to 1/2 width of Client area
-	iWidth = clientRect.Width() / 2;
+	// Set counters text
 	string strStatusBarText = "Counters: " + strSelectedCounters;
 	m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_COUNTERS),
 		strStatusBarText.c_str());
-	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_COUNTERS), 
-		ID_INDICATOR_COUNTERS, SBPS_NORMAL, iWidth );
 	
-	// Set the width of the serial numbers to 1/6 width of Client area
-	iWidth = iWidth / 3;
+	// Set serial numbers text
 	string strSerials = m_ipRuleSet->KeySerialList;
 	strStatusBarText = "SNs: " +  strSerials;
 	m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_SERIAL_NUMBERS),
 		strStatusBarText.c_str());
-	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_SERIAL_NUMBERS), 
-		ID_INDICATOR_SERIAL_NUMBERS, SBPS_NORMAL, iWidth );
 	
-	// Set the width of the ForInternalUseOnly to 1/3 width of Client area
-	iWidth = iWidth * 2;
 	// Update the internal-use-only flag in the status bar
 	strStatusBarText = "InternalUseOnly = ";
 	strStatusBarText += (m_ipRuleSet->ForInternalUseOnly == VARIANT_TRUE) ?
 		"Yes" : "No";
-	
 	m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_INTERNAL_USE_ONLY),
 		strStatusBarText.c_str());
-	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_INTERNAL_USE_ONLY), 
-		ID_INDICATOR_INTERNAL_USE_ONLY, SBPS_NORMAL, iWidth );
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescription* pObject, 
@@ -1374,5 +1368,92 @@ void CRuleSetEditor::validateRuleSetCanBeSaved()
 
 		throw UCLIDException("ELI27025", "Must select USB counters to save rule set.");
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSetEditor::doResize()
+{
+	// if it's minimized, do nothing
+	if (IsIconic())
+	{
+		return;
+	}
+
+	// Move/resize controls anchored all
+	m_wMgr.moveAnchoredAll(*GetDlgItem(IDC_STATIC_PROMPT), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredAll(*GetDlgItem(IDC_STATIC_ATTR), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredAll(*GetDlgItem(IDC_STATIC_RULES), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredAll(*GetDlgItem(IDC_LIST_RULES), m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Move/resize contols anchored top, left right
+	m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_EDIT_PREPROCESSOR), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_COMBO_ATTRIBUTES), m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Move controls anchored top and right
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_SELECTPP), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_ADDATTR), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_DELATTR), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_RENATTR), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_ADDRULE), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_DELRULE), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_CONRULE), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_RULEUP), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_RULEDOWN), m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Move controls anchored bottom and left
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_STOP), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_CHECK_INPUT_VALIDATOR), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_IV), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_INPUT_VALIDATOR), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_CHECK_SPLIT), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_ATT_SPLITTER), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_IE_SPLIT), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_IGNORE_AS_ERRORS), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_SPLIT), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_CHECK_OH), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_OUTPUT_HANDLER), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_IE_OH), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_IGNORE_OH_ERRORS), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_OH), m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Move controls anchored bottom, left and right
+	m_wMgr.moveAnchoredBottomLeftRight(*GetDlgItem(IDC_EDIT_IV), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeftRight(*GetDlgItem(IDC_EDIT_ATTRIBUTE_SPLITTER), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeftRight(*GetDlgItem(IDC_EDIT_OH), m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Move controls anchored bottom and right
+	m_wMgr.moveAnchoredBottomRight(*GetDlgItem(IDC_BTN_SELECTIV), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomRight(*GetDlgItem(IDC_BTN_SELECT_ATTRIBUTE_SPLITTER), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomRight(*GetDlgItem(IDC_BTN_SELECTOH), m_nDefaultW, m_nDefaultH, FALSE);
+
+	// Resize the status bar
+	int iWidth;
+	CRect clientRect;
+	GetClientRect(clientRect);
+
+	// Set width of counters status to 1/2 width of Client area
+	iWidth = clientRect.Width() / 2;
+	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_COUNTERS), 
+		ID_INDICATOR_COUNTERS, SBPS_NORMAL, iWidth );
+	
+	// Set the width of the serial numbers to 1/6 width of Client area
+	iWidth = iWidth / 3;
+	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_SERIAL_NUMBERS), 
+		ID_INDICATOR_SERIAL_NUMBERS, SBPS_NORMAL, iWidth );
+	
+	// Set the width of the ForInternalUseOnly to 1/3 width of Client area
+	iWidth = iWidth * 2;
+	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_INTERNAL_USE_ONLY), 
+		ID_INDICATOR_INTERNAL_USE_ONLY, SBPS_NORMAL, iWidth );
+
+	// Update default values
+	CRect rectDlg;
+	GetClientRect(rectDlg);
+	m_nDefaultW = rectDlg.Width();
+	m_nDefaultH = rectDlg.Height();
+
+	// Refresh window
+	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
+	Invalidate();
+	UpdateWindow();
 }
 //-------------------------------------------------------------------------------------------------

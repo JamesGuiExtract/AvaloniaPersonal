@@ -187,6 +187,16 @@ void WindowPersistenceMgr::moveAnchoredTopRight(CWnd &pCtr, int nOldWidth, int n
 	pCtr.MoveWindow(rectControl, bRepaint);
 }
 //-------------------------------------------------------------------------------------------------
+void WindowPersistenceMgr::moveAnchoredTopLeftRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint)
+{
+	CRect rectWnd, rectControl;
+	m_wnd.GetClientRect(rectWnd);
+	pCtr.GetWindowRect(rectControl);
+	m_wnd.ScreenToClient(rectControl);
+	rectControl.right = rectControl.right + rectWnd.Width() - nOldWidth;
+	pCtr.MoveWindow(rectControl, bRepaint);
+}
+//-------------------------------------------------------------------------------------------------
 void WindowPersistenceMgr::moveAnchoredBottomLeft(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint)
 {
 	CRect rectWnd, rectControl;
@@ -205,6 +215,17 @@ void WindowPersistenceMgr::moveAnchoredBottomLeftRight(CWnd &pCtr, int nOldWidth
 	m_wnd.ScreenToClient(rectControl);
 	rectControl.right = rectControl.right + rectWnd.Width() - nOldWidth;
 	rectControl.MoveToY(rectControl.top + rectWnd.Height() - nOldHeight);
+	pCtr.MoveWindow(rectControl, bRepaint);
+}
+//-------------------------------------------------------------------------------------------------
+void WindowPersistenceMgr::moveAnchoredBottomRight(CWnd &pCtr, int nOldWidth, int nOldHeight, BOOL bRepaint)
+{
+	CRect rectWnd, rectControl;
+	m_wnd.GetClientRect(rectWnd);
+	pCtr.GetWindowRect(rectControl);
+	m_wnd.ScreenToClient(rectControl);
+	rectControl.MoveToXY(rectControl.left + rectWnd.Width() - nOldWidth,
+		rectControl.top + rectWnd.Height() - nOldHeight);
 	pCtr.MoveWindow(rectControl, bRepaint);
 }
 //-------------------------------------------------------------------------------------------------

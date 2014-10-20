@@ -20,6 +20,7 @@
 #include "RuleGrid.h"
 
 #include <FileRecoveryManager.h>
+#include <WindowPersistenceMgr.h>
 
 #include <memory>
 #include <string>
@@ -162,6 +163,7 @@ protected:
 	afx_msg void OnDoubleClickInputValidator();
 	afx_msg void OnDoubleClickAttributeSplitter();
 	afx_msg void OnDoubleClickOutputHandler();
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -221,6 +223,17 @@ private:
 	// A rule execution session used to allow GetComponentData calls from within rule objects' UIs
 	// to take the configured FKB version into account.
 	UCLID_AFCORELib::IRuleExecutionSessionPtr m_ipRuleExecutionSession;
+
+	// Initial width and heights used to anchor controls
+	int m_nDefaultW;
+	int m_nDefaultH;
+
+	// Minimum dimensions
+	int m_nMinWidth;
+	int m_nMinHeight;
+
+	// Window position mgr
+	WindowPersistenceMgr m_wMgr;
 
 	//////////
 	// Methods
@@ -302,4 +315,6 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Throws an exception if the rule set is not licensed or is encrypted and cannot be saved
 	void validateRuleSetCanBeSaved();
+
+	void doResize();
 };

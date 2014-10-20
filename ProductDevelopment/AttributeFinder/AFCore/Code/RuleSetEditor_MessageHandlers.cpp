@@ -724,6 +724,20 @@ BOOL CRuleSetEditor::OnInitDialog()
 		// create the MRU list
 		refreshFileMRU();
 		setStatusBarText();
+
+		// Save original client width/height
+		CRect rectDlg;
+		GetClientRect(rectDlg);
+		m_nDefaultW = rectDlg.Width();
+		m_nDefaultH = rectDlg.Height();
+		
+		// Save minimum window width/height
+		GetWindowRect(rectDlg);
+		m_nMinWidth = rectDlg.Width();
+		m_nMinHeight = rectDlg.Height();
+
+		// Restore previous position if available
+		m_wMgr.RestoreWindowPosition();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04426")
 
@@ -1432,7 +1446,7 @@ void CRuleSetEditor::OnRclickPreprocessorText(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06063")
 }
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 void CRuleSetEditor::OnRclickHandlerText(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -1670,7 +1684,8 @@ BOOL CRuleSetEditor::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	try
 	{	
 		// Interested in Right click messages
-		if ((nHitTest == HTCLIENT) && (message == WM_RBUTTONDOWN))
+		// Changed to WM_RBUTTONUP so that menu doesn't disappear when bottom-aligned
+		if ((nHitTest == HTCLIENT) && (message == WM_RBUTTONUP))
 		{
 			LRESULT	result = 0;
 
@@ -1744,6 +1759,9 @@ void CRuleSetEditor::OnClose()
 		// of whether they are saving the current ruleset or not.  So,
 		// it is OK to delete the recovery file
 		m_FRM.deleteRecoveryFile();
+
+		// Save window position to the registry
+		m_wMgr.SaveWindowPosition();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04808")
 	
@@ -1837,6 +1855,8 @@ void CRuleSetEditor::OnSize(UINT nType, int cx, int cy)
 				m_apRuleTesterDlg->SetWindowPlacement(&placement2);
 			}
 		}
+
+		doResize();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08055")
 }
@@ -1988,5 +2008,16 @@ void CRuleSetEditor::OnBnClickedIgnoreAttSplitterErrors()
 	UpdateData(TRUE);
 
 	m_ipInfo->IgnoreAttributeSplitterErrors = asVariantBool(asCppBool(m_bIgnoreAttSplitterErrors));
+}
+//--------------------------------------------------------------------------------------------------
+void CRuleSetEditor::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	try
+	{
+		lpMMI->ptMinTrackSize.x = m_nMinWidth;
+		lpMMI->ptMinTrackSize.y = m_nMinHeight;
+		CDialog::OnGetMinMaxInfo(lpMMI);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37588");
 }
 //--------------------------------------------------------------------------------------------------
