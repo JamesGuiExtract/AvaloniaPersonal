@@ -57,6 +57,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E297A14B-8612-41EE-B811-9E64BE1D5606} = {E297A14B-8612-41EE-B811-9E64BE1D5606}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CountyCustomComponents", "..\..\..\IndustrySpecific\County\CountyCustomComponents\Code\CountyCustomComponents.vcxproj", "{A29CD5B4-BFDC-44D4-B3FE-9A73248FCAB3}"
 EndProject
@@ -708,12 +711,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.UWTra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.Lincoln", "..\..\..\..\DataEntry\FlexIndex\DEPs\Lincoln\Core\Code\Extract.DataEntry.DEP.Lincoln.csproj", "{4B182ED1-F380-419E-8F7A-E2A9D0339715}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateDotNetLicenseIDFiles", "..\..\..\..\Utils\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj", "{E297A14B-8612-41EE-B811-9E64BE1D5606}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://EngSvr.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 181
+		ProjectCount = 182
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -895,6 +900,7 @@ Global
 		ProjectRelativeDiskPath179 = ..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMFileInspector\ComLibrary\Core\Code\Extract.FileActionManager.FAMFileInspector.csproj
 		ProjectRelativeDiskPath180 = ..\..\..\..\DataEntry\LabDE\DEPs\UWTransplantCenter\Core\Code\Extract.DataEntry.DEP.UWTransplantCenter.csproj
 		ProjectRelativeDiskPath181 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Lincoln\Core\Code\Extract.DataEntry.DEP.Lincoln.csproj
+		ProjectRelativeDiskPath182 = ..\..\..\..\Utils\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3079,6 +3085,18 @@ Global
 		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Release|Win32.ActiveCfg = Release|Any CPU
 		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Release|x86.ActiveCfg = Release|Any CPU
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Debug|Win32.Build.0 = Debug|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Debug|x86.ActiveCfg = Debug|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Release|Any CPU.ActiveCfg = Release|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Release|Win32.ActiveCfg = Release|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Release|Win32.Build.0 = Release|Win32
+		{E297A14B-8612-41EE-B811-9E64BE1D5606}.Release|x86.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

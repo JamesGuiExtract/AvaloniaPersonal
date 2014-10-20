@@ -100,7 +100,7 @@
       <OutputFile>.\..\Debug/COMLMCore.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>I:\Common\Engineering\Tools\Utils\GenerateDotNetLicenseIDFiles\GenerateDotNetLicenseIDFiles.exe "$(ProjectDir)ComponentLicenseIDs.h"</Command>
+      <Command>$(OutDir)GenerateDotNetLicenseIDFiles.exe "$(ProjectDir)ComponentLicenseIDs.h"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -149,7 +149,7 @@
       <OutputFile>.\..\Release/COMLMCore.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>I:\Common\Engineering\Tools\Utils\GenerateDotNetLicenseIDFiles\GenerateDotNetLicenseIDFiles.exe "$(ProjectDir)ComponentLicenseIDs.h"</Command>
+      <Command>$(OutDir)GenerateDotNetLicenseIDFiles.exe "$(ProjectDir)ComponentLicenseIDs.h"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

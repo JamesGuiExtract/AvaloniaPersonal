@@ -85,6 +85,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E297A14B-8612-41EE-B811-9E64BE1D5606} = {E297A14B-8612-41EE-B811-9E64BE1D5606}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZLibUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcxproj", "{A1474E20-9B5F-4DF9-A400-490270BC7999}"
 EndProject
