@@ -1630,7 +1630,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED] = "1";
 	mapDefaultValues[gstrALLOW_DYNAMIC_TAG_CREATION] = "0";
 	mapDefaultValues[gstrAUTO_REVERT_LOCKED_FILES] = "1";
-	mapDefaultValues[gstrAUTO_REVERT_TIME_OUT_IN_MINUTES] = "60";
+	mapDefaultValues[gstrAUTO_REVERT_TIME_OUT_IN_MINUTES] = "5";
 	mapDefaultValues[gstrAUTO_REVERT_NOTIFY_EMAIL_LIST] = "";
 	mapDefaultValues[gstrNUMBER_CONNECTION_RETRIES] = "10";
 	mapDefaultValues[gstrCONNECTION_RETRY_TIMEOUT] = "120";

@@ -287,10 +287,9 @@ namespace Extract.FileActionManager.Database
                 timeOut = 60;
             }
 
-            if (timeOut < 5)
+            if (timeOut < 2)
             {
-                // Set to 5
-                timeOut = 5;
+                timeOut = 2;
             }
             else if (timeOut > 1440)
             {
@@ -478,7 +477,7 @@ namespace Extract.FileActionManager.Database
             try
             {
                 UtilityMethods.ShowMessageBox(
-                    "The auto revert timeout must be between 5 and 1,440 minutes.",
+                    "The auto revert timeout must be between 2 and 1,440 minutes.",
                     "Invalid Timeout", true);
 
                 // Re-select the _upDownRevertMinutes control, but only after any other events

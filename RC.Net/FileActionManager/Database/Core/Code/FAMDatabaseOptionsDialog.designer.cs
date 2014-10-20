@@ -256,7 +256,7 @@
             0,
             0});
             this._upDownRevertMinutes.Minimum = new decimal(new int[] {
-            5,
+            2,
             0,
             0,
             0});

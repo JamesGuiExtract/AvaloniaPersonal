@@ -31,7 +31,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 121;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 122;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -812,6 +812,32 @@ int UpdateToSchemaVersion121(_ConnectionPtr ipConnection, long *pnNumSteps,
 	vector<string> vecQueries;
 	vecQueries.push_back(gstrCREATE_FAST_ACTIONID_INDEX);
 	vecQueries.push_back(gstrCREATE_FAST_FILEID_ACTIONID_INDEX);
+	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+	executeVectorOfSQL(ipConnection, vecQueries);
+
+	return nNewSchemaVersion;
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion122(_ConnectionPtr ipConnection, long *pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	int nNewSchemaVersion = 122;
+
+	if (pnNumSteps != __nullptr)
+	{
+		// This is such a small tweak-- use a single step as opposed to the usual 3.
+		*pnNumSteps += 1;
+		return nNewSchemaVersion;
+	}
+
+	// https://extract.atlassian.net/browse/ISSUE-12493
+	// This setting was never adjusted to our knowledge; since it has new importance with the
+	// addition of parallelized (work unit) processing, change this settings to 5 minutes if it is
+	// currently at the previous default of 60 minutes.
+	vector<string> vecQueries;
+	vecQueries.push_back("UPDATE [DBInfo] SET [Value] = 5 " 
+		"WHERE [Name] = '" + gstrAUTO_REVERT_TIME_OUT_IN_MINUTES + "' AND [Value] = 60");
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
@@ -5793,7 +5819,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 118:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion119);
 				case 119:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion120);
 				case 120:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion121);
-				case 121:	break;
+				case 121:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion122);
+				case 122:	break;
 
 				default:
 					{
