@@ -24,7 +24,6 @@ namespace Extract.FileActionManager.Database
         const string _ALLOW_DYNAMIC_TAG_CREATION = "AllowDynamicTagCreation";
         const string _AUTO_CREATE_ACTIONS = "AutoCreateActions";
         const string _AUTO_DELETE_FILE_ACTION_COMMENT = "AutoDeleteFileActionCommentOnComplete";
-        const string _AUTO_REVERT_LOCKED_FILES = "AutoRevertLockedFiles";
         const string _AUTO_REVERT_TIME_OUT_IN_MINUTES = "AutoRevertTimeOutInMinutes";
         const string _AUTO_REVERT_NOTIFY_EMAIL_LIST = "AutoRevertNotifyEmailList";
         const string _MIN_TIME_BETWEEN_PROCESSING_DB_CHECK = "MinMillisecondsBetweenCheckForFilesToProcess";
@@ -358,12 +357,8 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         void UpdateAutoRevertEnabledState()
         {
-            bool autoRevert = _checkAutoRevertFiles.Checked;
-            int count = autoRevert ? _listAutoRevertEmailList.SelectedItems.Count : 0;
+            int count = _listAutoRevertEmailList.SelectedItems.Count;
 
-            _upDownRevertMinutes.Enabled = autoRevert;
-            _listAutoRevertEmailList.Enabled = autoRevert;
-            _buttonAddEmail.Enabled = autoRevert;
             _buttonModifyEmail.Enabled = count == 1;
             _buttonRemoveEmail.Enabled = count > 0;
         }
@@ -399,7 +394,6 @@ namespace Extract.FileActionManager.Database
             dictionary[_ALLOW_DYNAMIC_TAG_CREATION] = _checkAllowdynamicTagCreation;
             dictionary[_AUTO_CREATE_ACTIONS] = _checkAutoCreateActions;
             dictionary[_AUTO_DELETE_FILE_ACTION_COMMENT] = _checkAutoDeleteFileActionComments;
-            dictionary[_AUTO_REVERT_LOCKED_FILES] = _checkAutoRevertFiles;
             dictionary[_UPDATE_FAST_TABLE] = _checkStoreFASTHistory;
             dictionary[_UPDATE_QUEUE_EVENT_TABLE] = _checkStoreQueueEventHistory;
             dictionary[_STORE_SOURCE_DOC_NAME_CHANGE_HISTORY] = _checkStoreSourceDocChangeHistory;
@@ -602,17 +596,14 @@ namespace Extract.FileActionManager.Database
                 map.Set(_ALTERNATE_COMPONENT_DATA_DIR,
                     _alternateComponentDataDirectoryTextBox.Text.TrimEnd('\\', '/'));
 
-                bool autoRevert = _checkAutoRevertFiles.Checked;
-                if (autoRevert)
-                {
-                    map.Set(_AUTO_REVERT_TIME_OUT_IN_MINUTES,
-                        _upDownRevertMinutes.Value.ToString(CultureInfo.InvariantCulture));
+                map.Set(_AUTO_REVERT_TIME_OUT_IN_MINUTES,
+                    _upDownRevertMinutes.Value.ToString(CultureInfo.InvariantCulture));
 
-                    string value = _listAutoRevertEmailList.Items.Count > 0 ?
-                        string.Join(";", _listAutoRevertEmailList.Items.Cast<string>())
-                        : string.Empty;
-                    map.Set(_AUTO_REVERT_NOTIFY_EMAIL_LIST, value);
-                }
+                string value = _listAutoRevertEmailList.Items.Count > 0 ?
+                    string.Join(";", _listAutoRevertEmailList.Items.Cast<string>())
+                    : string.Empty;
+                map.Set(_AUTO_REVERT_NOTIFY_EMAIL_LIST, value);
+
                 if (_checkStoreInputEventTracking.Checked)
                 {
                     map.Set(_INPUT_EVENT_HISTORY_SIZE,

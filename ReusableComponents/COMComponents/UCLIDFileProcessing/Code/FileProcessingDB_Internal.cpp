@@ -1554,9 +1554,8 @@ void CFileProcessingDB::initializeTableValues80()
 			+ "', '0')";
 		vecQueries.push_back(strSQL);
 
-		// Add AutoRevertLockedFiles setting (default to true)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_LOCKED_FILES
-			+ "', '1')";
+		// (LEGACY) Add AutoRevertLockedFiles setting (default to true) 
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('AutoRevertLockedFiles', '1')";
 		vecQueries.push_back(strSQL);
 
 		// Add AutoRevertTimeOutInMinutes setting (default to 60 minutes)
@@ -1604,9 +1603,8 @@ void CFileProcessingDB::initializeTableValues80()
 			+ "', '0')";
 		vecQueries.push_back(strSQL);
 
-		// Add Skip Authentication For Services On Machines
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrSKIP_AUTHENTICATION_ON_MACHINES + "', '')";
+		// Add Skip Authentication On Machines
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('SkipAuthenticationOnMachines', '')";
 		vecQueries.push_back(strSQL);
 
 		// Execute all of the queries
@@ -1629,7 +1627,6 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrAUTO_DELETE_FILE_ACTION_COMMENT] = "0";
 	mapDefaultValues[gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED] = "1";
 	mapDefaultValues[gstrALLOW_DYNAMIC_TAG_CREATION] = "0";
-	mapDefaultValues[gstrAUTO_REVERT_LOCKED_FILES] = "1";
 	mapDefaultValues[gstrAUTO_REVERT_TIME_OUT_IN_MINUTES] = "5";
 	mapDefaultValues[gstrAUTO_REVERT_NOTIFY_EMAIL_LIST] = "";
 	mapDefaultValues[gstrNUMBER_CONNECTION_RETRIES] = "10";
@@ -2883,12 +2880,6 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							_lastCodePos = "170";
 
 							m_bAutoDeleteFileActionComment = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrAUTO_REVERT_LOCKED_FILES)
-						{
-							_lastCodePos = "180";
-
-							m_bAutoRevertLockedFiles = getStringField(ipFields, "Value") == "1";
 						}
 						else if (strValue == gstrAUTO_REVERT_TIME_OUT_IN_MINUTES)
 						{
@@ -4488,7 +4479,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != __nullptr);
 
 			// Revert files before attempting to get the files to process
-			if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
+			if (!m_bRevertInProgress)
 			{
 				// Begin a transaction
 				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
@@ -4704,8 +4695,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 		return;
 	}
 
-	// If Auto revert is enabled then run the revert method before checking for in processing file
-	if (m_bAutoRevertLockedFiles)
+	// Run the revert method before checking for in processing file
 	{
 		// Begin a transaction for the revert 
 		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
@@ -4752,8 +4742,7 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 		return false;
 	}
 
-	// If Auto revert is enabled then run the revert method before checking for in processing file
-	if (m_bAutoRevertLockedFiles)
+	// Run the revert method before checking for in processing file
 	{
 		// Begin a transaction for the revert 
 		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
@@ -4785,8 +4774,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 		return;
 	}
 
-	// If Auto revert is enabled then run the revert method before checking for in processing file
-	if (m_bAutoRevertLockedFiles)
+	// Run the revert method before checking for in processing file
 	{
 		// Begin a transaction for the revert 
 		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
@@ -5167,6 +5155,9 @@ void CFileProcessingDB::addOldDBInfoValues(map<string, string>& mapOldValues)
 	//		to the map so that a database that still contains the old name
 	//		is not treated as an unrecognized element
 	mapOldValues["SkipAuthenticationOnMachines"] = "";
+	// https://extract.atlassian.net/browse/ISSUE-12373
+	// Version 122 - Removed ability to turn off auto-revert
+	mapOldValues["AutoRevertLockedFiles"] = "";
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addOldTables(vector<string>& vecTables)

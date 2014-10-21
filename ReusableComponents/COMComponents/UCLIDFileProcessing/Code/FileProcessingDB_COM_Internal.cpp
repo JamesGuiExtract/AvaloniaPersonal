@@ -838,6 +838,7 @@ int UpdateToSchemaVersion122(_ConnectionPtr ipConnection, long *pnNumSteps,
 	vector<string> vecQueries;
 	vecQueries.push_back("UPDATE [DBInfo] SET [Value] = 5 " 
 		"WHERE [Name] = '" + gstrAUTO_REVERT_TIME_OUT_IN_MINUTES + "' AND [Value] = 60");
+	vecQueries.push_back("DELETE FROM [DBInfo] WHERE [Name] = 'AutoRevertLockedFiles'");
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
@@ -1640,8 +1641,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 					// If the file status is processing and the caller would like to check if it is a
 					// locked file from a timed-out instance, try reverting before returning the initial
 					// status.
-					if (m_bAutoRevertLockedFiles && *pStatus == kActionProcessing &&
-						asCppBool(vbAttemptRevertIfLocked))
+					if (*pStatus == kActionProcessing && asCppBool(vbAttemptRevertIfLocked))
 					{
 						// Begin a transaction
 						TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
@@ -2047,15 +2047,10 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				string strGateKeeperQuery =
 					"IF EXISTS ("
 					"	SELECT * FROM [FileActionStatus] " + strWhere +
-					"		AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>)";
-				if (m_bAutoRevertLockedFiles)
-				{
-					// The ActiveFAM table will frequently have SQL locks build up against it so
-					// querying against it here can be expensive at times. Instead, 
-					strGateKeeperQuery += " OR ([ActionStatus] = 'R' "
-					"		AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>)";
-				}
-				strGateKeeperQuery += ") SELECT 1 AS ID ELSE SELECT 0 AS ID";
+					"		AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>)"
+					"		OR ([ActionStatus] = 'R' "
+					"		AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>)"
+					") SELECT 1 AS ID ELSE SELECT 0 AS ID";
 
 				// Update the select statement with the action ID
 				replaceVariable(strGateKeeperQuery, strActionIDPlaceHolder, asString(nActionID));

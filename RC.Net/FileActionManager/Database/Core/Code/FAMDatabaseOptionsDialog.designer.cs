@@ -46,7 +46,6 @@
             this._buttonModifyEmail = new System.Windows.Forms.Button();
             this._buttonAddEmail = new System.Windows.Forms.Button();
             this._listAutoRevertEmailList = new System.Windows.Forms.ListBox();
-            this._checkAutoRevertFiles = new System.Windows.Forms.CheckBox();
             this._checkAutoDeleteFileActionComments = new System.Windows.Forms.CheckBox();
             this._checkAutoCreateActions = new System.Windows.Forms.CheckBox();
             this._checkAllowdynamicTagCreation = new System.Windows.Forms.CheckBox();
@@ -113,7 +112,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(23, 115);
+            label4.Location = new System.Drawing.Point(22, 98);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(305, 13);
             label4.TabIndex = 12;
@@ -122,11 +121,11 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(23, 95);
+            label3.Location = new System.Drawing.Point(22, 75);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(110, 13);
+            label3.Size = new System.Drawing.Size(170, 13);
             label3.TabIndex = 4;
-            label3.Text = "Revert file status after";
+            label3.Text = "Automatically revert file status after";
             // 
             // label1
             // 
@@ -140,7 +139,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(194, 95);
+            label5.Location = new System.Drawing.Point(260, 75);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(105, 13);
             label5.TabIndex = 21;
@@ -149,7 +148,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(3, 236);
+            label6.Location = new System.Drawing.Point(3, 219);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(271, 13);
             label6.TabIndex = 22;
@@ -158,7 +157,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(3, 262);
+            label7.Location = new System.Drawing.Point(3, 245);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(274, 13);
             label7.TabIndex = 23;
@@ -167,7 +166,7 @@
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new System.Drawing.Point(3, 282);
+            label8.Location = new System.Drawing.Point(3, 268);
             label8.Name = "label8";
             label8.Size = new System.Drawing.Size(201, 13);
             label8.TabIndex = 24;
@@ -186,7 +185,7 @@
             this._tabControlSettings.Location = new System.Drawing.Point(13, 13);
             this._tabControlSettings.Name = "_tabControlSettings";
             this._tabControlSettings.SelectedIndex = 0;
-            this._tabControlSettings.Size = new System.Drawing.Size(466, 351);
+            this._tabControlSettings.Size = new System.Drawing.Size(466, 337);
             this._tabControlSettings.TabIndex = 0;
             this._tabControlSettings.SelectedIndexChanged += new System.EventHandler(this.HandleTabControl_SelectedIndexChanged);
             // 
@@ -206,14 +205,13 @@
             this._tabGeneral.Controls.Add(this._listAutoRevertEmailList);
             this._tabGeneral.Controls.Add(label4);
             this._tabGeneral.Controls.Add(label3);
-            this._tabGeneral.Controls.Add(this._checkAutoRevertFiles);
             this._tabGeneral.Controls.Add(this._checkAutoDeleteFileActionComments);
             this._tabGeneral.Controls.Add(this._checkAutoCreateActions);
             this._tabGeneral.Controls.Add(this._checkAllowdynamicTagCreation);
             this._tabGeneral.Location = new System.Drawing.Point(4, 22);
             this._tabGeneral.Name = "_tabGeneral";
             this._tabGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this._tabGeneral.Size = new System.Drawing.Size(458, 325);
+            this._tabGeneral.Size = new System.Drawing.Size(458, 311);
             this._tabGeneral.TabIndex = 0;
             this._tabGeneral.Text = "General";
             this._tabGeneral.ToolTipText = "General FAM database settings";
@@ -223,14 +221,14 @@
             // 
             this._alternateComponentDataDirectoryTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._alternateComponentDataDirectoryTextBox.Location = new System.Drawing.Point(6, 298);
+            this._alternateComponentDataDirectoryTextBox.Location = new System.Drawing.Point(6, 284);
             this._alternateComponentDataDirectoryTextBox.Name = "_alternateComponentDataDirectoryTextBox";
             this._alternateComponentDataDirectoryTextBox.Size = new System.Drawing.Size(446, 20);
             this._alternateComponentDataDirectoryTextBox.TabIndex = 25;
             // 
             // _numberMaxTimeBetweenChecks
             // 
-            this._numberMaxTimeBetweenChecks.Location = new System.Drawing.Point(297, 259);
+            this._numberMaxTimeBetweenChecks.Location = new System.Drawing.Point(297, 242);
             this._numberMaxTimeBetweenChecks.MaximumValue = 1.7976931348623157E+308D;
             this._numberMaxTimeBetweenChecks.MinimumValue = -1.7976931348623157E+308D;
             this._numberMaxTimeBetweenChecks.Name = "_numberMaxTimeBetweenChecks";
@@ -240,7 +238,7 @@
             // _numberMinTimeBetweenChecks
             // 
             this._numberMinTimeBetweenChecks.AllowNegative = false;
-            this._numberMinTimeBetweenChecks.Location = new System.Drawing.Point(297, 233);
+            this._numberMinTimeBetweenChecks.Location = new System.Drawing.Point(297, 216);
             this._numberMinTimeBetweenChecks.MaximumValue = 1.7976931348623157E+308D;
             this._numberMinTimeBetweenChecks.MinimumValue = -1.7976931348623157E+308D;
             this._numberMinTimeBetweenChecks.Name = "_numberMinTimeBetweenChecks";
@@ -249,7 +247,7 @@
             // 
             // _upDownRevertMinutes
             // 
-            this._upDownRevertMinutes.Location = new System.Drawing.Point(139, 93);
+            this._upDownRevertMinutes.Location = new System.Drawing.Point(205, 73);
             this._upDownRevertMinutes.Maximum = new decimal(new int[] {
             1440,
             0,
@@ -273,7 +271,7 @@
             // _buttonRemoveEmail
             // 
             this._buttonRemoveEmail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonRemoveEmail.Location = new System.Drawing.Point(377, 190);
+            this._buttonRemoveEmail.Location = new System.Drawing.Point(377, 173);
             this._buttonRemoveEmail.Name = "_buttonRemoveEmail";
             this._buttonRemoveEmail.Size = new System.Drawing.Size(75, 23);
             this._buttonRemoveEmail.TabIndex = 9;
@@ -284,7 +282,7 @@
             // _buttonModifyEmail
             // 
             this._buttonModifyEmail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonModifyEmail.Location = new System.Drawing.Point(377, 161);
+            this._buttonModifyEmail.Location = new System.Drawing.Point(377, 144);
             this._buttonModifyEmail.Name = "_buttonModifyEmail";
             this._buttonModifyEmail.Size = new System.Drawing.Size(75, 23);
             this._buttonModifyEmail.TabIndex = 8;
@@ -295,7 +293,7 @@
             // _buttonAddEmail
             // 
             this._buttonAddEmail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonAddEmail.Location = new System.Drawing.Point(377, 132);
+            this._buttonAddEmail.Location = new System.Drawing.Point(377, 115);
             this._buttonAddEmail.Name = "_buttonAddEmail";
             this._buttonAddEmail.Size = new System.Drawing.Size(75, 23);
             this._buttonAddEmail.TabIndex = 7;
@@ -308,23 +306,12 @@
             this._listAutoRevertEmailList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._listAutoRevertEmailList.FormattingEnabled = true;
-            this._listAutoRevertEmailList.Location = new System.Drawing.Point(26, 132);
+            this._listAutoRevertEmailList.Location = new System.Drawing.Point(25, 115);
             this._listAutoRevertEmailList.Name = "_listAutoRevertEmailList";
             this._listAutoRevertEmailList.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this._listAutoRevertEmailList.Size = new System.Drawing.Size(345, 95);
             this._listAutoRevertEmailList.TabIndex = 6;
             this._listAutoRevertEmailList.SelectedIndexChanged += new System.EventHandler(this.HandleAutoRevertSelectionChanged);
-            // 
-            // _checkAutoRevertFiles
-            // 
-            this._checkAutoRevertFiles.AutoSize = true;
-            this._checkAutoRevertFiles.Location = new System.Drawing.Point(6, 75);
-            this._checkAutoRevertFiles.Name = "_checkAutoRevertFiles";
-            this._checkAutoRevertFiles.Size = new System.Drawing.Size(174, 17);
-            this._checkAutoRevertFiles.TabIndex = 3;
-            this._checkAutoRevertFiles.Text = "Automatically revert locked files";
-            this._checkAutoRevertFiles.UseVisualStyleBackColor = true;
-            this._checkAutoRevertFiles.CheckedChanged += new System.EventHandler(this.HandleAutoRevertCheckChangedEvent);
             // 
             // _checkAutoDeleteFileActionComments
             // 
@@ -371,7 +358,7 @@
             this._tabHistory.Location = new System.Drawing.Point(4, 22);
             this._tabHistory.Name = "_tabHistory";
             this._tabHistory.Padding = new System.Windows.Forms.Padding(3);
-            this._tabHistory.Size = new System.Drawing.Size(458, 325);
+            this._tabHistory.Size = new System.Drawing.Size(458, 307);
             this._tabHistory.TabIndex = 4;
             this._tabHistory.Text = "History";
             this._tabHistory.ToolTipText = "FAM history settings";
@@ -493,7 +480,7 @@
             this._tabSecurity.Location = new System.Drawing.Point(4, 22);
             this._tabSecurity.Name = "_tabSecurity";
             this._tabSecurity.Padding = new System.Windows.Forms.Padding(3);
-            this._tabSecurity.Size = new System.Drawing.Size(458, 325);
+            this._tabSecurity.Size = new System.Drawing.Size(458, 307);
             this._tabSecurity.TabIndex = 1;
             this._tabSecurity.Text = "Security";
             this._tabSecurity.ToolTipText = "FAM security settings";
@@ -569,7 +556,7 @@
             this._tabProductSpecific.Controls.Add(this._productSpecificLayout);
             this._tabProductSpecific.Location = new System.Drawing.Point(4, 22);
             this._tabProductSpecific.Name = "_tabProductSpecific";
-            this._tabProductSpecific.Size = new System.Drawing.Size(458, 325);
+            this._tabProductSpecific.Size = new System.Drawing.Size(458, 307);
             this._tabProductSpecific.TabIndex = 5;
             this._tabProductSpecific.Text = "Product Specific";
             this._tabProductSpecific.ToolTipText = "Product specific settings";
@@ -583,7 +570,7 @@
             this._productSpecificLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this._productSpecificLayout.Location = new System.Drawing.Point(0, 0);
             this._productSpecificLayout.Name = "_productSpecificLayout";
-            this._productSpecificLayout.Size = new System.Drawing.Size(458, 325);
+            this._productSpecificLayout.Size = new System.Drawing.Size(458, 307);
             this._productSpecificLayout.TabIndex = 1;
             // 
             // _groupIDShield
@@ -643,7 +630,7 @@
             this._tabEmail.Location = new System.Drawing.Point(4, 22);
             this._tabEmail.Name = "_tabEmail";
             this._tabEmail.Padding = new System.Windows.Forms.Padding(3);
-            this._tabEmail.Size = new System.Drawing.Size(458, 325);
+            this._tabEmail.Size = new System.Drawing.Size(458, 307);
             this._tabEmail.TabIndex = 6;
             this._tabEmail.Text = "Email";
             this._tabEmail.UseVisualStyleBackColor = true;
@@ -660,7 +647,7 @@
             // 
             this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._buttonCancel.Location = new System.Drawing.Point(404, 370);
+            this._buttonCancel.Location = new System.Drawing.Point(404, 356);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
             this._buttonCancel.TabIndex = 3;
@@ -670,7 +657,7 @@
             // _buttonOK
             // 
             this._buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonOK.Location = new System.Drawing.Point(323, 370);
+            this._buttonOK.Location = new System.Drawing.Point(323, 356);
             this._buttonOK.Name = "_buttonOK";
             this._buttonOK.Size = new System.Drawing.Size(75, 23);
             this._buttonOK.TabIndex = 2;
@@ -681,7 +668,7 @@
             // _buttonRefresh
             // 
             this._buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonRefresh.Location = new System.Drawing.Point(242, 370);
+            this._buttonRefresh.Location = new System.Drawing.Point(242, 356);
             this._buttonRefresh.Name = "_buttonRefresh";
             this._buttonRefresh.Size = new System.Drawing.Size(75, 23);
             this._buttonRefresh.TabIndex = 1;
@@ -691,7 +678,8 @@
             // 
             // _emailTestButton
             // 
-            this._emailTestButton.Location = new System.Drawing.Point(132, 370);
+            this._emailTestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._emailTestButton.Location = new System.Drawing.Point(132, 356);
             this._emailTestButton.Name = "_emailTestButton";
             this._emailTestButton.Size = new System.Drawing.Size(104, 23);
             this._emailTestButton.TabIndex = 4;
@@ -704,7 +692,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(491, 405);
+            this.ClientSize = new System.Drawing.Size(491, 391);
             this.Controls.Add(this._emailTestButton);
             this.Controls.Add(this._buttonRefresh);
             this.Controls.Add(this._buttonOK);
@@ -753,7 +741,6 @@
         private System.Windows.Forms.CheckBox _checkAutoCreateActions;
         private System.Windows.Forms.CheckBox _checkAllowdynamicTagCreation;
         private System.Windows.Forms.ListBox _listAutoRevertEmailList;
-        private System.Windows.Forms.CheckBox _checkAutoRevertFiles;
         private System.Windows.Forms.CheckBox _checkStoreInputEventTracking;
         private System.Windows.Forms.CheckBox _checkStoreQueueEventHistory;
         private System.Windows.Forms.CheckBox _checkStoreFASTHistory;

@@ -406,9 +406,6 @@ private:
 	// Flag indicating whether file action comments should be deleted when files are completed
 	bool m_bAutoDeleteFileActionComment;
 
-	// Flag indicating whether to automatically revert files whose FAM is no longer processing
-	bool m_bAutoRevertLockedFiles;
-
 	// Timeout value for automatically reverting files
 	int m_nAutoRevertTimeOutInMinutes;
 
