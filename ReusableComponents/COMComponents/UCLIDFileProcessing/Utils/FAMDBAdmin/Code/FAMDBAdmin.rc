@@ -547,6 +547,7 @@ BEGIN
         MENUITEM "Export file list...",         ID_SUMMARY_MENU_EXPORT_LIST
         MENUITEM "Inspect files...",            ID_SUMMARY_MENU_INSPECT_FILES
         MENUITEM "View exceptions for failed files...", ID_SUMMARY_MENU_VIEW_FAILED
+        MENUITEM "Copy count",                  ID_SUMMARY_MENU_COPY_COUNT
         MENUITEM SEPARATOR
         MENUITEM "Cancel",                      ID_SUMMARY_MENU_CANCEL
     END
@@ -556,8 +557,19 @@ IDR_MENU_SUMMARY_ROW_HEADER MENU
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "Copy action name",            ID_SUMMARY_MENU_ROW_HEADER_COPY
         MENUITEM "View exceptions for failed files...", ID_SUMMARY_MENU_VIEW_FAILED
+        MENUITEM "Copy action name",            ID_SUMMARY_MENU_ROW_HEADER_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "Cancel",                      ID_SUMMARY_MENU_CANCEL
+    END
+END
+
+IDR_MENU_SUMMARY_TOTAL_COLUMN MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "View exceptions for failed files...", ID_SUMMARY_MENU_VIEW_FAILED
+        MENUITEM "Copy count",                  ID_SUMMARY_MENU_COPY_COUNT
         MENUITEM SEPARATOR
         MENUITEM "Cancel",                      ID_SUMMARY_MENU_CANCEL
     END

@@ -137,6 +137,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminSummaryDlg, CPropertyPage)
 	ON_COMMAND(ID_SUMMARY_MENU_VIEW_FAILED, &OnContextViewFailed)
 	ON_COMMAND(ID_SUMMARY_MENU_INSPECT_FILES, &OnContextInspectFiles)
 	ON_COMMAND(ID_SUMMARY_MENU_ROW_HEADER_COPY, &OnContextCopyActionName)
+	ON_COMMAND(ID_SUMMARY_MENU_COPY_COUNT, &OnContextCopyCount)
 END_MESSAGE_MAP()
 //--------------------------------------------------------------------------------------------------
 
@@ -303,35 +304,39 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 		
 		CMenu menu;
 		CMenu *pContextMenu = __nullptr;
-		string strActionStatus;
 
 		// If there is a valid selection...
 		if (pNMItemActivate->iItem >= 0 && pNMItemActivate->iSubItem >= 0)
 		{
+			string strContextActionName = m_listActions.GetItemText(pNMItemActivate->iItem, 0);
+			m_nContextMenuActionID = m_ipFAMDB->GetActionID(strContextActionName.c_str());
+			string strActionStatus = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][0];
 
-			// If the click occured in the row header...
-			if (pNMItemActivate->iSubItem == 0)
+			// If there is not an associated action status code, the click occured in the row header or
+			// totals column.
+			if (strActionStatus.empty())
 			{
-				string strContextActionName = m_listActions.GetItemText(pNMItemActivate->iItem, 0);
-				m_nContextMenuActionID = m_ipFAMDB->GetActionID(strContextActionName.c_str());
+				if (pNMItemActivate->iSubItem == giACTION_COLUMN)
+				{
+					menu.LoadMenu(IDR_MENU_SUMMARY_ROW_HEADER);
+				}
+				else if (pNMItemActivate->iSubItem == giTOTALS_COLUMN)
+				{
+					m_strContextMenuCount =
+						m_listActions.GetItemText(pNMItemActivate->iItem, pNMItemActivate->iSubItem);
 
-				menu.LoadMenu(IDR_MENU_SUMMARY_ROW_HEADER);
+					menu.LoadMenu(IDR_MENU_SUMMARY_TOTAL_COLUMN);
+				}
 				pContextMenu = menu.GetSubMenu(0);
 			}
-			// Otherwise, see if the selected column has an associated action status code... 
-			else
+			// If there is an associated action status code, the click corresponsds to a specific
+			// action status.
+			else 
 			{
-				strActionStatus = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][0];
-			}
+				m_strContextMenuCount =
+					m_listActions.GetItemText(pNMItemActivate->iItem, pNMItemActivate->iSubItem);
 
-			// If there is an associated action status code... 
-			if (!strActionStatus.empty())
-			{
 				// Prepare file selection info based on the selected action and actions status
-				string strContextActionStatusName = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][1];
-				string strContextActionName = m_listActions.GetItemText(pNMItemActivate->iItem, 0);
-
-				m_nContextMenuActionID = m_ipFAMDB->GetActionID(strContextActionName.c_str());
 				EActionStatus esStatus = m_ipFAMDB->AsEActionStatus(strActionStatus.c_str());
 				m_ipContextMenuFileSelector->Reset();
 				m_ipContextMenuFileSelector->AddActionStatusCondition(m_ipFAMDB,
@@ -528,6 +533,16 @@ void CFAMDBAdminSummaryDlg::OnContextCopyActionName()
 		clipboardManager.writeText(strActionName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37286");
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::OnContextCopyCount()
+{
+	try
+	{
+		ClipboardManager clipboardManager(this);
+		clipboardManager.writeText(m_strContextMenuCount);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37596");
 }
 
 //--------------------------------------------------------------------------------------------------

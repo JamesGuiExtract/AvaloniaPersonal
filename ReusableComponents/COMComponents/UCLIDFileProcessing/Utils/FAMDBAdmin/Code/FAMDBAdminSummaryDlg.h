@@ -49,6 +49,7 @@ protected:
 	afx_msg void OnContextSetFileActionStatus();
 	afx_msg void OnContextViewFailed();
 	afx_msg void OnContextCopyActionName();
+	afx_msg void OnContextCopyCount();
 	virtual BOOL OnInitDialog();
 
 private:
@@ -73,8 +74,9 @@ private:
 	// Allows inspection of files in the database using the FAMFileInspector utility.
 	IFAMFileInspectorPtr m_ipFAMFileInspector;
 
-	// The action ID associated with the context menu click location.
+	// The action ID and count associated with the context menu click location.
 	long m_nContextMenuActionID;
+	string m_strContextMenuCount;
 
 	// Indicates if the queries used should use OracleSyntax
 	bool m_bUseOracleSyntax;
