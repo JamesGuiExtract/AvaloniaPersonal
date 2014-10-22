@@ -18,9 +18,9 @@ namespace Extract.SQLCDBEditor
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLCDBEditorForm));
-            TD.SandDock.DockingRules dockingRules1 = new TD.SandDock.DockingRules();
-            TD.SandDock.DockingRules dockingRules2 = new TD.SandDock.DockingRules();
-            TD.SandDock.DockingRules dockingRules3 = new TD.SandDock.DockingRules();
+            TD.SandDock.DockingRules dockingRules4 = new TD.SandDock.DockingRules();
+            TD.SandDock.DockingRules dockingRules5 = new TD.SandDock.DockingRules();
+            TD.SandDock.DockingRules dockingRules6 = new TD.SandDock.DockingRules();
             this._toolStrip = new System.Windows.Forms.ToolStrip();
             this._openToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -37,7 +37,7 @@ namespace Extract.SQLCDBEditor
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._statusStrip = new System.Windows.Forms.StatusStrip();
-            this._statusLabelSchemaInfo = new System.Windows.Forms.ToolStripStatusLabel();
+            this._databaseStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._tableDockWindow = new TD.SandDock.DockableWindow();
             this._tablesListBox = new System.Windows.Forms.ListBox();
@@ -51,6 +51,7 @@ namespace Extract.SQLCDBEditor
             this._queriesListBox = new System.Windows.Forms.ListBox();
             this._pluginDockableWindow = new TD.SandDock.DockableWindow();
             this._pluginsListBox = new System.Windows.Forms.ListBox();
+            this._dataStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this._toolStrip.SuspendLayout();
             this._menuStrip.SuspendLayout();
@@ -205,7 +206,8 @@ namespace Extract.SQLCDBEditor
             // _statusStrip
             // 
             this._statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._statusLabelSchemaInfo});
+            this._databaseStatusLabel,
+            this._dataStatusLabel});
             this._statusStrip.Location = new System.Drawing.Point(0, 476);
             this._statusStrip.Name = "_statusStrip";
             this._statusStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.ManagerRenderMode;
@@ -213,12 +215,12 @@ namespace Extract.SQLCDBEditor
             this._statusStrip.TabIndex = 3;
             this._statusStrip.Text = "statusStrip1";
             // 
-            // _statusLabelSchemaInfo
+            // _databaseStatusLabel
             // 
-            this._statusLabelSchemaInfo.Name = "_statusLabelSchemaInfo";
-            this._statusLabelSchemaInfo.Size = new System.Drawing.Size(832, 17);
-            this._statusLabelSchemaInfo.Spring = true;
-            this._statusLabelSchemaInfo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this._databaseStatusLabel.Name = "_databaseStatusLabel";
+            this._databaseStatusLabel.Size = new System.Drawing.Size(400, 17);
+            this._databaseStatusLabel.Spring = true;
+            this._databaseStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _sandDockManager
             // 
@@ -232,13 +234,13 @@ namespace Extract.SQLCDBEditor
             // 
             this._tableDockWindow.AllowCollapse = false;
             this._tableDockWindow.Controls.Add(this._tablesListBox);
-            dockingRules1.AllowDockBottom = true;
-            dockingRules1.AllowDockLeft = true;
-            dockingRules1.AllowDockRight = true;
-            dockingRules1.AllowDockTop = true;
-            dockingRules1.AllowFloat = true;
-            dockingRules1.AllowTab = true;
-            this._tableDockWindow.DockingRules = dockingRules1;
+            dockingRules4.AllowDockBottom = true;
+            dockingRules4.AllowDockLeft = true;
+            dockingRules4.AllowDockRight = true;
+            dockingRules4.AllowDockTop = true;
+            dockingRules4.AllowFloat = true;
+            dockingRules4.AllowTab = true;
+            this._tableDockWindow.DockingRules = dockingRules4;
             this._tableDockWindow.Guid = new System.Guid("85a6af86-de66-4810-9629-cf367ab421f1");
             this._tableDockWindow.Location = new System.Drawing.Point(0, 18);
             this._tableDockWindow.Name = "_tableDockWindow";
@@ -328,13 +330,13 @@ namespace Extract.SQLCDBEditor
             // 
             this._queryDockWindow.AllowCollapse = false;
             this._queryDockWindow.Controls.Add(this._queriesListBox);
-            dockingRules2.AllowDockBottom = true;
-            dockingRules2.AllowDockLeft = true;
-            dockingRules2.AllowDockRight = true;
-            dockingRules2.AllowDockTop = true;
-            dockingRules2.AllowFloat = true;
-            dockingRules2.AllowTab = true;
-            this._queryDockWindow.DockingRules = dockingRules2;
+            dockingRules5.AllowDockBottom = true;
+            dockingRules5.AllowDockLeft = true;
+            dockingRules5.AllowDockRight = true;
+            dockingRules5.AllowDockTop = true;
+            dockingRules5.AllowFloat = true;
+            dockingRules5.AllowTab = true;
+            this._queryDockWindow.DockingRules = dockingRules5;
             this._queryDockWindow.Guid = new System.Guid("77c6358a-bf4e-4e01-b533-508c8c53771b");
             this._queryDockWindow.Location = new System.Drawing.Point(0, 157);
             this._queryDockWindow.Name = "_queryDockWindow";
@@ -365,13 +367,13 @@ namespace Extract.SQLCDBEditor
             // 
             this._pluginDockableWindow.AllowCollapse = false;
             this._pluginDockableWindow.Controls.Add(this._pluginsListBox);
-            dockingRules3.AllowDockBottom = true;
-            dockingRules3.AllowDockLeft = true;
-            dockingRules3.AllowDockRight = true;
-            dockingRules3.AllowDockTop = true;
-            dockingRules3.AllowFloat = true;
-            dockingRules3.AllowTab = true;
-            this._pluginDockableWindow.DockingRules = dockingRules3;
+            dockingRules6.AllowDockBottom = true;
+            dockingRules6.AllowDockLeft = true;
+            dockingRules6.AllowDockRight = true;
+            dockingRules6.AllowDockTop = true;
+            dockingRules6.AllowFloat = true;
+            dockingRules6.AllowTab = true;
+            this._pluginDockableWindow.DockingRules = dockingRules6;
             this._pluginDockableWindow.Guid = new System.Guid("7ed945d9-f840-4970-8a04-7de7b125ba79");
             this._pluginDockableWindow.Location = new System.Drawing.Point(0, 296);
             this._pluginDockableWindow.Name = "_pluginDockableWindow";
@@ -395,6 +397,13 @@ namespace Extract.SQLCDBEditor
             this._pluginsListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.HandleListBoxDrawItem);
             this._pluginsListBox.SelectedIndexChanged += new System.EventHandler(this.HandleListSelectionChanged);
             this._pluginsListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleListMouseDown);
+            // 
+            // _dataStatusLabel
+            // 
+            this._dataStatusLabel.Name = "_dataStatusLabel";
+            this._dataStatusLabel.Size = new System.Drawing.Size(400, 17);
+            this._dataStatusLabel.Spring = true;
+            this._dataStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // SQLCDBEditorForm
             // 
@@ -445,7 +454,7 @@ namespace Extract.SQLCDBEditor
         private System.Windows.Forms.ToolStripMenuItem _toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _updateToCurrentSchemaToolStripMenuItem;
         private System.Windows.Forms.StatusStrip _statusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel _statusLabelSchemaInfo;
+        private System.Windows.Forms.ToolStripStatusLabel _databaseStatusLabel;
         private TD.SandDock.SandDockManager _sandDockManager;
         private TD.SandDock.DockableWindow _tableDockWindow;
         private TD.SandDock.DockContainer _navigationDockContainer;
@@ -461,6 +470,7 @@ namespace Extract.SQLCDBEditor
         private System.Windows.Forms.ToolStripMenuItem _deleteToolStripMenuItem;
         private TD.SandDock.DockableWindow _pluginDockableWindow;
         private System.Windows.Forms.ListBox _pluginsListBox;
+        private System.Windows.Forms.ToolStripStatusLabel _dataStatusLabel;
 
     }
 }

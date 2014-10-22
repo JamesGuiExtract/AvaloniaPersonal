@@ -122,6 +122,14 @@ namespace Extract.SQLCDBEditor
         List<QueryAndResultsControl> _pluginList = new List<QueryAndResultsControl>();
 
         /// <summary>
+        /// The last <see cref="StatusMessageChangedEventArgs"/> for each
+        /// <see cref="QueryAndResultsControl"/> that was reported via the
+        /// <see cref="QueryAndResultsControl.StatusMessageChanged"/> event.
+        /// </summary>
+        Dictionary<QueryAndResultsControl, StatusMessageChangedEventArgs> _activeStatusMessages =
+            new Dictionary<QueryAndResultsControl, StatusMessageChangedEventArgs>();
+
+        /// <summary>
         /// The binding between <see cref="_pluginList"/> and <see cref="_pluginsListBox"/>
         /// </summary>
         BindingSource _pluginsBindingSource = new BindingSource();
@@ -841,6 +849,9 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
+                // When a tab is being closed, clear any data status messages.
+                ApplyStatusMessage(null);
+
                 // Don't allow the primary tab itself to be closed... only the control it contains.
                 if (e.DockControl == _primaryTab)
                 {
@@ -972,6 +983,31 @@ namespace Extract.SQLCDBEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI34615");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:QueryAndResultsControl.StatusMessageChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.SQLCDBEditor.StatusMessageChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleStatusMessageChanged(object sender, StatusMessageChangedEventArgs e)
+        {
+            try
+            {
+                // Keep track of this status message for the case that this QueryAndResultsControl
+                // loses then re-gains focus again later.
+                _activeStatusMessages[(QueryAndResultsControl)sender] = e;
+
+                _dataStatusLabel.Text = e.StatusMessage;
+                _dataStatusLabel.ForeColor = (e.TextColor == Color.Empty)
+                    ? Color.Black
+                    : e.TextColor;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37598");
             }
         }
 
@@ -1416,6 +1452,10 @@ namespace Extract.SQLCDBEditor
         /// into the primary tab.</param>
         void OpenTableOrQueryCore(QueryAndResultsControl queryAndResultsControl, bool openInNewTab)
         {
+            // When a queryAndResultsControl is displayed, update the status bar with this control's
+            // active status message (if any).
+            ApplyStatusMessage(queryAndResultsControl);
+
             TabbedDocument tabbedDocument = null;
 
             _lastSelectedItem = queryAndResultsControl;
@@ -1532,6 +1572,7 @@ namespace Extract.SQLCDBEditor
             }
 
             queryAndResultsControl.DataChanged += HandleDataChanged;
+            queryAndResultsControl.StatusMessageChanged += HandleStatusMessageChanged;
             queryAndResultsControl.SentToSeparateTab += HandleTableOrQuerySentToSeparateTab;
             queryAndResultsControl.QueryCreated += HandleQueryCreated;
         }
@@ -1890,8 +1931,8 @@ namespace Extract.SQLCDBEditor
             }
 
             _updateToCurrentSchemaToolStripMenuItem.Enabled = canUpdateSchema;
-            _statusLabelSchemaInfo.ForeColor = textColor;
-            _statusLabelSchemaInfo.Text = statusText;
+            _databaseStatusLabel.ForeColor = textColor;
+            _databaseStatusLabel.Text = statusText;
 
             if (promptForUpdate)
             {
@@ -2068,7 +2109,7 @@ namespace Extract.SQLCDBEditor
             // Clear Dirty Flag
             _dirty = false;
 
-            _statusLabelSchemaInfo.Text = "";
+            _databaseStatusLabel.Text = "";
 
             // Update menu and tool strip
             EnableCommands();
@@ -2342,6 +2383,27 @@ namespace Extract.SQLCDBEditor
                     _pluginDockableWindow.Closing -= HandleDockWindowClosing;
                     _pluginDockableWindow.Close();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Applies the active status message for <see paramref="queryAndResultsControl"/> (if any)
+        /// to <see cref="_dataStatusLabel"/>.
+        /// </summary>
+        /// <param name="queryAndResultsControl">The query and results control.</param>
+        void ApplyStatusMessage(QueryAndResultsControl queryAndResultsControl)
+        {
+            StatusMessageChangedEventArgs statusEventArgs = null;
+            if (queryAndResultsControl != null &&
+                _activeStatusMessages.TryGetValue(queryAndResultsControl, out statusEventArgs))
+            {
+                _dataStatusLabel.Text = statusEventArgs.StatusMessage;
+                _dataStatusLabel.ForeColor = statusEventArgs.TextColor;
+            }
+            else
+            {
+                _dataStatusLabel.Text = "";
+                _dataStatusLabel.ForeColor = Color.Black;
             }
         }
 

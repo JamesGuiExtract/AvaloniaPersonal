@@ -233,6 +233,7 @@ namespace Extract.SQLCDBEditor
                 Name = plugin.DisplayName;
                 _plugin = plugin;
                 _plugin.DataChanged += HandlePluginDataChanged;
+                _plugin.StatusMessageChanged += HandlePluginStatusMessageChanged;
                 QueryAndResultsType = QueryAndResultsType.Plugin;
                 DataIsValid = true;
             }
@@ -250,6 +251,12 @@ namespace Extract.SQLCDBEditor
         /// Raised when the user has modified data.
         /// </summary>
         public event EventHandler<DataChangedEventArgs> DataChanged;
+
+        /// <summary>
+        /// Raised when the plugin has a new status message to display (may be
+        /// <see langword="null"/> to clear the existing status message.
+        /// </summary>
+        public event EventHandler<StatusMessageChangedEventArgs> StatusMessageChanged;
 
         /// <summary>
         /// Raised to indicate that the control should be opened in a separate tab.
@@ -1744,6 +1751,25 @@ namespace Extract.SQLCDBEditor
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="SQLCDBEditorPlugin.StatusMessageChanged"/> event of the
+        /// <see cref="_plugin"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="Extract.SQLCDBEditor.StatusMessageChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandlePluginStatusMessageChanged(object sender, StatusMessageChangedEventArgs e)
+        {
+            try
+            {
+                OnStatusMessageChanged(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37597");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -2565,6 +2591,20 @@ namespace Extract.SQLCDBEditor
             if (eventHandler != null)
             {
                 eventHandler(this, new DataChangedEventArgs(dataCommitted));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="StatusMessageChanged"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="StatusMessageChangedEventArgs"/> instance
+        /// containing the event data.</param>
+        void OnStatusMessageChanged(StatusMessageChangedEventArgs eventArgs)
+        {
+            var eventHandler = StatusMessageChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, eventArgs);
             }
         }
 

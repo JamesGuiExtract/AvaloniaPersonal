@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlServerCe;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -393,6 +394,8 @@ namespace Extract.SQLCDBEditor.Plugins
         {
             try
             {
+                ClearStatusMessage();
+
                 // If there is a single row selected, load the examples for the selected candidate
                 // AKA.
                 _selectedRow = e.SelectedRows
@@ -566,15 +569,35 @@ namespace Extract.SQLCDBEditor.Plugins
             // A page number of zero indicates no spatial info exists for the current example.
             if (example.Page == 0)
             {
-                return;
+                ShowStatusMessage("Unable to show location on document.", Color.Red);
+            }
+            else
+            {
+                ClearStatusMessage();
+
+                HighlightExample(example);
             }
 
+            // Enable the next/previous example buttons as appropriate.
+            _previousAKAToolStripButton.Enabled = index > 0;
+            _nextAKAToolStripButton.Enabled = index < (_examples.Count - 1);
+            _exampleIndex = index;
+
+            _imageViewer.Invalidate();
+        }
+
+        /// <summary>
+        /// Highlights the specified <see paramref="example"/> in the <see cref="_imageViewer"/>.
+        /// </summary>
+        /// <param name="example">The <see cref="AKAExample"/> to highlight.</param>
+        void HighlightExample(AKAExample example)
+        {
             _imageViewer.PageNumber = example.Page;
 
-            // The image viewer's default zoom will be for the full page. But as part of this plugin,
-            // the image viewer control is likely to be not very high and wider than it is high.
-            // Therefore, make the default zoom level to the image width so that the entire image
-            // isn't squeezed into a very small vertical area by default.
+            // The image viewer's default zoom will be for the full page. But as part of this
+            // plugin, the image viewer control is likely to be not very high and wider than it
+            // is high. Therefore, make the default zoom level to the image width so that the
+            // entire image isn't squeezed into a very small vertical area by default.
             if (_imageViewer.FitMode == FitMode.None)
             {
                 _imageViewer.FitMode = FitMode.FitToWidth;
@@ -583,7 +606,7 @@ namespace Extract.SQLCDBEditor.Plugins
 
             if (example.EndX != 0 && example.EndY != 0 && example.Height != 0)
             {
-                RasterZone rasterZone = new RasterZone(example.StartX, example.StartY, example.EndX, 
+                RasterZone rasterZone = new RasterZone(example.StartX, example.StartY, example.EndX,
                     example.EndY, example.Height, example.Page);
 
                 _exampleHighlight = new Highlight(_imageViewer, "", rasterZone);
@@ -594,13 +617,6 @@ namespace Extract.SQLCDBEditor.Plugins
                 // Ensure visibility of the new layer object.
                 _imageViewer.CenterOnLayerObjects(_exampleHighlight);
             }
-
-            // Enable the next/previous example buttons as appropriate.
-            _previousAKAToolStripButton.Enabled = index > 0;
-            _nextAKAToolStripButton.Enabled = index < (_examples.Count - 1);
-            _exampleIndex = index;
-
-            _imageViewer.Invalidate();
         }
 
         #endregion Private Members

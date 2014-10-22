@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
 
 namespace Extract.SQLCDBEditor
 {
@@ -94,6 +95,61 @@ namespace Extract.SQLCDBEditor
         /// if the change is in progress.
         /// </value>
         public bool DataCommitted
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
+    /// The arguments used for the <see cref="QueryAndResultsControl.StatusMessageChanged"/> event.
+    /// </summary>
+    public class StatusMessageChangedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StatusMessageChangedEventArgs"/> class.
+        /// </summary>
+        /// <param name="statusMessage">The status message to display.</param>
+        public StatusMessageChangedEventArgs(string statusMessage)
+            : base()
+        {
+            StatusMessage = statusMessage;
+            TextColor = Color.Empty;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StatusMessageChangedEventArgs"/> class.
+        /// </summary>
+        /// <param name="statusMessage">The status message to display.</param>
+        /// <param name="textColor">The color the status message text should be or
+        /// <see cref="Color.Empty"/> to use the default status message color.</param>
+        public StatusMessageChangedEventArgs(string statusMessage, Color textColor)
+            : base()
+        {
+            StatusMessage = statusMessage;
+            TextColor = textColor;
+        }
+
+        /// <summary>
+        /// Gets the status message to display.
+        /// </summary>
+        /// <value>
+        /// The status message to display.
+        /// </value>
+        public string StatusMessage
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Color"/> status message text should be or <see cref="Color.Empty"/>
+        /// to use the default status message color.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Color"/> status message text should be
+        /// </value>
+        public Color TextColor
         {
             get;
             private set;

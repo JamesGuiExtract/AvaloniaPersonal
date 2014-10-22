@@ -2,6 +2,7 @@
 using System;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace Extract.SQLCDBEditor
@@ -22,6 +23,12 @@ namespace Extract.SQLCDBEditor
         /// Raised when the plugin has modified data in the database.
         /// </summary>
         public event EventHandler<DataChangedEventArgs> DataChanged;
+
+        /// <summary>
+        /// Raised when the plugin has a new status message to display (may be
+        /// <see langword="null"/> to clear the existing status message.
+        /// </summary>
+        public event EventHandler<StatusMessageChangedEventArgs> StatusMessageChanged;
 
         #endregion Events
 
@@ -74,6 +81,25 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
+        /// Clears any currently displayed status message.
+        /// </summary>
+        protected virtual void ClearStatusMessage()
+        {
+            OnStatusMessageChanged(null, Color.Empty);
+        }
+
+        /// <summary>
+        /// Displays the specified <see paramref="statusMessage"/>.
+        /// </summary>
+        /// <param name="statusMessage">The status message to display.</param>
+        /// <param name="textColor">The color the status message text should be or
+        /// <see cref="Color.Empty"/> to use the default status message color.</param>
+        protected virtual void ShowStatusMessage(string statusMessage, Color textColor)
+        {
+            OnStatusMessageChanged(statusMessage, textColor);
+        }
+
+        /// <summary>
         /// Raises the <see cref="DataChanged"/> event.
         /// </summary>
         /// <param name="dataCommitted"><see langword="true"/> if the changed data was committed;
@@ -84,6 +110,22 @@ namespace Extract.SQLCDBEditor
             if (eventHandler != null)
             {
                 eventHandler(this, new DataChangedEventArgs(dataCommitted));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="StatusMessageChanged"/> event.
+        /// </summary>
+        /// <param name="statusMessage">The message to display or <see langword="null"/> to clear
+        /// any existing status message.</param>
+        /// <param name="textColor">The color the status message text should be or
+        /// <see cref="Color.Empty"/> to use the default status message color.</param>
+        void OnStatusMessageChanged(string statusMessage, Color textColor)
+        {
+            var eventHandler = StatusMessageChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new StatusMessageChangedEventArgs(statusMessage, textColor));
             }
         }
     }
