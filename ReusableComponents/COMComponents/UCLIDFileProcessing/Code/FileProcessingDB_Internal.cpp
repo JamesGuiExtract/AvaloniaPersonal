@@ -247,8 +247,8 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection, long nFileID, 
 													string strAction, const string& strState,
 													const string& strException,
-													bool bAllowQueuedStatusOverride,
 													bool bQueueChangeIfProcessing,
+													bool bAllowQueuedStatusOverride,
 													long nActionID, bool bRemovePreviousSkipped,
 													const string& strFASTComment)
 {
@@ -593,7 +593,7 @@ void CFileProcessingDB::setStatusForFile(_ConnectionPtr ipConnection, long nFile
 	{
 		// Change the status for the given file and return the previous state
 		EActionStatus oldStatus = setFileActionState(ipConnection, nFileID, strAction,
-			asStatusString(eStatus), "", bAllowQueuedStatusOverride, bQueueChangeIfProcessing);
+			asStatusString(eStatus), "", bQueueChangeIfProcessing, bAllowQueuedStatusOverride);
 
 		if (poldStatus != __nullptr)
 		{
@@ -3849,7 +3849,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			// processing when the FAM crashed are applied now.
 			setFileActionState(ipConnection, getLongField(ipFields, "FileID"), 
 				strActionName, strRevertToStatus, 
-				"", true, false, getLongField(ipFields, "ActionID"), false, strFASTComment);
+				"", false, true, getLongField(ipFields, "ActionID"), false, strFASTComment);
 
 			ipFileSet->MoveNext();
 		}

@@ -597,16 +597,16 @@ private:
 	//			will be updated for the file with the information for the current user and process.
 	//			If bRemovePreviousSkipped is false and strState == "S" the UPIID will be updated,
 	//			but all other skipped file fields will be unmodified.
+	//			If bQueueChangeIfProcessing is true and the document is already processing, queue
+	//			the new strState via the QueuedActionStatusChange table such that when it is done
+	//			processing it will be moved into that state.
 	//			If bAllowQueuedStatusOverride is true and the QueuedActionStatusChange table has a
 	//			pending change for the file, that change will be applied. If
 	//			bAllowQueuedStatusOverride is false, the QueuedActionStatusChange will be ignored
 	//			and the status will be set to strState.
-	//			If bQueueChangeIfProcessing is true and the document is already processing, queue
-	//			the new strState via the QueuedActionStatusChange table such that when it is done
-	//			processing it will be moved into that state.
 	EActionStatus setFileActionState(_ConnectionPtr ipConnection, long nFileID,
 		string strAction, const string& strState, const string& strException,
-		bool bAllowQueuedStatusOverride, bool bQueueChangeIfProcessing, long nActionID = -1,
+		bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride, long nActionID = -1,
 		bool bRemovePreviousSkipped = false, const string& strFASTComment = "");
 
 	// PROMISE: To set the specified group of files' action state for the specified action.

@@ -145,7 +145,7 @@ void FPRecordManager::discardProcessingQueue()
 		UCLID_FILEPROCESSINGLib::EActionStatus eaOldStatus =
 			(UCLID_FILEPROCESSINGLib::EActionStatus)kActionUnattempted;
 		m_ipFPMDB->SetStatusForFile(task.getFileID(), m_strAction.c_str(),
-			task.getFallbackStatus(), VARIANT_TRUE, VARIANT_TRUE, &eaOldStatus);
+			task.getFallbackStatus(), VARIANT_FALSE, VARIANT_TRUE, &eaOldStatus);
 	}
 
 	// Ensure the queue is cleared since we have now reverted the state of all files

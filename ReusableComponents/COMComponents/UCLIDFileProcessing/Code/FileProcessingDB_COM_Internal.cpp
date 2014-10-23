@@ -1404,7 +1404,7 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 
 				// change the given files state to completed unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", true, false);
+				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", false, true);
 
 				tg.CommitTrans();
 
@@ -1454,7 +1454,7 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 
 				// change the given files state to Failed unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString, true, false);
+				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString, false, true);
 
 				tg.CommitTrans();
 
@@ -1494,7 +1494,7 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 				
 				// change the given files state to Pending
 				setFileActionState(ipConnection, nFileID, asString(strAction), "P", "", 
-					asCppBool(vbAllowQueuedStatusOverride), false);
+					false, asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
 
@@ -1536,7 +1536,7 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 
 				// change the given files state to unattempted
 				setFileActionState(ipConnection, nFileID, asString(strAction), "U", "",
-					asCppBool(vbAllowQueuedStatusOverride), false);
+					false, asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
 
@@ -1576,7 +1576,7 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 
 			// Change the given files state to Skipped
 			setFileActionState(ipConnection, nFileID, asString(strAction), "S", "",
-				asCppBool(vbAllowQueuedStatusOverride), false, -1, asCppBool(bRemovePreviousSkipped));
+				false, asCppBool(vbAllowQueuedStatusOverride), -1, asCppBool(bRemovePreviousSkipped));
 
 			tg.CommitTrans();
 
@@ -2861,7 +2861,7 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 
 				// Set the file state to skipped unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, strActionName, "S", "", true, false, nActionID);
+				setFileActionState(ipConnection, nFileID, strActionName, "S", "", false, true, nActionID);
 
 				tg.CommitTrans();
 
