@@ -968,6 +968,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             ExtractException.Assert("ELI37568", "Unable to staple a single document", allFilesIds.Count() > 1);
 
             string outputFileName = null;
+            string requiredFolder = null;
             var imagePages = new List<ImagePage>();
 
             foreach (int fileId in allFilesIds)
@@ -976,11 +977,29 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 int pageCount = 0;
                 FAMFileInspectorForm.GetFileInfo(fileId, out fileName, out pageCount);
 
+                SourceDocumentPathTags pathTags = GetPathTags(fileName);
+
                 // Generate the output document name.
                 if (outputFileName == null)
                 {
-                    outputFileName = GetPathTags(fileName).Expand(StapledDocumentOutput);
+                    outputFileName = pathTags.Expand(StapledDocumentOutput);
                     _stapledOutputDocument = outputFileName;
+
+                    if (StapledDocumentOutput.StartsWith(
+                        "$DirOf($DirOf(<SourceDocName>))", StringComparison.OrdinalIgnoreCase))
+                    {
+                        requiredFolder = pathTags.Expand("$DirOf($DirOf(<SourceDocName>))");
+                    }
+                }
+                // If we are validating that staple documents should not come from separate
+                // directory trees, ensure the grandparent folder for the original document
+                // is the same as the grandparent folder of this document.
+                else if (requiredFolder != null)
+                {
+                    string folder = pathTags.Expand("$DirOf($DirOf(<SourceDocName>))");
+                    ExtractException.Assert("ELI37605", 
+                        "Unable to staple documents from separate departments.",
+                        folder.Equals(requiredFolder, StringComparison.OrdinalIgnoreCase));
                 }
 
                 bool removeFirstPage = fileIdsWithoutFirstPage.Contains(fileId);

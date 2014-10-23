@@ -35,7 +35,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// Default output path for stapled document output.
         /// </summary>
         const string _DEFAULT_STAPLED_DOCUMENT_OUTPUT =
-            @"$DirOf(<SourceDocName>)\Stapled_<FirstName>_<LastName>_$Now().tif";
+            @"$DirOf($DirOf(<SourceDocName>))\Lab\Stapled_<FirstName>_<LastName>_$Now().tif";
         
         /// <summary>
         /// Default tag to apply to documents that have been stapled.

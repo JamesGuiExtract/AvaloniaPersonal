@@ -1501,38 +1501,66 @@ namespace Extract.FileActionManager.Utilities
         {
             if (disposing)
             {
-                // Clean up managed objects
-                if (_formStateManager != null)
+                try
                 {
-                    _formStateManager.Dispose();
-                    _formStateManager = null;
-                }
+                    // https://extract.atlassian.net/browse/ISSUE-12527
+                    // It seems that disposing while a DataGridView is in edit mode causes an
+                    // exception. Ending the edit mode first avoids the exception.
+                    if (_dataSearchTermsDataGridView != null &&
+                        !_dataSearchTermsDataGridView.IsDisposed &&
+                        _dataSearchTermsDataGridView.IsCurrentCellInEditMode)
+                    {
+                        _dataSearchTermsDataGridView.EndEdit();
+                    }
 
-                if (_codecs != null)
-                {
-                    _codecs.Dispose();
-                    _codecs = null;
-                }
+                    if (_textSearchTermsDataGridView != null &&
+                        !_textSearchTermsDataGridView.IsDisposed &&
+                        _textSearchTermsDataGridView.IsCurrentCellInEditMode)
+                    {
+                        _textSearchTermsDataGridView.EndEdit();
+                    }
 
-                DisposeContextMenu();
+                    if (_fileListDataGridView != null &&
+                        !_fileListDataGridView.IsDisposed &&
+                        _fileListDataGridView.IsCurrentCellInEditMode)
+                    {
+                        _fileListDataGridView.EndEdit();
+                    }
 
-                if (components != null)
-                {
-                    components.Dispose();
-                    components = null;
-                }
+                    // Clean up managed objects
+                    if (_formStateManager != null)
+                    {
+                        _formStateManager.Dispose();
+                        _formStateManager = null;
+                    }
 
-                if (_queryTask != null)
-                {
-                    _queryTask.Dispose();
-                    _queryTask = null;
-                }
+                    if (_codecs != null)
+                    {
+                        _codecs.Dispose();
+                        _codecs = null;
+                    }
 
-                if (_fileHandlerCountdownEvent != null)
-                {
-                    _fileHandlerCountdownEvent.Dispose();
-                    _fileHandlerCountdownEvent = null;
+                    DisposeContextMenu();
+
+                    if (components != null)
+                    {
+                        components.Dispose();
+                        components = null;
+                    }
+
+                    if (_queryTask != null)
+                    {
+                        _queryTask.Dispose();
+                        _queryTask = null;
+                    }
+
+                    if (_fileHandlerCountdownEvent != null)
+                    {
+                        _fileHandlerCountdownEvent.Dispose();
+                        _fileHandlerCountdownEvent = null;
+                    }
                 }
+                catch { }
             }
 
             // Clean up unmanaged objects

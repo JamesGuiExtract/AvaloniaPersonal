@@ -2252,20 +2252,31 @@ namespace Extract.DataEntry
         {
             if (disposing)
             {
-                // Dispose of managed objects
-                if (_regularFont != null)
+                try
                 {
-                    _regularFont.Dispose();
-                    _regularFont = null;
-                }
+                    // https://extract.atlassian.net/browse/ISSUE-12527
+                    // Based on exception encountered in the FFI to do with edit mode, adding same code
+                    // here to protect against a crash when disposing.
+                    if (!IsDisposed && IsCurrentCellInEditMode)
+                    {
+                        EndEdit();
+                    }
 
-                if (_boldFont != null)
-                {
-                    _boldFont.Dispose();
-                    _boldFont = null;
-                }
+                    // Dispose of managed objects
+                    if (_regularFont != null)
+                    {
+                        _regularFont.Dispose();
+                        _regularFont = null;
+                    }
+
+                    if (_boldFont != null)
+                    {
+                        _boldFont.Dispose();
+                        _boldFont = null;
+                    }
+
+                } catch { }
             }
-
             // Dispose of unmanaged resources
 
             // Dispose of base class

@@ -17,21 +17,34 @@ namespace Extract.Redaction.Verification
         {
             if (disposing)
             {
-                // Release managed resources
-                if (components != null)
+                try
                 {
-                    components.Dispose();
+                    // https://extract.atlassian.net/browse/ISSUE-12527
+                    // Based on exception encountered in the FFI to do with edit mode, adding same code
+                    // here to protect against a crash when disposing.
+                    if (_dataGridView != null && !_dataGridView.IsDisposed &&
+                        _dataGridView.IsCurrentCellInEditMode)
+                    {
+                        _dataGridView.EndEdit();
+                    }
+
+                    // Release managed resources
+                    if (components != null)
+                    {
+                        components.Dispose();
+                    }
+                    if (_exemptionsDialog != null)
+                    {
+                        _exemptionsDialog.Dispose();
+                        _exemptionsDialog = null;
+                    }
+                    if (_visitedFont != null)
+                    {
+                        _visitedFont.Dispose();
+                        _visitedFont = null;
+                    }
                 }
-                if (_exemptionsDialog != null)
-	            {
-                    _exemptionsDialog.Dispose();
-                    _exemptionsDialog = null;
-	            }
-                if (_visitedFont != null)
-                {
-                    _visitedFont.Dispose();
-                    _visitedFont = null;
-                }
+                catch {}
             }
 
             // Release unmanaged resources
