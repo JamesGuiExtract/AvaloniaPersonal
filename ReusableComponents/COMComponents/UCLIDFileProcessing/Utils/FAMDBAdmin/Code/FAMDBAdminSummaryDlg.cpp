@@ -738,7 +738,7 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 		}
 
 		SYSTEMTIME st;
-		GetSystemTime(&st);
+		GetLocalTime(&st);
 		CString cstrMessage;
 	    cstrMessage.Format( "Last Updated: %02d/%02d/%d %02d:%02d:%02d", 
 							st.wMonth,
