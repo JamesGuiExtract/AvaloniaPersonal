@@ -293,279 +293,196 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
+		unsigned long nDataVersion = 0;
+		long nNumLetters = 0;
+		ByteStream bsLetters;
 
 		pStream->Read( &nDataLength, sizeof(nDataLength), NULL );
-		ByteStream data( nDataLength );
-		pStream->Read( data.getData(), nDataLength, NULL );
-		ByteStreamManipulator dataReader( ByteStreamManipulator::kRead, data );
 
-		// reset the data members
-		reset(true, true);
+		// Open a new scope to limit lifetime of duplicate data
+		{
+			ByteStream data( nDataLength );
+			pStream->Read( data.getData(), nDataLength, NULL );
+			ByteStreamManipulator dataReader( ByteStreamManipulator::kRead, data );
 
-		// Read the individual data items from the bytestream
-		// read the data version
-		unsigned long nDataVersion = 0;
+			// reset the data members
+			reset(true, true);
 
-		dataReader >> nDataVersion;
+			// Read the individual data items from the bytestream
+			// read the data version
+			dataReader >> nDataVersion;
 		
-		// Check for newer version
-		if (nDataVersion > gnCurrentVersion)
-		{
-			// Throw exception
-			UCLIDException ue( "ELI07672", "Unable to load newer SpatialString." );
-			ue.addDebugInfo( "Current Version", gnCurrentVersion );
-			ue.addDebugInfo( "Version to Load", nDataVersion );
-			throw ue;
-		}
-
-		if (nDataVersion >= 2)
-		{
-			dataReader >> m_strSourceDocName;
-		}
-
-		string strOCREngineVersion = "";
-		if (nDataVersion >= 12)
-		{
-			dataReader >> strOCREngineVersion;
-		}
-
-		// Read spatialness setting
-		if (nDataVersion >= 3)
-		{
-			// Version 8 made m_bIsSpatial obsolete, now an enumeration named
-			// m_eMode is used to keep track of the spatial mode of this spatial string
-			if( nDataVersion < 8 )
+			// Check for newer version
+			if (nDataVersion > gnCurrentVersion)
 			{
-				bool bIsSpatial;
-				dataReader >> bIsSpatial;
+				// Throw exception
+				UCLIDException ue( "ELI07672", "Unable to load newer SpatialString." );
+				ue.addDebugInfo( "Current Version", gnCurrentVersion );
+				ue.addDebugInfo( "Version to Load", nDataVersion );
+				throw ue;
+			}
 
-				if( bIsSpatial )
+			if (nDataVersion >= 2)
+			{
+				dataReader >> m_strSourceDocName;
+			}
+
+			string strOCREngineVersion = "";
+			if (nDataVersion >= 12)
+			{
+				dataReader >> strOCREngineVersion;
+			}
+
+			// Read spatialness setting
+			if (nDataVersion >= 3)
+			{
+				// Version 8 made m_bIsSpatial obsolete, now an enumeration named
+				// m_eMode is used to keep track of the spatial mode of this spatial string
+				if( nDataVersion < 8 )
 				{
-					// Set the mode to spatial
-					m_eMode = kSpatialMode;
+					bool bIsSpatial;
+					dataReader >> bIsSpatial;
+
+					if( bIsSpatial )
+					{
+						// Set the mode to spatial
+						m_eMode = kSpatialMode;
+					}
+					else
+					{
+						// Set the mode to non-spatial
+						m_eMode = kNonSpatialMode;
+
+						// read the string from the stream if the object is not a spatial string
+						std::string strTemp("");
+						dataReader >> strTemp;
+					
+						// Use updateString to put the new string in place.
+						updateString( strTemp );
+					}
 				}
 				else
 				{
-					// Set the mode to non-spatial
-					m_eMode = kNonSpatialMode;
+					// Version 8 writes the enumerated spatial mode out as an unsigned long
+					unsigned long uleMode = 0;
+					dataReader >> uleMode;
+					m_eMode = static_cast<ESpatialStringMode>( uleMode );
 
-					// read the string from the stream if the object is not a spatial string
-					std::string strTemp("");
-					dataReader >> strTemp;
-					
-					// Use updateString to put the new string in place.
-					updateString( strTemp );
+					// Version 8 writes the string every time no matter what
+					dataReader >> m_strString;
 				}
 			}
-			else
-			{
-				// Version 8 writes the enumerated spatial mode out as an unsigned long
-				unsigned long uleMode = 0;
-				dataReader >> uleMode;
-				m_eMode = static_cast<ESpatialStringMode>( uleMode );
 
-				// Version 8 writes the string every time no matter what
-				dataReader >> m_strString;
+			// Read forced rotation flag (no longer used)
+			if (nDataVersion == 10)
+			{
+				bool bTemp;
+				dataReader >> bTemp;
 			}
-		}
 
-		// Read forced rotation flag (no longer used)
-		if (nDataVersion == 10)
-		{
-			bool bTemp;
-			dataReader >> bTemp;
-		}
-
-		// version 5 has no fontsize or char confidence in the CppLetter
-		if (nDataVersion == 5)
-		{
-			struct Version5Letter
+			// version 5 has no fontsize or char confidence in the CppLetter
+			if (nDataVersion == 5)
 			{
-				unsigned short m_usGuess1;
-				unsigned short m_usGuess2;
-				unsigned short m_usGuess3;
-				unsigned short m_usTop;
-				unsigned short m_usLeft;
-				unsigned short m_usRight;
-				unsigned short m_usBottom;
-				unsigned char m_ucPageNumber;
-				bool m_bIsEndOfParagraph;
-				bool m_bIsEndOfZone;
-				bool m_bIsSpatial;
-			};
-			
-			long nNumLetters = 0;
-
-			dataReader >> nNumLetters;
-
-			if (nNumLetters > 0)
-			{
-				ByteStream bs;
-
-				bs.setSize(nNumLetters * sizeof(Version5Letter));
-				dataReader.read(bs);
-
-				Version5Letter* letters = (Version5Letter*)bs.getData();
-				// convert the Version5letters into current CppLetters
-				vector<CPPLetter> vecLetters;
-				
-				for (int i = 0; i < nNumLetters; i++)
+				struct Version5Letter
 				{
-					CPPLetter letter;
-
-					// Copy each element from Version5Letter to CPPLetter
-					letter.m_usGuess1 = letters[i].m_usGuess1; 
-					letter.m_usGuess2 = letters[i].m_usGuess2;
-					letter.m_usGuess3 = letters[i].m_usGuess3;
-					letter.m_ulTop = letters[i].m_usTop;
-					letter.m_ulBottom = letters[i].m_usBottom;
-					letter.m_ulLeft = letters[i].m_usLeft;
-					letter.m_ulRight = letters[i].m_usRight;
-					letter.m_usPageNumber = letters[i].m_ucPageNumber;
-					letter.m_bIsEndOfParagraph = letters[i].m_bIsEndOfParagraph;
-					letter.m_bIsEndOfZone = letters[i].m_bIsEndOfZone;
-					letter.m_bIsSpatial = letters[i].m_bIsSpatial;
-
-					// Copy default values for new fields
-					letter.m_ucFontSize = 0;
-					letter.m_ucCharConfidence = 100;
-					letter.m_ucFont = 0;
-
-					// Add this new CPP letter into the collection
-					vecLetters.push_back(letter);
-				}
-
-				// Note: this call will build the string
-				updateLetters(&vecLetters[0], nNumLetters);
-			}
-			else
-			{
-				updateString("");
-			}
-		}
-
-		if (nDataVersion == 6)
-		{
-			struct Version6Letter
-			{
-				unsigned short m_usGuess1;
-				unsigned short m_usGuess2;
-				unsigned short m_usGuess3;
-				unsigned short m_usTop;
-				unsigned short m_usLeft;
-				unsigned short m_usRight;
-				unsigned short m_usBottom;
-				unsigned char m_ucPageNumber;
-				bool m_bIsEndOfParagraph;
-				bool m_bIsEndOfZone;
-				bool m_bIsSpatial;
-				unsigned char m_ucFontSize;
-				unsigned char m_ucCharConfidence;
-			};
-
-			long nNumLetters = 0;
-
-			dataReader >> nNumLetters;
-
-			if (nNumLetters > 0)
-			{
-				ByteStream bs;
-
-				bs.setSize(nNumLetters*sizeof(Version6Letter));
-				dataReader.read(bs);
-
-				Version6Letter* letters = (Version6Letter*)bs.getData();
-				// convert the Version6letters into current CppLetters
-				vector<CPPLetter> vecLetters;
+					unsigned short m_usGuess1;
+					unsigned short m_usGuess2;
+					unsigned short m_usGuess3;
+					unsigned short m_usTop;
+					unsigned short m_usLeft;
+					unsigned short m_usRight;
+					unsigned short m_usBottom;
+					unsigned char m_ucPageNumber;
+					bool m_bIsEndOfParagraph;
+					bool m_bIsEndOfZone;
+					bool m_bIsSpatial;
+				};
 			
-				for(int i = 0; i < nNumLetters; i++)
-				{
-					CPPLetter letter;
-
-					// Copy each element from Version6Letter to CPPLetter
-					letter.m_usGuess1 = letters[i].m_usGuess1; 
-					letter.m_usGuess2 = letters[i].m_usGuess2;
-					letter.m_usGuess3 = letters[i].m_usGuess3;
-					letter.m_ulTop = letters[i].m_usTop;
-					letter.m_ulBottom = letters[i].m_usBottom;
-					letter.m_ulLeft = letters[i].m_usLeft;
-					letter.m_ulRight = letters[i].m_usRight;
-					letter.m_usPageNumber = letters[i].m_ucPageNumber;
-					letter.m_bIsEndOfParagraph = letters[i].m_bIsEndOfParagraph;
-					letter.m_bIsEndOfZone = letters[i].m_bIsEndOfZone;
-					letter.m_bIsSpatial = letters[i].m_bIsSpatial;
-					letter.m_ucFontSize = letters[i].m_ucFontSize;
-					letter.m_ucCharConfidence = letters[i].m_ucCharConfidence;
-
-					// Copy default value for new field
-					letter.m_ucFont = 0;
-
-					// Add this new CPP letter into the collection
-					vecLetters.push_back(letter);
-				}
-
-				// Note: this call will build the string
-				updateLetters(&vecLetters[0], nNumLetters);
-			}
-			else
-			{
-				updateString("");
-			}
-		}
-
-		if (nDataVersion == 7 || nDataVersion == 8)
-		{
-			long nNumLetters = 0;
-
-			if (nDataVersion == 7)
-			{
-				// nNumLetters is output even if not spatial for version 7
 				dataReader >> nNumLetters;
-			}
-
-			if( m_eMode == kSpatialMode )
-			{
-				// If the version is 7, we've already read the number of letters. Do not read again.
-				if( nDataVersion != 7 )
-				{
-					// nNumLetters is only output for spatial objects for version > 7
-					dataReader >> nNumLetters;
-				}
 
 				if (nNumLetters > 0)
 				{
-					struct Version7n8Letter
-					{
-						unsigned short m_usGuess1;
-						unsigned short m_usGuess2;
-						unsigned short m_usGuess3;
-						unsigned short m_usTop;
-						unsigned short m_usLeft;
-						unsigned short m_usRight;
-						unsigned short m_usBottom;
-						unsigned char m_ucPageNumber;
-						bool m_bIsEndOfParagraph;
-						bool m_bIsEndOfZone;
-						bool m_bIsSpatial;
-						unsigned char m_ucFontSize;
-						unsigned char m_ucCharConfidence;
-						unsigned char m_ucFont;
-					};
-
-					// Read the letter objects as one chunk
 					ByteStream bs;
-					bs.setSize(nNumLetters*sizeof(Version7n8Letter));
+
+					bs.setSize(nNumLetters * sizeof(Version5Letter));
 					dataReader.read(bs);
 
-					// Convert the Version7n8Letters into current CppLetters
-					Version7n8Letter* letters = (Version7n8Letter*)bs.getData();
+					Version5Letter* letters = (Version5Letter*)bs.getData();
+					// convert the Version5letters into current CppLetters
 					vector<CPPLetter> vecLetters;
-
+				
 					for (int i = 0; i < nNumLetters; i++)
 					{
 						CPPLetter letter;
 
-						// Copy each element from Version7n8Letter to CPPLetter
+						// Copy each element from Version5Letter to CPPLetter
+						letter.m_usGuess1 = letters[i].m_usGuess1; 
+						letter.m_usGuess2 = letters[i].m_usGuess2;
+						letter.m_usGuess3 = letters[i].m_usGuess3;
+						letter.m_ulTop = letters[i].m_usTop;
+						letter.m_ulBottom = letters[i].m_usBottom;
+						letter.m_ulLeft = letters[i].m_usLeft;
+						letter.m_ulRight = letters[i].m_usRight;
+						letter.m_usPageNumber = letters[i].m_ucPageNumber;
+						letter.m_bIsEndOfParagraph = letters[i].m_bIsEndOfParagraph;
+						letter.m_bIsEndOfZone = letters[i].m_bIsEndOfZone;
+						letter.m_bIsSpatial = letters[i].m_bIsSpatial;
+
+						// Copy default values for new fields
+						letter.m_ucFontSize = 0;
+						letter.m_ucCharConfidence = 100;
+						letter.m_ucFont = 0;
+
+						// Add this new CPP letter into the collection
+						vecLetters.push_back(letter);
+					}
+
+					// Note: this call will build the string
+					updateLetters(&vecLetters[0], nNumLetters);
+				}
+				else
+				{
+					updateString("");
+				}
+			}
+
+			if (nDataVersion == 6)
+			{
+				struct Version6Letter
+				{
+					unsigned short m_usGuess1;
+					unsigned short m_usGuess2;
+					unsigned short m_usGuess3;
+					unsigned short m_usTop;
+					unsigned short m_usLeft;
+					unsigned short m_usRight;
+					unsigned short m_usBottom;
+					unsigned char m_ucPageNumber;
+					bool m_bIsEndOfParagraph;
+					bool m_bIsEndOfZone;
+					bool m_bIsSpatial;
+					unsigned char m_ucFontSize;
+					unsigned char m_ucCharConfidence;
+				};
+
+				dataReader >> nNumLetters;
+
+				if (nNumLetters > 0)
+				{
+					ByteStream bs;
+
+					bs.setSize(nNumLetters*sizeof(Version6Letter));
+					dataReader.read(bs);
+
+					Version6Letter* letters = (Version6Letter*)bs.getData();
+					// convert the Version6letters into current CppLetters
+					vector<CPPLetter> vecLetters;
+			
+					for(int i = 0; i < nNumLetters; i++)
+					{
+						CPPLetter letter;
+
+						// Copy each element from Version6Letter to CPPLetter
 						letter.m_usGuess1 = letters[i].m_usGuess1; 
 						letter.m_usGuess2 = letters[i].m_usGuess2;
 						letter.m_usGuess3 = letters[i].m_usGuess3;
@@ -579,50 +496,43 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 						letter.m_bIsSpatial = letters[i].m_bIsSpatial;
 						letter.m_ucFontSize = letters[i].m_ucFontSize;
 						letter.m_ucCharConfidence = letters[i].m_ucCharConfidence;
-						letter.m_ucFont = letters[i].m_ucFont;
+
+						// Copy default value for new field
+						letter.m_ucFont = 0;
 
 						// Add this new CPP letter into the collection
 						vecLetters.push_back(letter);
 					}
 
 					// Note: this call will build the string
-					updateLetters( &vecLetters[0], nNumLetters );
+					updateLetters(&vecLetters[0], nNumLetters);
+				}
+				else
+				{
+					updateString("");
 				}
 			}
-			else if( m_eMode == kHybridMode )
+
+			if (nDataVersion == 7 || nDataVersion == 8)
 			{
-				// Read the raster zone vector
-				IPersistStreamPtr ipObj;
-				::readObjectFromStream(ipObj, pStream, "ELI14802");
-
-				IIUnknownVectorPtr ipVecRasterZones = ipObj;
-				ASSERT_RESOURCE_ALLOCATION("ELI25789", ipVecRasterZones != __nullptr);
-
-				long lSize = ipVecRasterZones->Size();
-				m_vecRasterZones.reserve(lSize);
-				for (long i=0; i < lSize; i++)
+				if (nDataVersion == 7)
 				{
-					UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipVecRasterZones->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI25790", ipZone != __nullptr);
-
-					m_vecRasterZones.push_back(ipZone);
+					// nNumLetters is output even if not spatial for version 7
+					dataReader >> nNumLetters;
 				}
-			}
-		}
-		else if (nDataVersion >= 9)
-		{
-			long nNumLetters = 0;
 
-			if (m_eMode == kSpatialMode)
-			{
-				// nNumLetters is only output for spatial objects for version > 7
-				dataReader >> nNumLetters;
-
-				if (nNumLetters > 0)
+				if( m_eMode == kSpatialMode )
 				{
-					if (nDataVersion < 13)
+					// If the version is 7, we've already read the number of letters. Do not read again.
+					if( nDataVersion != 7 )
 					{
-						struct Version9Letter
+						// nNumLetters is only output for spatial objects for version > 7
+						dataReader >> nNumLetters;
+					}
+
+					if (nNumLetters > 0)
+					{
+						struct Version7n8Letter
 						{
 							unsigned short m_usGuess1;
 							unsigned short m_usGuess2;
@@ -631,7 +541,7 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 							unsigned short m_usLeft;
 							unsigned short m_usRight;
 							unsigned short m_usBottom;
-							unsigned short m_usPageNumber;
+							unsigned char m_ucPageNumber;
 							bool m_bIsEndOfParagraph;
 							bool m_bIsEndOfZone;
 							bool m_bIsSpatial;
@@ -642,18 +552,18 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 
 						// Read the letter objects as one chunk
 						ByteStream bs;
-						bs.setSize(nNumLetters*sizeof(Version9Letter));
+						bs.setSize(nNumLetters*sizeof(Version7n8Letter));
 						dataReader.read(bs);
 
-						// Convert the Version9Letter into current CppLetters
-						Version9Letter* letters = (Version9Letter*)bs.getData();
+						// Convert the Version7n8Letters into current CppLetters
+						Version7n8Letter* letters = (Version7n8Letter*)bs.getData();
 						vector<CPPLetter> vecLetters;
 
 						for (int i = 0; i < nNumLetters; i++)
 						{
 							CPPLetter letter;
 
-							// Copy each element from Version9Letter to CPPLetter
+							// Copy each element from Version7n8Letter to CPPLetter
 							letter.m_usGuess1 = letters[i].m_usGuess1; 
 							letter.m_usGuess2 = letters[i].m_usGuess2;
 							letter.m_usGuess3 = letters[i].m_usGuess3;
@@ -661,7 +571,7 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 							letter.m_ulBottom = letters[i].m_usBottom;
 							letter.m_ulLeft = letters[i].m_usLeft;
 							letter.m_ulRight = letters[i].m_usRight;
-							letter.m_usPageNumber = letters[i].m_usPageNumber;
+							letter.m_usPageNumber = letters[i].m_ucPageNumber;
 							letter.m_bIsEndOfParagraph = letters[i].m_bIsEndOfParagraph;
 							letter.m_bIsEndOfZone = letters[i].m_bIsEndOfZone;
 							letter.m_bIsSpatial = letters[i].m_bIsSpatial;
@@ -674,97 +584,190 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 						}
 
 						// Note: this call will build the string
-						updateLetters(&vecLetters[0], nNumLetters);
-					}
-					else
-					{
-						// Determine size of chunk of Letters objects
-						ByteStream bs;
-						bs.setSize(nNumLetters * sizeof(CPPLetter));
-
-						// Read the chunk of letters and hold as an array
-						dataReader.read( bs );
-						CPPLetter* letters = (CPPLetter*)bs.getData();
-
-						// Note: this call will build the string
-						updateLetters(letters, nNumLetters);
+						updateLetters( &vecLetters[0], nNumLetters );
 					}
 				}
-			}
-			else if (m_eMode == kHybridMode)
-			{
-				// Read and store the vector of raster zones
-				IPersistStreamPtr ipObj;
-				::readObjectFromStream(ipObj, pStream, "ELI15481");
-
-				IIUnknownVectorPtr ipVecRasterZones = ipObj;
-				ASSERT_RESOURCE_ALLOCATION("ELI25791", ipVecRasterZones != __nullptr);
-
-				long lSize = ipVecRasterZones->Size();
-				m_vecRasterZones.reserve(lSize);
-				for (long i=0; i < lSize; i++)
+				else if( m_eMode == kHybridMode )
 				{
-					UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipVecRasterZones->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI25792", ipZone != __nullptr);
+					// Read the raster zone vector
+					IPersistStreamPtr ipObj;
+					::readObjectFromStream(ipObj, pStream, "ELI14802");
 
-					m_vecRasterZones.push_back(ipZone);
+					IIUnknownVectorPtr ipVecRasterZones = ipObj;
+					ASSERT_RESOURCE_ALLOCATION("ELI25789", ipVecRasterZones != __nullptr);
+
+					long lSize = ipVecRasterZones->Size();
+					m_vecRasterZones.reserve(lSize);
+					for (long i=0; i < lSize; i++)
+					{
+						UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipVecRasterZones->At(i);
+						ASSERT_RESOURCE_ALLOCATION("ELI25790", ipZone != __nullptr);
+
+						m_vecRasterZones.push_back(ipZone);
+					}
 				}
 			}
-		}
+			else if (nDataVersion >= 9)
+			{
+				if (m_eMode == kSpatialMode)
+				{
+					// nNumLetters is only output for spatial objects for version > 7
+					dataReader >> nNumLetters;
 
-		// load the vector of letter objects if the object is a spatial string
-		// NOTE: Versions 1 and 2 always wrote the letter objects, and the string
-		// was always computed from the letter objects.
-		// Beginning with version 3, the letter objects were written only if the
-		// string was spatial.
-		if (nDataVersion < 3 || (nDataVersion < 5 && m_eMode == kSpatialMode))
-		{
-			IPersistStreamPtr ipObj;
+					if (nNumLetters > 0)
+					{
+						if (nDataVersion < 13)
+						{
+							struct Version9Letter
+							{
+								unsigned short m_usGuess1;
+								unsigned short m_usGuess2;
+								unsigned short m_usGuess3;
+								unsigned short m_usTop;
+								unsigned short m_usLeft;
+								unsigned short m_usRight;
+								unsigned short m_usBottom;
+								unsigned short m_usPageNumber;
+								bool m_bIsEndOfParagraph;
+								bool m_bIsEndOfZone;
+								bool m_bIsSpatial;
+								unsigned char m_ucFontSize;
+								unsigned char m_ucCharConfidence;
+								unsigned char m_ucFont;
+							};
 
-			::readObjectFromStream(ipObj, pStream, "ELI19468");
+							// Read the letter objects as one chunk
+							ByteStream bs;
+							bs.setSize(nNumLetters*sizeof(Version9Letter));
+							dataReader.read(bs);
 
-			IIUnknownVectorPtr ipLetters = ipObj;
-			ASSERT_RESOURCE_ALLOCATION("ELI25793", ipLetters != __nullptr);
+							// Convert the Version9Letter into current CppLetters
+							Version9Letter* letters = (Version9Letter*)bs.getData();
+							vector<CPPLetter> vecLetters;
 
-			// NOTE: if the loaded letter objects were actually not spatial 
-			// (such as in versions 1 and 2), then this string will automatically
-			// be downgraded to a non-spatial string in updateLetters
+							for (int i = 0; i < nNumLetters; i++)
+							{
+								CPPLetter letter;
+
+								// Copy each element from Version9Letter to CPPLetter
+								letter.m_usGuess1 = letters[i].m_usGuess1; 
+								letter.m_usGuess2 = letters[i].m_usGuess2;
+								letter.m_usGuess3 = letters[i].m_usGuess3;
+								letter.m_ulTop = letters[i].m_usTop;
+								letter.m_ulBottom = letters[i].m_usBottom;
+								letter.m_ulLeft = letters[i].m_usLeft;
+								letter.m_ulRight = letters[i].m_usRight;
+								letter.m_usPageNumber = letters[i].m_usPageNumber;
+								letter.m_bIsEndOfParagraph = letters[i].m_bIsEndOfParagraph;
+								letter.m_bIsEndOfZone = letters[i].m_bIsEndOfZone;
+								letter.m_bIsSpatial = letters[i].m_bIsSpatial;
+								letter.m_ucFontSize = letters[i].m_ucFontSize;
+								letter.m_ucCharConfidence = letters[i].m_ucCharConfidence;
+								letter.m_ucFont = letters[i].m_ucFont;
+
+								// Add this new CPP letter into the collection
+								vecLetters.push_back(letter);
+							}
+
+							// Note: this call will build the string
+							updateLetters(&vecLetters[0], nNumLetters);
+						}
+						else
+						{
+							// Determine size of chunk of Letters objects
+							bsLetters.setSize(nNumLetters * sizeof(CPPLetter));
+
+							// Read the chunk of letters and hold as an array
+							dataReader.read( bsLetters );
+						}
+					}
+				}
+				else if (m_eMode == kHybridMode)
+				{
+					// Read and store the vector of raster zones
+					IPersistStreamPtr ipObj;
+					::readObjectFromStream(ipObj, pStream, "ELI15481");
+
+					IIUnknownVectorPtr ipVecRasterZones = ipObj;
+					ASSERT_RESOURCE_ALLOCATION("ELI25791", ipVecRasterZones != __nullptr);
+
+					long lSize = ipVecRasterZones->Size();
+					m_vecRasterZones.reserve(lSize);
+					for (long i=0; i < lSize; i++)
+					{
+						UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipVecRasterZones->At(i);
+						ASSERT_RESOURCE_ALLOCATION("ELI25792", ipZone != __nullptr);
+
+						m_vecRasterZones.push_back(ipZone);
+					}
+				}
+			}
+
+			// load the vector of letter objects if the object is a spatial string
+			// NOTE: Versions 1 and 2 always wrote the letter objects, and the string
+			// was always computed from the letter objects.
+			// Beginning with version 3, the letter objects were written only if the
+			// string was spatial.
+			if (nDataVersion < 3 || (nDataVersion < 5 && m_eMode == kSpatialMode))
+			{
+				IPersistStreamPtr ipObj;
+
+				::readObjectFromStream(ipObj, pStream, "ELI19468");
+
+				IIUnknownVectorPtr ipLetters = ipObj;
+				ASSERT_RESOURCE_ALLOCATION("ELI25793", ipLetters != __nullptr);
+
+				// NOTE: if the loaded letter objects were actually not spatial 
+				// (such as in versions 1 and 2), then this string will automatically
+				// be downgraded to a non-spatial string in updateLetters
 			
-			vector<CPPLetter> vecLetters;
-			long nSize = ipLetters->Size();
-			vecLetters.reserve(nSize);
-			for(long i = 0; i < nSize; i++)
-			{
-				UCLID_RASTERANDOCRMGMTLib::ILetterPtr ipLetter = ipLetters->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI25794", ipLetter != __nullptr);
+				vector<CPPLetter> vecLetters;
+				long nSize = ipLetters->Size();
+				vecLetters.reserve(nSize);
+				for(long i = 0; i < nSize; i++)
+				{
+					UCLID_RASTERANDOCRMGMTLib::ILetterPtr ipLetter = ipLetters->At(i);
+					ASSERT_RESOURCE_ALLOCATION("ELI25794", ipLetter != __nullptr);
 
-				CPPLetter letter;
-				ipLetter->GetCppLetter(&letter);
-				vecLetters.push_back(letter);
+					CPPLetter letter;
+					ipLetter->GetCppLetter(&letter);
+					vecLetters.push_back(letter);
+				}
+
+				if(vecLetters.size() > 0)
+				{
+					updateLetters(&vecLetters[0], vecLetters.size());
+				}
+				else
+				{
+					updateString("");
+				}
 			}
 
-			if(vecLetters.size() > 0)
+			if (nDataVersion >= 4 && (m_eMode == kSpatialMode || m_eMode == kHybridMode))
 			{
-				updateLetters(&vecLetters[0], vecLetters.size());
+				// Load the page info for spatial mode or hybrid mode
+				IPersistStreamPtr ipObj;
+
+				::readObjectFromStream(ipObj, pStream, "ELI09984");
+				ASSERT_RESOURCE_ALLOCATION("ELI15279", ipObj != __nullptr);
+				m_ipPageInfoMap = ipObj;
+
+				// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
+				// it may affect other SpatialStrings that share these page infos.
+				m_ipPageInfoMap->SetReadonly();
 			}
-			else
-			{
-				updateString("");
-			}
+	
+			// Save the OCR engine version
+			m_strOCREngineVersion = strOCREngineVersion;
 		}
 
-		if (nDataVersion >= 4 && (m_eMode == kSpatialMode || m_eMode == kHybridMode))
+		// Update letters if this was deferred to save memory
+		if (nDataVersion > 12)
 		{
-			// Load the page info for spatial mode or hybrid mode
-			IPersistStreamPtr ipObj;
-
-			::readObjectFromStream(ipObj, pStream, "ELI09984");
-			ASSERT_RESOURCE_ALLOCATION("ELI15279", ipObj != __nullptr);
-			m_ipPageInfoMap = ipObj;
-
-			// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
-			// it may affect other SpatialStrings that share these page infos.
-			m_ipPageInfoMap->SetReadonly();
+			m_vecLetters.resize(nNumLetters);
+			long lCopySize = sizeof(CPPLetter) * nNumLetters;
+            memcpy_s(&m_vecLetters[0], lCopySize , (CPPLetter*)bsLetters.getData(), lCopySize);
 		}
 		
 		// after we're done loading the string, do a consistency check
@@ -808,9 +811,6 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 		{
 			autoConvertLegacyHybridString();
 		}
-
-		// Save the OCR engine version
-		m_strOCREngineVersion = strOCREngineVersion;
 
 		// clear the dirty flag as we just loaded a fresh object
 		m_bDirty = false;
