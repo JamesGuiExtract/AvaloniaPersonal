@@ -587,6 +587,10 @@ void CRuleSetEditor::updateWindowCaption()
 		strResult = m_strCurrentFileName;
 		strResult += " - ";
 		strResult += strWINDOW_TITLE;
+		if (m_apRuleTesterDlg->m_bInitialized)
+		{
+			m_apRuleTesterDlg->updateWindowCaption();
+		}
 	}
 	else
 	{
