@@ -763,7 +763,7 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 		}
 
 		// Update letters if this was deferred to save memory
-		if (nDataVersion > 12)
+		if (nDataVersion > 12 && nNumLetters > 0)
 		{
 			m_vecLetters.resize(nNumLetters);
 			long lCopySize = sizeof(CPPLetter) * nNumLetters;
