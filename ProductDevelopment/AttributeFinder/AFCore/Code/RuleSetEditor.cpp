@@ -142,6 +142,15 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 				m_ipRuleSet->LoadFrom(get_bstr_t(
 					strRecoveryFileName.c_str()), VARIANT_TRUE);
 			}
+			else if (strFileName != "")
+			{
+				// load the ruleset from the specified file
+				m_ipRuleSet->LoadFrom(get_bstr_t(strFileName.c_str()), 
+					VARIANT_FALSE);
+
+				// update the current filename
+				m_strCurrentFileName = strFileName;
+			}
 
 			// at this point, regardless of whether the user decided to
 			// recover the file or not, the recovery file should be deleted.
