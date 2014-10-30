@@ -40,8 +40,7 @@ AFCoreInstallFilesRootDir=P:\AttributeFinder\CoreInstallation\Files
 AFInstallPDRootDir=P:\AttributeFinder
 AFInstallFilesRootDir=$(AFInstallPDRootDir)\SDKInstallation\Files
 
-AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
-FKBUpdateReleaseDir=$(AFBleedingEdgeDir)\$(FKBVersion)
+FKBUpdateReleaseDir=$(BleedingEdgeVersionDir)\$(FKBVersion)
 FKBInstallMediaDir=$(FKBUpdateInstallRoot)\Media\CD-ROM\DiskImages\DISK1
 
 BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
@@ -66,7 +65,6 @@ EncryptAndCopyComponentDataFiles:
 	@DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.spm"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @ECHO $(FKBVersion) > "$(AFCoreInstallFilesRootDir)\ComponentData\FKBVersion.txt"
-
 		
 BuildFKBUpdate: EncryptAndCopyComponentDataFiles
     @ECHO Building the FKBUpdate installation...

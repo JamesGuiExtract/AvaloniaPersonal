@@ -52,6 +52,48 @@ VerifyDir=$(EngineeringRootDirectory)\ProductDevelopment\Common\VerifyDir.bat
 SetProductVerScript=$(CScriptProgram) "$(CommonDirectory)\SetProductVersion.vbs"
 UpdateFileVersion="I:\Common\Engineering\Tools\Utils\UpdateFileVersion\UpdateFileVersion.exe"
 
+#Target path for symbolic links to shared installs - must have the ending \
+SharedInstallsPath=\\EngSvr\Internal\ProductReleases\SharedInstalls\
+MakeCommonLinks=$(CommonDirectory)\PowerShell\MakeLinksToCommonInstalls.ps1
+MakeSymLinks=$(CommonDirectory)\PowerShell\MakeSymLinks.ps1
+LinkShared=powershell -NoProfile -ExecutionPolicy Bypass -Command
+
+#Version specific paths for install files
+AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
+BleedingEdgeVersionDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)
+
+#FLEXIndex install related paths
+FLEXIndexSetupFiles=$(BleedingEdgeVersionDir)\FLEXIndex\SetupFiles
+FLEXIndexInstallFiles=$(FLEXIndexSetupFiles)\FlexIndex
+FLEXIndexDemo=$(FLEXIndexSetupFiles)\Demo_FlexIndex
+FLEXIndexExtractLMDir=$(FLEXIndexSetupFiles)\Extract Systems LM
+FLEXIndexInstallDir=$(FLEXIndexSetupFiles)\FlexIndexInstall
+FLEXIndexSilentInstallDir=$(FLEXIndexSetupFiles)\SilentInstalls
+FLEXIndexLinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(FLEXIndexSetupFiles)\' '$(SharedInstallsPath)'
+
+#IDShield install related paths
+IDShieldSetupFiles=$(BleedingEdgeVersionDir)\IDShield\SetupFiles
+IDShieldInstallFiles=$(IDShieldSetupFiles)\IDShield
+IDShieldDemo=$(IDShieldSetupFiles)\Demo_IDShield
+IDShieldExtractLMDir=$(IDShieldSetupFiles)\Extract Systems LM
+IDShieldInstallDir=$(IDShieldSetupFiles)\IDShieldInstall
+IDShieldSilentInstallDir=$(IDShieldSetupFiles)\SilentInstalls
+IDShieldLinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(IDShieldSetupFiles)\' '$(SharedInstallsPath)'
+
+#LabDE install related paths
+LabDESetupFiles=$(BleedingEdgeVersionDir)\LabDE\SetupFiles
+LabDEInstallFiles=$(LabDESetupFiles)\LabDE
+LabDEDemo=$(LabDESetupFiles)\Demo_LabDE
+LabDEExtractLMDir=$(LabDESetupFiles)\Extract Systems LM
+LabDEInstallDir=$(LabDESetupFiles)\LabDEInstall
+LabDESilentInstallDir=$(LabDESetupFiles)\SilentInstalls
+LabDELinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(LabDESetupFiles)\' '$(SharedInstallsPath)'
+LabDECorePointLink=$(LinkShared) "& '$(MakeSymLinks)' 'EngSvr' '$(LabDESetupFiles)\' '$(SharedInstallsPath)' 'Corepoint Integration Engine'
+
+#Other
+OtherSetupFiles=$(BleedingEdgeVersionDir)\Other
+IntegrationsSetupFiles=$(OtherSetupFiles)\Integrations
+
 !IF "$(BUILD_FROM_SVN)" == "YES"
 !include GetFromSVN.mak
 !ELSE

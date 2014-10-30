@@ -24,11 +24,9 @@
 PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 AFRootDirectory=$(PDRootDir)\AttributeFinder
 AFComponentData=$(AFRootDirectory)\ComponentData
-AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
 DemoRulesDir=$(EngineeringRootDirectory)\Rules\IDShield\Demo_IDShield\Rules
 
 RedactionImageDir=P:\AttributeFinder\Demo_IDShield\Sanitized
-RedactionInstallDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Demo_IDShield
 
 # determine the name of the release output directory based upon the build
 # configuration that is being built
@@ -47,24 +45,24 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 #
 CopyDemoFiles:
     @ECHO Copying the Demo files to installation directory...
-    @IF NOT EXIST "$(RedactionInstallDir)\Rules"  @MKDIR "$(RedactionInstallDir)\Rules" 
-	@XCOPY "$(AFRootDirectory)\Utils\RedactionDemo\Files\*.*" "$(RedactionInstallDir)" /V /s /e /y
-    $(VerifyDir) "$(AFRootDirectory)\Utils\RedactionDemo\Files" "$(RedactionInstallDir)"
-	@XCOPY "$(DemoRulesDir)\*.*" "$(RedactionInstallDir)\Rules" /V /s /e /y
-    $(VerifyDir) "$(DemoRulesDir)" "$(RedactionInstallDir)\Rules"
+    @IF NOT EXIST "$(IDShieldDemo)\Rules"  @MKDIR "$(IDShieldDemo)\Rules" 
+	@XCOPY "$(AFRootDirectory)\Utils\RedactionDemo\Files\*.*" "$(IDShieldDemo)" /V /s /e /y
+    $(VerifyDir) "$(AFRootDirectory)\Utils\RedactionDemo\Files" "$(IDShieldDemo)"
+	@XCOPY "$(DemoRulesDir)\*.*" "$(IDShieldDemo)\Rules" /V /s /e /y
+    $(VerifyDir) "$(DemoRulesDir)" "$(IDShieldDemo)\Rules"
     @ECHO Encrypting Rules files...
-    @SendFilesAsArgumentToApplication "$(RedactionInstallDir)\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-    @SendFilesAsArgumentToApplication "$(RedactionInstallDir)\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-    @DeleteFiles "$(RedactionInstallDir)\Rules\*.dat"
-    @DeleteFiles "$(RedactionInstallDir)\Rules\*.rsd"
-    @DeleteFiles "$(RedactionInstallDir)\vssver.scc"
+    @SendFilesAsArgumentToApplication "$(IDShieldDemo)\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+    @SendFilesAsArgumentToApplication "$(IDShieldDemo)\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+    @DeleteFiles "$(IDShieldDemo)\Rules\*.dat"
+    @DeleteFiles "$(IDShieldDemo)\Rules\*.rsd"
+    @DeleteFiles "$(IDShieldDemo)\vssver.scc"
 
 CopyImageFilesToInstallFolder: 
     @ECHO Copying the RedactionDemo Image files to installation directory...
-    @IF NOT EXIST "$(RedactionInstallDir)\DemoFiles\Installs\HybridDemo\Input" @MKDIR "$(RedactionInstallDir)\DemoFiles\Installs\HybridDemo\Input"
-    @XCOPY "$(RedactionImageDir)\*.*" "$(RedactionInstallDir)\DemoFiles\Installs\HybridDemo\Input" /V /s /e /y
-    $(VerifyDir) "$(RedactionImageDir)" "$(RedactionInstallDir)\DemoFiles\Installs\HybridDemo\Input"
-    @DeleteFiles "$(RedactionInstallDir)\vssver.scc"
+    @IF NOT EXIST "$(IDShieldDemo)\DemoFiles\Installs\HybridDemo\Input" @MKDIR "$(IDShieldDemo)\DemoFiles\Installs\HybridDemo\Input"
+    @XCOPY "$(RedactionImageDir)\*.*" "$(IDShieldDemo)\DemoFiles\Installs\HybridDemo\Input" /V /s /e /y
+    $(VerifyDir) "$(RedactionImageDir)" "$(IDShieldDemo)\DemoFiles\Installs\HybridDemo\Input"
+    @DeleteFiles "$(IDShieldDemo)\vssver.scc"
 
 DoEverything: CopyDemoFiles CopyImageFilesToInstallFolder
     @ECHO.

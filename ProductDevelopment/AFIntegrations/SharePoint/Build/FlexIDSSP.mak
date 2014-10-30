@@ -26,7 +26,7 @@ SharePointRootDir=$(BuildRootDirectory)\Engineering\ProductDevelopment\AFIntegra
 
 PDCommonDir=$(PDRootDir)\Common
 
-SPInstallationDirectory=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\Sharepoint
+SPInstallationDirectory=$(IntegrationsSetupFiles)\Sharepoint
 
 IDShieldSPClientIntallRoot=$(SharePointRootDir)\Installation\IDShieldSPClient
 

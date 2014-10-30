@@ -38,8 +38,8 @@ IDSInstallProjectDirectory=$(AFRootDirectory)\IndustrySpecific\Redaction\Install
 IDSRDTInstallMediaDir=$(IDSInstallProjectDirectory)\Media\CD-ROM\DiskImages\Disk1
 
 RDTReleaseBleedingEdgeDir=S:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT
-IDSRDTReleaseBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT_IDShieldCustomer
-FLEXCustomerRDTReleaseBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT_FLEXIndexCustomer
+IDSRDTReleaseBleedingEdgeDir=$(OtherSetupFiles)\RDT_IDShieldCustomer
+FLEXCustomerRDTReleaseBleedingEdgeDir=$(OtherSetupFiles)\RDT_FLEXIndexCustomer
 
 RCDotNetDir=$(EngineeringRootDirectory)\RC.Net
 

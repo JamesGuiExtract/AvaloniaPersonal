@@ -31,15 +31,8 @@ AFRequiredInstallsDir=$(AFInstallPDRootDir)\RequiredInstalls
 DemoShieldRunFilesDir=$(AFInstallPDRootDir)\DemoShieldFiles
 IDShieldInstallFilesRootDir=P:\AttributeFinder\IDShieldInstallation\Files
 
-AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
-AFReleaseBleedingEdgeDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\FlexIndex
-VOAClientReleaseBleedingEdgeDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\VOAClient
-FlexDataEntryReleaseDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Demo_FlexIndex
 FlexDataEntryInstallationFilesDir=P:\AttributeFinder\FlexDataEntryInstallation
-ExtractLMReleaseBleedingEdgeDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Extract Systems LM
-IDShieldReleaseBleedingEdgeDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\IDShield
-FlexIndexInstallDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\FlexIndexInstall
-IDShieldInstallDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\IDShieldInstall
+
 DotNetFiles=P:\AttributeFinder\CoreInstallation\Files\DotNetGAC
 
 MergeModuleRootDir=$(INSTALLSHIELD_PROJECTS_DIR)\MergeModules
@@ -111,7 +104,7 @@ CopyFilesToInstallFolder:
 
 CopyComponentVersionFile:
 	@ECHO Copying Component Version file...
-    @COPY /v "$(PDRootDir)\Common\LatestComponentVersions.mak" "$(AFReleaseBleedingEdgeDir)\ComponentsVersions.txt"
+    @COPY /v "$(PDRootDir)\Common\LatestComponentVersions.mak" "$(FLEXIndexInstallFiles)\ComponentsVersions.txt"
 
 BuildFlexIndexSDKInstall: BuildAttributeFinderCore CopyFilesToInstallFolder
     @ECHO Building UCLID FlexIndex SDK installation...
@@ -121,12 +114,32 @@ BuildFlexIndexSDKInstall: BuildAttributeFinderCore CopyFilesToInstallFolder
 
 CreateAttributeFinderInstallCD: BuildFlexIndexSDKInstall
 	@ECHO Copying to FlexIndex install folders
-    @IF NOT EXIST "$(AFReleaseBleedingEdgeDir)" MKDIR "$(AFReleaseBleedingEdgeDir)"
-    @XCOPY "$(FlexIndexSDKInstallMediaDir)\*.*" "$(AFReleaseBleedingEdgeDir)" /v /s /e /y
-    $(VerifyDir) "$(FlexIndexSDKInstallMediaDir)" "$(AFReleaseBleedingEdgeDir)"
-	@COPY "$(AFInstallFilesRootDir)\InstallHelp\*.*" "$(AFReleaseBleedingEdgeDir)"
-    @DeleteFiles "$(AFReleaseBleedingEdgeDir)\*.scc"
+    @IF NOT EXIST "$(FLEXIndexInstallFiles)" MKDIR "$(FLEXIndexInstallFiles)"
+    @XCOPY "$(FlexIndexSDKInstallMediaDir)\*.*" "$(FLEXIndexInstallFiles)" /v /s /e /y
+    $(VerifyDir) "$(FlexIndexSDKInstallMediaDir)" "$(FLEXIndexInstallFiles)"
+	@COPY "$(AFInstallFilesRootDir)\InstallHelp\*.*" "$(FLEXIndexInstallFiles)"
+	@COPY "$(FlexIndexSDKInstallRootDir)\Support Files\license.txt" "$(FLEXIndexInstallFiles)\Readme.txt"
+    @DeleteFiles "$(FLEXIndexInstallFiles)\*.scc"
+	$(FLEXIndexLinkShared)
+	
+CreateFLEXIndexDSInstall:
+	@ECHO Copying DemoShield Files
+	@IF NOT EXIST "$(FLEXIndexInstallDir)" MKDIR "$(FLEXIndexInstallDir)"
+	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(FLEXIndexInstallDir)" /v /s /e /y
+	@COPY "$(AFRootDirectory)\Installation\FlexInstall\Launch.ini" "$(FLEXIndexInstallDir)"
+	@COPY "$(AFRootDirectory)\Installation\FlexInstall\FlexInstall.dbd" "$(FLEXIndexInstallDir)"
+	@COPY "$(AFRootDirectory)\Installation\FlexInstall\autorun.inf" "$(FLEXIndexInstallFiles)"
+	@COPY "$(AFRootDirectory)\Installation\FlexInstall\FlexIndex.ico" "$(FLEXIndexInstallDir)"
 
+CopyFLEXIndexSilentInstall:
+	@ECHO Copying IDShield SilentInstall files...
+	@IF NOT EXIST "$(FLEXIndexSilentInstallDir)" MKDIR "$(FLEXIndexSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\*Uninst.*" "$(FLEXIndexSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\InstallFlexIndex.bat" "$(FLEXIndexSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\UninstallExtract.bat" "$(FLEXIndexSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\FlexIndex.iss" "$(FLEXIndexSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\FlexIndex64.iss" "$(FLEXIndexSilentInstallDir)"
+	
 CreateExtractLMInstallCD: BuildAttributeFinderCore
 	@ECHO Createing License Manager Install...
 	@CD "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\Build"
@@ -134,53 +147,21 @@ CreateExtractLMInstallCD: BuildAttributeFinderCore
     
 CreateFlexDataEntryInstallDir:
 	@ECHO Creating Demo_FlexIndex
-	@IF NOT EXIST "$(FlexDataEntryReleaseDir)\Input" MKDIR "$(FlexDataEntryReleaseDir)\Input"
-	@IF NOT EXIST "$(FlexDataEntryReleaseDir)\Rules" MKDIR "$(FlexDataEntryReleaseDir)\Rules"
+	@IF NOT EXIST "$(FLEXIndexDemo)\Input" MKDIR "$(FLEXIndexDemo)\Input"
+	@IF NOT EXIST "$(FLEXIndexDemo)\Rules" MKDIR "$(FLEXIndexDemo)\Rules"
 	@ECHO Copying the Demo_FlexIndex related files
-	@XCOPY "$(AFRootDirectory)\Utils\FlexDataEntry\Files\*.*" "$(FlexDataEntryReleaseDir)" /v /s /e /y
-	$(VerifyDir) "$(AFRootDirectory)\Utils\FlexDataEntry\Files" "$(FlexDataEntryReleaseDir)"
-	@XCOPY "$(FlexDataEntryInstallationFilesDir)\Images\*.*" "$(FlexDataEntryReleaseDir)\Input" /v /s /e /y
-	$(VerifyDir) "$(FlexDataEntryInstallationFilesDir)\Images" "$(FlexDataEntryReleaseDir)\Input"
-	@XCOPY "$(FlexDataEntryRulesDir)\*.*" "$(FlexDataEntryReleaseDir)\Rules" /v /s /e /y
-	$(VerifyDir) "$(FlexDataEntryRulesDir)" "$(FlexDataEntryReleaseDir)\Rules"
+	@XCOPY "$(AFRootDirectory)\Utils\FlexDataEntry\Files\*.*" "$(FLEXIndexDemo)" /v /s /e /y
+	$(VerifyDir) "$(AFRootDirectory)\Utils\FlexDataEntry\Files" "$(FLEXIndexDemo)"
+	@XCOPY "$(FlexDataEntryInstallationFilesDir)\Images\*.*" "$(FLEXIndexDemo)\Input" /v /s /e /y
+	$(VerifyDir) "$(FlexDataEntryInstallationFilesDir)\Images" "$(FLEXIndexDemo)\Input"
+	@XCOPY "$(FlexDataEntryRulesDir)\*.*" "$(FLEXIndexDemo)\Rules" /v /s /e /y
+	$(VerifyDir) "$(FlexDataEntryRulesDir)" "$(FLEXIndexDemo)\Rules"
 	@ECHO Encrypting Demo_FlexIndex rsd Files
-	@SendFilesAsArgumentToApplication "$(FlexDataEntryReleaseDir)\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-	@SendFilesAsArgumentToApplication "$(FlexDataEntryReleaseDir)\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-	@DeleteFiles "$(FlexDataEntryReleaseDir)\*.rsd"
-	@DeleteFiles "$(FlexDataEntryReleaseDir)\*.dat"
-	@DeleteFiles "$(FlexDataEntryReleaseDir)\*.scc"
-	
-CreateDemoShieldInstall:
-	@ECHO Copying Required installs
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 4.0 Framework" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 4.0 Framework"
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework"
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014"
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014Mgr" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014Mgr"
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell"
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller"
-	@XCOPY "$(AFRequiredInstallsDir)\DotNet 4.0 Framework\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 4.0 Framework" /v /s /e /y
-	@XCOPY "$(AFRequiredInstallsDir)\DotNet 3.5 Framework\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework" /v /s /e /y
-	@XCOPY "$(AFRequiredInstallsDir)\SQLServerExpress2014\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014" /v /s /e /y
-	@XCOPY "$(AFRequiredInstallsDir)\SQLServerExpress2014Mgr\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014Mgr" /v /s /e /y
-	@XCOPY "$(AFRequiredInstallsDir)\WindowsInstaller\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller" /v /s /e /y
-	@XCOPY "$(AFRequiredInstallsDir)\Powershell\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell" /v /s /e /y
-	@COPY "$(CommonDirectory)\OSSI\PowerShell\OSSI.INI" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell"
-	@COPY "$(CommonDirectory)\OSSI\WindowsInstaller\OSSI.INI" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller"
-	@COPY "$(CommonDirectory)\OSSI\SQLServer\OSSI.INI" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014"
-	@COPY "$(CommonDirectory)\OSSI\SQLServerMgr\OSSI.INI" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014Mgr"
-	@COPY "$(CommonDirectory)\OSSI\DotNet 4.0 Framework\OSSI.INI" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 4.0 Framework"
-	@COPY "$(CommonDirectory)\OSSI\DotNet 3.5 Framework\OSSI.INI" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework"
-	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 4.0 Framework"
-	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell"
-	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller"
-	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014"
-	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2014Mgr"
-	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework"
-	@ECHO Copying DemoShield Files
-	@IF NOT EXIST "$(FlexIndexInstallDir)" MKDIR "$(FlexIndexInstallDir)"
-	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(FlexIndexInstallDir)" /v /s /e /y
-	@COPY "$(AFRootDirectory)\Installation\FlexInstall\Launch.ini" "$(FlexIndexInstallDir)"
-	@COPY "$(AFRootDirectory)\Installation\FlexInstall\FlexInstall.dbd" "$(FlexIndexInstallDir)"
+	@SendFilesAsArgumentToApplication "$(FLEXIndexDemo)\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(FLEXIndexDemo)\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@DeleteFiles "$(FLEXIndexDemo)\*.rsd"
+	@DeleteFiles "$(FLEXIndexDemo)\*.dat"
+	@DeleteFiles "$(FLEXIndexDemo)\*.scc"
 		
 BuildIDShieldInstall: 
     @ECHO Building Extract Systems IDShield installation...
@@ -190,16 +171,29 @@ BuildIDShieldInstall:
 
 CreateIDShieldInstallCD: BuildIDShieldInstall
 	@ECHO Copying IDShield Install files ...
-    @IF NOT EXIST "$(IDShieldReleaseBleedingEdgeDir)" MKDIR "$(IDShieldReleaseBleedingEdgeDir)"
-    @XCOPY "$(IDShieldInstallMediaDir)\*.*" "$(IDShieldReleaseBleedingEdgeDir)" /v /s /e /y
-    $(VerifyDir) "$(IDShieldInstallMediaDir)" "$(IDShieldReleaseBleedingEdgeDir)"
-    @DeleteFiles "$(IDShieldReleaseBleedingEdgeDir)\vssver.scc"
+    @IF NOT EXIST "$(IDShieldInstallFiles)" MKDIR "$(IDShieldInstallFiles)"
+    @XCOPY "$(IDShieldInstallMediaDir)\*.*" "$(IDShieldInstallFiles)" /v /s /e /y
+    $(VerifyDir) "$(IDShieldInstallMediaDir)" "$(IDShieldInstallFiles)"
+    @DeleteFiles "$(IDShieldInstallFiles)\vssver.scc"
 	@IF NOT EXIST "$(IDShieldInstallDir)" MKDIR "$(IDShieldInstallDir)"
 	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(IDShieldInstallDir)" /v /s /e /y
 	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\Launch.ini" "$(IDShieldInstallDir)"
 	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\IDShieldInstall.dbd" "$(IDShieldInstallDir)"
-	@COPY "$(IDShieldInstallFilesRootDir)\InstallHelp\*.*" "$(IDShieldReleaseBleedingEdgeDir)"
+	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\IDShield.ico" "$(IDShieldInstallDir)"
+	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\autorun.inf" "$(IDShieldInstallFiles)"
+	@COPY "$(IDShieldInstallFilesRootDir)\InstallHelp\*.*" "$(IDShieldInstallFiles)"
+	@COPY "$(IDShieldInstallRootDir)\Support Files\license.txt" "$(IDShieldInstallFiles)\Readme.txt"
+	$(IDShieldLinkShared)
     
+CopyIDShieldSilentInstall:
+	@ECHO Copying IDShield SilentInstall files...
+	@IF NOT EXIST "$(IDShieldSilentInstallDir)" MKDIR "$(IDShieldSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\*Uninst.*" "$(IDShieldSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\InstallIDShield.bat" "$(IDShieldSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\UninstallExtract.bat" "$(IDShieldSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\IDShield.iss" "$(IDShieldSilentInstallDir)"
+	@COPY "$(AFRootDirectory)\SilentInstalls\IDShield64.iss" "$(IDShieldSilentInstallDir)"
+	
 CreateRedactionDemoInstall:
 	@ECHO Creating Redaction Demo Install Directory ...
 	@CD "$(RedactionDemoBuildDir)"
@@ -207,8 +201,8 @@ CreateRedactionDemoInstall:
 	
 CreateOtherDemos:
 	@ECHO Creating other demos...
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Other Demos" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Other Demos"
-	@XCOPY  "$(AFRootDirectory)\Utils\Demo_RedactionGame\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Other Demos" /v /s /e /y
+	@IF NOT EXIST "$(OtherSetupFiles)\Other Demos" MKDIR "$(OtherSetupFiles)\Other Demos"
+	@XCOPY  "$(AFRootDirectory)\Utils\Demo_RedactionGame\*.*" "$(OtherSetupFiles)\Other Demos" /v /s /e /y
 
 CreateLabDEInstall:
 	@Echo Building LabDE...
@@ -217,28 +211,17 @@ CreateLabDEInstall:
 	
 CreateNetDMSInstall:
 	@Echo Creating NetDMS install...
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall"
+	@IF NOT EXIST "$(IntegrationsSetupFiles)\NetDMSIntegrationInstall" MKDIR "$(IntegrationsSetupFiles)\NetDMSIntegrationInstall"
 	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSExporter.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\Exporter"
 	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSUtilities.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
 	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSCustomComponents.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
 	@COPY "$(BinariesFolder)\Interop.Weak.*.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
-	@XCOPY "$(NetDMSRootDir)\NetDMSIntegrationInstall\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall" /v /s /e /y
-	
-BuildExtractUninstaller:
-	@ECHO Creating ExtractUninstaller...
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(NUANCE_API_DIR);$(LEADTOOLS_API_DIR);;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet
-	$(SetProductVerScript) "$(CommonDirectory)\ExtractUninstaller\ExtractUninstaller.ism" "$(FlexIndexVersion)"
-    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(CommonDirectory)\ExtractUninstaller\ExtractUninstaller.ism"
-	
-CreateExtractUninstallerFolder: BuildExtractUninstaller
-	@ECHO Copying ExtractUninstaller...
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\ExtractUninstaller" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\ExtractUninstaller"
-	@XCOPY "$(CommonDirectory)\ExtractUninstaller\Media\CDROM\DiskImages\DISK1\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\ExtractUninstaller" /v /s /e /y
+	@XCOPY "$(NetDMSRootDir)\NetDMSIntegrationInstall\*.*" "$(IntegrationsSetupFiles)\NetDMSIntegrationInstall" /v /s /e /y
 	
 CopySilentInstallsDir:
 	@ECHO Copying SilentInstalls folder
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SilentInstalls" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SilentInstalls"
-	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SilentInstalls"
+	@IF NOT EXIST "$(OtherSetupFiles)\SilentInstalls" MKDIR $(OtherSetupFiles)\SilentInstalls"
+	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" $(OtherSetupFiles)\SilentInstalls"
 	
 CreateSharepointInstall:
 	@Echo Creating Sharepoint Installs...
@@ -272,9 +255,8 @@ CopyFilesToInternalUse:
 	@COPY  "$(BinariesFolder)\*.exe" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.dll" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.xml" "$(InternalUseBuildFilesArchive)\OriginalFiles"
-
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CreateSharepointInstall CopyFilesToInternalUse
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateFLEXIndexDSInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CreateSharepointInstall CopyFilesToInternalUse
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
@@ -282,7 +264,7 @@ GetAllFiles: GetEngineering
 
 DoBuilds: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore
 
-DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos UpdateLicenseFiles
+DoEverythingNoGet: DoBuilds CreateInstalls CopyFLEXIndexSilentInstall CopyIDShieldSilentInstall CopyComponentVersionFile DoDemos UpdateLicenseFiles
     @ECHO.
     @DATE /T
     @TIME /T

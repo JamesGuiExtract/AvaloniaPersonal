@@ -28,8 +28,7 @@ ExtractFlexCommonInstallDir=$(PDRootDir)\AttributeFinder\Installation\ExtractFle
 ExtractFlexCommonInstallFilesRootDir=P:\ExtractFlexCommon
 RequiredInstallsDir=P:\AttributeFinder\RequiredInstalls
 
-AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
-FKBUpdateReleaseDir=$(AFBleedingEdgeDir)\$(FKBVersion)
+FKBUpdateReleaseDir=$(BleedingEdgeVersionDir)\$(FKBVersion)
 FKBUpdateInstallRoot=$(PDRootDir)\AttributeFinder\Installation\FKBInstall
 FKBInstallMediaDir=$(FKBUpdateInstallRoot)\Media\CD-ROM\DiskImages\DISK1
 

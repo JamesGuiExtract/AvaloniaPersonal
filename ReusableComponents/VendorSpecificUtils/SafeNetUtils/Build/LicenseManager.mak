@@ -22,11 +22,8 @@
 # M A K E F I L E   V A R I A B L E S
 #
 PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
-AFRootDirectory=$(PDRootDir)\AttributeFinder
-AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
 
 LMInstallFilesRootDir=P:\LicenseManager\Files
-AFExtractLMBleedingEdgeDir=$(AFBleedingEdgeDir)\Extract Systems LM
 
 ExtractLMInstallRootDir=$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\Installation\Extract Systems LM
 ExtractLMInstallMediaDir=$(ExtractLMInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
@@ -65,13 +62,20 @@ BuildExtractLMInstall:CopyFilesToExtractLMInstall
 	$(SetProductVerScript) "$(ExtractLMInstallRootDir)\Extract Systems LM.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractLMInstallRootDir)\Extract Systems LM.ism"
 	
-
 CreateFlexLMInstall: BuildExtractLMInstall
 	@ECHO Copying LM Install to Flex Index Release Directory...
-    @IF NOT EXIST "$(AFExtractLMBleedingEdgeDir)" MKDIR "$(AFExtractLMBleedingEdgeDir)"
-    @XCOPY "$(ExtractLMInstallMediaDir)\*.*" "$(AFExtractLMBleedingEdgeDir)" /v /s /e /y
-    $(VerifyDir) "$(ExtractLMInstallMediaDir)" "$(AFExtractLMBleedingEdgeDir)"
-	@DeleteFiles "$(AFExtractLMBleedingEdgeDir)\vssver.scc"
+    @IF NOT EXIST "$(FLEXIndexExtractLMDir)" MKDIR "$(FLEXIndexExtractLMDir)"
+    @XCOPY "$(ExtractLMInstallMediaDir)\*.*" "$(FLEXIndexExtractLMDir)" /v /s /e /y
+    $(VerifyDir) "$(ExtractLMInstallMediaDir)" "$(FLEXIndexExtractLMDir)"
+	@DeleteFiles "$(FLEXIndexExtractLMDir)\vssver.scc"
+    @IF NOT EXIST "$(IDShieldExtractLMDir)" MKDIR "$(IDShieldExtractLMDir)"
+    @XCOPY "$(ExtractLMInstallMediaDir)\*.*" "$(IDShieldExtractLMDir)" /v /s /e /y
+    $(VerifyDir) "$(ExtractLMInstallMediaDir)" "$(IDShieldExtractLMDir)"
+	@DeleteFiles "$(IDShieldExtractLMDir)\vssver.scc"
+    @IF NOT EXIST "$(LabDEExtractLMDir)" MKDIR "$(LabDEExtractLMDir)"
+    @XCOPY "$(ExtractLMInstallMediaDir)\*.*" "$(LabDEExtractLMDir)" /v /s /e /y
+    $(VerifyDir) "$(ExtractLMInstallMediaDir)" "$(LabDEExtractLMDir)"
+	@DeleteFiles "$(LabDEExtractLMDir)\vssver.scc"
     @ECHO.
     @DATE /T
     @TIME /T
