@@ -52,7 +52,6 @@ LabelCommonFolder:
 BuildExtractSharePoint:
 	@ECHO Building Extract.SharePoint...
     @CD "$(SharePointRootDir)"
- 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(NUANCE_API_DIR);$(LEADTOOLS_API_DIR);;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(DOTFUSCATOR)
 	@devenv Extract.SharePoint.sln /BUILD $(BuildConfig) /USEENV
 	
 ObfuscateFiles: BuildExtractSharePoint 
@@ -60,7 +59,6 @@ ObfuscateFiles: BuildExtractSharePoint
 #	Copy the strong naming key to location dotfuscator xml file expects
 	@IF NOT EXIST "$(StrongNameKeyDir)" @MKDIR "$(StrongNameKeyDir)"
 	@COPY /V "$(RCNETDir)\Core\Code\ExtractInternalKey.snk" "$(StrongNameKeyDir)"
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(NUANCE_API_DIR);$(LEADTOOLS_API_DIR);;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(DOTFUSCATOR)
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\IDShieldForSPClient.exe" /mapout:"$(BinariesFolder)\Map\mapIDShieldForSPClient.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.ExtensionMethods.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ExtensionMethods.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.SharePoint.DataCapture.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.SharePoint.DataCapture.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)" $(PDCommonDir)\ObfuscateConfig.xml
@@ -77,7 +75,6 @@ CreateSharePointPackages: BuildExtractSharePoint ObfuscateFiles
 
 BuildIDShieldForSPClientInstall:
     @ECHO Building Extract Systems IDShield for Sharepoint Client installation...
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(NUANCE_API_DIR);$(LEADTOOLS_API_DIR);$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(IDShieldSPClientIntallRoot)\IDShieldSPClient.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(IDShieldSPClientIntallRoot)\IDShieldSPClient.ism"
 	
