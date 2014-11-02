@@ -53,7 +53,7 @@ SetProductVerScript=$(CScriptProgram) "$(CommonDirectory)\SetProductVersion.vbs"
 UpdateFileVersion="I:\Common\Engineering\Tools\Utils\UpdateFileVersion\UpdateFileVersion.exe"
 
 #Target path for symbolic links to shared installs - must have the ending 
-SharedInstallsPath=\\EngSvr\Internal\ProductReleases\SharedInstalls
+SharedInstallsPath=$(BUILD_PRODUCT_RELEASE)\SharedInstalls
 MakeCommonLinks=$(CommonDirectory)\PowerShell\MakeLinksToCommonInstalls.ps1
 MakeSymLinks=$(CommonDirectory)\PowerShell\MakeSymLinks.ps1
 LinkShared=powershell -NoProfile -ExecutionPolicy Bypass -Command
@@ -61,34 +61,38 @@ LinkShared=powershell -NoProfile -ExecutionPolicy Bypass -Command
 #Version specific paths for install files
 AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
 BleedingEdgeVersionDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)
+BleedingEdgeVersionUNCDir=$(BUILD_PRODUCT_RELEASE)\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
 
 #FLEXIndex install related paths
 FLEXIndexSetupFiles=$(BleedingEdgeVersionDir)\FLEXIndex\SetupFiles
+FLEXIndexSetupFilesUNC=$(BleedingEdgeVersionUNCDir)\FLEXIndex\SetupFiles
 FLEXIndexInstallFiles=$(FLEXIndexSetupFiles)\FlexIndex
 FLEXIndexDemo=$(FLEXIndexSetupFiles)\Demo_FlexIndex
 FLEXIndexExtractLMDir=$(FLEXIndexSetupFiles)\Extract Systems LM
 FLEXIndexInstallDir=$(FLEXIndexSetupFiles)\FlexIndexInstall
 FLEXIndexSilentInstallDir=$(FLEXIndexSetupFiles)\SilentInstalls
-FLEXIndexLinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(FLEXIndexSetupFiles)\' '$(SharedInstallsPath)\'"
+FLEXIndexLinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(FLEXIndexSetupFilesUNC)\' '$(SharedInstallsPath)\'"
 
 #IDShield install related paths
 IDShieldSetupFiles=$(BleedingEdgeVersionDir)\IDShield\SetupFiles
+IDShieldSetupFilesUNC=$(BleedingEdgeVersionUNCDir)\IDShield\SetupFiles
 IDShieldInstallFiles=$(IDShieldSetupFiles)\IDShield
 IDShieldDemo=$(IDShieldSetupFiles)\Demo_IDShield
 IDShieldExtractLMDir=$(IDShieldSetupFiles)\Extract Systems LM
 IDShieldInstallDir=$(IDShieldSetupFiles)\IDShieldInstall
 IDShieldSilentInstallDir=$(IDShieldSetupFiles)\SilentInstalls
-IDShieldLinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(IDShieldSetupFiles)\' '$(SharedInstallsPath)\'"
+IDShieldLinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(IDShieldSetupFilesUNC)\' '$(SharedInstallsPath)\'"
 
 #LabDE install related paths
 LabDESetupFiles=$(BleedingEdgeVersionDir)\LabDE\SetupFiles
+LabDESetupFilesUNC=$(BleedingEdgeVersionUNCDir)\LabDE\SetupFiles
 LabDEInstallFiles=$(LabDESetupFiles)\LabDE
 LabDEDemo=$(LabDESetupFiles)\Demo_LabDE
 LabDEExtractLMDir=$(LabDESetupFiles)\Extract Systems LM
 LabDEInstallDir=$(LabDESetupFiles)\LabDEInstall
 LabDESilentInstallDir=$(LabDESetupFiles)\SilentInstalls
 LabDELinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(LabDESetupFiles)\' '$(SharedInstallsPath)\'"
-LabDECorePointLink=$(LinkShared) "& '$(MakeSymLinks)' 'EngSvr' '$(LabDESetupFiles)\' '$(SharedInstallsPath)\' 'Corepoint Integration Engine'"
+LabDECorePointLink=$(LinkShared) "& '$(MakeSymLinks)' 'EngSvr' '$(LabDESetupFilesUNC)\' '$(SharedInstallsPath)\' 'Corepoint Integration Engine'"
 
 #Other
 OtherSetupFiles=$(BleedingEdgeVersionDir)\Other

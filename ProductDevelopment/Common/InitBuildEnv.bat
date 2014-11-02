@@ -13,6 +13,8 @@ SET PATH=%PATH%;%DevEnvDir%;%VCPP_DIR%\BIN;%VS_COMMON%\Tools;%VS_COMMON%\Tools\b
 SET PATH=%PATH%;%WINDOWS_SDK%\BIN;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet
 SET INSTALL_PRODUCT_DEVELOPMENT_PATH=\\fnp2\internal\Common\Engineering\productdevelopment
 
+SET BUILD_PRODUCT_RELEASE=\\EngSvr\internal\ProductReleases
+
 net use i: \\fnp2\internal
 
 net use m: \\engsvr\internal
@@ -22,7 +24,7 @@ REM r: should be mapped to the base location that the install will be moved afte
 IF DEFINED BUILD_FINISHED_INSTALL (
 	net use r: %BUILD_FINISHED_INSTALL%
 ) ELSE (
-	net use r: \\EngSvr\internal\ProductReleases
+	net use r: %BUILD_PRODUCT_RELEASE%
 )
 
 IF DEFINED BUILD_INSTALL_FILES (
