@@ -219,7 +219,7 @@ CreateNetDMSInstall:
 CopySilentInstallsDir:
 	@ECHO Copying SilentInstalls folder
 	@IF NOT EXIST "$(OtherSetupFiles)\SilentInstalls" MKDIR "$(OtherSetupFiles)\SilentInstalls"
-	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.* "$(OtherSetupFiles)\SilentInstalls"
+	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(OtherSetupFiles)\SilentInstalls"
 	
 CreateSharepointInstall:
 	@Echo Creating Sharepoint Installs...
