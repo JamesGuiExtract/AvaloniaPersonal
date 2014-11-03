@@ -55,7 +55,7 @@ UpdateFileVersion="I:\Common\Engineering\Tools\Utils\UpdateFileVersion\UpdateFil
 #Target path for symbolic links to shared installs - must have the ending 
 SharedInstallsPath=$(BUILD_PRODUCT_RELEASE)\SharedInstalls
 MakeCommonLinks=$(CommonDirectory)\PowerShell\MakeLinksToCommonInstalls.ps1
-MakeSymLinks=$(CommonDirectory)\PowerShell\MakeSymLinks.ps1
+MakeSymLink=$(CommonDirectory)\PowerShell\MakeSymLink.ps1
 LinkShared=powershell -NoProfile -ExecutionPolicy Bypass -Command
 
 #Version specific paths for install files
@@ -92,7 +92,7 @@ LabDEExtractLMDir=$(LabDESetupFiles)\Extract Systems LM
 LabDEInstallDir=$(LabDESetupFiles)\LabDEInstall
 LabDESilentInstallDir=$(LabDESetupFiles)\SilentInstalls
 LabDELinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(LabDESetupFilesUNC)\' '$(SharedInstallsPath)\'"
-LabDECorePointLink=$(LinkShared) "& '$(MakeSymLinks)' 'EngSvr' '$(LabDESetupFilesUNC)\' '$(SharedInstallsPath)\' 'Corepoint Integration Engine'"
+LabDECorePointLink=$(LinkShared) "& '$(MakeSymLink)' 'EngSvr' '$(LabDESetupFilesUNC)\' '$(SharedInstallsPath)\' 'Corepoint Integration Engine'"
 
 #Other
 OtherSetupFiles=$(BleedingEdgeVersionDir)\Other
