@@ -218,8 +218,8 @@ CreateNetDMSInstall:
 	
 CopySilentInstallsDir:
 	@ECHO Copying SilentInstalls folder
-	@IF NOT EXIST "$(OtherSetupFiles)\SilentInstalls" MKDIR $(OtherSetupFiles)\SilentInstalls"
-	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" $(OtherSetupFiles)\SilentInstalls"
+	@IF NOT EXIST "$(OtherSetupFiles)\SilentInstalls" MKDIR "$(OtherSetupFiles)\SilentInstalls"
+	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.* "$(OtherSetupFiles)\SilentInstalls"
 	
 CreateSharepointInstall:
 	@Echo Creating Sharepoint Installs...
@@ -254,7 +254,7 @@ CopyFilesToInternalUse:
 	@COPY  "$(BinariesFolder)\*.dll" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.xml" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateFLEXIndexDSInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CreateSharepointInstall CopyFilesToInternalUse
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CopyIDShieldSilentInstall CreateFLEXIndexDSInstall CopyFLEXIndexSilentInstall CreateLabDEInstall CreateNetDMSInstall CopySilentInstallsDir CreateSharepointInstall CopyFilesToInternalUse
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
@@ -262,7 +262,7 @@ GetAllFiles: GetEngineering
 
 DoBuilds: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore
 
-DoEverythingNoGet: DoBuilds CreateInstalls CopyFLEXIndexSilentInstall CopyIDShieldSilentInstall CopyComponentVersionFile DoDemos UpdateLicenseFiles
+DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos UpdateLicenseFiles
     @ECHO.
     @DATE /T
     @TIME /T
