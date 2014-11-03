@@ -185,6 +185,7 @@ CopyTestFiles:
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\ESFileSuppliers\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\ESFileSuppliers\AutomatedTest\" /s /e /y /I
+	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\ESSkipConditions\InteractiveTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\ESSkipConditions\InteractiveTest\" /s /e /y /I
 	@XCOPY "$(RCDotNetDir)\FileActionManager\FileProcessors\Core\Testing\*.*" "$(TestingFilesDirectory)\RC.Net\FileActionManager\FileProcessors\Core\Testing\" /s /e /y /I
 	@XCOPY "$(RCDotNetDir)\AttributeFinder\Rules\Core\AutomatedTest\*.*" "$(TestingFilesDirectory)\RC.Net\AttributeFinder\Rules\Core\AutomatedTest\" /s /e /y /I
 
