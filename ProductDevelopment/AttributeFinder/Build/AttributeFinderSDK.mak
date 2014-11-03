@@ -117,7 +117,7 @@ CreateAttributeFinderInstallCD: BuildFlexIndexSDKInstall
     @XCOPY "$(FlexIndexSDKInstallMediaDir)\*.*" "$(FLEXIndexInstallFiles)" /v /s /e /y
     $(VerifyDir) "$(FlexIndexSDKInstallMediaDir)" "$(FLEXIndexInstallFiles)"
 	@COPY "$(AFInstallFilesRootDir)\InstallHelp\*.*" "$(FLEXIndexInstallFiles)"
-	@COPY "$(FlexIndexSDKInstallRootDir)\Support Files\license.txt" "$(FLEXIndexInstallFiles)\Readme.txt"
+	@COPY "$(FlexIndexSDKInstallRootDir)\Support Files\license.txt" "$(FLEXIndexSetupFiles)\Readme.txt"
     @DeleteFiles "$(FLEXIndexInstallFiles)\*.scc"
 	$(FLEXIndexLinkShared)
 	
@@ -127,7 +127,7 @@ CreateFLEXIndexDSInstall:
 	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(FLEXIndexInstallDir)" /v /s /e /y
 	@COPY "$(AFRootDirectory)\Installation\FlexInstall\Launch.ini" "$(FLEXIndexInstallDir)"
 	@COPY "$(AFRootDirectory)\Installation\FlexInstall\FlexInstall.dbd" "$(FLEXIndexInstallDir)"
-	@COPY "$(AFRootDirectory)\Installation\FlexInstall\autorun.inf" "$(FLEXIndexInstallFiles)"
+	@COPY "$(AFRootDirectory)\Installation\FlexInstall\autorun.inf" "$(FLEXIndexSetupFiles)"
 	@COPY "$(AFRootDirectory)\Installation\FlexInstall\FlexIndex.ico" "$(FLEXIndexInstallDir)"
 
 CopyFLEXIndexSilentInstall:
@@ -178,9 +178,9 @@ CreateIDShieldInstallCD: BuildIDShieldInstall
 	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\Launch.ini" "$(IDShieldInstallDir)"
 	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\IDShieldInstall.dbd" "$(IDShieldInstallDir)"
 	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\IDShield.ico" "$(IDShieldInstallDir)"
-	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\autorun.inf" "$(IDShieldInstallFiles)"
+	@COPY "$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldInstall\autorun.inf" "$(IDShieldSetupFiles)"
 	@COPY "$(IDShieldInstallFilesRootDir)\InstallHelp\*.*" "$(IDShieldInstallFiles)"
-	@COPY "$(IDShieldInstallRootDir)\Support Files\license.txt" "$(IDShieldInstallFiles)\Readme.txt"
+	@COPY "$(IDShieldInstallRootDir)\Support Files\license.txt" "$(IDShieldSetupFiles)\Readme.txt"
 	$(IDShieldLinkShared)
     
 CopyIDShieldSilentInstall:

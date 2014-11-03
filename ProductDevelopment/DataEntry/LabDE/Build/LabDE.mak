@@ -106,7 +106,7 @@ CreateLabDEInstallCD: BuildLabDEInstall
     @XCOPY "$(LabDEInstallMediaDir)\*.*" "$(LabDEInstallFiles)" /v /s /e /y
     $(VerifyDir) "$(LabDEInstallMediaDir)" "$(LabDEInstallFiles)"
 	@COPY /v "$(LabDEInstallBuildFiles)\InstallHelp\*.*" "$(LabDEInstallFiles)"
-	@COPY /v "$(LabDEInstallRootDir)\LabDE\Support Files\license.txt" "$(LabDEInstallFiles)\Readme.txt"
+	@COPY /v "$(LabDEInstallRootDir)\LabDE\Support Files\license.txt" "$(LabDESetupFiles)\Readme.txt"
     @DeleteFiles "$(LabDEInstallFiles)\vssver.scc"
 	$(LabDELinkShared)
 	$(LabDECorePointLink)
