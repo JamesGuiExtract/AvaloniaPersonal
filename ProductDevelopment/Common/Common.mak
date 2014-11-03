@@ -91,7 +91,7 @@ LabDEDemo=$(LabDESetupFiles)\Demo_LabDE
 LabDEExtractLMDir=$(LabDESetupFiles)\Extract Systems LM
 LabDEInstallDir=$(LabDESetupFiles)\LabDEInstall
 LabDESilentInstallDir=$(LabDESetupFiles)\SilentInstalls
-LabDELinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(LabDESetupFiles)\' '$(SharedInstallsPath)\'"
+LabDELinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(LabDESetupFilesUNC)\' '$(SharedInstallsPath)\'"
 LabDECorePointLink=$(LinkShared) "& '$(MakeSymLinks)' 'EngSvr' '$(LabDESetupFilesUNC)\' '$(SharedInstallsPath)\' 'Corepoint Integration Engine'"
 
 #Other
