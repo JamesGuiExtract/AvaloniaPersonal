@@ -1207,6 +1207,9 @@ library UCLID_RASTERANDOCRMGMTLib
 		// PROMISE: Removes all characters from pTextToRemove that match characters in this string
 		//			(including the letter font coordinates and confidence). Non-white space
 		//			characters are removed only if they fall between matching spatial characters.
+		//			Will not remove anything unless the whole string is matched (excluding leading/
+		//			trailing non-spatial characters and characters that fall outside the specified
+		//			page/area).
 		// ARGS:	pTextToRemove - The text to remove
 		//			nPage - If > 0, only text from pTextToRemove that is on this page will be
 		//				removed.
@@ -1214,7 +1217,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		//				this rect will be removed.
 		//			NOTE: nPage and pRect may both be NULL, both be specified, or be specified
 		//				independently.
-		// RETURNS: The positon of the first character removed or -1 if no characters were removed.
+		// RETURNS: The position of the first character removed or -1 if no characters were removed.
 		[id(101), helpstring("method RemoveText")] HRESULT
 			RemoveText([in] ISpatialString* pTextToRemove, [in] long nPage,
 			[in] ILongRectangle *pRect, [out, retval] long* nPos);

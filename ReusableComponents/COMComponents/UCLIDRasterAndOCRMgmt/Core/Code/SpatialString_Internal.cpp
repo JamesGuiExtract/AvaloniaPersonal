@@ -3959,59 +3959,69 @@ void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatia
 	setExistingWS.clear();
 	bExistingLF = false;
 
-	// Start at the insertion position and work forwards looking for whitespace preceeding the
-	// last next spatial character. 
-	for (int nNextPos = rnPos; nNextPos < nCount; nNextPos++)
+	// If string to be inserted is on a page following the end of this string, append double-newline
+	if (rnPos == nCount && m_eMode != kNonSpatialMode && nPage > getLastPageNumber())
 	{
-		CPPLetter &nextLetter = m_vecLetters[nNextPos];
-
-		if (nextLetter.m_bIsSpatial)
+		appendString("\r\n\r\n");
+		nPosAdjustment -= 4;
+		m_bDirty = true;
+	}
+	else
+	{
+		// Start at the insertion position and work forwards looking for whitespace preceeding the
+		// last next spatial character. 
+		for (int nNextPos = rnPos; nNextPos < nCount; nNextPos++)
 		{
-			// Check for a new page
-			if (nextLetter.m_usPageNumber != nPage)
+			CPPLetter &nextLetter = m_vecLetters[nNextPos];
+
+			if (nextLetter.m_bIsSpatial)
 			{
+				// Check for a new page
+				if (nextLetter.m_usPageNumber != nPage)
+				{
+					break;
+				}
+				// Check for a new line using the spatial info of the string to be inserted
+				int nVerticalMidPoint = (nextLetter.m_ulTop + nextLetter.m_ulBottom) / 2;
+				int nHorizontalMidPoint = (nextLetter.m_ulLeft + nextLetter.m_ulRight) / 2;
+				if (nVerticalMidPoint < nTop || 
+					nVerticalMidPoint > nBottom || 
+					nHorizontalMidPoint < nRight)
+				{
+					if (!bExistingLF)
+					{
+						// If ipString should be on a separate line from the following chars but there
+						// is no existing trailing whitespace, insert a newline after ipString.
+						ipString->AppendString("\r\n");
+					}
+				}
+				// Check for a new word based on the spatial info of the string to be inserted
+				else if ((long)nextLetter.m_ulLeft - nNewSpaceAllowance > nRight)
+				{
+					if (setExistingWS.empty())
+					{
+						// If ipString should be a separate word from the following chars but there is
+						// no existing trailing whitespace, insert a space after ipString.
+						ipString->AppendString(" ");
+					}
+				}
+				// Spatially ipString appears to be part of the following word; remove any intervening
+				// whitespace chars.
+				else if ((long)nextLetter.m_ulLeft - nDelSpaceAllowance <= nRight)
+				{
+					setLettersToRemove.insert(setExistingWS.begin(), setExistingWS.end());
+				}
+
 				break;
 			}
-			// Check for a new line using the spatial info of the string to be inserted
-			int nVerticalMidPoint = (nextLetter.m_ulTop + nextLetter.m_ulBottom) / 2;
-			int nHorizontalMidPoint = (nextLetter.m_ulLeft + nextLetter.m_ulRight) / 2;
-			if (nVerticalMidPoint < nTop || 
-				nVerticalMidPoint > nBottom || 
-				nHorizontalMidPoint < nRight)
+			else
 			{
-				if (!bExistingLF)
-				{
-					// If ipString should be on a separate line from the following chars but there
-					// is no existing trailing whitespace, insert a newline after ipString.
-					ipString->AppendString("\r\n");
-				}
-			}
-			// Check for a new word based on the spatial info of the string to be inserted
-			else if ((long)nextLetter.m_ulLeft - nNewSpaceAllowance > nRight)
-			{
-				if (setExistingWS.empty())
-				{
-					// If ipString should be a separate word from the following chars but there is
-					// no existing trailing whitespace, insert a space after ipString.
-					ipString->AppendString(" ");
-				}
-			}
-			// Spatially ipString appears to be part of the following word; remove any intervening
-			// whitespace chars.
-			else if ((long)nextLetter.m_ulLeft - nDelSpaceAllowance <= nRight)
-			{
-				setLettersToRemove.insert(setExistingWS.begin(), setExistingWS.end());
-			}
+				setExistingWS.insert(nNextPos);
 
-			break;
-		}
-		else
-		{
-			setExistingWS.insert(nNextPos);
-
-			if (nextLetter.m_usGuess1 == '\r' || nextLetter.m_usGuess1 == '\n')
-			{
-				bExistingLF = true;
+				if (nextLetter.m_usGuess1 == '\r' || nextLetter.m_usGuess1 == '\n')
+				{
+					bExistingLF = true;
+				}
 			}
 		}
 	}

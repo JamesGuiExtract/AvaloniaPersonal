@@ -109,7 +109,9 @@ STDMETHODIMP CSpatialString::Replace(BSTR strToFind, BSTR strReplacement,
 		ASSERT_ARGUMENT("ELI06869", !stdstrToFind.empty());
 		
 		string stdstrReplacement = asString(strReplacement);
-		if (stdstrToFind == stdstrReplacement)
+
+		// If doing a non-regex replace, then skip if find == replacement
+		if (pRegExpr == __nullptr && stdstrToFind == stdstrReplacement)
 		{
 			// do no replacement
 			return S_OK;
@@ -760,6 +762,7 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long nPag
 		long nNumLettersToRemove = 0;
 		CPPLetter *pLettersToRemove = __nullptr;
 		ipTextToRemove->GetOCRImageLetterArray(&nNumLettersToRemove, (void **)&pLettersToRemove);
+		long nNumLettersRequiredToRemove = nNumLettersToRemove;
 
 		long nLetterCount = m_vecLetters.size();
 		long nPosition = 0;
@@ -788,6 +791,7 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long nPag
 					if (letterToRemove.m_usPageNumber != nPage)
 					{
 						bLastLetterRemoved = false;
+						nNumLettersRequiredToRemove--;
 						continue;
 					}
 				}
@@ -801,6 +805,7 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long nPag
 
 					if (!rect.PtInRect(ptMiddleOfLetter))
 					{
+						nNumLettersRequiredToRemove--;
 						continue;
 					}
 				}
@@ -823,6 +828,7 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long nPag
 				else
 				{
 					bLastLetterRemoved = false;
+					nNumLettersRequiredToRemove--;
 				}
 
 				nPosition++;
@@ -873,9 +879,9 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long nPag
 			}
 		}
 
-		// If at least one character was found to remove, remove the characters in
+		// If all the required characters-to-remove were found, remove the characters in
 		// setLettersToRemove.
-		if (nFirstPosition != -1)
+		if (nFirstPosition != -1 && setLettersToRemove.size() >= nNumLettersRequiredToRemove)
 		{
 			long nNewLetterCount = nLetterCount - setLettersToRemove.size();
 			vector<CPPLetter> vecNewLetters;
@@ -899,9 +905,13 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long nPag
 			}
 
 			m_bDirty = true;
-		}
 
-		*pnPos = nFirstPosition;
+			*pnPos = nFirstPosition;
+		}
+		else
+		{
+			*pnPos = -1;
+		}
 
 		return S_OK;
 	}
@@ -947,78 +957,85 @@ STDMETHODIMP CSpatialString::InsertBySpatialPosition(ISpatialString *pString,
 		bool bNewLineContingency = false;
 		bool bContingencyInMiddleOfWord = false;
 		long nCount = m_vecLetters.size();
-
-		// Loop through each positon in the string starting on the target page.
-		for (nPos = getFirstCharPositionOfPage(nPage); nPos < nCount; nPos++)
+		
+		if (nPage > getLastPageNumber())
 		{
-			CPPLetter& letter = m_vecLetters[nPos];
-			if (!letter.m_bIsSpatial)
+			nPos = nCount;
+		}
+		else
+		{
+			// Loop through each positon in the string starting on the target page.
+			for (nPos = getFirstCharPositionOfPage(nPage); nPos < nCount; nPos++)
 			{
-				continue;
-			}
-
-			if ((long)letter.m_usPageNumber == nPage)
-			{
-				// Compare the middle of the current letter to the area of the string to be added.
-				CPoint ptMiddleOfLetter(
-					(letter.m_ulLeft + letter.m_ulRight) / 2,
-					(letter.m_ulTop + letter.m_ulBottom) / 2);
-
-				// If this letter is in-line or below the string to be added and to the right of the
-				// new string, this is the spot the new string should be added.
-				if (ptMiddleOfLetter.y > nTop && ptMiddleOfLetter.x >= nRight)
+				CPPLetter& letter = m_vecLetters[nPos];
+				if (!letter.m_bIsSpatial)
 				{
+					continue;
+				}
+
+				if ((long)letter.m_usPageNumber == nPage)
+				{
+					// Compare the middle of the current letter to the area of the string to be added.
+					CPoint ptMiddleOfLetter(
+						(letter.m_ulLeft + letter.m_ulRight) / 2,
+						(letter.m_ulTop + letter.m_ulBottom) / 2);
+
+					// If this letter is in-line or below the string to be added and to the right of the
+					// new string, this is the spot the new string should be added.
+					if (ptMiddleOfLetter.y > nTop && ptMiddleOfLetter.x >= nRight)
+					{
+						break;
+					}
+					// If this letter is a normal height char that is completely below the string to be
+					// added, this is the positon to add it.
+					else if ((long)letter.m_ulTop > nBottom && letter.m_usGuess1 != '.' &&
+						letter.m_usGuess1 != ',' && letter.m_usGuess1 != '_')
+					{
+						break;
+					}
+					// If the letter appears that it may be in line at or below the string to add, set
+					// up a contingency index which will be used as the insertion point if a more
+					// definitive position is not subsequently found.
+					else if (ptMiddleOfLetter.y > nTop && !bNewLineContingency)
+					{
+						if (bStartOfNewWord && ptMiddleOfLetter.y > nBottom)
+						{
+							// If we've gotten to a position where it appears this char may be the
+							// start of a new word on a line below the new string, keep track of this
+							// position as the position to insert if a more definitive location is not
+							// found.
+							nContingencyPos = nPos;
+							// This contingency location appears to be on a new line, it won't be
+							// updated from this point; either it will or won't be the insertion
+							// position.
+							bNewLineContingency = true;
+						}
+						else if (ptMiddleOfLetter.x >= nLeft)
+						{
+							// The current char appears likely to be in-line, but to the left of the
+							// string to be added. The new string should be inserted after this
+							// one unless another such char is found further to the right.
+							nContingencyPos = nPos + 1;
+							// If this letter isn't at the end of a word, this contingency is
+							// suggesting insertion into the middle of a word.
+							bContingencyInMiddleOfWord = !getIsEndOfWord(nPos);
+						}
+					}
+
+					bStartOfNewWord = getIsEndOfWord(nPos);
+				}
+				// We're past the page on which the string is to be inserted. The string should be
+				// inserted here unless a contingency position has been found.
+				else
+				{
+					if (nContingencyPos != -1)
+					{
+						nPos = nContingencyPos;
+						nContingencyPos = -1;
+					}
+
 					break;
 				}
-				// If this letter is a normal height char that is completely below the string to be
-				// added, this is the positon to add it.
-				else if ((long)letter.m_ulTop > nBottom && letter.m_usGuess1 != '.' &&
-					letter.m_usGuess1 != ',' && letter.m_usGuess1 != '_')
-				{
-					break;
-				}
-				// If the letter appears that it may be in line at or below the string to add, set
-				// up a contingency index which will be used as the insertion point if a more
-				// definitive position is not subsequently found.
-				else if (ptMiddleOfLetter.y > nTop && !bNewLineContingency)
-				{
-					if (bStartOfNewWord && ptMiddleOfLetter.y > nBottom)
-					{
-						// If we've gotten to a position where it appears this char may be the
-						// start of a new word on a line below the new string, keep track of this
-						// position as the position to insert if a more definitive location is not
-						// found.
-						nContingencyPos = nPos;
-						// This contingency location appears to be on a new line, it won't be
-						// updated from this point; either it will or won't be the insertion
-						// position.
-						bNewLineContingency = true;
-					}
-					else if (ptMiddleOfLetter.x >= nLeft)
-					{
-						// The current char appears likely to be in-line, but to the left of the
-						// string to be added. The new string should be inserted after this
-						// one unless another such char is found further to the right.
-						nContingencyPos = nPos + 1;
-						// If this letter isn't at the end of a word, this contingency is
-						// suggesting insertion into the middle of a word.
-						bContingencyInMiddleOfWord = !getIsEndOfWord(nPos);
-					}
-				}
-
-				bStartOfNewWord = getIsEndOfWord(nPos);
-			}
-			// We're past the page on which the string is to be inserted. The string should be
-			// inserted here unless a contingency position has been found.
-			else
-			{
-				if (nContingencyPos != -1)
-				{
-					nPos = nContingencyPos;
-					nContingencyPos = -1;
-				}
-
-				break;
 			}
 		}
 

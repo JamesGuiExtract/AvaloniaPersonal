@@ -939,6 +939,15 @@ void CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc)
 			ASSERT_RESOURCE_ALLOCATION("ELI36504", ipDocText != __nullptr);
 
 			m_strSourceDocName = asString(ipDocText->SourceDocName);
+			
+			string strUSSFilename = m_strSourceDocName + ".uss";
+	
+			if (!isValidFile(strUSSFilename))
+			{
+				UCLIDException ue("ELI37626", "USS file is required for Enhance OCR.");
+				ue.addDebugInfo("Filename", strUSSFilename);
+				throw ue;
+			}
 
 			unlockDocumentSupport();
 
@@ -1198,6 +1207,7 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 		 pageIter != mapZonesToEnhance.end(); pageIter++)
 	{
 		long nPage = pageIter->first;
+
 		vector<ILongRectanglePtr> vecRectsToEnhance = pageIter->second;
 
 		// Initialize this page for processing.
@@ -1211,16 +1221,30 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 		{
 			// Shrink each rect down to it's pixel content to minimize the amount of processing that
 			// needs to be done.
-			for each (ILongRectanglePtr ipRect in vecRectsToEnhance)
+			vector<ILongRectanglePtr>::iterator vecIter;
+			for (vecIter = vecRectsToEnhance.begin(); vecIter != vecRectsToEnhance.end(); )
 			{
+				ILongRectanglePtr ipRect = *vecIter;
 				ASSERT_RESOURCE_ALLOCATION("ELI36517", ipRect != __nullptr);
 
 				UCLID_AFVALUEMODIFIERSLib::ISplitRegionIntoContentAreasPtr ipSRICA = getSRICA();
 				ASSERT_RESOURCE_ALLOCATION("ELI36518", ipSRICA != __nullptr);
 
 				ipSRICA->ShrinkToFit(m_strSourceDocName.c_str(), nPage, ipRect);
+
+				// https://extract.atlassian.net/browse/ISSUE-12532
+				// Delete if has no area
+				CRect rect;
+				ipRect->GetBounds(&rect.left, &rect.top, &rect.right, &rect.bottom);
+				if (rect.IsRectEmpty())
+				{
+					vecIter = vecRectsToEnhance.erase(vecIter);
+				}
+				else
+				{
+					++vecIter;
+				}
 			}
-		
 			// Remove all but vecRectsToEnhance from the image page. 
 			prepareImagePage(vecRectsToEnhance);
 		}
@@ -1235,7 +1259,6 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 		}
 
 		// Loop through each zone to apply the result back to the original attribute's value.
-		set<IAttributePtr> setModifiedAttributes;
 		for each (ZoneData zoneData in vecZonesToEnhance)
 		{
 			IAttributePtr ipAttribute = mapOriginalAttributes[zoneData.m_ipRect];
@@ -1243,12 +1266,6 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 
 			ISpatialStringPtr ipAttributeValue = ipAttribute->Value;
 			ASSERT_RESOURCE_ALLOCATION("ELI36520", ipAttributeValue != __nullptr);
-
-			if (setModifiedAttributes.find(ipAttribute) == setModifiedAttributes.end())
-			{
-				ipAttributeValue->Clear();
-				setModifiedAttributes.insert(ipAttribute);
-			}
 
 			applyZoneResults(ipAttributeValue, zoneData);
 		}
@@ -1268,7 +1285,7 @@ void CEnhanceOCR::enhanceOCR(vector<ZoneData> &zones)
 	// Keeps track of which rects now meet m_nConfidenceCriteria and should not be processed by any
 	// subsequent filters.
 	vector<ILongRectanglePtr> vecRectsMeetingConfidenceCriteria;
-	bool bAreAnyZonesLeftToProcess = true;
+	bool bAreAnyZonesLeftToProcess = zones.size() > 0;
 
 	// Iterate through each filter in the configured filter package.
 	for (long nFilterIndex = 0; bAreAnyZonesLeftToProcess && nFilterIndex < m_nFilterCount;
@@ -1538,7 +1555,7 @@ ISpatialStringSearcherPtr CEnhanceOCR::setCurrentPage(IAFDocumentPtr ipDoc, long
 			
 	if (!isValidFile(strUSSFilename))
 	{
-		UCLIDException ue("ELI36673", "USS file is required for Enhance OCR task.");
+		UCLIDException ue("ELI36673", "USS file is required for Enhance OCR .");
 		ue.addDebugInfo("Filename", strUSSFilename);
 		throw ue;
 	}
@@ -2153,7 +2170,7 @@ void CEnhanceOCR::applyFilter(pBITMAPHANDLE pBitmap, L_INT nDim, const L_INT pFi
 	{
 		pSpatialFilter->fltDivisor += ((L_INT*)pFilter)[i];
 	}
-	
+
 	// The filter bias indicates what threshold the above ratio must meet in order for the resulting
 	// pixel to be black. A bias value of 0 is equivalent to a threshold of 50% black, so to turn
 	// the threshold ratio into a bias, subtract 50%.
@@ -2968,13 +2985,6 @@ void CEnhanceOCR::applyZoneResults(ISpatialStringPtr ipOriginalText, const ZoneD
 				{
 					nPos = ipOriginalText->SetSurroundingWhitespace(ipResult, nPos);
 					ipOriginalText->Insert(nPos, ipResult);
-				}
-				// Since ipOriginalText may have been modified by other zones, it is possible it no
-				// longer constains the original zone text. In this case, just insert ipResult
-				// according to spatial location.
-				else
-				{
-					ipOriginalText->InsertBySpatialPosition(ipResult, VARIANT_FALSE);
 				}
 			}
 		}
