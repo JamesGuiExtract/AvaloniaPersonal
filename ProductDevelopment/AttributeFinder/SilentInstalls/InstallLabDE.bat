@@ -11,7 +11,7 @@ call "%~dp0UninstallExtract.bat"
 SET LABDE_ROOT=%~dp0
 
 :: Replaces the Other\SilentInstalls path if it exists with the Release path 
-CALL SET LABDE_ROOT=%LABDE_ROOT:Other\SilentInstalls=LabDE\SetupFiles%
+CALL SET LABDE_ROOT=%LABDE_ROOT:Other\SilentInstalls=LabDE\SetupFiles\LabDE%
 
 :: If replace the SilentInstalls with the product folder 
 CALL SET LABDE_ROOT=%LABDE_ROOT:SilentInstalls=LabDE%

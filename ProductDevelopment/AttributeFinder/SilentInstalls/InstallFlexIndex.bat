@@ -11,7 +11,7 @@ call "%~dp0UninstallExtract.bat"
 SET FLEXINDEX_ROOT=%~dp0
 
 :: Replaces the Other\SilentInstalls path if it exists with the Release path 
-CALL SET FLEXINDEX_ROOT=%FLEXINDEX_ROOT:Other\SilentInstalls=FLEXIndex\SetupFiles%
+CALL SET FLEXINDEX_ROOT=%FLEXINDEX_ROOT:Other\SilentInstalls=FLEXIndex\SetupFiles\FLEXIndex%
 
 :: If replace the SilentInstalls with the product folder 
 CALL SET FLEXINDEX_ROOT=%FLEXINDEX_ROOT:SilentInstalls=FLEXIndex%

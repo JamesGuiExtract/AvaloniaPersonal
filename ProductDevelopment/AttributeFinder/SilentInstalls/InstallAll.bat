@@ -14,9 +14,9 @@ SET IDSHIELD_ROOT=%~dp0
 SET EXTRACTLM_ROOT=%~dp0
 
 :: Replaces the Other\SilentInstalls path if it exists with the Release path 
-CALL SET LABDE_ROOT=%LABDE_ROOT:Other\SilentInstalls=LabDE\SetupFiles%
-CALL SET FLEXINDEX_ROOT=%FLEXINDEX_ROOT:Other\SilentInstalls=FLEXIndex\SetupFiles%
-CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:Other\SilentInstalls=IDShield\SetupFiles%
+CALL SET LABDE_ROOT=%LABDE_ROOT:Other\SilentInstalls=LabDE\SetupFiles\LabDE%
+CALL SET FLEXINDEX_ROOT=%FLEXINDEX_ROOT:Other\SilentInstalls=FLEXIndex\SetupFiles\FLEXIndex%
+CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:Other\SilentInstalls=IDShield\SetupFiles\IDShield%
 CALL SET EXTRACTLM_ROOT=%EXTRACTLM_ROOT:Other\SilentInstalls=FLEXIndex\SetupFiles\Extract Systems LM%
 
 :: If replace the SilentInstalls with the product folder 

@@ -11,7 +11,7 @@ call "%~dp0UninstallExtract.bat"
 SET IDSHIELD_ROOT=%~dp0
 
 :: Replaces the Other\SilentInstalls path if it exists with the Release path 
-CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:Other\SilentInstalls=IDShield\SetupFiles%
+CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:Other\SilentInstalls=IDShield\SetupFiles\IDShield%
 
 :: If replace the SilentInstalls with the product folder 
 CALL SET IDSHIELD_ROOT=%IDSHIELD_ROOT:SilentInstalls=IDShield%
