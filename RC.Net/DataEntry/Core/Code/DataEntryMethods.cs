@@ -919,6 +919,50 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Merges <see paramref="stringToMerge"/> into <see paramref="source"/> as a hybrid string.
+        /// Unlike in the native <see cref="T:SpatialString.MergeAsHybridString"/> method,
+        /// <see paramref="stringToMerge"/> can contain only spatial info (no string value) and
+        /// still be able to merge successfully.
+        /// </summary>
+        /// <param name="source">The <see cref="SpatialString"/> into which
+        /// <see paramref="stringToMerge"/> should be merged.</param>
+        /// <param name="stringToMerge">The <see cref="SpatialString"/> to merge into
+        /// <see paramref="source"/>.
+        /// </param>
+        internal static void DataEntryMergeAsHybridString(this SpatialString source, 
+            SpatialString stringToMerge)
+        {
+            try
+            {
+                // Special handling for case that stringToMerge has no string value.
+                if (string.IsNullOrWhiteSpace(stringToMerge.String))
+                {
+                    // If it has no spatial value either, there is nothing to do.
+                    if (!stringToMerge.HasSpatialInfo())
+                    {
+                        return;
+                    }
+
+                    // https://extract.atlassian.net/browse/ISSUE-12545
+                    // Because of a clone of stringToMerge that occurs in
+                    // SpatialString.MergeAsHybridString, that call here would lead to an exception
+                    // due to the blank string value. Avoid that issue by just adding the raster
+                    // zones of stringToMerge to source.
+                    source.DowngradeToHybridMode();
+                    source.AddRasterZones(stringToMerge.GetOCRImageRasterZones(), stringToMerge.SpatialPageInfos);
+                }
+                else
+                {
+                    source.MergeAsHybridString(stringToMerge);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37627");
+            }
+        }
+
+        /// <summary>
         /// Returns a <see langword="string"/> representing the tab index of the provided control 
         /// as a number prefixed by period separated numbers representing all parent controls
         /// beneath the <see cref="DataEntryControlHost"/>.  For example, if the control has a 

@@ -609,7 +609,7 @@ namespace Extract.DataEntry
                         }
                         else
                         {
-                            forcedSpatialResult.MergeAsHybridString(resultSet.ForcedSpatialResult);
+                            forcedSpatialResult.DataEntryMergeAsHybridString(resultSet.ForcedSpatialResult);
                         }
                     }
                 }
@@ -818,7 +818,7 @@ namespace Extract.DataEntry
                             else
                             {
                                 vecRasterZones.Append(forcedSpatialResult.GetOCRImageRasterZones());
-                                forcedSpatialResult.MergeAsHybridString(
+                                forcedSpatialResult.DataEntryMergeAsHybridString(
                                     distinctResult.FirstSpatialStringValue);
                             }
 
@@ -877,7 +877,7 @@ namespace Extract.DataEntry
                             else
                             {
                                 SpatialString spatialResultCopy = forcedSpatialResult.Clone();
-                                spatialResultCopy.MergeAsHybridString(resultSet.ForcedSpatialResult);
+                                spatialResultCopy.DataEntryMergeAsHybridString(resultSet.ForcedSpatialResult);
                                 resultSet.ForcedSpatialResult = spatialResultCopy;
                             }
                         }
