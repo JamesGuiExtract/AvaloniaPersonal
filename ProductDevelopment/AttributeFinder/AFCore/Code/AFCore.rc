@@ -606,7 +606,7 @@ BEGIN
     IDS_IDSHIELD_PRODUCT    "ID Shield"
     IDS_UNKNOWN_PRODUCT     "Unknown"
     IDS_RULETESTER_PRODUCT  "Rule Tester"
-    ID_INDICATOR_TIME       "Last run time: %f seconds"
+    ID_INDICATOR_TIME       "Last run time: %.3f seconds"
 END
 
 STRINGTABLE
