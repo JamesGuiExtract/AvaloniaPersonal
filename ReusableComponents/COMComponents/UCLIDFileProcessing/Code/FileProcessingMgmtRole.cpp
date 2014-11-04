@@ -143,7 +143,6 @@ ProcessingThreadData::~ProcessingThreadData()
 // WorkUnitThreadData
 //-------------------------------------------------------------------------------------------------
 Win32Event WorkItemThreadData::ms_threadStopProcessing;
-CMutex WorkItemThreadData::ms_mutexForWorkItemIdle;
 
 WorkItemThreadData::WorkItemThreadData(CFileProcessingMgmtRole* pFPMgmtRole, long nActionID, 
 	Win32Semaphore &rSemaphore, IFileProcessingDB *pDB) :
@@ -1838,7 +1837,6 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI37036", ipMiscUtils != __nullptr);
 		bool bDone = false;
-		bool bHasIdleMutex = false;
 		DWORD dwWaitTime = gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK;
 		FPWorkItem workItem;
 
@@ -1850,50 +1848,20 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 				{
 					nWorkItemID = -1;
 
+					pFPMgmtRole->m_eventProcessManagerActive.wait();
+
 					// Get next work item to process
 					bool bWorkItemReturned = fprm->getWorkItemToProcess(workItem);
 					
-					if (!bWorkItemReturned && pThreadData->ms_threadStopProcessing.isSignaled())
+					if (!bWorkItemReturned)
 					{
 						// no work items to process
 						break;
-					}
-					else if (!bWorkItemReturned && !bHasIdleMutex)
-					{
-						// This is set up so that when there are no workitems available all but one
-						// thread will wait either for processing stop or until it gets the idle mutex
-						// the thread that gets the mutex will keep polling until it gets a work 
-						// item or processing stops, when it gets a work item it releases the mutex
-						// resets the wait time to 0 which will allow another thread to try
-						// if there are enough work items all threads should be processing
-						HANDLE handles[] = 
-						{
-							pThreadData->ms_mutexForWorkItemIdle,
-							pThreadData->ms_threadStopProcessing.getHandle()
-						};
-
-						DWORD waitReturn = WaitForMultipleObjects(
-							2, handles, FALSE, INFINITE);
-						
-						if (waitReturn == WAIT_OBJECT_0 || waitReturn == WAIT_ABANDONED_0)
-						{
-							bHasIdleMutex = true;
-						}
-						else
-						{
-							break;
-						}
 					}
 					UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = workItem.getWorkItemRecord();
 
 					if (bWorkItemReturned && ipWorkItem != __nullptr)
 					{
-						if (bHasIdleMutex)
-						{
-							pThreadData->ms_mutexForWorkItemIdle.Unlock();
-							bHasIdleMutex = false;
-							dwWaitTime = gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK;
-						}
 						// if the work item group is the same as the last one don't have to 
 						// recreate the task just use the one from the last
 						if (nWorkItemGroupID != ipWorkItem->WorkItemGroupID)
@@ -1916,21 +1884,6 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 						workItem.markAsCompleted();
 						fprm->updateWorkItem(workItem);
 					}
-
-					
-					if (bHasIdleMutex)
-					{
-						// now need to wait - this thread will now be the only one active
-						// until either more workitems are available or a stop processing 
-						// event is signalled
-						if (pThreadData->ms_threadStopProcessing.wait(dwWaitTime) != WAIT_TIMEOUT)
-						{
-							break;
-						}
-						// Set the wait time for the next time through the loop
-						dwWaitTime = (dwWaitTime >= gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK) 
-							? gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK : dwWaitTime + 100;
-					}
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36918");
 			}
@@ -1950,12 +1903,6 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 			}
 		}
 		while (!pThreadData->ms_threadStopProcessing.isSignaled());
-		
-		// if the thread has the Idle mutex need to unlock it
-		if (bHasIdleMutex)
-		{
-			pThreadData->ms_mutexForWorkItemIdle.Unlock();
-		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI36867");
 	
@@ -2067,11 +2014,7 @@ UINT CFileProcessingMgmtRole::handleStopRequestAsynchronously(void *pData)
 		pRecordManager->stopProcessingQueue();
 
 		// Notify the FAM that processing is cancelling
-		if (pFPM->m_eCurrentRunningState == kNormalStop)
-		{	
-			// Notify all of the processors of the stop request
-			pFPM->notifyFileProcessingTasksOfStopRequest();
-		};
+		pFPM->notifyFileProcessingTasksOfStopRequest();
 		
 		// The user (or OEM application) wants to stop the processing of files as soon as possible.
 		// Indicate to the record manager that the pending files in the queue are to be discarded
@@ -2213,10 +2156,12 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 					break;
 
 				case kProcessingCancelled:
-					Stop();
+					if (m_eCurrentRunningState != kScheduleStop && m_eCurrentRunningState != kPaused)
+					{
+						Stop();
+					}
 					task.markAsNone();
 					break;
-
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI14340");
@@ -2684,7 +2629,7 @@ void CFileProcessingMgmtRole::validateLicense()
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingMgmtRole::notifyFileProcessingTasksOfStopRequest()
 {
-	// Need to obtain a semaphore since this method uses th em_vecProcessingThreadData vector
+	// Need to obtain a semaphore since this method uses the m_vecProcessingThreadData vector
 	CSingleLock lock(&m_threadDataSemaphore, TRUE);
 
 	for (unsigned int i = 0; i < m_vecProcessingThreadData.size(); i++)
@@ -2805,7 +2750,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 				{
 				case WAIT_TIMEOUT:
 					// If the wait timed out need to change to the next running state
-					// retrurned by the timeTillNextProcessingChange function
+					// returned by the timeTillNextProcessingChange function
 					// Only change the state if it is not paused
 					if (ePreviousState != kPaused)
 					{
@@ -3061,14 +3006,14 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 				nNumThreads = getNumLogicalProcessors();
 			}
 
-			// Create athe processing semaphore needed for any processing
-			createProcessingSemaphore(nNumThreads);
-
-			// if there are parallelizable tasks setup the thread data
-			bool bParallelize = setupWorkItemThreadData(nNumThreads, lActionID);			
-
 			if (!bDontStartThreads)
 			{
+				// Create athe processing semaphore needed for any processing
+				createProcessingSemaphore(nNumThreads);
+
+				// if there are parallelizable tasks setup the thread data
+				bool bParallelize = setupWorkItemThreadData(nNumThreads, lActionID);			
+
 				// Create all the file processors for the threads and 
 				// notify them that processing is about to begin
 				for (int i = 0; i < nNumThreads; i++)
@@ -3153,7 +3098,7 @@ void CFileProcessingMgmtRole::stopProcessing()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28211");
 }
 //-------------------------------------------------------------------------------------------------
-unsigned long CFileProcessingMgmtRole::timeTillNextProcessingChange( ERunningState &eNextRunningState )
+unsigned long CFileProcessingMgmtRole::timeTillNextProcessingChange( ERunningState &eNextRunningState)
 {
 	// If not limiting to a schedule running state should always be kNormalRun
 	if (!m_bLimitProcessingToSchedule)

@@ -185,6 +185,12 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31586", ipFileRecord != __nullptr);
 
+		// If cancel has been signaled before processing file and it is allowed exit with canceled status
+		if (m_bAllowCancelBeforeComplete && bCancelRequested == VARIANT_TRUE)
+		{
+			*pResult = kProcessingCancelled;
+			return S_OK;
+		}
 		string strInputFileName = asString(ipFileRecord->Name);
 
 		// Default to successful completion
@@ -864,7 +870,13 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		_bstr_t bstrStringized = getMiscUtils()->GetObjectAsStringizedByteStream(ipTask);
 		
 		// Check if work item group already exists
-		long nWorkItemGroupID = ipDB->FindWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nTotalPages);
+		long nWorkItemGroupID = 0;
+		
+		// Only look for an existing work item group if this can be canceled
+		if (m_bAllowCancelBeforeComplete)
+		{
+			nWorkItemGroupID = ipDB->FindWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nTotalPages);
+		}
 
 		// The record already exists so return the group id
 		if (nWorkItemGroupID != 0)

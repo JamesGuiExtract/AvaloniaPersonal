@@ -38,7 +38,9 @@ FPRecordManager::FPRecordManager()
   m_bSleepTimeCalculated(false),
   m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB),
   m_bRestrictToCurrentUPI(false),
-  m_eLastFilePriority(kPriorityDefault)
+  m_eLastFilePriority(kPriorityDefault),
+  m_bAllowRestartableProcessing(false),
+  m_bAllowRestartableFlagRetrievedFromDB(false)
 {
 	try
 	{
@@ -100,6 +102,11 @@ void FPRecordManager::discardProcessingQueue()
 {
 	ASSERT_ARGUMENT("ELI14002", m_ipFPMDB != __nullptr);
 
+	// Set the Work Item processing to the current UPI
+	m_bRestrictToCurrentUPI = true;
+
+	discardWorkItems();
+
 	// If the queue has already been discarded just return [FlexIDSCore #3738]
 	if (processingQueueIsDiscarded())
 	{
@@ -151,12 +158,6 @@ void FPRecordManager::discardProcessingQueue()
 	// Ensure the queue is cleared since we have now reverted the state of all files
 	// [FlexIDSCore #3738]
 	m_queTaskIds.clear();
-
-	// Set the Work Item processing to the current UPI
-	m_bRestrictToCurrentUPI = true;
-	
-	// Discard work items that do not have the file processing in this instance
-	discardWorkItems();
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::updateTask(FileProcessingRecord& task)
@@ -547,6 +548,8 @@ void FPRecordManager::clear(bool bClearUI)
 
 	m_bParallelizableEnabled = false;
 	m_bRestrictToCurrentUPI = false;
+	m_bAllowRestartableFlagRetrievedFromDB = false;
+	m_bAllowRestartableProcessing = false;
 
 	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
 	m_queWorkItemIds.clear();
@@ -684,39 +687,74 @@ long FPRecordManager::getNumberOfFilesFailed()
 //-------------------------------------------------------------------------------------------------
 bool FPRecordManager::getWorkItemToProcess(FPWorkItem& workItem)
 {
-	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
+	unsigned long nSleepTime = gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK;
 
+	// Using min sleep time until the sleep times have been calculated
+	if (m_bSleepTimeCalculated)
+	{
+		nSleepTime = *m_currentWorkItemTime;
+	}
+	
+	// Initialize the Allow restartable flag
+	loadAllowRestartableFromDB();
+	
 	long nWorkItemsLoaded = 0;
-
-	// check for available items in the queue
-	if (m_queWorkItemIds.size() <= 0)
+	do
 	{
-		// get more items
-		nWorkItemsLoaded = loadWorkItemsFromDB(m_nMaxFilesFromDB, 
-			(UCLID_FILEPROCESSINGLib::EFilePriority) m_eLastFilePriority);
-	}
+		CSingleLock lg(&m_queWorkItemsMutex, TRUE);
 
-	// if no work items in the queue return false
-	if (m_queWorkItemIds.size() <= 0 )
-	{
-		return false;
-	}
+		// check for available items in the queue
+		if (!(m_bAllowRestartableProcessing && processingIsStopped()) && m_queWorkItemIds.size() <= 0)
+		{
+			// get more items
+			nWorkItemsLoaded = loadWorkItemsFromDB(m_nMaxFilesFromDB, 
+				(UCLID_FILEPROCESSINGLib::EFilePriority) m_eLastFilePriority);
+		}
+
+		// if no work items in the queue and processing is stopped return false
+		if (m_queWorkItemIds.size() <= 0)
+		{
+			if (processingIsStopped() || 
+				(processingQueueIsDiscarded() && !m_bKeepProcessingAsAdded && m_queTaskIds.empty()))
+			{
+				return false;
+			}
+
+			if (m_bSleepTimeCalculated)
+			{
+				nSleepTime = *m_currentWorkItemTime;
+				if (m_currentWorkItemTime != m_maxSleepTime)
+				{
+					m_currentWorkItemTime++;
+				}
+			}
+			continue;
+		}
 	
-	// get the next work item on the queue	
-	long workItemID = m_queWorkItemIds.front();
-	// Only lock the mutex for a short time to get the work item record
-	{
-		CSingleLock lockMap(&m_mapReadWorkItems, TRUE);
-		workItem = m_mapWorkItems[workItemID];
+		// Reset the sleeptime
+		if (m_bSleepTimeCalculated)
+		{
+			m_currentWorkItemTime = m_vecSleepTimes.begin();
+		}
+
+		// get the next work item on the queue	
+		long workItemID = m_queWorkItemIds.front();
+		// Only lock the mutex for a short time to get the work item record
+		{
+			CSingleLock lockMap(&m_mapReadWorkItems, TRUE);
+			workItem = m_mapWorkItems[workItemID];
+		}
+
+		// Remove from the work item queue because it will be processed
+		m_queWorkItemIds.pop_front();
+
+		// Update the status of the workitem
+		updateWorkItem(workItem);
+		return true;
 	}
-
-	// Remove from the work item queue because it will be processed
-	m_queWorkItemIds.pop_front();
-
-	// Update the status of the workitem
-	updateWorkItem(workItem);
+	while (m_queueStopEvent.wait(nSleepTime) == WAIT_TIMEOUT);
 	
-	return true;	
+	return false;	
 }
 //-------------------------------------------------------------------------------------------------
 FPWorkItem FPRecordManager::getWorkItem(long workItemID)
@@ -1265,6 +1303,7 @@ void FPRecordManager::computeSleepIntervals()
 
 		// Set the current iterator to the min sleep time and the max iterator to the last entry
 		m_currentSleepTime = m_vecSleepTimes.begin();
+		m_currentWorkItemTime = m_currentSleepTime;
 		m_maxSleepTime = m_vecSleepTimes.end() - 1;
 		m_bSleepTimeCalculated = true;
 	}
@@ -1347,13 +1386,16 @@ void FPRecordManager::discardWorkItems()
 {
 	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
 
-	_bstr_t bstrAllowRestartable = m_ipFPMDB->GetDBInfoSetting("AllowRestartableProcessing", VARIANT_FALSE);
+	loadAllowRestartableFromDB();
 
 	// If Restartable processing is not enabled then work items in the queue for file that are 
 	// processing in the current UPI should be kept in the queue to be processed. 
 	// If Restartable processing is enabled all of the work items in the queue waiting to be processed
-	// will be cleared
-	bool bKeepCurrentUPI = asString(bstrAllowRestartable) == "0";
+	// will be cleared if processing is stopped (discardWorkItems will be called if m_bKeepProcessingAsAdded is false
+	// and the last file has been queued but processingIsStopped() will be false in this case 
+	// no new files will be added but the work items for the currently processing files in this 
+	// instance need to be processed)
+	bool bKeepCurrentUPI = !m_bAllowRestartableProcessing || !processingIsStopped();
 
 	// go through the list of waiting items
 	long nNumberInQueue = m_queWorkItemIds.size();
@@ -1378,16 +1420,20 @@ void FPRecordManager::discardWorkItems()
 		}
 		else
 		{
-			// Set the work item back to pending
-			m_ipFPMDB->SetWorkItemToPending(workItemID);
-			
-			// Find the work item in the work item map
-			workItemMap::iterator it = m_mapWorkItems.find(workItemID);
-			if(it != m_mapWorkItems.end())
+			try
 			{
-				// Remove the work item from the map
-				m_mapWorkItems.erase(it);
+				// Set the work item back to pending
+				m_ipFPMDB->SetWorkItemToPending(workItemID);
+			
+				// Find the work item in the work item map
+				workItemMap::iterator it = m_mapWorkItems.find(workItemID);
+				if(it != m_mapWorkItems.end())
+				{
+					// Remove the work item from the map
+					m_mapWorkItems.erase(it);
+				}
 			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS ("ELI37614");
 		}
 	}
 }
@@ -1397,6 +1443,7 @@ long FPRecordManager::loadWorkItemsFromDB(long nNumToLoad, UCLID_FILEPROCESSINGL
 	long numberWorkItemsLoaded;
 
 	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
+
 	IIUnknownVectorPtr ipWorkItems = 
 		m_ipFPMDB->GetWorkItemsToProcess(m_nActionID, asVariantBool(m_bRestrictToCurrentUPI), 
 			nNumToLoad, eMinPriority);
@@ -1425,7 +1472,8 @@ bool FPRecordManager::workItemsToProcess()
 		// next work item priority
 		CSingleLock lg(&m_queWorkItemsMutex, TRUE);
 		long nWorkItemsAvailable = m_queWorkItemIds.size();
-		if (nWorkItemsAvailable <= 0)
+
+        if (!(m_bAllowRestartableProcessing && processingIsStopped()) && nWorkItemsAvailable <= 0)
 		{
 			nWorkItemsAvailable = loadWorkItemsFromDB(m_nMaxFilesFromDB, 
 				(UCLID_FILEPROCESSINGLib::EFilePriority) m_eLastFilePriority);
@@ -1437,3 +1485,15 @@ bool FPRecordManager::workItemsToProcess()
 	}
 	return false;
 }
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::loadAllowRestartableFromDB()
+{
+	// Only want to retrieve this the first time this is called
+	if (!m_bAllowRestartableFlagRetrievedFromDB)
+	{
+		_bstr_t bstrAllowRestartable = m_ipFPMDB->GetDBInfoSetting("AllowRestartableProcessing", VARIANT_FALSE);
+		m_bAllowRestartableProcessing = asString(bstrAllowRestartable) == "1";
+		m_bAllowRestartableFlagRetrievedFromDB = true;
+	}
+}
+//-------------------------------------------------------------------------------------------------

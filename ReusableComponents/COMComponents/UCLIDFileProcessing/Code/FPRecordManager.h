@@ -190,7 +190,8 @@ public:
 	inline void setMaxNumberOfFilesFromDB(long nMaxNumberOfFiles)
 		{ m_nMaxFilesFromDB = nMaxNumberOfFiles; }
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: To return a work item to process if one is available
+	// PROMISE: To return a work item to process if one is available. returns false if processing is
+	//			stopped and no more work items are available.
 	bool getWorkItemToProcess(FPWorkItem& workItem);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return a copy of the work item with workitem ID that is in m_mapWorkItems
@@ -279,6 +280,7 @@ private:
 
 	vector<unsigned long> m_vecSleepTimes;
 	vector<unsigned long>::iterator m_currentSleepTime; // Iterator into the sleep time vector
+	vector<unsigned long>::iterator m_currentWorkItemTime; // Iterator into the sleep time vector for workItem time
 	vector<unsigned long>::iterator m_maxSleepTime; // Iterator that points to the max sleep time
 	bool m_bSleepTimeCalculated;
 
@@ -330,6 +332,13 @@ private:
 	// Flag to indicate that only workitems for files being processed in the current instance 
 	// should be retrieved from the database
 	bool m_bRestrictToCurrentUPI;
+
+	// Flag to indicate that restartable processing is enabled. This is only used 
+	// if m_bParallelizableEnabled is true
+	bool m_bAllowRestartableProcessing;
+
+	// Flag to indicate that the AllowRestartableProcessing has been retrieved from the database
+	bool m_bAllowRestartableFlagRetrievedFromDB;
 
 	////////////////
 	// Methods
@@ -385,4 +394,7 @@ private:
 
 	// returns true if there are workItems to process and false if there are not work items to process
 	bool workItemsToProcess();
+
+	// Retrieves the AllowRestartable setting from the database
+	void loadAllowRestartableFromDB();
 };

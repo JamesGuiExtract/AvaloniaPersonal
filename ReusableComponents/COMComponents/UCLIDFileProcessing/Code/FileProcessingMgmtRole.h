@@ -90,10 +90,6 @@ public:
 	Win32Event m_threadStartedEvent;
 	Win32Event m_threadEndedEvent;
 	static Win32Event ms_threadStopProcessing;
-	
-	// Used when no work items are returned and the thread that locks this mutex
-	// then enters polling loop until work items are available or stop has been initiated
-	static CMutex ms_mutexForWorkItemIdle;
 };
 
 
