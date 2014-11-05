@@ -76,7 +76,7 @@ const string DEFAULT_DIRECTORY = "C:\\";
 
 // Column Width Bounds
 #define	MIN_WIDTH					0
-#define	MAX_WIDTH					400
+#define	MAX_WIDTH					800
 
 const char *gszAPP_TRACE_TAG		= "application trace";
 const char *gszAPP_DISPLAYED_TAG	= "displayed:";
@@ -488,7 +488,7 @@ void CUEXViewerDlg::OnSize(UINT nType, int cx, int cy)
 			long nSpacingX = rectList.left;
 			long nSpacingY = rectList.top;
 
-			// re-position the next-file button
+			// reposition the next-file button
 			CWnd *pNextButton = GetDlgItem(ID_BTN_NEXT_LOG_FILE);
 			ASSERT_RESOURCE_ALLOCATION("ELI14856", pNextButton != __nullptr);
 			CRect rectNextButton;
@@ -518,7 +518,7 @@ void CUEXViewerDlg::OnSize(UINT nType, int cx, int cy)
 			rectExList.right = rectPrevButton.left - nSpacingX;
 			pExList->MoveWindow(&rectExList);
 
-			// resposition the label above the exception file list dropdown
+			// reposition the label above the exception file list dropdown
 			CWnd *pExListLabel = GetDlgItem(IDC_STATIC_EXCEPTION_FILE_LIST);
 			ASSERT_RESOURCE_ALLOCATION("ELI14859", pExListLabel != __nullptr);
 			CRect rectExListLabel;
@@ -1961,6 +1961,10 @@ long CUEXViewerDlg::getColumnWidth(string strColumn)
 		if ((iActual >= MIN_WIDTH) && (iActual <= MAX_WIDTH))
 		{
 			lWidth = iActual;
+		}
+		else if (iActual > MAX_WIDTH)
+		{
+			lWidth = MAX_WIDTH;
 		}
 	}
 
