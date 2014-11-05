@@ -31,7 +31,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <see cref="ViewImageTaskForm"/>.
         /// </summary>
         static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
-            FileSystemMethods.ApplicationDataPath, "ImageViewerTask", "ImageViewerTaskForm.xml");
+            FileSystemMethods.UserApplicationDataPath, "ImageViewerTask", "ImageViewerTaskForm.xml");
 
         /// <summary>
         /// The title to display for the view image task form.

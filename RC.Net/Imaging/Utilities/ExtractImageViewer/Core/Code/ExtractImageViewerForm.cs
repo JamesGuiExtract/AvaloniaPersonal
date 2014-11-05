@@ -64,7 +64,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <see cref="ExtractImageViewerForm"/>.
         /// </summary>
         static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
-            FileSystemMethods.ApplicationDataPath, "Extract Image Viewer",
+            FileSystemMethods.UserApplicationDataPath, "Extract Image Viewer",
             "ExtractImageViewerForm.xml");
 
         /// <summary>

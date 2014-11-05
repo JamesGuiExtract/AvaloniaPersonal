@@ -37,7 +37,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see cref="PaginationUtilityForm"/>.
         /// </summary>
         static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
-            FileSystemMethods.ApplicationDataPath, "PaginationUtility", "PaginationUtility.xml");
+            FileSystemMethods.UserApplicationDataPath, "PaginationUtility", "PaginationUtility.xml");
 
         /// <summary>
         /// Name for the mutex used to serialize persistance of the control and form layout.

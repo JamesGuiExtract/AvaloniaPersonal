@@ -87,7 +87,20 @@ namespace Extract.Utilities
         {
         }
 
-        /// <overloads>Initializes a new ConfigSettings instance.</overloads>
+        /// <summary>
+        /// Initializes a new ConfigSettings instance.
+        /// <param name="useCommonAppData">Use CommonApplicationData folder for the
+        /// config file.</param>
+        /// </summary>
+        public ConfigSettings(bool useCommonAppData)
+            : this( (useCommonAppData
+                        ? Path.Combine(FileSystemMethods.CommonApplicationDataPath,
+                          Path.GetFileName(Assembly.GetAssembly(typeof(T)).Location) + ".config")
+                        : null
+                    ), true, true)
+        {
+        }
+
         /// <summary>
         /// Initializes a new ConfigSettings instance.
         /// </summary>
@@ -139,13 +152,13 @@ namespace Extract.Utilities
             try
             {
                 // If a filename was not specified, create one based on the name of the
-                // ApplicationDataPath and the assembly that defines T.
+                // UserApplicationDataPath and the assembly that defines T.
                 if (configFileName == null)
                 {
                     _configFileName = Assembly.GetAssembly(typeof(T)).Location;
                     _configFileName = Path.GetFileName(_configFileName);
                     _configFileName = Path.Combine(
-                        FileSystemMethods.ApplicationDataPath, _configFileName + ".config");
+                        FileSystemMethods.UserApplicationDataPath, _configFileName + ".config");
                 }
                 else
                 {

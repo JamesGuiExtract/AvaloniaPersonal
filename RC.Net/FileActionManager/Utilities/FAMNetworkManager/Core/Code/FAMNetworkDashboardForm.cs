@@ -184,7 +184,7 @@ namespace Extract.FileActionManager.Utilities
         /// Path to the folder containing the application settings for this application.
         /// </summary>
         static readonly string _APPLICATION_SETTINGS_DIR =
-            Path.Combine(FileSystemMethods.ApplicationDataPath, "FAM Network Manager");
+            Path.Combine(FileSystemMethods.UserApplicationDataPath, "FAM Network Manager");
 
         /// <summary>
         /// The full path to the file that contains information about persisting the 
@@ -332,7 +332,7 @@ namespace Extract.FileActionManager.Utilities
                 InitializeComponent();
 
                 _config = new ConfigSettings<Properties.Settings>(
-                    Path.Combine(FileSystemMethods.ApplicationDataPath, "FAMNetworkManager.config"));
+                    Path.Combine(FileSystemMethods.UserApplicationDataPath, "FAMNetworkManager.config"));
 
                 _currentFile = fileToOpen;
 

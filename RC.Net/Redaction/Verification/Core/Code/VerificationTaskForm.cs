@@ -63,7 +63,7 @@ namespace Extract.Redaction.Verification
         /// <see cref="VerificationTaskForm"/>.
         /// </summary>
         static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
-            FileSystemMethods.ApplicationDataPath, "ID Shield", "VerificationForm.xml");
+            FileSystemMethods.UserApplicationDataPath, "ID Shield", "VerificationForm.xml");
 
         /// <summary>
         /// The full path to the ID Shield help file.

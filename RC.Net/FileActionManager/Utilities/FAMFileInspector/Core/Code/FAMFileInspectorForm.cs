@@ -89,7 +89,7 @@ namespace Extract.FileActionManager.Utilities
         /// <see cref="FAMFileInspectorForm"/>.
         /// </summary>
         static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
-            FileSystemMethods.ApplicationDataPath, "FAMFileInspector", "FAMFileInspector.xml");
+            FileSystemMethods.UserApplicationDataPath, "FAMFileInspector", "FAMFileInspector.xml");
 
         /// <summary>
         /// Name for the mutex used to serialize persistance of the control and form layout.

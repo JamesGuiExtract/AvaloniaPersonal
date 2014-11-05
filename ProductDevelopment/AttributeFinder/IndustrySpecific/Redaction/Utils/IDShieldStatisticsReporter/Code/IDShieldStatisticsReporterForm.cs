@@ -79,7 +79,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// <see cref="IDShieldStatisticsReporterForm"/>.
         /// </summary>
         static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
-            FileSystemMethods.ApplicationDataPath, "ID Shield", "StatisticsReporterForm.xml");
+            FileSystemMethods.UserApplicationDataPath, "ID Shield", "StatisticsReporterForm.xml");
 
         /// <summary>
         /// Name for the mutex used to serialize persistance of the control and form layout.
@@ -188,7 +188,7 @@ namespace Extract.IDShieldStatisticsReporter
                 InitializeComponent();
 
                 _config = new ConfigSettings<Settings>(
-                    Path.Combine(FileSystemMethods.ApplicationDataPath, 
+                    Path.Combine(FileSystemMethods.UserApplicationDataPath, 
                     "IDShieldStatisticsReporter.config"));
 
                 // Create an condition object so that its configuration screen can be used to

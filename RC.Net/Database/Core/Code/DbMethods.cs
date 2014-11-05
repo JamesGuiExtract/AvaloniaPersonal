@@ -25,7 +25,7 @@ namespace Extract.Database
         /// <summary>
         /// Provides access to settings in the config file.
         /// </summary>
-        static ConfigSettings<Properties.Settings> _config = new ConfigSettings<Properties.Settings>();
+        static ConfigSettings<Properties.Settings> _config = new ConfigSettings<Properties.Settings>(true);
 
         #endregion Constants
 

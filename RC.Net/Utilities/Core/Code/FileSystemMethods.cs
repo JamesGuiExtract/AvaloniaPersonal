@@ -47,14 +47,14 @@ namespace Extract.Utilities
         /// <summary>
         /// The full path to the Extract Systems application data folder.
         /// </summary>
-        static readonly string _APPLICATION_DATA_PATH = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Extract Systems");
+        static readonly string _USER_APPLICATION_DATA_PATH = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.DoNotVerify), "Extract Systems");
 
         /// <summary>
         /// The full path to the extract systems common application data folder
         /// </summary>
         static readonly string _COMMON_APPLICATION_DATA_PATH = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData, Environment.SpecialFolderOption.DoNotVerify),
             "Extract Systems");
 
         /// <summary>
@@ -179,11 +179,11 @@ namespace Extract.Utilities
         /// Gets the full path to the Extract Systems local user application data folder.
         /// </summary>
         /// <value>The full path to the Extract Systems local user application data folder.</value>
-        public static string ApplicationDataPath
+        public static string UserApplicationDataPath
         {
             get
             {
-                return _APPLICATION_DATA_PATH;
+                return _USER_APPLICATION_DATA_PATH;
             }
         }
 

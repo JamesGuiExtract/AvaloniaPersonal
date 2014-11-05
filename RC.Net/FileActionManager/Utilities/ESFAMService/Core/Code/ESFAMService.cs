@@ -278,7 +278,7 @@ namespace Extract.FileActionManager.Utilities
                 else
                 {
                     var ee = new ExtractException("ELI35295", "Application trace: SleepTimeOnStart "
-                        + "ignored since system in not in the process of starting up.");
+                        + "ignored since system is not in the process of starting up.");
                     ee.AddDebugData("System uptime", SystemMethods.SystemUptime, false);
                     ee.Log();
                 }

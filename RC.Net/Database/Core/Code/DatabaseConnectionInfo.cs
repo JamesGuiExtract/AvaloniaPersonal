@@ -41,7 +41,7 @@ namespace Extract.Database
         /// Allows data sources and providers to be looked up by name.
         /// </summary>
         DataConnectionConfiguration _connectionConfig =
-            new DataConnectionConfiguration(FileSystemMethods.ApplicationDataPath);
+            new DataConnectionConfiguration(FileSystemMethods.CommonApplicationDataPath);
 
         #endregion Fields
 

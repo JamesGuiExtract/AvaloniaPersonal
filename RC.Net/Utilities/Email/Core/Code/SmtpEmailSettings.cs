@@ -148,7 +148,7 @@ namespace Extract.Utilities.Email
         /// Location to store the user settings.
         /// </summary>
         static readonly string _USER_SETTINGS = Path.Combine(
-            FileSystemMethods.ApplicationDataPath, _SETTINGS_FOLDER, _SETTINGS_FILE);
+            FileSystemMethods.UserApplicationDataPath, _SETTINGS_FOLDER, _SETTINGS_FILE);
 
         /// <summary>
         /// Location to store the global settings.
