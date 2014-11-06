@@ -1,7 +1,7 @@
-// Enable to test performance. Use with a config file that sets PreventSave to True.
+// Add PERFORMANCE_TESTING to the "Conditional compilation symbols" in the build setting to
+// enable to performance testing. Use with a config file that sets PreventSave to True.
 // When enabled, the UI will automatically move to the next document after each is loaded.
 // When processing stops and the UI is closed, it will log an exception with total run time.
-//#define PERFORMANCE_TESTING
 
 using Extract.Database;
 using Extract.Drawing;
@@ -2677,8 +2677,10 @@ namespace Extract.DataEntry
 
             if (!Visible && _performanceTestingStartTime.HasValue)
             {
-                new ExtractException("ELI36157", "TotalTime: " +
-                    (DateTime.Now - _performanceTestingStartTime.Value).ToString("g")).Log();
+                var ee = new ExtractException("ELI36157", "TotalTime: " +
+                    (DateTime.Now - _performanceTestingStartTime.Value).ToString("g"));
+                DataEntryQuery.ReportPerformanceData(ee);
+                ee.Log();
                 _performanceTestingStartTime = null;
             }
         }

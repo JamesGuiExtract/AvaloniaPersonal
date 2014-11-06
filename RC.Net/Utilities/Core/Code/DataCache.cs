@@ -378,6 +378,20 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Outputs the keys for the currently cached <see cref="DataItem"/>s prefixed by their
+        /// respective scores (higher score = more expensive to generate), in order from most to
+        /// least expensive.
+        /// </summary>
+        /// <returns>The keys for the currently cached <see cref="DataItem"/>s.</returns>
+        public IEnumerable<string> ReportCachedData()
+        {
+            foreach (DataItem item in _rankedData.Reverse())
+            {
+                yield return item.Score.ToString() + ": " + item.Key;
+            }
+        }
+
+        /// <summary>
         /// Clears all data from the cache.
         /// </summary>
         public void Clear()

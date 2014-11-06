@@ -1,3 +1,11 @@
+// Add PERFORMANCE_TESTING to the "Conditional compilation symbols" in the build setting to
+// enable to performance testing. Use with a config file that sets PreventSave to True.
+// When enabled, the UI will automatically move to the next document after each is loaded.
+// When processing stops and the UI is closed, it will log an exception with total run time.
+// The top 25 most expensive queries will be output as debug values where the expensiveness
+// is the initial query execution time multiplied by the number of executions. This resulting
+// "score" will be shown just before the query itself in the debug value.
+
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -21,6 +29,12 @@ namespace Extract.DataEntry
         #endregion Constants
 
         #region Fields
+
+#if PERFORMANCE_TESTING
+        static DataCache<string, CachedQueryData<string[]>> _performanceCache =
+            new DataCache<string, CachedQueryData<string[]>>(
+                26, CachedQueryData<string[]>.GetScore);
+#endif
 
         /// <summary>
         /// Indicates whether this query is a default query.
@@ -328,6 +342,22 @@ namespace Extract.DataEntry
             }
         }
 
+#if PERFORMANCE_TESTING
+        /// <summary>
+        /// Populates as debug info into <see paramref="ee"/> the most expensive queries that have
+        /// been executed.
+        /// </summary>
+        /// <param name="ee">The <see cref="ExtractException"/> in which the query performance data
+        /// should be reported.</param>
+        static public void ReportPerformanceData(ExtractException ee)
+        {
+            foreach (string cachedQuery in _performanceCache.ReportCachedData())
+            {
+                ee.AddDebugData("Query", cachedQuery, false);
+            }
+        }
+#endif
+
         #endregion Methods
 
         #region Overrides
@@ -392,6 +422,33 @@ namespace Extract.DataEntry
             {
                 throw ExtractException.AsExtractException("ELI28859", ex);
             }
+        }
+
+        /// <summary>
+        /// Evaluates the query by combining all child <see cref="QueryNode"/>s.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="QueryResult"/> representing the result of the query.
+        /// </returns>
+        public override QueryResult Evaluate()
+        {
+#if PERFORMANCE_TESTING
+            DateTime startTime = DateTime.Now;
+#endif
+
+            QueryResult result = base.Evaluate();
+
+#if PERFORMANCE_TESTING
+            double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
+            CachedQueryData<string[]> cachedResults;
+            if (!_performanceCache.TryGetData(QueryText, out cachedResults))
+            {
+                cachedResults = new CachedQueryData<string[]>(new string[0], executionTime);
+                _performanceCache.CacheData(QueryText, cachedResults);
+            }
+#endif
+
+            return result;
         }
 
         #endregion Overrides
