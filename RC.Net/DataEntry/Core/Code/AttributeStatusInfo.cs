@@ -1256,6 +1256,12 @@ namespace Extract.DataEntry
 
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
+                // https://extract.atlassian.net/browse/ISSUE-12547
+                // Consider any assignment of a value via specification of a SpatialString
+                // programmatic. Specifically, without this assignment swipes into the new row of a
+                // table end up getting cleared.
+                statusInfo.LastAppliedStringValue = value.String;
+
                 if (_endEditInProgress)
                 {
                     // If EndEdit is currently being processed (and this is a result of it), raise
