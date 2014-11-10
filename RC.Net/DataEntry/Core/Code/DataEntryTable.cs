@@ -791,6 +791,8 @@ namespace Extract.DataEntry
         /// data.</param>
         protected override void OnUserAddedRow(DataGridViewRowEventArgs e)
         {
+            string initialValue = null;
+
             try
             {
                 OnUpdateStarted(new EventArgs());
@@ -806,21 +808,12 @@ namespace Extract.DataEntry
 
                 // Obtain the initial value before calling ApplyAttributeToRow which may trigger
                 // auto-update queries and cause the value to change.
-                string initialValue = CurrentCell.Value.ToString();
+                initialValue = CurrentCell.Value.ToString();
 
                 CurrentCell.Value = "";
 
                 // Add a new attribute for the specified row.
                 ApplyAttributeToRow(e.Row.Index - 1, null, null);
-
-                // If the initial value was null or empty (can this happen?) there is nothing more
-                // to do.
-                if (string.IsNullOrEmpty(initialValue))
-                {
-                    return;
-                }
-
-                this.SafeBeginInvoke("ELI34449", () => BeginEdit(initialValue));
             }
             catch (Exception ex)
             {
@@ -837,6 +830,18 @@ namespace Extract.DataEntry
                 this.SafeBeginInvoke("ELI34408", () => OnUpdateEnded(new EventArgs()));
                 this.SafeBeginInvoke("ELI34410", () =>
                     AttributeStatusInfo.UndoManager.ExtendCurrentOperation());
+
+                // If the initial value was null or empty (can this happen?) there is no need to
+                // call BeginEdit
+                if (!string.IsNullOrEmpty(initialValue))
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-12554
+                    // With the addition of PauseQueries for ISSUE-12453, queries will now be
+                    // scheduled for execution in the above OnUpdateEnded call. If BeginEdit is
+                    // scheduled before those queries, the queries may override initialValue.
+                    // Therefore, the scheduling of BeginEdit has been moved down here.
+                    this.SafeBeginInvoke("ELI34449", () => BeginEdit(initialValue));
+                }
             }
         }
 

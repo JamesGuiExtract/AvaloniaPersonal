@@ -187,10 +187,17 @@ namespace Extract.DataEntry
         static Dictionary<IAttribute, KeyValuePair<bool, SpatialString>> _attributesBeingModified;
 
         /// <summary>
-        /// Keeps track of whether EndEdit is currently being processed.
+        /// Prevents recursion of EndEdit while <see cref="_attributesBeingModified"/> is being
+        /// processed.
         /// </summary>
         [ThreadStatic]
-        static bool _endEditInProgress;
+        static bool _endEditRecursionBlock;
+
+        /// <summary>
+        /// Keeps track of current number of nested calls into EndEdit (should never be > 2).
+        /// </summary>
+        [ThreadStatic]
+        static int _endEditReferenceCount;
 
         /// <summary>
         /// Specifies whether validation triggers are currently enabled.
@@ -570,7 +577,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _endEditInProgress;
+                return _endEditReferenceCount > 0;
             }
         }
 
@@ -867,7 +874,8 @@ namespace Extract.DataEntry
                 _statusInfoMap.Clear();
                 _subAttributesToParentMap.Clear();
                 _attributesBeingModified.Clear();
-                _endEditInProgress = false;
+                _endEditReferenceCount = 0;
+                _endEditRecursionBlock = false;
                 if (pathTags != null)
                 {
                     _pathTags = pathTags;
@@ -1262,7 +1270,7 @@ namespace Extract.DataEntry
                 // table end up getting cleared.
                 statusInfo.LastAppliedStringValue = value.String;
 
-                if (_endEditInProgress)
+                if (EndEditInProgress)
                 {
                     // If EndEdit is currently being processed (and this is a result of it), raise
                     // the non-incremental modification event now.
@@ -1426,7 +1434,7 @@ namespace Extract.DataEntry
 
                     AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                    if (_endEditInProgress)
+                    if (EndEditInProgress)
                     {
                         // If EndEdit is currently being processed (and this is a result of it), raise
                         // the non-incremental modification event now.
@@ -2892,14 +2900,20 @@ namespace Extract.DataEntry
             {
                 InitializeStatics();
 
-                if (_endEditInProgress)
+                if (_endEditRecursionBlock)
                 {
+                    // As after as I can tell, this is never reached; all recursion appears to
+                    // originate from OnEditEnded. However, since recursion while
+                    // _endEditRecursionBlock is true would cause an exception due to
+                    // _attributesBeingModified being modified while being iterated, keep this check
+                    // in place.
                     return;
                 }
 
                 try
                 {
-                    _endEditInProgress = true;
+                    _endEditRecursionBlock = true;
+                    _endEditReferenceCount++;
 
                     // If attributes have been modified since the last end edit, raise 
                     // IncrementalUpdate == false AttributeValueModified events now.
@@ -2918,13 +2932,35 @@ namespace Extract.DataEntry
                 }
                 finally
                 {
-                    _endEditInProgress = false;
+                    _endEditRecursionBlock = false;
 
-                    OnEditEnded();
+                    // https://extract.atlassian.net/browse/ISSUE-12549
+                    // OnEditEnded can cause recursive calls into this method; only the first call
+                    // of OnEditEnded is needed.
+                    if (_endEditReferenceCount == 1)
+                    {
+                        try
+                        {
+                            OnEditEnded();
+
+                            // Any time EndEdit is called, consider it the end of an operation.
+                            _undoManager.StartNewOperation();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI37634");
+                        }
+                        finally
+                        {
+                            // Ensure _endEditReferenceCount always gets set back to zero.
+                            _endEditReferenceCount = 0;
+                        }
+                    }
+                    else
+                    {
+                        _endEditReferenceCount--;
+                    }
                 }
-
-                // Any time EndEdit is called, consider it the end of an operation.
-                _undoManager.StartNewOperation();
             }
             catch (Exception ex)
             {
@@ -3106,6 +3142,8 @@ namespace Extract.DataEntry
                 _attributesBeingModified =
                     new Dictionary<IAttribute, KeyValuePair<bool, SpatialString>>();
                 _undoManager = new UndoManager();
+                _endEditReferenceCount = 0;
+                _endEditRecursionBlock = false;
             }
         }
 

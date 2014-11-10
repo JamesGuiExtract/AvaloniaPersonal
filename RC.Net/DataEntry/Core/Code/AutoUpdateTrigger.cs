@@ -655,6 +655,9 @@ namespace Extract.DataEntry
         {
             if (_executingPendingTriggers)
             {
+                // https://extract.atlassian.net/browse/ISSUE-12549
+                // With the change to EndEdit mad for this issue, recursion into this method should
+                // no longer occur. However, it doesn't hurt to keep this check in place.
                 return;
             }
 
