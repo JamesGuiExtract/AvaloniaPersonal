@@ -1,6 +1,7 @@
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1409,6 +1410,15 @@ namespace Extract.DataEntry
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI26135", _OBJECT_NAME);
+
+                // https://extract.atlassian.net/browse/ISSUE-12555
+                // Ensure leading spaces are removed when applying values from auto-complete since
+                // we artificially prepending spaces to auto-complete values allow the space bar to
+                // trigger auto-complete.
+                if (value.Length > 0 && value[0] == ' ' && FormsMethods.IsAutoCompleteDisplayed())
+                {
+                    value = value.Substring(1);
+                }
 
                 // Don't do anything if the specified value matches the existing value.
                 if (attribute.Value.String != value)
