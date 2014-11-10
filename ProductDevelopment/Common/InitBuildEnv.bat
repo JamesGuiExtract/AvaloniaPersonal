@@ -12,7 +12,7 @@ SET PATH=%windir%;%windir%\System32;%windir%\System32\WindowsPowerShell\v1.0;I:\
 SET PATH=%PATH%;%DevEnvDir%;%VCPP_DIR%\BIN;%VS_COMMON%\Tools;%VS_COMMON%\Tools\bin;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;%VCPP_DIR%\VCPackages;%VCPP_DIR%\Bin;%DOTFUSCATOR%;%FX_COP%;
 SET PATH=%PATH%;%WINDOWS_SDK%\BIN;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet
 SET INSTALL_PRODUCT_DEVELOPMENT_PATH=\\fnp2\internal\Common\Engineering\productdevelopment
-
+SET ENGSVR_INTERNAL_BASE=D:\Internal
 SET BUILD_PRODUCT_RELEASE=\\EngSvr\internal\ProductReleases
 
 net use i: \\fnp2\internal
