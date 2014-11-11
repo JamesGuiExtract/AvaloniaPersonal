@@ -75,7 +75,6 @@ CopyFilesToInstallFolder:
 	@DeleteFiles "$(LabDEInstallBuildFiles)\NonSelfRegFiles\*.*" /S
 	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet\leadtools*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet"
 	@COPY /v "$(BinariesFolder)\Obfuscated\*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /v "$(BinariesFolder)\Extract.DataEntry.DEP.StandardLabDE.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\DataEntryCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Interop.*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
@@ -117,7 +116,7 @@ CreateDemoShieldInstall: CreateLabDEInstallCD
 	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(LabDEInstallDir)" /v /s /e /y
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\Launch.ini" "$(LabDEInstallDir)"
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\LabDEInstall.dbd" "$(LabDEInstallDir)"
-	@COPY "$(LabDEDir)\DEPs\StandardLabDE\Core\Code\Resources\LabDE.ico" "$(LabDEInstallDir)"
+	@COPY "$(LabDEInstallRootDir)\LabDEInstall\LabDE.ico" "$(LabDEInstallDir)"
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\autorun.inf" "$(LabDESetupFiles)"
 
 CreateDemo_LabDE: 

@@ -313,7 +313,6 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>AllOtherFiles</td><td>{BF13F1DD-ACE5-414A-97D2-8A7CEE2DAC71}</td><td>COMMON_COMPONENTS</td><td>8</td><td>VersionNT&gt;=600</td><td>disabledthemes.sdb</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td>{DAF7F71B-7533-4E2B-8F3C-74BBEC214E00}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.dataentry.dep.standa</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td>{39AF42D5-575F-4A4F-8BF0-0C3319DAE366}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.labresultscu</td><td>44</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LabDEFolder</td><td>{F8B0585C-259A-4172-8687-7838FC3DBF95}</td><td>LAB_DE</td><td>8</td><td/><td>alternatetestnamemanager.plu</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1127,7 +1126,6 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>DefaultFeature</td><td>AllOtherFiles</td></row>
-		<row><td>DefaultFeature</td><td>Extract.DataEntry.DEP.StandardLabDE.dll</td></row>
 		<row><td>DefaultFeature</td><td>Extract.LabResultsCustomComponents</td></row>
 		<row><td>DefaultFeature</td><td>Help</td></row>
 		<row><td>DefaultFeature</td><td>LabDEFolder</td></row>
@@ -1148,7 +1146,6 @@
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>alternatetestnamemanager.plu</td><td>LabDEFolder</td><td>ALTERN~1.PLU|AlternateTestNameManager.plugin</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDEFOLDER_FILES&gt;\AlternateTestNameManager.plugin</td><td>1</td><td/></row>
 		<row><td>disabledthemes.sdb</td><td>AllOtherFiles</td><td>DISABL~1.SDB|DisabledThemes.sdb</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DATAENTRY_MISC&gt;\DisabledThemes.sdb</td><td>1</td><td/></row>
-		<row><td>extract.dataentry.dep.standa</td><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td>EXTRAC~1.DLL|Extract.DataEntry.DEP.StandardLabDE.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.DEP.StandardLabDE.dll</td><td>1</td><td/></row>
 		<row><td>extract.labresultscu</td><td>Extract.LabResultsCustomComponents</td><td>EXTRAC~1.DLL|Extract.LabResultsCustomComponents.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.LabResultsCustomComponents.dll</td><td>1</td><td/></row>
 		<row><td>labde.chm</td><td>Help</td><td>LabDE.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDE_HELP_FILES&gt;\LabDE.chm</td><td>1</td><td/></row>
 		<row><td>labde_high_effort_files_by_u1</td><td>Reports</td><td>LABDEH~1.XML|LabDE high effort files by user.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE high effort files by user.xml</td><td>1</td><td/></row>
@@ -1288,7 +1285,6 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>AllOtherFiles</td><td/><td/><td>_2609E52D_0837_45AF_AB4E_609D37B72624_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td/><td/><td>_89E482A2_8239_4551_BA24_07F6784E8F7F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td/><td/><td>_778BE2D2_CB4F_4383_9D0D_3A3DDEE5587C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_10883AA1_60F1_460D_A0E0_D91F6169AF21_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>LabDEFolder</td><td/><td/><td>_4720FFCA_BC22_4E12_B442_FA549FA1FA19_FILTER</td><td/><td/><td/><td/></row>
