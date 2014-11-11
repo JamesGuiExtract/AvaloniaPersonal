@@ -1851,7 +1851,7 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 					pFPMgmtRole->m_eventProcessManagerActive.wait();
 
 					// Get next work item to process
-					bool bWorkItemReturned = fprm->getWorkItemToProcess(workItem);
+					bool bWorkItemReturned = fprm->getWorkItemToProcess(workItem, pThreadData->ms_threadStopProcessing);
 					
 					if (!bWorkItemReturned)
 					{

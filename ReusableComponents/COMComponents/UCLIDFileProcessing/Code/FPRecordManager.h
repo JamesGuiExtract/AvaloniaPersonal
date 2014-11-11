@@ -190,9 +190,9 @@ public:
 	inline void setMaxNumberOfFilesFromDB(long nMaxNumberOfFiles)
 		{ m_nMaxFilesFromDB = nMaxNumberOfFiles; }
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: To return a work item to process if one is available. returns false if processing is
-	//			stopped and no more work items are available.
-	bool getWorkItemToProcess(FPWorkItem& workItem);
+	// PROMISE: To return a work item to process if one is available. returns false if stopWorkItemThreadEvent
+	//			is signaled and no more work items are available.
+	bool getWorkItemToProcess(FPWorkItem& workItem, Win32Event &stopWorkItemThreadEvent);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return a copy of the work item with workitem ID that is in m_mapWorkItems
 	FPWorkItem getWorkItem(long workItemID);

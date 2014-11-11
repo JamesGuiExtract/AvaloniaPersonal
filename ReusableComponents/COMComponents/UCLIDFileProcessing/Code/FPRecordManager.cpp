@@ -685,7 +685,7 @@ long FPRecordManager::getNumberOfFilesFailed()
 	return m_nNumberOfFilesFailed;
 }
 //-------------------------------------------------------------------------------------------------
-bool FPRecordManager::getWorkItemToProcess(FPWorkItem& workItem)
+bool FPRecordManager::getWorkItemToProcess(FPWorkItem& workItem, Win32Event &stopWorkItemThreadEvent)
 {
 	unsigned long nSleepTime = gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK;
 
@@ -711,15 +711,9 @@ bool FPRecordManager::getWorkItemToProcess(FPWorkItem& workItem)
 				(UCLID_FILEPROCESSINGLib::EFilePriority) m_eLastFilePriority);
 		}
 
-		// if no work items in the queue and processing is stopped return false
+		// if no work items in the queue calculate the sleep time and continue
 		if (m_queWorkItemIds.size() <= 0)
 		{
-			if (processingIsStopped() || 
-				(processingQueueIsDiscarded() && !m_bKeepProcessingAsAdded && m_queTaskIds.empty()))
-			{
-				return false;
-			}
-
 			if (m_bSleepTimeCalculated)
 			{
 				nSleepTime = *m_currentWorkItemTime;
@@ -752,7 +746,7 @@ bool FPRecordManager::getWorkItemToProcess(FPWorkItem& workItem)
 		updateWorkItem(workItem);
 		return true;
 	}
-	while (m_queueStopEvent.wait(nSleepTime) == WAIT_TIMEOUT);
+	while (stopWorkItemThreadEvent.wait(nSleepTime) == WAIT_TIMEOUT);
 	
 	return false;	
 }
