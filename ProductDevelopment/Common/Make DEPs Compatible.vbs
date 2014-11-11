@@ -3,11 +3,19 @@ targetApplications(0) = "ProcessFiles.exe"
 targetApplications(1) = "DataEntryApplication.exe"
 targetApplications(2) = "RunFPSFile.exe"
 
-Dim dependentAssemblies(3)
+Dim dependentAssemblies(11)
 dependentAssemblies(0) = "Extract"
 dependentAssemblies(1) = "Extract.DataEntry"
-dependentAssemblies(2) = "Extract.Licensing"
-dependentAssemblies(3) = "Extract.Utilities.Forms"
+dependentAssemblies(2) = "Extract.Drawing"
+dependentAssemblies(3) = "Extract.FileActionManager.FAMFileInspector"
+dependentAssemblies(4) = "Extract.Imaging"
+dependentAssemblies(5) = "Extract.Imaging.Forms"
+dependentAssemblies(6) = "Extract.Interop"
+dependentAssemblies(7) = "Extract.Licensing"
+dependentAssemblies(8) = "Extract.Utilities"
+dependentAssemblies(9) = "Extract.Utilities.Forms"
+dependentAssemblies(10) = "FAMFileInspector"
+dependentAssemblies(11) = "LeadTools.WinForms"
 
 Const namespaceURI = "urn:schemas-microsoft-com:asm.v1"
 
@@ -90,25 +98,32 @@ Function ApplyConfig(filename)
             dependentAssemblyNode.appendChild(assemblyIdentityNode)
         End If
         
-        installedVersion = fileSys.GetFileVersion(commonComponents & "\" & dependentAssembly & ".dll")
+        installedVersion = Empty
+		If fileSys.FileExists(commonComponents & "\" & dependentAssembly & ".dll") Then
+			installedVersion = fileSys.GetFileVersion(commonComponents & "\" & dependentAssembly & ".dll")
+		ElseIf fileSys.FileExists(commonComponents & "\" & dependentAssembly & ".exe") Then
+			installedVersion = fileSys.GetFileVersion(commonComponents & "\" & dependentAssembly & ".exe")
+		End If
         
-        Set bindingRedirectNode = FindNode(dependentAssemblyNode, "bindingRedirect", "newVersion", installedVersion, False)
-        If Not bindingRedirectNode Is Nothing Then
-            oldVersion = bindingRedirectNode.getAttribute("oldVersion")
-            If Not oldVersion = "1.0.0.0-100.0.0.0" Then
-                dependentAssemblyNode.removeChild(bindingRedirectNode)
-                Set bindingRedirectNode = Nothing
-            End If
-        End If
-        
-        If bindingRedirectNode Is Nothing Then
-            Set bindingRedirectNode = xmlDoc.createNode(1, "bindingRedirect", namespaceURI)
-            bindingRedirectNode.setAttribute("oldVersion"), "1.0.0.0-100.0.0.0"
-            bindingRedirectNode.setAttribute("newVersion"), installedVersion
-            dependentAssemblyNode.appendChild(bindingRedirectNode)
-            
-            modifiedConfig = True
-        End If
+		If Not IsEmpty(installedVersion) Then
+			Set bindingRedirectNode = FindNode(dependentAssemblyNode, "bindingRedirect", "newVersion", installedVersion, False)
+			If Not bindingRedirectNode Is Nothing Then
+				oldVersion = bindingRedirectNode.getAttribute("oldVersion")
+				If Not oldVersion = "1.0.0.0-100.0.0.0" Then
+					dependentAssemblyNode.removeChild(bindingRedirectNode)
+					Set bindingRedirectNode = Nothing
+				End If
+			End If
+			
+			If bindingRedirectNode Is Nothing Then
+				Set bindingRedirectNode = xmlDoc.createNode(1, "bindingRedirect", namespaceURI)
+				bindingRedirectNode.setAttribute("oldVersion"), "1.0.0.0-100.0.0.0"
+				bindingRedirectNode.setAttribute("newVersion"), installedVersion
+				dependentAssemblyNode.appendChild(bindingRedirectNode)
+				
+				modifiedConfig = True
+			End If
+		End If
     Next
     
     If modifiedConfig = True Then

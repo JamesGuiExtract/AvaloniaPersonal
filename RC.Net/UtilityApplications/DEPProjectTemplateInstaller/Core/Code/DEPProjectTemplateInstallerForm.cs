@@ -213,7 +213,8 @@ namespace DEPProjectTemplateInstaller
         {
             string sourceProjectDir = Path.GetDirectoryName(_sourceProjectTextBox.Text);
             string oldProjectName =
-                Regex.Match(_sourceProjectTextBox.Text, @"(?<=Extract\.DataEntry\.DEP\.)[\w]+(?=\.csproj)")
+                Regex.Match(_sourceProjectTextBox.Text,
+                    @"(?<=(Extract\.DataEntry\.DEP\.)?)[\w]+(?=\.csproj)")
                 .Value;
 
             string designerFile = Directory.GetFiles(sourceProjectDir, "*.Designer.cs").Single();

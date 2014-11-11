@@ -616,12 +616,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rul
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.StandardLabDE", "..\..\..\..\DataEntry\LabDE\DEPs\StandardLabDE\Core\Code\Extract.DataEntry.DEP.StandardLabDE.csproj", "{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.StandardLabDE.Test", "..\..\..\..\DataEntry\LabDE\DEPs\StandardLabDE\Testing\Automated\Extract.DataEntry.DEP.StandardLabDE.Test.csproj", "{135A1E4D-B8B4-468E-A01F-34B6238EAB64}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
@@ -661,8 +655,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLCDBEditor.Plugins.AlternateTestNameManager", "..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Plugins\AlternateTestNameManager\Core\Code\SQLCDBEditor.Plugins.AlternateTestNameManager.csproj", "{AEE81E26-DAB9-46FF-817F-F4F7F4A31737}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.UITransplantCenter", "..\..\..\..\DataEntry\LabDE\DEPs\UITransplantCenter\Core\Code\Extract.DataEntry.DEP.UITransplantCenter.csproj", "{76DADA14-AF4A-4B30-A88A-B9245103F1B9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.NetDMSCustomComponents", "..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\Extract.NetDMSCustomComponents.csproj", "{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}"
 EndProject
@@ -707,8 +699,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.F
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.UWTransplantCenter", "..\..\..\..\DataEntry\LabDE\DEPs\UWTransplantCenter\Core\Code\Extract.DataEntry.DEP.UWTransplantCenter.csproj", "{F2480F46-F4F2-40DD-8139-90E9E575B61C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.Lincoln", "..\..\..\..\DataEntry\FlexIndex\DEPs\Lincoln\Core\Code\Extract.DataEntry.DEP.Lincoln.csproj", "{4B182ED1-F380-419E-8F7A-E2A9D0339715}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateDotNetLicenseIDFiles", "..\..\..\..\Utils\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj", "{E297A14B-8612-41EE-B811-9E64BE1D5606}"
@@ -718,7 +708,7 @@ Global
 		VaultHost = http://EngSvr.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 182
+		ProjectCount = 179
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -877,30 +867,27 @@ Global
 		ProjectRelativeDiskPath156 = ..\..\..\..\..\RC.Net\Utilities\ShellExtensions\Core\Code\Extract.Utilities.ShellExtensions.csproj
 		ProjectRelativeDiskPath157 = ..\..\..\..\..\RC.Net\UtilityApplications\Services\ESIPCService\Core\Code\ESIPCService.csproj
 		ProjectRelativeDiskPath158 = ..\..\..\..\..\RC.Net\AttributeFinder\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj
-		ProjectRelativeDiskPath159 = ..\..\..\..\DataEntry\LabDE\DEPs\StandardLabDE\Core\Code\Extract.DataEntry.DEP.StandardLabDE.csproj
-		ProjectRelativeDiskPath160 = ..\..\..\..\DataEntry\LabDE\DEPs\StandardLabDE\Testing\Automated\Extract.DataEntry.DEP.StandardLabDE.Test.csproj
-		ProjectRelativeDiskPath161 = ..\..\..\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj
-		ProjectRelativeDiskPath162 = ..\..\..\..\..\RC.Net\DataEntry\Core\Testing\Automated\Extract.DataEntry.Test.csproj
-		ProjectRelativeDiskPath163 = ..\..\..\..\DataEntry\LabDE\DEPs\HealthNetworkLabs\Core\Code\Extract.DataEntry.DEP.HealthNetworkLabs.csproj
-		ProjectRelativeDiskPath164 = ..\..\..\..\DataEntry\FlexIndex\DEPs\DemoFlexIndex\Core\Code\Extract.DataEntry.DEP.DemoFlexIndex.csproj
-		ProjectRelativeDiskPath165 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Courts\Core\Code\Extract.DataEntry.DEP.Courts.csproj
-		ProjectRelativeDiskPath166 = ..\..\..\..\..\RC.Net\UtilityApplications\ExpressionAndQueryTester\Core\Code\ExpressionAndQueryTester.csproj
-		ProjectRelativeDiskPath167 = AFCoreTest.sln
-		ProjectRelativeDiskPath168 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj
-		ProjectRelativeDiskPath169 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj
-		ProjectRelativeDiskPath170 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj
-		ProjectRelativeDiskPath171 = ..\..\..\..\DataEntry\LabDE\DEPs\UITransplantCenter\Core\Code\Extract.DataEntry.DEP.UITransplantCenter.csproj
-		ProjectRelativeDiskPath172 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\Extract.NetDMSCustomComponents.csproj
-		ProjectRelativeDiskPath173 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSExporter\Core\Code\Extract.NetDMSExporter.csproj
-		ProjectRelativeDiskPath174 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj
-		ProjectRelativeDiskPath175 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Fresno\Core\Code\Extract.DataEntry.DEP.Fresno.csproj
-		ProjectRelativeDiskPath176 = ..\..\..\..\DataEntry\FlexIndex\DEPs\PeirsonAndPatterson\Core\Code\Extract.DataEntry.DEP.PeirsonAndPatterson.csproj
-		ProjectRelativeDiskPath177 = ..\..\..\..\..\RC.Net\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj
-		ProjectRelativeDiskPath178 = ..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMFileInspector\Core\Code\FAMFileInspector.csproj
-		ProjectRelativeDiskPath179 = ..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMFileInspector\ComLibrary\Core\Code\Extract.FileActionManager.FAMFileInspector.csproj
-		ProjectRelativeDiskPath180 = ..\..\..\..\DataEntry\LabDE\DEPs\UWTransplantCenter\Core\Code\Extract.DataEntry.DEP.UWTransplantCenter.csproj
-		ProjectRelativeDiskPath181 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Lincoln\Core\Code\Extract.DataEntry.DEP.Lincoln.csproj
-		ProjectRelativeDiskPath182 = ..\..\..\..\Utils\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj
+		ProjectRelativeDiskPath159 = ..\..\..\..\DataEntry\LabDE\DEPs\StandardLabDE\Testing\Automated\Extract.DataEntry.DEP.StandardLabDE.Test.csproj
+		ProjectRelativeDiskPath160 = ..\..\..\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj
+		ProjectRelativeDiskPath161 = ..\..\..\..\..\RC.Net\DataEntry\Core\Testing\Automated\Extract.DataEntry.Test.csproj
+		ProjectRelativeDiskPath162 = ..\..\..\..\DataEntry\LabDE\DEPs\HealthNetworkLabs\Core\Code\Extract.DataEntry.DEP.HealthNetworkLabs.csproj
+		ProjectRelativeDiskPath163 = ..\..\..\..\DataEntry\FlexIndex\DEPs\DemoFlexIndex\Core\Code\Extract.DataEntry.DEP.DemoFlexIndex.csproj
+		ProjectRelativeDiskPath164 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Courts\Core\Code\Extract.DataEntry.DEP.Courts.csproj
+		ProjectRelativeDiskPath165 = ..\..\..\..\..\RC.Net\UtilityApplications\ExpressionAndQueryTester\Core\Code\ExpressionAndQueryTester.csproj
+		ProjectRelativeDiskPath166 = AFCoreTest.sln
+		ProjectRelativeDiskPath167 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj
+		ProjectRelativeDiskPath168 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj
+		ProjectRelativeDiskPath169 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj
+		ProjectRelativeDiskPath170 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\Extract.NetDMSCustomComponents.csproj
+		ProjectRelativeDiskPath171 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSExporter\Core\Code\Extract.NetDMSExporter.csproj
+		ProjectRelativeDiskPath172 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj
+		ProjectRelativeDiskPath173 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Fresno\Core\Code\Extract.DataEntry.DEP.Fresno.csproj
+		ProjectRelativeDiskPath174 = ..\..\..\..\DataEntry\FlexIndex\DEPs\PeirsonAndPatterson\Core\Code\Extract.DataEntry.DEP.PeirsonAndPatterson.csproj
+		ProjectRelativeDiskPath175 = ..\..\..\..\..\RC.Net\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj
+		ProjectRelativeDiskPath176 = ..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMFileInspector\Core\Code\FAMFileInspector.csproj
+		ProjectRelativeDiskPath177 = ..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMFileInspector\ComLibrary\Core\Code\Extract.FileActionManager.FAMFileInspector.csproj
+		ProjectRelativeDiskPath178 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Lincoln\Core\Code\Extract.DataEntry.DEP.Lincoln.csproj
+		ProjectRelativeDiskPath179 = ..\..\..\..\Utils\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2821,18 +2808,6 @@ Global
 		{52C53912-5790-4F68-AB57-6CBC3EF45A14}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{52C53912-5790-4F68-AB57-6CBC3EF45A14}.Release|Win32.ActiveCfg = Release|Any CPU
 		{52C53912-5790-4F68-AB57-6CBC3EF45A14}.Release|x86.ActiveCfg = Release|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Release|Win32.ActiveCfg = Release|Any CPU
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}.Release|x86.ActiveCfg = Release|Any CPU
 		{135A1E4D-B8B4-468E-A01F-34B6238EAB64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{135A1E4D-B8B4-468E-A01F-34B6238EAB64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{135A1E4D-B8B4-468E-A01F-34B6238EAB64}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -2953,18 +2928,6 @@ Global
 		{AEE81E26-DAB9-46FF-817F-F4F7F4A31737}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AEE81E26-DAB9-46FF-817F-F4F7F4A31737}.Release|Win32.ActiveCfg = Release|Any CPU
 		{AEE81E26-DAB9-46FF-817F-F4F7F4A31737}.Release|x86.ActiveCfg = Release|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Release|Win32.ActiveCfg = Release|Any CPU
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -3061,18 +3024,6 @@ Global
 		{01578DD9-C725-4028-AC48-0CDE1EC000D5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{01578DD9-C725-4028-AC48-0CDE1EC000D5}.Release|Win32.ActiveCfg = Release|Any CPU
 		{01578DD9-C725-4028-AC48-0CDE1EC000D5}.Release|x86.ActiveCfg = Release|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Release|Win32.ActiveCfg = Release|Any CPU
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Release|x86.ActiveCfg = Release|Any CPU
 		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -3105,15 +3056,12 @@ Global
 		{2647A3A7-B595-44B3-A563-33E130CDF117} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{7F346080-BD78-4690-A4F2-E403CB5EA7DE} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{A24D4168-C496-4543-9C99-DE2E07FF71BF} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
-		{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{135A1E4D-B8B4-468E-A01F-34B6238EAB64} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{36E9920D-97A3-48EB-BF63-7647319AA197} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{BE903913-8853-4966-A333-93B29D64E7E4} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{4E6AEDAD-E73D-4BAB-9B2A-4E0BF8026FAD} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
-		{76DADA14-AF4A-4B30-A88A-B9245103F1B9} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{7EE21844-B318-4203-A593-6306B6BB6234} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{8600FF47-6098-4462-95FE-60CACF8DC886} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
-		{F2480F46-F4F2-40DD-8139-90E9E575B61C} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{4B182ED1-F380-419E-8F7A-E2A9D0339715} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{139729CD-0F06-48E8-9F4A-08E78BB6575F} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA} = {4CAFD9CC-640F-4836-B388-D370B6219488}
