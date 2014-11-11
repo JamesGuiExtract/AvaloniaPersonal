@@ -1,0 +1,316 @@
+<HTML>
+
+<HEAD>
+<TITLE>Standard LabDE Load &amp; Save Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> Standard LabDE<br>Load &amp; Save Testing Checklist<br>
+<IMG src="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+	<LI><h3>Prompt For Save : stand-alone mode</h3>
+	<ul>
+		<LI>Open an image.
+		<LI>Select <b>File - Close</b>.  Confirm that the <b>document</b> is closed 
+		without a prompt.
+<p>
+		<LI>Open an image.
+		<LI>Select <b>File - Exit</b>.  Confirm that the <b>application</b> is closed 
+		without a prompt.
+<p>
+		<LI>Open an image.
+		<LI>Change a character in a single field.
+		<LI>Select <b>File - Close</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>Cancel</b> returns to the document and that data is retained.
+		<LI>Select <b>File - Close</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>No</b> closes the document and <b>does not</b> update the VOA file.
+		<LI>Re-open the image.
+		<LI>Change a character in a single field.
+		<LI>Select <b>File - Close</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>Yes</b> closes the document and <b>does</b> update the VOA file.
+<p>
+		<LI>Open an image.
+		<LI>Swipe text into the <b>Comment</b> field.
+		<LI>Select <b>File - Close</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>Cancel</b> returns to the document.
+		<LI>Select <b>File - Close</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>No</b> closes the document and <b>does not</b> update the VOA file.
+		<LI>Re-open the image.
+		<LI>Swipe text into the <b>Comment</b> field.
+		<LI>Select <b>File - Close</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>Yes</b> closes the document and <b>does</b> update the VOA file.
+<p>
+		<li><b>[DataEntry #605]</b> Application crash without write permission
+		<ul>
+			<LI>Open a LabDE demo image.
+			<LI>Modify the VOA file permission to read-only.
+			<li>Confirm that a meaningful error message is presented when the user 
+			attempts to save changes.
+			<li>Confirm that the application <b>does not</b> crash.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Prompt For Save : FAM mode</h3>
+	<ul>
+		<LI>Start processing.
+		<LI>Select <b>File - Stop processing</b>.  Confirm that the <b>FAM</b> is closed 
+		without a prompt.
+		<LI>Confirm that the document returns to <b>Pending</b> status.
+<p>
+		<LI>Start processing.
+		<LI>Select <b>Stop processing</b> from the FAM toolbar.  Confirm that the <b>FAM</b> is closed 
+		without a prompt.
+		<LI>Confirm that the document returns to <b>Pending</b> status.
+<p>
+		<LI>Start processing.
+		<LI>Change a character in a single field.
+		<LI>Select <b>File - Stop processing</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>Cancel</b> returns to the document and that data is retained.
+		<LI>Select <b>File - Stop processing</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>No</b> closes the FAM and <b>does not</b> update the VOA file.
+		<LI>Start processing and confirm that the same image is displayed.
+		<LI>Change a character in a single field.
+		<LI>Select <b>File - Stop processing</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>Yes</b> closes the FAM and <b>does</b> update the VOA file.
+		<LI>Start processing and confirm that the same image is displayed.
+<p>
+		<LI>Start processing.
+		<LI>Swipe text into the <b>Comment</b> field.
+		<LI>Select <b>File - Stop processing</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>Cancel</b> returns to the document.
+		<LI>Select <b>File - Stop processing</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>No</b> closes the FAM and <b>does not</b> update the VOA file.
+		<LI>Start processing and confirm that the same image is displayed.
+		<LI>Swipe text into the <b>Comment</b> field.
+		<LI>Select <b>File - Stop processing</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
+		<LI>Confirm that <b>Yes</b> closes the FAM and <b>does</b> update the VOA file.
+		<LI>Start processing and confirm that the same image is displayed.
+<p>
+		<LI><b>[DataEntry #291]</b> Crashes when stopped with unsaved changes
+		<ul>
+			<LI>Start processing.
+			<LI>Change data such that the contents are all valid.
+			<LI>Stop processing <b>from the FAM</b>.  
+			<li>Confirm that a <b>Data Not Saved</b> prompt is displayed.
+			<LI>Confirm that <b>Cancel</b> returns to the document without closing LabDE 
+			and that data is retained.
+			<LI>Run this test again and Confirm that <b>Ok</b> saves the data and closes LabDE.
+<p>
+			<LI>Start processing.
+			<LI>Change data such that some data are invalid.
+			<LI>Stop processing <b>from the FAM</b>.  
+			<li>Confirm that an <b>Invalid value</b> exception is displayed.
+			<LI>Close the exception and confirm that LabDE closes after choosing to not save changes.
+		</ul>
+<p>
+		<li><b>[DataEntry #308]</b> Files fail after stopping processing.
+		<ul>
+			<li>Start processing.
+			<li>Change data.
+			<li><b>In the FAM</b>, stop processing.
+			<li>When the confirmation dialog comes up, select <b>Cancel</b>.
+			<li>Save the changes in the document.
+			<li>Confirm that the data entry UI closes and that no file is failed.
+<p>
+			<li>Start processing.
+			<li>Change data.
+			<li><b>In the verification UI</b>, click on the red X or select <b>Stop Processing</b>
+			from the File menu.
+			<li>When the confirmation dialog comes up, select <b>Cancel</b>.
+			<li>Save changes to the document.
+			<li>Confirm that processing continues as usual.
+		</ul>
+<p>
+		<li><b>[DataEntry #605]</b> Application crash without write permission
+		<ul>
+			<LI>Open a LabDE demo image.
+			<LI>Modify the VOA file permission to read-only.
+			<li>Confirm that a meaningful error message is presented when the user 
+			attempts to save changes.
+			<li>Confirm that the application <b>does not</b> crash.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Load &amp; Save : stand-alone mode</h3>
+	<ul>
+		<LI>Select an image for verification.  Delete or rename any associated VOA file.
+		<LI>Open the image.
+		<LI>Enter data into a field.
+		<LI>Close the application and save data.  
+		<LI>Confirm that a <b>VOA file</b> is created.
+		<LI>Open the VOA file in the <b>VOA Viewer</b> 
+		<ul>
+			<LI>Confirm that the entered data is present.
+			<LI>Confirm that empty attributes are present for other fields 
+			available in the <b>Data Entry Application</b>.
+		</ul>
+		<LI>Re-open the image.
+		<LI>Confirm that the entered data is still present.
+		<LI><b>[DataEntry #193]</b> Confirm that the first table cell is selected, not 
+		the last cell selected in the previous image.
+<p>
+		<LI>Select an image for verification.  Confirm that an associated VOA file is present.
+		<LI>Open the image.
+		<LI>Confirm that data is appropriately presented in various fields.
+		<LI>Select a field that contains spatial data (solid color highlight appears 
+		when selected).
+		<LI>Swipe different text into the field.
+		<LI>Close the application and save data.  
+		<LI>Open the VOA file in the <b>VOA Viewer</b> and confirm that the swiped data 
+		is present.
+		<LI>Re-open the image.
+		<LI>Confirm that the swiped data is still present and the new highlight is provided.
+		<li>Zoom in before closing the document.
+		<LI>Close this image and open another image.
+		<LI><b>[DataEntry #576]</b> Confirm that the new image is not zoomed in.
+	</ul>
+<p>
+	<LI><h3>Load &amp; Save : FAM mode</h3>
+	<ul>
+		<LI>Delete or rename any VOA file associated with images to be verified.
+		<LI>Start processing.
+		<LI>Enter data into a field.
+		<LI>Save data.  
+		<LI>Confirm that a <b>VOA file</b> is created.
+		<LI>Open the VOA file in the <b>VOA Viewer</b> 
+		<ul>
+			<LI>Confirm that the entered data is present.
+			<LI>Confirm that empty attributes are present for other fields 
+			available in the <b>Data Entry Application</b>.
+		</ul>
+		<LI>Reset verification status to <b>Pending</b>.
+		<LI>Re-verify the image.
+		<LI>Confirm that the entered data is still present.
+<p>
+		<LI>Confirm that VOA files are present.
+		<LI>Start processing.
+		<LI>Confirm that data is appropriately presented in various fields.
+		<LI>Select a field that contains spatial data (solid color highlight appears 
+		when selected).
+		<LI>Swipe different text into the field.
+		<LI>Close the application and save data.  
+		<LI>Open the VOA file in the <b>VOA Viewer</b> and confirm that the swiped data 
+		is present.
+		<LI>Reset verification status to <b>Pending</b>.
+		<LI>Re-verify the image.
+		<LI>Confirm that the swiped data is still present and the new highlight is provided.
+		<li>Zoom in before saving / closing the document.
+		<LI>Save this image and open another image.
+		<LI><b>[DataEntry #576]</b> Confirm that the new image is not zoomed in.
+<p>
+		<LI><b>[DataEntry #148]</b> Default cell marked as viewed on click
+		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Confirm that cell <b>0,0</b> is selected by default.
+			<li>Click on a different cell in the table.
+			<li>Confirm that the clicked cell is marked as viewed.
+			<li>Confirm that cell <b>0,0</b> is <b>not</b> marked as viewed unless 
+			the table was previously active.
+	       	</ul>
+		<LI><b>[DataEntry #173]</b> Trim whitespace on load
+		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Confirm that leading whitespace is not seen for any attributes.
+			<li>Confirm that trailing whitespace is not seen for any attributes.
+	       	</ul>
+		<li><b>[DataEntry #372, #432]</b> Behavior after save.
+		<ul>
+			<li>Open a document in FAM mode. Save it.
+			<li>When the next document appears, confirm that focus begins in the appropriate field
+			and that the keyboard can be used to enter data and navigate.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Handling Invalid / Unviewed Data : stand-alone mode</h3>
+	<ul>
+		<li>Exercise the <b>Demo_LabDE</b> images.
+		<li>Open <b>A003.tif</b>.
+		<LI><b>[DataEntry #327]</b> Confirm that the <b>Result Status</b> field is 
+		initially selected and displays as viewed (non-bold font).
+		<li><b>[DataEntry #618]</b> Confirm that the <b>Lab Name</b> field displays
+		as unviewed.
+		<LI>Confirm that no data values are invalid.
+		<li>Click the <b>Save</b> button.
+		<li>Confirm that no prompt about unviewed data is presented.
+		<LI>Change the <b>Date of Birth</b> field to an invalid value.
+		<li>Click the <b>Save</b> button.
+		<LI>Confirm that an <b>Invalid value</b> error is presented.
+		<li>Modify the <b>Date of Birth</b> field to provide a valid date.
+		<LI>Confirm that some other data is still presented in bold, indicating that it 
+		is still <b>unviewed</b>.
+		<li>Click the <b>Save</b> button, confirm that no prompt about unviewed data 
+		is presented.
+		<LI>Confirm that the changed data is saved with the new date in the VOA file.
+	</ul>
+<p>
+	<LI><h3>Handling Invalid / Unviewed Data : FAM mode</h3>
+	<ul>
+		<li>Exercise the <b>Demo_LabDE</b> images.
+		<li>Open <b>A003.tif</b>.
+		<LI><b>[DataEntry #327]</b> Confirm that the <b>Result Status</b> field is 
+		initially selected and displays as viewed (non-bold font).
+		<li><b>[DataEntry #618]</b> Confirm that the <b>Lab Name</b> field displays
+		as unviewed.
+		<LI>Confirm that no data values are invalid.
+		<li>Click the <b>Save</b> button.
+		<li>Confirm that no prompt about unviewed data is presented.
+		<li>Requeue A003.tif and verify the document again.
+		<LI>Change the <b>Date of Birth</b> field to an invalid value.
+		<li>Click the <b>Save</b> button.
+		<LI>Confirm that an <b>Invalid value</b> error is presented.
+		<li>Modify the <b>Date of Birth</b> field to provide a valid date.
+		<LI>Confirm that some other data is still presented in bold, indicating that it 
+		is still <b>unviewed</b>.
+		<li>Click the <b>Save</b> button, confirm that no prompt about unviewed data 
+		is presented.
+		<LI>Confirm that the changed data is saved with the new date in the VOA file.
+<p>
+		<li><b>[DataEntry #435]</b> Attempting to save completes processing.
+		<ul>
+			<li>Start processing in FAM mode.
+			<li>Ensure that there is invalid data in the current document. Attempt to save.
+			<li>Confirm that a dialog is displayed informing you that there is invalid data.
+			<li>Confirm that the document remains in processing and no new document is
+			provided for verification.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+	<ul>
+		<LI><b>[DataEntry #167]</b> Saving validated data
+		<ul>
+			<LI>Open a Demo_LabDE image containing some invalid data.
+			<LI>Fix the invalid items.
+			<LI>Confirm that changes can be saved and that the next document 
+			is loaded.
+		</ul>
+<p>
+		<li><b>[DataEntry #210, #281]</b> Corrupted VOA files
+		<ul>
+			<li>Open, process, and save a document.
+			<li>Close the document and exit LabDE.
+			<li>Confirm that the document can be opened without error in <b>FAM</b> mode.
+			<li>Confirm that the document can be opened without error in <b>standalone</b> mode.
+			<li>Confirm that the associated VOA file can be opened without error in the <b>VOA
+			file viewer</b>.
+		</ul>
+<p>
+		<LI><b>[DataEntry #259]</b> Hints turn in to spatial data after save
+		<ul>
+			<LI>Open image <b>A003.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Ref. Range</b> field of one of the <b>eGFR</b> rows.
+			<LI>Confirm that a red hint is provided.
+			<LI>Type some text into the cell and save the results.
+			<LI>Reopen image <b>A003.tif</b>.
+			<LI>Select the same cell.
+			<LI>Confirm that the displayed tooltip matches the manually entered text.
+			<LI>Confirm that the hint is green.
+		</ul>
+	</ul>
+</UL>
+</BODY>
+</HTML>
