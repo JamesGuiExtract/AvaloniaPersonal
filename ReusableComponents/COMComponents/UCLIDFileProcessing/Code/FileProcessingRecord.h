@@ -225,6 +225,19 @@ private:
 	// will be a subset of m_stopWatch's duration
 	StopWatch m_stopWatchErrorTask;
 
+	// Flag set by registry that determines whether to forego using a progress status object
+	static bool m_sbDisableProgressStatusDisplay;
+
+	// Used to record the task duration tracked by the sub progress status object
+	double m_dTaskDuration;
+
+	// Starts the main stop watch as well as the timer of the sub progress status object, if it exists
+	void startTaskTimer();
+
+	// Stops the main stop watch as well as the timer of the sub progress status object, if it exists.
+	// Records the time from the sub progress status object and sets both progress status objects to null.
+	void stopTaskTimer();
+
 	// Local file record
 	LocalFileRecord m_lfrFileRcd;
 
@@ -233,6 +246,8 @@ private:
 	// The progress status of the current task at any given time can be determined from
 	// the SubProgressStatus member of this ProgressStatus object.
 	IProgressStatusPtr m_ipProgressStatus;
+	
+	// Progress status object of actual current task. Used for timing.
+	IProgressStatusPtr m_ipSubProgressStatus;
 };
-
 //-------------------------------------------------------------------------------------------------

@@ -19,7 +19,12 @@ const string gstrFPRECORD_FOLDER				= "\\FileProcessingRecord";
 const string gstrDISPLAY_PROGRESS_STATUS_KEY	= "DisplayProgressStatus";
 const string gstrDEFAULT_PROGRESS_STATUS		= "1";
 
-const long FileProcessingRecord::NO_ID = 0; 
+const long FileProcessingRecord::NO_ID = 0;
+
+//--------------------------------------------------------------------------------------------------
+// Static members
+//--------------------------------------------------------------------------------------------------
+bool FileProcessingRecord::m_sbDisableProgressStatusDisplay = false;
 
 //-------------------------------------------------------------------------------------------------
 FileProcessingRecord::FileProcessingRecord()
@@ -34,9 +39,6 @@ FileProcessingRecord::FileProcessingRecord(const UCLID_FILEPROCESSINGLib::IFileR
 	m_strMachine = strMachine.empty() ? getComputerName() : strMachine;
 	m_eStatus = kRecordNone;
 	
-	m_stopWatch.reset();
-	m_stopWatchErrorTask.reset();
-
 	// Set the File Record
 	m_lfrFileRcd.setRecord(ipFileRcd);
 }
@@ -62,7 +64,9 @@ void FileProcessingRecord::reset()
 	m_stopWatch.reset();
 	m_stopWatchErrorTask.reset();
 	m_lfrFileRcd.reset();
+	m_dTaskDuration = 0.0;
 	m_ipProgressStatus = __nullptr;
+	m_ipSubProgressStatus = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::copyFrom(const FileProcessingRecord& task)
@@ -75,17 +79,17 @@ void FileProcessingRecord::copyFrom(const FileProcessingRecord& task)
 	m_strErrorTaskException = task.m_strErrorTaskException;
 	m_lfrFileRcd = task.m_lfrFileRcd;
 	m_ipProgressStatus = task.m_ipProgressStatus;
+	m_ipSubProgressStatus = task.m_ipSubProgressStatus;
+	m_dTaskDuration = task.m_dTaskDuration;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsStarted()
 {
-	// Start the stop watch and mark the record as current
-	m_stopWatch.start();
+	// Mark the record as current
 	m_eStatus = kRecordCurrent;
 
 	// Determine display of progress status
 	static bool sbRegistryRead = false;
-	static bool sbDisableProgressStatusDisplay = false;
 	if (!sbRegistryRead)
 	{
 		// Create RPM to retrieve setting from registry
@@ -103,12 +107,12 @@ void FileProcessingRecord::markAsStarted()
 			gstrFPRECORD_FOLDER, gstrDISPLAY_PROGRESS_STATUS_KEY, gstrDEFAULT_PROGRESS_STATUS ) );
 
 		// Set flags
-		sbDisableProgressStatusDisplay = (nDisplayProgressStatus == 0);
+		m_sbDisableProgressStatusDisplay = (nDisplayProgressStatus == 0);
 		sbRegistryRead = true;
 	}
 
 	// Create and initialize the progress status object if appropriate
-	if (!sbDisableProgressStatusDisplay)
+	if (!m_sbDisableProgressStatusDisplay)
 	{
 		// TODO: if an exception is thrown from this location, the FAM does not behave
 		// correctly.  The FAM stops processing, but the file still stays in the "currently being
@@ -117,84 +121,62 @@ void FileProcessingRecord::markAsStarted()
 		// Create the progress status object
 		m_ipProgressStatus.CreateInstance(CLSID_ProgressStatus);
 		ASSERT_RESOURCE_ALLOCATION("ELI16075", m_ipProgressStatus != __nullptr);
-
+		
 		// Initialize the progress status object
 		m_ipProgressStatus->InitProgressStatus("Initializing processing...", 0, 1, VARIANT_TRUE);
+
+		// Create the sub progress status object
+		m_ipSubProgressStatus.CreateInstance(CLSID_ProgressStatus);
+		ASSERT_RESOURCE_ALLOCATION("ELI37635", m_ipSubProgressStatus != __nullptr);
+		m_ipProgressStatus->SubProgressStatus = m_ipSubProgressStatus;
 	}
+
+	// Start m_stopWatch and progress timer, if it exists
+	startTaskTimer();
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsCompleted()
 {
-	m_stopWatch.stop();
+	stopTaskTimer();
 	m_eStatus = kRecordComplete;
-	
-	// Partial fix to P16#2457 (see notes of that record)
-	// There may be thousands of records shown in the completed-files-list, depending upon the 
-	// setting configured by the user in the options dialog.
-	// We don't want a progress status object to be stored for each of those records as it just
-	// takes up more memory and OS handles (each COM object consumes one OS handle).
-	
-	// Since this record has completed processing, the progress status object is not useful
-	// anyway.  Just release the associated memory.
-	m_ipProgressStatus = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsPending()
 {
-	m_stopWatch.stop();
+	stopTaskTimer();
 	m_eStatus = kRecordPending;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsFailed(const string& strException)
 {
-	m_stopWatch.stop();
+	stopTaskTimer();
 	m_strException = strException;
 	m_eStatus = kRecordFailed;
-
-	// Partial fix to P16#2457 (see notes of that record)
-	// There may be thousands of records shown in the failed-files-list, depending upon the 
-	// setting configured by the user in the options dialog.
-	// We don't want a progress status object to be stored for each of those records as it just
-	// takes up more memory and OS handles (each COM object consumes one OS handle).
-	
-	// Since this record has failed processing, the progress status object is not useful
-	// anyway.  Just release the associated memory.
-	m_ipProgressStatus = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsNone()
 {
-	m_stopWatch.stop();
+	stopTaskTimer();
 	m_eStatus = kRecordNone;
 }
 //---------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsProcessingError(const string& strException)
 {
-	m_stopWatch.stop();
+	stopTaskTimer();
 	m_strException = strException;
 	m_eStatus = kRecordProcessingError;
 }
 //---------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsSkipped()
 {
-	m_stopWatch.stop();
+	stopTaskTimer();
 	m_eStatus = kRecordSkipped;
-
-	// Partial fix to P16#2457 (see notes of that record)
-	// There may be thousands of records shown in the completed-files-list, depending upon the 
-	// setting configured by the user in the options dialog.
-	// We don't want a progress status object to be stored for each of those records as it just
-	// takes up more memory and OS handles (each COM object consumes one OS handle).
-	
-	// Since this record has completed processing, the progress status object is not useful
-	// anyway.  Just release the associated memory.
-	m_ipProgressStatus = __nullptr;
 }
 //---------------------------------------------------------------------------------------------
 void FileProcessingRecord::notifyRunningErrorTask()
 {
 	// m_stopWatch will include the time elapsed while running m_stopWatchErrorTask 
-	m_stopWatch.start();
+	startTaskTimer();
 	m_stopWatchErrorTask.start();
 }
 //---------------------------------------------------------------------------------------------
@@ -202,14 +184,14 @@ void FileProcessingRecord::notifyErrorTaskCompleted()
 {
 	// m_stopWatch will include the time elapsed while running m_stopWatchErrorTask
 	m_stopWatchErrorTask.stop();
-	m_stopWatch.stop();
+	stopTaskTimer();
 }
 //---------------------------------------------------------------------------------------------
 void FileProcessingRecord::notifyErrorTaskFailed(const string& strException)
 {
-	// m_stopWatch will include the time elapsed while running m_stopWatchErrorTask
+	// Task timer will include the time elapsed while running m_stopWatchErrorTask
 	m_stopWatchErrorTask.stop();
-	m_stopWatch.stop();
+	stopTaskTimer();
 
 	m_strErrorTaskException = strException;
 }
@@ -219,9 +201,60 @@ bool FileProcessingRecord::isActive()
 	return m_stopWatch.isRunning();
 }
 //---------------------------------------------------------------------------------------------
+void FileProcessingRecord::startTaskTimer()
+{
+	m_stopWatch.start();
+	if (m_ipSubProgressStatus != __nullptr)
+	{
+		m_ipSubProgressStatus->StartProgressTimer();
+	}
+}
+//---------------------------------------------------------------------------------------------
+void FileProcessingRecord::stopTaskTimer()
+{
+	m_stopWatch.stop();
+	if (m_ipSubProgressStatus != __nullptr)
+	{
+		m_ipSubProgressStatus->StopProgressTimer();
+		
+		// Partial fix to P16#2457 (see notes of that record)
+		// There may be thousands of records shown in the completed and failed-files lists,
+		// depending upon the setting configured by the user in the options dialog.
+		// We don't want a progress status object to be stored for each of those records as it just
+		// takes up more memory and OS handles (each COM object consumes one OS handle).
+	
+		// Since this record has completed or failed processing or been set back to pending,
+		// the progress status objects are no longer useful.
+		
+		// Save the sub-progress status time since that reflects actual task time
+		// (Top level is just "Executing task #..." and might also describe time spent waiting
+		// for processor time)
+		m_dTaskDuration = m_ipSubProgressStatus->GetProgressDuration();
+		
+		m_ipProgressStatus = __nullptr;
+		m_ipSubProgressStatus = __nullptr;
+	}
+}
+//---------------------------------------------------------------------------------------------
 double FileProcessingRecord::getTaskDuration()
 {
-	return m_stopWatch.getElapsedTime();
+	// If no progress status object was used then return the stopwatch time
+	if (m_sbDisableProgressStatusDisplay)
+	{
+		return m_stopWatch.getElapsedTime();
+	}
+	// Otherwise use time from the progress status object if is still exists
+	else if (m_ipSubProgressStatus != __nullptr)
+	{
+		return m_ipSubProgressStatus->GetProgressDuration();
+	}
+	// If the progress status object was discarded then this record is no longer active and its
+	// duration was recorded in m_dTaskDuration. Since error tasks are run after the progress
+	// status object is gone, the error task time needs to be added to the main task time.
+	else
+	{
+		return m_dTaskDuration + getErrorTaskDuration();
+	}
 }
 //-------------------------------------------------------------------------------------------------
 SYSTEMTIME FileProcessingRecord::getStartTime() const

@@ -1101,7 +1101,18 @@ EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPt
 
 		long nTotalProcessedOrFailed = wigsStatusRecord.lCompletedCount + wigsStatusRecord.lFailedCount;
 		if (ipProgressStatus != NULL)
-		{
+		{	
+			if (eAllWorkItemStatus == kWorkUnitPending)
+			{
+				// Still waiting to start OCRing so turn/keep timer off
+				ipProgressStatus->StopProgressTimer();
+			}
+			else
+			{
+				// No longer waiting for processor time so make sure timer is running
+				ipProgressStatus->StartProgressTimer();
+			}
+
 			if (nTotalProcessedOrFailed != lLastProcessed)
 			{
 				string strText = "OCR'd " + asString(nTotalProcessedOrFailed) + " of " + asString(wigsStatusRecord.lTotal) + " page(s)";
@@ -1109,6 +1120,7 @@ EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPt
 				lLastProcessed = nTotalProcessedOrFailed;
 			}
 		}
+
 		if (eAllWorkItemStatus == kWorkUnitFailed)
 		{
 			unsigned long totalCount = wigsStatusRecord.lCompletedCount + wigsStatusRecord.lFailedCount;
@@ -1116,6 +1128,13 @@ EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPt
 				(m_bSkipPageOnFailure && (wigsStatusRecord.lFailedCount > m_uiMaxOcrPageFailureNumber ||
 				wigsStatusRecord.lFailedCount *100.0 / totalCount > (double)m_uiMaxOcrPageFailurePercentage)))
 			{
+
+				// Make sure progress timer is running
+				if (ipProgressStatus != NULL)
+				{	
+					ipProgressStatus->StartProgressTimer();
+				}
+
 				// need to aggregate the exceptions from the database
 
 				UCLIDException ue("ELI36861", "Failed to OCR Document.");
@@ -1127,6 +1146,13 @@ EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPt
 			}
 		}
 	}
+
+	// Make sure progress timer is running
+	if (ipProgressStatus != NULL)
+	{	
+		ipProgressStatus->StartProgressTimer();
+	}
+
 	return kProcessingSuccessful;
 }
 //-------------------------------------------------------------------------------------------------

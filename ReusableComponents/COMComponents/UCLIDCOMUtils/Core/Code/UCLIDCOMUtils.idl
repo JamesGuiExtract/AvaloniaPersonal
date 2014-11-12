@@ -1453,6 +1453,17 @@ library UCLID_COMUTILSLib
 		[id(11), helpstring("method CompleteProgressItems")] HRESULT CompleteProgressItems(
 			[in] BSTR strNextGroupText, [in] long nNumItemsCompleted);
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To obtain the total running time between calls to StartProgressTimer and
+		//			StopProgressTimer
+		[id(12), helpstring("method GetProgressDuration")] HRESULT GetProgressDuration(
+			[out, retval] double *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	Starts the internal stopwatch.
+		[id(13), helpstring("method StartProgressTimer")] HRESULT StartProgressTimer();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	Stops the internal stopwatch.
+		[id(14), helpstring("method StopProgressTimer")] HRESULT StopProgressTimer();
+		//-----------------------------------------------------------------------------------------
 	};
 
 	[

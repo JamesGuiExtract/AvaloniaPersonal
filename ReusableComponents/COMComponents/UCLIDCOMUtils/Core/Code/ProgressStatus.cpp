@@ -341,6 +341,40 @@ STDMETHODIMP CProgressStatus::CompleteProgressItems(/*[in]*/ BSTR strNextGroupTe
 	
 	return S_OK;
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CProgressStatus::StartProgressTimer()
+{
+	try
+	{
+		m_stopWatch.start();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37631")
+	
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CProgressStatus::StopProgressTimer()
+{
+	try
+	{
+		m_stopWatch.stop();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37630")
+	
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CProgressStatus::GetProgressDuration(/*[out, retval]*/ double *pVal)
+{
+	try
+	{
+		*pVal = m_stopWatch.getElapsedTime();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37632")
+	
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------
 // Private helper functions

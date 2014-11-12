@@ -4,6 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "UCLIDCOMUtils.h"
+#include <StopWatch.h>
 
 #include <string>
 
@@ -61,6 +62,9 @@ public:
 	STDMETHOD(ResetSubProgressStatus)();
 	STDMETHOD(CompleteProgressItems)(/*[in]*/ BSTR strNextGroupText, 
 			/*[in]*/ long nNumItemsCompleted);
+	STDMETHOD(GetProgressDuration)(/*[out, retval]*/ double *pVal);
+	STDMETHOD(StopProgressTimer)();
+	STDMETHOD(StartProgressTimer)();
 
 private:
 	//----------------------------------------------------------------------------------------------
@@ -86,6 +90,9 @@ private:
 	// operation.  A NULL sub progress status object pointer just means that we are not 
 	// tracking progress at the next lower level of operation.
 	UCLID_COMUTILSLib::IProgressStatusPtr m_ipSubProgressStatus;
+
+	// Stopwatch to track progress time
+	StopWatch m_stopWatch;
 
 	//----------------------------------------------------------------------------------------------
 	// Private / Helper functions
