@@ -246,7 +246,6 @@
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\ISLockPermissions.dll</td></row>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 	</table>
 
@@ -382,10 +381,6 @@
 		<col def="S255">ISComments</col>
 		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
 		<row><td>NewDriverError</td><td>19</td><td/><td>Unable to install new Sentinel Driver</td><td/><td/></row>
 		<row><td>OldDriverError</td><td>19</td><td/><td>Unable to uninstall old Sentinel Driver</td><td/><td/></row>
@@ -1150,8 +1145,8 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
-		<row><td>fieldactutil.exe</td><td>FieldActivation</td><td>FIELDA~1.EXE|FieldActUtil.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_FIELDACTIVATION_FI&gt;\FieldActUtil.exe</td><td>1</td><td/></row>
-		<row><td>uusafe32.dll</td><td>UUsafe32.dll</td><td>UUsafe32.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_FIELDACTIVATION_FI&gt;\UUsafe32.dll</td><td>1</td><td/></row>
+		<row><td>fieldactutil.exe</td><td>FieldActivation</td><td>FIELDA~1.EXE|FieldActUtil.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_FIELDACTIVATION_FILES&gt;\FieldActUtil.exe</td><td>1</td><td/></row>
+		<row><td>uusafe32.dll</td><td>UUsafe32.dll</td><td>UUsafe32.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_FIELDACTIVATION_FILES&gt;\UUsafe32.dll</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -1350,7 +1345,7 @@
 		<col def="S0">IncludeFiles</col>
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>FieldActivation</td><td>&lt;PATH_TO_FIELDACTIVATION_FILES&gt;</td><td>4</td><td/><td>FieldActUtil.exe</td><td>0</td></row>
+		<row><td>FieldActivation</td><td>&lt;PATH_TO_FIELDACTIVATION_FILES&gt;</td><td>4</td><td/><td>FieldActUtil.exe, uusafe32.dll</td><td>0</td></row>
 	</table>
 
 	<table name="ISFeatureExtended">
@@ -1608,16 +1603,8 @@
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
-		<row><td>PATH_TO_64BITINSTALLER_FILES</td><td>I:\Common\Engineering\ProductDevelopment\LicenseManager\Files\64bitInstaller</td><td/><td>2</td></row>
-		<row><td>PATH_TO_FIELDACTIVATION_FI</td><td>P:\LicenseManager\Files\FieldActivation</td><td/><td>2</td></row>
-		<row><td>PATH_TO_FIELDACTIVATION_FILES</td><td>I:\Common\Engineering\ProductDevelopment\LicenseManager\Files\FieldActivation</td><td/><td>2</td></row>
-		<row><td>PATH_TO_INSTALLSCRIPTS_FIL</td><td>D:\William\Engineering\ProductDevelopment\Common\InstallScripts</td><td/><td>2</td></row>
-		<row><td>PATH_TO_LEADTOOLSDLLS_FILES</td><td>I:\Common\Engineering\ProductDevelopment\InputFunnel\CoreInstallation\Files\LeadToolsDlls</td><td/><td>2</td></row>
-		<row><td>PATH_TO_NONSELFREGCC_FILES</td><td>I:\Common\Engineering\ProductDevelopment\LicenseManager\Files\NonSelfRegCC</td><td/><td>2</td></row>
-		<row><td>PATH_TO_NONSELFREGCOMMO_FILES1</td><td>I:\Common\Engineering\ProductDevelopment\InputFunnel\CoreInstallation\Files\NonSelfRegCommonComponents</td><td/><td>2</td></row>
-		<row><td>PATH_TO_ROGUEWAVEDLLS_FILES</td><td>I:\Common\Engineering\ProductDevelopment\InputFunnel\CoreInstallation\Files\RogueWaveDlls</td><td/><td>2</td></row>
-		<row><td>PATH_TO_ROGUEWAVEDLLS_FILES1</td><td>I:\Common\Engineering\ProductDevelopment\AttributeFinder\CoreInstallation\Files\RogueWaveDlls</td><td/><td>2</td></row>
-		<row><td>PATH_TO_SELFREGCOMMONCO_FILES</td><td>I:\Common\Engineering\ProductDevelopment\InputFunnel\CoreInstallation\Files\SelfRegCommonComponents</td><td/><td>2</td></row>
+		<row><td>PATH_TO_FIELDACTIVATION_FILES</td><td>P:\LicenseManager\Files\FieldActivation</td><td/><td>2</td></row>
+		<row><td>PATH_TO_INSTALLSCRIPTS_FILES</td><td>&lt;ISProjectFolder&gt;\..\..\..\..\..\ProductDevelopment\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
@@ -1880,7 +1867,7 @@
 	<table name="ISScriptFile">
 		<col key="yes" def="s255">ISScriptFile</col>
 		<row><td>&lt;ISProjectDataFolder&gt;\script files\Setup.Rul</td></row>
-		<row><td>&lt;PATH_TO_INSTALLSCRIPTS_FIL&gt;\Common.rul</td></row>
+		<row><td>&lt;PATH_TO_INSTALLSCRIPTS_FILES&gt;\Common.rul</td></row>
 	</table>
 
 	<table name="ISSearchReplace">
@@ -3201,10 +3188,6 @@
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
 		<row><td>ISLockPermissionsCost</td><td/><td>1456</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td/><td>5851</td><td/><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td/><td>2201</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>5501</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>6401</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>2202</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>
 		<row><td>InstallFinalize</td><td/><td>6400</td><td>InstallFinalize</td><td/></row>
 		<row><td>InstallInitialize</td><td/><td>1501</td><td>InstallInitialize</td><td/></row>
