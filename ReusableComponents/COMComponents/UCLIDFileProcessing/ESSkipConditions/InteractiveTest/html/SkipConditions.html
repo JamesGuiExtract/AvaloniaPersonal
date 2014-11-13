@@ -11,12 +11,14 @@
 <ul>
    	<li><h3>Test Setup</h3>
 	<ul>
-	   	<li>Get the <b>FPS</b> and <b>Images</b> folders for the FAM Condition tests from 
-		source control. <br>
-       		<b>$/Engineering/ReusableComponents/COM 
+	   	<li><b>FPS</b> and <b>Images</b> folders for the FAM Condition tests can be 
+		found here: <br>
+       		<b>./TestingFiles/ReusableComponents/COM 
 		Components/UCLIDFileProcessing/ESSkipConditions/InteractiveTest</b></li> 
    		<li>The FPS files use <b>(local)</b> and <b>FAM_Condition</b> as the database 
 		server and database name, respectively.</li> 
+		<li>Create a <b>DB_Condition</b> action to exercise the test cases found in 
+		<b>/FPS/Exercise_DB_Condition.bat</b>.
    		<li>For this testing checklist, use only a <b>Server</b> license file, not an 
 		<b>RDT</b> license file.</li> 
 	</ul>
@@ -783,6 +785,9 @@
 			<li>Confirm that images can be queued without a page count and then 
 			the page count can be determined during execution of the page count 
 			condition.
+			<li>Confirm that this object can be used with <b>Core: 
+			Conditionally execute task</b>.
+			<li>Confirm that this object can be used as a <b>Skip Condition</b>.
 		</ul> 
 <p>
       		<li>Confirm the droplist for the Select Condition dialog includes: 
