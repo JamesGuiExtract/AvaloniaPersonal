@@ -367,12 +367,12 @@ static const string gstrCREATE_WORK_ITEM_TABLE =
 	"[Sequence] [int] NOT NULL,"
 	"[StringizedException] [nvarchar](MAX) NULL)";
 
-static const string gstrCREATE_METADATA_FIELD =
+static const string gstrCREATE_METADATA_FIELD_TABLE =
 	"CREATE TABLE [dbo].[MetadataField] ("
 	"[ID] INT NOT NULL IDENTITY(1,1) CONSTRAINT [PK_MetadataField] PRIMARY KEY CLUSTERED, "
 	"[Name] NVARCHAR(50))";
 
-static const string gstrCREATE_FILE_METADATA_FIELD_VALUE =
+static const string gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE =
 	"CREATE TABLE [dbo].[FileMetadataFieldValue] ("
 	"[ID] INT NOT NULL IDENTITY(1,1) CONSTRAINT [PK_FileMetadataFieldValue] PRIMARY KEY CLUSTERED, "
 	"[FileID] INT NOT NULL, "

@@ -1166,6 +1166,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrDB_FIELD_SEARCH);
 			eraseFromVector(vecTables, gstrDB_FILE_HANDLER);
 			eraseFromVector(vecTables, gstrDB_FEATURE);
+			eraseFromVector(vecTables, gstrMETADATA_FIELD);
 		}
 
 		// Drop the tables in the vector
@@ -1372,6 +1373,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_FIELD_SEARCH_TABLE);
 		vecQueries.push_back(gstrCREATE_FILE_HANDLER_TABLE);
 		vecQueries.push_back(gstrCREATE_FEATURE_TABLE);
+		vecQueries.push_back(gstrCREATE_METADATA_FIELD_TABLE);
 	}
 
 	// Add queries to create tables to the vector
@@ -1404,8 +1406,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE);
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_TABLE);
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_TABLE);
-	vecQueries.push_back(gstrCREATE_METADATA_FIELD);
-	vecQueries.push_back(gstrCREATE_FILE_METADATA_FIELD_VALUE);
+	vecQueries.push_back(gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE);
 
 	return vecQueries;
 }

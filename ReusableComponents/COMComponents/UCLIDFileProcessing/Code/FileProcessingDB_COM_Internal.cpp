@@ -786,8 +786,8 @@ int UpdateToSchemaVersion120(_ConnectionPtr ipConnection, long *pnNumSteps,
 	}
 
 	vector<string> vecQueries;
-	vecQueries.push_back(gstrCREATE_METADATA_FIELD);
-	vecQueries.push_back(gstrCREATE_FILE_METADATA_FIELD_VALUE);
+	vecQueries.push_back(gstrCREATE_METADATA_FIELD_TABLE);
+	vecQueries.push_back(gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE);
 	vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_FAMFILE_FK);
 	vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_METADATA_FIELD_FK);
 	vecQueries.push_back(gstrMETADATA_FIELD_VALUE_INDEX);
