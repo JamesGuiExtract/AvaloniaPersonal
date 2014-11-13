@@ -349,7 +349,7 @@ namespace Extract.FileActionManager.Forms
 
                 string finalRegEx = "^" + string.Join("|", regExes) + "$";
 
-                return availableTags.Where(tagName => Regex.IsMatch(tagName, finalRegEx));
+                return availableTags.Where(tagName => Regex.IsMatch(tagName, finalRegEx, RegexOptions.IgnoreCase));
             }
             catch (Exception ex)
             {
