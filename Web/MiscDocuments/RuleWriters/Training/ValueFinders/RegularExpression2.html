@@ -90,6 +90,17 @@
                 </p>
             </ul>
         </li>
+        <li><p>The fuzzy expression<br>
+        <pre>&#x22;(?~&#x3C;error=4&#x3E;Certificate)&#x22;</pre>
+        matched against &#x22;Certificatc&#x22; will only match &#x22;Certificat&#x22;<br>
+        So, the expression<br>
+        <pre>&#x22;(?~&#x3C;error=4&#x3E;Certificate)\W*of\W*Death&#x22;</pre>
+        will not match the phrase &#x22;Certificatc of Death&#x22;</p>
+        <p>To work around this, allow for some extra text after the fuzzy regex, proportionate to the errors allowed. In this case use<br>
+        <pre>&#x22;(?~&#x3C;error=4&#x3E;Certificate)[\s\S]{0,4}\W*of\W*Death&#x22;</pre>
+        To speed up the expression significantly use atomic groups like this<br>
+        <pre>&#x22;(?&#x3E;(?~&#x3C;error=4&#x3E;Certificate))[\s\S]{0,4}of\W*Death&#x22;</pre></p>
+        </li>
         <li>Fuzzy regular expressions do <b>not</b> work inside look behind groups.  (The regular expression will not throw an error, but it will not behave in a fuzzy manner.)
             <ul>
                 <p>
@@ -100,6 +111,13 @@
                                 <li>(?&lt!(?~&lterror=3&gtState\x20Project\x20Number))\d{9}</li>
                             </p>
                         </ul>
+                    </li>
+                    <li>To work around this put a look-ahead inside the look-behind:<br>
+                        Change this:<br>
+                        <pre>(?&#x3C;=(?~&#x3C;error=2&#x3E;Number)\W*)</pre>
+                        to this:<br>
+                        <pre>(?&#x3C;=(?=(?~&#x3C;error=2&#x3E;Number))[\s\S]{0,8}\W*)</pre>
+                        (with the 8 in [\s\S]{0,8} being the total of the errors and number of characters in &#x22;Number&#x22;)
                     </li>
                 </p>
             </ul>
