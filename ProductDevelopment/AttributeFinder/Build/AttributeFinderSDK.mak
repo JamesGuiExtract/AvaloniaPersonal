@@ -199,8 +199,8 @@ CreateRedactionDemoInstall:
 	
 CreateOtherDemos:
 	@ECHO Creating other demos...
-	@IF NOT EXIST "$(OtherSetupFiles)\Other Demos" MKDIR "$(OtherSetupFiles)\Other Demos"
-	@XCOPY  "$(AFRootDirectory)\Utils\Demo_RedactionGame\*.*" "$(OtherSetupFiles)\Other Demos" /v /s /e /y
+	@IF NOT EXIST "$(OtherSetupFiles)\Other Demos\Demo_RedactionGame" MKDIR "$(OtherSetupFiles)\Other Demos\Demo_RedactionGame"
+	@XCOPY  "$(AFRootDirectory)\Utils\Demo_RedactionGame\*.*" "$(OtherSetupFiles)\Other Demos\Demo_RedactionGame" /v /s /e /y
 
 CreateLabDEInstall:
 	@Echo Building LabDE...
