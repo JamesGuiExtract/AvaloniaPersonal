@@ -30,14 +30,11 @@
 		<ul>
 	        	<li>Process a single large document with <b>parallelization OFF</b> 
 			and the FPS file configured to use a specified number of threads. 
-			Record the processing time.
+			Record the processing time. Times are expected to be approximately 
+			identical.
 			<ul>
 				<li><b>1</b> thread:  time = 
 				<li><b>2</b> threads: time = 
-				<li><b>3</b> threads: time = 
-				<li><b>4</b> threads: time = 
-				<li><b>5</b> threads: time = 
-				<li><b>6</b> threads: time = 
 			</ul>
 	        	<li>Process a single large document with <b>parallelization ON</b> 
 			and the FPS file configured to use a specified number of threads. 
@@ -50,10 +47,11 @@
 				<li><b>5</b> threads: time = 
 				<li><b>6</b> threads: time = 
 			</ul>
-			<li>Confirm that the processing time decreases in proportion to the 
-			number of threads used.
-			<li>Confirm that processing time no longer decreases when the number 
-			of threads is greater than the number of cores on the processing machine.
+			<li>Confirm that the parallelized processing time decreases in 
+			proportion to the number of threads used.
+			<li>Confirm that parallelized processing time no longer decreases when 
+			the number of threads is greater than the number of cores on the 
+			processing machine.
 		</ul>
 <p>
 		<li><u>PDF Documents</u>
@@ -202,13 +200,13 @@
 		</ul>
        	</ul>
 <p>
-	<LI><b>ISSUE-12368: Test Temporary Work Files Are Cleaned Up</b>
+	<LI><b>ISSUE-12368: Test Temporary Work Items Are Cleaned Up</b>
        	<ul>
   	   	<LI>Process a single large document with parallelization ON.
-		<li>Confirm that USS files are generated for each individual page during 
-		processing.
-		<li>Confirm that the intermediate USS files are deleted after OCR is 
-		complete.
+		<li>Confirm that output data is generated for each individual work item 
+		during processing.
+		<li>Confirm that the work item information in the database is deleted after 
+		OCR is complete.
        	</ul>
 <p>
 	<LI><b>ISSUE-12369: Test OCR Memory Usage And Speed Versus Non-Parallelized</b>
@@ -282,7 +280,28 @@
 <p>
 	<LI><b>ISSUE-12382: Work Unit Processing With Scheduled Processing and Pause</b>
        	<ul>
-  	   	<LI>TBD.
+		<li>Prepare a set of large images for parallel processing.
+		<li>Confirm that the <b>AllowRestartableProcessing</b> flag from 
+		<b>DBInfo</b> is <b>1</b>.
+		<li>Process the files.
+		<li><b>Pause processing</b> in the middle of processing a large file.
+		<li>Confirm that active work items remain in the database.
+		<li>Resume processing.
+		<li>Confirm that the previously file processing continues processing 
+		its active work items.
+		<li>Confirm that the file completes successfully.
+		<li>Confirm that other files complete successfully.
+		<li>Repeat the pause and resume sequence and confirm proper behavior.
+<p>
+		<li>Repeat the test with the FPS file configured for <b>Scheduled 
+		Processing</b> such that processing is expected to stop for one hour before 
+		it is complete.
+		<li>Start processing.
+		<li>Confirm that the file processing when the Stop Time is 
+		reached stops processing after completing only the active work item.
+		<li>Confirm that work items remain unfinished during the downtime.
+		<li>Confirm that processing continues where it left off once the 
+		downtime is finished.
        	</ul>
 <p>
 	<LI><b>ISSUE-12393: Centralized Exception Logging</b>
@@ -318,15 +337,15 @@
 			the Start Time is reached.
 		</ul>
 <p>
-		<li><u>Missing Intermediate Files</u>
+		<li><u>Missing Work Items</u>
 		<ul>
 			<li>Prepare a large image for parallel processing.
 			<li>Process the file.
-			<li>During processing, delete one or more of the intermediate 
-			USS files.
+			<li>During processing, delete one or more of the completed work items 
+			from the database.
 			<li>Confirm that the file fails processing with a meaningful 
 			exception.
-			<li>Confirm that other intermediate files are automatically deleted.
+			<li>Confirm that the other work items are automatically deleted.
 		</ul>
        	</ul>
 </OL>
