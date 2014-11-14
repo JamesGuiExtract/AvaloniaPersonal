@@ -10,9 +10,15 @@ ECHO.
 del input\*.voa /s /q
 del input\*.uss /s /q
 del input\*.xml /s /q
+del input\extended\*.voa /s /q
+del input\extended\*.uss /s /q
+del input\extended\*.xml /s /q
+del input\extended\*_*.tif /s /q
 del "Outbound XML Messages\*.*" /s /q
 del "Outbound XML Messages\Sent\*.*" /s /q
-del "Transmitted HL7 Messages\*.*" /s /q
+del "OnBase export\*.*" /s /q
+
+copy "Solution\Database Files\Original\OrderMappingDB.sdf" "Solution\Database Files\OrderMappingDB.sdf"
 
 rem Setup batch file to detach the DB
 echo sp_detach_db Demo_LabDE >"%~dp0SQL.sql"
