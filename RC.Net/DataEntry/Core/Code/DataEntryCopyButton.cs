@@ -501,7 +501,8 @@ namespace Extract.DataEntry
 
                         // If the attribute has not yet been marked as not persistable, this is the
                         // first time it has been displayed-- initialize the attribute as invalid.
-                        if (!_disabled && AttributeStatusInfo.IsAttributePersistable(_attribute))
+                        if (!_disabled && !string.IsNullOrEmpty(ValidationErrorMessage)
+                            && AttributeStatusInfo.IsAttributePersistable(_attribute))
                         {
                             _errorProvider.SetError(this, _validationErrorMessage);
                             AttributeStatusInfo.SetDataValidity(_attribute, DataValidity.Invalid);

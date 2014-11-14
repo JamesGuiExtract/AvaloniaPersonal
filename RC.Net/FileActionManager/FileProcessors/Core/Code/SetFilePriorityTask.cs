@@ -433,8 +433,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <see langword="false"/> if task does not require admin access</returns>
         public bool RequiresAdminAccess()
         {
-            // TODO: Determine if this should require admin access
-            return true;
+            return false;
         }
 
         #endregion IAccessRequired Members
