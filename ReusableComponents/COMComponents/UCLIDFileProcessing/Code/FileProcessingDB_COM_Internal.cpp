@@ -7549,3 +7549,62 @@ bool CFileProcessingDB::SetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFileID,
+													   BSTR bstrMetadataFieldName,
+													   BSTR *pbstrMetadataFieldValue)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			string strQuery =
+				"SELECT [Value] FROM [FileMetadataFieldValue] "
+					"INNER JOIN [MetadataField] ON [MetadataField].[ID] = [FileMetadataFieldValue].[MetadataFieldID] "
+					"WHERE [FileID] = <FileID> AND [Name] = '<MetadataFieldName>'";
+
+			replaceVariable(strQuery, "<FileID>", asString(nFileID));
+			replaceVariable(strQuery, "<MetadataFieldName>", asString(bstrMetadataFieldName));
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+				
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipResult(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37639", ipResult != __nullptr);
+
+				// Execute the query get the set of WorkItems
+				ipResult->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
+				if (!asCppBool(ipResult->adoEOF))
+				{
+					// Get the fields from the file set
+					FieldsPtr ipFields = ipResult->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI37640", ipFields != __nullptr);					
+
+					*pbstrMetadataFieldValue = get_bstr_t(getStringField(ipFields, "Value")).Detach();
+				}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37641");	
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37642");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------

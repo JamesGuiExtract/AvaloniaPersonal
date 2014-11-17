@@ -273,6 +273,7 @@ public:
 	STDMETHOD(SetWorkItemToPending)(long nWorkItemID);
 	STDMETHOD(GetFailedWorkItemsForGroup)(long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
 	STDMETHOD(SetMetadataFieldValue)(long nFileID, BSTR bstrMetadataFieldName, BSTR bstrMetadataFieldValue);
+	STDMETHOD(GetMetadataFieldValue)(long nFileID, BSTR bstrMetadataFieldName, BSTR *pbstrMetadataFieldValue);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1098,6 +1099,7 @@ private:
 	bool SetWorkItemToPending_Internal(bool bDBLocked, long nWorkItemID);
 	bool GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
 	bool SetMetadataFieldValue_Internal(bool bDBLocked, long nFileID, BSTR bstrMetadataFieldName, BSTR bstrMetadataFieldValue);
+	bool GetMetadataFieldValue_Internal(bool bDBLocked, long nFileID, BSTR bstrMetadataFieldName, BSTR *pbstrMetadataFieldValue);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

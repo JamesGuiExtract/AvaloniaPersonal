@@ -1507,6 +1507,10 @@ library UCLID_FILEPROCESSINGLib
 		// REQUIRE: bstrMetadataFieldName exists in the MetadataField table.
 		[id(136), helpstring("method SetMetadataFieldValue")] HRESULT SetMetadataFieldValue([in] long nFileID,
 			[in] BSTR bstrMetadataFieldName, [in] BSTR bstrMetadataFieldValue);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To get the specified metadata field value for the specified file.
+		[id(137), helpstring("method GetMetadataFieldValue")] HRESULT GetMetadataFieldValue([in] long nFileID,
+			[in] BSTR bstrMetadataFieldName, [out, retval] BSTR *pbstrMetadataFieldValue);
 	};
 
 	[
