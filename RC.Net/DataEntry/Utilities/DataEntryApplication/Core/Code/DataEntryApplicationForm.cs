@@ -60,9 +60,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         const string _SAVE_AND_COMMIT = "Save and commit";
 
         /// <summary>
-        /// "Commit without saving"
+        /// "Next document"
         /// </summary>
-        const string _COMMIT_WITHOUT_SAVING = "Commit without saving";
+        const string _NEXT_DOCUMENT = "Next document";
 
         #endregion Constants
 
@@ -3728,14 +3728,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (enableSave)
                 {
                     _saveAndCommitMenuItem.Text = "&" + _SAVE_AND_COMMIT;
+                    _saveAndCommitMenuItem.Image = Resources.SaveImageButtonSmall;
                     _saveAndCommitButton.Text = _SAVE_AND_COMMIT;
                     _saveAndCommitButton.ToolTipText = _SAVE_AND_COMMIT + " (Ctrl+S)";
+                    _saveAndCommitButton.Image = Resources.SaveImageButton;
                 }
                 else
                 {
-                    _saveAndCommitMenuItem.Text = "&" + _COMMIT_WITHOUT_SAVING;
-                    _saveAndCommitButton.Text = _COMMIT_WITHOUT_SAVING;
-                    _saveAndCommitButton.ToolTipText = _COMMIT_WITHOUT_SAVING + " (Ctrl+S)";
+                    _saveAndCommitMenuItem.Text = "&" + _NEXT_DOCUMENT;
+                    _saveAndCommitMenuItem.Image = Resources.NextDocumentSmall;
+                    _saveAndCommitButton.Text = _NEXT_DOCUMENT;
+                    _saveAndCommitButton.ToolTipText = _NEXT_DOCUMENT + " (Ctrl+S)";
+                    _saveAndCommitButton.Image = Resources.NextDocument;
                 }
 
                 if (_isLoaded)
