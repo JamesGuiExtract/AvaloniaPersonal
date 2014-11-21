@@ -154,7 +154,9 @@ namespace Extract.ReportViewer
 
                 if (_textParameter != null)
                 {
-                    _textParameter.ParameterValue = _parameterValue.Text;
+                    // Replace instances of ' with '' so that sql queries will work correctly
+                    // See https://extract.atlassian.net/browse/ISSUE-12591
+                    _textParameter.ParameterValue = _parameterValue.Text.Replace("'", "''");
                 }
             }
             catch (Exception ex)
