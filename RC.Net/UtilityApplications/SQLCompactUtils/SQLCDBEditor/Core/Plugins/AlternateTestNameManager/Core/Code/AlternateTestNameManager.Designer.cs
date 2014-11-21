@@ -100,6 +100,7 @@
             // 
             // _previousAKAToolStripButton
             // 
+            this._previousAKAToolStripButton.ToolTipText = "Go to previous AKA";
             this._previousAKAToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._previousAKAToolStripButton.Enabled = false;
             this._previousAKAToolStripButton.Image = global::Extract.SQLCDBEditor.Plugins.Properties.Resources.PreviousAKAExample;
@@ -110,6 +111,7 @@
             // 
             // _nextAKAToolStripButton
             // 
+            this._nextAKAToolStripButton.ToolTipText = "Go to next AKA";
             this._nextAKAToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._nextAKAToolStripButton.Enabled = false;
             this._nextAKAToolStripButton.Image = global::Extract.SQLCDBEditor.Plugins.Properties.Resources.NextAKAExample;

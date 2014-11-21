@@ -40,8 +40,8 @@ private:
 	// Used for the server if the combo box type is kDatabaseName
 	string m_strServer;
 
-	// Stores the current running platform
-	PLATFORM m_winPlatform;
+	// Stores whether current OS is >= Vista
+	bool m_bVistaOrLater;
 
 	// Gets a list of installed SQL instances from the registry and adds (local)\<instance> to
 	// the list box.  If the instance is named MSSQL

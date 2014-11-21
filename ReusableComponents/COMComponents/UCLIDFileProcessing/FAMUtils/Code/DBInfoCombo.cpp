@@ -25,8 +25,8 @@ DBInfoCombo::DBInfoCombo(EDBInfoType eDBInfoType)
 : m_eDBInfoType(eDBInfoType),
 m_strServer("")
 {
-	// Get the current OS platform
-	m_winPlatform = GetPlatform();
+	// Get vista-or-later flag value
+	m_bVistaOrLater = isPlatformWinVistaOrGreater();
 }
 	
 //-------------------------------------------------------------------------------------------------
@@ -115,9 +115,10 @@ void DBInfoCombo::OnCbnSelendok()
 				{
 					addLocalInstances();
 				}
-
-				// On Vista need to adjust the rectangle size manually
-				if (m_winPlatform == WINVISTA)
+				
+				// On Vista and Win7 with Aero theme and Window 8
+				// need to adjust the rectangle size manually
+				if (m_bVistaOrLater)
 				{
 					// Get the current window rectangle
 					CRect rect;
@@ -126,6 +127,10 @@ void DBInfoCombo::OnCbnSelendok()
 					// Adjust the bottom to be tall enough for at least 7 items
 					// (GetItemHeight(-1) returns height of edit box which should
 					// be the height of each item in the list
+
+					// NOTE: It actually doesn't seem to matter what height is used:
+					// At least on Win 8, "rect.bottom = rect.bottom + 1" has the same
+					// effect as "rect.top + GetItemHeight(-1) * 7"
 					rect.bottom = rect.top + GetItemHeight(-1) * 7;
 
 					// Set the new window size
