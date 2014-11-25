@@ -115,7 +115,7 @@ begin
 	// Need to install msmq which depends on the OS Version
 	if ( SYSINFO.nOSMajor = 5 ) then
 		szProgram = "sysocmgr";
-		szCmdLine = "/i:" + WINDIR ^ "sysoc.inf /u:\"" + SUPPORTDIR ^ "XP_2003_MSMQ.ini\" /q";
+		szCmdLine = "/i:" + WINDIR ^ "sysoc.inf /u:\"" + SUPPORTDIR ^ "XP_2003_MSMQ.ini\" /q /c";
 		//MessageBox( szCmdLine, MB_OK);
 		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 	elseif (SYSINFO.nOSMajor = 6 ) then
@@ -127,9 +127,9 @@ begin
 			szProgram = "ocsetup";
 			// If it is server the arguments need to be different
 			if ( SYSINFO. nOSProductType = VER_NT_SERVER ) then
-				szCmdLine = "MSMQ-Server /passive /quiet";	
+				szCmdLine = "MSMQ-Server /passive /quiet /norestart";	
 			else
-				szCmdLine = "MSMQ-Container;MSMQ-Server /passive /quiet";
+				szCmdLine = "MSMQ-Container;MSMQ-Server /passive /quiet /norestart";
 			endif;
 		else
 			szProgram = "DISM ";
