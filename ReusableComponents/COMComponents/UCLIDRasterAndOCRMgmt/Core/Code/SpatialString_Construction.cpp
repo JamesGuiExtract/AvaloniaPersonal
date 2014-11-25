@@ -747,6 +747,7 @@ STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings)
 			if (i == 0)
 			{
 				m_strSourceDocName = ipStr->SourceDocName;
+				m_strOCREngineVersion = ipStr->OCREngineVersion;
 			}
 			else if (nCurrPage == nLastProcessedPage)
 			{
