@@ -3905,7 +3905,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="I4">ISAttributes</col>
 		<row><td>ConfigureEmailSettingsShortcut</td><td>newfolder2</td><td>##ID_STRING29##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]EmailFile</td><td>/c</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1</td><td>newfolder1</td><td>##ID_STRING11##</td><td>Help</td><td>[HELP]IDShield.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut10</td><td>newfolder2</td><td>##ID_STRING19##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut10</td><td>newfolder2</td><td>##ID_STRING19##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]ExtractImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut111</td><td>newfolder2</td><td>##ID_STRING22##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]DetectAndReportFailure.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut12</td><td>newfolder2</td><td>##ID_STRING33##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]SQLCDBEditor.exe</td><td>"[EXTRACT_SYSTEMS_COMMON_APP_DATA]ESFAMService\ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut121</td><td>newfolder1</td><td>##ID_STRING23##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>

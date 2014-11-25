@@ -3826,7 +3826,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut3</td><td>newfolder2</td><td>##ID_STRING5##</td><td>Help</td><td>[COMMON_COMPONENTS]VOAFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder2</td><td>##ID_STRING6##</td><td>Help</td><td>[COMMON_COMPONENTS]USSFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut5</td><td>newfolder2</td><td>##ID_STRING7##</td><td>Help</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut6</td><td>newfolder2</td><td>##ID_STRING8##</td><td>Help</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut6</td><td>newfolder2</td><td>##ID_STRING8##</td><td>Help</td><td>[COMMON_COMPONENTS]ExtractImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut7</td><td>newfolder1</td><td>##ID_STRING9##</td><td>Help</td><td>[LABDE_HELP]LabDE.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut8</td><td>newfolder1</td><td>##ID_STRING10##</td><td>Help</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut9</td><td>newfolder1</td><td>##ID_STRING11##</td><td>Help</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
