@@ -861,6 +861,18 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		// Get the total number of pages in the image
 		long nTotalPages = getNumberOfPagesInImage(strFileName);
 
+		// vecPages will be set to have all the page numbers to be processed
+		// if not doing all of the pages
+		vector<int> vecPages;
+		long nPagesToProcess = nTotalPages;
+		
+		// If only processing specified pages, fill the vecPages vector with the pages
+		if (m_eOCRPageRangeType == UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages)
+		{
+			vecPages = getPageNumbers(nTotalPages, m_strSpecificPages, false);
+			nPagesToProcess = vecPages.size();
+		}
+
 		IIUnknownVectorPtr ipWorkItemsToAdd(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI36910", ipWorkItemsToAdd != __nullptr);
 		
@@ -875,7 +887,7 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		// Only look for an existing work item group if this can be canceled
 		if (m_bAllowCancelBeforeComplete)
 		{
-			nWorkItemGroupID = ipDB->FindWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nTotalPages);
+			nWorkItemGroupID = ipDB->FindWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nPagesToProcess);
 		}
 
 		// The record already exists so return the group id
@@ -889,8 +901,8 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		case UCLID_FILEPROCESSORSLib::kOCRAll:
 			{
 				// Create the work item group
-				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nTotalPages); 
-				for (long i = 1; i <= nTotalPages; i++)
+				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nPagesToProcess); 
+				for (long i = 1; i <= nPagesToProcess; i++)
 				{
 					// Add the page to the work items to add list
 					ipWorkItemsToAdd->PushBack(createWorkItem("<SourceDocName>", i));
@@ -906,17 +918,11 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 			break;
 		case UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages:
 			{
-				// Get the pages to be processed
-				vector<int> vecPages = getPageNumbers(nTotalPages, m_strSpecificPages, false);
-
-				// Get the total number of pages to be processed
-				int numberOfPages = vecPages.size();
-
 				// Create the work item group
-				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, numberOfPages); 
+				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nPagesToProcess); 
 
 				// Add the work items to the group
-				for (int i = 0; i < numberOfPages; i++)
+				for (int i = 0; i < nPagesToProcess; i++)
 				{
 					// Add the page to the work items to add list
 					ipWorkItemsToAdd->PushBack(createWorkItem("<SourceDocName>", vecPages[i]));	
