@@ -151,10 +151,15 @@ namespace Extract.SQLCDBEditor.Plugins
         {
             get
             {
-                return "SELECT [LabTest].[TestCode], [OfficialName] AS [Official Name], [Name] AS [Candidate AKA], COUNT(*) AS Count " +
+                return "SELECT [LabTest].[TestCode], [OfficialName] AS [Official Name], " +
+                                "[CandidateAlternateTestName].[Name] AS [Candidate AKA], COUNT(*) AS Count " +
                             "FROM [CandidateAlternateTestName] " +
                             "INNER JOIN [LabTest] ON [CandidateAlternateTestName].[TestCode] = [LabTest].[TestCode] " +
-                            "GROUP BY [LabTest].[TestCode], [OfficialName], [Name] " +
+                            "LEFT JOIN [AlternateTestName] ON " +
+		                    "   ([CandidateAlternateTestName].[TestCode] = [AlternateTestName].[TestCode] AND " +
+		                    "    [CandidateAlternateTestName].[Name] = [AlternateTestName].[Name]) " +
+                            "WHERE [AlternateTestName].[Name] IS NULL " +
+                            "GROUP BY [LabTest].[TestCode], [OfficialName], [CandidateAlternateTestName].[Name] " +
                             "HAVING MAX(CAST([Ignore] AS INT)) = 0";
             }
         }
