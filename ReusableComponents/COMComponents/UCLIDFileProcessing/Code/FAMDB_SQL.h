@@ -370,7 +370,8 @@ static const string gstrCREATE_WORK_ITEM_TABLE =
 static const string gstrCREATE_METADATA_FIELD_TABLE =
 	"CREATE TABLE [dbo].[MetadataField] ("
 	"[ID] INT NOT NULL IDENTITY(1,1) CONSTRAINT [PK_MetadataField] PRIMARY KEY CLUSTERED, "
-	"[Name] NVARCHAR(50))";
+	"[Name] NVARCHAR(50) NOT NULL,"
+	"CONSTRAINT [IX_MetadataFieldName] UNIQUE NONCLUSTERED ([Name] ASC))";
 
 static const string gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE =
 	"CREATE TABLE [dbo].[FileMetadataFieldValue] ("
