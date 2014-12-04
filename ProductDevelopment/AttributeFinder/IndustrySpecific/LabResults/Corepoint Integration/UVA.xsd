@@ -99,6 +99,13 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" minOccurs="1" type="xs:string" />
+							<xs:element name="OrderNumber" minOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 							<xs:element name="Name" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
@@ -128,13 +135,6 @@
 								</xs:complexType>
 							</xs:element>
 							<xs:element name="CollectionTime" minOccurs="1">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="FullText" type="xs:string" />
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-							<xs:element name="OrderNumber" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="FullText" type="xs:string" />
