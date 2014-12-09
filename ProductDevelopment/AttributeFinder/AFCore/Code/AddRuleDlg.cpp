@@ -1031,19 +1031,23 @@ void CAddRuleDlg::OnDoubleClickDocumentPreprocessor()
 {
 	try
 	{
-		// Update m_upDocPreprocessor based on user input
-		// It's OK to update m_ipRule's preprocessor directly because when m_ipRule represents
-		// an existing rule that is being reconfigured it is a clone, not the original object
+		// make sure the doc preprocessor is non-null
+		if (m_ipDocPreprocessor == __nullptr)
+		{
+			setPreprocessor();
+		}
+
+		// update m_upDocPreprocessor based on user input
 		VARIANT_BOOL vbDirty = m_ipMiscUtils->HandlePlugInObjectDoubleClick(
-			m_ipRule->RuleSpecificDocPreprocessor, gbstrRULE_SPECIFIC_DOCUMENT_PREPROCESSOR_DISPLAY_NAME,
+			m_ipDocPreprocessor, gbstrRULE_SPECIFIC_DOCUMENT_PREPROCESSOR_DISPLAY_NAME,
 			get_bstr_t(AFAPI_DOCUMENT_PREPROCESSORS_CATEGORYNAME), 
 			VARIANT_TRUE, gRequiredInterfaces.ulCount, gRequiredInterfaces.pIIDs);
 
 		// check if m_upDocPreprocessor was modified
 		if (vbDirty == VARIANT_TRUE)
 		{
-			// Set the preprocessor object based on change
-			setPreprocessor();
+			// refresh the preprocessor check box and edit control to reflect changes
+			updatePreprocessorCheckBoxAndEditControl();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16042")
