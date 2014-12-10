@@ -64,6 +64,12 @@ namespace Extract.FileActionManager.Utilities
         static object _lock = new object();
 
         /// <summary>
+        /// Indicates that the class is ready to process a new <see cref="OpenFAMFileInspector"/>
+        /// call.
+        /// </summary>
+        static ManualResetEvent _readyEvent = new ManualResetEvent(true);
+
+        /// <summary>
         /// The <see cref="FAMFileInspectorForm"/> instance currently in use by this class.
         /// </summary>
         static volatile FAMFileInspectorForm _fileInspectorForm;
@@ -161,6 +167,10 @@ namespace Extract.FileActionManager.Utilities
                         return;
                     }
 
+                    // A new form is being initialized; indicate that additional calls to
+                    // OpenFAMFileInspector cannot be processed.
+                    _readyEvent.Reset();
+
                     // [DotNetRCAndUtils:1009]
                     // The form needs to be launched into it's own STA thread. Otherwise there are
                     // message handling issue that can intefere with tab order and print
@@ -200,7 +210,9 @@ namespace Extract.FileActionManager.Utilities
 
                             if (owner == IntPtr.Zero)
                             {
-                                // Run non-modal.
+                                // Run non-modal. Processing of a subsequent call can be processed
+                                // as soon as the form has been activated.
+                                _fileInspectorForm.Activated += (sender, e) => _readyEvent.Set();
                                 Application.Run(_fileInspectorForm);
                             }
                             else
@@ -219,9 +231,22 @@ namespace Extract.FileActionManager.Utilities
                         {
                             ex.ExtractDisplay("ELI35851");
                         }
+                        finally
+                        {
+                            // https://extract.atlassian.net/browse/ISSUE-12649
+                            // At this point the form has been displayed (if called modally, has
+                            // been displayed and closed). It is now safe to make another call into
+                            // OpenFAMFileInspector.
+                            _readyEvent.Set();
+                        }
                     });
                     uiThread.SetApartmentState(ApartmentState.STA);
                     uiThread.Start();
+                    
+                    // https://extract.atlassian.net/browse/ISSUE-12649
+                    // Don't release the lock this call has until either the FFI has finished
+                    // initializing and been activated or a modal instance has been closed.
+                    WaitUntilReady(owner != IntPtr.Zero);
                 }
             }
             catch (Exception ex)
@@ -260,6 +285,24 @@ namespace Extract.FileActionManager.Utilities
             {
                 VariantVector fileSetIDs = fileProcessingDB.GetFileSetFileIDs(fileSetName);
                 _fileInspectorForm.FileProcessingDB.AddFileSet(fileSetName, fileSetIDs);
+            }
+        }
+
+        /// <summary>
+        /// Idles the current thread until a previous call to OpenFAMFileInspector has finished
+        /// initializing _fileInspectorForm.
+        /// </summary>
+        /// <param name="doNonInputEvents">If <see langword="true"/>, non-user input events
+        /// necessary to initialize the FFI as a modal form will be processed during this wait;
+        /// User input events will be ignored.</param>
+        static void WaitUntilReady(bool doNonInputEvents)
+        {
+            while (!_readyEvent.WaitOne(0))
+            {
+                if (doNonInputEvents)
+                {
+                    WindowsMessage.DoEventsExcept(WindowsMessage.UserInputMessages);
+                }
             }
         }
 

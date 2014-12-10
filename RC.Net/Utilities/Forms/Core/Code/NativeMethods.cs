@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Drawing;
-using System.ComponentModel;
 
 namespace Extract.Utilities.Forms
 {
@@ -33,6 +34,11 @@ namespace Extract.Utilities.Forms
         // when restoring a minimized window.
         const int SW_RESTORE = 0x09;
 
+        /// <summary>
+        /// A value for the RemoveMessage parameter of the PeekMessage call.
+        /// </summary>
+        const uint PM_REMOVE = 1;
+
         #endregion Constants
 
         #region Structs
@@ -49,6 +55,21 @@ namespace Extract.Utilities.Forms
             public UInt32 dwFlags;
             public UInt32 uCount;
             public UInt32 dwTimeout;
+        }
+
+        /// <summary>
+        /// Represents a MSG struct used by the PeekMessage, TranslateMessage and DispatchMessage
+        /// Windows API calls.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        struct NativeMessage
+        {
+            public IntPtr handle;
+            public int msg;
+            public IntPtr wParam;
+            public IntPtr lParam;
+            public uint time;
+            public Point p;
         }
 
         #endregion Structs
@@ -291,6 +312,51 @@ namespace Extract.Utilities.Forms
         /// <returns></returns>
         [DllImport("user32.dll")]
         private static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        /// <summary>
+        /// Dispatches incoming sent messages, checks the thread message queue for a posted message,
+        /// and retrieves the message (if any exist).
+        /// </summary>
+        /// <param name="lpMsg">A pointer to an NativeMessage structure that receives message
+        /// information.</param>
+        /// <param name="hWnd">A handle to the window whose messages are to be retrieved. The
+        /// window must belong to the current thread. If hWnd is NULL, PeekMessage retrieves
+        /// messages for any window that belongs to the current thread, and any messages on the
+        /// current thread's message queue whose hwnd value is NULL</param>
+        /// <param name="wMsgFilterMin">The value of the first message in the range of messages to
+        /// be examined. If wMsgFilterMin and wMsgFilterMax are both zero, PeekMessage returns all
+        /// available messages (that is, no range filtering is performed).</param>
+        /// <param name="wMsgFilterMax">The value of the last message in the range of messages to
+        /// be examined. If wMsgFilterMin and wMsgFilterMax are both zero, PeekMessage returns all
+        /// available messages (that is, no range filtering is performed).</param>
+        /// <param name="wRemoveMsg">Specifies how messages are to be handled.</param>
+        /// <returns><see langword="true"/> if there was an available message; otherwise,
+        /// <see langword="false"/>.</returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool PeekMessage(out NativeMessage lpMsg, IntPtr hWnd, uint wMsgFilterMin,
+           uint wMsgFilterMax, uint wRemoveMsg);
+
+        /// <summary>
+        /// Translates virtual-key messages into character messages.
+        /// </summary>
+        /// <param name="lpMsg">A pointer to a NativeMessage structure that contains message
+        /// information retrieved from the calling thread's message queue.</param>
+        /// <returns><see langword="true"/> if the message was translated; otherwise,
+        /// <see langword="false"/>.</returns>
+        [DllImport("user32.dll")]
+        static extern bool TranslateMessage([In] ref NativeMessage lpMsg);
+
+        /// <summary>
+        /// Dispatches a message to a window procedure.
+        /// </summary>
+        /// <param name="lpmsg">A pointer to a NativeMessage structure that contains the message.
+        /// </param>
+        /// <returns>The return value specifies the value returned by the window procedure. Although
+        /// its meaning depends on the message being dispatched, the return value generally is
+        /// ignored.</returns>
+        [DllImport("user32.dll")]
+        static extern IntPtr DispatchMessage([In] ref NativeMessage lpmsg);
 
         #endregion P/Invokes
 
@@ -678,6 +744,25 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35794");
+            }
+        }
+
+        /// <summary>
+        /// Processes all Windows messages currently in the message queue except for
+        /// <see paramref="messagesToIgnore"/>.
+        /// </summary>
+        /// <param name="messagesToIgnore">The window messages that should be ignored/discarded
+        /// rather than processed.</param>
+        public static void DoEventsExcept(HashSet<int> messagesToIgnore)
+        {
+            NativeMessage message;
+            while (PeekMessage(out message, IntPtr.Zero, 0, 0, PM_REMOVE))
+            {
+                if (!messagesToIgnore.Contains(message.msg))
+                {
+                    TranslateMessage(ref message);
+                    DispatchMessage(ref message);
+                }
             }
         }
 

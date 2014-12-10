@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Extract.Utilities.Forms
 {
     /// <summary>
@@ -5,6 +8,8 @@ namespace Extract.Utilities.Forms
     /// </summary>
     public static class WindowsMessage
     {
+        #region Public Constants
+
         /// <summary>
         /// Allows changes in a window to be redrawn or prevents changes in that window from being 
         /// redrawn.
@@ -16,6 +21,11 @@ namespace Extract.Utilities.Forms
         /// application's window.
         /// </summary>
         public const int Paint = 0x000F;
+
+        /// <summary>
+        /// The first of all key related messages.
+        /// </summary>
+        public const int KeyFirst = 0x0100;
 
         /// <summary>
         /// Key down message
@@ -58,6 +68,11 @@ namespace Extract.Utilities.Forms
         public const int SystemDeadCharacter = 0x0107;
 
         /// <summary>
+        /// The last of all key related messages.
+        /// </summary>
+        public const int KeyLast = 0x0109;
+
+        /// <summary>
         /// The user chose a command from the Window menu or chose the maximize button, minimize 
         /// button, restore button, or close button.
         /// </summary>
@@ -72,6 +87,11 @@ namespace Extract.Utilities.Forms
         /// Vertical scroll message
         /// </summary>
         public const int VerticalScroll = 0x0115;
+
+        /// <summary>
+        /// The first of all mouse related messages.
+        /// </summary>
+        public const int MouseFirst = 0x0200;
 
         /// <summary>
         /// Mouse move message
@@ -129,6 +149,11 @@ namespace Extract.Utilities.Forms
         public const int MouseWheel = 0x020A;
 
         /// <summary>
+        /// The last of all mouse related messages.
+        /// </summary>
+        public const int MouseLast = 0x020A;
+
+        /// <summary>
         /// Left button down in non-client area message.
         /// </summary>
         public const int NonClientLeftButtonDown = 0x00A1;
@@ -182,6 +207,64 @@ namespace Extract.Utilities.Forms
         /// Kill focus message
         /// </summary>
         public const int KillFocus = 0x0008;
-    }
 
+        #endregion Public Constants
+
+        #region Private Fields
+
+        static HashSet<int> _userInputMessages = null;
+
+        #endregion Private Fields
+
+        #region Properties
+
+        /// <summary>
+        /// All messages that represent user mouse or keyboard input.
+        /// </summary>
+        public static HashSet<int> UserInputMessages
+        {
+            get
+            {
+                try
+                {
+                    if (_userInputMessages == null)
+                    {
+                        _userInputMessages = new HashSet<int>(
+                            Enumerable.Range(KeyFirst, KeyLast - KeyFirst + 1)
+                            .Union(Enumerable.Range(MouseFirst, MouseLast - MouseFirst + 1)));
+                    }
+
+                    return _userInputMessages;
+                }
+                catch (System.Exception ex)
+                {
+                    throw ex.AsExtract("ELI37753");
+                }
+            }
+        }
+
+        #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        /// Processes all Windows messages currently in the message queue except for
+        /// <see paramref="messagesToIgnore"/>.
+        /// </summary>
+        /// <param name="messagesToIgnore">The window messages that should be ignored/discarded
+        /// rather than processed.</param>
+        public static void DoEventsExcept(HashSet<int> messagesToIgnore)
+        {
+            try
+            {
+                NativeMethods.DoEventsExcept(messagesToIgnore);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex.AsExtract("ELI37754");
+            }
+        }
+
+        #endregion Methods
+    }
 }
