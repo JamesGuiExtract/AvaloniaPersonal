@@ -44,7 +44,7 @@ function main(args) {
         license(9);
     }
     catch (err) {
-        handleScriptError("InternalScriptError", "Unable to license SDK (version 9+)", err);
+        handleScriptError("ELI37749", "Unable to license SDK (version 9+)", err);
     }
 
     var root = fso.getAbsolutePathName(args[0]);
@@ -62,7 +62,7 @@ function main(args) {
             ruleset.LoadFrom(rsdfilename, true);
         }
         catch (err) {
-            handleScriptError("InternalScriptError", "Unable to load ruleset", err, "RSD File", rsdfilename);
+            handleScriptError("ELI37750", "Unable to load ruleset", err, "RSD File", rsdfilename);
         }
 
         var modified = false;
@@ -76,7 +76,7 @@ function main(args) {
                 ruleset.SaveTo(rsdfilename, true);
             }
             catch (err) {
-                handleScriptError("InternalScriptError", "Unable to save ruleset", err, "RSD File", rsdfilename);
+                handleScriptError("ELI37751", "Unable to save ruleset", err, "RSD File", rsdfilename);
             }
         }
     }
