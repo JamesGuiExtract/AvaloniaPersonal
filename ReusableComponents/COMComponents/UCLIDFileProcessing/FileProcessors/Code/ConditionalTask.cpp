@@ -286,6 +286,14 @@ STDMETHODIMP CConditionalTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	{
 		m_ipFileRequestHandler = pFileRequestHandler;
 		// true/false tasks will be initialized/closed per file
+
+		// Initialize condition if it implements the IInitClose interface
+		// Retrieve the FAM Condition from the Object-With-Description
+		IInitClosePtr ipInitClose = m_ipFAMCondition->Object;
+		if (ipInitClose != __nullptr)
+		{
+			ipInitClose->Init(nActionID, pFAMTM, pDB, pFileRequestHandler);
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16580");
 	
@@ -332,9 +340,26 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 			ipProgressStatus->StartNextItemGroup("Evaluating condition...", nNUM_PROGRESS_ITEMS_CONDITION_EVALUATION);
 		}
 
+		// If cancel was requested call cancel before calling the FileMatchesFAMCondition
+		IFAMCancelablePtr ipCancelable = ipFAMCondition;
+		if (bCancelRequested == VARIANT_TRUE && ipCancelable != __nullptr)
+		{
+			ipCancelable->Cancel();
+		}
+
 		// Exercise the FAM Condition
 		bool bConditionSatisfied = asCppBool(ipFAMCondition->FileMatchesFAMCondition(
 			ipFileRecord, pDB, nActionID, pTagManager));
+
+		// Check if the condition was canceled
+		if (ipCancelable != __nullptr)
+		{
+			if (ipCancelable->IsCanceled() == VARIANT_TRUE)
+			{
+				*pResult = kProcessingCancelled;
+				return S_OK;
+			}
+		}
 
 		// Kick off progress status for task execution
 		IProgressStatusPtr ipSubProgressStatus = __nullptr;
@@ -389,6 +414,14 @@ STDMETHODIMP CConditionalTask::raw_Cancel()
 
 	try
 	{
+		// Need to pass cancel to the Condition
+		// Retrieve the FAM Condition from the Object-With-Description
+		IFAMCancelablePtr ipCancelable = m_ipFAMCondition->Object;
+		if (ipCancelable != __nullptr)
+		{
+			ipCancelable->Cancel();
+		}
+
 		// Need to inform Executor to pass on cancel request as necessary
 		m_ipFAMTaskExecutor->Cancel();
 	}
@@ -403,7 +436,13 @@ STDMETHODIMP CConditionalTask::raw_Close()
 
 	try
 	{
-		// Not needed... true/false tasks will be initialized/closed per file
+		// Close conditions that implement the IInitClose interface
+		// Retrieve the FAM Condition from the Object-With-Description
+		IInitClosePtr ipInitClose = m_ipFAMCondition->Object;
+		if (ipInitClose != __nullptr)
+		{
+			ipInitClose->Close();
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16582");
 	

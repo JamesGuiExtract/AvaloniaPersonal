@@ -1349,3 +1349,22 @@ const string gstrGET_FAILED_WORK_ITEM_FOR_GROUP =
 	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
 	"WHERE WorkItemGroupID = <WorkItemGroupID> "
 	"AND [WorkItem].[Status] = 'F' ";
+
+const string gstrGET_WORK_ITEM_GROUP_ID =
+	"WITH workItemTotals (ID, CountOfWorkItems ,NumberOfWorkItems)  "
+	"AS ( "
+	"	SELECT WorkItemGroupID AS ID "
+	"		,COUNT(WorkItem.ID) AS CountOfWorkItems "
+	"		,NumberOfWorkItems "
+	"	FROM WorkItemGroup "
+	"	INNER JOIN WorkItem ON WorkItemGroup.ID = WorkItem.WorkItemGroupID "
+	"	WHERE FileID = <FileID> "
+	"		AND ActionID = <ActionID> "
+	"		AND StringizedSettings = '<StringizedSettings>' "
+	"		AND NumberOfWorkItems = <NumberOfWorkItems> "
+	"	GROUP BY WorkItemGroupID "
+	"		,NumberOfWorkItems "
+	"	) "
+	"SELECT ID "
+	"FROM workItemTotals "
+	"WHERE CountOfWorkItems = NumberOfWorkItems ";

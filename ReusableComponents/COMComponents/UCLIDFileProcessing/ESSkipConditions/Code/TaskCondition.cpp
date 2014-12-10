@@ -17,7 +17,9 @@ const unsigned long gnCurrentVersion = 2;
 // CTaskCondition
 //-------------------------------------------------------------------------------------------------
 CTaskCondition::CTaskCondition() :
-	m_bLogExceptions(true)
+	m_bLogExceptions(true),
+	m_bCanceled(false),
+	m_bCancelRequested(false)
 {
 	try
 	{
@@ -143,26 +145,22 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecor
 			throw ue;
 		}
 
-		// Insert the task into a vector of object with description objects for processing
-		IIUnknownVectorPtr ipTasks(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI20161", ipTasks != __nullptr);
-
-		IObjectWithDescriptionPtr ipTaskOWD(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI20167", ipTaskOWD != __nullptr);
-
-		ipTaskOWD->Object = m_ipTask;
-		ipTasks->PushBack(ipTaskOWD);
+		// Initialize the canceled flag to false
+		m_bCanceled = false;
 
 		try
 		{
 			try
 			{
 				// Execute the task.
-				// The condition is satisfied if the task completed without exception or cancellation
-				EFileProcessingResult eResult = m_ipFAMTaskExecutor->InitProcessClose(
-					pFileRecord, ipTasks, lActionID, pFPDB, pFAMTM, __nullptr, __nullptr,
-					VARIANT_FALSE);
+				// The condition is satisfied if the task completed without exception
+				EFileProcessingResult eResult = m_ipTask->ProcessFile(pFileRecord, lActionID,
+					pFAMTM, pFPDB, __nullptr, asVariantBool(m_bCancelRequested));
+
 				*pRetVal = asVariantBool(eResult == kProcessingSuccessful);
+
+				// Set the canceled flag if result was kProcessingCancelled
+				m_bCanceled = eResult == kProcessingCancelled;
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20162");
 		}
@@ -214,6 +212,8 @@ STDMETHODIMP CTaskCondition::InterfaceSupportsErrorInfo(REFIID riid)
 		{
 			&IID_ITaskCondition,
 			&IID_IFAMCondition,
+			&IID_IFAMCancelable,
+			&IID_IInitClose,
 			&IID_IPersistStream,
 			&IID_ICopyableObject,
 			&IID_ICategorizedComponent,
@@ -592,6 +592,81 @@ STDMETHODIMP CTaskCondition::get_InstanceGUID(GUID * pVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37152");
 }
+
+//-------------------------------------------------------------------------------------------------
+// IFAMCancelable Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::raw_Cancel()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Reset the Cancel requested flag
+		m_bCancelRequested = true;
+
+		// Pass the cance to the task
+		m_ipTask->Cancel();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37666");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::raw_IsCanceled(VARIANT_BOOL *pvbCanceled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check parameter
+		ASSERT_ARGUMENT("ELI37673", pvbCanceled != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		*pvbCanceled = asVariantBool(m_bCanceled);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37674");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IInitClose Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::raw_Init(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB* pDB,
+			IFileRequestHandler* pFileRequestHandler)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Reset the Cancel requested flag
+		m_bCancelRequested = false;
+
+		// Call Init on the task
+		m_ipTask->Init(nActionID, pFAMTM, pDB, pFileRequestHandler);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37733");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::raw_Close()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Call Close on the task
+		m_ipTask->Close();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37734");
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------

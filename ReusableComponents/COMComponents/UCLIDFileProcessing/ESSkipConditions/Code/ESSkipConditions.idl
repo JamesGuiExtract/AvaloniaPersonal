@@ -172,6 +172,12 @@ library EXTRACT_FAMCONDITIONSLib
 			[in] IIUnknownVector* pFAMConditions, [in] ELogicalOperator eLogicalOperator, 
 			[in] IFileRecord* pFileRecord, [in] IFileProcessingDB* pFPDB,
 			[in] long lActionID, [in] IFAMTagManager* pFAMTM, [out, retval] VARIANT_BOOL* pRetVal);
+		[id(2), helpstring("method Parallelize")] HRESULT Parallelize([in] IIUnknownVector* pFAMConditions,
+			[out, retval] VARIANT_BOOL *pvbParallelize);
+		[id(3), helpstring("method Init")] HRESULT Init([in] IIUnknownVector* pFAMConditions,
+			[in] long nActionID, [in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB* pDB,
+			[in] IFileRequestHandler* pFileRequestHandler);
+		[id(4), helpstring("method Close")] HRESULT Close([in] IIUnknownVector* pFAMConditions);
 	};
 
 	[
@@ -334,6 +340,7 @@ library EXTRACT_FAMCONDITIONSLib
 	coclass GenericMultiFAMCondition
 	{
 		[default] interface IGenericMultiFAMCondition;
+		interface IFAMCancelable;
 		interface ILicensedComponent;
 	};
 
@@ -344,6 +351,9 @@ library EXTRACT_FAMCONDITIONSLib
 	coclass MultiFAMConditionAND
 	{
 		[default] interface IFAMCondition;
+		interface IFAMCancelable;
+		interface IInitClose;
+		interface IParallelizableTask;
 		interface ILicensedComponent;
 		interface ICopyableObject;
 		interface ICategorizedComponent;
@@ -358,6 +368,9 @@ library EXTRACT_FAMCONDITIONSLib
 	coclass MultiFAMConditionOR
 	{
 		[default] interface IFAMCondition;
+		interface IFAMCancelable;
+		interface IInitClose;
+		interface IParallelizableTask;
 		interface ILicensedComponent;
 		interface ICopyableObject;
 		interface ICategorizedComponent;
@@ -372,6 +385,9 @@ library EXTRACT_FAMCONDITIONSLib
 	coclass MultiFAMConditionEXACTONE
 	{
 		[default] interface IFAMCondition;
+		interface IFAMCancelable;
+		interface IInitClose;
+		interface IParallelizableTask;
 		interface ILicensedComponent;
 		interface ICopyableObject;
 		interface ICategorizedComponent;
@@ -386,6 +402,9 @@ library EXTRACT_FAMCONDITIONSLib
 	coclass MultiFAMConditionNONE
 	{
 		[default] interface IFAMCondition;
+		interface IFAMCancelable;
+		interface IInitClose;
+		interface IParallelizableTask;
 		interface ILicensedComponent;
 		interface ICopyableObject;
 		interface ICategorizedComponent;
@@ -401,6 +420,8 @@ library EXTRACT_FAMCONDITIONSLib
 	{
 		[default] interface ITaskCondition;
 		interface IFAMCondition;
+		interface IFAMCancelable;
+		interface IInitClose;
 		interface ICategorizedComponent;
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;

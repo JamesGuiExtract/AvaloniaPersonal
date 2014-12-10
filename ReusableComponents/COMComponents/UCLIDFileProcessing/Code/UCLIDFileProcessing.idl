@@ -569,6 +569,53 @@ library UCLID_FILEPROCESSINGLib
 
 	[
 		object,
+		uuid(57735366-4759-4177-899A-EE79EE2FF007),
+		dual,
+		helpstring("IFAMCancelable Interface"),
+		pointer_default(unique)
+	]
+	interface IFAMCancelable : IDispatch
+	{
+		[id(1), helpstring("method Cancel")] HRESULT Cancel();
+		[id(2), helpstring("method IsCanceled")] HRESULT IsCanceled([out, retval] VARIANT_BOOL *pvbCanceled);
+	};
+	
+	[
+		object,
+		uuid(44DDA42B-DFC4-4E2F-9F9A-73465725E2B4),
+		dual,
+		helpstring("IInitClose Interface"),
+		pointer_default(unique)
+	]
+	interface IInitClose : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To alert the object that processing is about to start so it can 
+		//				perform any necessary initialization.
+		// ARGUMENTS:	nActionID - The ID of the action being processed
+		//				pFAMTM - A FAMTagManager object for expanding filename tags/methods
+		//				pDB - The database being operated upon
+		//				pFileRequestHandler- The IFileRequestHandler that can be used
+        //				by the task to carry out requests for files to be checked out, released or
+		//				re-ordered in the queue.
+		// NOTE:		This may be called multiple times on the same object because the same coClass
+		//				may be being used in multiple threads.  This will happen per processing session
+		//				not per file.
+		//				See note about IFileProcessingTask multithreading above
+		[id(11), helpstring("method Init")] HRESULT Init([in] long nActionID,
+			[in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB* pDB,
+			[in] IFileRequestHandler* pFileRequestHandler);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To notify a object that the processing has been completed.
+		//				(allowing the object to perform any cleanup it may wish to do)
+		// NOTE:		This may be called multiple times on the same object because the same coClass
+		//				may be being used in multiple threads. This will happen per processing session
+		//				not per file
+		[id(2), helpstring("method Close")] HRESULT Close();		
+	};
+
+	[
+		object,
 		uuid(B4690765-4695-4D25-8F79-3F34C72AC4CB),
 		dual,
 		helpstring("IWorkItemRecord Interface"),

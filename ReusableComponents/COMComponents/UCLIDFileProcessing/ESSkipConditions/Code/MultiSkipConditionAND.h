@@ -17,9 +17,12 @@ class ATL_NO_VTABLE CMultiFAMConditionAND :
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IFAMCondition, &IID_IFAMCondition, &LIBID_UCLID_FILEPROCESSINGLib>,
+	public IDispatchImpl<IFAMCancelable, &IID_IFAMCancelable, &LIBID_UCLID_FILEPROCESSINGLib>,
+	public IDispatchImpl<IInitClose, &IID_IInitClose, &LIBID_UCLID_FILEPROCESSINGLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMultipleObjectHolder, &IID_IMultipleObjectHolder, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<IParallelizableTask, &__uuidof(IParallelizableTask), &LIBID_UCLID_FILEPROCESSINGLib, /* wMajor = */ 1>,
 	public ISpecifyPropertyPagesImpl<CMultiFAMConditionAND>
 {
 public:
@@ -33,6 +36,8 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 BEGIN_COM_MAP(CMultiFAMConditionAND)
 	COM_INTERFACE_ENTRY(IFAMCondition)
 	COM_INTERFACE_ENTRY2(IDispatch, IFAMCondition)
+	COM_INTERFACE_ENTRY(IFAMCancelable)
+	COM_INTERFACE_ENTRY(IInitClose)
 	COM_INTERFACE_ENTRY(IAccessRequired)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY(IPersistStream)
@@ -41,6 +46,7 @@ BEGIN_COM_MAP(CMultiFAMConditionAND)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IMultipleObjectHolder)
+	COM_INTERFACE_ENTRY(IParallelizableTask)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 END_COM_MAP()
 
@@ -90,18 +96,36 @@ public:
 	STDMETHOD(raw_GetObjectType)(BSTR* pstrObjectType);
 	STDMETHOD(raw_GetRequiredIID)(IID *riid);
 
+	// IFAMCancelable
+	STDMETHOD(raw_Cancel)();
+	STDMETHOD(raw_IsCanceled)(VARIANT_BOOL *pvbCanceled);
+
+	// IParallelizableTask Methods
+	STDMETHOD(raw_ProcessWorkItem)(IWorkItemRecord *pWorkItem, long nActionID,
+		IFAMTagManager* pFAMTM,  IFileProcessingDB* pDB, IProgressStatus *pProgressStatus);
+	STDMETHOD(get_Parallelize)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_Parallelize)(VARIANT_BOOL newVal);
+
+	// IInitClose
+	STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB* pDB,
+			IFileRequestHandler* pFileRequestHandler);
+	STDMETHOD(raw_Close)();
+
 private:
 	/////////////
 	// Methods
 	/////////////
 	void validateLicense();
+	
+	// The task that should be run to evaluate whether this condition succeeds or fails.
+	EXTRACT_FAMCONDITIONSLib::IGenericMultiFAMConditionPtr getGenericMultiFAMCondition();
 
 	/////////////
 	// Variables
 	/////////////
 	// A pointer to IGenericMultiFAMCondition object
 	// the IGenericMultiFAMCondition will do the real work and 
-	// it contains an IIUnknownVectorPtr contain the same FAM condtions.
+	// it contains an IIUnknownVectorPtr contain the same FAM conditions.
 	EXTRACT_FAMCONDITIONSLib::IGenericMultiFAMConditionPtr m_ipGenericMultiFAMCondition;
 
 	// each entry in the vector below is expected to be of type 

@@ -12,7 +12,10 @@
 //--------------------------------------------------------------------------------------------------
 // CGenericMultiFAMCondition
 //--------------------------------------------------------------------------------------------------
-CGenericMultiFAMCondition::CGenericMultiFAMCondition()
+CGenericMultiFAMCondition::CGenericMultiFAMCondition() :
+	m_bCanceled(false), 
+	m_bCancelRequested(false),
+	m_ipCurrentCondition(__nullptr)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -32,7 +35,8 @@ STDMETHODIMP CGenericMultiFAMCondition::InterfaceSupportsErrorInfo(REFIID riid)
 	static const IID* arr[] = 
 	{
 		&IID_ILicensedComponent,
-		&IID_IGenericMultiFAMCondition
+		&IID_IGenericMultiFAMCondition,
+		&IID_IFAMCancelable
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -80,6 +84,12 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector*
 
 	try
 	{
+		// Initialize canceled flag to false
+		m_bCanceled = false;
+
+		// Initialize the current condition to null
+		m_ipCurrentCondition = __nullptr;
+
 		validateLicense();
 
 		IIUnknownVectorPtr ipMultiFAMConditions = pFAMConditions;
@@ -128,19 +138,36 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector*
 
 			// Get the FAM conditon object-with-description 
 			// at the current position
-			IObjectWithDescriptionPtr ipObj = ipMultiFAMConditions->At(i);;
+			IObjectWithDescriptionPtr ipObj = ipMultiFAMConditions->At(i);
 			ASSERT_RESOURCE_ALLOCATION("ELI13824", ipObj != __nullptr);
 
 			// If the current FAM condition is enabled
 			if (ipObj->Enabled == VARIANT_TRUE)
 			{
 				// Get the FAM condition inside the object-with-description
-				IFAMConditionPtr ipFAMConditionHandler = ipObj->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI13825", ipFAMConditionHandler != __nullptr);
+				m_ipCurrentCondition = ipObj->Object;
+				ASSERT_RESOURCE_ALLOCATION("ELI13825", m_ipCurrentCondition != __nullptr);
+
+				// If cancel was requested call cancel before calling the FileMatchesFAMCondition
+				IFAMCancelablePtr ipCancelable = m_ipCurrentCondition;
+				if (m_bCancelRequested && ipCancelable != __nullptr)
+				{
+					ipCancelable->Cancel();
+				}
 
 				// check if file matches FAM condition
-				VARIANT_BOOL bVal = ipFAMConditionHandler->FileMatchesFAMCondition(
+				VARIANT_BOOL bVal = m_ipCurrentCondition->FileMatchesFAMCondition(
 					pFileRecord, pFPDB, lActionID, pFAMTM);
+				
+				// Check if canceled to set flag
+				if (ipCancelable != __nullptr)
+				{
+					m_bCanceled = asCppBool(ipCancelable->IsCanceled());
+					if (m_bCanceled)
+					{
+						return S_OK;
+					}
+				}
 
 				// Consider different Logical operator as:
 				// "AND"  "OR/ATLEAST ONE"  "EXACTLY ONE"  "NONE"
@@ -203,6 +230,167 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector*
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13822")
 
 	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CGenericMultiFAMCondition::Parallelize(IIUnknownVector* pFAMConditions,
+			VARIANT_BOOL *pvbParallelize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		IIUnknownVectorPtr ipMultiFAMConditions = pFAMConditions;
+
+		// Get the number of FAM condition items
+		long nNumItems = ipMultiFAMConditions->Size();
+
+		// Initialize Parallelize to false
+		*pvbParallelize = VARIANT_FALSE;
+
+		for (int i = 0; i < nNumItems; i++)
+		{
+			// Get the FAM conditon object-with-description 
+			// at the current position
+			IObjectWithDescriptionPtr ipObj = ipMultiFAMConditions->At(i);;
+			ASSERT_RESOURCE_ALLOCATION("ELI37723", ipObj != __nullptr);
+			
+			// Initialize Parallelize to false
+			*pvbParallelize = VARIANT_FALSE;
+
+			// If the current FAM condition is enabled
+			if (ipObj->Enabled == VARIANT_TRUE)
+			{
+				// Get the FAM condition inside the object-with-description
+				IParallelizableTaskPtr ipParallizable = ipObj->Object;
+				if (ipParallizable != __nullptr)
+				{
+					*pvbParallelize = ipParallizable->Parallelize;
+					if (asCppBool(*pvbParallelize))
+					{
+						return S_OK;
+					}
+				}
+			}
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37722");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CGenericMultiFAMCondition::Init(IIUnknownVector* pFAMConditions, long nActionID, 
+	IFAMTagManager* pFAMTM, IFileProcessingDB* pDB,	IFileRequestHandler* pFileRequestHandler)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		IIUnknownVectorPtr ipMultiFAMConditions = pFAMConditions;
+
+		// Get the number of FAM condition items
+		long nNumItems = ipMultiFAMConditions->Size();
+
+		for (int i = 0; i < nNumItems; i++)
+		{
+			// Get the FAM conditon object-with-description 
+			// at the current position
+			IObjectWithDescriptionPtr ipObj = ipMultiFAMConditions->At(i);;
+			ASSERT_RESOURCE_ALLOCATION("ELI37740", ipObj != __nullptr);
+			
+			// If the current FAM condition is enabled
+			if (ipObj->Enabled == VARIANT_TRUE)
+			{
+				// Get the FAM condition inside the object-with-description
+				IInitClosePtr ipInitClose = ipObj->Object;
+				if (ipInitClose != __nullptr)
+				{
+					ipInitClose->Init(nActionID, pFAMTM, pDB, pFileRequestHandler);
+				}
+			}
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37738");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CGenericMultiFAMCondition::Close(IIUnknownVector* pFAMConditions)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		IIUnknownVectorPtr ipMultiFAMConditions = pFAMConditions;
+
+		// Get the number of FAM condition items
+		long nNumItems = ipMultiFAMConditions->Size();
+
+		for (int i = 0; i < nNumItems; i++)
+		{
+			// Get the FAM conditon object-with-description 
+			// at the current position
+			IObjectWithDescriptionPtr ipObj = ipMultiFAMConditions->At(i);;
+			ASSERT_RESOURCE_ALLOCATION("ELI37741", ipObj != __nullptr);
+			
+			// If the current FAM condition is enabled
+			if (ipObj->Enabled == VARIANT_TRUE)
+			{
+				// Get the FAM condition inside the object-with-description
+				IInitClosePtr ipInitClose = ipObj->Object;
+				if (ipInitClose != __nullptr)
+				{
+					ipInitClose->Close();
+				}
+			}
+		}
+
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37739");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IFAMCancelable
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CGenericMultiFAMCondition::raw_Cancel()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Set the Cancel Requested flag
+		m_bCancelRequested = true;
+
+		// Call Cancel on the current condition if it implements IFAMCanceable
+		IFAMCancelablePtr ipCancelable = m_ipCurrentCondition;
+		if (ipCancelable != __nullptr)
+		{
+			ipCancelable->Cancel();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37686");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CGenericMultiFAMCondition::raw_IsCanceled(VARIANT_BOOL *pvbCanceled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check parameter
+		ASSERT_ARGUMENT("ELI37683", pvbCanceled != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		*pvbCanceled = asVariantBool(m_bCanceled);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37684");
 }
 
 //-------------------------------------------------------------------------------------------------

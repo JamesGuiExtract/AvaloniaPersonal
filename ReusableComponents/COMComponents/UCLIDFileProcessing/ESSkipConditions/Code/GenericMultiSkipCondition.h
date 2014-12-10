@@ -13,6 +13,7 @@ class ATL_NO_VTABLE CGenericMultiFAMCondition :
 	public CComCoClass<CGenericMultiFAMCondition, &CLSID_GenericMultiFAMCondition>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<IGenericMultiFAMCondition, &IID_IGenericMultiFAMCondition, &LIBID_EXTRACT_FAMCONDITIONSLib>,
+	public IDispatchImpl<IFAMCancelable, &IID_IFAMCancelable, &LIBID_UCLID_FILEPROCESSINGLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>
 {
 public:
@@ -24,6 +25,7 @@ DECLARE_REGISTRY_RESOURCEID(IDR_GENERICMULTIFAMCONDITION)
 BEGIN_COM_MAP(CGenericMultiFAMCondition)
 	COM_INTERFACE_ENTRY(IGenericMultiFAMCondition)
 	COM_INTERFACE_ENTRY2(IDispatch, IGenericMultiFAMCondition)
+	COM_INTERFACE_ENTRY(IFAMCancelable)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 END_COM_MAP()
@@ -49,10 +51,32 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(FileMatchesFAMCondition)(IIUnknownVector* pFAMConditions, ELogicalOperator eLogicalOperator, 
 		IFileRecord* pFileRecord, IFileProcessingDB* pFPDB, long lActionID, 
 		IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
+	STDMETHOD(Parallelize)(IIUnknownVector* pFAMConditions, VARIANT_BOOL *pvbParallelize);
+	STDMETHOD(Init)(IIUnknownVector* pFAMConditions, long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB* pDB,
+			IFileRequestHandler* pFileRequestHandler);
+	STDMETHOD(Close)(IIUnknownVector* pFAMConditions);
+
+	// IFAMCancelable
+	STDMETHOD(raw_Cancel)();
+	STDMETHOD(raw_IsCanceled)(VARIANT_BOOL *pvbCanceled);
 
 private:
 	/////////////
 	// Methods
 	/////////////
 	void validateLicense();
+
+	/////////////
+	// Variables
+	/////////////
+
+	// Flag to indicate if the last call to FileMatchesFAMCondition had any conditions that were 
+	// canceled
+	bool m_bCanceled;
+
+	// Flag to indicate that a cancel has been requested
+	bool m_bCancelRequested;
+
+	// Used to hold the currently processing condition
+	IFAMConditionPtr m_ipCurrentCondition;
 };

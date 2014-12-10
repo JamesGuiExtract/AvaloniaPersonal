@@ -41,6 +41,9 @@ STDMETHODIMP CMultiFAMConditionNONE::InterfaceSupportsErrorInfo(REFIID riid)
 	static const IID* arr[] = 
 	{
 		&IID_IFAMCondition,
+		&IID_IFAMCancelable,
+		&IID_IInitClose,
+		&IID_IParallelizableTask,
 		&IID_ILicensedComponent,
 		&IID_ICategorizedComponent,
 		&IID_ISpecifyPropertyPages,
@@ -68,15 +71,8 @@ STDMETHODIMP CMultiFAMConditionNONE::raw_FileMatchesFAMCondition(IFileRecord* pF
 
 	try
 	{
-		// Create m_ipGenericMultiFAMCondition if not exist
-		if (m_ipGenericMultiFAMCondition == __nullptr)
-		{
-			m_ipGenericMultiFAMCondition.CreateInstance(CLSID_GenericMultiFAMCondition);
-			ASSERT_RESOURCE_ALLOCATION("ELI13860", m_ipGenericMultiFAMCondition != __nullptr);
-		}
-
 		// call FileMatchesFAMCondition inside GenericMultiFAMCondition class
-		*pRetVal = m_ipGenericMultiFAMCondition->FileMatchesFAMCondition(m_ipMultiFAMConditions, 
+		*pRetVal = getGenericMultiFAMCondition()->FileMatchesFAMCondition(m_ipMultiFAMConditions, 
 			EXTRACT_FAMCONDITIONSLib::kNONEOperator, pFileRecord, pFPDB, lActionID, pFAMTM);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13862")
@@ -456,6 +452,138 @@ STDMETHODIMP CMultiFAMConditionNONE::raw_IsLicensed(VARIANT_BOOL * pbValue)
 }
 
 //-------------------------------------------------------------------------------------------------
+// IFAMCancelable Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionNONE::raw_Cancel()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Pass the cancel to the Generic MultiFAM condition
+		IFAMCancelablePtr ipCancelable = getGenericMultiFAMCondition();
+		if (ipCancelable != __nullptr)
+		{
+			ipCancelable->Cancel();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37692");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionNONE::raw_IsCanceled(VARIANT_BOOL *pvbCanceled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check parameter
+		ASSERT_ARGUMENT("ELI37693", pvbCanceled != __nullptr);
+
+		// Check license
+		validateLicense();
+		
+		*pvbCanceled = VARIANT_FALSE;
+		
+		// Get the IsCanceled state from the Generic MultiFAM Condition
+		IFAMCancelablePtr ipCancelable = getGenericMultiFAMCondition();
+		if (ipCancelable != __nullptr)
+		{
+			*pvbCanceled = ipCancelable->IsCanceled();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37694");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IParallelizableTask Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionNONE::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, long nActionID,
+		IFAMTagManager* pFAMTM, IFileProcessingDB* pDB, IProgressStatus *pProgressStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Nothing to do
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37730");	
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionNONE::get_Parallelize(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Get the Parallelize state from the contained objects
+		*pVal = getGenericMultiFAMCondition()->Parallelize(m_ipMultiFAMConditions);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37731");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionNONE::put_Parallelize(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// This is only parallelizable if the contained task is parallelizable
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37732");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IInitClose Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionNONE::raw_Init(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB* pDB,
+			IFileRequestHandler* pFileRequestHandler)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Call init on all the FAMConditions that implement InitClose interface
+		getGenericMultiFAMCondition()->Init(m_ipMultiFAMConditions, nActionID, pFAMTM, pDB, pFileRequestHandler);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37742");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionNONE::raw_Close()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Call Close on all the FAMConditions that implement InitClose interface
+		getGenericMultiFAMCondition()->Close(m_ipMultiFAMConditions);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37743");
+}
+
+//-------------------------------------------------------------------------------------------------
 // Helper functions
 //-------------------------------------------------------------------------------------------------
 void CMultiFAMConditionNONE::validateLicense()
@@ -463,5 +591,16 @@ void CMultiFAMConditionNONE::validateLicense()
 	static const unsigned long THIS_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
 
 	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI13927", "NONE in Multiple FAM Condition");
+}
+//-------------------------------------------------------------------------------------------------
+EXTRACT_FAMCONDITIONSLib::IGenericMultiFAMConditionPtr CMultiFAMConditionNONE::getGenericMultiFAMCondition()
+{
+	// Create m_ipGenericMultiFAMCondition if not exist
+	if (m_ipGenericMultiFAMCondition == __nullptr)
+	{
+		m_ipGenericMultiFAMCondition.CreateInstance(CLSID_GenericMultiFAMCondition);
+		ASSERT_RESOURCE_ALLOCATION("ELI37691", m_ipGenericMultiFAMCondition != __nullptr);
+	}
+	return m_ipGenericMultiFAMCondition;
 }
 //-------------------------------------------------------------------------------------------------

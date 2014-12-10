@@ -6621,13 +6621,26 @@ bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFile
 		{
 			ASSERT_ARGUMENT("ELI37093",  pnWorkItemGroupID != __nullptr);
 
+			// Initialize strings used in queries
+			string strFileID = asString(nFileID);
+			string strActionID = asString(nActionID);
+			string strStringizedTask = asString(stringizedTask);
+			string strNumberOfWorkItems = asString(nNumberOfWorkItems);
+
+			// Create the query to get matching work item group id
+			string strGetExisting = gstrGET_WORK_ITEM_GROUP_ID;
+			replaceVariable(strGetExisting, "<FileID>", strFileID);
+			replaceVariable(strGetExisting, "<ActionID>", strActionID);
+			replaceVariable(strGetExisting, "<StringizedSettings>", strStringizedTask);
+			replaceVariable(strGetExisting, "<NumberOfWorkItems>", strNumberOfWorkItems);
+
 			// Open a recordset that contain only the record (if it exists) with the given filename
 			string strAddWorkItemGroupSQL = gstrADD_WORK_ITEM_GROUP_QUERY;
 
 			// Add the values to the query
-			strAddWorkItemGroupSQL += " VALUES(" + asString(nFileID) + ", " + asString(nActionID) +
-				", '" + asString(stringizedTask) + "', '" +
-				m_strUPI + "', " + asString(nNumberOfWorkItems) + ")";
+			strAddWorkItemGroupSQL += " VALUES(" + strFileID + ", " + strActionID +
+				", '" + strStringizedTask + "', '" +
+				m_strUPI + "', " + strNumberOfWorkItems + ")";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -6644,9 +6657,7 @@ bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFile
 				try
 				{
 					// see if group already exists
-					executeCmdQuery(ipConnection, "Select ID FROM WorkItemGroup WHERE FileID = " + asString(nFileID)
-						+ " AND ActionID = " + asString (nActionID) + " AND StringizedSettings = '" + 
-						asString(stringizedTask) + "'", false, pnWorkItemGroupID);
+					executeCmdQuery(ipConnection, strGetExisting, false, pnWorkItemGroupID);
 
 				}
 				catch(...)
@@ -7020,12 +7031,19 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 		try
 		{
 			ASSERT_ARGUMENT("ELI37104",  pnWorkItemGroupID != __nullptr);
+			
+			// Initialize strings used in queries
+			string strFileID = asString(nFileID);
+			string strActionID = asString(nActionID);
+			string strStringizedTask = asString(stringizedTask);
+			string strNumberOfWorkItems = asString(nNumberOfWorkItems);
 
-			// Setup the query to get the WorkItemGroupID that has matching FileID, ActionID, stringizedTask and 
-			// NumberOfWorkItems 
-			string strWorkItemGroupSQL = "Select * FROM WorkItemGroup WHERE FileID = " + asString(nFileID)
-						+ " AND ActionID = " + asString (nActionID) + " AND StringizedSettings = '" + 
-						asString(stringizedTask) + "' AND NumberOfWorkItems = " + asString(nNumberOfWorkItems);
+			// Create the query to get matching work item group id
+			string strGetExisting = gstrGET_WORK_ITEM_GROUP_ID;
+			replaceVariable(strGetExisting, "<FileID>", strFileID);
+			replaceVariable(strGetExisting, "<ActionID>", strActionID);
+			replaceVariable(strGetExisting, "<StringizedSettings>", strStringizedTask);
+			replaceVariable(strGetExisting, "<NumberOfWorkItems>", strNumberOfWorkItems);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -7043,7 +7061,7 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 				ASSERT_RESOURCE_ALLOCATION("ELI37105", ipWorkItemGroupSet != __nullptr);
 
 				// Execute the query to get the WorkItemID if it exists
-				ipWorkItemGroupSet->Open(strWorkItemGroupSQL.c_str(), 
+				ipWorkItemGroupSet->Open(strGetExisting.c_str(), 
 					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 					adLockReadOnly, adCmdText);
 
@@ -7055,37 +7073,12 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 
 					*pnWorkItemGroupID = getLongField(ipFields, "ID");
 
-					// Check that there are the correct number of work items in the WorkItem table
-					string strWorkItemQuery = 
-						"SELECT COUNT(ID) as WorkItemCount FROM WorkItem WHERE WorkItemGroupID = " + 
-						asString(*pnWorkItemGroupID) + " GROUP BY WorkItemGroupID";
-
-					_RecordsetPtr ipWorkItemCountSet =
-						ipConnection->Execute(strWorkItemQuery.c_str(), NULL, adCmdText);
-
-					if (ipWorkItemCountSet != __nullptr && ipWorkItemCountSet->adoEOF != VARIANT_TRUE)
-					{
-						ipFields = ipWorkItemCountSet->Fields;
-						long nCount = getLongField(ipFields, "WorkItemCount");
-						
-						if (nCount != nNumberOfWorkItems)
-						{
-							*pnWorkItemGroupID = 0;
-						}
-						else 
-						{
-							TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
-							// need to update the UPI to the current UPI
-							string setUPI = "UPDATE WorkItemGroup SET UPI = '" + m_strUPI + 
-								"' WHERE ID = " + asString(*pnWorkItemGroupID);
-							executeCmdQuery(ipConnection, setUPI);
-							tg.CommitTrans();
-						}
-					}
-					else
-					{
-						*pnWorkItemGroupID = 0;
-					}
+					TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
+					// need to update the UPI to the current UPI
+					string setUPI = "UPDATE WorkItemGroup SET UPI = '" + m_strUPI + 
+						"' WHERE ID = " + asString(*pnWorkItemGroupID);
+					executeCmdQuery(ipConnection, setUPI);
+					tg.CommitTrans();
 				}
 				else
 				{

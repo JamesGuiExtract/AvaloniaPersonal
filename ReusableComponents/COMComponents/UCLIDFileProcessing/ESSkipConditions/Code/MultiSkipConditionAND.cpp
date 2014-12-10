@@ -41,6 +41,9 @@ STDMETHODIMP CMultiFAMConditionAND::InterfaceSupportsErrorInfo(REFIID riid)
 	static const IID* arr[] = 
 	{
 		&IID_IFAMCondition,
+		&IID_IFAMCancelable,
+		&IID_IInitClose,
+		&IID_IParallelizableTask,
 		&IID_ILicensedComponent,
 		&IID_ICategorizedComponent,
 		&IID_ISpecifyPropertyPages,
@@ -69,15 +72,8 @@ STDMETHODIMP CMultiFAMConditionAND::raw_FileMatchesFAMCondition(IFileRecord* pFi
 
 	try
 	{
-		// Create m_ipGenericMultiFAMCondition if not exist
-		if (m_ipGenericMultiFAMCondition == __nullptr)
-		{
-			m_ipGenericMultiFAMCondition.CreateInstance(CLSID_GenericMultiFAMCondition);
-			ASSERT_RESOURCE_ALLOCATION("ELI13826", m_ipGenericMultiFAMCondition != __nullptr);
-		}
-
 		// call FileMatchesFAMCondition inside GenericMultiFAMCondition class
-		*pRetVal = m_ipGenericMultiFAMCondition->FileMatchesFAMCondition(m_ipMultiFAMConditions, 
+		*pRetVal = getGenericMultiFAMCondition()->FileMatchesFAMCondition(m_ipMultiFAMConditions, 
 			EXTRACT_FAMCONDITIONSLib::kANDOperator, pFileRecord, pFPDB, lActionID, pFAMTM);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13830")
@@ -458,6 +454,137 @@ STDMETHODIMP CMultiFAMConditionAND::raw_IsLicensed(VARIANT_BOOL * pbValue)
 }
 
 //-------------------------------------------------------------------------------------------------
+// IFAMCancelable Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionAND::raw_Cancel()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Pass the cancel to the Generic multiFAM condition
+		IFAMCancelablePtr ipCancelable = getGenericMultiFAMCondition();
+		if (ipCancelable != __nullptr)
+		{
+			ipCancelable->Cancel();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37678");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionAND::raw_IsCanceled(VARIANT_BOOL *pvbCanceled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check parameter
+		ASSERT_ARGUMENT("ELI37679", pvbCanceled != __nullptr);
+
+		// Check license
+		validateLicense();
+		*pvbCanceled = VARIANT_FALSE;
+		
+		// ge the IsCanceled result from Generic MultFAM condition
+		IFAMCancelablePtr ipCancelable = getGenericMultiFAMCondition();
+		if (ipCancelable != __nullptr)
+		{
+			*pvbCanceled = ipCancelable->IsCanceled();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37680");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IParallelizableTask Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionAND::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, long nActionID,
+		IFAMTagManager* pFAMTM, IFileProcessingDB* pDB, IProgressStatus *pProgressStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// nothing to do
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37727");	
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionAND::get_Parallelize(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Get the Parallelize status from the contained objects
+		*pVal = getGenericMultiFAMCondition()->Parallelize(m_ipMultiFAMConditions);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37728");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionAND::put_Parallelize(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// This is only parallelizable if the contained task is parallelizable
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37729");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IInitClose Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionAND::raw_Init(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB* pDB,
+			IFileRequestHandler* pFileRequestHandler)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Call init on all the FAMConditions that implement InitClose interface
+		getGenericMultiFAMCondition()->Init(m_ipMultiFAMConditions, nActionID, pFAMTM, pDB, pFileRequestHandler);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37746");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionAND::raw_Close()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Call Close on all the FAMConditions that implement InitClose interface
+		getGenericMultiFAMCondition()->Close(m_ipMultiFAMConditions);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37747");
+}
+
+//-------------------------------------------------------------------------------------------------
 // Helper functions
 //-------------------------------------------------------------------------------------------------
 void CMultiFAMConditionAND::validateLicense()
@@ -467,3 +594,15 @@ void CMultiFAMConditionAND::validateLicense()
 	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI13854", "AND Multiple FAM Condition");
 }
 //-------------------------------------------------------------------------------------------------
+EXTRACT_FAMCONDITIONSLib::IGenericMultiFAMConditionPtr CMultiFAMConditionAND::getGenericMultiFAMCondition()
+{
+	// Create m_ipGenericMultiFAMCondition if not exist
+	if (m_ipGenericMultiFAMCondition == __nullptr)
+	{
+		m_ipGenericMultiFAMCondition.CreateInstance(CLSID_GenericMultiFAMCondition);
+		ASSERT_RESOURCE_ALLOCATION("ELI13826", m_ipGenericMultiFAMCondition != __nullptr);
+	}
+	return m_ipGenericMultiFAMCondition;
+}
+//-------------------------------------------------------------------------------------------------
+
