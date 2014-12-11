@@ -50,6 +50,8 @@ CopyDemoFiles:
     $(VerifyDir) "$(AFRootDirectory)\Utils\RedactionDemo\Files" "$(IDShieldDemo)"
 	@XCOPY "$(DemoRulesDir)\*.*" "$(IDShieldDemo)\Rules" /V /s /e /y
     $(VerifyDir) "$(DemoRulesDir)" "$(IDShieldDemo)\Rules"
+	@ECHO Updating IDShield demo rules for FKB Version...
+	$(CScriptProgram) "$(PDRootDir)\Scripts\UpdateFKB.js" "$(IDShieldDemo)\Rules" "$(FKBVersion)"
     @ECHO Encrypting Rules files...
     @SendFilesAsArgumentToApplication "$(IDShieldDemo)\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @SendFilesAsArgumentToApplication "$(IDShieldDemo)\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"

@@ -128,6 +128,8 @@ CreateDemo_LabDE:
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEDemo)\Input" /v /s /e /y
 	@XCOPY "$(RulesDir)\LabDE\Demo_LabDE\Solution\*.*" "$(LabDEDemo)\Solution" /v /s /e /y	
 	@COPY /v  "$(BinariesFolder)\Obfuscated\AlternateTestNameManager.plugin" "$(LabDEDemo)\Solution\Database Files"
+	@ECHO Updating LabDE demo rules for FKB Version...
+	$(CScriptProgram) "$(PDRootDir)\Scripts\UpdateFKB.js" "$(LabDEDemo)\Solution\Rules" "$(FKBVersion)"
 	@ECHO Encrypting LabDE Demo Rules...
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
