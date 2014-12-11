@@ -48,7 +48,7 @@ function main(args) {
     }
 
     var root = fso.getAbsolutePathName(args[0]);
-    var newFKB = args[1];
+    var newFKB = args[1].replace(/^FKB\sVer\.\s*/i, "");
     if (newFKB === undefined || newFKB == "") {
         throw new Error(1000000, "Must specify non-blank FKB!");
     }
