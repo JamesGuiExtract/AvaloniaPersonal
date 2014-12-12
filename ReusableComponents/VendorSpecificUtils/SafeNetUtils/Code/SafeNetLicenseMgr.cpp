@@ -1124,24 +1124,21 @@ void SafeNetLicenseMgr::checkAlert(const string& strCounterName, SP_DWORD dwCoun
 
 			if ( dwNewValue <= dwAlertValue || dwNewValue == 0 )
 			{
-				// make sure alert multiple is greater than 0
-				if ( dwAlertMultiple > 0 )
+				// Send alert if the previous counter value was greater than the alert level
+				if (dwCounterValue > dwAlertValue)
 				{
-					// Alert may be required
-					DWORD dwAlertRemainder = dwAlertValue % dwAlertMultiple;
-					DWORD dwNewRemainder = dwNewValue % dwAlertMultiple;
-
-					// Check if the new value is changing from above to below the level and alert is required
-					if ( dwNewRemainder == dwAlertRemainder || dwNewValue == 0)
-					{
-						bSendAlert = true;
-					}
-				}
-				else if (dwNewValue == dwAlertValue )
-				{
-					// send alert once when the new value equals the alert value
 					bSendAlert = true;
 				}
+				// Else if multiple alerts are enabled, check to see if we have passed an alert threshold
+				else if ( dwAlertMultiple > 0 )
+				{
+					// Send alert when the new value falls from above to below a factor of dwAlertMultiple
+					// below the alert value or if the new value is zero
+					// NOTE: This relies on the fact that all values are unsigned
+					bSendAlert = ((dwAlertValue-dwNewValue)/dwAlertMultiple
+									- (dwAlertValue-dwCounterValue)/dwAlertMultiple) != 0;
+				}
+				
 			}
 		}
 		if ( bSendAlert )
@@ -1152,7 +1149,7 @@ void SafeNetLicenseMgr::checkAlert(const string& strCounterName, SP_DWORD dwCoun
 			strAlertString = "The " + strCounterName + " Counter for USB Key SN "
 				+ asString(m_dwSN) + " has " + strNewValue + " counts remaining.\r\n";
 
-			// Add the Name, organiztion and phone number if given
+			// Add the Name, organization and phone number if given
 			sendAlert(strAlertString);
 		}
 	}
