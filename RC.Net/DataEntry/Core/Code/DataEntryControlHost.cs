@@ -1786,7 +1786,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the document's data was successfully saved.
         /// <see langword="false"/> if the data was not saved (such as when data fails validation).
         /// </returns>
-        public bool SaveData(bool validateData)
+        public virtual bool SaveData(bool validateData)
         {
             try
             {
