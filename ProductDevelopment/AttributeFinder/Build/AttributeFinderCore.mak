@@ -86,7 +86,13 @@ BuildPDUtils: BuildAttributeFinderCore
     @TIME /T
     @ECHO.
 
-BuildAttributeFinderCore:  
+CopyAPIFiles:
+	@ECHO Copying API files to Release
+	IF NOT EXIST "($(BinariesFolder)" @MKDIR "$(BinariesFolder)"
+	@COPY "$(LEADTOOLS_API_DIR)\*.*"  "$(BinariesFolder)"
+	@COPY "$(NUANCE_API_DIR)\*.*" "$(BinariesFolder)"
+	
+BuildAttributeFinderCore: CopyAPIFiles 
 	@ECHO Building AFCore...
     @ECHO.
     @DATE /T

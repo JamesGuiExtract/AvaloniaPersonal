@@ -46,12 +46,12 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 CopyDemoFiles:
     @ECHO Copying the Demo files to installation directory...
     @IF NOT EXIST "$(IDShieldDemo)\Rules"  @MKDIR "$(IDShieldDemo)\Rules" 
+	@ECHO Updating IDShield demo rules for FKB Version...
+	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" -silent "$(DemoRulesDir)" "$(FKBVersion)"
 	@XCOPY "$(AFRootDirectory)\Utils\RedactionDemo\Files\*.*" "$(IDShieldDemo)" /V /s /e /y
     $(VerifyDir) "$(AFRootDirectory)\Utils\RedactionDemo\Files" "$(IDShieldDemo)"
 	@XCOPY "$(DemoRulesDir)\*.*" "$(IDShieldDemo)\Rules" /V /s /e /y
     $(VerifyDir) "$(DemoRulesDir)" "$(IDShieldDemo)\Rules"
-	@ECHO Updating IDShield demo rules for FKB Version...
-	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" -silent "$(IDShieldDemo)\Rules" "$(FKBVersion)"
     @ECHO Encrypting Rules files...
     @SendFilesAsArgumentToApplication "$(IDShieldDemo)\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @SendFilesAsArgumentToApplication "$(IDShieldDemo)\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"

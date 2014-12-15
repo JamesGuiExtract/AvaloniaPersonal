@@ -148,6 +148,8 @@ CreateFlexDataEntryInstallDir:
 	@ECHO Creating Demo_FlexIndex
 	@IF NOT EXIST "$(FLEXIndexDemo)\Input" MKDIR "$(FLEXIndexDemo)\Input"
 	@IF NOT EXIST "$(FLEXIndexDemo)\Rules" MKDIR "$(FLEXIndexDemo)\Rules"
+	@ECHO Updating Flex Data Entry rules for FKB update...
+	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" -silent "$(FlexDataEntryRulesDir)" "$(FKBVersion)"
 	@ECHO Copying the Demo_FlexIndex related files
 	@XCOPY "$(AFRootDirectory)\Utils\FlexDataEntry\Files\*.*" "$(FLEXIndexDemo)" /v /s /e /y
 	$(VerifyDir) "$(AFRootDirectory)\Utils\FlexDataEntry\Files" "$(FLEXIndexDemo)"
@@ -155,8 +157,6 @@ CreateFlexDataEntryInstallDir:
 	$(VerifyDir) "$(FlexDataEntryInstallationFilesDir)\Images" "$(FLEXIndexDemo)\Input"
 	@XCOPY "$(FlexDataEntryRulesDir)\*.*" "$(FLEXIndexDemo)\Rules" /v /s /e /y
 	$(VerifyDir) "$(FlexDataEntryRulesDir)" "$(FLEXIndexDemo)\Rules"
-	@ECHO Updating Flex Data Entry rules for FKB update...
-	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" -silent "$(FLEXIndexDemo)" "$(FKBVersion)"
 	@ECHO Encrypting Demo_FlexIndex rsd Files
 	@SendFilesAsArgumentToApplication "$(FLEXIndexDemo)\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(FLEXIndexDemo)\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
