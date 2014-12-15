@@ -156,7 +156,7 @@ CreateFlexDataEntryInstallDir:
 	@XCOPY "$(FlexDataEntryRulesDir)\*.*" "$(FLEXIndexDemo)\Rules" /v /s /e /y
 	$(VerifyDir) "$(FlexDataEntryRulesDir)" "$(FLEXIndexDemo)\Rules"
 	@ECHO Updating Flex Data Entry rules for FKB update...
-	$(CScriptProgram) "$(PDRootDir)\Scripts\UpdateFKB.js" "$(FLEXIndexDemo)" "$(FKBVersion)"
+	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" "$(FLEXIndexDemo)" "$(FKBVersion)"
 	@ECHO Encrypting Demo_FlexIndex rsd Files
 	@SendFilesAsArgumentToApplication "$(FLEXIndexDemo)\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(FLEXIndexDemo)\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
