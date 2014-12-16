@@ -88,7 +88,7 @@ BuildPDUtils: BuildAttributeFinderCore
 
 CopyAPIFiles:
 	@ECHO Copying API files to Release
-	IF NOT EXIST "($(BinariesFolder)" @MKDIR "$(BinariesFolder)"
+	IF NOT EXIST "$(BinariesFolder)" @MKDIR "$(BinariesFolder)"
 	@COPY "$(LEADTOOLS_API_DIR)\*.*"  "$(BinariesFolder)"
 	@COPY "$(NUANCE_API_DIR)\*.*" "$(BinariesFolder)"
 	
