@@ -466,6 +466,9 @@ private:
 	// necessary to start it again.
 	volatile bool m_bRevertInProgress;
 
+	// Indicates that a work item revert is in progress
+	volatile bool m_bWorkItemRevertInProgress;
+
 	// Indicates whether retries will be attempted per the CommandTimeout DBInfo setting if a query
 	// times out.
 	bool m_bRetryOnTimeout;
@@ -865,6 +868,11 @@ private:
 	// Method checks for timed out FAM's and reverts file status for ones that are found.
 	// If there are files to revert and bDBLocked is false an exception will be thrown
 	void revertTimedOutProcessingFAMs(bool bDBLocked, const _ConnectionPtr& ipConnection);
+
+	// Method that resets workitems that are marked as processing for FAM's that have timed out
+	// if there is an exception it will be thrown if bDBLocked is false otherwise an exception
+	// will be logged.
+	void revertTimedOutWorkItems(bool bDBLocked, const _ConnectionPtr &ipConnection);
 
 	// Verifies that the current instance is registered via RegisterActiveFAM and registers it if it
 	// is not.

@@ -1304,11 +1304,12 @@ const string gstrADD_WORK_ITEM_GROUP_QUERY =
 const string gstrADD_WORK_ITEM_QUERY =
 	"INSERT INTO [dbo].WorkItem (WorkItemGroupID, Status, Input, BinaryInput, Output, UPI, Sequence)  VALUES ";
 
-const string gstrRESET_ORPHANED_WORK_ITEM_QUERY =
-	"UPDATE dbo.WorkItem SET [Status] = 'P' "
+const string gstrRESET_TIMEDOUT_WORK_ITEM_QUERY =
+	"UPDATE dbo.WorkItem SET [Status] = 'P', [UPI] = '' "
 	"FROM dbo.WorkItem wi LEFT JOIN dbo.ActiveFAM af "
 	"ON wi.UPI = af.UPI "
-	"WHERE [Status] = 'R' AND af.UPI IS NULL";
+	"WHERE [Status] = 'R' AND "
+	"	 (af.UPI IS NULL OR af.LastPingTime < DATEADD(SECOND, -<TimeOutInSeconds>,GetDate()))";
 
 const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE = 
 	"SELECT [WorkItem].ID "

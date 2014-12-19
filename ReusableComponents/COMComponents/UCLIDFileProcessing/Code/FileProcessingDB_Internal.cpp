@@ -3859,13 +3859,10 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		string strQuery = "DELETE FROM ActiveFAM WHERE ID = " + asString(nUPIID); 
 		executeCmdQuery(ipConnection, strQuery);
 
-		// Reset any work items that have a status of processing but the FAM is no longer active.
-		long nNumberWorkItemsReset = executeCmdQuery(ipConnection, gstrRESET_ORPHANED_WORK_ITEM_QUERY);
-
 		// Set up the logged exception if it is not null
 		if (pUE != __nullptr)
 		{
-			bool bAtLeastOneReset = nNumberWorkItemsReset > 0;
+			bool bAtLeastOneReset = false;
 			string strEmailMessage = "";
 
 			map<string, map<string,int>>::iterator itMap = map_StatusCounts.begin();
@@ -3886,8 +3883,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 					bAtLeastOneReset = true;
 				}
 			}
-			pUE->addDebugInfo("NumberWorkItemsReset", nNumberWorkItemsReset);
-
+			
 			// Only log the reset exception if one or more files were reset
 			if (bAtLeastOneReset)
 			{
@@ -5262,6 +5258,9 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, l
 	{
 		try
 		{
+			// Revert any workitems associated with timed out FAMs
+			revertTimedOutWorkItems(bDBLocked, ipConnection);
+
 			bool bTransactionSuccessful = false;
 
 			// Start the stopwatch to use to check for transaction timeout
@@ -5349,3 +5348,51 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, l
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::revertTimedOutWorkItems(bool bDBLocked, const _ConnectionPtr &ipConnection)
+{
+	if (m_bWorkItemRevertInProgress)
+	{
+		return;
+	}
+
+	m_bWorkItemRevertInProgress = true;
+
+	try
+	{
+		try
+		{
+			// Begin a transaction
+			TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
+			string strQuery = gstrRESET_TIMEDOUT_WORK_ITEM_QUERY;
+			replaceVariable(strQuery, "<TimeOutInSeconds>", asString(m_nAutoRevertTimeOutInMinutes * 60));
+
+			// Reset any work items that have a status of processing but the FAM is no longer active.
+			long nNumberWorkItemsReset = executeCmdQuery(ipConnection, strQuery);
+
+			// Commit the reverted files
+			tgRevert.CommitTrans();
+
+			m_bWorkItemRevertInProgress = false;
+
+			// Only log the reset exception if one or more WorkItems were reset
+			if (nNumberWorkItemsReset > 0)
+			{
+				UCLIDException ue ("ELI37767", "Application trace: Work Items reverted");
+				ue.addDebugInfo("NumberOfWorkItemsReverted", nNumberWorkItemsReset);
+				ue.log();
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37768")
+	}
+	catch(UCLIDException &ue)
+	{
+		m_bWorkItemRevertInProgress = false;
+
+		// if the DB is not locked rethrow exception - if locked just log exception
+		if (!bDBLocked)
+		{
+			throw;
+		}
+		ue.log();
+	}
+}
