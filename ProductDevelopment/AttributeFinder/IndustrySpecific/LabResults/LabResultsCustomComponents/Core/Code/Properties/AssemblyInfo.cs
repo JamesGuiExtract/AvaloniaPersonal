@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("LabResultsCustomComponents")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2014")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
