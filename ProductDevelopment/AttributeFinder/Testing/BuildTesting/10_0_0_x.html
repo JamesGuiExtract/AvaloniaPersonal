@@ -1,0 +1,452 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.0.0.x Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.0.0.x Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed after <b>10.0.0.31</b>
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-5235]</b> RuleSet Editor
+        	<ul>
+			<li>Open the <b>RuleSet Editor</b> and add some attributes.
+			<li>Cause a catastrophic error by killing RuleSet Editor.
+			<li>Open a specific RSD file.
+			<li>Choose <b>No</b> when asked about recovering from the error.
+			<li>Confirm that the specific RSD file is opened.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-10310, ISSUE-12394, ISSUE-12511, ISSUE-12625]</b> Task Condition
+        	<ul>
+			<li>Configure verification as the task inside <b>Core: Conditionally 
+			execute task</b>.
+			<li>Stop processing from within verification.
+			<li>Confirm that the file being verified returns to <b>Pending</b> 
+			status.
+			<li>Confirm that the task is not considered <b>met</b>.
+			<li>Confirm that the task is not considered <b>not met</b>.
+			<li>Confirm that subsequent files are not brought up for verification.
+<p>
+			<li>Exercise the <b>ISSUE-12366</b> test cases from the <b>FAM 
+			Parallelization</b> checklist.
+			<li>Confirm proper behavior.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-11783]</b> UEX Viewer
+        	<ul>
+			<li>Open <b>UEXViewer.exe</b>.
+			<li>Resize various columns including <b>Top Exception</b>.
+			<li>Close and reopen the application.
+			<li>Confirm that each column width is persistent.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-11879, ISSUE-11881]</b> USB License Key Manager
+        	<ul>
+			<li>Confirm that an Alert message is sent when the <b>Alert Level</b> 
+			is not reached exactly.
+			<li>Confirm that an Alert message is sent when the <b>Alert Multiple</b> 
+			is not reached exactly.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12237]</b> DEP Project Template Installer
+        	<ul>
+			<li>Exercise the DEP Project Installer at 
+			<b>I:\Common\Engineering\ProductDevelopment\DataEntry\DEP 
+			project template installer\DEPProjectTemplateInstaller.exe</b>.
+			<li>Make a local copy of a DEP project.
+			<li>Rename the <b>CSPROJ</b> to be something other than 
+			<b>Extract.DataEntry.DEP.CUSTOMER_NAME.csproj</b>
+			<li>Confirm that the renamed project can be used as a DEP template.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12274]</b> Image Viewer
+        	<ul>
+			<li>Confirm that <b>ImageViewer.exe</b> is not set as the default 
+			application for TIF files.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12314]</b> DB Contents Condition
+        	<ul>
+			<li>Create an FPS file using <b>DB Contents Condition</b> where 
+			the condition is expected to be met.
+			<li>Exercise the FPS file via FAM service where the service 
+			is run via a domain account that is not in the local administrators 
+			group.
+			<li>Confirm that the FPS file processes without error.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12396]</b> FAM Parallelization
+        	<ul>
+			<li>Process a set of large documents <b>without</b> parallelization.
+			<li>Confirm that the <b>Detailed Report For Specific Document</b> 
+			report allows the user to determine precisely how much time was 
+			required to process a large document.
+			<li>Process a set of large documents <b>with</b> parallelization.
+			<li>Confirm that the <b>Detailed Report For Specific Document</b> 
+			report allows the user to determine precisely how much time was 
+			required to process a large document.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12401, ISSUE-12552, ISSUE-12553, ISSUE-12582, ISSUE-12583, 
+		ISSUE-12585]</b> Demo_LabDE
+        	<ul>
+			<li>Confirm that <b>Demo_LabDE</b> only shows the <b>Result Status</b> 
+			column for the QA operator.
+			<li>Confirm that the <b>Result Status</b> column automatically 
+			updates to <b>C</b> if the QA operator makes a change.
+			<li>Confirm that <b>Demo_LabDE</b> uses the current best validation 
+			rules for value and range.
+			<li>Confirm that <b>Demo_LabDE</b> includes more and useful tags.
+			<li>Confirm that <b>Demo_LabDE</b> includes new documents.
+			<li>Confirm that new <b>Demo_LabDE</b> documents are sanitized.
+			<li>Confirm that <b>Demo_LabDE</b> rules run without error on all 
+			included documents.
+			<li>Confirm that Lab Address automatically updates Lab Name.
+			<li>Confirm that Patient MRN is automatically updated from other 
+			patient information.
+			<li>Confirm that <b>Demo_LabDE</b> demonstrates handling priority 
+			patients.
+			<li>Confirm that <b>Demo_LabDE</b> demonstrates handling duplicate 
+			documents.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12418]</b> Installing LabDE on Server 2012 R2
+        	<ul>
+			<li>Confirm that the <b>MSMQ</b> feature is automatically 
+			installed as part of the <b>HL7 Integration</b> install.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12549]</b> Data Entry Verification - Undo
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12544</b>.
+			<li>Open <b>C_0150.tif</b>.
+			<li>Select the <b>CBC WITH DIFFERENTIAL</b> order.
+			<li>Using the <b>Word</b> highlight tool, swipe the <b>RBC</b> 
+			result into the new row of the result component table ("RBC ... M/UL").
+			<li>Note that RBC is mis-OCR'd as <b>MAC</b>.
+			<li>Correct the name to be <b>RBC</b> and click <b>TAB</b>.
+			<li>Confirm that the code is correctly updated.
+			<li>Click the <b>Undo</b> button.
+			<li>Confirm that RBC reverts to MAC and that the code is cleared.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12554]</b> Data Entry Verification - New Order Row
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12544</b>.
+			<li>Open the included document.
+			<li>Highlight the name cell of the new row in the <b>Orders</b> table.
+			<li>Type an order name (such as <b>CBC</b>) into the name cell of 
+			the newly created row.
+			<li>Confirm that all typed characters are displayed in the cell.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12555]</b> Data Entry Verification - Auto Complete List
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12544</b>.
+			<li>Open the included document.
+			<li>Navigate to the <b>City Filter</b> field.
+			<li>Type <b>Madison</b>
+			<li>Tab to the <b>Lab Name</b> field and make sure that the entire 
+			field is selected.
+			<li>Press <b>SPACE</b> to launch an auto-complete list of the 
+			available labs in Madison.
+			<li>Press <b>TAB</b> to apply the first available lab.
+			<li>Confirm that the leading space is removed and that the 
+			selected Lab Name is valid.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12556]</b> FAM Parallelization
+        	<ul>
+			<li>Confirm that <b>AllowRestartableProcessing</b> is off in DBInfo.
+			<li>Queue a 50 page document.
+			<li>Configure a FAM to OCR with parallel processing.
+			<li>Press <b>Start processing</b> and immediately press 
+			<b>Stop processing</b>.
+			<li>Confirm that the FAM does not hang.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12559]</b> Extract.DataEntry.DEP.StandardLabDE.dll
+        	<ul>
+			<li>Confirm that <b>Extract.DataEntry.DEP.StandardLabDE.dll</b> is 
+			not installed with LabDE.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12568]</b> AKA Plugin Toolbar Buttons
+        	<ul>
+			<li>Open <b>OrderMapperDB.sdf</b> from <b>Demo_LabDE</b>.
+			<li>Confirm that <b>Add AKAs</b> is available in the <b>Plugins</b> 
+			pane.
+			<li>Select <b>Add AKAs</b>.
+			<li>Confirm that the <b>Previous AKA</b> toolbar button has a tooltip.
+			<li>Confirm that the <b>Next AKA</b> toolbar button has a tooltip.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12569]</b> Redaction NRS
+        	<ul>
+			<li>Confirm that all tests pass.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12571]</b> Tag Filtering In Verification
+        	<ul>
+			<li>Add tags to a database.
+			<li>Configure each of the following tasks with tag filtering such that 
+			the tag pattern matches a defined tag except for case.
+			<li>Confirm that this setting is accepted.
+			<ul>
+				<li>Core: View Image
+				<li>Data Entry: Verify extracted data
+				<li>Redaction: Verify sensitive data
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12572]</b> Metadata Field Definitions
+        	<ul>
+			<li>Add some metadata field definitions to a database.
+			<li>Clear the database while retaining actions, counters, tags, 
+			users and database settings.
+			<li>Confirm that the metadata field definitions are retained.
+			<li>Clear the database while <b>not</b> retaining actions, counters, 
+			tags, users and database settings.
+			<li>Confirm that the metadata field definitions are removed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12573]</b> Other Demos Folder
+        	<ul>
+			<li>Inspect the <b>Other\Other Demos</b> folder for the current build.
+			<li>Confirm that each included demo is provided in its own, named 
+			subfolder.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12574]</b> FAMProcess.exe Not Registered
+        	<ul>
+			<li>Upgrade a test machine from an older 10.0 build.
+			<li>Confirm that <b>FAMProcess.exe</b> is registered by running 
+			successfully via FAM Service.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12579]</b> Data Entry Copy Button
+        	<ul>
+			<li>Create a DEP using a <b>Data Entry Copy Button</b>.
+			<li>Remove the <b>Validation Error Message</b> and confirm that 
+			the validation error icon is not displayed.
+			<li>Confirm that results can be saved without clicking the Copy 
+			button.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12584]</b> SQL Server 2014 Express Installation
+        	<ul>
+			<li>Confirm that installing SQL Server 2014 Express does not prompt 
+			for a directory in which to extract the installation files.
+			<li>Confirm that installing SQL Server 2014 Management Studio Express 
+			does not prompt for a directory in which to extract the installation files.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12586]</b> Data Entry Verification With Prevent Save
+        	<ul>
+			<li>Configure Data Entry verification with the <b>PreventSave</b> 
+			option.
+			<ul>
+				<li>TBD
+			</ul>
+			<li>Confirm that toolbar button for <b>save and commit</b> should 
+			use the same image as the next document button for the Core: View image 
+			task.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12587]</b> Modify Source Document Name In Database
+        	<ul>
+			<li>Confirm that the <b>Core: Modify source document name in database</b> 
+			task works correctly for a filename that contains an apostrophe.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12591]</b> Detailed Report For Specific Document
+        	<ul>
+			<li>Confirm that a correct report is generated for a filename 
+			that contains an apostrophe.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12593]</b> Uninstalling FKB Updates
+        	<ul>
+			<li>Confirm that if an FKB Update equal to or newer than <b>14.3.0.38</b> 
+			is uninstalled, all of the associated files and folders are removed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12604]</b> LabDE Installation
+        	<ul>
+			<li>Confirm that the automatic installation of MSMQ does not do an 
+			automatic restart.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12609]</b> USS Viewer
+        	<ul>
+			<li>Confirm that USS files created via parallel OCR include <b>OCR 
+			Engine Version</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12612]</b> Image Viewer Shortcut
+        	<ul>
+			<li>Confirm that each <b>Image Viewer</b> shortcut on the Start Menu 
+			opens <b>ExtractImageViewer.exe</b>.
+			<ul>
+				<li>FLEX Index
+				<li>ID Shield
+				<li>LabDE
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12613, ISSUE-12615]</b> Demo_LabDE Rules
+        	<ul>
+			<li>Exercise the demo rules.
+			<li>Confirm that no <b>Conflicting FKB version numbers</b> errors 
+			are logged.
+			<li>Confirm that no errors are logged about missing 
+			<b>AddMetadataInfoDB.rsd.etf</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12614]</b> LabDE Help File
+        	<ul>
+			<li>Open the <b>Overview: Working with Reports</b> page.
+			<li>Confirm that links exist for the LabDE reports.
+			<ul>
+				<li>LabDE Data Entry Rates By User
+				<li>LabDE High Effort Files By User
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12626]</b> AKA Plugin
+        	<ul>
+			<li>Use a database that has <b>CandidateAlternateTestNames</b> 
+			collected.
+			<li>Add one of the AKAs into the <b>AlternateTestName</b> table.
+			<li>Open the AKA Plugin.
+			<li>Confirm that the AKA that was added is no longer in the list 
+			of candidate AKAs.
+			<li>Confirm that no exception is displayed after clicking the 
+			<b>Add AKAs</b> button.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12629]</b> MetadataField table
+        	<ul>
+			<li>Confirm that the <b>Name</b> field must be unique.
+			<li>Confirm that the <b>Name</b> field cannot be NULL.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12642]</b> RuleSet Editor
+        	<ul>
+			<li>Copy a <b>Document preprocessor</b> to the Clipboard.
+			<li>Add a new attribute rule and paste the copied object to the 
+			<b>preprocessor</b> field.
+			<li>Double-click the newly pasted preprocessor.
+			<li>Confirm that the appropriate settings dialog is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12643]</b> Demo_LabDE Lab Address Filter Fields
+        	<ul>
+			<li>Verify an image.
+			<li>Enter <b>Atlantis</b> in the <b>City Filter</b> field.
+			<li>Select the <b>Lab Name</b> field and press <b>[SPACE]</b>.
+			<li>Confirm that no labs are presented in the drop-down.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12645]</b> Duplicate Documents
+        	<ul>
+			<li>Confirm that the associated query correctly handles filenames 
+			that contain an apostrophe.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12646, ISSUE-12647]</b> Indexing NRS
+        	<ul>
+			<li>Confirm that all <b>Address Finder</b> test cases pass.
+			<li>Confirm that all <b>Address Splitter</b> test cases pass.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12649]</b> Duplicate Documents Context Menu
+        	<ul>
+			<li>Verify an image that has duplicate documents available.
+			<li>Open FFI to display the list of duplicate documents.
+			<li>Select all listed items.
+			<li>Right-click to display the context menu.
+			<li>Confirm that the verification UI is not brought back to the 
+			foreground.
+			<li>Repeat the test several times.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12656]</b> Demo Rules And FKB Updates
+        	<ul>
+			<li>Confirm that each demo ruleset requires the associated FKB update.
+			<ul>
+				<li>Demo_FLEXIndex
+				<li>Demo_IDShield
+				<li>Demo_LabDE
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12662]</b> Demo_LabDE Lab Name Auto-Update Query
+        	<ul>
+			<li>Verify an image.
+			<li>Confirm that specifying a lab name for one order no longer 
+			updates lab information for other orders.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-126xx]</b> TBD
+        	<ul>
+			<li>TBD
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

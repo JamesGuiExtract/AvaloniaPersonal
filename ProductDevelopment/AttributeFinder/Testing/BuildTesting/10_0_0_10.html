@@ -1,0 +1,377 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.0.0.10 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.0.0.10 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-964]</b> Visual Studio Designer Crash
+        	<ul>
+			<li>While editing a DEP using the Designer in Visual Studio, delete 
+			a non-empty group box.
+			<li>Confirm that Visual Studio does not crash.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-11684]</b> Extra Containers With Folder File Supplier
+        	<ul>
+			<li>Prepare a test to supply a sudden addition of <b>1 million</b> 
+			files.
+			<li>Track queuing rate.
+			<li>Confirm that the queuing rate is not significantly slower as 
+			the number of queued files increases.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12089]</b> Licensing Utility Folder Updates
+        	<ul>
+			<li>Confirm that each possibly current licensing folder contains 
+			both updated DAT files and requried DLLs and EXEs.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12243]</b> Restrict Tags For Verify Redactions Task
+        	<ul>
+			<li>Confirm that the <b>Redaction: Verify sensitive data</b> 
+			property page includes a checkbox for <b>Allow user to apply 
+			tags to the document</b>.
+			<li>Confirm presence of an associated <b>Settings...</b> 
+			button.
+			<li>Confirm that the checkbox is checked by default.
+			<li>Confirm that clicking the Settings button displays a 
+			<b>Select Tags</b> dialog.
+			<li><u>Select Tags</u>
+			<ul>
+				<li>Confirm presence of a <b>Display all available tags</b> 
+				checkbox.
+				<li>Confirm that this is checked by default.
+				<li>Confirm presence of a <b>Display these tags</b> 
+				checkbox.
+				<li>Confirm that a multi-line checked list box contains 
+				each defined tag.
+				<li>Confirm presence of a <b>Display any tags that match 
+				these wildcard patterns:</b> checkbox.
+				<li>Confirm presence of an associated edit box.
+				<li>Confirm that the edit box is enabled only when the 
+				checkbox is checked.
+				<li>Confirm presence of an associated balloon help icon.
+				<li>Confirm that the balloon help notes use of <b>?</b> and 
+				<b>*</b> as wildcard characters.
+				<li>Confirm that settings are persistent.
+			</ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Confirm that the <b>Redaction: Verify sensitive data</b> 
+				task can <b>Display all available tags</b>.
+				<li>Confirm that the <b>Redaction: Verify sensitive data</b> 
+				task can display a specified subset of tags.
+				<li>Confirm that the <b>Redaction: Verify sensitive data</b> 
+				task can display tags specified via wildcard patterns.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12244]</b> Restrict Tags For Verify Extracted Data Task
+        	<ul>
+			<li>Confirm that the <b>Data Entry: Verify extracted data</b> 
+			property page includes a checkbox for <b>Allow user to apply 
+			tags to the document</b>.
+			<li>Confirm presence of an associated <b>Settings...</b> 
+			button.
+			<li>Confirm that the checkbox is checked by default.
+			<li>Confirm that clicking the Settings button displays a 
+			<b>Select Tags</b> dialog.
+			<li><u>Select Tags</u>
+			<ul>
+				<li>Confirm presence of a <b>Display all available tags</b> 
+				checkbox.
+				<li>Confirm that this is checked by default.
+				<li>Confirm presence of a <b>Display these tags</b> 
+				checkbox.
+				<li>Confirm that a multi-line checked list box contains 
+				each defined tag.
+				<li>Confirm presence of a <b>Display any tags that match 
+				these wildcard patterns:</b> checkbox.
+				<li>Confirm presence of an associated edit box.
+				<li>Confirm that the edit box is enabled only when the 
+				checkbox is checked.
+				<li>Confirm presence of an associated balloon help icon.
+				<li>Confirm that the balloon help notes use of <b>?</b> and 
+				<b>*</b> as wildcard characters.
+				<li>Confirm that settings are persistent.
+			</ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Confirm that the <b>Data Entry: Verify extracted data</b> 
+				task can <b>Display all available tags</b>.
+				<li>Confirm that the <b>Data Entry: Verify extracted data</b> 
+				task can display a specified subset of tags.
+				<li>Confirm that the <b>Data Entry: Verify extracted data</b> 
+				task can display tags specified via wildcard patterns.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12319]</b> FAM Parallelizable Tasks
+        	<ul>
+			<li>Confirm that <b>Core: OCR document</b> supports use of 
+			parallel processing for images with more than 2 pages.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12328]</b> IFileProcessingDB Instances Created With MTA
+        	<ul>
+			<li>Exercise verification and confirm that no <b>DB Lock Timeout</b> 
+			errors are logged.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12340]</b> SQL Server 2014
+        	<ul>
+			<li>Confirm that the <b>FLEX Index</b> install includes <b>SQL 
+			Server 2014 Express</b> plus <b>SQL Management Studio</b>
+			<li>Confirm that the <b>ID Shield</b> install includes <b>SQL 
+			Server 2014 Express</b> plus <b>SQL Management Studio</b>
+			<li>Confirm that the <b>LabDE</b> install includes <b>SQL 
+			Server 2014 Express</b> plus <b>SQL Management Studio</b>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12345]</b> Extended ANSI Characters With Create Redacted Text
+        	<ul>
+			<LI>Exercise a local copy of the test files found in 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12345</b>.
+			<li>Create a <b>Test</b> database with a <b>Test</b> action.
+			<li>Exercise <b>Ocr-Rules-Redact.fps</b>.
+			<li>Review the output files.
+			<ul>
+				<li>aarpmagazine.2.redacted.csv
+				<li>aarpmagazine.2.csv.UTF8.redacted.txt
+				<li>aarpmagazine.2.csv.redacted.txt
+			</ul>
+			<li>Confirm that original <b>Dr. Jekyll</b> and <b>Mr. Hyde</b> text 
+			is redacted.
+			<li>Confirm that the original, special double-quote characters still 
+			surround the redacted text.
+			<li>Confirm that other <b>special</b> characters are unaffected.
+<p>
+			<li>Clear the database.
+			<li>Exercise <b>Ocr-Rules-Redact2.fps</b>.
+			<li>Review the output files.
+			<ul>
+				<li>aarpmagazine.2.redacted.csv
+				<li>aarpmagazine.2.csv.UTF8.redacted.txt
+				<li>aarpmagazine.2.csv.redacted.txt
+			</ul>
+			<li>Confirm that original <b>Dr. Jekyll</b> and <b>Mr. Hyde</b> text 
+			is redacted.
+			<li><b>[ISSUE-12415] NOT FIXED for 9.9.2</b> Confirm that the original, 
+			special double-quote characters are also redacted.
+			<li>Confirm that other <b>special</b> characters are unaffected.
+<p>
+			<li>Clear the database.
+			<li>Exercise <b>Ocr-Rules-Redact3.fps</b>.
+			<li>Review the output file.
+			<ul>
+				<li>test.csv
+			</ul>
+			<li>Confirm that the original <b>Jek&quot;&quot;yll</b> and 
+			<b>Hy&quot;&quot;de</b> text is redacted.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12353]</b> Visual Studio Designer Errors With DEPs
+        	<ul>
+			<li>Load a DEP into the Visual Studio Designer that uses a table 
+			containing a combo box. Any LabDE DEP that displays Flags is 
+			suitable.
+			<li>Confirm that an <b>ELI25578: Auto-complete query must be 
+			specified for ComboBox cells</b> exception is not displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12367]</b> Parallelized OCR Within Conditional Task
+        	<ul>
+			<li>Exercise the FPS files from <b>M:\PVCS_JIRA\JIRA\ISSUE-12367</b>.
+			<li>Confirm that task processing does not freeze at 0% or 33%.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12369]</b> Memory Usage and Speed For Parallelized OCR
+        	<ul>
+	  	   	<LI>Use source files from <b>M:\PVCS_JIRA\JIRA\ISSUE-12369</b>.
+  		   	<LI>Confirm that <b>parallelization = OFF</b>.
+			<li>Exercise <b>QueueAndOCRVeryLargeDocs.fps</b> with 
+			<b>LogProcessStats.exe</b> and note the processing time.
+			<li>Clear the database and delete any output files.
+  	   		<LI>Confirm that <b>parallelization = ON</b>.
+			<li>Exercise <b>QueueAndOCRVeryLargeDocs.fps</b> with 
+			<b>LogProcessStats.exe</b> and note the processing time.
+			<li>Confirm that the two processing times are approximately equal.
+			<li>Confirm that peak memory usages for the two tests are approximately 
+			equal.
+<p>
+			<li>Clear the database and delete any output files.
+			<li>Add copies of the 30+ test images from Demo_IDShield to the testing 
+			folder.
+			<li>Exercise <b>QueueAndOCRWithA.fps</b>.
+			<ul>
+				<li>Confirm that <b>A-0050pages.tif</b> is processed ahead of 
+				the <b>Demo_IDShield</b> images.
+				<li>Record the total processing (clock) time for the image set.
+			</ul>
+			<li>Exercise <b>QueueAndOCRWithZ.fps</b>.
+			<ul>
+				<li>Confirm that <b>Z-0050pages.tif</b> is processed after the 
+				<b>Demo_IDShield</b> images.
+				<li>Record the total processing (clock) time for the image set.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12389]</b> Disabling Annotations In Image Viewer
+        	<ul>
+			<li>Modify the <b>HKCU/Software/Extract 
+			Systems/ReusableComponents/OcxAndDlls/ImageEdit/Annotations</b> key 
+			to <b>0</b>.
+			<li>Confirm that image annotations are not displayed in 
+			<b>ExtractImageViewer.exe</b>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12407, 12408, 12409]</b> OCR Document Work Item Results Stored 
+		In FAM Database
+        	<ul>
+			<li>Confirm that work item information from parallel OCR is stored 
+			in a <b>WorkItem</b> table in the FAM database.
+			<li>Confirm that work item information is automatically deleted when 
+			a file is completed.
+			<li>Confirm that work item information is automatically deleted when 
+			a file is failed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12412]</b> FAM DB Admin Action Names
+        	<ul>
+			<li>Confirm that the <b>Manually Set Action Status</b> dialog 
+			has enough space in its combo boxes for long action names.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12413]</b> FAM DB Admin Context Menu
+        	<ul>
+			<li>Confirm that right-clicking one of the action names on the 
+			<b>Summary</b> tab displays a context menu allowing the user to 
+			copy the selected action name to the Clipboard.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12416, 12421]</b> Send Email Settings Dialog
+        	<ul>
+			<li>Configure email settings via DB Admin.
+			<li>Create an FPS file and check the <b>Send an email</b> button.
+			<li>Click the <b>Configure email</b> button.
+			<li>Resize the settings dialog and confirm that button anchoring and 
+			dialog size remain acceptable.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12417]</b> Update Database Schema
+        	<ul>
+			<li>Confirm that a FAM database with schema version &lt; 118 is 
+			successfully updated.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12419]</b> Restrict Tags For View Image Task
+        	<ul>
+			<li>Confirm that the <b>Core: View image</b> 
+			property page includes a checkbox for <b>Allow user to apply 
+			tags to the document</b>.
+			<li>Confirm presence of an associated <b>Settings...</b> 
+			button.
+			<li>Confirm that the checkbox is checked by default.
+			<li>Confirm that clicking the Settings button displays a 
+			<b>Select Tags</b> dialog.
+			<li><u>Select Tags</u>
+			<ul>
+				<li>Confirm presence of a <b>Display all available tags</b> 
+				checkbox.
+				<li>Confirm that this is checked by default.
+				<li>Confirm presence of a <b>Display these tags</b> 
+				checkbox.
+				<li>Confirm that a multi-line checked list box contains 
+				each defined tag.
+				<li>Confirm presence of a <b>Display any tags that match 
+				these wildcard patterns:</b> checkbox.
+				<li>Confirm presence of an associated edit box.
+				<li>Confirm that the edit box is enabled only when the 
+				checkbox is checked.
+				<li>Confirm presence of an associated balloon help icon.
+				<li>Confirm that the balloon help notes use of <b>?</b> and 
+				<b>*</b> as wildcard characters.
+				<li>Confirm that settings are persistent.
+			</ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Confirm that the <b>Core: View image</b> 
+				task can <b>Display all available tags</b>.
+				<li>Confirm that the <b>Core: View image</b> 
+				task can display a specified subset of tags.
+				<li>Confirm that the <b>Core: View image</b> 
+				task can display tags specified via wildcard patterns.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12424]</b> Target Property
+        	<ul>
+			<li>Modify a test DEP <b>OR</b> a customer DEP (local modifications 
+			only!) for the following test cases.
+			<ul>
+				<li>Confirm that an auto-update query can be used to modify 
+				a non-standard property on the same DEP object.
+				<li>Confirm that an auto-update query can be used to modify 
+				a non-standard property on a different DEP object.
+				<li>Confirm that an auto-update query can be used to modify 
+				multiple non-standard properties on the same DEP object.
+				<li>Confirm that an auto-update query can be used to modify 
+				multiple non-standard properties on a different DEP object.
+			</ul>
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

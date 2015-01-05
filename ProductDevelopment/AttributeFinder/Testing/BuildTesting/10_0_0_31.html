@@ -1,0 +1,808 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.0.0.31 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.0.0.31 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-1128]</b> AKA Plugin
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-1128</b>.
+			<li>Copy <b>AlternateTestNameManager.plugin</b> from the same version 
+			of the <b>Demo_LabDE\Solution\Database Files</b> folder to the test 
+			folder.
+			<li>Modify <b>UpdateFilenames.sqlce</b> to reflect the path to the 
+			test folder.
+			<li>Execute the query and confirm that the filenames in the 
+			<b>CandidateAlternateTestNames</b> table reflect the test folder 
+			location.
+			<li>Open <b>OrdermappingDB.sdf</b> and select the <b>AddAKAs</b> plugin.
+			<li>Sort the result set by <b>Count</b> and confirm that <b>URBC</b> 
+			has multiple examples.
+			<li>Step through the examples.
+			<ul>
+				<li>Confirm that for the documents that do not have spatial 
+				information to display for the example, that <b>Unable to 
+				show location on document</b> is displayed on the status bar.
+				<li>Confirm that the <b>Previous AKA</b> button is enabled 
+				and disabled as appropriate.
+				<li>Confirm that the <b>Next AKA</b> button is enabled 
+				and disabled as appropriate.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-7460]</b> Maximizable USS Viewer and VOA Viewer
+        	<ul>
+			<li>Confirm that the <b>USS Viewer</b> can be maximized.
+			<li>Confirm that window size and position is persistent.
+			<li>Confirm that the <b>VOA Viewer</b> can be maximized.
+			<li>Confirm that window size and position is persistent.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-11366]</b> Inaccurate FAM DB Statistics
+        	<ul>
+			<li>Use <b>SQL Management Studio</b> to modify <b>ActionStatistics</b>.
+			<li>Confirm negative values are displayed on the <b>Summary</b> tab.
+			<li>Confirm that a message box is presented to the user with 
+			useful instructions about how to recalculate summary statistics.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12116]</b> FFI - Open File Location
+        	<ul>
+			<li>Confirm that the FAM File Inspector <b>context menu</b> 
+			includes an <b>Open file location</b> option.
+			<li>Confirm proper functionality.
+			<li>Confirm that <b>Admin mode</b> is required.
+			<li>Confirm that the option is only enabled for single selection.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12277]</b> USB Counter Exception Logged For Zero Counts
+        	<ul>
+			<li>Configure a USB key with a small number of counts.
+			<li>Configure an FPS file for rule execution and exercise it 
+			via FAM service.
+			<li>Confirm that a meaningful exception is logged when the counts 
+			are exhausted.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12278]</b> RuleSet Editor
+        	<ul>
+			<li>Confirm that <b>RuleSet Editor</b> displays the fully-qualified 
+			path to the RSD file being edited.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12309]</b> FAM DB Admin
+        	<ul>
+			<li>Confirm that the <b>Summary</b> tab includes a <b>Last Updated:</b> 
+			timestamp.
+			<li>Confirm that the timestamp is updated each time the <b>Refresh</b> 
+			button is clicked.
+			<li>Confirm that the timestamp is presented in local time.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12310]</b> FFI - Page Navigation
+        	<ul>
+			<li>Open <b>FAM File Inspector</b> and select a multi-page image.
+			<li>Use the <b>page navigation</b> control and type in a new page 
+			number.
+			<li>Confirm that <b>ENTER</b> navigates to the appropriate page and 
+			does not move to a different document.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12315, ISSUE-12510]</b> RunFPSFile and IgnoreDB
+        	<ul>
+			<LI>Exercise <b>Exercise_DB_Condition.bat</b> found in 
+			<b>.\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing
+			\ESSkipConditions\InteractiveTest\FPS</b>.
+			<li>Confirm that all tests pass.
+			<li>Confirm that the test cases are installed in 
+			<b>C:\ProgramData\Extract Systems\TestingFiles\ReusableComponents
+			\COMComponents\UCLIDFileProcessing\ESSkipConditions</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12319]</b> FAM Parallelization
+        	<ul>
+			<li>Exercise the following test cases from the <b>FAM 
+			Parallelization</b> checklist.
+			<ul>
+				<li><b>ISSUE-12361</b>
+				<li><b>ISSUE-12362</b>
+				<li><b>ISSUE-12363</b>
+				<li><b>ISSUE-12364</b>
+				<li><b>ISSUE-12365</b>
+				<li><b>ISSUE-12366</b>
+				<li><b>ISSUE-12368</b>
+				<li><b>ISSUE-12371</b>
+				<li><b>ISSUE-12372</b>
+				<li><b>ISSUE-12382</b>
+				<li><b>ISSUE-12393</b>
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12320]</b> Spatial String Load and Save
+        	<ul>
+			<li>Open <b>M:\PVCS_JIRA\JIRA\ISSUE-12320\10000pages.tif.uss</b>.
+			<li>Confirm that the USS file loads without error.
+			<li>Use <b>Task Manager</b> to check actual memory usage.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12322]</b> DB Admin Copy Count
+        	<ul>
+			<li>Confirm that DB Admin supports <b>Copy count</b> context menu 
+			option from the Summary tab.
+			<li>Confirm that the correct value is copied to the Clipboard.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12324]</b> DataEntry Trace Output
+        	<ul>
+			<li>Exercise <b>Demo_LabDE</b> while tracing output.
+			<ul>
+				<li>Start with a clean database.
+				<li>Run <b>ExtractData.fps</b>.
+				<li>Modify <b>StandardLabDE.config</b> such that 
+				<b>&lt;Extract.DataEntry.Utilities.DataEntryApplication.
+				Properties.Settings&gt;</b> under 
+				<b>&lt;applicationSettings&gt;</b> includes a setting node 
+				with <b>name=&quot;EnableTrace&quot;</b> and a child 
+				value node with <b>True</b>.
+				<li>Run <b>Dbgview.exe</b> from Steve's Public Utilities 
+				folder.
+				<li>Prepare filtering to capture <b>FormattingRuleResult</b> 
+				data.
+				<li>Verify an image.
+				<li>Confirm that trace results are provided after swiping 
+				into <b>ResultDate</b>.
+				<li>Confirm that trace results are provided after swiping 
+				into <b>Copy To Physician</b>.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12325]</b> Rule Tester
+        	<ul>
+			<li>Exercise some rules via <b>Rule Tester</b>.
+			<li>Confirm that total rules execution time is displayed in the 
+			status bar.
+			<li>Confirm that execution time is displayed with millisecond 
+			precision.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12329, ISSUE-12333, ISSUE-12334, ISSUE-12336]</b> Help Files
+        	<ul>
+			<li>Confirm that each Help file contains a valid link for the 
+			<b>Customer Care Portal</b> on the main Support page.
+			<ul>
+				<li>FLEX Index
+				<li>ID Shield
+				<li>LabDE
+			</ul>
+			<li>Confirm that the <b>Extract Image Viewer</b> page includes a 
+			screenshot for the <b>Image Search Form</b>.
+			<li>Review <b>How To - Process Tasks - Core Tasks</b> and confirm 
+			that a link exists for each task, especially <b>Core: View image</b>.
+			<li>Review <b> Installation - How To Install</b> and confirm 
+			that the window captions indicate version 10.0.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12332]</b> SQL Server CE 4.0
+        	<ul>
+			<li>Confirm that <b>SQL Server CE 4.0</b> is not included in a 
+			<b>FLEX Index</b> installation.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12337]</b> Demo_LabDE InsertAKAs Rule
+        	<ul>
+			<li>Exercise <b>M:\PVCS_JIRA\JIRA\ISSUE-12337\AKA_Test.tif</b> 
+			using <b>Demo_LabDE</b> rules.
+			<li>Add a new row to the <b>LabTest</b> table in the <b>OrderMapper</b> 
+			database.
+			<ul>
+				<li>TestCode = <b>USA</b>
+				<li>TestName = <b>American's</b>
+			</ul>
+			<li>Add a new row to the <b>LabOrderTest</b> table in the <b>OrderMapper</b> 
+			database.
+			<ul>
+				<li>OrderCode = <b>CREAT</b>
+				<li>TestCode = <b>USA</b>
+				<li>Mandatory = <b>No</b>
+			</ul>
+			<li>Start verification <b>after</b> saving the <b>OrderMapper</b> 
+			database.
+			<li>In the <b>Creatinine</b> order, select the new row of the result 
+			components table and activate the word highlight tool.
+			<li>Swipe <b>eGFR for African American's i &gt;60 ml/min/1.73 sqm</b> 
+			then change the name to <b>American's</b>.
+			<li>Select the new row again.
+			<li>Swipe <b>eGFR for Non-African American's i &gt;60 ml/min/1.73 sqm</b> 
+			then change the name to <b>American's</b>.
+			<li>Correct all validation errors on the document and <b>Save</b>.
+			<li>Process the document using <b>InsertAKAs.fps</b>.
+			<li>Confirm that processing succeeds and that two candidate AKAs are 
+			added to the OrderMapper database.
+			<li>Confirm that the candidate AKAs each have apostrophes.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12358]</b> ID Shield Verification
+        	<ul>
+			<li>Configure the <b>Redaction: Verify sensitive data</b> task to 
+			<b>Require users to specify redaction type for redactions</b>.
+			<ul>
+				<li>Verify an image.
+				<li>Confirm that a type is required for a redaction.
+				<li>Confirm that a type is not required if the redaction is 
+				turned off.
+			</ul>
+			<li>Configure the <b>Redaction: Verify sensitive data</b> task to 
+			<b>Require users to specify exemption codes for redactions</b>.
+			<ul>
+				<li>Verify an image.
+				<li>Confirm that an exemption code is required for a redaction.
+				<li>Confirm that an exemption code is not required if the 
+				redaction is turned off.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12360]</b> NRS Indexing
+        	<ul>
+			<li>Confirm that there are no <b>Party Finder</b> errors with 
+			<b>Beneficiary - Deed of Trust</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12370]</b> FAM Display for Work Units
+        	<ul>
+			<li>Confirm that the FAM <b>Processing Log</b> tab includes a 
+			page for <b>Work Items (0)</b>.
+			<li>Confirm that the following columns are defined.
+			<ul>
+				<li>Date
+				<li>Start Time
+				<li>FileID
+				<li>Filename
+				<li>Current Work Item
+				<li>Work Item Progress
+				<li>Folder
+			</ul>
+			<li>Process some large images with parallelization turned on.
+			<li>Confirm that the <b>Work Items (0)</b> text changes as the FAM 
+			processes images.
+			<li>Confirm that the work items grid updates appropriately.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12373]</b> DB Admin Auto-Revert Timeout
+        	<ul>
+			<li>Confirm that the auto-revert timeout defaults to <b>5 minutes</b>.
+			<li>Confirm that there is no longer an option to turn auto-revert on 
+			or off.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12374]</b> FAM Parallelization and Files To Retrieve
+        	<ul>
+			<li>Prepare a FAM to OCR a 1000-page file with <b>Normal</b> priority 
+			while listening for more files to be added with <b>Above Normal</b> 
+			priority.
+			<li>Confirm that the 1000-page file is processing.
+			<li>Add a 50-page file.
+			<li>Confirm that the currently retrieved work items finish processing.
+			<li>Confirm that the 50-page file begins processing at <b>Above 
+			Normal</b> priority before the 1000-page file is completed.
+			<li>Confirm that the 1000-page file continues processing after the 
+			50-page file is completed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12397]</b> InstallAll.bat
+        	<ul>
+			<li>Confirm that <b>InstallAll.bat</b> works properly with the new 
+			structure of the build output files and folders
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12403]</b> Other Products
+        	<ul>
+			<li>Confirm that <b>FLEX Index</b> no longer includes a button for 
+			<b>Other Products</b> in the Demo_Shield install.
+			<li>Confirm that <b>ID Shield</b> no longer includes a button for 
+			<b>Other Products</b> in the Demo_Shield install.
+			<li>Confirm that <b>LabDE</b> no longer includes a button for 
+			<b>Other Products</b> in the Demo_Shield install.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12404]</b> SQL Compact Installation Error
+        	<ul>
+			<li>Install <b>ID Shield 8.0</b> on a clean test machine.
+			<li>Confirm that SQL Compact 3.5 SP1 is installed.
+			<li>Upgrade to <b>ID Shield 10.0</b>.
+			<li>Confirm that the upgrade proceeds without error. 
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12410]</b> Path Tag Functions
+        	<ul>
+			<li>Confirm that the following functions are expanded correctly.
+			<ul>
+				<li>$UserName()
+				<li>($UserName())
+				<li>Test (Test $UserName())
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12411]</b> DB Admin - Viewing Exceptions
+        	<ul>
+			<li>Open a <b>DB Admin</b> instance to a large database such as 
+			was used for the <b>TX - Tarrant</b> project.
+			<li>Confirm that <b>Inspect files</b> works without a long delay.
+			<li>Confirm that <b>View exceptions</b> works without a long delay.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12429, ISSUE-12447]</b> DB Admin - File Set Condition
+        	<ul>
+			<li>Confirm that the <b>Select Files</b> dialog within DB Admin 
+			includes a <b>specified file(s) condition</b> option.
+			<li>Confirm that the condition object includes a radio button for 
+			<b>The file is in the following list: (wildcards: ? for any single 
+			char, * for any text</b>.
+			<ul>
+				<li>Confirm that a list box is provided with Add, Modify, 
+				Delete and Browse... buttons.
+				<li>Confirm proper behavior for the <b>Add</b> button.
+				<li>Confirm proper behavior for the <b>Modify</b> button.
+				<li>Confirm proper behavior for the <b>Delete</b> button.
+				<li>Confirm proper behavior for the <b>Browse...</b> button.
+			</ul>
+			<li>Confirm that the condition object includes a radio button for 
+			<b>The file is listed in this text file</b>
+			<ul>
+				<li>Confirm that an edit box is provided with a browse button.
+				<li>Confirm proper behavior of the browse button.
+			</ul>
+			<li>Confirm that explicitly named files can be selected.
+			<li>Confirm that files named using <b>?</b> can be selected.
+			<li>Confirm that files named using <b>*</b> can be selected.
+			<li>Confirm that files in a list file can be selected.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12435, ISSUE-12437]</b> Create Multipage Image
+        	<ul>
+			<li>Confirm that a CSV file with a trailing newline character is 
+			processed successfully.
+			<li>Confirm that <b>CreateMultipageImage.exe</b> honors filename 
+			case.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12438, ISSUE-12445]</b> Text Functions
+        	<ul>
+			<li>Confirm that <b>$LowerCase()</b> works correctly.
+			<li>Confirm that <b>$UpperCase()</b> works correctly.
+			<li>Exercise <b>Test Text Function Expander</b> and 
+			<b>$Replace()</b>
+			<ul>
+				<li>Set SourceDocName to <b>2014-08-28</b>.
+				<li>Use <b>$Replace()</b> to remove the dash characters.
+				<li>Use <b>$Replace()</b> to replace the dash characters.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12439, ISSUE-12453]</b> Data Queries
+        	<ul>
+			<li>Prepare a testing folder and unzip testing files from 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12439\MidlandDEPTest.zip</b>.
+			<li>Follow relevant instructions provided in <b>Readme.txt</b>.
+			<li>Note that some of the tests will <b>fail</b> because the 
+			underlying issues are not yet fixed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12446]</b> DB Admin Schema Updates
+        	<ul>
+			<li>Confirm that an out-of-date database schema can be successfully 
+			updated.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12448]</b> P&P Rules
+        	<ul>
+			<li>Create a test set of <b>Pierson and Patterson</b> images and 
+			rules.
+			<li>Exercise the rules.
+			<li>Confirm that no <b>ELI37130: All strings should be spatial</b> 
+			exceptions are logged.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12451]</b> Redaction: Create Redacted Text
+        	<ul>
+			<li>Confirm that correct output is generated for a text file that begins 
+			with whitespace.
+			<li>Confirm that correct output is generated for a text file that does 
+			not begin with whitespace.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12457]</b> Data Query / Verification Testing
+        	<ul>
+			<li>Prepare a testing folder and unzip testing files from 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12439\MidlandDEPTest.zip</b>.
+			<li>Exercise the following general data entry issues.
+			<ul>
+				<li><b>[ISSUE-1161]</b>
+				<ul>
+					<li>Load a document.
+					<li>Modify a combo-box value.
+					<li>Save (but do not commit) the document.
+					<li>Stop and restart verification.
+					<li>Confirm that the combo-box retains the modified 
+					value.
+					<li>Move to the next document.
+					<li>Confirm that the combo-box does not retain the 
+					value that was changed for the previous document.
+				</ul>
+				<li><b>[ISSUE-834]</b>
+				<ul>
+					<li>Load a <b>Demo_LabDE</b> document.
+					<li>Copy a table row that includes a combo-box value 
+					(such as a Flag value in LabDE).
+					<li>Paste the copied row into the new row of the table.
+					<li>Confirm that the combo-box setting is pasted.
+					<li>Paste the row over an existing row that has a different 
+					Flag value.
+					<li>Confirm that the Flag value is correctly updated.
+				</ul>
+				<li><b>[ISSUE-765]</b>
+				<ul>
+					<li>Confirm that the first <b>Demo_FLEXIndex</b> image 
+					displays a <b>Document Type</b> in the DEP.
+				</ul>
+				<li><b>[ISSUE-12439, ISSUE-12453]</b>
+				<ul>
+					<li>see above
+				</ul>
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12463, ISSUE-12508]</b> Database Contents Condition - Fuzzy 
+		Comparisons
+        	<ul>
+			<li>Process the <b>Demo_LabDE</b> images.
+			<li>Modify the Patient information for <b>x.tif</b> to remove the 
+			<b>Name</b> attribute from the VOA file.
+			<li>Create an FPS file to conditionally create a text file for this 
+			image.
+			<ul>
+				<li>Use the <b>Database Contents Condition</b> with 
+				<b>specified database connection</b>.
+				<li>Connect to <b>OrderMapper.sdf</b>.
+				<li>Consider the condition as met if the <b>Physician</b> 
+				table contains at least one row with all of the following values.
+				<li>Specify Field = <b>FirstName</b> and Value = 
+				<b>&lt;/PatientInfo/Name/First&gt;</b>.
+				<li>Modify <b>OrderMapper.sdf</b> to remove the entries from the 
+				<b>Physician</b> that have a blank <b>FirstName</b>.
+				<li>Add a <b>Core: Create file</b> task if the condition is met.
+				<li>Confirm that <b>A003.tif</b> passes this test.
+				<li>Modify the test as follows.
+				<ul>
+					<li>Modify <b>A003.tif.voa</b> so that the Patient's 
+					first name is Roberto instead of Robert.
+					<li>Confirm that <b>A003.tif</b> does not pass this test.
+				</ul>
+				<li>Modify the test as follows.
+				<ul>
+					<li>Check the <b>Fuzzy?</b> option for the Database 
+					contents condition.
+					<li>Confirm that <b>A003.tif</b> does pass this test.
+				</ul>
+				<li>Modify the test as follows.
+				<ul>
+					<li>Modify <b>A003.tif.voa</b> so that the Patient's 
+					first name is Rob instead of Robert.
+					<li>Confirm that <b>A003.tif</b> does not pass this test.
+				</ul>
+				<li>Modify the test as follows.
+				<ul>
+					<li>Modify <b>A003.tif.voa</b> to remove the 
+					<b>PatientInfo/Name/First</b> attribute.
+					<li>Confirm that <b>A003.tif</b> does not pass this test.
+					<li>Confirm that no exception is thrown.
+				</ul>
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12464, ISSUE-12470]</b> Pagination Utility
+        	<ul>
+			<li>Confirm that a color document is produced from all colored input 
+			pages.
+			<li>Confirm that a color document is produced from a mix of colored and 
+			uncolored input pages.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12467]</b> Image Format Converter
+        	<ul>
+			<li>Confirm that the <b>/color</b> option forces color to be preserved 
+			when converting a PDF to a TIF.
+			<li>Confirm that color is not preserved by default when converting a 
+			PDF to a TIF.
+			<li>Confirm that the usage message includes the <b>/color</b> option.
+			<li>Confirm that the <b>Help</b> file reflects the change.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12468]</b> FAM File Inspector
+        	<ul>
+			<li>Display some files in the file list.
+			<li>Select one file and drag the mouse across several other files in 
+			the list.
+			<li>Confirm that file selection does not change.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12469]</b> FAM Database
+        	<ul>
+			<li>Confirm that a current FAM database contains a <b>MetadataField</b> 
+			table.
+			<ul>
+				<li>ID
+				<li>Name
+			</ul>
+			<li>Confirm that a current FAM database contains a 
+			<b>FileMetadataFieldValue</b> table.
+			<ul>
+				<li>ID
+				<li>FileID
+				<li>MetadataFieldID
+				<li>Value
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12471, ISSUE-12495]</b> InstallAll.bat
+        	<ul>
+			<li>Confirm that this works properly on a clean test machine.
+			<li>Confirm that this works properly as a version upgrade.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12488]</b> .NET Rule Objects
+        	<ul>
+			<li>Confirm that the following rule objects can be configured as 
+			conditional rules.
+			<ul>
+				<li>Data Query Value Finder
+				<li>Modify Spatial Mode Value Modifier
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12490, ISSUE-12491]</b> Set File Priority
+        	<ul>
+			<li>Reset the <b>Demo_IDShield</b> database.
+			<li>Modify one or more of the Input filenames to include an 
+			apostrophe character.
+			<li>Queue the files.
+			<li>Exercise <b>Core: Set file priority</b>.
+			<li>Confirm that file priority is correctly changed for the filenames 
+			with apostrophes.
+			<li>Supply some files from the <b>I:\</b> drive. It is expected that 
+			these files are supplied with short filenames.
+			<li>Exercise <b>Core: Set file priority</b>.
+			<li>Confirm that priority is changed as expected.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12493]</b> FAM DB Admin
+        	<ul>
+			<li>Confirm that the default auto-revert timeout is <b>5</b>.
+			<li>Confirm that there is no longer a way to turn off auto-revert.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12500, 12501, 12503, 12504, 12505, 12506, 12507]</b> 
+		Installation and Build Folders
+        	<ul>
+			<li>Confirm that the <b>FlexIndexInstall</b> folder includes 
+			<b>FlexIndex.ico</b>.
+			<li>Confirm that the <b>IDShieldInstall</b> folder includes 
+			<b>IDShield.ico</b>.
+			<li>Confirm that individual files related to a <b>product-specific</b> 
+			installation are moved to product-specific folders in the build folder 
+			hierarchy.
+			<li>Confirm that the <b>Install</b> help files are copied to the 
+			appropriate roots of the <b>product-specific</b> build folder hierarchy.
+			<li>Confirm that <b>autorun.inf</b> and <b>readme.txt</b> files 
+			are created in the <b>product-specific</b> build folder hierarchy.
+			<li>Confirm that <b>product-specific</b> SilentInstalls folders are 
+			created in the build folder hierarchy.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12502]</b> Demo Database Schema
+        	<ul>
+			<li>Confirm that the <b>Demo_FLEXIndex</b> database contains only 
+			<b>FLEX Index</b> elements.
+			<li>Confirm that the <b>Demo_IDShield</b> database contains only 
+			<b>ID Shield</b> elements.
+			<li>Confirm that the <b>Demo_LabDE</b> database contains only 
+			<b>LabDE</b> elements.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12509]</b> RunFPSFile
+        	<ul>
+			<li>Confirm that <b>RunFPSFile.exe</b> works properly when used 
+			with the <b>/ignoreDB</b> switch.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12512, ISSUE-12515]</b> Rule Set Editor
+        	<ul>
+			<li>Confirm that the <b>Add Rule</b> dialog control moves 
+			correctly when the editor is being resized.
+			<li>Confirm that <b>Rule Set Editor</b> can be resized.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12516]</b> USB License Key Manager
+        	<ul>
+			<li>Confirm that the utility displays <b>N/A</b> for count values 
+			when a key is not connected.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12522]</b> Split File
+        	<ul>
+			<li>Confirm that <b>SplitFile.exe</b> opens files in binary mode 
+			so that EOF characters do not cause the utility to exit.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12523, ISSUE-12529]</b> Rule Tester
+        	<ul>
+			<li>Open and modify an RSD file with Rule Set Editor.
+			<li>Kill Rule Set Editor.
+			<li>Reopen Rule Set Editor and confirm that the previously unsaved 
+			changes are available in the Recovery File.
+			<li>Save the RSD file.
+			<li>Open the Rule Tester from withint Rule Set Editor.
+			<li>Confirm that the saved path to the RSD file is displayed in the 
+			title bar.
+			<li>Confirm that the <b>Rule Tester</b> window can be aero-snapped 
+			on a Windows 7 or later operating system.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12528]</b> Scheduled Processing
+        	<ul>
+			<li>Configure an FPS file with a Sleep task that sleeps for 1 minute 
+			for each file.
+			<li>Prepare a processing schedule to process for an hour, sleep for 
+			an hour, and repeat.
+			<li>Configure the FPS file to retrieve 25 files at a time.
+			<li>Check the number of files processing with each transition to 
+			inactivity.
+			<li>Confirm that the processing count does not keep rising through 
+			several cycles.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12532, ISSUE-12533]</b> Enhance OCR
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12521</b>.
+			<li>Copy <b>nuance19.11_A_0102.tif.uss</b> to <b>A_0102.tif.uss</b>.
+			<li>Exercise <b>test.rsd</b> against <b>A_0102.tif.uss</b>.
+			<li>Confirm that the rules run without error.
+			<li>Confirm that the found output is from <b>page 4</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12535]</b> Rule Tester
+        	<ul>
+			<li>Confirm that total execution time displayed on the status bar 
+			is rounded to the nearest millisecond.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12545, ISSUE-12547]</b> Data Entry Verification - Swipes
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12544</b>.
+			<li>Open the included document.
+			<li>Highlight the name cell of the new row in the result 
+			components table.
+			<li>Swipe any text on the document (such as <b>1900</b> that is 
+			not a result name.
+			<li>Confirm that the swipe creates a new row with the swiped text 
+			in the name cell.
+			<li>Type a result name (such as <b>RBC</b>) into the name cell of 
+			the newly created row.
+			<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12549]</b> Data Entry Verification - Undo
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12544</b>.
+			<li>Open <b>C_0150.tif</b>.
+			<li>Select the <b>CBC WITH DIFFERENTIAL</b> order.
+			<li>Using the <b>Word</b> highlight tool, swipe the <b>RBC</b> 
+			result into the new row of the result component table ("RBC ... M/UL").
+			<li>Note that RBC is mis-OCR'd as <b>MAC</b>.
+			<li>Correct the name to be <b>RBC</b> and click <b>TAB</b>.
+			<li>Confirm that the code is correctly updated.
+			<li>Click the <b>Undo</b> button.
+			<li>Confirm that RBC reverts to MAC and that the code is cleared.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12554]</b> Data Entry Verification - New Order Row
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12544</b>.
+			<li>Open the included document.
+			<li>Highlight the name cell of the new row in the <b>Orders</b> table.
+			<li>Type an order name (such as <b>CBC</b>) into the name cell of 
+			the newly created row.
+			<li>Confirm that all typed characters are displayed in the cell.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12555]</b> Data Entry Verification - Auto Complete List
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12544</b>.
+			<li>Open the included document.
+			<li>Navigate to the <b>City Filter</b> field.
+			<li>Type <b>Madison</b>
+			<li>Tab to the <b>Lab Name</b> field and make sure that the entire 
+			field is selected.
+			<li>Press <b>SPACE</b> to launch an auto-complete list of the 
+			available labs in Madison.
+			<li>Press <b>TAB</b> to apply the first available lab.
+			<li>Confirm that the leading space is removed and that the 
+			selected Lab Name is valid.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+   	<ul>
+  	   	<LI><b>FFI - Handling Duplicate Documents</b>
+	    	<ul>
+            		<li>Exercise the <b>Handling Duplicate Documents</b> feature 
+			checklist.
+       		</ul>
+<p>
+		<LI><b>Core: Rasterize PDF</b>
+		<ul>
+			<li>Confirm that the property page includes a <b>Preserve color 
+			depth</b> option.
+			<li>Confirm that the option is unchecked by default.
+			<li>Confirm that the <b>Preserve color depth</b> option forces color 
+			to be preserved when converting a PDF to a TIF.
+			<li>Confirm that color is not preserved by default when converting a 
+			PDF to a TIF.
+			<li>Confirm that the <b>Help</b> file reflects the change.
+	       	</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
