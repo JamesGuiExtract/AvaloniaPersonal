@@ -205,6 +205,29 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 <p>
   	   	<LI><b>[LegacyRC #6149]</b> Confirm that the <b>TestTextFunctionExpander</b> 
 		utility does not insert parameter names when a tag is selected.
+<p>
+  	   	<LI><b>[ISSUE-12410]</b> Path Tag Functions
+        	<ul>
+			<li>Confirm that the following functions are expanded correctly.
+			<ul>
+				<li>$UserName()
+				<li>($UserName())
+				<li>Test (Test $UserName())
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12438, ISSUE-12445]</b> Text Functions
+        	<ul>
+			<li>Confirm that <b>$LowerCase()</b> works correctly.
+			<li>Confirm that <b>$UpperCase()</b> works correctly.
+			<li>Exercise <b>Test Text Function Expander</b> and 
+			<b>$Replace()</b>
+			<ul>
+				<li>Set SourceDocName to <b>2014-08-28</b>.
+				<li>Use <b>$Replace()</b> to remove the dash characters.
+				<li>Use <b>$Replace()</b> to replace the dash characters.
+			</ul>
+        	</ul>
 	</ul>
 </ul>
 </body>
