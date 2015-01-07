@@ -338,6 +338,63 @@
 					<li>Confirm that all files process successfully and 
 					that no errors have been logged.
 				</ul>
+<p>
+  	   			<LI><b>[ISSUE-12463, ISSUE-12508]</b> Database Contents 
+				Condition - Fuzzy Comparisons
+        			<ul>
+					<li>Process the <b>Demo_LabDE</b> images.
+					<li>Modify the Patient information for <b>x.tif</b> to 
+					remove the <b>Name</b> attribute from the VOA file.
+					<li>Create an FPS file to conditionally create a text 
+					file for this image.
+					<ul>
+						<li>Use the <b>Database Contents Condition</b> 
+						with <b>specified database connection</b>.
+						<li>Connect to <b>OrderMapper.sdf</b>.
+						<li>Consider the condition as met if the 
+						<b>Physician</b> table contains at least one row 
+						with all of the following values.
+						<li>Specify Field = <b>FirstName</b> and Value = 
+						<b>&lt;/PatientInfo/Name/First&gt;</b>.
+						<li>Modify <b>OrderMapper.sdf</b> to remove the 
+						entries from the <b>Physician</b> that have a 
+						blank <b>FirstName</b>.
+						<li>Add a <b>Core: Create file</b> task if the 
+						condition is met.
+						<li>Confirm that <b>A003.tif</b> passes this test.
+						<li>Modify the test as follows.
+						<ul>
+							<li>Modify <b>A003.tif.voa</b> so that 
+							the Patient's first name is Roberto instead 
+							of Robert.
+							<li>Confirm that <b>A003.tif</b> does not 
+							pass this test.
+						</ul>
+						<li>Modify the test as follows.
+						<ul>
+							<li>Check the <b>Fuzzy?</b> option for the 
+							Database contents condition.
+							<li>Confirm that <b>A003.tif</b> does pass 
+							this test.
+						</ul>
+						<li>Modify the test as follows.
+						<ul>
+							<li>Modify <b>A003.tif.voa</b> so that the 
+							Patient's first name is Rob instead of 
+							Robert.
+							<li>Confirm that <b>A003.tif</b> does not 
+							pass this test.
+						</ul>
+						<li>Modify the test as follows.
+						<ul>
+							<li>Modify <b>A003.tif.voa</b> to remove the 
+							<b>PatientInfo/Name/First</b> attribute.
+							<li>Confirm that <b>A003.tif</b> does not 
+							pass this test.
+							<li>Confirm that no exception is thrown.
+						</ul>
+					</ul>
+        			</ul>
 			</ul>
 		</ul>
 <p>
@@ -886,6 +943,23 @@
 				<li>Redaction: Merge ID Shield data files
 				<li>Redaction: Verify sensitive data
 			</ul>
+<p>
+	  	   	<LI><b>[ISSUE-10310, ISSUE-12394, ISSUE-12511, ISSUE-12625]</b> Task 
+			Condition
+        		<ul>
+				<li>Configure verification as the task inside <b>Core: 
+				Conditionally execute task</b>.
+				<li>Stop processing from within verification.
+				<li>Confirm that the file being verified returns to 
+				<b>Pending</b> status.
+				<li>Confirm that the task is not considered <b>met</b>.
+				<li>Confirm that the task is not considered <b>not met</b>.
+				<li>Confirm that subsequent files are not brought up for verification.
+<p>
+				<li>Exercise the <b>ISSUE-12366</b> test cases from the <b>FAM 
+				Parallelization</b> checklist.
+				<li>Confirm proper behavior.
+        		</ul>
 		</ul>
 <p>
       		<li>Confirm the droplist for the Select Condition dialog includes: 
@@ -902,7 +976,8 @@
 			<b>&ltSourceDocName&gt.voa</b>.
        			<li>Confirm that the <b>Tag Selector</b> button displays a context 
                		menu to the immediate right of the button.
-            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
+            		<li>Confirm that the items in the context menu include 
+			<b>&ltSourceDocName&gt</b>,
        	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
        			<li>Confirm that when an item is chosen it either inserts text at 
 			the cursor position or replaces the highlighted text in the edit box. 
