@@ -280,64 +280,81 @@
         the application exits smoothly.</li>
     </ul></li>
 <p>
-    <li><h2>Miscellaneous</h2>
-    <ul>
-        <LI><b>[FlexIDSCore #3587] NOT FIXED</b> Processing 0-byte USS files
-        <ul>
-            <li>Create a USS file with <b>0</b> bytes.</li>
-            <li>Exercise the USS file.</li>
-            <li>Confirm that an <b>Unable to decompress</b> exception is not seen.</li>
-            <li>Confirm that a meaningful exception is presented.</li>
-        </ul></li>
+    	<li><h2>Miscellaneous</h2>
+    	<ul>
+        	<LI><b>[FlexIDSCore #3587] NOT FIXED</b> Processing 0-byte USS files
+        	<ul>
+            		<li>Create a USS file with <b>0</b> bytes.</li>
+            		<li>Exercise the USS file.</li>
+            		<li>Confirm that an <b>Unable to decompress</b> exception is not seen.</li>
+            		<li>Confirm that a meaningful exception is presented.</li>
+        	</ul></li>
 <p>
-        <li><b>[LegacyRC #5477]</b> possible to have pos &gt; 100%
-        <ul>
-            <li>Create and open a very short USS file.</li>
-            <li>Position the cursor at the very end of the document.</li>
-            <li>Confirm that the position in the status bar does not exceed 100%.</li>
-        </ul></li>
+        	<li><b>[LegacyRC #5477]</b> possible to have pos &gt; 100%
+        	<ul>
+            		<li>Create and open a very short USS file.</li>
+            		<li>Position the cursor at the very end of the document.</li>
+            		<li>Confirm that the position in the status bar does not exceed 100%.</li>
+        	</ul></li>
 <p>
-   	<LI><b>[LegacyRC #6256]</b> Confirm that the <b>USS File Viewer</b> can successfully  
-	find characters that are not included in a specified font range.
+   		<LI><b>[LegacyRC #6256]</b> Confirm that the <b>USS File Viewer</b> can 
+		successfully find characters that are not included in a specified font range.
 <p>
-   	<LI><b>[JIRA #11993]</b> Confirm that an exception is not displayed if the window is 
-	minimized while the cursor is at the beginning of the document.
+  	   	<LI><b>[ISSUE-7460]</b> Maximizable USS Viewer and VOA Viewer
+        	<ul>
+			<li>Confirm that the <b>USS Viewer</b> can be maximized.
+			<li>Confirm that window size and position is persistent.
+			<li>Confirm that the <b>VOA Viewer</b> can be maximized.
+			<li>Confirm that window size and position is persistent.
+        	</ul>
 <p>
-   	<LI><b>[JIRA #11995]</b> Confirm that resizing the window to its minimum size still 
-	displays the menu bar, toolbar, status bar and some text.
+   		<LI><b>[JIRA #11993]</b> Confirm that an exception is not displayed if the window 
+		is minimized while the cursor is at the beginning of the document.
 <p>
-   	<LI><b>[JIRA #12004, #12008, #12280]</b> Invalid Index Exception
-	<ul>
-		<li>Open 1000-page USS file from 
-		<b>I:\Common\Testing\Test_Images\ManyPage Images.</b>
-		<li>Move scroll bar near or to the bottom of the document.
-		<li>Press <b>Page Down</b> one or more times to reach the very end of 
-		the document.
-		<li>Confirm that no exception is displayed.
+   		<LI><b>[JIRA #11995]</b> Confirm that resizing the window to its minimum size 
+		still displays the menu bar, toolbar, status bar and some text.
 <p>
-		<li>Open USS Viewer
-		<li>Use <b>File - Open</b> to select <b>TestImage002.tif.uss</b> from 
-		Demo_IDShield.
-		<li>Click before the first character in the file.
-		<li>Press <b>Page Down</b> several times to reach the bottom of the document.
-		<li>Confirm that no exception is displayed.
+   		<LI><b>[JIRA #12004, #12008, #12280]</b> Invalid Index Exception
+		<ul>
+			<li>Open 1000-page USS file from 
+			<b>I:\Common\Testing\Test_Images\ManyPage Images.</b>
+			<li>Move scroll bar near or to the bottom of the document.
+			<li>Press <b>Page Down</b> one or more times to reach the very end of 
+			the document.
+			<li>Confirm that no exception is displayed.
 <p>
-		<li>Open USS Viewer
-		<li>Use <b>File - Open</b> to select 
-		<b>M:\PVCS_JIRA\JIRA\ISSUE-12280\05536.tif.uss</b>.
-		<li>Confirm that no exception is displayed.
-	</ul>
+			<li>Open USS Viewer
+			<li>Use <b>File - Open</b> to select <b>TestImage002.tif.uss</b> from 
+			Demo_IDShield.
+			<li>Click before the first character in the file.
+			<li>Press <b>Page Down</b> several times to reach the bottom of the 
+			document.
+			<li>Confirm that no exception is displayed.
 <p>
-   	<LI><b>[JIRA #12007]</b> Page Down
-	<ul>
-		<li>Open USS Viewer
-		<li>Use <b>File - Open</b> to select <b>TestImage002.tif.uss</b> from 
-		Demo_IDShield.
-		<li><b>Do not</b> click before the first character in the file.
-		<li>Press <b>Page Down</b> several times to reach the bottom of the document.
-		<li>Confirm that the scroll position changes and no exception is displayed.
-	</ul>
-    </ul></li>
+			<li>Open USS Viewer
+			<li>Use <b>File - Open</b> to select 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12280\05536.tif.uss</b>.
+			<li>Confirm that no exception is displayed.
+		</ul>
+<p>
+   		<LI><b>[JIRA #12007]</b> Page Down
+		<ul>
+			<li>Open USS Viewer
+			<li>Use <b>File - Open</b> to select <b>TestImage002.tif.uss</b> from 
+			Demo_IDShield.
+			<li><b>Do not</b> click before the first character in the file.
+			<li>Press <b>Page Down</b> several times to reach the bottom of the 
+			document.
+			<li>Confirm that the scroll position changes and no exception is displayed.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-12320]</b> Spatial String Load and Save
+        	<ul>
+			<li>Open <b>M:\PVCS_JIRA\JIRA\ISSUE-12320\10000pages.tif.uss</b>.
+			<li>Confirm that the USS file loads without error.
+			<li>Use <b>Task Manager</b> to check actual memory usage.
+        	</ul>
+    	</ul></li>
 </ol>
 </body>
 </html>
