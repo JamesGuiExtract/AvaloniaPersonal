@@ -97,7 +97,8 @@ namespace Extract.LabResultsCustomComponents
             /// The collection of <see cref="LabTest"/> objects contained by this order
             /// mapping.
             /// </summary>
-            public Dictionary<string, LabTest> ContainedTests = new Dictionary<string, LabTest>();
+            public Dictionary<string, LabTest> ContainedTests =
+                new Dictionary<string, LabTest>(StringComparer.OrdinalIgnoreCase);
 
             /// <summary>
             /// Initializes a new instance of the <see cref="OrderGroupingPermutation"/>
@@ -154,7 +155,7 @@ namespace Extract.LabResultsCustomComponents
 
                 // Build a new set of tests by adding newGroup's tests.
                 Dictionary<string, LabTest> combinedTests =
-                    new Dictionary<string, LabTest>(ContainedTests);
+                    new Dictionary<string, LabTest>(ContainedTests, StringComparer.OrdinalIgnoreCase);
                 foreach (LabTest test in newGroup.LabTests)
                 {
                     string name = test.Name.ToUpperInvariant();
@@ -208,7 +209,7 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// For each order mapper instance, keeps track of the local database copy to use.
         /// </summary>
-        static TemporaryFileCopyManager _localDatabaseCopyManager = new TemporaryFileCopyManager();
+        TemporaryFileCopyManager _localDatabaseCopyManager;
 
         /// <summary>
         /// The name of the database file to use for order mapping.
@@ -251,6 +252,7 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 _databaseFile = databaseFile;
+                _localDatabaseCopyManager = new TemporaryFileCopyManager();
                 _requireMandatory = requireMandatory;
                 _dirty = true;
             }
@@ -397,7 +399,7 @@ namespace Extract.LabResultsCustomComponents
                 pAttributes.Clear();
                 pAttributes.CopyFrom(newAttributes);
 
-                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // Report memory usage of hierarchy after processing to ensure all COM objects
                 // referenced in final result are reported.
                 pAttributes.ReportMemoryUsage();
             }
@@ -739,7 +741,7 @@ namespace Extract.LabResultsCustomComponents
         {
             string query = "SELECT [Code], [Name], [EpicCode], [TieBreaker] FROM [LabOrder] "
                 + "WHERE [EpicCode] IS NOT NULL";
-            Dictionary<string, LabOrder> orders = new Dictionary<string, LabOrder>();
+            Dictionary<string, LabOrder> orders = new Dictionary<string, LabOrder>(StringComparer.OrdinalIgnoreCase);
             using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
             {
                 using (SqlCeDataReader reader = command.ExecuteReader())
@@ -1302,12 +1304,14 @@ namespace Extract.LabResultsCustomComponents
             // Escape the single quote
             testName = testName.Replace("'", "''");
 
-            // Create a dictionary to hold the potential codes
-            object temp = new object();
-            Dictionary<string, object> orderCodes = new Dictionary<string, object>();
+            // Create a set to hold the potential codes
+            HashSet<string> orderCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             // Query the official name table for potential order codes
-            string query = "SELECT DISTINCT [OrderCode] FROM [LabOrderTest] INNER JOIN "
+            // Use LabOrder.Code instead of LabOrderTest.OrderCode because these two might not be strictly equal
+            // because of the way that SQL handles trailing spaces
+            // https://extract.atlassian.net/browse/ISSUE-12073
+            string query = "SELECT DISTINCT [Code] FROM [LabOrder] JOIN [LabOrderTest] ON [Code] = [OrderCode] JOIN "
                 + "[LabTest] ON [LabOrderTest].[TestCode] = [LabTest].[TestCode] "
                 + "WHERE [LabTest].[OfficialName] = '" + testName + "'";
             using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
@@ -1317,16 +1321,19 @@ namespace Extract.LabResultsCustomComponents
                     while (reader.Read())
                     {
                         string code = reader.GetString(0);
-                        if (!orderCodes.ContainsKey(code))
+                        if (!orderCodes.Contains(code))
                         {
-                            orderCodes.Add(code, temp);
+                            orderCodes.Add(code);
                         }
                     }
                 }
             }
 
             // Query the alternate test table for potential order codes
-            query = "SELECT DISTINCT [OrderCode] FROM [LabOrderTest] INNER JOIN "
+            // Use LabOrder.Code instead of LabOrderTest.OrderCode because these two might not be strictly equal
+            // because of the way that SQL handles trailing spaces
+            // https://extract.atlassian.net/browse/ISSUE-12073
+            query = "SELECT DISTINCT [Code] FROM [LabOrder] JOIN [LabOrderTest] ON [Code] = [OrderCode] JOIN "
                 + "[AlternateTestName] ON [LabOrderTest].[TestCode] = [AlternateTestName].[TestCode] "
                 + "WHERE [AlternateTestName].[Name] = '" + testName + "'";
             using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
@@ -1336,15 +1343,15 @@ namespace Extract.LabResultsCustomComponents
                     while (reader.Read())
                     {
                         string code = reader.GetString(0);
-                        if (!orderCodes.ContainsKey(code))
+                        if (!orderCodes.Contains(code))
                         {
-                            orderCodes.Add(code, temp);
+                            orderCodes.Add(code);
                         }
                     }
                 }
             }
 
-            return new List<string>(orderCodes.Keys);
+            return orderCodes.ToList<string>();
         }
 
         /// <summary>
@@ -1514,7 +1521,7 @@ namespace Extract.LabResultsCustomComponents
         {
             if (disposing)
             {
-                _localDatabaseCopyManager.Dereference(_databaseFile, this);
+                _localDatabaseCopyManager.Dispose();
             }
 
             // Dispose of unmanaged resources

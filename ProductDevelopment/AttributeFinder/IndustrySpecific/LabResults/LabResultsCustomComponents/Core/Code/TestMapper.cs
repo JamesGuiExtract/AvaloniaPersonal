@@ -27,19 +27,20 @@ namespace Extract.LabResultsCustomComponents
         /// Keeps track of the test codes that have already been mapped and, thus, should not be
         /// considered for any additonal tests.
         /// </summary>
-        HashSet<string> _mappedTestCodes = new HashSet<string>();
+        HashSet<string> _mappedTestCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Keeps track of the test names that have already been mapped and, thus, should not be
         /// considered for any additonal tests.
         /// </summary>
-        HashSet<string> _mappedTestNames = new HashSet<string>();
+        HashSet<string> _mappedTestNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Maps each <see cref="_allTestCodes"/> to the available LabTests that could be associated
         /// with that test code based on the test name.
         /// </summary>
-        Dictionary<string, List<LabTest>> _mappingCandidates = new Dictionary<string, List<LabTest>>();
+        Dictionary<string, List<LabTest>> _mappingCandidates =
+            new Dictionary<string, List<LabTest>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Keeps track of the total number of open <see cref="TestMapper"/> instances as part of
@@ -257,10 +258,10 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 TotalOpenInstances = 1;
-                _mandatoryTestCodes = new HashSet<string>(mandatoryTestCodes);
-                _allTestCodes = new List<string>(mandatoryTestCodes.Union(allTestCodes));
+                _mandatoryTestCodes = new HashSet<string>(mandatoryTestCodes, StringComparer.OrdinalIgnoreCase);
+                _allTestCodes = new List<string>(mandatoryTestCodes.Union(allTestCodes, StringComparer.OrdinalIgnoreCase));
 
-                var nameToTestMappingDictionary = new Dictionary<string, List<string>>();
+                var nameToTestMappingDictionary = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
                 foreach (var mapping in nameToTestMapping)
                 {
                     nameToTestMappingDictionary[mapping.Key] = mapping.Value;
@@ -291,8 +292,8 @@ namespace Extract.LabResultsCustomComponents
 
                 // The child instance will have separate sets of mapped test codes and names,
                 // however, so more can be mapped without affecting the parent instance.
-                _mappedTestCodes = new HashSet<string>(parentPermutations._mappedTestCodes);
-                _mappedTestNames = new HashSet<string>(parentPermutations._mappedTestNames);
+                _mappedTestCodes = new HashSet<string>(parentPermutations._mappedTestCodes, StringComparer.OrdinalIgnoreCase);
+                _mappedTestNames = new HashSet<string>(parentPermutations._mappedTestNames, StringComparer.OrdinalIgnoreCase);
 
                 TotalOpenInstances++;
             }

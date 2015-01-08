@@ -48,7 +48,7 @@ namespace Extract.LabResultsCustomComponents
 
                 // Set the name based on the attributes spatial string
                 SpatialString ss = _attribute.Value;
-                _name = ss.String.ToUpperInvariant();
+                _name = ss.String;
             }
             catch (Exception ex)
             {
@@ -98,7 +98,7 @@ namespace Extract.LabResultsCustomComponents
             {
                 _testCode = (value == null)
                     ? null
-                    : value.ToUpperInvariant();
+                    : value;
             }
         }
 

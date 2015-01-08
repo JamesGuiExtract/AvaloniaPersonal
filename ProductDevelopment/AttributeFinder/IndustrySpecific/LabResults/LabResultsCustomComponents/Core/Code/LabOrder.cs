@@ -49,7 +49,7 @@ namespace Extract.LabResultsCustomComponents
         /// (the official and alternate names) to their their possible associated test codes.
         /// </summary>
         readonly Dictionary<string, List<string>> _otherTests
-            = new Dictionary<string, List<string>>();
+            = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// A set containing the test codes for all mandatory tests for this order
@@ -84,10 +84,10 @@ namespace Extract.LabResultsCustomComponents
         public LabOrder(string orderCode, string orderName, string epicCode,
             string tieBreakerString, SqlCeConnection dbConnection)
         {
-            _orderCode = orderCode.ToUpperInvariant();
-            _orderName = orderName.ToUpperInvariant();
-            _epicCode = epicCode.ToUpperInvariant();
-            _tieBreakerString = tieBreakerString.ToUpperInvariant();
+            _orderCode = orderCode;
+            _orderName = orderName;
+            _epicCode = epicCode;
+            _tieBreakerString = tieBreakerString;
 
             // Fill the test collections
             FillMandatoryCollection(dbConnection);
@@ -173,7 +173,11 @@ namespace Extract.LabResultsCustomComponents
         List<string> GetTestCodes(SqlCeConnection dbConnection, bool mandatory)
         {
             // Query to get all test codes
-            string query = "SELECT [TestCode] FROM [LabOrderTest] WHERE [OrderCode] = '"
+            // Use LabTest.TestCode instead of LabOrderTest.TestCode because these two might not be strictly equal
+            // because of the way that SQL handles trailing spaces
+            // https://extract.atlassian.net/browse/ISSUE-12073
+            string query = "SELECT [LabTest].[TestCode] FROM [LabTest] JOIN [LabOrderTest] ON "
+                + " [LabTest].[TestCode] = [LabOrderTest].[TestCode] WHERE [OrderCode] = '"
                 + _orderCode.Replace("'", "''") + "' AND [Mandatory] = " + (mandatory ? "1" : "0");
 
             List<string> testCodes = new List<string>();
@@ -183,7 +187,7 @@ namespace Extract.LabResultsCustomComponents
                 {
                     while (reader.Read())
                     {
-                        testCodes.Add(reader.GetString(0).ToUpperInvariant());
+                        testCodes.Add(reader.GetString(0));
                     }
                 }
             }
@@ -213,7 +217,7 @@ namespace Extract.LabResultsCustomComponents
                 {
                     while (reader.Read())
                     {
-                        testNames.Add(reader.GetString(0).ToUpperInvariant());
+                        testNames.Add(reader.GetString(0));
                     }
                 }
             }
@@ -227,7 +231,7 @@ namespace Extract.LabResultsCustomComponents
                 {
                     while (reader.Read())
                     {
-                        testNames.Add(reader.GetString(0).ToUpperInvariant());
+                        testNames.Add(reader.GetString(0));
                     }
                 }
             }
