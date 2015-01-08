@@ -44,6 +44,7 @@ STDMETHODIMP CMultiFAMConditionOR::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IFAMCancelable,
 		&IID_IInitClose,
 		&IID_IParallelizableTask,
+		&IID_IFAMProcessingResult,
 		&IID_ILicensedComponent,
 		&IID_ICategorizedComponent,
 		&IID_ISpecifyPropertyPages,
@@ -581,6 +582,29 @@ STDMETHODIMP CMultiFAMConditionOR::raw_Close()
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37737");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IFAMProcessingResult Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionOR::raw_GetResult(EFileProcessingResult* pResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		IFAMProcessingResultPtr ipProcessingResult = getGenericMultiFAMCondition();
+
+		*pResult = kProcessingSuccessful;
+		if (ipProcessingResult != __nullptr)
+		{
+			// Call Close on the task
+			*pResult = ipProcessingResult->GetResult();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37773");
 }
 
 //-------------------------------------------------------------------------------------------------

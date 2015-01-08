@@ -19,7 +19,8 @@ const unsigned long gnCurrentVersion = 2;
 CTaskCondition::CTaskCondition() :
 	m_bLogExceptions(true),
 	m_bCanceled(false),
-	m_bCancelRequested(false)
+	m_bCancelRequested(false),
+	m_eTaskResult(kProcessingSuccessful)
 {
 	try
 	{
@@ -148,6 +149,9 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecor
 		// Initialize the canceled flag to false
 		m_bCanceled = false;
 
+		// Initialize the result to successful
+		m_eTaskResult = kProcessingSuccessful;
+
 		try
 		{
 			try
@@ -161,6 +165,7 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecor
 
 				// Set the canceled flag if result was kProcessingCancelled
 				m_bCanceled = eResult == kProcessingCancelled;
+				m_eTaskResult = eResult;
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20162");
 		}
@@ -213,6 +218,7 @@ STDMETHODIMP CTaskCondition::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ITaskCondition,
 			&IID_IFAMCondition,
 			&IID_IFAMCancelable,
+			&IID_IFAMProcessingResult,
 			&IID_IInitClose,
 			&IID_IPersistStream,
 			&IID_ICopyableObject,
@@ -665,6 +671,23 @@ STDMETHODIMP CTaskCondition::raw_Close()
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37734");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IFAMSkipable Methods
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::raw_GetResult(EFileProcessingResult* pResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Call Close on the task
+		*pResult = m_eTaskResult;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37752");
 }
 
 //-------------------------------------------------------------------------------------------------

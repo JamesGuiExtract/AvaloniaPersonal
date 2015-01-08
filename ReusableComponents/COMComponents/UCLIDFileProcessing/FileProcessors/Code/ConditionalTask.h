@@ -142,8 +142,11 @@ private:
 	// Collected OWD tasks to be executed if condition is False
 	IIUnknownVectorPtr m_ipTasksForFalse;
 
-	// Executor utility to process conditional tasks
-	IFileProcessingTaskExecutorPtr m_ipFAMTaskExecutor;
+	// Executor utility to process conditional tasks for condition true
+	IFileProcessingTaskExecutorPtr m_ipFAMTaskExecutorTrue;
+
+	// Executor utility to process conditional tasks for condition false
+	IFileProcessingTaskExecutorPtr m_ipFAMTaskExecutorFalse;
 
 	// Not used by this class, but passed to child tasks.
 	IFileRequestHandlerPtr m_ipFileRequestHandler;

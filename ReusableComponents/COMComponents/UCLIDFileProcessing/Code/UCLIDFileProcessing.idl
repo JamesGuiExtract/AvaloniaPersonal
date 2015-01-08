@@ -582,6 +582,18 @@ library UCLID_FILEPROCESSINGLib
 	
 	[
 		object,
+		uuid(5D813089-61BF-46F5-BF5F-7DE4933EDE63),
+		dual,
+		helpstring("IFAMProcessingResult Interface"),
+		pointer_default(unique)
+	]
+	interface IFAMProcessingResult : IDispatch
+	{
+		[id(1), helpstring("method GetResult")] HRESULT GetResult([out, retval] EFileProcessingResult* pResult);
+	};
+	
+	[
+		object,
 		uuid(44DDA42B-DFC4-4E2F-9F9A-73465725E2B4),
 		dual,
 		helpstring("IInitClose Interface"),

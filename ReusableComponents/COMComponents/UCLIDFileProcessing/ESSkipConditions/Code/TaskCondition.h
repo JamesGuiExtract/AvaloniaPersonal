@@ -20,6 +20,7 @@ class ATL_NO_VTABLE CTaskCondition :
 	public IDispatchImpl<ITaskCondition, &IID_ITaskCondition, &LIBID_EXTRACT_FAMCONDITIONSLib>,
 	public IDispatchImpl<IFAMCondition, &IID_IFAMCondition, &LIBID_UCLID_FILEPROCESSINGLib>,
 	public IDispatchImpl<IFAMCancelable, &IID_IFAMCancelable, &LIBID_UCLID_FILEPROCESSINGLib>,
+	public IDispatchImpl<IFAMProcessingResult, &IID_IFAMProcessingResult, &LIBID_UCLID_FILEPROCESSINGLib>,
 	public IDispatchImpl<IInitClose, &IID_IInitClose, &LIBID_UCLID_FILEPROCESSINGLib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
@@ -46,6 +47,7 @@ public:
 		COM_INTERFACE_ENTRY2(IDispatch, ITaskCondition)
 		COM_INTERFACE_ENTRY(IFAMCondition)
 		COM_INTERFACE_ENTRY(IFAMCancelable)
+		COM_INTERFACE_ENTRY(IFAMProcessingResult)
 		COM_INTERFACE_ENTRY(IInitClose)
 		COM_INTERFACE_ENTRY(IAccessRequired)
 		COM_INTERFACE_ENTRY(ISupportErrorInfo)
@@ -121,6 +123,9 @@ public:
 			IFileRequestHandler* pFileRequestHandler);
 	STDMETHOD(raw_Close)();
 
+	// IFAMProcessingResult
+	STDMETHOD(raw_GetResult)(EFileProcessingResult* pResult);
+
 private:
 	/////////////////
 	// Variables
@@ -142,6 +147,9 @@ private:
 
 	// Flag to indicate that cancel has been requested
 	bool m_bCancelRequested;
+
+	// Result of the processFile call for the on the task
+	EFileProcessingResult m_eTaskResult;
 
 	/////////////////
 	// Methods

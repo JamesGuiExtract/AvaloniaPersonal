@@ -15,7 +15,8 @@
 CGenericMultiFAMCondition::CGenericMultiFAMCondition() :
 	m_bCanceled(false), 
 	m_bCancelRequested(false),
-	m_ipCurrentCondition(__nullptr)
+	m_ipCurrentCondition(__nullptr),
+	m_eTaskResult(kProcessingSuccessful)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -36,7 +37,8 @@ STDMETHODIMP CGenericMultiFAMCondition::InterfaceSupportsErrorInfo(REFIID riid)
 	{
 		&IID_ILicensedComponent,
 		&IID_IGenericMultiFAMCondition,
-		&IID_IFAMCancelable
+		&IID_IFAMCancelable,
+		&IID_IFAMProcessingResult
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -89,6 +91,9 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector*
 
 		// Initialize the current condition to null
 		m_ipCurrentCondition = __nullptr;
+
+		// Initialize the current result to successful
+		m_eTaskResult = kProcessingSuccessful;
 
 		validateLicense();
 
@@ -164,6 +169,20 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector*
 				{
 					m_bCanceled = asCppBool(ipCancelable->IsCanceled());
 					if (m_bCanceled)
+					{
+						return S_OK;
+					}
+				}
+
+				// Check if current condition implements IFAMProcessingResult
+				IFAMProcessingResultPtr ipProcessingResult = m_ipCurrentCondition;
+				if (ipProcessingResult != __nullptr)
+				{
+					// Save the result
+					m_eTaskResult = ipProcessingResult->GetResult();
+					
+					// if it was not successful return
+					if (m_eTaskResult != kProcessingSuccessful)
 					{
 						return S_OK;
 					}
@@ -391,6 +410,28 @@ STDMETHODIMP CGenericMultiFAMCondition::raw_IsCanceled(VARIANT_BOOL *pvbCanceled
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37684");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IFAMProcessingResult functions
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CGenericMultiFAMCondition::raw_GetResult(EFileProcessingResult* pResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check parameter
+		ASSERT_ARGUMENT("ELI37755", pResult != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		*pResult = m_eTaskResult;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37756");
 }
 
 //-------------------------------------------------------------------------------------------------

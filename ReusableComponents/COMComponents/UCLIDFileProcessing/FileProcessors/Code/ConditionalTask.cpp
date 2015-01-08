@@ -35,14 +35,18 @@ CConditionalTask::CConditionalTask()
 	m_ipFAMCondition(__nullptr),
 	m_ipTasksForTrue(__nullptr),
 	m_ipTasksForFalse(__nullptr),
-	m_ipFAMTaskExecutor(__nullptr),
+	m_ipFAMTaskExecutorTrue(__nullptr),
+	m_ipFAMTaskExecutorFalse(__nullptr),
 	m_ipFileRequestHandler(__nullptr),
 	m_ipMiscUtils(__nullptr)
 {
 	try
 	{
-		m_ipFAMTaskExecutor.CreateInstance(CLSID_FileProcessingTaskExecutor);
-		ASSERT_RESOURCE_ALLOCATION("ELI17767", m_ipFAMTaskExecutor != __nullptr);
+		m_ipFAMTaskExecutorTrue.CreateInstance(CLSID_FileProcessingTaskExecutor);
+		ASSERT_RESOURCE_ALLOCATION("ELI17767", m_ipFAMTaskExecutorTrue != __nullptr);
+				
+		m_ipFAMTaskExecutorFalse.CreateInstance(CLSID_FileProcessingTaskExecutor);
+		ASSERT_RESOURCE_ALLOCATION("ELI37748", m_ipFAMTaskExecutorFalse != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI17941");
 }
@@ -55,7 +59,8 @@ CConditionalTask::~CConditionalTask()
 		m_ipFAMCondition = __nullptr;
 		m_ipTasksForTrue = __nullptr;
 		m_ipTasksForFalse = __nullptr;
-		m_ipFAMTaskExecutor = __nullptr;
+		m_ipFAMTaskExecutorTrue = __nullptr;
+		m_ipFAMTaskExecutorFalse = __nullptr;
 		m_ipFileRequestHandler = __nullptr;
 		m_ipMiscUtils = __nullptr;
 	}
@@ -75,7 +80,8 @@ void CConditionalTask::FinalRelease()
 		m_ipFAMCondition = __nullptr;
 		m_ipTasksForTrue = __nullptr;
 		m_ipTasksForFalse = __nullptr;
-		m_ipFAMTaskExecutor = __nullptr;
+		m_ipFAMTaskExecutorTrue = __nullptr;
+		m_ipFAMTaskExecutorFalse = __nullptr;
 		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27261");
@@ -294,6 +300,11 @@ STDMETHODIMP CConditionalTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 		{
 			ipInitClose->Init(nActionID, pFAMTM, pDB, pFileRequestHandler);
 		}
+
+		// Call init on all of the objects in the true and false lists
+		m_ipFAMTaskExecutorFalse->Init(m_ipTasksForFalse, nActionID, pDB, pFAMTM, pFileRequestHandler);
+		m_ipFAMTaskExecutorTrue->Init(m_ipTasksForTrue, nActionID, pDB, pFAMTM, pFileRequestHandler);
+
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16580");
 	
@@ -361,6 +372,16 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 			}
 		}
 
+		IFAMProcessingResultPtr ipProcessingResult = ipFAMCondition;
+		if (ipProcessingResult != __nullptr)
+		{
+			*pResult = ipProcessingResult->GetResult();
+			if (*pResult != kProcessingSuccessful)
+			{
+				return S_OK;
+			}
+		}
+
 		// Kick off progress status for task execution
 		IProgressStatusPtr ipSubProgressStatus = __nullptr;
 		if (ipProgressStatus)
@@ -379,9 +400,8 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 			if (m_ipTasksForTrue != __nullptr && m_ipTasksForTrue->Size() > 0)
 			{
 				// Execute true tasks
-				*pResult = m_ipFAMTaskExecutor->InitProcessClose(ipFileRecord, 
-					m_ipTasksForTrue, nActionID, pDB, pTagManager, m_ipFileRequestHandler,
-					ipSubProgressStatus, bCancelRequested);
+				*pResult = m_ipFAMTaskExecutorTrue->ProcessFile(ipFileRecord, 
+					nActionID, ipSubProgressStatus, bCancelRequested);
 			}
 		}
 		else
@@ -390,9 +410,8 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 			if (m_ipTasksForFalse != __nullptr && m_ipTasksForFalse->Size() > 0)
 			{
 				// Execute false tasks
-				*pResult = m_ipFAMTaskExecutor->InitProcessClose(ipFileRecord, 
-					m_ipTasksForFalse, nActionID, pDB, pTagManager, m_ipFileRequestHandler,
-					ipSubProgressStatus, bCancelRequested);
+				*pResult = m_ipFAMTaskExecutorFalse->ProcessFile(ipFileRecord, 
+					nActionID, ipSubProgressStatus, bCancelRequested);
 			}
 		}
 
@@ -423,7 +442,8 @@ STDMETHODIMP CConditionalTask::raw_Cancel()
 		}
 
 		// Need to inform Executor to pass on cancel request as necessary
-		m_ipFAMTaskExecutor->Cancel();
+		m_ipFAMTaskExecutorTrue->Cancel();
+		m_ipFAMTaskExecutorFalse->Cancel();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19442");
 	
@@ -443,6 +463,10 @@ STDMETHODIMP CConditionalTask::raw_Close()
 		{
 			ipInitClose->Close();
 		}
+		
+		// Close the task executers
+		m_ipFAMTaskExecutorTrue->Close();
+		m_ipFAMTaskExecutorFalse->Close();		
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16582");
 	
