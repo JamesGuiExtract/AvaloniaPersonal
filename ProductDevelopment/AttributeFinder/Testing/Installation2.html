@@ -57,6 +57,22 @@ or the ID Shield DemoShield application.</h2>
 	<b>Administrators</b> group.
 	<li>Add the new user to the <b>Remote Desktop Users</b> group.
 <p>
+    	<LI><b>Installation and Build Folders</b>
+    	<ul>
+		<li>Confirm that <b>product-specific</b> SilentInstalls folders are 
+		created in the build folder hierarchy.
+<p>
+		<li>Confirm that <b>InstallAll.bat</b> works properly on a clean test machine.
+		<li>Confirm that <b>InstallAll.bat</b> works properly as a version upgrade.
+<p>
+		<li>Confirm that <b>FLEX Index</b> no longer includes a button for 
+		<b>Other Products</b> in the Demo_Shield install.
+		<li>Confirm that <b>ID Shield</b> no longer includes a button for 
+		<b>Other Products</b> in the Demo_Shield install.
+		<li>Confirm that <b>LabDE</b> no longer includes a button for 
+		<b>Other Products</b> in the Demo_Shield install.
+    	</ul></li>
+<p>
        	<li>Confirm that <b>elevated permissions</b> are requested during installation of Extract 
 	Systems software if <b>administrator</b> is not the logged in user.</li>
        	<li>With a clean installation, confirm that FPS, USS, and VOA files are all correctly 
@@ -157,7 +173,7 @@ or the ID Shield DemoShield application.</h2>
                 		<li>Detect and Report Failure</li>
                 		<li>FAM File Inspector</li>
                 		<li>FAM Network Manager</li>
-                		<li>Image Viewer</li>
+                		<li>Image Viewer (opens ExtractImageViewer.exe)</li>
                 		<li>Pagination Utility</li>
                 		<li>Rule Tester</li>
                 		<li>Test Text Function Expander</li>
@@ -226,7 +242,7 @@ or the ID Shield DemoShield application.</h2>
                 		<li>FAM File Inspector</li>
                 		<li>FAM Network Manager</li>
 				<li>ID Shield Statistics Reporter</li>
-                		<li>Image Viewer</li>
+                		<li>Image Viewer (opens ExtractImageViewer.exe)</li>
                 		<li>Pagination Utility</li>
                 		<li>Rule Tester</li>
                 		<li>Test Text Function Expander</li>
@@ -299,7 +315,7 @@ or the ID Shield DemoShield application.</h2>
                 		<li>Detect and Report Failure</li>
                 		<li>FAM File Inspector</li>
                 		<li>FAM Network Manager</li>
-                		<li>Image Viewer</li>
+                		<li>Image Viewer (opens ExtractImageViewer.exe)</li>
                 		<li>Pagination Utility</li>
                 		<li>Rule Tester</li>
                 		<li>Test Text Function Expander</li>
@@ -351,6 +367,10 @@ or the ID Shield DemoShield application.</h2>
 		<li>Confirm that <b>ID Shield</b> cannot be uninstalled.
 		<li>Confirm that <b>LabDE</b> cannot be uninstalled.
         	<li>Confirm that the <b>FKB update</b> uninstalls without error.</li>
+  	   	<LI><b>[ISSUE-12593]</b> Confirm that if an FKB Update equal to or newer 
+		than <b>14.3.0.38</b> is uninstalled, all of the associated files and folders 
+		are removed.
+<p>
         	<li>Confirm that <b>RDT</b> uninstalls without error.</li>
 		<li>Uninstall <b>LabDE</b>.
         	<li>With <b>FLEX Index</b>, <b>ID Shield</b> and <b>Extract Systems LM</b> 
