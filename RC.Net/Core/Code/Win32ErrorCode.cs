@@ -1097,7 +1097,17 @@ namespace Extract
         /// <summary>
         /// InvalidAddress
         /// </summary>
-        InvalidAddress = 487
+        InvalidAddress = 487,
+
+        /// <summary>
+        /// LogOnFailure
+        /// </summary>
+        LogOnFailure = 1326,
+
+        /// <summary>
+        /// NoSuchDomain
+        /// </summary>
+        NoSuchDomain = 1355
     }
 
     /// <summary>
@@ -1332,6 +1342,8 @@ namespace Extract
                 case Win32ErrorCode.NetWriteFault: return "A write fault occurred on the network.";
                 case Win32ErrorCode.NoProcSlots: return "The system cannot start another process at this time.";
                 case Win32ErrorCode.InvalidBlock: return "The storage control block address is invalid.";
+                case Win32ErrorCode.LogOnFailure: return "The user name or password is incorrect.";
+                case Win32ErrorCode.NoSuchDomain: return "The specified domain either does not exist or could not be contacted.";
 
                 default: return "unknown.";
             }
