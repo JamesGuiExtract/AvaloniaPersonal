@@ -13,7 +13,7 @@ namespace Extract.Database
     /// configured with the <see cref="DataConnectionDialog"/>.
     /// </summary>
     [CLSCompliant(false)]
-    public class DatabaseConnectionInfo
+    public class DatabaseConnectionInfo : IDisposable
     {
         #region Constants
 
@@ -32,16 +32,40 @@ namespace Extract.Database
         static TemporaryFileCopyManager _localDatabaseCopyManager = new TemporaryFileCopyManager();
 
         /// <summary>
-        /// Keeps track of the original database filename associated with each open SQL CE connection.
+        /// The type of connection if not provided via the <see cref="DataProvider"/> property.
         /// </summary>
-        static ConcurrentDictionary<DbConnection, string> _originalSqlCeDbFileNames =
-            new ConcurrentDictionary<DbConnection, string>();
+        Type _targetConnectionType = null;
 
         /// <summary>
         /// Allows data sources and providers to be looked up by name.
         /// </summary>
         DataConnectionConfiguration _connectionConfig =
             new DataConnectionConfiguration(FileSystemMethods.CommonApplicationDataPath);
+
+        /// <summary>
+        /// A <see cref="DbConnection"/> managed by this instance for the case that the caller does
+        /// not need to manually handle connection availability and updates of SQL CE files. For
+        /// SQL CE connections, a temporary local copy will be created, updated and deleted
+        /// automatically.
+        /// </summary>
+        DbConnection _managedDbConnection;
+
+        /// <summary>
+        /// The connection string associated with the current <see cref="_managedDbConnection"/>.
+        /// </summary>
+        string _managedConnectionString;
+
+        /// <summary>
+        /// The <see cref="ConnectionString"/> property with any path tags/functions expanded.
+        /// </summary>
+        string _expandedConnectionString;
+
+        /// <summary>
+        /// If this instance represents an SQL CE connection and <see cref="UseLocalSqlCeCopy"/> is
+        /// <see langword="true"/>, the name of the master database file used to create the copy
+        /// currently in use.
+        /// </summary>
+        string _activeSqlCeDb;
 
         #endregion Fields
 
@@ -66,6 +90,26 @@ namespace Extract.Database
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI34749");
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseConnectionInfo"/> class.
+        /// </summary>
+        /// <param name="targetConnectionType">The fully qualified type name for the connection.
+        /// </param>
+        /// <param name="connectionString">The connection string.</param>
+        public DatabaseConnectionInfo(string targetConnectionType, string connectionString)
+            : base()
+        {
+            try
+            {
+                _targetConnectionType = Type.GetType(targetConnectionType);
+                ConnectionString = connectionString;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37787");
             }
         }
 
@@ -123,6 +167,10 @@ namespace Extract.Database
             {
                 DataSourceName = databaseConnectionInfo.DataSourceName;
                 DataProviderName = databaseConnectionInfo.DataProviderName;
+                if (TargetConnectionType == null)
+                {
+                    _targetConnectionType = databaseConnectionInfo.TargetConnectionType;
+                }
                 ConnectionString = databaseConnectionInfo.ConnectionString;
             }
             catch (Exception ex)
@@ -134,6 +182,62 @@ namespace Extract.Database
         #endregion Constructors
 
         #region Properties
+
+        /// <summary>
+        /// Gets the type of the connection to use.
+        /// </summary>
+        /// <value>
+        /// The type of the connection to use.
+        /// </value>
+        public Type TargetConnectionType
+        {
+            get
+            {
+                try
+                {
+                    if (_targetConnectionType != null)
+                    {
+                        return _targetConnectionType;
+                    }
+                    else if (DataProvider != null)
+                    {
+                        return DataProvider.TargetConnectionType;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI37788");
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _targetConnectionType)
+                    {
+                        // If there is an existing DataProvider with a connection type that
+                        // conflicts with the provided type, clear the DataProvider and DataSource
+                        // and use only the newly provided connection type.
+                        if (DataProvider != null && DataProvider.TargetConnectionType != value)
+                        {
+                            DataProvider = null;
+                            DataSource = null;
+                        }
+
+                        _targetConnectionType = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI37789");
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the name of the data source.
@@ -239,6 +343,84 @@ namespace Extract.Database
             set;
         }
 
+        /// <summary>
+        /// <see langword="true"/> to open and manage a local copy of the database if this
+        /// connection is for a SQL CE database.
+        /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Ce")]
+        public bool UseLocalSqlCeCopy
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IPathTags"/> instance used to expand path tags/functions in
+        /// the connection string.
+        /// </summary>
+        /// <value>
+        /// The <see cref="IPathTags"/> instance used to expand path tags/functions in the
+        /// connection string.
+        /// </value>
+        public IPathTags PathTags
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DbConnection"/> managed by this instance for the case that the
+        /// caller does not need to manually handle connection availability and updates of SQL CE
+        /// files. For SQL CE connections, a temporary local copy will be created, updated and
+        /// deleted automatically.
+        /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Db")]
+        public DbConnection ManagedDbConnection
+        {
+            get
+            {
+                try
+                {
+                    if (_managedDbConnection != null)
+                    {
+                        // The connection should be reset if any of the connection properties have
+                        // changed.
+                        bool recreateConnection =
+                            _managedDbConnection.GetType() != TargetConnectionType ||
+                            _managedConnectionString != ConnectionString;
+
+                        // The connection should also be reset if we are using a SQL CE connection
+                        // to a local DB copy and the master copy has been updated.
+                        if (!recreateConnection && _activeSqlCeDb != null &&
+                            _localDatabaseCopyManager.HasFileBeenModified(_activeSqlCeDb))
+                        {
+                            recreateConnection = true;
+                        }
+
+                        if (recreateConnection)
+                        {
+                            CloseManagedDbConnection();
+                        }
+                    }
+
+                    // Open a new connection if needed.
+                    if (_managedDbConnection == null &&
+                        TargetConnectionType != null &&
+                        !string.IsNullOrWhiteSpace(ConnectionString))
+                    {
+                        _managedDbConnection = OpenConnection();
+                        _managedConnectionString = ConnectionString;
+                    }
+
+                    return _managedDbConnection;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI37790");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -288,102 +470,83 @@ namespace Extract.Database
         }
 
         /// <summary>
-        /// Creates and opens a <see cref="DbConnection"/> for the current configuration.
+        /// Creates and opens a <see cref="ManagedDbConnection"/> for the current configuration.
         /// </summary>
-        /// <param name="useLocalSqlCeCopy"><see langword="true"/> to open and manage a local copy
-        /// of the database if this connection is for a SQL CE database.
-        /// <para><b>Note</b></para>
-        /// If <see langword="true"/>, re-opening <see cref="DbConnection"/> instances that have been
-        /// closed is un-supported as the local database copy used may no longer exist.</param>
-        /// <returns>The open <see cref="DbConnection"/>.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Ce")]
-        public DbConnection OpenConnection(bool useLocalSqlCeCopy)
+        /// <returns>The open <see cref="ManagedDbConnection"/>.</returns>
+        public DbConnection OpenConnection()
         {
-            try
-            {
-                return OpenConnection(useLocalSqlCeCopy, null);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI34757");
-            }
-        }
-
-        /// <summary>
-        /// Creates and opens a <see cref="DbConnection"/> for the current configuration.
-        /// </summary>
-        /// <param name="useLocalSqlCeCopy"><see langword="true"/> to open and manage a local copy
-        /// of the database if this connection is for a SQL CE database.
-        /// <para><b>Note</b></para>
-        /// If <see langword="true"/>, re-opening <see cref="DbConnection"/> instances that have been
-        /// closed is un-supported as the local database copy used may no longer exist.</param>
-        /// <param name="pathTags">A <see cref="IPathTags"/> instance used to expand path
-        /// tags/functions in the connection string.</param>
-        /// <returns>The open <see cref="DbConnection"/>.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Ce")]
-        public DbConnection OpenConnection(bool useLocalSqlCeCopy, IPathTags pathTags)
-        {
-            object sqlceDatabaseFileObject = null;
-            string sqlceDatabaseFile = null;
-
             try
             {
                 ExtractException.Assert("ELI34758", "Database provider has not been specified.",
-                    DataProvider != null);
+                    TargetConnectionType != null);
 
                 DbConnection dbConnection =
-                    (DbConnection)Activator.CreateInstance(DataProvider.TargetConnectionType);
-                dbConnection.ConnectionString = (pathTags == null)
+                    (DbConnection)Activator.CreateInstance(TargetConnectionType);
+                _expandedConnectionString = (PathTags == null)
                     ? ConnectionString
-                    : pathTags.Expand(ConnectionString);
+                    : PathTags.Expand(ConnectionString);
 
-                if (useLocalSqlCeCopy &&
-                    DataSource.Name.Equals(SqlCe.SqlCeDataSource.Name, StringComparison.Ordinal))
+                if (UseLocalSqlCeCopy &&
+                    TargetConnectionType.Name.Equals("SqlCeConnection", StringComparison.Ordinal))
                 {
-                    var connectionStringBuilder = new DbConnectionStringBuilder();
-                    connectionStringBuilder.ConnectionString = dbConnection.ConnectionString;
-                    string parameterName = null;
-                    if (connectionStringBuilder.TryGetValue("Data Source", out sqlceDatabaseFileObject))
-                    {
-                        parameterName = "Data Source";
-                    }
-                    else if (connectionStringBuilder.TryGetValue("DataSource", out sqlceDatabaseFileObject))
-                    {
-                        parameterName = "DataSource";
-                    }
-                    else
-                    {
-                        ExtractException.ThrowLogicException("ELI36924");
-                    }
-
-                    sqlceDatabaseFile = (string)sqlceDatabaseFileObject;
-                    connectionStringBuilder.Add(parameterName,
-                        _localDatabaseCopyManager.GetCurrentTemporaryFileName(
-                            sqlceDatabaseFile, this, true));
-                    dbConnection.ConnectionString = connectionStringBuilder.ConnectionString;
+                    string connectionString = GetLocalSqlCeConnectionString(_expandedConnectionString, out _activeSqlCeDb);
+                    dbConnection.ConnectionString = connectionString;
+                }
+                else
+                {
+                    _activeSqlCeDb = null;
+                    dbConnection.ConnectionString = _expandedConnectionString;
                 }
 
                 dbConnection.Open();
-
-                // Handle the StateChange event for SQL CE connections to be able to dereference
-                // the local temp file when no longer in use. The Disposed event would be better
-                // except that it is not raised when the connection is disposed.
-                if (!string.IsNullOrEmpty(sqlceDatabaseFile))
-                {
-                    _originalSqlCeDbFileNames.TryAdd(dbConnection, sqlceDatabaseFile);
-                    dbConnection.StateChange += HandleDbConnection_StateChange;
-                }
 
                 return dbConnection;
             }
             catch (Exception ex)
             {
-                if (!string.IsNullOrEmpty(sqlceDatabaseFile))
+                if (!string.IsNullOrEmpty(_activeSqlCeDb))
                 {
-                    _localDatabaseCopyManager.Dereference(sqlceDatabaseFile, this);
+                    try
+                    {
+                        _localDatabaseCopyManager.Dereference(_activeSqlCeDb, this);
+                    }
+                    catch (Exception ex2)
+                    {
+                        ex2.ExtractLog("ELI37791");
+                    }
+
+                    _activeSqlCeDb = null;
                 }
 
                 throw ex.AsExtract("ELI34759");
+            }
+        }
+
+        /// <summary>
+        /// Closes the <see cref="ManagedDbConnection"/> if it is currently active. This call has
+        /// no effect and generates no exceptions if <see cref="ManagedDbConnection"/> is
+        /// <see langword="null"/> or closed.
+        /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Db")]
+        public void CloseManagedDbConnection()
+        {
+            try
+            {
+                if (_managedDbConnection != null)
+                {
+                    _managedDbConnection.Dispose();
+                    _managedDbConnection = null;
+                    _managedConnectionString = null;
+                    if (_activeSqlCeDb != null)
+                    {
+                        _localDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
+                        _activeSqlCeDb = null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37792");
             }
         }
 
@@ -402,7 +565,8 @@ namespace Extract.Database
         {
             try
             {
-                return DataSourceName.GetHashCode() ^
+                return (TargetConnectionType == null) ? 0 : TargetConnectionType.GetHashCode() ^
+                       DataSourceName.GetHashCode() ^
                        DataProviderName.GetHashCode() ^
                        ConnectionString.GetHashCode();
             }
@@ -448,7 +612,8 @@ namespace Extract.Database
                 }
 
                 // Return true if the fields match:
-                return (DataSourceName == other.DataSourceName &&
+                return (TargetConnectionType == other.TargetConnectionType &&
+                    DataSourceName == other.DataSourceName &&
                     DataProviderName == other.DataProviderName &&
                     ConnectionString == other.ConnectionString);
             }
@@ -460,40 +625,88 @@ namespace Extract.Database
 
         #endregion Overrides
 
-        #region Event Handlers
+        #region IDisposable
 
+        /// <overloads>Releases resources used by the <see cref="DatabaseConnectionInfo"/>.
+        /// </overloads>
         /// <summary>
-        /// Handles the <see cref="DbConnection.StateChange"/> event of a <see cref="DbConnection"/>.
+        /// Releases all resources used by the <see cref="DatabaseConnectionInfo"/>.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Data.StateChangeEventArgs"/> instance containing
-        /// the event data.</param>
-        void HandleDbConnection_StateChange(object sender, System.Data.StateChangeEventArgs e)
+        public void Dispose()
         {
-            try
-            {
-                // Ideally the Dispose event would be handled instead in order to dereference the
-                // local DB copy, except that it does not appear to be raised when the connection
-                // is disposed.
-                if (e.CurrentState == System.Data.ConnectionState.Closed)
-                {
-                    DbConnection dbConnection = sender as DbConnection;
-
-                    string sqlCeDatabaseFile;
-                    if (_originalSqlCeDbFileNames.TryRemove(dbConnection, out sqlCeDatabaseFile))
-                    {
-                        _localDatabaseCopyManager.Dereference((string)sqlCeDatabaseFile, this);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log exceptions here rather than displaying or throwing because there is a good
-                // chance this event is occuring as part of a Dispose call on the connection.
-                ex.ExtractLog("ELI36982");
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        #endregion Event Handlers
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="DatabaseConnectionInfo"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                try
+                {
+                    if (_managedDbConnection != null)
+                    {
+                        _managedDbConnection.Dispose();
+                        _managedDbConnection = null;
+                    }
+
+                    if (_activeSqlCeDb != null)
+                    {
+                        _localDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
+                        _activeSqlCeDb = null;
+                    }
+                }
+                catch { }
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable
+
+        #region Private Members
+
+        /// <summary>
+        /// Creates a version of the specified <see paramref="connectionString"/> that points to a
+        /// temporary local copy of the database.
+        /// </summary>
+        /// <param name="connectionString">The connection string that references the master database
+        /// file.</param>
+        /// <param name="sqlceDatabaseFile">The name of the master database file (parsed from
+        /// <see paramref="connectionString"/>.</param>
+        /// <returns>A version of the specified <see paramref="connectionString"/> that points to a
+        /// temporary local copy of the database.</returns>
+        string GetLocalSqlCeConnectionString(string connectionString, out string sqlceDatabaseFile)
+        {
+            var connectionStringBuilder = new DbConnectionStringBuilder();
+            connectionStringBuilder.ConnectionString = connectionString;
+            string parameterName = null;
+            object sqlceDatabaseFileObject = null;
+            if (connectionStringBuilder.TryGetValue("Data Source", out sqlceDatabaseFileObject))
+            {
+                parameterName = "Data Source";
+            }
+            else if (connectionStringBuilder.TryGetValue("DataSource", out sqlceDatabaseFileObject))
+            {
+                parameterName = "DataSource";
+            }
+            else
+            {
+                ExtractException.ThrowLogicException("ELI36924");
+            }
+
+            sqlceDatabaseFile = (string)sqlceDatabaseFileObject;
+            connectionStringBuilder.Add(parameterName,
+                _localDatabaseCopyManager.GetCurrentTemporaryFileName(
+                    sqlceDatabaseFile, this, true));
+            return connectionStringBuilder.ConnectionString; ;
+        }
+
+        #endregion Private Members
     }
 }

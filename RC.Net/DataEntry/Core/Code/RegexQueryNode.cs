@@ -33,10 +33,12 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="rootAttribute">The <see cref="IAttribute"/> that should be considered the
         /// root of any attribute query.</param>
-        /// <param name="dbConnection">The <see cref="DbConnection"/> that should be used to
-        /// evaluate any SQL queries.</param>
-        public RegexQueryNode(IAttribute rootAttribute, DbConnection dbConnection)
-            : base(rootAttribute, dbConnection)
+        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) that should be used to
+        /// evaluate any SQL queries; The key is the connection name (blank for default connection).
+        /// </param>
+        public RegexQueryNode(IAttribute rootAttribute,
+            Dictionary<string, DbConnection> dbConnections)
+            : base(rootAttribute, dbConnections)
         {
         }
 

@@ -146,10 +146,11 @@ namespace Extract.DataEntry
         static IUnknownVector _attributes;
 
         /// <summary>
-        /// A database available for use in validation or auto-update queries.
+        /// A database(s) available for use in validation or auto-update queries; The key is the
+        /// connection name (blank for default connection).
         /// </summary>
         [ThreadStatic]
-        static DbConnection _dbConnection;
+        static Dictionary<string, DbConnection> _dbConnections;
 
         /// <summary>
         /// Caches the info object for each <see cref="IAttribute"/> for quick reference later on.
@@ -838,13 +839,16 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="sourceDocName">The name of the currently open document.</param>
         /// <param name="attributes">The active <see cref="IAttribute"/> hierarchy.</param>
-        /// <param name="dbConnection">A compact SQL database available for use in validation or
-        /// auto-update queries. (Can be <see langword="null"/> if not required).</param>
+        /// <param name="dbConnection">Any database available for use in validation or
+        /// auto-update queries; (Can be <see langword="null"/> if not required).</param>
         [ComVisible(false)]
         public static void ResetData(string sourceDocName, IUnknownVector attributes,
             DbConnection dbConnection)
         {
-            ResetData(sourceDocName, attributes, dbConnection, null);
+            var dbConnections = new Dictionary<string, DbConnection>();
+            dbConnections[""] = dbConnection;
+
+            ResetData(sourceDocName, attributes, dbConnections, null);
         }
 
         /// <summary>
@@ -855,14 +859,15 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="sourceDocName">The name of the currently open document.</param>
         /// <param name="attributes">The active <see cref="IAttribute"/> hierarchy.</param>
-        /// <param name="dbConnection">A compact SQL database available for use in validation or
-        /// auto-update queries. (Can be <see langword="null"/> if not required).</param>
+        /// <param name="dbConnections">Any database(s) available for use in validation or
+        /// auto-update queries; The key is the connection name (blank for default connection).
+        /// (Can be <see langword="null"/> if not required).</param>
         /// <param name="pathTags">An <see cref="IPathTags"/> instance to be used to expand tags if
         /// anything other than the SourceDocName tag is needed; Otherwise, <see langword="null"/>.
         /// </param>
         [ComVisible(false)]
         public static void ResetData(string sourceDocName, IUnknownVector attributes,
-            DbConnection dbConnection, IPathTags pathTags)
+            Dictionary<string, DbConnection> dbConnections, IPathTags pathTags)
         {
             try
             {
@@ -916,8 +921,8 @@ namespace Extract.DataEntry
 
                 _attributes = attributes;
                 _sourceDocName = sourceDocName;
-                _dbConnection = dbConnection;
-
+                _dbConnections = dbConnections;
+                
                 OnDataReset();
             }
             catch (Exception ex)
@@ -933,8 +938,35 @@ namespace Extract.DataEntry
         /// to initialize.</param>
         /// <param name="sourceDocName">The source document name to which the attributes are
         /// affiliated with.</param>
-        /// <param name="dbConnection">The <see cref="DbConnection"/> to use for the queries.
-        /// </param>
+        /// <param name="dbConnection">The database to use for the queries. (Can be
+        /// <see langword="null"/> if not required).</param>
+        [ComVisible(false)]
+        public static void InitializeForQuery(IUnknownVector attributes, string sourceDocName,
+            DbConnection dbConnection)
+        {
+            try
+            {
+                var dbConnections = new Dictionary<string, DbConnection>();
+                dbConnections[""] = dbConnection;
+
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, null);
+                Initialize(attributes);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37785");
+            }
+        }
+
+        /// <summary>
+        /// Initializes for query (includes resetting the current threads AttributeStatusInfo data).
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
+        /// to initialize.</param>
+        /// <param name="sourceDocName">The source document name to which the attributes are
+        /// affiliated with.</param>
+        /// <param name="dbConnection">The database to use for the queries. (Can be
+        /// <see langword="null"/> if not required).</param>
         /// <param name="pathTags">The <see cref="IPathTags"/> to use if anything more than the
         /// SourceDocName is needed for the expansion; otherwise, <see langword="null"/>.</param>
         [ComVisible(false)]
@@ -943,7 +975,36 @@ namespace Extract.DataEntry
         {
             try
             {
-                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnection, pathTags);
+                var dbConnections = new Dictionary<string, DbConnection>();
+                dbConnections[""] = dbConnection;
+
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags);
+                Initialize(attributes);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37786");
+            }
+        }
+
+        /// <summary>
+        /// Initializes for query (includes resetting the current threads AttributeStatusInfo data).
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
+        /// to initialize.</param>
+        /// <param name="sourceDocName">The source document name to which the attributes are
+        /// affiliated with.</param>
+        /// <param name="dbConnections">The database(s) to use for the queries. (Can be
+        /// <see langword="null"/> if not required).</param>
+        /// <param name="pathTags">The <see cref="IPathTags"/> to use if anything more than the
+        /// SourceDocName is needed for the expansion; otherwise, <see langword="null"/>.</param>
+        [ComVisible(false)]
+        public static void InitializeForQuery(IUnknownVector attributes, string sourceDocName,
+            Dictionary<string, DbConnection> dbConnections, IPathTags pathTags)
+        {
+            try
+            {
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags);
                 Initialize(attributes);
             }
             catch (Exception ex)
@@ -3299,7 +3360,7 @@ namespace Extract.DataEntry
                         sourceAttributes.PushBackIfNotContained(attribute);
 
                         _autoUpdateTriggers[attribute] = new AutoUpdateTrigger(attribute,
-                            statusInfo._autoUpdateQuery, _dbConnection, false);
+                            statusInfo._autoUpdateQuery, _dbConnections, false);
                     }
                 }
             }
@@ -3334,7 +3395,7 @@ namespace Extract.DataEntry
                         sourceAttributes.PushBackIfNotContained(attribute);
 
                         _validationTriggers[attribute] = new AutoUpdateTrigger(attribute,
-                            statusInfo._validationQuery, _dbConnection, true);
+                            statusInfo._validationQuery, _dbConnections, true);
                     }
                 }
                 else

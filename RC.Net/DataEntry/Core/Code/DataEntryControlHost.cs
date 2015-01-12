@@ -572,9 +572,16 @@ namespace Extract.DataEntry
         bool _processingSwipe;
 
         /// <summary>
-        /// A database available for use in validation or auto-update queries.
+        /// Database(s) available for use in validation or auto-update queries; The key is the
+        /// connection name (blank for default connection).
         /// </summary>
-        DbConnection _dbConnection;
+        Dictionary<string, DbConnection> _dbConnections;
+
+        /// <summary>
+        /// The default <see cref="DbConnection"/> to use when a connection is not specified by
+        /// name. This is also the connection that will be used to load smart tags.
+        /// </summary>
+        DbConnection _defaultDbConnection;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -1126,41 +1133,20 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Specifies the database connection to be used in data validation or auto-update queries.
+        /// Gets the database connection to be used in data validation or auto-update queries.
         /// </summary>
-        /// <value>The <see cref="DbConnection"/> to be used. (Can be <see langword="null"/> if one
+        /// <value>The <see cref="DbConnection"/>(s) to be used; The key is the connection name
+        /// (blank for default connection). (Can be <see langword="null"/> if one
         /// is not required by the DEP).</value>
         /// <returns>The <see cref="DbConnection"/> in use or <see langword="null"/> if none
         /// has been specified.</returns>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public DbConnection DatabaseConnection
+        public Dictionary<string, DbConnection> DatabaseConnections
         {
             get
             {
-                return _dbConnection;
-            }
-
-            set
-            {
-                try
-                {
-                    if (_dbConnection != value)
-                    {
-                        _dbConnection = value;
-
-                        if (_isLoaded)
-                        {
-                            // If the dbconnection is changed, the SmartTagManager needs to be
-                            // updated.
-                            InitializeSmartTagManager();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI28879", ex);
-                }
+                return _dbConnections;
             }
         }
 
@@ -1581,7 +1567,8 @@ namespace Extract.DataEntry
                         _attributes = attributes;
 
                         // Notify AttributeStatusInfo of the new attribute hierarchy
-                        AttributeStatusInfo.ResetData(_imageViewer.ImageFile, _attributes, _dbConnection);
+                        AttributeStatusInfo.ResetData(_imageViewer.ImageFile, _attributes,
+                            _dbConnections, null);
 
                         // [DataEntry:1151]
                         // Disabled highlight prefetch.
@@ -3926,7 +3913,7 @@ namespace Extract.DataEntry
                     IAttribute activeAttribute = GetActiveAttribute(null);
 
                     DataEntryQuery dataEntryQuery =
-                        DataEntryQuery.Create(e.Value, activeAttribute, _dbConnection);
+                        DataEntryQuery.Create(e.Value, activeAttribute, _dbConnections);
                     QueryResult queryResult = dataEntryQuery.Evaluate();
                     e.Value = queryResult.ToString();
                 }
@@ -4275,6 +4262,45 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Set the database connection(s) to be used in data validation or auto-update queries.
+        /// </summary>
+        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) to be used; The key is the
+        /// connection name (blank for default connection). (Can be <see langword="null"/> if one is
+        /// not required by the DEP).</param>
+        internal void SetDatabaseConnections(Dictionary<string, DbConnection> dbConnections)
+        {
+            try
+            {
+                if (_dbConnections != dbConnections)
+                {
+                    _dbConnections = dbConnections;
+
+                    DbConnection defaultDbConnection = null;
+                    if (_dbConnections != null)
+                    {
+                        _dbConnections.TryGetValue("", out defaultDbConnection);
+                    }
+
+                    if (defaultDbConnection != _defaultDbConnection)
+                    {
+                        _defaultDbConnection = defaultDbConnection;
+                            
+                        if (_isLoaded)
+                        {
+                            // If the dbconnection is changed, the SmartTagManager needs to be
+                            // updated.
+                            InitializeSmartTagManager();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28879", ex);
+            }
+        }
+
         #endregion Internal Members
 
         #region Private Members
@@ -4478,7 +4504,7 @@ namespace Extract.DataEntry
             try
             {
                 // DataEntry SmartTags require a database connection.
-                if (_dbConnection == null)
+                if (_defaultDbConnection == null)
                 {
                     if (_smartTagManager != null)
                     {
@@ -4490,7 +4516,7 @@ namespace Extract.DataEntry
                 }
 
                 // DataEntry SmartTags require a 'SmartTag' table.
-                string[] queryResults = DBMethods.GetQueryResultsAsStringArray(_dbConnection,
+                string[] queryResults = DBMethods.GetQueryResultsAsStringArray(_defaultDbConnection,
                     "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SmartTag'");
                 if (queryResults.Length == 0)
                 {
@@ -4504,7 +4530,7 @@ namespace Extract.DataEntry
                 }
 
                 // Retrieve the smart tags...
-                queryResults = DBMethods.GetQueryResultsAsStringArray(_dbConnection,
+                queryResults = DBMethods.GetQueryResultsAsStringArray(_defaultDbConnection,
                     "SELECT TagName, TagValue FROM [SmartTag]");
 
                 // And put them into a dictionary that the SmartTagManager can use

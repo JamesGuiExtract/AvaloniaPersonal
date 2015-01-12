@@ -93,9 +93,10 @@ namespace Extract.DataEntry
         IAttribute _rootAttribute;
 
         /// <summary>
-        /// The <see cref="DatabaseConnection"/> that should be used to evaluate any SQL queries.
+        /// The <see cref="DbConnection"/>(s) that should be used to evaluate any SQL queries;
+        /// The key is the connection name (blank for default connection).
         /// </summary>
-        DbConnection _dbConnection;
+        Dictionary<string, DbConnection> _dbConnections;
 
         /// <summary>
         /// The named <see cref="QueryNode"/>s which this <see cref="QueryNode"/> references.
@@ -134,15 +135,17 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="rootAttribute">The <see cref="IAttribute"/> that should be considered the
         /// root of any attribute query.</param>
-        /// <param name="dbConnection">The <see cref="DatabaseConnection"/> that should be used to
-        /// evaluate any SQL queries.</param>
-        public CompositeQueryNode(IAttribute rootAttribute, DbConnection dbConnection)
+        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) that should be used
+        /// to evaluate any SQL queries; The key is the connection name (blank for default
+        /// connection).</param>
+        public CompositeQueryNode(IAttribute rootAttribute,
+            Dictionary<string, DbConnection> dbConnections)
             : base()
         {
             try
             {
                 _rootAttribute = rootAttribute;
-                _dbConnection = dbConnection;
+                _dbConnections = dbConnections;
             }
             catch (Exception ex)
             {
@@ -194,15 +197,16 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets the <see cref="DatabaseConnection"/> that should be used to evaluate any SQL queries.
+        /// Gets the <see cref="DbConnection"/>(s) that should be used to evaluate any SQL queries.
         /// </summary>
-        /// <returns>The <see cref="DatabaseConnection"/> that should be used to evaluate any SQL queries.
+        /// <returns>The <see cref="DbConnection"/>(s) that should be used to evaluate any SQL
+        /// queries; The key is the connection name (blank for default connection).
         /// </returns>
-        public virtual DbConnection DatabaseConnection
+        public virtual Dictionary<string, DbConnection> DatabaseConnections
         {
             get
             {
-                return _dbConnection;
+                return _dbConnections;
             }
         }
 
@@ -502,13 +506,13 @@ namespace Extract.DataEntry
                             StringComparison.OrdinalIgnoreCase))
                         {
                             childQueryNode =
-                                new SqlQueryNode(RootAttribute, DatabaseConnection);
+                                new SqlQueryNode(RootAttribute, DatabaseConnections);
                         }
                         else if (childElement.Name.Equals("Attribute",
                             StringComparison.OrdinalIgnoreCase))
                         {
                             childQueryNode =
-                                new AttributeQueryNode(RootAttribute, DatabaseConnection);
+                                new AttributeQueryNode(RootAttribute, DatabaseConnections);
                         }
                         // Maintain "Complex" keyword for compatilility with versions <= 9.0
                         else if (childElement.Name.Equals("Complex",
@@ -517,19 +521,19 @@ namespace Extract.DataEntry
                             StringComparison.OrdinalIgnoreCase))
                         {
                             childQueryNode =
-                                new CompositeQueryNode(RootAttribute, DatabaseConnection);
+                                new CompositeQueryNode(RootAttribute, DatabaseConnections);
                         }
                         else if (childElement.Name.Equals("Regex",
                             StringComparison.OrdinalIgnoreCase))
                         {
                             childQueryNode =
-                                new RegexQueryNode(RootAttribute, DatabaseConnection);
+                                new RegexQueryNode(RootAttribute, DatabaseConnections);
                         }
                         else if (childElement.Name.Equals("Expression",
                             StringComparison.OrdinalIgnoreCase))
                         {
                             childQueryNode =
-                                new ExpressionQueryNode(RootAttribute, DatabaseConnection);
+                                new ExpressionQueryNode(RootAttribute, DatabaseConnections);
                         }
                         else
                         {

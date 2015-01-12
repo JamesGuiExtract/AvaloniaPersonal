@@ -41,10 +41,12 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="rootAttribute">The <see cref="IAttribute"/> that should be considered the
         /// root of any attribute query.</param>
-        /// <param name="dbConnection">The <see cref="DbConnection"/> that should be used to
-        /// evaluate any SQL queries.</param>
-        public ExpressionQueryNode(IAttribute rootAttribute, DbConnection dbConnection)
-            : base(rootAttribute, dbConnection)
+        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) that should be used to
+        /// evaluate any SQL queries; The key is the connection name (blank for default connection).
+        /// </param>
+        public ExpressionQueryNode(IAttribute rootAttribute,
+            Dictionary<string, DbConnection> dbConnections)
+            : base(rootAttribute, dbConnections)
         {
             // [DataEntry:1236]
             // By default, multiple lines from a Composite query will be treated as separate

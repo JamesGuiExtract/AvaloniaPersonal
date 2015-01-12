@@ -88,7 +88,7 @@ namespace Extract.DataEntry.Test
 
             string xml = @"<SourceDocName/>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -107,7 +107,7 @@ namespace Extract.DataEntry.Test
 
             string xml = @"<SolutionDirectory/>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -127,7 +127,7 @@ namespace Extract.DataEntry.Test
 
             string xml = @"<Attribute>/ConsiderationAmount</Attribute>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -148,7 +148,7 @@ namespace Extract.DataEntry.Test
             IAttribute considerationAmountAttribute = (IAttribute)attributes.At(0);
 
             DataEntryQuery query =
-                DataEntryQuery.Create(xml, considerationAmountAttribute, null);
+                DataEntryQuery.Create(xml, considerationAmountAttribute);
 
             QueryResult result = query.Evaluate();
 
@@ -165,7 +165,7 @@ namespace Extract.DataEntry.Test
 
             string xml = @"<Attribute StringList=' and '>/Wagon/Sale/Customer</Attribute>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -191,7 +191,7 @@ namespace Extract.DataEntry.Test
                 "<Attribute Root='Sale'>../Specs/Width</Attribute>\r\n" +
                 "<Attribute Root='Sale'>../Specs/Length</Attribute>\r\n";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -225,7 +225,7 @@ namespace Extract.DataEntry.Test
                          "<ConsiderationAmount SpatialField='EndY'/>\r\n" +
                          "<ConsiderationAmount SpatialField='Height'/>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -257,7 +257,7 @@ namespace Extract.DataEntry.Test
                          "<Attribute>/DocumentType</Attribute>\r\n" +
                          "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -284,7 +284,7 @@ namespace Extract.DataEntry.Test
                          "<Attribute>*/@FULL</Attribute>\r\n" +
                          "<Attribute>*/Recipient2@FULL</Attribute>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -311,7 +311,7 @@ namespace Extract.DataEntry.Test
 
             string xml = "<Attribute>@Numeric|*@Dollar|DocumentType@String|LegalDescription/*|ReturnAddress/@Company|*/@FULL|*/Recipient2@FULL</Attribute>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -455,7 +455,7 @@ namespace Extract.DataEntry.Test
             string xml = @"<Regex Pattern='\&lt;[\d\.]+' SelectionMode='First'>" +
                 "<Attribute StringList=','>/Test/Component/Range</Attribute></Regex>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -473,7 +473,7 @@ namespace Extract.DataEntry.Test
             string xml = @"<Regex Pattern='\&lt;[\d\.]+' StringList=' '>" +
                 "<Attribute StringList=','>/Test/Component/Range</Attribute></Regex>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -488,7 +488,7 @@ namespace Extract.DataEntry.Test
         {
             string xml = @"<Expression>'Mickey' + ' ' + 'Mouse'</Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -503,7 +503,7 @@ namespace Extract.DataEntry.Test
         {
             string xml = @"<Expression>2.0 + <Composite Type='Double'>2</Composite></Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -518,7 +518,7 @@ namespace Extract.DataEntry.Test
         {
             string xml = @"<Expression>2.0 + <Composite Type='Double' Default='2.0'>One</Composite></Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -538,7 +538,7 @@ namespace Extract.DataEntry.Test
                             @".?{#this > 100.0}" +
                         @"</Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -563,7 +563,7 @@ namespace Extract.DataEntry.Test
                 "</Declarations>" +
                 "<Query><Expression><First Type='string[]'/> + <All Type='string[]'/></Expression></Query>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -584,7 +584,7 @@ namespace Extract.DataEntry.Test
                 "</Declarations>" +
                 "<Query><Expression><All Type='string[]'/> - <First Type='string[]'/></Expression></Query>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -607,7 +607,7 @@ namespace Extract.DataEntry.Test
                 "</Declarations>" +
                 "<Query><Expression><A Type='string[]'/>.sort() == <B Type='string[]'/>.sort()</Expression></Query>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -626,7 +626,7 @@ namespace Extract.DataEntry.Test
 	                        @"0 + <Attribute StringList=' + ' Parameterize='False' AbortIfEmpty='True'>/Test/Component/Garbage</Attribute>" +
                          @"</Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -651,7 +651,7 @@ namespace Extract.DataEntry.Test
                             @"</Composite>[3]" +
                         @"</Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -741,7 +741,7 @@ namespace Extract.DataEntry.Test
                             @"<Attribute StringList=' + ' Parameterize='False'>/Test/Component/Value</Attribute>" +
                          @"</Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -762,7 +762,7 @@ namespace Extract.DataEntry.Test
                             @"</Regex>" +
                         @"</Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -782,7 +782,7 @@ namespace Extract.DataEntry.Test
                             @".sum()" +
                          @"</Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -804,7 +804,7 @@ namespace Extract.DataEntry.Test
                             @"0.0" +
                         @"</Expression>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             QueryResult result = query.Evaluate();
 
@@ -880,7 +880,7 @@ namespace Extract.DataEntry.Test
                         "2\r\n" +
                         "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -906,7 +906,7 @@ namespace Extract.DataEntry.Test
                         "2\r\n" +
                         "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -933,7 +933,7 @@ namespace Extract.DataEntry.Test
                         "2\r\n" +
                         "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -959,7 +959,7 @@ namespace Extract.DataEntry.Test
                         "2\r\n" +
                         "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -986,7 +986,7 @@ namespace Extract.DataEntry.Test
                         "2\r\n" +
                         "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -1014,7 +1014,7 @@ namespace Extract.DataEntry.Test
                         "2\r\n" +
                         "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -1040,7 +1040,7 @@ namespace Extract.DataEntry.Test
                         "2\r\n" +
                         "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -1066,7 +1066,7 @@ namespace Extract.DataEntry.Test
                         "2\r\n" +
                         "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -1092,7 +1092,7 @@ namespace Extract.DataEntry.Test
                         "2\r\n" +
                         "</Composite>";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 
@@ -1119,7 +1119,7 @@ namespace Extract.DataEntry.Test
                         "</Composite>\r\n" +
                         "B\r\n";
 
-            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+            DataEntryQuery query = DataEntryQuery.Create(xml);
 
             string[] results = query.Evaluate().ToStringArray();
 

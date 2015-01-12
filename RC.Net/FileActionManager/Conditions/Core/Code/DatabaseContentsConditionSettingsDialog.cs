@@ -393,6 +393,12 @@ namespace Extract.FileActionManager.Conditions
                     _schemaInfoUpdateComplete.Dispose();
                     _schemaInfoUpdateComplete = null;
                 }
+
+                if (_schemaInfoDbConnectionInfo != null)
+                {
+                    _schemaInfoDbConnectionInfo.Dispose();
+                    _schemaInfoDbConnectionInfo = null;
+                }
             }
             base.Dispose(disposing);
         }
@@ -1238,6 +1244,7 @@ namespace Extract.FileActionManager.Conditions
                 // Use a DatabaseConnectionInfo instance to open manually specified connections so
                 // that local SQL CE database copies are automatically managed.
                 _schemaInfoDbConnectionInfo = new DatabaseConnectionInfo(connectionInfo);
+                _schemaInfoDbConnectionInfo.UseLocalSqlCeCopy = true;
                 var connectionStringBuilder = new DbConnectionStringBuilder();
                 connectionStringBuilder.ConnectionString = pathTags.Expand(connectionInfo.ConnectionString);
                 if (connectionInfo.DataSource.Name.Equals(DataSource.SqlDataSource.Name, StringComparison.Ordinal))
@@ -1249,7 +1256,7 @@ namespace Extract.FileActionManager.Conditions
                     connectionStringBuilder.Add("Timeout", _SCHEMA_UPDATE_TIMEOUT);
                 }
                 _schemaInfoDbConnectionInfo.ConnectionString = connectionStringBuilder.ConnectionString;
-                _schemaInfoDbConnection = _schemaInfoDbConnectionInfo.OpenConnection(true);
+                _schemaInfoDbConnection = _schemaInfoDbConnectionInfo.OpenConnection();
             }
 
             return _schemaInfoDbConnection;

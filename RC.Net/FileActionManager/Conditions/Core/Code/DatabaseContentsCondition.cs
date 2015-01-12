@@ -1218,6 +1218,7 @@ namespace Extract.FileActionManager.Conditions
                 // For the time being, use new connections for every file to avoid the risk of
                 // keeping connections open indefinitely since there is no way for the condition to
                 // know if processing is stopped.
+                _databaseConnectionInfo.CloseManagedDbConnection();
                 if (_dbConnection != null)
                 {
                     _dbConnection.Dispose();
@@ -1535,6 +1536,12 @@ namespace Extract.FileActionManager.Conditions
                     _dbConnection.Dispose();
                     _dbConnection = null;                    
                 }
+
+                if (_databaseConnectionInfo != null)
+                {
+                    _databaseConnectionInfo.Dispose();
+                    _databaseConnectionInfo = null;
+                }
             }
 
             // Dispose of ummanaged resources
@@ -1690,6 +1697,9 @@ namespace Extract.FileActionManager.Conditions
                 string expandedOutput = "";
                 isDataEntryQueryOnly = false;
 
+                _databaseConnectionInfo.UseLocalSqlCeCopy = true;
+                _databaseConnectionInfo.PathTags = pathTags;
+
                 ExtractException.Assert("ELI36984", "Invalid text expansion parameters.",
                     (databaseConnectionInfo == null) != (fileProcessingDB == null));
 
@@ -1753,7 +1763,7 @@ namespace Extract.FileActionManager.Conditions
                             }
 
                             DbConnection dbConnection = (fileProcessingDB == null)
-                                ? GetDbConnection(databaseConnectionInfo, pathTags)
+                                ? GetDbConnection(databaseConnectionInfo)
                                 : GetDbConnection(fileProcessingDB);
 
                             AttributeStatusInfo.InitializeForQuery(sourceAttributes,
@@ -1918,15 +1928,12 @@ namespace Extract.FileActionManager.Conditions
         /// Gets the <see cref="DbConnection"/> to use for evaluating the query.
         /// </summary>
         /// <param name="databaseConnectionInfo"></param>
-        /// <param name="pathTags">A <see cref="FileActionManagerPathTags"/> instance used to expand
-        /// any path tags/functions in the connection info.</param>
         /// <returns>The <see cref="DbConnection"/> to use for evaluating the query.</returns>
-        DbConnection GetDbConnection(DatabaseConnectionInfo databaseConnectionInfo,
-            FileActionManagerPathTags pathTags)
+        DbConnection GetDbConnection(DatabaseConnectionInfo databaseConnectionInfo)
         {
             if (_dbConnection == null)
             {
-                _dbConnection = databaseConnectionInfo.OpenConnection(true, pathTags);
+                _dbConnection = databaseConnectionInfo.ManagedDbConnection;
             }
 
             return _dbConnection;
@@ -1949,6 +1956,9 @@ namespace Extract.FileActionManager.Conditions
             DataTable queryResults = null;
             string sqlQuery = "";
             bool isDataEntryQueryOnly = false;
+
+            _databaseConnectionInfo.UseLocalSqlCeCopy = true;
+            _databaseConnectionInfo.PathTags = pathTags;
 
             if (UseQuery)
             {
@@ -1980,7 +1990,7 @@ namespace Extract.FileActionManager.Conditions
             {
                 DbConnection dbConnection = UseFAMDBConnection
                     ? GetDbConnection(fileProcessingDB)
-                    : GetDbConnection(_databaseConnectionInfo, pathTags);
+                    : GetDbConnection(_databaseConnectionInfo);
 
                 using (DbTransaction transaction = dbConnection.BeginTransaction())
                 using (var dbCommand = DBMethods.CreateDBCommand(dbConnection, sqlQuery, null))

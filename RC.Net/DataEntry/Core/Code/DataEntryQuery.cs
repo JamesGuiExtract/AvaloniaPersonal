@@ -86,10 +86,12 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="rootAttribute">The <see cref="IAttribute"/> that should be considered the
         /// root of any attribute query.</param>
-        /// <param name="dbConnection">The <see cref="DbConnection"/> that should be used to
-        /// evaluate any SQL queries.</param>
-        private DataEntryQuery(IAttribute rootAttribute, DbConnection dbConnection)
-            : base(rootAttribute, dbConnection)
+        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) that should be used to
+        /// evaluate any SQL queries; The key is the connection name (blank for default
+        /// connection).</param>
+        private DataEntryQuery(IAttribute rootAttribute,
+            Dictionary<string, DbConnection> dbConnections)
+            : base(rootAttribute, dbConnections)
         {
 
         }
@@ -97,6 +99,32 @@ namespace Extract.DataEntry
         #endregion Constructors
 
         #region Static Members
+
+        /// <overloads>
+        /// Creates a new <see cref="DataEntryQuery"/>.
+        /// </overloads>
+        /// <summary>
+        /// Creates a new <see cref="DataEntryQuery"/>.
+        /// </summary>
+        /// <param name="xml">The xml that specifies the query.</param>
+        /// <returns>A <see cref="DataEntryQuery"/> defined by the specified
+        /// <see paramref="xml"/>.</returns>
+        static public DataEntryQuery Create(string xml)
+        {
+            return Create(xml, null, (DbConnection)null);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="DataEntryQuery"/>.
+        /// </summary>
+        /// <param name="xml">The xml that specifies the query.</param>
+        /// <param name="rootAttribute">The <see cref="IAttribute"/></param>
+        /// <returns>A <see cref="DataEntryQuery"/> defined by the specified
+        /// <see paramref="xml"/>.</returns>
+        static public DataEntryQuery Create(string xml, IAttribute rootAttribute)
+        {
+            return Create(xml, rootAttribute, (DbConnection)null);
+        }
 
         /// <summary>
         /// Creates a new <see cref="DataEntryQuery"/>.
@@ -112,8 +140,34 @@ namespace Extract.DataEntry
         {
             try
             {
+                var dbConnections = new Dictionary<string, DbConnection>();
+                dbConnections[""] = dbConnection;
+
+                return Create(xml, rootAttribute, dbConnections);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37784");
+            }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="DataEntryQuery"/>.
+        /// </summary>
+        /// <param name="xml">The xml that specifies the query.</param>
+        /// <param name="rootAttribute">The <see cref="IAttribute"/></param>
+        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) that should be used to
+        /// evaluate any SQL queries; The key is the connection name (blank for default connection).
+        /// </param>
+        /// <returns>A <see cref="DataEntryQuery"/> defined by the specified
+        /// <see paramref="xml"/>.</returns>
+        static public DataEntryQuery Create(string xml, IAttribute rootAttribute,
+            Dictionary<string, DbConnection> dbConnections)
+        {
+            try
+            {
                 DataEntryQuery[] queryList =
-                    CreateList(xml, rootAttribute, dbConnection,
+                    CreateList(xml, rootAttribute, dbConnections,
                     MultipleQueryResultSelectionMode.List);
 
                 ExtractException.Assert("ELI28861", "Specified XML defines multiple queries!",
@@ -135,14 +189,16 @@ namespace Extract.DataEntry
         /// <param name="xml">The xml that specifies the queries</param>
         /// <param name="rootAttribute">The <see cref="IAttribute"/> that should be considered the
         /// root of any attribute query.</param>
-        /// <param name="dbConnection">The <see cref="DbConnection"/> that should be used to
-        /// evaluate any SQL queries.</param>
+        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) that should be used to
+        /// evaluate any SQL queries; The key is the connection name (blank for default connection).
+        /// </param>
         /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> that
         /// should be used to determine how multiple resulting values should be handled.</param>
         /// <returns>A list of <see cref="DataEntryQuery"/> instances defined by the specified
         /// <see paramref="xml"/>.</returns>
         static public DataEntryQuery[] CreateList(string xml, IAttribute rootAttribute,
-            DbConnection dbConnection, MultipleQueryResultSelectionMode selectionMode)
+            Dictionary<string, DbConnection> dbConnections,
+            MultipleQueryResultSelectionMode selectionMode)
         {
             try
             {
@@ -181,7 +237,7 @@ namespace Extract.DataEntry
                     .FirstOrDefault();
                 if (declarationsNode != null)
                 {
-                    queryNodeDeclarations = new DataEntryQuery(rootAttribute, dbConnection);
+                    queryNodeDeclarations = new DataEntryQuery(rootAttribute, dbConnections);
                     queryNodeDeclarations.LoadFromXml(declarationsNode, namedReferences);
                     RegisterNamedDependencies(namedReferences);
 
@@ -200,7 +256,7 @@ namespace Extract.DataEntry
                     .OfType<XmlNode>()
                     .Where(n => n.Name.Equals("Query", StringComparison.OrdinalIgnoreCase)))
                 {
-                    DataEntryQuery dataEntryQuery = new DataEntryQuery(rootAttribute, dbConnection);
+                    DataEntryQuery dataEntryQuery = new DataEntryQuery(rootAttribute, dbConnections);
                     dataEntryQuery.SelectionMode = selectionMode;
                     dataEntryQuery.LoadFromXml(node, namedReferences);
                     queryList.Add(dataEntryQuery);

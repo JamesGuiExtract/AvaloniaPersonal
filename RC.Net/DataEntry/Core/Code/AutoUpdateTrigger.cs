@@ -44,9 +44,10 @@ namespace Extract.DataEntry
         DataEntryQuery _defaultQuery;
 
         /// <summary>
-        /// A database for auto-update queries.
+        /// Database(s) for auto-update queries; The key is the connection name (blank for default
+        /// connection).
         /// </summary>
-        DbConnection _dbConnection;
+        Dictionary<string, DbConnection> _dbConnections;
 
         /// <summary>
         /// Indicates whether the trigger is to be used to update a validation list instead of the
@@ -110,13 +111,14 @@ namespace Extract.DataEntry
         /// </param>
         /// <param name="query">. Every time an attribute specified in the query is modified, this
         /// query will be re-evaluated and used to update the value.</param>
-        /// <param name="dbConnection">The compact SQL database to use for auto-update queries that
-        /// use a database query (can be <see langword="null"/> if not required).</param>
+        /// <param name="dbConnections">The database(s) to use for SQL query nodes; The key is the
+        /// connection name (blank for default connection). (can be <see langword="null"/> if not
+        /// required).</param>
         /// <param name="validationTrigger"><see langword="true"/> if the trigger should update the
         /// validation list associated with the <see paramref="targetAttribute"/> instead of the
         /// <see cref="IAttribute"/> value itself; <see langword="false"/> otherwise.</param>
         public AutoUpdateTrigger(IAttribute targetAttribute, string query,
-            DbConnection dbConnection, bool validationTrigger)
+            Dictionary<string, DbConnection> dbConnections, bool validationTrigger)
         {
             try
             {
@@ -135,11 +137,11 @@ namespace Extract.DataEntry
 
                 // Initialize the fields.
                 _targetAttribute = targetAttribute;
-                _dbConnection = dbConnection;
+                _dbConnections = dbConnections;
                 _validationTrigger = validationTrigger;
 
                 DataEntryQuery[] dataEntryQueries = DataEntryQuery.CreateList(
-                    query, _targetAttribute, _dbConnection,
+                    query, _targetAttribute, _dbConnections,
                     _validationTrigger
                         ? MultipleQueryResultSelectionMode.List
                         : MultipleQueryResultSelectionMode.None);

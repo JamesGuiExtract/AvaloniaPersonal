@@ -491,16 +491,17 @@ namespace Extract.AttributeFinder.Rules
                 .Where(attribute => attribute.Value != null)
                 .FirstOrDefault();
 
-            using (DbConnection dbConnection = string.IsNullOrWhiteSpace(
-                    _databaseConnectionControl.DatabaseConnectionInfo.ConnectionString)
-                ? null
-                : _databaseConnectionControl.DatabaseConnectionInfo.OpenConnection(true))
+            _databaseConnectionControl.DatabaseConnectionInfo.UseLocalSqlCeCopy = true;
+
+            try
             {
                 AttributeStatusInfo.InitializeForQuery(sourceAttributes,
-                    firstAttribute.Value.SourceDocName, dbConnection, null);
+                    firstAttribute.Value.SourceDocName,
+                        _databaseConnectionControl.DatabaseConnectionInfo.ManagedDbConnection);
 
                 DataEntryQuery query =
-                    DataEntryQuery.Create(queryText, rootAttribute, dbConnection);
+                    DataEntryQuery.Create(queryText, rootAttribute,
+                        _databaseConnectionControl.DatabaseConnectionInfo.ManagedDbConnection);
 
                 QueryResult result = query.Evaluate();
 
@@ -509,6 +510,10 @@ namespace Extract.AttributeFinder.Rules
                 _resultsDataGridView.DataSource = result.ToStringArray()
                     .Select(value => new { Value = value })
                     .ToList();
+            }
+            finally
+            {
+                _databaseConnectionControl.DatabaseConnectionInfo.CloseManagedDbConnection();
             }
         }
 

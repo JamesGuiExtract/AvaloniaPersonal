@@ -1,5 +1,4 @@
 ﻿using Extract.Database;
-using Extract.DataEntry.Properties;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -7,6 +6,7 @@ using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using UCLID_AFCORELib;
 
 namespace Extract.DataEntry
@@ -20,21 +20,50 @@ namespace Extract.DataEntry
         #region Statics
 
         /// <summary>
-        /// Keep track of the last DB connection; <see cref="_cachedResults"/> needs to be cleared
-        /// every time the database is changed.
-        /// </summary>
-        static DbConnection _lastDBConnection;
-
-        /// <summary>
         /// Cached SQL query results for frequently used or expensive queries.
         /// </summary>
-        static DataCache<string, CachedQueryData<string[]>> _cachedResults =
-            new DataCache<string, CachedQueryData<string[]>>(
-                QueryNode.QueryCacheLimit, CachedQueryData<string[]>.GetScore);
+        static Dictionary<string, DbConnectionWrapper> _connectionInfo =
+            new Dictionary<string, DbConnectionWrapper>();
 
         #endregion Statics
 
+        #region DbConnectionWrapper
+
+        /// <summary>
+        /// Encapsulates a <see cref="DbConnection"/> and its associated cached results.
+        /// </summary>
+        class DbConnectionWrapper
+        {
+            /// <summary>
+            /// The <see cref="DbConnection"/>.
+            /// </summary>
+            public DbConnection DbConnection;
+
+            /// <summary>
+            /// The cached results associated with <see cref="DbConnection"/>
+            /// </summary>
+            public DataCache<string, CachedQueryData<string[]>> CachedResults =
+                new DataCache<string, CachedQueryData<string[]>>(
+                    QueryNode.QueryCacheLimit, CachedQueryData<string[]>.GetScore);
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DbConnectionWrapper"/> class.
+            /// </summary>
+            /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+            public DbConnectionWrapper(DbConnection dbConnection)
+            {
+                DbConnection = dbConnection;
+            }
+        }
+
+        #endregion DbConnectionWrapper
+
         #region Fields
+
+        /// <summary>
+        /// The <see cref="DbConnectionWrapper"/> currently being used for this query node.
+        /// </summary>
+        DbConnectionWrapper _currentConnection = null;
 
         /// <summary>
         /// A string that indicates the following element in a query is a parameter.
@@ -55,10 +84,11 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="rootAttribute">The <see cref="IAttribute"/> that should be considered the
         /// root of any attribute query.</param>
-        /// <param name="dbConnection">The <see cref="DbConnection"/> that should be used to
-        /// evaluate any SQL queries.</param>
-        public SqlQueryNode(IAttribute rootAttribute, DbConnection dbConnection)
-            : base(rootAttribute, dbConnection)
+        /// <param name="dbConnections">The <see cref="DbConnection"/>(s) that should be used to
+        /// evaluate any SQL queries; The key is the connection name (blank for default connection).
+        /// </param>
+        public SqlQueryNode(IAttribute rootAttribute, Dictionary<string, DbConnection> dbConnections)
+            : base(rootAttribute, dbConnections)
         {
             try
             {
@@ -69,17 +99,57 @@ namespace Extract.DataEntry
                 // literal newline chars are not intended to delineate multiple results for an SQL
                 // query, allow newline chars to be treated as liternal newline chars.
                 TreatNewLinesAsWhiteSpace = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34488");
+            }
+        }
 
-                // If the connection has changed since the last SqlQueryNode was created, the static
-                // cache needs to be cleared.
-                if (_lastDBConnection != dbConnection)
+        #endregion Constructors
+
+        #region Overrides
+
+        /// <summary>
+        /// Loads the <see cref="QueryNode"/> using the specified XML query string.
+        /// </summary>
+        /// <param name="xmlNode">The XML query string defining the query.</param>
+        /// <param name="namedReferences">A communal collection of named
+        /// <see cref="NamedQueryReferences"/>s available to allow referencing of named nodes.</param>
+        internal override void LoadFromXml(System.Xml.XmlNode xmlNode,
+            Dictionary<string, NamedQueryReferences> namedReferences)
+        {
+            try
+            {
+                base.LoadFromXml(xmlNode, namedReferences);
+
+                // Look up the appropriate connection for this node.
+                XmlAttribute xmlAttribute = xmlNode.Attributes["Connection"];
+                string connectionName = (xmlAttribute == null) ? "" : xmlAttribute.Value;
+
+                ExtractException.Assert("ELI37783", "Database must be specified for SQL query nodes.",
+                    DatabaseConnections != null && DatabaseConnections.ContainsKey(connectionName));
+
+                // Look for an existing DbConnectionWrapper under this name.
+                if (_connectionInfo.TryGetValue(connectionName, out _currentConnection))
                 {
-                    _cachedResults.Clear();
+                    // If the connection itself has changed since the last time DbConnectionWrapper
+                    // was used (such as if an SQL CE OrderMappingDB has been updated), the static
+                    // cache needs to be cleared.
+                    if (_currentConnection.DbConnection != DatabaseConnections[connectionName])
+                    {
+                        _currentConnection.CachedResults.Clear();
+                        _currentConnection.DbConnection = DatabaseConnections[connectionName];
+                    }
+                }
+                else
+                {
+                    // A DbConnectionWrapper needs to be created for this name.
+                    _currentConnection = new DbConnectionWrapper(DatabaseConnections[connectionName]);
+                    _connectionInfo[connectionName] = _currentConnection;
                 }
 
-                _lastDBConnection = dbConnection;
-
-                string dbType = dbConnection.GetType().ToString();
+                string dbType = _currentConnection.DbConnection.GetType().ToString();
                 if (dbType.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     _parameterMarker = ":";  // Oracle
@@ -98,13 +168,9 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI34488");
+                throw ex.AsExtract("ELI37797");
             }
         }
-
-        #endregion Constructors
-
-        #region Overrides
 
         /// <summary>
         /// Evaluates the query by using the combined result of all child
@@ -119,7 +185,7 @@ namespace Extract.DataEntry
             {
                 ExtractException.Assert("ELI26733",
                     "Unable to evaluate query without database connection!",
-                    DatabaseConnection != null);
+                    _currentConnection != null && _currentConnection.DbConnection != null);
 
                 StringBuilder sqlQuery = new StringBuilder();
 
@@ -153,14 +219,14 @@ namespace Extract.DataEntry
 
                 if (FlushCache)
                 {
-                    _cachedResults.Clear();
+                    _currentConnection.CachedResults.Clear();
                 }
 
                 // If there are cached results for this query, retrieve them.
                 string[] queryResults;
                 CachedQueryData<string[]> cachedResults;
                 cacheKey += sqlQuery.ToString();
-                if (_cachedResults.TryGetData(cacheKey, out cachedResults))
+                if (_currentConnection.CachedResults.TryGetData(cacheKey, out cachedResults))
                 {
                     queryResults = cachedResults.Data;
                 }
@@ -171,14 +237,14 @@ namespace Extract.DataEntry
 
                     // Execute the query.
                     queryResults = DBMethods.GetQueryResultsAsStringArray(
-                        DatabaseConnection, sqlQuery.ToString(), parameters, ", ");
+                        _currentConnection.DbConnection, sqlQuery.ToString(), parameters, ", ");
 
                     if (AllowCaching && !FlushCache)
                     {
                         // Attempt to cache the results.
                         double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
                         cachedResults = new CachedQueryData<string[]>(queryResults, executionTime);
-                        _cachedResults.CacheData(cacheKey, cachedResults);
+                        _currentConnection.CachedResults.CacheData(cacheKey, cachedResults);
                     }
                 }
                 else

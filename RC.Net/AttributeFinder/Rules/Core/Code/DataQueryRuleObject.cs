@@ -141,6 +141,7 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
+                _databaseConnectionInfo.PathTags = _pathTags;
             }
             catch (Exception ex)
             {
@@ -159,6 +160,7 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 CopyFrom(dataQueryRuleObject);
+                _databaseConnectionInfo.PathTags = _pathTags;
             }
             catch (Exception ex)
             {
@@ -717,8 +719,7 @@ namespace Extract.AttributeFinder.Rules
                 dbConnection = GetDatabaseConnection(out databaseWorkingCopyFileName, 
                     out originalSQLCEDBFileName);
 
-                AttributeStatusInfo.InitializeForQuery(
-                    sourceAttributes, sourceDocName, dbConnection, null);
+                AttributeStatusInfo.InitializeForQuery(sourceAttributes, sourceDocName, dbConnection);
 
                 DataEntryQuery query = DataEntryQuery.Create(Query, null, dbConnection);
 
@@ -838,7 +839,7 @@ namespace Extract.AttributeFinder.Rules
                     try
                     {
                         // The path is already expanded, so there is no need to provide _pathTags.
-                        return tempDatabaseConnectionInfo.OpenConnection(false);
+                        return tempDatabaseConnectionInfo.OpenConnection();
                     }
                     catch
                     {
@@ -855,7 +856,7 @@ namespace Extract.AttributeFinder.Rules
                 }
                 else
                 {
-                    return DatabaseConnectionInfo.OpenConnection(false, _pathTags);
+                    return DatabaseConnectionInfo.OpenConnection();
                 }
             }
 

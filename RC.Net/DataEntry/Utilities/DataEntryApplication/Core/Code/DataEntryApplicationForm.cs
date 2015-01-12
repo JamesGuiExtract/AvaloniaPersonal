@@ -1,3 +1,4 @@
+using Extract.Database;
 using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
 using Extract.FileActionManager.Forms;
 using Extract.Imaging.Forms;
@@ -158,12 +159,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The settings for this application.
         /// </summary>
-        ConfigSettings<Settings> _applicationConfig;
+        ConfigSettings<Properties.Settings> _applicationConfig;
 
         /// <summary>
         /// The user settings to be persisted to the registry for this application.
         /// </summary>
-        RegistrySettings<Settings> _registry;
+        RegistrySettings<Properties.Settings> _registry;
 
         /// <summary>
         /// The verificaton task settings.
@@ -388,32 +389,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         ApplicationCommand _redoCommand;
 
         /// <summary>
-        /// The database connection to be used for any validation or auto-update queries requiring a
-        /// database.
+        /// DatabaseConnectionInfo instances to be used for any validation or auto-update queries
+        /// requiring a database; The key is the connection name (blank for default connection).
         /// </summary>
-        DbConnection _dbConnection;
-
-        /// <summary>
-        /// A map for each database being used from the original source location to the local
-        /// temporary copy.
-        /// </summary>
-        Dictionary<string, TemporaryFile> _localDbCopies = new Dictionary<string, TemporaryFile>();
-
-        /// <summary>
-        /// A map for each database being used of the last time the source DB was modified so that
-        /// a new copy can be retrieved if needed.
-        /// </summary>
-        Dictionary<string, DateTime?> _lastDbModificationTimes = new Dictionary<string, DateTime?>();
-
-        /// <summary>
-        /// The path of the source DB.
-        /// </summary>
-        string _dataSourcePath;
-
-        /// <summary>
-        /// The connection string used to open the current database connection.
-        /// </summary>
-        string _currentDbConnectionString;
+        Dictionary<string, DatabaseConnectionInfo> _dbConnections =
+            new Dictionary<string, DatabaseConnectionInfo>();
 
         /// <summary>
         /// The user-specified settings for the data entry application.
@@ -569,10 +549,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // Initialize the application settings.
                 _applicationConfig =
-                    new ConfigSettings<Settings>(expandedConfigFileName, false, false);
+                    new ConfigSettings<Properties.Settings>(expandedConfigFileName, false, false);
 
                 // Initialize the user registry settings.
-                _registry = new RegistrySettings<Settings>(@"Software\Extract Systems\DataEntry");
+                _registry = new RegistrySettings<Properties.Settings>(
+                    @"Software\Extract Systems\DataEntry");
 
                 _brandingResources = new BrandingResourceManager(
                     DataEntryMethods.ResolvePath(_applicationConfig.Settings.ApplicationResourceFile));
@@ -1588,23 +1569,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     components = null;
                 }
 
-                if (_dbConnection != null)
-                {
-                    _dbConnection.Dispose();
-                    _dbConnection = null;
-                }
-
                 if (_dataEntryControlHost != null)
                 {
                     // Will cause the control host to be disposed of.
                     SetDataEntryControlHost(null);
                 }
 
-                // If we were using a temporary local copy of a remote database, delete it now.
-                if (_localDbCopies != null)
+                if (_dbConnections != null)
                 {
-                    CollectionMethods.ClearAndDispose(_localDbCopies);
-                    _localDbCopies = null;
+                    CollectionMethods.ClearAndDispose(_dbConnections);
+                    _dbConnections = null;
                 }
 
                 // Dispose of menu items
@@ -1827,7 +1801,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // If the data entery config didn't change, still need to call
                         // GetDatabaseConnection to get the latest version of the database (in case
                         // it has been updated).
-                        _dataEntryControlHost.DatabaseConnection = GetDatabaseConnection();
+                        _dataEntryControlHost.SetDatabaseConnections(GetDatabaseConnections());
                     }
 
                     // Record database statistics on load
@@ -3597,15 +3571,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         _dataEntryControlHost.ClearData();
 
-                        _dataEntryControlHost.DatabaseConnection = null;
+                        _dataEntryControlHost.SetDatabaseConnections(null);
                     }
 
                     _dataEntryControlHost = dataEntryControlHost;
 
                     if (_dataEntryControlHost != null)
                     {
-                        // If there's a database available, let the control host know about it.
-                        _dataEntryControlHost.DatabaseConnection = GetDatabaseConnection();
+                        // If there's database(s) available, let the control host know about it.
+                        _dataEntryControlHost.SetDatabaseConnections(GetDatabaseConnections());
 
                         // Register for events and engage shortcut handlers for the new DEP
                         _dataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
@@ -4115,144 +4089,203 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
         
         /// <summary>
-        /// Attempts to open a database connection for use by the DEP for validation and
+        /// Attempts to open database connection(s) for use by the DEP for validation and
         /// auto-updates if connection information is specfied in the config settings.
         /// </summary>
-        /// <returns>The <see cref="DbConnection"/>. If no database connection is currently
-        /// configured, any open connection will be closed and <see langword="null"/> will returned.
+        /// <returns>A dictionary of <see cref="DbConnection"/>(s) where the key is the connection
+        /// name (blank for default). If no database connection is currently configured, any open
+        /// connection will be closed and <see langword="null"/> will returned.
         /// </returns>
-        DbConnection GetDatabaseConnection()
+        Dictionary<string, DbConnection> GetDatabaseConnections()
         {
             try
             {
-                string connectionString = "";
-
-                if (_activeDataEntryConfig != null &&
-                    !string.IsNullOrEmpty(_activeDataEntryConfig.Config.Settings.DatabaseType))
+                if (_activeDataEntryConfig == null)
                 {
-                    // A full connection string has been provided.
-                    if (!string.IsNullOrEmpty(_activeDataEntryConfig.Config.Settings.DatabaseConnectionString))
+                    CollectionMethods.ClearAndDispose(_dbConnections);
+                }
+                else
+                {
+                    // Retrieve the databaseConnections XML section from the active configuration if
+                    // it exists
+                    IXPathNavigable databaseConnections =
+                        _activeDataEntryConfig.Config.GetSectionXml("databaseConnections");
+
+                    bool loadedDefaultConnection = false;
+
+                    // Parse and create/update each specified connection.
+                    XPathNavigator databaseConnectionsNode = null;
+                    if (databaseConnections != null)
                     {
-                        ExtractException.Assert("ELI26157", "Either a database connection string " +
-                            "can be specified, or a local datasource-- not both.",
-                            string.IsNullOrEmpty(_activeDataEntryConfig.Config.Settings.LocalDataSource));
+                        databaseConnectionsNode = databaseConnections.CreateNavigator();
 
-                        connectionString = _activeDataEntryConfig.Config.Settings.DatabaseConnectionString;
-
-                        // If a DB connection is open but the connectionString has changed, close
-                        // the current connection.
-                        if (_dbConnection != null && _currentDbConnectionString != connectionString)
+                        if (databaseConnectionsNode.MoveToFirstChild())
                         {
-                            _dbConnection.Dispose();
-                            _dbConnection = null;
+                            do
+                            {
+                                bool isDefaultConnection = false;
+                                LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
+
+                                ExtractException.Assert("ELI37781",
+                                    "Multiple default connections are defined.",
+                                    !isDefaultConnection || !loadedDefaultConnection);
+
+                                loadedDefaultConnection |= isDefaultConnection;
+                            }
+                            while (databaseConnectionsNode.MoveToNext());
                         }
                     }
-                    // A local datasource has been specfied; compute the connection string.
-                    else if (!string.IsNullOrEmpty(_activeDataEntryConfig.Config.Settings.LocalDataSource))
+
+                    // If there was no default database connection specified via the
+                    // databaseConnections section, attempt to load it via the legacy DB properties.
+                    if (!loadedDefaultConnection && _activeDataEntryConfig != null)
                     {
-                        ExtractException.Assert("ELI26158", "Either a database connection string " +
-                            "can be specified, or a local datasource-- not both.",
-                            string.IsNullOrEmpty(_activeDataEntryConfig.Config.Settings.DatabaseConnectionString));
-
-                        // Resolve path as lower-case to make lookups in _localDbCopies and
-                        // _lastDbModificationTimes case-insensitive.
-                        _dataSourcePath =
-                            DataEntryMethods.ResolvePath(_activeDataEntryConfig.Config.Settings.LocalDataSource)
-                            .ToLower(CultureInfo.CurrentCulture);
-
-                        // Keep track of whether we need to make a new copy of the source DB.
-                        bool getNewCopy = false;
-                        DateTime? lastDbModificationTime = null;
-                        TemporaryFile oldDbCopy = null;
-
-                        // [DataEntry:399, 688, 986]
-                        // Whether or not the file is accessed via a network share, create and use a
-                        // local copy. Though multiple connections are allowed to a local file, the
-                        // connections cannot see each other's changes.
-                        TemporaryFile localDbCopy;
-                        if (!_localDbCopies.TryGetValue(_dataSourcePath, out localDbCopy)
-                            || localDbCopy == null)
-                        {
-                            localDbCopy = new TemporaryFile(true);
-                            getNewCopy = true;
-                        }
-                        // Create a new connection string (and, thus, connection) if the source
-                        // database has been updated.
-                        else if (!_lastDbModificationTimes.TryGetValue(_dataSourcePath, out lastDbModificationTime) ||
-                                 File.GetLastWriteTime(_dataSourcePath) > lastDbModificationTime.Value)
-                        {
-                            oldDbCopy = localDbCopy;
-                            localDbCopy = new TemporaryFile(true);
-                            getNewCopy = true;
-                        }
-                        else
-                        {
-                            // [DataEntry:1182]
-                            // The local copy is up-to-date, but it may be a different DB than is
-                            // currently in use.
-                            connectionString = "Data Source='" + localDbCopy.FileName + "';";
-                            if (connectionString != _currentDbConnectionString)
-                            {
-                                getNewCopy = true;
-                            }
-                        }
-
-                        if (getNewCopy)
-                        {
-                            // Before opening the new connection, close the old one.
-                            if (_dbConnection != null)
-                            {
-                                _dbConnection.Dispose();
-                                _dbConnection = null;
-                            }
-
-                            // Delete the old SQL CE working copy (if one exists).
-                            if (oldDbCopy != null)
-                            {
-                                oldDbCopy.Dispose();
-                            }
-
-                            FileSystemMethods.PerformFileOperationWithRetry(() =>
-                                File.Copy(_dataSourcePath, localDbCopy.FileName, true),
-                                true);
-
-                            _localDbCopies[_dataSourcePath] = localDbCopy;
-                            _lastDbModificationTimes[_dataSourcePath] = File.GetLastWriteTime(_dataSourcePath);
-                        }
-
-                        connectionString = "Data Source='" + localDbCopy.FileName + "';";
+                        SetDatabaseConnection("",
+                            _activeDataEntryConfig.Config.Settings.DatabaseType,
+                            _activeDataEntryConfig.Config.Settings.LocalDataSource,
+                            _activeDataEntryConfig.Config.Settings.DatabaseConnectionString);
                     }
                 }
 
-                _currentDbConnectionString = connectionString;
-
-                // As long as connection information was provieded one way or another,
-                // create and open the database connection.
-                if (_dbConnection == null && !string.IsNullOrEmpty(connectionString))
-                {
-                    Type dbType = Type.GetType(_activeDataEntryConfig.Config.Settings.DatabaseType);
-                    _dbConnection = (DbConnection)Activator.CreateInstance(dbType);
-                    _dbConnection.ConnectionString = connectionString;
-                    _dbConnection.Open();
-                }
-
-                return _dbConnection;
+                // This class keeps track of DatabaseConfigurationInfo objects for ease of
+                // management, but the DataEntryControlHost only cares about the DbConnections
+                // themselves; return the managed connection for each.
+                return _dbConnections.ToDictionary(
+                    (conn) => conn.Key, (conn) => conn.Value.ManagedDbConnection);
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI26159",
-                    "Failed to open database connection!", ex);
-                if (_activeDataEntryConfig != null)
+                throw ex.AsExtract("ELI26159");
+            }
+        }
+
+        /// <summary>
+        /// Given the specified <see paramref="databaseConnectionsNode"/>, creates or updates the
+        /// specified database connection for use in the <see cref="DataEntryControlHost"/>.
+        /// </summary>
+        /// <param name="databaseConnectionsNode">A <see cref="XPathNavigator"/> instance from a
+        /// data entry config file defining the connection.</param>
+        /// <param name="isDefaultConnection"><see langword="true"/> if the connection is defined as
+        /// the default database connection; otherwise, <see langword="false"/>.</param>
+        void LoadDatabaseConnection(XPathNavigator databaseConnectionsNode,
+            out bool isDefaultConnection)
+        {
+            isDefaultConnection = false;
+            string connectionName = "";
+            string databaseType = "";
+            string localDataSource = "";
+            string databaseConnectionString = "";
+
+            XPathNavigator attribute = databaseConnectionsNode.Clone();
+            if (attribute.MoveToFirstAttribute())
+            {
+                do
                 {
-                    ee.AddDebugData("Database type", 
-                        _activeDataEntryConfig.Config.Settings.DatabaseType, false);
-                    ee.AddDebugData("Local datasource",
-                        _activeDataEntryConfig.Config.Settings.LocalDataSource, false);
-                    ee.AddDebugData("Connection string",
-                        _activeDataEntryConfig.Config.Settings.DatabaseConnectionString, false);
+                    if (attribute.Name.Equals("name", StringComparison.OrdinalIgnoreCase))
+                    {
+                        connectionName = attribute.Value;
+                    }
+                    else if (attribute.Name.Equals("default", StringComparison.OrdinalIgnoreCase))
+                    {
+                        isDefaultConnection = attribute.Value.ToBoolean();
+                    }
+                }
+                while (attribute.MoveToNextAttribute());
+            }
+
+            XPathNavigator connectionProperty = databaseConnectionsNode.Clone();
+            if (connectionProperty.MoveToFirstChild())
+            {
+                // Load all properties of the defined connection.
+                do
+                {
+                    if (connectionProperty.Name.Equals("databaseType",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        databaseType = connectionProperty.Value;
+                    }
+                    else if (connectionProperty.Name.Equals("localDataSource",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        localDataSource = connectionProperty.Value;
+                    }
+                    else if (connectionProperty.Name.Equals("databaseConnectionString",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        databaseConnectionString = connectionProperty.Value;
+                    }
+                }
+                while (connectionProperty.MoveToNext());
+
+                if (string.IsNullOrWhiteSpace(connectionName))
+                {
+                    // If the connection is not named, assume it to be the default.
+                    isDefaultConnection = true;
+                }
+                else
+                {
+                    SetDatabaseConnection(connectionName,
+                        databaseType, localDataSource, databaseConnectionString);
                 }
 
-                throw ee;
+                // If this is the default connection, add the connection under a blank name as well
+                // (blank in _dbConnections indicates the default connection.) 
+                if (isDefaultConnection && !string.IsNullOrEmpty(connectionName))
+                {
+                    _dbConnections[""] = _dbConnections[connectionName];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds or updates <see cref="_dbConnections"/> with a <see cref="DatabaseConnectionInfo"/>
+        /// instance under the specified <see paramref="name"/>.
+        /// </summary>
+        /// <param name="name">The name of the connection ("" for the default connection)</param>
+        /// <param name="databaseType">The qualified type name of the database connection.</param>
+        /// <param name="localDataSource">If using an SQL CE DB, the name of the DB file can be
+        /// specified here in lieu of the <see paramref="connectionString"/>.</param>
+        /// <param name="connectionString">The connection string to use when connecting to the DB.
+        /// </param>
+        void SetDatabaseConnection(string name, string databaseType, string localDataSource,
+            string connectionString)
+        {
+            if (!string.IsNullOrWhiteSpace(localDataSource))
+            {
+                ExtractException.Assert("ELI37778", "Either a database connection string " +
+                    "can be specified, or a local datasource-- not both.",
+                    string.IsNullOrEmpty(connectionString), "Local data source", localDataSource,
+                    "Connection string", connectionString);
+
+                connectionString = SqlCompactMethods.BuildDBConnectionString(
+                    DataEntryMethods.ResolvePath(localDataSource).ToLower(CultureInfo.CurrentCulture));
+            }
+
+            DatabaseConnectionInfo dbConnInfo = null;
+            if (_dbConnections.TryGetValue(name, out dbConnInfo))
+            {
+                // If there is an existing connection by this name that differs from the newly
+                // specified one (or there is no newly specified connection) close the existing
+                // connection.
+                if (string.IsNullOrWhiteSpace(connectionString) ||
+                    Type.GetType(databaseType) != dbConnInfo.TargetConnectionType ||
+                    connectionString != dbConnInfo.ConnectionString)
+                {
+                    _dbConnections.Remove(name);
+                    if (dbConnInfo != null)
+                    {
+                        dbConnInfo.Dispose();
+                        dbConnInfo = null;
+                    }
+                }
+            }
+
+            // Create the DatabaseConnectionInfo instance if needed.
+            if (dbConnInfo == null && !string.IsNullOrWhiteSpace(connectionString))
+            {
+                dbConnInfo = new DatabaseConnectionInfo(databaseType, connectionString);
+                dbConnInfo.UseLocalSqlCeCopy = true;
+                _dbConnections[name] = dbConnInfo;
             }
         }
 
