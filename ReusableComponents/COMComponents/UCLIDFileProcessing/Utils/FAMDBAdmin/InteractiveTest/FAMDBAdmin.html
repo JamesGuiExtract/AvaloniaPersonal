@@ -23,7 +23,7 @@
 <ul>
     	<li>A <b>Database server name</b> combo box is presented.</li>
     	<li>If both a <b>Server</b> and a <b>Database name</b> have been previously selected, 
-confirm that both names are preloaded into the combo boxes.</li>
+	confirm that both names are preloaded into the combo boxes.</li>
     	<li>Confirm that the combo box includes <b>(local)</b> as a option if SQL Server has 
 	been installed or not if only the native client was installed.
     	<ul>
@@ -226,13 +226,52 @@ confirm that both names are preloaded into the combo boxes.</li>
         	<li>Confirm that <b>Export file list...</b> brings up the file list export 
 		dialog with the scope prepopulated to export a list of the files in the 
 		relevant cell.</li>
+        	<li>Confirm that <b>Inspect files...</b> brings up the FAM File Inspector 
+		window with the scope prepopulated to list the files in the relevant cell.</li>
         	<li>Confirm that <b>View exceptions for failed files...</b> brings up a 
 		temporary UEX log displaying the exceptions associated with failures for 
 		the relevant action.</li>
+        	<li>Confirm that <b>Copy count</b> copies the number in the relevant cell to 
+		the Clipboard.</li>
+<p>
+  	   	<LI><b>[ISSUE-12411]</b> DB Admin - Viewing Exceptions
+        	<ul>
+			<li>Open a <b>DB Admin</b> instance to a large database such as 
+			was used for the <b>TX - Tarrant</b> project.
+			<li>Confirm that <b>Inspect files</b> works without a long delay.
+			<li>Confirm that <b>View exceptions</b> works without a long delay.
+        	</ul>
+    	</ul></li>
+<p>
+    	<li>Confirm that right-clicking in an Action Name cell in the summary tab provides a 
+	context menu.
+    	<ul>
+        	<li>Confirm that <b>View exceptions for failed files...</b> brings up a 
+		temporary UEX log displaying the exceptions associated with failures for 
+		the relevant action.</li>
+        	<li>Confirm that <b>Copy action name</b> copies the action name in the 
+		cell to the Clipboard.</li>
     	</ul></li>
 <p>
    	<LI><b>[LegacyRC #6106]</b> Confirm that the <b>Unattempted</b> column on the 
 	DB Admin Summary tab will no longer display negative numbers while queuing.
+<p>
+  	<LI><b>[ISSUE-11366]</b> Inaccurate FAM DB Statistics
+       	<ul>
+		<li>Use <b>SQL Management Studio</b> to modify <b>ActionStatistics</b>.
+		<li>Confirm negative values are displayed on the <b>Summary</b> tab.
+		<li>Confirm that a message box is presented to the user with 
+		useful instructions about how to recalculate summary statistics.
+       	</ul>
+<p>
+   	<LI><b>[ISSUE-12309]</b> Last Updated
+      	<ul>
+		<li>Confirm that the <b>Summary</b> tab includes a <b>Last Updated:</b> 
+		timestamp.
+		<li>Confirm that the timestamp is updated each time the <b>Refresh</b> 
+		button is clicked.
+		<li>Confirm that the timestamp is presented in local time.
+       	</ul>
 </ul>
 
 <h2>Database Menu</h2>
@@ -263,10 +302,13 @@ confirm that both names are preloaded into the combo boxes.</li>
 		and database settings</b> checkbox) from the database.
         	<ul>
             		<li>Export a list of all files via <b>Tools - Export File Lists...</b>.</li>
-            		<li>Confirm that <b>0</b> files were exported to the selected output file.</li>
+            		<li>Confirm that <b>0</b> files were exported to the selected output 
+			file.</li>
             		<li>Attempt to rename an Action via <b>Manage - Actions...</b></li>
-            		<li>Confirm that <b>There are no actions inside the current database</b>.</li>
-            		<li>Confirm that counters, tags and users have been removed from the database.</li>
+            		<li>Confirm that <b>There are no actions inside the current 
+			database</b>.</li>
+            		<li>Confirm that counters, tags and users have been removed from the 
+			database.</li>
             		<li>Confirm that the original login password is still effective.</li>
         	</ul></li>
 <p>
@@ -279,8 +321,8 @@ confirm that both names are preloaded into the combo boxes.</li>
 			<li>Confirm that multiple error messages are not displayed.
        		</ul>
 <p>
-            	<li><b>[LegacyRC #6163]</b> Confirm that the DB Admin does <b>not</b> allow you to clear 
-		the database in the following situations:
+            	<li><b>[LegacyRC #6163]</b> Confirm that the DB Admin does <b>not</b> allow you 
+		to clear the database in the following situations:
                 <ul>
                     	<li>FAM is processing documents</lI>
                     	<li>FAM is queueing documents</li>
@@ -288,6 +330,17 @@ confirm that both names are preloaded into the combo boxes.</li>
                     	<li>FAM is listening for documents or waiting for documents to be added to the
                     	queue.</li>
             	</ul></li>
+<p>
+  	   	<LI><b>[ISSUE-12572]</b> Metadata Field Definitions
+        	<ul>
+			<li>Add some metadata field definitions to a database.
+			<li>Clear the database while retaining actions, counters, tags, 
+			users and database settings.
+			<li>Confirm that the metadata field definitions are retained.
+			<li>Clear the database while <b>not</b> retaining actions, counters, 
+			tags, users and database settings.
+			<li>Confirm that the metadata field definitions are removed.
+        	</ul>
     	</ul></li>
 <p>
     	<li><b>Reset Lock</b>
@@ -333,13 +386,13 @@ confirm that both names are preloaded into the combo boxes.</li>
                 		<li>Allow dynamic tag creation</li>
                 		<li>Automatically create actions specified in FPS files</li>
                 		<li>Automatically delete file action comments on completion</li>
-                		<li>Automatically revert locked files</li>                
             		</ul></li>
             		<li>Confirm that there is a spin control for the number of minutes of 
 			inactivity after which to revert files.</li>
 			<ul>
 	            		<li>Confirm that the spin control has a minimum of <b>5</b> and a 
 				maximum of <b>1440</b>.</li>
+	            		<li>Confirm that the default is <b>5</b> minutes.</li>
 			</ul>
             		<li>Confirm that there is a list box with <b>Add</b>, <b>Modify</b>, and 
 			<b>Remove</b> buttons.</li>
@@ -779,22 +832,23 @@ confirm that both names are preloaded into the combo boxes.</li>
 <p>
     	<li><b>Manually set action status...</b>
     	<ul>
-        	<li>Confirm that there is a read-only edit box with an associated <b>Select files...</b>
-        	button.</li>
+        	<li>Confirm that there is a read-only edit box with an associated <b>Select 
+		files...</b> button.</li>
         	<li>Confirm that all actions listed in the database appear in the <b>Action</b> drop 
 		down menu and vice-versa.</li>
-        	<li>Confirm that the action and target status drop down boxes both default to empty.</li>
+        	<li>Confirm that the action and target status drop down boxes both default to 
+		empty.</li>
         	<li>Confirm that you are required to specify an action and target status.</li>
-        	<li>Use the <b>Apply</b> button to update the action status for <b>all files referenced 
-		in the database</b>. Confirm that the status has been updated for all files for the 
-		selected action and that the dialog remains open.</li>
+        	<li>Use the <b>Apply</b> button to update the action status for <b>all files 
+		referenced in the database</b>. Confirm that the status has been updated for 
+		all files for the selected action and that the dialog remains open.</li>
         	<li>Use the <b>OK</b> button to update the action status for <b>all files referenced 
 		in the database</b>. Confirm that the status has been updated for all files for the 
 		selected action and that the dialog has closed.</li>
-        	<li>Confirm that <b>CTRL+M</b> performs the same function as selecting <b>Manually Set 
-        	Action Status</b> from the <b>Action</b> menu.</li>
-        	<li>Confirm that the <b>Summary</b> tab is refreshed after an action status is manually 
-		set.</li>
+        	<li>Confirm that <b>CTRL+M</b> performs the same function as selecting <b>Manually 
+		Set Action Status</b> from the <b>Action</b> menu.</li>
+        	<li>Confirm that the <b>Summary</b> tab is refreshed after an action status is 
+		manually set.</li>
         	<li><b>[LegacyRC #5106] NOT FIXED!</b>Confirm that "Status of Action" radio button can 
 		be selected by using Tab and Arrow key.</li>
 <p>
@@ -839,9 +893,12 @@ confirm that both names are preloaded into the combo boxes.</li>
 			</ul>
 		</ul>
 <p>
-  	   	<LI><b>[LegacyRC #6276]</b> Confirm that the <b>UpdateFileActionStateTransitionTable</b> 
-		entry in the <b>DBInfo</b> table is respected for using <b>Tools - Manually set action 
-		status</b> from DB Admin.
+  	   	<LI><b>[LegacyRC #6276]</b> Confirm that the 
+		<b>UpdateFileActionStateTransitionTable</b> entry in the <b>DBInfo</b> table 
+		is respected for using <b>Tools - Manually set action status</b> from DB Admin.
+<p>
+  	   	<LI><b>[ISSUE-12412]</b> Confirm that the <b>Manually Set Action Status</b> 
+		dialog has enough space in its combo boxes for long action names.
     	</ul></li>
 <p>
     	<li><b>Manually set file processing priority...</b>
@@ -1169,7 +1226,8 @@ confirm that both names are preloaded into the combo boxes.</li>
         	<li>Confirm that a meaningful error message is presented and that processing does not 
         	start.</li>
 <p>
-        	<li>Remain logged in to the test machine as a user with a <b>defined</b> password.</li>
+        	<li>Remain logged in to the test machine as a user with a <b>defined</b> 
+		password.</li>
         	<li>Create a new database.</li>
         	<li>Confirm that the caption for the notification message about setting the database 
         	password is <b>Set Admin Password</b>.</li>
@@ -1186,10 +1244,12 @@ confirm that both names are preloaded into the combo boxes.</li>
     	<li><b>[LegacyRC #5943]</b> Menu items after clearing while processing
     	<ul>
         	<li>Create a database, queue some files, and start them processing.</li>
-        	<li>While files are being processed, open the DB Admin and try to clear the database.</li>
-        	<li>A dialog will appear informing you that there is active processing; dismiss it.</li>
-        	<li>Confirm that all appropriate menu items (e.g., Reset lock, Change password) are still
-        	enabled.</li>
+        	<li>While files are being processed, open the DB Admin and try to clear the 
+		database.</li>
+        	<li>A dialog will appear informing you that there is active processing; dismiss 
+		it.</li>
+        	<li>Confirm that all appropriate menu items (e.g., Reset lock, Change password) 
+		are still enabled.</li>
     	</ul></li>
 <p>
     	<li><b>[LegacyRC #5957]</b> Context menu and refresh
@@ -1218,6 +1278,24 @@ confirm that both names are preloaded into the combo boxes.</li>
 			<li>Export a file list.
 		</ul>
 	</ul>
+<p>
+   	<LI><b>[ISSUE-12469]</b> FAM Database
+       	<ul>
+		<li>Confirm that a current FAM database contains a <b>MetadataField</b> 
+		table.
+		<ul>
+			<li>ID
+			<li>Name
+		</ul>
+		<li>Confirm that a current FAM database contains a 
+		<b>FileMetadataFieldValue</b> table.
+		<ul>
+			<li>ID
+			<li>FileID
+			<li>MetadataFieldID
+			<li>Value
+		</ul>
+       	</ul>
 </ul>
 </body>
 </html>
