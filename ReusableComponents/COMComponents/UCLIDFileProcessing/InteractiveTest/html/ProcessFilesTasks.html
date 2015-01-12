@@ -1012,8 +1012,21 @@
             to decrypt files that are not encrypted.</li>
             <li><b>[DotNet #665]</b> Confirm that the task will create the destination folder if
             it is not already present.</li>
+    </ul> 
+<p>
+    	<li><b>Core: Enhance OCR</b>
+        <ul> 
+<p>
+  	   	<LI><b>[ISSUE-12532, ISSUE-12533]</b> Enhance OCR
+        	<ul>
+			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12521</b>.
+			<li>Copy <b>nuance19.11_A_0102.tif.uss</b> to <b>A_0102.tif.uss</b>.
+			<li>Exercise <b>test.rsd</b> against <b>A_0102.tif.uss</b>.
+			<li>Confirm that the rules run without error.
+			<li>Confirm that the found output is from <b>page 4</b>.
+        	</ul>
         </ul></li>
-    <p>
+<p>
         <li><b>Core: Execute rules</b>
         <ul> 
             <li>Select <b>Core: Execute rules</b> as the task using the Add button.
@@ -1318,28 +1331,32 @@
             <li>Confirm that an appropriate message is displayed if you provide a blank or
             incorrect password.</li>
 <p>
-            <li><b>[LegacyRC #5969]</b> Single quotes in new SourceDocName
-            <ul>
-                <li>Confirm that you cannot use the Modify SourceDocName for a SQL injection 
-                attack. One possibility is to set your new SourceDocName to
-                &lt;SourceDocName&gt;'WHERE FileName='&lt;SourceDocName&gt;';DROP TABLE
-                [FileActionStateTransition];UPDATE [FAMFile] SET [FileName] = 
-                '&lt;SourceDocName&gt;</li>
-            </ul></li>
+            	<li><b>[LegacyRC #5969]</b> Single quotes in new SourceDocName
+            	<ul>
+                	<li>Confirm that you cannot use the Modify SourceDocName for a SQL 
+			injection attack. One possibility is to set your new SourceDocName to 
+                	&lt;SourceDocName&gt;'WHERE FileName='&lt;SourceDocName&gt;';DROP TABLE 
+                	[FileActionStateTransition];UPDATE [FAMFile] SET [FileName] = 
+			'&lt;SourceDocName&gt;</li>
+            	</ul></li>
 <p>
-            <li><b>[LegacyRC #5979]</b> Couldn't be run as a service
-            <ul>
-                <li>Configure a database to require authentication to run.</li>
-                <li>Confirm that the FAM requires the admin password to run.</li>
-                <li>Confirm that the service also requires the admin password; this should 
-                prevent any files from being processed.</li>
-                <li>Add the machine name to the SkipAuthenticationOnMachines dbinfo setting.</li>
-                <li>Confirm that the FAM still requires the admin password.</li>
-                <li>Confirm that the service no longer requires the admin password.</li>
-                <li>Confirm that the same behavior happens if the database is <b>not</b> set to
-                require authentication, but the FAM includes a task that <b>does</b> require
-                administrative privileges.</li>
-            </ul></li>
+            	<li><b>[LegacyRC #5979]</b> Couldn't be run as a service
+            	<ul>
+                	<li>Configure a database to require authentication to run.</li>
+                	<li>Confirm that the FAM requires the admin password to run.</li>
+                	<li>Confirm that the service also requires the admin password; this should 
+                	prevent any files from being processed.</li>
+                	<li>Add the machine name to the SkipAuthenticationOnMachines dbinfo 
+			setting.</li>
+                	<li>Confirm that the FAM still requires the admin password.</li>
+                	<li>Confirm that the service no longer requires the admin password.</li>
+                	<li>Confirm that the same behavior happens if the database is <b>not</b> 
+			set to require authentication, but the FAM includes a task that 
+			<b>does</b> require administrative privileges.</li>
+            	</ul></li>
+<p>
+  	   	<LI><b>[ISSUE-12587]</b> Confirm that the <b>Core: Modify source document name 
+		in database</b> task works correctly for a filename that contains an apostrophe.
         </ul></li>
     <p>
         <li><b>Core: OCR document</b>
@@ -1671,31 +1688,47 @@ ORDER BY DateTimeStamp<br>
 <p>
         <li><b>Core: Set file priority</b>
         <ul>
-            <li>Use the add button to select <b>Core: Set file priority</b> as the the task.</li>
-            <li>Confirm that this task requires a FLEX Index or ID Shield <b>server</b> 
-            license.</li>
-            <li>Confirm that there is a textbox for <b>Filename</b> with a default value of
-            <b>&lt;SourceDocName&gt;</b>.</li>
-            <li>Confirm that there is an associated <b>tag selector</b> and <b>browse</b> button
-            and that they work correctly.</li>
-            <li>Confirm that there is a dropdown for <b>Priority</b> with a default value of
-            <b>Normal</b>.</li>
-            <li>Confirm that the dropdown options are
-            <ul>
-                <li>Low</li>
-                <li>Below Normal</li>
-                <li>Normal</li>
-                <li>Above Normal</li>
-                <li>High</li>
-            </ul></li>
-        <P>
-            <li>Confirm that priority can be changed for a document other than 
-            <b>&lt;SourceDocName&gt;</b>.</li>
-            <li>Confirm that priority can be set to any of the priority options.</li>
-            <li>Confirm that the task fails appropriately when setting priority for a file that
-            does not exist in the database.</lI>
+            	<li>Use the add button to select <b>Core: Set file priority</b> as the the 
+		task.</li>
+            	<li>Confirm that this task requires a FLEX Index or ID Shield <b>server</b> 
+            	license.</li>
+            	<li>Confirm that there is a textbox for <b>Filename</b> with a default value of
+            	<b>&lt;SourceDocName&gt;</b>.</li>
+            	<li>Confirm that there is an associated <b>tag selector</b> and <b>browse</b> 
+		button and that they work correctly.</li>
+            	<li>Confirm that there is a dropdown for <b>Priority</b> with a default value of
+            	<b>Normal</b>.</li>
+            	<li>Confirm that the dropdown options are
+            	<ul>
+                	<li>Low</li>
+                	<li>Below Normal</li>
+                	<li>Normal</li>
+                	<li>Above Normal</li>
+                	<li>High</li>
+            	</ul></li>
+<P>
+            	<li>Confirm that priority can be changed for a document other than 
+            	<b>&lt;SourceDocName&gt;</b>.</li>
+            	<li>Confirm that priority can be set to any of the priority options.</li>
+            	<li>Confirm that the task fails appropriately when setting priority for a file 
+		that does not exist in the database.</lI>
         </ul></li>
-    <p>
+<p>
+  	   	<LI><b>[ISSUE-12490, ISSUE-12491]</b> Set File Priority
+        	<ul>
+			<li>Reset the <b>Demo_IDShield</b> database.
+			<li>Modify one or more of the Input filenames to include an 
+			apostrophe character.
+			<li>Queue the files.
+			<li>Exercise <b>Core: Set file priority</b>.
+			<li>Confirm that file priority is correctly changed for the filenames 
+			with apostrophes.
+			<li>Supply some files from the <b>I:\</b> drive. It is expected that 
+			these files are supplied with short filenames.
+			<li>Exercise <b>Core: Set file priority</b>.
+			<li>Confirm that priority is changed as expected.
+        	</ul>
+<p>
         <li><b>Core: Sleep</b>
         <ul> 
             <li>Confirm that an <b>Core: Sleep</b> task exists.
@@ -1892,12 +1925,53 @@ ORDER BY DateTimeStamp<br>
 			<li><b>Tools - Zoom window</b>
 			<li><b>Tools - Pan</b>
 		</ul>
+<p>
 		<li><b>[JIRA #12287]</b> Confirm that the following shortcut keys have no 
 		effect.
 		<ul>
 			<li><b>H</b> - for the highlight tool
 			<li><b>ESC</b> - for the selection tool
 		</ul>
+<p>
+  	   	<LI><b>[ISSUE-12419]</b> Restrict Tags For View Image Task
+        	<ul>
+			<li>Confirm that the <b>Core: View image</b> 
+			property page includes a checkbox for <b>Allow user to apply 
+			tags to the document</b>.
+			<li>Confirm presence of an associated <b>Settings...</b> 
+			button.
+			<li>Confirm that the checkbox is checked by default.
+			<li>Confirm that clicking the Settings button displays a 
+			<b>Select Tags</b> dialog.
+			<li><u>Select Tags</u>
+			<ul>
+				<li>Confirm presence of a <b>Display all available tags</b> 
+				checkbox.
+				<li>Confirm that this is checked by default.
+				<li>Confirm presence of a <b>Display these tags</b> 
+				checkbox.
+				<li>Confirm that a multi-line checked list box contains 
+				each defined tag.
+				<li>Confirm presence of a <b>Display any tags that match 
+				these wildcard patterns:</b> checkbox.
+				<li>Confirm presence of an associated edit box.
+				<li>Confirm that the edit box is enabled only when the 
+				checkbox is checked.
+				<li>Confirm presence of an associated balloon help icon.
+				<li>Confirm that the balloon help notes use of <b>?</b> and 
+				<b>*</b> as wildcard characters.
+				<li>Confirm that settings are persistent.
+			</ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Confirm that the <b>Core: View image</b> 
+				task can <b>Display all available tags</b>.
+				<li>Confirm that the <b>Core: View image</b> 
+				task can display a specified subset of tags.
+				<li>Confirm that the <b>Core: View image</b> 
+				task can display tags specified via wildcard patterns.
+			</ul>
+        	</ul>
 	</ul></li>
 </ul>
 </ol>
