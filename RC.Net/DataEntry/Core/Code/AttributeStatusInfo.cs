@@ -1332,45 +1332,42 @@ namespace Extract.DataEntry
                 // table end up getting cleared.
                 statusInfo.LastAppliedStringValue = value.String;
 
-                if (EndEditInProgress)
+                if (EndEditInProgress || !endOfEdit)
                 {
                     // If EndEdit is currently being processed (and this is a result of it), raise
-                    // the non-incremental modification event now.
-                    statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo, true);
+                    // the non-incremental modification event; otherwise, if this change is not
+                    // triggering EndOfEdit, raise an incremental modification event to queue the
+                    // value for an eventual non-incremental event.
+                    statusInfo.OnAttributeValueModified(
+                        attribute, !EndEditInProgress, acceptSpatialInfo, true);
+                }
+
+                // https://extract.atlassian.net/browse/ISSUE-12662
+                // Whether or not EndEditInProgress, track modified attributes for the purpose of
+                // keeping track of which attributes need to be validated.
+                KeyValuePair<bool, SpatialString> existingModification;
+                if (_attributesBeingModified.TryGetValue(attribute, out existingModification))
+                {
+                    // If the attribute already exists in _attributesBeingModified, but is
+                    // marked as a non-spatial change, mark it as a spatial change instead.
+                    if (existingModification.Key == false)
+                    {
+                        _attributesBeingModified[attribute] =
+                            new KeyValuePair<bool, SpatialString>(
+                                true, existingModification.Value);
+                    }
                 }
                 else
                 {
-                    if (!endOfEdit)
-                    {
-                        // If not the end of the edit raise an incremental modification event and
-                        // queue the value for an eventual non-incremental event.
-                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo, true);
-                    }
+                    // If the attribute has not been added to _attributesBeingModified, add it.
+                    _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
+                        true, modifiedAttributeMemento.OriginalValue);
+                }
 
-                    KeyValuePair<bool, SpatialString> existingModification;
-                    if (_attributesBeingModified.TryGetValue(attribute, out existingModification))
-                    {
-                        // If the attribute already exists in _attributesBeingModified, but is
-                        // marked as a non-spatial change, mark it as a spatial change instead.
-                        if (existingModification.Key == false)
-                        {
-                            _attributesBeingModified[attribute] =
-                                new KeyValuePair<bool, SpatialString>(
-                                    true, existingModification.Value);
-                        }
-                    }
-                    else
-                    {
-                        // If the attribute has not been added to _attributesBeingModified, add it.
-                        _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
-                            true, modifiedAttributeMemento.OriginalValue);
-                    }
-
-                    // After queing the modification, call EndEdit if directed.
-                    if (endOfEdit)
-                    {
-                        EndEdit();
-                    }
+                // After queing the modification, call EndEdit if directed.
+                if (!EndEditInProgress && endOfEdit)
+                {
+                    EndEdit();
                 }
             }
             catch (Exception ex)
@@ -1505,23 +1502,19 @@ namespace Extract.DataEntry
 
                     AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                    if (EndEditInProgress)
-                    {
-                        // If EndEdit is currently being processed (and this is a result of it), raise
-                        // the non-incremental modification event now.
-                        statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo, false);
-                    }
-                    else
-                    {
-                        // Raise an incremental modification event and queue the value for an
-                        // eventual non-incremental event.
-                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo, false);
+                    // If EndEdit is currently being processed (and this is a result of it), raise
+                    // the non-incremental modification event; otherwise, if this change is not
+                    // triggering EndOfEdit, raise an incremental modification event to queue the
+                    // value for an eventual non-incremental event.
+                    statusInfo.OnAttributeValueModified(attribute, !EndEditInProgress, acceptSpatialInfo, false);
 
-                        if (!_attributesBeingModified.ContainsKey(attribute))
-                        {
-                            _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
-                                false, modifiedAttributeMemento.OriginalValue);
-                        }
+                    // https://extract.atlassian.net/browse/ISSUE-12662
+                    // Whether or not EndEditInProgress, track modified attributes for the purpose of
+                    // keeping track of which attributes need to be validated.
+                    if (!_attributesBeingModified.ContainsKey(attribute))
+                    {
+                        _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
+                            false, modifiedAttributeMemento.OriginalValue);
                     }
                 }
 
@@ -2986,20 +2979,18 @@ namespace Extract.DataEntry
                     _endEditRecursionBlock = true;
                     _endEditReferenceCount++;
 
-                    // If attributes have been modified since the last end edit, raise 
-                    // IncrementalUpdate == false AttributeValueModified events now.
-                    if (_attributesBeingModified.Count > 0)
-                    {
-                        foreach (KeyValuePair<IAttribute, KeyValuePair<bool, SpatialString>>
-                            modifiedAttribute in _attributesBeingModified)
-                        {
-                            AttributeStatusInfo statusInfo = GetStatusInfo(modifiedAttribute.Key);
-                            statusInfo.OnAttributeValueModified(modifiedAttribute.Key, false, false,
-                                modifiedAttribute.Value.Key);
-                        }
+                    RaiseValueModifedForAttributesBeingModified();
 
-                        _attributesBeingModified.Clear();
-                    }
+                    // https://extract.atlassian.net/browse/ISSUE-12662
+                    // Now that all queries that are to be triggered have triggered, explicitly
+                    // validate all attributes that have been modified; attributes not currently
+                    // displayed will not otherwise be validated unless they use a query that
+                    // explicitly references one of the modified attributes. For example, a regex
+                    // pattern or validation list that is produced independent of the currently
+                    // value will not otherwise get validated.
+                    ValidateAllAttributesBeingModified();
+
+                    _attributesBeingModified.Clear();
                 }
                 finally
                 {
@@ -3410,6 +3401,50 @@ namespace Extract.DataEntry
                         validationTrigger.UpdateValue();
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Updates the validation status of all attributes in <see cref="_attributesBeingModified"/>.
+        /// </summary>
+        static void ValidateAllAttributesBeingModified()
+        {
+            // Retrieve a separate copy of the current _attributesBeingModified so any modifiections
+            // to _attributesBeingModified while executing this method does not cause errors
+            // iterating _attributesBeingModified.
+            var attributesBeingModified = _attributesBeingModified.Keys.Distinct().ToArray();
+
+            // Validate each modified attribute.
+            foreach (IAttribute attribute in attributesBeingModified)
+            {
+                // Use throwException = false to update the validation status without
+                // actually throwing an error.
+                Validate(attribute, false);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="AttributeValueModified"/> event for every entry in
+        /// <see cref="_attributesBeingModified"/> modifed for attributes being modified.
+        /// </summary>
+        static void RaiseValueModifedForAttributesBeingModified()
+        {
+            // https://extract.atlassian.net/browse/ISSUE-12662
+            // Retrieve a separate copy of the current _attributesBeingModified so that
+            // we can continue to add to _attributesBeingModified as auto-update queries are
+            // triggered here.
+            Dictionary<IAttribute, KeyValuePair<bool, SpatialString>> attributesBeingModified =
+                _attributesBeingModified.ToDictionary(
+                    (entry) => entry.Key, (entry) => entry.Value);
+
+            // If attributes have been modified since the last end edit, raise 
+            // IncrementalUpdate == false AttributeValueModified events now.
+            foreach (KeyValuePair<IAttribute, KeyValuePair<bool, SpatialString>>
+                modifiedAttribute in attributesBeingModified)
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(modifiedAttribute.Key);
+                statusInfo.OnAttributeValueModified(modifiedAttribute.Key, false, false,
+                    modifiedAttribute.Value.Key);
             }
         }
 
