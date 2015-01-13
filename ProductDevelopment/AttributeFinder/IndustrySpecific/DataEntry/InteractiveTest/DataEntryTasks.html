@@ -71,6 +71,69 @@
 			<li>Manually edit the <b>City</b> to <b>Brainerd</b>.
 			<li>Confirm that <b>Zip Code</b> is now valid.
         	</ul></li>
+<p>
+		<li><b>Miscellaneous</b>
+		<ul>
+  	   		<LI><b>[ISSUE-12244]</b> Restrict Tags For Verify Extracted Data Task
+        		<ul>
+				<li>Confirm that the <b>Data Entry: Verify extracted data</b> 
+				property page includes a checkbox for <b>Allow user to apply 
+				tags to the document</b>.
+				<li>Confirm presence of an associated <b>Settings...</b> 
+				button.
+				<li>Confirm that the checkbox is checked by default.
+				<li>Confirm that clicking the Settings button displays a 
+				<b>Select Tags</b> dialog.
+				<li><u>Select Tags</u>
+				<ul>
+					<li>Confirm presence of a <b>Display all available tags</b> 
+					checkbox.
+					<li>Confirm that this is checked by default.
+					<li>Confirm presence of a <b>Display these tags</b> 
+					checkbox.
+					<li>Confirm that a multi-line checked list box contains 
+					each defined tag.
+					<li>Confirm presence of a <b>Display any tags that match 
+					these wildcard patterns:</b> checkbox.
+					<li>Confirm presence of an associated edit box.
+					<li>Confirm that the edit box is enabled only when the 
+					checkbox is checked.
+					<li>Confirm presence of an associated balloon help icon.
+					<li>Confirm that the balloon help notes use of <b>?</b> and 
+					<b>*</b> as wildcard characters.
+					<li>Confirm that settings are persistent.
+				</ul>
+				<li><u>Functionality</u>
+				<ul>
+					<li>Confirm that the <b>Data Entry: Verify extracted data</b> 
+					task can <b>Display all available tags</b>.
+					<li>Confirm that the <b>Data Entry: Verify extracted data</b> 
+					task can display a specified subset of tags.
+					<li>Confirm that the <b>Data Entry: Verify extracted data</b> 
+					task can display tags specified via wildcard patterns.
+				</ul>
+	        	</ul>
+<p>
+	  	   	<LI><b>[ISSUE-12571]</b> Tag Filtering In Verification
+        		<ul>
+				<li>Add tags to a database.
+				<li>Configure the task with tag filtering such that the tag 
+				pattern matches a defined tag except for case.
+				<li>Confirm that this setting is accepted.
+			</ul>
+<p>
+	  	   	<LI><b>[ISSUE-12586]</b> Data Entry Verification With Prevent Save
+        		<ul>
+				<li>Configure Data Entry verification with the <b>PreventSave</b> 
+				option.
+				<ul>
+					<li>TBD
+				</ul>
+				<li>Confirm that toolbar button for <b>save and commit</b> should 
+				use the same image as the next document button for the Core: 
+				View image task.
+        		</ul>
+        	</ul></li>
 	</UL></li>
 </UL>
 </HTML>
