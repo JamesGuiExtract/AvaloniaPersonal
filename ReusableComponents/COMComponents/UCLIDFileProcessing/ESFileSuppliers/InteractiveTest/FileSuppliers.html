@@ -10,10 +10,10 @@
 <hr>
 <b>Setup</b>
 <ul>
-   	<li>Confirm Queue Setup and Queue Log tabs are created after the checkbox for Queue files for 
-   	this action in Action tab is checked.</li>
-   	<li>Confirm when the Queue files for this action checkbox is cleared, Queue Setup and Queue Log
-   	tabs disappear.</li> 
+   	<li>Confirm Queue Setup and Queue Log tabs are created after the checkbox for Queue files 
+	for this action in Action tab is checked.</li>
+   	<li>Confirm when the Queue files for this action checkbox is cleared, Queue Setup and 
+	Queue Log tabs disappear.</li> 
    	<li>Confirm that the setting of the checkbox is persistent.</li>
 </ul> 
 <p>
@@ -28,8 +28,8 @@
         	<li>Description</li> 
         	<li>Status</li> 
     	</ul></li>
-    	<li>Confirm that the Queue Setup tab includes a <b>Do not queue any file that meets the following 
-	condition</b> edit box.</li>
+    	<li>Confirm that the Queue Setup tab includes a <b>Do not queue any file that meets the 
+	following condition</b> edit box.</li>
     	<LI><b>[FlexIDSCore #4227, #4257]</b> Double-clicking read-only text boxes
     	<ul>
         	<li>On Server 2008, Server 2008 R2, or Windows 7, confirm the following behavior:
@@ -423,6 +423,15 @@
 			<li>Confirm that the file filters include <b>*.tiff</b> as part of the 
 			TIF selection.
 		</ul>
+<p>
+  	   	<LI><b>[ISSUE-11684]</b> Extra Containers With Folder File Supplier
+        	<ul>
+			<li>Prepare a test to supply a sudden addition of <b>1 million</b> 
+			files.
+			<li>Track queuing rate.
+			<li>Confirm that the queuing rate is not significantly slower as 
+			the number of queued files increases.
+        	</ul>
     	</ul></li>
 <p>
     	<li>Select <b>Files from FTP site</b> as the file supplier in the Select File Supplier dialog,
