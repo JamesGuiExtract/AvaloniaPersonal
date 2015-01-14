@@ -725,6 +725,56 @@
 			<li>Confirm that the extended characters are handled correctly 
 			in the output.
         	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12345]</b> Extended ANSI Characters With Create Redacted Text
+        	<ul>
+			<LI>Exercise a local copy of the test files found in 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12345</b>.
+			<li>Create a <b>Test</b> database with a <b>Test</b> action.
+			<li>Exercise <b>Ocr-Rules-Redact.fps</b>.
+			<li>Review the output files.
+			<ul>
+				<li>aarpmagazine.2.redacted.csv
+				<li>aarpmagazine.2.csv.UTF8.redacted.txt
+				<li>aarpmagazine.2.csv.redacted.txt
+			</ul>
+			<li>Confirm that original <b>Dr. Jekyll</b> and <b>Mr. Hyde</b> text 
+			is redacted.
+			<li>Confirm that the original, special double-quote characters still 
+			surround the redacted text.
+			<li>Confirm that other <b>special</b> characters are unaffected.
+<p>
+			<li>Clear the database.
+			<li>Exercise <b>Ocr-Rules-Redact2.fps</b>.
+			<li>Review the output files.
+			<ul>
+				<li>aarpmagazine.2.redacted.csv
+				<li>aarpmagazine.2.csv.UTF8.redacted.txt
+				<li>aarpmagazine.2.csv.redacted.txt
+			</ul>
+			<li>Confirm that original <b>Dr. Jekyll</b> and <b>Mr. Hyde</b> text 
+			is redacted.
+			<li><b>[ISSUE-12415] NOT FIXED for 9.9.2</b> Confirm that the original, 
+			special double-quote characters are also redacted.
+			<li>Confirm that other <b>special</b> characters are unaffected.
+<p>
+			<li>Clear the database.
+			<li>Exercise <b>Ocr-Rules-Redact3.fps</b>.
+			<li>Review the output file.
+			<ul>
+				<li>test.csv
+			</ul>
+			<li>Confirm that the original <b>Jek&quot;&quot;yll</b> and 
+			<b>Hy&quot;&quot;de</b> text is redacted.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12451]</b> Redaction: Create Redacted Text
+        	<ul>
+			<li>Confirm that correct output is generated for a text file that begins 
+			with whitespace.
+			<li>Confirm that correct output is generated for a text file that does 
+			not begin with whitespace.
+        	</ul>
         </ul></li>
     </ul></li>
 <p>
