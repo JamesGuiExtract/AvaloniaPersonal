@@ -523,6 +523,15 @@
 			<li>Confirm that the settings are persistent.
 			<li>Confirm that the settings are saved in the appropriate <b>DBInfo</b> 
 			fields.
+<p>
+	  	   	<LI><b>[ISSUE-12416, 12421]</b> Send Email Settings Dialog
+        		<ul>
+				<li>Configure email settings via DB Admin.
+				<li>Create an FPS file and check the <b>Send an email</b> button.
+				<li>Click the <b>Configure email</b> button.
+				<li>Resize the settings dialog and confirm that button anchoring and 
+				dialog size remain acceptable.
+	        	</ul>
         	</ul></li>
         	<li>Confirm that changes made in the Database options dialog are logged in 
 		Application Traces.</li>
@@ -1031,6 +1040,7 @@
     		<li>Action status condition.</li>
     		<li>Priority condition.</li>
     		<li>Query condition.</li>
+    		<li>Specified file(s) condition.</li>
     		<li>Tag condition.</li>
 	</ul>
 	<li>Confirm that a list box exists that will display the defined conditions.
@@ -1086,6 +1096,30 @@
 		<b>SELECT FAMFile.ID FROM FAMFile</b>. 
 		<li>Confirm that the result is displayed in the list box with appropriate 
 		text inserted before the query.
+<p>
+    		<li>Confirm that for <b>Specified file(s) condition</b>, a <b>Specified  
+		file(s) condition</b> dialog is displayed.</li>
+		<li>Confirm that the condition object includes a radio button for 
+		<b>The file is in the following list: (wildcards: ? for any single 
+		char, * for any text</b>.
+		<ul>
+			<li>Confirm that a list box is provided with Add, Modify, 
+			Delete and Browse... buttons.
+			<li>Confirm proper behavior for the <b>Add</b> button.
+			<li>Confirm proper behavior for the <b>Modify</b> button.
+			<li>Confirm proper behavior for the <b>Delete</b> button.
+			<li>Confirm proper behavior for the <b>Browse...</b> button.
+		</ul>
+		<li>Confirm that the condition object includes a radio button for 
+		<b>The file is listed in this text file</b>
+		<ul>
+			<li>Confirm that an edit box is provided with a browse button.
+			<li>Confirm proper behavior of the browse button.
+		</ul>
+		<li>Confirm that explicitly named files can be selected.
+		<li>Confirm that files named using <b>?</b> can be selected.
+		<li>Confirm that files named using <b>*</b> can be selected.
+		<li>Confirm that files in a list file can be selected.
 <p>
     		<li>Confirm that for <b>Tag condition</b>, a <b>Tag condition</b> dialog 
 		is displayed.</li>
