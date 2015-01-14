@@ -610,6 +610,16 @@
 		format. See <b>M:\PVCS_JIRA\JIRA\ISSUE-12162\samplecolor.tif</b>.
         	<li>Confirm that the output PDF remains full color.
     	</ul>
+<p>
+   	<LI><b>[ISSUE-12467]</b> Image Format Converter
+       	<ul>
+		<li>Confirm that the <b>/color</b> option forces color to be preserved 
+		when converting a PDF to a TIF.
+		<li>Confirm that color is not preserved by default when converting a 
+		PDF to a TIF.
+		<li>Confirm that the usage message includes the <b>/color</b> option.
+		<li>Confirm that the <b>Help</b> file reflects the change.
+       	</ul>
 </ul>
 </li>
 <p>
@@ -767,6 +777,12 @@
 		<li>Confirm that two files are created: <b>input.1</b> with lines 1-5 
 		and <b>input.2</b> with lines 6-10.
         </ul>
+<p>
+   	<LI><b>[ISSUE-12522]</b> Split File
+       	<ul>
+		<li>Confirm that <b>SplitFile.exe</b> opens files in binary mode 
+		so that EOF characters do not cause the utility to exit.
+       	</ul>
 </ul>
 </li>
 </ol>
