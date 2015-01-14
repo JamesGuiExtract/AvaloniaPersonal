@@ -238,6 +238,26 @@
 		</ul>
        	</ul>
 <p>
+   	<LI><b>[ISSUE-12370]</b> FAM Display for Work Units
+       	<ul>
+		<li>Confirm that the FAM <b>Processing Log</b> tab includes a 
+		page for <b>Work Items (0)</b>.
+		<li>Confirm that the following columns are defined.
+		<ul>
+			<li>Date
+			<li>Start Time
+			<li>FileID
+			<li>Filename
+			<li>Current Work Item
+			<li>Work Item Progress
+			<li>Folder
+		</ul>
+		<li>Process some large images with parallelization turned on.
+		<li>Confirm that the <b>Work Items (0)</b> text changes as the FAM 
+		processes images.
+		<li>Confirm that the work items grid updates appropriately.
+       	</ul>
+<p>
 	<LI><b>ISSUE-12371: Test Stopping FAM With Active Parallelized Processing</b>
        	<ul>
   	   	<LI>Use source files from <b>M:\PVCS_JIRA\JIRA\ISSUE-12371</b>.
@@ -276,6 +296,20 @@
 		<li>Confirm that processing continues on <b>Process-1.fps</b>.
 		<li>Confirm that after the auto-revert timeout period is finished, 
 		processing successfully completes on <b>Process-1.fps</b>.
+       	</ul>
+<p>
+   	<LI><b>[ISSUE-12374]</b> FAM Parallelization and Files To Retrieve
+       	<ul>
+		<li>Prepare a FAM to OCR a 1000-page file with <b>Normal</b> priority 
+		while listening for more files to be added with <b>Above Normal</b> 
+		priority.
+		<li>Confirm that the 1000-page file is processing.
+		<li>Add a 50-page file.
+		<li>Confirm that the currently retrieved work items finish processing.
+		<li>Confirm that the 50-page file begins processing at <b>Above 
+		Normal</b> priority before the 1000-page file is completed.
+		<li>Confirm that the 1000-page file continues processing after the 
+		50-page file is completed.
        	</ul>
 <p>
 	<LI><b>ISSUE-12382: Work Unit Processing With Scheduled Processing and Pause</b>
@@ -320,6 +354,28 @@
 		<li>Confirm that parallel processing works as expected.
        	</ul>
 <p>
+   	<LI><b>[ISSUE-12396]</b> FAM Parallelization
+       	<ul>
+		<li>Process a set of large documents <b>without</b> parallelization.
+		<li>Confirm that the <b>Detailed Report For Specific Document</b> 
+		report allows the user to determine precisely how much time was 
+		required to process a large document.
+		<li>Process a set of large documents <b>with</b> parallelization.
+		<li>Confirm that the <b>Detailed Report For Specific Document</b> 
+		report allows the user to determine precisely how much time was 
+		required to process a large document.
+       	</ul>
+<p>
+   	<LI><b>[ISSUE-12556]</b> FAM Parallelization
+       	<ul>
+		<li>Confirm that <b>AllowRestartableProcessing</b> is off in DBInfo.
+		<li>Queue a 50 page document.
+		<li>Configure a FAM to OCR with parallel processing.
+		<li>Press <b>Start processing</b> and immediately press 
+		<b>Stop processing</b>.
+		<li>Confirm that the FAM does not hang.
+       	</ul>
+<p>
 	<LI><h2>Miscellaneous</h2>
        	<ul>
 		<li><b>ISSUE-12398</b> <u>Scheduled Processing</u>
@@ -336,6 +392,17 @@
 			<li>Confirm that other files do not start processing until after 
 			the Start Time is reached.
 		</ul>
+<p>
+  	   	<LI><b>[ISSUE-12407, 12408, 12409]</b> OCR Document Work Item Results Stored 
+		In FAM Database
+        	<ul>
+			<li>Confirm that work item information from parallel OCR is stored 
+			in a <b>WorkItem</b> table in the FAM database.
+			<li>Confirm that work item information is automatically deleted when 
+			a file is completed.
+			<li>Confirm that work item information is automatically deleted when 
+			a file is failed.
+        	</ul>
 <p>
 		<li><u>Missing Work Items</u>
 		<ul>
