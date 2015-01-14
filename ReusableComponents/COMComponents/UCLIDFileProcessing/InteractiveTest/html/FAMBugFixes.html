@@ -147,6 +147,19 @@
 		<li>Stop the FAM service.
 		<li>Close the FPS files.
        	</ul>
+<p>
+   	<LI><b>[ISSUE-12528]</b> Scheduled Processing
+       	<ul>
+		<li>Configure an FPS file with a Sleep task that sleeps for 1 minute 
+		for each file.
+		<li>Prepare a processing schedule to process for an hour, sleep for 
+		an hour, and repeat.
+		<li>Configure the FPS file to retrieve 25 files at a time.
+		<li>Check the number of files processing with each transition to 
+		inactivity.
+		<li>Confirm that the processing count does not keep rising through 
+		several cycles.
+       	</ul>
 </ul>
 </body> 
 </html>
