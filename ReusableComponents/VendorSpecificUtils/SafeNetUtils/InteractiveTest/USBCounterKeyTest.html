@@ -70,8 +70,8 @@
 	<h2>Email Settings Dialog</h2>
 	<UL>
 		<LI>Confirm that the <b>Outgoing mail (SMTP):</b> edit box is editable.
-		<LI>Confirm that the <b>Requires Authentication to Send</b> checkbox is selectable.					<LI>Confirm that when selected the <b>User Name</b> and <b>Password</b> edit boxes 
-		are enabled.
+		<LI>Confirm that the <b>Requires Authentication to Send</b> checkbox is selectable.			<LI>Confirm that when selected the <b>User Name</b> and <b>Password</b> edit 
+		boxes are enabled.
 		<LI>Confirm that when selected the <b>Use SSL</b> check box is also enabled.
 		<LI>Confirm that the <b>Sender Display Name</b> edit box is enabled.
 		<LI>Confirm that the <b>Sender Email Address</b> edit box is enabled.
@@ -89,6 +89,9 @@
 		<LI>Confirm that the <b>OK</b> button is also disabled if the <b>Requires 
 		authentication to send</b> checkbox is checked and the <b>User name</b> is 
 		undefined.
+<p>
+  	   	<LI><b>[ISSUE-12516]</b> Confirm that the utility displays <b>N/A</b> for count 
+		values when a key is not connected.
 <p>
 		<LI>Confirm that <b>OK</b> saves the changes and exits the dialog.
 		<LI>Confirm that <b>Cancel</b> ignores the changes and exits the dialog.
@@ -191,6 +194,23 @@
 		</ul>
 		<li>Exercise the rules two more times. Confirm that <b>1</b> additional email is 
 		received as specified above.
+<p>
+  	   	<LI><b>[ISSUE-11879, ISSUE-11881]</b> USB License Key Manager
+        	<ul>
+			<li>Confirm that an Alert message is sent when the <b>Alert Level</b> 
+			is not reached exactly.
+			<li>Confirm that an Alert message is sent when the <b>Alert Multiple</b> 
+			is not reached exactly.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12277]</b> USB Counter Exception Logged For Zero Counts
+        	<ul>
+			<li>Configure a USB key with a small number of counts.
+			<li>Configure an FPS file for rule execution and exercise it 
+			via FAM service.
+			<li>Confirm that a meaningful exception is logged when the counts 
+			are exhausted.
+        	</ul>
 	</UL>
 <p>
 	<h2>Test Cases</h2>
