@@ -4,10 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
-using System.Security.Permissions;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -2938,13 +2936,12 @@ namespace Extract.DataEntry
                 swipedText, AttributeName);
 
             // Find all attributes which apply to this control.
-            IUnknownVector formattedAttributes = DataEntryMethods.InitializeAttributes(
-                AttributeName, MultipleMatchSelectionMode.All, formattedData, null, this, null,
-                false, null, null, null, null);
+            IUnknownVector formattedAttributes =
+                DataEntryMethods.AFUtility.QueryAttributes(formattedData, AttributeName, false);
 
             // If no attributes were returned from the rule, return false to indicate formatting
             // was not successful.
-            if (formattedAttributes.Size() == 0)
+            if (formattedAttributes == null || formattedAttributes.Size() == 0)
             {
                 return false;
             }
