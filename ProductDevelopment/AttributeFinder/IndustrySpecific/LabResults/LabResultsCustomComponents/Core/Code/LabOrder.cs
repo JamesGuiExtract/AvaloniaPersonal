@@ -42,13 +42,20 @@ namespace Extract.LabResultsCustomComponents
         /// (the official and alternate names) to their possible associated test codes.
         /// </summary>
         readonly Dictionary<string, List<string>> _mandatoryTests
-            = new Dictionary<string, List<string>>();
+            = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// A collection of non-mandatory tests mapping all possible test names
-        /// (the official and alternate names) to their their possible associated test codes.
+        /// (the official and alternate names) to their possible associated test codes.
         /// </summary>
         readonly Dictionary<string, List<string>> _otherTests
+            = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// A collection of both mandatory and non-mandatory tests mapping all possible test names
+        /// (the official and alternate names) to their possible associated test codes.
+        /// </summary>
+        readonly Dictionary<string, List<string>> _allTests
             = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
@@ -79,10 +86,10 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="tieBreakerString">The tiebreaker string to use in deciding which order to
         /// map to in phase 2 when the number of combined groups for 2 different orders is the same.
         /// </param>
-        /// <param name="dbConnection">The database connection to use to fill the collections
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to fill the collections
         /// of tests.</param>
         public LabOrder(string orderCode, string orderName, string epicCode,
-            string tieBreakerString, SqlCeConnection dbConnection)
+            string tieBreakerString, OrderMappingDBCache dbCache)
         {
             _orderCode = orderCode;
             _orderName = orderName;
@@ -90,8 +97,8 @@ namespace Extract.LabResultsCustomComponents
             _tieBreakerString = tieBreakerString;
 
             // Fill the test collections
-            FillMandatoryCollection(dbConnection);
-            FillOtherCollection(dbConnection);
+            FillMandatoryCollection(dbCache);
+            FillOtherCollection(dbCache);
         }
 
         #endregion Constructors
@@ -101,11 +108,11 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Fills the mandatory test collection for this order.
         /// </summary>
-        /// <param name="dbConnection">The database connection to use.</param>
-        void FillMandatoryCollection(SqlCeConnection dbConnection)
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use.</param>
+        void FillMandatoryCollection(OrderMappingDBCache dbCache)
         {
             // Get the list of mandatory tests
-            List<string> mandatoryTestCodes = GetTestCodes(dbConnection, true);
+            List<string> mandatoryTestCodes = GetTestCodes(dbCache, true);
             foreach (string testCode in mandatoryTestCodes)
             {
                 // Add the test code to the mandatory test code collection
@@ -115,7 +122,7 @@ namespace Extract.LabResultsCustomComponents
                 _allTestCodes.Add(testCode);
 
                 // Get all names for this test code
-                List<string> testNames = GetTestNames(dbConnection, testCode);
+                List<string> testNames = GetTestNames(dbCache, testCode);
                 foreach (string testName in testNames)
                 {
                     // Add each name for this test code to the mandatory collection
@@ -125,7 +132,15 @@ namespace Extract.LabResultsCustomComponents
                         testCodes = new List<string>();
                         _mandatoryTests[testName] = testCodes;
                     }
+                    testCodes.Add(testCode);
 
+                    // Add each name for this test code to the all test collection
+                    testCodes = null;
+                    if (!_allTests.TryGetValue(testName, out testCodes))
+                    {
+                        testCodes = new List<string>();
+                        _allTests[testName] = testCodes;
+                    }
                     testCodes.Add(testCode);
                 }
             }
@@ -134,11 +149,11 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Fills the other test collection for this order.
         /// </summary>
-        /// <param name="dbConnection">The database connection to use.</param>
-        void FillOtherCollection(SqlCeConnection dbConnection)
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use.</param>
+        void FillOtherCollection(OrderMappingDBCache dbCache)
         {
             // Get the list of other tests
-            List<string> otherTestCodes = GetTestCodes(dbConnection, false);
+            List<string> otherTestCodes = GetTestCodes(dbCache, false);
             foreach (string testCode in otherTestCodes)
             {
                 // Add the test code to the other test code collection
@@ -148,17 +163,25 @@ namespace Extract.LabResultsCustomComponents
                 _allTestCodes.Add(testCode);
 
                 // Get all names for this test code
-                List<string> testNames = GetTestNames(dbConnection, testCode);
+                List<string> testNames = GetTestNames(dbCache, testCode);
                 foreach (string testName in testNames)
                 {
                     // Add each name for this test code to the other collection
-                    List<string> testCodes;
+                    List<string> testCodes = null;
                     if (!_otherTests.TryGetValue(testName, out testCodes))
                     {
                         testCodes = new List<string>();
                         _otherTests[testName] = testCodes;
                     }
+                    testCodes.Add(testCode);
 
+                    // Add each name for this test code to the all test collection
+                    testCodes = null;
+                    if (!_allTests.TryGetValue(testName, out testCodes))
+                    {
+                        testCodes = new List<string>();
+                        _allTests[testName] = testCodes;
+                    }
                     testCodes.Add(testCode);
                 }
             }
@@ -167,10 +190,10 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Gets a collection of either mandatory or non-mandatory tests for this order.
         /// </summary>
-        /// <param name="dbConnection">The database connection to use to get the test codes.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to get the test codes.</param>
         /// <param name="mandatory">Whether to get the mandatory tests or not.</param>
         /// <returns>A collection of tests codes.</returns>
-        List<string> GetTestCodes(SqlCeConnection dbConnection, bool mandatory)
+        List<string> GetTestCodes(OrderMappingDBCache dbCache, bool mandatory)
         {
             // Query to get all test codes
             // Use LabTest.TestCode instead of LabOrderTest.TestCode because these two might not be strictly equal
@@ -181,7 +204,7 @@ namespace Extract.LabResultsCustomComponents
                 + _orderCode.Replace("'", "''") + "' AND [Mandatory] = " + (mandatory ? "1" : "0");
 
             List<string> testCodes = new List<string>();
-            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
+            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
             {
                 using (SqlCeDataReader reader = command.ExecuteReader())
                 {
@@ -198,10 +221,10 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Gets the list of all possible names for this test (the official and alternate names).
         /// </summary>
-        /// <param name="dbConnection">The database connection to use.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use.</param>
         /// <param name="testCode">The test code to find the names for.</param>
         /// <returns>A collection of all possible names for the specified test code.</returns>
-        static List<string> GetTestNames(SqlCeConnection dbConnection, string testCode)
+        static List<string> GetTestNames(OrderMappingDBCache dbCache, string testCode)
         {
             // Escape the single quote
             testCode = testCode.Replace("'", "''");
@@ -211,7 +234,7 @@ namespace Extract.LabResultsCustomComponents
 
             // Get the alternate names
             List<string> testNames = new List<string>();
-            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
+            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
             {
                 using (SqlCeDataReader reader = command.ExecuteReader())
                 {
@@ -225,7 +248,7 @@ namespace Extract.LabResultsCustomComponents
             // Get the official name
             query = "SELECT [OfficialName] FROM [LabTest] WHERE [TestCode] = '"
                 + testCode + "'";
-            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
+            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
             {
                 using (SqlCeDataReader reader = command.ExecuteReader())
                 {
@@ -269,7 +292,7 @@ namespace Extract.LabResultsCustomComponents
         public List<LabTest> GetMatchingTests(IEnumerable<LabTest> tests)
         {
             List<LabTest> matchingTests = TestMapper.FindBestMapping(
-                tests, _mandatoryTestCodes, _allTestCodes, _mandatoryTests.Union(_otherTests));
+                tests, _mandatoryTestCodes, _allTestCodes, _allTests);
 
             return matchingTests;
         }

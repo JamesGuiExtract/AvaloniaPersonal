@@ -72,8 +72,12 @@ namespace Extract.LabResultsCustomComponents
         /// Initializes a new instance of the <see cref="OrderGrouping"/> class.
         /// </summary>
         /// <param name="attribute">The attribute to initialize the group from.</param>
-        public OrderGrouping(IAttribute attribute)
-            : this(attribute, null)
+        /// <param name="labOrders"></param>A map of lab order codes to
+        /// <see cref="LabOrder"/>s.  If not <see langword="null"/> then
+        /// the EpicCode attribute will be used to search the collection and
+        /// set the <see cref="LabOrder"/> value.</param>
+        public OrderGrouping(IAttribute attribute, Dictionary<string, LabOrder> labOrders)
+            : this(attribute, labOrders, null)
         {
         }
 
@@ -85,12 +89,15 @@ namespace Extract.LabResultsCustomComponents
         /// <see cref="LabOrder"/>s.  If not <see langword="null"/> then
         /// the EpicCode attribute will be used to search the collection and
         /// set the <see cref="LabOrder"/> value.</param>
+        /// <param name="nameToAttributes"></param>A map of names to attributes. If <see langword="null"/>
+        /// then a new map will be generated from the attribute parameter.
         // The call to DateTime.TryParse has been analyzed and the result can be
         // safely ignored since we are explicitly handling the setting of the out
         // parameter to the default value of DateTime.MinValue
         [SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults",
             MessageId="System.DateTime.TryParse(System.String,System.DateTime@)")]
-        public OrderGrouping(IAttribute attribute, Dictionary<string, LabOrder> labOrders)
+        public OrderGrouping(IAttribute attribute, Dictionary<string, LabOrder> labOrders,
+            Dictionary<string, List<IAttribute>> nameToAttributes)
         {
             try
             {
@@ -99,9 +106,16 @@ namespace Extract.LabResultsCustomComponents
                 // Get the sub attributes
                 IUnknownVector attributes = attribute.SubAttributes;
 
-                // Get a map of names to attributes from the attribute collection
-                _nameToAttributes = LabDEOrderMapper.GetMapOfNamesToAttributes(attributes);
-
+                // If no name-to-attribute map was passed in, generate it from the attribute collection
+                if (nameToAttributes == null)
+                {
+                    _nameToAttributes = LabDEOrderMapper.GetMapOfNamesToAttributes(attributes);
+                }
+                else
+                {
+                    _nameToAttributes = nameToAttributes;
+                }
+                
                 // Get the date and time from the attributes
                 List<IAttribute> temp;
                 if (_nameToAttributes.TryGetValue("COLLECTIONDATE", out temp))
@@ -274,7 +288,7 @@ namespace Extract.LabResultsCustomComponents
         /// This should only be called as the last step before adding this list to the final
         /// order grouping collection.
         /// </summary>
-        internal void UpdateLabTestsToOfficialName(SqlCeConnection dbConnection)
+        internal void UpdateLabTestsToOfficialName(OrderMappingDBCache dbCache)
         {
             // Only perform mapping if the LabOrder has been set (this group may be
             // an unknown order)
@@ -290,10 +304,11 @@ namespace Extract.LabResultsCustomComponents
                 }
 
                 // Create a dictionary mapping the LabTest to its name
-                Dictionary<string, LabTest> labTests = new Dictionary<string, LabTest>(temp.Count);
+                Dictionary<string, LabTest> labTests =
+                    new Dictionary<string, LabTest>(temp.Count, StringComparer.OrdinalIgnoreCase);
                 foreach (LabTest test in temp)
                 {
-                    labTests.Add(test.Name.ToUpperInvariant(), test);
+                    labTests.Add(test.Name, test);
                 }
 
                 // Now iterate the collection of component attributes and update their value
@@ -307,7 +322,7 @@ namespace Extract.LabResultsCustomComponents
                 foreach (IAttribute attribute in tests)
                 {
                     // Get the name
-                    string name = attribute.Value.String.ToUpperInvariant();
+                    string name = attribute.Value.String;
 
                     // Get the lab test for this name
                     LabTest labTest;
@@ -320,7 +335,7 @@ namespace Extract.LabResultsCustomComponents
                     IAttribute officialName = new AttributeClass();
                     officialName.Name = "OfficialName";
                     officialName.Value.CreateNonSpatialString(
-                        LabDEOrderMapper.GetTestNameFromTestCode(labTest.TestCode, dbConnection),
+                        LabDEOrderMapper.GetTestNameFromTestCode(labTest.TestCode, dbCache),
                         attribute.Value.SourceDocName);
 
                     // Add the official name subattribute

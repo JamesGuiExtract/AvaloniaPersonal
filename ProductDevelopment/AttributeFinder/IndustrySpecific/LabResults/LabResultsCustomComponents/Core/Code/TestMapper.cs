@@ -77,7 +77,7 @@ namespace Extract.LabResultsCustomComponents
         /// </returns>
         public static List<LabTest> FindBestMapping(IEnumerable<LabTest> tests,
             IEnumerable<string> mandatoryTestCodes, IEnumerable<string> allTestCodes,
-            IEnumerable<KeyValuePair<string, List<string>>> nameToTestMapping)
+            Dictionary<string, List<string>> nameToTestMapping)
         {
             try
             {
@@ -108,7 +108,7 @@ namespace Extract.LabResultsCustomComponents
         /// </returns>
         public static bool AllMandatoryTestsExist(IEnumerable<LabTest> tests,
             IEnumerable<string> mandatoryTestCodes,
-            IEnumerable<KeyValuePair<string, List<string>>> nameToTestMapping)
+            Dictionary<string, List<string>> nameToTestMapping)
         {
             try
             {
@@ -253,21 +253,15 @@ namespace Extract.LabResultsCustomComponents
         /// test code(s) for which that name might be associated.</param>
         TestMapper(IEnumerable<LabTest> tests,
             IEnumerable<string> mandatoryTestCodes, IEnumerable<string> allTestCodes,
-            IEnumerable<KeyValuePair<string, List<string>>> nameToTestMapping)
+            Dictionary<string, List<string>> nameToTestMapping)
         {
             try
             {
                 TotalOpenInstances = 1;
                 _mandatoryTestCodes = new HashSet<string>(mandatoryTestCodes, StringComparer.OrdinalIgnoreCase);
                 _allTestCodes = new List<string>(mandatoryTestCodes.Union(allTestCodes, StringComparer.OrdinalIgnoreCase));
-
-                var nameToTestMappingDictionary = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-                foreach (var mapping in nameToTestMapping)
-                {
-                    nameToTestMappingDictionary[mapping.Key] = mapping.Value;
-                }
-
-                InitializeMappingCandidates(tests, nameToTestMappingDictionary);
+               
+                InitializeMappingCandidates(tests, nameToTestMapping);
             }
             catch (Exception ex)
             {
@@ -353,19 +347,18 @@ namespace Extract.LabResultsCustomComponents
                 // key to which it could be mapped.
                 foreach (LabTest test in tests)
                 {
-                    // Iterate each code for each test this name could be mapped under.
-                    foreach (string testCode in nameToTestMapping
-                        .Where(mapping =>
-                            mapping.Key.Equals(test.Name, StringComparison.OrdinalIgnoreCase))
-                        .SelectMany(mandatoryTest => mandatoryTest.Value)
-                        .Distinct())
+                    List<string> possibleTestCodes;
+                    if (nameToTestMapping.TryGetValue(test.Name, out possibleTestCodes))
                     {
-                        // Create a copy of the test and assign the test code.
-                        LabTest mappedTest = new LabTest(test.Attribute);
-                        mappedTest.TestCode = testCode;
+                        foreach (string testCode in possibleTestCodes)
+                        {
+                            // Create a copy of the test and assign the test code.
+                            LabTest mappedTest = new LabTest(test.Attribute);
+                            mappedTest.TestCode = testCode;
 
-                        // Add the test copy as a possible mapping for testCode.
-                        _mappingCandidates[testCode].Add(mappedTest);
+                            // Add the test copy as a possible mapping for testCode.
+                            _mappingCandidates[testCode].Add(mappedTest);
+                        }
                     }
                 }
             }

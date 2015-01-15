@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OrderMappingDBCache.cs" />
     <Compile Include="LabDEOrderMapper.cs" />
     <Compile Include="LabDEOrderMapperConfigurationForm.cs">
       <SubType>Form</SubType>

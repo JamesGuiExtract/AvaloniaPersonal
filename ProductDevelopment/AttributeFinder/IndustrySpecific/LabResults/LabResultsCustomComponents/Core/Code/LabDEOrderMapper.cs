@@ -5,21 +5,15 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Data.SqlServerCe;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.LabResultsCustomComponents
 {
@@ -49,11 +43,6 @@ namespace Extract.LabResultsCustomComponents
         static readonly int _CURRENT_VERSION = 2;
 
         /// <summary>
-        /// The number of times to retry if failed connecting to the database file.
-        /// </summary>
-        static readonly int _DB_CONNECTION_RETRIES = 5;
-
-        /// <summary>
         /// A couple algorithms used in the order mapper to find the best combinations of objects
         /// are NP-complete. To prevent a runaway computation from exhausting all memory, these
         /// algorithms will be capped at this many possible grouping combinations to be considering
@@ -75,7 +64,7 @@ namespace Extract.LabResultsCustomComponents
             /// <summary>
             /// The database connection to use for mapping orders.
             /// </summary>
-            SqlCeConnection _dbConnection;
+            OrderMappingDBCache _dbCache;
 
             /// <summary>
             /// The sourcedoc name to use in the grouping.
@@ -106,11 +95,11 @@ namespace Extract.LabResultsCustomComponents
             /// </summary>
             /// <param name="originalGroup">The original order group for this permutation (before
             /// any merging with other orders has taken place).</param>
-            /// <param name="dbConnection">The database connection to use when performing the
+            /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use when performing the
             /// order mapping.</param>
             /// <param name="sourceDocName">The sourcedoc name to use in the grouping.</param>
             public OrderGroupingPermutation(OrderGrouping originalGroup,
-                SqlCeConnection dbConnection, string sourceDocName)
+                OrderMappingDBCache dbCache, string sourceDocName)
             {
                 // The initial combined group contains only the original group
                 CombinedGroup = originalGroup;
@@ -119,11 +108,11 @@ namespace Extract.LabResultsCustomComponents
                 // Initialize the dictionary of contained tests
                 foreach (LabTest test in originalGroup.LabTests)
                 {
-                    ContainedTests[test.Name.ToUpperInvariant()] = test;
+                    ContainedTests[test.Name] = test;
                 }
 
                 // Store the other data needed to perform mappings/mergings
-                _dbConnection = dbConnection;
+                _dbCache = dbCache;
                 _sourceDocName = sourceDocName;
             }
 
@@ -158,7 +147,7 @@ namespace Extract.LabResultsCustomComponents
                     new Dictionary<string, LabTest>(ContainedTests, StringComparer.OrdinalIgnoreCase);
                 foreach (LabTest test in newGroup.LabTests)
                 {
-                    string name = test.Name.ToUpperInvariant();
+                    string name = test.Name;
                     if (combinedTests.ContainsKey(name))
                     {
                         // The test was already contained in the permutation, these two groups
@@ -172,7 +161,7 @@ namespace Extract.LabResultsCustomComponents
                 // Groups could potentially be merged, find the best order
                 KeyValuePair<string, List<LabTest>> bestOrder =
                     FindBestOrder(new List<LabTest>(combinedTests.Values),
-                        labOrders, _dbConnection, false);
+                        labOrders, _dbCache, false);
 
                 // In order to group into a new combined order, the resulting order must contain
                 // all of the tests from the list.
@@ -193,7 +182,7 @@ namespace Extract.LabResultsCustomComponents
 
                 // Create the new grouping permutation
                 OrderGroupingPermutation newGroupingPermutation =
-                    new OrderGroupingPermutation(combinedGroup, _dbConnection, _sourceDocName);
+                    new OrderGroupingPermutation(combinedGroup, _dbCache, _sourceDocName);
                 newGroupingPermutation.ContainedTests = combinedTests;
                 newGroupingPermutation.ContainedGroups = new List<OrderGrouping>(ContainedGroups);
                 newGroupingPermutation.ContainedGroups.Add(newGroup);
@@ -329,7 +318,7 @@ namespace Extract.LabResultsCustomComponents
         public void ProcessOutput(IUnknownVector pAttributes, AFDocument pDoc,
             ProgressStatus pProgressStatus)
         {
-            SqlCeConnection dbConnection = null;
+            OrderMappingDBCache dbCache = null;
             try
             {
                 // Validate the license
@@ -340,12 +329,8 @@ namespace Extract.LabResultsCustomComponents
                 // memory.
                 pAttributes.ReportMemoryUsage();
 
-                // Get a database connection for processing (creating a local copy of the database
-                // first, if necessary).
-                dbConnection = GetDatabaseConnection(pDoc);
-
-                // Open the database connection
-                dbConnection.Open();
+                // Create the database cache object
+                dbCache = new OrderMappingDBCache(pDoc, _databaseFile);
 
                 // Build a new vector of attributes that have been mapped to orders
                 IUnknownVector newAttributes = new IUnknownVector();
@@ -373,7 +358,7 @@ namespace Extract.LabResultsCustomComponents
                 {
                     // Perform order mapping on the list of test attributes
                     List<IAttribute> mappedAttributes =
-                        MapOrders(testAttributes, dbConnection, _requireMandatory);
+                        MapOrders(testAttributes, dbCache, _requireMandatory);
 
                     // Create an attribute sorter for sorting sub attributes
                     ISortCompare attributeSorter =
@@ -391,8 +376,8 @@ namespace Extract.LabResultsCustomComponents
                 }
 
                 // Finished with database so close connection
-                dbConnection.Dispose();
-                dbConnection = null;
+                dbCache.Dispose();
+                dbCache = null;
 
                 // Clear the original attributes and set the attributes to the
                 // newly mapped collection
@@ -409,10 +394,10 @@ namespace Extract.LabResultsCustomComponents
             }
             finally
             {
-                if (dbConnection != null)
+                if (dbCache != null)
                 {
-                    dbConnection.Dispose();
-                    dbConnection = null;
+                    dbCache.Dispose();
+                    dbCache = null;
                 }
             }
         }
@@ -735,14 +720,15 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Builds a collection of order codes mapped to <see cref="LabOrder"/>s.
         /// </summary>
-        /// <param name="dbConnection">The database connection to use to retrieve the data.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to retrieve the data.</param>
         /// <returns>A collection of order codes mapped to <see cref="LabOrder"/>s.</returns>
-        static Dictionary<string, LabOrder> FillLabOrderCollection(SqlCeConnection dbConnection)
+        static Dictionary<string, LabOrder> FillLabOrderCollection(OrderMappingDBCache dbCache)
         {
             string query = "SELECT [Code], [Name], [EpicCode], [TieBreaker] FROM [LabOrder] "
                 + "WHERE [EpicCode] IS NOT NULL";
-            Dictionary<string, LabOrder> orders = new Dictionary<string, LabOrder>(StringComparer.OrdinalIgnoreCase);
-            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
+            Dictionary<string, LabOrder> orders =
+                new Dictionary<string, LabOrder>(StringComparer.OrdinalIgnoreCase);
+            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
             {
                 using (SqlCeDataReader reader = command.ExecuteReader())
                 {
@@ -753,7 +739,7 @@ namespace Extract.LabResultsCustomComponents
                         string epicCode = reader.GetString(2);
                         string tieBreaker = reader.GetString(3);
                         orders.Add(code,
-                            new LabOrder(code, name, epicCode, tieBreaker, dbConnection));
+                            new LabOrder(code, name, epicCode, tieBreaker, dbCache));
                     }
                 }
             }
@@ -765,11 +751,11 @@ namespace Extract.LabResultsCustomComponents
         /// Performs the mapping from tests to order grouping.
         /// </summary>
         /// <param name="tests">A list of tests to group.</param>
-        /// <param name="dbConnection">The database connection to use
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use
         /// for querying.</param>
         /// <param name="requireMandatory">Whether or not mandatory tests are required
         /// in the second pass of the order mapping algorithm.</param>
-        static List<IAttribute> MapOrders(List<IAttribute> tests, SqlCeConnection dbConnection,
+        static List<IAttribute> MapOrders(List<IAttribute> tests, OrderMappingDBCache dbCache,
             bool requireMandatory)
         {
             // If there are no tests, just return an empty list
@@ -783,14 +769,14 @@ namespace Extract.LabResultsCustomComponents
             sourceDocName = tests[0].Value.SourceDocName;
 
             // Build the list of all lab orders with their associated test collections.
-            Dictionary<string, LabOrder> labOrders = FillLabOrderCollection(dbConnection);
+            Dictionary<string, LabOrder> labOrders = FillLabOrderCollection(dbCache);
 
             // Perform the first pass grouping of the tests
-            List<IAttribute> firstPass = FirstPassGrouping(tests, dbConnection, labOrders,
+            List<IAttribute> firstPass = FirstPassGrouping(tests, dbCache, labOrders,
                 sourceDocName);
 
             // Perform the final grouping of the tests
-            List<IAttribute> finalGroupings = GetFinalGrouping(firstPass, dbConnection,
+            List<IAttribute> finalGroupings = GetFinalGrouping(firstPass, dbCache,
                 labOrders, sourceDocName, requireMandatory);
 
             // Return the final groupings
@@ -801,11 +787,11 @@ namespace Extract.LabResultsCustomComponents
         /// Performs the first pass grouping for each group of TEST attributes.
         /// </summary>
         /// <param name="tests">The list of TEST attributes to group.</param>
-        /// <param name="dbConnection">The database connection to use for the grouping.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for the grouping.</param>
         /// <param name="labOrders">A collection mapping order codes to
         /// <see cref="LabOrder"/>s.</param>
         /// <param name="sourceDocName">The sourcedoc name to use in the grouping.</param>
-        static List<IAttribute> FirstPassGrouping(List<IAttribute> tests, SqlCeConnection dbConnection,
+        static List<IAttribute> FirstPassGrouping(List<IAttribute> tests, OrderMappingDBCache dbCache,
             Dictionary<string, LabOrder> labOrders, string sourceDocName)
         {
             List<IAttribute> firstPassMapping = new List<IAttribute>();
@@ -861,7 +847,7 @@ namespace Extract.LabResultsCustomComponents
                         // Get the best match order for the remaining unmatched tests (require
                         // mandatory tests)
                         KeyValuePair<string, List<LabTest>> matchedTests =
-                            FindBestOrder(unmatchedTests, labOrders, dbConnection, true);
+                            FindBestOrder(unmatchedTests, labOrders, dbCache, true);
 
                         // Update the unmatched test list by removing the now matched tests
                         foreach (LabTest matches in matchedTests.Value)
@@ -933,7 +919,7 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="firstPassGrouping">A collection of attributes that have been grouped
         /// into orders.</param>
-        /// <param name="dbConnection">The database connection to use for querying data.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for querying data.</param>
         /// <param name="labOrders">The collection of lab order codes to <see cref="LabOrder"/>
         /// objects.</param>
         /// <param name="sourceDocName">The source document name to be used when creating new
@@ -943,7 +929,7 @@ namespace Extract.LabResultsCustomComponents
         /// <returns>A new collection of attributes that represent the second order
         /// grouping attempt.</returns>
         static List<IAttribute> GetFinalGrouping(List<IAttribute> firstPassGrouping,
-            SqlCeConnection dbConnection, Dictionary<string, LabOrder> labOrders,
+            OrderMappingDBCache dbCache, Dictionary<string, LabOrder> labOrders,
             string sourceDocName, bool requireMandatory)
         {
             List<OrderGrouping> bestGroups = new List<OrderGrouping>();
@@ -965,7 +951,7 @@ namespace Extract.LabResultsCustomComponents
             while (firstPass.Count > 0)
             {
                 OrderGroupingPermutation first = new OrderGroupingPermutation(firstPass[0],
-                    dbConnection, sourceDocName);
+                    dbCache, sourceDocName);
                 List<OrderGroupingPermutation> possibleGroupings = new List<OrderGroupingPermutation>();
                 possibleGroupings.Add(first);
 
@@ -1016,13 +1002,13 @@ namespace Extract.LabResultsCustomComponents
             // Check for any order groupings that are "UnknownOrder"
             // and attempt to map them to an order [DE #833]
             MapSingleUnknownOrders(
-                bestGroups, labOrders, dbConnection, sourceDocName, requireMandatory);
+                bestGroups, labOrders, dbCache, sourceDocName, requireMandatory);
 
             // firstPass should now contain all groupings that could be combined
             // update the test names to their official name
             foreach (OrderGrouping orderGroup in bestGroups)
             {
-                orderGroup.UpdateLabTestsToOfficialName(dbConnection);
+                orderGroup.UpdateLabTestsToOfficialName(dbCache);
 
                 // Add the mapped group to the final grouping
                 finalGrouping.Add(orderGroup.Attribute);
@@ -1131,7 +1117,7 @@ namespace Extract.LabResultsCustomComponents
             attribute.SubAttributes = sourceGroup.GetAllAttributesAsIUnknownVector();
 
             // Create a new group with this object
-            OrderGrouping newGroup = new OrderGrouping(attribute);
+            OrderGrouping newGroup = new OrderGrouping(attribute, null, sourceGroup.NameToAttributes);
             newGroup.LabOrder = labOrder;
             return newGroup;
         }
@@ -1145,12 +1131,12 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="orderGroups">The collection of <see cref="OrderGrouping"/>s
         /// to check.</param>
         /// <param name="labOrders">The map of order codes to <see cref="LabOrder"/>s.</param>
-        /// <param name="dbConnection">The database connection to use for querying data.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for querying data.</param>
         /// <param name="sourceDocName">The source doc name for the new attributes.</param>
         /// <param name="requireMandatory">If <see langword="true"/> then will only map to an
         /// order if all mandatory tests are present.</param>
         static void MapSingleUnknownOrders(List<OrderGrouping> orderGroups,
-            Dictionary<string, LabOrder> labOrders, SqlCeConnection dbConnection,
+            Dictionary<string, LabOrder> labOrders, OrderMappingDBCache dbCache,
             string sourceDocName, bool requireMandatory)
         {
             for (int i = 0; i < orderGroups.Count; i++)
@@ -1161,7 +1147,7 @@ namespace Extract.LabResultsCustomComponents
                     // Try to map this unknown order
                     KeyValuePair<string, List<LabTest>> bestMatch =
                         FindBestOrder(new List<LabTest>(group.LabTests),
-                        labOrders, dbConnection, requireMandatory);
+                        labOrders, dbCache, requireMandatory);
 
                     // Check for a new mapping
                     if (!bestMatch.Key.Equals("UnknownOrder", StringComparison.OrdinalIgnoreCase))
@@ -1204,13 +1190,13 @@ namespace Extract.LabResultsCustomComponents
         /// a known order.</param>
         /// <param name="labOrders">A collection mapping order codes to
         /// <see cref="LabOrder"/>s</param>
-        /// <param name="dbConnection">The database connection to use for data queries.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for data queries.</param>
         /// <param name="requireMandatory">If <see langword="true"/> then will only map to an
         /// order if all mandatory tests are present.  If <see langword="false"/> will map to
         /// the order with the most tests, even if all mandatory are not present.</param>
         /// <returns>A pair containing the order code and a list of matched tests.</returns>
         static KeyValuePair<string, List<LabTest>> FindBestOrder(List<LabTest> unmatchedTests,
-            Dictionary<string, LabOrder> labOrders, SqlCeConnection dbConnection,
+            Dictionary<string, LabOrder> labOrders, OrderMappingDBCache dbCache,
             bool requireMandatory)
         {
             // Variables to hold the best match seen thus far (will be modified as the
@@ -1221,8 +1207,8 @@ namespace Extract.LabResultsCustomComponents
             List<LabTest> bestMatchedTests = new List<LabTest>();
 
             // Check to see if the first test is part of any valid order
-            List<string> potentialOrderCodes =
-                GetPotentialOrderCodes(unmatchedTests[0].Name, dbConnection);
+            ReadOnlyCollection<string> potentialOrderCodes =
+                dbCache.GetPotentialOrderCodes(unmatchedTests[0].Name);
 
             // Loop through the potential orders attempting to match the order
             foreach (string orderCode in potentialOrderCodes)
@@ -1241,7 +1227,6 @@ namespace Extract.LabResultsCustomComponents
                 if (!requireMandatory || labOrder.ContainsAllMandatoryTests(unmatchedTests))
                 {
                     List<LabTest> matchedTests = labOrder.GetMatchingTests(unmatchedTests);
-
                     // Best match if more tests matched OR
                     if (matchedTests.Count > bestMatchCount)
                     {
@@ -1280,7 +1265,7 @@ namespace Extract.LabResultsCustomComponents
                     LabTest bestMatchedTest = bestMatchedTests[i];
 
                     LabTest sourceTest = unmatchedTests
-                        .Where(test => test.Name == bestMatchedTest.Name)
+                        .Where(test => test.Attribute == bestMatchedTest.Attribute)
                         .First();
 
                     sourceTest.TestCode = bestMatchedTest.TestCode;
@@ -1290,68 +1275,6 @@ namespace Extract.LabResultsCustomComponents
             }
 
             return new KeyValuePair<string, List<LabTest>>(bestOrderId, bestMatchedTests);
-        }
-
-        /// <summary>
-        /// Gets the list of potential order codes for the specified test.
-        /// </summary>
-        /// <param name="testName">The test to get the order codes for.</param>
-        /// <param name="dbConnection">The database connection to use.</param>
-        /// <returns>A list of potential order codes (or an empty list if no potential orders).
-        /// </returns>
-        static List<string> GetPotentialOrderCodes(string testName, SqlCeConnection dbConnection)
-        {
-            // Escape the single quote
-            testName = testName.Replace("'", "''");
-
-            // Create a set to hold the potential codes
-            HashSet<string> orderCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            // Query the official name table for potential order codes
-            // Use LabOrder.Code instead of LabOrderTest.OrderCode because these two might not be strictly equal
-            // because of the way that SQL handles trailing spaces
-            // https://extract.atlassian.net/browse/ISSUE-12073
-            string query = "SELECT DISTINCT [Code] FROM [LabOrder] JOIN [LabOrderTest] ON [Code] = [OrderCode] JOIN "
-                + "[LabTest] ON [LabOrderTest].[TestCode] = [LabTest].[TestCode] "
-                + "WHERE [LabTest].[OfficialName] = '" + testName + "'";
-            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
-            {
-                using (SqlCeDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        string code = reader.GetString(0);
-                        if (!orderCodes.Contains(code))
-                        {
-                            orderCodes.Add(code);
-                        }
-                    }
-                }
-            }
-
-            // Query the alternate test table for potential order codes
-            // Use LabOrder.Code instead of LabOrderTest.OrderCode because these two might not be strictly equal
-            // because of the way that SQL handles trailing spaces
-            // https://extract.atlassian.net/browse/ISSUE-12073
-            query = "SELECT DISTINCT [Code] FROM [LabOrder] JOIN [LabOrderTest] ON [Code] = [OrderCode] JOIN "
-                + "[AlternateTestName] ON [LabOrderTest].[TestCode] = [AlternateTestName].[TestCode] "
-                + "WHERE [AlternateTestName].[Name] = '" + testName + "'";
-            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
-            {
-                using (SqlCeDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        string code = reader.GetString(0);
-                        if (!orderCodes.Contains(code))
-                        {
-                            orderCodes.Add(code);
-                        }
-                    }
-                }
-            }
-
-            return orderCodes.ToList<string>();
         }
 
         /// <summary>
@@ -1397,9 +1320,9 @@ namespace Extract.LabResultsCustomComponents
         /// Gets the test name from the database based on the specified order code and test code.
         /// </summary>
         /// <param name="testCode">The test code to search on.</param>
-        /// <param name="dbConnection">The database connection to use.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use.</param>
         /// <returns>The test name for the specified order code and test code.</returns>
-        internal static string GetTestNameFromTestCode(string testCode, SqlCeConnection dbConnection)
+        internal static string GetTestNameFromTestCode(string testCode, OrderMappingDBCache dbCache)
         {
             // Escape the single quote
             string testCodeEscaped = testCode.Replace("'", "''");
@@ -1407,7 +1330,7 @@ namespace Extract.LabResultsCustomComponents
             string query = "SELECT [OfficialName] FROM [LabTest] WHERE [TestCode] = '"
                 + testCodeEscaped + "'";
 
-            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
+            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
             {
                 using (SqlCeDataReader reader = command.ExecuteReader())
                 {
@@ -1423,78 +1346,6 @@ namespace Extract.LabResultsCustomComponents
                         throw ee;
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// Gets the database connection to use for processing, creating a local copy if necessary.
-        /// </summary>
-        /// <param name="pDoc">The document object.</param>
-        /// <returns>The <see cref="SqlCeConnection"/> to use for processing.</returns>
-        SqlCeConnection GetDatabaseConnection(AFDocument pDoc)
-        {
-            try
-            {
-                // Expand the tags in the database file name
-                AFUtility afUtility = new AFUtility();
-                string databaseFile = afUtility.ExpandTagsAndFunctions(_databaseFile, pDoc);
-
-                // Check for the database files existence
-                if (!File.Exists(databaseFile))
-                {
-                    ExtractException ee = new ExtractException("ELI26170",
-                        "Database file does not exist!");
-                    ee.AddDebugData("Database File Name", databaseFile, false);
-                    throw ee;
-                }
-
-                // [DataEntry:399, 688, 986]
-                // Whether or not the file is accessed via a network share, retrieve and use a local
-                // temp copy of the reference database file. Though multiple connections are allowed
-                // to a local file, the connections cannot see each other's changes.
-                string connectionString = "Data Source='" + 
-                    _localDatabaseCopyManager.GetCurrentTemporaryFileName(databaseFile, this, true) + "';";
-
-                // Try to open the database connection, if there is a sqlce exception,
-                // just increment retry count, sleep, and try again
-                int retryCount = 0;
-                Exception tempEx = null;
-                SqlCeConnection dbConnection = null;
-                while (dbConnection == null && retryCount < _DB_CONNECTION_RETRIES)
-                {
-                    try
-                    {
-                        dbConnection = new SqlCeConnection(connectionString);
-                    }
-                    catch (SqlCeException ex)
-                    {
-                        tempEx = ex;
-                        retryCount++;
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ExtractException.AsExtractException("ELI26651", ex);
-                    }
-                }
-
-                // If all the retries failed and the connection is still null, throw an exception
-                if (retryCount >= _DB_CONNECTION_RETRIES && dbConnection == null)
-                {
-                    ExtractException ee = new ExtractException("ELI26652",
-                        "Unable to open database connection!", tempEx);
-                    ee.AddDebugData("Retries", retryCount, false);
-                    throw ee;
-                }
-
-                return dbConnection;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI27743",
-                    "Failed to obtain a database connection!", ex);
-                ee.AddDebugData("Database", _databaseFile, false);
-                throw ee;
             }
         }
 
