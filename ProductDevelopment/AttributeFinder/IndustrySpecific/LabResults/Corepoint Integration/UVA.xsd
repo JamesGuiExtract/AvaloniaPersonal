@@ -95,6 +95,7 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element ref="LabInfo" minOccurs="0" />
 				<xs:element name="Test" maxOccurs="unbounded" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
@@ -155,7 +156,6 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element ref="LabInfo" />
 							<xs:element name="Comment" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
@@ -243,7 +243,6 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element ref="LabInfo" minOccurs="0" />
 				<xs:element name="ResultDate" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
@@ -300,14 +299,6 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="FullText" minOccurs="1" type="xs:string" />
-				<xs:element name="DefaultLabDisplay" minOccurs="0">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element ref="Address" minOccurs="0" />
 				<xs:element name="LabCode" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
@@ -322,6 +313,7 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element ref="Address" minOccurs="0" />
 				<xs:element name="Name" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>

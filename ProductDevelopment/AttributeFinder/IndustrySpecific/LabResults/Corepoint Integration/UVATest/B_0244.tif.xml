@@ -35,6 +35,33 @@
 			<FullText>0987284</FullText>
 		</MR_Number>
 	</PatientInfo>
+	<LabInfo>
+		<FullText>N/A</FullText>
+		<LabCode>
+			<FullText>49D1093067</FullText>
+		</LabCode>
+		<LabIdentifier>
+			<FullText>AUGUSTA HEALTH LABORATORY</FullText>
+		</LabIdentifier>
+		<Address>
+			<FullText>N/A</FullText>
+			<Address1>
+				<FullText>78 Medical Center</FullText>
+			</Address1>
+			<City>
+				<FullText>Drive Fishersville</FullText>
+			</City>
+			<State>
+				<FullText>Virginia</FullText>
+			</State>
+			<ZipCode>
+				<FullText>22939</FullText>
+			</ZipCode>
+		</Address>
+		<Name>
+			<FullText>AUGUSTA HEALTH CLINICAL LABORATORY</FullText>
+		</Name>
+	</LabInfo>
 	<Test>
 		<FullText>N/A</FullText>
 		<OrderNumber>
@@ -61,15 +88,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D1093067</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>AUGUSTA HEALTH LABORATORY</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -586,15 +604,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D1093067</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>AUGUSTA HEALTH LABORATORY</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -652,15 +661,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D1093067</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>AUGUSTA HEALTH LABORATORY</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -718,15 +718,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D1093067</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>AUGUSTA HEALTH LABORATORY</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -784,15 +775,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D1093067</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>AUGUSTA HEALTH LABORATORY</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1067,28 +1049,4 @@
 			</Comment>
 		</Component>
 	</Test>
-	<LabInfo>
-		<FullText>N/A</FullText>
-		<DefaultLabDisplay>
-			<FullText>AUGUSTA HEALTH LABORATORY, 78 Medical Center Drive Fishersville</FullText>
-		</DefaultLabDisplay>
-		<Address>
-			<FullText>N/A</FullText>
-			<Address1>
-				<FullText>78 Medical Center</FullText>
-			</Address1>
-			<City>
-				<FullText>Drive Fishersville</FullText>
-			</City>
-			<State>
-				<FullText>Virginia</FullText>
-			</State>
-			<ZipCode>
-				<FullText>22939</FullText>
-			</ZipCode>
-		</Address>
-		<Name>
-			<FullText>AUGUSTA HEALTH CLINICAL LABORATORY</FullText>
-		</Name>
-	</LabInfo>
 </FlexData>

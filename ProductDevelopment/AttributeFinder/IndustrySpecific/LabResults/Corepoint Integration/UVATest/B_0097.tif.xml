@@ -35,6 +35,33 @@
 			<FullText>2011484</FullText>
 		</MR_Number>
 	</PatientInfo>
+	<LabInfo>
+		<FullText>N/A</FullText>
+		<LabCode>
+			<FullText>49D0661112</FullText>
+		</LabCode>
+		<LabIdentifier>
+			<FullText>RIVERSIDE WALTER REED HOSPITAL</FullText>
+		</LabIdentifier>
+		<Address>
+			<FullText>N/A</FullText>
+			<Address1>
+				<FullText>Hospital</FullText>
+			</Address1>
+			<City>
+				<FullText>Hosplbd Drive</FullText>
+			</City>
+			<State>
+				<FullText>VA</FullText>
+			</State>
+			<ZipCode>
+				<FullText>23061</FullText>
+			</ZipCode>
+		</Address>
+		<Name>
+			<FullText>Doctors Hospital</FullText>
+		</Name>
+	</LabInfo>
 	<Test>
 		<FullText>N/A</FullText>
 		<OrderNumber>
@@ -61,15 +88,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0661112</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>RIVERSIDE WALTER REED HOSPITAL</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -424,15 +442,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0661112</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>RIVERSIDE WALTER REED HOSPITAL</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -706,15 +715,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0661112</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>RIVERSIDE WALTER REED HOSPITAL</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -772,15 +772,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0661112</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>RIVERSIDE WALTER REED HOSPITAL</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -838,15 +829,6 @@
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0661112</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>RIVERSIDE WALTER REED HOSPITAL</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1391,28 +1373,4 @@
 			</Comment>
 		</Component>
 	</Test>
-	<LabInfo>
-		<FullText>N/A</FullText>
-		<DefaultLabDisplay>
-			<FullText>RIVERSIDE WALTER REED HOSPITAL, 7519 HOSPITAL DRIVE GLOUCESTER</FullText>
-		</DefaultLabDisplay>
-		<Address>
-			<FullText>N/A</FullText>
-			<Address1>
-				<FullText>Hospital</FullText>
-			</Address1>
-			<City>
-				<FullText>Hosplbd Drive</FullText>
-			</City>
-			<State>
-				<FullText>VA</FullText>
-			</State>
-			<ZipCode>
-				<FullText>23061</FullText>
-			</ZipCode>
-		</Address>
-		<Name>
-			<FullText>Doctors Hospital</FullText>
-		</Name>
-	</LabInfo>
 </FlexData>

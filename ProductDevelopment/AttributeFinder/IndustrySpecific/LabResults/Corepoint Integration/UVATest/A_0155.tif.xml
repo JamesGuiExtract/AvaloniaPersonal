@@ -35,6 +35,33 @@
 			<FullText>2055690</FullText>
 		</MR_Number>
 	</PatientInfo>
+	<LabInfo>
+		<FullText>N/A</FullText>
+		<LabCode>
+			<FullText>49D0231502</FullText>
+		</LabCode>
+		<LabIdentifier>
+			<FullText>VALLEY NEPHROLOGY ASSOCIATES</FullText>
+		</LabIdentifier>
+		<Address>
+			<FullText>N/A</FullText>
+			<Address1>
+				<FullText>2602 Franklin Road</FullText>
+			</Address1>
+			<City>
+				<FullText>Roanoke</FullText>
+			</City>
+			<State>
+				<FullText>VA</FullText>
+			</State>
+			<ZipCode>
+				<FullText>24014-1010</FullText>
+			</ZipCode>
+		</Address>
+		<Name>
+			<FullText>Ir epannogy ASSOC</FullText>
+		</Name>
+	</LabInfo>
 	<Test>
 		<FullText>N/A</FullText>
 		<OrderNumber>
@@ -61,15 +88,6 @@
 		<ResultTime>
 			<FullText>15:32</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0231502</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>VALLEY NEPHROLOGY ASSOCIATES</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -397,15 +415,6 @@
 		<ResultTime>
 			<FullText>15:32</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0231502</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>VALLEY NEPHROLOGY ASSOCIATES</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -949,15 +958,6 @@
 		<ResultTime>
 			<FullText>15:32</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0231502</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>VALLEY NEPHROLOGY ASSOCIATES</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1015,15 +1015,6 @@
 		<ResultTime>
 			<FullText>15:32</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0231502</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>VALLEY NEPHROLOGY ASSOCIATES</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1081,15 +1072,6 @@
 		<ResultTime>
 			<FullText>15:32</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0231502</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>VALLEY NEPHROLOGY ASSOCIATES</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1147,15 +1129,6 @@
 		<ResultTime>
 			<FullText>15:32</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0231502</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>VALLEY NEPHROLOGY ASSOCIATES</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1187,30 +1160,6 @@
 			</Comment>
 		</Component>
 	</Test>
-	<LabInfo>
-		<FullText>N/A</FullText>
-		<DefaultLabDisplay>
-			<FullText>VALLEY NEPHROLOGY ASSOCIATES, 2602 FRANKLIN RD SW ROANOKE</FullText>
-		</DefaultLabDisplay>
-		<Address>
-			<FullText>N/A</FullText>
-			<Address1>
-				<FullText>2602 Franklin Road</FullText>
-			</Address1>
-			<City>
-				<FullText>Roanoke</FullText>
-			</City>
-			<State>
-				<FullText>VA</FullText>
-			</State>
-			<ZipCode>
-				<FullText>24014-1010</FullText>
-			</ZipCode>
-		</Address>
-		<Name>
-			<FullText>Ir epannogy ASSOC</FullText>
-		</Name>
-	</LabInfo>
 	<ResultDate>
 		<FullText>05/20/2014</FullText>
 	</ResultDate>

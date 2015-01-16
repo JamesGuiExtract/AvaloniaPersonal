@@ -35,6 +35,30 @@
 			<FullText>2457315</FullText>
 		</MR_Number>
 	</PatientInfo>
+	<LabInfo>
+		<FullText>N/A</FullText>
+		<LabCode>
+			<FullText>34D0655059</FullText>
+		</LabCode>
+		<LabIdentifier>
+			<FullText>LABCORP BURLINGTON</FullText>
+		</LabIdentifier>
+		<Address>
+			<FullText>N/A</FullText>
+			<Address1>
+				<FullText>1447 York Court</FullText>
+			</Address1>
+			<City>
+				<FullText>Burlington</FullText>
+			</City>
+			<State>
+				<FullText>NC</FullText>
+			</State>
+			<ZipCode>
+				<FullText>27215-3361</FullText>
+			</ZipCode>
+		</Address>
+	</LabInfo>
 	<Test>
 		<FullText>N/A</FullText>
 		<OrderNumber>
@@ -56,20 +80,11 @@
 			<FullText>07:42</FullText>
 		</CollectionTime>
 		<ResultDate>
-			<FullText/>
+			<FullText>05/20/2014</FullText>
 		</ResultDate>
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>34D0655059</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>LABCORP BURLINGTON</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -587,25 +602,4 @@
 			</Comment>
 		</Component>
 	</Test>
-	<LabInfo>
-		<FullText>N/A</FullText>
-		<DefaultLabDisplay>
-			<FullText>LABCORP BURLINGTON, 1447 York Court Burlington</FullText>
-		</DefaultLabDisplay>
-		<Address>
-			<FullText>N/A</FullText>
-			<Address1>
-				<FullText>1447 York Court</FullText>
-			</Address1>
-			<City>
-				<FullText>Burlington</FullText>
-			</City>
-			<State>
-				<FullText>NC</FullText>
-			</State>
-			<ZipCode>
-				<FullText>27215-3361</FullText>
-			</ZipCode>
-		</Address>
-	</LabInfo>
 </FlexData>

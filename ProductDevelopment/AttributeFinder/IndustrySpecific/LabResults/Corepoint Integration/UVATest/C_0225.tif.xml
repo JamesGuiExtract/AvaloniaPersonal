@@ -35,6 +35,33 @@
 			<FullText>0994332</FullText>
 		</MR_Number>
 	</PatientInfo>
+	<LabInfo>
+		<FullText>N/A</FullText>
+		<LabCode>
+			<FullText>49D0225211</FullText>
+		</LabCode>
+		<LabIdentifier>
+			<FullText>WINCHESTER MEDICAL CENTER</FullText>
+		</LabIdentifier>
+		<Address>
+			<FullText>N/A</FullText>
+			<Address1>
+				<FullText>1840 Amherst Street</FullText>
+			</Address1>
+			<City>
+				<FullText>Winchester</FullText>
+			</City>
+			<State>
+				<FullText>VA</FullText>
+			</State>
+			<ZipCode>
+				<FullText>22601</FullText>
+			</ZipCode>
+		</Address>
+		<Name>
+			<FullText>Winchester Medical Center</FullText>
+		</Name>
+	</LabInfo>
 	<Test>
 		<FullText>N/A</FullText>
 		<OrderNumber>
@@ -61,15 +88,6 @@
 		<ResultTime>
 			<FullText>11:11</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0225211</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>WINCHESTER MEDICAL CENTER</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -640,15 +658,6 @@
 		<ResultTime>
 			<FullText>11:11</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0225211</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>WINCHESTER MEDICAL CENTER</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -976,15 +985,6 @@
 		<ResultTime>
 			<FullText>11:11</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0225211</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>WINCHESTER MEDICAL CENTER</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1042,15 +1042,6 @@
 		<ResultTime>
 			<FullText>11:11</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0225211</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>WINCHESTER MEDICAL CENTER</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1108,15 +1099,6 @@
 		<ResultTime>
 			<FullText>11:11</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0225211</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>WINCHESTER MEDICAL CENTER</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1174,15 +1156,6 @@
 		<ResultTime>
 			<FullText>11:11</FullText>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>49D0225211</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>WINCHESTER MEDICAL CENTER</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 12/04/2014.</FullText>
 		</Comment>
@@ -1214,30 +1187,6 @@
 			</Comment>
 		</Component>
 	</Test>
-	<LabInfo>
-		<FullText>N/A</FullText>
-		<DefaultLabDisplay>
-			<FullText>WINCHESTER MEDICAL CENTER, 1840 AMHERST STREET WINCHESTER</FullText>
-		</DefaultLabDisplay>
-		<Address>
-			<FullText>N/A</FullText>
-			<Address1>
-				<FullText>1840 Amherst Street</FullText>
-			</Address1>
-			<City>
-				<FullText>Winchester</FullText>
-			</City>
-			<State>
-				<FullText>VA</FullText>
-			</State>
-			<ZipCode>
-				<FullText>22601</FullText>
-			</ZipCode>
-		</Address>
-		<Name>
-			<FullText>Winchester Medical Center</FullText>
-		</Name>
-	</LabInfo>
 	<ResultDate>
 		<FullText>06/03/2014</FullText>
 	</ResultDate>
