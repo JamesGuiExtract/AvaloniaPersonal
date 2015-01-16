@@ -78,13 +78,13 @@ STDMETHODIMP CSpatialString::IsSpatiallyLessThan(ISpatialString* pSS, VARIANT_BO
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFirstPageS0 =
 			ipS0->GetSpecifiedPages(nFirstPageS0, nFirstPageS0);
 		ASSERT_RESOURCE_ALLOCATION("ELI25970", ipFirstPageS0 != __nullptr);
-		ILongRectanglePtr ipRectS0 = ipFirstPageS0->GetOriginalImageBounds();
+		ILongRectanglePtr ipRectS0 = ipFirstPageS0->GetOCRImageBounds();
 		ASSERT_RESOURCE_ALLOCATION("ELI25971", ipRectS0 != __nullptr);
 		
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFirstPageS1 =
 			ipS1->GetSpecifiedPages(nFirstPageS1, nFirstPageS1);
 		ASSERT_RESOURCE_ALLOCATION("ELI25972", ipFirstPageS1 != __nullptr);
-		ILongRectanglePtr ipRectS1 = ipFirstPageS1->GetOriginalImageBounds();
+		ILongRectanglePtr ipRectS1 = ipFirstPageS1->GetOCRImageBounds();
 		ASSERT_RESOURCE_ALLOCATION("ELI25973", ipRectS1 != __nullptr);
 
 		// Get the values from the rectangles
