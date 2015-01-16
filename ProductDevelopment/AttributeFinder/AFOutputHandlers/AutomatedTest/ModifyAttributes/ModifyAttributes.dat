@@ -48,7 +48,7 @@
 <TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
 
 /////////////////////////////
-// BACKREFERENCING TEST CASES
+// ATTRIBUTEREFERENCING TEST CASES
 /////////////////////////////
 
 // Second and third SSNs, separated by comma
@@ -153,3 +153,9 @@
 // commas between attributes.
 // Exercising ability to replace an AFQuery with a regular expression if prefaced by '='
 <TESTCASE>;TestBF33.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF33.eav
+
+// Test format strings to set the Name, Type, and Value
+<TESTCASE>;TestFS01.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestFS01.eav
+
+// Test setting the Type to be multiple types
+<TESTCASE>;TestFS02.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestFS02.eav
