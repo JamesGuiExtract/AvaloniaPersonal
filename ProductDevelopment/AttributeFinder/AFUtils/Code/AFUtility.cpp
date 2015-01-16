@@ -2056,10 +2056,12 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 	StringTokenizer::sGetTokens(strQuery, ".", vecTokens);
 	// There should only be a max of 2 tokens 
 	// Token 1 should be an xpath query
-	// Token 2 should be either "Value" or "Name"
-	// If bGetType is true we will return the type of the attribute
-	// otherwise we will return the value
-	bool bGetType = false;
+	// Token 2 should be "Value", "Type" or "Name"
+
+	// vType determines whether to return Name, Type or Value
+	enum VariableType { kGetType, kGetName, kGetValue };
+	VariableType vType = kGetValue;
+
 	if(vecTokens.size() > 2)
 	{
 		UCLIDException ue("ELI09677", "Invalid Variable Query.");
@@ -2078,7 +2080,11 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 	{
 		if(vecTokens[1] == "Type")
 		{
-			bGetType = true;
+			vType = kGetType;
+		}
+		else if(vecTokens[1] == "Name")
+		{
+			vType = kGetName;
 		}
 		else if(vecTokens[1] == "Value")
 		{
@@ -2099,6 +2105,20 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 		ipNewString.CreateInstance(CLSID_SpatialString);
 		ASSERT_RESOURCE_ALLOCATION("ELI09707", ipNewString != __nullptr);
 		string str = asString(ipAttribute->Type);
+		if(str == "")
+		{
+			return __nullptr;
+		}
+		ipNewString->CreateNonSpatialString(str.c_str(), "");
+	}
+	else if(strQueryPart1 == "Name")
+	{
+		// This means that the variable is %Name% which is just the Name of the
+		// Selected Attribute
+
+		ipNewString.CreateInstance(CLSID_SpatialString);
+		ASSERT_RESOURCE_ALLOCATION("ELI37771", ipNewString != __nullptr);
+		string str = asString(ipAttribute->Name);
 		if(str == "")
 		{
 			return __nullptr;
@@ -2138,7 +2158,7 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 			IAttributePtr ipFoundAttr = ipSelectedAttributes->At(ui);
 			ASSERT_RESOURCE_ALLOCATION("ELI09706", ipFoundAttr != __nullptr);
 		
-			if(bGetType)
+			if(vType == kGetType)
 			{
 				if (bUniqueOnly)
 				{
@@ -2154,6 +2174,24 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 				ISpatialStringPtr ipValue(CLSID_SpatialString);
 				ASSERT_RESOURCE_ALLOCATION("ELI19189", ipValue != __nullptr);
 				ipValue->CreateNonSpatialString(ipFoundAttr->Type, "");
+				ipValues->PushBack(ipValue);
+			}
+			else if(vType == kGetName)
+			{
+				if (bUniqueOnly)
+				{
+					string strName = asString(ipFoundAttr->Name);
+					if (setUsedValues.find(strName) != setUsedValues.end())
+					{
+						continue;
+					}
+
+					setUsedValues.insert(strName);
+				}
+
+				ISpatialStringPtr ipValue(CLSID_SpatialString);
+				ASSERT_RESOURCE_ALLOCATION("ELI37770", ipValue != __nullptr);
+				ipValue->CreateNonSpatialString(ipFoundAttr->Name, "");
 				ipValues->PushBack(ipValue);
 			}
 			else

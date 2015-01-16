@@ -73,16 +73,12 @@ STDMETHODIMP CModifyAttributeValuePP::Apply(void)
 			_bstr_t _bstrType( bstrAttributeType );
 
 			// Dummy IAttribute object for Name and Type validation
-			IAttributePtr	ipDummy( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09531", ipDummy != __nullptr );
 			if(m_bUpdateName)
 			{
-				ipDummy->PutName( _bstrName );
 				ipModifyValue->AttributeName = _bstrName;
 			}
 			if(m_bUpdateType)
 			{
-				ipDummy->PutType( _bstrType );
 				ipModifyValue->AttributeType = _bstrType;
 			}
 			

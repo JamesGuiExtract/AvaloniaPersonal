@@ -158,7 +158,7 @@ STDMETHODIMP CModifyAttributeValueOH::put_AttributeName(/*[in]*/ BSTR newVal)
 		string strNewVal = asString(newVal);
 
 		// Validate the attribute name
-		if (!isValidIdentifier(strNewVal))
+		if (strNewVal.find_first_of("%<>") == string::npos && !isValidIdentifier(strNewVal))
 		{
 			UCLIDException uex("ELI28574", "Invalid attribute name.");
 			uex.addDebugInfo("Invalid Name", strNewVal);
@@ -244,7 +244,8 @@ STDMETHODIMP CModifyAttributeValueOH::put_AttributeType(/*[in]*/ BSTR newVal)
 		string strNewVal = asString(newVal);
 
 		// Validate the attribute type
-		if (!strNewVal.empty() && !isValidIdentifier(strNewVal))
+		if (!strNewVal.empty() && strNewVal.find_first_of("%<>") == string::npos &&
+			!isValidIdentifier(strNewVal))
 		{
 			UCLIDException uex("ELI28575", "Invalid attribute type.");
 			uex.addDebugInfo("Invalid Type", strNewVal);
@@ -446,10 +447,20 @@ STDMETHODIMP CModifyAttributeValueOH::raw_ProcessOutput(IIUnknownVector* pAttrib
 					ipUpdateAttr.CreateInstance(CLSID_Attribute);
 					ASSERT_RESOURCE_ALLOCATION("ELI10268", ipUpdateAttr != __nullptr);
 				}
+				_bstr_t strAttributeName = ipUpdateAttr->Name;
+
+				ICopyableObjectPtr ipAttrSS(ipUpdateAttr->Value);
+				ASSERT_RESOURCE_ALLOCATION("ELI37772", ipAttrSS != __nullptr);
+
+				ISpatialStringPtr ipAttributeValue = ipAttrSS;
+
+				_bstr_t strAttributeType = ipUpdateAttr->Type;
+
 				// modify attribute value or type
 				if (m_bSetAttributeName)
 				{
-					ipUpdateAttr->Name = m_strAttributeName.c_str();
+					strAttributeName = m_ipAFUtil->ExpandFormatString(
+						ipMatchedAttr, m_strAttributeName.c_str(), '\0', __nullptr)->String;
 				}
 				else
 				{
@@ -464,14 +475,19 @@ STDMETHODIMP CModifyAttributeValueOH::raw_ProcessOutput(IIUnknownVector* pAttrib
 				if (m_bSetAttributeValue)
 				{
 					// replace the old attribute value with the new attribute value
-					ipUpdateAttr->Value = m_ipAFUtil->ExpandFormatString(
+					ipAttributeValue = m_ipAFUtil->ExpandFormatString(
 						ipMatchedAttr, m_strAttributeValue.c_str(), '\0', __nullptr);
 				}
 
 				if (m_bSetAttributeType)
 				{
-					ipUpdateAttr->Type = m_strAttributeType.c_str();
+					strAttributeType = m_ipAFUtil->ExpandFormatString(
+						ipMatchedAttr, m_strAttributeType.c_str(), '\0', __nullptr)->String;
 				}
+
+				ipUpdateAttr->Name = strAttributeName;
+				ipUpdateAttr->Value = ipAttributeValue;
+				ipUpdateAttr->Type = strAttributeType;
 
 				if (m_bCreateSubAttribute)
 				{
