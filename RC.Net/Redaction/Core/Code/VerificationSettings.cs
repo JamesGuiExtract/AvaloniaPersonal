@@ -61,7 +61,7 @@ namespace Extract.Redaction
         /// <summary>
         /// Specifies whether the user should be able to apply tags.
         /// </summary>
-        readonly bool _allowTags;
+        readonly bool _allowTags = true;
 
         /// <summary>
         /// Specifies which tags should be available to the users.
