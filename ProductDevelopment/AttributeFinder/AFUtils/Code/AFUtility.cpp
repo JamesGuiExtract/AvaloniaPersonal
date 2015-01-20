@@ -2051,16 +2051,17 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 											   const string& strSelection, const string& strDelim)
 {
 	// TODO: check the cache
-	bool bFound = false;
+	// bool bFound = false;
+
 	vector<string> vecTokens;
 	StringTokenizer::sGetTokens(strQuery, ".", vecTokens);
 	// There should only be a max of 2 tokens 
 	// Token 1 should be an xpath query
 	// Token 2 should be "Value", "Type" or "Name"
 
-	// vType determines whether to return Name, Type or Value
-	enum VariableType { kGetType, kGetName, kGetValue };
-	VariableType vType = kGetValue;
+	// eFieldType determines whether to return Name, Type or Value
+	enum EVariableType { kGetType, kGetName, kGetValue };
+	EVariableType eFieldType = kGetValue;
 
 	if(vecTokens.size() > 2)
 	{
@@ -2076,15 +2077,19 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 	}
 
 	string strQueryPart1 = vecTokens[0];
-	if(vecTokens.size() == 2)
+	
+	// Set use current node flag. Will set to false if sole token is not "Type" or "Value"
+	bool bUseCurrentNode = vecTokens.size() == 1 || strQueryPart1 == "";
+
+	if (vecTokens.size() == 2)
 	{
 		if(vecTokens[1] == "Type")
 		{
-			vType = kGetType;
+			eFieldType = kGetType;
 		}
 		else if(vecTokens[1] == "Name")
 		{
-			vType = kGetName;
+			eFieldType = kGetName;
 		}
 		else if(vecTokens[1] == "Value")
 		{
@@ -2096,10 +2101,25 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 			throw ue;
 		}
 	}
-	ISpatialStringPtr ipNewString = __nullptr;
-	if(strQueryPart1 == "Type")
+	else
 	{
-		// This means that the variable is %Type which is just the Type of the
+		if(vecTokens[0] == "Type")
+		{
+			eFieldType = kGetType;
+		}
+		else if(vecTokens[0] == "Value")
+		{
+		}
+		else
+		{
+			bUseCurrentNode = false;
+		}
+	}
+
+	ISpatialStringPtr ipNewString = __nullptr;
+	if(bUseCurrentNode && eFieldType == kGetType)
+	{
+		// This means that the variable is %Type% or %.Type% which is just the Type of the
 		// Selected Attribute
 
 		ipNewString.CreateInstance(CLSID_SpatialString);
@@ -2111,9 +2131,9 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 		}
 		ipNewString->CreateNonSpatialString(str.c_str(), "");
 	}
-	else if(strQueryPart1 == "Name")
+	else if(bUseCurrentNode && eFieldType == kGetName)
 	{
-		// This means that the variable is %Name% which is just the Name of the
+		// This means that the variable is %Name% or %.Name% which is just the Name of the
 		// Selected Attribute
 
 		ipNewString.CreateInstance(CLSID_SpatialString);
@@ -2125,7 +2145,7 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 		}
 		ipNewString->CreateNonSpatialString(str.c_str(), "");
 	}
-	else if(strQueryPart1 == "Value")
+	else if(bUseCurrentNode && eFieldType == kGetValue)
 	{
 		ipNewString = ipAttribute->Value;
 	}
@@ -2158,7 +2178,7 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 			IAttributePtr ipFoundAttr = ipSelectedAttributes->At(ui);
 			ASSERT_RESOURCE_ALLOCATION("ELI09706", ipFoundAttr != __nullptr);
 		
-			if(vType == kGetType)
+			if(eFieldType == kGetType)
 			{
 				if (bUniqueOnly)
 				{
@@ -2176,7 +2196,7 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 				ipValue->CreateNonSpatialString(ipFoundAttr->Type, "");
 				ipValues->PushBack(ipValue);
 			}
-			else if(vType == kGetName)
+			else if(eFieldType == kGetName)
 			{
 				if (bUniqueOnly)
 				{

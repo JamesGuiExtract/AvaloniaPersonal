@@ -1398,11 +1398,12 @@ bool CAttribute::containsType(string strType)
 		throw UCLIDException( "ELI09268", "Cannot search Attribute Type for an empty string!" );
 	}
 
-	// Check string for reserved character
 	char cReserved = '+';
+
+	// Don't bother searching if string contains reserved character because it will never match
 	if (strType.find( cReserved ) != string::npos)
 	{
-		throw UCLIDException( "ELI09266", "Cannot use '+' as Attribute Type!" );
+		return false;
 	}
 
 	// Convert desired string to upper case for case-insensitive comparison
