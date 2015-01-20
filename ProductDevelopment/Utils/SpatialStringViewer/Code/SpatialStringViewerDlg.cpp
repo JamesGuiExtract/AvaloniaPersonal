@@ -1194,7 +1194,7 @@ long CSpatialStringViewerDlg::getPageAtPos(long nPos)
 	try
 	{
 		//  Return -1 if nPos is not within the bounds of the loaded document
-		if (!asCppBool(m_ipSpatialString->HasSpatialInfo()) || nPos < 0)
+		if (m_ipSpatialString->GetMode() != kSpatialMode || nPos < 0)
 		{
 			return -1;
 		}

@@ -1,4 +1,4 @@
-// TestSpatialString.cpp : Implementation of CTestSpatialString
+/ TestSpatialString.cpp : Implementation of CTestSpatialString
 #include "stdafx.h"
 #include "SpatialStringAutomatedTest.h"
 #include "TestSpatialString.h"
@@ -93,6 +93,7 @@ STDMETHODIMP CTestSpatialString::raw_RunAutomatedTests(IVariantVector* pParams, 
 		runTestCase22();
 		runTestCase23();
 		runTestCase24();
+		runTestCase25();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06681")
 
@@ -2342,8 +2343,8 @@ void CTestSpatialString::runTestCase22()
 		ASSERT_RESOURCE_ALLOCATION("ELI09089", ipMulti != __nullptr );
 
 		if ( m_ipSpatialString->SourceDocName == ipMultipleSpatialString->SourceDocName &&
-			ipComplete->IsEqualTo( ipMulti ) == VARIANT_TRUE  && !m_ipSpatialString->HasSpatialInfo() &&
-			!ipMultipleSpatialString->HasSpatialInfo() )
+			ipComplete->IsEqualTo( ipMulti ) == VARIANT_TRUE  && (m_ipSpatialString->GetMode() == kSpatialMode) &&
+			(ipMultipleSpatialString->GetMode() == kSpatialMode))
 		{
 			// Successfull test if both spatial strings are equal
 			bSuccess = true;
@@ -2499,6 +2500,295 @@ void CTestSpatialString::runTestCase24()
 		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
 	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI21192", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+}
+//--------------------------------------------------------------------------------------------------
+void CTestSpatialString::runTestCase25()
+{
+	// this test case tests the functionality of CreateFromSpatialStrings() method on a multi-paged spatial string
+	bool bExceptionCaught = false;
+	bool bSuccess = false;
+
+	// For creating the name of the file to load
+	string strUSSFile;
+	vector<string> vecFilesToCombine;
+
+	// start the test case
+	m_ipResultLogger->StartTestCase( get_bstr_t("TEST_25_1" ),
+		get_bstr_t( "Testing CreateFromSpatialStrings() by creating a new string from 2 1 page docs "), 
+			kAutomatedTestCase ); 
+	try
+	{
+		// get the name of the USS file to load for this test
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.1.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+
+		// get the name of the 2nd USS file
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.2.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+		
+		// get the name of the USS file the has the expected results
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.1-2.uss";
+		
+		bSuccess = testCase25Helper(vecFilesToCombine, strUSSFile);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI37802", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+	
+	vecFilesToCombine.clear();
+
+	// start the test case
+	m_ipResultLogger->StartTestCase( get_bstr_t("TEST_25_2" ),
+		get_bstr_t( "Testing CreateFromSpatialStrings() by creating a new string from 2 2 page docs"), 
+			kAutomatedTestCase ); 
+	try
+	{
+		// get the name of the USS file to load for this test
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.1-2.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+
+		// get the name of the 2nd USS file
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.3-4.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+		
+		// Get the name of the file with the expected results
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.uss";
+		
+		bSuccess = testCase25Helper(vecFilesToCombine, strUSSFile);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI37804", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+		
+	vecFilesToCombine.clear();
+
+	// start the test case
+	m_ipResultLogger->StartTestCase( get_bstr_t("TEST_25_3" ),
+		get_bstr_t( "Testing CreateFromSpatialStrings() by creating a new string from 2 1 page docs and 1 2 page doc"), 
+			kAutomatedTestCase ); 
+	try
+	{
+		// get the name of the USS file to load for this test
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.1.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+
+		// get the name of the 2nd USS file
+		strUSSFile = m_strTestFilesFolder +  "TestImage003.tif.2.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+		
+		// get the name of the 3rd USS file
+		strUSSFile = m_strTestFilesFolder +  "TestImage003.tif.3-4.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+	
+		// Get the name of the USS file with the expected results
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.uss";
+		
+		bSuccess = testCase25Helper(vecFilesToCombine, strUSSFile);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));		
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI37808", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+			
+	vecFilesToCombine.clear();
+
+	// start the test case
+	m_ipResultLogger->StartTestCase( get_bstr_t("TEST_25_4" ),
+		get_bstr_t( "Testing CreateFromSpatialStrings() pages out of order - testing that an exception is thrown"), 
+			kAutomatedTestCase ); 
+	try
+	{
+		// get the name of the USS file to load for this test
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.2.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+
+		// get the name of the 2nd USS file
+		strUSSFile = m_strTestFilesFolder +  "TestImage003.tif.1.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+		
+		// get the name of the 3rd USS file
+		strUSSFile = m_strTestFilesFolder +  "TestImage003.tif.3-4.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+	
+		// Get the name of the USS file with the expected results
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.uss";
+		
+		// The combine is expected to fail so if it doesn't throw an exception the case fails
+		try
+		{
+			testCase25Helper(vecFilesToCombine, strUSSFile);
+			bSuccess = false;
+		}
+		catch(...)
+		{
+			bSuccess = true;
+		}
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));		
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI37809", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+	vecFilesToCombine.clear();
+
+	// start the test case
+	m_ipResultLogger->StartTestCase( get_bstr_t("TEST_25_5" ),
+		get_bstr_t( "Testing CreateFromSpatialStrings() with 1 page nonspatial and others spatial - testing that an exception is thrown"), 
+			kAutomatedTestCase ); 
+	try
+	{
+		// get the name of the USS file to load for this test
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.1.uss.txt";
+		vecFilesToCombine.push_back(strUSSFile);
+
+		// get the name of the 2nd USS file
+		strUSSFile = m_strTestFilesFolder +  "TestImage003.tif.2.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+		
+		// get the name of the 3rd USS file
+		strUSSFile = m_strTestFilesFolder +  "TestImage003.tif.3-4.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+	
+		// Get the name of the USS file with the expected results
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.uss";
+		
+		// The combine is expected to fail so if it doesn't throw an exception the case fails
+		try
+		{
+			testCase25Helper(vecFilesToCombine, strUSSFile);
+			m_ipResultLogger->AddTestCaseNote("Combined string was created, but should not have been because of the nonspatial string");
+			bSuccess = false;
+		}
+		catch(...)
+		{
+			bSuccess = true;
+		}
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));		
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI37810", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+	vecFilesToCombine.clear();
+
+	// start the test case
+	m_ipResultLogger->StartTestCase( get_bstr_t("TEST_25_6" ),
+		get_bstr_t( "Testing CreateFromSpatialStrings() with 1 page hybrid and others spatial - testing that an exception is thrown"), 
+			kAutomatedTestCase ); 
+	try
+	{
+		// get the name of the USS file to load for this test
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.1.hybrid.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+
+		// get the name of the 2nd USS file
+		strUSSFile = m_strTestFilesFolder +  "TestImage003.tif.2.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+		
+		// get the name of the 3rd USS file
+		strUSSFile = m_strTestFilesFolder +  "TestImage003.tif.3-4.uss";
+		vecFilesToCombine.push_back(strUSSFile);
+	
+		// Get the name of the USS file with the expected results
+		strUSSFile = m_strTestFilesFolder + "TestImage003.tif.uss";
+		
+		// The combine is expected to fail so if it doesn't throw an exception the case fails
+		try
+		{
+			testCase25Helper(vecFilesToCombine, strUSSFile);
+			m_ipResultLogger->AddTestCaseNote("Combined string was created, but should not have been because of the Hybrid string");
+			bSuccess = false;
+		}
+		catch(...)
+		{
+			bSuccess = true;
+		}
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));		
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI37810", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+}
+//-------------------------------------------------------------------------------------------------
+bool CTestSpatialString::testCase25Helper(vector<string>& rvecFilesToJoin, string& expected)
+{
+		// Create the vector to hold the strings to combine
+	IIUnknownVectorPtr ipStringsToCombine (CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI37799", ipStringsToCombine != __nullptr);
+
+	// Create string used to temp load from uss file
+	ISpatialStringPtr ipSS(CLSID_SpatialString);
+	ASSERT_RESOURCE_ALLOCATION("ELI37800", ipSS != __nullptr);
+
+	// load the strings to combine
+	for (int i = 0; i < rvecFilesToJoin.size(); i++)
+	{
+		// Create string used to temp load from uss file
+		ISpatialStringPtr ipSS(CLSID_SpatialString);
+		ASSERT_RESOURCE_ALLOCATION("ELI37800", ipSS != __nullptr);
+
+		ipSS->LoadFrom(get_bstr_t(rvecFilesToJoin[i]), VARIANT_FALSE);
+
+		ipStringsToCombine->PushBack(ipSS);
+	}
+
+	// clear the spatial string
+	m_ipSpatialString->Clear();
+
+	ipSS.CreateInstance(CLSID_SpatialString);
+
+	// Join the 2 strings
+	ipSS->CreateFromSpatialStrings(ipStringsToCombine);
+
+	m_ipSpatialString->LoadFrom( get_bstr_t( expected ), VARIANT_FALSE );
+
+	// Compare the strings
+	IComparableObjectPtr ipCompare = m_ipSpatialString;
+	ASSERT_RESOURCE_ALLOCATION("ELI37807", ipCompare != __nullptr);
+
+	return compareSpatialStrings(m_ipSpatialString, ipSS);
+}
+//--------------------------------------------------------------------------------------------------
+bool CTestSpatialString::compareSpatialStrings(ISpatialStringPtr ipSS1, ISpatialStringPtr ipSS2)
+{
+	IComparableObjectPtr ipCompare1 = ipSS1;
+
+	// First compare the non spatial info
+	if (ipCompare1->IsEqualTo(ipSS2) == VARIANT_FALSE)
+	{
+		return false;
+	}
+	// Compare the spatial info
+	ILongToObjectMapPtr ipPageInfo1 = ipSS1->SpatialPageInfos;
+	ILongToObjectMapPtr ipPageInfo2 = ipSS2->SpatialPageInfos;
+	IVariantVectorPtr ipKeys1 = ipPageInfo1->GetKeys();
+	IVariantVectorPtr ipKeys2 = ipPageInfo2->GetKeys();
+
+	int nNumKeys = ipKeys1->Size;
+	
+	// Compare the keys
+	if (nNumKeys != ipKeys2->Size )
+	{
+		return false;
+	}
+
+	// Compare each of the Page info structures
+	int i;
+
+	for (i = 0; i < nNumKeys; i++)
+	{
+		long nKey = ipKeys1->GetItem(i);
+		if (nKey != ipKeys2->GetItem(i).lVal)
+		{
+			return false;
+		}
+		ISpatialPageInfoPtr ipSP1 = ipPageInfo1->GetValue(nKey);
+		ISpatialPageInfoPtr ipSP2 = ipPageInfo2->GetValue(nKey);
+		if (ipSP1->Equal(ipSP2) == VARIANT_FALSE)
+		{
+			return false;
+		}
+	}
+	return true;
 }
 //--------------------------------------------------------------------------------------------------
 void CTestSpatialString::setTestFileFolder(IVariantVectorPtr ipParams, const std::string &strTCLFile)

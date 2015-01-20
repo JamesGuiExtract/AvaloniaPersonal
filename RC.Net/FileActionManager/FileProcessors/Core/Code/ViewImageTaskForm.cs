@@ -196,9 +196,11 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 Text = Path.GetFileName(_currentFileName) + " - " + _FORM_TASK_TITLE;
 
-                _tagFileToolStripButton.Enabled = true;
-                _tagFileToolStripButton.FileId = _currentFileId;
-
+                if (_tagFileToolStripButton.Database != null)
+                {
+                    _tagFileToolStripButton.Enabled = true;
+                    _tagFileToolStripButton.FileId = _currentFileId;
+                }
                 _nextDocumentToolStripButton.Enabled = true;
                 _nextDocumentToolStripMenuItem.Enabled = true;
             }

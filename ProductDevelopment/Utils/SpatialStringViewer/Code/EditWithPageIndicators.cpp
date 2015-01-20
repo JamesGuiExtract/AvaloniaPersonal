@@ -240,7 +240,7 @@ long CEditWithPageIndicators::getPageAtPos(long position)
 	try
 	{
 		long pageNumber = -1;
-		if (!asCppBool(m_ipSpatialString->HasSpatialInfo()))
+		if (m_ipSpatialString->GetMode() != kSpatialMode)
 		{
 			return pageNumber;
 		}

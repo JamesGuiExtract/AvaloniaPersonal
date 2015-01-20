@@ -729,11 +729,7 @@ STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings)
 		{
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStr = ipStrings->At(i); 
 			long nCurrPage = ipStr->GetFirstPageNumber();
-			if (nCurrPage != ipStr->GetLastPageNumber())
-			{
-				UCLIDException ue("ELI37163", "Single page Spatial strings expected.");
-				throw ue;
-			}
+			long nLastPage = ipStr->GetLastPageNumber();
 			
 			// if the current page is < than the last processed page throw an exception
             if (nCurrPage < nLastProcessedPage)
@@ -784,11 +780,26 @@ STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings)
 			memcpy_s(&(m_vecLetters[nPos]), lCopySize, letters, lCopySize);
 
 			// Add the pageInfo objects
-			if (nCurrPage != nLastProcessedPage)
+			// Need to iterate through all the pages that are contained in the source string
+			ILongToObjectMapPtr ipSourcePageInfos = ipStr->SpatialPageInfos;
+			long nSize = ipSourcePageInfos->Size;
+			for (long k = 0; k < nSize; k++)
 			{
-				m_ipPageInfoMap->Set(nCurrPage, ipStr->GetPageInfo(nCurrPage));
+				long nPage;
+				IUnknownPtr ipUnkVariableValue;
+				ipSourcePageInfos->GetKeyValue(k, &nPage, &ipUnkVariableValue);
+
+				// Do not add page info if the page is less than or equal to the last processed
+				// since there should already be a page info for those pages
+				if (nPage > nLastProcessedPage)
+				{
+					UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = ipUnkVariableValue;
+					ASSERT_RESOURCE_ALLOCATION("ELI37782", ipPageInfo != __nullptr);
+					m_ipPageInfoMap->Set(nPage, ipPageInfo);
+				}
 			}
-			nCurrPage = nLastProcessedPage;
+
+			nLastProcessedPage = nLastPage;
 
 			nPos += nNumLetters;
 		}

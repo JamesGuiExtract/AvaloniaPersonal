@@ -17,6 +17,7 @@
 #include <UPI.h>
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
+#include <StringTokenizer.h>
 
 #include <io.h>
 #include <cmath>
@@ -65,6 +66,8 @@ const int gnMAX_WORK_ITEMS_TO_GET_PER_CALL = 100;
 const string& gstrDEFAULT_SKIP_PAGE_ON_FAILURE = "0";
 const string& gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE = "25";
 const string& gstrDEFAULT_MAX_OCR_PAGE_FAILURE_NUMBER = "10";
+
+const long gnPAGES_PER_WORK_ITEM = 5;
 
 //--------------------------------------------------------------------------------------------------
 // COCRFileProcessor
@@ -213,7 +216,7 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 
 			ipSS->LoadFrom(strInputFileName.c_str(), VARIANT_FALSE);
 		}
-		else if (pDB == __nullptr || !m_bParallelize || ipFileRecord->Pages < 3 )
+		else if (pDB == __nullptr || !m_bParallelize || ipFileRecord->Pages <= gnPAGES_PER_WORK_ITEM)
 		{
 			// get the image to OCR
 			string strImageToOcr = m_bUseCleanedImageIfAvailable ?
@@ -738,27 +741,52 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 		IFAMTagManagerPtr ipFAMTM(pFAMTM);
 		ASSERT_RESOURCE_ALLOCATION("ELI37145", ipFAMTM != __nullptr);
 
-		string strInput = asString(ipFAMTM->ExpandTags(ipWorkItem->Input, ipWorkItem->FileName));
+		string strOriginalInput = ipWorkItem->Input;
+		string strInput;
+		vector<long> vecPages;
+		parseOCRInputText(strOriginalInput, strInput, vecPages);
 
-		string strInputFileName = getPathAndFileNameWithoutExtension(strInput);
-		string strExt = getExtensionFromFullPath(strInput);
-		
-		if (strExt.empty() )
-		{
-			UCLIDException ue ("ELI36855", "Invalid input for WorkItem.");
-			ue.addDebugInfo("Input", strInput);
-			throw ue;
-		}
-
-		long nPageNumber = asLong(getExtensionFromFullPath(strInput).substr(1,string::npos));
+		string strInputFileName = asString(ipFAMTM->ExpandTags(get_bstr_t(strInput), ipWorkItem->FileName));
 
 		// get the image to OCR
 		string strImageToOcr = m_bUseCleanedImageIfAvailable ?
 			getCleanImageNameIfExists(strInputFileName) : strInputFileName;
 
-		ISpatialStringPtr ipSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
-			nPageNumber, nPageNumber, UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
-			UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
+		ISpatialStringPtr ipSS;
+		
+		if (m_eOCRPageRangeType == UCLID_FILEPROCESSORSLib::kOCRAll)
+		{
+			// make sure there are 2 pages in vecPages
+			if (vecPages.size() != 2)
+			{
+				UCLIDException ueAll("ELI37795", "No Page specified.");
+				throw ueAll;
+			}
+			// process the 2 pages in the vecpages vector as strart and end
+			ipSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
+				vecPages[0], vecPages[1], UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
+				UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
+		}
+		else if (m_eOCRPageRangeType == UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages)
+		{
+			// Will need to join each of the strings that are returned so need an IUnknownVector
+			IIUnknownVectorPtr ipPages(CLSID_IUnknownVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI37796", ipPages != __nullptr);
+
+			for (int i = 0;i < vecPages.size(); i++)
+			{
+				ISpatialStringPtr ipTempSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
+					vecPages[i], vecPages[i], UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
+					UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
+
+				ipPages->PushBack(ipTempSS);
+			}
+
+			// Create the joint string
+			ipSS.CreateInstance(CLSID_SpatialString);
+			ipSS->CreateFromSpatialStrings(ipPages);
+			
+		}
 		ASSERT_RESOURCE_ALLOCATION("ELI36856", ipSS != __nullptr);
 
 		// Ensure source doc name is original image file if a clean image was used
@@ -858,20 +886,10 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 	{
 		string strFileName = asString(ipFileRecord->Name);
 
-		// Get the total number of pages in the image
-		long nTotalPages = getNumberOfPagesInImage(strFileName);
-
 		// vecPages will be set to have all the page numbers to be processed
 		// if not doing all of the pages
 		vector<int> vecPages;
-		long nPagesToProcess = nTotalPages;
-		
-		// If only processing specified pages, fill the vecPages vector with the pages
-		if (m_eOCRPageRangeType == UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages)
-		{
-			vecPages = getPageNumbers(nTotalPages, m_strSpecificPages, false);
-			nPagesToProcess = vecPages.size();
-		}
+		long nPagesToProcess = determinePagesToProcess(strFileName, vecPages);
 
 		IIUnknownVectorPtr ipWorkItemsToAdd(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI36910", ipWorkItemsToAdd != __nullptr);
@@ -881,13 +899,17 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		IFileProcessingTaskPtr ipTask(this);
 		_bstr_t bstrStringized = getMiscUtils()->GetObjectAsStringizedByteStream(ipTask);
 		
+		long nPagesForLastWorkItem = nPagesToProcess % gnPAGES_PER_WORK_ITEM;
+		long nNumberOfWorkItems = nPagesToProcess / gnPAGES_PER_WORK_ITEM;
+		nNumberOfWorkItems += (nPagesForLastWorkItem >0) ? 1:0;
+
 		// Check if work item group already exists
 		long nWorkItemGroupID = 0;
 		
 		// Only look for an existing work item group if this can be canceled
 		if (m_bAllowCancelBeforeComplete)
 		{
-			nWorkItemGroupID = ipDB->FindWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nPagesToProcess);
+			nWorkItemGroupID = ipDB->FindWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nNumberOfWorkItems);
 		}
 
 		// The record already exists so return the group id
@@ -901,14 +923,28 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		case UCLID_FILEPROCESSORSLib::kOCRAll:
 			{
 				// Create the work item group
-				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nPagesToProcess); 
-				for (long i = 1; i <= nPagesToProcess; i++)
+				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nNumberOfWorkItems); 
+				for (long i = 0; i < nNumberOfWorkItems; i++)
 				{
+					string strPages;
+
+					long nStartPage = i * gnPAGES_PER_WORK_ITEM + 1;
+					long nEndPage = nStartPage -1;
+					if (i < (nNumberOfWorkItems -1) || nPagesForLastWorkItem == 0)
+					{
+						nEndPage += gnPAGES_PER_WORK_ITEM;
+					}
+					else
+					{ 
+						nEndPage += nPagesForLastWorkItem;
+					}
+					strPages = asString(nStartPage) + "-" + asString(nEndPage);
+
 					// Add the page to the work items to add list
-					ipWorkItemsToAdd->PushBack(createWorkItem("<SourceDocName>", i));
+					ipWorkItemsToAdd->PushBack(createWorkItem("<SourceDocName>", strPages));
 
 					// Limit the number of work items that are added in one call
-					if (i % gnMAX_WORK_ITEMS_TO_ADD_PER_CALL == 0)
+					if (((i + 1) % gnMAX_WORK_ITEMS_TO_ADD_PER_CALL) == 0)
 					{
 						ipDB->AddWorkItems(nWorkItemGroupID, ipWorkItemsToAdd);
 						ipWorkItemsToAdd->Clear();
@@ -919,19 +955,36 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		case UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages:
 			{
 				// Create the work item group
-				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nPagesToProcess); 
+				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nNumberOfWorkItems); 
+
+				string strPages = "";
+
+				int i = 0;
 
 				// Add the work items to the group
-				for (int i = 0; i < nPagesToProcess; i++)
+				for (;i < nPagesToProcess; i++ )
 				{
-					// Add the page to the work items to add list
-					ipWorkItemsToAdd->PushBack(createWorkItem("<SourceDocName>", vecPages[i]));	
-
-					// Limit the number of work items that are added in one call
-					if ((i + 1) % gnMAX_WORK_ITEMS_TO_ADD_PER_CALL == 0)
+					if (i % gnPAGES_PER_WORK_ITEM == 0)
 					{
-						ipDB->AddWorkItems(nWorkItemGroupID, ipWorkItemsToAdd);
-						ipWorkItemsToAdd->Clear();
+						strPages = asString(vecPages[i]);
+					}
+					else
+					{
+						strPages += "|" + asString(vecPages[i]);
+					}
+					
+					int nextI = i + 1;
+					if ((nextI % gnPAGES_PER_WORK_ITEM) == 0 || nextI >= nPagesToProcess)
+					{
+						// Add the page to the work items to add list
+						ipWorkItemsToAdd->PushBack(createWorkItem("<SourceDocName>", strPages));	
+
+						// Limit the number of work items that are added in one call
+						if (((i + 1) % gnMAX_WORK_ITEMS_TO_ADD_PER_CALL) == 0)
+						{
+							ipDB->AddWorkItems(nWorkItemGroupID, ipWorkItemsToAdd);
+							ipWorkItemsToAdd->Clear();
+						}
 					}
 				}
 			}
@@ -985,10 +1038,6 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 				IWorkItemRecordPtr ipWorkItem = ipWorkItems->At(i);
 				ASSERT_RESOURCE_ALLOCATION("ELI36859", ipWorkItem != __nullptr);
 
-				// Get the page number
-				string strExt = getExtensionFromFullPath(asString(ipWorkItem->Input));
-				nPageNumber = asLong(strExt.substr(1));
-
 				UCLID_FILEPROCESSINGLib::EWorkItemStatus eStatus = ipWorkItem->Status;
 
 				// if the status is failed add its info to the aggregate exception and continue with
@@ -999,7 +1048,7 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 					workItemException.createFromString("ELI37553", 
 						asString(ipWorkItem->GetStringizedException()), false, false);
 					aggregateException.addDebugInfo("Exception History", workItemException);
-					strPages += ((bFailedWorkItem) ? ", " : "") + asString(nPageNumber);
+					aggregateException.addDebugInfo("WorkItemInput", asString( ipWorkItem->Input));
 					bFailedWorkItem = true;
 					continue;
 				}
@@ -1053,13 +1102,13 @@ IMiscUtilsPtr COCRFileProcessor::getMiscUtils()
 	return m_ipMiscUtils;
 }
 //-------------------------------------------------------------------------------------------------
-IWorkItemRecordPtr COCRFileProcessor::createWorkItem(string strFileName, int iPageNumber)
+IWorkItemRecordPtr COCRFileProcessor::createWorkItem(string strFileName, string strPages)
 {
 	IWorkItemRecordPtr ipWorkItem(CLSID_WorkItemRecord);
 	ASSERT_RESOURCE_ALLOCATION("ELI36911", ipWorkItem != __nullptr);
 
 	ipWorkItem->Status = kWorkUnitPending;
-	strFileName += "." + asString(iPageNumber);
+	strFileName += "|" + strPages;
 	ipWorkItem->Input = strFileName.c_str();
 
 	return ipWorkItem;
@@ -1200,4 +1249,74 @@ void COCRFileProcessor::getOCRSettings()
 	// Get value of MaxOcrPageFailurePercentage key
 	strValue = regMgr.getKeyValue("", "MaxOcrPageFailurePercentage", gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE);
 	m_uiMaxOcrPageFailurePercentage = asUnsignedLong(strValue);
+}
+//-------------------------------------------------------------------------------------------------
+long COCRFileProcessor::determinePagesToProcess(const string& strFileName, vector<int>& vecPages)
+{
+	// Get the total number of pages in the image
+	long nPagesToProcess = getNumberOfPagesInImage(strFileName);
+
+	// If only processing specified pages, fill the vecPages vector with the pages
+	if (m_eOCRPageRangeType == UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages)
+	{
+		vecPages = getPageNumbers(nPagesToProcess, m_strSpecificPages, false);
+		nPagesToProcess = vecPages.size();
+	}
+	return nPagesToProcess;
+
+}
+//-------------------------------------------------------------------------------------------------
+void COCRFileProcessor::parseOCRInputText(const string& strInputText, string& strFileName, vector<long>& vecPages)
+{
+	vector<string> vecTokens;
+	StringTokenizer::sGetTokens(strInputText, "|", vecTokens);
+
+	if (vecTokens.size() < 1)
+	{
+		UCLIDException ue("ELI37793", "WorkItem input not correct format.");
+		ue.addDebugInfo("Expected format 1", "<FileName with tags>| <page range eg. 1-4>");
+		ue.addDebugInfo("Expected format 2", "<FileName with tags>| <pages eg. 1|3|4>");
+		ue.addDebugInfo("Input", strInputText);
+		throw ue;
+	}
+
+	// if there is only one token - assume old format
+	if (vecTokens.size() == 1)
+	{
+		long nPos = vecTokens[0].find_last_of('.');
+		strFileName = vecTokens[0].substr(0, nPos - 1);
+		long nPage = asLong(vecTokens[0].substr(nPos + 1,string::npos));
+		vecPages.push_back(nPage);
+		vecPages.push_back(nPage);
+	}
+	else if (vecTokens.size() == 2)
+	{
+		strFileName = vecTokens[0];
+		vector<string> vecStrPages;
+		StringTokenizer::sGetTokens(vecTokens[1],"-", vecStrPages);
+
+		// should be at least 1 tokens
+		if (vecStrPages.size() < 1)
+		{
+			UCLIDException ue("ELI37794", "WorkItem input not correct format.");
+			ue.addDebugInfo("Expected format 1", "<FileName with tags>| <page range eg. 1-4>");
+			ue.addDebugInfo("Expected format 2", "<FileName with tags>| <pages eg. 1|3|4>");
+			ue.addDebugInfo("Input", strInputText);
+			throw ue;
+		}
+		vecPages.push_back(asLong(vecStrPages[0]));
+
+		if (vecStrPages.size() > 1)
+		{
+			vecPages.push_back(asLong(vecStrPages[1]));
+		}
+	}
+	else
+	{
+		strFileName = vecTokens[0];
+		for (long  i = 1; i < vecTokens.size(); i++)
+		{
+			vecPages.push_back(asLong(vecTokens[i]));
+		}
+	}
 }

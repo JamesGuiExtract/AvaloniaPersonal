@@ -164,7 +164,7 @@ private:
 	long createWorkItems(long nActionID, IFileRecordPtr ipFileRecord, IFileProcessingDBPtr ipDB);
 
 	// Creates the work item for the filename and page number
-	IWorkItemRecordPtr createWorkItem(string strFileName, int iPageNumber);
+	IWorkItemRecordPtr createWorkItem(string strFileName, string strPages);
 
 	// Stitches the results for individual pages together
 	ISpatialStringPtr stitchWorkItems(const string &strInputFile, long nWorkItemGroupID, IFileProcessingDBPtr ipDB);
@@ -183,4 +183,13 @@ private:
 	// gets the ocr settings from the registry for settings of m_bSkipPageOnFailure, 
 	// m_uiMaxOcrPageFailurePercentage, m_uiMaxOcrPageFailureNumber
 	void getOCRSettings();
+
+	// Returns the total number of pages to be processed, if specified pages are being processed
+	// vecPages will contain the pages - it will be empty if all pages are to be processed
+	long determinePagesToProcess(const string& strFileName, vector<int>& vecPages);
+
+	// Used to parse the input for a work item - strInputText is expected to be a | separated list
+	// with the unexpanded filename first (can contain tags) followed by list of pages expected to 
+	// be in order from lowest to highest
+	void parseOCRInputText(const string& strInputText, string& strFileName, vector<long>& vecPages);
 };
