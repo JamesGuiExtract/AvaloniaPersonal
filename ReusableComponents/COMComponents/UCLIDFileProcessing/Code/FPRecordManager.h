@@ -397,4 +397,7 @@ private:
 
 	// Retrieves the AllowRestartable setting from the database
 	void loadAllowRestartableFromDB();
+
+	// Checks the database for at least one file that is either Pending or Processing for the current action
+	bool areFilesProcessingWithParallelize();
 };

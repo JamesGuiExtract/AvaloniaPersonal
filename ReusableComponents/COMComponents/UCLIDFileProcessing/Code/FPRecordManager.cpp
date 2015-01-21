@@ -384,8 +384,9 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			// there are no files in the queue for processing.  If the queue has
 			// been closed, then just return false, as there is nothing more
 			// to pop, if the queue is open and m_pKeepProcessingAsAdded is
-			// is false exit and return false
-			if (nNumTasksLoaded == 0 && (!processingQueueIsOpen() || !m_bKeepProcessingAsAdded))
+			// is false and no files are processing for parallel processing exit and return false
+			if (nNumTasksLoaded == 0 && (!processingQueueIsOpen() || !m_bKeepProcessingAsAdded &&
+				!areFilesProcessingWithParallelize()))
 			{
 				// Discard processing queue so that once one thread exits because no files to process
 				// all threads will exit even if more files get supplied.
@@ -1489,5 +1490,26 @@ void FPRecordManager::loadAllowRestartableFromDB()
 		m_bAllowRestartableProcessing = asString(bstrAllowRestartable) == "1";
 		m_bAllowRestartableFlagRetrievedFromDB = true;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+bool  FPRecordManager::areFilesProcessingWithParallelize()
+{
+	// Only do the check if Parallelization is enabled
+	if (m_bParallelizableEnabled)
+	{
+		// Check database to see if any files are in the pending or processing state (another process is processing files)
+		string strQuery = "SELECT TOP 1 FAMFile.ID FROM dbo.FileActionStatus "
+							"INNER JOIN dbo.FAMFile "
+							"  ON FileActionStatus.FileID = FAMFile.ID "
+							"WHERE FileActionStatus.ActionStatus = 'R' "
+							"OR FileActionStatus.ActionStatus = 'P' "
+							"AND FileActionStatus.ActionID = " + asString(m_nActionID);
+		
+		_RecordsetPtr ipRecordSet = m_ipFPMDB->GetResultsForQuery(strQuery.c_str());
+
+		// If there is at least one record return true
+		return ipRecordSet->RecordCount > 0;
+	}
+	return false;
 }
 //-------------------------------------------------------------------------------------------------
