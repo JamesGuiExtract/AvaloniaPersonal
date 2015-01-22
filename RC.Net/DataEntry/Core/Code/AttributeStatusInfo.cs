@@ -189,6 +189,13 @@ namespace Extract.DataEntry
         static Dictionary<IAttribute, KeyValuePair<bool, SpatialString>> _attributesBeingModified;
 
         /// <summary>
+        /// Keeps track of the attributes that have been modified since the last time EndEdit was
+        /// called for the purposes of ensuring all are re-validated based on the updated value.
+        /// </summary>
+        [ThreadStatic]
+        static HashSet<IAttribute> _attributesToValidate;
+
+        /// <summary>
         /// Prevents recursion of EndEdit while <see cref="_attributesBeingModified"/> is being
         /// processed.
         /// </summary>
@@ -880,6 +887,7 @@ namespace Extract.DataEntry
                 _statusInfoMap.Clear();
                 _subAttributesToParentMap.Clear();
                 _attributesBeingModified.Clear();
+                _attributesToValidate.Clear();
                 _endEditReferenceCount = 0;
                 _endEditRecursionBlock = false;
                 if (pathTags != null)
@@ -1340,42 +1348,50 @@ namespace Extract.DataEntry
                 // table end up getting cleared.
                 statusInfo.LastAppliedStringValue = value.String;
 
-                if (EndEditInProgress || !endOfEdit)
-                {
-                    // If EndEdit is currently being processed (and this is a result of it), raise
-                    // the non-incremental modification event; otherwise, if this change is not
-                    // triggering EndOfEdit, raise an incremental modification event to queue the
-                    // value for an eventual non-incremental event.
-                    statusInfo.OnAttributeValueModified(
-                        attribute, !EndEditInProgress, acceptSpatialInfo, true);
-                }
-
                 // https://extract.atlassian.net/browse/ISSUE-12662
                 // Whether or not EndEditInProgress, track modified attributes for the purpose of
                 // keeping track of which attributes need to be validated.
-                KeyValuePair<bool, SpatialString> existingModification;
-                if (_attributesBeingModified.TryGetValue(attribute, out existingModification))
+                _attributesToValidate.Add(attribute);
+
+                if (EndEditInProgress)
                 {
-                    // If the attribute already exists in _attributesBeingModified, but is
-                    // marked as a non-spatial change, mark it as a spatial change instead.
-                    if (existingModification.Key == false)
-                    {
-                        _attributesBeingModified[attribute] =
-                            new KeyValuePair<bool, SpatialString>(
-                                true, existingModification.Value);
-                    }
+                    // If EndEdit is currently being processed (and this is a result of it), raise
+                    // the non-incremental modification event now.
+                    statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo, true);
                 }
                 else
                 {
-                    // If the attribute has not been added to _attributesBeingModified, add it.
-                    _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
-                        true, modifiedAttributeMemento.OriginalValue);
-                }
+                    if (!endOfEdit)
+                    {
+                        // If not the end of the edit raise an incremental modification event and
+                        // queue the value for an eventual non-incremental event.
+                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo, true);
+                    }
 
-                // After queing the modification, call EndEdit if directed.
-                if (!EndEditInProgress && endOfEdit)
-                {
-                    EndEdit();
+                    KeyValuePair<bool, SpatialString> existingModification;
+                    if (_attributesBeingModified.TryGetValue(attribute, out existingModification))
+                    {
+                        // If the attribute already exists in _attributesBeingModified, but is
+                        // marked as a non-spatial change, mark it as a spatial change instead.
+                        if (existingModification.Key == false)
+                        {
+                            _attributesBeingModified[attribute] =
+                                new KeyValuePair<bool, SpatialString>(
+                                    true, existingModification.Value);
+                        }
+                    }
+                    else
+                    {
+                        // If the attribute has not been added to _attributesBeingModified, add it.
+                        _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
+                            true, modifiedAttributeMemento.OriginalValue);
+                    }
+
+                    // After queing the modification, call EndEdit if directed.
+                    if (endOfEdit)
+                    {
+                        EndEdit();
+                    }
                 }
             }
             catch (Exception ex)
@@ -1510,19 +1526,28 @@ namespace Extract.DataEntry
 
                     AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                    // If EndEdit is currently being processed (and this is a result of it), raise
-                    // the non-incremental modification event; otherwise, if this change is not
-                    // triggering EndOfEdit, raise an incremental modification event to queue the
-                    // value for an eventual non-incremental event.
-                    statusInfo.OnAttributeValueModified(attribute, !EndEditInProgress, acceptSpatialInfo, false);
-
                     // https://extract.atlassian.net/browse/ISSUE-12662
                     // Whether or not EndEditInProgress, track modified attributes for the purpose of
                     // keeping track of which attributes need to be validated.
-                    if (!_attributesBeingModified.ContainsKey(attribute))
+                    _attributesToValidate.Add(attribute);
+
+                    if (EndEditInProgress)
                     {
-                        _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
-                            false, modifiedAttributeMemento.OriginalValue);
+                        // If EndEdit is currently being processed (and this is a result of it), raise
+                        // the non-incremental modification event now.
+                        statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo, false);
+                    }
+                    else
+                    {
+                        // Raise an incremental modification event and queue the value for an
+                        // eventual non-incremental event.
+                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo, false);
+
+                        if (!_attributesBeingModified.ContainsKey(attribute))
+                        {
+                            _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
+                                false, modifiedAttributeMemento.OriginalValue);
+                        }
                     }
                 }
 
@@ -2996,9 +3021,10 @@ namespace Extract.DataEntry
                     // explicitly references one of the modified attributes. For example, a regex
                     // pattern or validation list that is produced independent of the currently
                     // value will not otherwise get validated.
-                    ValidateAllAttributesBeingModified();
+                    ValidateAllModifiedAttributes();
 
                     _attributesBeingModified.Clear();
+                    _attributesToValidate.Clear();
                 }
                 finally
                 {
@@ -3086,6 +3112,7 @@ namespace Extract.DataEntry
                 // If an exception occured, clear any pending modifications so they are not applied
                 // on a subsequent edit event.
                 _attributesBeingModified.Clear();
+                _attributesToValidate.Clear();
 
                 throw ExtractException.AsExtractException("ELI26118", ex);
             }  
@@ -3211,6 +3238,7 @@ namespace Extract.DataEntry
                 _validationTriggers = new Dictionary<IAttribute, AutoUpdateTrigger>();
                 _attributesBeingModified =
                     new Dictionary<IAttribute, KeyValuePair<bool, SpatialString>>();
+                _attributesToValidate = new HashSet<IAttribute>();
                 _undoManager = new UndoManager();
                 _endEditReferenceCount = 0;
                 _endEditRecursionBlock = false;
@@ -3413,17 +3441,17 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Updates the validation status of all attributes in <see cref="_attributesBeingModified"/>.
+        /// Updates the validation status of all attributes in <see cref="_attributesToValidate"/>.
         /// </summary>
-        static void ValidateAllAttributesBeingModified()
+        static void ValidateAllModifiedAttributes()
         {
             // Retrieve a separate copy of the current _attributesBeingModified so any modifiections
             // to _attributesBeingModified while executing this method does not cause errors
             // iterating _attributesBeingModified.
-            var attributesBeingModified = _attributesBeingModified.Keys.Distinct().ToArray();
+            var modifiedAttributes = _attributesToValidate.ToArray();
 
             // Validate each modified attribute.
-            foreach (IAttribute attribute in attributesBeingModified)
+            foreach (IAttribute attribute in modifiedAttributes)
             {
                 // Use throwException = false to update the validation status without
                 // actually throwing an error.
