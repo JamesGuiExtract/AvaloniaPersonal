@@ -31,7 +31,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 122;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 123;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -839,6 +839,28 @@ int UpdateToSchemaVersion122(_ConnectionPtr ipConnection, long *pnNumSteps,
 	vecQueries.push_back("UPDATE [DBInfo] SET [Value] = 5 " 
 		"WHERE [Name] = '" + gstrAUTO_REVERT_TIME_OUT_IN_MINUTES + "' AND [Value] = 60");
 	vecQueries.push_back("DELETE FROM [DBInfo] WHERE [Name] = 'AutoRevertLockedFiles'");
+	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+	executeVectorOfSQL(ipConnection, vecQueries);
+
+	return nNewSchemaVersion;
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion123(_ConnectionPtr ipConnection, long *pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	int nNewSchemaVersion = 123;
+
+	if (pnNumSteps != __nullptr)
+	{
+		// This is such a small tweak-- use a single step as opposed to the usual 3.
+		*pnNumSteps += 1;
+		return nNewSchemaVersion;
+	}
+
+	vector<string> vecQueries;
+	vecQueries.push_back(
+		"ALTER TABLE [Action] ADD CONSTRAINT [Action_ASCName_Unique] UNIQUE (ASCName)"); 
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
@@ -5815,7 +5837,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 119:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion120);
 				case 120:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion121);
 				case 121:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion122);
-				case 122:	break;
+				case 122:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion123);
+				case 123:	break;
 
 				default:
 					{

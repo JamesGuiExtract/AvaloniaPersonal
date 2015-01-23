@@ -11,9 +11,10 @@ static const string gstrUSER_ID_VAR = "<UserID>";
 static const string gstrMACHINE_ID_VAR = "<MachineID>";
 
 // Create Table SQL statements
-static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [dbo].[Action] ([ID] [int] IDENTITY(1,1) NOT NULL "
-	"CONSTRAINT [PK_Action] PRIMARY KEY CLUSTERED, " 
-	"[ASCName] [nvarchar](50) NOT NULL,	[Description] [nvarchar](255) NULL)";
+static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [dbo].[Action] "
+	"([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Action] PRIMARY KEY CLUSTERED, " 
+	"[ASCName] [nvarchar](50) NOT NULL CONSTRAINT [Action_ASCName_Unique] UNIQUE, "
+	"[Description] [nvarchar](255) NULL)";
 
 static const string gstrCREATE_LOCK_TABLE = 
 	"CREATE TABLE [dbo].[LockTable]([LockName] [nvarchar](50) NOT NULL CONSTRAINT [PK_LockTable] PRIMARY KEY CLUSTERED,"
