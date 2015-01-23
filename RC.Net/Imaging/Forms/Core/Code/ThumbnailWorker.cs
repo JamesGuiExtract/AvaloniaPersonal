@@ -382,16 +382,36 @@ namespace Extract.Imaging.Forms
                 while (page > 0)
                 {
                     // Load the thumbnail for this page
-                    RasterImage thumbnail = _reader.ReadPageAsThumbnail(page, _thumbnailSize);
-                    lock (_lock)
+                    RasterImage privateThumbnail = null;
+                    RasterImage publicThumbnail = null;
+                    try
                     {
-                        _thumbnails[page - 1] = thumbnail;
+                        privateThumbnail = _reader.ReadPageAsThumbnail(page, _thumbnailSize);
+                        publicThumbnail = privateThumbnail;
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI37825");
+                        privateThumbnail = ThumbnailViewer._ERROR_IMAGE;
+                        // The image shared via the public ThumbnailLoaded event is to be managed
+                        // and disposed by the event's handler. Therefore, provide a copy of
+                        // _ERROR_IMAGE so that it does not get disposed.
+                        publicThumbnail = privateThumbnail.Clone();
                     }
 
-                    int pageNumber = page;
+                    lock (_lock)
+                    {
+                        _thumbnails[page - 1] = privateThumbnail;
+                    }
 
-                    OnThumbnailLoaded(pageNumber, thumbnail);
- 
+                    // If there were no registered comsumers of this event, any clone of _ERROR_IMAGE
+                    // should be disposed of here since there will be no other code to do so.
+                    if (!OnThumbnailLoaded(page, publicThumbnail) &&
+                        privateThumbnail == ThumbnailViewer._ERROR_IMAGE)
+                    {
+                        publicThumbnail.Dispose();
+                    }
+
                     page = GetNextPageToLoad();
                 }
             }
@@ -443,7 +463,9 @@ namespace Extract.Imaging.Forms
                 {
                     foreach (RasterImage image in _thumbnails)
                     {
-                        if (image != null)
+                        if (image != null && 
+                            image != ThumbnailViewer._LOADING_IMAGE &&
+                            image != ThumbnailViewer._ERROR_IMAGE)
                         {
                             image.Dispose();
                         }
@@ -484,14 +506,19 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="pageNumber">The page number that was loaded.</param>
         /// <param name="thumbnailImage">The loaded thumbnail <see cref="RasterImage"/>.</param>
-        void OnThumbnailLoaded(int pageNumber, RasterImage thumbnailImage)
+        /// <returns><see langword="true"/> if <see cref="ThumbnailLoaded"/> was raised;
+        /// <see langword="false"/> if there were no registered handlers of the event.</returns>
+        bool OnThumbnailLoaded(int pageNumber, RasterImage thumbnailImage)
         {
             var eventHandler = ThumbnailLoaded;
             if (eventHandler != null)
             {
                 eventHandler(this,
                     new ThumbnailLoadedEventArgs(pageNumber, thumbnailImage));
+                return true;
             }
+
+            return false;
         }
 
         #endregion Private Members

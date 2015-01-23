@@ -28,7 +28,12 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The default image to use for an image that is not yet loaded.
         /// </summary>
-        static readonly RasterImage _LOADING_IMAGE = GetLoadingImage();
+        static internal readonly RasterImage _LOADING_IMAGE = GetLoadingImage();
+
+        /// <summary>
+        /// The image to use for an image that failed to load properly.
+        /// </summary>
+        static internal readonly RasterImage _ERROR_IMAGE = GetErrorImage();
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -163,6 +168,20 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Gets the image to use for thumbnails that failed to load properly.
+        /// </summary>
+        /// <returns>The default image to use for thumbnails that failed to load properly.
+        /// </returns>
+        static RasterImage GetErrorImage()
+        {
+            using (Image image = new Bitmap(typeof(ThumbnailViewer), "Resources.Error.png"))
+            {
+                return RasterImageConverter.ConvertFromImage(image, ConvertFromImageOptions.None);
+            }
+        }
+
+
+        /// <summary>
         /// Populates the image list with default loading image for each page and triggers the 
         /// worker thread to load page thumnails for the currently open image.
         /// </summary>
@@ -209,7 +228,7 @@ namespace Extract.Imaging.Forms
                         if (item != null)
                         {
                             RasterImage image = item.Image;
-                            if (image != null && image != _LOADING_IMAGE)
+                            if (image != null && image != _LOADING_IMAGE && image != _ERROR_IMAGE)
                             {
                                 image.Dispose();
                             }
@@ -313,20 +332,24 @@ namespace Extract.Imaging.Forms
                     {
                         item.Image = image;
 
-                        // The thumbnail viewer should respect the InvertColors property of the
-                        // ImageViewer.
-                        if (ImageViewer.InvertColors)
+                        // Don't  invert or rotate the special loading/error images.
+                        if (image != _LOADING_IMAGE && image != _ERROR_IMAGE)
                         {
-                            var invertCommand = new InvertCommand();
-                            invertCommand.Run(item.Image);
-                        }
+                            // The thumbnail viewer should respect the InvertColors property of the
+                            // ImageViewer.
+                            if (ImageViewer.InvertColors)
+                            {
+                                var invertCommand = new InvertCommand();
+                                invertCommand.Run(item.Image);
+                            }
 
-                        _originalViewPerspectives[i] = item.Image.ViewPerspective;
+                            _originalViewPerspectives[i] = item.Image.ViewPerspective;
 
-                        if (ImageViewer.IsImageAvailable)
-                        {
-                            var pageData = ImageViewer.ImagePageData[i];
-                            item.Image.RotateViewPerspective(pageData.Orientation);
+                            if (ImageViewer.IsImageAvailable)
+                            {
+                                var pageData = ImageViewer.ImagePageData[i];
+                                item.Image.RotateViewPerspective(pageData.Orientation);
+                            }
                         }
 
                         item.Invalidate();
@@ -677,7 +700,7 @@ namespace Extract.Imaging.Forms
             for (int i = 0; i < _imageList.Items.Count; i++)
             {
                 RasterImageListItem item = _imageList.Items[i];
-                if (item.Image != null && item.Image != _LOADING_IMAGE)
+                if (item.Image != null && item.Image != _LOADING_IMAGE && item.Image != _ERROR_IMAGE)
                 {
                     var invertCommand = new InvertCommand();
                     invertCommand.Run(item.Image);

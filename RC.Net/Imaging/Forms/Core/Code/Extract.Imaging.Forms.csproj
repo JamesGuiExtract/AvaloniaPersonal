@@ -1076,6 +1076,7 @@
     <EmbeddedResource Include="Resources\InvertColorsButton.png" />
     <EmbeddedResource Include="Resources\RotateAllDocumentPagesClockwiseButtonSmall.png" />
     <EmbeddedResource Include="Resources\RotateAllDocumentPagesCounterclockwiseButtonSmall.png" />
+    <EmbeddedResource Include="Resources\Error.png" />
     <Content Include="Resources\WordHighlightButtonSmall.png" />
     <Content Include="Resources\WordRedactionButtonSmall.png" />
   </ItemGroup>
