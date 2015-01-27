@@ -224,6 +224,12 @@ void CRuleSetEditor::OnEditPaste()
 						// Find an unused Name
 						strNewName = incrementNumericalSuffix( strNewName );
 					}
+					
+					// Clone object before using
+					ICopyableObjectPtr ipCopy = ipItem;
+					ASSERT_RESOURCE_ALLOCATION("ELI37816", ipCopy != __nullptr);
+
+					ipItem = ipCopy->Clone();
 
 					// Add the attribute to the map
 					m_ipAttributeNameToInfoMap->Set( get_bstr_t( strNewName.c_str() ), 
@@ -305,8 +311,12 @@ void CRuleSetEditor::OnEditPaste()
 			// Add each Rule to the list and the vector
 			for (int i = 0; i < iCount; i++)
 			{
+				// Clone object before using
+				ICopyableObjectPtr ipCopy = ipPastedRules->At( i );
+				ASSERT_RESOURCE_ALLOCATION("ELI37817", ipCopy != __nullptr);
+
 				// Retrieve rule description
-				UCLID_AFCORELib::IAttributeRulePtr	ipNewRule = ipPastedRules->At( i );
+				UCLID_AFCORELib::IAttributeRulePtr	ipNewRule = ipCopy->Clone();
 				ASSERT_RESOURCE_ALLOCATION( "ELI19129", ipNewRule != __nullptr );
 				bool bIgnoreErrors = asCppBool( ipNewRule->IgnoreErrors );
 				string	strDescription( ipNewRule->GetDescription() );
@@ -347,8 +357,12 @@ void CRuleSetEditor::OnEditPaste()
 
 			if (m_ipInfo != __nullptr)
 			{
+				// Clone object before using
+				ICopyableObjectPtr ipCopy = ipObject;
+				ASSERT_RESOURCE_ALLOCATION("ELI37818", ipCopy != __nullptr);
+
 				// Set Input Validator
-				IObjectWithDescriptionPtr	ipIV = ipObject;
+				IObjectWithDescriptionPtr	ipIV = ipCopy->Clone();;
 				if (ipIV != __nullptr)
 				{
 					m_ipInfo->InputValidator = ipIV;
@@ -394,8 +408,12 @@ void CRuleSetEditor::OnEditPaste()
 
 			if (m_ipInfo != __nullptr)
 			{
+				// Clone object before using
+				ICopyableObjectPtr ipCopy = ipObject;
+				ASSERT_RESOURCE_ALLOCATION("ELI37819", ipCopy != __nullptr);
+
 				// Set Attribute Splitter
-				IObjectWithDescriptionPtr	ipSplit = ipObject;
+				IObjectWithDescriptionPtr	ipSplit = ipCopy->Clone();
 				if (ipSplit != __nullptr)
 				{
 					m_ipInfo->AttributeSplitter = ipSplit;
@@ -444,6 +462,11 @@ void CRuleSetEditor::OnEditPaste()
 			IObjectWithDescriptionPtr ipPreprocessor = ipObject;
 			if (ipPreprocessor != __nullptr)
 			{
+				// Clone before using
+				ICopyableObjectPtr ipCopy = ipPreprocessor;
+				ASSERT_RESOURCE_ALLOCATION("ELI37820", ipCopy != __nullptr);
+
+				ipPreprocessor  = ipCopy->Clone();
 				m_ipRuleSet->GlobalDocPreprocessor = ipPreprocessor;
 
 				// Display the Document Preprocessor description
@@ -484,6 +507,11 @@ void CRuleSetEditor::OnEditPaste()
 			IObjectWithDescriptionPtr ipOH = ipObject;
 			if (ipOH != __nullptr)
 			{
+				// Clone object before using
+				ICopyableObjectPtr ipCopy = ipOH;
+				ASSERT_RESOURCE_ALLOCATION("ELI37821", ipCopy != __nullptr);
+
+				ipOH = ipCopy->Clone();
 				m_ipRuleSet->GlobalOutputHandler = ipOH;
 
 				// Display the Output Handler description

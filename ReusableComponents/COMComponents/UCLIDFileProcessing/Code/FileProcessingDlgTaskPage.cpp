@@ -1182,7 +1182,7 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 			ASSERT_RESOURCE_ALLOCATION("ELI37121", ipCopyObj != __nullptr);
 
 			// Retrieve File Processor and description
-			IObjectWithDescriptionPtr	ipNewFP = ipCopyObj;
+			IObjectWithDescriptionPtr	ipNewFP = ipCopyObj->Clone();
 			ASSERT_RESOURCE_ALLOCATION( "ELI13497", ipNewFP != __nullptr );
 			string	strDescription( ipNewFP->GetDescription() );
 

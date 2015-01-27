@@ -713,6 +713,12 @@ void FileProcessingDlgScopePage::OnContextPaste()
 		IObjectWithDescriptionPtr ipSK = ipObject;
 		if (ipSK != __nullptr)
 		{
+			// Clone object before using
+			ICopyableObjectPtr ipCopy = ipSK;
+			ASSERT_RESOURCE_ALLOCATION("ELI37822", ipCopy != __nullptr);
+
+			ipSK = ipCopy->Clone();
+
 			getFSMgmtRole()->FAMCondition = ipSK;
 
 			// Display the FAM condition description

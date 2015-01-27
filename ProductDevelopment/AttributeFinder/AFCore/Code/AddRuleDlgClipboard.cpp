@@ -170,8 +170,12 @@ void CAddRuleDlg::OnEditPaste()
 				// Handle single-rule case
 				if (bSingleRule)
 				{
+					// Clone the object before using
+					ICopyableObjectPtr ipCopy = ipObject;
+					ASSERT_RESOURCE_ALLOCATION("ELI37813", ipCopy != __nullptr);
+
 					// Retrieve rule and description
-					IObjectWithDescriptionPtr	ipNewRule = ipObject;
+					IObjectWithDescriptionPtr	ipNewRule = ipCopy->Clone();
 					ASSERT_RESOURCE_ALLOCATION( "ELI08069", ipNewRule != __nullptr );
 					string	strDescription( ipNewRule->GetDescription() );
 
@@ -211,8 +215,12 @@ void CAddRuleDlg::OnEditPaste()
 					// Add each Rule to the list and the vector
 					for (int i = 0; i < iCount; i++)
 					{
+						// Clone object before using
+						ICopyableObjectPtr ipCopy = ipPastedRules->At( i );
+						ASSERT_RESOURCE_ALLOCATION("ELI37814", ipCopy != __nullptr);
+
 						// Retrieve rule and description
-						IObjectWithDescriptionPtr	ipNewRule = ipPastedRules->At( i );
+						IObjectWithDescriptionPtr	ipNewRule = ipCopy->Clone();
 						ASSERT_RESOURCE_ALLOCATION( "ELI05577", ipNewRule != __nullptr );
 						string	strDescription( ipNewRule->GetDescription() );
 
@@ -272,8 +280,12 @@ void CAddRuleDlg::OnEditPaste()
 
 				if (m_ipRule != __nullptr)
 				{
+					// Clone object before using
+					ICopyableObjectPtr ipCopy = ipObject;
+					ASSERT_RESOURCE_ALLOCATION("ELI37815", ipCopy != __nullptr);
+
 					// Set Document Preprocessor
-					IObjectWithDescriptionPtr	ipPre = ipObject;
+					IObjectWithDescriptionPtr	ipPre = ipCopy->Clone();
 					if (ipPre != __nullptr)
 					{
 						m_ipDocPreprocessor = ipPre;

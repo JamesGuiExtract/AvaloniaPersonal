@@ -618,8 +618,12 @@ LRESULT CMultipleObjSelectorPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWn
 		// Handle single-object case
 		if (bSingleObject)
 		{
+			// Clone object before using
+			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopy = ipObject;
+			ASSERT_RESOURCE_ALLOCATION("ELI37823", ipCopy != __nullptr);
+
 			// Retrieve object and description
-			UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipNewObj = ipObject;
+			UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipNewObj = ipCopy->Clone();
 			ASSERT_RESOURCE_ALLOCATION( "ELI11121", ipNewObj != __nullptr );
 			CString zText = (LPCTSTR) ipNewObj->Description;
 
@@ -646,9 +650,12 @@ LRESULT CMultipleObjSelectorPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWn
 			// Add each Object to the list and the vector
 			for (int i = 0; i < iCount; i++)
 			{
+				// Clone object before using
+				UCLID_COMUTILSLib::ICopyableObjectPtr ipCopy = ipPastedObjects->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI37824", ipCopy != __nullptr);
+
 				// Retrieve object and description
-				UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipNewObj = 
-					ipPastedObjects->At( i );
+				UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipNewObj = ipCopy->Clone();
 				ASSERT_RESOURCE_ALLOCATION( "ELI11123", ipNewObj != __nullptr );
 				CString zText = (LPCTSTR) ipNewObj->Description;
 
