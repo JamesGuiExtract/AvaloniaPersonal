@@ -550,27 +550,39 @@ LRESULT CMultipleObjSelectorPP::OnEditCopy(WORD wNotifyCode, WORD wID, HWND hWnd
 			// Throw exception
 			throw UCLIDException( "ELI11118", "Unable to determine selected object!" );
 		}
-
-		// Create a vector for selected objects
-		UCLID_COMUTILSLib::IIUnknownVectorPtr	ipCopiedObjects( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION( "ELI11119", ipCopiedObjects != __nullptr );
-
-		// Add each selected object to vector
-		while (iIndex != -1)
+		
+		if (m_listObjects.GetSelectedCount() == 1)
 		{
 			// Retrieve the selected object
 			IUnknownPtr	ipObject = m_ipObjects->At(iIndex);
-			ASSERT_RESOURCE_ALLOCATION("ELI09638", ipObject != __nullptr );
+			ASSERT_RESOURCE_ALLOCATION("ELI37827", ipObject != __nullptr );
 
-			// Add the object to the vector
-			ipCopiedObjects->PushBack( ipObject );
-
-			// Get the next selection
-			iIndex = m_listObjects.GetNextItem( iIndex, LVNI_ALL | LVNI_SELECTED );
+			// ClipboardManager will handle the Copy
+			m_ipClipboardMgr->CopyObjectToClipboard( ipObject );
 		}
+		else
+		{
+			// Create a vector for selected objects
+			UCLID_COMUTILSLib::IIUnknownVectorPtr	ipCopiedObjects( CLSID_IUnknownVector );
+			ASSERT_RESOURCE_ALLOCATION( "ELI11119", ipCopiedObjects != __nullptr );
 
-		// ClipboardManager will handle the Copy
-		m_ipClipboardMgr->CopyObjectToClipboard( ipCopiedObjects );
+			// Add each selected object to vector
+			while (iIndex != -1)
+			{
+				// Retrieve the selected object
+				IUnknownPtr	ipObject = m_ipObjects->At(iIndex);
+				ASSERT_RESOURCE_ALLOCATION("ELI09638", ipObject != __nullptr );
+
+				// Add the object to the vector
+				ipCopiedObjects->PushBack( ipObject );
+
+				// Get the next selection
+				iIndex = m_listObjects.GetNextItem( iIndex, LVNI_ALL | LVNI_SELECTED );
+			}
+
+			// ClipboardManager will handle the Copy
+			m_ipClipboardMgr->CopyObjectToClipboard( ipCopiedObjects );
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09637")
 	

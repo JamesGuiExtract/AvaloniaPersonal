@@ -63,27 +63,39 @@ void CAddRuleDlg::OnEditCopy()
 					throw UCLIDException( "ELI05519", 
 						"Unable to determine selected Attribute Modifying Rule!" );
 				}
-
-				// Create a vector for selected rules
-				IIUnknownVectorPtr	ipCopiedRules( CLSID_IUnknownVector );
-				ASSERT_RESOURCE_ALLOCATION( "ELI05529", ipCopiedRules != __nullptr );
-
-				// Add each selected rule to vector
-				while (iIndex != -1)
+	
+				if (m_listRules.GetSelectedCount() == 1)
 				{
-					// Retrieve the selected rule
-					IUnknownPtr	ipObject = m_ipAMRulesVector->At( iIndex );
-					ASSERT_RESOURCE_ALLOCATION( "ELI05576", ipObject != __nullptr );
+					// Retrieve the selected object
+					IUnknownPtr	ipObject = m_ipAMRulesVector->At(iIndex);
+					ASSERT_RESOURCE_ALLOCATION("ELI37828", ipObject != __nullptr );
 
-					// Add the rule to the vector
-					ipCopiedRules->PushBack( ipObject );
-
-					// Get the next selection
-					iIndex = m_listRules.GetNextSelectedItem( pos );
+					// ClipboardManager will handle the Copy
+					m_ipClipboardMgr->CopyObjectToClipboard( ipObject );
 				}
+				else
+				{
+					// Create a vector for selected rules
+					IIUnknownVectorPtr	ipCopiedRules( CLSID_IUnknownVector );
+					ASSERT_RESOURCE_ALLOCATION( "ELI05529", ipCopiedRules != __nullptr );
 
-				// ClipboardManager will handle the Copy
-				m_ipClipboardMgr->CopyObjectToClipboard( ipCopiedRules );
+					// Add each selected rule to vector
+					while (iIndex != -1)
+					{
+						// Retrieve the selected rule
+						IUnknownPtr	ipObject = m_ipAMRulesVector->At( iIndex );
+						ASSERT_RESOURCE_ALLOCATION( "ELI05576", ipObject != __nullptr );
+
+						// Add the rule to the vector
+						ipCopiedRules->PushBack( ipObject );
+
+						// Get the next selection
+						iIndex = m_listRules.GetNextSelectedItem( pos );
+					}
+
+					// ClipboardManager will handle the Copy
+					m_ipClipboardMgr->CopyObjectToClipboard( ipCopiedRules );
+				}
 			}
 			break;
 
@@ -225,28 +237,28 @@ void CAddRuleDlg::OnEditPaste()
 						string	strDescription( ipNewRule->GetDescription() );
 
 						// Insert the text into the list
-						m_listRules.InsertItem( iIndex, "");
+						m_listRules.InsertItem( iIndex + i, "");
 						CString zDescription = strDescription.c_str();
 
 						// Restore the description
-						m_listRules.SetItemText( iIndex , giDESC_LIST_COLUMN, 
+						m_listRules.SetItemText( iIndex + i, giDESC_LIST_COLUMN, 
 							zDescription.operator LPCTSTR() );
 
 						// Manage the checkbox
 						VARIANT_BOOL vbEnabled = ipNewRule->GetEnabled();
 						if(vbEnabled == VARIANT_TRUE)
 						{
-							m_listRules.SetCheck( iIndex, TRUE );
+							m_listRules.SetCheck( iIndex + i, TRUE );
 						}
 						else
 						{
-							m_listRules.SetCheck( iIndex, FALSE );
+							m_listRules.SetCheck( iIndex + i, FALSE );
 						}
 						// Insert the Modifying Rule object-with-description into the vector
 						m_ipAMRulesVector->Insert( iIndex + i, ipNewRule );
 
 						// select the new item
-						m_listRules.SetItemState( iIndex+i, LVIS_SELECTED, LVIS_SELECTED );
+						m_listRules.SetItemState( iIndex + i, LVIS_SELECTED, LVIS_SELECTED );
 					}
 				}
 
