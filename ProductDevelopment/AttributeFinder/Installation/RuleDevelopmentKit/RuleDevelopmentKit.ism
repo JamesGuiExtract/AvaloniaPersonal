@@ -3121,7 +3121,13 @@
 		<row><td>ID_STRING26</td><td>1033</td><td>This runs all of the automated tests</td><td>0</td><td/><td>1402659503</td></row>
 		<row><td>ID_STRING27</td><td>1033</td><td>OCRTES~1|OCR Test Images</td><td>0</td><td/><td>1536828750</td></row>
 		<row><td>ID_STRING28</td><td>1033</td><td>IMAGEC~1|Image Cleanup Settings Editor</td><td>0</td><td/><td>1570496653</td></row>
+		<row><td>ID_STRING29</td><td>1033</td><td>This runs all of the automated tests</td><td>0</td><td/><td>-660393489</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>ENCRYP~1|EncryptTextFile</td><td>0</td><td/><td>1914185967</td></row>
+		<row><td>ID_STRING30</td><td>1033</td><td>RUNRAS~1|Run Raster Zone Test</td><td>0</td><td/><td>-660358673</td></row>
+		<row><td>ID_STRING31</td><td>1033</td><td>This runs all of the automated tests</td><td>0</td><td/><td>-660381969</td></row>
+		<row><td>ID_STRING32</td><td>1033</td><td>RUNSPA~1|Run Spatial String Test</td><td>0</td><td/><td>-660361489</td></row>
+		<row><td>ID_STRING33</td><td>1033</td><td>This runs all of the automated tests</td><td>0</td><td/><td>-660402385</td></row>
+		<row><td>ID_STRING34</td><td>1033</td><td>RUNSPA~1|Run Spatial String Searcher Test</td><td>0</td><td/><td>-660383953</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>ENCRYP~1|Encrypt File</td><td>0</td><td/><td>-1331814998</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>RDT Components</td><td>0</td><td/><td>1914202479</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>FLEXIN~1|Extract Systems FLEX Index SDK</td><td>0</td><td/><td>194598446</td></row>
@@ -3774,6 +3780,9 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="i2">InstallMode</col>
 		<row><td>NewShortcut2</td><td>Binaries</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut6</td><td>TestingFiles</td><td/><td>AutomatedTests</td><td>2</td></row>
+		<row><td>NewShortcut61</td><td>TestingFiles</td><td/><td>AutomatedTests</td><td>2</td></row>
+		<row><td>NewShortcut611</td><td>TestingFiles</td><td/><td>AutomatedTests</td><td>2</td></row>
+		<row><td>NewShortcut6111</td><td>TestingFiles</td><td/><td>AutomatedTests</td><td>2</td></row>
 	</table>
 
 	<table name="RemoveIniFile">
@@ -3863,6 +3872,9 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut2</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING28##</td><td>Binaries</td><td>[COMMON_COMPONENTS]ImageCleanupSettingsEditor.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING10##</td><td>Binaries</td><td>[COMMON_COMPONENTS]TestHarness.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut6</td><td>AutomatedTests</td><td>##ID_STRING24##</td><td>TestingFiles</td><td>[COMMON_COMPONENTS]TestHarness</td><td>/f"[CommonAppDataFolder]Extract Systems\TestingFiles\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\All\AFCore.tcl"</td><td>##ID_STRING26##</td><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut61</td><td>AutomatedTests</td><td>##ID_STRING30##</td><td>TestingFiles</td><td>[COMMON_COMPONENTS]TestHarness</td><td>/f"[CommonAppDataFolder]Extract Systems\TestingFiles\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\RasterZoneTester\TestFiles\TestIntersection.tcl"</td><td>##ID_STRING29##</td><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut611</td><td>AutomatedTests</td><td>##ID_STRING32##</td><td>TestingFiles</td><td>[COMMON_COMPONENTS]TestHarness</td><td>/f"[CommonAppDataFolder]Extract Systems\TestingFiles\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringAutomatedTest\TestFiles\TestSpatialString.tcl"</td><td>##ID_STRING31##</td><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut6111</td><td>AutomatedTests</td><td>##ID_STRING34##</td><td>TestingFiles</td><td>[COMMON_COMPONENTS]TestHarness</td><td>/f"[CommonAppDataFolder]Extract Systems\TestingFiles\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringAutomatedTest\TestFiles\TestSpatialString.tcl"</td><td>##ID_STRING33##</td><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut7</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING16##</td><td>Binaries</td><td>[COMMON_COMPONENTS]IndexConverter.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut8</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING17##</td><td>Binaries</td><td>[COMMON_COMPONENTS]RDTConfig.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut9</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING18##</td><td>Binaries</td><td>[COMMON_COMPONENTS]RuleSetEditor.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
