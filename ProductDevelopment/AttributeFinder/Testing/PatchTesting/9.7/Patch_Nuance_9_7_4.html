@@ -37,6 +37,17 @@
 		searchable PDF</b> tasks when processing PDF documents on a <b>Server 
 		2008 R2</b> test machine.
 	</ul>
+<p>
+   	<LI><b>SCRs:</b> CUST-631
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>Create a special version of <b>ImageFormatConverter</b> that can be 
+		called parallel to <b>version 9.7.4.5</b>.
+		<ul>
+			<li>Successfully rasterize PDF forms.
+			<li>Retain full-color information in PDF images.
+		</ul>
+	</ul>
 </ul>
 <p>
 <h3>Patch Tests</h3>
@@ -305,6 +316,74 @@
 			<li>Exercise <b>Core: Convert to searchable PDF</b>.
 			<li>Confirm that all files are processed without any errors.
 			<li>Tested by Steve <b>03/27/2014</b>, could not reproduce.
+		</ul>
+	</ul>
+<p>
+	<LI><b>Image Format Converter</b>
+	<ul>
+		<li><u>Installation and Setup</u>
+		<ul>
+			<li>Install and license FLEX Index and ID Shield <b>9.7.4.5</b>.
+			<li>Extract files from <b>9.7.4.6 LeadTools.zip</b> to the 
+			<b>.\CommonComponents\9.7.4.6 LeadTools</b> folder.
+			<li>Modify the processing FPS file to include a <b>Core: Conditionally 
+			execute task(s)</b> task.
+			<ul>
+				<li>Add a <b>Filename pattern condition</b> to check if the 
+				source document is a PDF.
+				<li>If <b>condition is met</b>
+				<ul>
+					<li>Add a <b>Core: Launch application</b> task 
+					pointing to the patch folder's 
+					<b>ImageFormatConverter.exe</b>. Use 
+					&quot;&lt;SourceDocName&gt;&quot;, 
+					&quot;$ChangeExt(&lt;SourceDocName&gt;,tif)&quot;, 
+					/tif, and 
+					/color as the Parameters.
+					<li>Add a <b>Core: Convert to searchable PDF</b> task 
+					with <b>$ChangeExt(&lt;SourceDocName&gt;,tif)</b>
+				</ul>
+				<li>If <b>condition is not met</b>
+				<ul>
+					<li>Add a <b>Core: Create file</b> task with 
+					<b>$ChangeExt(&lt;SourceDocName&gt;,pdf)</b>.
+					<li>Add a <b>Core: Convert to searchable PDF</b> task 
+					with <b>&lt;SourceDocName&gt;</b>
+				</ul>
+			</ul>
+		</ul>
+		<li><u>Exercise Sample Images</u>
+		<ul>
+			<li>Process the following types of images and confirm appropriate 
+			results.
+			<li><u>Types</u>
+			<ul>
+				<li>Bitonal PDFs
+				<li>Color PDFs
+				<li>Color PDFs with form data
+				<li>PDFs that are already searchable
+				<li>PDF/A-compliant images
+				<li>Bitonal TIFs
+				<li>Color TIFs
+				<li>TIFs with annotations
+				<li>Customer-supplied images
+			</ul>
+			<li><u>Results</u>
+			<ul>
+				<li>Output images should include any original form data
+				<li>PDF output files should be searchable
+				<li>PDF output files should not be excessively larger than 
+				the input files
+				<li>Color quality is good on color images
+				<li>Searchable text should not be double-found
+			</ul>
+			<li><u>Notes</u>
+			<ul>
+				<li>Exercised by Wayne <b>01/28/2015</b> and <b>01/29/2015</b> 
+				on Cheddar.
+				<li>FPS files as tested include some weird settings for 
+				supplying where intermediate rasterized also get picked up.
+			</ul>
 		</ul>
        	</ul>
 </OL>
