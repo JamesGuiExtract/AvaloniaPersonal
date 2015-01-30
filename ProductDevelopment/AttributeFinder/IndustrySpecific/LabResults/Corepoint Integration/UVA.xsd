@@ -264,28 +264,28 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="FullText" minOccurs="1" type="xs:string" />
-				<xs:element name="Address1">
+				<xs:element name="Address1" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" type="xs:string" />
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="City">
+				<xs:element name="City" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" type="xs:string" />
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="State">
+				<xs:element name="State" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" type="xs:string" />
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="ZipCode">
+				<xs:element name="ZipCode" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" type="xs:string" />
