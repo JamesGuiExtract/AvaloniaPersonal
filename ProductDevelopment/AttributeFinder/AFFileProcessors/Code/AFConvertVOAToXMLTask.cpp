@@ -100,7 +100,8 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(IFileRecord* pFileRecord, l
 		validateLicense();
 
 		// Expand the tags for the VOA file
-		_bstr_t bstrVoaFile = ipTagManager->ExpandTags(m_strVOAFile.c_str(), strSourceDoc.c_str());
+		_bstr_t bstrVoaFile =
+			ipTagManager->ExpandTagsAndFunctions(m_strVOAFile.c_str(), strSourceDoc.c_str());
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
