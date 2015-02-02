@@ -554,8 +554,11 @@ LRESULT CMultipleObjSelectorPP::OnEditCopy(WORD wNotifyCode, WORD wID, HWND hWnd
 		if (m_listObjects.GetSelectedCount() == 1)
 		{
 			// Retrieve the selected object
-			IUnknownPtr	ipObject = m_ipObjects->At(iIndex);
+			UCLID_COMUTILSLib::IObjectWithDescriptionPtr	ipObject = m_ipObjects->At(iIndex);
 			ASSERT_RESOURCE_ALLOCATION("ELI37827", ipObject != __nullptr );
+			
+			// Apply enabled state to this ObjectWithDescription
+			ipObject->Enabled = asVariantBool(m_listObjects.GetCheckState(iIndex));
 
 			// ClipboardManager will handle the Copy
 			m_ipClipboardMgr->CopyObjectToClipboard( ipObject );
@@ -570,8 +573,11 @@ LRESULT CMultipleObjSelectorPP::OnEditCopy(WORD wNotifyCode, WORD wID, HWND hWnd
 			while (iIndex != -1)
 			{
 				// Retrieve the selected object
-				IUnknownPtr	ipObject = m_ipObjects->At(iIndex);
+				UCLID_COMUTILSLib::IObjectWithDescriptionPtr	ipObject = m_ipObjects->At(iIndex);
 				ASSERT_RESOURCE_ALLOCATION("ELI09638", ipObject != __nullptr );
+
+				// Apply enabled state to this ObjectWithDescription
+				ipObject->Enabled = asVariantBool(m_listObjects.GetCheckState(iIndex));
 
 				// Add the object to the vector
 				ipCopiedObjects->PushBack( ipObject );

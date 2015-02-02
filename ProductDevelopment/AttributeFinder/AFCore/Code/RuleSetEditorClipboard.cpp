@@ -319,12 +319,14 @@ void CRuleSetEditor::OnEditPaste()
 				UCLID_AFCORELib::IAttributeRulePtr	ipNewRule = ipCopy->Clone();
 				ASSERT_RESOURCE_ALLOCATION( "ELI19129", ipNewRule != __nullptr );
 				bool bIgnoreErrors = asCppBool( ipNewRule->IgnoreErrors );
+				bool bEnabled = asCppBool( ipNewRule->IsEnabled );
 				string	strDescription( ipNewRule->GetDescription() );
 
 				// Add the item without text in Enabled column
 				m_listRules.InsertRow(iIndex + i);
-				// Default to enabled, but keep previous rule's ignore error state.
-				m_listRules.SetRowInfo(iIndex + i, true, bIgnoreErrors, strDescription.c_str());
+				
+				// Set enabled and ignore error states.
+				m_listRules.SetRowInfo(iIndex + i, bEnabled, bIgnoreErrors, strDescription.c_str());
 
 				// Insert the new Rule
 				ipRules->Insert( iIndex + i, ipNewRule );
