@@ -72,7 +72,7 @@ namespace Extract.LabResultsCustomComponents
         /// Initializes a new instance of the <see cref="OrderGrouping"/> class.
         /// </summary>
         /// <param name="attribute">The attribute to initialize the group from.</param>
-        /// <param name="labOrders"></param>A map of lab order codes to
+        /// <param name="labOrders">A map of lab order codes to
         /// <see cref="LabOrder"/>s.  If not <see langword="null"/> then
         /// the EpicCode attribute will be used to search the collection and
         /// set the <see cref="LabOrder"/> value.</param>

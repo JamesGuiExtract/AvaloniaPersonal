@@ -413,13 +413,6 @@ namespace Extract.Redaction
                 AddNonOutputAttributes(previous, level, revisions);
             }
 
-            // Determine the next attribute id
-            // NOTE: This must be done before the call to initialize sensitive items
-            _nextId = GetNextId(_sensitiveItems, _revisionsAttribute);
-
-            // Ensure all sensitive items have attribute ids and are in their initial toggled state
-            InitializeSensitiveItems(_sensitiveItems);
-
             // Get all previous sessions
             _allSessions = AttributeMethods.GetAttributesByName(attributes,
                 Constants.AllSessionMetaDataNames);
@@ -442,6 +435,14 @@ namespace Extract.Redaction
             _surroundContextSessions = AttributeMethods.GetAttributesByName(attributes,
                 Constants.SurroundContextSessionMetaDataName);
             _surroundContextSessionId = GetSessionId(_surroundContextSessions);
+
+            // Determine the next attribute id
+            // NOTE: This must be done before the call to initialize sensitive items
+            _nextId = GetNextId(_sensitiveItems, _revisionsAttribute);
+
+            // Ensure all sensitive items have attribute ids and are in their initial toggled state
+            // NOTE: This must be done after initializing _verificationSessions
+            InitializeSensitiveItems(_sensitiveItems);
 
             // Store the remaining attributes
             int count = attributes.Size();
@@ -644,10 +645,11 @@ namespace Extract.Redaction
             foreach (SensitiveItem item in sensitiveItems)
             {
                 bool assigned = AssignId(item.Attribute);
-                if (assigned)
+                if (assigned || _verificationSessions.Length == 0)
                 {
-                    // Set the toggled state if this is the first time the attribute was loaded
-                    // [FIDSC #4026]
+                    // Set the toggled state if this is the first time the attribute was verified
+                    // https://extract.atlassian.net/browse/ISSUE-6306 [FIDSC #4026]
+                    // https://extract.atlassian.net/browse/ISSUE-7569
                     item.Attribute.Redacted = item.Level.Output;
                 }
             }
