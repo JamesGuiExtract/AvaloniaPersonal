@@ -84,7 +84,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("9AA5818D-D2A2-4A58-90FE-D86D229C136D")]
     [CLSCompliant(false)]
-    public class DataQueryRuleObject : IdentifiableObject, IDataQueryRuleObject
+    public class DataQueryRuleObject : IdentifiableObject, IDataQueryRuleObject, IDisposable
     {
         #region Constants
 
@@ -657,6 +657,54 @@ namespace Extract.AttributeFinder.Rules
 
         #endregion IMustBeConfiguredObject Members
 
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="DataQueryRuleObject"/>
+        /// </summary>
+        public void Dispose()
+        {
+            try
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI37826", ex);
+            }
+        }
+
+        /// <overloads>Releases all resources used by the <see cref="DataQueryRuleObject"/>.
+        /// </overloads>
+        /// <summary>
+        /// Releases all resources used by the <see cref="DataQueryRuleObject"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose of managed objects
+
+                // NOTE: Rule objects should really not be disposable as there is no mechanism in
+                // the rules engine that is able to dispose of disposable rule objects. However,
+                // DatabaseConnectionInfo really only has disposable resources to manage in the case
+                // that the ManagedDbConnection property is used (and it is not by this class).
+                // IDisposable is therefore implemented here out of diligence and to appease FXCop. 
+                if (_databaseConnectionInfo != null)
+                {
+                    _databaseConnectionInfo.Dispose();
+                    _databaseConnectionInfo = null;
+                }
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable Members
+
         #region Private Members
 
         /// <summary>
@@ -792,66 +840,67 @@ namespace Extract.AttributeFinder.Rules
                 if (DatabaseConnectionInfo.DataProvider.ShortDisplayName.StartsWith(
                     "SqlCe", StringComparison.OrdinalIgnoreCase))
                 {
-                    DatabaseConnectionInfo tempDatabaseConnectionInfo =
-                        new DatabaseConnectionInfo(DatabaseConnectionInfo);
-
-                    var connectionStringBuilder = new SqlConnectionStringBuilder(DataConnectionString);
-                    originalFileName = _pathTags.Expand(connectionStringBuilder.DataSource);
-                    
-                    workingCopyFileName = Path.Combine(
-                        Path.GetDirectoryName(originalFileName),
-                        "~" + Path.GetFileName(originalFileName));
-
-                    if (File.Exists(workingCopyFileName))
+                    using (DatabaseConnectionInfo tempDatabaseConnectionInfo =
+                        new DatabaseConnectionInfo(DatabaseConnectionInfo))
                     {
+                        var connectionStringBuilder = new SqlConnectionStringBuilder(DataConnectionString);
+                        originalFileName = _pathTags.Expand(connectionStringBuilder.DataSource);
+
+                        workingCopyFileName = Path.Combine(
+                            Path.GetDirectoryName(originalFileName),
+                            "~" + Path.GetFileName(originalFileName));
+
+                        if (File.Exists(workingCopyFileName))
+                        {
+                            try
+                            {
+                                // If there is a previous copy of the working copy, if it can be deleted
+                                // the instance that created it is not still open and it can therefore
+                                // be ignored.
+                                FileSystemMethods.DeleteFile(workingCopyFileName);
+                            }
+                            catch
+                            {
+                                // But if it couldn't be deleted, another instance of SQLCDBEditor likely
+                                // already has the database open for editing; prevent it from being opened.
+                                ExtractException ee = new ExtractException("ELI35291",
+                                    "This database is currently being edited by another process.");
+                                ee.AddDebugData("Database Filename", originalFileName, false);
+
+                                throw ee;
+                            }
+                        }
+
+                        // Create the new working copy.
+                        string sourceFileName = originalFileName;
+                        string destinationFileName = workingCopyFileName;
+                        FileSystemMethods.PerformFileOperationWithRetry(() =>
+                            File.Copy(sourceFileName, destinationFileName),
+                            true);
+                        File.SetAttributes(workingCopyFileName, FileAttributes.Hidden);
+
+                        // Set the new connection string.
+                        connectionStringBuilder.DataSource = workingCopyFileName;
+                        tempDatabaseConnectionInfo.ConnectionString =
+                            connectionStringBuilder.ConnectionString;
+
                         try
                         {
-                            // If there is a previous copy of the working copy, if it can be deleted
-                            // the instance that created it is not still open and it can therefore
-                            // be ignored.
-                            FileSystemMethods.DeleteFile(workingCopyFileName);
+                            // The path is already expanded, so there is no need to provide _pathTags.
+                            return tempDatabaseConnectionInfo.OpenConnection();
                         }
                         catch
                         {
-                            // But if it couldn't be deleted, another instance of SQLCDBEditor likely
-                            // already has the database open for editing; prevent it from being opened.
-                            ExtractException ee = new ExtractException("ELI35291",
-                                "This database is currently being edited by another process.");
-                            ee.AddDebugData("Database Filename", originalFileName, false);
+                            // Cleanup the working copy.
+                            FileSystemMethods.DeleteFile(workingCopyFileName);
 
-                            throw ee;
+                            // Ensure the outer scope won't attempt to "clean up" a temporary database
+                            // created by a different process.
+                            workingCopyFileName = null;
+                            originalFileName = null;
+
+                            throw;
                         }
-                    }
-
-                    // Create the new working copy.
-                    string sourceFileName = originalFileName;
-                    string destinationFileName = workingCopyFileName;
-                    FileSystemMethods.PerformFileOperationWithRetry(() =>
-                        File.Copy(sourceFileName, destinationFileName),
-                        true);
-                    File.SetAttributes(workingCopyFileName, FileAttributes.Hidden);
-
-                    // Set the new connection string.
-                    connectionStringBuilder.DataSource = workingCopyFileName;
-                    tempDatabaseConnectionInfo.ConnectionString =
-                        connectionStringBuilder.ConnectionString;
-
-                    try
-                    {
-                        // The path is already expanded, so there is no need to provide _pathTags.
-                        return tempDatabaseConnectionInfo.OpenConnection();
-                    }
-                    catch
-                    {
-                        // Cleanup the working copy.
-                        FileSystemMethods.DeleteFile(workingCopyFileName);
-
-                        // Ensure the outer scope won't attempt to "clean up" a temporary database
-                        // created by a different process.
-                        workingCopyFileName = null;
-                        originalFileName = null;
-                        
-                        throw;
                     }
                 }
                 else

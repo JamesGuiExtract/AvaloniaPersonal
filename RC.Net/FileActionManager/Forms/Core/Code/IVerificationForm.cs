@@ -5,117 +5,6 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.Forms
 {
     /// <summary>
-    /// Event args for a <see cref="IVerificationForm.FileComplete"/> event.
-    /// </summary>
-    [CLSCompliant(false)]
-    public class FileCompleteEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Specifies under what circumstances verification of the file completed.
-        /// </summary>
-        readonly EFileProcessingResult _fileProcessingResult;
-
-        /// <summary>
-        /// Initializes a new <see cref="FileCompleteEventArgs"/> instance.
-        /// </summary>
-        /// <param name="fileProcessingResult">
-        /// <see cref="EFileProcessingResult.kProcessingSuccessful"/> if verification of the
-        /// document completed successfully, <see cref="EFileProcessingResult.kProcessingCancelled"/>
-        /// if verification of the document was cancelled by the user or
-        /// <see cref="EFileProcessingResult.kProcessingSkipped"/> if verification of the current file
-        /// was skipped, but the user wishes to continue viewing subsequent documents.</param>
-        public FileCompleteEventArgs(EFileProcessingResult fileProcessingResult)
-            : base()
-        {
-            _fileProcessingResult = fileProcessingResult;
-        }
-
-        /// <summary>
-        /// The processing result of the file being shown.
-        /// </summary>
-        /// <returns></returns>
-        public EFileProcessingResult FileProcessingResult
-        {
-            get
-            {
-                return _fileProcessingResult;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Event args for a <see cref="IVerificationForm.FileRequested"/> event.
-    /// </summary>
-    [CLSCompliant(false)]
-    public class FileRequestedEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Initializes a new <see cref="FileRequestedEventArgs"/> instance.
-        /// </summary>
-        /// <param name="fileID">The ID of the file being requested for verification.</param>
-        public FileRequestedEventArgs(int fileID)
-            : base()
-        {
-            FileID = fileID;
-        }
-
-        /// <summary>
-        /// Gets the ID of the file being requested for verification.
-        /// </summary>
-        public int FileID
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets or sets whether the file is currently "processing" in the verification task
-        /// (waiting on another thread in prefetch).
-        /// </summary>
-        public bool FileIsAvailable
-        {
-            get;
-            set;
-        }
-    }
-
-    /// <summary>
-    /// Event args for a <see cref="IVerificationForm.FileDelayed"/> event.
-    /// </summary>
-    [CLSCompliant(false)]
-    public class FileDelayedEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Initializes a new <see cref="FileDelayedEventArgs"/> instance.
-        /// </summary>
-        /// <param name="fileID">The ID of the file whose processing is being delayed.</param>
-        public FileDelayedEventArgs(int fileID)
-            : base()
-        {
-            FileID = fileID;
-        }
-
-        /// <summary>
-        /// Gets the ID of the file whose processing is being delayed.
-        /// </summary>
-        public int FileID
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets or sets whether the file was currently "processing" in the verification task
-        /// (waiting on another thread in prefetch).
-        /// </summary>
-        public bool FileIsAvailable
-        {
-            get;
-            set;
-        }
-    }
-
-    /// <summary>
     /// Delegate for the <see cref="IVerificationForm.Open"/> method.
     /// </summary>
     /// <param name="fileName">Specifies the filename of the document image to open.</param>
@@ -139,6 +28,12 @@ namespace Extract.FileActionManager.Forms
     public interface IVerificationForm
     {
         /// <summary>
+        /// This event indicates the verification form has been initialized and is ready to load a
+        /// document.
+        /// </summary>
+        event EventHandler<EventArgs> Initialized;
+
+        /// <summary>
         /// Occurs when a file has completed verification.
         /// </summary>
         event EventHandler<FileCompleteEventArgs> FileComplete;
@@ -156,6 +51,13 @@ namespace Extract.FileActionManager.Forms
         event EventHandler<FileDelayedEventArgs> FileDelayed;
 
         /// <summary>
+        /// Raised when exceptions are raised from the verification UI that should result in the
+        /// document failing. Generally this will be raised as a result of errors loading or saving
+        /// the document as opposed to interacting with a successfully loaded document.
+        /// </summary>
+        event EventHandler<VerificationExceptionGeneratedEventArgs> ExceptionGenerated;
+
+        /// <summary>
         /// Gets whether the control styles of the current Windows theme should be used for the
         /// verification form.
         /// </summary>
@@ -164,6 +66,20 @@ namespace Extract.FileActionManager.Forms
         bool UseVisualStyles
         {
             get;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the verification form should prevent any
+        /// attempts at saving document data. This may be used after experiencing an error or when
+        /// the form is being programmatically closed. (when prompts to save in response to events
+        /// that occur are not appropriate)
+        /// </summary>
+        /// <value><see langword="true"/> if the verification form should prevent any
+        /// attempts at saving document data; otherwise, <see langword="false"/>.</value>
+        bool PreventSave
+        {
+            get;
+            set;
         }
 
         /// <summary>

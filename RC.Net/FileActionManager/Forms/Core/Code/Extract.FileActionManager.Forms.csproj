@@ -77,6 +77,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventArgs.cs" />
     <Compile Include="FileTag.cs" />
     <Compile Include="FileTagAddedEventArgs.cs" />
     <Compile Include="FileTagClickedEventArgs.cs" />

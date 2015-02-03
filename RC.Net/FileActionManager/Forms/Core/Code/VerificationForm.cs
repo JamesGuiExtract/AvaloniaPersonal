@@ -56,6 +56,11 @@ namespace Extract.FileActionManager.Forms
         EventWaitHandle _initializedEvent = new ManualResetEvent(false);
 
         /// <summary>
+        /// An event to indicate the <see cref="_form"/> failed to initialize properly.
+        /// </summary>
+        EventWaitHandle _initializationFailedEvent = new ManualResetEvent(false);
+
+        /// <summary>
         /// An event to indicate a document is done processing.
         /// </summary>
         EventWaitHandle _fileCompletedEvent = new AutoResetEvent(false);
@@ -111,6 +116,22 @@ namespace Extract.FileActionManager.Forms
         /// ShowForm needs to wait for the previous form to finish closing.
         /// </summary>
         volatile bool _formIsClosing;
+
+        /// <summary>
+        /// Indicates whether, in the case that processing failed due to the <see cref="_form"/>
+        /// raising an <see cref="IVerificationForm.ExceptionGenerated"/> event, that the user
+        /// should be given the option to continue processing on the next document.
+        /// </summary>
+        volatile bool _promptToContinueOnError;
+
+        /// <summary>
+        /// The handling of an <see cref="IVerificationForm.ExceptionGenerated"/> requires that any
+        /// additional exceptions that may pop up on the main verification form windows message loop
+        /// be surpressed so that the verification form can be cleanly closed programmatically
+        /// if need be. This member keeps track of the thread for which exception displays are being
+        /// blocked so that the block can be removed if need be.
+        /// </summary>
+        volatile int _exceptionDisplayBlockThreadId = -1;
 
         /// <summary>
         /// The processing result of the file being shown.
@@ -328,6 +349,7 @@ namespace Extract.FileActionManager.Forms
                         _canceledEvent.Reset();
                         _exceptionThrownEvent.Reset();
                         _closedEvent.Reset();
+                        _lastException = null;
 
                         _uiThread = CreateUserInterfaceThread(VerificationApplicationThread,
                             creator, minStackSize);
@@ -347,6 +369,7 @@ namespace Extract.FileActionManager.Forms
                 {
                     // If there was a problem, end the verification form.  true so any further exceptions 
                     // will be logged and not thrown
+                    _initializationFailedEvent.Set();
                     EndVerificationApplicationThread(true);
 
                     throw ExtractException.AsExtractException("ELI23977", ex);
@@ -497,7 +520,26 @@ namespace Extract.FileActionManager.Forms
                 // loaded.
                 lock (_lockFormChange)
                 {
-                    if (!IsUIReady)
+                    if (IsUIReady)
+                    {
+                        // Whenever a new file is to be loaded, ensure the PreventSave property is
+                        // reset and any exception display blocks intended for the last document do
+                        // not carry over to the this document.
+                        MainForm.PreventSave = false;
+
+                        if (_exceptionDisplayBlockThreadId != -1)
+                        {
+                            if (_exceptionDisplayBlockThreadId == _uiThread.ManagedThreadId)
+                            {
+                                // EndBlockExceptionDisplays is thread specific so it needs to be
+                                // invoked on MainForm's thread.
+                                MainForm.Invoke((MethodInvoker)(() =>
+                                    ExtractException.EndBlockExceptionDisplays()));
+                            }
+                            _exceptionDisplayBlockThreadId = -1;
+                        }
+                    }
+                    else
                     {
                         // Either a Cancel request was received or the user closed the verification form.
                         return EFileProcessingResult.kProcessingCancelled;
@@ -529,6 +571,23 @@ namespace Extract.FileActionManager.Forms
             {
                 // Ensure that _fileLoadedEvent gets set so that prefetch threads don't hang.
                 _fileLoadedEvent.Set();
+
+                // Always display exceptions that arise from a verification task.
+                ex.ExtractDisplay("ELI37834");
+
+                if (!_promptToContinueOnError || MessageBox.Show(
+                    "An error was encountered while attempting to process the document '" +
+                    fileName + "'.\r\n\r\nDo you wish to continue processing?",
+                    "Error: Continue processing?", MessageBoxButtons.YesNo, MessageBoxIcon.Error,
+                    MessageBoxDefaultButton.Button1, 0) == DialogResult.No)
+                {
+                    // The file was not cleanly handled and will be failed with an exception; it is
+                    // not appropriate to display any prompts to save the document on close as such
+                    // attempts would likely meet with similar errors (which may not be able to be 
+                    // handled cleanly in context of a form close).
+                    MainForm.PreventSave = true;
+                    Cancel();
+                }
 
                 ExtractException ee = ExtractException.AsExtractException("ELI23970", ex);
                 ee.AddDebugData("Filename", fileName, false);
@@ -873,6 +932,11 @@ namespace Extract.FileActionManager.Forms
                     _initializedEvent.Dispose();
                     _initializedEvent = null;
                 }
+                if (_initializationFailedEvent != null)
+                {
+                    _initializationFailedEvent.Dispose();
+                    _initializationFailedEvent = null;
+                }
                 if (_fileCompletedEvent != null)
                 {
                     _fileCompletedEvent.Dispose();
@@ -949,11 +1013,13 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
-        /// Handles the Form.Shown event.
+        /// Handles the <see cref="IVerificationForm.Initialized"/> event.
         /// </summary>
-        /// <param name="sender">The object that sent the Form.Shown event.</param>
-        /// <param name="e">The event data associated with the Form.Shown event.</param>
-        void HandleVerificationFormShown(object sender, EventArgs e)
+        /// <param name="sender">The object that sent the
+        /// <see cref="IVerificationForm.Initialized"/> event.</param>
+        /// <param name="e">The event data associated with the
+        /// <see cref="IVerificationForm.Initialized"/>n event.</param>
+        void HandleVerificationFormInitialized(object sender, EventArgs e)
         {
             // Notify any waiting threads that the verification form been initialized.
             _initializedEvent.Set();
@@ -1040,6 +1106,7 @@ namespace Extract.FileActionManager.Forms
         {
             // Reset _initializedEvent to indicate the form is no longer initialized
             _initializedEvent.Reset();
+            _initializationFailedEvent.Reset();
         }
 
         /// <summary>
@@ -1080,6 +1147,28 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
+        /// <summary>
+        /// Handles the case that an exception was generated in <see cref="MainForm"/> that should
+        /// be passed out to the calling thread.
+        /// </summary>
+        /// <param name="sender">The <see cref="IVerificationForm"/> that threw the
+        /// exception.
+        /// </param>
+        /// <param name="e">An <see cref="VerificationExceptionGeneratedEventArgs"/> instance that
+        /// contains the exception to be thrown.</param>
+        void HandleMainForm_ExceptionGenerated(object sender,
+            VerificationExceptionGeneratedEventArgs e)
+        {
+            try
+            {
+                StoreException(e.Exception, e.CanProcessingContinue);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37835");
+            }
+        }
+
         #endregion VerificationForm Event Handlers
 
         #region VerificationForm Private Properties
@@ -1107,6 +1196,20 @@ namespace Extract.FileActionManager.Forms
             get
             {
                 return _initializedEvent.WaitOne(0, false);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether initialization of the <see cref="_form"/> has failed.
+        /// </summary>
+        /// <value><see langword="true"/> if initialization of the <see cref="_form"/> has failed;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        bool InitializationFailed
+        {
+            get
+            {
+                return _initializationFailedEvent.WaitOne(0, false);
             }
         }
 
@@ -1213,7 +1316,7 @@ namespace Extract.FileActionManager.Forms
             }
             catch (Exception ex)
             {
-                StoreException(ex);
+                StoreException(ex, false);
             }
         }
 
@@ -1228,12 +1331,13 @@ namespace Extract.FileActionManager.Forms
                 MainForm = CreateTForm((CreateForm) obj);
 
                 // Register events
-                MainForm.Shown += HandleVerificationFormShown;
+                MainForm.Initialized += HandleVerificationFormInitialized;
                 MainForm.FileComplete += HandleFileComplete;
                 MainForm.FormClosing += HandleFormClosing;
                 MainForm.FormClosed += HandleFormClosed;
                 MainForm.FileRequested += HandleMainForm_FileRequested;
                 MainForm.FileDelayed += HandleMainForm_FileDelayed;
+                MainForm.ExceptionGenerated += HandleMainForm_ExceptionGenerated;
 
                 Application.Run(MainForm);
             }
@@ -1248,7 +1352,7 @@ namespace Extract.FileActionManager.Forms
             {
                 _initializedEvent.Reset();
 
-                StoreException(ex);
+                StoreException(ex, false);
             }
             finally
             {
@@ -1300,14 +1404,26 @@ namespace Extract.FileActionManager.Forms
         /// the calling thread.
         /// </summary>
         /// <param name="ex">The exception to store.</param>
-        void StoreException(Exception ex)
+        /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
+        /// the option to continue verification on the next document; <see langword="false"/> if the
+        /// error should prevent the possibility of continuing the verification session.</param>
+        void StoreException(Exception ex, bool canProcessingContinue)
         {
             if (_lastException != null)
             {
                 _lastException.Log();
             }
 
-            _lastException = ExtractException.AsExtractException("ELI23988", ex);
+            if (IsUIReady)
+            {
+                // EndBlockExceptionDisplays is thread specific so it needs to be
+                // invoked on MainForm's thread.
+                MainForm.Invoke((MethodInvoker)(() => ExtractException.BlockExceptionDisplays()));
+                _exceptionDisplayBlockThreadId = _uiThread.ManagedThreadId;
+            }
+
+            _lastException = ex.AsExtract("ELI37836");
+            _promptToContinueOnError = canProcessingContinue;
             _exceptionThrownEvent.Set();
         }
 
@@ -1347,11 +1463,12 @@ namespace Extract.FileActionManager.Forms
                     // Initialized returning true). If any _fileCompletedEvent events are fired,
                     // re-attempt to close the UI.
                     // This code will probably need to be re-worked with #254.
-                    if (Initialized || Completed)
+                    if (Initialized || InitializationFailed || Completed)
                     {
                         // Indicate the the form is no longer initialized now that we have asked
                         // it to close.
                         _initializedEvent.Reset();
+                        _initializationFailedEvent.Reset();
 
                         lock (_lockFormChange)
                         {

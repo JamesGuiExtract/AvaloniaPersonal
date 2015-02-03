@@ -87,6 +87,12 @@ namespace Extract.FileActionManager.FileProcessors
         #region Events
 
         /// <summary>
+        /// This event indicates the verification form has been initialized and is ready to load a
+        /// document.
+        /// </summary>
+        public event EventHandler<EventArgs> Initialized;
+
+        /// <summary>
         /// Occurs when a file has been "completed" (done viewing in this case).
         /// </summary>
         public event EventHandler<FileCompleteEventArgs> FileComplete;
@@ -114,6 +120,13 @@ namespace Extract.FileActionManager.FileProcessors
             add { }
             remove { }
         }
+
+        /// <summary>
+        /// Raised when exceptions are raised from the verification UI that should result in the
+        /// document failing. Generally this will be raised as a result of errors loading or saving
+        /// the document as opposed to interacting with a successfully loaded document.
+        /// </summary>
+        public event EventHandler<VerificationExceptionGeneratedEventArgs> ExceptionGenerated;
 
         #endregion Events
 
@@ -181,6 +194,20 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the verification form should prevent any
+        /// attempts at saving document data. This may be used after experiencing an error or when
+        /// the form is being programmatically closed. (when prompts to save in response to events
+        /// that occur are not appropriate)
+        /// </summary>
+        /// <value><see langword="true"/> if the verification form should prevent any
+        /// attempts at saving document data; otherwise, <see langword="false"/>.</value>
+        public bool PreventSave
+        {
+            get;
+            set;
         }
 
         #endregion Properties
@@ -317,10 +344,12 @@ namespace Extract.FileActionManager.FileProcessors
                 _imageViewer.Shortcuts[Keys.F10] = (() => _thumbnailsToolStripButton.PerformClick());
 
                 UpdateControls();
+
+                OnInitialized();
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI37054", ex);
+                RaiseVerificationException("ELI37054", ex, false);
             }
         }
 
@@ -353,15 +382,42 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Raises the <see cref="Initialized"/> event.
+        /// </summary>
+        void OnInitialized()
+        {
+            var eventHandler = Initialized;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="FileComplete"/> 
         /// event.</param>
         void OnFileComplete(FileCompleteEventArgs e)
         {
-            if (FileComplete != null)
+            var eventHandler = FileComplete;
+            if (eventHandler != null)
             {
-                FileComplete(this, e);
+                eventHandler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ExceptionGenerated"/> event.
+        /// </summary>
+        /// <param name="ee">The <see cref="VerificationExceptionGeneratedEventArgs"/> that has been
+        /// generated.</param>
+        void OnExceptionGenerated(VerificationExceptionGeneratedEventArgs ee)
+        {
+            var eventHandler = ExceptionGenerated;
+            if (eventHandler != null)
+            {
+                eventHandler(this, ee);
             }
         }
 
@@ -425,7 +481,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI37055");
+                RaiseVerificationException("ELI37055", ex, true);
             }
         }
 
@@ -445,7 +501,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI37056");
+                RaiseVerificationException("ELI37056", ex, true);
             }
         }
 
@@ -502,7 +558,11 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI37059", ex);
+                var ee = new ExtractException("ELI37059", 
+                    "Failed to " + 
+                    (_imageViewer.IsImageAvailable ? "load" : "clear") + 
+                    " document data!", ex);
+                RaiseVerificationException(ee, true);
             }
         }
 
@@ -527,25 +587,6 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ExtractException.Display("ELI37060", ex);
-            }
-        }
-
-        /// <summary>
-        /// Handles the<see cref="ImageViewer.ImageFileClosing"/> event to ensure the previously
-        /// loaded image is unloaded from the image reader cache in stand-alone mode.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.ImageFileClosingEventArgs"/>
-        /// instance containing the event data.</param>
-        void HandleImageViewerImageFileClosing(object sender, ImageFileClosingEventArgs e)
-        {
-            try
-            {
-                CancelFile();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI37062");
             }
         }
 
@@ -600,7 +641,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 ExtractException ee = new ExtractException("ELI37063", "Unable to open file.", ex);
                 ee.AddDebugData("File name", fileName, false);
-                _invoker.HandleException(ee);
+                RaiseVerificationException(ee, true);
             }
         }
 
@@ -677,9 +718,18 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         void GoToNextDocument()
         {
-            _imageViewer.CloseImage();
+            try
+            {
+                _imageViewer.CloseImage();
 
-            OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
+                OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
+            }
+            catch (Exception ex)
+            {
+                // This method can be called directly via a keyboard shortcut, so need to deal with
+                // exceptions here rather than trusting that the outer scope will do so.
+                RaiseVerificationException("ELI37832", ex, true);
+            }
         }
 
         /// <summary>
@@ -700,6 +750,35 @@ namespace Extract.FileActionManager.FileProcessors
             _imageViewer.CloseImage();
 
             OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingCancelled));
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ExceptionGenerated"/> event for handling by
+        /// <see cref="VerificationForm{T}"/>.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to be associated with the excpetion.</param>
+        /// <param name="ex">The <see cref="Exception"/> that being raised.</param>
+        /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
+        /// the option to continue verification on the next document; <see langword="false"/> if the
+        /// error should prevent the possibility of continuing the verification session.</param>
+        void RaiseVerificationException(string eliCode, Exception ex, bool canProcessingContinue)
+        {
+            RaiseVerificationException(ex.AsExtract(eliCode), canProcessingContinue);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ExceptionGenerated"/> event for handling by
+        /// <see cref="VerificationForm{T}"/>.
+        /// </summary>
+        /// <param name="ee">The <see cref="ExtractException"/> that being raised.</param>
+        /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
+        /// the option to continue verification on the next document; <see langword="false"/> if the
+        /// error should prevent the possibility of continuing the verification session.</param>
+        void RaiseVerificationException(ExtractException ee, bool canProcessingContinue)
+        {
+            var verificationException =
+                new VerificationExceptionGeneratedEventArgs(ee, canProcessingContinue);
+            OnExceptionGenerated(verificationException);
         }
 
         #endregion Private Members

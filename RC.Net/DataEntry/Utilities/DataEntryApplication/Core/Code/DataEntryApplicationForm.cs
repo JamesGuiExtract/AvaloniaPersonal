@@ -246,12 +246,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         bool _isLoaded;
 
         /// <summary>
-        /// Indicates whether an image is being closed programmatically rather than via a user
-        /// action.
-        /// </summary>
-        bool _forcingClose;
-
-        /// <summary>
         /// The <see cref="FileProcessingDB"/> in use.
         /// </summary>
         FileProcessingDB _fileProcessingDb;
@@ -717,6 +711,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the verification form should prevent any
+        /// attempts at saving document data. This may be used after experiencing an error or when
+        /// the form is being programmatically closed. (when prompts to save in response to events
+        /// that occur are not appropriate)
+        /// </summary>
+        /// <value><see langword="true"/> if the verification form should prevent any
+        /// attempts at saving document data; otherwise, <see langword="false"/>.</value>
+        public bool PreventSave
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets the active <see cref="DataEntryControlHost"/>.
         /// </summary>
         public DataEntryControlHost ActiveDataEntryControlHost
@@ -939,7 +947,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _fileProcessingDb == fileProcessingDB);
                 ExtractException.Assert("ELI29831", "Unexpected database action ID!",
                     _fileProcessingDb == null || _actionId == actionID);
-                
+
                 _fileId = fileID;
 
                 _tagFileToolStripButton.Database = fileProcessingDB;
@@ -975,8 +983,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI23871", ex);
-                _invoker.HandleException(ee);
+                //ExtractException ee = ExtractException.AsExtractException("ELI23871", ex);
+                //_invoker.HandleException(ee);
+                throw ex.AsExtract("ELI23871");
             }
         }
 
@@ -1346,12 +1355,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     ? null : _activeDataEntryConfig.DataEntryControlHost);
 
                 _isLoaded = true;
+                OnInitialized();
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI23670", ex);
                 ee.AddDebugData("Event Arguments", e, false);
-                DisplayCriticalException(ee);
+                RaiseVerificationException(ee, false);
             }
         }
 
@@ -1478,7 +1488,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (!_forcingClose)
+                if (!PreventSave)
                 {
                     // Check for unsaved data and cancel the close if necessary.
                     if (AttemptSave(false) == DialogResult.Cancel)
@@ -1492,15 +1502,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         {
                             RecordFileProcessingDatabaseStatistics(false, null);
                         }
-
-                        if (_dataEntryControlHost != null)
-                        {
-                            // Clear data to give the host a chance to clear any static COM objects that will
-                            // not be accessible from a different thread due to the single apartment threading
-                            // model.
-                            _dataEntryControlHost.ClearData();
-                        }
                     }
+                }
+
+                if (!e.Cancel && _dataEntryControlHost != null)
+                {
+                    // Clear data to give the host a chance to clear any static COM objects that will
+                    // not be accessible from a different thread due to the single apartment threading
+                    // model.
+                    _dataEntryControlHost.ClearData();
                 }
 
                 if (!_invisible)
@@ -1515,7 +1525,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             catch (Exception ex)
             {
-                ExtractException.AsExtractException("ELI24858", ex).Display();
+                RaiseVerificationException("ELI24858", ex, false);
             }
         }
 
@@ -1622,6 +1632,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Events
 
         /// <summary>
+        /// This event indicates the verification form has been initialized and is ready to load a
+        /// document.
+        /// </summary>
+        public event EventHandler<EventArgs> Initialized;
+
+        /// <summary>
         /// This event indicates that the current document is done processing.
         /// </summary>
         public event EventHandler<FileCompleteEventArgs> FileComplete;
@@ -1637,6 +1653,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// the FPRecordManager queue).
         /// </summary>
         public event EventHandler<FileDelayedEventArgs> FileDelayed;
+
+        /// <summary>
+        /// Raised when exceptions are raised from the verification UI that should result in the
+        /// document failing. Generally this will be raised as a result of errors loading or saving
+        /// the document as opposed to interacting with a successfully loaded document.
+        /// </summary>
+        public event EventHandler<VerificationExceptionGeneratedEventArgs> ExceptionGenerated;
 
         #endregion Events
 
@@ -1658,7 +1681,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException ee = new ExtractException("ELI23908",
                     "Failed to output document data!", ex);
                 ee.AddDebugData("Event data", e, false);
-                DisplayCriticalException(ee);
+                RaiseVerificationException(ee, true);
             }
         }
 
@@ -1682,7 +1705,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException ee = new ExtractException("ELI26948",
                     "Failed to output document data!", ex);
                 ee.AddDebugData("Event data", e, false);
-                DisplayCriticalException(ee);
+                ee.Display();
             }
         }
 
@@ -1702,11 +1725,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException ee = new ExtractException("ELI26943",
                     "Failed to output document data!", ex);
                 ee.AddDebugData("Event data", e, false);
-                DisplayCriticalException(ee);
-            }
-            finally
-            {
-                _forcingClose = false;
+                RaiseVerificationException(ee, true);
             }
         }
         /// <summary>
@@ -1889,7 +1908,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     (_imageViewer.IsImageAvailable ? "load" : "clear") + 
                     " document data!", ex);
                 ee.AddDebugData("Event data", e, false);
-                DisplayCriticalException(ee);
+                RaiseVerificationException(ee, true);
             }
         }
 
@@ -1904,7 +1923,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (!_forcingClose)
+                if (!PreventSave)
                 {
                     // Check for unsaved data and cancel the close if necessary.
                     if (AttemptSave(false) == DialogResult.Cancel)
@@ -1927,7 +1946,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI24982", ex);
                 ee.AddDebugData("Event data", e, false);
-                DisplayCriticalException(ee);
+                RaiseVerificationException(ee, false);
             }
         }
 
@@ -2091,7 +2110,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI24059", ex);
                 ee.AddDebugData("Event arguments", e, false);
-                DisplayCriticalException(ee);
+                RaiseVerificationException(ee, false);
             }
         }
 
@@ -2525,7 +2544,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI30653", ex);
                 ee.AddDebugData("Event data", e, false);
-                DisplayCriticalException(ee);
+                // Debated on whether this should be displayed instead, since this may be something
+                // that happens in the midst of verification not but this could happen during
+                // document load and even it if doesn't, it could indicate that the document will
+                // not be able to be correctly saved.
+                RaiseVerificationException(ee, true);
             }
         }
 
@@ -2547,7 +2570,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI30616", ex);
                 ee.AddDebugData("Event arguments", e, false);
-                ee.Display();
+                // Debated on whether this should be displayed instead, since this may be something
+                // that happens in the midst of verification not but this could happen during
+                // document load and even it if doesn't, it could indicate that the document will
+                // not be able to be correctly saved.
+                RaiseVerificationException(ee, true);
             }
         }
 
@@ -2782,7 +2809,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                     catch (Exception ex)
                     {
-                        ex.ExtractDisplay("ELI37506");
+                        throw ex.AsExtract("ELI37506");
                     }
                 }));
 
@@ -2990,11 +3017,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Raises the <see cref="Initialized"/> event.
+        /// </summary>
+        void OnInitialized()
+        {
+            var eventHandler = Initialized;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
         /// <param name="fileProcessingResult">Specifies under what circumstances
         /// verification of the file completed.</param>
-        protected virtual void OnFileComplete(EFileProcessingResult fileProcessingResult)
+        void OnFileComplete(EFileProcessingResult fileProcessingResult)
         {
             var eventHandler = FileComplete;
             if (eventHandler != null)
@@ -3008,7 +3047,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="eventArgs">The <see cref="FileRequestedEventArgs"/> instance containing
         /// the event data.</param>
-        protected virtual void OnFileRequested(FileRequestedEventArgs eventArgs)
+        void OnFileRequested(FileRequestedEventArgs eventArgs)
         {
             var eventHandler = FileRequested;
             if (eventHandler != null)
@@ -3022,12 +3061,26 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="eventArgs">The <see cref="FileDelayedEventArgs"/> instance containing the
         /// event data.</param>
-        protected virtual void OnFileDelayed(FileDelayedEventArgs eventArgs)
+        void OnFileDelayed(FileDelayedEventArgs eventArgs)
         {
             var eventHandler = FileDelayed;
             if (eventHandler != null)
             {
                 eventHandler(this, eventArgs);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ExceptionGenerated"/> event.
+        /// </summary>
+        /// <param name="ee">The <see cref="VerificationExceptionGeneratedEventArgs"/> for the event.
+        /// </param>
+        void OnExceptionGenerated(VerificationExceptionGeneratedEventArgs ee)
+        {
+            var eventHandler = ExceptionGenerated;
+            if (eventHandler != null)
+            {
+                eventHandler(this, ee);
             }
         }
 
@@ -3064,8 +3117,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     // If running in FAM mode, close the document until the next one is loaded so it
                     // is clear that the last document has been committed.
-                    
-                    _forcingClose = true;
+
+                    // Since data has been saved, prevent any other attempts that might be triggered
+                    // by events raised during this process.
+                    PreventSave = true;
 
                     _imageViewer.CloseImage();
 
@@ -3081,11 +3136,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI26945", ex);
-            }
-            finally
-            {
-                _forcingClose = false;
+                RaiseVerificationException("ELI26945", ex, true);
             }
         }
 
@@ -3182,7 +3233,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             if (!promptToSave || AttemptSave(false) != DialogResult.Cancel)
             {
-                _forcingClose = true;
+                // Since data has been saved, prevent any other attempts that might be triggered
+                // by events raised during this process.
+                PreventSave = true;
 
                 _imageViewer.CloseImage();
 
@@ -3194,19 +3247,41 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Displays and throws an exception.
+        /// Raises the <see cref="ExceptionGenerated"/> event for handling by
+        /// <see cref="VerificationForm{T}"/>.
         /// </summary>
-        /// <param name="ee">The <see cref="ExtractException"/> to display.</param>
-        static void DisplayCriticalException(ExtractException ee)
+        /// <param name="eliCode">The ELI code to be associated with the exception.</param>
+        /// <param name="ex">The <see cref="Exception"/> that being raised.</param>
+        /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
+        /// the option to continue verification on the next document; <see langword="false"/> if the
+        /// error should prevent the possibility of continuing the verification session.</param>
+        void RaiseVerificationException(string eliCode, Exception ex, bool canProcessingContinue)
         {
-            ee.Display();
-            
-            // TODO:
-            // At one point an event was used here to pass the critical exception out to the thread
-            // the file is being processed on in the FAM in order to fail the file. For the time
-            // being, nothing will happen after the exception is dismissed and the user will have
-            // to exit another way (This could mean the UI is in a bad state or the file was not
-            // properly loaded or saved).
+            RaiseVerificationException(ex.AsExtract(eliCode), canProcessingContinue);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ExceptionGenerated"/> event for handling by
+        /// <see cref="VerificationForm{T}"/>.
+        /// </summary>
+        /// <param name="ee">The <see cref="ExtractException"/> that being raised.</param>
+        /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
+        /// the option to continue verification on the next document; <see langword="false"/> if the
+        /// error should prevent the possibility of continuing the verification session.</param>
+        void RaiseVerificationException(ExtractException ee, bool canProcessingContinue)
+        {
+            if (_standAloneMode)
+            {
+                // In stand-alone mode, there is no FAM process or VerificationForm to deal with the
+                // exception.
+                ee.Display();
+            }
+            else
+            {
+                var verificationException =
+                    new VerificationExceptionGeneratedEventArgs(ee, canProcessingContinue);
+                OnExceptionGenerated(verificationException);
+            }
         }
 
         /// <summary>

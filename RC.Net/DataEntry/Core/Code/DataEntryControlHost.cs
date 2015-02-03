@@ -1719,7 +1719,7 @@ namespace Extract.DataEntry
                 {
                     ee.AddDebugData("FileName", _imageViewer.ImageFile, false);
                 }
-                ee.Display();
+                throw ee;
             }
             finally
             {
@@ -4285,7 +4285,7 @@ namespace Extract.DataEntry
                     if (defaultDbConnection != _defaultDbConnection)
                     {
                         _defaultDbConnection = defaultDbConnection;
-                            
+
                         if (_isLoaded)
                         {
                             // If the dbconnection is changed, the SmartTagManager needs to be

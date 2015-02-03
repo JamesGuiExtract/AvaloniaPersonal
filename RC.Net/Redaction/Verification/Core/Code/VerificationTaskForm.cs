@@ -413,6 +413,12 @@ namespace Extract.Redaction.Verification
         #region Events
 
         /// <summary>
+        /// This event indicates the verification form has been initialized and is ready to load a
+        /// document.
+        /// </summary>
+        public event EventHandler<EventArgs> Initialized;
+
+        /// <summary>
         /// Occurs when a file has completed verification.
         /// </summary>
         public event EventHandler<FileCompleteEventArgs> FileComplete;
@@ -440,6 +446,13 @@ namespace Extract.Redaction.Verification
             add { }
             remove { }
         }
+
+        /// <summary>
+        /// Raised when exceptions are raised from the verification UI that should result in the
+        /// document failing. Generally this will be raised as a result of errors loading or saving
+        /// the document as opposed to interacting with a successfully loaded document.
+        /// </summary>
+        public event EventHandler<VerificationExceptionGeneratedEventArgs> ExceptionGenerated;
 
         #endregion Events
 
@@ -634,6 +647,20 @@ namespace Extract.Redaction.Verification
             {
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the verification form should prevent any
+        /// attempts at saving document data. This may be used after experiencing an error or when
+        /// the form is being programmatically closed. (when prompts to save in response to events
+        /// that occur are not appropriate)
+        /// </summary>
+        /// <value><see langword="true"/> if the verification form should prevent any
+        /// attempts at saving document data; otherwise, <see langword="false"/>.</value>
+        public bool PreventSave
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -1457,6 +1484,13 @@ namespace Extract.Redaction.Verification
         /// with invalid data; otherwise true <see langword="true"/>.</returns>
         bool PromptAndSaveIfDirty()
         {
+            // If the PreventSave property is set, allow the current operation to proceed without
+            // prompting for or attempting any save of data.
+            if (PreventSave)
+            {
+                return true;
+            }
+
             // [FlexIDSCore:4708]
             // If in stand-alone mode, there are different prompts that need to be displayed.
             if (_standAloneMode)
@@ -1868,18 +1902,25 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void SelectSaveAndCommit()
         {
-            // Do not allow saving and commiting if the imageviewer is
-            // processing a tracking event
-            if (_imageViewer.IsImageAvailable && !_imageViewer.IsTracking && !_formClosing)
+            try
             {
-                _redactionGridView.CommitChanges();
-
-                if (!WarnIfInvalid())
+                // Do not allow saving and commiting if the imageviewer is
+                // processing a tracking event
+                if (_imageViewer.IsImageAvailable && !_imageViewer.IsTracking && !_formClosing)
                 {
-                    Commit();
+                    _redactionGridView.CommitChanges();
 
-                    AdvanceToNextDocument();
+                    if (!WarnIfInvalid())
+                    {
+                        Commit();
+
+                        AdvanceToNextDocument();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                RaiseVerificationException("ELI37829", ex, true);
             }
         }
 
@@ -2259,28 +2300,45 @@ namespace Extract.Redaction.Verification
                 return;
             }
 
-            _redactionGridView.CommitChanges();
-
-            // If the advancing from a document that has not yet been committed.
-            if (!IsInHistory)
+            try
             {
-                // If the slideshow is advancing, warns only if dirty and
-                // GeneralVerificationSettings.PromptForSaveUntilCommit is true.
-                // Otherwise, the user is advancing without explicitly hitting the commit button
-                // (Tab, seamless navigation, etc). In this case, warns as long as
-                // GeneralVerificationSettings.PromptForSaveUntilCommit is true.
-                if ((promptForSlideshowAdvance && !WarnBeforeSlideshowAutoAdvance()) ||
-                    (!promptForSlideshowAdvance && !WarnBeforeAutoCommit()))
-                {
-                    Commit();
+                _redactionGridView.CommitChanges();
 
+                // If the advancing from a document that has not yet been committed.
+                if (!IsInHistory)
+                {
+                    // If the slideshow is advancing, warns only if dirty and
+                    // GeneralVerificationSettings.PromptForSaveUntilCommit is true.
+                    // Otherwise, the user is advancing without explicitly hitting the commit button
+                    // (Tab, seamless navigation, etc). In this case, warns as long as
+                    // GeneralVerificationSettings.PromptForSaveUntilCommit is true.
+                    if ((promptForSlideshowAdvance && !WarnBeforeSlideshowAutoAdvance()) ||
+                        (!promptForSlideshowAdvance && !WarnBeforeAutoCommit()))
+                    {
+                        Commit();
+
+                        AdvanceToNextDocument(navigationTarget);
+                    }
+                }
+                // If the user is advancing past a previously committed document.
+                else if (PromptAndSaveIfDirty())
+                {
                     AdvanceToNextDocument(navigationTarget);
                 }
             }
-            // If the user is advancing past a previously committed document.
-            else if (PromptAndSaveIfDirty())
+            catch (Exception ex)
             {
-                AdvanceToNextDocument(navigationTarget);
+                // If in history allow the caller to deal with the exception as it had been prior to
+                // the code for https://extract.atlassian.net/browse/ISSUE-12302, otherwise raise
+                // the exception for VerificationForm to handle.
+                if (IsInHistory)
+                {
+                    throw ex;
+                }
+                else
+                {
+                    RaiseVerificationException("ELI37830", ex, true);
+                }
             }
         }
 
@@ -2308,21 +2366,27 @@ namespace Extract.Redaction.Verification
                 catch (Exception ex)
                 {
                     // Display the exception
-                    ExtractException.Display("ELI29135", ex);
+                    var ee = ex.AsExtract("ELI29135");
 
                     // Remove the bad image
                     if (IsInHistory)
                     {
+                        ee.Display();
+
                         _imageViewer.UnloadImage(_history[_historyIndex].DisplayImage);
                         _history.RemoveAt(_historyIndex);
-                    }
 
-                    // Undo the history increment
-                    if (forward)
-                    {
-                        _historyIndex--;
+                        // Undo the history increment
+                        if (forward)
+                        {
+                            _historyIndex--;
+                        }
+                        _imageViewer.OpenImage(oldMemento.DisplayImage, false);
                     }
-                    _imageViewer.OpenImage(oldMemento.DisplayImage, false);
+                    else
+                    {
+                        throw ee;
+                    }
                 }
 
                 // If we have moved to the currently processing document, remove the write lock
@@ -2645,7 +2709,7 @@ namespace Extract.Redaction.Verification
 
                 // Magnifier window
                 _imageViewer.Shortcuts[Keys.F12] = (() => _magnifierToolStripButton.PerformClick());
-                
+
                 // Thumbnails window
                 _imageViewer.Shortcuts[Keys.F10] = (() => _thumbnailsToolStripButton.PerformClick());
 
@@ -2697,10 +2761,12 @@ namespace Extract.Redaction.Verification
                 }
 
                 UpdateControls();
+
+                OnInitialized();
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI26715", ex);
+                RaiseVerificationException("ELI26715", ex, false);
             }
         }
 
@@ -2730,7 +2796,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI27116", ex);
+                RaiseVerificationException("ELI27116", ex, false);
             }
             finally
             {
@@ -2802,15 +2868,41 @@ namespace Extract.Redaction.Verification
         #region OnEvents
 
         /// <summary>
+        /// Raises the <see cref="Initialized"/> event.
+        /// </summary>
+        void OnInitialized()
+        {
+            var eventHandler = Initialized;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="FileComplete"/> 
         /// event.</param>
         void OnFileComplete(FileCompleteEventArgs e)
         {
-            if (FileComplete != null)
+            var eventHandler = FileComplete;
+            if (eventHandler != null)
             {
-                FileComplete(this, e);
+                eventHandler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ExceptionGenerated"/> event.
+        /// </summary>
+        /// <param name="ee">The <see cref="ExtractException"/> that has been generated.</param>
+        void OnExceptionGenerated(VerificationExceptionGeneratedEventArgs ee)
+        {
+            var eventHandler = ExceptionGenerated;
+            if (eventHandler != null)
+            {
+                eventHandler(this, ee);
             }
         }
 
@@ -2833,7 +2925,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI26628", ex);
+                RaiseVerificationException("ELI26628", ex, true);
             }
         }
 
@@ -2852,7 +2944,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI26785", ex);
+                RaiseVerificationException("ELI26785", ex, true);
             }
         }
 
@@ -2923,7 +3015,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI27046", ex);
+                RaiseVerificationException("ELI27046", ex, true);
             }
         }
 
@@ -2947,7 +3039,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI27047", ex);
+                RaiseVerificationException("ELI27047", ex, false);
             }
         }
 
@@ -3281,7 +3373,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI26760", ex);
+                throw ex.AsExtract("ELI26760");
             }
             finally
             {
@@ -3649,7 +3741,7 @@ namespace Extract.Redaction.Verification
                     ExtractException.Log("ELI31121", ex2);
                 }
 
-                ExtractException.Display("ELI31122", ex);
+                RaiseVerificationException("ELI31122", ex, true);
             }
         }
 
@@ -3791,7 +3883,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI32611");
+                RaiseVerificationException("ELI32611", ex, true);
             }
         }
 
@@ -3911,7 +4003,7 @@ namespace Extract.Redaction.Verification
                 ExtractException ee = new ExtractException("ELI26627",
                     "Unable to open file for verification.", ex);
                 ee.AddDebugData("File name", fileName, false);
-                _invoker.HandleException(ee);
+                RaiseVerificationException(ee, true);
             }
         }
 
@@ -4391,6 +4483,46 @@ namespace Extract.Redaction.Verification
 
                     _redactionGridView.Height += resizeAmount;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ExceptionGenerated"/> event for handling by
+        /// <see cref="VerificationForm{T}"/>.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to be associated with the exception.</param>
+        /// <param name="ex">The <see cref="Exception"/> that being raised.</param>
+        /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
+        /// the option to continue verification on the next document; <see langword="false"/> if the
+        /// error should prevent the possibility of continuing the verification session.</param>
+        void RaiseVerificationException(string eliCode, Exception ex, bool canProcessingContinue)
+        {
+            RaiseVerificationException(ex.AsExtract(eliCode), canProcessingContinue);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ExceptionGenerated"/> event for handling by
+        /// <see cref="VerificationForm{T}"/>.
+        /// </summary>
+        /// <param name="ee">The <see cref="Exception"/> that being raised.</param>
+        /// <param name="canProcessingContinue"><see langword="true"/> if the user should be given
+        /// the option to continue verification on the next document; <see langword="false"/> if the
+        /// error should prevent the possibility of continuing the verification session.</param>
+        void RaiseVerificationException(ExtractException ee, bool canProcessingContinue)
+        {
+            // In stand-alone mode, there is no FAM process or VerificationForm to deal with the
+            // exception. If in history, the error does not apply to the document the FAM process
+            // and VerificationForm know to be active, so it is not appropriate to raise the
+            // ExceptionGenerated event.
+            if (_standAloneMode || IsInHistory)
+            {
+                ee.Display();
+            }
+            else
+            {
+                var verificationException =
+                    new VerificationExceptionGeneratedEventArgs(ee, canProcessingContinue);
+                OnExceptionGenerated(verificationException);
             }
         }
 
