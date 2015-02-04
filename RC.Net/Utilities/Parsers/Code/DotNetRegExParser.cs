@@ -41,6 +41,13 @@ namespace Extract.Utilities.Parsers
         IExpressionFormatter _expressionFormatter = null;
 
         /// <summary>
+        /// Determines, for method calls that return tokens based on named groups,
+        /// whether all captures of named groups are returned (if <see langword="true"/>)
+        /// or only the last capture of the group are returned (if <see langword="false"/>).
+        /// </summary>
+        bool _ReturnAllGroupCaptures = false;
+
+        /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(DotNetRegexParser).ToString();
@@ -147,6 +154,24 @@ namespace Extract.Utilities.Parsers
                 {
                     throw ex.CreateComVisible("ELI36265", "Unable to set ExpressionFormatter.");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Property that determines, for method calls that return tokens based on named groups,
+        /// whether all captures of named groups are returned (if <see langword="true"/>)
+        /// or only the last capture of the group are returned (if <see langword="false"/>).
+        /// </summary>
+        public bool ReturnAllGroupCaptures
+        {
+            get
+            {
+                return _ReturnAllGroupCaptures;
+            }
+
+            set
+            {
+                _ReturnAllGroupCaptures = value;
             }
         }
 
@@ -265,14 +290,42 @@ namespace Extract.Utilities.Parsers
                             // Get the name of the group from the parser
                             string groupName = parser.GroupNameFromNumber(i);
 
-                            // Create a new token object
-                            Token captureToken = new Token();
+                            // Don't create a capture token if name begins with a number or
+                            // an '_' since these are understood as representing non-named groups
+                            char firstChar = groupName[0];
+                            if (firstChar == '_' || Char.IsNumber(firstChar))
+                            {
+                                continue;
+                            }
 
-                            // Initialize with the values from the group
-                            captureToken.InitToken(g.Index, g.Index + g.Length - 1, groupName, g.Value);
+                            // If returning all captures and the group actually captured something
+                            // iterate through its capture collection
+                            if (ReturnAllGroupCaptures && g.Success)
+                            {
+                                foreach (Capture c in g.Captures)
+                                {
+                                    // Create a new token object
+                                    Token captureToken = new Token();
 
-                            // Add to the named matches collection.
-                            namedMatches.PushBack(captureToken);
+                                    // Initialize with the values from the capture
+                                    captureToken.InitToken(c.Index, c.Index + c.Length - 1, groupName, c.Value);
+
+                                    // Add to the named matches collection.
+                                    namedMatches.PushBack(captureToken);
+                                }
+                            }
+                            // Otherwise use the values of the group
+                            else
+                            {
+                                // Create a new token object
+                                Token captureToken = new Token();
+
+                                // Initialize with the values from the group
+                                captureToken.InitToken(g.Index, g.Index + g.Length - 1, groupName, g.Value);
+
+                                // Add to the named matches collection.
+                                namedMatches.PushBack(captureToken);
+                            }
                         }
                     }
 
@@ -344,14 +397,42 @@ namespace Extract.Utilities.Parsers
                         // Get the name of the group from the parser
                         string groupName = parser.GroupNameFromNumber(i);
 
-                        // Create a new token object
-                        Token captureToken = new Token();
+                        // Don't create a capture token if name begins with a number or
+                        // an '_' since these are understood as representing non-named groups
+                        char firstChar = groupName[0];
+                        if (firstChar == '_' || Char.IsNumber(firstChar))
+                        {
+                            continue;
+                        }
 
-                        // Initialize with the values from the group
-                        captureToken.InitToken(g.Index, g.Index + g.Length - 1, groupName, g.Value);
+                        // If returning all captures and the group actually captured something
+                        // iterate through its capture collection
+                        if (ReturnAllGroupCaptures && g.Success)
+                        {
+                            foreach (Capture c in g.Captures)
+                            {
+                                // Create a new token object
+                                Token captureToken = new Token();
 
-                        // Add to the named matches collection.
-                        returnVector.PushBack(captureToken);
+                                // Initialize with the values from the capture
+                                captureToken.InitToken(c.Index, c.Index + c.Length - 1, groupName, c.Value);
+
+                                // Add to the named matches collection.
+                                returnVector.PushBack(captureToken);
+                            }
+                        }
+                        // Otherwise use the values of the group
+                        else
+                        {
+                            // Create a new token object
+                            Token captureToken = new Token();
+
+                            // Initialize with the values from the group
+                            captureToken.InitToken(g.Index, g.Index + g.Length - 1, groupName, g.Value);
+
+                            // Add to the named matches collection.
+                            returnVector.PushBack(captureToken);
+                        }
                     }
 
                     // If only want the first match return.

@@ -94,6 +94,7 @@ STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pP
 
 		IRegularExprParserPtr ipParser = getRegExParser(ipAFDoc);
 		ipParser->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
+		ipParser->ReturnAllGroupCaptures = VARIANT_FALSE;
 
 		// return vec of attributes
 		IIUnknownVectorPtr ipRetAttributes(CLSID_IUnknownVector);
@@ -104,7 +105,7 @@ STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pP
 			
 		// if the input file name is empty, it means that the
 		// document type is not determined, or this document
-		// is classifed as more than one document types.
+		// is classified as more than one document types.
 		// Return an empty attribute vec to indicate that there's no attribute found
 		// or the specified document type has no REPM finder rules associated with it
 		if (strInput.empty())

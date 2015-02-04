@@ -293,22 +293,19 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Find method will return an IUnknownVector of ObjectPair, which 
 		//			has Token(1) and IUnknownVector of Tokens(2).  The Token(1) is 
-		//			top level string match for the search, and the Token(2) is
-		//			submatch string of each top level string match. Token(2) could be
-		//			null if no sub match is found. Furthermore, Token(2) might
-		//			return -1 for start and end position if no position info is
-		//			available for the submatch.
+		//			top level string match for the search, and the Token(2) collection contains
+		//			the matches of each named group (unless the group name starts with a number or
+		//          an underscore) of the regex. Token(2) will be null if no named groups are
+		//          specified or if bReturnNamedMatches is false. To facilitate indexed access,
+		//          if a group has no captures it will still generate a token.
 		// PARAM:	bFindFirstMatch -- true: Find first match and return
 		//							   false: Find all matches and then return
-		//			bReturnNamedMatches -- true: Named captures specified in the regulare expression
-		//											will be return as named submatches
+		//			bReturnNamedMatches -- true: Named group captures specified in the regular
+		//										 expression will be returned as named submatches
+		//										 unless the group name starts with a number or an
+		//										 underscore.
 		//							    -- false: Object2 parameter of ObjectPairs in the 
-		//										returned vector will be NULL.
-		// TODO:    Currently if bReturnNamedMatches is true all sub matches will be returned
-		//			This is so objects that require the unamed matches that VBScriptParser 
-		//			returns will still work with the DotNetParser. Once only the DotNetParser
-		//			is used code should be modified to use named submathces and this should be
-		//			changed to only return named sub matches
+		//										  returned vector will be NULL.
 		[id(3), helpstring("method Find")] HRESULT Find([in] BSTR strInput, 
 			[in] VARIANT_BOOL bFindFirstMatchOnly, [in] VARIANT_BOOL bReturnNamedMatches,
 			[out, retval] IIUnknownVector **ippObjectPairs);
@@ -349,7 +346,8 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 		/// <summary>
         /// PROMISE: Search the input text and retrieves tokens representing the named groups from a
-        ///			 successful search. The primary search result is ignored.
+        ///			 successful search. The primary search result is ignored. If a group has no
+		//           captures it will still generate a token.
         /// PARAM:	 strInput -The string to search.</param>
         ///			 bFindFirstMatchOnly - VARIANT_TRUE to return the named groups for the first match
 		//				only; VARIANT_FALSE to return the named groups for all matches.
@@ -362,6 +360,14 @@ library UCLID_COMUTILSLib
 			[out, retval] IExpressionFormatter **ppVal);
 		[propput, id(10), helpstring("property ExpressionFormatter")] HRESULT ExpressionFormatter(
 			[in] IExpressionFormatter *pNewVal);
+		//-----------------------------------------------------------------------------------------
+		// Determines, for method calls that return tokens based on named groups,
+        // whether all captures of named groups are returned (if VARIANT_TRUE)
+        // or only the last capture of the group are returned (if VARIANT_FALSE).
+		[propget, id(11), helpstring("property ReturnAllGroupCaptures")] HRESULT ReturnAllGroupCaptures(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(11), helpstring("property ReturnAllGroupCaptures")] HRESULT ReturnAllGroupCaptures(
+			[in] VARIANT_BOOL newVal);
 		
 	};
 	[
@@ -872,14 +878,8 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return a new regular expression object based on a ProgID specified in the 
 		//			registry that is stored under the key specified by the component name. 
-		// PROMISE: return a valid IRegularExprParser object based on ProgID specified in registry
-		//			under the key specified with strComponentName. If no entry is in the registry
-		//			the value under Default key in the registry will be used.  If that does not 
-		//			exist the IEVBScriptParser will be used. 
-		//			strComponentName - Name of the component regexpression parser is for. Used to
-		//				obtain the value of a key in the registry.
-		// TODO:	The default may be changed to DotNetRegExParser, or this will be changed to 
-		//			always return a DotNetRegExParser.
+		// PROMISE: return a valid IRegularExprParser object. The object will be a
+		//			DotNetRegExParser.
 		[id(3), helpstring("method GetNewRegExpParserInstance")] HRESULT GetNewRegExpParserInstance(
 			[in] BSTR strComponentName, [out, retval] IRegularExprParser **pRegExpParser);
 		//-----------------------------------------------------------------------------------------

@@ -124,16 +124,10 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 				ITokenPtr ipToken = ipSearchResults->At(i);
 				ASSERT_RESOURCE_ALLOCATION("ELI33366", ipToken != __nullptr);
 				
-				// Ingore metadata or names that are not valid identifiers.
-				string strName = asString(ipToken->Name);
-				char cFirstChar = strName[0];
-				if (!isDigitChar(cFirstChar) && cFirstChar != '_' && !asString(ipToken->Value).empty())
-				{
-					IAttributePtr ipAttribute = createAttribute(ipToken, ipInputText);
-					ASSERT_RESOURCE_ALLOCATION("ELI33367", ipAttribute != __nullptr);
+				IAttributePtr ipAttribute = createAttribute(ipToken, ipInputText);
+				ASSERT_RESOURCE_ALLOCATION("ELI33367", ipAttribute != __nullptr);
 
-					ipFoundAttributes->PushBack(ipAttribute);
-				}
+				ipFoundAttributes->PushBack(ipAttribute);
 			}
 
 			// we have created a vector of attributes representing
@@ -228,7 +222,7 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 	}
 
 	// if we reached here, it's because we could not find any satisfactory
-	// attributs that match all our criteria
+	// attributes that match all our criteria
 	return false;
 }
 //-------------------------------------------------------------------------------------------------

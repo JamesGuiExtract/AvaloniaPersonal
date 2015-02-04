@@ -876,6 +876,7 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 		// Set the pattern and case values for the regular expression parser
 		ipParser->Pattern = getRegularExpr(ipAFDoc).c_str();
 		ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
+		ipParser->ReturnAllGroupCaptures = VARIANT_FALSE;
 
 		// Use the regular expression engine to parse the text and find attribute values
 		// matching the specified regular expression
@@ -915,12 +916,8 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 							ITokenPtr ipSubToken = ipSubMatches->At(s);
 							ASSERT_RESOURCE_ALLOCATION("ELI22477", ipSubToken != __nullptr);
 							
-							// Don't create attributes if name begins with a number,
-							// an '_' [FlexIDSCore #4095]
-							// or is empty.
-							string strName = asString(ipSubToken->Name);
-							char cFirstChar = strName[0];
-							if ( !isDigitChar(cFirstChar) && cFirstChar != '_' && !asString(ipSubToken->Value).empty() )
+							// Don't create attributes if value is empty.
+							if ( !asString(ipSubToken->Value).empty() )
 							{
 								IAttributePtr ipSubAttribute = createAttribute(ipSubToken, ipInputText);
 								ASSERT_RESOURCE_ALLOCATION("ELI22478", ipSubAttribute != __nullptr);

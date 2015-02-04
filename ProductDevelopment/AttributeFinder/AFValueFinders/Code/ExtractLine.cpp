@@ -601,7 +601,7 @@ void CExtractLine::parseLineNumbers(const string& strLineNumbers)
 	}
 
 	m_vecLineNumbers.clear();
-	ipParser->Pattern = "(\\d+)(\\s?-\\s?(\\d+))?";
+	ipParser->Pattern = "(?'a'\\d+)(?'b'\\s?-\\s?(?'c'\\d+))?";
 	// get top matches, which might be some numbers and some number ranges
 	IIUnknownVectorPtr ipTopMatches = 
 		ipParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_TRUE);

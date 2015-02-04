@@ -309,7 +309,7 @@ STDMETHODIMP CStringTokenizerModifier::raw_ModifyValue(IAttribute* pAttribute, I
 		}
 
 		// Get a regular expression parser with a pattern that will search for any %d and %d-%d
-		IRegularExprParserPtr ipParser = getRegexParser("(\\\\*)%(\\d+)(-%(\\d+))?");
+		IRegularExprParserPtr ipParser = getRegexParser("(?'a'\\\\*)%(?'b'\\d+)(?'c'-%(?'d'\\d+))?");
 
 		// find all token place holders (i.e. %d or %d-%d) in the result expression
 		IIUnknownVectorPtr ipTokenPlaceHolders = 
@@ -774,7 +774,7 @@ void CStringTokenizerModifier::validateLicense()
 bool CStringTokenizerModifier::validateExpression(const string& strExpr)
 {
 	// set pattern
-	IRegularExprParserPtr ipParser = getRegexParser("(\\\\*)(%|-|\\\\)");
+	IRegularExprParserPtr ipParser = getRegexParser("(?'a'\\\\*)(?'b'%|-|\\\\)");
 	IIUnknownVectorPtr ipFound = ipParser->Find(strExpr.c_str(), VARIANT_FALSE, VARIANT_TRUE);
 	if (ipFound != __nullptr)
 	{

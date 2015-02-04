@@ -26,9 +26,6 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //-------------------------------------------------------------------------------------------------
 // const string for file name header
 const string gstrFILE_NAME_HEADER = "file://";
-const string gstrMISC_UTILS_REG_PATH = 
-	"Software\\Extract Systems\\ReusableComponents\\UCLIDCOMUtils\\MiscUtils";
-const string gstrDEFAULT_PARSER_KEY_NAME = "Default";
 const string gstrDEFAULT_PARSER_PROG_ID = "ESRegExParser.DotNetRegExParser.1";
 
 // Tag names
