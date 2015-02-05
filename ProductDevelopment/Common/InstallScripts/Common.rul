@@ -458,7 +458,7 @@ begin
 		
 	// Install Crystal Reports
 	szProgram = "msiexec";
-	szCmdLine = " /qn /i " + SUPPORTDIR ^ "\\CRRuntime_12_1_mlb.msi";
+	szCmdLine = " /qn /norestart /i " + SUPPORTDIR ^ "\\CRRuntime_12_1_mlb.msi";
 	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 	
 	SdShowMsg("Setup is Installing Crystal Reports 12 Runtime", FALSE);
@@ -530,14 +530,14 @@ begin
 		// Install SQL Compact Edition
 		// 32bit needs to be installed even on 64 bit
 		szProgram = "msiexec";
-		szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x86-ENU.msi" + " /qb- /norestart";
+		szCmdLine = "/qb- /norestart /i " + SUPPORTDIR ^ "\\SSCERuntime_x86-ENU.msi";
 		if (!Is32BitSQLCEInstalled()) then
 			LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 		endif;
 
 		// If 64 bit OS install 64 version of SSCE	
 		if ( SYSINFO.bIsWow64 ) then
-			szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x64-ENU.msi" + " /qb- /norestart";
+			szCmdLine = "/qb- /norestart /i " + SUPPORTDIR ^ "\\SSCERuntime_x64-ENU.msi";
 			if (!Is64BitSQLCEInstalled()) then
 				LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 			endif;
@@ -837,7 +837,7 @@ begin
 	
 	// Install Microsoft Office Redistributable
 	szProgram = "msiexec";
-	szCmdLine = " /qn /i " + SUPPORTDIR ^ "\\o2007pia.msi";
+	szCmdLine = " /qn /norestart /i " + SUPPORTDIR ^ "\\o2007pia.msi";
 	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 	
 	SdShowMsg("Setup is Installing Microsoft Office Redistributable", FALSE);
@@ -913,7 +913,7 @@ begin
 	szProgram = "msiexec"; 
 	szInstallToRun = SUPPORTDIR ^ "\\Extract Systems FKB.msi";
 	LongPathToQuote(szInstallToRun, TRUE);
-	szCmdLine = " /i " + szInstallToRun + " /qb-";;
+	szCmdLine = "/qb- /norestart /i " + szInstallToRun ;
 	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 	
 	SdShowMsg("Setup is Installing Extract Systems FKB", FALSE);
