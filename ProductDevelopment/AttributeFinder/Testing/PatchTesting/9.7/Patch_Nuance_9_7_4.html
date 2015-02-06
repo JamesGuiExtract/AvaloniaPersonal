@@ -48,6 +48,19 @@
 			<li>Retain full-color information in PDF images.
 		</ul>
 	</ul>
+<p>
+   	<LI><b>SCRs:</b> ISSUE-12751
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>Create a custom version of ImageFormatConverter called 
+		<b>SpecialImageFormatConverter.exe</b> that allows PDF documents 
+		to be rasterized via the Apose toolkit.
+		<ul>
+			<li>Successfully rasterize PDF forms.
+			<li>Retain full-color information in PDF images.
+			<li>Do not dither color documents inappropriately.
+		</ul>
+	</ul>
 </ul>
 <p>
 <h3>Patch Tests</h3>
@@ -383,6 +396,55 @@
 				on Cheddar.
 				<li>FPS files as tested include some weird settings for 
 				supplying where intermediate rasterized also get picked up.
+			</ul>
+		</ul>
+       	</ul>
+<p>
+	<LI><b>Special Image Format Converter</b>
+	<ul>
+		<li><u>Installation and Setup</u>
+		<ul>
+			<li>Install and license FLEX Index and ID Shield <b>9.7.4.5</b>.
+			<li>Extract files from <b>9.7.4.5 SpecialImageFormatConverter.zip</b> 
+			to the <b>CommonComponents</b> folder.
+			<li>Exercise <b>SpecialImageFormatConverter.exe</b> via the 
+			<b>Core: Launch application</b> task.
+		</ul>
+		<li><u>Exercise Sample Images</u>
+		<ul>
+			<li>Process the following types of images and confirm appropriate 
+			results.
+			<li><u>Types</u>
+			<ul>
+				<li>Bitonal PDFs
+				<li>Color PDFs
+				<li>Color PDFs with form data
+				<li>PDFs that are already searchable
+				<li>PDF/A-compliant images
+				<li>Bitonal TIFs
+				<li>Color TIFs
+				<li>TIFs with annotations
+				<li>Customer-supplied images
+			</ul>
+			<li><u>Results</u>
+			<ul>
+				<li>Output images should include any original form data
+				<li>PDF output files should be searchable
+				<li>PDF output files should not be excessively larger than 
+				the input files
+				<li>Color quality is good on color images
+				<li>Searchable text should not be double-found
+				<li>Bits-per-pixel settings should correspond with the size 
+				of the output images.
+			</ul>
+			<li><u>Notes</u>
+			<ul>
+				<li>Exercised by Wayne <b>02/05/2015</b> and <b>02/06/2015</b> 
+				on DELL-I7.
+				<li>Some output files were unexpectedly large with <b>/8bpp</b> 
+				option chosen. This is probably due to unnecessary storage for 
+				bitonal images.
+				<li>Dithering seemed acceptable with <b>/8bpp</b> option.
 			</ul>
 		</ul>
        	</ul>
