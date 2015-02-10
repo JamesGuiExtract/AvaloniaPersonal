@@ -31,7 +31,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 123;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 124;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -58,7 +58,7 @@ int UpdateToSchemaVersion101(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		if (pnNumSteps != __nullptr)
 		{
-			// This update requires potentialy creating a new row in the FileActionStatus table for
+			// This update requires potentially creating a new row in the FileActionStatus table for
 			// every row in the FAMFile table and is therefore O(n) relative to the number of files
 			// in the DB.
 			*pnNumSteps += 10;
@@ -83,7 +83,7 @@ int UpdateToSchemaVersion101(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
 	
 		// Add query to transfer the data from the old FAMFile.ASC columns into the new FileActionStatus
-		// table, then drop the FAMFile.ASC columns columns
+		// table, then drop the FAMFile.ASC columns.
 		vecQueries.push_back(
 			"DECLARE @dynamic_command NVARCHAR(MAX)\r\n"
 			"DECLARE @action_name NVARCHAR(50)\r\n"
@@ -516,7 +516,7 @@ int UpdateToSchemaVersion112(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		if (pnNumSteps != __nullptr)
 		{
-			// This update requires potentialy creating a new row in the FileActionStatus table for
+			// This update requires potentially creating a new row in the FileActionStatus table for
 			// every row in the FAMFile table and is therefore O(n) relative to the number of files
 			// in the DB.
 			*pnNumSteps += 10;
@@ -867,6 +867,30 @@ int UpdateToSchemaVersion123(_ConnectionPtr ipConnection, long *pnNumSteps,
 
 	return nNewSchemaVersion;
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion124(_ConnectionPtr ipConnection, long *pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	int nNewSchemaVersion = 124;
+
+	if (pnNumSteps != __nullptr)
+	{
+		*pnNumSteps += 3;
+		return nNewSchemaVersion;
+	}
+
+	// https://extract.atlassian.net/browse/ISSUE-12763
+	// This schema update actually doesn't do anything in terms of the core FAM DB schema-- it
+	// exists only to trigger a schema update in order to prompt the user whether they want to add
+	// the newly created LabDE schema elements. That prompt occurs within
+	// CLabDEProductDBMgr::UpdateSchemaForFAMDBVersion when the current FAM DB schema version is 123.
+	vector<string> vecQueries;
+	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+	executeVectorOfSQL(ipConnection, vecQueries);
+
+	return nNewSchemaVersion;
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -1019,7 +1043,8 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 	{
 		try
 		{
-			// Replace any occurences of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
+			// Replace any occurrences of ' with '' this is because SQL Server use the ' to indicate
+			// the beginning and end of a string
 			string strFileName = asString(strFile);
 			replaceVariable(strFileName, "'", "''");
 
@@ -1170,7 +1195,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					
 					_lastCodePos = "72";
 
-					// Reset the ipFields to the requeried fields
+					// Reset the ipFields to the required fields
 					ipFields = ipFileSet->Fields;
 					ASSERT_RESOURCE_ALLOCATION("ELI31068", ipFields != __nullptr);
 
@@ -1315,7 +1340,8 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI30366", ipFileSet != __nullptr);
 
-				// Replace any occurances of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
+				// Replace any occurrences of ' with '' this is because SQL Server use the ' to
+				// indicate the beginning and end of a string
 				string strFileName = asString(strFile);
 				replaceVariable(strFileName, "'", "''");
 
@@ -1673,7 +1699,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 						// Commit the changes to the database
 						tg.CommitTrans();
 
-						// Re-query to see if the status changed as a result of being auto-revereted.
+						// Re-query to see if the status changed as a result of being auto-reverted.
 						ipFileSet->Requery(adOptionUnspecified);
 
 						// Get the updated status
@@ -1866,7 +1892,7 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactIsolated, &m_mutex);
 
-				// Get the action ID as as string
+				// Get the action ID as a string
 				string strActionID = asString(nActionID);
 
 				// Remove any records from the skipped file table that where skipped for this action
@@ -2254,7 +2280,8 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 				// Get the action ID and update the strActionName to stored value
 				long nActionID = getActionID(ipConnection, strActionName);
 
-				// Replace any occurences of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
+				// Replace any occurrences of ' with '' this is because SQL Server use the ' to
+				// indicate the beginning and end of a string
 				string strFolderName = asString(strFolder);
 				replaceVariable(strFolderName, "'", "''");
 
@@ -4280,7 +4307,7 @@ bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 			// Stop thread here
 			m_eventStopMaintainenceThreads.signal();
 
-			// Wait for the ping and statistics maintainence threads to exit.
+			// Wait for the ping and statistics maintenance threads to exit.
 			HANDLE handles[2];
 			handles[0] = m_eventPingThreadExited.getHandle();
 			handles[1] = m_eventStatsThreadExited.getHandle();
@@ -5394,7 +5421,7 @@ bool CFileProcessingDB::RemoveLoginUser_Internal(bool bDBLocked, BSTR bstrUserNa
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
-				// Delet the specified user from the login table
+				// Delete the specified user from the login table
 				executeCmdQuery(ipConnection, "DELETE FROM Login WHERE UserName = '" + strUserName + "'");
 
 				// Commit the changes
@@ -5650,8 +5677,8 @@ bool CFileProcessingDB::GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BS
 		{
 			ASSERT_ARGUMENT("ELI29546",  ppFileRecord != __nullptr);
 
-			// Replace any occurences of ' with '' this is because SQL Server use the ' to indicate the
-			// beginning and end of a string
+			// Replace any occurrences of ' with '' this is because SQL Server use the ' to indicate
+			// the beginning and end of a string
 			string strFileName = asString(bstrFile);
 			replaceVariable(strFileName, "'", "''");
 
@@ -5769,7 +5796,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 		{
 			m_bValidatingOrUpdatingSchema = true;
 
-			// Assume a lock is going to be neccessary for a schema update.
+			// Assume a lock is going to be necessary for a schema update.
 			ASSERT_ARGUMENT("ELI31401", bDBLocked == true);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
@@ -5838,7 +5865,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 120:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion121);
 				case 121:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion122);
 				case 122:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion123);
-				case 123:	break;
+				case 123:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion124);
+				case 124:	break;
 
 				default:
 					{
@@ -5865,11 +5893,14 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			// A working count of the steps for each stage.
 			long nStepCount = 0;
 			
+			IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
+			ASSERT_RESOURCE_ALLOCATION("ELI31398", ipProdSpecificMgrs != __nullptr);
+
 			// For each product-specific database, the current schema version being acted upon.
 			map<string, long> mapProductSpecificVersions;
 
 			// For each FAM DB schema version in the conversion process, query each product-specific
-			// database manager for any schema updates that occured during the time the FAM DB was
+			// database manager for any schema updates that occurred during the time the FAM DB was
 			// at the corresponding schema version.
 			typedef vector<DB_SCHEMA_UPDATE_FUNC>::iterator funcIterator;
 			funcIterator iterFunc = vecUpdateFuncs.begin();
@@ -5878,8 +5909,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				// Get a count of the total number of steps required for all product-specific
 				// schema update steps corresponding to the FAM DB nSchemaVersion. 
 				nStepCount = 0;
-				executeProdSpecificSchemaUpdateFuncs(ipConnection, nSchemaVersion, &nStepCount,
-					__nullptr, mapProductSpecificVersions);
+				executeProdSpecificSchemaUpdateFuncs(ipConnection, ipProdSpecificMgrs,
+					nSchemaVersion, &nStepCount, __nullptr, mapProductSpecificVersions);
 
 				if (iterFunc != vecUpdateFuncs.end())
 				{
@@ -5919,8 +5950,9 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				zMessage.Format("Updating database schema... (Step %i of %i)", i + 1, nStageCount);
 				ipProgressStatus->StartNextItemGroup(zMessage.GetString(), vecStepCounts[i]);
 
-				executeProdSpecificSchemaUpdateFuncs(ipConnection, nSchemaVersion, NULL,
-					ipProgressStatus->SubProgressStatus, mapProductSpecificVersions);
+				executeProdSpecificSchemaUpdateFuncs(ipConnection, ipProdSpecificMgrs,
+					nSchemaVersion, NULL, ipProgressStatus->SubProgressStatus,
+					mapProductSpecificVersions);
 
 				if (i < nFuncCount)
 				{

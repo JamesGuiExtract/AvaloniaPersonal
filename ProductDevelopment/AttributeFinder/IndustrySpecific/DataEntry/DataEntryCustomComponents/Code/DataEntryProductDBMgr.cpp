@@ -454,7 +454,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 					UCLIDException ue("ELI31431",
 						"Automatic updates are not supported for the current schema.");
 					ue.addDebugInfo("FAM Schema Version", nFAMDBSchemaVersion, false);
-					ue.addDebugInfo("ID Shield Schema Version", *pnProdSchemaVersion, false);
+					ue.addDebugInfo("Data entry Schema Version", *pnProdSchemaVersion, false);
 					throw ue;
 				}
 		}

@@ -751,7 +751,7 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 			{
 				_lastCodePos = "80_10";
 
-				// if adding or modifing the file add the file modified and file size fields
+				// if adding or modifying the file add the file modified and file size fields
 				CTime fileTime;
 				fileTime = getFileModificationTimeStamp(strFileName);
 				_lastCodePos = "80_20";
@@ -856,7 +856,7 @@ string CFileProcessingDB::getActionName(_ConnectionPtr ipConnection, long nActio
 		_RecordsetPtr ipAction(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI14046", ipAction != __nullptr);
 
-		// Oepn Action table
+		// Open Action table
 		ipAction->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 			adLockReadOnly, adCmdTableDirect);
 
@@ -1564,17 +1564,17 @@ void CFileProcessingDB::initializeTableValues80()
 			+ "', '60')";
 		vecQueries.push_back(strSQL);
 			
-		// Add AutoRevertNotifyEmailList setting (default to empy string)
+		// Add AutoRevertNotifyEmailList setting (default to empty string)
 		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_NOTIFY_EMAIL_LIST
 			+ "', '')";
 		vecQueries.push_back(strSQL);
 
-		// Add NumberOfConnectionRetries setting (default to empy string)
+		// Add NumberOfConnectionRetries setting (default to empty string)
 		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrNUMBER_CONNECTION_RETRIES
 			+ "', '10')";
 		vecQueries.push_back(strSQL);
 			
-		// Add ConnectionRetryTimeout setting (default to empy string)
+		// Add ConnectionRetryTimeout setting (default to empty string)
 		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCONNECTION_RETRY_TIMEOUT
 			+ "', '120')";
 		vecQueries.push_back(strSQL);
@@ -1689,7 +1689,7 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 {
 	try
 	{
-		// Temporary string for from action strin since getActionID cannot use const string
+		// Temporary string for from action string since getActionID cannot use const string
 		// TODO: This can be removed and the const string& strFrom changed to non const ref
 		string strTmpFrom = strFrom;
 
@@ -1960,7 +1960,7 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 	// Select the existing Statistics record if it exists
 	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
 
-	// Open the recordset for the statisics with the record for ActionID if it exists
+	// Open the recordset for the statistics with the record for ActionID if it exists
 	ipActionStatSet->Open(strSelectStat.c_str(), 
 		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 		adLockOptimistic, adCmdText);
@@ -2311,7 +2311,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 		};
 
 		// Determine the range of possible wait times for each attempt at getting the lock based
-		// upon how many active FAMs there are. The more active FAMs, the greater the likelyhood
+		// upon how many active FAMs there are. The more active FAMs, the greater the likelihood
 		// that multiple processes are hitting the DB in this loop.
 		if (nMaxWaitTime < 0)
 		{
@@ -2586,7 +2586,7 @@ bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdm
 	// Check for no password
 	if (strStoredEncryptedCombined.empty())
 	{
-		// if there is no stored password then strPassword should be emtpy
+		// if there is no stored password then strPassword should be empty
 		return strPassword.empty();
 	}
 
@@ -2845,7 +2845,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						{
 							_lastCodePos = "80";
 
-							// Get the commmand timeout
+							// Get the command timeout
 							m_iCommandTimeout =  asLong(getStringField(ipFields, "Value"));
 						}
 						else if (strValue == gstrUPDATE_QUEUE_EVENT_TABLE)
@@ -3364,7 +3364,7 @@ void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 		
 		_lastCodePos = "20";
 		
-		// Initilize count for MLI Code iteration count
+		// Initialize count for MLI Code iteration count
 		long nCount = 0;
 		map<DWORD, _ConnectionPtr>::iterator it;
 		for (it = m_mapThreadIDtoDBConnections.begin(); it != m_mapThreadIDtoDBConnections.end(); it++)
@@ -4069,7 +4069,7 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 		CFileProcessingDB *pDB = static_cast<CFileProcessingDB *>(pData);
 		ASSERT_ARGUMENT("ELI35126", pDB != __nullptr);
 
-		// Stagger the start of the maintainence threads so that, at least initially, the threads
+		// Stagger the start of the maintenance threads so that, at least initially, the threads
 		// aren't firing at the same time. Use a random time so that if a bunch of processes are
 		// started simultaneously, they don't all hit the DB at the same time.
 		unsigned int nTimeToSleep;
@@ -4515,7 +4515,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						// LockedFile records
 						strQuery = gstrGET_FILES_TO_PROCESS_QUERY;
 
-						// Replace the variable to set upt the query
+						// Replace the variable to set up the query
 						replaceVariable(strQuery, "<SelectFilesToProcessQuery>", strSelectSQL);
 						replaceVariable(strQuery, "<ActionID>", asString(nActionID));
 						replaceVariable(strQuery, "<UserID>", asString(getFAMUserID(ipConnection)));
@@ -4620,7 +4620,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						throw uex;
 					}
 
-					// In the case that the the exception is because the database has gotten into an
+					// In the case that the exception is because the database has gotten into an
 					// inconsistent state (as with LegacyRCAndUtiles:6350), use a small sleep here to
 					// prevent thousands (or millions) of successive failures which may bog down the
 					// DB and burn through table IDs.
@@ -4716,7 +4716,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	// if there are any records in ipProcessingSet there is active processing.
 	if (!asCppBool(ipProcessingSet->adoEOF))
 	{
-		// Since processing is occuring need to throw an exception.
+		// Since processing is occurring need to throw an exception.
 		UCLIDException ue("ELI30547", "Processing is active for this action.");
 		ue.addDebugInfo("ActionID",strActionID);
 		FieldsPtr ipFields = ipProcessingSet->Fields;
@@ -4793,7 +4793,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 	// if there are any records in ipProcessingSet there is active processing.
 	if (!asCppBool(ipProcessingSet->adoEOF))
 	{
-		// Since processing is occuring need to throw an exception.
+		// Since processing is occurring need to throw an exception.
 		UCLIDException ue("ELI30608", "Database has active processing.");
 		FieldsPtr ipFields = ipProcessingSet->Fields;
 		if (ipFields != __nullptr)
@@ -4855,7 +4855,7 @@ bool CFileProcessingDB::isStatisticsUpdateFromDeltaNeeded(const _ConnectionPtr& 
 	// Select the existing Statistics record if it exists
 	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
 
-	// Open the recordset for the statisics with the record for ActionID if it exists
+	// Open the recordset for the statistics with the record for ActionID if it exists
 	ipActionStatSet->Open(strSelectStat.c_str(), 
 		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 		adLockOptimistic, adCmdText);
@@ -4893,7 +4893,7 @@ void CFileProcessingDB::updateActionStatisticsFromDelta(const _ConnectionPtr& ip
 		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
 
 	// Since the query for the set uses a Aggregate function (MAX) there should always
-	// be at least one record if not there there is a problem
+	// be at least one record if there is not a problem
 	if (asCppBool(ipActionStatisticsDeltaSet->adoEOF))
 	{
 		UCLIDException ue("ELI30774", "No records found.");
@@ -5166,13 +5166,10 @@ void CFileProcessingDB::addOldTables(vector<string>& vecTables)
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection,
-	int nFAMSchemaVersion, long *pnStepCount, IProgressStatusPtr ipProgressStatus,
-	map<string, long> &rmapProductSpecificVersions)
+	IIUnknownVectorPtr ipProdSpecificMgrs, int nFAMSchemaVersion, long *pnStepCount,
+	IProgressStatusPtr ipProgressStatus, map<string, long> &rmapProductSpecificVersions)
 {
-	IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
-	ASSERT_RESOURCE_ALLOCATION("ELI31398", ipProdSpecificMgrs != __nullptr);
-
-	// Loop throught all installed & licensed product-specific DB managers and call
+	// Loop through all installed & licensed product-specific DB managers and call
 	// UpdateSchemaForFAMDBVersion for each.
 	long nCountProdSpecMgrs = ipProdSpecificMgrs->Size();
 	for (long i = 0; i < nCountProdSpecMgrs; i++)
@@ -5330,7 +5327,7 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, l
 						throw uex;
 					}
 
-					// In the case that the the exception is because the database has gotten into an
+					// In the case that the exception is because the database has gotten into an
 					// inconsistent state (as with LegacyRCAndUtiles:6350), use a small sleep here to
 					// prevent thousands (or millions) of successive failures which may bog down the
 					// DB and burn through table IDs.

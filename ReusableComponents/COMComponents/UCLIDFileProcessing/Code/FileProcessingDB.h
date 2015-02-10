@@ -966,9 +966,9 @@ private:
 	void addOldTables(vector<string>& vecTables);
 
 	// Runs the UpdateSchemaForFAMDBVersion function for each installed product-specific database.
-	void executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection, int nFAMSchemaVersion,
-		long *pnStepCount, IProgressStatusPtr ipProgressStatus,
-		map<string, long> &rmapProductSpecificVersions);
+	void executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection, 
+		IIUnknownVectorPtr ipProdSpecificMgrs, int nFAMSchemaVersion, long *pnStepCount,
+		IProgressStatusPtr ipProgressStatus, map<string, long> &rmapProductSpecificVersions);
 
 	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr getWorkItemFromFields(const FieldsPtr& ipFields);
 	IIUnknownVectorPtr setWorkItemsToProcessing(bool bDBLocked, long nActionID, long nNumberToGet,

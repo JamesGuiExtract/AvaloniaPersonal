@@ -1,0 +1,26 @@
+HKCR
+{
+	LabDECppCustomComponents.LabDEDBMgr.1 = s 'LabDEDBMgr Class'
+	{
+		CLSID = s '{A714F2AD-17CF-4C1B-8F2C-0ABFA031351A}'
+	}
+	LabDECppCustomComponents.LabDEDBMgr = s 'LabDEDBMgr Class'
+	{
+		CLSID = s '{A714F2AD-17CF-4C1B-8F2C-0ABFA031351A}'		
+		CurVer = s 'LabDECppCustomComponents.LabDEDBMgr.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A714F2AD-17CF-4C1B-8F2C-0ABFA031351A} = s 'LabDEDBMgr Class'
+		{
+			ProgID = s 'LabDECppCustomComponents.LabDEDBMgr.1'
+			VersionIndependentProgID = s 'LabDECppCustomComponents.LabDEDBMgr'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{1A3470EB-9D1E-41CA-A047-31E7D18B0BED}'
+		}
+	}
+}
