@@ -16,6 +16,7 @@
 #include <ExtractMFCUtils.h>
 #include <ClipboardManager.h>
 #include <VectorOperations.h>
+#include <DateUtil.h>
 
 #include <string>
 #include <vector>
@@ -1187,9 +1188,12 @@ void FileProcessingDlgStatusPage::updateStatisticsVariablesWithTaskInfo(long nFi
 		try
 		{
 			// Make an interval for this task's processing time
-			SYSTEMTIME stCurrentTime;
-			GetLocalTime(&stCurrentTime);
-			TimeInterval interval(task.getStartTime(), stCurrentTime);
+			SYSTEMTIME stCurrentTime, stStartTime;
+			CTime ct = CTime::GetCurrentTime();
+			stCurrentTime = asUTCSystemTime(ct);
+			stStartTime = asUTCSystemTime(task.getStartTime());
+
+			TimeInterval interval(stStartTime, stCurrentTime);
 
 			// Add the processing time of this task to the total processing time
 			// The merge prevents overlaps from being counted twice.

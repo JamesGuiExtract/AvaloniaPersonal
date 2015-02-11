@@ -31,7 +31,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 124;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 125;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -885,6 +885,33 @@ int UpdateToSchemaVersion124(_ConnectionPtr ipConnection, long *pnNumSteps,
 	// the newly created LabDE schema elements. That prompt occurs within
 	// CLabDEProductDBMgr::UpdateSchemaForFAMDBVersion when the current FAM DB schema version is 123.
 	vector<string> vecQueries;
+	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+	executeVectorOfSQL(ipConnection, vecQueries);
+
+	return nNewSchemaVersion;
+}
+
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion125(_ConnectionPtr ipConnection, long *pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	int nNewSchemaVersion = 125;
+
+	if (pnNumSteps != __nullptr)
+	{
+		// This is such a small tweak-- use a single step as opposed to the usual 3.
+		*pnNumSteps += 1;
+		return nNewSchemaVersion;
+	}
+
+	vector<string> vecQueries;
+	vecQueries.push_back("ALTER TABLE dbo.LockTable DROP CONSTRAINT DF_LockTable_LockTime"); 
+	vecQueries.push_back(
+		"ALTER TABLE dbo.LockTable ADD CONSTRAINT DF_LockTable_LockTime DEFAULT (getutcdate()) FOR LockTime");
+	vecQueries.push_back("ALTER TABLE dbo.ActiveFAM DROP CONSTRAINT DF_ActiveFAM_LastPingTime");
+	vecQueries.push_back(
+		"ALTER TABLE dbo.ActiveFAM ADD CONSTRAINT DF_ActiveFAM_LastPingTime DEFAULT (getutcdate()) FOR LastPingTime");
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
@@ -5794,6 +5821,9 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 	{
 		try
 		{
+			// Make sure all Product specific DB managers have been recognized.
+			checkForNewDBManagers();
+
 			m_bValidatingOrUpdatingSchema = true;
 
 			// Assume a lock is going to be necessary for a schema update.
@@ -5866,7 +5896,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 121:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion122);
 				case 122:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion123);
 				case 123:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion124);
-				case 124:	break;
+				case 124:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion125);
+				case 125:	break;
 
 				default:
 					{

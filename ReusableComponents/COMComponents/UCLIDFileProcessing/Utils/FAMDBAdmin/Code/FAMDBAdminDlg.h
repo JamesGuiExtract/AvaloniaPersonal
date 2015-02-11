@@ -108,7 +108,7 @@ private:
 	// Indicates whether the most recently attempt schema update succeeded.
 	bool m_bSchemaUpdateSucceeded;
 
-	// Indicates wether the current database schema is known to be out-of-date.
+	// Indicates the current database schema is known to be out-of-date.
 	bool m_bDBSchemaIsNotCurrent;
 
 	// Saves/restores window position/size info to/from the registry.

@@ -50,7 +50,7 @@ public:
 	double getWorkItemDuration();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the starting time of the stopwatch
-	SYSTEMTIME getStartTime() const;
+	CTime getStartTime() const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the filename from the IWorkItemRecord member variable
 	//			if the m_ipWorkItemRecord is NULL an exception will be thrown

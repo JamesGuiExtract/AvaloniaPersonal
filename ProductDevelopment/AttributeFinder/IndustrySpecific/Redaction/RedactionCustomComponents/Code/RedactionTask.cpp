@@ -646,11 +646,11 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 
         // Stop the stop watch
         swProcessingTime.stop();
-        SYSTEMTIME tStartTime = swProcessingTime.getBeginTime();
+        CTime tStartTime = swProcessingTime.getBeginTime();
         double dElapsedSeconds = swProcessingTime.getElapsedTime();
 
         // Add a metadata attribute to the VOA file
-        storeMetaData(strVOAFileName, ipVOAAttr, ipFoundAttr, tStartTime, dElapsedSeconds, 
+        storeMetaData(strVOAFileName, ipVOAAttr, ipFoundAttr, asLocalSystemTime(tStartTime), dElapsedSeconds, 
             strImageName, strOutputName, bOutputFileExists);
 
         // Add ID Shield data if a database is provided

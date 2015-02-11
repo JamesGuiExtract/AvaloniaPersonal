@@ -441,7 +441,7 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 			AfxBeginThread(upgradeToCurrentSchemaThread, this);
 
 			// Show a modal progress status dialog that cannot be closed by the user. The background
-			// thread will close the dialog once the udpate has completed (whether successfully or not).
+			// thread will close the dialog once the update has completed (whether successfully or not).
 			m_ipSchemaUpdateProgressStatusDialog->ShowModalDialog(m_hWnd);
 
 			if (m_bSchemaUpdateSucceeded)

@@ -7,7 +7,6 @@
 #include "FileProcessingDlgStatusPage.h"
 #include "WorkItemsPage.h"
 
-#include <TimeIntervalMerger.h>
 #include <FileProcessingConfigMgr.h>
 #include <ResizablePropertySheet.h>
 

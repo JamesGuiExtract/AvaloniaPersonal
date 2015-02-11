@@ -75,9 +75,10 @@ void TaskInfoDlg::setTask(const FileProcessingRecord& task)
 	}
 	else
 	{
-		// TESTTHIS: was the code change here during the VS2005 port valid
-		tm _tm  = systemTimeToTm(m_taskFileProcessing.m_stopWatch.getBeginTime());
-
+		// Get the local time
+		tm _tm;
+		m_taskFileProcessing.m_stopWatch.getBeginTime().GetLocalTm(&_tm);
+		
 		// the display string
 		char pszTemp[256];
 		if (asctime_s(pszTemp, sizeof(pszTemp), &_tm) != 0)

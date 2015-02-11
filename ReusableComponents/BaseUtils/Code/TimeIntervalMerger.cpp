@@ -48,10 +48,12 @@ TimeInterval::TimeInterval(const SYSTEMTIME& startTime, const SYSTEMTIME& endTim
 }
 //-------------------------------------------------------------------------------------------------
 TimeInterval::TimeInterval(const StopWatch& stopWatch)
-:m_startTime(stopWatch.getBeginTime()), m_endTime(stopWatch.getEndTime())
 {
 	try
 	{
+		m_startTime = asUTCSystemTime(stopWatch.getBeginTime());
+		m_endTime = asUTCSystemTime(stopWatch.getEndTime());
+		
 		// ensure proper argument
 		ASSERT_ARGUMENT("ELI11124", asULongLong(m_endTime) >= asULongLong(m_startTime));
 		ASSERT_ARGUMENT("ELI11130", asULongLong(m_endTime) >= 0);

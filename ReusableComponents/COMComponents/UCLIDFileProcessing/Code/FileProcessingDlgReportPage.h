@@ -9,7 +9,6 @@
 #include "FileProcessingDB.h"
 #include "TaskEvent.h"
 
-#include <TimeIntervalMerger.h>
 #include <XInfoTip.h>
 
 #include <vector>

@@ -88,7 +88,7 @@ double StopWatch::getElapsedTime()
 {
 	if (m_bIsRunning && !m_bIsReset)
 	{
-		SYSTEMTIME endTime;
+		CTime endTime;
 		LARGE_INTEGER endCounter;
 		
 		getCurrentTime(endTime, endCounter);
@@ -145,7 +145,7 @@ bool StopWatch::isReset()
 	return m_bIsReset;
 }
 //-------------------------------------------------------------------------------------------------
-const SYSTEMTIME& StopWatch::getBeginTime() const
+const CTime& StopWatch::getBeginTime() const
 {
 	if(m_bIsReset)
 	{
@@ -158,7 +158,7 @@ const SYSTEMTIME& StopWatch::getBeginTime() const
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const SYSTEMTIME& StopWatch::getEndTime() const
+const CTime& StopWatch::getEndTime() const
 {
 	// ensure that the stop watch is not running
 	if (m_bIsRunning)
@@ -175,10 +175,10 @@ const SYSTEMTIME& StopWatch::getEndTime() const
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-void StopWatch::getCurrentTime(SYSTEMTIME& rendTime, LARGE_INTEGER& rendCounter) const
+void StopWatch::getCurrentTime(CTime& rendTime, LARGE_INTEGER& rendCounter) const
 {
 	// get the end time
-	GetLocalTime(&rendTime);
+	rendTime = CTime::GetCurrentTime();
 
 	// get the end-counter
 	if (QueryPerformanceCounter(&rendCounter) == 0)
@@ -190,10 +190,10 @@ void StopWatch::getCurrentTime(SYSTEMTIME& rendTime, LARGE_INTEGER& rendCounter)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-double StopWatch::getLowResElapsedTime(const SYSTEMTIME& endTime)
+double StopWatch::getLowResElapsedTime(const CTime& endTime)
 {
 	// if the end time is less than the start time log an exception
-	if (asULongLong(endTime) < asULongLong(m_startTime))
+	if (endTime < m_startTime)
 	{
 		// [LegacyRCAndUtils:6312]
 		// Prevent repeated exceptions from being logged.
@@ -217,9 +217,9 @@ double StopWatch::getLowResElapsedTime(const SYSTEMTIME& endTime)
 	}
 
 	// return the elapsed time in seconds
-	ULONGLONG qwSpan = asULongLong(m_endTime) - asULongLong(m_startTime);
+	CTimeSpan ts = endTime - m_startTime;
 
-	return (double) qwSpan / ST_SECOND;
+	return (double) ts.GetTotalSeconds();
 }
 //-------------------------------------------------------------------------------------------------
 double StopWatch::getHighResElapsedTime(const LARGE_INTEGER& endCounter)

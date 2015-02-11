@@ -739,6 +739,21 @@ EXPORT_BaseUtils tm systemTimeToTm(const SYSTEMTIME &st)
 	return tm_time;
 }
 //-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils SYSTEMTIME tmToSystemTime(const tm &t)
+{
+	SYSTEMTIME st_time;
+	ZeroMemory(&st_time, sizeof(SYSTEMTIME));
+
+	st_time.wYear = t.tm_year + 1900;
+	st_time.wMonth = t.tm_mon + 1;
+	st_time.wDay = t.tm_mday;
+	st_time.wHour = t.tm_hour;
+	st_time.wMinute = t.tm_min;
+	st_time.wSecond = t.tm_sec;
+	
+	return st_time;
+}
+//-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils ULONGLONG asULongLong(const SYSTEMTIME& st)
 {
 	FILETIME ft;
@@ -754,3 +769,19 @@ EXPORT_BaseUtils string formatSystemTime(const SYSTEMTIME &st, const string& str
     return string(szBuf);
 }
 //-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils SYSTEMTIME asLocalSystemTime(const CTime &ct)
+{
+	tm _tm;
+	ct.GetLocalTm(&_tm);
+
+	return tmToSystemTime(_tm);
+}
+//-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils SYSTEMTIME asUTCSystemTime(const CTime &ct)
+{
+	tm _tm;
+	ct.GetGmtTm(&_tm);
+
+	return tmToSystemTime(_tm);
+}
+

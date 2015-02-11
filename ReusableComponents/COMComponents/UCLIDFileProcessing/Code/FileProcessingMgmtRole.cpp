@@ -2729,7 +2729,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 				}
 				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28507")
 
-				// Post Schedule Inactive messag to the UI
+				// Post Schedule Inactive message to the UI
 				if ( eNextRunningState == kScheduleStop && pFPM->m_hWndOfUI != __nullptr)
 				{
 					::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_INACTIVE, 0, 0);
@@ -2933,7 +2933,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 	// Obtain this lock since both semaphores are needed
 	CSingleLock lockThread(&m_threadLock, TRUE );
 
-	// Aquire both semaphore counts since the thread data will be 
+	// Acquire both semaphore counts since the thread data will be 
 	// created in this method
 	CSingleLock guard( &m_threadDataSemaphore, TRUE );
 	CSingleLock guard2( &m_threadDataSemaphore, TRUE );
@@ -2950,7 +2950,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 				// Kick off the thread which will wait for all file processing threads
 				// to complete and then update the UI
 				// By putting this kick-off this early in this method, we can benefit from 
-				// the fact that all the sitations related to processing ending
+				// the fact that all the situations related to processing ending
 				// (due to errors or due to successful processing) can be handled in one
 				// place (i.e. this thread function).
 				AfxBeginThread(fileProcessingThreadsWatcherThread, this);
@@ -3008,7 +3008,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 
 			if (!bDontStartThreads)
 			{
-				// Create athe processing semaphore needed for any processing
+				// Create the processing semaphore needed for any processing
 				createProcessingSemaphore(nNumThreads);
 
 				// if there are parallelizable tasks setup the thread data
@@ -3173,7 +3173,7 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 	{
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		
-		// Initialize thread data, mgmnt role and file record from pData.
+		// Initialize thread data, management role and file record from pData.
 		ProcessingThreadData *pThreadData = static_cast<ProcessingThreadData *>(pData);
 		ASSERT_ARGUMENT("ELI34993", pThreadData != __nullptr);
 
@@ -3212,7 +3212,7 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 
 				pMgmtRole->m_pRecordMgr->pop(task, false, parallelSemaphore);
 				
-				// The semaphore has already been aquired
+				// The semaphore has already been acquired
 				Win32SemaphoreLockGuard lg(parallelSemaphore, false);
 				
 				// Process the file
@@ -3260,7 +3260,7 @@ unsigned long CFileProcessingMgmtRole::getProcessingThreadStackSize()
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingMgmtRole::createProcessingSemaphore(long nNumberOfCounts)
 {
-	// if going to be using parellelizable tasks create the semaphore
+	// if going to be using parallelizable tasks create the semaphore
 	UPI upi = UPI::getCurrentProcessUPI();
 
 	// make sure if the semaphore exists that it is destroyed first
@@ -3319,7 +3319,7 @@ void CFileProcessingMgmtRole::startWorkItemThreads(unsigned long ulStackSize)
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingMgmtRole::signalWorkItemThreadsToStopAndWait()
 {
-	// workitem threads to exit if Parallizable tasks are being used
+	// workitem threads to exit if parallelizable tasks are being used
 	long nSize = m_vecWorkItemThreads.size();
 	if (nSize > 0)
 	{

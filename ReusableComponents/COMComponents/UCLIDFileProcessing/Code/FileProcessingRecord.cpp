@@ -257,7 +257,7 @@ double FileProcessingRecord::getTaskDuration()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-SYSTEMTIME FileProcessingRecord::getStartTime() const
+CTime FileProcessingRecord::getStartTime() const
 {
 	return m_stopWatch.getBeginTime();
 }
@@ -267,7 +267,7 @@ double FileProcessingRecord::getErrorTaskDuration()
 	return m_stopWatchErrorTask.getElapsedTime();
 }
 //-------------------------------------------------------------------------------------------------
-SYSTEMTIME FileProcessingRecord::getErrorTaskStartTime() const
+CTime FileProcessingRecord::getErrorTaskStartTime() const
 {
 	return m_stopWatchErrorTask.getBeginTime();
 }

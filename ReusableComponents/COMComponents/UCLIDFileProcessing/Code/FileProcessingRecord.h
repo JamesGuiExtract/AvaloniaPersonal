@@ -92,14 +92,14 @@ public:
 	double getTaskDuration();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the starting time of the stopwatch
-	SYSTEMTIME getStartTime() const;
+	CTime getStartTime() const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To return the number of seconds elapsed during the execution
 	// of the error task (regardless of whether the error task completed successfully or not)
 	double getErrorTaskDuration();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the starting time of the error task stopwatch
-	SYSTEMTIME getErrorTaskStartTime() const;
+	CTime getErrorTaskStartTime() const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the filename from the IFileRecord member variable
 	//			if the m_ipFileRcd is NULL an exception will be thrown

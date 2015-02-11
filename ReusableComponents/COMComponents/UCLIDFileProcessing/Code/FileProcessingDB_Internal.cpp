@@ -3503,6 +3503,9 @@ void CFileProcessingDB::clear(bool bLocked, bool retainUserValues)
 
 			tg.CommitTrans();
 
+			// Check for new Product specific DB managers
+			checkForNewDBManagers();
+
 			// Add the Product specific db after the base tables have been committed
 			addProductSpecificDB(!retainUserValues);
 
@@ -3944,7 +3947,7 @@ void CFileProcessingDB::pingDB()
 
 	// Update the ping record. 
 	executeCmdQuery(getDBConnection(), 
-		"UPDATE ActiveFAM SET LastPingTime=GETDATE() WHERE ID = " + asString(m_nUPIID));
+		"UPDATE ActiveFAM SET LastPingTime=GETUTCDATE() WHERE ID = " + asString(m_nUPIID));
 
 	m_dwLastPingTime = GetTickCount();
 }
@@ -4203,7 +4206,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 		}
 
 		// Query to show the elapsed time since last ping for all ActiveFAM records
-		string strElapsedSQL = "SELECT [ID], DATEDIFF(minute,[LastPingTime],GetDate()) as Elapsed "
+		string strElapsedSQL = "SELECT [ID], DATEDIFF(minute,[LastPingTime],GetUTCDate()) as Elapsed "
 			"FROM [ActiveFAM]";
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
@@ -5393,3 +5396,19 @@ void CFileProcessingDB::revertTimedOutWorkItems(bool bDBLocked, const _Connectio
 		ue.log();
 	}
 }
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::checkForNewDBManagers()
+{
+	// create a vector of all categories we care about.
+	IVariantVectorPtr ipCategoryNames(CLSID_VariantVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI37870", ipCategoryNames != __nullptr);
+
+	// Only want to get all Product Specific DB managers
+	ipCategoryNames->PushBack(get_bstr_t(FP_FAM_PRODUCT_SPECIFIC_DB_MGRS.c_str()));
+	
+	ICategoryManagerPtr ipCategoryManager(CLSID_CategoryManager);
+	ASSERT_RESOURCE_ALLOCATION("ELI37871", ipCategoryManager != __nullptr);
+
+	ipCategoryManager->CheckForNewComponents(ipCategoryNames);
+}
+//-------------------------------------------------------------------------------------------------

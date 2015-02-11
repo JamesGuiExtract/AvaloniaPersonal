@@ -85,7 +85,7 @@ double FPWorkItem::getWorkItemDuration()
 	return m_stopWatch.getElapsedTime();
 }
 //-------------------------------------------------------------------------------------------------
-SYSTEMTIME FPWorkItem::getStartTime() const
+CTime FPWorkItem::getStartTime() const
 {
 	return m_stopWatch.getBeginTime();
 }

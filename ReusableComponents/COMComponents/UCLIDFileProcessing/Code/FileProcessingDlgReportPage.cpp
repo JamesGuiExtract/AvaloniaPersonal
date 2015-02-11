@@ -707,11 +707,8 @@ bool FileProcessingDlgReportPage::setTimeRemainingRows()
 		}
 
 		// Find how many seconds have passed since the oldest snapshot
-		SYSTEMTIME stOldest, stCurrent;
-		rOldestSnapshotInVector.getTime().GetAsSystemTime(stOldest);
-		currentTime.GetAsSystemTime(stCurrent);
-		TimeInterval interval(stOldest, stCurrent);
-		unsigned long nSeconds = interval.getTotalSeconds();
+		CTimeSpan ts = currentTime - rOldestSnapshotInVector.getTime();
+		unsigned long nSeconds = ts.GetTotalSeconds();
 		_lastCodePos = "70";
 		
 		double dBytesPerSecond = 0;
@@ -872,15 +869,12 @@ bool FileProcessingDlgReportPage::setTimeRemainingRows()
 			if ( ipActionStatsRecent->NumBytesComplete == ipActionStatsNew->NumBytesComplete )
 			{
 				// Get the amount of time that has passed since reliable processing has taken place
-				SYSTEMTIME stTimeOfLastProcess, stCurrentTime;
-				m_TimeOfLastProcess.GetAsSystemTime(stTimeOfLastProcess);
-				currentTime.GetAsSystemTime(stCurrentTime);
-				TimeInterval interval(stTimeOfLastProcess, stCurrentTime);
+				CTimeSpan ts = currentTime - m_TimeOfLastProcess;
 				_lastCodePos = "320";
 
 				// Split the time into a meaningful format
 				long nDays, nHours, nMins, nSecs;
-				splitTime( interval.getTotalSeconds() + giINTERPRET_STATS_DELAY, nDays, nHours, nMins, nSecs);
+				splitTime( ts.GetTotalSeconds() + giINTERPRET_STATS_DELAY, nDays, nHours, nMins, nSecs);
 				_lastCodePos = "330";
 
 				// If no work has been detected, display the label.

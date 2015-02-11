@@ -97,9 +97,18 @@ EXPORT_BaseUtils bool isValidTime(const string& strWord, long* lHour, long* lMin
 // PROMISE: Converts the provided SYSTEMTIME argument into a tm struct
 EXPORT_BaseUtils tm systemTimeToTm(const SYSTEMTIME &st);
 //-------------------------------------------------------------------------------------------------
+// PROMISE: Converts the provided tm argument into a SYSTEMTIME struct
+EXPORT_BaseUtils SYSTEMTIME tmToSystemTime(const tm &t);
+//-------------------------------------------------------------------------------------------------
 // PROMISE: Converts the provided SYSTEMTIME argument into a ULONGLONG
 EXPORT_BaseUtils ULONGLONG asULongLong(const SYSTEMTIME &st);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Formats that provided SYSTEMTIME using a strftime format specification
 EXPORT_BaseUtils string formatSystemTime(const SYSTEMTIME &st, const string& strFormat);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Converts the CTime argument into a SYSTEMTIME representing the local time
+EXPORT_BaseUtils SYSTEMTIME asLocalSystemTime(const CTime &ct);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Converts the CTime argument into a SYSTEMTIME representing the UTC time
+EXPORT_BaseUtils SYSTEMTIME asUTCSystemTime(const CTime &ct);
 //-------------------------------------------------------------------------------------------------

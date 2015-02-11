@@ -19,7 +19,7 @@ static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [dbo].[Action] "
 static const string gstrCREATE_LOCK_TABLE = 
 	"CREATE TABLE [dbo].[LockTable]([LockName] [nvarchar](50) NOT NULL CONSTRAINT [PK_LockTable] PRIMARY KEY CLUSTERED,"
 	"[UPI] [nvarchar](512), "
-	"[LockTime] datetime NOT NULL CONSTRAINT [DF_LockTable_LockTime]  DEFAULT (GETDATE()))";
+	"[LockTime] datetime NOT NULL CONSTRAINT [DF_LockTable_LockTime]  DEFAULT (GETUTCDATE()))";
 
 static const string gstrCREATE_DB_INFO_TABLE = 
 	"CREATE TABLE [dbo].[DBInfo]([ID] int IDENTITY(1,1) NOT NULL, "
@@ -163,7 +163,7 @@ static const string gstrCREATE_ACTIVE_FAM_TABLE =
 	"CREATE TABLE [dbo].[ActiveFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ActiveFAM] PRIMARY KEY CLUSTERED, "
 	"[ActionID] [int] NOT NULL, "
 	"[UPI] [nvarchar](450), "
-	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ActiveFAM_LastPingTime]  DEFAULT (GETDATE()),"
+	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ActiveFAM_LastPingTime]  DEFAULT (GETUTCDATE()),"
 	"[Queuing] [bit] NOT NULL,"
 	"[Processing] [bit] NOT NULL)";
 
@@ -877,7 +877,7 @@ static const string gstrADD_METADATA_FIELD_VALUE_METADATA_FIELD_FK =
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_NAME_VAL = "<LockName>";
 static const string gstrDB_LOCK_QUERY = 
-	"SELECT LockName, UPI, LockTime, DATEDIFF(second, LockTime, GETDATE()) AS TimeLocked "
+	"SELECT LockName, UPI, LockTime, DATEDIFF(second, LockTime, GETUTCDATE()) AS TimeLocked "
 	"FROM LockTable WHERE LockName = '" + gstrDB_LOCK_NAME_VAL + "'";
 
 // Query for deleting specific locks from the lock table
@@ -1263,7 +1263,7 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 "		WHERE STATUS = 'P' "
 "			AND WorkItemGroup.ActionID = <ActionID> "
 "			AND ('<GroupUPI>' = '' OR WorkItemGroup.UPI = '<GroupUPI>') "
-"			AND ActiveFAM.LastPingTime >= DATEADD(SECOND, -90, GetDate()) "
+"			AND ActiveFAM.LastPingTime >= DATEADD(SECOND, -90, GetUTCDate()) "
 "			AND FileActionStatus.Priority >= <MinPriority> "
 "		ORDER BY FileActionStatus.Priority DESC, FAMFile.ID ASC "
 "		) "
@@ -1310,7 +1310,7 @@ const string gstrRESET_TIMEDOUT_WORK_ITEM_QUERY =
 	"FROM dbo.WorkItem wi LEFT JOIN dbo.ActiveFAM af "
 	"ON wi.UPI = af.UPI "
 	"WHERE [Status] = 'R' AND "
-	"	 (af.UPI IS NULL OR af.LastPingTime < DATEADD(SECOND, -<TimeOutInSeconds>,GetDate()))";
+	"	 (af.UPI IS NULL OR af.LastPingTime < DATEADD(SECOND, -<TimeOutInSeconds>,GetUTCDate()))";
 
 const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE = 
 	"SELECT [WorkItem].ID "

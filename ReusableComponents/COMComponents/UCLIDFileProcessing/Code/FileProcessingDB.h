@@ -976,6 +976,9 @@ private:
 	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr setWorkItemToProcessing(bool bDBLocked, long nActionID, 
 		bool bRestrictToUPI, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection);
 
+	// Checks for new Product Specific DB managers
+	void checkForNewDBManagers();
+
 	void validateLicense();
 
 	// Internal implementation methods
