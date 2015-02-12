@@ -22,6 +22,8 @@
             this._cancelButton = new System.Windows.Forms.Button();
             this._testQueryButton = new System.Windows.Forms.Button();
             this._databaseConnectionControl = new Extract.Database.DatabaseConnectionControl();
+            this._useFAMDBCheckBox = new System.Windows.Forms.CheckBox();
+            this._useSpecifiedDBCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             panel1 = new System.Windows.Forms.Panel();
             panel1.SuspendLayout();
@@ -46,14 +48,16 @@
             panel1.Controls.Add(this._queryScintillaBox);
             panel1.Location = new System.Drawing.Point(13, 28);
             panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(543, 127);
+            panel1.Size = new System.Drawing.Size(543, 151);
             panel1.TabIndex = 19;
             // 
             // _queryScintillaBox
             // 
+            this._queryScintillaBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._queryScintillaBox.Annotations.Visibility = ScintillaNET.AnnotationsVisibility.Standard;
             this._queryScintillaBox.ConfigurationManager.Language = "xml";
-            this._queryScintillaBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this._queryScintillaBox.Indentation.ShowGuides = true;
             this._queryScintillaBox.Indentation.SmartIndentType = ScintillaNET.SmartIndent.Simple;
             this._queryScintillaBox.Indentation.TabWidth = 4;
@@ -64,16 +68,16 @@
             this._queryScintillaBox.Location = new System.Drawing.Point(0, 0);
             this._queryScintillaBox.Margins.Margin1.Width = 0;
             this._queryScintillaBox.Name = "_queryScintillaBox";
-            this._queryScintillaBox.Size = new System.Drawing.Size(539, 123);
+            this._queryScintillaBox.Size = new System.Drawing.Size(539, 149);
             this._queryScintillaBox.TabIndex = 0;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(400, 266);
+            this._okButton.Location = new System.Drawing.Point(400, 332);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 3;
+            this._okButton.TabIndex = 5;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -82,20 +86,20 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(481, 266);
+            this._cancelButton.Location = new System.Drawing.Point(481, 332);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 4;
+            this._cancelButton.TabIndex = 6;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
             // _testQueryButton
             // 
             this._testQueryButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._testQueryButton.Location = new System.Drawing.Point(319, 266);
+            this._testQueryButton.Location = new System.Drawing.Point(319, 332);
             this._testQueryButton.Name = "_testQueryButton";
             this._testQueryButton.Size = new System.Drawing.Size(75, 23);
-            this._testQueryButton.TabIndex = 2;
+            this._testQueryButton.TabIndex = 4;
             this._testQueryButton.Text = "Test query";
             this._testQueryButton.UseVisualStyleBackColor = true;
             this._testQueryButton.Click += new System.EventHandler(this.HandleTestQueryClick);
@@ -104,19 +108,42 @@
             // 
             this._databaseConnectionControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._databaseConnectionControl.Location = new System.Drawing.Point(13, 165);
+            this._databaseConnectionControl.Enabled = false;
+            this._databaseConnectionControl.Location = new System.Drawing.Point(13, 231);
             this._databaseConnectionControl.Name = "_databaseConnectionControl";
             this._databaseConnectionControl.PathTags = null;
             this._databaseConnectionControl.ShowCopyConnectionTypeMenuOption = true;
             this._databaseConnectionControl.Size = new System.Drawing.Size(543, 92);
-            this._databaseConnectionControl.TabIndex = 1;
+            this._databaseConnectionControl.TabIndex = 3;
+            // 
+            // _useFAMDBCheckBox
+            // 
+            this._useFAMDBCheckBox.AutoSize = true;
+            this._useFAMDBCheckBox.Location = new System.Drawing.Point(12, 185);
+            this._useFAMDBCheckBox.Name = "_useFAMDBCheckBox";
+            this._useFAMDBCheckBox.Size = new System.Drawing.Size(180, 17);
+            this._useFAMDBCheckBox.TabIndex = 1;
+            this._useFAMDBCheckBox.Text = "Use current FAM DB connection";
+            this._useFAMDBCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _useSpecifiedDBCheckBox
+            // 
+            this._useSpecifiedDBCheckBox.AutoSize = true;
+            this._useSpecifiedDBCheckBox.Location = new System.Drawing.Point(12, 208);
+            this._useSpecifiedDBCheckBox.Name = "_useSpecifiedDBCheckBox";
+            this._useSpecifiedDBCheckBox.Size = new System.Drawing.Size(167, 17);
+            this._useSpecifiedDBCheckBox.TabIndex = 2;
+            this._useSpecifiedDBCheckBox.Text = "Use specified DB connection:";
+            this._useSpecifiedDBCheckBox.UseVisualStyleBackColor = true;
             // 
             // DataQueryRuleObjectSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(568, 298);
+            this.ClientSize = new System.Drawing.Size(568, 364);
+            this.Controls.Add(this._useSpecifiedDBCheckBox);
+            this.Controls.Add(this._useFAMDBCheckBox);
             this.Controls.Add(panel1);
             this.Controls.Add(this._databaseConnectionControl);
             this.Controls.Add(this._testQueryButton);
@@ -145,5 +172,7 @@
         private ScintillaNET.Scintilla _queryScintillaBox;
         private System.Windows.Forms.Button _testQueryButton;
         private Database.DatabaseConnectionControl _databaseConnectionControl;
+        private System.Windows.Forms.CheckBox _useFAMDBCheckBox;
+        private System.Windows.Forms.CheckBox _useSpecifiedDBCheckBox;
     }
 }

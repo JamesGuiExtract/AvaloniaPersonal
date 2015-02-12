@@ -5,6 +5,7 @@ using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Data.Common;
+using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -12,6 +13,7 @@ using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder.Rules
@@ -33,6 +35,30 @@ namespace Extract.AttributeFinder.Rules
         /// The data query.
         /// </value>
         string Query
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the current FAM DB connection should be used.
+        /// </summary>
+        /// <value><see langword="true"/> if the current FAM DB connection should be used;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        bool UseFAMDBConnection
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the specified DB connection should be used.
+        /// </summary>
+        /// <value><see langword="true"/> if the specified DB connection should be used;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        bool UseSpecifiedDBConnection
         {
             get;
             set;
@@ -95,8 +121,9 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Current version.
+        /// <para>Version 2: Added UseFAMDbConnection and UseSpecifiedDbConnection.</para>
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -111,6 +138,16 @@ namespace Extract.AttributeFinder.Rules
         /// The data query.
         /// </summary>
         string _query;
+
+        /// <summary>
+        /// Indicates whether the current FAM DB connection should be used.
+        /// </summary>
+        bool _useFAMDBConnection;
+
+        /// <summary>
+        /// Indicates whether the specified DB connection should be used.
+        /// </summary>
+        bool _useSpecifiedDBConnection;
 
         /// <summary>
         /// The <see cref="DatabaseConnectionInfo"/> describing the data source to be used for SQL
@@ -198,6 +235,66 @@ namespace Extract.AttributeFinder.Rules
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI34782");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the current FAM DB connection should be used.
+        /// </summary>
+        /// <value><see langword="true"/> if the current FAM DB connection should be used;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool UseFAMDBConnection
+        {
+            get
+            {
+                return _useFAMDBConnection;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _useFAMDBConnection)
+                    {
+                        _useFAMDBConnection = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI37872");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the current FAM DB connection should be used.
+        /// </summary>
+        /// <value><see langword="true"/> if the current FAM DB connection should be used;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool UseSpecifiedDBConnection
+        {
+            get
+            {
+                return _useSpecifiedDBConnection;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _useSpecifiedDBConnection)
+                    {
+                        _useSpecifiedDBConnection = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI37873");
                 }
             }
         }
@@ -335,7 +432,7 @@ namespace Extract.AttributeFinder.Rules
                 // memory.
                 pDocument.Attribute.ReportMemoryUsage();
 
-                // Initialize for use in any embeded path tags/functions.
+                // Initialize for use in any embedded path tags/functions.
                 _pathTags.Document = pDocument;
 
                 QueryResult queryResults =
@@ -399,7 +496,7 @@ namespace Extract.AttributeFinder.Rules
                 pAttributes.ReportMemoryUsage();
                 pDoc.Text.ReportMemoryUsage();
 
-                // Initialize for use in any embeded path tags/functions.
+                // Initialize for use in any embedded path tags/functions.
                 _pathTags.Document = pDoc;
 
                 ExecuteQuery(pAttributes, pDoc.Text.SourceDocName);
@@ -426,7 +523,7 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34788", _COMPONENT_DESCRIPTION);
 
-                // Make a clone to update settings and only copy if ok
+                // Make a clone to update settings and only copy if the dialog is ok'd
                 DataQueryRuleObject cloneOfThis = (DataQueryRuleObject)Clone();
 
                 using (DataQueryRuleObjectSettingsDialog dlg
@@ -558,6 +655,10 @@ namespace Extract.AttributeFinder.Rules
                     DataProviderName = reader.ReadString();
                     DataConnectionString = reader.ReadString();
 
+                    UseFAMDBConnection = (reader.Version >= 2) ? reader.ReadBoolean() : false;
+                    UseSpecifiedDBConnection = (reader.Version >= 2) ? reader.ReadBoolean() :
+                        !string.IsNullOrWhiteSpace(DataProviderName);
+
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
@@ -590,6 +691,9 @@ namespace Extract.AttributeFinder.Rules
                     writer.Write(DataSourceName);
                     writer.Write(DataProviderName);
                     writer.Write(DataConnectionString);
+
+                    writer.Write(UseFAMDBConnection);
+                    writer.Write(UseSpecifiedDBConnection);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -640,8 +744,12 @@ namespace Extract.AttributeFinder.Rules
                     return false;
                 }
 
-                if (string.IsNullOrWhiteSpace(DataProviderName) &&
-                    Query.IndexOf("<SQL>", StringComparison.OrdinalIgnoreCase) != -1)
+                if (UseSpecifiedDBConnection && string.IsNullOrWhiteSpace(DataProviderName))
+                {
+                    return false;
+                }
+
+                if (!UseFAMDBConnection && !UseSpecifiedDBConnection && QueryUsesSQL)
                 {
                     return false;
                 }
@@ -743,8 +851,21 @@ namespace Extract.AttributeFinder.Rules
             DataSourceName = source.DataSourceName;
             DataProviderName = source.DataProviderName;
             DataConnectionString = source.DataConnectionString;
+            UseFAMDBConnection = source.UseFAMDBConnection;
+            UseSpecifiedDBConnection = source.UseSpecifiedDBConnection;
 
             _dirty = true;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the configured query uses an SQL node.
+        /// </summary>
+        bool QueryUsesSQL
+        {
+            get
+            {
+                return Query.IndexOf("<SQL", StringComparison.OrdinalIgnoreCase) != -1;
+            }
         }
 
         /// <summary>
@@ -762,10 +883,34 @@ namespace Extract.AttributeFinder.Rules
             {
                 // Get a database connection. If an SQL CE DB, the database will be opened under a
                 // a temporary name (prefixed with '~').
-                string databaseWorkingCopyFileName;
-                string originalSQLCEDBFileName;
-                dbConnection = GetDatabaseConnection(out databaseWorkingCopyFileName, 
-                    out originalSQLCEDBFileName);
+                string databaseWorkingCopyFileName = "";
+                string originalSQLCEDBFileName = "";
+
+                if (QueryUsesSQL)
+                {
+                    if (UseFAMDBConnection)
+                    {
+                        // Initialize a database connection using the last configured
+                        // IFileProcessingDB settings used this process.
+                        // NOTE: The connection string may be for a database that has not actually
+                        // been used. The connection string is based only on the properties of an
+                        // IFileProcessingDB instance that have been set, not based on a connection
+                        // that has actually been opened. Thus, for example, if we are running
+                        // within a RunFPSFile instance with the /ingoreDB flag, even though the
+                        // FAM instance will not have connected to a database, the database info
+                        // will still have been loaded from the FPS file and that is what will be
+                        // used here.
+                        IFileProcessingDB fileProcessingDB = new FileProcessingDBClass();
+                        dbConnection = new OleDbConnection(
+                            fileProcessingDB.GetLastConnectionStringConfiguredThisProcess());
+                        dbConnection.Open();
+                    }
+                    else if (UseSpecifiedDBConnection)
+                    {
+                        dbConnection = GetDatabaseConnection(out databaseWorkingCopyFileName,
+                            out originalSQLCEDBFileName);
+                    }
+                }
 
                 AttributeStatusInfo.InitializeForQuery(sourceAttributes, sourceDocName, dbConnection);
 

@@ -35,6 +35,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //-------------------------------------------------------------------------------------------------
 std::string CFileProcessingDB::ms_strCurrServerName = "";
 std::string CFileProcessingDB::ms_strCurrDBName = "";
+std::string CFileProcessingDB::ms_strCurrAdvConnProperties = "";
 std::string CFileProcessingDB::ms_strLastUsedAdvConnStr = "";
 
 CMutex CFileProcessingDB::ms_mutexPingDBLock;
@@ -1136,6 +1137,7 @@ STDMETHODIMP CFileProcessingDB::ConnectLastUsedDBThisProcess()
 		// Set the active settings to the saved static settings
 		m_strDatabaseServer = ms_strCurrServerName;
 		m_strDatabaseName  = ms_strCurrDBName;
+		m_strAdvConnStrProperties = ms_strCurrAdvConnProperties;
 
 		resetDBConnection();
 		return S_OK;
@@ -2606,6 +2608,10 @@ STDMETHODIMP CFileProcessingDB::put_AdvancedConnectionStringProperties(BSTR newV
 
 		m_strAdvConnStrProperties = asString(newVal);
 
+		// Set the static advanced connection string properties.
+		CSingleLock lock(&m_mutex, TRUE);
+		ms_strCurrAdvConnProperties = m_strAdvConnStrProperties;
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35141");
@@ -3288,6 +3294,27 @@ STDMETHODIMP CFileProcessingDB::GetMetadataFieldValue(long nFileID, BSTR bstrMet
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37637");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetLastConnectionStringConfiguredThisProcess(BSTR *pbstrConnectionString)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		ASSERT_ARGUMENT("ELI37874", pbstrConnectionString != __nullptr);
+
+		CSingleLock lock(&m_mutex, TRUE);
+		string strConnectionString = createConnectionString(
+			ms_strCurrServerName, ms_strCurrDBName, ms_strCurrAdvConnProperties);
+
+		*pbstrConnectionString = _bstr_t(strConnectionString.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37875");
 }
 
 //-------------------------------------------------------------------------------------------------

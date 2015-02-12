@@ -708,7 +708,7 @@ bool FileProcessingDlgReportPage::setTimeRemainingRows()
 
 		// Find how many seconds have passed since the oldest snapshot
 		CTimeSpan ts = currentTime - rOldestSnapshotInVector.getTime();
-		unsigned long nSeconds = ts.GetTotalSeconds();
+		unsigned long nSeconds = (unsigned long)ts.GetTotalSeconds();
 		_lastCodePos = "70";
 		
 		double dBytesPerSecond = 0;
@@ -874,7 +874,7 @@ bool FileProcessingDlgReportPage::setTimeRemainingRows()
 
 				// Split the time into a meaningful format
 				long nDays, nHours, nMins, nSecs;
-				splitTime( ts.GetTotalSeconds() + giINTERPRET_STATS_DELAY, nDays, nHours, nMins, nSecs);
+				splitTime((long) ts.GetTotalSeconds() + giINTERPRET_STATS_DELAY, nDays, nHours, nMins, nSecs);
 				_lastCodePos = "330";
 
 				// If no work has been detected, display the label.

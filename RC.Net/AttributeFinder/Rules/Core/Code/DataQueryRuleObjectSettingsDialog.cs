@@ -48,13 +48,24 @@ namespace Extract.AttributeFinder.Rules
 
                 InitializeComponent();
 
+                // Only one of the two DB connection checkboxes may be checked at any one time.
+                _useFAMDBCheckBox.CheckedChanged +=
+                    ((o, e) => _useSpecifiedDBCheckBox.Checked &= !_useFAMDBCheckBox.Checked);
+                _useSpecifiedDBCheckBox.CheckedChanged +=
+                    ((o, e) => 
+                        {
+                            _useFAMDBCheckBox.Checked &= !_useSpecifiedDBCheckBox.Checked;
+                            _databaseConnectionControl.Enabled = _useSpecifiedDBCheckBox.Checked;
+                        });
+
                 _databaseConnectionControl.PathTags = new AttributeFinderPathTags();
 
                 // Apply Settings values to the UI.
                 if (Settings != null)
                 {
                     _queryScintillaBox.Text = Settings.Query;
-
+                    _useFAMDBCheckBox.Checked = Settings.UseFAMDBConnection;
+                    _useSpecifiedDBCheckBox.Checked = Settings.UseSpecifiedDBConnection;
                     _databaseConnectionControl.DatabaseConnectionInfo =
                         new DatabaseConnectionInfo(Settings.DatabaseConnectionInfo);
                 }
@@ -196,8 +207,7 @@ namespace Extract.AttributeFinder.Rules
                     {
                         case DialogResult.Yes:
                             _queryScintillaBox.Text = _testerForm.ExpressionOrQuery;
-                            _databaseConnectionControl.DatabaseConnectionInfo =
-                                new DatabaseConnectionInfo(_testerForm.DatabaseConnectionInfo);
+
                             _testerForm.Hide();
                             break;
 
@@ -238,9 +248,17 @@ namespace Extract.AttributeFinder.Rules
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(
-                        _databaseConnectionControl.DatabaseConnectionInfo.DataProviderName) &&
-                    _queryScintillaBox.Text.IndexOf("<SQL>", StringComparison.OrdinalIgnoreCase) != -1)
+                if (_useSpecifiedDBCheckBox.Checked &&
+                    string.IsNullOrWhiteSpace(
+                        _databaseConnectionControl.DatabaseConnectionInfo.DataProviderName))
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "A database connection has not been specified.",
+                        "Database connection not specified", true);
+                }
+
+                if (!_useFAMDBCheckBox.Checked && !_useSpecifiedDBCheckBox.Checked &&
+                    _queryScintillaBox.Text.IndexOf("<SQL", StringComparison.OrdinalIgnoreCase) != -1)
                 {
                     UtilityMethods.ShowMessageBox(
                         "A database connection must be specified for queries that contain SQL elements.",
@@ -249,6 +267,8 @@ namespace Extract.AttributeFinder.Rules
                 }
 
                 Settings.Query = _queryScintillaBox.Text;
+                Settings.UseFAMDBConnection = _useFAMDBCheckBox.Checked;
+                Settings.UseSpecifiedDBConnection = _useSpecifiedDBCheckBox.Checked;
                 Settings.DatabaseConnectionInfo = new DatabaseConnectionInfo(
                     _databaseConnectionControl.DatabaseConnectionInfo);
 

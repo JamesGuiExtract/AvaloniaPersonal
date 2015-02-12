@@ -274,6 +274,7 @@ public:
 	STDMETHOD(GetFailedWorkItemsForGroup)(long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
 	STDMETHOD(SetMetadataFieldValue)(long nFileID, BSTR bstrMetadataFieldName, BSTR bstrMetadataFieldValue);
 	STDMETHOD(GetMetadataFieldValue)(long nFileID, BSTR bstrMetadataFieldName, BSTR *pbstrMetadataFieldValue);
+	STDMETHOD(GetLastConnectionStringConfiguredThisProcess)(BSTR *pbstrConnectionString);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -391,6 +392,9 @@ private:
 
 	// Saves the last set Database name in the current process
 	static string ms_strCurrDBName;
+
+	// Saves the last set advanced connection string properties in the current process.
+	static string ms_strCurrAdvConnProperties;
 
 	// The last connection string that was used by this process.
 	static string ms_strLastUsedAdvConnStr;

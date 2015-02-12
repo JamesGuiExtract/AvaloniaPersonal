@@ -219,7 +219,7 @@ library UCLID_FILEPROCESSINGLib
 	]
 	interface IOnceEveryMathCondition : IMathConditionChecker
 	{
-		// How often each run the condition is satisified (must be greater than 2)
+		// How often each run the condition is satisfied (must be greater than 2)
 		[propget, id(1), helpstring("property NumberOfTimes")] HRESULT NumberOfTimes(
 			[out, retval] long* pnTimes);
 		[propput, id(1), helpstring("property NumberOfTimes")] HRESULT NumberOfTimes(
@@ -263,7 +263,7 @@ library UCLID_FILEPROCESSINGLib
 	// IFileProcessingTask Note:
 	// Multiple instances may be created in different threads and acted upon at the time
 	// If the task cannot be run multithreaded, the task is required to control processing 
-	// via mutexs as necessary to make it thread-safe. Currently there is only one case
+	// via mutexes as necessary to make it thread-safe. Currently there is only one case
 	// where this is an issue: the RedactionVerificationUI.
 	interface IFileProcessingTask : IAccessRequired
 	{
@@ -308,7 +308,7 @@ library UCLID_FILEPROCESSINGLib
 		//					the CoClass will update the provided progress status object with
 		//					progress information.  No CoClass is required to provide progress
 		//					status information.  Those that do provide progress status information are
-		//					free to update the progres status information at random times, or at 
+		//					free to update the progress status information at random times, or at 
 		//					a particular frequency of the CoClass's choice.  A CoClass capable
 		//					of providing progress information is also free to create one or more 
 		//					sub-levels of progress information.
@@ -354,7 +354,7 @@ library UCLID_FILEPROCESSINGLib
 		// NOTE:		This call will be made on a different thread than the other calls, so the
 		//				Standby call must be thread-safe.This allows the file processor to block on
 		//				the Standby call, but it also means that call to ProcessFile or Close may
-		//				come while the Standby call is still ocurring. If this happens, the return
+		//				come while the Standby call is still occurring. If this happens, the return
 		//				value of Standby will be ignored; however, Standby should promptly return
 		//				in this case to avoid needlessly keeping a thread alive.
 		[id(15), helpstring("method Standby")] HRESULT Standby([out, retval] VARIANT_BOOL* pVal);
@@ -844,7 +844,7 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To add the file to the database.
 		//			if the bForceStatusChange flag is VARIANT_FALSE
-		//				if file is not in the datbase or current status is kActionUnattempted will be added 
+		//				if file is not in the database or current status is kActionUnattempted will be added 
 		//				the file will be added and the status will be set to the eNewStatus value
 		//				otherwise the status will be unchanged
 		//			if the bForceStatusChange flag is VARINT_TRUE
@@ -897,7 +897,7 @@ library UCLID_FILEPROCESSINGLib
 			[in] EActionStatus eStatus);
 
 		// -----------------------------------------------------------------------------------------------
-		// REQUIRE:	straction is a valid action defined in the Action table
+		// REQUIRE:	strAction is a valid action defined in the Action table
 		//			nID is a valid file ID defined in the FPMFile table
 		// PROMISE: If pOldStatus != __nullptr, then the old status associated with the file will be returned.
 		// NOTE:	If pOldStatus != __nullptr, then two database operations will need to performed (as opposed to
@@ -998,11 +998,17 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(34), helpstring("property DatabaseName")] HRESULT DatabaseName([out, retval] BSTR* pVal);
 		[propput, id(34), helpstring("property DatabaseName")] HRESULT DatabaseName([in] BSTR newVal);
 		
-		// PROMISE: To create a new database in the currently set DatabaseServer withthe name bstrNewDBName
+		// PROMISE: To create a new database in the currently set DatabaseServer with the name bstrNewDBName
 		// REQUIRES: DatabaseServer property must be set to a valid database server.
 		[id(35), helpstring("method CreateNewDB")] HRESULT CreateNewDB([in] BSTR bstrNewDBName);
 
-		// PROMISE: To set the DatabaseServer and DatabaseName to the last used values in the running process
+		// PROMISE: Connects to a database using the last configured database connection this process.
+		// NOTE: The connection may be for a database that has not actually been used yet this process.
+		// The connection string is based only on the properties of an IFileProcessingDB instance that
+		// have been set, not based on a connection  that has actually been opened. Thus, for example,
+		// if we are running within a RunFPSFile instance with the /ingoreDB flag, even though the FAM
+		// instance will not have connected to a database, the database info will still have been loaded
+		// from the FPS file and that is what will be used here.
 		[id(36), helpstring("method ConnectLastUsedDBThisProcess ")] HRESULT ConnectLastUsedDBThisProcess();
 
 		// PROMISE: To store a setting in the DBInfo table of the database. 
@@ -1222,7 +1228,7 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrCounterName, [in] BSTR bstrNewCounterName);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To set the value for the specified counter.  If bstrCounterName is not found
-		//			in the database an an exception will be thrown.
+		//			in the database an exception will be thrown.
 		[id(73), helpstring("method SetUserCounterValue")] HRESULT SetUserCounterValue(
 			[in] BSTR bstrCounterName, [in] LONGLONG llNewValue);
 		// -----------------------------------------------------------------------------------------------
@@ -1421,7 +1427,7 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(112), helpstring("property ConnectionString")]
 			HRESULT ConnectionString([out, retval] BSTR* pbstrConnectionString);
 		//-----------------------------------------------------------------------------------------
-		// RETURNS: VARIANT_TRUE if the whether the user has entered valide admin credentials.
+		// RETURNS: VARIANT_TRUE if the whether the user has entered valid admin credentials.
 		[propget, id(113), helpstring("property LoggedInAsAdmin")]
 			HRESULT LoggedInAsAdmin([out, retval] VARIANT_BOOL* pbLoggedInAsAdmin);
 		//-----------------------------------------------------------------------------------------
@@ -1541,7 +1547,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(132), helpstring("method SetFallbackStatus")] HRESULT SetFallbackStatus(
 			[in] IFileRecord* pFileRecord, [in] EActionStatus eaFallbackStatus);
 		//-----------------------------------------------------------------------------------------
-		// PROMISE: Gets upto nMaxWorkItemsToReturn from the the database that have a minimum 
+		// PROMISE: Gets up to nMaxWorkItemsToReturn from the database that have a minimum 
 		//			priority of eMinPriority for the given nActionID will be returned in ppWorkItems
 		//			if VBRestrictToUPI is VARIANT_TRUE only work items that are in a work item group
 		//			that is being processed in the current instance.
@@ -1570,6 +1576,17 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To get the specified metadata field value for the specified file.
 		[id(137), helpstring("method GetMetadataFieldValue")] HRESULT GetMetadataFieldValue([in] long nFileID,
 			[in] BSTR bstrMetadataFieldName, [out, retval] BSTR *pbstrMetadataFieldValue);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Gets a connection string for the last configured DB server, database, and advanced
+		// connection string properties in this process.
+		// NOTE: The connection string may be for a database that has not actually been used. The
+		// connection string is based only on the properties of an IFileProcessingDB instance that have
+		// been set, not based on a connection  that has actually been opened. Thus, for example, if we are
+		// running within a RunFPSFile instance with the /ingoreDB flag, even though the FAM instance will
+		// not have connected to a database, the database info will still have been loaded from the FPS file
+		// and that is what will be used here.
+		[id(138), helpstring("method GetLastConnectionStringConfiguredThisProcess ")]
+			HRESULT GetLastConnectionStringConfiguredThisProcess([out, retval] BSTR *pbstrConnectionString);
 	};
 
 	[
@@ -2038,7 +2055,7 @@ library UCLID_FILEPROCESSINGLib
         //			by the tasks to carry out requests for files to be checked out, released or
 		//			re-ordered in the queue.
 		//			NOTE: pFileRequestHandler is not currently guaranteed to be available in all
-		//			execution contexts. The task is responsible for asserting its existance if
+		//			execution contexts. The task is responsible for asserting its existence if
 		//			needed.
 		[id(1), helpstring("method Init")] HRESULT Init([in] IIUnknownVector* pFileProcessingTasks,
 			[in] long nActionID, [in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager,
@@ -2067,7 +2084,7 @@ library UCLID_FILEPROCESSINGLib
         //			by the tasks to carry out requests for files to be checked out, released or
 		//			re-ordered in the queue.
 		//			NOTE: pFileRequestHandler is not currently guaranteed to be available in all
-		//			execution contexts. The task is responsible for asserting its existance if
+		//			execution contexts. The task is responsible for asserting its existence if
 		//			needed.
 		//			pProgressStatus- The ProgressStatus object to update (can be NULL)
 		//			bCancelRequested - VARIANT_TRUE if the user has requested cancellation.  IFileProcessingTaskExecutor
@@ -2082,7 +2099,7 @@ library UCLID_FILEPROCESSINGLib
 			[in] VARIANT_BOOL bCancelRequested, [out, retval] EFileProcessingResult* pResult);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To call cancel on the currently running task.
-		//			Notifies the currently executing task (if there is one) the the user has requested for 
+		//			Notifies the currently executing task (if there is one) the user has requested for 
 		//			processing to stop. It is not required that the active task necessarily abort processing, however.  
 		//			Currently the only FileProcessingTask that acts on this request is the RedactionVerificationUI
 		// REQUIRED: Nothing. If there is no current task, this call will have no effect
@@ -2112,7 +2129,7 @@ library UCLID_FILEPROCESSINGLib
 		// NOTE:	This call will be made on a different thread than the other calls, so the
 		//			Standby call must be thread-safe.This allows the file processor to block on
 		//			the Standby call, but it also means that call to ProcessFile or Close may
-		//			come while the Standby call is still ocurring. If this happens, the return
+		//			come while the Standby call is still occurring. If this happens, the return
 		//			value of Standby will be ignored; however, Standby should promptly return
 		//			in this case to avoid needlessly keeping a thread alive.
 		[id(9), helpstring("method Standby")] HRESULT Standby([out, retval] VARIANT_BOOL* pVal);
