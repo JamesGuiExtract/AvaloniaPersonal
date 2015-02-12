@@ -41,7 +41,7 @@
 ///////////
 !ExtractCore,6001
 !InputFunnelCore,6002:6070:$ExtractCore
-!FlexIndexAndIDShieldCore,6003:6076:$RuleWritingCore:$DataEntryCore
+!FlexIndexAndIDShieldCore,6003:6052:6076:$RuleWritingCore:$DataEntryCore
 !FlexIndex,6004:$FlexIndexAndIDShieldCore
 !RedactionCore,6010
 !IDShield,6005:$FlexIndexAndIDShieldCore:$RedactionCore
@@ -89,7 +89,6 @@ FLEX Index / ID Shield Utilities,0
 -    Create Searchable PDF,6079
 -    Disable USB Counters (locked to PC) <DevOnly>,6072
 -    Disable USB Key Serial Numbers <RWOnly>,6071
--    Enhance OCR,6052
 -    File Inspector Search,6084
 -    FTP/SFTP file transfer,6083
 -    Handwriting Recognition,6078
