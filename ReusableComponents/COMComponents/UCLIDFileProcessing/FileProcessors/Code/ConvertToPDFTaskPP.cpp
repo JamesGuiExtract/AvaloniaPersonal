@@ -16,7 +16,21 @@
 //-------------------------------------------------------------------------------------------------
 
 // PDF file extensions string
-const char* gpszPDF_FILE_EXTS = "PDF Files (*.pdf)|*.pdf||";
+const char* gpszPDF_FILE_EXTS = 	
+	"All image files|*.bmp;*.rle;*.dib;*.rst;*.gp4;*.mil;*.cal;*.cg4;*.flc;*.fli;*.gif;*.jpg;*.pcx;*.pct;*.png;*.tga;*.tif;*.tiff;*.pdf|"
+	"GDD files|*.gdd|"
+	"BMP files (*.bmp;*.rle;*.dib)|*.bmp;*.rle;*.dib|"
+	"CALS1 files (*.rst;*.gp4;*.mil;*.cal;*.cg4)|*.rst;*.gp4;*.mil;*.cal;*.cg4|"
+	"FLIC files (*.flc;*.fli)|*.flc;*.fli|"
+	"GIF files (*.gif)|*.gif|"
+	"JFIF files (*.jpg)|*.jpg|"
+	"PCX files (*.pcx)|*.pcx|"
+	"PICT files (*.pct)|*.pct|"
+	"PNG files (*.png)|*.png|"
+	"TGA files (*.tga)|*.tga|"
+	"TIFF files (*.tif)|*.tif|"
+	"PDF files (*.pdf)|*.pdf|"
+	"All files (*.*)|*.*||";
 
 //-------------------------------------------------------------------------------------------------
 // CConvertToPDFTaskPP
@@ -234,7 +248,7 @@ LRESULT CConvertToPDFTaskPP::OnClickedBtnInputImageBrowse(WORD wNotifyCode, WORD
 	try
 	{
 		// create the input image file dialog
-		CFileDialog fileDlg(TRUE, NULL, "", OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		CFileDialog fileDlg(TRUE, ".pdf", "*.pdf", OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gpszPDF_FILE_EXTS, CWnd::FromHandle(m_hWnd));
 	
 		// prompt the user to select an input image file
