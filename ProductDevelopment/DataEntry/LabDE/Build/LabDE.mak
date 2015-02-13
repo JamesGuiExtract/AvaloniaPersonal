@@ -88,7 +88,7 @@ CopyFilesToInstallFolder:
 	@XCOPY "$(LabDEDir)\Reports\*.*" "$(LabDEInstallBuildFiles)\Reports" /v /s /e /y
 # Make .nl files to register the COM .NET files
 	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.nl"
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\LabDECppCC.dll" /b >>"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.nl"
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\LabDECppCC.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.rl"
 
 CopyFilesForLabDEInstall: CopyFilesToInstallFolder 
 	@ECHO Copying files for the LabDE Install
