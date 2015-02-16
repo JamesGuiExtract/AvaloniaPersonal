@@ -45,6 +45,7 @@ namespace Extract.Rules
             this._matchCaseCheckBox = new System.Windows.Forms.CheckBox();
             this._exportButton = new System.Windows.Forms.Button();
             this._regexHelpLinkLabel = new System.Windows.Forms.LinkLabel();
+            this._fuzzySearchCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -69,15 +70,15 @@ namespace Extract.Rules
             // 
             // _wordsOrPatternsTextBox
             // 
-            this._wordsOrPatternsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._wordsOrPatternsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._wordsOrPatternsTextBox.HideSelection = false;
             this._wordsOrPatternsTextBox.Location = new System.Drawing.Point(7, 21);
             this._wordsOrPatternsTextBox.Multiline = true;
             this._wordsOrPatternsTextBox.Name = "_wordsOrPatternsTextBox";
             this._wordsOrPatternsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this._wordsOrPatternsTextBox.Size = new System.Drawing.Size(309, 230);
+            this._wordsOrPatternsTextBox.Size = new System.Drawing.Size(309, 209);
             this._wordsOrPatternsTextBox.TabIndex = 1;
             this._wordsOrPatternsTextBox.WordWrap = false;
             this._wordsOrPatternsTextBox.TextChanged += new System.EventHandler(this._wordsOrPatternsTextBox_TextChanged);
@@ -86,10 +87,10 @@ namespace Extract.Rules
             // 
             this._isRegexCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._isRegexCheckBox.AutoSize = true;
-            this._isRegexCheckBox.Location = new System.Drawing.Point(7, 280);
+            this._isRegexCheckBox.Location = new System.Drawing.Point(7, 276);
             this._isRegexCheckBox.Name = "_isRegexCheckBox";
             this._isRegexCheckBox.Size = new System.Drawing.Size(158, 17);
-            this._isRegexCheckBox.TabIndex = 5;
+            this._isRegexCheckBox.TabIndex = 6;
             this._isRegexCheckBox.Text = "Treat as regular expressions";
             this._isRegexCheckBox.UseVisualStyleBackColor = true;
             this._isRegexCheckBox.CheckedChanged += new System.EventHandler(this._isRegexCheckBox_CheckedChanged);
@@ -98,7 +99,7 @@ namespace Extract.Rules
             // 
             this._matchCaseCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._matchCaseCheckBox.AutoSize = true;
-            this._matchCaseCheckBox.Location = new System.Drawing.Point(7, 257);
+            this._matchCaseCheckBox.Location = new System.Drawing.Point(7, 236);
             this._matchCaseCheckBox.Name = "_matchCaseCheckBox";
             this._matchCaseCheckBox.Size = new System.Drawing.Size(82, 17);
             this._matchCaseCheckBox.TabIndex = 4;
@@ -122,7 +123,7 @@ namespace Extract.Rules
             this._regexHelpLinkLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._regexHelpLinkLabel.AutoSize = true;
             this._regexHelpLinkLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
-            this._regexHelpLinkLabel.Location = new System.Drawing.Point(162, 281);
+            this._regexHelpLinkLabel.Location = new System.Drawing.Point(160, 276);
             this._regexHelpLinkLabel.Name = "_regexHelpLinkLabel";
             this._regexHelpLinkLabel.Size = new System.Drawing.Size(65, 13);
             this._regexHelpLinkLabel.TabIndex = 6;
@@ -130,8 +131,21 @@ namespace Extract.Rules
             this._regexHelpLinkLabel.Text = "What\'s this?";
             this._regexHelpLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.HandleRegexHelpLinkLabelLinkClicked);
             // 
+            // _fuzzySearchCheckBox
+            // 
+            this._fuzzySearchCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._fuzzySearchCheckBox.AutoSize = true;
+            this._fuzzySearchCheckBox.Location = new System.Drawing.Point(7, 256);
+            this._fuzzySearchCheckBox.Name = "_fuzzySearchCheckBox";
+            this._fuzzySearchCheckBox.Size = new System.Drawing.Size(88, 17);
+            this._fuzzySearchCheckBox.TabIndex = 5;
+            this._fuzzySearchCheckBox.Text = "Fuzzy search";
+            this._fuzzySearchCheckBox.UseVisualStyleBackColor = true;
+            this._fuzzySearchCheckBox.CheckedChanged += new System.EventHandler(this._fuzzySearchCheckBox_CheckedChanged);
+            // 
             // WordOrPatternListRulePropertyPage
             // 
+            this.Controls.Add(this._fuzzySearchCheckBox);
             this.Controls.Add(this._regexHelpLinkLabel);
             this.Controls.Add(this._exportButton);
             this.Controls.Add(this._matchCaseCheckBox);
@@ -155,5 +169,6 @@ namespace Extract.Rules
         private System.Windows.Forms.CheckBox _matchCaseCheckBox;
         private System.Windows.Forms.Button _exportButton;
         private System.Windows.Forms.LinkLabel _regexHelpLinkLabel;
+        private System.Windows.Forms.CheckBox _fuzzySearchCheckBox;
     }
 }

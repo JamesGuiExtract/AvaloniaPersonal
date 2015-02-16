@@ -1,6 +1,8 @@
 using Extract.Licensing;
+using Extract.Utilities.Parsers;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
@@ -40,6 +42,12 @@ namespace Extract.Rules
         /// </summary>
         bool _matchCase;
 
+
+        /// <summary>
+        /// Flag indicating that a fuzzy search should be used.
+        /// </summary>
+        bool _fuzzySearch;
+
         /// <summary>
         /// Flag indicating if the word list should be treated as a regular expression.
         /// </summary>
@@ -51,7 +59,8 @@ namespace Extract.Rules
         string _text;
 
         /// <summary>
-        /// The regular expression pattern to search.
+        /// The regular expression parser used to store the regular expression to search.
+        /// This is used so that the pattern stored will be expanded if using fuzzy search
         /// </summary>
         /// <remarks>
         /// <para>All <see cref="WordOrPatternListRule"/>s can be expressed as a regular 
@@ -60,7 +69,7 @@ namespace Extract.Rules
         /// <para>Value is <see langword="null"/> if the regular expression has not yet been 
         /// compiled.</para>
         /// </remarks>
-        Regex _regex;
+         DotNetRegexParser _regex;
 
         /// <summary>
         /// The property page associated with this rule.
@@ -75,7 +84,7 @@ namespace Extract.Rules
         /// <summary>
         /// Initializes a new <see cref="WordOrPatternListRule"/> class. 
         /// </summary>
-        public WordOrPatternListRule() : this(false, false, "")
+        public WordOrPatternListRule() : this(false, false, false, "")
         {
         }
 
@@ -84,10 +93,11 @@ namespace Extract.Rules
         /// the specified settings.</summary>
         /// <param name="matchCase">If <see langword="true"/> will search the text
         /// in a case-sensitive fashion.</param>
+        /// <param name="fuzzySearch">If <see langword="true"/> will search with a fuzzy search </param>
         /// <param name="treatAsRegularExpression">If <see langword="true"/> will
         /// treat the search text as a regular expression pattern.</param>
         /// <param name="text">The search text.</param>
-        public WordOrPatternListRule(bool matchCase, bool treatAsRegularExpression, string text)
+        public WordOrPatternListRule(bool matchCase, bool fuzzySearch, bool treatAsRegularExpression, string text)
         {
             try
             {
@@ -96,6 +106,7 @@ namespace Extract.Rules
                     _OBJECT_NAME);
 
                 _matchCase = matchCase;
+                _fuzzySearch = fuzzySearch;
                 _treatAsRegularExpression = treatAsRegularExpression;
                 _text = text;
             }
@@ -128,6 +139,27 @@ namespace Extract.Rules
                 if (_matchCase != value)
                 {
                     _matchCase = value;
+                    _regex = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the search should be fuzzy
+        /// </summary>
+        /// <value>If <see langword="true"/> then the search text will be fuzzy</value>
+        /// <returns>If <see langword="true"/> then the search text will be treated as fuzzy</returns>
+        public bool FuzzySearch
+        {
+            get
+            {
+                return _fuzzySearch;
+            }
+            set
+            {
+                if (_fuzzySearch != value)
+                {
+                    _fuzzySearch = value;
                     _regex = null;
                 }
             }
@@ -223,13 +255,25 @@ namespace Extract.Rules
                     for (int i = 0; i < lines.Length; i++)
                     {
                         lines[i] = Regex.Escape(lines[i]);
+
+                        if (_fuzzySearch && lines[i].Length > 1)
+                        {
+                            // Allow one wrong char per 3 chars in the search term and 1 extra whitespace char
+                            // per 2 chars in the search term.
+                            int errorAllowance = lines[i].Length / 3;
+                            int whiteSpaceAllowance = lines[i].Length / 2;
+
+                            lines[i] = string.Format(CultureInfo.InvariantCulture,
+                                "(?~<method=better_fit,error={0:D},xtra_ws={1:D}>{2})",
+                                errorAllowance, whiteSpaceAllowance, lines[i]);
+                        }
                     }
                 }
-
+                
                 // Build the regular expression
                 string regularExpression = _GROUP_NAME + string.Join("|", lines) + ")";
 
-                // Check if the casing should be matched
+                 // Check if the casing should be matched
                 RegexOptions options = RegexOptions.ExplicitCapture;
                 if (!_matchCase)
                 {
@@ -237,7 +281,9 @@ namespace Extract.Rules
                 }
 
                 // Store the regular expression
-                _regex = new Regex(regularExpression, options);
+                _regex = new DotNetRegexParser();
+                _regex.Pattern = regularExpression;
+                _regex.RegexOptions = options;
             }
         }
 
@@ -263,9 +309,9 @@ namespace Extract.Rules
                 // Ensure that the regular expression is not null
                 ExtractException.Assert("ELI22222", "Regular expression must not be null!",
                     _regex != null);
-
+                
                 // Compute the matches
-                return MatchResult.ComputeMatches(_RULE_NAME, _regex, ocrOutput, MatchType.Match, false);
+                return MatchResult.ComputeMatches(_RULE_NAME, _regex.Regex, ocrOutput, MatchType.Match, false);
             }
             catch (Exception ex)
             {

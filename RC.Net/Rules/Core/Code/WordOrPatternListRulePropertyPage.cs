@@ -70,6 +70,7 @@ namespace Extract.Rules
                 // Set the UI elements
                 _wordsOrPatternsTextBox.Text = _rule.Text;
                 _matchCaseCheckBox.Checked = _rule.MatchCase;
+                _fuzzySearchCheckBox.Checked = _rule.FuzzySearch;
                 _isRegexCheckBox.Checked = _rule.TreatAsRegularExpression;
 
                 // Set the state of the UI elements
@@ -144,6 +145,7 @@ namespace Extract.Rules
                 // Store the settings
                 _rule.Text = _wordsOrPatternsTextBox.Text;
                 _rule.MatchCase = _matchCaseCheckBox.Checked;
+                _rule.FuzzySearch = _fuzzySearchCheckBox.Checked;
                 _rule.TreatAsRegularExpression = _isRegexCheckBox.Checked;
 
                 // Ensure the settings are valid
@@ -327,6 +329,28 @@ namespace Extract.Rules
         void HandleRegexHelpLinkLabelLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             UserHelpMethods.ShowRegexHelp(TopLevelControl);
+        }
+
+        /// <summary>
+        /// Handles the Fuzzy search CheckBox changed event
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void _fuzzySearchCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // Disable or enable the RegexCheckBox
+                _isRegexCheckBox.Enabled = !_fuzzySearchCheckBox.Checked;
+                _isRegexCheckBox.Checked = _isRegexCheckBox.Checked && !_fuzzySearchCheckBox.Checked;
+
+                // Raise the property page modified event
+                OnPropertyPageModified();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI37886", ex);
+            }
         }
     }
 }
