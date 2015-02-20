@@ -554,7 +554,7 @@ STDMETHODIMP CFileProcessingMgmtRole::CheckoutForProcessing(long nFileID,
 		// Query for an existing record in the lock table.
 		string strLockedFileQuery =
 			"SELECT [UPI] FROM [LockedFile] "
-			"	INNER JOIN [FAMSession] ON [FAMSession].[ID] = [LockedFile].[UPIID] "
+			"	INNER JOIN [ActiveFAM] ON [ActiveFAM].[ID] = [LockedFile].[UPIID] "
 			"	WHERE [FileID] = " + asString(nFileID);
 
 		_RecordsetPtr ipRecords = getFPMDB()->GetResultsForQuery(strLockedFileQuery.c_str());
