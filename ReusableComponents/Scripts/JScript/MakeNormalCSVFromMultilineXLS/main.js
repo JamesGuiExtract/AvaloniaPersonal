@@ -101,7 +101,7 @@ function main(args) {
 
       // For each line in the spreadsheet, write:
       // One or more rows to Output.csv
-      var eof = sheet.UsedRange.Rows.Count;
+      var eof = sheet.UsedRange.Rows.Count + 1;
       var outputCSV = getCSVName("Output");
       for (var curRow=1; curRow < eof; curRow++) {
 
