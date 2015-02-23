@@ -2141,6 +2141,15 @@ namespace Extract.DataEntry
                 {
                     try
                     {
+                        // https://extract.atlassian.net/browse/ISSUE-12551
+                        // There may be pending incremental changes that have not yet been committed
+                        // via EndEdit. Call EndEdit here, otherwise any queries that would have
+                        // fired as part of the EndEdit that will eventually be triggered below will
+                        // be blocked due to AttributeStatusInfo.BlockAutoUpdateQueries. If redo is
+                        // subsequently called, the redo will then not contain any of the values
+                        // that would have been set by these queries.
+                        AttributeStatusInfo.EndEdit();
+
                         // [DataEntry:1186]
                         // Unless blocked, the changes that are undone/redone here may trigger
                         // auto-update queries to fire which then result in data that is not in the
