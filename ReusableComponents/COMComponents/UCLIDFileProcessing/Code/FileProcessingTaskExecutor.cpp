@@ -143,14 +143,18 @@ STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingT
 		IIUnknownVectorPtr ipFileProcessingTasks(pFileProcessingTasks);
 		ASSERT_ARGUMENT("ELI26780", ipFileProcessingTasks != __nullptr);
 
+		// Database is allowed to be NULL since this may be running from 
+		// RunFPSFile with /ignoreDB
+		// https://extract.atlassian.net/browse/ISSUE-12746
 		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_ARGUMENT("ELI26781", ipDB != __nullptr);
 
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(pFAMTagManager);
 		ASSERT_ARGUMENT("ELI26782", ipFAMTagManager != __nullptr);
 
+		// FileRequestHandler is allowed to be null since this may be running 
+		// from RunFPSFile with /ignoreDB
+		// https://extract.atlassian.net/browse/ISSUE-12746
 		UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr ipFileRequestHandler(pFileRequestHandler);
-		ASSERT_ARGUMENT("ELI37483", ipFileRequestHandler != __nullptr);
 
 		// Call the init method
 		init(ipFileProcessingTasks, nActionID, ipDB, ipFAMTagManager, ipFileRequestHandler);
@@ -216,7 +220,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(IFileRecord* pFileRec
 		UCLID_FILEPROCESSINGLib::IFileRequestHandlerPtr ipFileRequestHandler(pFileRequestHandler);
 		// https://extract.atlassian.net/browse/ISSUE-12509
 		// pFileRequestHandler is not currently guaranteed to be available in all execution contexts.
-		// The task is responsible for asserting its existance if needed.
+		// The task is responsible for asserting its existence if needed.
 		ASSERT_ARGUMENT("ELI17866", pResult !=  __nullptr);
 		ASSERT_ARGUMENT("ELI31324", pFileRecord != __nullptr);
 
@@ -644,7 +648,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 					}
 					strMsg += "!";
 
-					// Add the history record and debug information before rethrowing the exception.
+					// Add the history record and debug information before re-throwing the exception.
 					UCLIDException uexOuter("ELI17697",strMsg, ue);
 					uexOuter.addDebugInfo("File", strSourceDocName);
 					uexOuter.addDebugInfo("Task", strCurrentTaskName);
