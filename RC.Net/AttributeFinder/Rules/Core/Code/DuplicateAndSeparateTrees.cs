@@ -587,11 +587,14 @@ namespace Extract.AttributeFinder.Rules
         /// appropriate.</param>
         void DuplicateAndSeparateTree(IUnknownVector rootAttributes, ComAttribute attribute)
         {
-            bool foundDivindingAttribute = false;
-            // Contains the original hierarchry beneath the attribute.
+            bool foundDividingAttribute = false;
+            // Contains the original hierarchy beneath the attribute.
             IUnknownVector originalAttributeTree = attribute.SubAttributes;
+            // Make a new subattribute list
+            IUnknownVector newAttributeTree = new IUnknownVector();
             // Contains any new hierarchies that are produced.
             List<ComAttribute> duplicatedTrees = new List<ComAttribute>();
+
             // Contains all non-dividing attributes encountered.
             List<ComAttribute> nonDividingAttributes = new List<ComAttribute>();
 
@@ -602,12 +605,14 @@ namespace Extract.AttributeFinder.Rules
                 if (subAttribute.Name.Equals(DividingAttributeName,
                         StringComparison.OrdinalIgnoreCase))
                 {
-                    if (!foundDivindingAttribute)
+                    if (!foundDividingAttribute)
                     {
-                        foundDivindingAttribute = true;
+                        foundDividingAttribute = true;
                         // During processing, separate the original tree beneath the attribute
                         // so it can be cloned without bringing the entire tree along with it.
                         attribute.SubAttributes = new IUnknownVector();
+                        // Add this attribute to the new subattribute tree
+                        newAttributeTree.PushBack(subAttribute);
                     }
                     else
                     {
@@ -622,13 +627,15 @@ namespace Extract.AttributeFinder.Rules
                         copyThis = (ICopyableObject)nonDividingAttributes.ToIUnknownVector();
                         duplicatedAttribute.SubAttributes.Append((IUnknownVector)copyThis.Clone());
 
-                        // Move the dividing attribute to the new tree.
-                        originalAttributeTree.RemoveValue(subAttribute);
+                        // Add the dividing attribute to the new tree.
                         duplicatedAttribute.SubAttributes.PushBack(subAttribute);
                     }
                 }
                 else
                 {
+                    // Add this attribute to the new subattribute tree
+                    newAttributeTree.PushBack(subAttribute);
+
                     // Copy this attribute to all duplicate trees created thus far.
                     foreach (ComAttribute duplicatedAttribute in duplicatedTrees)
                     {
@@ -641,11 +648,10 @@ namespace Extract.AttributeFinder.Rules
                 }
             }
 
-            // If at least one divinding attribute was found, we need to restore that attribute's
-            // sub-attribute hierarchy.
-            if (foundDivindingAttribute)
+            // If at least one dividing attribute was found we need to set the subattributes
+            if (foundDividingAttribute)
             {
-                attribute.SubAttributes = originalAttributeTree;
+                attribute.SubAttributes = newAttributeTree;
             }
 
             // If there were any duplicate trees created, add them to the output.

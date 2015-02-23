@@ -1,0 +1,5 @@
+// Tests dividing one hierarchy into two
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// Tests copying of non-dividing attributes to each new hierarchy
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav

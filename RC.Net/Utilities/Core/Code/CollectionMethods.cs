@@ -303,21 +303,11 @@ namespace Extract.Utilities
         [CLSCompliant(false)]
         public static IEnumerable<T> ToIEnumerable<T>(this IIUnknownVector comVector)
         {
-            try
-            {
-                int size = comVector.Size();
-                List<T> list = new List<T>(size);
+            int size = comVector.Size();
 
-                for (int i = 0; i < size; i++)
-                {
-                    list.Add((T)comVector.At(i));
-                }
-
-                return list;
-            }
-            catch (Exception ex)
+            for (int i = 0; i < size; i++)
             {
-                throw ExtractException.AsExtractException("ELI31778", ex);
+                yield return (T)comVector.At(i);
             }
         }
 
@@ -330,21 +320,10 @@ namespace Extract.Utilities
         [CLSCompliant(false)]
         public static IEnumerable<T> ToIEnumerable<T>(this IVariantVector variantVector)
         {
-            try
+            int size = variantVector.Size;
+            for (int i = 0; i < size; i++)
             {
-                int size = variantVector.Size;
-                List<T> list = new List<T>(size);
-
-                for (int i = 0; i < size; i++)
-                {
-                    list.Add((T)variantVector[i]);
-                }
-
-                return list;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI33854", ex);
+                yield return (T)variantVector[i];
             }
         }
 
@@ -376,6 +355,36 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI31806");
+            }
+        }
+
+        /// <summary>
+        /// Gets the value associated with the given key. If the key is not already present in the
+        /// dictionary the <see paramref="valueFactory"/> function is used to create the value and
+        /// it is added to the dictionary.
+        /// </summary>
+        /// <typeparam name="TKey">The type for the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type for the values in the dictionary.</typeparam>
+        /// <param name="dictionary">The dictionary.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="valueFactory">The delegate function used to create the value.</param>
+        /// <returns>The value associated with the given key.</returns>
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary,
+            TKey key, Func<TKey, TValue> valueFactory)
+        {
+            try
+            {
+                TValue value;
+                if (!dictionary.TryGetValue(key, out value))
+                {
+                    value = valueFactory(key);
+                    dictionary.Add(key, value);
+                }
+                return value;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37887");
             }
         }
     }
