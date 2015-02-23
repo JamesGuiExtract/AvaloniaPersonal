@@ -397,7 +397,7 @@
 396  OnAdvertisementAfter                               iswi.obl(DriverConv.obs)
 397  OnAdvertisementBefore                              iswi.obl(DriverConv.obs)
 398  OnAppSearch                                        iswi.obl(DriverConv.obs)
-399  OnBegin                                            iswi.obl(DriverConv.obs)
+399  OnBegin                                            Setup.obs
 400  OnCCPSearch                                        iswi.obl(DriverConv.obs)
 401  OnCanceling                                        iswi.obl(DriverConv.obs)
 402  OnComponentError                                   iswi.obl(DriverConv.obs)

@@ -20,7 +20,7 @@
 #include "..\..\..\..\..\Common\InstallScripts\OnMaintUIBefore.rul"
 
 #include "..\..\..\..\..\Common\InstallScripts\OnMaintUIAfter.rul"
-                                 
+
                                  
 #define CORE_POINT_CLIENT_GUID "{5DAD3198-6D64-46FA-961C-FBB76B722F4A}"
 
@@ -163,3 +163,34 @@ begin
 			LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
 	endif;
 end;
+
+
+
+//---------------------------------------------------------------------------
+// OnResumeUIAfter
+//
+// The OnResumeUIBefore event is called when end user runs installation that is
+// performing a resumed install. Usually this happens by specifying a property
+// like REINSTALL or ADDLOCAL at the command line when the  product is already
+// installed. In the handler, installation usually displays UI that will
+// inform end user that Reinstallation has been completed successfully.
+//---------------------------------------------------------------------------
+function OnResumeUIAfter()
+    STRING szTitle, szMsg1, szMsg2, szOption1, szOption2;
+    NUMBER bOpt1, bOpt2;
+begin
+	Disable(STATUSEX);
+
+	szTitle = SdLoadString(IDS_IFX_SDFINISH_UPDATE_TITLE);    
+    szMsg1  = SdLoadString(IDS_IFX_SDFINISH_UPDATE_MSG1);
+	bOpt1   = FALSE;
+    bOpt2   = FALSE;
+
+    if ( BATCH_INSTALL ) then
+    	SdFinishReboot ( szTitle , szMsg1 , SYS_BOOTMACHINE , szMsg2 , 0 );
+    else    
+       	SdFinish ( szTitle , szMsg1 , szMsg2 , szOption1 , szOption2 , bOpt1 , bOpt2 );
+    endif;
+end;
+
+

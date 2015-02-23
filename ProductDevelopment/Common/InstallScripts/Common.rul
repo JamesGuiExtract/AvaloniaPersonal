@@ -105,11 +105,11 @@
 	prototype BOOL IsCorrectSQLCEInstalled(STRING);
 	prototype BOOL Is64BitSQLCEInstalled();
 	prototype BOOL Is32BitSQLCEInstalled();
+	prototype UninstallSharedItems();
 	
 
     // your global variables
     BOOL gbInstalled;
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,7 +183,9 @@ begin
 	
 	if (RegDBKeyExist(strRDTUninstallKey) = 1 ) then
 		// this means FLEX Index RDT is installed the uninstall can not continue
-		MessageBox("RDT must be uninstalled before " + @PRODUCT_NAME + " can be removed", SEVERE);
+		if (MODE != SILENTMODE) then
+			MessageBox("RDT must be uninstalled before " + @PRODUCT_NAME + " can be removed", SEVERE);
+		endif;
 		gbInstalled = FALSE;
 		abort;
 	endif;	
@@ -303,7 +305,9 @@ begin
     
     // If one of the products was installed display dialog and terminate install
 	if ( bInstalled ) then
-		MessageBox(strMsg, SEVERE);
+		if (MODE != SILENTMODE) then
+			MessageBox(strMsg, SEVERE);
+		endif;
 		gbInstalled = FALSE;
 		abort;
 	endif;	
@@ -495,7 +499,15 @@ begin
 		" will cause those applications to work incorrectly." , MB_YESNO );
 
 	if (nResult = IDYES) then
-	    UninstallApplication(CRYSTAL_REPORTS_GUID,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
+		if (SYSINFO.nOSMajor >= 6)  then
+			LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+		endif;
+			
+		// Install Crystal Reports
+		szProgram = "msiexec";
+		szCmdLine = " /qn /norestart /x" + CRYSTAL_REPORTS_GUID;
+		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	    
   	endif;
 end;
 
@@ -572,7 +584,9 @@ begin
 	
 	if ( svValue != "1") then
 		gbInstalled  = FALSE;
-		MessageBox("Microsoft .NET 4.0 must be installed before running this install.", MB_OK);
+		if (MODE != SILENTMODE) then
+			MessageBox("Microsoft .NET 4.0 must be installed before running this install.", MB_OK);
+		endif;
 		abort;
 	endif; 
 end;
@@ -780,6 +794,10 @@ end;
 function UninstallDotNetService(strServiceName)
 STRING szCmdLine;
 begin
+	if (SYSINFO.nOSMajor >= 6)  then
+		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+	endif;
+	
 	szCmdLine = "/u " + strServiceName;            
 	LaunchAppAndWait( INSTALL_UTIL_PATH , szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 end;
@@ -1078,4 +1096,73 @@ begin
 					LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | 
 					LAAW_OPTION_SHOW_HOURGLASS );
 
+end;
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Function: UninstallSharedItems
+//
+// Purpose: uninstall and clean up for last product uninstalled
+//
+/////////////////////////////////////////////////////////////////////////////////
+function UninstallSharedItems()
+begin
+	// Check if other products are installed before uninstalling these items
+	if (AreOtherExtractProductsInstalled() == FALSE) then
+		// Stop the services first
+		ServiceStopService("Extract Systems Exception Service");
+		ServiceStopService("Extract Systems FDRS Service");
+		ServiceStopService("Extract Systems IPC Service");    
+		ServiceStopService("Nuance Licensing Service");
+		
+		// Unregister the shell extension
+		UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
+
+		// Uninstall ESFAMService
+		UninstallDotNetService("\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");
+		
+		// Uninstall the ESFDRSService.exe 
+		UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFDRSService.exe\"");   
+		
+		// Uninstall the Extract.ExceptionService
+		UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "Extract.ExceptionService.exe\"");      
+		
+		// UnInstall the ESIPCService
+		UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESIPCService.exe\"");   
+		
+		// Uninstall the ESAppMonitorService
+		UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESAppMonitorService.exe\"");  
+		
+		if (MODE != SILENTMODE) then
+			// Uninstall Crystal Reports
+			UninstallCrystalReports12();
+			UninstallSQLCE ();
+		endif;
+		
+		// Register the shell extension
+		UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
+		
+		UninstallInliteKeyDrivers();
+
+		// Delete all lst files
+		DeleteFile(PROGRAMFILES + EXTRACT_DIR + "\\*.LST");
+
+		UnRegisterAll();
+		
+	endif;
+end;
+
+//---------------------------------------------------------------------------
+// OnBegin
+//
+// The OnBegin event is called directly by the framework after the setup
+// initializes.
+//---------------------------------------------------------------------------
+function OnBegin()
+begin
+	// TO DO: you may change default non-UI setting, for example
+	//
+	// You may also perform your custom initialization steps, check requirements, etc.
+	
+	gbInstalled = FALSE;
 end;

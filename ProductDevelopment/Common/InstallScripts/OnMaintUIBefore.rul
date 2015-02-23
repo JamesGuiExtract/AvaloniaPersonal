@@ -67,44 +67,8 @@ Dlg_SdFeatureTree:
 		case REMOVEALL: 
 			detectRDTInstall();
 			
-			// Check if other products are installed before uninstalling these items
-			if (AreOtherExtractProductsInstalled() == FALSE) then
-				// Stop the services first
-				ServiceStopService("Extract Systems Exception Service");
-				ServiceStopService("Extract Systems FDRS Service");
-				ServiceStopService("Extract Systems IPC Service");    
-				ServiceStopService("Nuance Licensing Service");
-				
-				// Unregister the shell extension
-				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
+			UninstallSharedItems();
 
-				// Uninstall ESFAMService
-				UninstallDotNetService("\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");
-				
-				// Uninstall the ESFDRSService.exe 
-				UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFDRSService.exe\"");   
-				
-				// Uninstall the Extract.ExceptionService
-				UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "Extract.ExceptionService.exe\"");      
-				
-				// UnInstall the ESIPCService
-				UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESIPCService.exe\"");      
-				
-				// Uninstall Crystal Reports
-				UninstallCrystalReports12();
-				UninstallSQLCE ();
-				
-				// Register the shell extension
-				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
-				
-				UninstallInliteKeyDrivers();
-   	
-		    	// Delete all lst files
-  			  	DeleteFile(PROGRAMFILES + EXTRACT_DIR + "\\*.LST");
-
-				UnRegisterAll();
-				
-			endif;
   			FeatureRemoveAll();
 		case REPAIR:    
 			FeatureReinstall();

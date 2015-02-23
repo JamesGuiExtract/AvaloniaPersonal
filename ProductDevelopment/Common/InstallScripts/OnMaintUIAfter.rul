@@ -15,6 +15,7 @@ begin
 
 	bOpt1   = FALSE;
 	bOpt2   = FALSE;
+	
     
 	// Added - Version 9.5 - Use appropriate strings for complete
     // uninstall.

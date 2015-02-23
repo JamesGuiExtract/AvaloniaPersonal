@@ -30,7 +30,9 @@ begin
  
  	// make sure the user has administrative privilege
 	if (Is(USER_ADMINISTRATOR, "") <= 0) then
-		MessageBox("You must have administrative privileges on this computer to install the software package. Setup will terminate.", WARNING);
+		if (MODE != SILENTMODE) then
+			MessageBox("You must have administrative privileges on this computer to install the software package. Setup will terminate.", WARNING);
+		endif;
 		abort;
 	endif;                    
 	                            

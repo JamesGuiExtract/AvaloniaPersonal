@@ -21,27 +21,27 @@ SET RDT=%InstallShieldFolder%\{735E1622-3990-445F-9E5D-B0D7FDE292A3}\setup.exe
 :: UnInstall RDT
 IF NOT EXIST "%RDT%" GOTO UninstLabDE
 
-start /wait "" "%RDT%"  -l0x0409  -uninst /s /w /f1"%~dp0rdtuninst.iss"
+start /wait "" "%RDT%"  -l0x0409  /removeonly /s /w /f1"%~dp0rdtuninst.iss"
 
 :UninstLabDE
 :: UnInstall LabDE
 IF NOT EXIST "%LabDE%" GOTO UninstFlexIndex
 
-start /wait "" "%LabDE%" -l0x0409  -uninst /s /w /f1"%~dp0labdeuninst.iss"
+start /wait "" "%LabDE%" -l0x0409  /removeonly /s /w /f1"%~dp0labdeuninst.iss"
 
 :UninstFlexIndex
 
 :: UnInstall FlexIndex
 IF NOT EXIST "%FlexIndex%" GOTO UninstIDShield
 
-start /wait "" "%FlexIndex%"  -l0x0409  -uninst /s /w /f1"%~dp0flexindexuninst.iss"
+start /wait "" "%FlexIndex%"  -l0x0409  /removeonly /s /w /f1"%~dp0flexindexuninst.iss"
 
 :UninstIDShield
 
 :: UnInstall IDShield
 IF NOT EXIST "%IdShield%" GOTO UninstLM
 
-start /wait "" "%IdShield%" -l0x0409  -uninst /s /w /f1"%~dp0idshielduninst.iss"
+start /wait "" "%IdShield%" -l0x0409  /removeonly /s /w /f1"%~dp0idshielduninst.iss"
 
 :UninstLM
 
