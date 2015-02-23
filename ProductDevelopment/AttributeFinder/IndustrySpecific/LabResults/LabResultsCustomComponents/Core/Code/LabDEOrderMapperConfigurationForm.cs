@@ -24,7 +24,7 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Initializes a new instance of the <see cref="LabDEOrderMapperConfigurationForm"/> class.
         /// </summary>
-        public LabDEOrderMapperConfigurationForm() : this(null, false)
+        public LabDEOrderMapperConfigurationForm() : this(null, false, true, false, false)
         {
         }
 
@@ -34,7 +34,17 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="databaseFile">The name of the database file to display in the
         /// text box.</param>
         /// <param name="requireMandatoryTests">Whether mandatory tests are required or not.</param>
-        public LabDEOrderMapperConfigurationForm(string databaseFile, bool requireMandatoryTests)
+        /// <param name="useFilledRequirement">Whether the filled requirement of an order should be
+        /// used when deciding whether an order can be used.</param>
+        /// <param name="useOutstandingOrders">Whether only orders with codes matching the
+        /// provided OutstandingOrderCode attributes should be used. If <see langword="false"/> then
+        /// the outstanding order codes will be used if possible but other codes will be considered
+        /// if necessary.</param>
+        /// <param name="eliminateDuplicateTestSubAttributes">Whether to eliminate duplicate Test
+        /// subattributes after mapping is finished.</param>
+        public LabDEOrderMapperConfigurationForm(string databaseFile, bool requireMandatoryTests,
+            bool useFilledRequirement, bool useOutstandingOrders,
+            bool eliminateDuplicateTestSubAttributes)
         {
             try
             {
@@ -45,6 +55,12 @@ namespace Extract.LabResultsCustomComponents
                 _textDatabaseFile.Text = _databaseFile ?? "";
 
                 _checkRequireMandatoryTests.Checked = requireMandatoryTests;
+
+                _checkUseFilledRequirement.Checked = useFilledRequirement;
+
+                _checkUseOutstandingOrders.Checked = useOutstandingOrders;
+
+                _checkEliminateDuplicateTestSubAttributes.Checked = eliminateDuplicateTestSubAttributes;
             }
             catch (Exception ex)
             {
@@ -73,6 +89,39 @@ namespace Extract.LabResultsCustomComponents
             get
             {
                 return _checkRequireMandatoryTests.Checked;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether to require that orders meet their filled requirement
+        /// </summary>
+        public bool UseFilledRequirement
+        {
+            get
+            {
+                return _checkUseFilledRequirement.Checked;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether to limit orders to be considered based on known, outstanding order codes
+        /// </summary>
+        public bool UseOutstandingOrders
+        {
+            get
+            {
+                return _checkUseOutstandingOrders.Checked;
+            }
+        }
+
+        /// <summary>
+        /// Whether to remove any duplicate Test sub-attributes after the mapping is finished.
+        /// </summary>
+        public bool EliminateDuplicateTestSubAttributes
+        {
+            get
+            {
+                return _checkEliminateDuplicateTestSubAttributes.Checked;
             }
         }
 

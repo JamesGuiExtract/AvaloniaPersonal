@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Extract.LabResultsCustomComponents
 {
@@ -19,25 +18,25 @@ namespace Extract.LabResultsCustomComponents
         HashSet<string> _mandatoryTestCodes;
 
         /// <summary>
-        /// The complete set of possible test codes for the target <see cref="LabOrder"/>.
+        /// The set of all other test codes for the target <see cref="LabOrder"/>
         /// </summary>
-        List<string> _allTestCodes;
+        HashSet<string> _otherTestCodes;
 
         /// <summary>
         /// Keeps track of the test codes that have already been mapped and, thus, should not be
-        /// considered for any additonal tests.
+        /// considered for any additional tests.
         /// </summary>
         HashSet<string> _mappedTestCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Keeps track of the test names that have already been mapped and, thus, should not be
-        /// considered for any additonal tests.
+        /// considered for any additional tests.
         /// </summary>
         HashSet<string> _mappedTestNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Maps each <see cref="_allTestCodes"/> to the available LabTests that could be associated
-        /// with that test code based on the test name.
+        /// Maps each test code for the target <see cref="LabOrder"/> to the available LabTests
+        /// that could be associated with that test code based on the test name.
         /// </summary>
         Dictionary<string, List<LabTest>> _mappingCandidates =
             new Dictionary<string, List<LabTest>>(StringComparer.OrdinalIgnoreCase);
@@ -56,7 +55,8 @@ namespace Extract.LabResultsCustomComponents
 
         /// <summary>
         /// Finds the best mapping in terms of the number of <see paramref="tests"/> that can be
-        /// mapped into the the tests defined by <see paramref="allTestCodes"/> based on the
+        /// mapped into the tests defined by <see paramref="mandatoryTestCodes"/> and
+        /// <see paramref="otherTestCodes"/> based on the
         /// available mappings in <see paramref="nameToTestMapping"/>. The best mapping is defined
         /// as the mapping that maps the most tests; in the event of a tiebreaker, the tiebreaker is
         /// the one that maps the most mandatory tests.
@@ -64,25 +64,24 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="tests">The <see cref="LabTest"/>s that should be mapped</param>
         /// <param name="mandatoryTestCodes">The mandatory test codes for the <see cref="LabOrder"/>
         /// into which the <see paramref="tests"/> are being mapped.</param>
-        /// <param name="allTestCodes">All possible test codes for the <see cref="LabOrder"/>
+        /// <param name="otherTestCodes">Other test codes for the <see cref="LabOrder"/>
         /// into which the <see paramref="tests"/> are being mapped.</param>
-        /// <param name="nameToTestMapping">A map of each possible name on the document to the
-        /// test code(s) for which that name might be associated.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
         /// <returns>
         /// A list of <see cref="LabTest"/>s that have been mapped into the test codes.
         /// <para><b>Note:</b></para>
         /// The LabTest instances returned will not be the same instances from
-        /// <see paramref="tests"/>. Rather, they will be new instances where the the appropriate
+        /// <see paramref="tests"/>. Rather, they will be new instances where the appropriate
         /// <see cref="LabTest.TestCode"/> value has been assigned.
         /// </returns>
         public static List<LabTest> FindBestMapping(IEnumerable<LabTest> tests,
-            IEnumerable<string> mandatoryTestCodes, IEnumerable<string> allTestCodes,
-            Dictionary<string, List<string>> nameToTestMapping)
+            HashSet<string> mandatoryTestCodes, HashSet<string> otherTestCodes,
+            OrderMappingDBCache dbCache)
         {
             try
             {
                 TestMapper possibleMappings =
-                        new TestMapper(tests, mandatoryTestCodes, allTestCodes, nameToTestMapping);
+                        new TestMapper(tests, mandatoryTestCodes, otherTestCodes, dbCache);
 
                 var matchingTests = FindMapping(possibleMappings, false);
 
@@ -101,19 +100,18 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="tests">The <see cref="LabTest"/>s that should be mapped</param>
         /// <param name="mandatoryTestCodes">The mandatory test codes for the <see cref="LabOrder"/>
         /// into which the <see paramref="tests"/> are being mapped.</param>
-        /// <param name="nameToTestMapping">A map of each possible name on the document to the 
-        /// test code(s) for which that name might be associated.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
         /// <returns><see langword="true"/> if <see paramref="tests"/> can be used to satisfy all
         /// codes from <see paramref="mandatoryTestCodeDomain"/>; otherwise, <see langword="false"/>.
         /// </returns>
         public static bool AllMandatoryTestsExist(IEnumerable<LabTest> tests,
-            IEnumerable<string> mandatoryTestCodes,
-            Dictionary<string, List<string>> nameToTestMapping)
+            HashSet<string> mandatoryTestCodes,
+            OrderMappingDBCache dbCache)
         {
             try
             {
                 TestMapper possibleMappings =
-                        new TestMapper(tests, mandatoryTestCodes, new string[] { }, nameToTestMapping);
+                        new TestMapper(tests, mandatoryTestCodes, new HashSet<string>(), dbCache);
 
                 var matchingTests = FindMapping(possibleMappings, true);
 
@@ -181,7 +179,7 @@ namespace Extract.LabResultsCustomComponents
                 // the most remaining nodes to be mapped.
                 foreach (LabTest candidateTest in candidateTests)
                 {
-                    // Create a new copy of possibleMappings to pass into a recusive call on the
+                    // Create a new copy of possibleMappings to pass into a recursive call on the
                     // remaining nodes.
                     var remainingMappings = new TestMapper(possibleMappings);
 
@@ -247,21 +245,20 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="tests">The <see cref="LabTest"/>s that should be mapped.</param>
         /// <param name="mandatoryTestCodes">The mandatory test codes for the <see cref="LabOrder"/>
         /// into which the <see paramref="tests"/> are being mapped.</param>
-        /// <param name="allTestCodes">All possible test codes for the <see cref="LabOrder"/>
+        /// <param name="otherTestCodes">Other possible test codes for the <see cref="LabOrder"/>
         /// into which the <see paramref="tests"/> are being mapped.</param>
-        /// <param name="nameToTestMapping">A map of each possible name on the document to the
-        /// test code(s) for which that name might be associated.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
         TestMapper(IEnumerable<LabTest> tests,
-            IEnumerable<string> mandatoryTestCodes, IEnumerable<string> allTestCodes,
-            Dictionary<string, List<string>> nameToTestMapping)
+            HashSet<string> mandatoryTestCodes, HashSet<string> otherTestCodes,
+            OrderMappingDBCache dbCache)
         {
             try
             {
                 TotalOpenInstances = 1;
-                _mandatoryTestCodes = new HashSet<string>(mandatoryTestCodes, StringComparer.OrdinalIgnoreCase);
-                _allTestCodes = new List<string>(mandatoryTestCodes.Union(allTestCodes, StringComparer.OrdinalIgnoreCase));
+                _mandatoryTestCodes = mandatoryTestCodes;
+                _otherTestCodes = otherTestCodes;
                
-                InitializeMappingCandidates(tests, nameToTestMapping);
+                InitializeMappingCandidates(tests, dbCache);
             }
             catch (Exception ex)
             {
@@ -280,7 +277,7 @@ namespace Extract.LabResultsCustomComponents
             {
                 // The child instance will share the following values with its ancestors.
                 _mandatoryTestCodes = parentPermutations._mandatoryTestCodes;
-                _allTestCodes = parentPermutations._allTestCodes;
+                _otherTestCodes = parentPermutations._otherTestCodes;
                 _mappingCandidates = parentPermutations._mappingCandidates;
                 _totalOpenInstances = parentPermutations._totalOpenInstances;
 
@@ -328,17 +325,17 @@ namespace Extract.LabResultsCustomComponents
         /// mapped to a list of possible names for the test.
         /// </summary>
         /// <param name="tests">The <see cref="LabTest"/>s that should be mapped.</param>
-        /// <param name="nameToTestMapping">A map of each possible name on the document to the
-        /// test code(s) for which that name might be associated.</param>
-        void InitializeMappingCandidates(IEnumerable<LabTest> tests,
-            Dictionary<string, List<string>> nameToTestMapping)
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to get potential
+        /// test codes.</param>
+        void InitializeMappingCandidates(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache)
         {
             try
             {
                 // Initialize _mappingCandidates with a key for every test code that could appear in
                 // the target order.
                 _mappingCandidates.Clear();
-                foreach (string testCode in _allTestCodes.Distinct())
+
+                foreach (string testCode in _mandatoryTestCodes.Concat(_otherTestCodes))
                 {
                     _mappingCandidates[testCode] = new List<LabTest>();
                 }
@@ -347,18 +344,18 @@ namespace Extract.LabResultsCustomComponents
                 // key to which it could be mapped.
                 foreach (LabTest test in tests)
                 {
-                    List<string> possibleTestCodes;
-                    if (nameToTestMapping.TryGetValue(test.Name, out possibleTestCodes))
-                    {
-                        foreach (string testCode in possibleTestCodes)
-                        {
-                            // Create a copy of the test and assign the test code.
-                            LabTest mappedTest = new LabTest(test.Attribute);
-                            mappedTest.TestCode = testCode;
+                    var possibleTestCodes = dbCache.GetPotentialTestCodes(test.Name).Where(
+                        s => _mappingCandidates.ContainsKey(s));
 
-                            // Add the test copy as a possible mapping for testCode.
-                            _mappingCandidates[testCode].Add(mappedTest);
-                        }
+                    foreach (string testCode in possibleTestCodes)
+                    {
+                        List<LabTest> possibleTests = _mappingCandidates[testCode];
+                        // Create a copy of the test and assign the test code.
+                        LabTest mappedTest = new LabTest(test.Attribute);
+                        mappedTest.TestCode = testCode;
+
+                        // Add the test copy as a possible mapping for testCode.
+                        possibleTests.Add(mappedTest);
                     }
                 }
             }
@@ -380,7 +377,7 @@ namespace Extract.LabResultsCustomComponents
                 // Select the next test code key for which candidate tests should be grabbed.
                 // The mandatory test codes will come first so that they are mapped before
                 // non-mandatory tests.
-                string nextKey = _allTestCodes
+                string nextKey = _mandatoryTestCodes.Concat(_otherTestCodes)
                     .Where(code => !_mappedTestCodes.Contains(code))
                     .FirstOrDefault();
 
@@ -396,7 +393,7 @@ namespace Extract.LabResultsCustomComponents
                 // Mark this test code as mapped so that it is not returned in any future call.
                 _mappedTestCodes.Add(nextKey);
 
-                // Return a the list of all candiate LabTests for this test code that haven't
+                // Return a the list of all candidate LabTests for this test code that haven't
                 // already been mapped.
                 return new List<LabTest>(
                     _mappingCandidates[nextKey]

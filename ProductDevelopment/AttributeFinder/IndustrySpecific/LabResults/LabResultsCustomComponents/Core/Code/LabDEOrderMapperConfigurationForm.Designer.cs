@@ -36,6 +36,9 @@ namespace Extract.LabResultsCustomComponents
             this._buttonOk = new System.Windows.Forms.Button();
             this._buttonCancel = new System.Windows.Forms.Button();
             this._checkRequireMandatoryTests = new System.Windows.Forms.CheckBox();
+            this._checkUseFilledRequirement = new System.Windows.Forms.CheckBox();
+            this._checkUseOutstandingOrders = new System.Windows.Forms.CheckBox();
+            this._checkEliminateDuplicateTestSubAttributes = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -57,7 +60,7 @@ namespace Extract.LabResultsCustomComponents
             // _buttonTags
             // 
             this._buttonTags.Image = ((System.Drawing.Image)(resources.GetObject("_buttonTags.Image")));
-            this._buttonTags.Location = new System.Drawing.Point(429, 23);
+            this._buttonTags.Location = new System.Drawing.Point(429, 24);
             this._buttonTags.Name = "_buttonTags";
             this._buttonTags.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
             this._buttonTags.Size = new System.Drawing.Size(22, 22);
@@ -67,11 +70,9 @@ namespace Extract.LabResultsCustomComponents
             // _buttonBrowse
             // 
             this._buttonBrowse.FileFilter = "SQL Compact Database File (*.sdf)|*.sdf||";
-            this._buttonBrowse.FileOrFolderPath = null;
-            this._buttonBrowse.FolderBrowser = false;
-            this._buttonBrowse.Location = new System.Drawing.Point(457, 23);
+            this._buttonBrowse.Location = new System.Drawing.Point(457, 24);
             this._buttonBrowse.Name = "_buttonBrowse";
-            this._buttonBrowse.Size = new System.Drawing.Size(27, 20);
+            this._buttonBrowse.Size = new System.Drawing.Size(27, 22);
             this._buttonBrowse.TabIndex = 3;
             this._buttonBrowse.Text = "...";
             this._buttonBrowse.TextControl = this._textDatabaseFile;
@@ -79,20 +80,21 @@ namespace Extract.LabResultsCustomComponents
             // 
             // _buttonOk
             // 
-            this._buttonOk.Location = new System.Drawing.Point(328, 74);
+            this._buttonOk.Location = new System.Drawing.Point(328, 173);
             this._buttonOk.Name = "_buttonOk";
             this._buttonOk.Size = new System.Drawing.Size(75, 23);
-            this._buttonOk.TabIndex = 4;
+            this._buttonOk.TabIndex = 8;
             this._buttonOk.Text = "OK";
             this._buttonOk.UseVisualStyleBackColor = true;
             this._buttonOk.Click += new System.EventHandler(this.HandleOkButtonClicked);
             // 
             // _buttonCancel
             // 
-            this._buttonCancel.Location = new System.Drawing.Point(409, 74);
+            this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this._buttonCancel.Location = new System.Drawing.Point(409, 173);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
-            this._buttonCancel.TabIndex = 5;
+            this._buttonCancel.TabIndex = 9;
             this._buttonCancel.Text = "Cancel";
             this._buttonCancel.UseVisualStyleBackColor = true;
             this._buttonCancel.Click += new System.EventHandler(this.HandleCancelClicked);
@@ -100,18 +102,53 @@ namespace Extract.LabResultsCustomComponents
             // _checkRequireMandatoryTests
             // 
             this._checkRequireMandatoryTests.AutoSize = true;
-            this._checkRequireMandatoryTests.Location = new System.Drawing.Point(15, 51);
+            this._checkRequireMandatoryTests.Location = new System.Drawing.Point(15, 68);
             this._checkRequireMandatoryTests.Name = "_checkRequireMandatoryTests";
             this._checkRequireMandatoryTests.Size = new System.Drawing.Size(317, 17);
-            this._checkRequireMandatoryTests.TabIndex = 6;
+            this._checkRequireMandatoryTests.TabIndex = 4;
             this._checkRequireMandatoryTests.Text = "Require mandatory tests during second pass of order mapping";
             this._checkRequireMandatoryTests.UseVisualStyleBackColor = true;
             // 
+            // _checkUseFilledRequirement
+            // 
+            this._checkUseFilledRequirement.AutoSize = true;
+            this._checkUseFilledRequirement.Location = new System.Drawing.Point(15, 91);
+            this._checkUseFilledRequirement.Name = "_checkUseFilledRequirement";
+            this._checkUseFilledRequirement.Size = new System.Drawing.Size(253, 17);
+            this._checkUseFilledRequirement.TabIndex = 5;
+            this._checkUseFilledRequirement.Text = "Use FilledRequirement column to validate orders";
+            // 
+            // _checkUseOutstandingOrders
+            // 
+            this._checkUseOutstandingOrders.AutoSize = true;
+            this._checkUseOutstandingOrders.Location = new System.Drawing.Point(15, 114);
+            this._checkUseOutstandingOrders.Name = "_checkUseOutstandingOrders";
+            this._checkUseOutstandingOrders.Size = new System.Drawing.Size(433, 17);
+            this._checkUseOutstandingOrders.TabIndex = 6;
+            this._checkUseOutstandingOrders.Text = "Prefer known, outstanding orders (code matches a Test/OutstandingOrderCode value)" +
+    "";
+            this._checkUseOutstandingOrders.UseVisualStyleBackColor = true;
+            // 
+            // _checkEliminateDuplicateTestSubAttributes
+            // 
+            this._checkEliminateDuplicateTestSubAttributes.AutoSize = true;
+            this._checkEliminateDuplicateTestSubAttributes.Location = new System.Drawing.Point(15, 137);
+            this._checkEliminateDuplicateTestSubAttributes.Name = "_checkEliminateDuplicateTestSubAttributes";
+            this._checkEliminateDuplicateTestSubAttributes.Size = new System.Drawing.Size(247, 17);
+            this._checkEliminateDuplicateTestSubAttributes.TabIndex = 7;
+            this._checkEliminateDuplicateTestSubAttributes.Text = "Eliminate duplicate sub-attributes after mapping";
+            this._checkEliminateDuplicateTestSubAttributes.UseVisualStyleBackColor = true;
+            // 
             // LabDEOrderMapperConfigurationForm
             // 
+            this.AcceptButton = this._buttonOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(496, 109);
+            this.CancelButton = this._buttonCancel;
+            this.ClientSize = new System.Drawing.Size(496, 209);
+            this.Controls.Add(this._checkEliminateDuplicateTestSubAttributes);
+            this.Controls.Add(this._checkUseFilledRequirement);
+            this.Controls.Add(this._checkUseOutstandingOrders);
             this.Controls.Add(this._checkRequireMandatoryTests);
             this.Controls.Add(this._buttonCancel);
             this.Controls.Add(this._buttonOk);
@@ -140,5 +177,8 @@ namespace Extract.LabResultsCustomComponents
         private System.Windows.Forms.Button _buttonOk;
         private System.Windows.Forms.Button _buttonCancel;
         private System.Windows.Forms.CheckBox _checkRequireMandatoryTests;
+        private System.Windows.Forms.CheckBox _checkUseFilledRequirement;
+        private System.Windows.Forms.CheckBox _checkUseOutstandingOrders;
+        private System.Windows.Forms.CheckBox _checkEliminateDuplicateTestSubAttributes;
     }
 }

@@ -36,6 +36,12 @@ namespace Extract.LabResultsCustomComponents
         readonly List<LabTest> _labTests = new List<LabTest>();
 
         /// <summary>
+        /// Set of all known outstanding order codes. Only orders in this set will be considered for
+        /// use. If null then all orders will be considered.
+        /// </summary>
+        readonly HashSet<string> _outstandingOrderCodes;
+
+        /// <summary>
         /// A dictionary grouping attributes to their names
         /// </summary>
         readonly Dictionary<string, List<IAttribute>> _nameToAttributes;
@@ -66,6 +72,7 @@ namespace Extract.LabResultsCustomComponents
                 _nameToAttributes.Add(pair.Key, new List<IAttribute>(pair.Value));
             }
             _labOrder = grouping._labOrder;
+            _outstandingOrderCodes = grouping._outstandingOrderCodes;
         }
 
         /// <summary>
@@ -76,8 +83,11 @@ namespace Extract.LabResultsCustomComponents
         /// <see cref="LabOrder"/>s.  If not <see langword="null"/> then
         /// the EpicCode attribute will be used to search the collection and
         /// set the <see cref="LabOrder"/> value.</param>
-        public OrderGrouping(IAttribute attribute, Dictionary<string, LabOrder> labOrders)
-            : this(attribute, labOrders, null)
+        /// <param name="limitToOutstandingOrders">Whether to limit potential orders to known
+        /// outstanding order codes.</param>
+        public OrderGrouping(IAttribute attribute, Dictionary<string, LabOrder> labOrders,
+            bool limitToOutstandingOrders)
+            : this(attribute, labOrders, null, limitToOutstandingOrders, null)
         {
         }
 
@@ -89,19 +99,26 @@ namespace Extract.LabResultsCustomComponents
         /// <see cref="LabOrder"/>s.  If not <see langword="null"/> then
         /// the EpicCode attribute will be used to search the collection and
         /// set the <see cref="LabOrder"/> value.</param>
-        /// <param name="nameToAttributes"></param>A map of names to attributes. If <see langword="null"/>
-        /// then a new map will be generated from the attribute parameter.
+        /// <param name="nameToAttributes">A map of names to attributes. If <see langword="null"/>
+        /// then a new map will be generated from the attribute parameter.</param>
+        /// <param name="generateOutstandingOrders">If true then the set of outstanding order codes
+        /// will be created from the <see paramref="nameToAttributes"/> map or from the sub-attribute
+        /// collection of the <see paramref="attribute"/></param>
+        /// <param name="outstandingOrderCodes">The set of outstanding order codes used to limit
+        /// potential orders.</param>
         // The call to DateTime.TryParse has been analyzed and the result can be
         // safely ignored since we are explicitly handling the setting of the out
         // parameter to the default value of DateTime.MinValue
         [SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults",
             MessageId="System.DateTime.TryParse(System.String,System.DateTime@)")]
         public OrderGrouping(IAttribute attribute, Dictionary<string, LabOrder> labOrders,
-            Dictionary<string, List<IAttribute>> nameToAttributes)
+            Dictionary<string, List<IAttribute>> nameToAttributes, bool generateOutstandingOrders,
+            HashSet<string> outstandingOrderCodes)
         {
             try
             {
                 _attribute = attribute;
+                _outstandingOrderCodes = outstandingOrderCodes;
 
                 // Get the sub attributes
                 IUnknownVector attributes = attribute.SubAttributes;
@@ -144,6 +161,20 @@ namespace Extract.LabResultsCustomComponents
                 if (_nameToAttributes.TryGetValue("COMPONENT", out temp))
                 {
                     _labTests.AddRange(LabDEOrderMapper.BuildTestList(temp));
+                }
+
+                // Get set of outstanding orders
+                if (generateOutstandingOrders)
+                {
+                    temp = null;
+                    if (_nameToAttributes.TryGetValue("OUTSTANDINGORDERCODE", out temp))
+                    {
+                        _outstandingOrderCodes = LabDEOrderMapper.BuildOutstandingOrdersSet(temp);
+                    }
+                    else
+                    {
+                        _outstandingOrderCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    }
                 }
 
                 // Get the epic code and set the _labOrder value
@@ -288,14 +319,14 @@ namespace Extract.LabResultsCustomComponents
         /// This should only be called as the last step before adding this list to the final
         /// order grouping collection.
         /// </summary>
-        internal void UpdateLabTestsToOfficialName(OrderMappingDBCache dbCache)
+        internal void AddOfficialNameAndTestCode(OrderMappingDBCache dbCache)
         {
             // Only perform mapping if the LabOrder has been set (this group may be
             // an unknown order)
             if (_labOrder != null)
             {
                 // The get matching tests call should update the test code for each lab test
-                List<LabTest> temp = _labOrder.GetMatchingTests(_labTests);
+                List<LabTest> temp = _labOrder.GetMatchingTests(_labTests, dbCache);
 
                 // Sanity check, the lists should be the same size
                 if (temp.Count != _labTests.Count)
@@ -340,6 +371,15 @@ namespace Extract.LabResultsCustomComponents
 
                     // Add the official name subattribute
                     attribute.SubAttributes.PushBack(officialName);
+
+                    // Create the test code subattribute
+                    IAttribute testCode = new AttributeClass();
+                    testCode.Name = "TestCode";
+                    testCode.Value.CreateNonSpatialString(labTest.TestCode,
+                        attribute.Value.SourceDocName);
+
+                    // Add the test code subattribute
+                    attribute.SubAttributes.PushBack(testCode);
                 }
             }
         }
@@ -351,7 +391,7 @@ namespace Extract.LabResultsCustomComponents
         /// <see cref="OrderGrouping.LabOrder"/> does not equal <see langword="null"/>).
         /// </summary>
         /// <returns>Whether all mandatory tests are present or not.</returns>
-        internal bool ContainsAllMandatoryTests()
+        internal bool ContainsAllMandatoryTests(OrderMappingDBCache dbCache)
         {
             try
             {
@@ -359,7 +399,7 @@ namespace Extract.LabResultsCustomComponents
                     "Cannot check for mandatory tests when order has not been mapped.",
                     _labOrder != null);
 
-                return _labOrder.ContainsAllMandatoryTests(_labTests);
+                return _labOrder.ContainsAllMandatoryTests(_labTests, dbCache);
             }
             catch (Exception ex)
             {
@@ -439,6 +479,18 @@ namespace Extract.LabResultsCustomComponents
             set
             {
                 _labOrder = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the set of all known outstanding order codes. Only orders in this set will be
+        /// considered for use. If <see langword="null"/> then all orders will be considered.
+        /// </summary>
+        public HashSet<string> OutstandingOrderCodes
+        {
+            get
+            {
+                return _outstandingOrderCodes;
             }
         }
 

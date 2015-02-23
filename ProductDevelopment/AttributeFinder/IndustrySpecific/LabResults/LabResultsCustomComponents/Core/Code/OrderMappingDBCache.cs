@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 
@@ -18,6 +19,14 @@ namespace Extract.LabResultsCustomComponents
         /// The number of times to retry if failed connecting to the database file.
         /// </summary>
         static readonly int _DB_CONNECTION_RETRIES = 5;
+
+        /// <summary>
+        /// Ignore non-word chars in test names (e.g., AKAs) unless they have special meaning
+        /// (every non-word char except % and #).
+        /// </summary>
+        static readonly string _IGNORE_PATTERN = @"[\W-[%#]]+";
+
+        Dictionary<string, string> _nameToNormalizedName = new Dictionary<string, string>();
 
         #endregion Constants
 
@@ -40,6 +49,16 @@ namespace Extract.LabResultsCustomComponents
         /// This is used for memoization by the <see cref="GetPotentialOrderCodes"/> method
         /// </summary>
         Dictionary<string, ReadOnlyCollection<string>> _nameToPotentialOrderCodesCache;
+
+        /// <summary>
+        /// Mapping of normalized names to possible test codes
+        /// </summary>
+        Dictionary<string, HashSet<string>> _normalizedNameToTestCodes;
+
+        /// <summary>
+        /// Mapping of test codes to names (official and alternate)
+        /// </summary>
+        Dictionary<string, HashSet<string>> _testCodeToNames;
 
         #endregion Fields
 
@@ -71,18 +90,64 @@ namespace Extract.LabResultsCustomComponents
 
             _localDatabaseCopyManager = new TemporaryFileCopyManager();
 
-            _nameToPotentialOrderCodesCache = new Dictionary<string, ReadOnlyCollection<string>>(StringComparer.OrdinalIgnoreCase);
+            _nameToPotentialOrderCodesCache
+                = new Dictionary<string, ReadOnlyCollection<string>>(StringComparer.OrdinalIgnoreCase);
 
             // Get a database connection for processing (creating a local copy of the database).
             _dbConnection = GetDatabaseConnection(pDoc);
 
             // Open the database connection
             _dbConnection.Open();
+
+            // Populate mappings of names and test codes
+            _normalizedNameToTestCodes = new Dictionary<string, HashSet<string>>();
+            _testCodeToNames = new Dictionary<string, HashSet<string>>();
+
+            string query = "SELECT DISTINCT * FROM "
+                + "(SELECT [TestCode], [OfficialName] AS [TestName] FROM [LabTest] "
+                + "UNION SELECT [TestCode], [Name] AS [TestName] FROM [AlternateTestName]) [Tests]";
+
+            using (SqlCeCommand command = new SqlCeCommand(query, _dbConnection))
+            using (SqlCeDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    string code = reader.GetString(0);
+                    string name = reader.GetString(1);
+                    
+                    
+                    string normalizedName = getNormalizedName(name);
+                    HashSet<string> codes = _normalizedNameToTestCodes.GetOrAdd(normalizedName,
+                        _ => new HashSet<string>());
+                    codes.Add(code);
+
+                    HashSet<string> names = _testCodeToNames.GetOrAdd(code,
+                        _ => new HashSet<string>());
+                    names.Add(name);
+                }
+            }
         }
         #endregion Constructors
 
         #region Public Methods
 
+        public HashSet<string> GetTestNames(string testCode)
+        {
+            HashSet<string> names;
+            if (_testCodeToNames.TryGetValue(testCode, out names))
+            {
+                return names;
+            }
+
+            return new HashSet<string>();
+        }
+
+        public HashSet<string> GetPotentialTestCodes(string testName)
+        {
+            return _normalizedNameToTestCodes.GetOrAdd(getNormalizedName(testName),
+                _ => new HashSet<string>());
+        }
+        
         /// <summary>
         /// Gets the list of potential order codes for the specified test. Uses cached values if available.
         /// </summary>
@@ -91,67 +156,35 @@ namespace Extract.LabResultsCustomComponents
         /// </returns>
         public ReadOnlyCollection<string> GetPotentialOrderCodes(string testName)
         {
-            ReadOnlyCollection<string> potentialOrderCodes;
-
-            // Escape the single quote
-            testName = testName.Replace("'", "''");
-
-            if (_nameToPotentialOrderCodesCache.TryGetValue(testName, out potentialOrderCodes))
+            return _nameToPotentialOrderCodesCache.GetOrAdd(testName, name =>
             {
-                return potentialOrderCodes;
-            }
+                // Create a set to hold the potential codes
+                HashSet<string> orderCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            // Create a set to hold the potential codes
-            HashSet<string> orderCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                List<string> testCodes = GetPotentialTestCodes(name)
+                    .Select(testCode => "'" + testCode.Replace("'", "''") + "'").ToList();
 
-            // Query the official name table for potential order codes
-            // Use LabOrder.Code instead of LabOrderTest.OrderCode because these two might not be strictly equal
-            // because of the way that SQL handles trailing spaces
-            // https://extract.atlassian.net/browse/ISSUE-12073
-            string query = "SELECT DISTINCT [Code] FROM [LabOrder] JOIN [LabOrderTest] ON [Code] = [OrderCode] JOIN "
-                + "[LabTest] ON [LabOrderTest].[TestCode] = [LabTest].[TestCode] "
-                + "WHERE [LabTest].[OfficialName] = '" + testName + "'";
-            using (SqlCeCommand command = new SqlCeCommand(query, _dbConnection))
-            {
-                using (SqlCeDataReader reader = command.ExecuteReader())
+                if (testCodes.Count > 0)
                 {
-                    while (reader.Read())
+                    // Query for potential order codes
+                    // Use LabOrder.Code instead of LabOrderTest.OrderCode because these two might not be strictly equal
+                    // because of the way that SQL handles trailing spaces
+                    // https://extract.atlassian.net/browse/ISSUE-12073
+                    string query = "SELECT DISTINCT [Code] FROM [LabOrder] JOIN [LabOrderTest] ON [Code] = [OrderCode] "
+                        + "WHERE [LabOrderTest].[TestCode] IN (" + String.Join(",", testCodes) + ")";
+                    using (SqlCeCommand command = new SqlCeCommand(query, _dbConnection))
+                    using (SqlCeDataReader reader = command.ExecuteReader())
                     {
-                        string code = reader.GetString(0);
-                        if (!orderCodes.Contains(code))
+                        while (reader.Read())
                         {
+                            string code = reader.GetString(0);
                             orderCodes.Add(code);
                         }
                     }
                 }
-            }
 
-            // Query the alternate test table for potential order codes
-            // Use LabOrder.Code instead of LabOrderTest.OrderCode because these two might not be strictly equal
-            // because of the way that SQL handles trailing spaces
-            // https://extract.atlassian.net/browse/ISSUE-12073
-            query = "SELECT DISTINCT [Code] FROM [LabOrder] JOIN [LabOrderTest] ON [Code] = [OrderCode] JOIN "
-                + "[AlternateTestName] ON [LabOrderTest].[TestCode] = [AlternateTestName].[TestCode] "
-                + "WHERE [AlternateTestName].[Name] = '" + testName + "'";
-            using (SqlCeCommand command = new SqlCeCommand(query, _dbConnection))
-            {
-                using (SqlCeDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        string code = reader.GetString(0);
-                        if (!orderCodes.Contains(code))
-                        {
-                            orderCodes.Add(code);
-                        }
-                    }
-                }
-            }
-
-            potentialOrderCodes = new ReadOnlyCollection<string>(orderCodes.ToList<string>());
-            _nameToPotentialOrderCodesCache[testName] = potentialOrderCodes;
-
-            return potentialOrderCodes;
+                return new ReadOnlyCollection<string>(orderCodes.ToList<string>());
+            });
         }
 
         #endregion Public Methods
@@ -228,6 +261,12 @@ namespace Extract.LabResultsCustomComponents
                 ee.AddDebugData("Database", _databaseFile, false);
                 throw ee;
             }
+        }
+
+        string getNormalizedName(string name)
+        {
+            return _nameToNormalizedName.GetOrAdd(name,
+                s => Regex.Replace(s, _IGNORE_PATTERN, "").ToUpperInvariant());
         }
 
         #endregion Private Methods

@@ -22,7 +22,7 @@ namespace Extract.LabResultsCustomComponents
         readonly string _orderCode;
 
         /// <summary>
-        /// The order name for this lab lorder
+        /// The order name for this lab order
         /// </summary>
         readonly string _orderName;
 
@@ -61,17 +61,25 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// A set containing the test codes for all mandatory tests for this order
         /// </summary>
-        readonly HashSet<string> _mandatoryTestCodes = new HashSet<string>();
+        readonly HashSet<string> _mandatoryTestCodes
+            = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// A set containing the test codes for all non-mandatory tests for this order
         /// </summary>
-        readonly HashSet<string> _otherTestCodes = new HashSet<string>();
+        readonly HashSet<string> _otherTestCodes
+            = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// A set containing all the test codes for this order (mandatory and non-mandatory)
         /// </summary>
-        readonly HashSet<string> _allTestCodes = new HashSet<string>();
+        readonly HashSet<string> _allTestCodes
+            = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// The number of tests that this order needs to be considered filled
+        /// </summary>
+        readonly int _filledRequirement;
 
         #endregion Fields
 
@@ -89,12 +97,13 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to fill the collections
         /// of tests.</param>
         public LabOrder(string orderCode, string orderName, string epicCode,
-            string tieBreakerString, OrderMappingDBCache dbCache)
+            string tieBreakerString, OrderMappingDBCache dbCache, int filledRequirement)
         {
             _orderCode = orderCode;
             _orderName = orderName;
             _epicCode = epicCode;
             _tieBreakerString = tieBreakerString;
+            _filledRequirement = filledRequirement;
 
             // Fill the test collections
             FillMandatoryCollection(dbCache);
@@ -122,7 +131,7 @@ namespace Extract.LabResultsCustomComponents
                 _allTestCodes.Add(testCode);
 
                 // Get all names for this test code
-                List<string> testNames = GetTestNames(dbCache, testCode);
+                var testNames = dbCache.GetTestNames(testCode);
                 foreach (string testName in testNames)
                 {
                     // Add each name for this test code to the mandatory collection
@@ -163,7 +172,7 @@ namespace Extract.LabResultsCustomComponents
                 _allTestCodes.Add(testCode);
 
                 // Get all names for this test code
-                List<string> testNames = GetTestNames(dbCache, testCode);
+                var testNames = dbCache.GetTestNames(testCode);
                 foreach (string testName in testNames)
                 {
                     // Add each name for this test code to the other collection
@@ -217,65 +226,22 @@ namespace Extract.LabResultsCustomComponents
 
             return testCodes;
         }
-
-        /// <summary>
-        /// Gets the list of all possible names for this test (the official and alternate names).
-        /// </summary>
-        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use.</param>
-        /// <param name="testCode">The test code to find the names for.</param>
-        /// <returns>A collection of all possible names for the specified test code.</returns>
-        static List<string> GetTestNames(OrderMappingDBCache dbCache, string testCode)
-        {
-            // Escape the single quote
-            testCode = testCode.Replace("'", "''");
-
-            string query = "SELECT [Name] FROM [AlternateTestName] WHERE [TestCode] = '"
-                + testCode + "'";
-
-            // Get the alternate names
-            List<string> testNames = new List<string>();
-            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
-            {
-                using (SqlCeDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        testNames.Add(reader.GetString(0));
-                    }
-                }
-            }
-
-            // Get the official name
-            query = "SELECT [OfficialName] FROM [LabTest] WHERE [TestCode] = '"
-                + testCode + "'";
-            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
-            {
-                using (SqlCeDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        testNames.Add(reader.GetString(0));
-                    }
-                }
-            }
-
-            return testNames;
-        }
-
+        
         /// <summary>
         /// Checks if a collection of <see cref="LabTest"/> contains all of the mandatory
         /// tests for this lab order.
         /// </summary>
         /// <param name="tests">The collection of tests to check.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
         /// <returns><see langword="true"/> if <paramref name="tests"/> contained
         /// all of the mandatory tests for this order; <see langword="false"/> if
         /// <paramref name="tests"/> does not contain all mandatory tests.</returns>
-        public bool ContainsAllMandatoryTests(IEnumerable<LabTest> tests)
+        public bool ContainsAllMandatoryTests(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache)
         {
-            bool containsAllMandtory = 
-                TestMapper.AllMandatoryTestsExist(tests, _mandatoryTestCodes, _mandatoryTests);
+            bool containsAllMandatory = 
+                TestMapper.AllMandatoryTestsExist(tests, _mandatoryTestCodes, dbCache);
 
-            return containsAllMandtory;
+            return containsAllMandatory;
         }
 
         /// <summary>
@@ -288,11 +254,12 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="tests">The collection of <see cref="LabTest"/> to check for matching
         /// tests.</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
         /// <returns>A subset of <paramref name="tests"/> that match this order.</returns>
-        public List<LabTest> GetMatchingTests(IEnumerable<LabTest> tests)
+        public List<LabTest> GetMatchingTests(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache)
         {
             List<LabTest> matchingTests = TestMapper.FindBestMapping(
-                tests, _mandatoryTestCodes, _allTestCodes, _allTests);
+                tests, _mandatoryTestCodes, _otherTestCodes, dbCache);
 
             return matchingTests;
         }
@@ -343,6 +310,17 @@ namespace Extract.LabResultsCustomComponents
             get
             {
                 return _tieBreakerString;
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of tests that this order needs to be considered 'filled.'
+        /// </summary>
+        public int FilledRequirement
+        {
+            get
+            {
+                return _filledRequirement;
             }
         }
 
