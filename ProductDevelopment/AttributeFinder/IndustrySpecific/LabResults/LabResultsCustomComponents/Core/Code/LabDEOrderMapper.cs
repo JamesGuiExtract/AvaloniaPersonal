@@ -883,6 +883,7 @@ namespace Extract.LabResultsCustomComponents
         /// Builds a collection of order codes mapped to <see cref="LabOrder"/>s.
         /// </summary>
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to retrieve the data.</param>
+        /// <param name="useFilledRequirement">Whether to retrieve the filled requirement for orders.</param>
         /// <returns>A collection of order codes mapped to <see cref="LabOrder"/>s.</returns>
         static Dictionary<string, LabOrder> FillLabOrderCollection(OrderMappingDBCache dbCache,
             bool useFilledRequirement)

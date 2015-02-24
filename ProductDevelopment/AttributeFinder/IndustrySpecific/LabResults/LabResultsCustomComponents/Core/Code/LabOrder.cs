@@ -94,6 +94,7 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="tieBreakerString">The tiebreaker string to use in deciding which order to
         /// map to in phase 2 when the number of combined groups for 2 different orders is the same.
         /// </param>
+        /// <param name="filledRequirement">The number of tests required to consider this order filled.</param>
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to fill the collections
         /// of tests.</param>
         public LabOrder(string orderCode, string orderName, string epicCode,
