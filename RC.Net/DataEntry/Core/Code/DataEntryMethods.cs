@@ -181,7 +181,7 @@ namespace Extract.DataEntry
         /// default component data directory.
         /// </summary>
         /// <value>
-        /// The onent data root directory to be used.
+        /// The alternate component data root directory to be used.
         /// </value>
         public static string AlternateComponentDataDir
         {
@@ -209,7 +209,7 @@ namespace Extract.DataEntry
         /// <param name="sourceAttributes">The <see cref="IUnknownVector"/> instance of 
         /// <see cref="IAttribute"/>s from which to find the <see cref="IAttribute"/>.</param>
         /// <param name="removedMatches">An <see cref="IUnknownVector"/> of 
-        /// <see cref="IAttribute"/>s to be populated with the the set of attributes removed
+        /// <see cref="IAttribute"/>s to be populated with the set of attributes removed
         /// from sourceAttributes. (These are attributes that will have matched the specified
         /// attribute name, but are not kept due to the selectionMode parameter). Can be 
         /// <see langword="null"/> if the caller does not care to know which 
@@ -326,7 +326,7 @@ namespace Extract.DataEntry
         /// <param name="sourceAttributes">The <see cref="IUnknownVector"/> instance of 
         /// <see cref="IAttribute"/>s from which to find the <see cref="IAttribute"/>.</param>
         /// <param name="removedMatches">An <see cref="IUnknownVector"/> of 
-        /// <see cref="IAttribute"/>s to be populated with the the set of attributes removed
+        /// <see cref="IAttribute"/>s to be populated with the set of attributes removed
         /// from sourceAttributes. (These are attributes that will have matched the provided 
         /// attribute name, but are not kept due to the selectionMode parameter). Can be 
         /// <see langword="null"/> if the caller does not care to know which 
@@ -481,7 +481,7 @@ namespace Extract.DataEntry
                 bool oldAttributeRemoved = false;
                 int index = -1;
 
-                // If oldAttribute was specified, attempt to find its location in the the vector and,
+                // If oldAttribute was specified, attempt to find its location in the vector and,
                 // if found, remove it.
                 if (oldAttribute != null)
                 {
@@ -516,7 +516,7 @@ namespace Extract.DataEntry
                         
                         if (currentIndex == index)
                         {
-                            // If the attribute already exists at the targe location, there
+                            // If the attribute already exists at the target location, there
                             // is nothing to do.
                             currentIndex = -1;
                             index = -1;
@@ -980,7 +980,7 @@ namespace Extract.DataEntry
             {
                 // [DataEntry:1004]
                 // Since this value will be compared using the string class, pad zeros so that tab
-                // indicies of up to 999 can be compared.
+                // indices of up to 999 can be compared.
                 string paddedTabIndex =
                     string.Format(CultureInfo.InvariantCulture, "{0:D3}", control.TabIndex);
 
@@ -1267,7 +1267,7 @@ namespace Extract.DataEntry
                     {
                         try
                         {
-                            // Techinically un-necessary, but the clipboard is being flakey, so
+                            // Technically un-necessary, but the clipboard is being flaky, so
                             // maybe this will help?
                             if (i > 0)
                             {
@@ -1363,7 +1363,7 @@ namespace Extract.DataEntry
                                 ?? data.GetFormats().FirstOrDefault();
 
                             // If the data on the clipboard matches the backup clipboard data copy,
-                            // don't bother using the real clipboard data which can be flakey; just
+                            // don't bother using the real clipboard data which can be flaky; just
                             // use the backup copy.
                             if (!string.IsNullOrEmpty(format) && _lastClipboardData != null &&
                                 _lastClipboardData.GetDataPresent(format))
@@ -1386,6 +1386,58 @@ namespace Extract.DataEntry
 	        {
 		        throw ex.AsExtract("ELI35405");
 	        }
+        }
+
+        /// <summary>
+        /// Clears the clipboard data with retries. Upon failure even after retries, the resulting
+        /// exception is logged rather than thrown/displayed.
+        /// https://extract.atlassian.net/browse/ISSUE-12792
+        /// Throwing an exception probably led to an MRN not getting saved for a customer which is
+        /// worse behavior that not clearing the clipboard. Just log instead.
+        /// </summary>
+        public static void ClearClipboardData()
+        {
+            try
+            {
+                using (new TemporaryWaitCursor())
+                {
+                    Exception clipboardException = null;
+
+                    // Retry loop in case clipboard clear fails (clipboard can be flaky)...
+                    for (int i = 0; i < _CLIPBOARD_RETRY_COUNT; i++)
+                    {
+                        try
+                        {
+                            if (i > 0)
+                            {
+                                System.Threading.Thread.Sleep(200);
+                            }
+
+                            // The clipboard can be flaky...
+                            Clipboard.Clear();
+
+                            // Success; break out of loop.
+                            clipboardException = null;
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            clipboardException = ex;
+                        }
+                    }
+
+                    // Throw the last exception that was caught in the retry loop.
+                    if (clipboardException != null)
+                    {
+                        throw clipboardException;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI37888", "Failed to clear the clipboard.", ex);
+                ee.Log();
+            }
         }
 
         #endregion Static Methods

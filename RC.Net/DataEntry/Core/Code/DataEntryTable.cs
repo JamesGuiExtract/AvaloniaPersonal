@@ -1925,7 +1925,7 @@ namespace Extract.DataEntry
                 string rowDataType = GetDataFormatName(Clipboard.GetDataObject());
                 if (!string.IsNullOrEmpty(rowDataType) && rowDataType != "System.String")
                 {
-                    Clipboard.Clear();
+                    DataEntryMethods.ClearClipboardData();
                 }
             }
             catch (Exception ex)
@@ -3364,7 +3364,7 @@ namespace Extract.DataEntry
                 // cleared for row pasting. Clear the clipboard if specified.
                 if (!dragAndDrop && ClearClipboardOnPaste && Clipboard.ContainsText())
                 {
-                    Clipboard.Clear();
+                    DataEntryMethods.ClearClipboardData();
                 }
             }
             catch (Exception ex)

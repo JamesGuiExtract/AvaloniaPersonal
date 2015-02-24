@@ -3148,7 +3148,7 @@ namespace Extract.DataEntry
 
                         if (e.Attribute.Value.String.EndsWith(text, StringComparison.Ordinal))
                         {
-                            Clipboard.Clear();
+                            DataEntryMethods.ClearClipboardData();
                         }
                     }
                 }
