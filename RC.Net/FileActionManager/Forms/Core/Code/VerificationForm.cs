@@ -127,7 +127,7 @@ namespace Extract.FileActionManager.Forms
         /// <summary>
         /// The handling of an <see cref="IVerificationForm.ExceptionGenerated"/> requires that any
         /// additional exceptions that may pop up on the main verification form windows message loop
-        /// be surpressed so that the verification form can be cleanly closed programmatically
+        /// be suppressed so that the verification form can be cleanly closed programmatically
         /// if need be. This member keeps track of the thread for which exception displays are being
         /// blocked so that the block can be removed if need be.
         /// </summary>
@@ -350,7 +350,8 @@ namespace Extract.FileActionManager.Forms
                         _exceptionThrownEvent.Reset();
                         _closedEvent.Reset();
                         _lastException = null;
-
+                        _waitingFileIDQueue.Clear();
+                        
                         _uiThread = CreateUserInterfaceThread(VerificationApplicationThread,
                             creator, minStackSize);
 
@@ -428,7 +429,7 @@ namespace Extract.FileActionManager.Forms
                     }
 
                     // Wait until the UI thread has finished loading its document before
-                    // pre-fetcthing. Even with multiple cores, disk I/O from the prefectch can
+                    // pre-fetching. Even with multiple cores, disk I/O from the prefetch can
                     // cause the UI thread to load slower.
                     _fileLoadedEvent.WaitOne();
 
@@ -572,6 +573,9 @@ namespace Extract.FileActionManager.Forms
                 // Ensure that _fileLoadedEvent gets set so that prefetch threads don't hang.
                 _fileLoadedEvent.Set();
 
+                // If the FileID for the current file is in the _waitingFileQueue - remove it
+                _waitingFileIDQueue.Remove(fileID);
+
                 // Always display exceptions that arise from a verification task.
                 ex.ExtractDisplay("ELI37834");
 
@@ -685,7 +689,7 @@ namespace Extract.FileActionManager.Forms
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
         /// it also means that call to <see cref="ShowDocument"/> or <see cref="CloseForm"/> may
-        /// come while the Standby call is still ocurring. If this happens, the return value of
+        /// come while the Standby call is still occurring. If this happens, the return value of
         /// Standby will be ignored; however, Standby should promptly return in this case to avoid
         /// needlessly keeping a thread alive.
         /// </summary>
@@ -1098,10 +1102,10 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
-        /// Handles the Form.Shown event.
+        /// Handles the Form.Closed event.
         /// </summary>
-        /// <param name="sender">The object that sent the  Form.Shown event.</param>
-        /// <param name="e">The event data associated with the  Form.Shown event.</param>
+        /// <param name="sender">The object that sent the  Form.Closed event.</param>
+        /// <param name="e">The event data associated with the  Form.Closed event.</param>
         void HandleFormClosed(object sender, FormClosedEventArgs e)
         {
             // Reset _initializedEvent to indicate the form is no longer initialized
@@ -1187,9 +1191,9 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
-        /// Indicates whether or not the <see cref="_form"/> is initialzed and ready for use.
+        /// Indicates whether or not the <see cref="_form"/> is initialized and ready for use.
         /// </summary>
-        /// <returns><see langword="true"/> if <see cref="_form"/> is intialized, 
+        /// <returns><see langword="true"/> if <see cref="_form"/> is initialized, 
         /// <see langword="false"/> if it is not.</returns>
         bool Initialized
         {
@@ -1465,7 +1469,7 @@ namespace Extract.FileActionManager.Forms
                     // This code will probably need to be re-worked with #254.
                     if (Initialized || InitializationFailed || Completed)
                     {
-                        // Indicate the the form is no longer initialized now that we have asked
+                        // Indicate the form is no longer initialized now that we have asked
                         // it to close.
                         _initializedEvent.Reset();
                         _initializationFailedEvent.Reset();

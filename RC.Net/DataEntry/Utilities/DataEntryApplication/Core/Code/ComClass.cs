@@ -15,7 +15,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
     /// panes:
     /// <list type="bullet">
     /// <item>The Data Entry Panel (DEP) will display the content from a document and allow for the content
-    /// to be verifed/corrected.  The DEP consists of a <see cref="DataEntryControlHost"/> instance 
+    /// to be verified/corrected.  The DEP consists of a <see cref="DataEntryControlHost"/> instance 
     /// populated by controls which implement <see cref="IDataEntryControl"/>.</item>
     /// <item>The image viewer will display the document image itself and allow for interaction with the
     /// DEP such as highlighting the image area associated with the content currently selected in the DEP
@@ -73,7 +73,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         VerificationSettings _settings;
 
         /// <summary>
-        /// The name of the action currently being processd.
+        /// The name of the action currently being processed.
         /// </summary>
         FileProcessingDB _fileProcessingDB;
 
@@ -98,7 +98,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
         #endregion Fields
 
-        #region Contructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="ComClass"/> class.
@@ -282,7 +282,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Gets the minimum stack size needed for the thread in which this task is to be run.
         /// </summary>
         /// <value>
-        /// The the minimum stack size needed for the thread in which this task is to be run.
+        /// The minimum stack size needed for the thread in which this task is to be run.
         /// </value>
         public uint MinStackSize
         {
