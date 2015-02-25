@@ -1,0 +1,69 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 10.0 Hotfix 01 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 10.0 Hotfix 01 Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> UW Transplant
+   	<LI><b>SCRs:</b> ISSUE-12748
+   	<LI><b>Issue:</b> Installation of LabDE 10.0 on a 64-bit Windows 7 workstation caused 
+	an undesired automatic reboot when the workstation was already waiting for a reboot 
+	due to Windows Updates.
+</ul>
+<p>
+<h3>Hotfix Tests</h3>
+<OL>
+	<LI><b>Test Setup</b>
+	<ul>
+		<LI>Prepare a clean test machine.
+		<li>Apply some <b>Windows Updates</b> such that a reboot is requested.
+		<LI>Make a local copy of the LabDE <b>10.0.0.51</b> and <b>SilentInstalls</b> 
+		folders.
+		<li>Update the associated files with the new versions from 
+		<b>I:\users\William_Parr\Public\LabDE UW 10.0 Install Hotfix</b>.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Tests</b>
+	<ul>
+		<LI><b>Installation</b>
+		<ul>
+			<li>Confirm that <b>LabDE 10.0.0.51</b> installs properly.
+	       		<ul>
+				<li>No automatic restart should be done.
+				<li>A reboot should be recommended after the install is complete.
+	       		</ul>
+			<li>Restart the test machine.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Functionality</b>
+		<ul>
+			<li>Exercise the <b>Demo_LabDE</b> and confirm that expected results 
+			are seen.
+			<li>Confirm that the appropriate secondary installs are correctly 
+			installed.
+			<ul>
+				<li>Clear Image PDK
+				<li>Crystal Reports 2008
+				<li>SQL Compact 3.5
+				<li>SQL Server Native Client
+			</ul>
+			<li>Confirm that all <b>Start Menu</b> items work properly.
+	       	</ul>
+   		</LI>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>

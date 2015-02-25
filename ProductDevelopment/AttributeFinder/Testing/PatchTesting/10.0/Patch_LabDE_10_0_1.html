@@ -1,0 +1,70 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.0.1 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE 10.0.1 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> UW Transplant
+   	<LI><b>SCRs:</b> ISSUE-12787
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>While exercising the <b>Duplicate Documents</b> feature in LabDE, files 
+		were prevented from being checked out.
+	</ul>
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<ul>
+	<LI><b>Problem Replication</b>
+	<ul>
+		<li>Begin by queuing and processing the <b>Extended</b> images from 
+		<b>Demo_LabDE</b>.
+		<li>Use SQL Management Studio to add <b>Domain_User</b> access privileges 
+		to the Demo_LabDE database.
+		<li>Use SQL Management Studio to add and then remove a row from the 
+		<b>ActiveFAM</b> table.
+		<li>Verify a document and click the <b>Duplicate Documents</b> button 
+		to display the <b>FAM File Inspector</b>.
+		<ul>
+			<li>Confirm that the current document is displayed as 
+			<b>In Use</b> and that no actions are available on the file.
+			<li>Confirm that an image being verified by another user on 
+			another machine is displayed as In Use but with the actual 
+			user not properly identified.
+		</ul>
+		<li>Close verification.
+       	</ul>
+<p>
+	<LI><b>Patch Installation</b>
+	<ul>
+		<li>Unzip <b>LabDE Patch 10.0.1.zip</b>.
+		<li>Run <b>Install.bat</b> to update the Extract Systems files.
+		<li><b>[TESTING ONLY]</b> Replace <b>Extract.DataEntry.DEP.Demo_LabDE.dll</b> 
+		in the <b>C:\Demo_LabDE\Solution\Bin</b> folder.
+       	</ul>
+<p>
+	<LI><b>Testing</b>
+	<ul>
+		<li>Verify a document via <b>Duplicate Documents</b>.
+		<li>Confirm that the current document is displayed as <b>In Use</b>.
+		<li>Confirm that other actions are available.
+		<li>Stop verification.
+		<li>Verify an image on another workstation.
+		<li>Restart verification on the first workstation.
+		<li>Confirm that when the two documents being verified pass the tests for 
+		being potential duplicates that the remote document is properly identified 
+		as in use by the remote user.
+       	</ul>
+</ul>
+</BODY>
+</HTML>
