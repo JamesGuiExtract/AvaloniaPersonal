@@ -118,6 +118,7 @@
             // 
             // _useFAMDBCheckBox
             // 
+            this._useFAMDBCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._useFAMDBCheckBox.AutoSize = true;
             this._useFAMDBCheckBox.Location = new System.Drawing.Point(12, 185);
             this._useFAMDBCheckBox.Name = "_useFAMDBCheckBox";
@@ -128,6 +129,7 @@
             // 
             // _useSpecifiedDBCheckBox
             // 
+            this._useSpecifiedDBCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._useSpecifiedDBCheckBox.AutoSize = true;
             this._useSpecifiedDBCheckBox.Location = new System.Drawing.Point(12, 208);
             this._useSpecifiedDBCheckBox.Name = "_useSpecifiedDBCheckBox";

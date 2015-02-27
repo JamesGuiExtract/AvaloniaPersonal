@@ -11,7 +11,8 @@ using namespace std;
 //--------------------------------------------------------------------------------------------------
 static const string gstrPATIENT_TABLE = "Patient";
 
-static const string gstrCREATE_PATIENT_TABLE = 
+// The original schema of the patient table; only used as part of a schema update.
+static const string gstrCREATE_PATIENT_TABLE_V1 = 
 	"CREATE TABLE [dbo].[Patient]( "
 	" [MRN] NVARCHAR(20) NOT NULL CONSTRAINT [PK_Patient] PRIMARY KEY CLUSTERED, "
 	" [FirstName] NVARCHAR(50) NOT NULL, "
@@ -20,12 +21,22 @@ static const string gstrCREATE_PATIENT_TABLE =
 	" [Suffix] NVARCHAR(50) NULL, "
 	" [DOB] DATETIME NULL)";
 
+static const string gstrCREATE_PATIENT_TABLE = 
+	"CREATE TABLE [dbo].[Patient]( "
+	" [MRN] NVARCHAR(20) NOT NULL CONSTRAINT [PK_Patient] PRIMARY KEY CLUSTERED, "
+	" [FirstName] NVARCHAR(50) NOT NULL, "
+	" [MiddleName] NVARCHAR(50) NULL, "
+	" [LastName] NVARCHAR(50) NOT NULL, "
+	" [Suffix] NVARCHAR(50) NULL, "
+	" [DOB] DATETIME NULL,"
+	" [Gender] NCHAR(1) NULL)";
+
 static const string gstrCREATE_PATIENT_FIRSTNAME_INDEX =
-	"CREATE UNIQUE NONCLUSTERED INDEX [IX_Patient_FirstName] "
+	"CREATE NONCLUSTERED INDEX [IX_Patient_FirstName] "
 	"	ON [Patient]([FirstName], [LastName])";
 
 static const string gstrCREATE_PATIENT_LASTNAME_INDEX =
-	"CREATE UNIQUE NONCLUSTERED INDEX [IX_Patient_LastName] "
+	"CREATE NONCLUSTERED INDEX [IX_Patient_LastName] "
 	"	ON [Patient]([LastName], [FirstName])";
 
 //--------------------------------------------------------------------------------------------------
@@ -40,15 +51,17 @@ static const string gstrCREATE_ORDER_STATUS_TABLE =
 
 // Populate the OrderStatus table.
 static const string gstrPOPULATE_ORDER_STATUSES = 
-	"INSERT INTO [dbo].[OrderStatus] VALUES ('O', 'Open'); "
-	"INSERT INTO [dbo].[OrderStatus] VALUES ('C', 'Canceled'); ";
+	"INSERT INTO [dbo].[OrderStatus] VALUES ('A', "
+		"'Available: Has not been cancelled; may or may not have been fulfilled'); "
+	"INSERT INTO [dbo].[OrderStatus] VALUES ('C', 'Canceled');";
 
 //--------------------------------------------------------------------------------------------------
 // Order Table
 //--------------------------------------------------------------------------------------------------
 static const string gstrORDER_TABLE = "Order";
 
-static const string gstrCREATE_ORDER_TABLE = 
+// The original schema of the order table; only used as part of a schema update.
+static const string gstrCREATE_ORDER_TABLE_V1 = 
 	"CREATE TABLE [dbo].[Order]( "
 	" [OrderNumber] NVARCHAR(20) NOT NULL CONSTRAINT [PK_Order] PRIMARY KEY CLUSTERED, "
 	" [OrderCode] NVARCHAR(30) NOT NULL, "
@@ -56,6 +69,14 @@ static const string gstrCREATE_ORDER_TABLE =
 	" [RequestDateTime] DATETIME NULL, "
 	" [CollectionDateTime] DATETIME NULL, "
 	" [OrderStatus] NCHAR(1) NOT NULL)";
+
+static const string gstrCREATE_ORDER_TABLE = 
+	"CREATE TABLE [dbo].[Order]( "
+	" [OrderNumber] NVARCHAR(20) NOT NULL CONSTRAINT [PK_Order] PRIMARY KEY CLUSTERED, "
+	" [OrderCode] NVARCHAR(30) NOT NULL, "
+	" [PatientMRN] NVARCHAR(20) NULL, "
+	" [ReceivedDateTime] DATETIME NOT NULL DEFAULT GETDATE(), "
+	" [OrderStatus] NCHAR(1) NOT NULL DEFAULT 'A')";
 
 static const string gstrADD_FK_ORDER_PATIENT_MRN = 
 	"ALTER TABLE [dbo].[Order]  "
@@ -72,11 +93,16 @@ static const string gstrADD_FK_ORDER_ORDERSTATUS =
 	" ON DELETE NO ACTION";
 
 static const string gstrCREATE_ORDER_MRN_INDEX =
-	"CREATE UNIQUE NONCLUSTERED INDEX [IX_Order_PatientMRN] ON [Order]([PatientMRN])";
+	"CREATE NONCLUSTERED INDEX [IX_Order_PatientMRN] ON [Order]([PatientMRN])";
 
-static const string gstrCREATE_ORDER_ORDERCODE_INDEX =
-	"CREATE UNIQUE NONCLUSTERED INDEX [IX_Order_OrderCode] "
+// This index is no longer used since RequestDateTime was renamed to ReceivedDateTime 
+static const string gstrCREATE_ORDER_ORDERCODE_INDEX_V1 =
+	"CREATE NONCLUSTERED INDEX [IX_Order_OrderCode] "
 	"	ON [Order]([OrderCode], [RequestDateTime])";
+
+static const string gstrCREATE_ORDER_ORDERCODERECEIVEDDATETIME_INDEX =
+	"CREATE NONCLUSTERED INDEX [IX_Order_OrderCodeReceivedDateTime] "
+	"	ON [Order]([OrderCode], [ReceivedDateTime])";
 
 //--------------------------------------------------------------------------------------------------
 // OrderFile Table
@@ -108,7 +134,7 @@ static const string gstrADD_FK_ORDERFILE_FAMFILE =
 	" ON DELETE CASCADE";
 
 static const string gstrCREATE_ORDERFILE_ORDER_INDEX =
-	"CREATE UNIQUE NONCLUSTERED INDEX [IX_OrderFile_Order] ON [OrderFile]([OrderNumber])";
+	"CREATE NONCLUSTERED INDEX [IX_OrderFile_Order] ON [OrderFile]([OrderNumber])";
 
 static const string gstrCREATE_ORDERFILE_FAMFILE_INDEX =
-	"CREATE UNIQUE NONCLUSTERED INDEX [IX_OrderFile_FAMFile] ON [OrderFile]([FileID])";
+	"CREATE NONCLUSTERED INDEX [IX_OrderFile_FAMFile] ON [OrderFile]([FileID])";

@@ -25,7 +25,8 @@ using namespace std;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-static const long glLABDE_DB_SCHEMA_VERSION = 1;
+/// Version 2: https://extract.atlassian.net/browse/ISSUE-12801
+static const long glLABDE_DB_SCHEMA_VERSION = 2;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -46,16 +47,16 @@ int UpdateToSchemaVersion1(_ConnectionPtr ipConnection, long* pnNumSteps,
 		}
 
 		vector<string> vecQueries;
-		vecQueries.push_back(gstrCREATE_PATIENT_TABLE);
+		vecQueries.push_back(gstrCREATE_PATIENT_TABLE_V1);
 		vecQueries.push_back(gstrCREATE_PATIENT_FIRSTNAME_INDEX);
 		vecQueries.push_back(gstrCREATE_PATIENT_LASTNAME_INDEX);
 		vecQueries.push_back(gstrCREATE_ORDER_STATUS_TABLE);
 		vecQueries.push_back(gstrPOPULATE_ORDER_STATUSES);
-		vecQueries.push_back(gstrCREATE_ORDER_TABLE);
+		vecQueries.push_back(gstrCREATE_ORDER_TABLE_V1);
 		vecQueries.push_back(gstrADD_FK_ORDER_PATIENT_MRN);
 		vecQueries.push_back(gstrADD_FK_ORDER_ORDERSTATUS);
 		vecQueries.push_back(gstrCREATE_ORDER_MRN_INDEX);
-		vecQueries.push_back(gstrCREATE_ORDER_ORDERCODE_INDEX);
+		vecQueries.push_back(gstrCREATE_ORDER_ORDERCODE_INDEX_V1);
 		vecQueries.push_back(gstrCREATE_ORDER_FILE_TABLE);
 		vecQueries.push_back(gstrADD_FK_ORDERFILE_ORDER);
 		vecQueries.push_back(gstrADD_FK_ORDERFILE_FAMFILE);
@@ -70,6 +71,60 @@ int UpdateToSchemaVersion1(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37840");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion2(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 2;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		
+		// Add gender column to patient table.
+		vecQueries.push_back("ALTER TABLE [dbo].[Patient] ADD [Gender] NCHAR(1) NULL");
+
+		// Rename RequestDateTime column to ReceivedDateTime and drop CollectionDateTime
+		vecQueries.push_back("EXEC sp_rename 'dbo.Order.RequestDateTime', 'ReceivedDateTime'");
+		vecQueries.push_back("ALTER TABLE [dbo].[Order] ADD DEFAULT GETDATE() FOR [ReceivedDateTime]");
+		vecQueries.push_back("ALTER TABLE [dbo].[Order] DROP COLUMN [CollectionDateTime]");
+
+		// These indices all inappropriately had a unique constraint. Drop and re-add the indices to
+		// fix.
+		vecQueries.push_back("DROP INDEX [IX_Patient_FirstName] ON [dbo].[Patient]");
+		vecQueries.push_back("DROP INDEX [IX_Patient_LastName] ON [dbo].[Patient]");
+		vecQueries.push_back("DROP INDEX [IX_Order_OrderCode] ON [dbo].[Order]");
+		vecQueries.push_back("DROP INDEX [IX_Order_PatientMRN] ON [dbo].[Order]");
+		vecQueries.push_back("DROP INDEX [IX_OrderFile_Order] ON [dbo].[OrderFile]");
+		vecQueries.push_back("DROP INDEX [IX_OrderFile_FAMFile] ON [dbo].[OrderFile]");
+		vecQueries.push_back(gstrCREATE_PATIENT_FIRSTNAME_INDEX);
+		vecQueries.push_back(gstrCREATE_PATIENT_LASTNAME_INDEX);
+		vecQueries.push_back(gstrCREATE_ORDER_MRN_INDEX);
+		vecQueries.push_back(gstrCREATE_ORDER_ORDERCODERECEIVEDDATETIME_INDEX);
+		vecQueries.push_back(gstrCREATE_ORDERFILE_ORDER_INDEX);
+		vecQueries.push_back(gstrCREATE_ORDERFILE_FAMFILE_INDEX);
+
+		// We have changed the code "O" for "Open" to "A" for "Available"
+		// This re-population would cause problems on databases that had existing orders, but at
+		// this point no such databases exist, so...
+		vecQueries.push_back("DELETE FROM [dbo].[OrderStatus]");
+		vecQueries.push_back(gstrPOPULATE_ORDER_STATUSES);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37890");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -214,7 +269,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
 		vecCreateQueries.push_back(gstrADD_FK_ORDER_PATIENT_MRN);
 		vecCreateQueries.push_back(gstrADD_FK_ORDER_ORDERSTATUS);
 		vecCreateQueries.push_back(gstrCREATE_ORDER_MRN_INDEX);
-		vecCreateQueries.push_back(gstrCREATE_ORDER_ORDERCODE_INDEX);
+		vecCreateQueries.push_back(gstrCREATE_ORDER_ORDERCODERECEIVEDDATETIME_INDEX);
 		vecCreateQueries.push_back(gstrADD_FK_ORDERFILE_ORDER);
 		vecCreateQueries.push_back(gstrADD_FK_ORDERFILE_FAMFILE);
 		vecCreateQueries.push_back(gstrCREATE_ORDERFILE_ORDER_INDEX);
@@ -427,12 +482,21 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 
 		switch (*pnProdSchemaVersion)
 		{
-			case 0:	// The schema update from 2 to 3 needs to take place against FAM DB schema version 110
+			case 0:	// The initial schema should be added against FAM DB schema version 123
 					if (nFAMDBSchemaVersion == 123)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion1(ipConnection, pnNumSteps, NULL);
 					}
-			case 1: break;
+					break;
+
+			case 1: // The schema update from 1 to 2 needs to take place against FAM DB schema version 125
+					if (nFAMDBSchemaVersion == 125)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion2(ipConnection, pnNumSteps, NULL);
+					}
+					break;
+
+			case 2: break;
 
 			default:
 				{
