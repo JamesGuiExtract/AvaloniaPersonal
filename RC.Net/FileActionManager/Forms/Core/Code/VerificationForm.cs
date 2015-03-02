@@ -433,10 +433,22 @@ namespace Extract.FileActionManager.Forms
                     // cause the UI thread to load slower.
                     _fileLoadedEvent.WaitOne();
 
-                    // While waiting for the verification UI thread, prefetch data so that
-                    // MainForm.Open call on this thread will have less work to do and execute
-                    // faster.
-                    MainForm.Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB);
+                    // Need to log exception when loading prefetched file
+                    try
+                    {
+                        // While waiting for the verification UI thread, prefetch data so that
+                        // MainForm.Open call on this thread will have less work to do and execute
+                        // faster.
+                        MainForm.Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Just log this exception another exception will be thrown when the file
+                        // is loaded into the UI
+                        ExtractException ee = new ExtractException("ELI37889", "Unable to prefetch file.", ex);
+                        ee.AddDebugData("Filename", fileName, false);
+                        ee.Log();
+                    }
 
                     // Loop in case we need to wait on a requested file or a request has been made
                     // to delay processing of currently waiting files.

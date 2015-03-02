@@ -29,7 +29,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
     /// panes:
     /// <list type="bullet">
     /// <item>The Data Entry Panel (DEP) will display the content from a document and allow for the content
-    /// to be verifed/corrected.  The DEP consists of a <see cref="DataEntryControlHost"/> instance 
+    /// to be verified/corrected.  The DEP consists of a <see cref="DataEntryControlHost"/> instance 
     /// populated by controls which implement <see cref="IDataEntryControl"/>.</item>
     /// <item>The image viewer will display the document image itself and allow for interaction with the
     /// DEP such as highlighting the image area associated with the content currently selected in the DEP
@@ -167,7 +167,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         RegistrySettings<Properties.Settings> _registry;
 
         /// <summary>
-        /// The verificaton task settings.
+        /// The verification task settings.
         /// </summary>
         VerificationSettings _settings;
 
@@ -463,7 +463,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         bool _allowTabbingByGroup = true;
 
         /// <summary>
-        /// The comment loaded or to be stored the the file processing database.
+        /// The comment loaded or to be stored the file processing database.
         /// </summary>
         string _fileProcessingDBComment;
 
@@ -661,11 +661,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _imageViewer.DefaultStatusMessage = "Waiting for next document...";
                 }
 
-                // Apply the peristed auto-OCR settings.
+                // Apply the persisted auto-OCR settings.
                 _imageViewer.AutoOcr = _registry.Settings.AutoOcr;
                 _imageViewer.OcrTradeoff = _registry.Settings.OcrTradeoff;
 
-                // For prefetching purposes, allow the ImageViewer to cache images.
+                // For pre-fetching purposes, allow the ImageViewer to cache images.
                 _imageViewer.CacheImages = true;
 
                 _invoker = new ControlInvoker(this);
@@ -983,9 +983,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             catch (Exception ex)
             {
-                //ExtractException ee = ExtractException.AsExtractException("ELI23871", ex);
-                //_invoker.HandleException(ee);
-                throw ex.AsExtract("ELI23871");
+                RaiseVerificationException("ELI23871", ex, true);
             }
         }
 
@@ -1029,7 +1027,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <para><b>Note</b></para>
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
-        /// it also means the form may be opened or closed while the Standby call is still ocurring.
+        /// it also means the form may be opened or closed while the Standby call is still occurring.
         /// If this happens, the return value of Standby will be ignored; however, Standby should
         /// promptly return in this case to avoid needlessly keeping a thread alive.
         /// </summary>
@@ -1329,7 +1327,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Establish connections between the image viewer and all image viewer controls.
                 _imageViewer.EstablishConnections(this);
 
-                // Don't allow the image viewer to be show in a seperate window or the magnifier to
+                // Don't allow the image viewer to be show in a separate window or the magnifier to
                 // be shown if the form is in invisible mode.
                 if (!_invisible)
                 {
@@ -1456,7 +1454,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // [DataEntry:316]
-                // Don't allow any shortcuts or menu naviagation via keys while an image viewer
+                // Don't allow any shortcuts or menu navigation via keys while an image viewer
                 // tracking event is in progress.
                 if (_imageViewer.Capture)
                 {
@@ -1518,7 +1516,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _sandDockManager.SaveLayout();
                 }
 
-                // Don't call base.OnFormClosing until we know know if the close is being canceled
+                // Don't call base.OnFormClosing until we know if the close is being canceled
                 // (if VerificationForm receives a FormClosing event, it expects that the form will
                 // indeed close).
                 base.OnFormClosing(e);
@@ -1666,7 +1664,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Event Handlers
 
         /// <summary>
-        /// Handles the case that the user requested that the data be saved and commited.
+        /// Handles the case that the user requested that the data be saved and committed.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
@@ -1787,8 +1785,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _documentLoadCount++;
 
                     // [DataEntry:693]
-                    // On WindowsXP, recources associated with the auto-complete list (
-                    // particularily GDI objects) do not seem to be cleaned up and eventually 
+                    // On WindowsXP, resources associated with the auto-complete list (
+                    // particularly GDI objects) do not seem to be cleaned up and eventually 
                     // "Error creating window handle" exceptions will result. Calling GC.Collect
                     // cleans up these resources. (GCFrequency default == 1)
                     if (_imageViewer.IsImageAvailable && _activeDataEntryConfig != null &&
@@ -1817,7 +1815,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     if (!LoadCorrectConfigForData(attributes) && _dataEntryControlHost != null)
                     {
                         // [DataEntry:729]
-                        // If the data entery config didn't change, still need to call
+                        // If the data entry config didn't change, still need to call
                         // GetDatabaseConnection to get the latest version of the database (in case
                         // it has been updated).
                         _dataEntryControlHost.SetDatabaseConnections(GetDatabaseConnections());
@@ -1988,7 +1986,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // If an image is not available, the active cursor tool will be disabled
-                // automatically. Don't programatically change the cursor tool-- that way the last
+                // automatically. Don't programmatically change the cursor tool-- that way the last
                 // cursor tool will be remembered when the next image is loaded.
                 if (_imageViewer.IsImageAvailable)
                 {
@@ -2951,7 +2949,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 OnFileRequested(eventArgs);
                 bool requestSucceeded = eventArgs.FileIsAvailable;
 
-                // If the the specified file is not actively "processing" in the task (prefetch), move the
+                // If the specified file is not actively "processing" in the task (prefetch), move the
                 // file to the front of the FPRecordManager's queue to ensure it is the next file in.
                 if (!requestSucceeded)
                 {
@@ -3145,7 +3143,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="commitData"><see langword="true"/> if data is being committed and therefore
         /// it should be validated in the DEP or <see langword="false"/> if the purpose is to give
-        /// the user a chance to save the data without commiting in which case the user will be
+        /// the user a chance to save the data without committing in which case the user will be
         /// prompted whether to save or not.</param>
         /// <returns><see cref="DialogResult.Yes"/> if the document was successfully saved, 
         /// <see cref="DialogResult.No"/> if the user elected not to save or
@@ -3198,7 +3196,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
                     }
                 }
-                // Prompt if the data is not being commited.
+                // Prompt if the data is not being committed.
                 else
                 {
                     response = MessageBox.Show(this,
@@ -3207,7 +3205,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         MessageBoxDefaultButton.Button1, 0);
                 }
 
-                // If commiting data or the user elected to save, attempt the save.
+                // If committing data or the user elected to save, attempt the save.
                 if (response == DialogResult.Yes && !SaveData(commitData))
                 {
                     // Return cancel if the data in the DEP failed validation.
@@ -3614,7 +3612,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Sets the control which implements the data entry panel (DEP).
         /// </summary>
-        /// <param name="dataEntryControlHost">The control which implments the data entry panel
+        /// <param name="dataEntryControlHost">The control which implements the data entry panel
         /// (DEP). <see langword="null"/> is allowed, but results in a blank DEP.</param>
         void SetDataEntryControlHost(DataEntryControlHost dataEntryControlHost)
         {
@@ -4165,7 +4163,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         
         /// <summary>
         /// Attempts to open database connection(s) for use by the DEP for validation and
-        /// auto-updates if connection information is specfied in the config settings.
+        /// auto-updates if connection information is specified in the config settings.
         /// </summary>
         /// <returns>A dictionary of <see cref="DbConnection"/>(s) where the key is the connection
         /// name (blank for default). If no database connection is currently configured, any open
@@ -4488,7 +4486,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     SystemInformation.VerticalScrollBarWidth;
 
                 // [DataEntry:3770]
-                // If the image viewer is open in a separate window, the scrollpanel & DEP don't
+                // If the image viewer is open in a separate window, the scroll panel & DEP don't
                 // need to be confined to the area left of the splitter position.
                 if (_imageViewerForm == null)
                 {
