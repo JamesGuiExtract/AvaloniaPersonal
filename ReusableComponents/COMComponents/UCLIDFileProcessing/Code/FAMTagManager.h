@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CFAMTagManager
 class ATL_NO_VTABLE CFAMTagManager : 
@@ -51,7 +53,7 @@ public:
 	STDMETHOD(raw_ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
 	STDMETHOD(raw_ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
 	STDMETHOD(raw_GetBuiltInTags)(IVariantVector* *ppTags);
-	STDMETHOD(raw_GetINIFileTags)(IVariantVector* *ppTags);
+	STDMETHOD(raw_GetCustomFileTags)(IVariantVector* *ppTags);
 	STDMETHOD(raw_GetAllTags)(IVariantVector* *ppTags);
 	STDMETHOD(raw_GetFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
@@ -72,8 +74,18 @@ private:
 	//Variables
 	//////////
 
-	std::string m_strFPSDir;
-	std::string m_strFPSFileName;
+	// There should never be more than one FPSDir or FPSFileName per-process. By making these
+	// static, values set in one instance can be shared with a later instance that otherwise would
+	// not have access to the currently loaded FPS file.
+	static string ms_strFPSDir;
+	static string ms_strFPSFileName;
+
+	// Evaluates environment-specific tags. Also static since the environment tags will always be
+	// the same for a given context path.
+	static IEnvironmentTagProviderPtr ms_ipEnvironmentTagProvider;
+
+	// Controls access to the above static variables.
+	static CMutex ms_mutex;
 
 	// pointer to the utility object to use for path function expansion.
 	IMiscUtilsPtr m_ipMiscUtils;

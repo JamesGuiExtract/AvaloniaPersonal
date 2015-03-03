@@ -155,10 +155,10 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 			// Read the server and database
 			string strServer;
 			dataReader >> strServer;
-			getFPMDB()->DatabaseServer = strServer.c_str();
+			setDBServer(strServer);
 			string strDatabase;
 			dataReader >> strDatabase;
-			getFPMDB()->DatabaseName = strDatabase.c_str();
+			setDBName(strDatabase);
 		}
 
 		// Get the max files from db value
@@ -186,7 +186,7 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 		{
 			string strAdvConnStrProperties;
 			dataReader >> strAdvConnStrProperties;
-			getFPMDB()->AdvancedConnectionStringProperties = strAdvConnStrProperties.c_str();
+			setAdvConnString(strAdvConnStrProperties);
 		}
 
 		// Read in the collected File Supplying Management Role
@@ -240,15 +240,15 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bDisplayOfStatisticsEnabled;
 
 		// Save the Database server
-		dataWriter << asString(getFPMDB()->DatabaseServer);
+		dataWriter << m_strDBServer;
 		
 		// Save the database name
-		dataWriter << asString(getFPMDB()->DatabaseName);
+		dataWriter << m_strDBName;
 
 		dataWriter << m_nMaxFilesFromDB;
 
 		// Save the advanced connection string properties
-		dataWriter << asString(getFPMDB()->AdvancedConnectionStringProperties);
+		dataWriter << m_strAdvConnString;
 		
 		// Flush the stream
 		dataWriter.flushToByteStream();

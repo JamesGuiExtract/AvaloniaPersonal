@@ -55,7 +55,7 @@ public:
 	STDMETHOD(raw_ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData,
 		BSTR *pbstrOutput);
 	STDMETHOD(raw_GetBuiltInTags)(IVariantVector** ppTags);
-	STDMETHOD(raw_GetINIFileTags)(IVariantVector** ppTags);
+	STDMETHOD(raw_GetCustomFileTags)(IVariantVector** ppTags);
 	STDMETHOD(raw_GetAllTags)(IVariantVector** ppTags);
 	STDMETHOD(raw_GetFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
@@ -240,7 +240,7 @@ private:
 	void expandRuleExecIDTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandSourceDocNameTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandDocTypeTag(string& rstrInput, IAFDocumentPtr& ripDoc);
-	void expandINIFileTags(string& rstrInput, IAFDocumentPtr& ripDoc);
+	void expandCustomFileTags(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandAFDocTags(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandCommonComponentsDir(string& rstrInput);
 	//---------------------------------------------------------------------------------------------
@@ -250,7 +250,7 @@ private:
 	//			through the out parameter, and true is returned (to indicate that the value was
 	//			successfully found)
 	//			If strTagName is not found in the INI file, then false will be returned.
-	bool getTagValueFromINIFile(const string& strTagName, string& rstrTagValue);
+	bool getCustomTagValue(const string& strTagName, string& rstrTagValue);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return all tag names in strInput.
 	//			The returned strings will include the < and > chars
@@ -259,7 +259,7 @@ private:
 	// PURPOSE:	To expand the tags in the specified string (note rstrInput will be modified)
 	void expandTags(string& rstrInput, IAFDocumentPtr ipDoc);
 	//---------------------------------------------------------------------------------------------
-	// PURPOSE:	To return a reformated version of the format string specified by strFormat using
+	// PURPOSE:	To return a reformatted version of the format string specified by strFormat using
 	//			the supplied ipAttribute as the context used to expand variables. strFormat will
 	//			be modified so that following the call, only the text not processed will remain.
 	//			bScopeCloseExpected- Indicates the current format string is being expanded within
@@ -296,13 +296,14 @@ private:
 	// PURPOSE:	To return a Variant vector containing the built in doc tags
 	IVariantVectorPtr getBuiltInTags();
 	//---------------------------------------------------------------------------------------------
-	// PURPOSE:	To return a Variant vector containing the INI file tags
-	IVariantVectorPtr getINIFileTags();
+	// PURPOSE:	To return a Variant vector containing the custom file tags. These will be loaded
+	//			from the INI file specified by getINIFileName() ("UCLIDAFCore.ini")
+	IVariantVectorPtr loadCustomFileTagsFromINI();
 	//---------------------------------------------------------------------------------------------
 	// Gets the name of the AFCore INI file.
 	const char* getINIFileName();
 	//---------------------------------------------------------------------------------------------
-	// PURPOSE: To fill the specified IIUnknownVector with attribtues read from the specified
+	// PURPOSE: To fill the specified IIUnknownVector with attributes read from the specified
 	//			EAV file.
 	void generateAttributesFromEAVFile(const string& strFileName,
 		const IIUnknownVectorPtr& ipVector);
@@ -337,8 +338,8 @@ private:
 	// Variables
 	/////////////
 
-	// cache of tag name/value read from the INI file and mutex for reading/writing it
-	static map<string, string> ms_mapINIFileTagNameToValue;
+	// cache of custom tag name/values and mutex for reading/writing it
+	static map<string, string> ms_mapCustomFileTagNameToValue;
 
 	static string ms_strINIFileName;
 

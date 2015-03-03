@@ -40,7 +40,7 @@ const string strSOURCE_DOC_PATH_TAG = "<SourceDocName.Path>";
 const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 
 // globals and statics
-map<string, string> CAFUtility::ms_mapINIFileTagNameToValue;
+map<string, string> CAFUtility::ms_mapCustomFileTagNameToValue;
 string CAFUtility::ms_strINIFileName;
 CMutex CAFUtility::ms_Mutex;
 map<long, CRuleSetProfiler> CAFUtility::ms_mapProfilers;
@@ -683,7 +683,7 @@ STDMETHODIMP CAFUtility::raw_GetBuiltInTags(IVariantVector** ppTags)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::raw_GetINIFileTags(IVariantVector** ppTags)
+STDMETHODIMP CAFUtility::raw_GetCustomFileTags(IVariantVector** ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -691,7 +691,7 @@ STDMETHODIMP CAFUtility::raw_GetINIFileTags(IVariantVector** ppTags)
 	{	
 		validateLicense();
 
-		IVariantVectorPtr ipVec = getINIFileTags();
+		IVariantVectorPtr ipVec = loadCustomFileTagsFromINI();
 		ASSERT_RESOURCE_ALLOCATION("ELI11774", ipVec != __nullptr);
 
 		*ppTags = ipVec.Detach();
@@ -715,11 +715,11 @@ STDMETHODIMP CAFUtility::raw_GetAllTags(IVariantVector** ppTags)
 		IVariantVectorPtr ipVec1 = getBuiltInTags();
 		ASSERT_RESOURCE_ALLOCATION("ELI26583", ipVec1 != __nullptr);
 
-		// Get the INI tags
-		IVariantVectorPtr ipVec2 = getINIFileTags();
+		// Get the custom tags
+		IVariantVectorPtr ipVec2 = loadCustomFileTagsFromINI();
 		ASSERT_RESOURCE_ALLOCATION("ELI26584", ipVec2 != __nullptr);
 
-		// Append the INI tags to the built in tags
+		// Append the custom tags to the built in tags
 		ipVec1->Append(ipVec2);
 
 		// Return the collection
@@ -1131,7 +1131,7 @@ void CAFUtility::expandSourceDocNameTag(string& rstrInput,
 	// expand the filename tag
 	if (bSourceDocFileNameTagFound)
 	{
-		// get the filname and ensure it's not empty
+		// get the filename and ensure it's not empty
 		string strFileName = getFileNameWithoutExtension(strSourceDocName);
 		if (strFileName.empty())
 		{
@@ -1150,7 +1150,7 @@ void CAFUtility::expandSourceDocNameTag(string& rstrInput,
 	// expand the path tag
 	if (bSourceDocPathTagFound)
 	{
-		// get the filname and ensure it's not empty
+		// get the filename and ensure it's not empty
 		string strPath = getDirectoryFromFullPath(strSourceDocName);
 		if (strPath.empty())
 		{
@@ -1247,7 +1247,7 @@ void CAFUtility::expandAFDocTags(string& rstrInput, IAFDocumentPtr& ripDoc)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool CAFUtility::getTagValueFromINIFile(const string& strTagName, string& rstrTagValue)
+bool CAFUtility::getCustomTagValue(const string& strTagName, string& rstrTagValue)
 {
 	// remove the '<' and '>' from strTagName, and ensure
 	long nLen = strTagName.size();
@@ -1269,8 +1269,8 @@ bool CAFUtility::getTagValueFromINIFile(const string& strTagName, string& rstrTa
 
 		// check if we have already cached the value of the tag
 		map<string, string>::iterator iter;
-		iter = ms_mapINIFileTagNameToValue.find(strTag);
-		if (iter != ms_mapINIFileTagNameToValue.end())
+		iter = ms_mapCustomFileTagNameToValue.find(strTag);
+		if (iter != ms_mapCustomFileTagNameToValue.end())
 		{
 			rstrTagValue = iter->second;
 			return true;
@@ -1278,7 +1278,7 @@ bool CAFUtility::getTagValueFromINIFile(const string& strTagName, string& rstrTa
 
 		// get the value of the tag from the INI file
 		// NOTE: This code below is not very robust because it cannot
-		// distinguish between a non-existant key in the INI file and
+		// distinguish between a non-existent key in the INI file and
 		// an existing key in the INI file with an empty value
 		const char *pszSectionName = "ExpandableTags";
 		char pszResult[1024];
@@ -1292,14 +1292,14 @@ bool CAFUtility::getTagValueFromINIFile(const string& strTagName, string& rstrTa
 		rstrTagValue = pszResult;
 		if (!rstrTagValue.empty())
 		{
-			ms_mapINIFileTagNameToValue[strTagName] = rstrTagValue;
+			ms_mapCustomFileTagNameToValue[strTagName] = rstrTagValue;
 		}
 	}
 
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::expandINIFileTags(string& rstrInput,
+void CAFUtility::expandCustomFileTags(string& rstrInput,
 								   IAFDocumentPtr& ripDoc)
 {
 	// Expand any tags that have been defined at the INI file level.
@@ -1341,7 +1341,7 @@ void CAFUtility::expandINIFileTags(string& rstrInput,
 		string strTagValue;
 		// if the tag cannot be expanded from the INI FILE
 		// we will continue
-		if (!getTagValueFromINIFile(strTagName, /* ref */ strTagValue))
+		if (!getCustomTagValue(strTagName, /* ref */ strTagValue))
 		{
 			// continue searching
 			nStartSearchPos = nTagEndPos + 1;
@@ -2272,9 +2272,9 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 	{
 		ASSERT_ARGUMENT("ELI26167", ipDoc != __nullptr);
 
-		// expand the INI file tags first, because the INI file tag
-		// may use one or more of the other tags
-		expandINIFileTags(rstrInput, ipDoc);
+		// expand the custom tags first, because the custom tag may use one or more of the other
+		// tags
+		expandCustomFileTags(rstrInput, ipDoc);
 
 		// expand the various other tags
 		expandRSDFileDirTag(rstrInput);
@@ -2425,7 +2425,7 @@ IVariantVectorPtr CAFUtility::getBuiltInTags()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26579");
 }
 //-------------------------------------------------------------------------------------------------
-IVariantVectorPtr CAFUtility::getINIFileTags()
+IVariantVectorPtr CAFUtility::loadCustomFileTagsFromINI()
 {
 	try
 	{
@@ -2435,7 +2435,7 @@ IVariantVectorPtr CAFUtility::getINIFileTags()
 
 		// get the value of the tag from the INI file
 		// NOTE: This code below is not very robust because it cannot
-		// distinguish between a non-existant key in the INI file and
+		// distinguish between a non-existent key in the INI file and
 		// an existing key in the INI file with an empty value
 		const char *pszSectionName = "ExpandableTags";
 		char pszResult[2048];

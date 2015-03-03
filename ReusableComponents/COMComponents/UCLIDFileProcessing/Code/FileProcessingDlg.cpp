@@ -122,6 +122,9 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
 		m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_PROCESS);
 		ASSERT_RESOURCE_ALLOCATION("ELI14999", m_hIcon != __nullptr);
 
+		m_ipFAMTagUtility.CreateInstance(CLSID_FAMTagManager);
+		ASSERT_RESOURCE_ALLOCATION("ELI37906", m_ipFAMTagUtility != __nullptr);
+
 		ma_pCfgMgr = unique_ptr<FileProcessingConfigMgr>(new
 			FileProcessingConfigMgr());
 
@@ -1689,9 +1692,8 @@ LRESULT FileProcessingDlg::OnWorkItemStatusChange(WPARAM wParam, LPARAM lParam)
 //--------------------------------------------------------------------------------------------------
 // INotifyDBConfigChanged class
 //--------------------------------------------------------------------------------------------------
-void FileProcessingDlg::OnDBConfigChanged(const std::string& strServer, 
-										  const std::string& strDatabase,
-										  const std::string& strAdvConnStrProperties)
+void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
+										  string& rstrAdvConnStrProperties)
 { 
 	try
 	{
@@ -1706,12 +1708,45 @@ void FileProcessingDlg::OnDBConfigChanged(const std::string& strServer,
 		// NOTE: do this before the call to ResetDBConnection
 		//		 because ResetDBConnection will throw exception if
 		//		 the Server or DBName do not exist
-		getFPM()->DatabaseServer = strServer.c_str();
-		getFPM()->DatabaseName = strDatabase.c_str();
-		getFPM()->AdvancedConnectionStringProperties = strAdvConnStrProperties.c_str();
+		getFPM()->DatabaseServer = rstrServer.c_str();
+		getFPM()->DatabaseName = rstrDatabase.c_str();
+		getFPM()->AdvancedConnectionStringProperties = rstrAdvConnStrProperties.c_str();
 
 		// Reset the database connection
 		getDBPointer()->ResetDBConnection(VARIANT_FALSE);
+
+		// In case path tags were expanded, return the literal database connection properties we
+		// actually connected to.
+		rstrServer = getFPM()->DatabaseServer;
+		rstrDatabase = getFPM()->DatabaseName;
+		rstrAdvConnStrProperties = getFPM()->AdvancedConnectionStringProperties;
+
+		// Determine in environment-specific path tags <DatabaseServer> and <DatabaseName> are
+		// available and indicate the findings to m_propDatabasePage.
+		bool bDBServerTagExists = false;
+		bool bDBNameTagExists = false;
+
+		IVariantVectorPtr ipCustomTags = m_ipFAMTagUtility->GetCustomFileTags();
+		ASSERT_RESOURCE_ALLOCATION("ELI37907", ipCustomTags != __nullptr);
+
+		long nCount = ipCustomTags->Size;
+		for (long i = 0; i < nCount; i++)
+		{
+			string strCustomTag = asString(ipCustomTags->Item[i].bstrVal);
+			if (_strnicmp(strCustomTag.c_str(), gstrDATABASE_SERVER_TAG.c_str(), 
+				gstrDATABASE_SERVER_TAG.length()) == 0)
+			{
+				bDBServerTagExists = true;
+			}
+			else if (_strnicmp(strCustomTag.c_str(), gstrDATABASE_NAME_TAG.c_str(), 
+				gstrDATABASE_NAME_TAG.length()) == 0)
+			{
+				bDBNameTagExists = true;
+			}
+		}
+
+		m_propDatabasePage.showDBServerTag(bDBServerTagExists);
+		m_propDatabasePage.showDBNameTag(bDBNameTagExists);
 	}
 	catch ( ... )
 	{

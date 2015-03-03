@@ -46,4 +46,7 @@ using namespace ADODB;
 #import "..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
 using namespace Extract_Interfaces;
 
+#import "..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.tlb" named_guids
+using namespace Extract_Database;
+
 #import "UCLIDFileProcessing.tlb" 

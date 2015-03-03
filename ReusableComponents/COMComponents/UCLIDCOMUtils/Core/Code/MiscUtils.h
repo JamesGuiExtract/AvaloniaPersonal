@@ -46,7 +46,7 @@ public:
 	STDMETHOD(ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
 	STDMETHOD(GetBuiltInTags)(IVariantVector** ppTags);
-	STDMETHOD(GetINIFileTags)(IVariantVector** ppTags);
+	STDMETHOD(GetCustomFileTags)(IVariantVector** ppTags);
 	STDMETHOD(GetAllTags)(IVariantVector** ppTags);
 	STDMETHOD(GetFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);

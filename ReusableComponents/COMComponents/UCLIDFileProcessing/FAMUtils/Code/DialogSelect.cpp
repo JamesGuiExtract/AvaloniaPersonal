@@ -65,6 +65,16 @@ INT_PTR CDialogSelect::DoModal()
 	// call the base class member
 	return CDialog::DoModal();
 }
+//-------------------------------------------------------------------------------------------------
+void CDialogSelect::showDBServerTag(bool bShowDBServerTag)
+{
+	m_bShowDBServerTag = bShowDBServerTag;
+}
+//-------------------------------------------------------------------------------------------------
+void CDialogSelect::showDBNameTag(bool bShowDBNameTag)
+{
+	m_bShowDBNameTag = bShowDBNameTag;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Message Map
@@ -87,11 +97,21 @@ BOOL CDialogSelect::OnInitDialog()
 		case DBInfoCombo::kServerName:
 			SetWindowTextA(gstrSERVER_TITLE.c_str());
 			m_staticComboLabel.SetWindowTextA(gstrSERVER_COMBO_LABEL.c_str());
+			if (m_bShowDBServerTag)
+			{
+				m_comboData.showSpecialValue(gstrDATABASE_SERVER_TAG);
+			}
 			break;
+
 		case DBInfoCombo::kDatabaseName:
 			SetWindowTextA(gstrDB_TITLE.c_str());
 			m_staticComboLabel.SetWindowTextA(gstrDB_COMBO_LABEL.c_str());
+			if (m_bShowDBNameTag)
+			{
+				m_comboData.showSpecialValue(gstrDATABASE_NAME_TAG);
+			}
 			break;
+
 		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI17619");
 		};

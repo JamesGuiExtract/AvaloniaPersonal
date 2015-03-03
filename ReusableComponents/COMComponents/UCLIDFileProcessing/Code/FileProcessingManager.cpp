@@ -830,6 +830,9 @@ STDMETHODIMP CFileProcessingManager::get_DatabaseServer(/*[out, retval]*/ BSTR *
 	{
 		ASSERT_ARGUMENT("ELI17483", pVal != __nullptr);
 
+		// NOTE: The database server name returned will always be the literal name of the database
+		// server. This may differ from the value specified in the setter if the setter contained
+		// path tags or functions that were evaluated.
 		*pVal = getFPMDB()->DatabaseServer.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17482");
@@ -841,17 +844,9 @@ STDMETHODIMP CFileProcessingManager::put_DatabaseServer(/*[in]*/ BSTR newVal)
 {
 	try
 	{
-		// convert the newVal to std::string
-		string strNewVal = asString(newVal);
-		string strOldVal = asString(getFPMDB()->DatabaseServer);
+		validateLicense();
 
-		// check if the newVal is not blank and if it is a new server name
-		if (strNewVal != "" && strNewVal != strOldVal)
-		{
-			m_bDirty = true;
-		}
-
-		getFPMDB()->DatabaseServer = newVal;
+		setDBServer(asString(newVal));
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17481");
 	
@@ -864,6 +859,9 @@ STDMETHODIMP CFileProcessingManager::get_DatabaseName(/*[out, retval]*/ BSTR *pV
 	{
 		ASSERT_ARGUMENT("ELI17480", pVal != __nullptr);
 
+		// NOTE: The database name returned will always be the literal name of the database. This
+		// may differ from the value specified in the setter if the setter contained path tags or
+		// functions that were evaluated.
 		*pVal = getFPMDB()->DatabaseName.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17479");
@@ -875,17 +873,9 @@ STDMETHODIMP CFileProcessingManager::put_DatabaseName(/*[in]*/ BSTR newVal)
 {
 	try
 	{
-		// convert the newVal to std::string
-		string strNewVal = asString(newVal);
-		string strOldVal = asString(getFPMDB()->DatabaseName);
+		validateLicense();
 
-		// check if the newVal is not blank and if it is a new database name
-		if (strNewVal != "" && strNewVal != strOldVal)
-		{
-			m_bDirty = true;
-		}
-
-		getFPMDB()->DatabaseName = newVal;
+		setDBName(asString(newVal));
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17478");
 	
@@ -1190,6 +1180,9 @@ STDMETHODIMP CFileProcessingManager::get_AdvancedConnectionStringProperties(BSTR
 
 		ASSERT_ARGUMENT("ELI35135", pVal != __nullptr);
 
+		// NOTE: The advanced connection string returned will always be the literal connection
+		// string properties. This may differ from the value specified in the setter if the setter
+		// contained path tags or functions that were evaluated.
 		*pVal = getFPMDB()->AdvancedConnectionStringProperties.Detach();
 
 		return S_OK;
@@ -1205,16 +1198,7 @@ STDMETHODIMP CFileProcessingManager::put_AdvancedConnectionStringProperties(BSTR
 	{
 		validateLicense();
 
-		string strNewVal = asString(newVal);
-		string strOldVal = asString(getFPMDB()->AdvancedConnectionStringProperties);
-
-		// check if the new advanced connection string differs from the old one.
-		if (strNewVal != strOldVal)
-		{
-			m_bDirty = true;
-
-			getFPMDB()->AdvancedConnectionStringProperties = newVal;
-		}
+		setAdvConnString(asString(newVal));
 
 		return S_OK;
 	}
@@ -1348,7 +1332,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingManager::getFPMDB()
 	if ( m_ipFPMDB == __nullptr )
 	{
 		// https://extract.atlassian.net/browse/ISSUE-12328
-		// To prevent deadlocks from occuring, ensure the DB instance is hosted in a MTA.
+		// To prevent deadlocks from occurring, ensure the DB instance is hosted in a MTA.
 		m_ipFPMDB = CFileProcessingUtils::createMTAFileProcessingDB();
 		ASSERT_RESOURCE_ALLOCATION("ELI37182", m_ipFPMDB != __nullptr );
 
@@ -1384,6 +1368,43 @@ void CFileProcessingManager::setNewFPSFileName(string strFPSFileName)
 	// Set the FPS filename and directory for tag manager
 	m_ipFAMTagManager->FPSFileName = m_strFPSFileName.c_str();
 	m_ipFAMTagManager->FPSFileDir = getDirectoryFromFullPath(m_strFPSFileName).c_str();
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingManager::setDBServer(string strDBServer)
+{
+	// If the specified value is a new server name, mark as dirty.
+	if (strDBServer != m_strDBServer)
+	{
+		m_bDirty = true;
+	}
+
+	getFPMDB()->DatabaseServer = m_ipFAMTagManager->ExpandTagsAndFunctions(strDBServer.c_str(), "");
+	m_strDBServer = strDBServer;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingManager::setDBName(string strDBName)
+{
+	// If the specified value is a new database name, mark as dirty.
+	if (strDBName != m_strDBName)
+	{
+		m_bDirty = true;
+	}
+
+	getFPMDB()->DatabaseName = m_ipFAMTagManager->ExpandTagsAndFunctions(strDBName.c_str(), "");
+	m_strDBName = strDBName;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingManager::setAdvConnString(string strAdvConnString)
+{
+	// If the specified value is different that the current, mark as dirty.
+	if (strAdvConnString != m_strAdvConnString)
+	{
+		m_bDirty = true;
+	}
+
+	getFPMDB()->AdvancedConnectionStringProperties =
+		m_ipFAMTagManager->ExpandTagsAndFunctions(strAdvConnString.c_str(), "");
+	m_strAdvConnString = strAdvConnString;
 }
 //-------------------------------------------------------------------------------------------------
 string CFileProcessingManager::getExpandedActionName()
@@ -1425,6 +1446,10 @@ void CFileProcessingManager::clear()
 
 		// reset the record manager
 		m_recordMgr.clear(true);
+
+		m_strDBServer = "";
+		m_strDBName = "";
+		m_strAdvConnString = "";
 
 		// reset the database config file
 		getFPMDB()->DatabaseServer = "";

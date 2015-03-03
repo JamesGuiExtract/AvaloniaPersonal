@@ -1103,7 +1103,7 @@ STDMETHODIMP CMiscUtils::GetBuiltInTags(IVariantVector** ppTags)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35198");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMiscUtils::GetINIFileTags(IVariantVector** ppTags)
+STDMETHODIMP CMiscUtils::GetCustomFileTags(IVariantVector** ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

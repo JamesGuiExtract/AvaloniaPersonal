@@ -46,7 +46,9 @@ DatabasePage::DatabasePage()
 	m_zAdvConnStrProperties(""),
 	m_bInitialized(false),
 	m_pNotifyDBConfigChangedObject(NULL),
-	m_bBrowseEnabled(true)
+	m_bBrowseEnabled(true),
+	m_bShowDBServerTag(false),
+	m_bShowDBNameTag(false)
 {
 	try
 	{
@@ -120,6 +122,8 @@ void DatabasePage::OnBnClickedButtonBrowseServer()
 	try
 	{
 		CDialogSelect dlgSelect;
+		dlgSelect.showDBServerTag(m_bShowDBServerTag);
+
 		if (dlgSelect.DoModal() == IDOK)
 		{
 			// If the server has changed need to clear the selected DB
@@ -157,6 +161,8 @@ void DatabasePage::OnBnClickedButtonBrowseDB()
 		}
 
 		CDialogSelect dlgSelectDB(strServer);
+		dlgSelectDB.showDBNameTag(m_bShowDBNameTag);
+
 		if (dlgSelectDB.DoModal() == IDOK)
 		{
 			setDatabase((LPCTSTR)dlgSelectDB.m_zComboValue);
@@ -407,8 +413,8 @@ void DatabasePage::setDBConnectionStatus( const string& strStatusString )
 	// Save the settings if the connection was established
 	if (strStatusString == gstrCONNECTION_ESTABLISHED)
 	{
-		ma_pCfgMgr->setLastGoodDBSettings((LPCSTR)m_zServer, (LPCSTR)m_zDBName,
-			(LPCSTR)m_zAdvConnStrProperties);
+		ma_pCfgMgr->setLastGoodDBSettings(
+			m_strCurrServer, m_strCurrDBName, m_strCurrAdvConnStrProperties);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -445,6 +451,16 @@ void DatabasePage::setBrowseEnabled(bool bBrowseEnabled)
 		m_btnAdvConnStrProperties.EnableWindow(asMFCBool(m_bBrowseEnabled));
 		m_btnConnectLastUsedDB.ShowWindow(m_bBrowseEnabled ? SW_SHOW : SW_HIDE);
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void DatabasePage::showDBServerTag(bool bShowDBServerTag)
+{
+	m_bShowDBServerTag = bShowDBServerTag;
+}
+//-------------------------------------------------------------------------------------------------
+void DatabasePage::showDBNameTag(bool bShowDBNameTag)
+{
+	m_bShowDBNameTag = bShowDBNameTag;
 }
 //-------------------------------------------------------------------------------------------------
 void DatabasePage::updateLastUsedDBButton()
@@ -494,8 +510,12 @@ void DatabasePage::notifyObjects()
 	// Notify the dbConfigChange object
 	if (m_pNotifyDBConfigChangedObject != __nullptr)
 	{
-		m_pNotifyDBConfigChangedObject->OnDBConfigChanged(string(m_zServer), string(m_zDBName),
-			(LPCSTR)m_zAdvConnStrProperties);
+		m_strCurrServer = string(m_zServer);
+		m_strCurrDBName = string(m_zDBName);
+		m_strCurrAdvConnStrProperties = string(m_zAdvConnStrProperties);
+
+		m_pNotifyDBConfigChangedObject->OnDBConfigChanged(
+			m_strCurrServer, m_strCurrDBName, m_strCurrAdvConnStrProperties);
 	}
 }
 //-------------------------------------------------------------------------------------------------

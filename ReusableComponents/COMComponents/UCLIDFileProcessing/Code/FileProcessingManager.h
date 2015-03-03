@@ -147,6 +147,11 @@ private:
 	// loaded from or saved to
 	string m_strFPSFileName;
 
+	// Database connection variables.
+	string m_strDBServer;
+	string m_strDBName;
+	string m_strAdvConnString;
+
 	// This flag will be set to true
 	bool bRunOnInit;
 
@@ -217,6 +222,16 @@ private:
 	// updated. Added as a temporary workaround to a crash:
 	// https://extract.atlassian.net/browse/ISSUE-12055
 	void setNewFPSFileName(string strFPSFileName);
+
+	// Applies a new DB server, where any path tags or functions in strDBServer are evaluated.
+	void setDBServer(string strDBServer);
+	
+	// Applies a new DB name, where any path tags or functions in strDBServer are evaluated.
+	void setDBName(string strDBName);
+
+	// Applies a new advanced connection string properties value, where any path tags or functions
+	// in strDBServer are evaluated.
+	void setAdvConnString(string strAdvConnString);
 
 	// Returns the action name with the tags expanded
 	// NOTE: This method also sets the FPSFileDir value for the tag manager

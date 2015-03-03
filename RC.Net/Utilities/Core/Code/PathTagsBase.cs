@@ -203,16 +203,16 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Gets a list of the INI path tags.
+        /// Gets a list of the custom path tags.
         /// </summary>
         /// <returns>A <see cref="VariantVector"/> of the INI path tags.</returns>
         [CLSCompliant(false)]
-        public VariantVector GetINIFileTags()
+        public VariantVector GetCustomFileTags()
         {
             try
             {
                 // 11/15/2012 SNK
-                // For better or worse this class hasn't supported INI file tags up until now and
+                // For better or worse this class hasn't supported custom file tags up until now and
                 // I'm leaving it that way for expediency.
                 return new VariantVector();
             }

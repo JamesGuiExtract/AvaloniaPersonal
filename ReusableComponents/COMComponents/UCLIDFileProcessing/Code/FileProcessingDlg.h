@@ -89,8 +89,11 @@ public:
 
 // INotifyDBConfigChanged class
 public:
-	void OnDBConfigChanged(const string& strServer, const string& strDatabase,
-		const string& strAdvConnStrProperties);
+	// In the case that the specified connection information has path tags/functions to be expanded,
+	// the variable values are changed to represent the literal database upon completion of this
+	// call.
+	void OnDBConfigChanged(
+		string& rstrServer, string& rstrDatabase, string& rstrAdvConnStrProperties);
 
 protected:
 // Overrides
@@ -269,6 +272,10 @@ private:
 	// MRU List objects
 	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_upUserConfig;
 	std::unique_ptr<MRUList> m_upMRUList;
+
+	// Used to determine if <DatabaseServer> and <DatabaseName> environment specific path tags are
+	// available for use in m_propDatabasePage.
+	ITagUtilityPtr m_ipFAMTagUtility;
 
 	////////////
 	// Methods

@@ -12,10 +12,18 @@
 //--------------------------------------------------------------------------------------------------
 // Tag names
 //--------------------------------------------------------------------------------------------------
-const std::string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
-const std::string strFPS_FILE_DIR_TAG = "<FPSFileDir>";
-const std::string strFPS_FILENAME_TAG = "<FPSFileName>";
-const std::string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
+const string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
+const string strFPS_FILE_DIR_TAG = "<FPSFileDir>";
+const string strFPS_FILENAME_TAG = "<FPSFileName>";
+const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
+
+//--------------------------------------------------------------------------------------------------
+// Statics
+//--------------------------------------------------------------------------------------------------
+string CFAMTagManager::ms_strFPSDir;
+string CFAMTagManager::ms_strFPSFileName;
+CMutex CFAMTagManager::ms_mutex;
+IEnvironmentTagProviderPtr CFAMTagManager::ms_ipEnvironmentTagProvider;
 
 //--------------------------------------------------------------------------------------------------
 // CFAMTagManager
@@ -24,6 +32,15 @@ CFAMTagManager::CFAMTagManager()
 : m_ipMiscUtils(CLSID_MiscUtils)
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI35226", m_ipMiscUtils != __nullptr);
+
+	// ms_ipEnvironmentTagProvider is not created until the first instance of FAMTagManager is
+	// created.
+	CSingleLock lock(&ms_mutex, TRUE);
+	if (ms_ipEnvironmentTagProvider == __nullptr)
+	{
+		ms_ipEnvironmentTagProvider.CreateInstance("Extract.Database.EnvironmentTagProvider");
+		ASSERT_RESOURCE_ALLOCATION("ELI37903", ms_ipEnvironmentTagProvider != __nullptr);
+	}
 }
 //--------------------------------------------------------------------------------------------------
 CFAMTagManager::~CFAMTagManager()
@@ -67,7 +84,8 @@ STDMETHODIMP CFAMTagManager::get_FPSFileDir(BSTR *strFPSDir)
 
 		ASSERT_ARGUMENT("ELI24981", strFPSDir != __nullptr);
 
-		*strFPSDir = _bstr_t(m_strFPSDir.c_str()).Detach();
+		CSingleLock lock(&ms_mutex, TRUE);
+		*strFPSDir = _bstr_t(ms_strFPSDir.c_str()).Detach();
 
 		return S_OK;		
 	}
@@ -81,7 +99,10 @@ STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
 		// Check license
 		validateLicense();
 
-		m_strFPSDir = asString(strFPSDir);
+		CSingleLock lock(&ms_mutex, TRUE);
+		ms_strFPSDir = asString(strFPSDir);
+
+		ms_ipEnvironmentTagProvider->ContextPath = ms_strFPSDir.c_str();
 
 		return S_OK;
 	}
@@ -97,7 +118,8 @@ STDMETHODIMP CFAMTagManager::get_FPSFileName(BSTR *strFPSFileName)
 
 		ASSERT_ARGUMENT("ELI36124", strFPSFileName != __nullptr);
 
-		*strFPSFileName = _bstr_t(m_strFPSFileName.c_str()).Detach();
+		CSingleLock lock(&ms_mutex, TRUE);
+		*strFPSFileName = _bstr_t(ms_strFPSFileName.c_str()).Detach();
 
 		return S_OK;		
 	}
@@ -111,8 +133,11 @@ STDMETHODIMP CFAMTagManager::put_FPSFileName(BSTR strFPSFileName)
 		// Check license
 		validateLicense();
 
-		m_strFPSFileName = asString(strFPSFileName);
+		CSingleLock lock(&ms_mutex, TRUE);
+		ms_strFPSFileName = asString(strFPSFileName);
 
+		string strPath = getDirectoryFromFullPath(ms_strFPSFileName);
+	
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36126");
@@ -130,8 +155,8 @@ STDMETHODIMP CFAMTagManager::raw_ExpandTags(BSTR bstrInput, BSTR bstrSourceDocNa
 
 		// The code is used to expand tags, currently it supports <SourceDocName> 
 		// and <FPSFile>
-		std::string strInput = asString(bstrInput);
-		std::string strSourceDocName = asString(bstrSourceDocName);
+		string strInput = asString(bstrInput);
+		string strSourceDocName = asString(bstrSourceDocName);
 
 		expandTags(strInput, strSourceDocName);
 
@@ -153,8 +178,8 @@ STDMETHODIMP CFAMTagManager::ExpandTags(BSTR bstrInput, BSTR bstrSourceName, BST
 
 		// The code is used to expand tags, currently it support <SourceDocName> 
 		// and <FPSFile>
-		std::string strInput = asString(bstrInput);
-		std::string strSourceDocName = asString(bstrSourceName);
+		string strInput = asString(bstrInput);
+		string strSourceDocName = asString(bstrSourceName);
 
 		expandTags(strInput, strSourceDocName);
 
@@ -222,8 +247,8 @@ STDMETHODIMP CFAMTagManager::raw_GetBuiltInTags(IVariantVector* *ppTags)
 		IVariantVectorPtr ipVec(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI14396", ipVec != __nullptr);
 
-		// Push the current tags into vector, currrently we
-		// only have <SourceDocName>, <FPSFileDir> <FPSFileName> and <CommonComponentsDir>
+		// Push the current tags into vector. Currently:
+		// <SourceDocName>, <FPSFileDir> <FPSFileName> and <CommonComponentsDir>
 		ipVec->PushBack(get_bstr_t(strSOURCE_DOC_NAME_TAG));
 		ipVec->PushBack(get_bstr_t(strFPS_FILE_DIR_TAG));
 		ipVec->PushBack(get_bstr_t(strFPS_FILENAME_TAG));
@@ -236,7 +261,7 @@ STDMETHODIMP CFAMTagManager::raw_GetBuiltInTags(IVariantVector* *ppTags)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14390");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::raw_GetINIFileTags(IVariantVector* *ppTags)
+STDMETHODIMP CFAMTagManager::raw_GetCustomFileTags(IVariantVector* *ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -248,9 +273,11 @@ STDMETHODIMP CFAMTagManager::raw_GetINIFileTags(IVariantVector* *ppTags)
 		IVariantVectorPtr ipVec(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI19432", ipVec != __nullptr);
 
-		// Currently we do not have any INI file tags
+		CSingleLock lock(&ms_mutex, TRUE);
+		IVariantVectorPtr ipTagNames = ms_ipEnvironmentTagProvider->GetTagNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI37904", ipTagNames != __nullptr);
 
-		*ppTags = ipVec.Detach();	
+		*ppTags = ipTagNames.Detach();	
 	
 		return S_OK;
 	}
@@ -269,9 +296,9 @@ STDMETHODIMP CFAMTagManager::raw_GetAllTags(IVariantVector* *ppTags)
 		ITagUtilityPtr ipThis(this);
 		ASSERT_RESOURCE_ALLOCATION("ELI14397", ipThis != __nullptr);
 
-		// Call GetBuiltInTags() and GetINIFileTags()
+		// Call GetBuiltInTags() and GetCustomFileTags()
 		IVariantVectorPtr ipVec1 = ipThis->GetBuiltInTags();
-		IVariantVectorPtr ipVec2 = ipThis->GetINIFileTags();
+		IVariantVectorPtr ipVec2 = ipThis->GetCustomFileTags();
 		// Build a vector of all tags
 		ipVec1->Append(ipVec2);
 
@@ -461,6 +488,25 @@ void CFAMTagManager::getTagNames(const string& strInput,
 //-------------------------------------------------------------------------------------------------
 void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocName)
 {
+	// As long as ms_strFPSDir is specified, apply any defined environment-specific path tags.
+	// Expand these before the built-in tags so that built-in tags can be used within custom
+	// environment tags.
+	CSingleLock lock(&ms_mutex, TRUE);
+	if (!ms_strFPSDir.empty())
+	{
+		IVariantVectorPtr ipTagNames = ms_ipEnvironmentTagProvider->GetTagNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI37905", ipTagNames != __nullptr);
+
+		long nCount = ipTagNames->Size;
+		for (long i = 0; i < nCount; i++)
+		{
+			string strName = asString(ipTagNames->Item[i].bstrVal);
+			string strValue = ms_ipEnvironmentTagProvider->GetTagValue(ipTagNames->Item[i].bstrVal);
+
+			replaceVariable(rstrInput, strName, strValue);
+		}
+	}
+
 	bool bSourceDocNameTagFound = rstrInput.find(strSOURCE_DOC_NAME_TAG) != string::npos;
 	bool bFPSFileDirTagFound = rstrInput.find(strFPS_FILE_DIR_TAG) != string::npos;
 	bool bFPSFileNameTagFound = rstrInput.find(strFPS_FILENAME_TAG) != string::npos;
@@ -485,7 +531,8 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 
 	if (bFPSFileDirTagFound)
 	{
-		if (m_strFPSDir == "")
+		CSingleLock lock(&ms_mutex, TRUE);
+		if (ms_strFPSDir == "")
 		{
 			string strMsg = "There is no FPS file directory available to expand the ";
 			strMsg += strFPS_FILE_DIR_TAG;
@@ -494,12 +541,13 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 			ue.addDebugInfo("strInput", rstrInput);
 			throw ue;
 		}
-		replaceVariable(rstrInput, strFPS_FILE_DIR_TAG, m_strFPSDir);
+		replaceVariable(rstrInput, strFPS_FILE_DIR_TAG, ms_strFPSDir);
 	}
 
 	if (bFPSFileNameTagFound)
 	{
-		if (m_strFPSFileName == "")
+		CSingleLock lock(&ms_mutex, TRUE);
+		if (ms_strFPSFileName == "")
 		{
 			string strMsg = "There is no FPS filename available to expand the ";
 			strMsg += strFPS_FILENAME_TAG;
@@ -508,7 +556,7 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 			ue.addDebugInfo("strInput", rstrInput);
 			throw ue;
 		}
-		replaceVariable(rstrInput, strFPS_FILENAME_TAG, m_strFPSFileName);
+		replaceVariable(rstrInput, strFPS_FILENAME_TAG, ms_strFPSFileName);
 	}
 
 	if (bCommonComponentsDirFound)

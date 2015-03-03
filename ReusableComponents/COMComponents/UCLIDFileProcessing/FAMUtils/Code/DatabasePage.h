@@ -2,6 +2,7 @@
 
 #include "FAMUtils.h"
 #include "FileProcessingConfigMgr.h"
+#include "StdAfx.h"
 
 #include <RegistryPersistenceMgr.h>
 
@@ -21,10 +22,13 @@ class IDBConfigNotifications
 public:
 	// PURPOSE: To allow the class that uses the Database page to be notified when
 	//			a new server and database have been selected.  
+	//			In the case that the specified connection information has path tags/functions to be
+	//			expanded, the variable values are changed to represent the literal database upon
+	//			completion of this call.
 	// NOTE:	When implementing this method the setDBConnectionStatus should be called 
 	//			to update the DB status field on the database page
-	virtual void OnDBConfigChanged(const string& strServer, const string& strDatabase,
-		const string& strAdvConnStrProperties) = 0;
+	virtual void OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
+		string& rstrAdvConnStrProperties) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -46,7 +50,7 @@ public:
 	//			Notify object.
 	void setDBConnectionStatus(const string& strStatusString);
 
-	// PROMISE: Set the name SQL server, DBName and any advanced connetion string properties to use.
+	// PROMISE: Set the name SQL server, DBName and any advanced connection string properties to use.
 	//			If the bNotifyObjects flag is true and an object has been set with 
 	//			setNotifyDBConfigChanged then the OnDBConfigChanged method will be called
 	void setConnectionInfo(const string& strSQLServer, const string& strDBName,
@@ -60,6 +64,12 @@ public:
 
 	// PROMISE: To set the m_bBrowseEnabled flag
 	void setBrowseEnabled(bool bBrowseEnabled);
+
+	// Specifies whether gstrDATABASE_SERVER_TAG should be show in the server selection dropdown.
+	void showDBServerTag(bool bShowDBServerTag);
+
+	// Specifies whether gstrDATABASE_NAME_TAG should be show in the server name dropdown.
+	void showDBNameTag(bool bShowDBNameTag);
 
 	// PROMISE: To enable or disable the LastUsedDBButton based on whether
 	//			there is a last db and server setting in the registry or not
@@ -89,6 +99,12 @@ private:
 	CString m_zDBName;
 	CString m_zAdvConnStrProperties;
 
+	// Represents the literal variables for the current DB connection. This may differ from the
+	// above control values if the values above have path tag/functions that were evaluated.
+	string m_strCurrServer;
+	string m_strCurrDBName;
+	string m_strCurrAdvConnStrProperties;
+
 	// Control Variables
 	CButton m_btnBrowseDB;
 	CButton m_btnSqlServerBrowse;
@@ -110,6 +126,12 @@ private:
 	// If this is false the buttons will be disabled.
 	// The default value is true
 	bool m_bBrowseEnabled;
+
+	// Whether gstrDATABASE_SERVER_TAG should be shown in the server selection dropdown.
+	bool m_bShowDBServerTag;
+
+	// Whether gstrDATABASE_NAME_TAG should be shown in the DB name dropdown.
+	bool m_bShowDBNameTag;
 
 	// Registry Persistence managers
 	unique_ptr<FileProcessingConfigMgr> ma_pCfgMgr;

@@ -17,10 +17,18 @@ public:
 	// This constructor causes object to use database names in combo box
 	CDialogSelect(const string& strServer, CWnd*pParent = NULL);
 	
-	// This constructor causes object to use Server names in combo boxl
+	// This constructor causes object to use Server names in combo box
 	CDialogSelect(CWnd* pParent = NULL);   // standard constructor
 	
 	virtual ~CDialogSelect();
+
+	// Specifies whether gstrDATABASE_SERVER_TAG should be show in the dropdown when the combo is
+	// of type kServerName.
+	void showDBServerTag(bool bShowDBServerTag);
+
+	// Indicates whether gstrDATABASE_NAME_TAG should be show in the dropdown when the combo is
+	// of type kDatabaseName.
+	void showDBNameTag(bool bShowDBNameTag);
 
 // Dialog Data
 	enum { IDD = IDD_DIALOG_SELECT };
@@ -42,6 +50,14 @@ private:
 
 	// This holds the server to find the db names
 	string m_strServer;
+
+	// Whether gstrDATABASE_SERVER_TAG should be show in the dropdown when the combo is of type
+	// kServerName.
+	bool m_bShowDBServerTag;
+
+	// Whether gstrDATABASE_SERVER_TAG should be show in the dropdown when the combo is of type
+	// kServerName.
+	bool m_bShowDBNameTag;
 
 public:
 	// Control value

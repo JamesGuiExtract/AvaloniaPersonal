@@ -1303,10 +1303,10 @@ library UCLID_COMUTILSLib
 		// PROMISE: If there are no built-in tags an empty vector (not NULL) will be returned
 		[id(3), helpstring("method GetBuiltInTags")] HRESULT GetBuiltInTags([out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To return a list of all the tags 
+		// PURPOSE: To return a list of custom tags 
 		// REQUIRE: NONE
-		// PROMISE: If there are no built-in tags an empty vector (not NULL) will be returned
-		[id(4), helpstring("method GetINIFileTags")] HRESULT GetINIFileTags([out, retval] IVariantVector** ppTags);
+		// PROMISE: If there are no custom tags an empty vector (not NULL) will be returned
+		[id(4), helpstring("method GetCustomFileTags")] HRESULT GetCustomFileTags([out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
 		[id(5), helpstring("method GetAllTags")] HRESULT GetAllTags([out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
@@ -1316,6 +1316,33 @@ library UCLID_COMUTILSLib
 		[id(7), helpstring("method GetFormattedFunctionNames")] HRESULT GetFormattedFunctionNames(
 			[out, retval] IVariantVector** ppFunctionNames);
 	}	
+
+	[
+		object,
+		uuid(CECE585E-CC98-49F0-9666-E9ECC88FD4C0),
+		dual,
+		helpstring("IEnvironmentTagProvider Interface"),
+		pointer_default(unique)
+	]
+	interface IEnvironmentTagProvider : IDispatch
+	{
+		// PURPOSE: To specify the path for which the environment tags apply (the directory where
+		//			the FPS files that will use these settings are).
+		[propput, id(1), helpstring("property ContextPath")] HRESULT ContextPath([in] BSTR newVal);
+		[propget, id(1), helpstring("property ContextPath")] HRESULT ContextPath([out, retval] BSTR *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Returns the face currently defining the tag values that will be returned by
+		//			GetTagValue.
+		[propget, id(2), helpstring("property ActiveFace")] HRESULT ActiveFace([out, retval] BSTR *pVal);
+		// PURPOSE: To return a list of all environment-specific tags available for use. These are
+		//			tags in addition to built-in tags that can have different values depending on
+		//			the current environment or "face". (i.e., "Test" vs. "Prod")
+		[id(3), helpstring("method GetTagNames")] HRESULT GetTagNames([out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To retrieve the value for the specified tag in the current environment.
+		[id(4), helpstring("method GetTagValue")] HRESULT GetTagValue(
+			[in] BSTR bstrTagName, [out, retval] BSTR* pbstrTagValue);
+	}
 
 	//---------------------------------------------------------------------------------------------
 	// IProgressStatus ----------------------------------------------------------------------------

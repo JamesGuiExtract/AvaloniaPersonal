@@ -53,6 +53,11 @@ DBInfoCombo::EDBInfoType DBInfoCombo::getDBInfoType()
 {
 	return m_eDBInfoType;
 }
+//-------------------------------------------------------------------------------------------------
+void DBInfoCombo::showSpecialValue(string strValue)
+{
+	m_setSpecialValues.insert(strValue);
+}
 
 //-------------------------------------------------------------------------------------------------
 // Message Map
@@ -163,6 +168,12 @@ void DBInfoCombo::OnCbnDropdown()
 			{
 				addLocalInstances();
 			}
+
+			for each (string strValue in m_setSpecialValues)
+			{
+				AddString(strValue.c_str());
+			}
+
 			// Add Browse string to list
 			AddString(gstrBROWSE_STRING.c_str());
 		}

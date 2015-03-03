@@ -445,10 +445,16 @@ library UCLID_FILEPROCESSINGLib
 		//[propget, id(44), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([out, retval] BSTR* pVal);		
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set and get the database server name
-		[propput, id(45), helpstring("property DatabaseServer")] HRESULT DatabaseServer([in] BSTR newVal);		
-		[propget, id(45), helpstring("property DatabaseServer")] HRESULT DatabaseServer([out, retval] BSTR* pVal);		
+		// NOTE:	The input value may be a path tag expression to be evaluated. However, the
+		//			return value will always be the literal server name (may be the evaluated result
+		//			of a path tag expression.
+		[propput, id(45), helpstring("property DatabaseServer")] HRESULT DatabaseServer([in] BSTR newVal);
+		[propget, id(45), helpstring("property DatabaseServer")] HRESULT DatabaseServer([out, retval] BSTR* pVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set and get the database name
+		// NOTE:	The input value may be a path tag expression to be evaluated. However, the
+		//			return value will always be the literal database name (may be the evaluated result
+		//			of a path tag expression).
 		[propput, id(46), helpstring("property DatabaseName")] HRESULT DatabaseName([in] BSTR newVal);		
 		[propget, id(46), helpstring("property DatabaseName")] HRESULT DatabaseName([out, retval] BSTR* pVal);		
 		//-----------------------------------------------------------------------------------------
@@ -506,8 +512,11 @@ library UCLID_FILEPROCESSINGLib
 		[id(55), helpstring("method AuthenticateService")] HRESULT AuthenticateService(
 			[in] BSTR bstrValue);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Gets and sets database connection string properties that should override or be used
-		// in additional to the default connection string properties.
+		// PURPOSE: Gets and sets database connection string properties that should override or be
+		// used in additional to the default connection string properties.
+		// NOTE:	The input value may be a path tag expression to be evaluated. However, the
+		//			return value will always be the literal connection string properties (may be the
+		//			evaluated result of a path tag expression).
 		[propput, id(56), helpstring("property AdvancedConnectionStringProperties")]
 			HRESULT AdvancedConnectionStringProperties([in] BSTR newVal);		
 		[propget, id(56), helpstring("property AdvancedConnectionStringProperties")]

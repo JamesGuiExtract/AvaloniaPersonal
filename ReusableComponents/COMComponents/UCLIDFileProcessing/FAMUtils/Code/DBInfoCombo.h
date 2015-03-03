@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 using namespace std;
 
@@ -25,6 +26,10 @@ public:
 
 	// Returns the EDBInfoType for the combo box
 	EDBInfoType getDBInfoType();
+	
+	// Allows a special value to be added to the options in the dropdown in addition to the items
+	// that would normally appear.
+	void showSpecialValue(string strValue);
 
 protected:
 	DECLARE_MESSAGE_MAP()
@@ -42,6 +47,9 @@ private:
 
 	// Stores whether current OS is >= Vista
 	bool m_bVistaOrLater;
+
+	// A set of all the special values to be displayed in the dropdown.
+	set<string> m_setSpecialValues;
 
 	// Gets a list of installed SQL instances from the registry and adds (local)\<instance> to
 	// the list box.  If the instance is named MSSQL

@@ -129,18 +129,18 @@ static const CString ChooseDocTag(const T &ipTagUtility, const U &btnTagButton, 
 			vecChoices.push_back(""); // Separator
 		}
 
-		// Add tags in specified ini file
-		IVariantVectorPtr ipVecIniTags = ipTagUtility->GetINIFileTags();
-		long lIniSize = ipVecIniTags->Size;
-		for (long i = 0; i < lIniSize; i++)
+		// Add any custom tags
+		IVariantVectorPtr ipVecCustomTags = ipTagUtility->GetCustomFileTags();
+		long lCustomTagCount = ipVecCustomTags->Size;
+		for (long i = 0; i < lCustomTagCount; i++)
 		{
-			_variant_t var = ipVecIniTags->Item[i];
+			_variant_t var = ipVecCustomTags->Item[i];
 			string str = asString(var.bstrVal);
 			vecChoices.push_back(str);
 		}
 
-		// Add a separator if there is at least one tas from INI file
-		if (lIniSize > 0)
+		// Add a separator if there is at least one custom tag
+		if (lCustomTagCount > 0)
 		{
 			vecChoices.push_back(""); // Separator
 		}

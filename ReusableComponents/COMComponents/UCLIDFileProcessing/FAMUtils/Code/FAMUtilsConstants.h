@@ -84,3 +84,7 @@ static const string gstrQUERY_FILES_WITH_TAGS = "SELECT <SelectFileValues> FROM 
 static const string gstrMAIN_DB_LOCK = "Main";
 static const string gstrUSER_COUNTER_DB_LOCK = "UserCounter";
 static const string gstrWORKITEM_DB_LOCK = "WorkItem";
+
+// Special-purpose FAM tag names
+const string gstrDATABASE_SERVER_TAG = "<DatabaseServer>";
+const string gstrDATABASE_NAME_TAG = "<DatabaseName>";
