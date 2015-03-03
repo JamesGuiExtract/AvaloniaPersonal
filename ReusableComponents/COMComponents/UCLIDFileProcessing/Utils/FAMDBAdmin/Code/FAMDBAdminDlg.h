@@ -65,8 +65,11 @@ protected:
 
 	//INotifyDBConfigChanged
 public:
-	virtual void OnDBConfigChanged(const string& strServer, const string& strDatabase,
-		const string& strAdvConnStrProperties);
+	// In the case that the specified connection information has path tags/functions to be expanded,
+	// the variable values are changed to represent the literal database upon completion of this
+	// call.
+	virtual void OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
+		string& rstrAdvConnStrProperties);
 
 	// Method called to cause the summary tab to refresh its data
 	// If nActionID is -1, all actions are refreshed. Otherwise, only the action with the specified

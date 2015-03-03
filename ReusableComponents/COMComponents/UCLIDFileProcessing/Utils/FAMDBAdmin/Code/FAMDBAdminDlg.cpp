@@ -163,7 +163,7 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 		// Set the BrowseEnabled flag to false so that the Server and Database are not selectable
 		m_propDatabasePage.setBrowseEnabled(false);
 
-		// Get the server and datatabase from the FAMDB
+		// Get the server and database from the FAMDB
 		string strServer = asString(m_ipFAMDB->DatabaseServer);
 		string strDatabase = asString(m_ipFAMDB->DatabaseName);
 		string strAdvConnStrProperties = asString(m_ipFAMDB->AdvancedConnectionStringProperties);
@@ -178,7 +178,7 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 		m_propDatabasePage.setConnectionInfo(strServer, strDatabase, strAdvConnStrProperties);
 
 		// If the DB is not connected and valid, if it is because the schema is out of date, prompt
-		// to updgrade now.
+		// to upgrade now.
 		if (!m_bIsDBGood)
 		{
 			string strCurDBStatus = asString(m_ipFAMDB->GetCurrentConnectionStatus());
@@ -446,8 +446,12 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 
 			if (m_bSchemaUpdateSucceeded)
 			{
-				OnDBConfigChanged(asString(m_ipFAMDB->DatabaseServer), asString(m_ipFAMDB->DatabaseName),
-					asString(m_ipFAMDB->AdvancedConnectionStringProperties));
+				string strServer = asString(m_ipFAMDB->DatabaseServer);
+				string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
+				string strAdvConnStringProperties =
+					asString(m_ipFAMDB->AdvancedConnectionStringProperties);
+
+				OnDBConfigChanged(strServer, strDatabaseName, strAdvConnStringProperties);
 
 				// Set the database status
 				setUIDatabaseStatus();
@@ -707,7 +711,7 @@ void CFAMDBAdminDlg::OnToolsFileActionManager()
 		strEXEPath += "\\";
 		strEXEPath += gstrFILE_ACTION_MANAGER_FILENAME;
 
-		// Set the the parameters to load the server and database in the FAM
+		// Set the parameters to load the server and database in the FAM
 		// Add quotes around the database name [LegacyRC #5124]
 		string strParameters = "/sd " + asString(m_ipFAMDB->DatabaseServer) + 
 			" \"" + asString(m_ipFAMDB->DatabaseName) + "\"";
@@ -886,8 +890,8 @@ void CFAMDBAdminDlg::UpdateSummaryTab(long nActionID /*= -1*/)
 //-------------------------------------------------------------------------------------------------
 //INotifyDBConfigChanged
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnDBConfigChanged(const std::string& strServer, const std::string& strDatabase,
-	const std::string& strAdvConnStrProperties)
+void CFAMDBAdminDlg::OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
+	string& rstrAdvConnStrProperties)
 {
 	// Must set flags if this fails but will still want the exception info
 	try
@@ -902,11 +906,16 @@ void CFAMDBAdminDlg::OnDBConfigChanged(const std::string& strServer, const std::
 		m_bDBSchemaIsNotCurrent = false;
 
 		// Set the server and database
-		m_ipFAMDB->DatabaseServer = strServer.c_str();
-		m_ipFAMDB->DatabaseName = strDatabase.c_str();
+		m_ipFAMDB->DatabaseServer = rstrServer.c_str();
+		m_ipFAMDB->DatabaseName = rstrDatabase.c_str();
 
 		// Attempt to connect with the new settings
 		m_ipFAMDB->ResetDBConnection(VARIANT_FALSE);
+
+		// In case path tags were expanded, return the literal database connection properties we
+		// actually connected to.
+		rstrServer = asString(m_ipFAMDB->DatabaseServer);
+		rstrDatabase = asString(m_ipFAMDB->DatabaseName);
 
 		// Set the connection is good to true
 		m_bIsDBGood = true;
@@ -978,7 +987,7 @@ void CFAMDBAdminDlg::enableMenus()
 //-------------------------------------------------------------------------------------------------
 bool CFAMDBAdminDlg::notifyNoActions()
 {
-	// Check if there is no action inside the datebase;
+	// Check if there is no action inside the database;
 	IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
 	ASSERT_RESOURCE_ALLOCATION("ELI15255", ipMapActions != __nullptr );
 
@@ -1049,7 +1058,7 @@ ICategorizedComponentPtr CFAMDBAdminDlg::getCategorizedComponent(const std::stri
 		{
 			setFailedIDs.insert(strProgID);
 
-			// Provide datails about the plug-in object we failed to instantiate
+			// Provide details about the plug-in object we failed to instantiate
 			UCLIDException uexOuter("ELI18150", "Invalid component!", ue);
 			uexOuter.addDebugInfo("ProgID", strProgID);
 
@@ -1071,7 +1080,7 @@ void CFAMDBAdminDlg::setUIDatabaseStatus()
 	}
 	catch(...)
 	{
-		// Dont need to do anything
+		// Don't need to do anything
 	}
 
 	// Set the status default status
