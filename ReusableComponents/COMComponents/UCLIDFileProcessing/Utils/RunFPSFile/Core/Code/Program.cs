@@ -79,6 +79,26 @@ namespace Extract.FileActionManager.RunFPSFile
         /// </summary>
         static string _logFileName;
 
+        /// <summary>
+        /// Pointer to the currently processing management role
+        /// </summary>
+        static FileProcessingMgmtRole _fileProcessingManagementRole;
+
+        /// <summary>
+        /// Pointer to the file record for the processing file
+        /// </summary>
+        static FileRecord _fileRecord;
+
+        /// <summary>
+        /// Pointer to the current tag manager
+        /// </summary>
+        static FAMTagManager _tagManager;
+
+        /// <summary>
+        /// Pointer to the current tag executor;
+        /// </summary>
+        static FileProcessingTaskExecutor _taskExecutor;
+
         #endregion Fields
 
         /// <summary>
@@ -128,25 +148,34 @@ namespace Extract.FileActionManager.RunFPSFile
                             try
                             {
                                 // Create a new copy of FileProcessingManagerClass on the processing
-                                // thead to do the processing;
+                                // thread to do the processing;
                                 var fileProcessingManager2 = new FileProcessingManagerClass();
                                 fileProcessingManager2.LoadFrom(_fpsFileName, false);
 
-                                FAMTagManagerClass tagManager = new FAMTagManagerClass();
-                                tagManager.FPSFileDir = Path.GetDirectoryName(_fpsFileName);
+                                _fileProcessingManagementRole = fileProcessingManager2.FileProcessingMgmtRole;
+
+                                _tagManager = new FAMTagManagerClass();
+                                _tagManager.FPSFileDir = Path.GetDirectoryName(_fpsFileName);
+                                _tagManager.FPSFileName = _fpsFileName;
 
                                 // Setup file record for call to InitProcessClose
-                                FileRecordClass fileRecord = new FileRecordClass();
-                                fileRecord.Name = _sourceDocName;
-                                fileRecord.FileID = 0;
+                                _fileRecord = new FileRecordClass();
+                                _fileRecord.Name = _sourceDocName;
+                                _fileRecord.FileID = 0;
 
                                 // Use a local task executor to directly execute the file processing
                                 // tasks.
-                                FileProcessingTaskExecutorClass taskExecutor =
-                                    new FileProcessingTaskExecutorClass();
-                                taskExecutor.InitProcessClose(fileRecord,
-                                    fileProcessingManager2.FileProcessingMgmtRole.FileProcessors, 0,
-                                    null, tagManager, null, null, false);
+                                _taskExecutor = new FileProcessingTaskExecutorClass();
+                                try
+                                {
+                                    _taskExecutor.InitProcessClose(_fileRecord, _fileProcessingManagementRole.FileProcessors, 
+                                        0, null, _tagManager, null, null, false);
+                                }
+                                catch (Exception taskEx)
+                                {
+                                    handleTaskExceptionNoDB(taskEx);
+                                    throw taskEx.AsExtract("ELI37891");
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -412,6 +441,115 @@ namespace Extract.FileActionManager.RunFPSFile
                 MessageBoxDefaultButton.Button1, 0);
         }
 
+        /// <summary>
+        /// Performs the options selected in the fps when a task throws and exception when running
+        /// RunFPSFile without a database.
+        /// </summary>
+        /// <remarks>The method is intended to be called from a catch block and logs all exceptions</remarks>
+        /// <param name="taskException">The exception that was thrown by the task execution</param>
+        private static void handleTaskExceptionNoDB(Exception taskException)
+        {
+            logErrorDetails(taskException);
+
+            sendErrorEmail(taskException);
+
+            executeErrorTask();
+        }
+
+        /// <summary>
+        /// Executes the error task if there it is selected in the fpmRole. Logs exceptions.
+        /// </summary>
+        private static void executeErrorTask()
+        {
+            try
+            {
+                // Execute error task if configured
+                if (_fileProcessingManagementRole.ExecuteErrorTask)
+                {
+                    // Push the error task into an IUnknownVector to pass to the TaskExecutor
+                    IUnknownVectorClass tasksToRun = new IUnknownVectorClass();
+                    tasksToRun.PushBack(_fileProcessingManagementRole.ErrorTask);
+
+                    // Execute the error task
+                    _taskExecutor.InitProcessClose(_fileRecord, tasksToRun, 0, null, _tagManager,
+                        null, null, false);
+                }
+            }
+            catch (Exception errorTaskEx)
+            {
+                errorTaskEx.ExtractLog("ELI37897");
+            }
+        }
+
+        /// <summary>
+        /// Sends an error email if it is selected in the _fpmRole. Logs exceptions.
+        /// </summary>
+        /// <remarks>Since this is expected to be ran with no database the SMTPSettings.config 
+        /// must exist in "C:\ProgramData\Extract Systems\EmailSettings". This file is created by
+        /// configuring the email settings using USBLicenseKeyManager</remarks>
+        /// <param name="taskException">The exception to be sent in the email.</param>
+        private static void sendErrorEmail(Exception taskException)
+        {
+            try
+            {
+                // Send error email if selected
+                if (_fileProcessingManagementRole.SendErrorEmail)
+                {
+                    // The ErrorEmailTask should be configured.
+                    var sendEmail = _fileProcessingManagementRole.ErrorEmailTask;
+                    ExtractException.Assert("ELI37910", "No ErrorEmailTask configured.", sendEmail != null);
+
+                    // Add the exception to the email
+                    sendEmail.StringizedException = taskException.AsExtract("ELI37894").AsStringizedByteStream();
+
+                    // Put the Email task in a IUnknownVector to pass to the TaskExcecutor
+                    ObjectWithDescription errorEmailTaskWrapper = new ObjectWithDescription();
+                    errorEmailTaskWrapper.Object = sendEmail;
+                    IUnknownVectorClass tasksToRun = new IUnknownVectorClass();
+                    tasksToRun.PushBack(errorEmailTaskWrapper);
+
+                    // Execute the Email error task.
+                    _taskExecutor.InitProcessClose(_fileRecord, tasksToRun, 0, null, _tagManager,
+                        null, null, false);
+                }
+            }
+            catch (Exception emailEx)
+            {
+                emailEx.ExtractLog("ELI37896");
+            }
+        }
+
+        /// <summary>
+        /// Logs the exception passed in if the _fpmRole has Log error details selected.
+        /// </summary>
+        /// <param name="taskException">The exception to be logged.</param>
+        private static void logErrorDetails(Exception taskException)
+        {
+            try
+            {
+                // If error details are to be logged log the details to the file specified in the
+                // fps configuration.
+                if (_fileProcessingManagementRole.LogErrorDetails)
+                {
+                    string logFileName = _tagManager.ExpandTagsAndFunctions(_fileProcessingManagementRole.ErrorLogName, _fileRecord.Name);
+                    if (Path.GetExtension(logFileName).ToLower() == ".uex")
+                    {
+                        taskException.ExtractLog("ELI37893", logFileName);
+                    }
+                    else
+                    {
+                        ExtractException logException =
+                            new ExtractException("ELI37911", "Error log file name must have uex extension.");
+                        throw logException;
+                    }
+                }
+            }
+            catch (Exception logEx)
+            {
+                logEx.ExtractLog("ELI37895");
+            }
+        }
+        
         #endregion Private Methods
     }
 }
