@@ -179,6 +179,33 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.VisibleChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
+        /// </param>
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnVisibleChanged(e);
+
+                // https://extract.atlassian.net/browse/ISSUE-12812
+                // If the visibility of this control is changed after document load, the viewable
+                // status of the attribute needs to be updated so that highlights and validation
+                // are applied correctly.
+                if (_attribute != null &&
+                    DataEntryControlHost != null && !DataEntryControlHost.ChangingData)
+                {
+                    AttributeStatusInfo.MarkAsViewable(_attribute, Visible);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37917");
+            }
+        }
+
         #endregion Overrides
 
         #region IDataEntryValidator Members
@@ -342,7 +369,7 @@ namespace Extract.DataEntry
         public event EventHandler<AttributesSelectedEventArgs> AttributesSelected;
 
         /// <summary>
-        /// Gets or sets the <see cref="DataEntryControlHost"/> to which this coopy button belongs
+        /// Gets or sets the <see cref="DataEntryControlHost"/> to which this copy button belongs
         /// </summary>
         /// <value>The <see cref="DataEntryControlHost"/> to which this copy button belongs.</value>
         [Browsable(false)]

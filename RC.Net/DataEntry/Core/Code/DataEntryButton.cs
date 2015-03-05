@@ -42,7 +42,7 @@ namespace Extract.DataEntry
         string _attributeName;
 
         /// <summary>
-        /// Indicates whether the button was explicity assigned an attribute name. Otherwise, a
+        /// Indicates whether the button was explicitly assigned an attribute name. Otherwise, a
         /// placeholder name will be assigned.
         /// </summary>
         bool? _hasSpecifiedAttributeName;
@@ -199,10 +199,10 @@ namespace Extract.DataEntry
         /// If not specified, a placeholder name will be assigned and PersistAttribute will be
         /// assumed to be false.
         /// </summary>
-        /// <value>Sets the name indentifying the <see cref="IAttribute"/> to be associated with 
+        /// <value>Sets the name identifying the <see cref="IAttribute"/> to be associated with 
         /// the <see cref="DataEntryButton"/>.
         /// </value>
-        /// <returns>The name indentifying the <see cref="IAttribute"/> to be associated with the 
+        /// <returns>The name identifying the <see cref="IAttribute"/> to be associated with the 
         /// <see cref="DataEntryButton"/>.</returns>
         [Category("Data Entry Button")]
         public string AttributeName
@@ -452,7 +452,7 @@ namespace Extract.DataEntry
                             if (value)
                             {
                                 // When flashing the button's background color should alternate
-                                // between the previouly specified background color and one that
+                                // between the previously specified background color and one that
                                 // is lighter than the specified background color.
                                 _normalBackgroundColor = BackColor;
                                 _flashingBackgroundColor = (FlashColor == Color.Empty)
@@ -547,7 +547,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Fired to request that the and <see cref="IAttribute"/> or <see cref="IAttribute"/>(s) be
         /// propagated to any dependent controls.  This will be in response to an 
-        /// <see cref="IAttribute"/> having been modified (ie, via a swipe or loading a document). 
+        /// <see cref="IAttribute"/> having been modified (i.e., via a swipe or loading a document). 
         /// The event will provide the updated <see cref="IAttribute"/>(s) to registered listeners.
         /// </summary>
         public event EventHandler<AttributesEventArgs> PropagateAttributes;
@@ -841,7 +841,7 @@ namespace Extract.DataEntry
                     // Don't update the value if the value hasn't actually changed. Doing so is not
                     // only in-efficient but it can cause un-intended side effects if an
                     // auto-complete list is active.
-                    // Also, only allow Text to be blanked out if the button has been explicity
+                    // Also, only allow Text to be blanked out if the button has been explicitly
                     // mapped to an attribute.
                     string newValue = (_attribute.Value != null) ? _attribute.Value.String : "";
                     if ((_hasSpecifiedAttributeName.Value || !string.IsNullOrWhiteSpace(newValue)) &&
@@ -1051,6 +1051,33 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.VisibleChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
+        /// </param>
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnVisibleChanged(e);
+
+                // https://extract.atlassian.net/browse/ISSUE-12812
+                // If the visibility of this control is changed after document load, the viewable
+                // status of the attribute needs to be updated so that highlights and validation
+                // are applied correctly.
+                if (_attribute != null &&
+                    DataEntryControlHost != null && !DataEntryControlHost.ChangingData)
+                {
+                    AttributeStatusInfo.MarkAsViewable(_attribute, Visible);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37915");
+            }
+        }
+
         /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
@@ -1156,7 +1183,7 @@ namespace Extract.DataEntry
         void OnAttributeChanged()
         {
             // Display the attribute text.
-            // Only allow Text to be blanked out if the button has been explicity mapped to an
+            // Only allow Text to be blanked out if the button has been explicitly mapped to an
             // attribute.
             if (_attribute != null && _attribute.Value != null &&
                 (_hasSpecifiedAttributeName.Value ||
@@ -1172,7 +1199,7 @@ namespace Extract.DataEntry
             // associated with this control has changed.
             OnAttributesSelected();
 
-            // Raise the PropagateAttributes event so that any descendents of this data controlc can
+            // Raise the PropagateAttributes event so that any descendants of this data control can
             // re-map themselves.
             OnPropagateAttributes();
         }

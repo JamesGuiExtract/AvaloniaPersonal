@@ -83,8 +83,8 @@ namespace Extract.DataEntry
         AllowWithWarnings = 1,
 
         /// <summary>
-        /// Allow data to be saved when  when data that does not conform to a
-        /// validation requirement is present, but prompt for each invalid field first.
+        /// Allow data to be saved when data that does not conform to a validation requirement is
+        /// present, but prompt for each invalid field first.
         /// </summary>
         PromptForEach = 2,
 
@@ -436,7 +436,7 @@ namespace Extract.DataEntry
         HashSet<Keys> _depressedKeys = new HashSet<Keys>();
 
         /// <summary>
-        /// Inidicates when a manual focus change is taking place (tab key was pressed or a
+        /// Indicates when a manual focus change is taking place (tab key was pressed or a
         /// highlight was selected in the image viewer).
         /// </summary>
         bool _manualFocusEvent;
@@ -661,7 +661,7 @@ namespace Extract.DataEntry
         bool _drawingHighlights;
 
         /// <summary>
-        /// Indicates whether the last navigation (selection change) that occured was done via the
+        /// Indicates whether the last navigation (selection change) that occurred was done via the
         /// tab key, and if so in which direction. <see langword="null"/> if the last navigation was
         /// not via the tab key, <see langword="true"/> if the last navigation was via tab
         /// (forward), <see langword="false"/> if the last navigation was shift + tab (backward).
@@ -758,7 +758,7 @@ namespace Extract.DataEntry
 
                 InitializeComponent();
 
-                // Initializing these members (particularily OcrManager) during design-time
+                // Initializing these members (particularly OcrManager) during design-time
                 // crashes Visual Studio.  These members aren't needed during design-time, so
                 // we can ignore them.
                 if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
@@ -1176,7 +1176,7 @@ namespace Extract.DataEntry
         /// If <see langword="true"/>, the <see cref="UpdateEnded"/> event can be used to be
         /// notified when the update is complete.
         /// </summary>
-        /// <returns><see langword="true"/> if a signficant update of control values is in progress,
+        /// <returns><see langword="true"/> if a significant update of control values is in progress,
         /// <see langword="false"/> otherwise.</returns>
         public bool UpdateInProgress
         {
@@ -1237,6 +1237,21 @@ namespace Extract.DataEntry
                 {
                     throw ex.AsExtract("ELI34068");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value used to indicate that the current document data is changing (either being
+        /// loaded or cleared).
+        /// </summary>
+        /// <value><see langword="true"/> if the loaded data is changing; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool ChangingData
+        {
+            get
+            {
+                return _changingData;
             }
         }
 
@@ -1329,7 +1344,7 @@ namespace Extract.DataEntry
                 }
 
                 // [DataEntry:1034]
-                // Ensure no user input is handled while in the process of undo-ing an operation.
+                // Ensure no user input is handled while in the process of undoing an operation.
                 if (InUndo || InRedo)
                 {
                     if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp ||
@@ -1981,7 +1996,7 @@ namespace Extract.DataEntry
                             AttributeStatusInfo.UndoManager.AddMemento(
                                 new DataEntryModifiedAttributeMemento(attribute));
 
-                            // Accepting spatial info will not trigger an EndEdit call to seperate this
+                            // Accepting spatial info will not trigger an EndEdit call to separate this
                             // as an independent operation but it should considered one.
                             AttributeStatusInfo.UndoManager.StartNewOperation();
 
@@ -2543,7 +2558,7 @@ namespace Extract.DataEntry
         public event EventHandler<MessageHandledEventArgs> MessageHandled;
 
         /// <summary>
-        /// Indicates that a siginficant update of control values has ended. Examples include
+        /// Indicates that a significant update of control values has ended. Examples include
         /// loading a new document or selecting/creating a new table row on a table with dependent
         /// controls.
         /// </summary>
@@ -2834,7 +2849,7 @@ namespace Extract.DataEntry
                     AttributeStatusInfo.UndoManager.AddMemento(activeControlMemento);
                 }
 
-                // Schedule the focus change to be handled via the message que. This prevents
+                // Schedule the focus change to be handled via the message queue. This prevents
                 // situations where focus can be called from within the GotFocus handler as warned
                 // against here:
                 // http://msdn.microsoft.com/en-us/library/system.windows.forms.control.enter.aspx
@@ -2848,7 +2863,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles a <see cref="IDataEntryControl"/> gaining focus, invoked via the message que.
+        /// Handles a <see cref="IDataEntryControl"/> gaining focus, invoked via the message queue.
         /// </summary>
         /// <param name="newActiveDataControl">The <see cref="IDataEntryControl"/> that is gaining
         /// focus.</param>
@@ -2871,7 +2886,7 @@ namespace Extract.DataEntry
                 Control lastActiveDataControl = (Control)_activeDataControl;
 
                 // If a manual focus event is in progress, don't treat this as a regaining focus
-                // event. The sender is the control programatically given focus.
+                // event. The sender is the control programmatically given focus.
                 if (_manualFocusEvent)
                 {
                     _regainingFocus = false;
@@ -3088,7 +3103,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case that a <see cref="IDataEntryControl"/> has fininshed processing an
+        /// Handles the case that a <see cref="IDataEntryControl"/> has finished processing an
         /// update based on user interaction with that control.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
@@ -3124,7 +3139,7 @@ namespace Extract.DataEntry
             {
                 if (InUndo || InRedo)
                 {
-                    // None of the below code needs to execute when undo-ing or re-doing attribute
+                    // None of the below code needs to execute when undoing or re-doing attribute
                     // values.
                     return;
                 }
@@ -3345,7 +3360,7 @@ namespace Extract.DataEntry
                                 spatialPageInfo.Initialize(_imageViewer.ImageWidth, _imageViewer.ImageHeight, 0, 0);
                                 spatialPageInfos.Set(_imageViewer.PageNumber, spatialPageInfo);
 
-                                // Create the hyrid result using the spatial data from the swipe
+                                // Create the hybrid result using the spatial data from the swipe
                                 // with the text from the OCR attempt.
                                 var hybridOcrText = new SpatialString();
                                 hybridOcrText.CreateHybridString(
@@ -3358,7 +3373,7 @@ namespace Extract.DataEntry
                             }
                             else
                             {
-                                // If no OCR results were produced, notifiy the user.
+                                // If no OCR results were produced, notify the user.
                                 if (ocrText == null || string.IsNullOrEmpty(ocrText.String))
                                 {
                                     ShowUserNotificationTooltip("No text was recognized.");
@@ -3726,7 +3741,7 @@ namespace Extract.DataEntry
 
                     if (highlight != null)
                     {
-                        // If the layer object the selection tool just left was a highight for the
+                        // If the layer object the selection tool just left was a highlight for the
                         // current hover attribute, clear the hover attribute.
                         IAttribute attribute;
                         if (_highlightAttributes.TryGetValue(highlight, out attribute) &&
@@ -4035,7 +4050,7 @@ namespace Extract.DataEntry
         /// <param name="attribute">The <see cref="IAttribute"/> whose highlight 
         /// <see cref="RasterZone"/>s will be returned.</param>
         /// <param name="includeSubAttributes"><see langword="true"/> if raster zones from all
-        /// descendents of the specified <see cref="IAttribute"/> should be included;
+        /// descendants of the specified <see cref="IAttribute"/> should be included;
         /// <see langword="false"/> if they should not.</param>
         /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attribute"/> grouped by
         /// page.</returns>
@@ -4053,7 +4068,7 @@ namespace Extract.DataEntry
         /// <param name="attributes">The <see cref="IAttribute"/>s whose highlight
         /// <see cref="RasterZone"/>s will be returned.</param>
         /// <param name="includeSubAttributes"><see langword="true"/> if raster zones from all
-        /// descendents of the specified <see cref="IAttribute"/>s should be included;
+        /// descendants of the specified <see cref="IAttribute"/>s should be included;
         /// <see langword="false"/> if they should not.</param>
         /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attributes"/>' highlights
         /// grouped by page.</returns>
@@ -4360,7 +4375,7 @@ namespace Extract.DataEntry
                 {
                     if (_controlUpdateReferenceCount != value)
                     {
-                        // Within a control update, don't allow changes to be grouped into seperate
+                        // Within a control update, don't allow changes to be grouped into separate
                         // operations. Everything up until _controlUpdateReferenceCount == 0 should
                         // be considered a single operation.
                         if (_controlUpdateReferenceCount == 0 && value > 0)
@@ -4639,7 +4654,7 @@ namespace Extract.DataEntry
                         // If the next tab stop attribute represents an attribute group and that
                         // group contains the currently active attribute and is a tab stop on its
                         // own, don't select the group, rather first select the attribute
-                        // indepently (set selectGroup = false).
+                        // independently (set selectGroup = false).
                         if (activeAttribute != null)
                         {
                             IAttribute nextTabStopAttribute = null;
@@ -4853,7 +4868,7 @@ namespace Extract.DataEntry
         {
             // To avoid unnecessary drawing, wait until we are done loading a document or a
             // control is done with an update before attempting to display any layer objects.
-            // Also, ensure against resursive calls.
+            // Also, ensure against recursive calls.
             if (_changingData || _drawingHighlights || ControlUpdateReferenceCount > 0)
             {
                 return;
@@ -5485,7 +5500,7 @@ namespace Extract.DataEntry
 
             // Loop through each attribute in the chain, but only call PropagateAttribute for the
             // last (deepest) attribute mapped to a particular control.  This is to prevent an 
-            // ealier (ancestor) attribute from being marked as viewed.
+            // earlier (ancestor) attribute from being marked as viewed.
             while (attributes.Count > 0)
             {
                 // Get the next attribute off the stack and obtain its owning control.
@@ -5662,7 +5677,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Retrieves the geneaolgy of the supplied <see cref="IAttribute"/>.
+        /// Retrieves the genealogy of the supplied <see cref="IAttribute"/>.
         /// <para><b>Requirements:</b></para>
         /// The supplied <see cref="IAttribute"/> must have been added as a key to the 
         /// _attributeToParentMap dictionary.
@@ -5670,7 +5685,7 @@ namespace Extract.DataEntry
         /// <param name="attribute">The <see cref="IAttribute"/> whose genealogy is requested.
         /// </param>
         /// <returns>A genealogy of <see cref="IAttribute"/>s with each attribute further down the
-        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack; the
+        /// the stack being a descendant to the previous <see cref="IAttribute"/> in the stack; the
         /// last entry being the specified <see cref="IAttribute"/>.</returns>
         static Stack<IAttribute> GetAttributeGenealogy(IAttribute attribute)
         {
@@ -5802,7 +5817,7 @@ namespace Extract.DataEntry
                                                 (int)((uint)m.LParam & 0xFFFF0000) >> 16);
                 mousePosition = clickedControl.PointToScreen(mousePosition);
 
-                // If the click occured within the control host, if it didn't occur on a data entry
+                // If the click occurred within the control host, if it didn't occur on a data entry
                 // control, make sure that focus will remain on the currently active data entry 
                 // control.
                 if (clickedControl == this || Contains(clickedControl))
@@ -5810,7 +5825,7 @@ namespace Extract.DataEntry
                     clickedDataEntryControl = _activeDataControl;
                 }
 
-                // Loop down through all the control's descendents at the mouse position to try to
+                // Loop down through all the control's descendants at the mouse position to try to
                 // find a data entry control at the click location. 
                 while (clickedControl != null)
                 {
@@ -5939,9 +5954,9 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Counts the number of unviewed items in the current <see cref="IAttribute"/> heirarchy.
+        /// Counts the number of unviewed items in the current <see cref="IAttribute"/> hierarchy.
         /// </summary>
-        /// <returns>The number of unviewed items in the current <see cref="IAttribute"/> heirarchy.
+        /// <returns>The number of unviewed items in the current <see cref="IAttribute"/> hierarchy.
         /// </returns>
         int CountUnviewedItems()
         {
@@ -5989,9 +6004,9 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Counts the number of invalid items in the current <see cref="IAttribute"/> heirarchy.
+        /// Counts the number of invalid items in the current <see cref="IAttribute"/> hierarchy.
         /// </summary>
-        /// <returns>The number of invalid items in the current <see cref="IAttribute"/> heirarchy.
+        /// <returns>The number of invalid items in the current <see cref="IAttribute"/> hierarchy.
         /// </returns>
         int CountInvalidItems()
         {
@@ -6067,7 +6082,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Returns a list of all <see cref="RasterZone"/>s associated with the 
-        /// provided set of <see cref="IAttribute"/>s (including all descendents of the supplied 
+        /// provided set of <see cref="IAttribute"/>s (including all descendants of the supplied 
         /// <see cref="IAttribute"/>s if needed).
         /// </summary>
         /// <param name="attributes">The set of <see cref="IAttribute"/>s whose raster zones are 
@@ -6117,7 +6132,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Ensures the existance of one or more CompositeHighlightLayerObjects (one per page) for
+        /// Ensures the existence of one or more CompositeHighlightLayerObjects (one per page) for
         /// the specified attribute (creating one if necessary). Hints will be updated while actual
         /// highlights based on the data itself will be re-used as is.
         /// </summary>
@@ -6133,7 +6148,7 @@ namespace Extract.DataEntry
             // [DataEntry:1153]
             // There is at least one situation in which Undo can cause a table cell's mapped
             // attribute (which has already been deleted) to be selected. Make sure a highlight is
-            // never added for a deleted (or uninitizalized) attribute.
+            // never added for a deleted (or uninitialized) attribute.
             var statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
             if (!statusInfo.IsInitialized)
             {
@@ -6192,11 +6207,11 @@ namespace Extract.DataEntry
         /// <see paremref="attribute"/>.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which the highlight is needed.</param>
-        /// <param name="makeVisible"><see langword="true"/> if the hightlight should be immediately
+        /// <param name="makeVisible"><see langword="true"/> if the highlight should be immediately
         /// visible, otherwise <see langword="false"/>.</param>
-        /// <param name="isHint"><see langword="true"/> if the hightlight should be a hint,
+        /// <param name="isHint"><see langword="true"/> if the highlight should be a hint,
         /// otherwise <see langword="false"/>.</param>
-        /// <param name="isAccepted"><see langword="true"/> if the hightlight should be accepted,
+        /// <param name="isAccepted"><see langword="true"/> if the highlight should be accepted,
         /// otherwise <see langword="false"/>.</param>
         /// <param name="prefetching"><see langword="true"/> if the attribute highlight is being
         /// created for the purposes of prefetching; otherwise, <see langword="false"/>.</param>
@@ -6511,8 +6526,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Sorts the <see cref="IAttribute"/>s contained in the provided dictionaries according to
         /// their positions in the document. The sorting will attempt to identify attributes in a
-        /// row across the page and and work from left-to-right across the row before dropping down
-        /// to the next row.
+        /// row across the page and work from left-to-right across the row before dropping down to
+        /// the next row.
         /// <para><b>Note</b></para>
         /// This private helper will not include any non-spatial attributes in the results.
         /// </summary>
@@ -6725,14 +6740,14 @@ namespace Extract.DataEntry
         /// which and anchor point is needed.</param>
         /// <param name="anchorAlignment">The point location along a bounding box of all supplied
         /// zones on which the anchor point should be based.  The bounding box will be relative to
-        /// the orientation of the suppled raster zones. (ie, if the raster zones are upside-down,
+        /// the orientation of the suppled raster zones. (i.e., if the raster zones are upside-down,
         /// anchorAlignment.Top would result in an anchor point at the bottom of the zones as they
         /// appear on the page.</param>
         /// <param name="anchorOffsetAngle">The anchor point will be offset from the anchorAlignment
         /// position at this angle. (relative to the raster zones' orientation, not the page)</param>
         /// <param name="standoffDistance">The number of image pixels away from the bounds of the
         /// raster zones the anchor point should be.</param>
-        /// <param name="anchoredObjectRotation">Specifies the rotation (in degress) that an
+        /// <param name="anchoredObjectRotation">Specifies the rotation (in degrees) that an
         /// associated <see cref="AnchoredObject"/> should be drawn at to match up with the
         /// orientation of the raster zones.  This will be the average rotation of the zones unless
         /// it is sufficiently close to level, in which case the angle will be rounded off to
@@ -6754,7 +6769,7 @@ namespace Extract.DataEntry
             double roundingCuttoffAngle = (180.0 / Math.PI) * GeometryMethods.GetAngle(
                 new PointF(0, 0), new PointF(bounds.Width, standoffDistance));
 
-            // Allow a maximum of 5 degress of departure from level even if a greater angle was
+            // Allow a maximum of 5 degrees of departure from level even if a greater angle was
             // calculated based on the raster zone dimensions.
             roundingCuttoffAngle = Math.Min(roundingCuttoffAngle, 5.0);
 
@@ -6907,7 +6922,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                // Attempt to apply a pre-created highlight if it is avaliable.
+                // Attempt to apply a pre-created highlight if it is available.
                 if (!ApplyPreCreatedHighlight(attribute, makeVisible, preCreatedHighlights))
                 {
                     // Otherwise create the highlight for this attribute.
@@ -6917,7 +6932,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Attempts to apply a pre-created highlight if it is avaliable. Also creates a an error
+        /// Attempts to apply a pre-created highlight if it is available. Also creates a an error
         /// icon if necessary.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which the highlight should
@@ -7266,7 +7281,7 @@ namespace Extract.DataEntry
                             PropagateAttributes(attributesToPropagate, true, false);
 
                             // Since this loop is being run within an event handler, DoEvents needs
-                            // to be called to allow the attribute propogation to occur.
+                            // to be called to allow the attribute propagation to occur.
                             Application.DoEvents();
                         }
 

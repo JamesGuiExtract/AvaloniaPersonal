@@ -58,7 +58,7 @@ namespace Extract.DataEntry
 
             /// <summary>
             /// <see langword="true"/> if the query represents a validation warning,
-            /// <see langword="false"/> if the query identifies data that is truely invalid.
+            /// <see langword="false"/> if the query identifies data that is truly invalid.
             /// </summary>
             public bool IsWarning;
 
@@ -300,13 +300,16 @@ namespace Extract.DataEntry
                 originalValue = attribute.Value == null ? "" : attribute.Value.String;
                 string value = originalValue;
 
-                // Allow validation lists and queries to be used only to update auto-complete lists
-                // without actually ever validating based on the list items.  Also, since .Net won't
-                // display validation error icons without error text, this enforces consistency by
-                // preventing cases where the DataEntry framework considers a value invalid, yet
-                // no error icon is displayed.
+                // NOTE: Validate may be used only to update auto-complete lists without actually
+                // ever validating based on the list items; in the case that validation is not
+                // enabled, DataValidity.Valid will be returned. Also preventing an item from being
+                // marked invalid without _validationErrorMessage enforces consistency; .Net won't
+                // display validation error icons without error text, so this prevents the situation
+                // where the DataEntry framework considers a value invalid, yet no error icon is
+                // displayed.
                 bool validationEnabled = !string.IsNullOrEmpty(_validationErrorMessage) &&
-                                         AttributeStatusInfo.IsValidationEnabled(attribute);
+                                         AttributeStatusInfo.IsValidationEnabled(attribute) &&
+                                         AttributeStatusInfo.IsViewable(attribute);
 
                 // If there is a specified validation pattern, check it.
                 if (validationEnabled &&  _validationRegex != null &&

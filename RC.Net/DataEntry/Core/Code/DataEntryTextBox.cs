@@ -237,14 +237,14 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets or sets the name identifying the <see cref="IAttribute"/> to be associated with 
         /// the <see cref="DataEntryTextBox"/>.</summary>
-        /// <value>Sets the name indentifying the <see cref="IAttribute"/> to be associated with 
+        /// <value>Sets the name identifying the <see cref="IAttribute"/> to be associated with 
         /// the <see cref="DataEntryTextBox"/>. Specifying <see langword="null"/> will make the
         /// text box a "dependent sibling" to its <see cref="ParentDataEntryControl"/> meaning 
         /// its attribute will share the same name as the control it is dependent upon, but 
         /// the specific attribute it displays will be dependent on the current selection in the 
         /// <see cref="ParentDataEntryControl"/>.
         /// </value>
-        /// <returns>The name indentifying the <see cref="IAttribute"/> to be associated with the 
+        /// <returns>The name identifying the <see cref="IAttribute"/> to be associated with the 
         /// <see cref="DataEntryTextBox"/>.</returns>
         [Category("Data Entry Text Box")]
         public string AttributeName
@@ -624,7 +624,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Handles the case the focus has changed to another control.  At this point, attempt to
-        /// use validation to correct capitialization differences with a validation list.
+        /// use validation to correct capitalization differences with a validation list.
         /// </summary>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
         protected override void OnLostFocus(EventArgs e)
@@ -789,10 +789,10 @@ namespace Extract.DataEntry
             try
             {
                 // [DataEntry:385]
-                // If the the up or down arrow keys are pressed while the cursor is at the end
-                // of the text and the auto-complete list is not currently displayed, temporarily
-                // disable auto-complete to prevent some apparent memory issues with auto-complete
-                // that can otherwise cause garbage characters to appear at the end of the field.
+                // If the up or down arrow keys are pressed while the cursor is at the end of the
+                // text and the auto-complete list is not currently displayed, temporarily disable
+                // auto-complete to prevent some apparent memory issues with auto-complete that can
+                // otherwise cause garbage characters to appear at the end of the field.
                 if ((e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) &&
                     SelectionStart == Text.Length && !FormsMethods.IsAutoCompleteDisplayed())
                 {
@@ -853,6 +853,33 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.VisibleChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
+        /// </param>
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnVisibleChanged(e);
+
+                // https://extract.atlassian.net/browse/ISSUE-12812
+                // If the visibility of this control is changed after document load, the viewable
+                // status of the attribute needs to be updated so that highlights and validation
+                // are applied correctly.
+                if (_attribute != null &&
+                    DataEntryControlHost != null && !DataEntryControlHost.ChangingData)
+                {
+                    AttributeStatusInfo.MarkAsViewable(_attribute, Visible);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37918");
+            }
+        }
+
         #endregion Overrides
 
         #region IDataEntryControl Events
@@ -868,7 +895,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Fired to request that the and <see cref="IAttribute"/> or <see cref="IAttribute"/>(s) be
         /// propagated to any dependent controls.  This will be in response to an 
-        /// <see cref="IAttribute"/> having been modified (ie, via a swipe or loading a document). 
+        /// <see cref="IAttribute"/> having been modified (i.e., via a swipe or loading a document). 
         /// The event will provide the updated <see cref="IAttribute"/>(s) to registered listeners.
         /// </summary>
         public event EventHandler<AttributesEventArgs> PropagateAttributes;
@@ -904,7 +931,7 @@ namespace Extract.DataEntry
         /// <see cref="DataEntryControlHost"/> should not redraw highlights, etc, until the update
         /// is complete.
         /// <para><b>NOTE:</b></para>
-        /// This event should only be raised for updates that initiated via user interation with the
+        /// This event should only be raised for updates that initiated via user interaction with the
         /// control. It should not be raised for updates triggered by the
         /// <see cref="DataEntryControlHost"/> such as <see cref="ProcessSwipedText"/>.
         /// </summary>
@@ -1310,7 +1337,7 @@ namespace Extract.DataEntry
                     OnAttributesSelected();
 
                     // Update the font according to the viewed status. Perform the font change
-                    // asynchronously othersize the it results in memory corruption related to
+                    // asynchronously otherwise the it results in memory corruption related to
                     // auto-complete lists (probably related to the window handle recreation it
                     // triggers). Compare against _fontStyle instead of the current font since
                     // a font change could be pending in the message queue.
@@ -1577,7 +1604,7 @@ namespace Extract.DataEntry
             // associated with this control has changed.
             OnAttributesSelected();
 
-            // Raise the PropagateAttributes event so that any descendents of this data control can
+            // Raise the PropagateAttributes event so that any descendants of this data control can
             // re-map themselves.
             OnPropagateAttributes();
         }
@@ -1802,7 +1829,7 @@ namespace Extract.DataEntry
         {
             _fontStyle = fontStyle;
 
-            // Perform the font change asynchronously othersize it results in memory corruption
+            // Perform the font change asynchronously otherwise it results in memory corruption
             // related to auto-complete lists (probably related to the window handle recreation it
             // triggers).
             base.BeginInvoke(new FontStyleDelegate(SetFontStyleDirect),

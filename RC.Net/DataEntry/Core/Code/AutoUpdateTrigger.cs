@@ -75,7 +75,7 @@ namespace Extract.DataEntry
         static List<Tuple<AutoUpdateTrigger, DataEntryQuery>> _queriesPendingUpdate;
 
         /// <summary>
-        /// Keeps track of whether the <see cref="_queriesPendingUpdate"/> are in the processs of
+        /// Keeps track of whether the <see cref="_queriesPendingUpdate"/> are in the process of
         /// being evaluated. Do not allow for re-entry to <see cref="ExecuteAllPendingTriggers"/>.
         /// </summary>
         [ThreadStatic]
@@ -86,7 +86,7 @@ namespace Extract.DataEntry
         #region Constructors
 
         /// <summary>
-        /// Provides static initializatoin for the <see cref="AutoUpdateTrigger"/> class.
+        /// Provides static initialization for the <see cref="AutoUpdateTrigger"/> class.
         /// </summary>
         // FXCop believes static members are being initialized here.
         [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
@@ -500,6 +500,20 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.SetValue(_targetAttribute, statusInfo.LastAppliedStringValue, false, true);
                     }
 
+                    // https://extract.atlassian.net/browse/ISSUE-12813
+                    // Calling RefreshAttributes on the control will not necessarily trigger
+                    // validation to occur in the case that the attribute is not currently loaded in
+                    // the control (i.e., the ParentDataEntryControl does not currently have this
+                    // attribute's parent selected).
+                    // I investigated the potential performance hit of this call since in most
+                    // cases validation will also be triggered elsewhere (including by the
+                    // subsequent RefreshAttributes call). However, needless query re-evaluation
+                    // is prevented via CompositeQueryNode.CachedResult and
+                    // AttributeStatusInfo.ValidationStateChanged is raised only when the validation
+                    // state actually changes, so extra calls to validate have very little added
+                    // cost.
+                    AttributeStatusInfo.Validate(_targetAttribute, false);
+
                     statusInfo.OwningControl.RefreshAttributes(false, _targetAttribute);
 
                     return true;
@@ -682,7 +696,7 @@ namespace Extract.DataEntry
                     _queriesPendingUpdate.RemoveAt(0);
                     
                     // Ensure that a field and/or it's autoupdate trigger(s) haven't been deleted or
-                    // disposed of since the query modification occured.
+                    // disposed of since the query modification occurred.
                     AutoUpdateTrigger autoUpdateQuery = pendingTrigger.Item1;
                     if (autoUpdateQuery._isDisposed ||
                         !AttributeStatusInfo.GetStatusInfo(autoUpdateQuery._targetAttribute).IsInitialized)

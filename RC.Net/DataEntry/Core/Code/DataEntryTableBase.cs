@@ -122,7 +122,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// A reference count of the methods that have requested to temporarily prevent processing
-        /// of selection changes so that one or more programatic selection changes can be made 
+        /// of selection changes so that one or more programmatic selection changes can be made 
         /// before the table is in its intended state and ready to process selection events.
         /// </summary>
         int _suppressSelectionProcessingReferenceCount;
@@ -140,7 +140,7 @@ namespace Extract.DataEntry
         HashSet<IAttribute> _pendingRefreshAttributes = new HashSet<IAttribute>();
 
         /// <summary>
-        /// Whether attribute spatial info needes to be refreshed once the supression of attribute
+        /// Whether attribute spatial info needs to be refreshed once the suppression of attribute
         /// refreshes is released.
         /// </summary>
         bool _pendingSpatialRefresh;
@@ -215,7 +215,7 @@ namespace Extract.DataEntry
         DataGridViewCellStyle _disabledCellStyle;
 
         /// <summary>
-        /// [DataEntry:920] We need to prevent programatic calls to EndEdit in some circumstances
+        /// [DataEntry:920] We need to prevent programmatic calls to EndEdit in some circumstances
         /// to prevent the table from getting into a bad state.
         /// </summary>
         bool _preventProgrammaticEndEdit;
@@ -475,7 +475,7 @@ namespace Extract.DataEntry
         /// Gets whether the table is currently active.
         /// </summary>
         /// <returns><see langword="true"/> if the table is currently active (in terms of the data
-        /// entry framwork); <see langword="false"/> otherwise.</returns>
+        /// entry framework); <see langword="false"/> otherwise.</returns>
         protected bool IsActive
         {
             get
@@ -1266,7 +1266,7 @@ namespace Extract.DataEntry
                 base.OnEditingControlShowing(e);
 
                 // If the current selection does not result in a propagated attribute when dependent
-                // controls are present (ie, selection across multiple rows), don't allow edit mode
+                // controls are present (i.e., selection across multiple rows), don't allow edit mode
                 // since that dependent triggers in the dependent controls wouldn't be updated.
                 if (PropagateAttributes != null && _currentlyPropagatedAttribute == null &&
                     CurrentRow.Index != NewRowIndex)
@@ -1386,7 +1386,7 @@ namespace Extract.DataEntry
                 {
                     // [DataEntry:920]
                     // When in the process of validating, prevent IndicateActive(false) from
-                    // programatically ending edit mode as this will result in null object
+                    // programmatically ending edit mode as this will result in null object
                     // reference exceptions
                     _preventProgrammaticEndEdit = true;
                     base.OnValidating(e);
@@ -1422,7 +1422,7 @@ namespace Extract.DataEntry
                 {
                     dataEntryCell = Rows[e.RowIndex].Cells[e.ColumnIndex] as IDataEntryTableCell;
 
-                    // If the cell in question has a validation warning assosiated with it, paint
+                    // If the cell in question has a validation warning associated with it, paint
                     // the warning icon instead of the error icon.
                     if (dataEntryCell != null && dataEntryCell.Attribute != null &&
                         (AttributeStatusInfo.GetDataValidity(dataEntryCell.Attribute) ==
@@ -1617,6 +1617,77 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.DataGridView.ColumnStateChanged"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="DataGridViewColumnStateChangedEventArgs"/> that contains
+        /// the event data.</param>
+        /// <exception cref="T:System.InvalidCastException">The column changed from read-only to
+        /// read/write, enabling the current cell to enter edit mode, but the
+        /// <see cref="P:DataGridViewCell.EditType"/> property of the current cell does not indicate
+        /// a class that derives from <see cref="T:Control"/> and implements
+        /// <see cref="T:IDataGridViewEditingControl"/>.</exception>
+        protected override void OnColumnStateChanged(DataGridViewColumnStateChangedEventArgs e)
+        {
+            try
+            {
+                base.OnColumnStateChanged(e);
+
+                // https://extract.atlassian.net/browse/ISSUE-12812
+                // If the visible status of a column is changed after document load, the viewable
+                // status of the affected attributes needs to be updated so that highlights and
+                // validation are applied correctly.
+                if (e.StateChanged == DataGridViewElementStates.Visible &&
+                    DataEntryControlHost != null && !DataEntryControlHost.ChangingData)
+                {
+                    foreach (IAttribute attribute in Rows.OfType<DataGridViewRow>()
+                        .Select(row => row.Cells[e.Column.Index]).OfType<IDataEntryTableCell>()
+                        .Select(cell => cell.Attribute)
+                        .Where(attribute => attribute != null))
+                    {
+                        bool viewable = Visible && e.Column.Visible;
+                        AttributeStatusInfo.MarkAsViewable(attribute, viewable);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37913");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.VisibleChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
+        /// </param>
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnVisibleChanged(e);
+
+                // https://extract.atlassian.net/browse/ISSUE-12812
+                // If the visibility of the table is changed after document load, the viewable
+                // status of the attributes needs to be updated so that highlights and validation
+                // are applied correctly.
+                if (DataEntryControlHost != null && !DataEntryControlHost.ChangingData)
+                {
+                    foreach (IDataEntryTableCell cell in Rows.OfType<DataGridViewRow>()
+                        .SelectMany(row => row.Cells.OfType<IDataEntryTableCell>())
+                        .Where(cell => cell.Attribute != null))
+                    {
+                        bool viewable = Visible && cell.AsDataGridViewCell.OwningColumn.Visible;
+                        AttributeStatusInfo.MarkAsViewable(cell.Attribute, viewable);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI37914");
+            }
+        }
+
         #endregion Overrides
 
         #region IDataEntryControl Members
@@ -1633,7 +1704,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Fired to request that the and <see cref="IAttribute"/> or <see cref="IAttribute"/>(s) be
         /// propagated to any dependent controls.  This can be in response to an 
-        /// <see cref="IAttribute"/> having been modified (ie, via a swipe or loading a document) or
+        /// <see cref="IAttribute"/> having been modified (i.e., via a swipe or loading a document) or
         /// the result of a new selection in a multi-attribute table. The event will provide the 
         /// updated <see cref="IAttribute"/>(s) to registered listeners.
         /// </summary>
@@ -1659,8 +1730,8 @@ namespace Extract.DataEntry
         /// <see cref="DataEntryControlHost"/> should not redraw highlights, etc, until the update
         /// is complete.
         /// <para><b>NOTE:</b></para>
-        /// This event should only be raised for updates that initiated via user interation with the
-        /// control. It should not be raised for updates triggered by the
+        /// This event should only be raised for updates that initiated via user interaction with
+        /// the control. It should not be raised for updates triggered by the
         /// <see cref="DataEntryControlHost"/> such as <see cref="ProcessSwipedText"/>.
         /// </summary>
         public event EventHandler<EventArgs> UpdateStarted;
@@ -1782,7 +1853,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Activates or inactivates the <see cref="DataEntryTable"/>.
-        /// <para><b>Requirments:</b></para>
+        /// <para><b>Requirements:</b></para>
         /// This method must be called with setActive <see langword="true"/> before the user is
         /// able to edit data in the table.
         /// </summary>
@@ -1829,7 +1900,7 @@ namespace Extract.DataEntry
                 // [DataEntry:148]
                 // Processing needs to take place to mark selected cells as read and derived classes
                 // likely will need to raise events such as SwipingStateChanged based on the current
-                // selection. OnSelectionChanged encompases the processing that needs to happen,
+                // selection. OnSelectionChanged encompass the processing that needs to happen,
                 // however the windows events are ordered such that a click in the table will trigger
                 // GotFocus (and, thus, IndicateActive) before the mouse click is processed which
                 // may change the current selection. This means doing the processing now may
@@ -1849,7 +1920,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Commands a multi-selection control to propogate the specified <see cref="IAttribute"/>
+        /// Commands a multi-selection control to propagate the specified <see cref="IAttribute"/>
         /// onto dependent <see cref="IDataEntryControl"/>s.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> whose sub-attributes should be
@@ -2192,7 +2263,7 @@ namespace Extract.DataEntry
         #region Abstract IDataEntryControl Members
 
         /// <summary>
-        /// Gets or sets whether the table accepts as input input the <see cref="SpatialString"/>
+        /// Gets or sets whether the table accepts as input the <see cref="SpatialString"/>
         /// associated with an image swipe.
         /// </summary>
         /// <value><see langword="true"/> to configure the table to accept swiped input, 
@@ -2725,7 +2796,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                // If refreshes are still being supressed, there is nothing yet to do.
+                // If refreshes are still being suppressed, there is nothing yet to do.
                 if (_suppressRefreshReferenceCount > 0)
                 {
                     return;
@@ -2858,10 +2929,10 @@ namespace Extract.DataEntry
             try
             {
                 // [DataEntry:385]
-                // If the the up or down arrow keys are pressed while the cursor is at the end
-                // of the text and the auto-complete list is not currently displayed, end edit mode
-                // and manually change the selected cell based on the arrow key as should happen.
-                // This prevents apparent memory issues with auto-complete that can otherwise cause
+                // If the up or down arrow keys are pressed while the cursor is at the end of the
+                // text and the auto-complete list is not currently displayed, end edit mode and
+                // manually change the selected cell based on the arrow key as should happen. This
+                // prevents apparent memory issues with auto-complete that can otherwise cause
                 // garbage characters to appear at the end of the field.
                 if ((e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) && EditingControl != null)
                 {
@@ -2882,7 +2953,7 @@ namespace Extract.DataEntry
                         // ending edit mode...
                         EndEdit();
 
-                        // ... and then manually specifiying the new CurrentCell based on the arrow
+                        // ... and then manually specifying the new CurrentCell based on the arrow
                         // key pressed.
                         if (e.KeyCode == Keys.Down)
                         {

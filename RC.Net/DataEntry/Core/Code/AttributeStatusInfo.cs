@@ -27,7 +27,7 @@ namespace Extract.DataEntry
     public enum HintType
     {
         /// <summary>
-        /// The <see cref="IAttribute"/> is truely spatial (not a hint).
+        /// The <see cref="IAttribute"/> is truly spatial (not a hint).
         /// </summary>
         None = 0,
 
@@ -181,7 +181,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Keeps track of the attributes that have been modified since the last time EndEdit was
-        /// called. Each modified attribute is assiged a KeyValuePair which keeps track of whether
+        /// called. Each modified attribute is assigned a KeyValuePair which keeps track of whether
         /// the spatial information has changed and what the original attribute value was in case
         /// it needs to be reverted.
         /// </summary>
@@ -252,7 +252,7 @@ namespace Extract.DataEntry
         IDataEntryControl _owningControl;
 
         /// <summary>
-        /// The the template to use to create new per-instance validator instances.
+        /// The template to use to create new per-instance validator instances.
         /// </summary>
         IDataEntryValidator _validatorTemplate;
 
@@ -267,7 +267,7 @@ namespace Extract.DataEntry
         bool _hasBeenViewed;
 
         /// <summary>
-        /// Whether this attribute has been propagated (ie, its children have been mapped to
+        /// Whether this attribute has been propagated (i.e., its children have been mapped to
         /// any dependent child controls.
         /// </summary>
         bool _hasBeenPropagated;
@@ -375,7 +375,7 @@ namespace Extract.DataEntry
         #region Constructors
 
         /// <summary>
-        /// Creates a new <see cref="AttributeStatusInfo"/> instance.  This contructor should never
+        /// Creates a new <see cref="AttributeStatusInfo"/> instance.  This constructor should never
         /// be called directly by an outside class except via the <see cref="IPersistStream"/>
         /// COM interface.
         /// </summary>
@@ -654,8 +654,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets or sets a value indicating whether auto-update queries should be temporarily
         /// prevented from updating text. The queries will still be loaded for all attributes, but
-        /// they will not be triggered while while blocked. Un-blocking the queries will not
-        /// execute the queries that would have been triggered while blocked.
+        /// they will not be triggered while blocked. Un-blocking the queries will not execute the
+        /// queries that would have been triggered while blocked.
         /// Queries that are using the <see cref="DataEntryQuery.TargetProperty"/> property to
         /// update something other than the control's text/value will continue to execute.
         /// </summary>
@@ -689,7 +689,10 @@ namespace Extract.DataEntry
                 if (value != _pauseQueries)
                 {
                     _pauseQueries = value;
-                    OnQueryDelayEnded();
+                    if (!_pauseQueries)
+                    {
+                        OnQueryDelayEnded();
+                    }
                 }
             }
         }
@@ -750,7 +753,7 @@ namespace Extract.DataEntry
         /// <param name="category">The category <see paramref="traceLines"/> should be associated
         /// with.</param>
         /// <param name="attribute">The <see cref="IAttribute"/> the trace line pertains to.</param>
-        /// <param name="traceLines">The lines to output. If any specified line constains carriage
+        /// <param name="traceLines">The lines to output. If any specified line contains carriage
         /// returns it will automatically be split into separate lines.</param>
         [ComVisible(false)]
         public static void Trace(string category, IAttribute attribute,
@@ -1022,7 +1025,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Initializes an attribute heirarchy unaffiliated with any data entry controls. May be
+        /// Initializes an attribute hierarchy unaffiliated with any data entry controls. May be
         /// called to prepare attributes for use within a <see cref="DataEntryQuery"/>.
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of
@@ -1084,9 +1087,9 @@ namespace Extract.DataEntry
         /// <see cref="IDataEntryValidator"/> created to validate the attribute's data.
         /// Can be <see langword="null"/> to keep the existing validator or if data validation is
         /// not required.</param>
-        /// <param name="tabStopMode">A <see cref="TabStopMode"/> value indicatng under what
+        /// <param name="tabStopMode">A <see cref="TabStopMode"/> value indicating under what
         /// circumstances the attribute should serve as a tab stop. Can be <see langword="null"/> to
-        /// keep the existing tabStopMode settin.</param>
+        /// keep the existing tabStopMode setting.</param>
         /// <param name="autoUpdateQuery">A query which will cause the <see cref="IAttribute"/>'s
         /// value to automatically be updated using values from other <see cref="IAttribute"/>s
         /// and/or a database query.</param>
@@ -1130,7 +1133,7 @@ namespace Extract.DataEntry
                 {
                     // [DataEntry:1004]
                     // Since this value will be compared using the string class, pad zeros so that tab
-                    // indicies of up to 999 can be compared.
+                    // indices of up to 999 can be compared.
                     string paddedDisplayOrder =
                         string.Format(CultureInfo.InvariantCulture, "{0:D3}", displayOrder.Value);
 
@@ -1171,7 +1174,7 @@ namespace Extract.DataEntry
                             DataEntryMethods.AttributeAsVector(attribute));
                 }
 
-                // Set/update the propogated status if necessary.
+                // Set/update the propagated status if necessary.
                 if (considerPropagated && !statusInfo._hasBeenPropagated)
                 {
                     statusInfo._hasBeenPropagated = considerPropagated;
@@ -1387,7 +1390,7 @@ namespace Extract.DataEntry
                             true, modifiedAttributeMemento.OriginalValue);
                     }
 
-                    // After queing the modification, call EndEdit if directed.
+                    // After queuing the modification, call EndEdit if directed.
                     if (endOfEdit)
                     {
                         EndEdit();
@@ -1619,7 +1622,7 @@ namespace Extract.DataEntry
                 }
 
                 // Set the now disposed of validator to null so that if this attribute is later
-                // resurrected via Undo, the validatory will be re-initialized.
+                // resurrected via Undo, the validator will be re-initialized.
                 statusInfo._validator = null;
 
                 IUnknownVector subAttributes = attribute.SubAttributes;
@@ -1635,7 +1638,7 @@ namespace Extract.DataEntry
                     DeleteAttribute((IAttribute)subAttributes.At(0));
                 }
 
-                // Remove the attribute from the overall attribute heirarchy.
+                // Remove the attribute from the overall attribute hierarchy.
                 IUnknownVector parentCollection;
                 if (statusInfo._parentAttribute != null)
                 {
@@ -1803,7 +1806,7 @@ namespace Extract.DataEntry
         /// been viewed.</param>
         /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
         /// the point at which the scan should be started with each attribute further down the
-        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// the stack being a descendant to the previous <see cref="IAttribute"/> in the stack.
         /// </param>
         /// <param name="forward"><see langword="true"/> to scan forward through the attribute 
         /// hierarchy, <see langword="false"/> to scan backward.</param>
@@ -1888,7 +1891,7 @@ namespace Extract.DataEntry
         /// <see cref="InvalidDataSaveMode.AllowWithWarnings"/> should be included.</param>
         /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
         /// the point at which the scan should be started with each attribute further down the
-        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// the stack being a descendant to the previous <see cref="IAttribute"/> in the stack.
         /// </param>
         /// <param name="forward"><see langword="true"/> to scan forward through the attribute 
         /// hierarchy, <see langword="false"/> to scan backward.</param>
@@ -1956,8 +1959,7 @@ namespace Extract.DataEntry
                 // [DataEntry:876]
                 // Ensure an item's validity doesn't change after it has been deleted (i.e., it is
                 // no longer initialized)
-                if (statusInfo._isViewable && statusInfo._dataValidity != dataValidity &&
-                    statusInfo._initialized)
+                if (statusInfo._dataValidity != dataValidity && statusInfo._initialized)
                 {
                     statusInfo._dataValidity = dataValidity;
 
@@ -2045,7 +2047,7 @@ namespace Extract.DataEntry
         /// been propagated.</param>
         /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
         /// the point at which the scan should be started with each attribute further down the
-        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// the stack being a descendant to the previous <see cref="IAttribute"/> in the stack.
         /// </param>
         /// <param name="unPropagatedAttributes">A stack of <see cref="IAttribute"/>s
         /// where the first attribute in the stack represents the root-level attribute
@@ -2080,7 +2082,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/> has not been propagated.</param>
         /// <param name="recursive">If <see langword="false"/> only the specified 
         /// <see cref="IAttribute"/> will be marked as propagated.  If <see langword="true"/> all 
-        /// descendents <see cref="IAttribute"/>s will be marked as propagated as well.</param>
+        /// descendants <see cref="IAttribute"/>s will be marked as propagated as well.</param>
         [ComVisible(false)]
         public static void MarkAsPropagated(IAttribute attribute, bool propagated, bool recursive)
         {
@@ -2140,6 +2142,21 @@ namespace Extract.DataEntry
                     {
                         OnViewedStateChanged(attribute, false);
                     }
+
+                    // https://extract.atlassian.net/browse/ISSUE-12812
+                    // Since non-viewable attributes will not be considered invalid, ensure the
+                    // validation status is up-to-date for any attribute whose viewed status has
+                    // been changed since the original document load.
+                    if (!statusInfo._owningControl.DataEntryControlHost.ChangingData)
+                    {
+                        AttributeStatusInfo.Validate(attribute, false);
+                        if (isViewable)
+                        {
+                            // If the attribute has been made viewable, make sure the control is
+                            // accurately indicating the current validation state.
+                            statusInfo._owningControl.RefreshAttributes(false, attribute);
+                        }
+                    }
                 }
                 return true;
             }
@@ -2180,7 +2197,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/> is to be sought.</param>
         /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
         /// the point at which the scan should be started with each attribute further down the
-        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// the stack being a descendant to the previous <see cref="IAttribute"/> in the stack.
         /// </param>
         /// <param name="forward"><see langword="true"/> to scan forward through the
         /// <see cref="IAttribute"/>s, <see langword="false"/> to scan backward.</param>
@@ -2223,7 +2240,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/> is to be sought.</param>
         /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
         /// the point at which the scan should be started with each attribute further down the
-        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// the stack being a descendant to the previous <see cref="IAttribute"/> in the stack.
         /// </param>
         /// <param name="forward"><see langword="true"/> to scan forward through the
         /// <see cref="IAttribute"/>s, <see langword="false"/> to scan backward.</param>
@@ -2267,7 +2284,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/> is to be sought.</param>
         /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
         /// the point at which the scan should be started with each attribute further down the
-        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// the stack being a descendant to the previous <see cref="IAttribute"/> in the stack.
         /// </param>
         /// <param name="forward"><see langword="true"/> to scan forward through the
         /// <see cref="IAttribute"/>s, <see langword="false"/> to scan backward.</param>
@@ -2363,7 +2380,7 @@ namespace Extract.DataEntry
 
                 // [DataEntry:1004]
                 // Since this value will be compared using the string class, pad zeros so that tab
-                // indicies of up to 999 can be compared.
+                // indices of up to 999 can be compared.
                 string paddedDisplayOrder =
                         string.Format(CultureInfo.InvariantCulture, "{0:D3}", displayOrder);
 
@@ -2484,8 +2501,8 @@ namespace Extract.DataEntry
         /// Gets whether hints are enabled for the <see cref="IAttribute"/>. The fact that hints
         /// are enabled doesn't necessarily mean the attribute has one.
         /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> whose whose hint enabled status is
-        /// to be checked.</param>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose hint enabled status is to be
+        /// checked.</param>
         /// <returns><see langword="true"/> if hints are enabled for the specified
         /// <see cref="IAttribute"/>; <see langword="false"/> otherwise.
         /// </returns>
@@ -2508,8 +2525,8 @@ namespace Extract.DataEntry
         /// Sets whether hints are enabled for the <see cref="IAttribute"/>. The fact that hints
         /// are enabled doesn't necessarily mean the attribute has one.
         /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> whose whose hint enabled status is
-        /// to be set.</param>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose hint enabled status is to be
+        /// set.</param>
         /// <param name="hintEnabled"><see langword="true"/> to enable hints for the specified
         /// <see cref="IAttribute"/>; <see langword="false"/> otherwise.
         /// </param>
@@ -2766,7 +2783,7 @@ namespace Extract.DataEntry
                 // DataEntryModifiedAttributeMemento knows of the attribute's original value.
                 _undoManager.AddMemento(new DataEntryModifiedAttributeMemento(attribute));
 
-                // Removing spatial info will not trigger an EndEdit call to seperate this as an
+                // Removing spatial info will not trigger an EndEdit call to separate this as an
                 // independent operation but it should considered one.
                 _undoManager.StartNewOperation();
 
@@ -2813,7 +2830,7 @@ namespace Extract.DataEntry
         /// spatial info.</param>
         /// <param name="requireDirect"><see langword="true"/> to require that the attribute value
         /// itself is spatial or that it's hint is a direct hint; <see langword="false"/> if an
-        /// itself hint is allowed to satisify this chec.</param>
+        /// itself hint is allowed to satisfy this check.</param>
         /// <returns><see langword="true"/> the specified <see paramref="attribute"/> has spatial
         /// info; otherwise, <see langword="false"/>.
         /// </returns>
@@ -2937,7 +2954,7 @@ namespace Extract.DataEntry
                         query = query.Substring(0, queryEnd);
                     }
 
-                    // If we are at the root of the heirarchy, _attributes needs to be used for the
+                    // If we are at the root of the hierarchy, _attributes needs to be used for the
                     // query as there will be no rootAttribute.
                     IUnknownVector attributesToQuery =
                         (rootAttribute == null) ? _attributes : rootAttribute.SubAttributes;
@@ -2948,7 +2965,7 @@ namespace Extract.DataEntry
                     {
                         IAttribute attribute = (IAttribute)attributesToQuery.At(i);
 
-                        // Anything prior to (or in the abscense of) an @ char is a filter on the
+                        // Anything prior to (or in the absence of) an @ char is a filter on the
                         // attribute name, whereas anything after is a filter on the attribute type.
                         var queryFilters = query.Split('@');
                         string nameFilter = queryFilters[0];
@@ -3109,7 +3126,7 @@ namespace Extract.DataEntry
                     ExtractException.Log("ELI27096", ex2);
                 }
 
-                // If an exception occured, clear any pending modifications so they are not applied
+                // If an exception occurred, clear any pending modifications so they are not applied
                 // on a subsequent edit event.
                 _attributesBeingModified.Clear();
                 _attributesToValidate.Clear();
@@ -3119,7 +3136,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Releases all <see cref="IAttribute"/> COM objects in the supplied vectory by calling
+        /// Releases all <see cref="IAttribute"/> COM objects in the supplied vector by calling
         /// FinalReleaseComObject on each. This needs to be done due to the assignment of
         /// <see cref="AttributeStatusInfo"/> objects as the DataObject member of an attribute.
         /// (If this is not done, handles are leaked).
@@ -3428,7 +3445,7 @@ namespace Extract.DataEntry
                 else
                 {
                     // If a validation trigger is in place, use it to update the control's
-                    // validationlist now since by virtue of the fact that the attribute is being
+                    // validation list now since by virtue of the fact that the attribute is being
                     // re-initialized, the control was likely previously displaying a different
                     // attribute with a different validation list.
                     AutoUpdateTrigger validationTrigger = null;
@@ -3445,7 +3462,7 @@ namespace Extract.DataEntry
         /// </summary>
         static void ValidateAllModifiedAttributes()
         {
-            // Retrieve a separate copy of the current _attributesBeingModified so any modifiections
+            // Retrieve a separate copy of the current _attributesBeingModified so any modification
             // to _attributesBeingModified while executing this method does not cause errors
             // iterating _attributesBeingModified.
             var modifiedAttributes = _attributesToValidate.ToArray();
@@ -3461,7 +3478,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Raises the <see cref="AttributeValueModified"/> event for every entry in
-        /// <see cref="_attributesBeingModified"/> modifed for attributes being modified.
+        /// <see cref="_attributesBeingModified"/> modified for attributes being modified.
         /// </summary>
         static void RaiseValueModifedForAttributesBeingModified()
         {
@@ -3488,7 +3505,7 @@ namespace Extract.DataEntry
         /// Raises the AttributeValueModified event.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> whose value was modified.</param>
-        /// <param name="incrementalUpdate">see langword="true"/>if the modification is part of an
+        /// <param name="incrementalUpdate"><see langword="true"/>if the modification is part of an
         /// ongoing edit; <see langword="false"/> if the edit has finished.</param>
         /// <param name="acceptSpatialInfo"><see langword="true"/> if the modification should
         /// trigger the <see cref="IAttribute"/>'s spatial info to be accepted,
