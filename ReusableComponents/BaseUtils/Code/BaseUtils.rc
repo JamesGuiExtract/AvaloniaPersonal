@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -74,7 +72,7 @@ BEGIN
     LTEXT           "",IDC_STATIC_MSG,7,7,172,30
 END
 
-IDD_PROMPT2_DLG DIALOG  0, 0, 214, 90
+IDD_PROMPT2_DLG DIALOG 0, 0, 214, 90
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -86,7 +84,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_INPUT2,7,48,200,14,ES_AUTOHSCROLL
 END
 
-IDD_PROMPT_DLG DIALOG  0, 0, 212, 60
+IDD_PROMPT_DLG DIALOG 0, 0, 212, 60
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Sans Serif"
@@ -104,7 +102,7 @@ FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,90,40,50,14
     CONTROL         "Status:",IDC_STRING,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,5,5,225,8
-    CONTROL         "Progress1",IDC_PROGRESS_BAR,"msctls_progress32",WS_BORDER | 0x1,5,20,228,16
+    CONTROL         "Progress1",IDC_PROGRESS_BAR,"msctls_progress32",PBS_SMOOTH | WS_BORDER,5,20,228,16
 END
 
 IDD_LOGINDLG DIALOGEX 0, 0, 202, 86
@@ -120,13 +118,13 @@ BEGIN
     LTEXT           "Password",IDC_STATIC,9,36,32,8
 END
 
-IDD_HIGHLIGHT_WINDOW_DLG DIALOG  0, 0, 186, 94
+IDD_HIGHLIGHT_WINDOW_DLG DIALOG 0, 0, 186, 94
 STYLE DS_SETFONT | WS_POPUP
 FONT 8, "MS Sans Serif"
 BEGIN
 END
 
-IDD_DLG_SELECT_FILE DIALOG  0, 0, 242, 76
+IDD_DLG_SELECT_FILE DIALOG 0, 0, 242, 76
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Pick File"
 FONT 8, "MS Sans Serif"
@@ -187,17 +185,18 @@ BEGIN
     LTEXT           "Show debug information for",IDC_STATIC,229,95,87,8
 END
 
-IDD_DIALOG_INFO DIALOGEX 0, 0, 357, 95
+IDD_DIALOG_INFO DIALOGEX 0, 0, 400, 95
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Error"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,282,74,68,14
-    EDITTEXT        IDC_EDIT_INFO_TEXT,80,5,270,60,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | NOT WS_BORDER
-    PUSHBUTTON      "&Details ...",IDC_BUTTON_DETAILS,207,74,68,14
+    DEFPUSHBUTTON   "&OK",IDOK,329,74,68,14
+    EDITTEXT        IDC_EDIT_INFO_TEXT,80,5,316,60,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | NOT WS_BORDER
     CONTROL         159,IDC_STATIC,"Static",SS_BITMAP,5,7,67,62
     CONTROL         "Automatically close window in 100 seconds",IDC_CHECK_TIMEOUT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,76,160,12
+    PUSHBUTTON      "&Save As...",IDC_BUTTON_SAVEAS,175,74,68,14
+    PUSHBUTTON      "&Details ...",IDC_BUTTON_DETAILS,252,74,68,14
 END
 
 
@@ -216,7 +215,7 @@ IDI_ICON_INFORMATION    ICON                    "res\\icon_info.ico"
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_TIMEDRETRYDLG, DIALOG
     BEGIN
@@ -301,7 +300,7 @@ BEGIN
     IDD_DIALOG_INFO, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 350
+        RIGHTMARGIN, 393
         TOPMARGIN, 7
         BOTTOMMARGIN, 88
     END
@@ -321,7 +320,7 @@ IDB_BITMAP_ERROR        BITMAP                  "res\\bitmap_i.bmp"
 // Menu
 //
 
-IDR_BASE_MNU_CONTEXT MENU 
+IDR_BASE_MNU_CONTEXT MENU
 BEGIN
     POPUP "Context"
     BEGIN
@@ -335,31 +334,12 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// String Table
-//
-
-STRINGTABLE 
-BEGIN
-    IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
-END
-
-#endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
-LANGUAGE 9, 1
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Version
 //
 
-VS_VERSION_INFO     VERSIONINFO
-  FILEVERSION       1,0,0,1
-  PRODUCTVERSION    1,0,0,1
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -370,28 +350,41 @@ VS_VERSION_INFO     VERSIONINFO
  FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
-	BLOCK "StringFileInfo"
-	BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
         BLOCK "040904B0"
-		BEGIN 
-			VALUE "CompanyName",     "Extract Systems, LLC\0"
-			VALUE "FileDescription", "BaseUtils DLL\0"
-			VALUE "FileVersion",     "1, 0, 0, 1\0"
-			VALUE "InternalName",    "BaseUtils\0"
-			VALUE "LegalCopyright",  "Copyright (C) 2015\0"
-			VALUE "LegalTrademarks", "\0"
-			VALUE "OriginalFilename","BaseUtils.DLL\0"
-			VALUE "ProductName",     "BaseUtils Dynamic Link Library\0"
-			VALUE "ProductVersion",  "1, 0, 0, 1\0"
-		END
-	END
-	BLOCK "VarFileInfo" 
-	BEGIN 
-		VALUE "Translation", 0x409, 1200
+        BEGIN
+            VALUE "CompanyName", "Extract Systems, LLC"
+            VALUE "FileDescription", "BaseUtils DLL"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "BaseUtils"
+            VALUE "LegalCopyright", "Copyright (C) 2015"
+            VALUE "OriginalFilename", "BaseUtils.DLL"
+            VALUE "ProductName", "BaseUtils Dynamic Link Library"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
     END
 END
 
-#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

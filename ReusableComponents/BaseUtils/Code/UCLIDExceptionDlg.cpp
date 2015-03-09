@@ -8,6 +8,7 @@
 #include "TemporaryResourceOverride.h"
 #include "RegistryPersistenceMgr.h"
 #include "RegConstants.h"
+#include "LoadFileDlgThread.h"
 
 extern HINSTANCE gModuleResource;
 
@@ -75,6 +76,7 @@ void UCLIDExceptionDlg::DoDataExchange(CDataExchange* pDX)
 		CDialog::DoDataExchange(pDX);
 		//{{AFX_DATA_MAP(UCLIDExceptionDlg)
 		DDX_Text(pDX, IDC_EDIT_INFO_TEXT, m_Information);
+		DDX_Control(pDX, IDC_BUTTON_SAVEAS, m_SaveAsButton);
 		//}}AFX_DATA_MAP
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20274");
@@ -84,6 +86,7 @@ BEGIN_MESSAGE_MAP(UCLIDExceptionDlg, CDialog)
 	//{{AFX_MSG_MAP(UCLIDExceptionDlg)
 	ON_BN_CLICKED(IDC_BUTTON_DETAILS, OnButtonDetails)
 	ON_BN_CLICKED(IDC_CHECK_TIMEOUT, OnCheckTimeout)
+	ON_BN_CLICKED(IDC_BUTTON_SAVEAS, OnButtonSaveAs)
 	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -99,23 +102,7 @@ void UCLIDExceptionDlg::OnButtonDetails()
 		TemporaryResourceOverride resourceOverride(gModuleResource);
 
 		// Turn off auto close if user is present and opens the Details dialog
-		if (m_lTimerID > 0)
-		{
-			// Kill the automatic close timer
-			KillTimer( m_lTimerID );
-
-			// Update auto close text
-			CButton* pButton = (CButton *)GetDlgItem( IDC_CHECK_TIMEOUT );
-			if (pButton != __nullptr)
-			{
-				string strLabel = makeTimeoutString( 0 );
-				pButton->SetWindowText( strLabel.c_str() );
-
-				// Uncheck the button and disable it
-				pButton->SetCheck( BST_UNCHECKED );
-				pButton->EnableWindow( FALSE );
-			}
-		}
+		killTimerIfRunning();
 
 		// Display the Details dialog
 		UCLIDExceptionDetailsDlg dlg(*m_pUclidExceptionCaught,this);
@@ -265,6 +252,7 @@ void UCLIDExceptionDlg::OnCheckTimeout()
 
 				// Kill the timer and disable the checkbox
 				KillTimer( m_lTimerID );
+				m_lTimerID = 0;
 				pButton->EnableWindow( FALSE );
 			}
 			else
@@ -306,6 +294,41 @@ void UCLIDExceptionDlg::OnTimer(UINT nIDEvent)
 		ue.log("", false);
 	}
 }
+//--------------------------------------------------------------------------------------------------
+void UCLIDExceptionDlg::OnButtonSaveAs() 
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(gModuleResource);
+
+	try
+	{
+		// Turn off auto close if user is present and opens the SaveAs dialog
+		killTimerIfRunning();
+		
+		//open File dialog and get the file name selected by user
+		//default extension is .uex i.e. uclid exception file
+		CString zFileName;
+		CFileDialog fileSaveAsDlg(FALSE,"uex" , zFileName ,(OFN_OVERWRITEPROMPT | OFN_EXTENSIONDIFFERENT  |  
+			OFN_LONGNAMES | OFN_NOREADONLYRETURN) ,"UCLID Exception files(*.uex)|*.uex||");
+		fileSaveAsDlg.m_ofn.lpstrTitle = "Save exception file as";
+		
+		// Pass the pointer of dialog to create ThreadDataStruct object
+		ThreadFileDlg tfd(&fileSaveAsDlg);
+
+		//if user clicks to save it get the path name
+		if (tfd.doModal() == IDOK)
+		{
+			zFileName = fileSaveAsDlg.GetPathName();
+			
+			//use getVersion function and write it into the exception file
+			string strFileName(zFileName.operator LPCTSTR());
+			
+			//call saveTo method of UCLIDException to save the file
+			m_pUclidExceptionCaught->saveTo(strFileName);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37919");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Public methods
@@ -319,7 +342,7 @@ void UCLIDExceptionDlg::display(const string& strMsg)
 		string strReplaceText1 = "~~~~~~";
 		replaceVariable(strText, strToFind, strReplaceText1);
 		string strReplaceText2 = "\r\n";
-		// TODO; fix this cluge!
+		// TODO; fix this kluge!
 		replaceVariable(strText, strReplaceText1, strReplaceText2);
 
 		m_Information = _T(strText.c_str());
@@ -416,3 +439,25 @@ void UCLIDExceptionDlg::updateCountdown()
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void UCLIDExceptionDlg::killTimerIfRunning()
+{
+	// Turn off auto close if user is present and opens the Details dialog
+	if (m_lTimerID > 0)
+	{
+		// Kill the automatic close timer
+		KillTimer( m_lTimerID );
+		m_lTimerID = 0;
+
+		// Update auto close text
+		CButton* pButton = (CButton *)GetDlgItem( IDC_CHECK_TIMEOUT );
+		if (pButton != __nullptr)
+		{
+			string strLabel = makeTimeoutString( 0 );
+			pButton->SetWindowText( strLabel.c_str() );
+
+			// Uncheck the button and disable it
+			pButton->SetCheck( BST_UNCHECKED );
+			pButton->EnableWindow( FALSE );
+		}
+	}
+}

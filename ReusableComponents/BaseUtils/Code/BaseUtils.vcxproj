@@ -357,6 +357,7 @@
     <None Include="BaseUtils.def" />
     <None Include="res\BaseUtils.rc2" />
     <None Include="res\bitmap_i.bmp" />
+    <None Include="res\icon_info.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BaseUtils.rc">

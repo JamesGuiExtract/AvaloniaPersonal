@@ -24,7 +24,7 @@ public:
 	// PROMISE: To display all information associated with the specified UCLIDException
 	//			object in a Windows GUI.
 	//
-	// ARGS:	uclidException: the UCLIDException object who's associated infomation needs
+	// ARGS:	uclidException: the UCLIDException object who's associated information needs
 	//			to be displayed to the user.
 	//		
 	void handleException(const UCLIDException& uclidException);
@@ -38,6 +38,7 @@ public:
 // Dialog Data
 	//{{AFX_DATA(UCLIDExceptionDlg)
 	CString	m_Information;
+	CButton		m_SaveAsButton;
 	//}}AFX_DATA
 
 // Overrides
@@ -63,6 +64,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnCheckTimeout();
 	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnButtonSaveAs();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -93,4 +95,7 @@ private:
 	string	makeTimeoutString(long lTimeout);
 	// Does the actual update of the label and closes dialog at zero
 	void	updateCountdown();
+
+	// Stop the count down to close the dialog if it is active
+	void killTimerIfRunning();
 };
