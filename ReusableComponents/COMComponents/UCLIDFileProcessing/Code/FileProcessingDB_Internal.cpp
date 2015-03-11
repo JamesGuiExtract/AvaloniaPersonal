@@ -1149,9 +1149,6 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 {
 	try
 	{
-		// First remove all Product Specific stuff
-		removeProductSpecificDB(bRetainUserTables);
-
 		// Get the list of tables
 		vector<string> vecTables; 
 		getExpectedTables(vecTables);
@@ -2680,7 +2677,7 @@ bool CFileProcessingDB::initializeIfBlankDB()
 				"Do you wish to initialize it now?", "Initialize Database?", MB_YESNO);
 			if (iResult == IDYES)
 			{
-				clear(false);
+				clear(false, true, false);
 				return true;
 			}
 
@@ -3108,7 +3105,7 @@ IIUnknownVectorPtr CFileProcessingDB::getLicensedProductSpecificMgrs()
 	return ipProdSpecMgrs;
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::removeProductSpecificDB(bool bRetainUserTables)
+void CFileProcessingDB::removeProductSpecificDB(bool bOnlyTables, bool bRetainUserTables)
 {
 	try
 	{
@@ -3124,13 +3121,14 @@ void CFileProcessingDB::removeProductSpecificDB(bool bRetainUserTables)
 			ASSERT_RESOURCE_ALLOCATION("ELI18952", ipMgr != __nullptr);
 
 			// Remove the schema for the product specific manager
-			ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr(), asVariantBool(bRetainUserTables));
+			ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr(), 
+				asVariantBool(bOnlyTables), asVariantBool(bRetainUserTables));
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27610")
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::addProductSpecificDB(bool bAddUserTables)
+void CFileProcessingDB::addProductSpecificDB(bool bOnlyTables, bool bAddUserTables)
 {
 	try
 	{
@@ -3146,7 +3144,8 @@ void CFileProcessingDB::addProductSpecificDB(bool bAddUserTables)
 			ASSERT_RESOURCE_ALLOCATION("ELI19791", ipMgr != __nullptr);
 
 			// Add the schema from the product specific db manager
-			ipMgr->AddProductSpecificSchema(getThisAsCOMPtr(), asVariantBool(bAddUserTables));
+			ipMgr->AddProductSpecificSchema(getThisAsCOMPtr(),
+				asVariantBool(bOnlyTables), asVariantBool(bAddUserTables));
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27608")
@@ -3413,7 +3412,7 @@ void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29885");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::clear(bool bLocked, bool retainUserValues)
+void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserValues)
 {
 	try
 	{
@@ -3480,6 +3479,9 @@ void CFileProcessingDB::clear(bool bLocked, bool retainUserValues)
 				getEncryptedPWFromDB(strAdminPW, true);
 			}
 
+			// First remove all Product Specific stuff
+			removeProductSpecificDB(true, retainUserValues);
+
 			// Drop the tables
 			dropTables(retainUserValues);
 
@@ -3507,7 +3509,7 @@ void CFileProcessingDB::clear(bool bLocked, bool retainUserValues)
 			checkForNewDBManagers();
 
 			// Add the Product specific db after the base tables have been committed
-			addProductSpecificDB(!retainUserValues);
+			addProductSpecificDB(!bInitializing, !retainUserValues);
 
 			// Reset the database connection
 			resetDBConnection();

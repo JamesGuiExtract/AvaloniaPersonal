@@ -1609,14 +1609,16 @@ library UCLID_FILEPROCESSINGLib
 	{
 		// PROMISE: To create the required tables and relationships for the product that is 
 		//			implementing this interface.  
-		// ARGS:	bAddUserTables- VARIANT_TRUE if any user tables need to be added.
+		// ARGS:	bOnlyTables- VARIANT_TRUE if only tables are to be added (and not stored procedures, etc).
+		// ARGS:	bAddUserTables- VARIANT_TRUE if user tables need to be added.
 		[id(1), helpstring("method AddProductSpecificSchema")] HRESULT AddProductSpecificSchema(
-			[in] IFileProcessingDB* pDB, [in] VARIANT_BOOL bAddUserTables);
+			[in] IFileProcessingDB* pDB, [in] VARIANT_BOOL bOnlyTables, [in] VARIANT_BOOL bAddUserTables);
 
 		// PROMISE: To remove any relationships and tables that were added in a call to AddProductSpecificSchema
-		// ARGS:	bAddUserTables- VARIANT_TRUE if any user tables need to be retained.
+		// ARGS:	bOnlyTables- VARIANT_TRUE if only tables are to be added (and not stored procedures, etc).
+		// ARGS:	bAddUserTables- VARIANT_TRUE if user tables need to be retained.
 		[id(2), helpstring("method RemoveProductSpecificSchema")] HRESULT RemoveProductSpecificSchema(
-			[in] IFileProcessingDB* pDB, [in] VARIANT_BOOL bRetainUserTables);
+			[in] IFileProcessingDB* pDB, [in] VARIANT_BOOL bOnlyTables, [in] VARIANT_BOOL bRetainUserTables);
 
 		// PROMISE: Ensures the product database schema is up-to-date.
 		[id(3), helpstring("method ValidateSchema")] HRESULT ValidateSchema([in] IFileProcessingDB* pDB);

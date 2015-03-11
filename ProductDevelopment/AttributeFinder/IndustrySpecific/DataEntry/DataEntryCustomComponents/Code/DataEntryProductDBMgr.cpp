@@ -179,6 +179,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_IsLicensed(VARIANT_BOOL  * pbValue)
 // IProductSpecificDBMgr Methods
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB *pDB,
+																  VARIANT_BOOL bOnlyTables,
 																  VARIANT_BOOL bAddUserTables)
 {
 	try
@@ -297,7 +298,8 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema80(IFileProcess
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB,
-																	VARIANT_BOOL bRetainUserTables)
+																	 VARIANT_BOOL bOnlyTables,
+																	 VARIANT_BOOL bRetainUserTables)
 {
 	try
 	{

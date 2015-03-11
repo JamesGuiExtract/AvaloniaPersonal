@@ -1064,7 +1064,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		ipDBConnection->Close();
 
 		// Clear the new database to set up the tables
-		clear(false);
+		clear(false, true, false);
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17469");

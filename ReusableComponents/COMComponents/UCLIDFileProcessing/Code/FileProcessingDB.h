@@ -793,10 +793,10 @@ private:
 	IIUnknownVectorPtr getLicensedProductSpecificMgrs();
 
 	// Removes the schema for each of the licensed product specific managers
-	void removeProductSpecificDB(bool bRetainUserTables);
+	void removeProductSpecificDB(bool bOnlyTables, bool bRetainUserTables);
 
 	// Adds the schema for each of the licensed product specific managers
-	void addProductSpecificDB(bool bAddUserTables);
+	void addProductSpecificDB(bool bOnlyTables, bool bAddUserTables);
 
 	// Adds the schema for each of the licensed product specific managers with the schema that
 	// existed as of the release of Flex/IDS 8.0.
@@ -827,7 +827,8 @@ private:
 	void closeAllDBConnections(bool bTemporaryClose);
 
 	// Internal clear DB function
-	void clear(bool bLocked, bool retainUserValues = false);
+	// Use bInitializing only if initializing a database for the first time.
+	void clear(bool bLocked, bool bInitializing, bool retainUserValues);
 
 	// Internal DB initialization function for the 8.0 schema.
 	void init80DB();

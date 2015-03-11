@@ -2528,7 +2528,7 @@ bool CFileProcessingDB::Clear_Internal(bool bDBLocked, VARIANT_BOOL vbRetainUser
 		try
 		{
 			// Call the internal clear
-			clear(bDBLocked, asCppBool(vbRetainUserValues));
+			clear(bDBLocked, false, asCppBool(vbRetainUserValues));
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30651");
 	}

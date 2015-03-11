@@ -25,8 +25,10 @@ using namespace std;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-/// Version 2: https://extract.atlassian.net/browse/ISSUE-12801
-static const long glLABDE_DB_SCHEMA_VERSION = 2;
+// Version 2: https://extract.atlassian.net/browse/ISSUE-12801
+// Version 3: https://extract.atlassian.net/browse/ISSUE-12805 
+//			  (Order.ReferenceDateTime and ORMMessage columns)
+static const long glLABDE_DB_SCHEMA_VERSION = 3;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -125,6 +127,35 @@ int UpdateToSchemaVersion2(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37890");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 3;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE [Order] ADD [ReferenceDateTime] DATETIME");
+		vecQueries.push_back("ALTER TABLE [Order] ADD [ORMMessage] XML");
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37920");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -236,7 +267,8 @@ STDMETHODIMP CLabDEProductDBMgr::raw_IsLicensed(VARIANT_BOOL  * pbValue)
 // IProductSpecificDBMgr Methods
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB *pDB,
-																  VARIANT_BOOL bAddUserTables)
+															  VARIANT_BOOL bOnlyTables,
+															  VARIANT_BOOL bAddUserTables)
 {
 	try
 	{
@@ -275,6 +307,12 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
 		vecCreateQueries.push_back(gstrCREATE_ORDERFILE_ORDER_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_ORDERFILE_FAMFILE_INDEX);
 
+		if (!asCppBool(bOnlyTables))
+		{
+			// Add stored procedures
+			vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+		}
+
 		// Execute the queries to create the LabDE tables
 		executeVectorOfSQL(ipDBConnection, vecCreateQueries);
 
@@ -303,6 +341,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema80(IFileProcessingD
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLabDEProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB,
+																 VARIANT_BOOL bOnlyTables,
 																 VARIANT_BOOL bRetainUserTables)
 {
 	try
@@ -329,6 +368,11 @@ STDMETHODIMP CLabDEProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessing
 		getLabDETables(vecTables);
 
 		dropTablesInVector(ipDBConnection, vecTables);
+
+		if (!asCppBool(bOnlyTables))
+		{
+			executeCmdQuery(ipDBConnection, "DROP PROCEDURE [CullEmptyORMMessageNodes]", false);
+		}
 
 		return S_OK;
 	}
@@ -494,9 +538,17 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion2(ipConnection, pnNumSteps, NULL);
 					}
+					// Intentionally leaving out break since both updates 2 and 3 take place within
+					// FAM schema 125.
+
+			case 2: // The schema update from 2 to 3 needs to take place against FAM DB schema version 125
+					if (nFAMDBSchemaVersion == 125)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion3(ipConnection, pnNumSteps, NULL);
+					}
 					break;
 
-			case 2: break;
+			case 3: break;
 
 			default:
 				{
