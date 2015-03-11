@@ -91,7 +91,7 @@
 				<FullText>70-100</FullText>
 			</Range>
 			<Flag>
-				<FullText>H</FullText>
+				<FullText>HH</FullText>
 			</Flag>
 			<OriginalName>
 				<FullText>GLUCOSE</FullText>
@@ -163,7 +163,7 @@
 				<FullText>8.5-10.1</FullText>
 			</Range>
 			<Flag>
-				<FullText>L</FullText>
+				<FullText>LL</FullText>
 			</Flag>
 			<OriginalName>
 				<FullText>CALCIUM</FullText>
