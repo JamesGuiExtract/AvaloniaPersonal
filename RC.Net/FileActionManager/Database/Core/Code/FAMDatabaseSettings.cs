@@ -13,6 +13,7 @@ namespace Extract.FileActionManager.Database
     /// </summary>
     /// <typeparam name="T">The <see cref="ApplicationSettingsBase"/> derivative to be persisted.
     /// </typeparam>
+    [CLSCompliant(false)]
     public class FAMDatabaseSettings<T> : ExtractSettingsBase<T> where T : ApplicationSettingsBase, new()
     {
         #region Constants
