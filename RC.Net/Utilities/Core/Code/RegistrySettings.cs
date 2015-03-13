@@ -33,7 +33,7 @@ namespace Extract.Utilities
 
         #endregion Fields
 
-        #region Consturctors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistrySettings&lt;T&gt;"/> class.
@@ -50,7 +50,7 @@ namespace Extract.Utilities
         /// <param name="registryKeyName">Name of the registry key.</param>
         /// <param name="dynamic">if set to <see langword="true"/> [dynamic].</param>
         public RegistrySettings(string registryKeyName, bool dynamic)
-            :base(dynamic)
+            :base(dynamic, null)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace Extract.Utilities
 
                         if (value != null)
                         {
-                            UpdatePropertyFromString(property.Name, value);
+                            UpdatePropertyFromString(property.Name, value, false);
                         }
                     }
                 }

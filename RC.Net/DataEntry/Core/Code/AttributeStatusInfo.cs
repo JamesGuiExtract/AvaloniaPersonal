@@ -686,13 +686,20 @@ namespace Extract.DataEntry
 
             set
             {
-                if (value != _pauseQueries)
+                try
                 {
-                    _pauseQueries = value;
-                    if (!_pauseQueries)
+                    if (value != _pauseQueries)
                     {
-                        OnQueryDelayEnded();
+                        _pauseQueries = value;
+                        if (!_pauseQueries)
+                        {
+                            OnQueryDelayEnded();
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI37926");
                 }
             }
         }
@@ -1097,6 +1104,7 @@ namespace Extract.DataEntry
         /// validator associated with the attribute to be updated using values from other
         /// <see cref="IAttribute"/>'s and/or a database query.</param>
         [ComVisible(false)]
+        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes, 
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
             TabStopMode? tabStopMode, IDataEntryValidator validatorTemplate, string autoUpdateQuery,

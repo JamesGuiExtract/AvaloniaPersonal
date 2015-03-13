@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.XPath;
+using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities
 {
@@ -15,6 +17,7 @@ namespace Extract.Utilities
     /// loaded/saved to a specified config file and, optionally, dynamically updated as property
     /// values are changed.
     /// </summary>
+    [CLSCompliant(false)]
     public sealed class ConfigSettings<T> : ExtractSettingsBase<T> where T : ApplicationSettingsBase, new()
     {
         #region Constants
@@ -69,7 +72,7 @@ namespace Extract.Utilities
         static readonly object _lock = new object();
 
         /// <summary>
-        /// File-specific mutexs to lock access while creating/saving config files
+        /// File-specific mutexes to lock access while creating/saving config files
         /// </summary>
         static readonly Dictionary<string, object> _fileLocks =
             new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
@@ -108,7 +111,7 @@ namespace Extract.Utilities
         /// <see langword="null"/>, an appropriately named config file name will be automatically
         /// generated within the users ApplicationData folder.</param>
         public ConfigSettings(string configFileName)
-            : this(configFileName, true, true)
+            : this(configFileName, true, true, null)
         {
         }
 
@@ -125,7 +128,28 @@ namespace Extract.Utilities
         /// should be created if there is no config file at the specified location,
         /// <see langword="false"/> if an error should occur if the file is missing.</param>
         public ConfigSettings(string configFileName, bool dynamic, bool createIfMissing)
-            : this(configFileName, null, dynamic, createIfMissing)
+            : this(configFileName, null, dynamic, createIfMissing, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new ConfigSettings instance.
+        /// </summary>
+        /// <param name="configFileName">The config file to use as a source for the settings.
+        /// </param>
+        /// <param name="dynamic">If <see langword="true"/>, properties will be saved to disk as 
+        /// soon as they are modified and re-freshed from disk as necessary every time the Settings 
+        /// property is accessed. If <see langword="false"/> the properties will only be loaded and
+        /// saved to disk when explicitly requested.</param>
+        /// <param name="createIfMissing"><see langword="true"/> if a new config file instance
+        /// should be created if there is no config file at the specified location,
+        /// <see langword="false"/> if an error should occur if the file is missing.</param>
+        /// <param name="tagUtility">The <see cref="ITagUtility"/> that should be used to expand
+        /// setting values as they are loaded.</param>
+        [CLSCompliant(false)]
+        public ConfigSettings(string configFileName, bool dynamic, bool createIfMissing,
+            ITagUtility tagUtility)
+            : this(configFileName, null, dynamic, createIfMissing, tagUtility)
         {
         }
 
@@ -145,9 +169,12 @@ namespace Extract.Utilities
         /// <param name="createIfMissing"><see langword="true"/> if a new config file instance
         /// should be created if there is no config file at the specified location,
         /// <see langword="false"/> if an error should occur if the file is missing.</param>
+        /// <param name="tagUtility">The <see cref="ITagUtility"/> that should be used to expand
+        /// setting values as they are loaded.</param>
+        [CLSCompliant(false)]
         public ConfigSettings(string configFileName, string defaultConfigFileName, bool dynamic,
-            bool createIfMissing)
-            : base(dynamic)
+            bool createIfMissing, ITagUtility tagUtility)
+            : base(dynamic, tagUtility)
         {
             try
             {
@@ -467,7 +494,7 @@ namespace Extract.Utilities
         /// <summary>
         /// Returns a mutex object for all instances of sharing the same _fileName
         /// </summary>
-        /// <returns>A mutex objec to use when updating the config file.</returns>
+        /// <returns>A mutex object to use when updating the config file.</returns>
         object FileLock
         {
             get
@@ -822,8 +849,15 @@ namespace Extract.Utilities
                         SettingElement xmlSetting = configSection.Settings.Get(settingName);
                         if (xmlSetting != null)
                         {
-                            // Convert the string XML value to the appropriate type and apply the value.
-                            UpdatePropertyFromString(settingName, xmlSetting.Value.ValueXml.InnerText);
+                            // Get the string version of the value to apply to this setting,
+                            // interpreted as XML and expanding tags as specified.
+                            string stringValue =
+                                xmlSetting.Value.ValueXml.GetNodeValue(TagUtility, false, true);
+
+                            // Convert the string XML value to the appropriate type and apply the
+                            // value. GetNodeValue will have already expanded tags if appropriate,
+                            // so further expansion is never necessary.
+                            UpdatePropertyFromString(settingName, stringValue, false);
                         }
                     }
                 }
@@ -860,8 +894,8 @@ namespace Extract.Utilities
         /// set on non-<see langword="public"/> fields of the object as well.
         /// </summary>
         /// <param name="nodes">The <see cref="XmlNodeList"/> containing the settings.</param>
-        /// <param name="instance">The <see langword="object"/> to apply the settngs to.</param>
-        static void ProcessObjectSettings(XmlNodeList nodes, object instance)
+        /// <param name="instance">The <see langword="object"/> to apply the settings to.</param>
+        void ProcessObjectSettings(XmlNodeList nodes, object instance)
         {
             Type objectType = instance.GetType();
 
@@ -897,15 +931,21 @@ namespace Extract.Utilities
                         throw ee;
                     }
 
+                    // Get the string version of the value to apply to this setting, interpreted
+                    // as XML and expanding tags as specified (default to interpreting as XML as
+                    // the legacy usage for the objectSettings in config files has been to override
+                    // DEP control properties which are often XML queries).
+                    string stringValue = node.GetNodeValue(TagUtility, true, false);
+
                     objectProperty.SetValue(instance,
                         TypeDescriptor.GetConverter(objectProperty.PropertyType).ConvertFromString(
-                            node.InnerXml), null);
+                            stringValue), null);
                 }
             }
         }
 
         /// <summary>
-        /// Asserts the existance of and retrieves the value of the name <see cref="XmlAttribute"/>
+        /// Asserts the existence of and retrieves the value of the name <see cref="XmlAttribute"/>
         /// from the specified <see cref="XmlNode"/>.
         /// </summary>
         /// <param name="node"></param>
@@ -918,5 +958,93 @@ namespace Extract.Utilities
         }
 
         #endregion Private Members
+    }
+
+    /// <summary>
+    /// Extension methods for the <see cref="ConfigSettings{T}"/> class.
+    /// </summary>
+    [CLSCompliant(false)]
+    public static class ConfigSettingsExtensionMethods
+    {
+        /// <summary>
+        /// Reads the string representation of the specified <see paramref="node"/>.
+        /// NOTE: Path tags/functions are expanded as indicated by
+        /// <see paramref="expandTagsDefault"/> or an "expandTags" attribute on the node, but path
+        /// tags will not be expanded if the value is to be interpreted as literal XML.
+        /// </summary>
+        /// <param name="node">The <see cref="XmlNode"/> for which the value should be read.</param>
+        /// <param name="tagUtility">The <see cref="ITagUtility"/> that should be used to expand
+        /// setting values as they are loaded.</param>
+        /// <param name="xmlDefault"><see langword="true"/> to treat the value as literal XML unless
+        /// the node has and XML attribute specifying otherwise. If not treated as XML, XML escape
+        /// characters will be interpreted.</param>
+        /// <param name="expandTagsDefault"><see langword="true"/> to expand any path tag
+        /// expressions in the string value; otherwise, <see langword="false"/>.</param>
+        /// <returns>The string representation of the specified <see paramref="node"/>.</returns>
+        // While the XPathNavigator type may be better for node, I think that would require
+        // assumptions about which concrete type node was. Anyway, for the limited context this is
+        // being used, I don't think the effort to re-write to use XPathNavigator is justified.
+        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes", MessageId = "System.Xml.XmlNode")]
+        public static string GetNodeValue(this XmlNode node, ITagUtility tagUtility, 
+            bool xmlDefault, bool expandTagsDefault)
+        {
+            try
+            {
+                bool explicitSetting = false;
+
+                // Check if there is an attribute on the node specifying whether to treat the string
+                // as literal XML.
+                bool valueIsXml = xmlDefault;
+                XmlAttribute xmlAttribute = node.Attributes.OfType<XmlAttribute>()
+                    .Where(attribute =>
+                        attribute.Name.Equals("XML", StringComparison.OrdinalIgnoreCase))
+                    .SingleOrDefault();
+                if (xmlAttribute != null)
+                {
+                    valueIsXml = xmlAttribute.Value.ToBoolean();
+                    explicitSetting = true;
+                }
+
+                // Check if there is an attribute on the node specifying whether to expand any path
+                // tags or functions.
+                bool expandTags = expandTagsDefault;
+                xmlAttribute = node.Attributes.OfType<XmlAttribute>()
+                    .Where(attribute =>
+                        attribute.Name.Equals("expandTags", StringComparison.OrdinalIgnoreCase))
+                    .SingleOrDefault();
+                if (xmlAttribute != null)
+                {
+                    ExtractException.Assert("ELI37924", "Conflicting config node settings; Path " +
+                        "tags cannot be expanded on values interpreted as XML.",
+                        !valueIsXml || !explicitSetting, "Setting Value", node.InnerXml);
+
+                    // If the node value is explicitly indicated to have path tags expanded, assume
+                    // it is not to be interpreted as XML.
+                    valueIsXml = false;
+                    expandTags = xmlAttribute.Value.ToBoolean();
+                }
+
+                string value;
+                if (valueIsXml)
+                {
+                    value = node.InnerXml;
+                }
+                else
+                {
+                    value = node.InnerText;
+
+                    if (expandTags && tagUtility != null)
+                    {
+                        value = tagUtility.ExpandTagsAndFunctions(value, "", null);
+                    }
+                }
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37927");
+            }
+        }
     }
 }

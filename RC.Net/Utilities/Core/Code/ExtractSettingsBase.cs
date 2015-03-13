@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities
 {
@@ -77,11 +78,14 @@ namespace Extract.Utilities
         /// location as necessary every time the Settings property is accessed. If
         /// <see langword="false"/> the properties will only be loaded and saved to their persisted
         /// location when explicitly requested.</param>
+        /// <param name="tagUtility">The <see cref="ITagUtility"/> that should be used to expand
+        /// setting values as they are loaded.</param>
         // FXCop warns because the constructor calls CheckPropertyTypes which accesses Settings
         // which calls virtual method RefreshSettings. But RefreshSettings checks the Constructed
         // property before executing thereby preventing any unintended consequences.
+        [CLSCompliant(false)]
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        protected ExtractSettingsBase(bool dynamic)
+        protected ExtractSettingsBase(bool dynamic, ITagUtility tagUtility)
         {
             try
             {
@@ -95,6 +99,7 @@ namespace Extract.Utilities
                 }
 
                 _dynamic = dynamic;
+                TagUtility = tagUtility;
 
                 // Create a new instance (will have the default settings)
                 _settings = new T();
@@ -175,7 +180,7 @@ namespace Extract.Utilities
                         .ToArray();
                 }
 
-                // Explicity call SavePropertyValue for all specified settings to force fields to be
+                // Explicitly call SavePropertyValue for all specified settings to force fields to be
                 // created in the persisted location.
                 foreach (string settingName in propertyNames)
                 {
@@ -249,6 +254,24 @@ namespace Extract.Utilities
         #region Protected Members
 
         /// <summary>
+        /// Gets the <see cref="ITagUtility"/> that should be used to expand setting values as they
+        /// are loaded.
+        /// <para><b>Note:</b></para>
+        /// The setting values are loaded and tags expanded as values are loaded, not at the time
+        /// that settings are accessed. Therefore, context transient tags such as SourceDocName
+        /// cannot be evaluated. Additionally, the implementing class has the ability to dictate
+        /// which setting's values are expanded via a parameter to
+        /// <see cref="UpdatePropertyFromString"/>, so not all values are necessarily expanded just
+        /// because a tag utility is provided.
+        /// </summary>
+        [CLSCompliant(false)]
+        protected ITagUtility TagUtility
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Commits the current value of the specified property to the persisted location.
         /// </summary>
         /// <param name="settingName">The name of the property to be applied.</param>
@@ -302,14 +325,21 @@ namespace Extract.Utilities
         /// <summary>
         /// Updates the specified property from a string value.
         /// </summary>
-        /// <param name="propertyName">Name of the setting to update</param>
+        /// <param name="propertyName">Name of the setting to update.</param>
         /// <param name="value">The <see langword="string"/> value to convert and apply.</param>
-        protected void UpdatePropertyFromString(string propertyName, string value)
+        /// <param name="expandTags"><see langword="true"/> if <see paramref="value"/> should be
+        /// expanded via <see cref="TagUtility"/> (if provided).</param>
+        protected void UpdatePropertyFromString(string propertyName, string value, bool expandTags)
         {
             try 
 	        {
                 SettingsProperty property = Settings.Properties[propertyName];
                 ExtractException.Assert("ELI32885", "Invalid property.", property != null);
+
+                if (expandTags && TagUtility != null)
+                {
+                    value = TagUtility.ExpandTagsAndFunctions(value, "", null);
+                }
 
                 if (property.PropertyType == typeof(string))
                 {
@@ -403,7 +433,7 @@ namespace Extract.Utilities
         /// constructors).
         /// <para><b>Note to implementers</b></para>
         /// It is required that any derived class set this property to <see langword="true"/> at
-        /// the end of the the class's constructor.
+        /// the end of the class's constructor.
         /// </summary>
         protected bool Constructed
         {
@@ -576,7 +606,7 @@ namespace Extract.Utilities
             {
                 _refreshing = true;
 
-                // Load the settings from their persisted location if they have been modifed since
+                // Load the settings from their persisted location if they have been modified since
                 // the last time they were loaded.
                 DateTime lastModified = GetLastModifiedTime();
                 if (lastModified > _lastModified)

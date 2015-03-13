@@ -15,6 +15,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Xml;
 using System.Xml.XPath;
 using TD.SandDock;
 using UCLID_AFCORELib;
@@ -270,6 +271,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The name of the action being processed.
         /// </summary>
         string _actionName;
+
+        /// <summary>
+        /// The <see cref="ITagUtility"/> interface of the <see cref="FAMTagManager"/> provided to
+        /// expand path tags/functions.
+        /// </summary>
+        ITagUtility _tagUtility;
 
         /// <summary>
         /// Allows data entry specific database operations.
@@ -533,6 +540,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     tagManager = new FAMTagManager();
                 }
 
+                _tagUtility = (ITagUtility)tagManager;
+
                 string expandedConfigFileName = 
                     tagManager.ExpandTagsAndFunctions(settings.ConfigFileName, null);
 
@@ -542,8 +551,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     Path.GetDirectoryName(expandedConfigFileName);
 
                 // Initialize the application settings.
-                _applicationConfig =
-                    new ConfigSettings<Properties.Settings>(expandedConfigFileName, false, false);
+                _applicationConfig = new ConfigSettings<Properties.Settings>(
+                    expandedConfigFileName, false, false, _tagUtility);
 
                 // Initialize the user registry settings.
                 _registry = new RegistrySettings<Properties.Settings>(
@@ -3431,7 +3440,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Load the configuration settings from file.
                 ConfigSettings<Extract.DataEntry.Properties.Settings> config =
                     new ConfigSettings<Extract.DataEntry.Properties.Settings>(
-                        configFileName, masterConfigFileName, false, false);
+                        configFileName, masterConfigFileName, false, false, _tagUtility);
 
                 // Retrieve the name of the DEP assembly
                 string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
@@ -4272,20 +4281,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Load all properties of the defined connection.
                 do
                 {
+                    // Use GetNodeValue extension method for XmlNode to allow for expansion of path
+                    // tags in the config file.
+                    var xmlNode = (XmlNode)connectionProperty.UnderlyingObject;
+
                     if (connectionProperty.Name.Equals("databaseType",
                         StringComparison.OrdinalIgnoreCase))
                     {
-                        databaseType = connectionProperty.Value;
+                        databaseType = xmlNode.GetNodeValue(_tagUtility, false, true);
                     }
                     else if (connectionProperty.Name.Equals("localDataSource",
                         StringComparison.OrdinalIgnoreCase))
                     {
-                        localDataSource = connectionProperty.Value;
+                        localDataSource = xmlNode.GetNodeValue(_tagUtility, false, true);
                     }
                     else if (connectionProperty.Name.Equals("databaseConnectionString",
                         StringComparison.OrdinalIgnoreCase))
                     {
-                        databaseConnectionString = connectionProperty.Value;
+                        databaseConnectionString = xmlNode.GetNodeValue(_tagUtility, false, true);
                     }
                 }
                 while (connectionProperty.MoveToNext());

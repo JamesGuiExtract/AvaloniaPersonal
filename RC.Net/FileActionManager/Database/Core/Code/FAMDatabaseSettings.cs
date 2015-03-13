@@ -9,11 +9,10 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.Database
 {
     /// <summary>
-    /// An <see cref="ExtractSettingsBase{T}"/> that allows persistance to and from a FAM database.
+    /// An <see cref="ExtractSettingsBase{T}"/> that allows persistence to and from a FAM database.
     /// </summary>
     /// <typeparam name="T">The <see cref="ApplicationSettingsBase"/> derivative to be persisted.
     /// </typeparam>
-    [CLSCompliant(false)]
     public class FAMDatabaseSettings<T> : ExtractSettingsBase<T> where T : ApplicationSettingsBase, new()
     {
         #region Constants
@@ -40,7 +39,7 @@ namespace Extract.FileActionManager.Database
 
         #endregion Fields
 
-        #region Contructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FAMDatabaseSettings&lt;T&gt;"/> class.
@@ -57,7 +56,7 @@ namespace Extract.FileActionManager.Database
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "FAM")]
         public FAMDatabaseSettings(IFileProcessingDB FAMDatabase, bool dynamic,
             ILookup<string, string> propertyLookup)
-            : base(dynamic)
+            : base(dynamic, null)
         {
             try 
 	        {	        
@@ -79,7 +78,7 @@ namespace Extract.FileActionManager.Database
         #region Overrides
 
         /// <summary>
-        /// Loads the data from the the DBInfo table into the Settings instance.
+        /// Loads the data from the DBInfo table into the Settings instance.
         /// </summary>
         public override void Load()
         {
@@ -107,7 +106,7 @@ namespace Extract.FileActionManager.Database
                             }
                         }
 
-                        UpdatePropertyFromString(property.Name, value);
+                        UpdatePropertyFromString(property.Name, value, false);
                     }
                 }
             }
