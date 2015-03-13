@@ -153,6 +153,9 @@ private:
 	// The maximum number of pages that can fail without failing the document.
 	unsigned long m_uiMaxOcrPageFailureNumber;
 
+	// The name of the computer the task is running on.
+	string m_strComputerName;
+
 	/////////////
 	// Methods
 	/////////////
@@ -161,7 +164,8 @@ private:
 	IOCREnginePtr getOCREngine();
 
 	// Creates the work items for OCR in the database
-	long createWorkItems(long nActionID, IFileRecordPtr ipFileRecord, IFileProcessingDBPtr ipDB);
+	long createWorkItems(long nActionID, IFileRecordPtr ipFileRecord, IFileProcessingDBPtr ipDB,
+		const string &strProgressDescription);
 
 	// Creates the work item for the filename and page number
 	IWorkItemRecordPtr createWorkItem(string strFileName, string strPages);

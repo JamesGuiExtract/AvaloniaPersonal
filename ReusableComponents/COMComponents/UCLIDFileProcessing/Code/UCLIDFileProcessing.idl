@@ -682,6 +682,9 @@ library UCLID_FILEPROCESSINGLib
 			[out, retval] EFilePriority* pePriority);
 		[propput, id(13), helpstring("property Priority")] HRESULT Priority(
 			[in] EFilePriority ePriority);
+
+		[propget, id(14), helpstring ("property RunningTaskDescription")] HRESULT RunningTaskDescription([out, retval] BSTR *pOutput);
+		[propput, id(14), helpstring ("property RunningTaskDescription")] HRESULT RunningTaskDescription([in] BSTR Input);
 	}
 
 	[
@@ -1458,7 +1461,7 @@ library UCLID_FILEPROCESSINGLib
 		//			found record will be returned. 
 		[id(116), helpstring("method CreateWorkItemGroup")] HRESULT CreateWorkItemGroup(
 			[in] long nFileID, [in] long nActionID, [in] BSTR stringizedTask, [in] long nNumberOfWorkItems,
-			[out, retval] long *pnWorkItemGroupID);
+			[in] BSTR bstrRunningTaskDescription, [out, retval] long *pnWorkItemGroupID);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Adds the work items in pWorkItems to the WorkItem table with the WorkItemGroupID
 		// NOTE:	The WorkItem records in the pWorkItems vector are not required to have the 
@@ -1515,7 +1518,7 @@ library UCLID_FILEPROCESSINGLib
 		//			table for a found work group
 		[id(125), helpstring("method FindWorkItemGroup")] HRESULT FindWorkItemGroup(
 			[in] long nFileID, [in] long nActionID, [in] BSTR stringizedTask, [in] long nNumberOfWorkItems,
-			[out, retval] long *pnWorkItemGroupID); 
+			[in] BSTR bstrRunningTaskDescription, [out, retval] long *pnWorkItemGroupID); 
 		[id(126), helpstring("method SaveWorkItemBinaryOutput")] HRESULT SaveWorkItemBinaryOutput(
 			[in] long WorkItemID, [in] IUnknown *pBinaryOutput);
 		//-----------------------------------------------------------------------------------------

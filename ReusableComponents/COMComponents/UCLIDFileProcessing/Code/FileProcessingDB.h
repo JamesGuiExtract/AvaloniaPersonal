@@ -249,7 +249,7 @@ public:
 	STDMETHOD(IsFeatureEnabled)(BSTR bstrFeatureName, VARIANT_BOOL* pbFeatureIsEnabled);
 	STDMETHOD(DuplicateConnection)(IFileProcessingDB *pConnectionSource);
 	STDMETHOD(CreateWorkItemGroup)(long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
-			long *pnWorkItemGroupID);
+			BSTR bstrRunningTaskDescription, long *pnWorkItemGroupID);
 	STDMETHOD(AddWorkItems)(long nWorkItemGroupID, IIUnknownVector *pWorkItems);
 	STDMETHOD(GetWorkItemsForGroup)(long nWorkItemGroupID, long nStartPos, long nCount, IIUnknownVector **pWorkItems);
 	STDMETHOD(GetWorkItemGroupStatus)(long nWorkItemGroupID, WorkItemGroupStatus *pWorkGroupStatus,
@@ -260,7 +260,7 @@ public:
 	STDMETHOD(GetWorkGroupData)(long WorkItemGroupID, long *pnNumberOfWorkItems, BSTR *pstringizedTask);
 	STDMETHOD(SaveWorkItemOutput)(long WorkItemID, BSTR strWorkItemOutput);
 	STDMETHOD(FindWorkItemGroup)(long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
-			long *pnWorkItemGroupID);
+			BSTR bstrRunningTaskDescription, long *pnWorkItemGroupID);
 	STDMETHOD(SaveWorkItemBinaryOutput)(long WorkItemID, IUnknown *pBinaryOutput);
 	STDMETHOD(GetFileSets)(IVariantVector **pvecIDs);
 	STDMETHOD(AddFileSet)(BSTR bstrFileSetName, IVariantVector *pvecIDs);
@@ -280,7 +280,7 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
 private:
-	// Current schema version for the non normailized DB
+	// Current schema version for the non normalized DB
 	static const long ms_lFAMDBSchemaVersion;
 
 	class SetFileActionData
@@ -354,7 +354,7 @@ private:
 	// Machine name
 	string m_strMachineName;
 
-	// Used to hold the MachineID of m_strMachineName in the databse
+	// Used to hold the MachineID of m_strMachineName in the database
 	// this value is set to 0 if the database connection info changes
 	long m_lMachineID;
 
@@ -449,7 +449,7 @@ private:
 
 	IMiscUtilsPtr m_ipMiscUtils;
 
-	// Events used for the ping and statistics maintainence threads.
+	// Events used for the ping and statistics maintenance threads.
 	Win32Event m_eventStopMaintainenceThreads;
 	Win32Event m_eventPingThreadExited;
 	Win32Event m_eventStatsThreadExited;
@@ -480,7 +480,7 @@ private:
 	// Indicates whether the user was denied permission to run the fast file count query.
 	bool m_bDeniedFastCountPermission;
 
-	// Indicates whether the user has entered valide admin credentials.
+	// Indicates whether the user has entered valid admin credentials.
 	bool m_bLoggedInAsAdmin;
 
 	// A map of all enabled features to a boolean that indicates whether the feature should be
@@ -559,14 +559,14 @@ private:
 
 	// PROMISE:	To add multiple ActionStateTransition table records that are represented be the given data.
 	// ARGS:	ipConnection	- Connection object to use to update the tables
-	//			strAction		- The action whos state is changing
+	//			strAction		- The action whose state is changing
 	//			nActionID		- The id of the action that is changing
 	//			strToState		- The new state for the action
 	//			strException	- Contains the exception string if this transitioning to a failed state
 	//			strComment		- Comment for the added records
 	//			strWhereClause	- Where clause to select the records from the FPMFile that the state is changing, this should
 	//							  be used so that only one current action state is selected
-	//			strTopClause	- Top clause to specifiy the number of records that meet the where clause condition that should
+	//			strTopClause	- Top clause to specify the number of records that meet the where clause condition that should
 	//							  have records added to the ActionStateTransition table
 	void addASTransFromSelect (_ConnectionPtr ipConnection, const string &strAction,
 		long nActionID, const string &strToState, const string &strException, const string &strComment, 
@@ -744,7 +744,7 @@ private:
 	// Returns the this pointer as a IFileProcssingDBPtr COM pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr getThisAsCOMPtr();
 
-	// Checks the strPassword value agains the password from the database
+	// Checks the strPassword value against the password from the database
 	bool isPasswordValid(const string& strPassword, bool bUseAdmin);
 
 	// Returns true if the configured database exists and is blank.
@@ -1095,7 +1095,7 @@ private:
 	bool GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
 	bool IsFeatureEnabled_Internal(bool bDBLocked, BSTR bstrFeatureName, VARIANT_BOOL* pbFeatureIsEnabled);
 	bool CreateWorkItemGroup_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR stringizedTask,
-		long nNumberOfWorkItems, long *pnWorkItemGroupID);
+		long nNumberOfWorkItems, BSTR bstrRunningTaskDescription, long *pnWorkItemGroupID);
 	bool AddWorkItems_Internal(bool bDBLocked, long nWorkItemGroupID, IIUnknownVector *pWorkItems);
 	bool GetWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, long nStartPos, long nCount, IIUnknownVector **ppWorkItems);
 	bool GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWorkItemGroupID,
@@ -1105,8 +1105,8 @@ private:
 	bool NotifyWorkItemCompleted_Internal(bool bDBLocked, long nWorkItemID);
 	bool GetWorkGroupData_Internal(bool bDBLocked, long WorkItemGroupID, long *pnNumberOfWorkItems, BSTR *pstringizedTask);
 	bool SaveWorkItemOutput_Internal(bool bDBLocked, long WorkItemID, BSTR strWorkItemOutput);
-	bool FindWorkItemGroup_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR stringizedTask, long nNumberOfWorkItems,
-			long *pnWorkItemGroupID);
+	bool FindWorkItemGroup_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR stringizedTask, 
+		long nNumberOfWorkItems, BSTR bstrRunningTaskDescription, long *pnWorkItemGroupID);
 	bool SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long WorkItemID, IUnknown *pBinaryOutput);
 	bool GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
 	bool SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);

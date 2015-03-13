@@ -431,3 +431,31 @@ STDMETHODIMP CWorkItemRecord::put_Priority(EFilePriority ePriority)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37449");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::get_RunningTaskDescription(BSTR *pstrRunningTaskDescription)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI37921", pstrRunningTaskDescription != __nullptr);
+
+		*pstrRunningTaskDescription = _bstr_t(m_strRunningTaskDescription.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37922");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CWorkItemRecord::put_RunningTaskDescription(BSTR strRunningTaskDescription)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_strRunningTaskDescription = asString(strRunningTaskDescription);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37923");
+}
+//-------------------------------------------------------------------------------------------------

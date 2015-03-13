@@ -5232,6 +5232,7 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::getWorkItemFromFi
 	ipWorkItemRecord->FileID = getLongField(ipFields, "FileID");
 	ipWorkItemRecord->WorkGroupUPI = getStringField(ipFields, "WorkGroupUPI").c_str();
 	ipWorkItemRecord->Priority = (UCLID_FILEPROCESSINGLib::EFilePriority) getLongField(ipFields, "Priority");
+	ipWorkItemRecord->RunningTaskDescription = getStringField(ipFields, "RunningTaskDescription").c_str();
 
 	return ipWorkItemRecord;
 }

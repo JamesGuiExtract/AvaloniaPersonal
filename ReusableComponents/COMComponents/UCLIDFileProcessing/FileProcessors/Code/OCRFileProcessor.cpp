@@ -69,6 +69,8 @@ const string& gstrDEFAULT_MAX_OCR_PAGE_FAILURE_NUMBER = "10";
 
 const long gnPAGES_PER_WORK_ITEM = 5;
 
+const string& gstrCOMPONENT_DESCRIPTION = "Core: OCR document";
+
 //--------------------------------------------------------------------------------------------------
 // COCRFileProcessor
 //--------------------------------------------------------------------------------------------------
@@ -87,6 +89,7 @@ COCRFileProcessor::COCRFileProcessor()
 {
 	try
 	{
+		m_strComputerName = getComputerName();
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI11043")
 }
@@ -255,10 +258,26 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			IFileProcessingDBPtr ipDB(pDB);
 			ASSERT_RESOURCE_ALLOCATION("ELI36925", ipDB != __nullptr);
 
-			// Create the work items
-			long nWorkGroup = createWorkItems(nActionID, ipFileRecord, ipDB);
-			
 			IProgressStatusPtr ipProgressStatus(pProgressStatus);
+			
+			// Build the progress description string
+			string strProgressDescription;
+			if (ipProgressStatus != __nullptr)
+			{
+				string strTmp = asString(ipProgressStatus->Text);
+				if (!strTmp.empty())
+				{
+					strProgressDescription = strTmp + " from " + m_strComputerName;
+				}
+			}
+			else
+			{
+				strProgressDescription = gstrCOMPONENT_DESCRIPTION + " from " + m_strComputerName;
+			}
+			
+			// Create the work items
+			long nWorkGroup = createWorkItems(nActionID, ipFileRecord, ipDB, strProgressDescription);
+			
 			EFileProcessingResult processingResult = 
 				waitForWorkToComplete(ipProgressStatus, ipDB, nWorkGroup, strInputFileName);
 
@@ -387,7 +406,7 @@ STDMETHODIMP COCRFileProcessor::raw_GetComponentDescription(BSTR * pstrComponent
 	{
 		ASSERT_ARGUMENT("ELI19614", pstrComponentDescription != __nullptr);
 
-		*pstrComponentDescription = _bstr_t("Core: OCR document").Detach();
+		*pstrComponentDescription = _bstr_t(gstrCOMPONENT_DESCRIPTION.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11031")
 
@@ -754,6 +773,9 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 
 		ISpatialStringPtr ipSS;
 		
+		// Initialize the progress for the workitem
+		pProgressStatus->InitProgressStatus(pWorkItem->RunningTaskDescription,0, 1, VARIANT_TRUE);		
+		
 		if (m_eOCRPageRangeType == UCLID_FILEPROCESSORSLib::kOCRAll)
 		{
 			// make sure there are 2 pages in vecPages
@@ -762,23 +784,51 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 				UCLIDException ueAll("ELI37795", "No Page specified.");
 				throw ueAll;
 			}
-			// process the 2 pages in the vecpages vector as strart and end
+
+			// Add pages to the work item progress description
+			string strTaskDescription = pWorkItem->RunningTaskDescription;
+			if (vecPages[0] != vecPages[1])
+			{
+				strTaskDescription = strTaskDescription + " Pages " + asString(vecPages[0]) + 
+					"-" + asString(vecPages[1]);
+			}
+			else
+			{
+				strTaskDescription = strTaskDescription + " Page" + asString(vecPages[0]);
+			}
+		
+			pProgressStatus->StartNextItemGroup(strTaskDescription.c_str(),1);
+
+			// process the 2 pages in the vecpages vector as start and end
 			ipSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
 				vecPages[0], vecPages[1], UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
-				UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
+				UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus->SubProgressStatus);
 		}
 		else if (m_eOCRPageRangeType == UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages)
 		{
 			// Will need to join each of the strings that are returned so need an IUnknownVector
 			IIUnknownVectorPtr ipPages(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI37796", ipPages != __nullptr);
+			
+			// Initialize the progress for the workitem
+			pProgressStatus->InitProgressStatus(pWorkItem->RunningTaskDescription,0, 
+				vecPages.size(), VARIANT_TRUE);	
+			
+			// Add pages to the work item progress description
+			string strPages = (vecPages.size() > 1) ? " Pages ": " Page ";
+			for (int i = 0; i < vecPages.size(); i++)
+			{
+				strPages = strPages + ((i == 0) ? " " : ", ") + asString(vecPages[i]);
+			}
 
+			string strTaskDescription = asString(pWorkItem->RunningTaskDescription) + strPages;
 			for (int i = 0;i < vecPages.size(); i++)
 			{
+				pProgressStatus->StartNextItemGroup(strTaskDescription.c_str(),1);
 				ISpatialStringPtr ipTempSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
 					vecPages[i], vecPages[i], UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
-					UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
-
+					UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus->SubProgressStatus);
+				pProgressStatus->CompleteProgressItems(strTaskDescription.c_str(), 1 );
 				ipPages->PushBack(ipTempSS);
 			}
 
@@ -880,7 +930,8 @@ IOCREnginePtr COCRFileProcessor::getOCREngine()
 	return m_ipOCREngine;
 }
 //-------------------------------------------------------------------------------------------------
-long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRecord, IFileProcessingDBPtr ipDB)
+long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRecord, IFileProcessingDBPtr ipDB,
+	const string &strProgressDescription)
 {
 	try
 	{
@@ -909,7 +960,8 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		// Only look for an existing work item group if this can be canceled
 		if (m_bAllowCancelBeforeComplete)
 		{
-			nWorkItemGroupID = ipDB->FindWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nNumberOfWorkItems);
+			nWorkItemGroupID = ipDB->FindWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, 
+				nNumberOfWorkItems, strProgressDescription.c_str());
 		}
 
 		// The record already exists so return the group id
@@ -923,7 +975,8 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		case UCLID_FILEPROCESSORSLib::kOCRAll:
 			{
 				// Create the work item group
-				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nNumberOfWorkItems); 
+				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, 
+					bstrStringized, nNumberOfWorkItems, strProgressDescription.c_str()); 
 				for (long i = 0; i < nNumberOfWorkItems; i++)
 				{
 					string strPages;
@@ -955,7 +1008,8 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 		case UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages:
 			{
 				// Create the work item group
-				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, bstrStringized, nNumberOfWorkItems); 
+				nWorkItemGroupID = ipDB->CreateWorkItemGroup(ipFileRecord->FileID, nActionID, 
+					bstrStringized, nNumberOfWorkItems, strProgressDescription.c_str()); 
 
 				string strPages = "";
 
@@ -1117,7 +1171,7 @@ IWorkItemRecordPtr COCRFileProcessor::createWorkItem(string strFileName, string 
 EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPtr ipProgressStatus,
 	IFileProcessingDBPtr ipDB, long nWorkGroup, const string &strInputFileName)
 {
-	// Semaphore is assumed to be aquired for the thread before the call
+	// Semaphore is assumed to be acquired for the thread before the call
 	// to ProcessFile
 	UPI upi = UPI::getCurrentProcessUPI();
 
@@ -1274,8 +1328,8 @@ void COCRFileProcessor::parseOCRInputText(const string& strInputText, string& st
 	if (vecTokens.size() < 1)
 	{
 		UCLIDException ue("ELI37793", "WorkItem input not correct format.");
-		ue.addDebugInfo("Expected format 1", "<FileName with tags>| <page range eg. 1-4>");
-		ue.addDebugInfo("Expected format 2", "<FileName with tags>| <pages eg. 1|3|4>");
+		ue.addDebugInfo("Expected format 1", "<FileName with tags>| <page range e.g. 1-4>");
+		ue.addDebugInfo("Expected format 2", "<FileName with tags>| <pages e.g. 1|3|4>");
 		ue.addDebugInfo("Input", strInputText);
 		throw ue;
 	}
@@ -1299,8 +1353,8 @@ void COCRFileProcessor::parseOCRInputText(const string& strInputText, string& st
 		if (vecStrPages.size() < 1)
 		{
 			UCLIDException ue("ELI37794", "WorkItem input not correct format.");
-			ue.addDebugInfo("Expected format 1", "<FileName with tags>| <page range eg. 1-4>");
-			ue.addDebugInfo("Expected format 2", "<FileName with tags>| <pages eg. 1|3|4>");
+			ue.addDebugInfo("Expected format 1", "<FileName with tags>| <page range e.g. 1-4>");
+			ue.addDebugInfo("Expected format 2", "<FileName with tags>| <pages e.g. 1|3|4>");
 			ue.addDebugInfo("Input", strInputText);
 			throw ue;
 		}

@@ -342,7 +342,8 @@ static const string gstrCREATE_WORK_ITEM_GROUP_TABLE =
 	"[ActionID] [int] NOT NULL,"
 	"[StringizedSettings] [nvarchar](MAX) NULL,"
 	"[UPI] [nvarchar](450) NULL, "
-	"[NumberOfWorkItems] [int] NOT NULL)";
+	"[NumberOfWorkItems] [int] NOT NULL, "
+	"RunningTaskDescription [nvarchar](256) NULL)";
 
 static const string gstrCREATE_WORK_ITEM_TABLE_V118 =
 	"CREATE TABLE [dbo].[WorkItem]("
@@ -930,7 +931,7 @@ static const string gstrDELETE_OLD_INPUT_EVENT_RECORDS =
 	"(SELECT CAST([Value] AS int) FROM [DBInfo] WHERE [Name] = '"
 	+ gstrINPUT_EVENT_HISTORY_SIZE + "'), 30))";
 
-// Query to use to calclulate and insert new ActionStatistics records for the ActionIDs when the id
+// Query to use to calculate and insert new ActionStatistics records for the ActionIDs when the id
 // to recreate is determined by the <ActionIDWhereClause> which needs to be substituted in.
 // NOTE: This query will throw and exception if the ActionStatistics record for that action id 
 //		 already exists.
@@ -1133,7 +1134,7 @@ static const string gstrTAG_ID_VAR = "<TagID>";
 static const string gstrUPDATE_DOC_TAG_HISTORY_VAR = "<UpdateDocTagHistory>";
 
 // Updates the DocTagHistory table if gstrUPDATE_DOC_TAG_HISTORY_VAR is 1
-// NOTE: This query ends with " END" to ensure it is nested withing whichever query
+// NOTE: This query ends with " END" to ensure it is nested within whichever query
 // uses it. Therefore, any query using it must include "BEGIN".
 #define UPDATE_DOC_TAG_HISTORY_QUERY(TagAdded) \
 	" IF (1 = " + gstrUPDATE_DOC_TAG_HISTORY_VAR + ")" \
@@ -1240,14 +1241,16 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 "		[BinaryInput] [varbinary](MAX) NULL, \r\n"
 "		[FileID] [int] NULL, \r\n"
 "		[WorkGroupUPI] [nvarchar](512) NULL, \r\n"
-"		[Priority] [int] NULL \r\n"
+"		[Priority] [int] NULL, \r\n"
+"		[RunningTaskDescription] [nvarchar](256) NULL \r\n"
 "	); \r\n"
 "	SET NOCOUNT ON \r\n"
 "	BEGIN TRY \r\n"
 "		UPDATE [dbo].WorkItem Set Status = 'R', UPI = '<UPI>'  \r\n"
 "		OUTPUT DELETED.ID, DELETED.WorkItemGroupID, WorkItemGroup.ActionID, INSERTED.Status, DELETED.[Input], "
 "			DELETED.[Output], INSERTED.UPI, FAMFile.FileName, DELETED.StringizedException, NULL, "
-"			DELETED.BinaryInput, FAMFile.ID, WorkItemGroup.UPI, FileActionStatus.Priority INTO @OutputTableVar  \r\n"
+"			DELETED.BinaryInput, FAMFile.ID, WorkItemGroup.UPI, FileActionStatus.Priority, "
+"			WorkItemGroup.RunningTaskDescription INTO @OutputTableVar  \r\n"
 "		FROM  WorkItem INNER JOIN WorkItemGroup ON WorkItemGroup.ID = WorkItem.WorkItemGroupID "
 "		INNER JOIN FAMFile ON FAMFile.ID = WorkItemGroup.FileID "
 "		INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND  "
@@ -1299,7 +1302,7 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 
 const string gstrADD_WORK_ITEM_GROUP_QUERY = 
 	"INSERT INTO [dbo].WorkItemGroup (FileID, ActionID, StringizedSettings, UPI, "
-	"NumberOfWorkItems) "
+	"NumberOfWorkItems, RunningTaskDescription) "
 	"OUTPUT INSERTED.ID ";
 
 const string gstrADD_WORK_ITEM_QUERY =
@@ -1327,6 +1330,7 @@ const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE =
 	"  ,[FileID] "
 	"  ,[WorkItemGroup].[UPI] as WorkGroupUPI "
 	"  ,[Priority] "
+	"  ,[RunningTaskDescription] "
 	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
 	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
 	"WHERE WorkItemGroupID = <WorkItemGroupID> "

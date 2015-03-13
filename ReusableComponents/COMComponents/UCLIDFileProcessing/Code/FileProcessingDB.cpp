@@ -2843,7 +2843,7 @@ STDMETHODIMP CFileProcessingDB::GetWorkItemGroupStatus(long nWorkItemGroupID, Wo
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::CreateWorkItemGroup(long nFileID, long nActionID,  
-			BSTR stringizedTask, long nNumberOfWorkItems, long *pnWorkItemGroupID)
+			BSTR stringizedTask, long nNumberOfWorkItems, BSTR bstrRunningTaskDescription, long *pnWorkItemGroupID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -2851,11 +2851,13 @@ STDMETHODIMP CFileProcessingDB::CreateWorkItemGroup(long nFileID, long nActionID
 	{
 		validateLicense();
 		
-		if (!CreateWorkItemGroup_Internal(false, nFileID, nActionID, stringizedTask, nNumberOfWorkItems, pnWorkItemGroupID))
+		if (!CreateWorkItemGroup_Internal(false, nFileID, nActionID, stringizedTask, nNumberOfWorkItems,
+			bstrRunningTaskDescription, pnWorkItemGroupID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
-			CreateWorkItemGroup_Internal(true,  nFileID, nActionID, stringizedTask, nNumberOfWorkItems, pnWorkItemGroupID);
+			CreateWorkItemGroup_Internal(true,  nFileID, nActionID, stringizedTask, nNumberOfWorkItems, 
+				bstrRunningTaskDescription, pnWorkItemGroupID);
 		}
 
 		return S_OK;
@@ -2984,8 +2986,8 @@ STDMETHODIMP CFileProcessingDB::SaveWorkItemOutput(long WorkItemID, BSTR strWork
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36920");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::FindWorkItemGroup(long nFileID, long nActionID,  
-			BSTR stringizedTask, long nNumberOfWorkItems, long *pnWorkItemGroupID)
+STDMETHODIMP CFileProcessingDB::FindWorkItemGroup(long nFileID, long nActionID, BSTR stringizedTask, 
+	long nNumberOfWorkItems, BSTR bstrRunningTaskDescription, long *pnWorkItemGroupID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -2993,11 +2995,13 @@ STDMETHODIMP CFileProcessingDB::FindWorkItemGroup(long nFileID, long nActionID,
 	{
 		validateLicense();
 		
-		if (!FindWorkItemGroup_Internal(false, nFileID, nActionID, stringizedTask, nNumberOfWorkItems, pnWorkItemGroupID))
+		if (!FindWorkItemGroup_Internal(false, nFileID, nActionID, stringizedTask, nNumberOfWorkItems, 
+			bstrRunningTaskDescription, pnWorkItemGroupID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
-			FindWorkItemGroup_Internal(true,  nFileID, nActionID, stringizedTask, nNumberOfWorkItems, pnWorkItemGroupID);
+			FindWorkItemGroup_Internal(true,  nFileID, nActionID, stringizedTask, nNumberOfWorkItems, 
+				bstrRunningTaskDescription, pnWorkItemGroupID);
 		}
 
 		return S_OK;

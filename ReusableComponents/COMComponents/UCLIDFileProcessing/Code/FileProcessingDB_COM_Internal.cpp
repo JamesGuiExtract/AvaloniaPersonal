@@ -31,7 +31,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 125;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 126;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -912,6 +912,27 @@ int UpdateToSchemaVersion125(_ConnectionPtr ipConnection, long *pnNumSteps,
 	vecQueries.push_back("ALTER TABLE dbo.ActiveFAM DROP CONSTRAINT DF_ActiveFAM_LastPingTime");
 	vecQueries.push_back(
 		"ALTER TABLE dbo.ActiveFAM ADD CONSTRAINT DF_ActiveFAM_LastPingTime DEFAULT (getutcdate()) FOR LastPingTime");
+	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+	executeVectorOfSQL(ipConnection, vecQueries);
+
+	return nNewSchemaVersion;
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion126(_ConnectionPtr ipConnection, long *pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	int nNewSchemaVersion = 126;
+
+	if (pnNumSteps != __nullptr)
+	{
+		// This is such a small tweak-- use a single step as opposed to the usual 3.
+		*pnNumSteps += 1;
+		return nNewSchemaVersion;
+	}
+
+	vector<string> vecQueries;
+	vecQueries.push_back("ALTER TABLE dbo.WorkItemGroup ADD RunningTaskDescription nvarchar(256) NULL"); 
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
@@ -5897,7 +5918,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 122:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion123);
 				case 123:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion124);
 				case 124:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion125);
-				case 125:	break;
+				case 125:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion126);
+				case 126:	break;
 
 				default:
 					{
@@ -6699,7 +6721,7 @@ bool CFileProcessingDB::GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWo
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFileID, long nActionID, 
-	BSTR stringizedTask, long nNumberOfWorkItems, long *pnWorkItemGroupID)
+	BSTR stringizedTask, long nNumberOfWorkItems, BSTR bstrRunningTaskDescription, long *pnWorkItemGroupID)
 {
 	try
 	{
@@ -6712,6 +6734,7 @@ bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFile
 			string strActionID = asString(nActionID);
 			string strStringizedTask = asString(stringizedTask);
 			string strNumberOfWorkItems = asString(nNumberOfWorkItems);
+			string strRunningTaskDescription = asString(bstrRunningTaskDescription);
 
 			// Create the query to get matching work item group id
 			string strGetExisting = gstrGET_WORK_ITEM_GROUP_ID;
@@ -6720,13 +6743,16 @@ bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFile
 			replaceVariable(strGetExisting, "<StringizedSettings>", strStringizedTask);
 			replaceVariable(strGetExisting, "<NumberOfWorkItems>", strNumberOfWorkItems);
 
+			// Escape the ' in the task description since it will be used in a query
+			replaceVariable(strRunningTaskDescription, "'", "''");
+
 			// Open a recordset that contain only the record (if it exists) with the given filename
 			string strAddWorkItemGroupSQL = gstrADD_WORK_ITEM_GROUP_QUERY;
 
 			// Add the values to the query
 			strAddWorkItemGroupSQL += " VALUES(" + strFileID + ", " + strActionID +
 				", '" + strStringizedTask + "', '" +
-				m_strUPI + "', " + strNumberOfWorkItems + ")";
+				m_strUPI + "', " + strNumberOfWorkItems + ", '" + strRunningTaskDescription + "')";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -7110,7 +7136,7 @@ bool CFileProcessingDB::SaveWorkItemOutput_Internal(bool bDBLocked, long WorkIte
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID, long nActionID, 
-	BSTR stringizedTask, long nNumberOfWorkItems, long *pnWorkItemGroupID)
+	BSTR stringizedTask, long nNumberOfWorkItems, BSTR bstrRunningTaskDescription, long *pnWorkItemGroupID)
 {
 	try
 	{
@@ -7123,6 +7149,7 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 			string strActionID = asString(nActionID);
 			string strStringizedTask = asString(stringizedTask);
 			string strNumberOfWorkItems = asString(nNumberOfWorkItems);
+			string strRunningTaskDescription = asString(bstrRunningTaskDescription);
 
 			// Create the query to get matching work item group id
 			string strGetExisting = gstrGET_WORK_ITEM_GROUP_ID;
@@ -7162,6 +7189,7 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 					TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
 					// need to update the UPI to the current UPI
 					string setUPI = "UPDATE WorkItemGroup SET UPI = '" + m_strUPI + 
+						"', RunningTaskDescription = '" + strRunningTaskDescription + 
 						"' WHERE ID = " + asString(*pnWorkItemGroupID);
 					executeCmdQuery(ipConnection, setUPI);
 					tg.CommitTrans();

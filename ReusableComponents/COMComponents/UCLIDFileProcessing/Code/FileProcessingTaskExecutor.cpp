@@ -565,6 +565,14 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
 							__nullptr : ipProgressStatus->SubProgressStatus;
 
+						// Initialize the Sub-ProgressStatus with the parent progress text
+						// This allows the task being executed to have the progress text of the 
+						// parent - this is used for progress in work items 
+						if (ipSubProgressStatus != __nullptr)
+						{
+							ipSubProgressStatus->InitProgressStatus(ipProgressStatus->Text, 0, 1, VARIANT_FALSE);
+						}
+
 						// Ensure that in the case of an error that m_ipCurrentTask will be restored to NULL
 						ValueRestorer<UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr> restorer(m_ipCurrentTask, NULL);
 

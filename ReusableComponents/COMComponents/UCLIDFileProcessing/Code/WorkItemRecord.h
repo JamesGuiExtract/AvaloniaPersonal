@@ -76,6 +76,8 @@ public:
 	STDMETHOD(put_WorkGroupUPI)(BSTR UPI);
 	STDMETHOD(get_Priority)(EFilePriority* pePriority);
 	STDMETHOD(put_Priority)(EFilePriority ePriority);
+	STDMETHOD(get_RunningTaskDescription)(BSTR* pbstrRunningTaskDescription);
+	STDMETHOD(put_RunningTaskDescription)(BSTR bstrRunningTaskDescription);
 
 private:
 
@@ -93,6 +95,7 @@ private:
 	long m_nFileID;
 	string m_strWorkGroupUPI;
 	EFilePriority m_ePriority;
+	string m_strRunningTaskDescription;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WorkItemRecord), CWorkItemRecord)

@@ -105,7 +105,7 @@ void StandbyThread::endStandby()
 		// Do not attempt the same code here that was added to
 		// CFileProcessingTaskExecutor::StandbyThread::endStandby() to address LegacyRCAndUtils:6211.
 		// The race condition is much less likely to occur in this class (the mgmt role would need
-		// to be destoryed in the time before m_eventCancelProcessing.signal is called) and doing
+		// to be destroyed in the time before m_eventCancelProcessing.signal is called) and doing
 		// so here would cause a deadlock. In the extremely unlikely case that the race condition
 		// occurs here, the only negative side-effect is that an exception will be logged (ELI33935).
 	}
@@ -300,7 +300,7 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB* pDB, long lAction
 		m_eventPause.reset();
 		m_eventResume.reset();
 
-		// Initialice the current running state to normal stop.
+		// Initialize the current running state to normal stop.
 		m_eCurrentRunningState = kNormalStop;
 
 		// start the processing thread
@@ -1608,7 +1608,7 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		m_ipProcessingSingleFileRecord = __nullptr;
 		m_bProcessingSingleFile = false;
 
-		// Exceptions that occured while processing a file in processTask will not be thrown out.
+		// Exceptions that occurred while processing a file in processTask will not be thrown out.
 		// Throw the exception here if necessary.
 		if (!strException.empty())
 		{
@@ -1806,7 +1806,7 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadProc(void *pData)
 //-------------------------------------------------------------------------------------------------
 UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 {
-	// cast argument into Work item thread data structure porinter
+	// cast argument into Work item thread data structure pointer
 	WorkItemThreadData *pThreadData = static_cast<WorkItemThreadData *>(pData);
 	ASSERT_ARGUMENT("ELI36866", pThreadData != __nullptr);
 
@@ -1820,7 +1820,7 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 		// Setup the database pointer
 		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(pThreadData->m_pDB);
 
-		// Setup pointer to the file processing managerment role
+		// Setup pointer to the file processing management role
 		CFileProcessingMgmtRole *pFPMgmtRole = pThreadData->m_pFPMgmtRole;
 		ASSERT_RESOURCE_ALLOCATION("ELI37138", pFPMgmtRole != __nullptr);
 
@@ -2096,7 +2096,7 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 			// we now have a valid task that we need to process
 			try
 			{
-				// The semaphore has already been aquired
+				// The semaphore has already been acquired
 				Win32SemaphoreLockGuard lg(parallelSemaphore, false);
 
 				// process the task
