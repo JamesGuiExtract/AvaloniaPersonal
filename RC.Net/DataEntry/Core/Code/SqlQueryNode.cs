@@ -22,8 +22,14 @@ namespace Extract.DataEntry
         /// <summary>
         /// Cached SQL query results for frequently used or expensive queries.
         /// </summary>
-        static Dictionary<string, DbConnectionWrapper> _connectionInfo =
-            new Dictionary<string, DbConnectionWrapper>();
+        // https://extract.atlassian.net/browse/ISSUE-12827
+        // The data query framework (primarily AttributeStatusInfo) is set up to run independently
+        // on separate threads by having static fields be designated ThreadStatic. In this case,
+        // if _connectionInfo is not set to be ThreadStatic and the DataQueryRuleObject is being
+        // used in a multi-threaded FPS file, the connection (originally assigned via 
+        // DataEntryQuery.Create()) in one thread may be inappropriately used in another thread.
+        [ThreadStatic]
+        static Dictionary<string, DbConnectionWrapper> _connectionInfo;
 
         #endregion Statics
 
@@ -97,7 +103,7 @@ namespace Extract.DataEntry
                 // results; when those results are subsequently combined before evaluation, there
                 // will be no whitespace where the carriage return was. Since it can be assumed that
                 // literal newline chars are not intended to delineate multiple results for an SQL
-                // query, allow newline chars to be treated as liternal newline chars.
+                // query, allow newline chars to be treated as literal newline chars.
                 TreatNewLinesAsWhiteSpace = true;
             }
             catch (Exception ex)
@@ -129,6 +135,12 @@ namespace Extract.DataEntry
 
                 ExtractException.Assert("ELI37783", "Database must be specified for SQL query nodes.",
                     DatabaseConnections != null && DatabaseConnections.ContainsKey(connectionName));
+
+                // _connectionInfo is ThreadStatic; ensure it is created per-thread.
+                if (_connectionInfo == null)
+                {
+                    _connectionInfo = new Dictionary<string, DbConnectionWrapper>();
+                }
 
                 // Look for an existing DbConnectionWrapper under this name.
                 if (_connectionInfo.TryGetValue(connectionName, out _currentConnection))
@@ -249,7 +261,7 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    // If the query is blank, just return an emptry result (not an error condition).
+                    // If the query is blank, just return an empty result (not an error condition).
                     queryResults = new string[0];
                 }
 
