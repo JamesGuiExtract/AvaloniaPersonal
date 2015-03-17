@@ -31,7 +31,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 126;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 127;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -933,6 +933,28 @@ int UpdateToSchemaVersion126(_ConnectionPtr ipConnection, long *pnNumSteps,
 
 	vector<string> vecQueries;
 	vecQueries.push_back("ALTER TABLE dbo.WorkItemGroup ADD RunningTaskDescription nvarchar(256) NULL"); 
+	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+	executeVectorOfSQL(ipConnection, vecQueries);
+
+	return nNewSchemaVersion;
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion127(_ConnectionPtr ipConnection, long *pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	int nNewSchemaVersion = 127;
+
+	if (pnNumSteps != __nullptr)
+	{
+		// This is such a small tweak-- use a single step as opposed to the usual 3.
+		*pnNumSteps += 1;
+		return nNewSchemaVersion;
+	}
+
+	vector<string> vecQueries;
+	vecQueries.push_back("ALTER TABLE dbo.FileMetadataFieldValue ALTER COLUMN Value nvarchar(400) NULL"); 
+	vecQueries.push_back(gstrMETADATA_FIELD_VALUE_VALUE_INDEX);
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
@@ -5919,7 +5941,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 123:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion124);
 				case 124:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion125);
 				case 125:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion126);
-				case 126:	break;
+				case 126:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion127);
+				case 127:	break;
 
 				default:
 					{

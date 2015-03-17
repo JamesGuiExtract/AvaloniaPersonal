@@ -380,7 +380,7 @@ static const string gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE =
 	"[ID] INT NOT NULL IDENTITY(1,1) CONSTRAINT [PK_FileMetadataFieldValue] PRIMARY KEY CLUSTERED, "
 	"[FileID] INT NOT NULL, "
 	"[MetadataFieldID] INT NOT NULL, "
-	"[Value] NVARCHAR(MAX))";
+	"[Value] NVARCHAR(400))";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
@@ -454,6 +454,11 @@ static const string gstrCREATE_WORK_ITEM_ID_STATUS_INDEX =
 
 static const string gstrMETADATA_FIELD_VALUE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_FileMetadataFieldValue] ON [FileMetadataFieldValue]([FileID], [MetadataFieldID])";
+
+static const string gstrMETADATA_FIELD_VALUE_VALUE_INDEX = 
+	"CREATE NONCLUSTERED INDEX "
+	"[IX_FileMetadataFieldValue_Value] ON [dbo].[FileMetadataFieldValue] ( "
+	"[MetadataFieldID] ASC,  [Value] ASC ) INCLUDE ([FileID]) ";
 
 static const string gstrCREATE_FAST_ACTIONID_INDEX = 
 	"CREATE NONCLUSTERED INDEX IX_FileActionStateTransition_ActionID "
