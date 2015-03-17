@@ -23,8 +23,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._documentTypeComboBox = new System.Windows.Forms.ComboBox();
             this._scrollPanel = new Extract.DataEntry.Utilities.DataEntryApplication.DataEntryScrollPanel();
             this._dockContainer = new TD.SandDock.DockContainer();
+            this._dockContainer1 = new TD.SandDock.DockContainer();
             this._magnifierDockableWindow = new TD.SandDock.DockableWindow();
             this._magnifierControl = new Extract.Imaging.Forms.MagnifierControl();
+            this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
+            this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
@@ -92,6 +95,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._miscImageToolStrip = new System.Windows.Forms.ToolStrip();
             this._toggleShowAllHighlightsButton = new System.Windows.Forms.ToolStripButton();
             this._magnifierToolStripButton = new Extract.Imaging.Forms.MagnifierWindowToolStripButton();
+            this._thumbnailsToolStripButton = new Extract.Imaging.Forms.ThumbnailViewerToolStripButton();
             this._basicCommandsImageViewerToolStrip = new System.Windows.Forms.ToolStrip();
             this._zoomWindowToolStripButton = new Extract.Imaging.Forms.ZoomWindowToolStripButton();
             this._panToolStripButton = new Extract.Imaging.Forms.PanToolStripButton();
@@ -112,6 +116,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomLevelToolStripStatusLabel = new Extract.Imaging.Forms.ZoomLevelToolStripStatusLabel();
             this._resolutionToolStripStatusLabel = new Extract.Imaging.Forms.ResolutionToolStripStatusLabel();
             this._mousePositionToolStripStatusLabel = new Extract.Imaging.Forms.MousePositionToolStripStatusLabel();
+            this._thumbnailDockableWindow.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).BeginInit();
             this._splitContainer.Panel1.SuspendLayout();
             this._splitContainer.Panel2.SuspendLayout();
@@ -119,6 +124,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._documentTypePanel.SuspendLayout();
             this._dockContainer.SuspendLayout();
             this._magnifierDockableWindow.SuspendLayout();
+            this._dockContainer1.SuspendLayout();
             this._toolStripContainer.TopToolStripPanel.SuspendLayout();
             this._toolStripContainer.SuspendLayout();
             this._menuStrip.SuspendLayout();
@@ -132,7 +138,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _sandDockManager
             // 
-            this._sandDockManager.DockSystemContainer = this;
+            this._sandDockManager.DockSystemContainer = this._splitContainer.Panel2;
             this._sandDockManager.OwnerForm = this;
             // 
             // _magnifierControl
@@ -141,7 +147,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._magnifierControl.ImageViewer = null;
             this._magnifierControl.Location = new System.Drawing.Point(0, 0);
             this._magnifierControl.Name = "_magnifierControl";
-            this._magnifierControl.Size = new System.Drawing.Size(1097, 162);
+            this._magnifierControl.Size = new System.Drawing.Size(1097, 157);
             this._magnifierControl.TabIndex = 1;
             // 
             // _magnifierDockableWindow
@@ -151,9 +157,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._magnifierDockableWindow.Controls.Add(this._magnifierControl);
             this._magnifierDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
             this._magnifierDockableWindow.Guid = new System.Guid("25fa87c7-8272-45c9-9ec8-f2f81c20e9eb");
-            this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 18);
+            this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 23);
             this._magnifierDockableWindow.Name = "_magnifierDockableWindow";
-            this._magnifierDockableWindow.Size = new System.Drawing.Size(1097, 162);
+            this._magnifierDockableWindow.Size = new System.Drawing.Size(1097, 157);
             this._magnifierDockableWindow.TabIndex = 0;
             this._magnifierDockableWindow.Text = "Magnifier";
             // 
@@ -169,6 +175,43 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._dockContainer.Name = "_dockContainer";
             this._dockContainer.Size = new System.Drawing.Size(1097, 204);
             this._dockContainer.TabIndex = 1;
+            // 
+            // _thumbnailDockableWindow
+            // 
+            this._thumbnailDockableWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this._thumbnailDockableWindow.Collapsed = true;
+            this._thumbnailDockableWindow.Controls.Add(this._thumbnailViewer);
+            this._thumbnailDockableWindow.FloatingSize = new System.Drawing.Size(500, 300);
+            this._thumbnailDockableWindow.Guid = new System.Guid("fe65f9f4-1b32-4a67-b510-e1427e22c782");
+            this._thumbnailDockableWindow.Location = new System.Drawing.Point(4, 23);
+            this._thumbnailDockableWindow.Name = "_thumbnailDockableWindow";
+            this._thumbnailDockableWindow.PrimaryControl = this;
+            this._thumbnailDockableWindow.Size = new System.Drawing.Size(200, 459);
+            this._thumbnailDockableWindow.TabIndex = 0;
+            this._thumbnailDockableWindow.Text = "Page thumbnails";
+            // 
+            // _thumbnailViewer
+            // 
+            this._thumbnailViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._thumbnailViewer.ImageViewer = null;
+            this._thumbnailViewer.Location = new System.Drawing.Point(0, 0);
+            this._thumbnailViewer.Name = "_thumbnailViewer";
+            this._thumbnailViewer.Size = new System.Drawing.Size(200, 459);
+            this._thumbnailViewer.TabIndex = 0;
+            // 
+            // _dockContainer1
+            // 
+            this._dockContainer1.ContentSize = 200;
+            this._dockContainer1.Controls.Add(this._thumbnailDockableWindow);
+            this._dockContainer1.Dock = System.Windows.Forms.DockStyle.Right;
+            this._dockContainer1.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._thumbnailDockableWindow))}, this._thumbnailDockableWindow)))});
+            this._dockContainer1.Location = new System.Drawing.Point(706, 0);
+            this._dockContainer1.Manager = this._sandDockManager;
+            this._dockContainer1.Name = "_dockContainer1";
+            this._dockContainer1.Size = new System.Drawing.Size(204, 506);
+            this._dockContainer1.TabIndex = 2;
             // 
             // _splitContainer
             // 
@@ -188,6 +231,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _splitContainer.Panel2
             // 
             this._splitContainer.Panel2.Controls.Add(this._dockContainer);
+            this._splitContainer.Panel2.Controls.Add(this._dockContainer1);
             this._splitContainer.Panel2.Controls.Add(this._imageViewer);
             this._splitContainer.Size = new System.Drawing.Size(1097, 506);
             this._splitContainer.SplitterDistance = 184;
@@ -237,7 +281,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._scrollPanel.AutoScroll = true;
             this._scrollPanel.Location = new System.Drawing.Point(0, 46);
             this._scrollPanel.Name = "_scrollPanel";
-            this._scrollPanel.Size = new System.Drawing.Size(181, 457);
+            this._scrollPanel.Size = new System.Drawing.Size(181, 563);
             this._scrollPanel.TabIndex = 0;
             // 
             // _imageViewer
@@ -250,7 +294,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._imageViewer.Name = "_imageViewer";
             this._imageViewer.OcrTradeoff = Extract.Imaging.OcrTradeoff.Accurate;
             this._imageViewer.RedactionMode = false;
-            this._imageViewer.Size = new System.Drawing.Size(910, 506);
+            this._imageViewer.Size = new System.Drawing.Size(911, 506);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
             this._imageViewer.WordHighlightToolEnabled = true;
@@ -278,8 +322,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._fileCommandsToolStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._dataEntryOperationsToolStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._miscImageToolStrip);
-            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._basicCommandsImageViewerToolStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._pageNavigationImageViewerToolStrip);
+            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._basicCommandsImageViewerToolStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
             // 
             // _menuStrip
@@ -458,7 +502,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rotateCounterclockwiseToolStripMenuItem.ImageViewer = null;
             this._rotateCounterclockwiseToolStripMenuItem.Name = "_rotateCounterclockwiseToolStripMenuItem";
             this._rotateCounterclockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._rotateCounterclockwiseToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+            this._rotateCounterclockwiseToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
             this._rotateCounterclockwiseToolStripMenuItem.Text = "Rotate counterclockwise";
             // 
             // _rotateClockwiseToolStripMenuItem
@@ -468,7 +512,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rotateClockwiseToolStripMenuItem.ImageViewer = null;
             this._rotateClockwiseToolStripMenuItem.Name = "_rotateClockwiseToolStripMenuItem";
             this._rotateClockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._rotateClockwiseToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+            this._rotateClockwiseToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
             this._rotateClockwiseToolStripMenuItem.Text = "Rotate clockwise";
             // 
             // _rotateAllDocumentPagesCounterclockwiseToolStripMenuItem
@@ -489,7 +533,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rotateAllDocumentPagesClockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
             this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
             this._rotateAllDocumentPagesClockwiseToolStripMenuItem.Text = "Rotate all pages clockwise";
-
             // 
             // _gotoPageToolStripMenuItem
             // 
@@ -858,10 +901,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._miscImageToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._miscImageToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._toggleShowAllHighlightsButton,
+            this._thumbnailsToolStripButton,
             this._magnifierToolStripButton});
             this._miscImageToolStrip.Location = new System.Drawing.Point(309, 24);
             this._miscImageToolStrip.Name = "_miscImageToolStrip";
-            this._miscImageToolStrip.Size = new System.Drawing.Size(75, 39);
+            this._miscImageToolStrip.Size = new System.Drawing.Size(111, 39);
             this._miscImageToolStrip.TabIndex = 2;
             // 
             // _toggleShowAllHighlightsButton
@@ -885,6 +929,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._magnifierToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._magnifierToolStripButton.Text = "Show/Hide magnifier (F12)";
             // 
+            // _thumbnailsToolStripButton
+            // 
+            this._thumbnailsToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._thumbnailsToolStripButton.DockableWindow = null;
+            this._thumbnailsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._thumbnailsToolStripButton.Name = "_thumbnailsToolStripButton";
+            this._thumbnailsToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._thumbnailsToolStripButton.Text = "Show/Hide thumbnails";
+            // 
             // _basicCommandsImageViewerToolStrip
             // 
             this._basicCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -897,7 +950,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._angularHighlightToolStripButton,
             this._rectangularHighlightToolStripButton,
             this._wordHighlightToolStripButton});
-            this._basicCommandsImageViewerToolStrip.Location = new System.Drawing.Point(384, 24);
+            this._basicCommandsImageViewerToolStrip.Location = new System.Drawing.Point(420, 24);
             this._basicCommandsImageViewerToolStrip.Name = "_basicCommandsImageViewerToolStrip";
             this._basicCommandsImageViewerToolStrip.Size = new System.Drawing.Size(219, 39);
             this._basicCommandsImageViewerToolStrip.TabIndex = 0;
@@ -973,7 +1026,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._pageNavigationToolStripTextBox,
             this._nextPageToolStripButton,
             this._lastPageToolStripButton});
-            this._pageNavigationImageViewerToolStrip.Location = new System.Drawing.Point(603, 24);
+            this._pageNavigationImageViewerToolStrip.Location = new System.Drawing.Point(639, 24);
             this._pageNavigationImageViewerToolStrip.Name = "_pageNavigationImageViewerToolStrip";
             this._pageNavigationImageViewerToolStrip.Size = new System.Drawing.Size(224, 39);
             this._pageNavigationImageViewerToolStrip.TabIndex = 0;
@@ -1035,9 +1088,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
             this._viewCommandsImageViewerToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(827, 24);
+            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(863, 24);
             this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
-            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(270, 39);
+            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(234, 39);
             this._viewCommandsImageViewerToolStrip.TabIndex = 0;
             // 
             // _statusStrip
@@ -1060,7 +1113,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._userActionToolStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this._userActionToolStripStatusLabel.ImageViewer = null;
             this._userActionToolStripStatusLabel.Name = "_userActionToolStripStatusLabel";
-            this._userActionToolStripStatusLabel.Size = new System.Drawing.Size(815, 19);
+            this._userActionToolStripStatusLabel.Size = new System.Drawing.Size(735, 19);
             this._userActionToolStripStatusLabel.Spring = true;
             this._userActionToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -1115,6 +1168,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this.MainMenuStrip = this._menuStrip;
             this.Name = "DataEntryApplicationForm";
             this.Text = "Data Entry Application";
+            this._thumbnailDockableWindow.ResumeLayout(false);
             this._splitContainer.Panel1.ResumeLayout(false);
             this._splitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).EndInit();
@@ -1123,6 +1177,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._documentTypePanel.PerformLayout();
             this._dockContainer.ResumeLayout(false);
             this._magnifierDockableWindow.ResumeLayout(false);
+            this._dockContainer1.ResumeLayout(false);
             this._toolStripContainer.TopToolStripPanel.ResumeLayout(false);
             this._toolStripContainer.TopToolStripPanel.PerformLayout();
             this._toolStripContainer.ResumeLayout(false);
@@ -1236,6 +1291,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.ToolStripButton _undoToolStripButton;
         private System.Windows.Forms.ToolStripButton _redoToolStripButton;
         private Imaging.Forms.MagnifierWindowToolStripButton _magnifierToolStripButton;
+        private Extract.Imaging.Forms.ThumbnailViewerToolStripButton _thumbnailsToolStripButton;
         private TD.SandDock.SandDockManager _sandDockManager;
         private TD.SandDock.DockableWindow _magnifierDockableWindow;
         private TD.SandDock.DockContainer _dockContainer;
@@ -1243,6 +1299,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private Imaging.Forms.OneToOneZoomToolStripMenuItem _oneToOneZoomToolStripMenuItem;
         private Imaging.Forms.RotateAllDocumentPagesClockwiseToolStripMenuItem _rotateAllDocumentPagesClockwiseToolStripMenuItem;
         private Imaging.Forms.RotateAllDocumentPagesCounterclockwiseToolStripMenuItem _rotateAllDocumentPagesCounterclockwiseToolStripMenuItem;
+        private TD.SandDock.DockableWindow _thumbnailDockableWindow;
+        private Extract.Imaging.Forms.ThumbnailViewer _thumbnailViewer;
+        private TD.SandDock.DockContainer _dockContainer1;
     }
 }
 

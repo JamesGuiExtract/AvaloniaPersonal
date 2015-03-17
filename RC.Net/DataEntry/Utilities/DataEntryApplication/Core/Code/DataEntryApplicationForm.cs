@@ -767,6 +767,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _magnifierDockableWindow.Close();
                     }
 
+                    if (_thumbnailDockableWindow.IsOpen)
+                    {
+                        _thumbnailDockableWindow.Close();
+                    }
                     if (_imageViewerForm != null)
                     {
                         CloseSeparateImageWindow();
@@ -1093,6 +1097,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 _magnifierToolStripButton.DockableWindow = _magnifierDockableWindow;
+                _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
 
                 // Establish shortcut keys
 
@@ -1217,7 +1222,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Toggle showing magnifier pane.
                 _imageViewer.Shortcuts[Keys.F12] = (() => _magnifierToolStripButton.PerformClick());
 
-                // Hide any visible toolTips
+               // Hide any visible toolTips
                 _hideToolTipsCommand = new ApplicationCommand(_imageViewer.Shortcuts,
                     new Keys[] { Keys.Escape }, null,
                     new ToolStripItem[] { _hideToolTipsMenuItem }, false, true, false);
@@ -1344,6 +1349,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // to manually open it as floating, then close it prior to loading any saved layout
                     // (which will override the default situation, if present).
                     _magnifierDockableWindow.OpenFloating();
+                    _thumbnailDockableWindow.OpenFloating();
 
                     if (_registry.Settings.ShowSeparateImageWindow)
                     {
@@ -1351,6 +1357,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
 
                     _magnifierDockableWindow.Close();
+                    _thumbnailDockableWindow.Close();
+                    
                     _sandDockManager.LoadLayout();
                 }
 
@@ -1578,6 +1586,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     _magnifierDockableWindow.Dispose();
                     _magnifierDockableWindow = null;
+                }
+
+                if (_thumbnailDockableWindow != null)
+                {
+                    _thumbnailDockableWindow.Dispose();
+                    _thumbnailDockableWindow = null;
                 }
 
                 if (components != null)
