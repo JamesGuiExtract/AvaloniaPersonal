@@ -116,6 +116,7 @@ IDR_MERGEATTRIBUTES     REGISTRY                "MergeAttributes.rgs"
 IDR_MERGEATTRIBUTESPP   REGISTRY                "MergeAttributesPP.rgs"
 IDR_MERGEATTRIBUTETREES REGISTRY                "MergeAttributeTrees.rgs"
 IDR_MERGEATTRIBUTETREESPP REGISTRY                "MergeAttributeTreesPP.rgs"
+IDR_SPATIALLYSORTATTRIBUTES REGISTRY			"SpatiallySortAttributes.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //

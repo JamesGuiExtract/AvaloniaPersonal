@@ -35,6 +35,8 @@
 #include "RunObjectOnQuery.h"
 #include "RunObjectOnQueryPP.h"
 #include "ConditionalOutputHandler.h"
+#include "SpatiallySortAttributes.h"
+
 CComModule _Module;
 
 BEGIN_OBJECT_MAP(ObjectMap)
@@ -61,6 +63,7 @@ OBJECT_ENTRY(CLSID_ReformatPersonNamesPP, CReformatPersonNamesPP)
 OBJECT_ENTRY(CLSID_RunObjectOnQuery, CRunObjectOnQuery)
 OBJECT_ENTRY(CLSID_RunObjectOnQueryPP, CRunObjectOnQueryPP)
 OBJECT_ENTRY(CLSID_ConditionalOutputHandler, CConditionalOutputHandler)
+OBJECT_ENTRY(CLSID_SpatiallySortAttributes, CSpatiallySortAttributes)
 END_OBJECT_MAP()
 
 class CAFOutputHandlersApp : public CWinApp

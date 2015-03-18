@@ -324,6 +324,12 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="SpatiallySortAttributes.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="StdAfx.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -369,6 +375,7 @@
     <None Include="SelectOnlyUniqueValues.rgs" />
     <None Include="SelectUsingMajority.rgs" />
     <None Include="SelectWithUI.rgs" />
+    <None Include="SpatiallySortAttributes.rgs" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="AFOutputHandlers.idl">
@@ -421,6 +428,7 @@
     <ClInclude Include="RunObjectOnQueryPP.h" />
     <ClInclude Include="SelectOnlyUniqueValues.h" />
     <ClInclude Include="SelectUsingMajority.h" />
+    <ClInclude Include="SpatiallySortAttributes.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="XMLFileWriter.h" />
     <ClInclude Include="XMLVersion1Writer.h" />

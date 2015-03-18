@@ -787,4 +787,15 @@ library UCLID_AFOUTPUTHANDLERSLib
 	{
 		[default] interface IUnknown;
 	};
+	[
+		uuid(72C48762-8927-4E68-A2E8-37B3BD3D9FC0),
+		helpstring("SpatiallySortAttributes Class")
+	]
+	coclass SpatiallySortAttributes
+	{
+		[default] interface IOutputHandler;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
 };

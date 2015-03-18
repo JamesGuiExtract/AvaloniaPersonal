@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFOutputHandlers.SpatiallySortAttributes.1 = s 'SpatiallySortAttributes Class'
+	{
+		CLSID = s '{72C48762-8927-4E68-A2E8-37B3BD3D9FC0}'
+	}
+	UCLIDAFOutputHandlers.SpatiallySortAttributes = s 'SpatiallySortAttributes Class'
+	{
+		CLSID = s '{72C48762-8927-4E68-A2E8-37B3BD3D9FC0}'
+		CurVer = s 'UCLIDAFOutputHandlers.SpatiallySortAttributes.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {72C48762-8927-4E68-A2E8-37B3BD3D9FC0} = s 'SpatiallySortAttributes Class'
+		{
+			ProgID = s 'UCLIDAFOutputHandlers.SpatiallySortAttributes.1'
+			VersionIndependentProgID = s 'UCLIDAFOutputHandlers.SpatiallySortAttributes'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}'
+		}
+	}
+}
