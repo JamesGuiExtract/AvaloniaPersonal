@@ -181,13 +181,6 @@
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>
-										<xs:element name="Units" minOccurs="1">
-											<xs:complexType>
-												<xs:sequence>
-													<xs:element name="FullText" type="xs:string" />
-												</xs:sequence>
-											</xs:complexType>
-										</xs:element>
 										<xs:element name="Range">
 											<xs:complexType>
 												<xs:sequence>
@@ -206,6 +199,13 @@
 															</xs:sequence>
 														</xs:complexType>
 													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Units" minOccurs="1">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="FullText" type="xs:string" />
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>
