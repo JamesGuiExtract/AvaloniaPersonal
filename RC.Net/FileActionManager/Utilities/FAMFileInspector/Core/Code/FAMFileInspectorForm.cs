@@ -92,7 +92,7 @@ namespace Extract.FileActionManager.Utilities
             FileSystemMethods.UserApplicationDataPath, "FAMFileInspector", "FAMFileInspector.xml");
 
         /// <summary>
-        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// Name for the mutex used to serialize persistence of the control and form layout.
         /// </summary>
         static readonly string _FORM_PERSISTENCE_MUTEX_STRING =
             "24440334-DE0C-46C1-920F-45D064A10DBF";
@@ -506,7 +506,7 @@ namespace Extract.FileActionManager.Utilities
         bool? _reportsEnabled;
 
         /// <summary>
-        /// Keeps track of whether ProcessCmdKey is currently being handled to prevent recusion.
+        /// Keeps track of whether ProcessCmdKey is currently being handled to prevent recursion.
         /// </summary>
         bool _processingCmdKey;
 
@@ -881,6 +881,15 @@ namespace Extract.FileActionManager.Utilities
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the name of the file that contains a list of files to display
+        /// </summary>
+        public string FileListFileName
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Methods
@@ -1036,7 +1045,7 @@ namespace Extract.FileActionManager.Utilities
                 _fileSelectionCount = 0;
 
                 // If generating a new file list, the previous search results don't apply anymore.
-                // Unheck show search results until a new search is run.
+                // Uncheck show search results until a new search is run.
                 _showOnlyMatchesCheckBox.Checked = false;
                 _showOnlyMatchesCheckBox.Enabled = false;
 
@@ -1051,7 +1060,7 @@ namespace Extract.FileActionManager.Utilities
                     StartBackgroundOperation(() =>
                         RunDatabaseQuery(query, preservedData, _queryCanceler.Token));
                 }
-                else
+                else if (!string.IsNullOrWhiteSpace(SourceDirectory))
                 {
                     var fileFilter = string.IsNullOrWhiteSpace(FileFilter)
                         ? null
@@ -1065,6 +1074,14 @@ namespace Extract.FileActionManager.Utilities
                     // rows are loaded.
                     StartBackgroundOperation(() =>
                         RunFileEnumeration(fileEnumerable, preservedData, _queryCanceler.Token));
+                }
+                else
+                {
+                    CommentedTextFileReader listOfFiles = new CommentedTextFileReader(FileListFileName);
+                    // Run the enumeration on a background thread so the UI remains responsive as
+                    // rows are loaded.
+                    StartBackgroundOperation(() =>
+                        RunFileEnumeration(listOfFiles.AsEnumerable(), preservedData, _queryCanceler.Token));
                 }
             }
             catch (Exception ex)
@@ -1628,6 +1645,16 @@ namespace Extract.FileActionManager.Utilities
                         }
                     }
                 }
+                else if (!string.IsNullOrWhiteSpace(FileListFileName))
+                {
+                    using (var fileListfileNameFrom = new FileListFileNameForm(this))
+                    {
+                        if (fileListfileNameFrom.ShowDialog(this) == DialogResult.OK)
+                        {
+                            selectionConfirmed = true;
+                        }
+                    }
+                }
 
                 // If the file selection was confirmed, update the file list and clear any existing
                 // search results.
@@ -2040,7 +2067,7 @@ namespace Extract.FileActionManager.Utilities
                     _dragDropMouseDownPoint = null;
 
                     // If selection change had been suppressed on the corresponding MouseDown, apply
-                    // the selection change that would have occured now.
+                    // the selection change that would have occurred now.
                     if (_suppressedSelectionChange)
                     {
                         _suppressedSelectionChange = false;
@@ -3419,7 +3446,7 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="query">The query used to generate the file list.</param>
         /// <param name="preservedData">If not <see langword="null"/>, indicates files for which
-        /// should be marked as flagged in the newly popluated list.</param>
+        /// should be marked as flagged in the newly populated list.</param>
         /// <param name="cancelToken">The <see cref="CancellationToken"/> that should be checked
         /// after adding each file to the list to ensure the operation hasn't been canceled.</param>
         void RunDatabaseQuery(string query, Dictionary<string, FAMFileData> preservedData, CancellationToken cancelToken)
@@ -3482,7 +3509,7 @@ namespace Extract.FileActionManager.Utilities
             catch (OperationCanceledException)
             {
                 // If canceled, the user didn't want to wait around for the operation to complete;
-                // they don't need to see an excepton about the operation being canceled.
+                // they don't need to see an exception about the operation being canceled.
             }
             catch (Exception ex)
             {
@@ -3523,7 +3550,7 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="fileEnumerable">The <see cref="IEnumerable{T}"/> of <see cref="string"/>s
         /// containing the files to be in the file list.</param>
         /// <param name="preservedData">If not <see langword="null"/>, indicates files for which
-        /// should be marked as flagged in the newly popluated list.</param>
+        /// should be marked as flagged in the newly populated list.</param>
         /// <param name="cancelToken">The <see cref="CancellationToken"/> that should be checked
         /// after adding each file to the list to ensure the operation hasn't been canceled.</param>
         void RunFileEnumeration(IEnumerable<string> fileEnumerable, Dictionary<string, FAMFileData> preservedData,
@@ -3565,7 +3592,7 @@ namespace Extract.FileActionManager.Utilities
             catch (OperationCanceledException)
             {
                 // If canceled, the user didn't want to wait around for the operation to complete;
-                // they don't need to see an excepton about the operation being canceled.
+                // they don't need to see an exception about the operation being canceled.
             }
             catch (Exception ex)
             {
@@ -4139,7 +4166,7 @@ namespace Extract.FileActionManager.Utilities
             catch (OperationCanceledException)
             {
                 // If canceled, the user didn't want to wait around for the operation to complete;
-                // they don't need to see an excepton about the operation being canceled.
+                // they don't need to see an exception about the operation being canceled.
             }
             catch (Exception ex)
             {
@@ -4627,6 +4654,11 @@ namespace Extract.FileActionManager.Utilities
                     ? "\r\nShowing all files regardless of type."
                     : "\r\nShowing files of type: " + FileFilter;
             }
+            else if (!string.IsNullOrWhiteSpace(FileListFileName))
+            {
+                _selectFilesSummaryLabel.Text =
+                    "Showing files listed in file: " + FileListFileName;
+            }
         }
 
         /// <summary>
@@ -4684,7 +4716,7 @@ namespace Extract.FileActionManager.Utilities
                 }
                 else if (columnDefinition.FFIColumnType == FFIColumnType.Combo)
                 {
-                    // Combo box columns should be popluated with all possible value options across
+                    // Combo box columns should be populated with all possible value options across
                     // all circumstances. The ones that are relevant for a specific row will be
                     // queried at the time the value is edited in order to remove disallowed
                     // values for that row.
@@ -4732,7 +4764,7 @@ namespace Extract.FileActionManager.Utilities
                 
                 // Retrieve all options that may be valid across all possible selections and add
                 // them to a context sub-menu. Options that are not valid given a specific selection
-                // will be disabled at the time the context menu is diplayed.
+                // will be disabled at the time the context menu is displayed.
                 var options = column.GetContextMenuChoices(null).ToIEnumerable<string>();
                 if (options != null && options.Any())
                 {

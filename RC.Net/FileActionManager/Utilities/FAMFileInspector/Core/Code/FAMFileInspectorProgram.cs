@@ -71,6 +71,11 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         static SubsetType? _subsetType;
 
+        /// <summary>
+        /// The name of the file that contains a list of files to display
+        /// </summary>
+        static string _fileListFileName;
+
         #endregion Fields
 
         #region Main
@@ -118,6 +123,10 @@ namespace Extract.FileActionManager.Utilities
                         famFileInspectorForm.FileFilter = _fileFilter;
                     }
                 }
+                else if (!string.IsNullOrWhiteSpace(_fileListFileName))
+                {
+                    famFileInspectorForm.FileListFileName = _fileListFileName;
+                }
 
                 if (_fileCount.HasValue)
                 {
@@ -129,6 +138,11 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 if (!string.IsNullOrWhiteSpace(famFileInspectorForm.SourceDirectory))
+                {
+                    Application.Run(famFileInspectorForm);
+                    return;
+                }
+                else if (!string.IsNullOrWhiteSpace(famFileInspectorForm.FileListFileName))
                 {
                     Application.Run(famFileInspectorForm);
                     return;
@@ -339,7 +353,35 @@ namespace Extract.FileActionManager.Utilities
                         return false;
                     }
 
+                    if (!string.IsNullOrWhiteSpace(_fileListFileName))
+                    {
+                        ShowUsage("/directory can not be used with /filelist.");
+                        return false;
+                    }
+
                     _directory = args[i];
+                }
+                else if (argument.Equals("/filelist", StringComparison.OrdinalIgnoreCase))
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        ShowUsage("File name expected.");
+                        return false;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(_directory))
+                    {
+                        ShowUsage("/filelist cannot be used with /directory.");
+                        return false;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(_fileFilter))
+                    {
+                        ShowUsage("/filefilter cannot be used with /filelist.");
+                    }
+
+                    _fileListFileName = args[i];
                 }
                 else if (i == 0)
                 {
@@ -435,6 +477,11 @@ namespace Extract.FileActionManager.Utilities
                         return false;
                     }
 
+                    if (!string.IsNullOrWhiteSpace(_fileListFileName))
+                    {
+                        ShowUsage("/filefilter cannot be used with /filelist.");
+                        return false;
+                    }
                     _fileFilter = args[i];
                 }
                 else if (argument.Equals("/r", StringComparison.OrdinalIgnoreCase))
@@ -448,11 +495,11 @@ namespace Extract.FileActionManager.Utilities
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(_directory))
+            if (!string.IsNullOrWhiteSpace(_directory) || !string.IsNullOrWhiteSpace(_fileListFileName))
             {
                 if (!string.IsNullOrWhiteSpace(_databaseServer) || !string.IsNullOrWhiteSpace(_databaseName))
                 {
-                    ShowUsage("A directory can be specified only in the absence of a database.");
+                    ShowUsage("A directory or file list can be specified only in the absence of a database.");
                 }
             }
             else
@@ -472,7 +519,7 @@ namespace Extract.FileActionManager.Utilities
 
                 if (_recursive)
                 {
-                    ShowUsage("The /r (recursive) paramater cannot be used without the /directory parameter");
+                    ShowUsage("The /r (recursive) parameter cannot be used without the /directory parameter");
                     return false;
                 }
 
@@ -480,7 +527,7 @@ namespace Extract.FileActionManager.Utilities
                 // since it indicates the command line option was used.
                 if (_fileFilter != null)
                 {
-                    ShowUsage("The /filefilter paramater cannot be used without the /directory parameter");
+                    ShowUsage("The /filefilter parameter cannot be used without the /directory parameter");
                     return false;
                 }
             }
@@ -511,10 +558,12 @@ namespace Extract.FileActionManager.Utilities
             }
 
             usage.Append(Environment.GetCommandLineArgs()[0]);
-            usage.AppendLine(" /? | [<ServerName> <DatabaseName> [/action <actionName> " +
+            usage.AppendLine(" /? | [[<ServerName> <DatabaseName> [/action <actionName> " +
                 "/status <statusName>] [/query <queryFileName>] | /directory <directory> " +
                 "[/filefilter <filefilter>] [/r]] " +
-                "[/filecount [top|bottom|random] <count>]");
+                " | " +
+                "/filelist <filename> ]" +
+                " [/filecount [top|bottom|random] <count>]");
             usage.AppendLine();
             usage.AppendLine("ServerName: The name of the database server to connect to.");
             usage.AppendLine();
@@ -538,6 +587,8 @@ namespace Extract.FileActionManager.Utilities
             usage.AppendLine();
             usage.AppendLine("/r: Specifies that files in subdirectories to the specified directory " +
                 "should be included.");
+            usage.AppendLine();
+            usage.AppendLine("/filelist <filename>: A filename that contains a list of files.");
             usage.AppendLine();
             usage.AppendLine("/filecount [top|bottom|random] <count>: Specifies number of files that may be " +
                 "displayed in the file list at once and, optionally, how the subset should be selected from " +
