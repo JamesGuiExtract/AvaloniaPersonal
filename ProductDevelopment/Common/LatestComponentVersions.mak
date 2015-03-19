@@ -1,2 +1,2 @@
-FlexIndexVersion=FlexIndex Ver. 10.1.0.20
-FKBVersion=FKB Ver. 15.1.0.20
+FlexIndexVersion=FlexIndex Ver. 10.1.0.21
+FKBVersion=FKB Ver. 15.1.0.21
