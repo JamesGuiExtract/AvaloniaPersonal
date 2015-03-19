@@ -709,12 +709,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LabDECppCustomComponents", 
 		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.LabDE", "..\..\..\..\..\RC.Net\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj", "{882FDE16-73BE-4420-B89F-ABE418902983}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://EngSvr.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 181
+		ProjectCount = 182
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -896,6 +898,7 @@ Global
 		ProjectRelativeDiskPath179 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Lincoln\Core\Code\Extract.DataEntry.DEP.Lincoln.csproj
 		ProjectRelativeDiskPath180 = ..\..\..\..\Utils\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj
 		ProjectRelativeDiskPath181 = ..\..\..\IndustrySpecific\LabResults\LabDECppCustomComponents\Code\LabDECppCustomComponents.vcxproj
+		ProjectRelativeDiskPath182 = ..\..\..\..\..\RC.Net\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -4146,6 +4149,24 @@ Global
 		{E855B92D-442C-4A54-8C7F-CF7C7820F79A}.Template|Win32.ActiveCfg = Template|Win32
 		{E855B92D-442C-4A54-8C7F-CF7C7820F79A}.Template|Win32.Build.0 = Template|Win32
 		{E855B92D-442C-4A54-8C7F-CF7C7820F79A}.Template|x86.ActiveCfg = Template|Win32
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Debug|Win32.ActiveCfg = Debug|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Debug|x86.ActiveCfg = Debug|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Debug|x86.Build.0 = Debug|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Release|Any CPU.ActiveCfg = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Release|Mixed Platforms.Build.0 = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Release|Win32.ActiveCfg = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Release|x86.ActiveCfg = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Release|x86.Build.0 = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Template|Any CPU.ActiveCfg = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Template|Mixed Platforms.ActiveCfg = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Template|Mixed Platforms.Build.0 = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Template|Win32.ActiveCfg = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Template|x86.ActiveCfg = Release|x86
+		{882FDE16-73BE-4420-B89F-ABE418902983}.Template|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
