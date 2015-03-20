@@ -141,6 +141,9 @@ void DatabasePage::OnBnClickedButtonBrowseServer()
 			
 			// change the focus to the browse db button
 			m_btnBrowseDB.SetFocus();
+
+			// Notify the objects of config change
+			notifyObjects();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17504");

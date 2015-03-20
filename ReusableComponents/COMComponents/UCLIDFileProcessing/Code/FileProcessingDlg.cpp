@@ -57,7 +57,7 @@ const long gnSKIPPED_COUNTS_STATUS_PANE_WIDTH = 108;				// RIGHT OF THE LABEL OF
 const long gnTOTAL_COUNTS_STATUS_PANE_WIDTH = 95;
 
 // Use of XP Themes causes a visual artifact updating the connection
-// status icon if padding is not added to the righthand side [P13:4707]
+// status icon if padding is not added to the right hand side [P13:4707]
 const long gnSTATUSBAR_RIGHTHAND_PADDING = 10;
 
 // Default labels for status bar panes
@@ -644,7 +644,7 @@ void FileProcessingDlg::OnBtnStop()
 	{
 		// [FlexIDSCore:5003]
 		// If someone clicks the stop button before a stop initiated by closing the verification
-		// window has been completed, theres no need to display an exception to the user; log
+		// window has been completed, there's no need to display an exception to the user; log
 		// instead.
 		if (ue.getTopELI() == "ELI12734")
 		{
@@ -962,7 +962,7 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 		// Get the total Processing time in order to update the time statistics
 		if (isPageDisplayed(kProcessingLogPage))
 		{
-			// If the processing log page doesnt exist, these will remain 0 and be used
+			// If the processing log page doesn't exist, these will remain 0 and be used
 			// as a flag for the enabling or disabling the local page.
 			unTotalProcTime = m_propProcessingPage.getTotalProcTime();
 			m_propProcessingPage.getLocalStats( nTotalBytes, nTotalDocs, nTotalPages );
@@ -1324,8 +1324,10 @@ void FileProcessingDlg::OnFileSave()
 
 	try
 	{
-		// Test if the FAM is running OR not ready [LRCAU #5278]
-		if (!m_bRunning && isFAMReady())
+		// Test if the FAM is running 
+		// Save should be allowed even when settings are not runnable  
+		// https://extract.atlassian.net/browse/ISSUE-12798
+		if (!m_bRunning)
 		{
 			saveFile(m_strCurrFPSFilename);
 		}
@@ -1833,7 +1835,7 @@ void FileProcessingDlg::updateTabs(const set<EDlgTabPage>& setPages)
 		}
 	}
 
-	// Add pages that should be displayedd
+	// Add pages that should be displayed
 	for ( EDlgTabPage ePage = kActionPage; ePage <= kStatisticsPage; ePage = (EDlgTabPage)(ePage + 1))
 	{
 		// Check if the current page is in the set of pages to display
@@ -2153,16 +2155,12 @@ void FileProcessingDlg::updateUI()
 		zStatusText = getFAMStatus();
 
 		bool bEnableRun = false;
-		bool bEnableSave = false;
-		bool bEnableSaveAs = false;
 
 		CMenu* pMenu = GetMenu();
 
 		if (zStatusText == "Ready")
 		{
 			bEnableRun = true;
-			bEnableSave = true;
-			bEnableSaveAs = true;
 		}
 
 		// Get the database status
@@ -2174,9 +2172,6 @@ void FileProcessingDlg::updateUI()
 		// Disable/enable run save and save as button and menu items
 		m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, asMFCBool(bEnableRun) );
 		m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_OPEN, asMFCBool(!m_bRunning));
-		m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_SAVE, asMFCBool(bEnableSave));
-		pMenu->EnableMenuItem(ID_FILE_SAVE, MF_BYCOMMAND | (bEnableSave ?  MF_ENABLED : MF_GRAYED) );
-		pMenu->EnableMenuItem(ID_FILE_SAVEAS, MF_BYCOMMAND | (bEnableSaveAs ? MF_ENABLED : MF_GRAYED) );
 		pMenu->EnableMenuItem(ID_PROCESS_STARTPROCESSING, MF_BYCOMMAND | (bEnableRun ? MF_ENABLED: MF_GRAYED) );
 		pMenu->EnableMenuItem(ID_FILE_NEW, MF_BYCOMMAND | MF_ENABLED );
 		pMenu->EnableMenuItem(ID_FILE_OPEN, MF_BYCOMMAND | MF_ENABLED );
@@ -2392,19 +2387,8 @@ bool FileProcessingDlg::checkForSave()
 			"Save Changes?", MB_YESNOCANCEL );
 		if (nRet == IDYES)
 		{
-			try
-			{
-				validateFAMStatus();
-			}
-			catch (UCLIDException& ue)
-			{
-				CString zStatusText = ue.getTopText().c_str();
-				string strPrompt = "Cannot save the current settings to FPS file.\n" + zStatusText;
-				
-				// Provide MessageBox to user
-				MessageBox(strPrompt.c_str(), "Save failed", MB_OK|MB_ICONINFORMATION );
-				return false;
-			}
+			// Save should be allowed even when settings are not runnable  
+			// https://extract.atlassian.net/browse/ISSUE-12798
 
 			// Check for read-only FPS file (P13 #4181)
 			if (isFileReadOnly( m_strCurrFPSFilename ))
@@ -2459,7 +2443,7 @@ void FileProcessingDlg::loadSettingsFromManager()
 		addFileToMRUList(strFPSFile);
 	}
 
-	// set the database file for the datatabase page
+	// set the database file for the database page
 	if (isPageDisplayed(kDatabasePage))
 	{
 		m_propDatabasePage.setConnectionInfo(asString(getFPM()->DatabaseServer), 
@@ -2708,7 +2692,7 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 			// Call one last time to get the final stats.  This is so that if processing or supplying of all of the files
 			// finishes the stats that are displayed will be current at the time of the thread stop event being signaled.
 			// If this is the only instance and it is processing files the final stats will show that the processing is 
-			// finished instead of showing the stats as of the last timout
+			// finished instead of showing the stats as of the last timeout
 			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_TRUE);
 			
 			_lastCodePos = "90";
