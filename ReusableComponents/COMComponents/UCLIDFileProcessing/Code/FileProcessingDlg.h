@@ -381,4 +381,6 @@ private:
 
 	// Displays the given page if it is not already displayed
 	void displayPage(EDlgTabPage ePage);
+
+	string getDefaultFileName();
 };

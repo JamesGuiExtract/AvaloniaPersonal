@@ -154,7 +154,7 @@
             this.Controls.Add(this._cancelButton);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(300, 200);
+            this.MinimumSize = new System.Drawing.Size(450, 350);
             this.Name = "DataQueryRuleObjectSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

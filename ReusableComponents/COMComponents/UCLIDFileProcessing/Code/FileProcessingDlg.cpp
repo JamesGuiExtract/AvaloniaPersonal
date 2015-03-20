@@ -2320,11 +2320,14 @@ bool FileProcessingDlg::saveFile(std::string strFileName)
 {
 	if (strFileName == "")
 	{
+		// Get the default file name based on action 
+		strFileName = (m_strCurrFPSFilename.empty()) ? getDefaultFileName(): m_strCurrFPSFilename;
+
 		const static string strFilter = "File Processing Specifications (*.fps)|*.fps|"
 											"All Files (*.*)|*.*||";
 		
-		// ask user to select file to load
-		CFileDialog fileDlg(FALSE, gstrFILE_PROCESSING_SPECIFICATION_EXT.c_str(), m_strCurrFPSFilename.c_str(), 
+		// ask user to select file to save
+		CFileDialog fileDlg(FALSE, gstrFILE_PROCESSING_SPECIFICATION_EXT.c_str(), strFileName.c_str(), 
 			OFN_ENABLESIZING | OFN_EXPLORER | OFN_NOREADONLYRETURN | OFN_PATHMUSTEXIST,
 			strFilter.c_str(), this);
 		
@@ -2925,3 +2928,43 @@ void FileProcessingDlg::removeFileFromMRUList(const string& strFileToRemove)
 	m_upMRUList->writeToPersistentStore();	
 }
 //-------------------------------------------------------------------------------------------------
+string FileProcessingDlg::getDefaultFileName()
+{
+	// Make sure the action patch has been initialized
+	if (m_propActionPage.m_hWnd == __nullptr)
+	{
+		return "";
+	}
+	
+	// Get the configured action name
+	string strActionName = m_propActionPage.GetCurrentActionName();
+	if (strActionName.empty())
+	{
+		return "";
+	}
+
+	// Get the state of the check boxes on the Action page
+	bool bQueuing = m_propActionPage.m_btnQueue.GetCheck() == BST_CHECKED;
+	bool bProcess = m_propActionPage.m_btnProcess.GetCheck() == BST_CHECKED;
+	bool bStats = m_propActionPage.m_btnDisplay.GetCheck() == BST_CHECKED;
+
+	// If nothing is checked there is no default;
+	if (!bQueuing && !bProcess && !bStats)
+	{
+		return "";
+	}
+
+	// Process is checked and Queuing is not
+	if (bProcess && !bQueuing)
+	{
+		return strActionName + ".fps";
+	}
+
+	// Both Process and Queuing are checked
+	if (bProcess & bQueuing)
+	{
+		return strActionName + "_QueueAndProcess.fps";
+	}
+
+	return strActionName + ((bQueuing) ? "_Queue.fps" : "_Stats.fps" );
+}
