@@ -39,6 +39,9 @@ namespace Microsoft.Data.ConnectionUI
 		// Available data providers: 
 		private IDictionary<string, DataProvider> dataProviders;
 
+        // Object to lock when initializing
+        private static object lockInitilization = new object();
+
 		/// <summary>
 		/// Constructor
 		/// </summary>
@@ -336,20 +339,25 @@ namespace Microsoft.Data.ConnectionUI
         /// </summary>
         void InitializeSourcesAndProviders()
         {
-            this.dataSources = new Dictionary<string, DataSource>();
-            this.dataSources.Add(DataSource.SqlDataSource.Name, DataSource.SqlDataSource);
-            this.dataSources.Add(DataSource.SqlFileDataSource.Name, DataSource.SqlFileDataSource);
-            this.dataSources.Add(DataSource.OracleDataSource.Name, DataSource.OracleDataSource);
-            this.dataSources.Add(DataSource.AccessDataSource.Name, DataSource.AccessDataSource);
-            this.dataSources.Add(DataSource.OdbcDataSource.Name, DataSource.OdbcDataSource);
-            this.dataSources.Add(SqlCe.SqlCeDataSource.Name, SqlCe.SqlCeDataSource);
+            // The first time this is called the DataSource items are uninitialized statics so there
+            // needs to be a lock so multiple threads are not trying to initialize them.
+            lock (lockInitilization)
+            {
+                this.dataSources = new Dictionary<string, DataSource>();
+                this.dataSources.Add(DataSource.SqlDataSource.Name, DataSource.SqlDataSource);
+                this.dataSources.Add(DataSource.SqlFileDataSource.Name, DataSource.SqlFileDataSource);
+                this.dataSources.Add(DataSource.OracleDataSource.Name, DataSource.OracleDataSource);
+                this.dataSources.Add(DataSource.AccessDataSource.Name, DataSource.AccessDataSource);
+                this.dataSources.Add(DataSource.OdbcDataSource.Name, DataSource.OdbcDataSource);
+                this.dataSources.Add(SqlCe.SqlCeDataSource.Name, SqlCe.SqlCeDataSource);
 
-            this.dataProviders = new Dictionary<string, DataProvider>();
-            this.dataProviders.Add(DataProvider.SqlDataProvider.Name, DataProvider.SqlDataProvider);
-            this.dataProviders.Add(DataProvider.OracleDataProvider.Name, DataProvider.OracleDataProvider);
-            this.dataProviders.Add(DataProvider.OleDBDataProvider.Name, DataProvider.OleDBDataProvider);
-            this.dataProviders.Add(DataProvider.OdbcDataProvider.Name, DataProvider.OdbcDataProvider);
-            this.dataProviders.Add(SqlCe.SqlCeDataProvider.Name, SqlCe.SqlCeDataProvider);
+                this.dataProviders = new Dictionary<string, DataProvider>();
+                this.dataProviders.Add(DataProvider.SqlDataProvider.Name, DataProvider.SqlDataProvider);
+                this.dataProviders.Add(DataProvider.OracleDataProvider.Name, DataProvider.OracleDataProvider);
+                this.dataProviders.Add(DataProvider.OleDBDataProvider.Name, DataProvider.OleDBDataProvider);
+                this.dataProviders.Add(DataProvider.OdbcDataProvider.Name, DataProvider.OdbcDataProvider);
+                this.dataProviders.Add(SqlCe.SqlCeDataProvider.Name, SqlCe.SqlCeDataProvider);
+            }
         }
 	}
 }
