@@ -47,6 +47,18 @@ library UCLID_COMUTILSLib
 
 	typedef
 	[
+		uuid(12C2AEEE-A195-47E4-ABF5-677B4BDF648C),
+		helpstring ("ConditionComparisonType")
+	]
+	enum
+	{
+		kValueOf = 0,
+		kCompareMaximum = 1,
+		kCompareMinimum = 2
+	} EConditionComparisonType;
+
+	typedef
+	[
 		uuid(864A21E3-BD94-44d3-9AEE-8FA4915FF0BB), 
 		helpstring("Extract Systems EAggregateFunctions")
 	]

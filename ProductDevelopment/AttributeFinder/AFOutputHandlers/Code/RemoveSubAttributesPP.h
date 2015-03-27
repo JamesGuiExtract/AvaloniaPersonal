@@ -38,6 +38,7 @@ BEGIN_MSG_MAP(CRemoveSubAttributesPP)
 	MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 	COMMAND_HANDLER(IDC_BUTTON_CHOOSE_DATA_SCORER, BN_CLICKED, OnClickedChooseDataScorer)
 	COMMAND_HANDLER(IDC_CHECK_REMOVE_IF_SCORE, BN_CLICKED, OnClickedRemoveIfScore)
+	COMMAND_HANDLER(IDC_COMBO_CONDITION_VALUE, CBN_SELCHANGE, OnCbnSelchangeComboValue)
 END_MSG_MAP()
 // Handler prototypes:
 //  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -56,6 +57,7 @@ END_MSG_MAP()
 	LRESULT OnClickedRemoveIfScore(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnBnClickedButtonConfigureSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnCbnSelchangeComboAttributeSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnCbnSelchangeComboValue(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 private:
 	
@@ -66,6 +68,7 @@ private:
 	ATLControls::CEdit m_editDataScorerName;
 	ATLControls::CComboBox m_cmbCondition;
 	ATLControls::CEdit m_editScore;
+	ATLControls::CComboBox m_cmbConditionValue;
 	
 	IObjectWithDescriptionPtr m_ipDataScorer;
 
@@ -75,7 +78,7 @@ private:
 	// Stores association between registered Object names and ProgIDs
 	UCLID_COMUTILSLib::IStrToStrMapPtr	m_ipObjectMap;
 
-	// This is the currently selected componenet
+	// This is the currently selected component
 	ICategorizedComponentPtr m_ipObject;
 
 	///////////

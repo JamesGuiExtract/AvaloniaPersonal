@@ -69,6 +69,8 @@ END_CATEGORY_MAP()
 	STDMETHOD(put_ConditionalRemove)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_AttributeSelector)(IAttributeSelector ** pVal);
 	STDMETHOD(put_AttributeSelector)(IAttributeSelector * newVal);
+	STDMETHOD(get_CompareConditionType)(EConditionComparisonType *pVal);
+	STDMETHOD(put_CompareConditionType)(EConditionComparisonType newVal);
 	
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
@@ -105,6 +107,8 @@ private:
 	EConditionalOp m_eCondition;
 	long m_nScoreToCompare;
 
+	EConditionComparisonType m_eConditionComparisonType;
+
 	bool m_bConditionalRemove;
 	
 	IAFUtilityPtr m_ipAFUtility;
@@ -121,5 +125,8 @@ private:
 	UCLID_AFOUTPUTHANDLERSLib::IRemoveSubAttributesPtr getThisAsCOMPtr();
 	//----------------------------------------------------------------------------------------------
 	void validateLicense();
+	
+	// Compares the itemScore to the nComparisonScore using the defined m_eCondition	
+	bool compareWithCondition(long itemScore, long nComparisonScore);
 };
 

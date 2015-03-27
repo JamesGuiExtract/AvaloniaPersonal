@@ -81,22 +81,26 @@ STDMETHODIMP CRemoveSubAttributesPP::Apply(void)
 				ipRSA->DataScorer = m_ipDataScorer;
 				ipRSA->ScoreCondition = (EConditionalOp)m_cmbCondition.GetCurSel();
 				
-				CComBSTR bstrScore;
-				m_editScore.GetWindowText(&bstrScore);
-				string strScore = asString(bstrScore);
-				if(strScore.length() == 0)
+				ipRSA->CompareConditionType = (EConditionComparisonType) m_cmbConditionValue.GetCurSel();
+
+				if (ipRSA->CompareConditionType == kValueOf)
 				{
-					m_editScore.SetFocus();
-					throw UCLIDException( "ELI09801", "Please specify a score." );
+					CComBSTR bstrScore;
+					m_editScore.GetWindowText(&bstrScore);
+					string strScore = asString(bstrScore);
+					if(strScore.length() == 0)
+					{
+						m_editScore.SetFocus();
+						throw UCLIDException( "ELI09801", "Please specify a score." );
+					}
+					long nScore = asLong(strScore);
+					if (nScore < 0 || nScore > 100)
+					{
+						m_editScore.SetFocus();
+						throw UCLIDException( "ELI09800", "Please specify a score between 0 and 100!" );
+					}
+					ipRSA->ScoreToCompare = asLong(strScore);
 				}
-				long nScore = asLong(strScore);
-				if (nScore < 0 || nScore > 100)
-				{
-					m_editScore.SetFocus();
-					throw UCLIDException( "ELI09800", "Please specify a score between 0 and 100!" );
-				}
-				ipRSA->ScoreToCompare = asLong(strScore);
-				
 			}
 			else
 			{
@@ -168,6 +172,13 @@ LRESULT CRemoveSubAttributesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 			m_cmbCondition.InsertString(kLEQ, "<=");
 			m_cmbCondition.InsertString(kGEQ, ">=");
 
+			m_cmbConditionValue = GetDlgItem( IDC_COMBO_CONDITION_VALUE );
+			m_cmbConditionValue.InsertString(kValueOf, "Value of");
+			m_cmbConditionValue.InsertString(kCompareMaximum, "Maximum");
+			m_cmbConditionValue.InsertString(kCompareMinimum, "Minimum");
+
+			m_cmbConditionValue.SetCurSel((int) ipRSA->CompareConditionType);
+
 			m_editScore = GetDlgItem( IDC_EDIT_SCORE );
 
 			// Initialize the UI to the state of the current IRemove AttributesPtr
@@ -186,7 +197,7 @@ LRESULT CRemoveSubAttributesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 			m_editDataScorerName.SetWindowText(_bstr_t(strDesc.c_str()));
 			m_cmbCondition.SetCurSel(ipRSA->ScoreCondition);
 
-			string strScore = asString(ipRSA->ScoreToCompare);
+			string strScore = (ipRSA->CompareConditionType == kValueOf) ? asString(ipRSA->ScoreToCompare) :	"0";
 			m_editScore.SetWindowText(strScore.c_str());
 
 			populateObjectCombo();
@@ -254,13 +265,15 @@ LRESULT CRemoveSubAttributesPP::OnClickedRemoveIfScore(WORD wNotifyCode, WORD wI
 	{
 		m_butChooseDataScorer.EnableWindow(TRUE);
 		m_cmbCondition.EnableWindow(TRUE);
-		m_editScore.EnableWindow(TRUE);
+		m_editScore.EnableWindow((m_cmbConditionValue.GetCurSel() == 0) ? TRUE : FALSE);
+		m_cmbConditionValue.EnableWindow(TRUE);
 	}
 	else
 	{
 		m_butChooseDataScorer.EnableWindow(FALSE);
 		m_cmbCondition.EnableWindow(FALSE);
 		m_editScore.EnableWindow(FALSE);
+		m_cmbConditionValue.EnableWindow(FALSE);
 	}
 	return 0;
 }
@@ -314,6 +327,18 @@ LRESULT CRemoveSubAttributesPP::OnCbnSelchangeComboAttributeSelector(WORD /*wNot
 		SetDirty( TRUE );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13307");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CRemoveSubAttributesPP::OnCbnSelchangeComboValue(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	try
+	{
+		long lCurrSelection = m_cmbConditionValue.GetCurSel();
+		m_editScore.EnableWindow(lCurrSelection != 0 ? FALSE : TRUE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37980")
 
 	return 0;
 }

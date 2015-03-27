@@ -1150,9 +1150,9 @@ namespace Extract.FileActionManager.FileProcessors
                         // If the database connection does not exist and the text appears to contain
                         // tags than need it, note the issue for later logging.
                         if (fileProcessingDB == null &&
-                            (match.Value.IndexOf("<ActionName>", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                             match.Value.IndexOf("<DatabaseName>", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                             match.Value.IndexOf("<DatabaseServerName>", StringComparison.OrdinalIgnoreCase) >= 0))
+                            (match.Value.IndexOf(FileActionManagerDatabasePathTags.ActionTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                             match.Value.IndexOf(FileActionManagerDatabasePathTags.DatabaseTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                             match.Value.IndexOf(FileActionManagerDatabasePathTags.DatabaseServerTag, StringComparison.OrdinalIgnoreCase) >= 0))
 
                         {
                             _dbConnectionMissing = true;

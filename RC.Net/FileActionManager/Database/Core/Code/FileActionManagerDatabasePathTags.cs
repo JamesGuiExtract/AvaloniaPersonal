@@ -26,7 +26,7 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// Constant string for the database server name tag
         /// </summary>
-        public static readonly string DatabaseServerTag = "<DatabaseServerName>";
+        public static readonly string DatabaseServerTag = "<DatabaseServer>";
 
         #endregion Constants
 

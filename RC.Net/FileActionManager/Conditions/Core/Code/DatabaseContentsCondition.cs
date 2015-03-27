@@ -1849,9 +1849,9 @@ namespace Extract.FileActionManager.Conditions
 
                 // If he text appears to contain database related tags that could not be expanded,
                 // throw an error.
-                if ((expandedOutput.IndexOf("<ActionName>", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     expandedOutput.IndexOf("<DatabaseName>", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     expandedOutput.IndexOf("<DatabaseServerName>", StringComparison.OrdinalIgnoreCase) >= 0))
+                if ((expandedOutput.IndexOf(FileActionManagerDatabasePathTags.ActionTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     expandedOutput.IndexOf(FileActionManagerDatabasePathTags.DatabaseTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     expandedOutput.IndexOf(FileActionManagerDatabasePathTags.DatabaseServerTag, StringComparison.OrdinalIgnoreCase) >= 0))
                 {
                     var ee = new ExtractException("ELI36957",
                         "FAM DB is unavailable to expand data query for query condition.");

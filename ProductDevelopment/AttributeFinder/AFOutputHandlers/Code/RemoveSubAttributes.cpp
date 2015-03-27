@@ -20,7 +20,7 @@ using namespace std;
 // Constants
 //-------------------------------------------------------------------------------------------------
 // Version 4: Added CIdentifiableObject
-const unsigned long gnCurrentVersion = 4;
+const unsigned long gnCurrentVersion = 5;
 
 //-------------------------------------------------------------------------------------------------
 // CRemoveSubAttributes
@@ -242,6 +242,40 @@ STDMETHODIMP CRemoveSubAttributes::put_AttributeSelector(IAttributeSelector * ne
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRemoveSubAttributes::get_CompareConditionType(EConditionComparisonType* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check licensing
+		validateLicense();
+
+		*pVal = m_eConditionComparisonType;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37981")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRemoveSubAttributes::put_CompareConditionType(EConditionComparisonType newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check licensing
+		validateLicense();
+
+		m_eConditionComparisonType = newVal;
+		m_bDirty = true;
+
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37982")
+
+	return S_OK;
+}
 
 //-------------------------------------------------------------------------------------------------
 // IOutputHandler
@@ -262,6 +296,11 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 
 		if(m_bConditionalRemove)
 		{
+			long nMaxOrMinScore = (m_eConditionComparisonType == kCompareMinimum) ? 100 : 0;
+			map<long, long> mapOfScores;
+
+			mapOfScores.clear();
+
 			{
 				PROFILE_RULE_OBJECT("", "", m_ipAS, 0);
 
@@ -284,39 +323,56 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 					PROFILE_RULE_OBJECT(asString(m_ipDataScorer->Description), "", ipDataScorer, 0);
 					
 					nScore = ipDataScorer->GetDataScore1(ipAttr);
+
 				}
 
-				bool bRemove = false;
-			
-				switch(m_eCondition)
+				switch (m_eConditionComparisonType)
 				{
-				case kEQ:
-					bRemove = (nScore == m_nScoreToCompare);
+				case kCompareMinimum:
+					if (nMaxOrMinScore > nScore)
+					{
+						nMaxOrMinScore = nScore;
+					}
+					mapOfScores[i] = nScore;
 					break;
-				case kNEQ:
-					bRemove = (nScore != m_nScoreToCompare);
-					break;
-				case kLT:
-					bRemove = (nScore < m_nScoreToCompare);
-					break;
-				case kGT:
-					bRemove = (nScore > m_nScoreToCompare);
-					break;
-				case kLEQ:
-					bRemove = (nScore <= m_nScoreToCompare);
-					break;
-				case kGEQ:
-					bRemove = (nScore >= m_nScoreToCompare);
+				case kCompareMaximum:
+					if (nMaxOrMinScore < nScore)
+					{
+						nMaxOrMinScore = nScore;
+					}
+					mapOfScores[i] = nScore;
 					break;
 				}
+
+			
 				// We are going to remove all the attributes in ipFoundAttributes'
 				// so if an attribute is to remain it must be taken out of 
 				// ipFoundAttributes
-				if(!bRemove)
+				if(m_eConditionComparisonType == kValueOf)
 				{
-					ipFoundAttributes->Remove(i);
-					i--;
-					lSize--;
+					bool bRemove = compareWithCondition(nScore, m_nScoreToCompare);
+					if (!bRemove)
+					{
+						ipFoundAttributes->Remove(i);
+						i--;
+						lSize--;
+					}
+				}
+			}
+
+			// if the comparisonType is not kValueOf need to determine which items to to remove
+			if (m_eConditionComparisonType != kValueOf)
+			{
+				// Compare the saved scores in reverse order with the 
+				// determined value
+				for (long i = mapOfScores.size() - 1; i >= 0; i--)
+				{
+					// if the attribute is not to be removed it needs to be
+					// removed from the ipFoundAttributes vector
+					if (!compareWithCondition(mapOfScores[i], nMaxOrMinScore))
+					{
+						ipFoundAttributes->Remove(i);
+					}
 				}
 			}
 		}
@@ -440,7 +496,7 @@ STDMETHODIMP CRemoveSubAttributes::raw_CopyFrom(IUnknown *pObject)
 		m_eCondition = ipSource->ScoreCondition;
 		m_nScoreToCompare = ipSource->ScoreToCompare;
 		m_ipAS = ipSource->AttributeSelector;
-
+		m_eConditionComparisonType = ipSource->CompareConditionType;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12819");
 
@@ -503,6 +559,7 @@ STDMETHODIMP CRemoveSubAttributes::Load(IStream *pStream)
 		m_eCondition = kEQ;
 		m_bConditionalRemove = false;
 		m_nScoreToCompare = 0;
+		m_eConditionComparisonType = kValueOf;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -549,6 +606,13 @@ STDMETHODIMP CRemoveSubAttributes::Load(IStream *pStream)
 				m_eCondition = (EConditionalOp)nTmp;
 				dataReader >> m_nScoreToCompare;
 			}
+		}
+
+		if (nDataVersion >= 5)
+		{
+			long nTmp = 0;
+			dataReader >> nTmp;
+			m_eConditionComparisonType = (EConditionComparisonType) nTmp;
 		}
 
 		// read the data scorer object
@@ -603,6 +667,7 @@ STDMETHODIMP CRemoveSubAttributes::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			dataWriter << (long)m_eCondition;
 			dataWriter << m_nScoreToCompare;
+			dataWriter << (long)m_eConditionComparisonType;
 		}
 		dataWriter.flushToByteStream();
 
@@ -694,3 +759,29 @@ void CRemoveSubAttributes::validateLicense()
 		"Remove SubAttributes Output Handler" );
 }
 //-------------------------------------------------------------------------------------------------
+bool CRemoveSubAttributes::compareWithCondition(long itemScore, long nComparisonScore)
+{
+	bool bRemove = false;
+	switch(m_eCondition)
+	{
+	case kEQ:
+		bRemove = (itemScore == nComparisonScore);
+		break;
+	case kNEQ:
+		bRemove = (itemScore != nComparisonScore);
+		break;
+	case kLT:
+		bRemove = (itemScore < nComparisonScore);
+		break;
+	case kGT:
+		bRemove = (itemScore > nComparisonScore);
+		break;
+	case kLEQ:
+		bRemove = (itemScore <= nComparisonScore);
+		break;
+	case kGEQ:
+		bRemove = (itemScore >= nComparisonScore);
+		break;
+	}
+	return bRemove;
+}
