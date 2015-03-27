@@ -274,6 +274,10 @@ public:
 	STDMETHOD(GetFailedWorkItemsForGroup)(long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
 	STDMETHOD(SetMetadataFieldValue)(long nFileID, BSTR bstrMetadataFieldName, BSTR bstrMetadataFieldValue);
 	STDMETHOD(GetMetadataFieldValue)(long nFileID, BSTR bstrMetadataFieldName, BSTR *pbstrMetadataFieldValue);
+	STDMETHOD(AddMetadataField)(BSTR bstrMetadataFieldName);
+	STDMETHOD(DeleteMetadataField)(BSTR bstrMetadataFieldName);
+	STDMETHOD(RenameMetadataField)(BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
+	STDMETHOD(GetMetadataFieldNames)(IVariantVector** ppvecMetadataFieldNames);
 	STDMETHOD(GetLastConnectionStringConfiguredThisProcess)(BSTR *pbstrConnectionString);
 
 // ILicensedComponent Methods
@@ -909,6 +913,9 @@ private:
 
 	// Checks whether the specified action name is valid
 	void validateNewActionName(const string& strActionName);
+	
+	// Checks whether the specified metadata field name is valid
+	void validateMetadataFieldName(const string& strMetadataFieldName);
 
 	// Gets a regular expression parser
 	IRegularExprParserPtr getParser();
@@ -1116,6 +1123,10 @@ private:
 	bool GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
 	bool SetMetadataFieldValue_Internal(bool bDBLocked, long nFileID, BSTR bstrMetadataFieldName, BSTR bstrMetadataFieldValue);
 	bool GetMetadataFieldValue_Internal(bool bDBLocked, long nFileID, BSTR bstrMetadataFieldName, BSTR *pbstrMetadataFieldValue);
+	bool GetMetadataFieldNames_Internal(bool bDBLocked, IVariantVector **ppMetadataFieldNames);
+	bool AddMetadataField_Internal(bool bDBLocked, const string& strMetadataFieldName);
+	bool DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMetadataFieldName);
+	bool RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

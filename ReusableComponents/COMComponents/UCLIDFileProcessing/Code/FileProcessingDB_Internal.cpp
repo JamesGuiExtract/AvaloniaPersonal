@@ -4372,6 +4372,21 @@ void CFileProcessingDB::validateNewActionName(const string& strActionName)
 	}
 }
 //--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::validateMetadataFieldName(const string& strMetadataFieldName)
+{
+	// Check if the metadata field name is valid
+	if (strMetadataFieldName.length() > 50 || !isValidIdentifier(strMetadataFieldName))
+	{
+		// Throw an exception
+		UCLIDException ue("ELI29706", "Specified metadata field name is invalid.");
+		ue.addDebugInfo("Metadata Field Name", strMetadataFieldName);
+		ue.addDebugInfo("Valid Pattern", "[_a-zA-Z][_a-zA-Z0-9]*" );
+		ue.addDebugInfo("Metadata Field Name Length", strMetadataFieldName.length());
+		ue.addDebugInfo("Maximum Length", "50");
+		throw ue;
+	}
+}
+//--------------------------------------------------------------------------------------------------
 IRegularExprParserPtr CFileProcessingDB::getParser()
 {
 	try

@@ -7741,3 +7741,285 @@ bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetMetadataFieldNames_Internal(bool bDBLocked, IVariantVector **ppMetadataFieldNames)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI37657", ppMetadataFieldNames != __nullptr);
+
+			IVariantVectorPtr ipVecMetadataFields(CLSID_VariantVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI37658", ipVecMetadataFields != __nullptr);
+
+			string strQuery = "SELECT [Name] FROM [MetadataField]";
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				validateDBSchemaVersion();
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipMetadataFieldSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37659", ipMetadataFieldSet != __nullptr);
+
+				// Open Recordset that contains the metadata field names
+				ipMetadataFieldSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+					adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+				// Loop through each metadata field name and add it to the variant vector
+				while (ipMetadataFieldSet->adoEOF == VARIANT_FALSE)
+				{
+					// Get the metadata field name and add it to the collection
+					string strMetadataFieldName = getStringField(ipMetadataFieldSet->Fields, "Name");
+					ipVecMetadataFields->PushBack(strMetadataFieldName.c_str());
+
+					// Move to the next metadata field
+					ipMetadataFieldSet->MoveNext();
+				}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37660");
+
+			// Set the out value
+			*ppMetadataFieldNames = ipVecMetadataFields.Detach();
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37661");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::AddMetadataField_Internal(bool bDBLocked, const string& strMetadataFieldName)
+{
+	try
+	{
+		try
+		{
+			string strQuery = "SELECT [Name] FROM [MetadataField] WHERE [Name] = '"
+				+ strMetadataFieldName + "'";
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				validateDBSchemaVersion();
+
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipMetadataFieldSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI27355", ipMetadataFieldSet != __nullptr);
+
+				// Open Recordset that contains the metadata field names
+				ipMetadataFieldSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+					adLockOptimistic, adCmdText);
+
+				if (ipMetadataFieldSet->adoEOF == VARIANT_FALSE)
+				{
+					UCLIDException ue("ELI27356", "Specified metadata field already exists!");
+					ue.addDebugInfo("Metadata Field Name", strMetadataFieldName);
+					throw ue;
+				}
+				else
+				{
+					ipMetadataFieldSet->AddNew();
+
+					// Get the fields
+					FieldsPtr ipFields = ipMetadataFieldSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI27357", ipFields != __nullptr);
+
+					// Set the fields
+					setStringField(ipFields, "Name", strMetadataFieldName);
+
+					// Update the table
+					ipMetadataFieldSet->Update();
+				}
+
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37699");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37700");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMetadataFieldName)
+{
+	try
+	{
+		try
+		{
+			// Get the metadata field name
+			string strMetadataFieldName = asString(bstrMetadataFieldName);
+			validateMetadataFieldName(strMetadataFieldName);
+
+			// Build the query
+			string strQuery = "SELECT [Name] FROM [MetadataField] WHERE [Name] = '"
+				+ strMetadataFieldName + "'";
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				validateDBSchemaVersion();
+
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipMetadataFieldSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37701", ipMetadataFieldSet != __nullptr);
+
+				// Open Recordset that contains the metadata field names
+				ipMetadataFieldSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+					adLockOptimistic, adCmdText);
+
+				if (ipMetadataFieldSet->adoEOF == VARIANT_FALSE)
+				{
+					// Delete the current record
+					ipMetadataFieldSet->Delete(adAffectCurrent);
+
+					// Update the table
+					ipMetadataFieldSet->Update();
+				}
+
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37702");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30675");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName,
+	BSTR bstrNewMetadataFieldName)
+{
+	try
+	{
+		try
+		{
+			// Get the old name and validate it
+			string strOldMetadataFieldName = asString(bstrOldMetadataFieldName);
+			validateMetadataFieldName(strOldMetadataFieldName);
+
+			// Get the new name and validate it
+			string strNewMetadataFieldName = asString(bstrNewMetadataFieldName);
+			validateMetadataFieldName(strNewMetadataFieldName);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				validateDBSchemaVersion();
+
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
+
+				string strQueryBase = "SELECT [Name] FROM [MetadataField] WHERE [Name] = '";
+
+				// Check for new name existence
+				string strTempQuery = strQueryBase + strNewMetadataFieldName + "'";
+				_RecordsetPtr ipTemp(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37703", ipTemp != __nullptr);
+
+				ipTemp->Open(strTempQuery.c_str(), _variant_t((IDispatch*) ipConnection, true),
+					adOpenDynamic, adLockOptimistic, adCmdText);
+				if (ipTemp->adoEOF == VARIANT_FALSE)
+				{
+					UCLIDException ue("ELI37704", "New metadata field name already exists.");
+					ue.addDebugInfo("Old Metadata Field Name", strOldMetadataFieldName);
+					ue.addDebugInfo("New Metadata Field Name", strNewMetadataFieldName);
+					throw ue;
+				}
+
+				string strQuery = strQueryBase + strOldMetadataFieldName + "'";
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipMetadataFieldSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI37705", ipMetadataFieldSet != __nullptr);
+
+				// Open Recordset that contains the tag names
+				ipMetadataFieldSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+					adLockOptimistic, adCmdText);
+
+				// Ensure there is a record for the old tag name
+				if (ipMetadataFieldSet->adoEOF == VARIANT_TRUE)
+				{
+					UCLIDException ue("ELI37706", "The specified metadata field does not exist!");
+					ue.addDebugInfo("Old Metadata Field Name", strOldMetadataFieldName);
+					ue.addDebugInfo("New Metadata Field Name", strNewMetadataFieldName);
+					throw ue;
+				}
+
+				// Get the fields pointer
+				FieldsPtr ipFields = ipMetadataFieldSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI37707", ipFields != __nullptr);
+
+				// Update the record with the new value
+				if (!strNewMetadataFieldName.empty())
+				{
+					setStringField(ipFields, "Name", strNewMetadataFieldName);
+				}
+
+				ipMetadataFieldSet->Update();
+
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI37708");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37709");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------

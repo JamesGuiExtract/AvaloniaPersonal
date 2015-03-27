@@ -1589,6 +1589,28 @@ library UCLID_FILEPROCESSINGLib
 		[id(137), helpstring("method GetMetadataFieldValue")] HRESULT GetMetadataFieldValue([in] long nFileID,
 			[in] BSTR bstrMetadataFieldName, [out, retval] BSTR *pbstrMetadataFieldValue);
 		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To add a new metadata field to the MetadataField table.
+		// REQUIRE: bstrMetadataFieldName is not NULL or empty string
+		[id(138), helpstring("method AddMetadataField")] HRESULT AddMetadataField([in] BSTR bstrMetadataFieldName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To remove the specified metadata field from the MetadataField table.
+		//			If bstrMetadataFieldName does not exist	in the MetadataField table then the MetadataField
+		//			table will remain unchanged.
+		// NOTE:	This will also remove any values for this field from the FileMetadataValue table.
+		// REQUIRE: bstrMetadataFieldName is not NULL or empty string.
+		[id(139), helpstring("method DeleteMetadataField")] HRESULT DeleteMetadataField(
+			[in] BSTR bstrMetadataFieldName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To change the name of an existing metadata field.
+		// REQUIRE: bstrOldMetadataFieldName is not NULL or empty string AND bstrOldMetadataFieldName
+		//			is in the MetadataField table.
+		[id(140), helpstring("method RenameMetadataField")] HRESULT RenameMetadataField(
+			[in] BSTR bstrOldMetadataFieldName,	[in] BSTR bstrNewMetadataFieldName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To get a collection of metadata field names
+		[id(141), helpstring("method GetMetadataFieldNames")] HRESULT GetMetadataFieldNames(
+			[out, retval] IVariantVector** ppvecMetadataFieldNames);
+		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Gets a connection string for the last configured DB server, database, and advanced
 		// connection string properties in this process.
 		// NOTE: The connection string may be for a database that has not actually been used. The
@@ -1597,7 +1619,7 @@ library UCLID_FILEPROCESSINGLib
 		// running within a RunFPSFile instance with the /ingoreDB flag, even though the FAM instance will
 		// not have connected to a database, the database info will still have been loaded from the FPS file
 		// and that is what will be used here.
-		[id(138), helpstring("method GetLastConnectionStringConfiguredThisProcess ")]
+		[id(142), helpstring("method GetLastConnectionStringConfiguredThisProcess ")]
 			HRESULT GetLastConnectionStringConfiguredThisProcess([out, retval] BSTR *pbstrConnectionString);
 	};
 

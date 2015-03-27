@@ -61,6 +61,7 @@ protected:
 	afx_msg void OnManageActions();
 	afx_msg void OnToolsSetPriority();
 	afx_msg void OnRecalculateStats();
+	afx_msg void OnManageMetadataFields();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged

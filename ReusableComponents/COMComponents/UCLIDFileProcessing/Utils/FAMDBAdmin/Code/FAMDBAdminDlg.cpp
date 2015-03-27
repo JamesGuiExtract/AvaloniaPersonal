@@ -15,6 +15,7 @@
 #include "..\..\..\..\InputFunnel\IFCore\Code\IFCategories.h"
 #include "ManageUsersDlg.h"
 #include "ManageActionsDlg.h"
+#include "ManageMetadataFieldsDlg.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -122,6 +123,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_SETPRIORITY, &CFAMDBAdminDlg::OnToolsSetPriority)
 	ON_COMMAND(ID_TOOLS_REPORTS, &CFAMDBAdminDlg::OnToolsReports)
 	ON_COMMAND(ID_TOOLS_RECALCULATE_STATS, &CFAMDBAdminDlg::OnRecalculateStats)
+	ON_COMMAND(ID_MANAGE_METADATA, &CFAMDBAdminDlg::OnManageMetadataFields)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -839,7 +841,23 @@ void CFAMDBAdminDlg::OnManageActions()
 		UpdateSummaryTab();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29104");
-}//-------------------------------------------------------------------------------------------------
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnManageMetadataFields()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{	
+		// Create a new Metadata fields manager dialog
+		CManageMetadataFieldsDlg dlg(m_ipFAMDB);
+
+		// Display the dialog
+		dlg.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37649");
+}
+//-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnToolsSetPriority()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -1122,3 +1140,4 @@ UINT CFAMDBAdminDlg::upgradeToCurrentSchemaThread(LPVOID pParam)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
+

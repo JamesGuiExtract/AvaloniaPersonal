@@ -55,6 +55,7 @@
 #define IDC_RDCOPYFROM                  2002
 #define IDC_CMB_STATUS                  2003
 #define IDC_CMB_COPY_FROM               2004
+#define IDD_DIALOG_MANAGE_METADATA_FIELDS 2005
 #define IDC_EDIT_OLD_ACTION_NAME        2006
 #define IDC_EDT_NEW_ACTION              2008
 #define IDC_CMB_ACTION_STATUS           2010
@@ -129,6 +130,12 @@
 #define IDC_BTN_REFRESH_ACTIONS         2095
 #define IDC_BTN_ACTION_CLOSE            2096
 #define IDC_BTN_CLEAR_USER_PASSWORD     2097
+#define IDC_LIST_METADATA_FIELDS_TO_MANAGE 2109
+#define IDC_BTN_ADD_METADATA_FIELD      2110
+#define IDC_BTN_REMOVE_METADATA_FIELD   2111
+#define IDC_BTN_RENAME_METADATA_FIELD   2112
+#define IDC_BTN_REFRESH_METADATA_FIELDS 2113
+#define IDC_BTN_METADATA_FIELD_CLOSE    2114
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -161,14 +168,15 @@
 #define ID_TOOLS_INSPECT_FILES          32805
 #define ID_SUMMARY_MENU_ROW_HEADER_COPY 32806
 #define ID_SUMMARY_MENU_COPY_COUNT      32807
+#define ID_MANAGE_METADATA              32808
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        146
-#define _APS_NEXT_COMMAND_VALUE         32808
-#define _APS_NEXT_CONTROL_VALUE         2109
-#define _APS_NEXT_SYMED_VALUE           2000
+#define _APS_NEXT_COMMAND_VALUE         32809
+#define _APS_NEXT_CONTROL_VALUE         2115
+#define _APS_NEXT_SYMED_VALUE           2006
 #endif
 #endif

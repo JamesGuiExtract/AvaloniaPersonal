@@ -3320,7 +3320,92 @@ STDMETHODIMP CFileProcessingDB::GetLastConnectionStringConfiguredThisProcess(BST
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37875");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AddMetadataField(BSTR bstrMetadataFieldName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+	try
+	{
+		validateLicense();
+
+		string strMetadataFieldName = asString(bstrMetadataFieldName);
+
+		// Validate the tag name
+		validateMetadataFieldName(strMetadataFieldName);
+
+		if (!AddMetadataField_Internal(false, strMetadataFieldName))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			AddMetadataField_Internal(true, strMetadataFieldName);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37710");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::DeleteMetadataField(BSTR bstrMetadataFieldName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!DeleteMetadataField_Internal(false, bstrMetadataFieldName))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			DeleteMetadataField_Internal(true, bstrMetadataFieldName);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37711");
+
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RenameMetadataField(BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!RenameMetadataField_Internal(false, bstrOldMetadataFieldName, bstrNewMetadataFieldName))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+			RenameMetadataField_Internal(true, bstrOldMetadataFieldName, bstrNewMetadataFieldName);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37712");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetMetadataFieldNames(IVariantVector **ppMetadataFieldNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetMetadataFieldNames_Internal(false, ppMetadataFieldNames))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			GetMetadataFieldNames_Internal(true, ppMetadataFieldNames);
+		}
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37656");
+}
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
 //-------------------------------------------------------------------------------------------------
