@@ -82,10 +82,14 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="dataCommitted"><see langword="true"/> if the changed data was committed;
         /// <see langword="false"/> if the change is in progress.</param>
-        public DataChangedEventArgs(bool dataCommitted)
+        /// <param name="refreshSource"><see langword="true"/> if the
+        /// <see cref="QueryAndResultsControl"/> that raised the event should be refreshed as well;
+        /// otherwise, <see langword="false"/>.</param>
+        public DataChangedEventArgs(bool dataCommitted, bool refreshSource)
             : base()
         {
             DataCommitted = dataCommitted;
+            RefreshSource = refreshSource;
         }
 
         /// <summary>
@@ -95,6 +99,18 @@ namespace Extract.SQLCDBEditor
         /// if the change is in progress.
         /// </value>
         public bool DataCommitted
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="QueryAndResultsControl"/> that raised
+        /// the event should be refreshed.
+        /// </summary>
+        /// <value><see langword="true"/> if the <see cref="QueryAndResultsControl"/> that raised
+        /// the event should be refreshed as well; otherwise, <see langword="false"/>.</value>
+        public bool RefreshSource
         {
             get;
             private set;

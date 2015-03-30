@@ -23,6 +23,8 @@
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation />
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>http://localhost/SQLCDBEditor/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -35,10 +37,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -72,6 +72,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -88,6 +89,21 @@
     </Compile>
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ContextEditingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ContextEditingForm.Designer.cs">
+      <DependentUpon>ContextEditingForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ContextTagsPlugin.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CreateContextForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateContextForm.Designer.cs">
+      <DependentUpon>CreateContextForm.cs</DependentUpon>
     </Compile>
     <Compile Include="EventArgs.cs" />
     <Compile Include="SQLCDBEditorPlugin.cs">
@@ -112,6 +128,15 @@
       <SubType>Designer</SubType>
       <DependentUpon>AboutBox.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ContextEditingForm.resx">
+      <DependentUpon>ContextEditingForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ContextTagsPlugin.resx">
+      <DependentUpon>ContextTagsPlugin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateContextForm.resx">
+      <DependentUpon>CreateContextForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="QueryAndResultsControl.resx">
       <DependentUpon>QueryAndResultsControl.cs</DependentUpon>
@@ -131,6 +156,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="Properties\DataSources\Extract.Database.ContextTableV1.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

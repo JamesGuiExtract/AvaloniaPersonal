@@ -23,7 +23,7 @@ const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 string CFAMTagManager::ms_strFPSDir;
 string CFAMTagManager::ms_strFPSFileName;
 CMutex CFAMTagManager::ms_mutex;
-IEnvironmentTagProviderPtr CFAMTagManager::ms_ipEnvironmentTagProvider;
+IContextTagProviderPtr CFAMTagManager::ms_ipContextTagProvider;
 
 //--------------------------------------------------------------------------------------------------
 // CFAMTagManager
@@ -33,13 +33,13 @@ CFAMTagManager::CFAMTagManager()
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI35226", m_ipMiscUtils != __nullptr);
 
-	// ms_ipEnvironmentTagProvider is not created until the first instance of FAMTagManager is
+	// ms_ipContextTagProvider is not created until the first instance of FAMTagManager is
 	// created.
 	CSingleLock lock(&ms_mutex, TRUE);
-	if (ms_ipEnvironmentTagProvider == __nullptr)
+	if (ms_ipContextTagProvider == __nullptr)
 	{
-		ms_ipEnvironmentTagProvider.CreateInstance("Extract.Database.EnvironmentTagProvider");
-		ASSERT_RESOURCE_ALLOCATION("ELI37903", ms_ipEnvironmentTagProvider != __nullptr);
+		ms_ipContextTagProvider.CreateInstance("Extract.Database.ContextTagProvider");
+		ASSERT_RESOURCE_ALLOCATION("ELI37903", ms_ipContextTagProvider != __nullptr);
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
 		CSingleLock lock(&ms_mutex, TRUE);
 		ms_strFPSDir = asString(strFPSDir);
 
-		ms_ipEnvironmentTagProvider->ContextPath = ms_strFPSDir.c_str();
+		ms_ipContextTagProvider->ContextPath = ms_strFPSDir.c_str();
 
 		return S_OK;
 	}
@@ -274,7 +274,7 @@ STDMETHODIMP CFAMTagManager::raw_GetCustomFileTags(IVariantVector* *ppTags)
 		ASSERT_RESOURCE_ALLOCATION("ELI19432", ipVec != __nullptr);
 
 		CSingleLock lock(&ms_mutex, TRUE);
-		IVariantVectorPtr ipTagNames = ms_ipEnvironmentTagProvider->GetTagNames();
+		IVariantVectorPtr ipTagNames = ms_ipContextTagProvider->GetTagNames();
 		ASSERT_RESOURCE_ALLOCATION("ELI37904", ipTagNames != __nullptr);
 
 		*ppTags = ipTagNames.Detach();	
@@ -494,14 +494,14 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 	CSingleLock lock(&ms_mutex, TRUE);
 	if (!ms_strFPSDir.empty())
 	{
-		IVariantVectorPtr ipTagNames = ms_ipEnvironmentTagProvider->GetTagNames();
+		IVariantVectorPtr ipTagNames = ms_ipContextTagProvider->GetTagNames();
 		ASSERT_RESOURCE_ALLOCATION("ELI37905", ipTagNames != __nullptr);
 
 		long nCount = ipTagNames->Size;
 		for (long i = 0; i < nCount; i++)
 		{
 			string strName = asString(ipTagNames->Item[i].bstrVal);
-			string strValue = ms_ipEnvironmentTagProvider->GetTagValue(ipTagNames->Item[i].bstrVal);
+			string strValue = ms_ipContextTagProvider->GetTagValue(ipTagNames->Item[i].bstrVal);
 
 			replaceVariable(rstrInput, strName, strValue);
 		}

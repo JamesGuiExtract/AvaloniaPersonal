@@ -144,6 +144,21 @@ namespace Extract.SQLCDBEditor.Plugins
         }
 
         /// <summary>
+        /// Indicates whether the plugin's <see cref="Control"/> should be displayed in the
+        /// <see cref="QueryAndResultsControl"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if the plugin's control should be displayed;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public override bool DisplayControl
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Gets a query which will return all un-ignored candidate AKAs along with the number of
         /// times the AKAs have appeared in the documents.
         /// </summary>
@@ -161,17 +176,6 @@ namespace Extract.SQLCDBEditor.Plugins
                             "WHERE [AlternateTestName].[Name] IS NULL " +
                             "GROUP BY [LabTest].[TestCode], [OfficialName], [CandidateAlternateTestName].[Name] " +
                             "HAVING MAX(CAST([Ignore] AS INT)) = 0";
-            }
-        }
-
-        /// <summary>
-        /// Gets the plugin pane.
-        /// </summary>
-        public Control PluginPane
-        {
-            get
-            {
-                return this;
             }
         }
 
@@ -300,7 +304,7 @@ namespace Extract.SQLCDBEditor.Plugins
 
                         _pluginManager.RefreshQueryResults();
 
-                        OnDataChanged(true);
+                        OnDataChanged(true, false);
                     }
                 }
             }
@@ -330,7 +334,7 @@ namespace Extract.SQLCDBEditor.Plugins
                     string testCode = (string)_selectedRow.ItemArray[0];
                     string name = (string)_selectedRow.ItemArray[2];
 
-                    if (MessageBox.Show("Are you sure you wish to ingore \"" + name +
+                    if (MessageBox.Show("Are you sure you wish to ignore \"" + name +
                         "\" as an AKA for \"" + testCode + "\"? If ignored this name will not " +
                         "be displayed as an AKA candidate even if additional examples are found.",
                         "Ignore AKA?",
@@ -349,7 +353,7 @@ namespace Extract.SQLCDBEditor.Plugins
 
                         _pluginManager.RefreshQueryResults();
 
-                        OnDataChanged(true);
+                        OnDataChanged(true, false);
                     }
                 }
             }
@@ -380,7 +384,7 @@ namespace Extract.SQLCDBEditor.Plugins
 
                     _pluginManager.RefreshQueryResults();
 
-                    OnDataChanged(true);
+                    OnDataChanged(true, false);
                 }
             }
             catch (Exception ex)
@@ -425,7 +429,7 @@ namespace Extract.SQLCDBEditor.Plugins
                     _examples.Clear();
                     _exampleIndex = 0;
 
-                    // Create a new AKAExample for each row that has assosciate spatial information
+                    // Create a new AKAExample for each row that has associate spatial information
                     // in a document that exists.
                     foreach (string exampleData in examples)
                     {

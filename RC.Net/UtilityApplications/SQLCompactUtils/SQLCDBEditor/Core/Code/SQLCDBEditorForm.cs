@@ -57,7 +57,7 @@ namespace Extract.SQLCDBEditor
             FileSystemMethods.UserApplicationDataPath, _DEFAULT_TITLE, _DEFAULT_TITLE + ".xml");
 
         /// <summary>
-        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// Name for the mutex used to serialize persistence of the control and form layout.
         /// </summary>
         static readonly string _FORM_PERSISTENCE_MUTEX_STRING =
             "{DE40ED67-7A96-41F9-BDE8-20634534EF38";
@@ -966,7 +966,7 @@ namespace Extract.SQLCDBEditor
                         .OfType<TabbedDocument>()
                         .Where(tab => tab.Controls.Count == 1)
                         .Select(tab => (QueryAndResultsControl)tab.Controls[0])
-                        .Where(control => control != sender))
+                        .Where(control => e.RefreshSource || control != sender))
                     {
                         // Use false so that for queries, the results get marked as stale, but don't
                         // get automatically refreshed.
@@ -1578,8 +1578,8 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Closes the the specified <see paramref="queryAndResultsControl"/> and deletes any
-        /// associated sqlce file from disk.
+        /// Closes the specified <see paramref="queryAndResultsControl"/> and deletes any associated
+        /// sqlce file from disk.
         /// </summary>
         /// <param name="queryAndResultsControl">The <see cref="QueryAndResultsControl"/> to delete.
         /// </param>
@@ -1951,7 +1951,7 @@ namespace Extract.SQLCDBEditor
 
         /// <summary>
         /// Method sets the windows title as SQLCDBEditor if no database file is loaded and if a 
-        /// database file is loaded appends the filename preceeded by an * if the changes have been
+        /// database file is loaded appends the filename preceded by an * if the changes have been
         /// made since it was loaded.
         /// </summary>
         void SetWindowTitle()

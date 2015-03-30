@@ -1333,19 +1333,19 @@ library UCLID_COMUTILSLib
 		object,
 		uuid(CECE585E-CC98-49F0-9666-E9ECC88FD4C0),
 		dual,
-		helpstring("IEnvironmentTagProvider Interface"),
+		helpstring("IContextTagProvider Interface"),
 		pointer_default(unique)
 	]
-	interface IEnvironmentTagProvider : IDispatch
+	interface IContextTagProvider : IDispatch
 	{
 		// PURPOSE: To specify the path for which the environment tags apply (the directory where
 		//			the FPS files that will use these settings are).
 		[propput, id(1), helpstring("property ContextPath")] HRESULT ContextPath([in] BSTR newVal);
 		[propget, id(1), helpstring("property ContextPath")] HRESULT ContextPath([out, retval] BSTR *pVal);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Returns the face currently defining the tag values that will be returned by
+		// PURPOSE: Returns the context currently defining the tag values that will be returned by
 		//			GetTagValue.
-		[propget, id(2), helpstring("property ActiveFace")] HRESULT ActiveFace([out, retval] BSTR *pVal);
+		[propget, id(2), helpstring("property ActiveContext")] HRESULT ActiveContext([out, retval] BSTR *pVal);
 		// PURPOSE: To return a list of all environment-specific tags available for use. These are
 		//			tags in addition to built-in tags that can have different values depending on
 		//			the current environment or "face". (i.e., "Test" vs. "Prod")

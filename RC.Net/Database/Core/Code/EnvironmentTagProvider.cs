@@ -2,7 +2,6 @@
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -13,51 +12,51 @@ using UCLID_COMUTILSLib;
 namespace Extract.Database
 {
     /// <summary>
-    /// Provides custom path tags in addition to built-in tags that can have different values
-    /// depending on the current environment or "face". (i.e., "Test" vs. "Prod")
+    /// Provides context-specific path tags in addition to built-in tags that can have different
+    /// values depending on the current context. (i.e., "Test" vs. "Prod")
     /// </summary>
     [ComVisible(true)]
     [Guid("C30D753F-2B48-4101-AAB5-F84A5FC404CF")]
     [CLSCompliant(false)]
-    [ProgId("Extract.Database.EnvironmentTagProvider")]
-    public class EnvironmentTagProvider : IEnvironmentTagProvider
+    [ProgId("Extract.Database.ContextTagProvider")]
+    public class ContextTagProvider : IContextTagProvider
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static readonly string _OBJECT_NAME = typeof(EnvironmentTagProvider).ToString();
+        static readonly string _OBJECT_NAME = typeof(ContextTagProvider).ToString();
 
         /// <summary>
-        /// The name of the SQL CE database file that defines environment tags.
+        /// The name of the SQL CE database file that defines the context-specific tags.
         /// </summary>
-        static readonly string _SETTING_FILENAME = "FAMSettings.sdf";
+        static readonly string _SETTING_FILENAME = "CustomTags.sdf";
 
         #endregion Constants
 
         #region Fields
 
         /// <summary>
-        /// Keeps track of the name to value for all currently defined tags.
+        /// Keeps track of the value for all tags in the current context.
         /// </summary>
-        Dictionary<string, string> _environmentTagValues =
+        Dictionary<string, string> _tagValues =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// The path for which the environment tags apply (the directory where the FPS files that
-        /// will use these settings are).
+        /// The path for which the tags apply (the directory where the FPS files that will use
+        /// these settings are).
         /// </summary>
         string _contextPath;
 
         /// <summary>
-        /// The face currently defining the tag values that will be returned by
+        /// The context currently defining the tag values that will be returned by
         /// <see cref="GetTagValue"/>.
         /// </summary>
-        string _activeFace;
+        string _activeContext;
 
         /// <summary>
-        /// Controls access to _environmentTagValues from multiple threads.
+        /// Controls access to _tagValues from multiple threads.
         /// </summary>
         object _lock = new object();
 
@@ -66,9 +65,9 @@ namespace Extract.Database
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EnvironmentTagProvider"/> class.
+        /// Initializes a new instance of the <see cref="ContextTagProvider"/> class.
         /// </summary>
-        public EnvironmentTagProvider()
+        public ContextTagProvider()
         {
             try
             {
@@ -84,14 +83,14 @@ namespace Extract.Database
 
         #endregion Constructors
 
-        #region IEnvironmentTagProvider
+        #region IContextTagProvider
 
         /// <summary>
         /// Gets or sets the path for which the environment tags apply (the directory where the FPS
         /// files that will use these settings are).
         /// </summary>
         /// <value>
-        /// The path for which the environment tags apply
+        /// The path for which the context-specific tags apply
         /// </value>
         public string ContextPath
         {
@@ -108,27 +107,27 @@ namespace Extract.Database
                     {
 // Loading of environment/context specific tags disabled until some open questions with the
 // implementation are resolved.
-//LoadTagsForPath(value);
+// LoadTagsForPath(value, true);
                         _contextPath = value;
                     }
                 }
                 catch (Exception ex)
                 {
                     throw ex.CreateComVisible("ELI37900",
-                        "Failed to load environment tags for specified path.");
+                        "Failed to load context-specific tags for specified path.");
                 }
             }
         }
 
         /// <summary>
-        /// Gets the face currently defining the tag values that will be returned by
+        /// Gets the context currently defining the tag values that will be returned by
         ///	<see cref="GetTagValue"/>
         /// </summary>
-        public string ActiveFace
+        public string ActiveContext
         {
             get
             {
-                return _activeFace;
+                return _activeContext;
             }
         }
 
@@ -144,23 +143,23 @@ namespace Extract.Database
             {
                 lock (_lock)
                 {
-                    return _environmentTagValues.Keys.ToVariantVector();
+                    return _tagValues.Keys.ToVariantVector();
                 }
             }
             catch (Exception ex)
             {
                 var ee = ex.AsExtract("ELI37909");
-                ee.AddDebugData("ActiveFace", _activeFace, false);
+                ee.AddDebugData("ActiveContext", _activeContext, false);
 
-                throw ee.CreateComVisible("ELI37901", "Failed to load environment-specific tags.");
+                throw ee.CreateComVisible("ELI37901", "Failed to load context-specific tags.");
             }
         }
 
         /// <summary>
-        /// Gets the value for the specified tag in the specified environment.
+        /// Gets the value for the specified tag in the <see cref="ActiveContext"/>.
         /// </summary>
         /// <param name="tagName">Name of the tag.</param>
-        /// <returns></returns>
+        /// <returns>The value for the specified tag in the <see cref="ActiveContext"/>.</returns>
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
         public string GetTagValue(string tagName)
         {
@@ -168,86 +167,91 @@ namespace Extract.Database
 	        {
                 lock (_lock)
                 {
-                    return _environmentTagValues[tagName];
+                    return _tagValues[tagName];
                 }
 	        }
 	        catch (Exception ex)
 	        {
-                var ee = ex.AsExtract("ELI37909");
-                ee.AddDebugData("ActiveFace", _activeFace, false);
+                var ee = ex.AsExtract("ELI37962");
+                ee.AddDebugData("ActiveContext", _activeContext, false);
                 ee.AddDebugData("TagName", tagName, false);
 
                 throw ee.CreateComVisible("ELI37902", "Failed to retrieve environment tag value.");
 	        }
         }
 
-        #endregion IEnvironmentTagProvider
+        #endregion IContextTagProvider
 
         #region Private Members
 
         /// <summary>
-        /// Initializes <see cref="_environmentTagValues"/> with the tags for the specified
+        /// Initializes <see cref="_tagValues"/> with the tags for the specified
         /// <see paramref="contextPath"/>.
         /// </summary>
-        /// <param name="contextPath">The path for which the environment tags are to be loaded.
+        /// <param name="contextPath">The path for which the context-specific tags are to be loaded.
+        /// <param name="createIfMissing"><see langword="true"/> to create the database for the tags
+        /// if it does not already exist; otherwise, <see langword="false"/>.</param>
         /// </param>
-        void LoadTagsForPath(string contextPath)
+        void LoadTagsForPath(string contextPath, bool createIfMissing)
         {
             lock (_lock)
             {
-                _environmentTagValues.Clear();
+                _tagValues.Clear();
 
-                // Check to see if a settings file exists for the specified path.
+                // If no path is specified, don't load any tags.
                 if (string.IsNullOrWhiteSpace(contextPath))
                 {
                     return;
                 }
 
+                // Check to see if the tags database file exists.
                 string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
                 if (!File.Exists(settingFileName))
                 {
-                    return;
+                    if (createIfMissing)
+                    {
+                        var manager = new ContextTagDatabaseManager(settingFileName);
+                        manager.CreateDatabase(true);
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
             
-                // Query the database file to get the active face and associated tag values.
+                // Query the database file to get the active context and associated tag values.
                 using (var dbConnectionInfo = new DatabaseConnectionInfo(
                     typeof(SqlCeConnection).AssemblyQualifiedName,
                     SqlCompactMethods.BuildDBConnectionString(settingFileName)))
                 {
                     dbConnectionInfo.UseLocalSqlCeCopy = true;
 
-                    // In case some users are using a mapped drive, convert to a UNC path to try to
-                    // ensure as much as possible that all users accessing the same folder will be
-                    // correctly associated with the proper face.
-                    string UNCPath = contextPath;
-                    FileSystemMethods.ConvertToNetworkPath(ref UNCPath, false);
-
-                    var parameters = new Dictionary<string, string>();
-                    parameters["Path"] = UNCPath + "%";
-
-                    _activeFace = DBMethods.GetQueryResultsAsStringArray(
-                        dbConnectionInfo.ManagedDbConnection,
-                        "SELECT [Name] FROM [Face] WHERE [RootPath] LIKE @Path", parameters, "\t")
-                        .FirstOrDefault();
-
-                    // We were able to find a proper face; load all tag values for this face.
-                    if (_activeFace != null)
+                    using (ContextTagDatabase database = new ContextTagDatabase(
+                        (SqlCeConnection)dbConnectionInfo.ManagedDbConnection))
                     {
-                        parameters.Clear();
-                        parameters["Face"] = _activeFace;
-
-                        using (DataTable results = DBMethods.ExecuteDBQuery(
-                            dbConnectionInfo.ManagedDbConnection,
-                            "SELECT [Tag].[Name], [FaceTag].[Value] FROM [FaceTag] " +
-                            "	INNER JOIN [Face] ON [FaceTag].[FaceID] = [Face].[ID] " +
-                            "	INNER JOIN [Tag] ON [FaceTag].[TagID] = [Tag].[ID] " +
-                            "	WHERE [Face].[Name] = @Face", parameters))
+                        // In case some users are using a mapped drive, convert to a UNC path to try
+                        // to ensure as much as possible that all users accessing the same folder
+                        // will be correctly associated with the proper context.
+                        string UNCPath = contextPath;
+                        FileSystemMethods.ConvertToNetworkPath(ref UNCPath, false);
+                        if (UNCPath.EndsWith("\\", StringComparison.OrdinalIgnoreCase))
                         {
-                            // Enclose the tag name in brackets as it will appear in path tag
-                            // expressions.
-                            _environmentTagValues = results.Rows.OfType<DataRow>()
-                                .ToDictionary(
-                                    row => "<" + (string)row[0] + ">", row => (string)row[1]);
+                            UNCPath = UNCPath.Substring(0, UNCPath.Length - 1);
+                        }
+
+                        _activeContext = database.Context
+                            .Where(context => context.FPSFileDir == UNCPath)
+                            .Select(context => context.Name)
+                            .FirstOrDefault();
+
+                        // We were able to find a proper context; load all tag values for this
+                        // context.
+                        if (_activeContext != null)
+                        {
+                            _tagValues = database.TagValue
+                                .Where(tagValue => tagValue.Context.Name.Equals(_activeContext))
+                                .ToDictionary(tagValue => 
+                                    tagValue.CustomTag.Name, tagValue => tagValue.Value);
                         }
                     }
                 }

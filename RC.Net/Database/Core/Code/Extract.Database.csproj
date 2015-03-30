@@ -23,6 +23,7 @@
     <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation />
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>true</IsWebBootstrapper>
     <PublishUrl>http://localhost/Extract.Database/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -35,7 +36,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -83,7 +83,16 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EnvironmentTagProvider.cs" />
+    <Compile Include="ContextTagProvider.cs" />
+    <Compile Include="ContextTagsEditorViewCollection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextTagsEditorViewPropertyDescriptor.cs">
+      <DependentUpon>ContextTagsEditorViewCollection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ContextTagsEditorViewRow.cs">
+      <DependentUpon>ContextTagsEditorViewCollection.cs</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseConnectionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -94,6 +103,8 @@
     <Compile Include="DatabaseHelperMethods.cs" />
     <Compile Include="DataConnectionConfiguration.cs" />
     <Compile Include="DbMethods.cs" />
+    <Compile Include="ContextTagDatabaseManager.cs" />
+    <Compile Include="ContextTagDatabaseMapping.cs" />
     <Compile Include="IDatabaseSchemaUpdater.cs" />
     <Compile Include="IDataConnectionConfiguration.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

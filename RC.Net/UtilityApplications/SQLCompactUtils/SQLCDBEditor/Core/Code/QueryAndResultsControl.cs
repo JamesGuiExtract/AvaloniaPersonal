@@ -1,11 +1,11 @@
 ﻿using Extract.Database;
+using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -45,6 +45,15 @@ namespace Extract.SQLCDBEditor
     internal partial class QueryAndResultsControl : UserControl, INotifyPropertyChanged,
         ISQLCDBEditorPluginManager
     {
+        #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(QueryAndResultsControl).ToString();
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -84,7 +93,7 @@ namespace Extract.SQLCDBEditor
         string _masterQuery;
 
         /// <summary>
-        /// The last query text saved or loaded from disk. Used to deterimine if the query is
+        /// The last query text saved or loaded from disk. Used to determine if the query is
         /// dirty.
         /// </summary>
         string _lastSavedQuery;
@@ -129,7 +138,7 @@ namespace Extract.SQLCDBEditor
 
         /// <summary>
         /// Indicates if query execution is allowed. When <see cref="QueryModifiesData"/>, this is
-        /// set to <see langword="false"/>, unless the user explictly presses the execute button to
+        /// set to <see langword="false"/>, unless the user explicitly presses the execute button to
         /// prevent un-intended modification of data.
         /// </summary>
         bool _allowQueryExcecution = true;
@@ -168,6 +177,16 @@ namespace Extract.SQLCDBEditor
             try
             {
                 _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
+
+                if (_inDesignMode)
+                {
+                    // Load the license files from folder
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
+
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI38021",
+                    _OBJECT_NAME);
                
                 InitializeComponent();
 
@@ -293,9 +312,9 @@ namespace Extract.SQLCDBEditor
         #region Properties
 
         /// <summary>
-        /// Gets the name of the table or query, suffixed by an asterix if a query is dirty.
+        /// Gets the name of the table or query, suffixed by an asterisk if a query is dirty.
         /// </summary>
-        /// <returns>The name of the table or query, suffixed by an asterix if a query is dirty.
+        /// <returns>The name of the table or query, suffixed by an asterisk if a query is dirty.
         /// </returns>
         // Don't obfuscate because this un-obfuscated property name is needed by the PropertyChanged
         // event.
@@ -429,7 +448,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// Gets or sets a value indicating whether the query exists on disk as an sqlce file.
         /// </summary>
-        /// <value><see langword="true"/> if if query exists on disk; otherwise,
+        /// <value><see langword="true"/> if query exists on disk; otherwise,
         /// <see langword="false"/>.
         /// </value>
         public bool QueryFileExists
@@ -559,6 +578,26 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
+        /// Loads the plugin by providing it the <see paramref="connection"/> and using the 
+        /// <see cref="SQLCDBEditorPlugin.BindingSource"/> it creates using the connection.
+        /// </summary>
+        /// <param name="connection">The <see cref="SqlCeConnection"/> to the database.</param>
+        void LoadPluginViaBindingSource(SqlCeConnection connection)
+        {
+            _lastUsedParameters.Clear();
+
+            _resultsGrid.AllowUserToAddRows = false;
+            _resultsGrid.AllowUserToDeleteRows = false;
+            _resultsGrid.AutoGenerateColumns = true;
+
+            _connection = connection;
+            _plugin.LoadPlugin(this, _connection);
+            _resultsGrid.DataSource = _plugin.BindingSource;
+            
+            IsLoaded = true;
+        }
+
+        /// <summary>
         /// Loads the requests grid using the <see paramref="query"/>. This is logic that is shared
         /// between query and plugin types.
         /// </summary>
@@ -618,7 +657,7 @@ namespace Extract.SQLCDBEditor
                 _resultsSplitContainer.Panel1.Controls.Clear();
                 _resultsSplitContainer.Panel2.Controls.Clear();
 
-                if (!string.IsNullOrEmpty(_plugin.Query))
+                if (!string.IsNullOrEmpty(_plugin.Query) || UsingPluginBindingSource)
                 {
                     _resultsSplitContainer.Panel1.Controls.Add(_resultsPanel);
                     _resultsSplitContainer.Panel1Collapsed = false;
@@ -628,12 +667,15 @@ namespace Extract.SQLCDBEditor
                     _resultsSplitContainer.Panel1Collapsed = true;
                 }
 
-                _resultsSplitContainer.Panel2.Controls.Add(_plugin);
-                _plugin.Dock = DockStyle.Fill;
-
-                // Selected rows in the query control will be passed to the plugin a row at a time,
-                // so allow only full row selection.
-                _resultsGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                if (_plugin.DisplayControl)
+                {
+                    _resultsSplitContainer.Panel2.Controls.Add(_plugin);
+                    _plugin.Dock = DockStyle.Fill;
+                }
+                else
+                {
+                    _resultsSplitContainer.Panel2Collapsed = true;
+                }
 
                 // Hide the buttons used by the query control type.
                 _newQueryButton.Visible = false;
@@ -642,8 +684,15 @@ namespace Extract.SQLCDBEditor
                 _saveButton.Visible = false;
                 _executeQueryButton.Visible = false;
 
-                // LoadQueryCore will initialize the query results grid. 
-                LoadQueryCore(connection, _plugin.Query);
+                // initialize the query results grid. 
+                if (UsingPluginBindingSource)
+                {
+                    LoadPluginViaBindingSource(connection);
+                }
+                else
+                {
+                    LoadQueryCore(connection, _plugin.Query);
+                }
             }
             catch (Exception ex)
             {
@@ -666,7 +715,7 @@ namespace Extract.SQLCDBEditor
             {
                 // If the results table has not been created or it currently contains invalid data,
                 // prevent a refresh.
-                if (_resultsTable == null)
+                if (_resultsTable == null && !UsingPluginBindingSource)
                 {
                     return;
                 }
@@ -728,7 +777,18 @@ namespace Extract.SQLCDBEditor
                 }
                 else if (QueryAndResultsType == QueryAndResultsType.Plugin)
                 {
-                    RefreshQuery(latestDataTable);
+                    if (UsingPluginBindingSource)
+                    {
+                        // For the time being, just always assume a plugin's binding source has
+                        // changed. Can later revisit making this code agnostic as to whether the
+                        // data is provided via a DataTable or BindingSource.
+                        dataChanged = true;
+                    }
+                    else
+                    {
+                        RefreshQuery(latestDataTable);
+                        _plugin.RefreshData();
+                    }
                 }
 
                 if (QueryAndResultsType == QueryAndResultsType.Query && forceQueryExcecution)
@@ -825,9 +885,18 @@ namespace Extract.SQLCDBEditor
 
             // Apply the latest data to the grid.
             _resultsGrid.DataSource = null;
-            _resultsTable.Dispose();
-            _resultsTable = latestDataTable;
-            _resultsGrid.DataSource = _resultsTable;
+
+            if (UsingPluginBindingSource)
+            {
+                _plugin.RefreshData();
+                _resultsGrid.DataSource = _plugin.BindingSource;
+            }
+            else
+            {
+                _resultsTable.Dispose();
+                _resultsTable = latestDataTable;
+                _resultsGrid.DataSource = _resultsTable;
+            }
 
             if (QueryAndResultsType == QueryAndResultsType.Table)
             {
@@ -913,7 +982,7 @@ namespace Extract.SQLCDBEditor
                 {
                     _allowQueryExcecution = false;
 
-                    OnDataChanged(true);
+                    OnDataChanged(true, false);
                 }
             }
         }
@@ -1015,7 +1084,7 @@ namespace Extract.SQLCDBEditor
                 {
                     case QueryAndResultsType.Table:
                         {
-                            // Create a query selecting all columns explicity.
+                            // Create a query selecting all columns explicitly.
                             string query = "SELECT ";
 
                             query += string.Join("\r\n\t,", _resultsTable.Columns
@@ -1173,19 +1242,29 @@ namespace Extract.SQLCDBEditor
                 }
 
                 // [DataEntry:882, 885]
-                // Make the table read only if there is no primary key. Without a primary key, rows
-                // cannot be deleted and modified data cannot be merged with changes from other
-                // tables.
-                _resultsGrid.ReadOnly =
-                    _primaryKeyColumnNames == null || _primaryKeyColumnNames.Count() == 0;
+                // Make the table read only based BindingSource read-only status or on the presence
+                // of a primary key for tables. Without a primary key, table rows cannot be deleted
+                // and modified data cannot be merged with changes from other tables.
+                _resultsGrid.ReadOnly = UsingPluginBindingSource
+                    ? _plugin.BindingSource.IsReadOnly
+                    : (_primaryKeyColumnNames == null || _primaryKeyColumnNames.Count() == 0);
                 _resultsGrid.AllowUserToAddRows = !_resultsGrid.ReadOnly;
                 _resultsGrid.AllowUserToDeleteRows = !_resultsGrid.ReadOnly;
 
-                // [DotNetRCAndUtils:826]
-                // Before using _resultsTable, the constraints need to be cleared so that if new
-                // rows are added which violates a constraint, they will be flagged but allowed to
-                // continue to exist in the table until.
-                RemoveConstraints(_resultsTable);
+                // If read-only, selected rows in the query control will be passed to a plugin a row
+                // at a time, so use full row selection.
+                _resultsGrid.SelectionMode = _resultsGrid.ReadOnly
+                    ? DataGridViewSelectionMode.FullRowSelect
+                    : DataGridViewSelectionMode.RowHeaderSelect;
+
+                if (_resultsTable != null)
+                {
+                    // [DotNetRCAndUtils:826]
+                    // Before using _resultsTable, the constraints need to be cleared so that if new
+                    // rows are added which violates a constraint, they will be flagged but allowed to
+                    // continue to exist in the table until.
+                    RemoveConstraints(_resultsTable);
+                }
 
                 _resultsTable.TableNewRow += HandleTableNewRow;
                 _resultsTable.ColumnChanged += HandleColumnChanged;
@@ -1219,7 +1298,13 @@ namespace Extract.SQLCDBEditor
 
                     if (QueryAndResultsType == QueryAndResultsType.Plugin)
                     {
-                        _plugin.LoadPlugin(this, _connection);
+                        // Plugins with binding sources will have been loaded already (when
+                        // UsingPluginBindingSource, load is necessary to initialize
+                        // _resultsGrid.DataSource).
+                        if (!UsingPluginBindingSource)
+                        {
+                            _plugin.LoadPlugin(this, _connection);
+                        }
 
                         // SelectionChanged will not have been registered by the plugin until
                         // _plugin.LoadPlugin is called, so fire a selection event now so that the
@@ -1345,7 +1430,7 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                OnDataChanged(false);
+                OnDataChanged(false, false);
             }
             catch (Exception ex)
             {
@@ -1460,7 +1545,7 @@ namespace Extract.SQLCDBEditor
                         ExtractException ee = ex.AsExtract("ELI35345");
 
                         // The inner exception will be likely to contain a much more appropriate
-                        // message about the problem deleteing the row.
+                        // message about the problem deleting the row.
                         if (ee.InnerException != null)
                         {
                             throw ee.InnerException;
@@ -1471,10 +1556,14 @@ namespace Extract.SQLCDBEditor
                         }
                     }
 
-                    OnDataChanged(true);
+                    OnDataChanged(true, false);
 
                     // Reload the empty table into the grid.
                     RefreshData(true, true);
+                }
+                else
+                {
+                    OnDataChanged(true, false);
                 }
             }
             catch (Exception ex)
@@ -1743,7 +1832,7 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                OnDataChanged(e.DataCommitted);
+                OnDataChanged(e.DataCommitted, e.RefreshSource);
             }
             catch (Exception ex)
             {
@@ -1825,6 +1914,22 @@ namespace Extract.SQLCDBEditor
                 {
                     return false;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is using the <see cref="_plugin"/>'s
+        /// <see cref="SQLCDBEditorPlugin.BindingSource"/> rather than _resultsTable as
+        /// _resultsGrid.DataSource.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance is using the plugin's BindingSource;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        bool UsingPluginBindingSource
+        {
+            get
+            {
+                return _plugin != null && _plugin.ProvidesBindingSource;
             }
         }
 
@@ -2010,7 +2115,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// Removes table and column constraints for the <see paramref="dataTable"/> so that a
         /// DataGridView using it has as much freedom as possible to allow invalid data to exist
-        /// until a user choses to correct it (needs to save.
+        /// until a user choses to correct it (needs to save).
         /// </summary>
         /// <param name="dataTable">The data table.</param>
         static void RemoveConstraints(DataTable dataTable)
@@ -2020,6 +2125,7 @@ namespace Extract.SQLCDBEditor
             {
                 // Allow the user to enter as much text as they wish; it will be marked invalid if
                 // it is too much.
+// This affects auto-sizing code. Max data lengths should be separately stored for columns sizing.
                 column.MaxLength = -1;
                 column.AllowDBNull = true;
             }
@@ -2035,36 +2141,42 @@ namespace Extract.SQLCDBEditor
             using (var graphics = _resultsGrid.CreateGraphics())
             {
                 var font = _resultsGrid.ColumnHeadersDefaultCellStyle.Font;
-                for (int i = 0; i < _resultsTable.Columns.Count; i++)
+                for (int i = 0; i < _resultsGrid.ColumnCount; i++)
                 {
-                    var column = _resultsTable.Columns[i];
-                    var type = column.DataType;
+                    DataGridViewColumn column = _resultsGrid.Columns[i];
 
                     // Default fill weight will be 1 with a minimum width of 50 (~ 6 chars)
-                    float fillWeight = 1.0F;
+                    float fillWeight = 1.0F; 
                     int minSize = 50;
 
-                    if (type == typeof(bool))
+                    if (column.ValueType == typeof(bool))
                     {
                         // Bool fields do not need to scale larger with size as the table does and
                         // can have a smaller min width.
                         fillWeight = 0.01F;
                         minSize = 25;
                     }
-                    else if (type == typeof(string))
+                    else if (column.ValueType == typeof(string))
                     {
-                        // For text fields that can be > 10 chars but not unlimited, scale up from
-                        // a fill weight of 1.0 logarithmically.
-                        // MaxLength 10	 = 1.0
-                        // MaxLength 50	 = 2.6
-                        // MaxLength 500 = 4.9
-                        if (column.MaxLength > 10)
+                        int maxLength = -1;
+                        if (!UsingPluginBindingSource)
                         {
-                            fillWeight = (float)Math.Log((double)column.MaxLength / 3.7);
+                            DataColumn dataColumn = _resultsTable.Columns[i];
+                            maxLength = dataColumn.MaxLength;
+
+                            // For text fields that can be > 10 chars but not unlimited, scale up from
+                            // a fill weight of 1.0 logarithmically.
+                            // MaxLength 10	 = 1.0
+                            // MaxLength 50	 = 2.6
+                            // MaxLength 500 = 4.9
+                            if (maxLength > 10)
+                            {
+                                fillWeight = (float)Math.Log((double)maxLength / 3.7);
+                            }
                         }
 
                         // But cap the max fill weight at 7 (MaxLength ~5000)
-                        if (fillWeight > 7.0F || column.MaxLength == -1)
+                        if (fillWeight > 7.0F || maxLength == -1)
                         {
                             fillWeight = 7.0F;
                         }
@@ -2075,9 +2187,9 @@ namespace Extract.SQLCDBEditor
                     var temp = _resultsGrid.Columns[i].HeaderText;
                     var size = graphics.MeasureString(temp, font);
                     minSize = Math.Max(minSize, (int)(size.Width + 0.5) + 4);
-                    _resultsGrid.Columns[i].MinimumWidth = minSize;
-                    _resultsGrid.Columns[i].FillWeight = fillWeight;
-                    _resultsGrid.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    column.MinimumWidth = minSize;
+                    column.FillWeight = fillWeight;
+                    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 }
 
                 // Perform a layout to apply the default column sizes.
@@ -2151,7 +2263,7 @@ namespace Extract.SQLCDBEditor
             // Remove any existing parameter controls.
             RemoveParameterControls();
 
-            // Parse the overall query text into separate queries delemited by "GO" statements.
+            // Parse the overall query text into separate queries delimited by "GO" statements.
             Regex queryParserRegex = new Regex(@"[\r\n]+[\s]*GO[\s]*[\r\n]+");
 
             string[] queries = queryParserRegex.Split(query);
@@ -2200,7 +2312,7 @@ namespace Extract.SQLCDBEditor
                             connection, queries[i], null, ",");
                     }
                     // Ignore any exceptions. A free-form edit box will be provided to enter the
-                    // paramter value.
+                    // parameter value.
                     catch { }
                 }
 
@@ -2218,8 +2330,8 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="index">The index of the parameter</param>
         /// <param name="prompt">The prompt to display for the parameter</param>
-        /// <param name="availableValues">The available values for the paramter. If
-        /// <see langword="null"/>, the paramter control will be a <see cref="TextBox"/>, otherwise
+        /// <param name="availableValues">The available values for the parameter. If
+        /// <see langword="null"/>, the parameter control will be a <see cref="TextBox"/>, otherwise
         /// the control will be a <see cref="ComboBox"/> whose drop list will be populated with the
         /// available values.</param>
         /// <param name="value">The value.</param>
@@ -2352,7 +2464,7 @@ namespace Extract.SQLCDBEditor
             {
                 // If the row is currently detached (i.e., new), errors such as constraint violations
                 // will not be caught by calling  _adapter.Update(). Adding it to _resultsTable
-                // right away can cause it to be sorted before the user is done entring the entire
+                // right away can cause it to be sorted before the user is done entering the entire
                 // row... so add it to a temporary copy of the table with a transaction that gets
                 // rolled back to test if it would be able to be added to _resultsTable without error.
                 using (DataTable tableCopy = row.Table.Copy())
@@ -2431,7 +2543,7 @@ namespace Extract.SQLCDBEditor
 
             _resultsGrid.Invalidate();
 
-            OnDataChanged(true);
+            OnDataChanged(true, false);
         }
 
         /// <summary>
@@ -2585,12 +2697,15 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="dataCommitted"><see langword="true"/> if the changed data was committed;
         /// <see langword="false"/> if the change is in progress.</param>
-        void OnDataChanged(bool dataCommitted)
+        /// <param name="refreshSource"><see langword="true"/> if the
+        /// <see cref="QueryAndResultsControl"/> that raised the event should be refreshed as well;
+        /// otherwise, <see langword="false"/>.</param>
+        void OnDataChanged(bool dataCommitted, bool refreshSource)
         {
             var eventHandler = DataChanged;
             if (eventHandler != null)
             {
-                eventHandler(this, new DataChangedEventArgs(dataCommitted));
+                eventHandler(this, new DataChangedEventArgs(dataCommitted, refreshSource));
             }
         }
 

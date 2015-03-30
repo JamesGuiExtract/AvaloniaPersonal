@@ -82,7 +82,7 @@ private:
 
 	// Evaluates environment-specific tags. Also static since the environment tags will always be
 	// the same for a given context path.
-	static IEnvironmentTagProviderPtr ms_ipEnvironmentTagProvider;
+	static IContextTagProviderPtr ms_ipContextTagProvider;
 
 	// Controls access to the above static variables.
 	static CMutex ms_mutex;

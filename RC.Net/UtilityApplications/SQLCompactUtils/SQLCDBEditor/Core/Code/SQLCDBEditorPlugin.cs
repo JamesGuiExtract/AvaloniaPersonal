@@ -54,6 +54,21 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
+        /// Indicates whether the plugin's <see cref="Control"/> should be displayed in the
+        /// <see cref="QueryAndResultsControl"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if the plugin's control should be displayed;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public virtual bool DisplayControl
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// If not <see langword="null"/>, results of this query are displayed in a pane above the
         /// plugin control.
         /// </summary>
@@ -62,9 +77,44 @@ namespace Extract.SQLCDBEditor
         {
             get
             {
-                throw new ExtractException("ELI34832",
-                    "Cannot use un-derived instance ofSQLCDBEditorPlugin class.");
+                return null;
             }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="BindingSource"/> property should be used
+        /// to populate the results grid rather that the results of <see cref="Query"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if the <see cref="BindingSource"/> property should be used
+        /// to populate the results grid; otherwise, <see langword="false"/>.
+        /// </value>
+        public virtual bool ProvidesBindingSource
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="BindingSource"/> to use for the results grid data if
+        /// <see cref="ProvidesBindingSource"/> is <see langword="true"/>.
+        /// </summary>
+        public virtual BindingSource BindingSource
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Performs any custom refresh logic needed by the plugin. Generally a plugin where
+        /// <see cref="ProvidesBindingSource"/> is <see langword="true"/> will need to perform the
+        /// refresh of the data here.
+        /// </summary>
+        public virtual void RefreshData()
+        {
         }
 
         /// <summary>
@@ -104,12 +154,15 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="dataCommitted"><see langword="true"/> if the changed data was committed;
         /// <see langword="false"/> if the change is in progress.</param>
-        protected void OnDataChanged(bool dataCommitted)
+        /// <param name="refreshSource"><see langword="true"/> if the
+        /// <see cref="QueryAndResultsControl"/> that raised the event should be refreshed as well;
+        /// otherwise, <see langword="false"/>.</param>
+        protected void OnDataChanged(bool dataCommitted, bool refreshSource)
         {
             var eventHandler = DataChanged;
             if (eventHandler != null)
             {
-                eventHandler(this, new DataChangedEventArgs(dataCommitted));
+                eventHandler(this, new DataChangedEventArgs(dataCommitted, refreshSource));
             }
         }
 
