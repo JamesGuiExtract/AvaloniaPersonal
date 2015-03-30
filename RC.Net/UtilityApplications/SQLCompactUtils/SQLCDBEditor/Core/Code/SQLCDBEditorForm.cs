@@ -1396,6 +1396,8 @@ namespace Extract.SQLCDBEditor
                     .Where(plugin => plugin != null)
                     .Select(plugin => new QueryAndResultsControl(plugin)));
 
+_pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
+
                 _pluginsBindingSource.ResetBindings(false);
 
                 _pluginsListBox.ClearSelected();
