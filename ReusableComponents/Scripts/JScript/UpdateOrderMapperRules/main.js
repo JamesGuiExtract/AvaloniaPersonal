@@ -61,7 +61,11 @@ function main(args) {
     WSHShell.Run(exporter + " " + args, 0, true);
 
     function substituteProblemChars(c) {
-        return c.replace(/[0O]/ig, "[0O]").replace(/m/ig, "(rn|m)").replace(/[il!]/ig, "[il!]").replace(/(#)/g, "\\$1");
+        if (c == '%') {
+            return "(%|[569][il:,.-]?[569]?)";
+        } else {
+            return c.replace(/[0O]/ig, "[0O]").replace(/m/ig, "(rn|m)").replace(/[il!]/ig, "[il!]").replace(/(#)/g, "\\$1");
+        }
     }
 
     // Make testname_ars files
