@@ -608,7 +608,7 @@ STDMETHODIMP CRemoveSubAttributes::Load(IStream *pStream)
 			}
 		}
 
-		if (nDataVersion >= 5)
+		if (nDataVersion >= 5 && m_bConditionalRemove)
 		{
 			long nTmp = 0;
 			dataReader >> nTmp;
