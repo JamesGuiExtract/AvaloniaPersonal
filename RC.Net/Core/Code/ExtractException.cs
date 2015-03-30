@@ -429,10 +429,10 @@ namespace Extract
         }
 
         /// <summary>
-        /// Formats the exception as an ouput string that contains metadata fields for the exception
+        /// Formats the exception as an output string that contains metadata fields for the exception
         /// as well as the stringized exception itself. (This is the format used by Log or SaveTo).
         /// </summary>
-        /// <returns>The exception formated as an output string.</returns>
+        /// <returns>The exception formatted as an output string.</returns>
         public string CreateLogString()
         {
             try
@@ -547,7 +547,24 @@ namespace Extract
             if (toolStrip != null)
             {
                 // Don't capture mouse events
-                toolStrip.Capture = false;
+                if (toolStrip.InvokeRequired)
+                {
+                    toolStrip.Invoke((MethodInvoker)(() =>
+                    {
+                        try
+                        {
+                            toolStrip.Capture = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI38031");
+                        }
+                    }));
+                }
+                else
+                {
+                    toolStrip.Capture = false;
+                }
                 return;
             }
 
@@ -738,7 +755,7 @@ namespace Extract
         }
 
         /// <summary>
-        /// Returns the exception as a stringized byte stram
+        /// Returns the exception as a stringized byte steam
         /// </summary>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Stringized")]
@@ -1331,7 +1348,7 @@ namespace Extract
         /// </summary>
         /// <param name="eliCode">The ELI code for a new history entry associated with the
         /// conversion.</param>
-        /// <param name="stringizedException">The stringized excpetion.</param>
+        /// <param name="stringizedException">The stringized exception.</param>
         /// <returns>An <see cref="ExtractException"/> that results from re-instantiating the
         /// stringized exception.</returns>
         [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
@@ -1368,7 +1385,7 @@ namespace Extract
         /// top-level exceptions.
         /// </summary>
         /// <param name="exceptions">The exceptions to aggregate.</param>
-        /// <returns>An aggregate <see cref="ExtractException"/> containin all data in
+        /// <returns>An aggregate <see cref="ExtractException"/> containing all data in
         /// <see paramref="exceptions"/>.</returns>
         // The debug data name of "ELI Code" is not an invalid ELI code.
         [SuppressMessage("ExtractRules", "ES0002:MethodsShouldContainValidEliCodes")]
@@ -1857,7 +1874,7 @@ namespace Extract
         /// top-level exceptions.
         /// </summary>
         /// <param name="exceptions">The exceptions to aggregate.</param>
-        /// <returns>An aggregate <see cref="ExtractException"/> containin all data in
+        /// <returns>An aggregate <see cref="ExtractException"/> containing all data in
         /// <see paramref="exceptions"/>.</returns>
         public static ExtractException AsAggregateException(this IEnumerable<ExtractException> exceptions)
         {

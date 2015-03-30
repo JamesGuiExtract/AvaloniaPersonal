@@ -223,7 +223,10 @@ STDMETHODIMP CCOMUCLIDException::Display()
 	{	
 		// Display the exception
 		UCLIDExceptionDlg dlg(CWnd::GetActiveWindow());
-
+		
+		// This was added to fix issue https://extract.atlassian.net/browse/ISSUE-12753
+		dlg.setDisplayAsForegroundWindow(true);
+		
 		if ( m_upException.get() != __nullptr )
 		{	
 			m_upException->log("", true, true);
