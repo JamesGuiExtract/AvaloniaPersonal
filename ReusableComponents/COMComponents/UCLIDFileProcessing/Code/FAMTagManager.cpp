@@ -411,6 +411,26 @@ STDMETHODIMP CFAMTagManager::StringContainsTags(BSTR strInput, VARIANT_BOOL *pbV
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14395");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::EditContextTags(HANDLE hParentWindow)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		if (ms_strFPSDir.empty())
+		{
+			throw UCLIDException("ELI38048",
+				"FPSFileDir must be defined to allow editing of context-specific tags.");
+		}
+
+		ms_ipContextTagProvider->EditTags(ms_strFPSDir.c_str(), hParentWindow);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38049");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ILicensedComponent

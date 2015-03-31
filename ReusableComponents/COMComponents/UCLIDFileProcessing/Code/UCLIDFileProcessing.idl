@@ -2028,6 +2028,11 @@ library UCLID_FILEPROCESSINGLib
 		// FPS file full name
 		[propget, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([out, retval] BSTR *strFPSFileName);
 		[propput, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([in] BSTR strFPSFileName);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Displays a UI to edit the available tags for the current FPSFileDir.
+		//			If hParentWindow is not null, the tag editing UI will be displayed modally
+		//			to hParentWindow; otherwise the editor window will be modeless.
+		[id(10), helpstring("method EditContextTags")] HRESULT EditContextTags([in] HANDLE hParentWindow);
 	};
 
 	[

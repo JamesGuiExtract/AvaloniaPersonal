@@ -105,9 +105,7 @@ namespace Extract.Database
                 {
                     if (value != _contextPath)
                     {
-// Loading of environment/context specific tags disabled until some open questions with the
-// implementation are resolved.
-// LoadTagsForPath(value, true);
+                        LoadTagsForPath(value);
                         _contextPath = value;
                     }
                 }
@@ -180,6 +178,42 @@ namespace Extract.Database
 	        }
         }
 
+        /// <summary>
+        /// Displays a UI to edit the available tags for the specified bstrContextPath.
+        /// </summary>
+        /// <param name="contextPath">The context path for which tags are being edited.</param>
+        /// <param name="hParentWindow">If not <see langword="null"/>, the tag editing UI will be
+        /// displayed modally this window; otherwise the editor window will be modeless.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
+        public void EditTags(string contextPath, IntPtr hParentWindow)
+        {
+            try
+            {
+                lock (_lock)
+                {
+                    // If no path is specified, don't load any tags.
+                    if (string.IsNullOrWhiteSpace(contextPath))
+                    {
+                        return;
+                    }
+
+                    // Create the database if it doesn't already exist.
+                    string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
+                    if (!File.Exists(settingFileName))
+                    {
+                        var manager = new ContextTagDatabaseManager(settingFileName);
+                        manager.CreateDatabase(true);
+                    }
+
+                    // TODO: Open the SDF database.
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI38047", "Error editing context-specific tags.");
+            }
+        }
+
         #endregion IContextTagProvider
 
         #region Private Members
@@ -189,10 +223,8 @@ namespace Extract.Database
         /// <see paramref="contextPath"/>.
         /// </summary>
         /// <param name="contextPath">The path for which the context-specific tags are to be loaded.
-        /// <param name="createIfMissing"><see langword="true"/> to create the database for the tags
-        /// if it does not already exist; otherwise, <see langword="false"/>.</param>
         /// </param>
-        void LoadTagsForPath(string contextPath, bool createIfMissing)
+        void LoadTagsForPath(string contextPath)
         {
             lock (_lock)
             {
@@ -204,19 +236,11 @@ namespace Extract.Database
                     return;
                 }
 
-                // Check to see if the tags database file exists.
+                // If _SETTING_FILENAME doesn't exist, there is nothing more to do.
                 string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
                 if (!File.Exists(settingFileName))
                 {
-                    if (createIfMissing)
-                    {
-                        var manager = new ContextTagDatabaseManager(settingFileName);
-                        manager.CreateDatabase(true);
-                    }
-                    else
-                    {
-                        return;
-                    }
+                    return;
                 }
             
                 // Query the database file to get the active context and associated tag values.

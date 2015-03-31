@@ -1354,6 +1354,12 @@ library UCLID_COMUTILSLib
 		// PURPOSE: To retrieve the value for the specified tag in the current environment.
 		[id(4), helpstring("method GetTagValue")] HRESULT GetTagValue(
 			[in] BSTR bstrTagName, [out, retval] BSTR* pbstrTagValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Displays a UI to edit the available tags for the specified bstrContextPath.
+		//			If hParentWindow is not null, the tag editing UI will be displayed modally
+		//			to hParentWindow; otherwise the editor window will be modeless.
+		[id(5), helpstring("method EditTags")] HRESULT EditTags([in] BSTR bstrContextPath,
+			[in] HANDLE hParentWindow);
 	}
 
 	//---------------------------------------------------------------------------------------------
