@@ -105,7 +105,7 @@
     <Compile Include="DbMethods.cs" />
     <Compile Include="ContextTagDatabaseManager.cs" />
     <Compile Include="ContextTagDatabaseMapping.cs" />
-    <Compile Include="IDatabaseSchemaUpdater.cs" />
+    <Compile Include="IDatabaseSchemaManager.cs" />
     <Compile Include="IDataConnectionConfiguration.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

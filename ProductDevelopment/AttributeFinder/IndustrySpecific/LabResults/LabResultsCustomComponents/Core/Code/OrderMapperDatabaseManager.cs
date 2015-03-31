@@ -792,7 +792,7 @@ namespace Extract.LabResultsCustomComponents
     /// <summary>
     /// Lab DE order mapper database schema manager class
     /// </summary>
-    public class OrderMapperDatabaseSchemaManager : IDatabaseSchemaUpdater
+    public class OrderMapperDatabaseSchemaManager : IDatabaseSchemaManager
     {
         #region Constants
 
@@ -1111,7 +1111,7 @@ namespace Extract.LabResultsCustomComponents
 
         #endregion Methods
 
-        #region IDatabaseSchemaUpdater Members
+        #region IDatabaseSchemaManager Members
 
         /// <summary>
         /// Sets the database connection to be used by the schema updater.
@@ -1249,6 +1249,18 @@ namespace Extract.LabResultsCustomComponents
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI31242", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the type name of an SQLCDBEditorPlugin that should completely replace the normal
+        /// SQLCDBEditor UI (no tables, queries or tabs)
+        /// </summary>
+        public string UIReplacementPlugin
+        {
+            get
+            {
+                return null;
             }
         }
 

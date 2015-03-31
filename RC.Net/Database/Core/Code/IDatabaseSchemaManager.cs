@@ -10,7 +10,7 @@ namespace Extract.Database
     /// Interface definition for implementing a DatabaseSchemaUpdater.
     /// </summary>
     [CLSCompliant(false)]
-    public interface IDatabaseSchemaUpdater
+    public interface IDatabaseSchemaManager
     {
         /// <summary>
         /// Sets the database connection to be used by the schema updater.
@@ -52,5 +52,11 @@ namespace Extract.Database
         /// </returns>
         Task<string> BeginUpdateToLatestSchema(IProgressStatus progressStatus,
             CancellationTokenSource cancelTokenSource);
+
+        /// <summary>
+        /// Gets the type name of an SQLCDBEditorPlugin that should completely replace the normal
+        /// SQLCDBEditor UI (no tables, queries or tabs)
+        /// </summary>
+        string UIReplacementPlugin { get; }
     }
 }

@@ -91,6 +91,11 @@ namespace Extract.SQLCDBEditor
         SqlCeConnection _connection;
 
         /// <summary>
+        /// The table names in the currently open database.
+        /// </summary>
+        HashSet<string> _tableNames;
+
+        /// <summary>
         /// The list of table names in the currently open database.
         /// </summary>
         List<QueryAndResultsControl> _tableList = new List<QueryAndResultsControl>();
@@ -165,14 +170,19 @@ namespace Extract.SQLCDBEditor
         string _customTitle;
 
         /// <summary>
-        /// The database schema updater used to update the current schema
+        /// The database schema manager used to update the current schema
         /// </summary>
-        IDatabaseSchemaUpdater _schemaUpdater;
+        IDatabaseSchemaManager _schemaManager;
 
         /// <summary>
         /// Saves/restores window state info
         /// </summary>
         FormStateManager _formStateManager;
+
+        /// <summary>
+        /// Indicates if a UI replacement plugin is currently being used.
+        /// </summary>
+        bool _usingUIReplacement;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -849,6 +859,14 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
+                if (UsingUIReplacement)
+                {
+                    // Prevent closing a UI replacement plugin (did not succeed in removing the
+                    //close button entirely)
+                    e.Cancel = true;
+                    return;
+                }
+
                 // When a tab is being closed, clear any data status messages.
                 ApplyStatusMessage(null);
 
@@ -1097,7 +1115,7 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                if (_schemaUpdater == null || !_schemaUpdater.IsUpdateRequired)
+                if (_schemaManager == null || !_schemaManager.IsUpdateRequired)
                 {
                     return;
                 }
@@ -1307,25 +1325,70 @@ namespace Extract.SQLCDBEditor
         #region Private Methods
 
         /// <summary>
+        /// Gets or sets if a UI replacement plugin is currently being used.
+        /// </summary>
+        /// <value><see langword="true"/> if a UI replacement plugin is currently being used;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        bool UsingUIReplacement
+        {
+            get
+            {
+                return _usingUIReplacement;
+            }
+
+            set
+            {
+                _usingUIReplacement = value;
+                _primaryTab.ShowOptions = !value;
+                _newQueryToolStripButton.Visible = !value;
+                _newQueryToolStripMenuItem.Visible = !value;
+                
+                if (_usingUIReplacement)
+                {
+                    _navigationDockContainer.Hide();
+                }
+                else
+                {
+                    _navigationDockContainer.Show();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the table names in the currently open database.
+        /// </summary>
+        /// <returns>A <see cref="HashSet{T}"/> of table names in the currently open database.
+        /// </returns>
+        HashSet<string> TableNames
+        {
+            get
+            {
+                if (_tableNames == null)
+                {
+                    _tableNames = new HashSet<string>(DBMethods.GetQueryResultsAsStringArray(
+                        _connection, "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"));
+                }
+
+                return _tableNames;
+            }
+        }
+                
+        /// <summary>
         /// Method loads the names of the tables in the opened database into the list box. This
         /// method does not save any changes to the database that was previously loaded. If the 
         /// database should be saved it should be done before calling this method.
         /// </summary>
         /// <returns>The names of the tables that were loaded.</returns>
         [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
-        HashSet<string> LoadTableList()
+        void LoadTableList()
         {
             // Remove the handler for the SelectedIndexChanged event while loading the list box
             _tablesListBox.SelectedIndexChanged -= HandleListSelectionChanged;
 
             try
             {
-                // Create adapter for the list of tables.
-                HashSet<string> tableNames = new HashSet<string>(
-                    DBMethods.GetQueryResultsAsStringArray(_connection,
-                        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"));
-
-                _tableList.AddRange(tableNames
+                _tableList.AddRange(TableNames
                     .Select(tableName =>
                         new QueryAndResultsControl(tableName, _databaseFileName,
                             QueryAndResultsType.Table)));
@@ -1333,8 +1396,6 @@ namespace Extract.SQLCDBEditor
                 _tablesBindingSource.ResetBindings(false);
 
                 _tablesListBox.ClearSelected();
-
-                return tableNames;
             }
             catch (Exception ex)
             {
@@ -1395,8 +1456,6 @@ namespace Extract.SQLCDBEditor
                         UtilityMethods.CreateTypeFromAssembly<SQLCDBEditorPlugin>(fileName))
                     .Where(plugin => plugin != null)
                     .Select(plugin => new QueryAndResultsControl(plugin)));
-
-_pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
 
                 _pluginsBindingSource.ResetBindings(false);
 
@@ -1511,7 +1570,8 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
 
             // If the control is open in a separate tab, don't provide the option to send it to
             // another one.
-            queryAndResultsControl.ShowSendToSeparateTabButton = (tabbedDocument == _primaryTab);
+            queryAndResultsControl.ShowSendToSeparateTabButton =
+                !UsingUIReplacement && (tabbedDocument == _primaryTab);
 
             if (isAlreadyLoaded)
             {
@@ -1660,7 +1720,7 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
             }
 
             // Ensure any active edits are committed.
-            foreach (var queryAndResultsControl in _tableList)
+            foreach (var queryAndResultsControl in _tableList.Union(_pluginList))
             {
                 queryAndResultsControl.EndDataEdit();
             }
@@ -1792,7 +1852,7 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
                 }
 
                 // Reset the schema updater
-                _schemaUpdater = null;
+                _schemaManager = null;
 
                 // Close the database
                 CloseDatabase();
@@ -1857,25 +1917,41 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
                     _databaseWorkingCopyFileName = null;
                 }
 
-                // Load the table names into the listBox
-                var tableNames = LoadTableList();
-                CheckSchemaVersionAndPromptForUpdate(tableNames);
+                CheckSchemaVersionAndPromptForUpdate();
 
-                LoadQueryList();
-                LoadPluginList();
-
-                // If this database was previously open reopen the same table
-                if (!string.IsNullOrEmpty(currentlyOpenTable))
+                if (_schemaManager != null &&
+                    !string.IsNullOrWhiteSpace(_schemaManager.UIReplacementPlugin))
                 {
-                    _tablesListBox.SelectedIndex = _tablesListBox.FindStringExact(currentlyOpenTable);
+                    UsingUIReplacement = true;
+
+                    Type pluginType = Type.GetType(_schemaManager.UIReplacementPlugin);
+                    SQLCDBEditorPlugin uiReplacementPlugin =
+                        (SQLCDBEditorPlugin)Activator.CreateInstance(pluginType);
+                    var pluginControl = new QueryAndResultsControl(uiReplacementPlugin);
+                    _pluginList.Add(pluginControl);
+
+                    OpenTableOrQuery(pluginControl, false);
                 }
-                else if (_tableList.Count > 0)
+                else
                 {
-                    _tablesListBox.SelectedIndex = 0;
+                    UsingUIReplacement = false;
+                    LoadTableList();
+                    LoadQueryList();
+                    LoadPluginList();
+
+                    // If this database was previously open reopen the same table
+                    if (!string.IsNullOrEmpty(currentlyOpenTable))
+                    {
+                        _tablesListBox.SelectedIndex = _tablesListBox.FindStringExact(currentlyOpenTable);
+                    }
+                    else if (_tableList.Count > 0)
+                    {
+                        _tablesListBox.SelectedIndex = 0;
+                    }
+
+                    _tablesListBox.Focus();
                 }
-
-                _tablesListBox.Focus();
-
+                
                 // Reset the _dirty flag
                 _dirty = false;
 
@@ -1901,25 +1977,24 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
         /// This will also update the status bar in the UI to indicate known schema,
         /// unknown schema, update needed.
         /// </summary>
-        /// <param name="tableNames">The table names.</param>
-        void CheckSchemaVersionAndPromptForUpdate(HashSet<string> tableNames)
+        void CheckSchemaVersionAndPromptForUpdate()
         {
-            _schemaUpdater = GetSchemaUpdater(tableNames);
+            _schemaManager = GetSchemaUpdater();
             string statusText = "Database schema is current.";
             Color textColor = Color.Green;
             bool promptForUpdate = false;
             bool canUpdateSchema = false;
-            if (_schemaUpdater != null)
+            if (_schemaManager != null)
             {
-                _schemaUpdater.SetDatabaseConnection(_connection);
-                if (_schemaUpdater.IsUpdateRequired)
+                _schemaManager.SetDatabaseConnection(_connection);
+                if (_schemaManager.IsUpdateRequired)
                 {
                     promptForUpdate = true;
                     canUpdateSchema = true;
                     textColor = Color.Black;
                     statusText = "Database schema requires updating.";
                 }
-                else if (_schemaUpdater.IsNewerVersion)
+                else if (_schemaManager.IsNewerVersion)
                 {
                     statusText = "Database was created in a newer version.";
                     textColor = Color.Red;
@@ -2074,8 +2149,8 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
             _newQueryToolStripButton.Enabled = databaseOpen;
             _newQueryToolStripMenuItem.Enabled = databaseOpen;
             _updateToCurrentSchemaToolStripMenuItem.Enabled =
-                _schemaUpdater != null
-                && _schemaUpdater.IsUpdateRequired;
+                _schemaManager != null
+                && _schemaManager.IsUpdateRequired;
         }
 
         /// <summary>
@@ -2096,6 +2171,7 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
                 }
             }
 
+            _tableNames = null;
             CollectionMethods.ClearAndDispose(_tableList);
             CollectionMethods.ClearAndDispose(_queryList);
             CollectionMethods.ClearAndDispose(_pluginList);
@@ -2142,13 +2218,12 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
         }
 
         /// <summary>
-        /// Attempts to get the <see cref="IDatabaseSchemaUpdater"/> for known schemas.
+        /// Attempts to get the <see cref="IDatabaseSchemaManager"/> for known schemas.
         /// </summary>
-        /// <param name="tableNames">The table names for the current database.</param>
-        IDatabaseSchemaUpdater GetSchemaUpdater(HashSet<string> tableNames)
+        IDatabaseSchemaManager GetSchemaUpdater()
         {
-            IDatabaseSchemaUpdater updater = null;
-            if (tableNames.Contains("Settings"))
+            IDatabaseSchemaManager updater = null;
+            if (TableNames.Contains("Settings"))
             {
                 // Setup dataAdapter to get the data
                 using (var table = new DataTable())
@@ -2167,7 +2242,7 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
                         // Build the name to the assembly containing the manager
                         var className = result[0]["Value"].ToString();
                         updater =
-                            UtilityMethods.CreateTypeFromTypeName(className) as IDatabaseSchemaUpdater;
+                            UtilityMethods.CreateTypeFromTypeName(className) as IDatabaseSchemaManager;
                         if (updater == null)
                         {
                             var ee = new ExtractException("ELI31154",
@@ -2180,9 +2255,9 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
                     else
                     {
                         // No schema updater defined. Check for FPSFile table
-                        if (tableNames.Contains("FPSFile"))
+                        if (TableNames.Contains("FPSFile"))
                         {
-                            updater = (IDatabaseSchemaUpdater)UtilityMethods.CreateTypeFromTypeName(
+                            updater = (IDatabaseSchemaManager)UtilityMethods.CreateTypeFromTypeName(
                                 "Extract.FileActionManager.Database.FAMServiceDatabaseManager");
                         }
                     }
@@ -2191,10 +2266,10 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
             else
             {
                 // Check for expected LabDE order mapper tables
-                if (tableNames.Contains("LabOrder") && tableNames.Contains("LabTest")
-                    && tableNames.Contains("LabOrderTest") && tableNames.Contains("AlternateTestName"))
+                if (TableNames.Contains("LabOrder") && TableNames.Contains("LabTest")
+                    && TableNames.Contains("LabOrderTest") && TableNames.Contains("AlternateTestName"))
                 {
-                    updater = (IDatabaseSchemaUpdater)UtilityMethods.CreateTypeFromTypeName(
+                    updater = (IDatabaseSchemaManager)UtilityMethods.CreateTypeFromTypeName(
                         "Extract.LabResultsCustomComponents.OrderMapperDatabaseSchemaManager");
                 }
             }
@@ -2222,11 +2297,11 @@ _pluginList.Add(new QueryAndResultsControl(new ContextTagsPlugin()));
                         using (var connection = new SqlCeConnection(
                             SqlCompactMethods.BuildDBConnectionString(tempName, false)))
                         {
-                            _schemaUpdater.SetDatabaseConnection(connection);
+                            _schemaManager.SetDatabaseConnection(connection);
                             try
                             {
                                 var task =
-                                    _schemaUpdater.BeginUpdateToLatestSchema(null,
+                                    _schemaManager.BeginUpdateToLatestSchema(null,
                                     new CancellationTokenSource());
 
                                 try

@@ -23,7 +23,7 @@ namespace Extract.FileActionManager.Database
     /// Manages the FAMService Database. Provides updating functionality and other methods
     /// for working with the FAMService Database.
     /// </summary>
-    public class FAMServiceDatabaseManager : IDatabaseSchemaUpdater
+    public class FAMServiceDatabaseManager : IDatabaseSchemaManager
     {
         #region Constants
 
@@ -496,7 +496,7 @@ namespace Extract.FileActionManager.Database
 
         #endregion Methods
 
-        #region IDatabaseSchemaUpdater Members
+        #region IDatabaseSchemaManager Members
 
         /// <summary>
         /// Gets a value indicating whether a database schema update is required.
@@ -901,6 +901,18 @@ namespace Extract.FileActionManager.Database
                 {
                     currentDb.Dispose();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the type name of an SQLCDBEditorPlugin that should completely replace the normal
+        /// SQLCDBEditor UI (no tables, queries or tabs)
+        /// </summary>
+        public string UIReplacementPlugin
+        {
+            get
+            {
+                return null;
             }
         }
 

@@ -1128,15 +1128,18 @@ namespace Extract.SQLCDBEditor
             {
                 // If the grid is currently being edited, apply the active edit to force the
                 // data to be validated.
-                if (QueryAndResultsType == QueryAndResultsType.Table &&
-                    _resultsGrid.IsCurrentCellInEditMode)
+                if (_resultsGrid.IsCurrentCellInEditMode)
                 {
                     _resultsGrid.EndEdit();
 
-                    DataRow row = ((DataRowView)_resultsGrid.CurrentCell.OwningRow.DataBoundItem).Row;
-                    if (row.RowState == DataRowState.Detached)
+                    if (QueryAndResultsType == QueryAndResultsType.Table)
                     {
-                        _resultsTable.Rows.Add(row);
+                        DataRow row =
+                            ((DataRowView)_resultsGrid.CurrentCell.OwningRow.DataBoundItem).Row;
+                        if (row.RowState == DataRowState.Detached)
+                        {
+                            _resultsTable.Rows.Add(row);
+                        }
                     }
                 }
             }

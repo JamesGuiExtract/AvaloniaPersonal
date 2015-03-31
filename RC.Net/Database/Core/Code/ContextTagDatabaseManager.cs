@@ -20,7 +20,7 @@ namespace Extract.Database
     /// <summary>
     /// Manages the context tags database.
     /// </summary>
-    public class ContextTagDatabaseManager : IDatabaseSchemaUpdater
+    public class ContextTagDatabaseManager : IDatabaseSchemaManager
     {
         #region Constants
 
@@ -415,7 +415,7 @@ namespace Extract.Database
 
         #endregion Methods
 
-        #region IDatabaseSchemaUpdater Members
+        #region IDatabaseSchemaManager Members
 
         /// <summary>
         /// Gets a value indicating whether a database schema update is required.
@@ -561,6 +561,18 @@ namespace Extract.Database
             }
         }
 
-        #endregion IDatabaseSchemaUpdater Members
+        /// <summary>
+        /// Gets the type name of an SQLCDBEditorPlugin that should completely replace the normal
+        /// SQLCDBEditor UI (no tables, queries or tabs)
+        /// </summary>
+        public string UIReplacementPlugin
+        {
+            get
+            {
+                return "Extract.SQLCDBEditor.ContextTagsPlugin";
+            }
+        }
+
+        #endregion IDatabaseSchemaManager Members
     }
 }

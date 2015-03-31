@@ -278,7 +278,7 @@ namespace Extract.FileActionManager.Database.Test
 
         /// <summary>
         /// Test whether a V2 service database is correctly updated to the current schema
-        /// when using the <see cref="IDatabaseSchemaUpdater"/> interface.
+        /// when using the <see cref="IDatabaseSchemaManager"/> interface.
         /// </summary>
         [Test, Category("Automated")]
         public static void UpdateFromV2ToCurrentIDatabaseSchemaUpdater()
@@ -289,7 +289,7 @@ namespace Extract.FileActionManager.Database.Test
                 tempV2 = new TemporaryFile(".sdf", false);
                 CreateV2Database(tempV2.FileName);
                 var manager = new FAMServiceDatabaseManager();
-                IDatabaseSchemaUpdater updater = (IDatabaseSchemaUpdater)manager;
+                IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
                 using (var connection = new SqlCeConnection(
                     SqlCompactMethods.BuildDBConnectionString(tempV2.FileName, false)))
                 {
@@ -418,7 +418,7 @@ namespace Extract.FileActionManager.Database.Test
 
         /// <summary>
         /// Test whether a V3 service database is correctly updated to the current schema
-        /// when using the <see cref="IDatabaseSchemaUpdater"/> interface.
+        /// when using the <see cref="IDatabaseSchemaManager"/> interface.
         /// </summary>
         [Test, Category("Automated")]
         public static void UpdateFromV3ToCurrentIDatabaseSchemaUpdater()
@@ -429,7 +429,7 @@ namespace Extract.FileActionManager.Database.Test
                 tempV3 = new TemporaryFile(".sdf", false);
                 CreateV3Database(tempV3.FileName);
                 var manager = new FAMServiceDatabaseManager();
-                IDatabaseSchemaUpdater updater = (IDatabaseSchemaUpdater)manager;
+                IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
                 using (var connection = new SqlCeConnection(
                     SqlCompactMethods.BuildDBConnectionString(tempV3.FileName, false)))
                 {
@@ -559,7 +559,7 @@ namespace Extract.FileActionManager.Database.Test
 
         /// <summary>
         /// Test whether a V4 service database is correctly updated to the current schema
-        /// when using the <see cref="IDatabaseSchemaUpdater"/> interface.
+        /// when using the <see cref="IDatabaseSchemaManager"/> interface.
         /// </summary>
         [Test, Category("Automated")]
         public static void UpdateFromV4ToCurrentIDatabaseSchemaUpdater()
@@ -570,7 +570,7 @@ namespace Extract.FileActionManager.Database.Test
                 tempV4 = new TemporaryFile(".sdf", false);
                 CreateV4Database(tempV4.FileName);
                 var manager = new FAMServiceDatabaseManager();
-                IDatabaseSchemaUpdater updater = (IDatabaseSchemaUpdater)manager;
+                IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
                 using (var connection = new SqlCeConnection(
                     SqlCompactMethods.BuildDBConnectionString(tempV4.FileName, false)))
                 {
@@ -698,7 +698,7 @@ namespace Extract.FileActionManager.Database.Test
 
         /// <summary>
         /// Test whether a V5 service database is correctly updated to the current schema
-        /// when using the <see cref="IDatabaseSchemaUpdater"/> interface.
+        /// when using the <see cref="IDatabaseSchemaManager"/> interface.
         /// </summary>
         [Test, Category("Automated")]
         public static void UpdateFromV5ToCurrentIDatabaseSchemaUpdater()
@@ -709,7 +709,7 @@ namespace Extract.FileActionManager.Database.Test
                 tempV5 = new TemporaryFile(".sdf", false);
                 CreateV5Database(tempV5.FileName);
                 var manager = new FAMServiceDatabaseManager();
-                IDatabaseSchemaUpdater updater = (IDatabaseSchemaUpdater)manager;
+                IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
                 using (var connection = new SqlCeConnection(
                     SqlCompactMethods.BuildDBConnectionString(tempV5.FileName, false)))
                 {

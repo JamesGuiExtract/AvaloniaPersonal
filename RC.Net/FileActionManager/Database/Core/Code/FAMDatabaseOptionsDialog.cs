@@ -530,23 +530,6 @@ namespace Extract.FileActionManager.Database
         }
 
         /// <summary>
-        /// Handles the auto revert check changed event.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void HandleAutoRevertCheckChangedEvent(object sender, EventArgs e)
-        {
-            try
-            {
-                UpdateAutoRevertEnabledState();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31920");
-            }
-        }
-
-        /// <summary>
         /// Handles the input event history check changed event.
         /// </summary>
         /// <param name="sender">The sender.</param>
