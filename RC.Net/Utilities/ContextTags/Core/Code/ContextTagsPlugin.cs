@@ -1,6 +1,5 @@
-﻿using Extract.Database;
-using Extract.Licensing;
-using Extract.Utilities;
+﻿using Extract.Licensing;
+using Extract.SQLCDBEditor;
 using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
@@ -10,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Extract.SQLCDBEditor
+namespace Extract.Utilities.ContextTags
 {
     /// <summary>
     /// A <see cref="SQLCDBEditorPlugin"/> implementation that allows for editing of a

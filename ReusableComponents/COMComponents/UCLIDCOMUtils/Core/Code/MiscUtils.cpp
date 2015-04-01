@@ -1122,6 +1122,20 @@ STDMETHODIMP CMiscUtils::GetCustomFileTags(IVariantVector** ppTags)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35201");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::EditCustomTags(HANDLE hParentWindow)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// MiscUtils does not support custom tags; there is nothing to do.
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38061");
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::GetAllTags(IVariantVector** ppTags)
 {

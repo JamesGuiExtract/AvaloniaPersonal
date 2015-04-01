@@ -700,6 +700,20 @@ STDMETHODIMP CAFUtility::raw_GetCustomFileTags(IVariantVector** ppTags)
 
 	return S_OK;
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::raw_EditCustomTags(HANDLE hParentWindow)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// No editing UI is provided; tags to be edited via INI.
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38062");
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFUtility::raw_GetAllTags(IVariantVector** ppTags)
 {

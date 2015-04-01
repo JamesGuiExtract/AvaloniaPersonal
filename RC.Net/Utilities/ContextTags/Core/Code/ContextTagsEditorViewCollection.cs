@@ -9,7 +9,7 @@ using System.Data.Linq;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Extract.Database
+namespace Extract.Utilities.ContextTags
 {
     /// <summary>
     /// Defines an editable view of a a <see cref="ContextTagDatabase"/> (CustomTag.sdf) database

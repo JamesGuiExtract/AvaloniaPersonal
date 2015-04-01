@@ -1,5 +1,7 @@
-﻿using Extract.Licensing;
-using Extract.Utilities;
+﻿using Extract.Database;
+using Extract.Licensing;
+using Extract.SQLCDBEditor;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
@@ -7,9 +9,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
-namespace Extract.Database
+namespace Extract.Utilities.ContextTags
 {
     /// <summary>
     /// Provides context-specific path tags in addition to built-in tags that can have different
@@ -18,7 +22,7 @@ namespace Extract.Database
     [ComVisible(true)]
     [Guid("C30D753F-2B48-4101-AAB5-F84A5FC404CF")]
     [CLSCompliant(false)]
-    [ProgId("Extract.Database.ContextTagProvider")]
+    [ProgId("Extract.Utilities.ContextTags.ContextTagProvider")]
     public class ContextTagProvider : IContextTagProvider
     {
         #region Constants
@@ -32,6 +36,11 @@ namespace Extract.Database
         /// The name of the SQL CE database file that defines the context-specific tags.
         /// </summary>
         static readonly string _SETTING_FILENAME = "CustomTags.sdf";
+
+        /// <summary>
+        /// The label of the option in the tags list to edit the available custom tags.
+        /// </summary>
+        static readonly string _EDIT_CUSTOM_TAGS_LABEL = "Edit custom tags...";
 
         #endregion Constants
 
@@ -181,31 +190,34 @@ namespace Extract.Database
         /// <summary>
         /// Displays a UI to edit the available tags for the specified bstrContextPath.
         /// </summary>
-        /// <param name="contextPath">The context path for which tags are being edited.</param>
         /// <param name="hParentWindow">If not <see langword="null"/>, the tag editing UI will be
         /// displayed modally this window; otherwise the editor window will be modeless.</param>
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
-        public void EditTags(string contextPath, IntPtr hParentWindow)
+        public void EditTags(IntPtr hParentWindow)
         {
             try
             {
+                ExtractException.Assert("ELI38057", "Null argument exception",
+                    hParentWindow != IntPtr.Zero);
+
                 lock (_lock)
                 {
-                    // If no path is specified, don't load any tags.
-                    if (string.IsNullOrWhiteSpace(contextPath))
-                    {
-                        return;
-                    }
+                    ExtractException.Assert("ELI38056",
+                        "Cannot edit tags when context has not been set",
+                        !string.IsNullOrWhiteSpace(ContextPath));
 
                     // Create the database if it doesn't already exist.
-                    string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
+                    string settingFileName = Path.Combine(ContextPath, _SETTING_FILENAME);
                     if (!File.Exists(settingFileName))
                     {
                         var manager = new ContextTagDatabaseManager(settingFileName);
                         manager.CreateDatabase(true);
                     }
 
-                    // TODO: Open the SDF database.
+                    EditDatabase(settingFileName, hParentWindow);
+
+                    // Re-load so that the available tags reflect the edits.
+                    LoadTagsForPath(ContextPath);
                 }
             }
             catch (Exception ex)
@@ -240,6 +252,8 @@ namespace Extract.Database
                 string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
                 if (!File.Exists(settingFileName))
                 {
+                    // Even if there are no custom tags available, provide the option to edit.
+                    _tagValues.Add(_EDIT_CUSTOM_TAGS_LABEL, "");
                     return;
                 }
             
@@ -278,6 +292,93 @@ namespace Extract.Database
                                     tagValue.CustomTag.Name, tagValue => tagValue.Value);
                         }
                     }
+                }
+
+                _tagValues.Add(_EDIT_CUSTOM_TAGS_LABEL, "");
+            }
+        }
+
+        /// <summary>
+        /// Opens the specified <see paramref="databaseFile"/> for editing in the
+        /// <see cref="SQLCDBEditor"/>.
+        /// </summary>
+        /// <param name="databaseFile">The database file to edit.</param>
+        /// <param name="parentWindow">If not <see langword="null"/>, the tag editing UI will be
+        /// displayed modally this window; otherwise the editor window will be modeless.</param>
+        void EditDatabase(string databaseFile, IntPtr parentWindow)
+        {
+            // The form will be launched in a different thread; use finishedEvent to keep track of
+            // when the editor UI has been closed.
+            using (ManualResetEvent finishedEvent = new ManualResetEvent(false))
+            {
+                lock (_lock)
+                {
+
+                    SQLCDBEditorForm sqlDbEditorForm = null;
+
+                    // The form needs to be launched into it's own STA thread. Otherwise there are
+                    // message handling issue that can interfere with some WinForms code.
+                    Thread uiThread = new Thread(() =>
+                    {
+                        try
+                        {
+                            // A new form is needed.
+                            sqlDbEditorForm = new SQLCDBEditorForm(databaseFile, false);
+
+                            if (parentWindow == IntPtr.Zero)
+                            {
+                                // Run non-modal. Processing of a subsequent call can be
+                                // processed as soon as the form has been activated.
+                                sqlDbEditorForm.Activated += (sender, e) => finishedEvent.Set();
+                                Application.Run(sqlDbEditorForm);
+                            }
+                            else
+                            {
+                                // Run modally to owner.
+                                sqlDbEditorForm.ShowDialog(
+                                    FormsMethods.WindowFromHandle(parentWindow));
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI38054");
+                        }
+                        finally
+                        {
+                            if (sqlDbEditorForm != null)
+                            {
+                                sqlDbEditorForm.Dispose();
+                                sqlDbEditorForm = null;
+                            }
+
+                            finishedEvent.Set();
+                        }
+                    });
+                    uiThread.SetApartmentState(ApartmentState.STA);
+                    uiThread.Start();
+
+                    // Don't release the lock this call has until either the form has finished
+                    // initializing and been activated or a modal instance has been closed.
+                    WaitForHandle(finishedEvent, parentWindow != IntPtr.Zero);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Idles the current thread until while running the message loop until 
+        /// <see paramref="waitHandle"/> is signaled.
+        /// </summary>
+        /// <param name="waitHandle">The <see cref="WaitHandle"/> to wait upon.</param>
+        /// <param name="doNonInputEvents">If <see langword="true"/>, non-user input events
+        /// necessary to initialize the editor UI as a modal form will be processed during this
+        /// wait; User input events will be ignored.</param>
+        static void WaitForHandle(WaitHandle waitHandle, bool doNonInputEvents)
+        {
+            while (!waitHandle.WaitOne(0))
+            {
+                if (doNonInputEvents)
+                {
+                    WindowsMessage.DoEventsExcept(WindowsMessage.UserInputMessages);
                 }
             }
         }

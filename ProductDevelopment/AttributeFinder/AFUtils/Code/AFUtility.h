@@ -59,6 +59,7 @@ public:
 	STDMETHOD(raw_GetAllTags)(IVariantVector** ppTags);
 	STDMETHOD(raw_GetFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
+	STDMETHOD(raw_EditCustomTags)(HANDLE hParentWindow);
 
 // IAFUtility
 	STDMETHOD(GetNameToAttributesMap)(

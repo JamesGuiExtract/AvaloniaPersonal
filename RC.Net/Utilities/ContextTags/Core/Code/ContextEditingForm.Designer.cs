@@ -1,4 +1,4 @@
-﻿namespace Extract.SQLCDBEditor
+﻿namespace Extract.Utilities.ContextTags
 {
     partial class ContextEditingForm
     {
@@ -71,7 +71,7 @@
             // 
             // _contextTableV1BindingSource
             // 
-            this._contextTableV1BindingSource.DataSource = typeof(Extract.Database.ContextTableV1);
+            this._contextTableV1BindingSource.DataSource = typeof(Extract.Utilities.ContextTags.ContextTableV1);
             // 
             // _idColumn
             // 

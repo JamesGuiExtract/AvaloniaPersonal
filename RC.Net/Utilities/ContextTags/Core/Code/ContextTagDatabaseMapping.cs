@@ -1,8 +1,9 @@
-﻿using System.Data.Linq;
+﻿using Extract.Database;
+using System.Data.Linq;
 using System.Data.Linq.Mapping;
 using System.Data.SqlServerCe;
 
-namespace Extract.Database
+namespace Extract.Utilities.ContextTags
 {
     #region AllVersions
 

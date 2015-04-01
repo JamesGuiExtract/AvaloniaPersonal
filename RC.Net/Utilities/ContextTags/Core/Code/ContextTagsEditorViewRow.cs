@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Extract.Database
+namespace Extract.Utilities.ContextTags
 {
     /// <summary>
     /// Defines an editable row of a view for a <see cref="ContextTagDatabase"/> (CustomTag.sdf) 

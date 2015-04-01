@@ -4,22 +4,23 @@ using Extract.Utilities;
 using System;
 using System.ComponentModel;
 using System.Data.SqlServerCe;
+using System.Linq;
 using System.Windows.Forms;
 
-namespace Extract.SQLCDBEditor
+namespace Extract.Utilities.ContextTags
 {
     /// <summary>
-    /// A <see cref="Form"/> that allows creation of a new context for a
-    /// <see cref="ContextTagDatabase"/>.
+    /// A <see cref="Form"/> that allows editing of a <see cref="ContextTagDatabase"/>'s context
+    /// table.
     /// </summary>
-    public partial class CreateContextForm : Form
+    public partial class ContextEditingForm : Form
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static readonly string _OBJECT_NAME = typeof(CreateContextForm).ToString();
+        static readonly string _OBJECT_NAME = typeof(ContextEditingForm).ToString();
 
         #endregion Constants
 
@@ -40,13 +41,11 @@ namespace Extract.SQLCDBEditor
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateContextForm"/> class.
+        /// Initializes a new instance of the <see cref="ContextEditingForm"/> class.
         /// </summary>
         /// <param name="connection">The <see cref="SqlCeConnection"/> of the database to edit.
         /// </param>
-        /// <param name="fpsFileDir">The FPS file directory to associate with the new context.
-        /// </param>
-        public CreateContextForm(SqlCeConnection connection, string fpsFileDir)
+        public ContextEditingForm(SqlCeConnection connection)
         {
             try
             {
@@ -59,23 +58,19 @@ namespace Extract.SQLCDBEditor
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI38027",
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI38022",
                     _OBJECT_NAME);
+
+                ExtractException.Assert("ELI38023", "Null argument exception", connection != null);
 
                 InitializeComponent();
 
                 _database = new ContextTagDatabase(connection);
-
-                // To avoid a user from creating contexts mapped to physical drives without specific
-                // intention, only initialize FPSFileDir if it is a UNC path.
-                if (fpsFileDir.StartsWith(@"\\", StringComparison.OrdinalIgnoreCase))
-                {
-                    _fpsFileDirTextBox.Text = fpsFileDir;
-                }
+                _dataGridView.DataSource = _database.Context;
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38028");
+                throw ex.AsExtract("ELI38024");
             }
         }
 
@@ -113,32 +108,43 @@ namespace Extract.SQLCDBEditor
         #region Event Handlers
 
         /// <summary>
-        /// Handles the Click event of the HandleOkButton control.
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_okButton"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
         void HandleOkButton_Click(object sender, EventArgs e)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(_contextNameTextBox.Text))
+            try 
+	        {
+                DataGridViewColumn nameColumn = _dataGridView.Columns["_nameColumn"];
+		        DataGridViewColumn fpsFileDirColumn = _dataGridView.Columns["_fpsFileDirColumn"];
+
+                if (_dataGridView.Rows.OfType<DataGridViewRow>()
+                    .Where(row => !row.IsNewRow)
+                    .Select(row => row.Cells[nameColumn.Index])
+                    .Any(cell => string.IsNullOrWhiteSpace(cell.Value as string)))
                 {
                     UtilityMethods.ShowMessageBox(
-                        @"Context name must be specified.", "Context name missing", true);
+                        "Context name must be specified.", "Context name missing", true);
                     DialogResult = DialogResult.None;
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(_fpsFileDirTextBox.Text))
+                if (_dataGridView.Rows.OfType<DataGridViewRow>()
+                    .Where(row => !row.IsNewRow)
+                    .Select(row => row.Cells[fpsFileDirColumn.Index])
+                    .Any(cell => string.IsNullOrWhiteSpace(cell.Value as string)))
                 {
-                    UtilityMethods.ShowMessageBox(
-                        @"FPSFileDir must be specified.", "FPSFileDir missing", true);
-                    DialogResult = DialogResult.None;
-                    return;
+                    UtilityMethods.ShowMessageBox("FPSFileDir must be specified", 
+                        "FPSFileDir missing", true);
                 }
 
-                if (!_fpsFileDirTextBox.Text.StartsWith(@"\\", StringComparison.OrdinalIgnoreCase))
+                if (_dataGridView.Rows.OfType<DataGridViewRow>()
+                    .Where (row => !row.IsNewRow)
+                    .Select(row => row.Cells[fpsFileDirColumn.Index])
+                    .Any(cell => !((string)cell.Value).StartsWith(@"\\",
+                        StringComparison.OrdinalIgnoreCase)))
                 {
                     DialogResult response = MessageBox.Show(null, "It is recommended that " +
                         "FPSFileDir be specified with a UNC path to avoid the risk that a " +
@@ -155,31 +161,30 @@ namespace Extract.SQLCDBEditor
 
                 try
                 {
-                    var context = new ContextTableV1();
-                    context.Name = _contextNameTextBox.Text;
-                    context.FPSFileDir = _fpsFileDirTextBox.Text;
-
                     // Remove any trailing backslash to ensure as best as possible that paths
                     // will match exactly when identifying the current context.
-                    if (context.FPSFileDir.EndsWith(@"\", StringComparison.OrdinalIgnoreCase))
+                    foreach (var cell in _dataGridView.Rows.OfType<DataGridViewRow>()
+                                .Where(row => !row.IsNewRow)
+                                .Select(row => row.Cells[fpsFileDirColumn.Index])
+                                .Where(cell => ((string)cell.Value).EndsWith(@"\", 
+                                    StringComparison.OrdinalIgnoreCase)))
                     {
-                        context.FPSFileDir =
-                            context.FPSFileDir.Substring(0, context.FPSFileDir.Length -1);
+                        string stringValue = (string)cell.Value;
+                        cell.Value = stringValue.Substring(0, stringValue.Length - 1);
                     }
 
-                    _database.Context.InsertOnSubmit(context);
                     _database.SubmitChanges();
                 }
                 catch (Exception ex)
                 {
-                    ex.ExtractDisplay("ELI38029");
+                    ex.ExtractDisplay("ELI38025");
                     DialogResult = DialogResult.None;
                 }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI38030");
-            }
+	        }
+	        catch (Exception ex)
+	        {
+		        ex.ExtractDisplay("ELI38026");
+	        }
         }
 
         #endregion Event Handlers

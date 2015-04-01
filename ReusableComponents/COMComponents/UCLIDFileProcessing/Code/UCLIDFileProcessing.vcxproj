@@ -422,9 +422,8 @@
     <ClInclude Include="WorkItemsPage.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj">
-      <Project>{d0465c3d-527b-4b21-8e07-79a6cb762cc9}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    <ProjectReference Include="..\..\..\..\RC.Net\Utilities\ContextTags\Core\Code\Extract.Utilities.ContextTags.csproj">
+      <Project>{4114a956-d3f0-4d89-b3bf-8bc45046129c}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj">
       <Project>{1b3ded27-dbf9-478a-9e31-ffa479621f5c}</Project>

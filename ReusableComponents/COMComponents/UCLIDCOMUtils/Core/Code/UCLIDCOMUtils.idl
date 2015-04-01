@@ -1327,6 +1327,11 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 		[id(7), helpstring("method GetFormattedFunctionNames")] HRESULT GetFormattedFunctionNames(
 			[out, retval] IVariantVector** ppFunctionNames);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Displays a UI to edit custom tags 
+		//			If hParentWindow is not null, the tag editing UI will be displayed modally
+		//			to hParentWindow; otherwise the editor window will be modeless.
+		[id(8), helpstring("method EditCustomTags")] HRESULT EditCustomTags([in] HANDLE hParentWindow);
 	}	
 
 	[
@@ -1355,11 +1360,10 @@ library UCLID_COMUTILSLib
 		[id(4), helpstring("method GetTagValue")] HRESULT GetTagValue(
 			[in] BSTR bstrTagName, [out, retval] BSTR* pbstrTagValue);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Displays a UI to edit the available tags for the specified bstrContextPath.
+		// PURPOSE: Displays a UI to edit the available tags for the current ContextPath.
 		//			If hParentWindow is not null, the tag editing UI will be displayed modally
 		//			to hParentWindow; otherwise the editor window will be modeless.
-		[id(5), helpstring("method EditTags")] HRESULT EditTags([in] BSTR bstrContextPath,
-			[in] HANDLE hParentWindow);
+		[id(5), helpstring("method EditTags")] HRESULT EditTags([in] HANDLE hParentWindow);
 	}
 
 	//---------------------------------------------------------------------------------------------

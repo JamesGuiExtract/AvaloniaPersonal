@@ -1,4 +1,4 @@
-﻿using Extract.Utilities;
+﻿using Extract.Database;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,9 +13,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
 
-using CurrentContextTagDatabase = Extract.Database.ContextTagDatabase;
+using CurrentContextTagDatabase = Extract.Utilities.ContextTags.ContextTagDatabase;
 
-namespace Extract.Database
+namespace Extract.Utilities.ContextTags
 {
     /// <summary>
     /// Manages the context tags database.
@@ -569,7 +569,7 @@ namespace Extract.Database
         {
             get
             {
-                return "Extract.SQLCDBEditor.ContextTagsPlugin";
+                return "Extract.Utilities.ContextTags.ContextTagsPlugin";
             }
         }
 

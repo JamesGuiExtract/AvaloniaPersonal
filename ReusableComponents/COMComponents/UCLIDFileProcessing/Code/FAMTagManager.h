@@ -57,6 +57,7 @@ public:
 	STDMETHOD(raw_GetAllTags)(IVariantVector* *ppTags);
 	STDMETHOD(raw_GetFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
+	STDMETHOD(raw_EditCustomTags)(HANDLE hParentWindow);
 
 // IFAMTagManager
 	STDMETHOD(get_FPSFileDir)(BSTR *strFPSDir);
@@ -67,7 +68,6 @@ public:
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput);
 	STDMETHOD(StringContainsInvalidTags)(BSTR strInput, VARIANT_BOOL *pbValue);
 	STDMETHOD(StringContainsTags)(BSTR strInput, VARIANT_BOOL *pbValue);
-	STDMETHOD(EditContextTags)(HANDLE hParentWindow);
 
 private:
 

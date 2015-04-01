@@ -918,6 +918,31 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Gets a <see cref="IWin32Window"/> from the <see paramref="handle"/> which can be for
+        /// either a managed WinForms control or a unmanaged window.
+        /// </summary>
+        /// <param name="handle">The window handle</param>
+        /// <returns>A <see cref="IWin32Window"/> representing the <see paramref="handle"/>.
+        /// </returns>
+        public static IWin32Window WindowFromHandle(IntPtr handle)
+        {
+            try
+            {
+                IWin32Window window = Control.FromHandle(handle);
+                if (window == null)
+                {
+                    window = new WindowWrapper(handle);
+                }
+
+                return window;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38059");
+            }
+        }
+
         #endregion Methods
     }
 

@@ -1,4 +1,4 @@
-﻿namespace Extract.SQLCDBEditor
+﻿namespace Extract.Utilities.ContextTags
 {
     partial class CreateContextForm
     {

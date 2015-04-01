@@ -193,6 +193,19 @@ static const CString ChooseDocTag(const T &ipTagUtility, const U &btnTagButton, 
 			{
 				// Replace the previous selection with the selected option.
 				zReplacmentValue = vecChoices[nSelection].c_str();
+
+				// Assume that if the tag name starts with "Edit" (and not an angle bracket), this
+				// option is intended to open the tags for editing.
+				if (zReplacmentValue.Find("Edit") == 0)
+				{
+					ipTagUtility->EditCustomTags(AfxGetMainWnd()->GetSafeHwnd());
+
+					// Return the selected text so that the selection of the doc tag otherwise
+					// has no effect.
+					CString zSelectedText = zControlText.Mid(rnSelStart, rnSelCount);
+					return zSelectedText;
+				}
+
 				rnSelStart += zReplacmentValue.GetLength();
 				rnSelCount = 0;
 			}

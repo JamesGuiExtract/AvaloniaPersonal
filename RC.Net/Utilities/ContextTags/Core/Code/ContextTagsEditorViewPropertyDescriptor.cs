@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel;
 
-namespace Extract.Database
+namespace Extract.Utilities.ContextTags
 {
     /// <summary>
     /// A <see cref="PropertyDescriptor"/> for describing the fields of

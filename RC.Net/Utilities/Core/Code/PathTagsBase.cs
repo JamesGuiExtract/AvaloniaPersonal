@@ -37,7 +37,10 @@ namespace Extract.Utilities
         /// The <see cref="MiscUtils"/> instance used to evaluate path functions.
         /// </summary>
         MiscUtils _utility = new MiscUtils();
-
+        
+        /// <summary>
+        /// The <see cref="ITagUtility"/> interface for <see cref="_utility"/>.
+        /// </summary>
         ITagUtility _tagUtility;
 
         #endregion Fields
@@ -292,6 +295,24 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI33216");
+            }
+        }
+
+        /// <summary>
+        /// Displays a UI to edit the available tags for the specified bstrContextPath.
+        /// </summary>
+        /// <param name="hParentWindow">If not <see langword="null"/>, the tag editing UI will be
+        /// displayed modally this window; otherwise the editor window will be modeless.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
+        public virtual void EditCustomTags(IntPtr hParentWindow)
+        {
+            try
+            {
+                _tagUtility.EditCustomTags(hParentWindow);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38063");
             }
         }
 

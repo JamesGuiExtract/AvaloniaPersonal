@@ -1924,9 +1924,10 @@ namespace Extract.SQLCDBEditor
                 {
                     UsingUIReplacement = true;
 
-                    Type pluginType = Type.GetType(_schemaManager.UIReplacementPlugin);
                     SQLCDBEditorPlugin uiReplacementPlugin =
-                        (SQLCDBEditorPlugin)Activator.CreateInstance(pluginType);
+                        (SQLCDBEditorPlugin)UtilityMethods.CreateTypeFromTypeName(
+                            _schemaManager.UIReplacementPlugin);
+
                     var pluginControl = new QueryAndResultsControl(uiReplacementPlugin);
                     _pluginList.Add(pluginControl);
 
