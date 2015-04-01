@@ -17,8 +17,6 @@
 
 using namespace std;
 
-const int NUM_OF_CHARS = 4096;
-
 // add license management password function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
@@ -73,6 +71,9 @@ STDMETHODIMP CREPMFinderPP::Apply(void)
 			// store misc other boolean flags
 			bool bCaseSensitive = IsDlgButtonChecked(IDC_CHK_CASE_REPM)==TRUE;
 			ipREPMFinder->CaseSensitive = bCaseSensitive ? VARIANT_TRUE : VARIANT_FALSE;
+			
+			int nChecked = m_chkOnlyCreateOneAttributePerGroup.GetCheck();
+			ipREPMFinder->OnlyCreateOneAttributePerGroup = asVariantBool(nChecked == BST_CHECKED);
 
 			// store the return match type
 			if (IsDlgButtonChecked(IDC_RADIO_RETURN_FIRST_MATCH) == TRUE)
@@ -179,6 +180,7 @@ LRESULT CREPMFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 		m_chkIgnoreMissingTags = GetDlgItem(IDC_CHK_IGNORE_NO_TAGS);
 		m_btnSelectDocTag = GetDlgItem(IDC_BTN_SELECT_DOC_TAG);
 		m_btnSelectDocTag.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
+		m_chkOnlyCreateOneAttributePerGroup = GetDlgItem(IDC_CHK_ONLY_CREATE_ONE_ATTRIBUTE_PER_GROUP);
 		
 		UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipREPMFinder = m_ppUnk[0];
 		if (ipREPMFinder)
@@ -253,6 +255,10 @@ LRESULT CREPMFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 				}
 			};
 
+			// Update the create-one-attribute-per-group check box
+			m_chkOnlyCreateOneAttributePerGroup.SetCheck
+				(ipREPMFinder->OnlyCreateOneAttributePerGroup == VARIANT_TRUE ? BST_CHECKED : BST_UNCHECKED);
+
 			// update the state of all controls that depend on the value
 			// of other controls
 			updateControls();
@@ -309,17 +315,42 @@ LRESULT CREPMFinderPP::OnClickedBtnOpenNotepad(WORD wNotifyCode, WORD wID, HWND 
 		// if the edit box has text
 		GetDlgItemText(IDC_EDIT_RULE_FILE, bstrFile.m_str);
 		string strFileName = asString(bstrFile);
+
+		// Expand available tags (e.g., <RSDFileDir>)
+		AFTagManager tagMgr;
+		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+		strFileName = tagMgr.expandTagsAndFunctions(strFileName, ipAFDoc);
+
+		// If an encrypted file is specified, open the unencrypted file
+		if (_strcmpi(getExtensionFromFullPath(strFileName).c_str(), ".etf") == 0)
+		{
+			strFileName = getPathAndFileNameWithoutExtension(strFileName);
+		}
+
+		// Open the file
 		if (!strFileName.empty())
 		{
-			// get window system32 path
-			char pszSystemDir[MAX_PATH];
-			::GetSystemDirectory(pszSystemDir, MAX_PATH);
+			// Prompt for file creation if it doesn't exist, unless it is part of an installed FKB
+			if (!isValidFile(strFileName)
+				&& _strcmpi(strFileName.substr(0,16).c_str(), "C:\\Program Files") != 0)
+			{
+				if (MessageBox("The specified file does not exist. "
+					"Do you want to create it?", "Create file", 
+					MB_YESNO) == IDYES)
+				{
+					ofstream outfile(strFileName.c_str());
+					if (!outfile.fail())
+					{
+						outfile.close();
+						waitForFileToBeReadable(strFileName);
+					}
+				}
+			}
 			
-			string strCommand(pszSystemDir);
-			strCommand += "\\Notepad.exe ";
-			strCommand += strFileName;
-			// run Notepad.exe with this file
-			::runEXE(strCommand);
+			// Use ShellExecute instead of just opening in notepad because notepad is not a very good editor.
+			// Use null for verb to use whichever is the default action (e.g., Edit)
+			ShellExecute(m_hWnd, __nullptr, strFileName.c_str(), __nullptr, 
+				getDirectoryFromFullPath(strFileName.c_str()).c_str(), SW_SHOW);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33300");

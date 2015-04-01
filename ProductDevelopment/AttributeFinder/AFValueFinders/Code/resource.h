@@ -114,6 +114,7 @@
 #define IDC_LIST_AFTER_CLUE             212
 #define IDC_CHK_NAMED_MATCHES_AS_SUBATTRIBUTES 213
 #define IDC_BTN_ADD_AFTER_CLUE          214
+#define IDC_CHK_ONLY_CREATE_ONE_SUBATTRIBUTE_PER_GROUP 214
 #define IDI_ICON_UP                     215
 #define IDC_BTN_REMOVE_AFTER_CLUE       216
 #define IDI_ICON_DOWN                   217
@@ -373,6 +374,8 @@
 #define IDC_BTN_BROWSE_REPM             474
 #define IDC_CHK_CASE_REPM               475
 #define IDC_CHK_FIRST_MATCH_ONLY        476
+#define IDC_CHK_ONLY_RETURN_ONE_ATTRIBUTE_PER_GROUP 476
+#define IDC_CHK_ONLY_CREATE_ONE_ATTRIBUTE_PER_GROUP 476
 #define IDC_FIRST_MATCH_ONLY_INFO       477
 
 // Next default values for new objects

@@ -291,8 +291,9 @@ void TestResultLoggerDlg::OnDblclkTree(NMHDR* pNMHDR, LRESULT* pResult)
 				}
 			}
 
-			// open the file
-			ShellExecute(m_hWnd, "open", iter->second.c_str(), NULL, 
+			// Open the file
+			// Use null for verb to use whichever is the default action (e.g., Edit)
+			ShellExecute(m_hWnd, __nullptr, iter->second.c_str(), __nullptr, 
 				getDirectoryFromFullPath(iter->second).c_str(), SW_SHOW);
 		}
 

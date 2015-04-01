@@ -42,7 +42,9 @@ BEGIN_MSG_MAP(CRegExprRulePP)
 	COMMAND_HANDLER(IDC_REG_EXP_FILE_INFO, BN_CLICKED, OnClickedRegExpFileInfo)
 	COMMAND_HANDLER(IDC_FIRST_MATCH_ONLY_INFO, BN_CLICKED, OnClickedFirstMatchOnlyInfo)
 	COMMAND_HANDLER(IDC_BTN_SELECT_DOC_TAG, BN_CLICKED, OnClickedSelectDocTag)
-	COMMAND_HANDLER(IDC_CHK_NAMED_MATCHES_AS_SUBATTRIBUTES, BN_CLICKED, OnClickedNamedMatchesAsSubAttributes);
+	COMMAND_HANDLER(IDC_CHK_NAMED_MATCHES_AS_SUBATTRIBUTES, BN_CLICKED,	OnClickedNamedMatchesAsSubAttributes);
+	COMMAND_HANDLER(IDC_CHK_ONLY_CREATE_ONE_SUBATTRIBUTE_PER_GROUP, BN_CLICKED,
+		OnClickedOnlyCreateOneSubAttributePerGroup);
 
 END_MSG_MAP()
 
@@ -66,6 +68,7 @@ END_MSG_MAP()
 	LRESULT OnClickedFirstMatchOnlyInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedNamedMatchesAsSubAttributes(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedOnlyCreateOneSubAttributePerGroup(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	ATLControls::CButton m_radioPatternText;
@@ -75,11 +78,13 @@ private:
 	ATLControls::CButton m_btnOpenNotepad;
 	ATLControls::CButton m_btnSelectDocTag;
 	ATLControls::CButton m_checkCreateSubAttributesFromMatches;
+	ATLControls::CButton m_checkOnlyCreateOneSubAttributePerGroup;
 	ATLControls::CButton m_checkFirstMatchOnly;
 
 	CXInfoTip m_infoTip;
 
 	bool m_bIsRegExpFromFile;
+	bool m_bAddCapturesAsSubAttributes;
 
 	bool storePattern(UCLID_AFVALUEFINDERSLib::IRegExprRulePtr ipRegExprRule);
 	bool storePatternFile(UCLID_AFVALUEFINDERSLib::IRegExprRulePtr ipRegExprRule);

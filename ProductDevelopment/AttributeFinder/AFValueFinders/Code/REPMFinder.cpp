@@ -21,7 +21,8 @@ using namespace std;
 // Constants
 //-------------------------------------------------------------------------------------------------
 // Version 2: Added CIdentifiableObject
-const unsigned long gnCurrentVersion = 2;
+// Version 3: Added m_bOnlyCreateOneAttributePerGroup
+const unsigned long gnCurrentVersion = 3;
 const EPMReturnMatchType eDEFAULT_RETURN_MATCH_TYPE = kReturnFirstMatch;
 
 //-------------------------------------------------------------------------------------------------
@@ -39,7 +40,8 @@ CREPMFinder::CREPMFinder()
   m_nMinScoreToConsiderAsMatch(0),
   m_nMinFirstToConsiderAsMatch(0),
   m_ipDataScorer(NULL),
-  m_bIgnoreInvalidTags(true)
+  m_bIgnoreInvalidTags(true),
+  m_bOnlyCreateOneAttributePerGroup(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -94,7 +96,7 @@ STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pP
 
 		IRegularExprParserPtr ipParser = getRegExParser(ipAFDoc);
 		ipParser->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
-		ipParser->ReturnAllGroupCaptures = VARIANT_FALSE;
+		ipParser->ReturnAllGroupCaptures = m_bOnlyCreateOneAttributePerGroup ? VARIANT_FALSE : VARIANT_TRUE;
 
 		// return vec of attributes
 		IIUnknownVectorPtr ipRetAttributes(CLSID_IUnknownVector);
@@ -539,6 +541,36 @@ STDMETHODIMP CREPMFinder::put_IgnoreInvalidTags(VARIANT_BOOL newVal)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CREPMFinder::get_OnlyCreateOneAttributePerGroup(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI38051", pVal != __nullptr);
+
+		*pVal = asVariantBool(m_bOnlyCreateOneAttributePerGroup);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38052");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CREPMFinder::put_OnlyCreateOneAttributePerGroup(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_bOnlyCreateOneAttributePerGroup = asCppBool(newVal);
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38053");
+}
+
+//-------------------------------------------------------------------------------------------------
 // IMustBeConfiguredObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CREPMFinder::raw_IsConfigured(VARIANT_BOOL * pbValue)
@@ -643,6 +675,8 @@ STDMETHODIMP CREPMFinder::raw_CopyFrom(IUnknown *pObject)
 		m_strRuleWorkedName = ipSource->GetRuleWorkedName();
 
 		m_bIgnoreInvalidTags = ipSource->IgnoreInvalidTags == VARIANT_TRUE;
+
+		m_bOnlyCreateOneAttributePerGroup = ipSource->OnlyCreateOneAttributePerGroup == VARIANT_TRUE;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33274");
 
@@ -704,6 +738,7 @@ STDMETHODIMP CREPMFinder::Load(IStream *pStream)
 		m_nMinScoreToConsiderAsMatch = 0;
 		m_nMinFirstToConsiderAsMatch = 0;
 		m_ipDataScorer = __nullptr; // delete the current data scorer object
+		m_bOnlyCreateOneAttributePerGroup = true;
 		
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -739,6 +774,11 @@ STDMETHODIMP CREPMFinder::Load(IStream *pStream)
 
 		dataReader >> m_nMinFirstToConsiderAsMatch;
 		dataReader >> m_bIgnoreInvalidTags;
+
+		if (nDataVersion >= 3)
+		{
+			dataReader >> m_bOnlyCreateOneAttributePerGroup;
+		}
 
 		// read the data scorer object
 		IPersistStreamPtr ipObj;
@@ -781,6 +821,7 @@ STDMETHODIMP CREPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << (unsigned long) m_eReturnMatchType;
 		dataWriter << m_nMinFirstToConsiderAsMatch;
 		dataWriter << m_bIgnoreInvalidTags;
+		dataWriter << m_bOnlyCreateOneAttributePerGroup;
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object

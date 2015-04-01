@@ -109,8 +109,15 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 		// objects' UIs to take the configured FKB version into account.
 		m_ipRuleExecutionSession.CreateInstance(CLSID_RuleExecutionSession);
 		ASSERT_RESOURCE_ALLOCATION("ELI33511", m_ipRuleExecutionSession != __nullptr);
-		// The file name doesn't really matter here.
-		m_ipRuleExecutionSession->SetRSDFileName("RuleSetEditor");
+		if (strFileName != "")
+		{
+			m_ipRuleExecutionSession->SetRSDFileName(strFileName.c_str());
+		}
+		else
+		{
+			// The file name doesn't really matter here.
+			m_ipRuleExecutionSession->SetRSDFileName("RuleSetEditor");
+		}
 
 		ma_pUserCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_AFCORE_KEY_PATH));
 		
@@ -359,6 +366,11 @@ void CRuleSetEditor::openFile(string strFileName)
 		_bstr_t bstrFileName = get_bstr_t(strFileName.c_str());
 		m_ipRuleSet->LoadFrom(bstrFileName, VARIANT_FALSE);
 
+		// Reset execution session
+		m_ipRuleExecutionSession = __nullptr;
+		m_ipRuleExecutionSession.CreateInstance(CLSID_RuleExecutionSession);
+		ASSERT_RESOURCE_ALLOCATION("ELI38065", m_ipRuleExecutionSession != __nullptr);
+		m_ipRuleExecutionSession->SetRSDFileName(bstrFileName);
 		m_ipRuleExecutionSession->SetFKBVersion(m_ipRuleSet->FKBVersion);
 		
 		// add the file to MRU list

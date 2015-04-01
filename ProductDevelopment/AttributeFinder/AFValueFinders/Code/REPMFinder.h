@@ -105,6 +105,8 @@ public:
 	STDMETHOD(put_ReturnMatchType)(/*[in]*/ EPMReturnMatchType eNewVal);
 	STDMETHOD(get_IgnoreInvalidTags)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_IgnoreInvalidTags)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_OnlyCreateOneAttributePerGroup)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_OnlyCreateOneAttributePerGroup)(VARIANT_BOOL newVal);
 
 // IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
@@ -132,6 +134,7 @@ private:
 	IObjectWithDescriptionPtr m_ipDataScorer;
 
 	bool m_bIgnoreInvalidTags;
+	bool m_bOnlyCreateOneAttributePerGroup;
 
 	// map of pattern file name to RegExPatternFileInterpreter
 	std::map<std::string, RegExPatternFileInterpreter> m_mapFileNameToInterpreter;

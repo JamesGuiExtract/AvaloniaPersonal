@@ -24,7 +24,8 @@
 // Version 4: Added m_bAddCapturesAsSubAttributes
 // Version 5: Added m_bFirstMatchOnly
 // Version 6: Added CIdentifiableObject
-const unsigned long gnCurrentVersion = 6;
+// Version 7: Added m_bOnlyCreateOneSubattributePerGroup
+const unsigned long gnCurrentVersion = 7;
 
 //-------------------------------------------------------------------------------------------------
 // CRegExprRule
@@ -38,6 +39,7 @@ CRegExprRule::CRegExprRule()
 	m_ipAFUtility(NULL),
 	m_ipMiscUtils(NULL),
 	m_bAddCapturesAsSubAttributes(false),
+	m_bOnlyCreateOneSubAttributePerGroup(false),
 	m_bFirstMatchOnly(false),
 	m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 {
@@ -315,7 +317,35 @@ STDMETHODIMP CRegExprRule::put_FirstMatchOnly(VARIANT_BOOL newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33504");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRegExprRule::get_OnlyCreateOneSubAttributePerGroup(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+	try
+	{
+		ASSERT_ARGUMENT("ELI38066", pVal != __nullptr);
+
+		*pVal = asVariantBool(m_bOnlyCreateOneSubAttributePerGroup);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38044");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRegExprRule::put_OnlyCreateOneSubAttributePerGroup(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_bOnlyCreateOneSubAttributePerGroup = asCppBool(newVal);
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38045");
+}
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
 //-------------------------------------------------------------------------------------------------
@@ -348,6 +378,7 @@ STDMETHODIMP CRegExprRule::Load(IStream *pStream)
 		m_strRegExpFileName = "";
 		m_bAddCapturesAsSubAttributes = false;
 		m_bFirstMatchOnly = false;
+		m_bOnlyCreateOneSubAttributePerGroup = true;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -375,6 +406,10 @@ STDMETHODIMP CRegExprRule::Load(IStream *pStream)
 			if (nDataVersion >= 5)
 			{
 				dataReader >> m_bFirstMatchOnly;
+			}
+			if (nDataVersion >= 7)
+			{
+				dataReader >> m_bOnlyCreateOneSubAttributePerGroup;
 			}
 		}
 		// in the newer version all whitespace is removed so
@@ -425,7 +460,7 @@ STDMETHODIMP CRegExprRule::Load(IStream *pStream)
 			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
-
+		
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -454,6 +489,7 @@ STDMETHODIMP CRegExprRule::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_strRegExpFileName;
 		dataWriter << m_bAddCapturesAsSubAttributes;
 		dataWriter << m_bFirstMatchOnly;
+		dataWriter << m_bOnlyCreateOneSubAttributePerGroup;
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -683,6 +719,7 @@ STDMETHODIMP CRegExprRule::raw_CopyFrom(IUnknown *pObject)
 		m_strRegExpFileName = ipSource->GetRegExpFileName();
 		m_strPattern = ipSource->GetPattern();
 		m_bAddCapturesAsSubAttributes = asCppBool(ipSource->CreateSubAttributesFromNamedMatches);
+		m_bOnlyCreateOneSubAttributePerGroup = asCppBool(ipSource->OnlyCreateOneSubAttributePerGroup);
 		m_bFirstMatchOnly = asCppBool(ipSource->FirstMatchOnly);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08257");
@@ -843,17 +880,8 @@ IAttributePtr CRegExprRule::createAttribute(ITokenPtr ipToken, ISpatialStringPtr
 	// given in the token.
 	if ( ipToken->Name.length() > 0)
 	{
-		// Handle the sub matches that are numbered
-		// eventually this will not be required
-		// TODO: Remove this if only using named sub matches
-		string strName = asString(ipToken->Name);
-		if ( isDigitChar( strName[0] ))
-		{
-			// Add capture prefix
-			strName = "Capture" + strName;
-		}
 		// Get the name from the token
-		ipAttribute->Name = strName.c_str();
+		ipAttribute->Name = ipToken->Name;
 	}
 
 	return ipAttribute;
@@ -876,7 +904,7 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 		// Set the pattern and case values for the regular expression parser
 		ipParser->Pattern = getRegularExpr(ipAFDoc).c_str();
 		ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
-		ipParser->ReturnAllGroupCaptures = VARIANT_FALSE;
+		ipParser->ReturnAllGroupCaptures = asVariantBool(!m_bOnlyCreateOneSubAttributePerGroup);
 
 		// Use the regular expression engine to parse the text and find attribute values
 		// matching the specified regular expression

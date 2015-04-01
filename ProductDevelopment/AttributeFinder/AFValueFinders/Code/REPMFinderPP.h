@@ -93,6 +93,7 @@ private:
 	ATLControls::CButton m_radioReturnFirstOrBest;
 	ATLControls::CButton m_chkIgnoreMissingTags;
 	ATLControls::CButton m_btnSelectDocTag;
+	ATLControls::CButton m_chkOnlyCreateOneAttributePerGroup;
 
 	bool m_bStoreRuleWorked;
 	IObjectWithDescriptionPtr m_ipDataScorer;

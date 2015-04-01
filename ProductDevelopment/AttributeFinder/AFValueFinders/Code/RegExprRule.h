@@ -81,6 +81,8 @@ public:
 	STDMETHOD(put_CreateSubAttributesFromNamedMatches)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_FirstMatchOnly)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_FirstMatchOnly)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_OnlyCreateOneSubAttributePerGroup)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_OnlyCreateOneSubAttributePerGroup)(VARIANT_BOOL newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -117,6 +119,7 @@ private:
 	bool m_bCaseSensitive;
 	bool m_bFirstMatchOnly;
 	bool m_bAddCapturesAsSubAttributes;
+	bool m_bOnlyCreateOneSubAttributePerGroup;
 	
 	bool m_bIsRegExpFromFile;
 	std::string m_strRegExpFileName;

@@ -15,7 +15,8 @@
 // CRegExprRulePP
 //-------------------------------------------------------------------------------------------------
 CRegExprRulePP::CRegExprRulePP() 
-: m_bIsRegExpFromFile(false)
+: m_bIsRegExpFromFile(false),
+  m_bAddCapturesAsSubAttributes(false)
 {
 	try
 	{
@@ -74,6 +75,10 @@ STDMETHODIMP CRegExprRulePP::Apply(void)
 			// Check first match only setting.
 			nChecked = m_checkFirstMatchOnly.GetCheck();
 			ipRegExprRule->FirstMatchOnly = asVariantBool(nChecked == BST_CHECKED);
+
+			// Check if the only-create-one-subattribute-per-group check box is checked
+			nChecked = m_checkOnlyCreateOneSubAttributePerGroup.GetCheck();
+			ipRegExprRule->OnlyCreateOneSubAttributePerGroup = asVariantBool(nChecked == BST_CHECKED);
 		}
 		SetDirty(FALSE);
 	}
@@ -165,6 +170,13 @@ LRESULT CRegExprRulePP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			m_checkFirstMatchOnly = GetDlgItem(IDC_CHK_FIRST_MATCH_ONLY);
 			m_checkFirstMatchOnly.SetCheck(asBSTChecked(ipRegExprRule->FirstMatchOnly));
 
+			// Setup the only-create-one-subattribute-per-group check box value
+			m_checkOnlyCreateOneSubAttributePerGroup = GetDlgItem(IDC_CHK_ONLY_CREATE_ONE_SUBATTRIBUTE_PER_GROUP);
+			bool bOnlyCreateOneSubAttributePerGroup = asCppBool(ipRegExprRule->OnlyCreateOneSubAttributePerGroup);
+			m_checkOnlyCreateOneSubAttributePerGroup.SetCheck(asBSTChecked( bOnlyCreateOneSubAttributePerGroup ));
+
+			m_bAddCapturesAsSubAttributes = ipRegExprRule->CreateSubAttributesFromNamedMatches == VARIANT_TRUE;
+
 			updateControls();
 		}
 		
@@ -232,17 +244,42 @@ LRESULT CRegExprRulePP::OnClickedBtnOpenNotepad(WORD wNotifyCode, WORD wID, HWND
 		// if the edit box has text
 		GetDlgItemText(IDC_EDIT_REG_EXP_FILE, bstrFile.m_str);
 		string strFileName = asString(bstrFile);
+
+		// Expand available tags (e.g., <RSDFileDir>)
+		AFTagManager tagMgr;
+		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+		strFileName = tagMgr.expandTagsAndFunctions(strFileName, ipAFDoc);
+
+		// If an encrypted file is specified, open the unencrypted file
+		if (_strcmpi(getExtensionFromFullPath(strFileName).c_str(), ".etf") == 0)
+		{
+			strFileName = getPathAndFileNameWithoutExtension(strFileName);
+		}
+
+		// Open the file
 		if (!strFileName.empty())
 		{
-			// get window system32 path
-			char pszSystemDir[MAX_PATH];
-			::GetSystemDirectory(pszSystemDir, MAX_PATH);
+			// Prompt for file creation if it doesn't exist, unless it is part of an installed FKB
+			if (!isValidFile(strFileName)
+				&& _strcmpi(strFileName.substr(0,16).c_str(), "C:\\Program Files") != 0)
+			{
+				if (MessageBox("The specified file does not exist. "
+					"Do you want to create it?", "Create file", 
+					MB_YESNO) == IDYES)
+				{
+					ofstream outfile(strFileName.c_str());
+					if (!outfile.fail())
+					{
+						outfile.close();
+						waitForFileToBeReadable(strFileName);
+					}
+				}
+			}
 			
-			string strCommand(pszSystemDir);
-			strCommand += "\\Notepad.exe";
-			
-			// run Notepad.exe with this file
-			runEXE( strCommand, strFileName );
+			// Use ShellExecute instead of just opening in notepad because notepad is not a very good editor.
+			// Use null for verb to use whichever is the default action (e.g., Edit)
+			ShellExecute(m_hWnd, __nullptr, strFileName.c_str(), __nullptr, 
+				getDirectoryFromFullPath(strFileName.c_str()).c_str(), SW_SHOW);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07528");
@@ -304,8 +341,7 @@ LRESULT CRegExprRulePP::OnClickedFirstMatchOnlyInfo(WORD wNotifyCode, WORD wID, 
 	try
 	{
 		// show tooltip info
-		CString zText("When used as an attriubte modifier, 'First match only' will\n"
-			"always be treated as checked regardless of how it's configured.");
+		CString zText("When used as an attribute modifier, this object always searches for the first match only.");
 		m_infoTip.Show(zText);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33505");
@@ -333,8 +369,23 @@ LRESULT CRegExprRulePP::OnClickedNamedMatchesAsSubAttributes(WORD wNotifyCode, W
 	try
 	{
 		SetDirty(TRUE);
+		m_bAddCapturesAsSubAttributes = IsDlgButtonChecked(IDC_CHK_NAMED_MATCHES_AS_SUBATTRIBUTES)==BST_CHECKED;
+		updateControls();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI23029");
+	
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CRegExprRulePP::OnClickedOnlyCreateOneSubAttributePerGroup(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		SetDirty(TRUE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38046");
 	
 	return 0;
 }
@@ -397,6 +448,7 @@ void CRegExprRulePP::updateControls()
 	m_btnSelectDocTag.EnableWindow(m_bIsRegExpFromFile ? TRUE : FALSE);
 	m_btnBrowse.EnableWindow(m_bIsRegExpFromFile ? TRUE : FALSE);
 	m_btnOpenNotepad.EnableWindow(m_bIsRegExpFromFile ? TRUE : FALSE);
+	m_checkOnlyCreateOneSubAttributePerGroup.EnableWindow(m_bAddCapturesAsSubAttributes ? TRUE : FALSE);
 }
 //-------------------------------------------------------------------------------------------------
 void CRegExprRulePP::validateLicense()
