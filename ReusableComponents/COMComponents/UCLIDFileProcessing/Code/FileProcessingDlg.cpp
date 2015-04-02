@@ -1704,6 +1704,8 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 		emptyWindowsMessageQueue();
 		CWaitCursor cWait;
 
+		bool bFPSFileSaved = !m_strCurrFPSFilename.empty();
+
 		// The connection parameters only need to be change on the FPM since the FPM will set these
 		// values of the DB.
 		// [p13 #4581 && #4580]
@@ -1714,41 +1716,88 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 		getFPM()->DatabaseName = rstrDatabase.c_str();
 		getFPM()->AdvancedConnectionStringProperties = rstrAdvConnStrProperties.c_str();
 
-		// Reset the database connection
-		getDBPointer()->ResetDBConnection(VARIANT_FALSE);
+		// Using tags for server and/or database - attempt to expand the tags
+		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
+		ASSERT_RESOURCE_ALLOCATION("ELI38050", ipFAMTag != __nullptr);
 
-		// In case path tags were expanded, return the literal database connection properties we
-		// actually connected to.
-		rstrServer = getFPM()->DatabaseServer;
-		rstrDatabase = getFPM()->DatabaseName;
-		rstrAdvConnStrProperties = getFPM()->AdvancedConnectionStringProperties;
+		// Determine if tags need to be expanded
+		bool bTagsToExpand = asCppBool(ipFAMTag->StringContainsTags(rstrServer.c_str())) || 
+					asCppBool(ipFAMTag->StringContainsTags(rstrDatabase.c_str())) ||
+					asCppBool(ipFAMTag->StringContainsTags(rstrAdvConnStrProperties.c_str()));
 
-		// Determine in environment-specific path tags <DatabaseServer> and <DatabaseName> are
-		// available and indicate the findings to m_propDatabasePage.
-		bool bDBServerTagExists = false;
-		bool bDBNameTagExists = false;
-
-		IVariantVectorPtr ipCustomTags = m_ipFAMTagUtility->GetCustomFileTags();
-		ASSERT_RESOURCE_ALLOCATION("ELI37907", ipCustomTags != __nullptr);
-
-		long nCount = ipCustomTags->Size;
-		for (long i = 0; i < nCount; i++)
+		if (bTagsToExpand)
 		{
-			string strCustomTag = asString(ipCustomTags->Item[i].bstrVal);
-			if (_strnicmp(strCustomTag.c_str(), gstrDATABASE_SERVER_TAG.c_str(), 
-				gstrDATABASE_SERVER_TAG.length()) == 0)
+			// The FPS file needs to have been saved
+			if (!bFPSFileSaved)
 			{
-				bDBServerTagExists = true;
+				// TODO: Add dialog that informs user that the file needs to be saved so that the
+				// correct context will be used.
+				if (AfxMessageBox("The configuration needs to be saved for the context to be identified.\r\nSave now?",
+					MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
+				{
+					// Prompt for save
+					bFPSFileSaved = saveFile(string(""));
+				}
 			}
-			else if (_strnicmp(strCustomTag.c_str(), gstrDATABASE_NAME_TAG.c_str(), 
-				gstrDATABASE_NAME_TAG.length()) == 0)
+			
+			if (bFPSFileSaved)
 			{
-				bDBNameTagExists = true;
+				ipFAMTag->FPSFileName = m_strCurrFPSFilename.c_str();
+				ipFAMTag->FPSFileDir = "";
+				ipFAMTag->FPSFileDir = getDirectoryFromFullPath(m_strCurrFPSFilename).c_str();
+
+				// Expand tags
+				string strExpandedServerName = ipFAMTag->ExpandTags(rstrServer.c_str(), "");
+				string strExpandedDBName = ipFAMTag->ExpandTags(rstrDatabase.c_str(), "");
+				string strExpandedAdvConnStrProperties = ipFAMTag->ExpandTags(rstrAdvConnStrProperties.c_str(), "");
+
+				// Determine if there are still tags that need to be expanded
+				bTagsToExpand = asCppBool(ipFAMTag->StringContainsTags(strExpandedServerName.c_str())) || 
+					asCppBool(ipFAMTag->StringContainsTags(strExpandedDBName.c_str())) ||
+					asCppBool(ipFAMTag->StringContainsTags(strExpandedAdvConnStrProperties.c_str()));
+
+				// If tags still need to be expanded open the edit context tags UI
+				if (bTagsToExpand)
+				{
+					m_ipFAMTagUtility->EditCustomTags(this->m_hWnd);
+					ipFAMTag->FPSFileDir = getDirectoryFromFullPath(m_strCurrFPSFilename).c_str(); 
+					strExpandedServerName = ipFAMTag->ExpandTags(rstrServer.c_str(), "");
+					strExpandedDBName = ipFAMTag->ExpandTags(rstrDatabase.c_str(), "");
+					strExpandedAdvConnStrProperties = ipFAMTag->ExpandTags(rstrAdvConnStrProperties.c_str(), "");
+				
+					// if the tags have not been expanded open the context database
+					bTagsToExpand = asCppBool(ipFAMTag->StringContainsTags(strExpandedServerName.c_str())) || 
+						asCppBool(ipFAMTag->StringContainsTags(strExpandedDBName.c_str())) ||
+						asCppBool(ipFAMTag->StringContainsTags(strExpandedAdvConnStrProperties.c_str()));
+				}
+
+				// Now that the tags should be there save the info again - the tags get expanded
+				// for the FileProcessingDB - but will be saved in the FPM with the tags
+				getFPM()->DatabaseServer = rstrServer.c_str();
+				getFPM()->DatabaseName = rstrDatabase.c_str();
+				getFPM()->AdvancedConnectionStringProperties = rstrAdvConnStrProperties.c_str();
 			}
 		}
+		
+		// Only try to connect if no tags need to be expanded
+		if (!bTagsToExpand)
+		{
+			// Reset the database connection
+			getDBPointer()->ResetDBConnection(VARIANT_FALSE);
+		
+			// In case path tags were expanded, return the literal database connection properties we
+			// actually connected to.
+			rstrServer = getFPM()->DatabaseServer;
+			rstrDatabase = getFPM()->DatabaseName;
+			rstrAdvConnStrProperties = getFPM()->AdvancedConnectionStringProperties;
+		}
+		else 
+		{
+			getDBPointer()->CloseAllDBConnections();
+		}
 
-		m_propDatabasePage.showDBServerTag(bDBServerTagExists);
-		m_propDatabasePage.showDBNameTag(bDBNameTagExists);
+		m_propDatabasePage.showDBServerTag(true);
+		m_propDatabasePage.showDBNameTag(true);
 	}
 	catch ( ... )
 	{

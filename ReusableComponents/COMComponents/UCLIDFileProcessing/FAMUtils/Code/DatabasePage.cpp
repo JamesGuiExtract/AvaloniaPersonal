@@ -9,6 +9,7 @@
 #include "DotNetUtils.h"
 #include "FAMUtilsConstants.h"
 #include "ADOUtils.h"
+#include "FAMUtilsConstants.h"
 
 #include <cpputil.h>
 #include <misc.h>
@@ -81,6 +82,7 @@ void DatabasePage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON_SQL_SERVER_BROWSE, m_btnSqlServerBrowse);
 	DDX_Control(pDX, IDC_BUTTON_LAST_USED_DB, m_btnConnectLastUsedDB);
 	DDX_Control(pDX, IDC_BUTTON_CONN_STR, m_btnAdvConnStrProperties);
+	DDX_Control(pDX, IDC_BUTTON_USE_CURRENT_CONTEXT, m_btnUseCurrentContextDatabase);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -93,6 +95,7 @@ BEGIN_MESSAGE_MAP(DatabasePage, CPropertyPage)
 	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_BUTTON_LAST_USED_DB, &DatabasePage::OnBnClickedButtonLastUsedDb)
 	ON_BN_CLICKED(IDC_BUTTON_CONN_STR, &DatabasePage::OnBnClickedButtonAdvConnStrProperties)
+	ON_BN_CLICKED(IDC_BUTTON_USE_CURRENT_CONTEXT, &DatabasePage::OnBnClickedButtonUseCurrentContextDatabase)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -294,6 +297,13 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 		rectConnectLastDBBtn.top = rectRefreshBtn.bottom + iDistBetween;
 		rectConnectLastDBBtn.bottom = rectConnectLastDBBtn.top + rectRefreshBtn.Height();
 		m_btnConnectLastUsedDB.MoveWindow(rectConnectLastDBBtn);
+
+		rectResize.left = rectConnectLastDBBtn.left - 4 - rectConnectLastDBBtn.Width();
+		rectResize.right = rectConnectLastDBBtn.left - 4;
+		rectResize.top = rectConnectLastDBBtn.top;
+		rectResize.bottom = rectConnectLastDBBtn.bottom;
+		
+		m_btnUseCurrentContextDatabase.MoveWindow(rectResize);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16160");
 }
@@ -387,6 +397,22 @@ void DatabasePage::OnBnClickedButtonAdvConnStrProperties()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35134");
 }
+void DatabasePage::OnBnClickedButtonUseCurrentContextDatabase()
+{
+	try
+	{
+		m_zServer = gstrDATABASE_SERVER_TAG.c_str();
+		m_zDBName = gstrDATABASE_NAME_TAG.c_str();
+		setServer(gstrDATABASE_SERVER_TAG);
+		setDatabase(gstrDATABASE_NAME_TAG);
+
+		UpdateData(FALSE);
+
+		notifyObjects();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38064");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // Public methods
@@ -453,6 +479,7 @@ void DatabasePage::setBrowseEnabled(bool bBrowseEnabled)
 		m_btnSqlServerBrowse.EnableWindow(asMFCBool(m_bBrowseEnabled));
 		m_btnAdvConnStrProperties.EnableWindow(asMFCBool(m_bBrowseEnabled));
 		m_btnConnectLastUsedDB.ShowWindow(m_bBrowseEnabled ? SW_SHOW : SW_HIDE);
+		m_btnUseCurrentContextDatabase.ShowWindow(m_bBrowseEnabled ? SW_SHOW : SW_HIDE);
 	}
 }
 //-------------------------------------------------------------------------------------------------

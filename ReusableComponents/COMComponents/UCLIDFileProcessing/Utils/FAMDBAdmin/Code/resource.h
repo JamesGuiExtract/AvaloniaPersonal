@@ -43,6 +43,7 @@
 #define IDC_BUTTON_CONN_STR             1009
 #define IDC_EDIT_ADDITIONAL_CONN_STR_ATTR 1010
 #define IDC_BUTTON_DEFAULT              1011
+#define IDC_BUTTON_USE_CURRENT_CONTEXT  1012
 // End Database Page ID's
 
 // This ID's are the same as in BaseUtils resource.h

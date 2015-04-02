@@ -91,6 +91,7 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnBnClickedButtonLastUsedDb();
 	afx_msg void OnBnClickedButtonAdvConnStrProperties();
+	afx_msg void OnBnClickedButtonUseCurrentContextDatabase();
 	virtual BOOL OnInitDialog();
 
 private:
@@ -115,6 +116,7 @@ private:
 	CButton m_btnAdvConnStrProperties;
 	CButton m_btnRefresh;
 	CButton m_btnConnectLastUsedDB;
+	CButton m_btnUseCurrentContextDatabase;
 
 	// Pointer is used to call SetDBConfigFile
 	IDBConfigNotifications* m_pNotifyDBConfigChangedObject;
