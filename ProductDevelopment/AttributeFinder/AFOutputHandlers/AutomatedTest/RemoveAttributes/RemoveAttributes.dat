@@ -48,3 +48,9 @@
 <TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
 
 <TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
+
+// Remove attributes with character confidence < Maximum
+<TESTCASE>;Test17.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test17.eav
+
+// Remove attributes with character confidence > Minimum
+<TESTCASE>;Test18.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test18.eav
