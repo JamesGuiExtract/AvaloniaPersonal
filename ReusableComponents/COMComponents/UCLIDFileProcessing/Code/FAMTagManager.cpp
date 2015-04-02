@@ -38,7 +38,7 @@ CFAMTagManager::CFAMTagManager()
 	CSingleLock lock(&ms_mutex, TRUE);
 	if (ms_ipContextTagProvider == __nullptr)
 	{
-		ms_ipContextTagProvider.CreateInstance("Extract.Database.ContextTagProvider");
+		ms_ipContextTagProvider.CreateInstance("Extract.Utilities.ContextTags.ContextTagProvider");
 		ASSERT_RESOURCE_ALLOCATION("ELI37903", ms_ipContextTagProvider != __nullptr);
 	}
 }
