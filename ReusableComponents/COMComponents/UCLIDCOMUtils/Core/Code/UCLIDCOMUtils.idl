@@ -1331,7 +1331,7 @@ library UCLID_COMUTILSLib
 		// PURPOSE: Displays a UI to edit custom tags 
 		//			If hParentWindow is not null, the tag editing UI will be displayed modally
 		//			to hParentWindow; otherwise the editor window will be modeless.
-		[id(8), helpstring("method EditCustomTags")] HRESULT EditCustomTags([in] HANDLE hParentWindow);
+		[id(8), helpstring("method EditCustomTags")] HRESULT EditCustomTags([in] long hParentWindow);
 	}	
 
 	[
@@ -1363,7 +1363,7 @@ library UCLID_COMUTILSLib
 		// PURPOSE: Displays a UI to edit the available tags for the current ContextPath.
 		//			If hParentWindow is not null, the tag editing UI will be displayed modally
 		//			to hParentWindow; otherwise the editor window will be modeless.
-		[id(5), helpstring("method EditTags")] HRESULT EditTags([in] HANDLE hParentWindow);
+		[id(5), helpstring("method EditTags")] HRESULT EditTags([in] long hParentWindow);
 	}
 
 	//---------------------------------------------------------------------------------------------

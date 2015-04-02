@@ -701,7 +701,7 @@ STDMETHODIMP CAFUtility::raw_GetCustomFileTags(IVariantVector** ppTags)
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::raw_EditCustomTags(HANDLE hParentWindow)
+STDMETHODIMP CAFUtility::raw_EditCustomTags(long hParentWindow)
 {
 	try
 	{

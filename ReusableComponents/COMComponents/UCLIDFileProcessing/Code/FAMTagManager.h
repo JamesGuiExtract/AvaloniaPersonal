@@ -57,7 +57,7 @@ public:
 	STDMETHOD(raw_GetAllTags)(IVariantVector* *ppTags);
 	STDMETHOD(raw_GetFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
-	STDMETHOD(raw_EditCustomTags)(HANDLE hParentWindow);
+	STDMETHOD(raw_EditCustomTags)(long hParentWindow);
 
 // IFAMTagManager
 	STDMETHOD(get_FPSFileDir)(BSTR *strFPSDir);

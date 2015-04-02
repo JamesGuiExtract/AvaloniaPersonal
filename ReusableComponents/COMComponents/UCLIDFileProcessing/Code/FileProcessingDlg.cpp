@@ -1759,7 +1759,7 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 				// If tags still need to be expanded open the edit context tags UI
 				if (bTagsToExpand)
 				{
-					m_ipFAMTagUtility->EditCustomTags(this->m_hWnd);
+					m_ipFAMTagUtility->EditCustomTags((long)GetSafeHwnd());
 					ipFAMTag->FPSFileDir = getDirectoryFromFullPath(m_strCurrFPSFilename).c_str(); 
 					strExpandedServerName = ipFAMTag->ExpandTags(rstrServer.c_str(), "");
 					strExpandedDBName = ipFAMTag->ExpandTags(rstrDatabase.c_str(), "");

@@ -351,7 +351,7 @@ STDMETHODIMP CFAMTagManager::raw_GetFormattedFunctionNames(IVariantVector** ppFu
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35240");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::raw_EditCustomTags(HANDLE hParentWindow)
+STDMETHODIMP CFAMTagManager::raw_EditCustomTags(long hParentWindow)
 {
 	try
 	{

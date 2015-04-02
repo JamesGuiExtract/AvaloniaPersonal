@@ -304,7 +304,7 @@ namespace Extract.Utilities
         /// <param name="hParentWindow">If not <see langword="null"/>, the tag editing UI will be
         /// displayed modally this window; otherwise the editor window will be modeless.</param>
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
-        public virtual void EditCustomTags(IntPtr hParentWindow)
+        public virtual void EditCustomTags(int hParentWindow)
         {
             try
             {

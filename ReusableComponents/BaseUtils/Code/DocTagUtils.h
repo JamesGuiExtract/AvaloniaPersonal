@@ -198,7 +198,7 @@ static const CString ChooseDocTag(const T &ipTagUtility, const U &btnTagButton, 
 				// option is intended to open the tags for editing.
 				if (zReplacmentValue.Find("Edit") == 0)
 				{
-					ipTagUtility->EditCustomTags(AfxGetMainWnd()->GetSafeHwnd());
+					ipTagUtility->EditCustomTags((long)AfxGetMainWnd()->GetSafeHwnd());
 
 					// Return the selected text so that the selection of the doc tag otherwise
 					// has no effect.

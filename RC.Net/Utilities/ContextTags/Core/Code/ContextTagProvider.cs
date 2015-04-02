@@ -193,12 +193,11 @@ namespace Extract.Utilities.ContextTags
         /// <param name="hParentWindow">If not <see langword="null"/>, the tag editing UI will be
         /// displayed modally this window; otherwise the editor window will be modeless.</param>
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
-        public void EditTags(IntPtr hParentWindow)
+        public void EditTags(int hParentWindow)
         {
             try
             {
-                ExtractException.Assert("ELI38057", "Null argument exception",
-                    hParentWindow != IntPtr.Zero);
+                ExtractException.Assert("ELI38057", "Null argument exception", hParentWindow != 0);
 
                 lock (_lock)
                 {
@@ -214,7 +213,7 @@ namespace Extract.Utilities.ContextTags
                         manager.CreateDatabase(true);
                     }
 
-                    EditDatabase(settingFileName, hParentWindow);
+                    EditDatabase(settingFileName, (IntPtr)hParentWindow);
 
                     // Re-load so that the available tags reflect the edits.
                     LoadTagsForPath(ContextPath);

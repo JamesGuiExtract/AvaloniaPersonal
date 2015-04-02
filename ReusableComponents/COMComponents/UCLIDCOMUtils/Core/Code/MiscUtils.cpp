@@ -1123,7 +1123,7 @@ STDMETHODIMP CMiscUtils::GetCustomFileTags(IVariantVector** ppTags)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35201");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CMiscUtils::EditCustomTags(HANDLE hParentWindow)
+STDMETHODIMP CMiscUtils::EditCustomTags(long hParentWindow)
 {
 	try
 	{
