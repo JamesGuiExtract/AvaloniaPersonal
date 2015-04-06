@@ -1,3 +1,4 @@
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -907,8 +908,8 @@ namespace Extract.DataEntry
                 else
                 {
                     _pathTags = (string.IsNullOrEmpty(_sourceDocName))
-                        ? new SourceDocumentPathTags()
-                        : new SourceDocumentPathTags(AttributeStatusInfo.SourceDocName);
+                        ? new FileActionManagerPathTags()
+                        : new FileActionManagerPathTags(null, AttributeStatusInfo.SourceDocName);
                 }
 
                 // Ensure data entry queries no longer react to changes in the attribute hierarchy.
@@ -3256,7 +3257,7 @@ namespace Extract.DataEntry
         {
             if (_pathTags == null)
             {
-                _pathTags = new SourceDocumentPathTags();
+                _pathTags = new FileActionManagerPathTags();
                 _statusInfoMap = new Dictionary<IAttribute, AttributeStatusInfo>();
                 _subAttributesToParentMap = new Dictionary<IUnknownVector, IAttribute>();
                 _autoUpdateTriggers = new Dictionary<IAttribute, AutoUpdateTrigger>();

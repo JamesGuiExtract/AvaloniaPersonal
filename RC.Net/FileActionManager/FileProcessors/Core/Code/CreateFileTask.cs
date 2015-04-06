@@ -1,4 +1,5 @@
-﻿using Extract.Interop;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
@@ -460,8 +461,7 @@ namespace Extract.FileActionManager.FileProcessors
                     "ELI31836", _COMPONENT_DESCRIPTION);
 
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir,
-                        pFAMTM.FPSFileName);
+                    new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
                 string fileName = pathTags.Expand(_fileName);
                 string fileContents = pathTags.Expand(_fileContents);
 

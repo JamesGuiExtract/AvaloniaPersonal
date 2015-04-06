@@ -62,7 +62,7 @@
             this._file2TextBox = new System.Windows.Forms.TextBox();
             this._unitsAgoComboBox = new System.Windows.Forms.ComboBox();
             this._file2Browse = new Extract.Utilities.Forms.BrowseButton();
-            this._file2PathTags = new Extract.Utilities.Forms.PathTagsButton();
+            this._file2PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._relativeTimeCompareRadioButton = new System.Windows.Forms.RadioButton();
             this._rangeEndDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this._compareRadioButton = new System.Windows.Forms.RadioButton();
@@ -71,7 +71,7 @@
             this._comparisonComboBox = new Extract.Utilities.Forms.BetterComboBox();
             this._file1PropertyComboBox = new System.Windows.Forms.ComboBox();
             this._metComboBox = new System.Windows.Forms.ComboBox();
-            this._file1PathTags = new Extract.Utilities.Forms.PathTagsButton();
+            this._file1PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._file1TextBox = new System.Windows.Forms.TextBox();
             this._file1Browse = new Extract.Utilities.Forms.BrowseButton();
             this._buttonOk = new System.Windows.Forms.Button();
@@ -550,13 +550,13 @@
         private System.Windows.Forms.Button _buttonOk;
         private System.Windows.Forms.Button _buttonCancel;
         private System.Windows.Forms.ComboBox _metComboBox;
-        private Utilities.Forms.PathTagsButton _file1PathTags;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _file1PathTags;
         private System.Windows.Forms.TextBox _file1TextBox;
         private Utilities.Forms.BrowseButton _file1Browse;
         private System.Windows.Forms.ComboBox _file1PropertyComboBox;
         private System.Windows.Forms.DateTimePicker _comparisonDateTimePicker;
         private Extract.Utilities.Forms.BetterComboBox _comparisonComboBox;
-        private Utilities.Forms.PathTagsButton _file2PathTags;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _file2PathTags;
         private System.Windows.Forms.TextBox _file2TextBox;
         private Utilities.Forms.BrowseButton _file2Browse;
         private System.Windows.Forms.ComboBox _file2PropertyComboBox;

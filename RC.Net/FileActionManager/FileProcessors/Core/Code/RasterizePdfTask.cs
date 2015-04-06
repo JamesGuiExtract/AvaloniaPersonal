@@ -1,4 +1,5 @@
-﻿using Extract.Imaging;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Imaging;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -299,7 +300,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// after successful rasterization.
         /// </summary>
         /// <value>
-        /// If <see langword="true"/> then the the SourceDocName will be modified to point to
+        /// If <see langword="true"/> then the SourceDocName will be modified to point to
         /// the converted file.
         /// </value>
         public bool ChangeSourceDocName
@@ -610,8 +611,7 @@ namespace Extract.FileActionManager.FileProcessors
                 var fileName = pFileRecord.Name;
 
                 // Create a tag manager and expand the tags in the file name
-                var tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(fileName), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
+                var tags = new FileActionManagerPathTags(pFAMTM, fileName);
 
                 // Get the source and destination files
                 pdfFile = Path.GetFullPath(tags.Expand(PdfFile));

@@ -42,7 +42,7 @@ namespace Extract.Redaction.Verification
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._collectOriginalDocumentCheckBox = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this._dataFolderPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._dataFolderPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._dataFolderBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._dataFolderTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -105,7 +105,7 @@ namespace Extract.Redaction.Verification
             this._dataFolderPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_dataFolderPathTagsButton.Image")));
             this._dataFolderPathTagsButton.Location = new System.Drawing.Point(311, 37);
             this._dataFolderPathTagsButton.Name = "_dataFolderPathTagsButton";
-            this._dataFolderPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
+            this._dataFolderPathTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._dataFolderPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._dataFolderPathTagsButton.TabIndex = 2;
             this._dataFolderPathTagsButton.TextControl = _dataFolderTextBox;
@@ -287,7 +287,7 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox _collectOriginalDocumentCheckBox;
         private System.Windows.Forms.CheckBox checkBox1;
-        private Extract.Utilities.Forms.PathTagsButton _dataFolderPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _dataFolderPathTagsButton;
         private Extract.Utilities.Forms.BrowseButton _dataFolderBrowseButton;
         private System.Windows.Forms.TextBox _dataFolderTextBox;
         private System.Windows.Forms.GroupBox groupBox2;

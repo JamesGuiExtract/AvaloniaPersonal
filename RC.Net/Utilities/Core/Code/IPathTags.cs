@@ -6,7 +6,7 @@ using System.ComponentModel;
 namespace Extract.Utilities
 {
     /// <summary>
-    /// Delegate used to provide the replacement value for custom tags.
+    /// Delegate used to provide the replacement value for added tags.
     /// </summary>
     /// <param name="path">The name of the path being expanded after standard tags and path tag
     /// functions have already been applied.</param>
@@ -17,6 +17,7 @@ namespace Extract.Utilities
     /// Represents a collection of expandable path tags.
     /// </summary>
     [TypeConverter(typeof(IPathTagsConverter))]
+    [CLSCompliant(false)]
     public interface IPathTags
     {
         /// <summary>
@@ -24,29 +25,19 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="tag">The tag name.</param>
         /// <param name="value">The value the tag is to be replaced with.</param>
-        void SetTagValue(string tag, string value);
+        void AddTag(string tag, string value);
 
         /// <summary>
-        /// Gets the current replacement value for the specified <see paramref="tag"/>.
-        /// </summary>
-        /// <param name="tag">The tag.</param>
-        /// <returns>The current replacement value for the specified <see paramref="tag"/>.
-        /// </returns>
-        string GetTagValue(string tag);
-
-        /// <summary>
-        /// Adds a custom tag to be expanded with <see paramref="expandTagMethod"/>.
+        /// Adds a tag to be expanded with <see paramref="expandTagMethod"/>.
         /// <para><b>Note</b></para>
-        /// Unlike standard tag, custom tags will not be expanded until after the path tag functions
+        /// Unlike other tags, these tags will not be expanded until after the path tag functions
         /// have been applied.
         /// </summary>
         /// <param name="tag">The tag name.</param>
-        /// <param name="expandTagMethod">The <see cref="ExpandTag"/> implementation that should be
-        /// used to provide the replacement value.</param>
-        /// <param name="delayedExpansion"><see langword="true"/> if the tag should not be expanded
-        /// until all other tags and functions have been expanded; otherwise, <see langword="false"/>.
-        /// </param>
-        void AddCustomTag(string tag, ExpandTag expandTagMethod, bool delayedExpansion);
+        /// <param name="expandTagMethod">The <see cref="ExpandTag"/> implementation that
+        /// should be used to provide the replacement value. The tag will not be expanded until all
+        /// other tags and functions have been expanded.</param>
+        void AddDelayedExpansionTag(string tag, ExpandTag expandTagMethod);
 
         /// <summary>
         /// Expands the tags in the specified path.
@@ -56,10 +47,56 @@ namespace Extract.Utilities
         string Expand(string path);
 
         /// <summary>
-        /// Gets the an iterator over the set of tags.
+        /// Gets a list of the built-in path tags.
         /// </summary>
-        /// <returns>The an iterator over the set of tags.</returns>
-        IEnumerable<string> Tags
+        /// <returns>A the built-in path tags.</returns>
+        IEnumerable<string> BuiltInTags
+        { 
+            get; 
+        }
+
+        /// <summary>
+        /// Gets a list of the custom (user-defined) path tags.
+        /// </summary>
+        /// <returns>A the custom path tags.</returns>
+        IEnumerable<string> CustomTags
+        { 
+            get; 
+        }
+
+        /// <summary>
+        /// Gets or sets a list of tags that should be filtered from <see cref="BuiltInTags"/> to
+        /// prevent them from appearing in a dropdown.
+        /// <para><b>Note</b></para>
+        /// These tags, if present in a string to be expanded, would still be expanded.
+        /// </summary>
+        IEnumerable<string> BuiltInTagFilter
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Displays a UI to edit the custom tags.
+        /// </summary>
+        /// <param name="parentWindow">If not <see langword="null"/>, the tag editing UI will be
+        /// displayed modally this window; otherwise the editor window will be modeless.</param>
+        void EditCustomTags(int parentWindow);
+
+        /// <summary>
+        /// Gets the built-in path functions.
+        /// </summary>
+        /// <returns>The function names.</returns>
+        IEnumerable<string> FunctionNames
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the function names formatted with parameters for display in a drop down list.
+        /// </summary>
+        /// <returns>The formatted function names.</returns>
+        IEnumerable<string> FormattedFunctionNames
         {
             get;
         }

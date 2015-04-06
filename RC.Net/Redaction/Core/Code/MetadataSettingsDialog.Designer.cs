@@ -41,7 +41,7 @@ namespace Extract.Redaction
             System.Windows.Forms.GroupBox groupBox1;
             System.Windows.Forms.Label label1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MetadataSettingsDialog));
-            this._metadataPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._metadataPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._metadataFileTextBox = new System.Windows.Forms.TextBox();
             this._metadataBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._cancelButton = new System.Windows.Forms.Button();
@@ -79,7 +79,7 @@ namespace Extract.Redaction
             this._metadataPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_metadataPathTagsButton.Image")));
             this._metadataPathTagsButton.Location = new System.Drawing.Point(363, 40);
             this._metadataPathTagsButton.Name = "_metadataPathTagsButton";
-            this._metadataPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
+            this._metadataPathTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._metadataPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._metadataPathTagsButton.TabIndex = 2;
             this._metadataPathTagsButton.TextControl = this._metadataFileTextBox;
@@ -163,7 +163,7 @@ namespace Extract.Redaction
 
 		private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
-        private Extract.Utilities.Forms.PathTagsButton _metadataPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _metadataPathTagsButton;
         private Extract.Utilities.Forms.BrowseButton _metadataBrowseButton;
         private System.Windows.Forms.TextBox _metadataFileTextBox;
         private DataFileControl _dataFileControl;

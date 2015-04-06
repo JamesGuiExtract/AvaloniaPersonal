@@ -36,7 +36,7 @@
             this._attachmentsColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
-            this._pathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._pathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._clearButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this._dataGridView)).BeginInit();
@@ -171,7 +171,7 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.DataGridView _dataGridView;
-        private Utilities.Forms.PathTagsButton _pathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsButton;
         private Utilities.Forms.BrowseButton _browseButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn _attachmentsColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;

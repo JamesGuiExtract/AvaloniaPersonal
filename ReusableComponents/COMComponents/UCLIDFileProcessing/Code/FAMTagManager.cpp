@@ -16,6 +16,9 @@ const string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
 const string strFPS_FILE_DIR_TAG = "<FPSFileDir>";
 const string strFPS_FILENAME_TAG = "<FPSFileName>";
 const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
+const string strDATABASE_SERVER_TAG = "<DatabaseServer>";
+const string strDATABASE_NAME_TAG = "<DatabaseName>";
+const string strDATABASE_ACTION_TAG = "<DatabaseAction>";
 
 //--------------------------------------------------------------------------------------------------
 // Statics
@@ -30,6 +33,7 @@ IContextTagProviderPtr CFAMTagManager::ms_ipContextTagProvider;
 //--------------------------------------------------------------------------------------------------
 CFAMTagManager::CFAMTagManager()
 : m_ipMiscUtils(CLSID_MiscUtils)
+, m_bAlwaysShowDatabaseTags(false)
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI35226", m_ipMiscUtils != __nullptr);
 
@@ -254,6 +258,35 @@ STDMETHODIMP CFAMTagManager::raw_GetBuiltInTags(IVariantVector* *ppTags)
 		ipVec->PushBack(get_bstr_t(strFPS_FILENAME_TAG));
 		ipVec->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
 
+		if (m_bAlwaysShowDatabaseTags)
+		{
+			IVariantVectorPtr ipContextTagNames = ms_ipContextTagProvider->GetTagNames();
+			ASSERT_RESOURCE_ALLOCATION("ELI38075", ipContextTagNames != __nullptr);
+
+			if (!ipContextTagNames->Contains(strDATABASE_SERVER_TAG.c_str()))
+			{
+				ipVec->PushBack(strDATABASE_SERVER_TAG.c_str());
+			}
+			
+			if (!ipContextTagNames->Contains(strDATABASE_NAME_TAG.c_str()))
+			{
+				ipVec->PushBack(strDATABASE_NAME_TAG.c_str());
+			}
+
+			if (!ipContextTagNames->Contains(strDATABASE_ACTION_TAG.c_str()))
+			{
+				ipVec->PushBack(strDATABASE_ACTION_TAG.c_str());
+			}
+		}
+
+		// Report any programmatically added tags.
+		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
+			 iter != m_mapAddedTags.end();
+			 iter++)
+		{
+			ipVec->PushBack(get_bstr_t(iter->first));
+		}
+
 		*ppTags = ipVec.Detach();
 	
 		return S_OK;
@@ -370,6 +403,32 @@ STDMETHODIMP CFAMTagManager::raw_EditCustomTags(long hParentWindow)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38049");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::raw_AddTag(BSTR bstrTagName, BSTR bstrTagValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI38088", bstrTagName != __nullptr);
+
+		validateLicense();
+
+		string strTag = asString(bstrTagName);
+		if (strTag.substr(0, 1) != "<")
+		{
+			strTag = "<" + strTag;
+		}
+		if (strTag.substr(strTag.length() - 1, 1) != ">")
+		{
+			strTag += ">";
+		}
+		m_mapAddedTags[strTag] = asString(bstrTagValue);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38089");
+}
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMTagManager::StringContainsInvalidTags(BSTR strInput, VARIANT_BOOL *pbValue)
 {
@@ -430,6 +489,66 @@ STDMETHODIMP CFAMTagManager::StringContainsTags(BSTR strInput, VARIANT_BOOL *pbV
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14395");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::get_AlwaysShowDatabaseTags(VARIANT_BOOL *pbValue)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38076", pbValue != __nullptr);
+
+		*pbValue = asVariantBool(m_bAlwaysShowDatabaseTags);
+
+		return S_OK;		
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38077");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::put_AlwaysShowDatabaseTags(VARIANT_BOOL bValue)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		m_bAlwaysShowDatabaseTags = asCppBool(bValue);
+
+		string strPath = getDirectoryFromFullPath(ms_strFPSFileName);
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38078");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::SetFAMDB(IFileProcessingDB *pFAMDB, long nActionID)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB(pFAMDB);
+		if (ipFAMDB == __nullptr)
+		{
+			m_strDatabaseServer.clear();
+			m_strDatabaseName.clear();
+			m_strDatabaseAction.clear();
+		}
+		else
+		{
+			m_strDatabaseServer = asString(ipFAMDB->DatabaseServer);
+			m_strDatabaseName = asString(ipFAMDB->DatabaseName);
+			m_strDatabaseAction = (nActionID != -1) 
+				? asString(ipFAMDB->GetActionName(nActionID))
+				: "";
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38079");
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -508,6 +627,21 @@ void CFAMTagManager::getTagNames(const string& strInput,
 //-------------------------------------------------------------------------------------------------
 void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocName)
 {
+	// In the case that the database name or server tags are present, attempt to resolve them
+	// before evaluating path tags so that the currently connected database overrides any definition
+	// of database server or name in CustomTags.sdf.
+	bool bDatabaseServerTagFound = rstrInput.find(strDATABASE_SERVER_TAG) != string::npos;
+	bool bDatabaseNameTagFound = rstrInput.find(strDATABASE_NAME_TAG) != string::npos;
+	if (bDatabaseServerTagFound && !m_strDatabaseServer.empty())
+	{
+		replaceVariable(rstrInput, strDATABASE_SERVER_TAG, m_strDatabaseServer);
+	}
+
+	if (bDatabaseNameTagFound && !m_strDatabaseName.empty())
+	{
+		replaceVariable(rstrInput, strDATABASE_NAME_TAG, m_strDatabaseName);
+	}
+
 	// As long as ms_strFPSDir is specified, apply any defined environment-specific path tags.
 	// Expand these before the built-in tags so that built-in tags can be used within custom
 	// environment tags.
@@ -531,6 +665,10 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 	bool bFPSFileDirTagFound = rstrInput.find(strFPS_FILE_DIR_TAG) != string::npos;
 	bool bFPSFileNameTagFound = rstrInput.find(strFPS_FILENAME_TAG) != string::npos;
 	bool bCommonComponentsDirFound = rstrInput.find(strCOMMON_COMPONENTS_DIR_TAG) != string::npos;
+	// In case database tags were used in a custom tag, try again to evaluate the tags here.
+	bDatabaseServerTagFound = rstrInput.find(strDATABASE_SERVER_TAG) != string::npos;
+	bDatabaseNameTagFound = rstrInput.find(strDATABASE_NAME_TAG) != string::npos;
+	bool bDatabaseActionTagFound = rstrInput.find(strDATABASE_ACTION_TAG) != string::npos;
 
 	// expand the strSOURCE_DOC_NAME_TAG tag with the appropriate value
 	if (bSourceDocNameTagFound)
@@ -551,7 +689,6 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 
 	if (bFPSFileDirTagFound)
 	{
-		CSingleLock lock(&ms_mutex, TRUE);
 		if (ms_strFPSDir == "")
 		{
 			string strMsg = "There is no FPS file directory available to expand the ";
@@ -566,7 +703,6 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 
 	if (bFPSFileNameTagFound)
 	{
-		CSingleLock lock(&ms_mutex, TRUE);
 		if (ms_strFPSFileName == "")
 		{
 			string strMsg = "There is no FPS filename available to expand the ";
@@ -585,6 +721,32 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 
 		// Replace the common components dir tag
 		replaceVariable(rstrInput, strCOMMON_COMPONENTS_DIR_TAG, strCommonComponentsDir);
+	}
+
+	if (bDatabaseServerTagFound && !m_strDatabaseServer.empty())
+	{
+		replaceVariable(rstrInput, strDATABASE_SERVER_TAG, m_strDatabaseServer);
+	}
+
+	if (bDatabaseNameTagFound && !m_strDatabaseName.empty())
+	{
+		replaceVariable(rstrInput, strDATABASE_NAME_TAG, m_strDatabaseName);
+	}
+
+	if (bDatabaseActionTagFound && !m_strDatabaseAction.empty())
+	{
+		replaceVariable(rstrInput, strDATABASE_ACTION_TAG, m_strDatabaseAction);
+	}
+
+	// Expand any programmatically added tags.
+	for (map<string, string>::iterator iter = m_mapAddedTags.begin();
+			iter != m_mapAddedTags.end();
+			iter++)
+	{
+		string strTag = iter->first;
+		string strValue = iter->second;
+
+		replaceVariable(rstrInput, strTag, strValue);
 	}
 }
 //-------------------------------------------------------------------------------------------------

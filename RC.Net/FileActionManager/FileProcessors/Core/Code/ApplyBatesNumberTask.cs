@@ -1,4 +1,5 @@
 using Extract.Drawing;
+using Extract.FileActionManager.Forms;
 using Extract.Imaging;
 using Extract.Imaging.Utilities;
 using Extract.Interop;
@@ -411,8 +412,8 @@ namespace Extract.FileActionManager.FileProcessors
                     _COMPONENT_DESCRIPTION);
 
                 // Create a tag manager and expand the tags in the file name
-                FileActionManagerPathTags tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
+                FileActionManagerPathTags tags =
+                    new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
                 fileName = Path.GetFullPath(tags.Expand(_fileName));
 
                 // Apply the bates number based on the format settings

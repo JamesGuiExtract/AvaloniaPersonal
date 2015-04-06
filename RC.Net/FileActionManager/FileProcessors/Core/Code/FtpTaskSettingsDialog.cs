@@ -1,4 +1,5 @@
 ﻿using EnterpriseDT.Net.Ftp;
+using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using System;
 using System.Windows.Forms;
@@ -75,10 +76,12 @@ namespace Extract.FileActionManager.FileProcessors
         {
             InitializeComponent();
 
-            // Initialize the Path tags buttons to have <SourceDocName>, <FPSFileDir> <FPSFileName>
-            // and <RemoteSourceDocName> tags
-            _localFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "", "");
-            _remoteFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "", "");
+            // Initialize the Path tags buttons with a custom <RemoteSourceDocName> option.
+            var pathTags = new FileActionManagerPathTags();
+            pathTags.AddTag(FtpTask.RemoteSourceDocNameTag, "");
+
+            _localFileNamePathTagsButton.PathTags = pathTags;
+            _remoteFileNamePathTagsButton.PathTags = pathTags;
 
             _settings = settings ?? new FtpTask();
         }
@@ -247,7 +250,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // If the _localOrNewFileNameTextBox equals <SourceDocName>, that is most likely
                 // just because it is the default value. <SourceDocName> on its own doesn't make
                 // sense as a new remote file name, so clear this value.
-                if (_localOrNewFileNameTextBox.Text == SourceDocumentPathTags.SourceDocumentTag)
+                if (_localOrNewFileNameTextBox.Text == FileActionManagerPathTags.SourceDocumentTag)
                 {
                     _localOrNewFileNameTextBox.Text = "";
                 }

@@ -1,5 +1,5 @@
 ﻿using Extract.Database;
-using Extract.FileActionManager.Database;
+using Extract.FileActionManager.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -273,7 +273,8 @@ namespace Extract.FileActionManager.Conditions
                 // Initialize styles that allow the table to appear disabled when it is disabled.
                 InitializeCellStyles();
 
-                var pathTags = new FileActionManagerDatabasePathTags("", "", "", null, 0);
+                var pathTags = new FileActionManagerPathTags();
+                pathTags.AlwaysShowDatabaseTags = true;
                 _databaseConnectionControl.PathTags = pathTags;
                 _queryPathTagsButton.PathTags = pathTags;
                 _fieldsPathTagsButton.PathTags = pathTags;
@@ -712,8 +713,8 @@ namespace Extract.FileActionManager.Conditions
                 // Path tags may not be able to properly expand any path tags in the connection
                 // string with a lot of the info not available at this point, but give it a shot.
                 IFileProcessingDB fileProcessingDB = new FileProcessingDB();
-                var pathTags =
-                    new FileActionManagerDatabasePathTags("", "", "", fileProcessingDB, 0);
+                var pathTags = new FileActionManagerPathTags();
+                pathTags.AlwaysShowDatabaseTags = true;
 
                 DbConnection lastConnection = _schemaInfoDbConnection;
                 DbConnection dbConnection = GetDbConnectionForSchemaUpdater(
@@ -825,7 +826,7 @@ namespace Extract.FileActionManager.Conditions
         {
             try
             {
-                // Don't persist selection fo use by _fieldsPathTagsButton after any control other
+                // Don't persist selection for use by _fieldsPathTagsButton after any control other
                 // that _fieldsPathTagsButton is activated.
                 if (sender != _fieldsPathTagsButton)
                 {
@@ -1116,7 +1117,7 @@ namespace Extract.FileActionManager.Conditions
         /// <see paramref="tableName"/> or <see paramref="query"/>.</param>
         /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/> that may be needed to
         /// expand some path tags.</param>
-        /// <param name="pathTags">The <see cref="FileActionManagerDatabasePathTags"/> used to
+        /// <param name="pathTags">The <see cref="FileActionManagerPathTags"/> used to
         /// expand any path tags/functions in the <see paramref="query"/>.</param>
         /// <param name="tableName">The name of the database table for which the field names are
         /// needed. Must be <see langword="null"/> if <see paramref="query"/> is specified.</param>
@@ -1124,7 +1125,7 @@ namespace Extract.FileActionManager.Conditions
         /// <see langword="null"/> if <see paramref="tableName"/> is specified.</param>
         /// <returns>An array of the field names.</returns>
         string[] GetResultFields(DbConnection dbConnection, IFileProcessingDB fileProcessingDB,
-            FileActionManagerDatabasePathTags pathTags, string tableName, string query)
+            FileActionManagerPathTags pathTags, string tableName, string query)
         {
             ExtractException.Assert("ELI36976", "Invalid text expansion parameters.",
                 string.IsNullOrEmpty(tableName) || string.IsNullOrEmpty(query));
@@ -1212,10 +1213,10 @@ namespace Extract.FileActionManager.Conditions
         /// re-use an existing connection when possible.</param>
         /// <param name="connectionInfo">The connection info.</param>
         /// <param name="fileProcessingDB"></param>
-        /// <param name="pathTags">The <see cref="FileActionManagerDatabasePathTags"/>.</param>
+        /// <param name="pathTags">The <see cref="FileActionManagerPathTags"/>.</param>
         /// <returns></returns>
         DbConnection GetDbConnectionForSchemaUpdater(bool resetConnection, DatabaseConnectionInfo connectionInfo,
-            IFileProcessingDB fileProcessingDB, FileActionManagerDatabasePathTags pathTags)
+            IFileProcessingDB fileProcessingDB, FileActionManagerPathTags pathTags)
         {
             // Re-use a previously obtained connection if possible.
             if (!resetConnection && _schemaInfoDbConnection != null &&

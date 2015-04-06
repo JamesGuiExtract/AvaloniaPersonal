@@ -56,7 +56,7 @@
             this._documentConditionTextBox = new System.Windows.Forms.TextBox();
             this._actionStatusComboBox = new System.Windows.Forms.ComboBox();
             this._pauseOnDocumentConditionCheckBox = new System.Windows.Forms.CheckBox();
-            this._actionNamePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._actionNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this.label3 = new System.Windows.Forms.Label();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
@@ -385,7 +385,7 @@
         private System.Windows.Forms.RadioButton _promptRandomlyRadioButton;
         private Utilities.Forms.BetterNumericUpDown _promptIntervalUpDown;
         private System.Windows.Forms.Label label3;
-        private Utilities.Forms.PathTagsButton _actionNamePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _actionNamePathTagsButton;
         private System.Windows.Forms.CheckBox _pauseOnDocumentConditionCheckBox;
         private System.Windows.Forms.ComboBox _actionStatusComboBox;
         private System.Windows.Forms.TextBox _documentConditionTextBox;

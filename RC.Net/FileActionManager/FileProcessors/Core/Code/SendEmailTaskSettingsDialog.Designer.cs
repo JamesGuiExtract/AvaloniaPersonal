@@ -40,10 +40,10 @@
             this._recipientTextBox = new System.Windows.Forms.TextBox();
             this._attachmentsButton = new System.Windows.Forms.Button();
             this._advancedButton = new System.Windows.Forms.Button();
-            this._bodyPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._subjectPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._recipientPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._carbonCopyPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._bodyPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._subjectPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._recipientPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._carbonCopyPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._resetErrorSettingsButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -262,11 +262,11 @@
         private System.Windows.Forms.TextBox _carbonCopyRecipient;
         private System.Windows.Forms.TextBox _recipientTextBox;
         private System.Windows.Forms.Button _attachmentsButton;
-        private Utilities.Forms.PathTagsButton _subjectPathTagsButton;
-        private Utilities.Forms.PathTagsButton _bodyPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _subjectPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _bodyPathTagsButton;
         private System.Windows.Forms.Button _advancedButton;
-        private Utilities.Forms.PathTagsButton _recipientPathTagsButton;
-        private Utilities.Forms.PathTagsButton _carbonCopyPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _recipientPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _carbonCopyPathTagsButton;
         private System.Windows.Forms.Button _resetErrorSettingsButton;
     }
 }

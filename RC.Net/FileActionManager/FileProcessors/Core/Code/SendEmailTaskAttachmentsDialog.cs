@@ -61,7 +61,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 if (errorEmailMode)
                 {
-                    _pathTagsButton.PathTags.SetTagValue(SendEmailTask.ExceptionFileTag, null);
+                    _pathTagsButton.PathTags.AddTag(SendEmailTask.ExceptionFileTag, null);
                 }
             }
             catch (Exception ex)

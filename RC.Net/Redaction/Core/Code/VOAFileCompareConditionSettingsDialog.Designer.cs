@@ -42,11 +42,11 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._useMutualOverlapComboBox = new System.Windows.Forms.ComboBox();
             this._overlapThresholdUpDown = new Extract.Utilities.Forms.BetterNumericUpDown();
-            this._dataFile1PathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._dataFile2PathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._dataFile1PathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._dataFile2PathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this._outputConditionCheckBox = new System.Windows.Forms.CheckBox();
-            this._outputFilePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._outputFilePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._outputFileTextBox = new System.Windows.Forms.TextBox();
             this._outputDataCheckBox = new System.Windows.Forms.CheckBox();
             label4 = new System.Windows.Forms.Label();
@@ -311,19 +311,19 @@
 
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
-        private Utilities.Forms.PathTagsButton _dataFile1PathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _dataFile1PathTagsButton;
         private System.Windows.Forms.TextBox _dataFile1TextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox _conditionMetComboBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private Utilities.Forms.PathTagsButton _dataFile2PathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _dataFile2PathTagsButton;
         private System.Windows.Forms.TextBox _dataFile2TextBox;
         private Utilities.Forms.BetterNumericUpDown _overlapThresholdUpDown;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox _outputDataCheckBox;
-        private Utilities.Forms.PathTagsButton _outputFilePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _outputFilePathTagsButton;
         private System.Windows.Forms.TextBox _outputFileTextBox;
         private System.Windows.Forms.CheckBox _outputConditionCheckBox;
         private System.Windows.Forms.ComboBox _useMutualOverlapComboBox;

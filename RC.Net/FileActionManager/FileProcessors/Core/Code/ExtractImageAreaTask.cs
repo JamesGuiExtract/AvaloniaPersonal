@@ -1,4 +1,5 @@
-﻿using Extract.Imaging;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Imaging;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -15,7 +16,6 @@ using UCLID_AFUTILSLib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
@@ -225,7 +225,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Gets an <see cref="FileActionManagerPathTags"/> instance with the AreaID tag added to
         /// expand <see cref="OutputFileName"/>.
         /// </summary>
-        public FileActionManagerPathTags OutputPathTags
+        internal FileActionManagerPathTags OutputPathTags
         {
             get
             {
@@ -234,7 +234,7 @@ namespace Extract.FileActionManager.FileProcessors
                     if (_outputPathTags == null)
                     {
                         _outputPathTags = new FileActionManagerPathTags();
-                        _outputPathTags.AddCustomTag(_AREA_ID_TAG, ExpandAreaIDTag, true);
+                        _outputPathTags.AddDelayedExpansionTag(_AREA_ID_TAG, ExpandAreaIDTag);
                     }
 
                     return _outputPathTags;
@@ -539,10 +539,11 @@ namespace Extract.FileActionManager.FileProcessors
                 _outputFileCreated = false;
 
                 string sourceDocName = pFileRecord.Name;
+                _outputPathTags = new FileActionManagerPathTags(pFAMTM, sourceDocName);
+                _outputPathTags.AddDelayedExpansionTag(_AREA_ID_TAG, ExpandAreaIDTag);
 
                 // Initialize the path tag instances with sourceDocName.
                 string dataFileName = pFAMTM.ExpandTagsAndFunctions(DataFileName, sourceDocName);
-                OutputPathTags.UpdateTagValues(sourceDocName, pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
 
                 // Extract image areas.
                 foreach (RasterZone rasterZone in GetZonesToExtract(dataFileName))

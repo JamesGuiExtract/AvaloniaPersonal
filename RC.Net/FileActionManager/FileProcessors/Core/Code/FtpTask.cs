@@ -1,5 +1,6 @@
 ﻿using EnterpriseDT.Net.Ftp;
 using EnterpriseDT.Util;
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -137,6 +138,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         const int _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE = 10;
 
+        /// <summary>
+        /// The file tag for the remote (FTP) copy of SourceDocName.
+        /// </summary>
+        internal static readonly string RemoteSourceDocNameTag = "<RemoteSourceDocName>";
+
         #endregion Constants
 
         #region Fields
@@ -149,7 +155,7 @@ namespace Extract.FileActionManager.FileProcessors
 
         // Contains the string including tags that specifies the local file name or the new name
         // to assign to a remote file that is being renamed.
-        string _localOrNewFileName = SourceDocumentPathTags.SourceDocumentTag;
+        string _localOrNewFileName = FileActionManagerPathTags.SourceDocumentTag;
 
         // Connection that is used for the settings for the ftp server
         SecureFTPConnection _configuredFtpConnection = new SecureFTPConnection();
@@ -691,14 +697,12 @@ namespace Extract.FileActionManager.FileProcessors
                     downloadFileInfo.Load();
 
                     // Create a tag manager and expand the tags in the file name
-                    tags = new FileActionManagerPathTags(
-                        Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, pFAMTM.FPSFileName,
-                            downloadFileInfo.RemoteSourceDocName);
+                    tags = new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
+                    tags.AddTag(FtpTask.RemoteSourceDocNameTag, downloadFileInfo.RemoteSourceDocName);
                 }
                 else
                 {
-                    tags = new FileActionManagerPathTags(
-                       Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
+                    tags = new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
                 }
 
                 if (ActionToPerform != EFTPAction.kDeleteFileFromFtpServer)

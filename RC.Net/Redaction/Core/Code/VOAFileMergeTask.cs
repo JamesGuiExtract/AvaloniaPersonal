@@ -1,4 +1,5 @@
 ﻿using Extract.AttributeFinder;
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -16,7 +17,6 @@ using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
-
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.Redaction
@@ -546,8 +546,7 @@ namespace Extract.Redaction
 
                 // Load the redactions
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(sourceDocName, pFAMTM.FPSFileDir,
-                        pFAMTM.FPSFileName);
+                    new FileActionManagerPathTags(pFAMTM, sourceDocName);
                 dataFile1 = pathTags.Expand(settings.DataFile1);
                 dataFile2 = pathTags.Expand(settings.DataFile2);
 

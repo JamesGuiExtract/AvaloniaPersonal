@@ -1,8 +1,7 @@
-﻿using Extract.Interop;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Interop;
 using Extract.Licensing;
-using Extract.Utilities;
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
@@ -47,7 +46,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The file to set priority for.
         /// </summary>
-        string _fileName = SourceDocumentPathTags.SourceDocumentTag;
+        string _fileName = FileActionManagerPathTags.SourceDocumentTag;
 
         /// <summary>
         /// The priority to set the file to.
@@ -386,8 +385,7 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(_licenseId, "ELI31262", _COMPONENT_DESCRIPTION);
 
                 // Create a tag manager and expand the tags in the file name
-                var tags = new FileActionManagerPathTags(
-                    pFileRecord.Name, pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
+                var tags = new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
                 fileName = tags.Expand(_fileName);
 
                 // Escape any ' in the filename

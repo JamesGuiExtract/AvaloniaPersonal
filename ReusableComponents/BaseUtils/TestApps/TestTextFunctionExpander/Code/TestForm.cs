@@ -9,6 +9,8 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using Extract.FileActionManager.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.BaseUtils.Testing
 {
@@ -76,9 +78,13 @@ namespace Extract.BaseUtils.Testing
                 // Clear the text from the expansion result box
                 _textExpansion.Clear();
 
+                var tagManager = new FAMTagManager();
+                tagManager.FPSFileDir = Path.GetDirectoryName(_textFpsFileName.Text);
+                tagManager.FPSFileName = _textFpsFileName.Text;
+                
+
                 // Get a tag manager to use for expanding the tags
-                FileActionManagerPathTags tags = new FileActionManagerPathTags(
-                    _textSourceDoc.Text,Path.GetDirectoryName(_textFpsFileName.Text), _textFpsFileName.Text );
+                var tags = new FileActionManagerPathTags(tagManager, _textSourceDoc.Text);
 
                 // Expand the value and place it in the expansion result box
                 _textExpansion.Text = tags.Expand(_textValue.Text);

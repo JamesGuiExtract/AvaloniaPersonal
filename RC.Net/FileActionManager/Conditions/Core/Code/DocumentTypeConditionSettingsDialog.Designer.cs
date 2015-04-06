@@ -34,7 +34,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DocumentTypeConditionSettingsDialog));
             System.Windows.Forms.Label label7;
             this._metComboBox = new System.Windows.Forms.ComboBox();
-            this._voaFilePathTags = new Extract.Utilities.Forms.PathTagsButton();
+            this._voaFilePathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._voaFileTextBox = new System.Windows.Forms.TextBox();
             this._voaFileBrowse = new Extract.Utilities.Forms.BrowseButton();
             this._clearButton = new System.Windows.Forms.Button();
@@ -241,7 +241,7 @@
         private System.Windows.Forms.Button _removeButton;
         private System.Windows.Forms.Button _selectButton;
         private System.Windows.Forms.ComboBox _metComboBox;
-        private Utilities.Forms.PathTagsButton _voaFilePathTags;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _voaFilePathTags;
         private System.Windows.Forms.TextBox _voaFileTextBox;
         private Utilities.Forms.BrowseButton _voaFileBrowse;
     }

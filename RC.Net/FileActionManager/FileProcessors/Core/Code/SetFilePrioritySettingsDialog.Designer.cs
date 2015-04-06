@@ -33,7 +33,7 @@
             System.Windows.Forms.Label label3;
             System.Windows.Forms.GroupBox _priorityGroupBox;
             System.Windows.Forms.Label label1;
-            this._fileTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._fileTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._fileNameTextBox = new System.Windows.Forms.TextBox();
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._priorityComboBox = new System.Windows.Forms.ComboBox();
@@ -68,7 +68,7 @@
             this._fileTagsButton.MaximumSize = new System.Drawing.Size(18, 20);
             this._fileTagsButton.MinimumSize = new System.Drawing.Size(18, 20);
             this._fileTagsButton.Name = "_fileTagsButton";
-            this._fileTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
+            this._fileTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileTagsButton.TabIndex = 1;
             this._fileTagsButton.TextControl = this._fileNameTextBox;
@@ -183,7 +183,7 @@
 
         #endregion
 
-        private Utilities.Forms.PathTagsButton _fileTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fileTagsButton;
         private Utilities.Forms.BrowseButton _browseButton;
         private System.Windows.Forms.TextBox _fileNameTextBox;
         private System.Windows.Forms.ComboBox _priorityComboBox;

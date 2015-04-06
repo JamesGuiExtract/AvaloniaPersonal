@@ -160,7 +160,7 @@ namespace Extract.BaseUtils.Testing
             this.pathTagsButton1.Image = ((System.Drawing.Image)(resources.GetObject("pathTagsButton1.Image")));
             this.pathTagsButton1.Location = new System.Drawing.Point(435, 102);
             this.pathTagsButton1.Name = "pathTagsButton1";
-            this.pathTagsButton1.PathTags = new Extract.Utilities.FileActionManagerPathTags();
+            this.pathTagsButton1.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this.pathTagsButton1.Size = new System.Drawing.Size(18, 20);
             this.pathTagsButton1.TabIndex = 16;
             this.pathTagsButton1.TextControl = this._textValue;

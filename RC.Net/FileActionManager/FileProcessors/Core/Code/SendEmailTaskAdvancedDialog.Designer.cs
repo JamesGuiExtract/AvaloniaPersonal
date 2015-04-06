@@ -33,7 +33,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SendEmailTaskAdvancedDialog));
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._dataFileTextBox = new System.Windows.Forms.TextBox();
-            this._pathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._pathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
@@ -145,7 +145,7 @@
         private System.Windows.Forms.TextBox _dataFileTextBox;
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
-        private Utilities.Forms.PathTagsButton _pathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsButton;
         private Utilities.Forms.BrowseButton _browseButton;
 
     }

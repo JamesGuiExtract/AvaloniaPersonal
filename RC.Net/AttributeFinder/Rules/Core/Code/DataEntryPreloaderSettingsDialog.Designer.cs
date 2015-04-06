@@ -32,7 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DataEntryPreloaderSettingsDialog));
             this._configFileNameTextBox = new System.Windows.Forms.TextBox();
             this._configFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
-            this._configFileNamePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._configFileNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -134,7 +134,7 @@
 
         #endregion
 
-        private Utilities.Forms.PathTagsButton _configFileNamePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _configFileNamePathTagsButton;
         private System.Windows.Forms.TextBox _configFileNameTextBox;
         private Utilities.Forms.BrowseButton _configFileNameBrowseButton;
         private System.Windows.Forms.Button _okButton;

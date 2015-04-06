@@ -1,4 +1,5 @@
-﻿using Extract.Interop;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
@@ -9,7 +10,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -284,8 +284,7 @@ namespace Extract.Redaction
 
                 // Load the redactions
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir,
-                        pFAMTM.FPSFileName);
+                    new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
                 string voaFile = pathTags.Expand(_settings.DataFile);
 
                 if (!File.Exists(voaFile))

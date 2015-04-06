@@ -6,6 +6,7 @@
 #include "UCLIDFileProcessing.h"
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -58,6 +59,7 @@ public:
 	STDMETHOD(raw_GetFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_EditCustomTags)(long hParentWindow);
+	STDMETHOD(raw_AddTag)(BSTR bstrTagName, BSTR bstrTagValue);
 
 // IFAMTagManager
 	STDMETHOD(get_FPSFileDir)(BSTR *strFPSDir);
@@ -68,6 +70,9 @@ public:
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput);
 	STDMETHOD(StringContainsInvalidTags)(BSTR strInput, VARIANT_BOOL *pbValue);
 	STDMETHOD(StringContainsTags)(BSTR strInput, VARIANT_BOOL *pbValue);
+	STDMETHOD(get_AlwaysShowDatabaseTags)(VARIANT_BOOL *pbValue);
+	STDMETHOD(put_AlwaysShowDatabaseTags)(VARIANT_BOOL bValue);
+	STDMETHOD(SetFAMDB)(IFileProcessingDB *pFAMDB, long nActionID);
 
 private:
 
@@ -87,6 +92,17 @@ private:
 
 	// Controls access to the above static variables.
 	static CMutex ms_mutex;
+
+	// Indicates whether database path tags should be used to 
+	bool m_bAlwaysShowDatabaseTags;
+
+	// The current values to use for the database tags.
+	string m_strDatabaseServer;
+	string m_strDatabaseName;
+	string m_strDatabaseAction;
+
+	// Programmatically added path tags.
+	map<string, string> m_mapAddedTags;
 
 	// pointer to the utility object to use for path function expansion.
 	IMiscUtilsPtr m_ipMiscUtils;

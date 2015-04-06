@@ -34,7 +34,7 @@
             this._btnOK = new System.Windows.Forms.Button();
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._renameFileToTextBox = new System.Windows.Forms.TextBox();
-            this._fileTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._fileTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -100,7 +100,7 @@
             this._fileTagsButton.MaximumSize = new System.Drawing.Size(18, 20);
             this._fileTagsButton.MinimumSize = new System.Drawing.Size(18, 20);
             this._fileTagsButton.Name = "_fileTagsButton";
-            this._fileTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
+            this._fileTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
 			this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileTagsButton.TabIndex = 1;
             this._fileTagsButton.TextControl = this._renameFileToTextBox;
@@ -134,7 +134,7 @@
         #endregion
 
 
-        private Utilities.Forms.PathTagsButton _fileTagsButton; 
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fileTagsButton; 
         private System.Windows.Forms.Button _btnCancel;
         private System.Windows.Forms.Button _btnOK;
         private Utilities.Forms.BrowseButton _browseButton;

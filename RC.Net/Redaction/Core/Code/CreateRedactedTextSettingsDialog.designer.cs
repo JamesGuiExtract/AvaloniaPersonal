@@ -54,7 +54,7 @@
             this._xmlElementTextBox = new System.Windows.Forms.TextBox();
             this._replaceCharactersRadioButton = new System.Windows.Forms.RadioButton();
             this._outputGroupBox = new System.Windows.Forms.GroupBox();
-            this._outputPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._outputPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._outputLocationTextBox = new System.Windows.Forms.TextBox();
             this._dataFileControl = new Extract.Redaction.DataFileControl();
             this._dataToRedactGroupBox.SuspendLayout();
@@ -422,7 +422,7 @@
         private System.Windows.Forms.TextBox _xmlElementTextBox;
         private System.Windows.Forms.RadioButton _replaceCharactersRadioButton;
         private System.Windows.Forms.GroupBox _outputGroupBox;
-        private Utilities.Forms.PathTagsButton _outputPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _outputPathTagsButton;
         private System.Windows.Forms.TextBox _outputLocationTextBox;
         private System.Windows.Forms.CheckBox _lowConfidenceDataCheckBox;
         private System.Windows.Forms.CheckBox _highConfidenceDataCheckBox;

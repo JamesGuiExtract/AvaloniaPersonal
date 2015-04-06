@@ -1096,6 +1096,14 @@ STDMETHODIMP CMiscUtils::GetBuiltInTags(IVariantVector** ppTags)
 		ipTags->PushBack(get_bstr_t(strSOURCE_DOC_NAME_TAG));
 		ipTags->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
 
+		// Report any programmatically added tags.
+		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
+			 iter != m_mapAddedTags.end();
+			 iter++)
+		{
+			ipTags->PushBack(get_bstr_t(iter->first));
+		}
+
 		*ppTags = (IVariantVector *)ipTags.Detach();
 
 		return S_OK;
@@ -1196,9 +1204,9 @@ STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnk
 			replaceVariable(strInput, strCOMMON_COMPONENTS_DIR_TAG, strCommonComponentsDir);
 		}
 
-		// Expand any custom tags.
-		for (map<string, string>::iterator iter = m_mapCustomTags.begin();
-			 iter != m_mapCustomTags.end();
+		// Expand any programmatically added tags.
+		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
+			 iter != m_mapAddedTags.end();
 			 iter++)
 		{
 			string strTag = iter->first;
@@ -1276,19 +1284,26 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35212");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMiscUtils::AddCustomTag(BSTR bstrTagName, BSTR bstrTagValue)
+STDMETHODIMP CMiscUtils::AddTag(BSTR bstrTagName, BSTR bstrTagValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
 		ASSERT_ARGUMENT("ELI36101", bstrTagName != __nullptr);
-		ASSERT_ARGUMENT("ELI36102", bstrTagValue != __nullptr);
 
 		validateLicense();
 
-		string strTag = "<" + asString(bstrTagName) + ">";
-		m_mapCustomTags[strTag] = asString(bstrTagValue);
+		string strTag = asString(bstrTagName);
+		if (strTag.substr(0, 1) != "<")
+		{
+			strTag = "<" + strTag;
+		}
+		if (strTag.substr(strTag.length() - 1, 1) != ">")
+		{
+			strTag += ">";
+		}
+		m_mapAddedTags[strTag] = asString(bstrTagValue);
 
 		return S_OK;
 	}

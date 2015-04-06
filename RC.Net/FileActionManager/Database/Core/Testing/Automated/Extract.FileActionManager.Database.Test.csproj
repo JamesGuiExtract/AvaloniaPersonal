@@ -81,6 +81,10 @@
       <Project>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</Project>
       <Name>Extract.Database</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
+      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
+      <Name>Extract.FileActionManager.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Code\Extract.FileActionManager.Database.csproj">
       <Project>{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}</Project>
       <Name>Extract.FileActionManager.Database</Name>

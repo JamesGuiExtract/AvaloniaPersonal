@@ -36,8 +36,8 @@
             this._deleteRecursivelyCheckBox = new System.Windows.Forms.CheckBox();
             this._limitRecursionCheckBox = new System.Windows.Forms.CheckBox();
             this._recursionLimitTextBox = new System.Windows.Forms.TextBox();
-            this._recursionLimitTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._folderNameTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._recursionLimitTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._folderNameTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._recursionLimitBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this.SuspendLayout();
             // 
@@ -183,11 +183,11 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Label label1;
-        private Utilities.Forms.PathTagsButton _folderNameTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _folderNameTagsButton;
         private System.Windows.Forms.TextBox _folderNameTextBox;
         private System.Windows.Forms.CheckBox _deleteRecursivelyCheckBox;
         private System.Windows.Forms.CheckBox _limitRecursionCheckBox;
-        private Utilities.Forms.PathTagsButton _recursionLimitTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _recursionLimitTagsButton;
         private System.Windows.Forms.TextBox _recursionLimitTextBox;
         private Utilities.Forms.BrowseButton _recursionLimitBrowseButton;
     }

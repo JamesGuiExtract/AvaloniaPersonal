@@ -1,8 +1,7 @@
-﻿using Extract.Interop;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Interop;
 using Extract.Licensing;
-using Extract.Utilities;
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
@@ -352,8 +351,7 @@ namespace Extract.FileActionManager.FileProcessors
                 string fileName = pFileRecord.Name;
 
                 // Create a tag manager and expand the tags in the file name
-                var tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(fileName), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
+                var tags = new FileActionManagerPathTags(pFAMTM, fileName);
 
                 // Get the new name for the file in the database
                 newFileNameInDB = tags.Expand(_renameFileTo);

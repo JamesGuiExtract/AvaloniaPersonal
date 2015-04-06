@@ -1,11 +1,7 @@
 using Extract.Licensing;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities
@@ -13,33 +9,23 @@ namespace Extract.Utilities
     /// <summary>
     /// Represents a collection of expandable path tags.
     /// </summary>
-    public abstract class PathTagsBase : IPathTags, ITagUtility
+    public abstract class PathTagsBase : IPathTags
     {
         #region Fields
 
         /// <summary>
-        /// Maps path tags to their fully expanded form
-        /// </summary>
-        IDictionary<string, string> _tagsToValues;
-
-        /// <summary>
-        /// Maps custom tags to the <see cref="ExpandTag"/> methods to use to expand them.
-        /// </summary>
-        Dictionary<string, ExpandTag> _customTags = new Dictionary<string, ExpandTag>();
-
-        /// <summary>
-        /// Maps custom that should not be expanded until after all other tags and functions have
+        /// Maps tags that should not be expanded until after all other tags and functions have
         /// been expanded to the <see cref="ExpandTag"/> methods to use to expand them.
         /// </summary>
-        Dictionary<string, ExpandTag> _delayedExpansionCustomTags = new Dictionary<string, ExpandTag>();
+        Dictionary<string, ExpandTag> _delayedExpansionTags = new Dictionary<string, ExpandTag>();
 
         /// <summary>
-        /// The <see cref="MiscUtils"/> instance used to evaluate path functions.
+        /// A list of tags that should be filtered from <see cref="BuiltInTags"/>.
         /// </summary>
-        MiscUtils _utility = new MiscUtils();
+        HashSet<string> _builtInTagFilter;
         
         /// <summary>
-        /// The <see cref="ITagUtility"/> interface for <see cref="_utility"/>.
+        /// The <see cref="TagUtility"/> instance used to expand tags..
         /// </summary>
         ITagUtility _tagUtility;
 
@@ -50,158 +36,41 @@ namespace Extract.Utilities
         /// <summary>
         /// Initializes a new instance of the <see cref="PathTagsBase"/> class.
         /// </summary>
-        /// <param name="tagsToValues">A dictionary that maps path tags to their expanded value.
-        /// </param>
-        protected PathTagsBase(IDictionary<string, string> tagsToValues)
+        protected PathTagsBase()
         {
             // Validate the license
             LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                 "ELI30040", this.GetType().ToString());
-
-            _tagUtility = (ITagUtility)_utility;
-            _tagsToValues = tagsToValues ?? new Dictionary<string, string>();
         }
 
         #endregion PathTagsBase Constructors
 
-        #region ITagUtility
-
-        /// <summary>
-        /// Expands path tags in <see paramref="bstrInput"/> using the supplied data in
-        /// <see paramref="bstrSourceDocName"/> and <see paramref="pData"/>.
-        /// </summary>
-        /// <param name="bstrInput">The text to expand.</param>
-        /// <param name="bstrSourceDocName">The current source document name.</param>
-        /// <param name="pData">Additional data needed to expand the path tags (if needed).
-        /// <para><b>Note:</b></para>
-        /// The type of pData is specific to implementing class.</param>
-        /// <returns>The expanded text.</returns>
-        public string ExpandTags(string bstrInput, string bstrSourceDocName, object pData)
-        {
-            try
-            {
-                string result = bstrInput;
-
-                // Expand standard tags.
-                foreach (KeyValuePair<string, string> pair in _tagsToValues
-                    .Where(pair => pair.Value != null))
-                {
-                    result = result.Replace(pair.Key, pair.Value);
-                }
-
-                // Expand custom tags last so the custom tag expansion method knows what the
-                // expanded path is. (excluding the expansion of custom tags)
-                foreach (KeyValuePair<string, ExpandTag> customTag in _customTags
-                    .Where(customTag => bstrInput.Contains(customTag.Key)))
-                {
-                    result = result.Replace(customTag.Key, customTag.Value(result));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw ex.CreateComVisible("ELI35187", ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Expands path tags and functions in <see paramref="bstrInput"/> using the supplied data
-        /// in <see paramref="pData"/>.
-        /// </summary>
-        /// <param name="bstrInput">The text to expand.</param>
-        /// <param name="bstrSourceDocName">The current source document name.</param>
-        /// <param name="pData">The data needed to expand the path tags.
-        /// <para><b>Note:</b></para>
-        /// The type of pData is specific to implementing class.</param>
-        /// <returns>The expanded text.</returns>
-        public string ExpandTagsAndFunctions(string bstrInput, string bstrSourceDocName, object pData)
-        {
-            try
-            {
-                string output = _utility.ExpandTagsAndFunctions(bstrInput, this, bstrSourceDocName, pData);
-
-                // Expand _delayedExpansionCustomTags tags last so the custom tag expansion method
-                // knows what the rest of the expanded path is. (excluding the expansion of custom tags)
-                foreach (KeyValuePair<string, ExpandTag> customTag in _delayedExpansionCustomTags
-                    .Where(customTag => bstrInput.Contains(customTag.Key)))
-                {
-                    output = output.Replace(customTag.Key, customTag.Value(output));
-                }
-
-                return output;
-            }
-            catch (Exception ex)
-            {
-                throw ex.CreateComVisible("ELI35188", ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Gets a list of all the path tags .
-        /// </summary>
-        /// <returns>A <see cref="VariantVector"/> of the all the path tags.</returns>
-        [CLSCompliant(false)]
-        public VariantVector GetAllTags()
-        {
-            try
-            {
-                return Tags.ToVariantVector<string>();
-            }
-            catch (Exception ex)
-            {
-                throw ex.CreateComVisible("ELI35189", ex.Message);
-            }
-        }
+        #region IPathTags Members
 
         /// <summary>
         /// Gets a list of the built-in path tags.
         /// </summary>
         /// <returns>A <see cref="VariantVector"/> of the built-in path tags.</returns>
-        [CLSCompliant(false)]
-        public VariantVector GetBuiltInTags()
+        public virtual IEnumerable<string> BuiltInTags
         {
-            try
+            get
             {
-                return Tags.ToVariantVector<string>();
-            }
-            catch (Exception ex)
-            {
-                throw ex.CreateComVisible("ELI35190", ex.Message);
-            }
-        }
+                try
+                {
+                    var builtInTags = TagUtility.GetBuiltInTags().ToIEnumerable<string>()
+                        .Union(_delayedExpansionTags.Keys);
 
-        /// <summary>
-        /// Gets a list of the built-in path functions.
-        /// </summary>
-        /// <returns>A <see cref="VariantVector"/> of the function names.</returns>
-        [CLSCompliant(false)]
-        public VariantVector GetFunctionNames()
-        {
-            try
-            {
-                return _tagUtility.GetFunctionNames();
-            }
-            catch (Exception ex)
-            {
-                throw ex.CreateComVisible("ELI35191", ex.Message);
-            }
-        }
+                    if (_builtInTagFilter != null)
+                    {
+                        builtInTags = builtInTags.Where(tag => _builtInTagFilter.Contains(tag));
+                    }
 
-        /// <summary>
-        /// Gets the function names formatted with parameters for display in a drop down list.
-        /// </summary>
-        /// <returns>A <see cref="VariantVector"/> of the formatted function names.</returns>
-        [CLSCompliant(false)]
-        public VariantVector GetFormattedFunctionNames()
-        {
-            try
-            {
-                return _tagUtility.GetFormattedFunctionNames();
-            }
-            catch (Exception ex)
-            {
-                throw ex.CreateComVisible("ELI35192", "Messages");
+                    return builtInTags;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35190");
+                }
             }
         }
 
@@ -210,35 +79,96 @@ namespace Extract.Utilities
         /// </summary>
         /// <returns>A <see cref="VariantVector"/> of the INI path tags.</returns>
         [CLSCompliant(false)]
-        public VariantVector GetCustomFileTags()
+        public virtual IEnumerable<string> CustomTags
         {
-            try
+            get
             {
-                // 11/15/2012 SNK
-                // For better or worse this class hasn't supported custom file tags up until now and
-                // I'm leaving it that way for expediency.
-                return new VariantVector();
-            }
-            catch (Exception ex)
-            {
-                throw ex.CreateComVisible("ELI35193", ex.Message);
+                try
+                {
+                    return TagUtility.GetCustomFileTags().ToIEnumerable<string>();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35193");
+                }
             }
         }
 
-        #endregion ITagUtility
+        /// <summary>
+        /// Gets a list of the built-in path functions.
+        /// </summary>
+        /// <returns>A <see cref="VariantVector"/> of the function names.</returns>
+        public virtual IEnumerable<string> FunctionNames
+        {
+            get
+            {
+                try
+                {
+                    return TagUtility.GetFunctionNames().ToIEnumerable<string>();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35191");
+                }
+            }
+        }
 
-        #region IPathTags Members
+        /// <summary>
+        /// Gets the function names formatted with parameters for display in a drop down list.
+        /// </summary>
+        /// <returns>A <see cref="VariantVector"/> of the formatted function names.</returns>
+        public virtual IEnumerable<string> FormattedFunctionNames
+        {
+            get
+            {
+                try
+                {
+                    return TagUtility.GetFormattedFunctionNames().ToIEnumerable<string>();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35192");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Displays a UI to edit the custom tags.
+        /// </summary>
+        /// <param name="parentWindow">If not <see langword="null"/>, the tag editing UI will be
+        /// displayed modally this window; otherwise the editor window will be modeless.</param>
+        public virtual void EditCustomTags(int parentWindow)
+        {
+            try
+            {
+                TagUtility.EditCustomTags(parentWindow);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35193");
+            }
+        }
 
         /// <summary>
         /// Sets a replacement value for a standard tag. Adds the tag if it does not already exists.
         /// </summary>
         /// <param name="tag">The tag name.</param>
         /// <param name="value">The value the tag is to be replaced with.</param>
-        public virtual void SetTagValue(string tag, string value)
+        public void AddTag(string tag, string value)
         {
             try
             {
-                _tagsToValues[tag] = value;
+                if (!tag.StartsWith("<", StringComparison.OrdinalIgnoreCase))
+                {
+                    tag = "<" + tag;
+                }
+                if (!tag.EndsWith(">", StringComparison.OrdinalIgnoreCase))
+                {
+                    tag += ">";
+                }
+
+
+                TagUtility.AddTag(tag, value);
             }
             catch (Exception ex)
             {
@@ -247,50 +177,29 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Gets the current replacement value for the specified <see paramref="tag"/>.
-        /// </summary>
-        /// <param name="tag">The tag.</param>
-        /// <returns>The current replacement value for the specified <see paramref="tag"/>.
-        /// </returns>
-        public virtual string GetTagValue(string tag)
-        {
-            try
-            {
-                return _tagsToValues[tag];
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI36121");
-            }
-        }
-
-        /// <summary>
-        /// Adds a custom tag to be expanded with <see paramref="expandTagMethod"/>.
+        /// Adds a tag to be expanded with <see paramref="expandTagMethod"/>.
         /// <para><b>Note</b></para>
-        /// Unlike standard tag, custom tags will not be expanded until after the path tag functions
-        /// have been applied.
+        /// Unlike standard tag, tags added via this method will not be expanded until after the
+        /// path tag functions have been applied.
         /// </summary>
         /// <param name="tag">The tag name.</param>
         /// <param name="expandTagMethod">The <see cref="ExpandTag"/> implementation that should be
-        /// used to provide the replacement value.</param>
-        /// <param name="delayedExpansion"><see langword="true"/> if the tag should not be expanded
-        /// until all other tags and functions have been expanded; otherwise, <see langword="false"/>.
-        /// <para><b>NOTE:</b></para>
-        /// Delayed expansion tags will not be evaluated at all by the <see cref="ExpandTags"/>
-        /// method.</param>
-        public virtual void AddCustomTag(string tag, ExpandTag expandTagMethod, bool delayedExpansion)
+        /// used to provide the replacement value. The tag will not be expanded until all other tags
+        /// and functions have been expanded.</param>
+        public void AddDelayedExpansionTag(string tag, ExpandTag expandTagMethod)
         {
             try
             {
-                if (delayedExpansion)
+                if (!tag.StartsWith("<", StringComparison.OrdinalIgnoreCase))
                 {
-                    _delayedExpansionCustomTags[tag] = expandTagMethod;
+                    tag = "<" + tag;
                 }
-                else
+                if (!tag.EndsWith(">", StringComparison.OrdinalIgnoreCase))
                 {
-                    _customTags[tag] = expandTagMethod;
+                    tag += ">";
                 }
-                _tagsToValues[tag] = null;
+
+                _delayedExpansionTags[tag] = expandTagMethod;
             }
             catch (Exception ex)
             {
@@ -299,20 +208,23 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Displays a UI to edit the available tags for the specified bstrContextPath.
+        /// Gets or sets a list of tags that should be filtered from <see cref="BuiltInTags"/> to
+        /// prevent them from appearing in a dropdown.
+        /// <para><b>Note</b></para>
+        /// These tags, if present in a string to be expanded, would still be expanded.
         /// </summary>
-        /// <param name="hParentWindow">If not <see langword="null"/>, the tag editing UI will be
-        /// displayed modally this window; otherwise the editor window will be modeless.</param>
-        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
-        public virtual void EditCustomTags(int hParentWindow)
+        public IEnumerable<string> BuiltInTagFilter
         {
-            try
+            get
             {
-                _tagUtility.EditCustomTags(hParentWindow);
+                return (_builtInTagFilter as IEnumerable<string>) ?? new string[0];
             }
-            catch (Exception ex)
+
+            set
             {
-                throw ex.AsExtract("ELI38063");
+                _builtInTagFilter = (value == null || !value.Any())
+                    ? null
+                    : new HashSet<string>(value, StringComparer.OrdinalIgnoreCase);
             }
         }
 
@@ -325,16 +237,14 @@ namespace Extract.Utilities
         {
             try
             {
-                // Don't need to pass any data to expand tags since all tags will be expanded by
-                // this class.
-                string result = _utility.ExpandTagsAndFunctions(path, this, "", null);
+                string result = TagUtility.ExpandTagsAndFunctions(path, StringData, ObjectData);
 
-                // Expand _delayedExpansionCustomTags tags last so the custom tag expansion method
-                // knows what the rest of the expanded path is. (excluding the expansion of custom tags)
-                foreach (KeyValuePair<string, ExpandTag> customTag in _delayedExpansionCustomTags
-                    .Where(customTag => path.Contains(customTag.Key)))
+                // Expand _delayedExpansionTags tags last so the tag expansion method knows what the
+                // rest of the expanded path is. 
+                foreach (KeyValuePair<string, ExpandTag> tag in _delayedExpansionTags
+                    .Where(tag => path.Contains(tag.Key)))
                 {
-                    result = result.Replace(customTag.Key, customTag.Value(result));
+                    result = result.Replace(tag.Key, tag.Value(result));
                 }
 
                 return result;
@@ -348,18 +258,60 @@ namespace Extract.Utilities
             }
         }
 
+        #endregion IPathTags Members
+
+        #region Protected Members
+
         /// <summary>
-        /// Gets the an iterator over the set of tags.
+        /// The <see langword="string"/> parameter to be used in calls to
+        /// <see cref="M:ITagUtility.ExpandTagsAndFunctions()"/> (typically SourceDocName).
         /// </summary>
-        /// <returns>The an iterator over the set of tags.</returns>
-        public IEnumerable<string> Tags
+        protected string StringData
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The <see langword="object"/> parameter to be used in calls to
+        /// <see cref="M:ITagUtility.ExpandTagsAndFunctions()"/>.
+        /// </summary>
+        protected object ObjectData
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the underlying <see cref="ITagUtility"/> used to expand tags and functions.
+        /// </summary>
+        /// <value>The underlying <see cref="ITagUtility"/>.</value>
+        [CLSCompliant(false)]
+        protected ITagUtility TagUtility
         {
             get
             {
-                return _tagsToValues.Keys;   
+                try
+                {
+                    if (_tagUtility == null)
+                    {
+                        _tagUtility = (ITagUtility)new MiscUtils();
+                    }
+
+                    return _tagUtility;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38068");
+                }
+            }
+
+            set
+            {
+                _tagUtility = value;
             }
         }
 
-        #endregion IPathTags Members
+        #endregion Protected Members
     }
 }

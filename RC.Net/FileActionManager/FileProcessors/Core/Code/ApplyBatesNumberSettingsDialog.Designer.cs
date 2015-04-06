@@ -43,7 +43,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this._fileNameGroupBox = new System.Windows.Forms.GroupBox();
-            this._fileTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._fileTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._fileNameTextBox = new System.Windows.Forms.TextBox();
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this.label1 = new System.Windows.Forms.Label();
@@ -140,7 +140,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._fileTagsButton.MaximumSize = new System.Drawing.Size(18, 20);
             this._fileTagsButton.MinimumSize = new System.Drawing.Size(18, 20);
             this._fileTagsButton.Name = "_fileTagsButton";
-            this._fileTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
+            this._fileTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileTagsButton.TabIndex = 2;
             this._fileTagsButton.TextControl = this._fileNameTextBox;
@@ -211,7 +211,7 @@ namespace Extract.FileActionManager.FileProcessors
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.GroupBox _fileNameGroupBox;
-        private Extract.Utilities.Forms.PathTagsButton _fileTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fileTagsButton;
         private Extract.Utilities.Forms.BrowseButton _browseButton;
         private System.Windows.Forms.TextBox _fileNameTextBox;
         private System.Windows.Forms.Label label1;

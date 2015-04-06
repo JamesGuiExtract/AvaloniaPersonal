@@ -1,4 +1,5 @@
 ﻿using Extract.FileActionManager.Database;
+using Extract.FileActionManager.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Email;
@@ -75,7 +76,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                 InitializeComponent();
 
-                var pathTags = new FileActionManagerDatabasePathTags("", "", "", null, 0);
+                var pathTags = new FileActionManagerPathTags();
+                pathTags.AlwaysShowDatabaseTags = true;
                 _subjectPathTagsButton.PathTags = pathTags;
                 _bodyPathTagsButton.PathTags = pathTags;
 

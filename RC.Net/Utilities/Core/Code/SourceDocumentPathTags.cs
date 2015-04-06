@@ -36,29 +36,21 @@ namespace Extract.Utilities
         /// <summary>
         /// Initializes a new instance of the <see cref="SourceDocumentPathTags"/> class.
         /// </summary>
+        /// <param name="sourceDocument">The value for the SourceDocName tag.</param>
         public SourceDocumentPathTags(string sourceDocument)
-            : base(GetTagsToValues(sourceDocument))
+            : base()
         {
+            try
+            {
+                StringData = sourceDocument;
+            }
+            catch (System.Exception ex)
+            {
+                throw ex.AsExtract("ELI38072");
+            }
         }
 
         #endregion SourceDocumentPathTags Constructors
-
-        #region SourceDocumentPathTags Methods
-
-        /// <summary>
-        /// Gets the path tags mapped to their expanded form.
-        /// </summary>
-        /// <param name="sourceDocument">The source document name.</param>
-        /// <returns>The path tags mapped to their expanded form.</returns>
-        static Dictionary<string, string> GetTagsToValues(string sourceDocument)
-        {
-            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(2);
-            tagsToValues.Add(_SOURCE_DOC_NAME_TAG, sourceDocument);
-            tagsToValues.Add(_COMMON_COMPONENTS_DIRECTORY_TAG, FileSystemMethods.CommonComponentsPath);
-            return tagsToValues;
-        }
-
-        #endregion SourceDocumentPathTags Methods
 
         #region Properties
 
@@ -71,6 +63,18 @@ namespace Extract.Utilities
             get
             {
                 return _SOURCE_DOC_NAME_TAG;
+            }
+        }
+
+        /// <summary>
+        /// Gets the CommonComponentsDir tag name.
+        /// </summary>
+        /// <value>The CommonComponentsDir tag name.</value>
+        public static string CommonComponentsDir
+        {
+            get
+            {
+                return _COMMON_COMPONENTS_DIRECTORY_TAG;
             }
         }
 

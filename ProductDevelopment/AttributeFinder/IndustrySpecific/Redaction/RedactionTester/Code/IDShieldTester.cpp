@@ -1021,9 +1021,9 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 		try
 		{
 			// Create custom path tags to be used to evaluate m_strTestOutputPath
-			m_ipMiscUtils->AddCustomTag("OutputFilesFolder", m_strOutputFileDirectory.c_str());
-			m_ipMiscUtils->AddCustomTag("FoundVoaFile", strFoundVOAFile.c_str());
-			m_ipMiscUtils->AddCustomTag("ExpectedVOAFile", strExpectedVOAFile.c_str());
+			m_ipMiscUtils->AddTag("OutputFilesFolder", m_strOutputFileDirectory.c_str());
+			m_ipMiscUtils->AddTag("FoundVoaFile", strFoundVOAFile.c_str());
+			m_ipMiscUtils->AddTag("ExpectedVOAFile", strExpectedVOAFile.c_str());
 
 			string strNoteFile = strImageFile + ".nte";
 

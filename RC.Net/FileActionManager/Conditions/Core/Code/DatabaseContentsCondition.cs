@@ -1,7 +1,6 @@
-﻿using ADODB;
-using Extract.Database;
+﻿using Extract.Database;
 using Extract.DataEntry;
-using Extract.FileActionManager.Database;
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -302,8 +301,10 @@ namespace Extract.FileActionManager.Conditions
 
         /// <summary>
         /// Current task version.
+        /// Version 2: 
+        /// Updated tag names: ActionName -> DatabaseAction and DatabaseServerName -> DatabaseServer
         /// </summary>
-        internal const int _CURRENT_VERSION = 1;
+        internal const int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -1149,17 +1150,9 @@ namespace Extract.FileActionManager.Conditions
                 _dataFileLoaded = false;
 
                 // Create the pathTags instance to be used to expand any path tags/functions.
-                // [DotNetRCAndUtils:1109]
-                // Use fallback values for the FPS file/dir in case the FPS has not yet been saved.
-                FileActionManagerPathTags pathTags = new FileActionManagerDatabasePathTags(
-                    pFileRecord.Name,
-                    string.IsNullOrWhiteSpace(pFAMTagManager.FPSFileDir)
-                        ? "<Unknown FPS Directory>"
-                        : pFAMTagManager.FPSFileDir,
-                    string.IsNullOrWhiteSpace(pFAMTagManager.FPSFileName)
-                        ? "<Unknown FPS Filename>"
-                        : pFAMTagManager.FPSFileName,
-                       pFPDB, lActionID);
+                FileActionManagerPathTags pathTags =
+                    new FileActionManagerPathTags(pFAMTagManager, pFileRecord.Name);
+                pathTags.AlwaysShowDatabaseTags = true;
 
                 queryResults = GetTableOrQueryResults(pFileRecord, pathTags, pFPDB);
 
@@ -1442,6 +1435,30 @@ namespace Extract.FileActionManager.Conditions
                     SearchModifier = (DatabaseContentsConditionSearchModifier)reader.ReadInt32();
                     SearchFields = (IUnknownVector)reader.ReadIPersistStream();
                     ErrorBehavior = (DatabaseContentsConditionErrorBehavior)reader.ReadInt32();
+
+                    if (reader.Version < 2)
+                    {
+                        // Update tag name of <ActionName> to <DatabaseAction> and
+                        // <DatabaseServerName> to <DatabaseServer>
+                        DataConnectionString = DataConnectionString.Replace("<ActionName>",
+                            FileActionManagerPathTags.DatabaseActionTag);
+                        DataConnectionString = DataConnectionString.Replace("<DatabaseServerName>",
+                            FileActionManagerPathTags.DatabaseServerTag);
+                        Query = Query.Replace("<ActionName>",
+                            FileActionManagerPathTags.DatabaseActionTag);
+                        Query = Query.Replace("<DatabaseServerName>",
+                            FileActionManagerPathTags.DatabaseServerTag);
+                        for (int i = 0; i < SearchFields.Size(); i++)
+                        {
+                            var fieldConfiguration = (VariantVector)SearchFields.At(i);
+                            string fieldValue = (string)fieldConfiguration[1];
+                            fieldValue = fieldValue.Replace("<ActionName>",
+                                FileActionManagerPathTags.DatabaseActionTag);
+                            fieldValue = fieldValue.Replace("<DatabaseServerName>",
+                                FileActionManagerPathTags.DatabaseServerTag);
+                            fieldConfiguration.Set(1, fieldValue);
+                        }
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -1785,7 +1802,7 @@ namespace Extract.FileActionManager.Conditions
                                 ee.AddDebugData("DataFilename", pathTags.Expand(DataFileName), false);
                                 ee.AddDebugData("SourceDocName", fileRecord.Name, false);
                                 ee.AddDebugData("FPS",
-                                    pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
+                                    pathTags.Expand(FileActionManagerPathTags.FpsFileNameTag), false);
                                 throw ee;
                             }
 
@@ -1828,7 +1845,7 @@ namespace Extract.FileActionManager.Conditions
                                 ee.AddDebugData("Query", match.Value, false);
                                 ee.AddDebugData("SourceDocName", fileRecord.Name, false);
                                 ee.AddDebugData("FPS",
-                                    pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
+                                    pathTags.Expand(FileActionManagerPathTags.FpsFileNameTag), false);
                                 throw ee;
                             }
                             else
@@ -1849,16 +1866,16 @@ namespace Extract.FileActionManager.Conditions
 
                 // If he text appears to contain database related tags that could not be expanded,
                 // throw an error.
-                if ((expandedOutput.IndexOf(FileActionManagerDatabasePathTags.ActionTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     expandedOutput.IndexOf(FileActionManagerDatabasePathTags.DatabaseTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     expandedOutput.IndexOf(FileActionManagerDatabasePathTags.DatabaseServerTag, StringComparison.OrdinalIgnoreCase) >= 0))
+                if ((expandedOutput.IndexOf(FileActionManagerPathTags.DatabaseActionTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     expandedOutput.IndexOf(FileActionManagerPathTags.DatabaseNameTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     expandedOutput.IndexOf(FileActionManagerPathTags.DatabaseServerTag, StringComparison.OrdinalIgnoreCase) >= 0))
                 {
                     var ee = new ExtractException("ELI36957",
                         "FAM DB is unavailable to expand data query for query condition.");
                     ee.AddDebugData("Query", expandedOutput, false);
                     ee.AddDebugData("SourceDocName", fileRecord.Name, false);
                     ee.AddDebugData("FPS",
-                        pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
+                        pathTags.Expand(FileActionManagerPathTags.FpsFileNameTag), false);
                     throw ee;
                 }
 

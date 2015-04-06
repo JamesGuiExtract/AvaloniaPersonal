@@ -2028,6 +2028,18 @@ library UCLID_FILEPROCESSINGLib
 		// FPS file full name
 		[propget, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([out, retval] BSTR *strFPSFileName);
 		[propput, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([in] BSTR strFPSFileName);
+		//-----------------------------------------------------------------------------------------
+		// IF VARIANT_TRUE, <DatabaseServer>, <DatabaseName> and <DatabaseAction> will be available
+		// even if they haven't been defined as a CustomTag.
+		[propget, id(10), helpstring("property AlwaysShowDatabaseTags")] HRESULT AlwaysShowDatabaseTags([out, retval] VARIANT_BOOL *pbValue);
+		[propput, id(10), helpstring("property AlwaysShowDatabaseTags")] HRESULT AlwaysShowDatabaseTags([in] VARIANT_BOOL bValue);
+		//-----------------------------------------------------------------------------------------
+		// Specifies the IFileProcessingDB currently being used for processing that should be used to
+		// expand database path tags.
+		// NOTE: If the currently connected database is changed after this making this call, the path
+		// tags will continue to return the old connection info. Thus, this call should be
+		// re-executed if at any point the database connection or action may have changed.
+		[id(11), helpstring("method SetFAMDB")] HRESULT SetFAMDB([in] IFileProcessingDB *pFAMDB, long nActionID);
 	};
 
 	[

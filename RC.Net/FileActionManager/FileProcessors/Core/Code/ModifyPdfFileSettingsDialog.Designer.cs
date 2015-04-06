@@ -36,7 +36,7 @@ namespace Extract.FileActionManager.FileProcessors
             System.Windows.Forms.GroupBox groupBox3;
             this._pdfFileBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._pdfFileTextBox = new System.Windows.Forms.TextBox();
-            this._pdfFilePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._pdfFilePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._removeAnnotationsCheckBox = new System.Windows.Forms.CheckBox();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
@@ -46,7 +46,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._useValueAsAddressRadioButton = new System.Windows.Forms.RadioButton();
             this._dataFileBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._dataFileTextBox = new System.Windows.Forms.TextBox();
-            this._dataFilePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._dataFilePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._hyperlinkAttributesTextBox = new System.Windows.Forms.TextBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
@@ -301,14 +301,14 @@ namespace Extract.FileActionManager.FileProcessors
 
         private System.Windows.Forms.TextBox _pdfFileTextBox;
         private Extract.Utilities.Forms.BrowseButton _pdfFileBrowseButton;
-        private Extract.Utilities.Forms.PathTagsButton _pdfFilePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pdfFilePathTagsButton;
         private System.Windows.Forms.CheckBox _removeAnnotationsCheckBox;
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.TextBox _hyperlinkAttributesTextBox;
         private Utilities.Forms.BrowseButton _dataFileBrowseButton;
         private System.Windows.Forms.TextBox _dataFileTextBox;
-        private Utilities.Forms.PathTagsButton _dataFilePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _dataFilePathTagsButton;
         private System.Windows.Forms.RadioButton _useValueAsAddressRadioButton;
         private System.Windows.Forms.TextBox _hyperlinkAddressTextBox;
         private System.Windows.Forms.RadioButton _useStaticAddressRadioButton;

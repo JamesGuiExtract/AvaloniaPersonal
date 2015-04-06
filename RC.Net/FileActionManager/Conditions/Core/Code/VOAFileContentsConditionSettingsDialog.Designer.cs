@@ -60,7 +60,7 @@
             this._metComboBox = new System.Windows.Forms.ComboBox();
             this._regexInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._attributeQueryInfoTip = new Extract.Utilities.Forms.InfoTip();
-            this._voaFilePathTags = new Extract.Utilities.Forms.PathTagsButton();
+            this._voaFilePathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._voaFileBrowse = new Extract.Utilities.Forms.BrowseButton();
             this._attributeCountUpDown = new Extract.Utilities.Forms.BetterNumericUpDown();
             this._comparisonInfoTip = new Extract.Utilities.Forms.InfoTip();
@@ -533,7 +533,7 @@
         private System.Windows.Forms.RadioButton _searchMatchRadioButton;
         private System.Windows.Forms.ComboBox _searchMatchTypeComboBox;
         private System.Windows.Forms.TextBox _voaFileTextBox;
-        private Utilities.Forms.PathTagsButton _voaFilePathTags;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _voaFilePathTags;
         private Utilities.Forms.BrowseButton _voaFileBrowse;
         private System.Windows.Forms.TextBox _searchTextBox;
         private System.Windows.Forms.RadioButton _inListRadioButton;

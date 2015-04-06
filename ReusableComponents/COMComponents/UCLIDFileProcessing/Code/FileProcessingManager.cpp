@@ -226,6 +226,10 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		// Register this FAM as active (allows for files stuck processing to be reverted)
 		m_ipFPMDB->RegisterActiveFAM(lActionId, ipSupplyingActionMgmtRole->Enabled,
 			ipProcessingActionMgmtRole->Enabled);
+
+		// Assign the DB connection info currently being used to the tag manager to be able to
+		// expand any database tags.
+		m_ipFAMTagManager->SetFAMDB(m_ipFPMDB, lActionId);
 		
 		// Try/catch in case of a failure to start processing so UnregisterProcessingFAM can be
 		// called and to stop supplying if it was started.
@@ -1034,6 +1038,10 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				// Register as an active FAM (allows for stuck files to be reverted)
 				long nActionId = getFPMDB()->GetActionID(bstrActionName);
 				getFPMDB()->RegisterActiveFAM(nActionId, vbQueue, vbProcess);
+
+				// Assign the DB connection info currently being used to the tag manager to be able to
+				// expand any database tags.
+				m_ipFAMTagManager->SetFAMDB(getFPMDB(), nActionId);
 
 				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord = __nullptr;
 				if (bQueue)

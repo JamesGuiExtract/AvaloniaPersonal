@@ -1,5 +1,6 @@
 ﻿using Extract.DataEntry;
 using Extract.FileActionManager.Database;
+using Extract.FileActionManager.Forms;
 using Extract.Interfaces;
 using Extract.Interop;
 using Extract.Licensing;
@@ -81,8 +82,10 @@ namespace Extract.FileActionManager.FileProcessors
 
         /// <summary>
         /// Current task version.
+        /// Version 2: 
+        /// Updated tag names: ActionName -> DatabaseAction and DatabaseServerName -> DatabaseServer
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -703,17 +706,9 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 // Create the pathTags instance to be used to expand any path tags/functions.
-                // [DotNetRCAndUtils:1109]
-                // Use fallback values for the FPS file/dir in case the FPS has not yet been saved.
-                FileActionManagerPathTags pathTags = new FileActionManagerDatabasePathTags(
-                    pFileRecord.Name,
-                    string.IsNullOrWhiteSpace(pFAMTM.FPSFileDir)
-                        ? "<Unknown FPS Directory>"
-                        : pFAMTM.FPSFileDir,
-                    string.IsNullOrWhiteSpace(pFAMTM.FPSFileName)
-                        ? "<Unknown FPS Filename>"
-                        : pFAMTM.FPSFileName,
-                       pDB, nActionID);
+                FileActionManagerPathTags pathTags = new FileActionManagerPathTags(
+                    pFAMTM, pFileRecord.Name);
+                pathTags.AlwaysShowDatabaseTags = true;
 
                 // Create and fill in the properties of an ExtractEmailMessage.
                 ExtractEmailMessage emailMessage = new ExtractEmailMessage();
@@ -746,7 +741,7 @@ namespace Extract.FileActionManager.FileProcessors
                     ee.AddDebugData("Data file", DataFileName, false);
                     ee.AddDebugData("SourceDocName", pFileRecord.Name, false);
                     ee.AddDebugData("FPS",
-                        pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
+                        pathTags.Expand(FileActionManagerPathTags.FpsFileNameTag), false);
                     ee.Log();
                 }
 
@@ -760,7 +755,7 @@ namespace Extract.FileActionManager.FileProcessors
                     ee.AddDebugData("Data file", DataFileName, false);
                     ee.AddDebugData("SourceDocName", pFileRecord.Name, false);
                     ee.AddDebugData("FPS",
-                        pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
+                        pathTags.Expand(FileActionManagerPathTags.FpsFileNameTag), false);
                     ee.Log();
                 }
 
@@ -865,6 +860,16 @@ namespace Extract.FileActionManager.FileProcessors
                     _body = reader.ReadString();
                     _attachments = reader.ReadStringArray();
                     _dataFileName = reader.ReadString();
+
+                    if (reader.Version < 2)
+                    {
+                        // Update tag name of <ActionName> to <DatabaseAction> and
+                        // <DatabaseServerName> to <DatabaseServer>
+                        _subject = _subject.Replace("<ActionName>",
+                            FileActionManagerPathTags.DatabaseActionTag);
+                        _body = _body.Replace("<DatabaseServerName>",
+                            FileActionManagerPathTags.DatabaseServerTag);
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -989,7 +994,7 @@ namespace Extract.FileActionManager.FileProcessors
                 string exceptionFileName = tempExceptionFile.FileName;
                 var ee = ExtractException.FromStringizedByteStream("ELI36117", StringizedException);
                 ee.Log(exceptionFileName);
-                pathTags.SetTagValue(ExceptionFileTag, exceptionFileName);
+                pathTags.AddTag(ExceptionFileTag, exceptionFileName);
             }
 
             var expandedAttachmentPaths = Attachments
@@ -1011,8 +1016,8 @@ namespace Extract.FileActionManager.FileProcessors
                         "However, that file was not found or was not accessible.",
                         missingAttachment);
                     ee.AddDebugData("Attachment", missingAttachment, false);
-                    ee.AddDebugData("FPS", 
-                        pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
+                    ee.AddDebugData("FPS",
+                        pathTags.Expand(FileActionManagerPathTags.FpsFileNameTag), false);
                 }
 
                 ee.Log();
@@ -1141,7 +1146,7 @@ namespace Extract.FileActionManager.FileProcessors
                             ee.AddDebugData("Query", match.Value, false);
                             ee.AddDebugData("SourceDocName", fileRecord.Name, false);
                             ee.AddDebugData("FPS",
-                                pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
+                                pathTags.Expand(FileActionManagerPathTags.FpsFileNameTag), false);
                             ee.Log();
                         }
                     }
@@ -1150,9 +1155,9 @@ namespace Extract.FileActionManager.FileProcessors
                         // If the database connection does not exist and the text appears to contain
                         // tags than need it, note the issue for later logging.
                         if (fileProcessingDB == null &&
-                            (match.Value.IndexOf(FileActionManagerDatabasePathTags.ActionTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                             match.Value.IndexOf(FileActionManagerDatabasePathTags.DatabaseTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                             match.Value.IndexOf(FileActionManagerDatabasePathTags.DatabaseServerTag, StringComparison.OrdinalIgnoreCase) >= 0))
+                            (match.Value.IndexOf(FileActionManagerPathTags.DatabaseActionTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                             match.Value.IndexOf(FileActionManagerPathTags.DatabaseServerTag, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                             match.Value.IndexOf(FileActionManagerPathTags.DatabaseServerTag, StringComparison.OrdinalIgnoreCase) >= 0))
 
                         {
                             _dbConnectionMissing = true;

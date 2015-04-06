@@ -1,11 +1,5 @@
-using Extract.Utilities;
-using Extract.Utilities.Forms;
+using Extract.FileActionManager.Forms;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 

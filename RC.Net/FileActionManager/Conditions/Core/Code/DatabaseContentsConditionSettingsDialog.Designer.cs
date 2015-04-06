@@ -28,13 +28,13 @@
             this._useFAMDbRadioButton = new System.Windows.Forms.RadioButton();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
-            this._queryPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._queryPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._queryTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this._searchModifierComboBox = new System.Windows.Forms.ComboBox();
             this._checkFieldsRadioButton = new System.Windows.Forms.RadioButton();
             this._doNotCheckFieldsRadioButton = new System.Windows.Forms.RadioButton();
-            this._fieldsPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._fieldsPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._fieldsDataGridView = new System.Windows.Forms.DataGridView();
             this._queryFieldColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._queryValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -412,13 +412,13 @@
 
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
-        private Utilities.Forms.PathTagsButton _queryPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _queryPathTagsButton;
         private System.Windows.Forms.TextBox _queryTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox _searchModifierComboBox;
         private System.Windows.Forms.RadioButton _checkFieldsRadioButton;
         private System.Windows.Forms.RadioButton _doNotCheckFieldsRadioButton;
-        private Utilities.Forms.PathTagsButton _fieldsPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fieldsPathTagsButton;
         private System.Windows.Forms.DataGridView _fieldsDataGridView;
         private System.Windows.Forms.Button _advancedButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;

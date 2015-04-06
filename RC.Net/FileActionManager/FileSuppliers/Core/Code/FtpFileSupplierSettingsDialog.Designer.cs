@@ -42,7 +42,7 @@
             this._fileFilterComboBox = new System.Windows.Forms.ComboBox();
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._localWorkingFolderTextBox = new System.Windows.Forms.TextBox();
-            this._localPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._localPathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._recursiveDownloadCheckBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -53,7 +53,7 @@
             this._secureFTPConnection = new EnterpriseDT.Net.Ftp.SecureFTPConnection(this.components);
             this._btnOK = new System.Windows.Forms.Button();
             this._btnCancel = new System.Windows.Forms.Button();
-            this._remotePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._remotePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._pollingIntervalNumericUpDown)).BeginInit();
@@ -232,7 +232,7 @@
             this._localPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_localPathTagsButton.Image")));
             this._localPathTagsButton.Location = new System.Drawing.Point(416, 288);
             this._localPathTagsButton.Name = "_localPathTagsButton";
-            this._localPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerSupplierPathTags();
+            this._localPathTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._localPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._localPathTagsButton.TabIndex = 8;
             this._localPathTagsButton.TextControl = this._localWorkingFolderTextBox;
@@ -345,7 +345,7 @@
             this._remotePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_remotePathTagsButton.Image")));
             this._remotePathTagsButton.Location = new System.Drawing.Point(388, 27);
             this._remotePathTagsButton.Name = "_remotePathTagsButton";
-            this._remotePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerSupplierPathTags();
+            this._remotePathTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._remotePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._remotePathTagsButton.TabIndex = 2;
             this._remotePathTagsButton.TextControl = this._remoteDownloadFolderTextBox;
@@ -396,13 +396,13 @@
         private System.Windows.Forms.TextBox _localWorkingFolderTextBox;
         private System.Windows.Forms.TextBox _remoteDownloadFolderTextBox;
         private Utilities.Forms.BrowseButton _browseButton;
-        private Utilities.Forms.PathTagsButton _localPathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _localPathTagsButton;
         private Forms.FtpConnectionSettingsControl _ftpConnectionSettingsControl;
         private System.Windows.Forms.TextBox _pollingTimesTextBox;
         private System.Windows.Forms.RadioButton _pollAtSetTimesRadioButton;
         private System.Windows.Forms.RadioButton _pollContinuouslyRadioButton;
         private System.Windows.Forms.RadioButton _downloadOnceRadioButton;
         private System.Windows.Forms.ComboBox _fileFilterComboBox;
-        private Utilities.Forms.PathTagsButton _remotePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _remotePathTagsButton;
     }
 }

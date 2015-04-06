@@ -34,8 +34,8 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this._localFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._localOrNewFileNameTextBox = new System.Windows.Forms.TextBox();
-            this._localFileNamePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._remoteFileNamePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._localFileNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._remoteFileNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._remoteOrOldFileNameTextBox = new System.Windows.Forms.TextBox();
             this._localOrNewFileNameLabel = new System.Windows.Forms.Label();
             this._remoteOrOldFileNameLabel = new System.Windows.Forms.Label();
@@ -334,8 +334,8 @@
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.TextBox _localOrNewFileNameTextBox;
         private System.Windows.Forms.Label _localOrNewFileNameLabel;
-        private Utilities.Forms.PathTagsButton _localFileNamePathTagsButton;
-        private Utilities.Forms.PathTagsButton _remoteFileNamePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _localFileNamePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _remoteFileNamePathTagsButton;
         private Utilities.Forms.BrowseButton _localFileNameBrowseButton;
         private System.Windows.Forms.RadioButton _renameFileRadioButton;
         private System.Windows.Forms.CheckBox _deleteEmptyFolderCheckBox;

@@ -95,8 +95,6 @@
     <Compile Include="ConfigSettings.cs">
       <DependentUpon>ExtractSettingsBase.cs</DependentUpon>
     </Compile>
-    <Compile Include="FileActionManagerPathTags.cs" />
-    <Compile Include="FileActionManagerSupplierPathTags.cs" />
     <Compile Include="FileSystemMethods.cs" />
     <Compile Include="InitializationFile.cs" />
     <Compile Include="IntervalTimer.cs" />

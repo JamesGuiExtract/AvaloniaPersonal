@@ -1,4 +1,5 @@
 ﻿using ADODB;
+using Extract.FileActionManager.Forms;
 using Extract.FileActionManager.Utilities;
 using Extract.Imaging;
 using Extract.Licensing;
@@ -985,7 +986,7 @@ namespace Extract.DataEntry.LabDE
                 int pageCount = 0;
                 FAMFileInspectorForm.GetFileInfo(fileId, out fileName, out pageCount);
 
-                SourceDocumentPathTags pathTags = GetPathTags(fileName);
+                IPathTags pathTags = GetPathTags(fileName);
 
                 // Generate the output document name.
                 if (outputFileName == null)
@@ -1031,14 +1032,14 @@ namespace Extract.DataEntry.LabDE
         /// Gets the duplicate document path tags.
         /// </summary>
         /// <param name="sourceDocName"></param>
-        protected virtual SourceDocumentPathTags GetPathTags(string sourceDocName)
+        protected virtual IPathTags GetPathTags(string sourceDocName)
         {
-            var pathTags = new SourceDocumentPathTags(sourceDocName);
-            pathTags.AddCustomTag("<FirstName>", (unused) => FirstName, false);
-            pathTags.AddCustomTag("<LastName>", (unused) => LastName, false);
-            pathTags.AddCustomTag("<DOB>", (unused) => DOB, false);
-            pathTags.AddCustomTag("<CollectionDate>", (unused) => CollectionDate, false);
-            pathTags.AddCustomTag("<StapledDocumentOutput>", (unused) => _stapledOutputDocument, false);
+            var pathTags = new FileActionManagerPathTags(null, sourceDocName);
+            pathTags.AddTag("<FirstName>", FirstName);
+            pathTags.AddTag("<LastName>", LastName);
+            pathTags.AddTag("<DOB>", DOB);
+            pathTags.AddTag("<CollectionDate>", CollectionDate);
+            pathTags.AddTag("<StapledDocumentOutput>", _stapledOutputDocument);
 
             return pathTags;
         }

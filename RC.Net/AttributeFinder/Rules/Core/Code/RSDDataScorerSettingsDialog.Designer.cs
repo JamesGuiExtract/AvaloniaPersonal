@@ -31,7 +31,7 @@
             System.Windows.Forms.GroupBox groupBox3;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RSDDataScorerSettingsDialog));
             System.Windows.Forms.GroupBox groupBox1;
-            this._rsdFileNamePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._rsdFileNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._rsdFileNameTextBox = new System.Windows.Forms.TextBox();
             this._rsdFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._scoreExpressionInfoTip = new Extract.Utilities.Forms.InfoTip();
@@ -173,7 +173,7 @@
 
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
-        private Utilities.Forms.PathTagsButton _rsdFileNamePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _rsdFileNamePathTagsButton;
         private System.Windows.Forms.TextBox _rsdFileNameTextBox;
         private Utilities.Forms.BrowseButton _rsdFileNameBrowseButton;
         private System.Windows.Forms.TextBox _scoreExpressionTextBox;

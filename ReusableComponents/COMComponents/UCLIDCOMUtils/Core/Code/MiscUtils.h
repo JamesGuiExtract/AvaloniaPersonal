@@ -107,7 +107,7 @@ public:
 	STDMETHOD(GetExpandedTags)(BSTR bstrString, BSTR bstrSourceDocName, BSTR* pbstrExpanded);
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, ITagUtility *pTagUtility,
 		BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
-	STDMETHOD(AddCustomTag)(BSTR bstrTagName, BSTR bstrTagValue);
+	STDMETHOD(AddTag)(BSTR bstrTagName, BSTR bstrTagValue);
 
 	STDMETHOD(HasImageFileExtension)(BSTR bstrFileName, VARIANT_BOOL* pvbValue);
 	STDMETHOD(HasNumericFileExtension)(BSTR bstrFileName, VARIANT_BOOL* pvbValue);
@@ -125,7 +125,7 @@ private:
 	void validateETFEngineLicense(); // validate license for encryption component
 
 	// Programatically added path tags.
-	map<string, string> m_mapCustomTags;
+	map<string, string> m_mapAddedTags;
 
 	// persistence mgr
 	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apSettings;

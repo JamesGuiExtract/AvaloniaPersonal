@@ -39,9 +39,9 @@
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this._fileContentsTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._fileContentsTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._fileContentsTextBox = new Extract.Utilities.Forms.BetterMultilineTextBox();
-            this._fileNameTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._fileNameTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -217,7 +217,7 @@
 
         #endregion
 
-        private Utilities.Forms.PathTagsButton _fileNameTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fileNameTagsButton;
         private System.Windows.Forms.TextBox _fileNameTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
@@ -228,7 +228,7 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Label label2;
-        private Utilities.Forms.PathTagsButton _fileContentsTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fileContentsTagsButton;
         private Utilities.Forms.BetterMultilineTextBox _fileContentsTextBox;
     }
 }

@@ -345,6 +345,7 @@ namespace Extract.Utilities.Forms
         /// <returns><see langword="true"/> if the message was translated; otherwise,
         /// <see langword="false"/>.</returns>
         [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool TranslateMessage([In] ref NativeMessage lpMsg);
 
         /// <summary>

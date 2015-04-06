@@ -1,4 +1,5 @@
 ﻿using EnterpriseDT.Net.Ftp;
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -357,7 +358,7 @@ namespace Extract.FileActionManager.FileSuppliers
         string _expandedRemoteDownloadFolder;
 
         // Used to expand folder paths
-        FileActionManagerSupplierPathTags _pathTags;
+        FileActionManagerPathTags _pathTags;
 
         // Queue of files to be downloaded.
         ConcurrentQueue<FtpFileInfo> _filesToDownload = new ConcurrentQueue<FtpFileInfo>();
@@ -957,7 +958,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 // Notify the FtpEventRecorder to recheck the DBInfo setting for whether to log FTP events
                 FtpEventRecorder.RecheckFtpLoggingStatus();
 
-                _pathTags = new FileActionManagerSupplierPathTags(pFAMTM.FPSFileDir);
+                _pathTags = new FileActionManagerPathTags(pFAMTM);
                 
                 // Per discussion with Arvind, remote download folder should be expanded only once
                 // per session.

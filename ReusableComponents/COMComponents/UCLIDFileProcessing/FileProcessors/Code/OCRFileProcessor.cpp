@@ -816,13 +816,13 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 			
 			// Add pages to the work item progress description
 			string strPages = (vecPages.size() > 1) ? " Pages ": " Page ";
-			for (int i = 0; i < vecPages.size(); i++)
+			for (size_t i = 0; i < vecPages.size(); i++)
 			{
 				strPages = strPages + ((i == 0) ? " " : ", ") + asString(vecPages[i]);
 			}
 
 			string strTaskDescription = asString(pWorkItem->RunningTaskDescription) + strPages;
-			for (int i = 0;i < vecPages.size(); i++)
+			for (size_t i = 0;i < vecPages.size(); i++)
 			{
 				pProgressStatus->StartNextItemGroup(strTaskDescription.c_str(),1);
 				ISpatialStringPtr ipTempSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
@@ -1085,9 +1085,8 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 			
 			nStart += gnMAX_WORK_ITEMS_TO_GET_PER_CALL;
 
-			long nPageNumber;
-			long nWorkItems = ipWorkItems->Size();
-			for  (long i = 0; i != nWorkItems; i++ )
+			size_t nWorkItems = ipWorkItems->Size();
+			for  (size_t i = 0; i != nWorkItems; i++ )
 			{
 				IWorkItemRecordPtr ipWorkItem = ipWorkItems->At(i);
 				ASSERT_RESOURCE_ALLOCATION("ELI36859", ipWorkItem != __nullptr);
@@ -1234,7 +1233,7 @@ EFileProcessingResult COCRFileProcessor::waitForWorkToComplete(IProgressStatusPt
 		{
 			unsigned long totalCount = wigsStatusRecord.lCompletedCount + wigsStatusRecord.lFailedCount;
 			if (!m_bSkipPageOnFailure ||  
-				(m_bSkipPageOnFailure && (wigsStatusRecord.lFailedCount > m_uiMaxOcrPageFailureNumber ||
+				(m_bSkipPageOnFailure && (wigsStatusRecord.lFailedCount > (long)m_uiMaxOcrPageFailureNumber ||
 				wigsStatusRecord.lFailedCount *100.0 / totalCount > (double)m_uiMaxOcrPageFailurePercentage)))
 			{
 
@@ -1368,7 +1367,7 @@ void COCRFileProcessor::parseOCRInputText(const string& strInputText, string& st
 	else
 	{
 		strFileName = vecTokens[0];
-		for (long  i = 1; i < vecTokens.size(); i++)
+		for (size_t  i = 1; i < vecTokens.size(); i++)
 		{
 			vecPages.push_back(asLong(vecTokens[i]));
 		}

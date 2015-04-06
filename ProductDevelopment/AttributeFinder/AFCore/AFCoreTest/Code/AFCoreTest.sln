@@ -711,12 +711,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.LabDE", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.ContextTags", "..\..\..\..\..\RC.Net\Utilities\ContextTags\Core\Code\Extract.Utilities.ContextTags.csproj", "{4114A956-D3F0-4D89-B3BF-8BC45046129C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Forms.Test", "..\..\..\..\..\RC.Net\FileActionManager\Forms\Core\Testing\Automated\Extract.FileActionManager.Forms.Test.csproj", "{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://EngSvr.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 183
+		ProjectCount = 184
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -900,6 +902,7 @@ Global
 		ProjectRelativeDiskPath181 = ..\..\..\IndustrySpecific\LabResults\LabDECppCustomComponents\Code\LabDECppCustomComponents.vcxproj
 		ProjectRelativeDiskPath182 = ..\..\..\..\..\RC.Net\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj
 		ProjectRelativeDiskPath183 = ..\..\..\..\..\RC.Net\Utilities\ContextTags\Core\Code\Extract.Utilities.ContextTags.csproj
+		ProjectRelativeDiskPath184 = ..\..\..\..\..\RC.Net\FileActionManager\Forms\Core\Testing\Automated\Extract.FileActionManager.Forms.Test.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -4186,6 +4189,24 @@ Global
 		{4114A956-D3F0-4D89-B3BF-8BC45046129C}.Template|Mixed Platforms.Build.0 = Release|Any CPU
 		{4114A956-D3F0-4D89-B3BF-8BC45046129C}.Template|Win32.ActiveCfg = Release|Any CPU
 		{4114A956-D3F0-4D89-B3BF-8BC45046129C}.Template|x86.ActiveCfg = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Release|Win32.ActiveCfg = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Release|x86.ActiveCfg = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Template|Any CPU.ActiveCfg = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Template|Any CPU.Build.0 = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Template|Mixed Platforms.Build.0 = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Template|Win32.ActiveCfg = Release|Any CPU
+		{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}.Template|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

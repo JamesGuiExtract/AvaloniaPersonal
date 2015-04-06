@@ -1,3 +1,4 @@
+using Extract.FileActionManager.Forms;
 using Extract.Imaging;
 using Extract.Interop;
 using Extract.Licensing;
@@ -11,9 +12,7 @@ using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-
 using ComAttribute = UCLID_AFCORELib.Attribute;
-using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 using EOrientation = UCLID_RASTERANDOCRMGMTLib.EOrientation;
 using ESpatialEntity = UCLID_RASTERANDOCRMGMTLib.ESpatialEntity;
 using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
@@ -576,8 +575,7 @@ namespace Extract.Redaction
 
                 // Load the redactions
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir,
-                        pFAMTM.FPSFileName);
+                    new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
                 string voaFile = pathTags.Expand(_settings.DataFile);
                 _voaLoader.LoadFrom(voaFile, pFileRecord.Name);
 

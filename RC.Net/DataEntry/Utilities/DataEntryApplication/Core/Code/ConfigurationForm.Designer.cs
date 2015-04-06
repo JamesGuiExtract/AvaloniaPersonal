@@ -36,7 +36,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._cancelButton = new System.Windows.Forms.Button();
             this._enableInputTrackingCheckBox = new System.Windows.Forms.CheckBox();
             this._enableCountersCheckBox = new System.Windows.Forms.CheckBox();
-            this._fileNameTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._fileNameTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._tagSettingsButton = new System.Windows.Forms.Button();
             this._allowTagsCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
@@ -179,7 +179,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.CheckBox _enableInputTrackingCheckBox;
         private System.Windows.Forms.CheckBox _enableCountersCheckBox;
-        private Extract.Utilities.Forms.PathTagsButton _fileNameTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fileNameTagsButton;
         private System.Windows.Forms.Button _tagSettingsButton;
         private System.Windows.Forms.CheckBox _allowTagsCheckBox;
     }

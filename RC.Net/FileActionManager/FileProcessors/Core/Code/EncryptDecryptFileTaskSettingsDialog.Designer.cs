@@ -40,11 +40,11 @@
             System.Windows.Forms.Panel panel1;
             this._checkOverwriteDestination = new System.Windows.Forms.CheckBox();
             this._textInputFile = new System.Windows.Forms.TextBox();
-            this._pathTagsDestination = new Extract.Utilities.Forms.PathTagsButton();
+            this._pathTagsDestination = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._textDestination = new System.Windows.Forms.TextBox();
             this._browseInput = new Extract.Utilities.Forms.BrowseButton();
             this._browseDestination = new Extract.Utilities.Forms.BrowseButton();
-            this._pathTagsInput = new Extract.Utilities.Forms.PathTagsButton();
+            this._pathTagsInput = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._textPassword = new System.Windows.Forms.TextBox();
             this._textPasswordConfirm = new System.Windows.Forms.TextBox();
             this._labelEnableDecrypt = new System.Windows.Forms.Label();
@@ -380,10 +380,10 @@
 
         private System.Windows.Forms.TextBox _textInputFile;
         private Utilities.Forms.BrowseButton _browseInput;
-        private Utilities.Forms.PathTagsButton _pathTagsInput;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsInput;
         private System.Windows.Forms.TextBox _textDestination;
         private Utilities.Forms.BrowseButton _browseDestination;
-        private Utilities.Forms.PathTagsButton _pathTagsDestination;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsDestination;
         private System.Windows.Forms.CheckBox _checkOverwriteDestination;
         private System.Windows.Forms.TextBox _textPassword;
         private System.Windows.Forms.TextBox _textPasswordConfirm;

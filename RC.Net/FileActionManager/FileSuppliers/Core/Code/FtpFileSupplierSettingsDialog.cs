@@ -1,4 +1,5 @@
 ﻿using EnterpriseDT.Net.Ftp;
+using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using System;
 using System.Windows.Forms;
@@ -87,6 +88,9 @@ namespace Extract.FileActionManager.FileSuppliers
                 
                 // Set the ftp connection editor connection
                 _ftpConnectionSettingsControl.FtpConnection = _secureFTPConnection;
+
+                _remotePathTagsButton.PathTags.BuiltInTagFilter = new[] { FileActionManagerPathTags.FpsFileDirectoryTag };
+                _localPathTagsButton.PathTags.BuiltInTagFilter = new[] { FileActionManagerPathTags.FpsFileDirectoryTag };
                 
                 UpdateControlState();
             }

@@ -1,3 +1,4 @@
+using Extract.FileActionManager.Forms;
 using Extract.Imaging;
 using Extract.Interop;
 using Extract.Licensing;
@@ -5,14 +6,12 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-using System.Reflection;
 
 namespace Extract.FileActionManager.FileProcessors
 {
@@ -418,7 +417,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Get the file name and initialize a path tags class
                 string fileName = Path.GetFullPath(pFileRecord.Name);
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(fileName, pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
+                    new FileActionManagerPathTags(pFAMTM, fileName);
 
                 // Expand any path tags in the file name
                 string pdfFile = pathTags.Expand(_settings.PdfFile);

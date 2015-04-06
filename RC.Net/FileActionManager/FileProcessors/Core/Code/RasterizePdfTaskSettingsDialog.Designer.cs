@@ -40,9 +40,9 @@
             this._groupDeleteFailed = new System.Windows.Forms.GroupBox();
             this._radioIgnoreError = new System.Windows.Forms.RadioButton();
             this._radioFailTask = new System.Windows.Forms.RadioButton();
-            this._pathTagsButtonOutputFile = new Extract.Utilities.Forms.PathTagsButton();
+            this._pathTagsButtonOutputFile = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._browseOutputFile = new Extract.Utilities.Forms.BrowseButton();
-            this._pathTagsButtonPdfFile = new Extract.Utilities.Forms.PathTagsButton();
+            this._pathTagsButtonPdfFile = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._browsePdfFile = new Extract.Utilities.Forms.BrowseButton();
             this._checkUseAltMethod = new System.Windows.Forms.CheckBox();
             this._checkPreserveColor = new System.Windows.Forms.CheckBox();
@@ -269,11 +269,11 @@
 
         #endregion
 
-        private Utilities.Forms.PathTagsButton _pathTagsButtonOutputFile;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsButtonOutputFile;
         private Utilities.Forms.BrowseButton _browseOutputFile;
         private System.Windows.Forms.TextBox _textConvertedFile;
         private Utilities.Forms.BrowseButton _browsePdfFile;
-        private Utilities.Forms.PathTagsButton _pathTagsButtonPdfFile;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsButtonPdfFile;
         private System.Windows.Forms.TextBox _textPdfFile;
         private System.Windows.Forms.CheckBox _checkModifySourceDoc;
         private System.Windows.Forms.CheckBox _checkDeletePdf;

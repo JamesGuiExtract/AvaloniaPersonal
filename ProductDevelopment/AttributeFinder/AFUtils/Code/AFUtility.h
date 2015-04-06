@@ -60,6 +60,7 @@ public:
 	STDMETHOD(raw_GetFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
 	STDMETHOD(raw_EditCustomTags)(long hParentWindow);
+	STDMETHOD(raw_AddTag)(BSTR bstrTagName, BSTR bstrTagValue);
 
 // IAFUtility
 	STDMETHOD(GetNameToAttributesMap)(
@@ -343,6 +344,9 @@ private:
 	static map<string, string> ms_mapCustomFileTagNameToValue;
 
 	static string ms_strINIFileName;
+
+	// Programmatically added path tags.
+	map<string, string> m_mapAddedTags;
 
 	static CMutex ms_Mutex;
 

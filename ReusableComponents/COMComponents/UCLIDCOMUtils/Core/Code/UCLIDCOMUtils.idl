@@ -1115,7 +1115,7 @@ library UCLID_COMUTILSLib
 		// PARAMS:	bstrTagName - The name of the tag (not including the angle brackets that are
 		//						  used to denote path tags).
 		//			bstrTagValue - The text that should replace the tag during path tag expansion.
-		[id(27), helpstring("method AddCustomTag")] HRESULT AddCustomTag(
+		[id(27), helpstring("method AddCustomTag")] HRESULT AddTag(
 			[in] BSTR bstrTagName, [in] BSTR bstrTagValue);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Indicates whether the extension of bstrFileName is one typically used for image
@@ -1332,6 +1332,11 @@ library UCLID_COMUTILSLib
 		//			If hParentWindow is not null, the tag editing UI will be displayed modally
 		//			to hParentWindow; otherwise the editor window will be modeless.
 		[id(8), helpstring("method EditCustomTags")] HRESULT EditCustomTags([in] long hParentWindow);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To programmatically add a path tag (and its corresponding expanded value). Any
+		//			tags added via this method will be become part of GetBuiltInTags rather than
+		//			GetCustomFileTags as "custom" tags refers to user-defined tags.
+		[id(9), helpstring("method AddTag")] HRESULT AddTag([in] BSTR bstrTagName, [in] BSTR bstrTagValue);
 	}	
 
 	[

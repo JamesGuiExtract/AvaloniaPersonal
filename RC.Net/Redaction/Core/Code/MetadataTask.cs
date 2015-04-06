@@ -1,4 +1,5 @@
 using Extract.AttributeFinder;
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -14,9 +15,8 @@ using System.Xml;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-
-using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 using ComAttribute = UCLID_AFCORELib.Attribute;
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 
 namespace Extract.Redaction
 {
@@ -1028,9 +1028,8 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI28521",
 					_COMPONENT_DESCRIPTION);
 
-                FileActionManagerPathTags tags = 
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir,
-                        pFAMTM.FPSFileName);
+                FileActionManagerPathTags tags =
+                    new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
 
                 // Load voa
                 string voaFileName = tags.Expand(_settings.DataFile);

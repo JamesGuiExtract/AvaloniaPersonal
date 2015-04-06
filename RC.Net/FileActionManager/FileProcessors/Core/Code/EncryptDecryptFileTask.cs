@@ -1,4 +1,5 @@
 ﻿using Extract.Encryption;
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -560,8 +561,7 @@ namespace Extract.FileActionManager.FileProcessors
                 var fileName = pFileRecord.Name;
 
                 // Create a tag manager and expand the tags in the file name
-                var tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(fileName), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
+                var tags = new FileActionManagerPathTags(pFAMTM, fileName);
 
                 // Get the source and destination files
                 sourceFile = Path.GetFullPath(tags.Expand(_inputFile));

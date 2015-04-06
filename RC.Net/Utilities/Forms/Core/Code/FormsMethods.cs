@@ -1,6 +1,7 @@
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -31,6 +32,7 @@ namespace Extract.Utilities.Forms
         /// <param name="control">The <see cref="Control"/> to check for qualification.</param>
         /// <returns><see langword="true"/> if the control qualifies, otherwise,
         /// <see langword="false"/>.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public delegate bool ControlQualifier(Control control);
 
         #endregion Delegates
@@ -1039,7 +1041,7 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <param name="form">The <see cref="Form"/> for which all controls are needed.</param>
         /// <returns>The enumeration of all <see cref="Control"/>s.</returns>
-        public static IEnumerable<Control> GetAllControls(this Form form)
+        public static IEnumerable<Control> GetAllControls(this Control form)
         {
             return FormsMethods.GetAllControls(form);
         }

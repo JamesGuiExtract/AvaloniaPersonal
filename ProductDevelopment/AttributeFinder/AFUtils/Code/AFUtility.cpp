@@ -715,6 +715,32 @@ STDMETHODIMP CAFUtility::raw_EditCustomTags(long hParentWindow)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38062");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::raw_AddTag(BSTR bstrTagName, BSTR bstrTagValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI38086", bstrTagName != __nullptr);
+
+		validateLicense();
+
+		string strTag = asString(bstrTagName);
+		if (strTag.substr(0, 1) != "<")
+		{
+			strTag = "<" + strTag;
+		}
+		if (strTag.substr(strTag.length() - 1, 1) != ">")
+		{
+			strTag += ">";
+		}
+		m_mapAddedTags[strTag] = asString(bstrTagValue);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38087");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFUtility::raw_GetAllTags(IVariantVector** ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -2299,6 +2325,17 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 		expandAFDocTags(rstrInput, ipDoc);
 		expandCommonComponentsDir(rstrInput);
 
+		// Expand any programmatically added tags.
+		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
+				iter != m_mapAddedTags.end();
+				iter++)
+		{
+			string strTag = iter->first;
+			string strValue = iter->second;
+
+			replaceVariable(rstrInput, strTag, strValue);
+		}
+
 		// at this time, ensure that there are no more tags left
 		vector<string> vecTagNames = getTagNames(rstrInput);
 		if (!vecTagNames.empty())
@@ -2432,6 +2469,14 @@ IVariantVectorPtr CAFUtility::getBuiltInTags()
 		ipVec->PushBack(get_bstr_t(strSOURCE_DOC_NAME_TAG));
 		ipVec->PushBack(get_bstr_t(gstrRULE_EXEC_ID_TAG));
 		ipVec->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
+
+		// Report any programmatically added tags.
+		for (map<string, string>::iterator iter = m_mapAddedTags.begin();
+			 iter != m_mapAddedTags.end();
+			 iter++)
+		{
+			ipVec->PushBack(get_bstr_t(iter->first));
+		}
 
 		// Return the vector
 		return ipVec;

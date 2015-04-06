@@ -1,5 +1,4 @@
 ﻿using Extract.Utilities;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Extract.Redaction.CustomComponentsHelper
@@ -14,7 +13,7 @@ namespace Extract.Redaction.CustomComponentsHelper
         #region Constants
         
         /// <summary>
-        /// The tag for excemption codes.
+        /// The tag for exemption codes.
         /// </summary>
         static readonly string _EXEMPTION_CODES_TAG = "<ExemptionCodes>";
 
@@ -41,32 +40,13 @@ namespace Extract.Redaction.CustomComponentsHelper
         /// <param name="exemptionCode">The exemption code.</param>
         /// <param name="fieldType">Type of the field.</param>
         public RedactionTextPathTags(string exemptionCode, string fieldType)
-            : base(GetTagsToValues(exemptionCode, fieldType))
+            : base()
         {
+            AddTag(_EXEMPTION_CODES_TAG, exemptionCode ?? string.Empty);
+            AddTag(_FIELD_TYPE_TAG, fieldType ?? string.Empty);
         }
 
         #endregion Constructors
-
-        #region Methods
-
-        /// <summary>
-        /// Gets the path tags mapped to their expanded form.
-        /// </summary>
-        /// <param name="exemptionCode">The exemption code.</param>
-        /// <param name="fieldType">Type of the field.</param>
-        /// <returns>
-        /// The path tags mapped to their expanded form.
-        /// </returns>
-        static Dictionary<string, string> GetTagsToValues(string exemptionCode,
-            string fieldType)
-        {
-            var tagsToValues = new Dictionary<string, string>(2);
-            tagsToValues[_EXEMPTION_CODES_TAG] = exemptionCode ?? string.Empty;
-            tagsToValues[_FIELD_TYPE_TAG] = fieldType ?? string.Empty;
-            return tagsToValues;
-        }
-
-        #endregion Methods
 
         #region Properties
 

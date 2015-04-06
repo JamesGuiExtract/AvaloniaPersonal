@@ -47,8 +47,8 @@
             this._outputFileTextBox = new System.Windows.Forms.TextBox();
             this._outputFileBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._outputFileInfoTip = new Extract.Utilities.Forms.InfoTip();
-            this._outputFilePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._dataFilePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._outputFilePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._dataFilePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._allowOutputAppendCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
@@ -328,7 +328,7 @@
 
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
-        private Utilities.Forms.PathTagsButton _dataFilePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _dataFilePathTagsButton;
         private System.Windows.Forms.TextBox _dataFileTextBox;
         private Utilities.Forms.BrowseButton _dataFileBrowseButton;
         private Utilities.Forms.InfoTip _attributeQueryInfoTip;
@@ -337,7 +337,7 @@
         private System.Windows.Forms.RadioButton _separateZonesRadioButton;
         private System.Windows.Forms.RadioButton _allAreasRadioButton;
         private System.Windows.Forms.RadioButton _firstAreaRadioButton;
-        private Utilities.Forms.PathTagsButton _outputFilePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _outputFilePathTagsButton;
         private System.Windows.Forms.TextBox _outputFileTextBox;
         private Utilities.Forms.BrowseButton _outputFileBrowseButton;
         private Utilities.Forms.InfoTip _outputFileInfoTip;

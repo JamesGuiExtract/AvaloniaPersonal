@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities.Forms
 {
@@ -38,6 +37,7 @@ namespace Extract.Utilities.Forms
     /// </summary>
     [DefaultEvent("TagSelected")]
     [DefaultProperty("PathTags")]
+    [CLSCompliant(false)]
     public partial class PathTagsButton : Button
     {
         #region Constants
@@ -55,11 +55,6 @@ namespace Extract.Utilities.Forms
         #endregion Constants
 
         #region PathTagsButton Fields
-
-        /// <summary>
-        /// The names of valid function tags.
-        /// </summary>
-        static readonly string[] _functionTags = GetFunctionTags();
 
         /// <summary>
         /// The context menu that is displayed when the tag button is clicked.
@@ -171,7 +166,7 @@ namespace Extract.Utilities.Forms
         /// <returns>The path tags that are available for selection.</returns>
         [Category("Behavior")]
         [Description("The path tags that are available for selection.")]
-        public IPathTags PathTags
+        public virtual IPathTags PathTags
         {
             get
             {
@@ -279,64 +274,6 @@ namespace Extract.Utilities.Forms
 
         #endregion Properties
 
-        #region PathTagsButton Methods
-
-        /// <summary>
-        /// Retrieves an array of the names of function tags.
-        /// </summary>
-        /// <returns>A array of the names of function tags.</returns>
-        static string[] GetFunctionTags()
-        {
-            List<string> functionTags;
-
-            // Do not do this at design time
-            if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
-            {
-                functionTags = new List<string>();
-            }
-            else
-            {
-                // Get the function tag names
-                ITagUtility miscUtils = (ITagUtility)new MiscUtils();
-                VariantVector functions = miscUtils.GetFormattedFunctionNames();
-
-                // Construct an array of the function tags
-                int size = functions.Size;
-                functionTags = new List<string>(size);
-                for (int i = 0; i < size; i++)
-                {
-                    string function = functions[i] as string;
-                    if (function != null)
-                    {
-                        functionTags.Add(function);
-                    }
-                }
-            }
-
-            // Return the resulting array
-            return functionTags.ToArray();
-        }
-
-        /// <summary>
-        /// Determines whether the <see cref="PathTags"/> property should be serialized.
-        /// </summary>
-        /// <returns><see langword="true"/> if the property has changed; <see langword="false"/>
-        /// if the property is its default value.</returns>
-        bool ShouldSerializePathTags()
-        {
-            return _pathTags != null && _pathTags.GetType() != typeof(SourceDocumentPathTags);
-        }
-
-        /// <summary>
-        /// Resets the <see cref="PathTags"/> property to its default value.
-        /// </summary>
-        void ResetPathTags()
-        {
-            _pathTags = null;
-        }
-
-        #endregion PathTagsButton Methods
-
         #region PathTagsButton OnEvents
 
         /// <summary>
@@ -404,10 +341,22 @@ namespace Extract.Utilities.Forms
 
                 if (_displayPathTags)
                 {
-                    // Add the doc tags
-                    foreach (string docTag in PathTags.Tags)
+                    foreach (string tag in PathTags.BuiltInTags)
                     {
-                        items.Add(new ToolStripMenuItem(docTag));
+                        items.Add(new ToolStripMenuItem(tag));
+                    }
+
+                    if (PathTags.CustomTags.Any())
+                    {
+                        if (items.Count > 0)
+                        {
+                            items.Add(new ToolStripSeparator());
+                        }
+
+                        foreach (string tag in PathTags.CustomTags)
+                        {
+                            items.Add(new ToolStripMenuItem(tag));
+                        }
                     }
                 }
 
@@ -421,7 +370,7 @@ namespace Extract.Utilities.Forms
                     }
 
                     // Add the function tags
-                    foreach (string function in _functionTags)
+                    foreach (string function in PathTags.FormattedFunctionNames)
                     {
                         items.Add(new ToolStripMenuItem(function));
                     }
@@ -508,6 +457,13 @@ namespace Extract.Utilities.Forms
                 string tagName = e.ClickedItem.Text;
                 if (_ownedItems.Contains(e.ClickedItem) && !string.IsNullOrEmpty(tagName))
                 {
+                    if (tagName.StartsWith("Edit", StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.SafeBeginInvoke("ELI38069", () => 
+                            PathTags.EditCustomTags((int)TopLevelControl.Handle));
+                        return;
+                    }
+
                     var eventArgs = new TagSelectingEventArgs(tagName);
                     OnTagSelecting(eventArgs);
 

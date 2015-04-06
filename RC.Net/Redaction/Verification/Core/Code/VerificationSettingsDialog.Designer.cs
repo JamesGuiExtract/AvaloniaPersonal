@@ -56,11 +56,11 @@ namespace Extract.Redaction.Verification
             this._requireTypeCheckBox = new System.Windows.Forms.CheckBox();
             this._verifyAllPagesCheckBox = new System.Windows.Forms.CheckBox();
             this._promptForSaveUntilCommit = new System.Windows.Forms.CheckBox();
-            this._actionNamePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._actionNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._actionStatusComboBox = new System.Windows.Forms.ComboBox();
             this._actionNameComboBox = new Extract.Utilities.Forms.BetterComboBox();
             this._fileActionCheckBox = new System.Windows.Forms.CheckBox();
-            this._backdropImagePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._backdropImagePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._backdropImageTextBox = new System.Windows.Forms.TextBox();
             this._backdropImageBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._backdropImageCheckBox = new System.Windows.Forms.CheckBox();
@@ -474,9 +474,9 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.CheckBox _fileActionCheckBox;
         private System.Windows.Forms.ComboBox _actionStatusComboBox;
         private Extract.Utilities.Forms.BetterComboBox _actionNameComboBox;
-        private Extract.Utilities.Forms.PathTagsButton _actionNamePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _actionNamePathTagsButton;
         private System.Windows.Forms.CheckBox _backdropImageCheckBox;
-        private Extract.Utilities.Forms.PathTagsButton _backdropImagePathTagsButton;
+        private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _backdropImagePathTagsButton;
         private Extract.Utilities.Forms.BrowseButton _backdropImageBrowseButton;
         private System.Windows.Forms.TextBox _backdropImageTextBox;
         private System.Windows.Forms.CheckBox _launchFullScreenCheckBox;

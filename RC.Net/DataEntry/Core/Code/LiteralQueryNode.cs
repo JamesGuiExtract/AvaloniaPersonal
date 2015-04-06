@@ -32,8 +32,8 @@ namespace Extract.DataEntry
             try
             {
                 // [DataEntry:858]
-                // Do not unnecessarily call SourceDocumentPathTags.Expand()-- this method is called a
-                // lot and SourceDocumentPathTags.Expand() uses an expensive COM call.
+                // Do not unnecessarily expand path tags-- this method is called a lot and the
+                // expand call is a relatively expensive COM call.
                 bool containsPossiblePathTag = (QueryText.Contains("$") ||
                     QueryText.IndexOf("<SourceDocName>", StringComparison.Ordinal) >= 0);
                 string expandedQuery = containsPossiblePathTag ?

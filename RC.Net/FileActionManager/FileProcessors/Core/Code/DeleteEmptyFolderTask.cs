@@ -1,6 +1,6 @@
-﻿using Extract.Interop;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Interop;
 using Extract.Licensing;
-using Extract.Utilities;
 using System;
 using System.IO;
 using System.Linq;
@@ -438,8 +438,7 @@ namespace Extract.FileActionManager.FileProcessors
                 validateLicense("ELI31861");
 
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir,
-                        pFAMTM.FPSFileName);
+                    new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
                 string folderName = pathTags.Expand(_folderName);
                 folderName = folderName.Replace('/', '\\').TrimEnd('\\');
 
