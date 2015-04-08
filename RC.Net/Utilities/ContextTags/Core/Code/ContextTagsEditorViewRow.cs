@@ -370,10 +370,11 @@ namespace Extract.Utilities.ContextTags
                     targetValue = new TagValueTableV1();
                     targetValue.ContextID = context.ID;
                     targetValue.TagID = row.CustomTag.ID;
+                    targetValue.Value = "";
                     _database.TagValue.InsertOnSubmit(targetValue);
                 }
 
-                targetValue.Value = (string)value;
+                targetValue.Value = ((string)value) ?? "";
                 _database.SubmitChanges();
             }
             catch (Exception ex)

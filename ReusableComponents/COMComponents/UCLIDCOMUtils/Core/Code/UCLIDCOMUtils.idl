@@ -1369,6 +1369,10 @@ library UCLID_COMUTILSLib
 		//			If hParentWindow is not null, the tag editing UI will be displayed modally
 		//			to hParentWindow; otherwise the editor window will be modeless.
 		[id(5), helpstring("method EditTags")] HRESULT EditTags([in] long hParentWindow);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets any tag names for values that have not been defined in the active context.
+		//			Returns an empty list if there is no active context.
+		[id(6), helpstring("method GetUndefinedTags")] HRESULT GetUndefinedTags([out, retval] IVariantVector** ppTags);
 	}
 
 	//---------------------------------------------------------------------------------------------

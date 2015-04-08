@@ -73,6 +73,8 @@ public:
 	STDMETHOD(get_AlwaysShowDatabaseTags)(VARIANT_BOOL *pbValue);
 	STDMETHOD(put_AlwaysShowDatabaseTags)(VARIANT_BOOL bValue);
 	STDMETHOD(SetFAMDB)(IFileProcessingDB *pFAMDB, long nActionID);
+	STDMETHOD(ValidateConfiguration)(BSTR bstrDatabaseServer, BSTR bstrDatabaseName,
+		BSTR* pbstrWarning);
 
 private:
 

@@ -177,6 +177,16 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			}
 		}
 
+		// Verifies that the tag manager has all necessary info to expand tags during processing.
+		BSTR pbstrWarning = m_ipFAMTagManager->ValidateConfiguration(
+			m_strDBServer.c_str(), m_strDBName.c_str());
+
+		if (pbstrWarning != __nullptr)
+		{
+			UCLIDException ue("ELI38109", "Application trace: " + asString(pbstrWarning));
+			ue.log();
+		}
+
 		// Expand the action name
 		string strExpandedAction = getExpandedActionName();
 
@@ -1207,6 +1217,37 @@ STDMETHODIMP CFileProcessingManager::put_AdvancedConnectionStringProperties(BSTR
 		validateLicense();
 
 		setAdvConnString(asString(newVal));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35138");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::GetConfigurationWarnings(BSTR *pbstrWarning)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38111", pbstrWarning != __nullptr);
+
+		*pbstrWarning = __nullptr;
+		
+		try
+		{
+			try
+			{
+				*pbstrWarning = m_ipFAMTagManager->ValidateConfiguration(
+					m_strDBServer.c_str(), m_strDBName.c_str());
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38110")
+		}
+		catch (UCLIDException &ue)
+		{
+			*pbstrWarning = get_bstr_t(ue.getTopText().c_str()).Detach();
+		}
 
 		return S_OK;
 	}

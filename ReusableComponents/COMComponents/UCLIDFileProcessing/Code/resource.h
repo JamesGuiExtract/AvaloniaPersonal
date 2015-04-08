@@ -301,13 +301,14 @@
 #define ID_FAM_MRU_FILE7                32811
 #define ID_FAM_MRU_FILE8                32812
 #define ID_MNU_FAM_MRU                  32813
+#define ID_TOOLS_EDITCUSTOMTAGS			32814
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        2066
-#define _APS_NEXT_COMMAND_VALUE         32814
+#define _APS_NEXT_COMMAND_VALUE         32815
 #define _APS_NEXT_CONTROL_VALUE         2066
 #define _APS_NEXT_SYMED_VALUE           2066
 #endif

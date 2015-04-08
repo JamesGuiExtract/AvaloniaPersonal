@@ -863,10 +863,9 @@ namespace Extract.FileActionManager.FileProcessors
 
                     if (reader.Version < 2)
                     {
-                        // Update tag name of <ActionName> to <DatabaseAction> and
-                        // <DatabaseServerName> to <DatabaseServer>
-                        _subject = _subject.Replace("<ActionName>",
-                            FileActionManagerPathTags.DatabaseActionTag);
+                        // Update tag name of <DatabaseServerName> to <DatabaseServer>
+                        _subject = _subject.Replace("<DatabaseServerName>",
+                            FileActionManagerPathTags.DatabaseServerTag);
                         _body = _body.Replace("<DatabaseServerName>",
                             FileActionManagerPathTags.DatabaseServerTag);
                     }

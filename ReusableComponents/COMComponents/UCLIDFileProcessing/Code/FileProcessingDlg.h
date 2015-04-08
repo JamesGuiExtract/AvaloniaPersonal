@@ -140,6 +140,7 @@ protected:
 	afx_msg void OnHelpAboutfileprocessingmanager();
 	afx_msg void OnHelpFileprocessingmanagerhelp();
 	afx_msg void OnToolsFAMDBAdmin();
+	afx_msg void OnToolsEditCustomTags();
 	afx_msg void OnToolbarDropDown(NMHDR* pNMHDR, LRESULT *plr);
 	afx_msg void OnSelectFAMMRUPopupMenu(UINT nID);
 	BOOL OnToolTipNotify(UINT nID, NMHDR* pNMHDR, LRESULT* pResult);
@@ -307,8 +308,9 @@ private:
 	void openFile(string strFileName);
 	//---------------------------------------------------------------------------------------------
 	// This method will flush the current dialog settings to the m_ipFileProcMgr and then saves them
-	// to an fps file
-	bool saveFile(string strFileName);
+	// to an fps file. bShowConfigurationWarnings indicates whether a prompt should be displayed
+	// about any potential configuration issues before allowing the save.
+	bool saveFile(string strFileName, bool bShowConfigurationWarnings);
 	//---------------------------------------------------------------------------------------------
 	// This method will check whether any settings in the editor have changed since the last 
 	// load/save if so it will prompt the user to Save, Continue without saving or cancel.

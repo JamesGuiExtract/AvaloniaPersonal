@@ -88,3 +88,4 @@ static const string gstrWORKITEM_DB_LOCK = "WorkItem";
 // Special-purpose FAM tag names
 const string gstrDATABASE_SERVER_TAG = "<DatabaseServer>";
 const string gstrDATABASE_NAME_TAG = "<DatabaseName>";
+const string gstrDATABASE_ACTION_TAG = "<ActionName>";

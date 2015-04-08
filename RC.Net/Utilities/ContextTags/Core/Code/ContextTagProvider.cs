@@ -205,24 +205,57 @@ namespace Extract.Utilities.ContextTags
                         "Cannot edit tags when context has not been set",
                         !string.IsNullOrWhiteSpace(ContextPath));
 
+                    bool createdDatabase = false;
+
                     // Create the database if it doesn't already exist.
                     string settingFileName = Path.Combine(ContextPath, _SETTING_FILENAME);
                     if (!File.Exists(settingFileName))
                     {
                         var manager = new ContextTagDatabaseManager(settingFileName);
                         manager.CreateDatabase(true);
+                        createdDatabase = true;
                     }
 
                     EditDatabase(settingFileName, (IntPtr)hParentWindow);
 
                     // Re-load so that the available tags reflect the edits.
-                    LoadTagsForPath(ContextPath);
+                    if (!LoadTagsForPath(ContextPath) && createdDatabase)
+                    {
+                        // If the database didn't previously exist and no tags were added, don't
+                        // keep the database file.
+                        FileSystemMethods.DeleteFile(settingFileName);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI38047", "Error editing context-specific tags.");
             }
+        }
+
+        /// <summary>
+        /// Gets the tags that have not been defined values in the current context.
+        /// </summary>
+        /// <returns>The tags that have not been defined values in the current context.</returns>
+        public VariantVector GetUndefinedTags()
+        {
+            try 
+	        {
+                if (string.IsNullOrWhiteSpace(_activeContext))
+                {
+                    return new VariantVector();
+                }
+
+                return _tagValues
+                    .Where(tag => string.IsNullOrWhiteSpace(tag.Value) && 
+                        !tag.Key.Equals(_EDIT_CUSTOM_TAGS_LABEL, StringComparison.OrdinalIgnoreCase))
+                    .Select(tag => tag.Key)
+                    .ToVariantVector();
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.CreateComVisible("ELI38094", "Failed to check tag values.");
+	        }
         }
 
         #endregion IContextTagProvider
@@ -235,7 +268,9 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         /// <param name="contextPath">The path for which the context-specific tags are to be loaded.
         /// </param>
-        void LoadTagsForPath(string contextPath)
+        /// <returns><see langword="true"/> if a non-empty database was loaded;
+        /// <see langword="false"/> if the database did not exist or was empty.</returns>
+        bool LoadTagsForPath(string contextPath)
         {
             lock (_lock)
             {
@@ -244,7 +279,7 @@ namespace Extract.Utilities.ContextTags
                 // If no path is specified, don't load any tags.
                 if (string.IsNullOrWhiteSpace(contextPath))
                 {
-                    return;
+                    return false;
                 }
 
                 // If _SETTING_FILENAME doesn't exist, there is nothing more to do.
@@ -253,8 +288,10 @@ namespace Extract.Utilities.ContextTags
                 {
                     // Even if there are no custom tags available, provide the option to edit.
                     _tagValues.Add(_EDIT_CUSTOM_TAGS_LABEL, "");
-                    return;
+                    return false;
                 }
+
+                bool databasePopulated = false;
             
                 // Query the database file to get the active context and associated tag values.
                 using (var dbConnectionInfo = new DatabaseConnectionInfo(
@@ -290,10 +327,14 @@ namespace Extract.Utilities.ContextTags
                                 .ToDictionary(tagValue => 
                                     tagValue.CustomTag.Name, tagValue => tagValue.Value);
                         }
+
+                        databasePopulated = database.Context.Any() || database.CustomTag.Any();
                     }
                 }
 
                 _tagValues.Add(_EDIT_CUSTOM_TAGS_LABEL, "");
+
+                return databasePopulated;
             }
         }
 

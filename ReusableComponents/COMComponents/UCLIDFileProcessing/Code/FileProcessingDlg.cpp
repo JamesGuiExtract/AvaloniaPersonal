@@ -19,6 +19,7 @@
 #include <LoadFileDlgThread.h>
 #include <FAMUtilsConstants.h>
 #include <SuspendWindowUpdates.h>
+#include <FAMUtilsConstants.h>
 
 #include <vector>
 
@@ -209,6 +210,7 @@ BEGIN_MESSAGE_MAP(FileProcessingDlg, CDialog)
 	ON_COMMAND(ID_BTN_FAM_SAVE, &FileProcessingDlg::OnFileSave)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXT,0x0000,0xFFFF,OnToolTipNotify)
 	ON_COMMAND(ID_TOOLS_DATABASEADMINISTRATIONUTILITY, &FileProcessingDlg::OnToolsFAMDBAdmin)
+	ON_COMMAND(ID_TOOLS_EDITCUSTOMTAGS, &FileProcessingDlg::OnToolsEditCustomTags)
 	ON_COMMAND_RANGE(ID_FAM_MRU_FILE1, ID_FAM_MRU_FILE8, &FileProcessingDlg::OnSelectFAMMRUPopupMenu)
 	ON_NOTIFY(TBN_DROPDOWN, AFX_IDW_TOOLBAR, &FileProcessingDlg::OnToolbarDropDown)
 END_MESSAGE_MAP()
@@ -368,7 +370,7 @@ void FileProcessingDlg::OnBtnRun()
 		// If auto-saving FPS file is enabled, save the FPS file
 		if (m_dlgOptions.getAutoSaveFPSFile())
 		{
-			if (!saveFile(m_strCurrFPSFilename))
+			if (!saveFile(m_strCurrFPSFilename, true))
 			{
 				// Do not run if the save failed/was cancelled
 				return;
@@ -1329,7 +1331,7 @@ void FileProcessingDlg::OnFileSave()
 		// https://extract.atlassian.net/browse/ISSUE-12798
 		if (!m_bRunning)
 		{
-			saveFile(m_strCurrFPSFilename);
+			saveFile(m_strCurrFPSFilename, true);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10960");
@@ -1342,7 +1344,7 @@ void FileProcessingDlg::OnFileSaveas()
 
 	try
 	{	
-		saveFile(string(""));
+		saveFile(string(""), true);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10961");
 	
@@ -1601,6 +1603,17 @@ void FileProcessingDlg::OnToolsFAMDBAdmin()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17611");
 }
 //-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::OnToolsEditCustomTags()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_ipFAMTagUtility->EditCustomTags((long)m_hWnd);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38104");
+}
+//-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnToolbarDropDown(NMHDR* pNMHDR, LRESULT *plr)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -1736,7 +1749,7 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 					MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
 				{
 					// Prompt for save
-					bFPSFileSaved = saveFile(string(""));
+					bFPSFileSaved = saveFile(string(""), false);
 				}
 			}
 			
@@ -1976,6 +1989,7 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	pMenu->EnableMenuItem(ID_PROCESS_PAUSEPROCESSING, MF_BYCOMMAND | (bEnablePause ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(ID_PROCESS_STOPPROCESSING, MF_BYCOMMAND | (bEnableStop ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(2, MF_BYPOSITION | (bRunningStatus ? MF_GRAYED : MF_ENABLED) );
+	pMenu->EnableMenuItem(ID_TOOLS_EDITCUSTOMTAGS, MF_BYCOMMAND | (m_strCurrFPSFilename.empty() ? MF_GRAYED : MF_ENABLED) );
 
 	// Enable/disable the controls on the database page based on whether
 	// we are currently processing or not
@@ -2365,8 +2379,25 @@ void FileProcessingDlg::openFile(string strFileName)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool FileProcessingDlg::saveFile(std::string strFileName)
+bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfigurationWarnings)
 {
+	if (bShowConfigurationWarnings)
+	{
+		string strWarning = asString(getFPM()->GetConfigurationWarnings());
+
+		if (!strWarning.empty())
+		{
+			strWarning += "\r\n\r\nContinue with save?";
+
+			int nResponse = MessageBox(strWarning.c_str(), "Configuration warning",
+				MB_YESNO| MB_ICONEXCLAMATION);
+			if (nResponse != IDYES)
+			{
+				return false;
+			}
+		}
+	}
+
 	if (strFileName == "")
 	{
 		// Get the default file name based on action 
@@ -2446,11 +2477,11 @@ bool FileProcessingDlg::checkForSave()
 			if (isFileReadOnly( m_strCurrFPSFilename ))
 			{
 				// Display a SaveAs dialog
-				return saveFile( "" );
+				return saveFile("", true);
 			}
 
 			// if the file fails to save we treat it as if the user wishes to cancel
-			if (!saveFile(m_strCurrFPSFilename))
+			if (!saveFile(m_strCurrFPSFilename, true))
 			{
 				return false;
 			}

@@ -87,6 +87,12 @@ namespace Extract.SQLCDBEditor
         SqlCeCommandBuilder _commandBuilder;
 
         /// <summary>
+        /// Stores the MaxLength for each column in the table for use in calculating default column
+        /// sizes.
+        /// </summary>
+        Dictionary<int, int> _columnSizes = new Dictionary<int, int>();
+
+        /// <summary>
         /// The query to evaluate. This does not contain any sub-queries for defining query
         /// parameters.
         /// </summary>
@@ -733,6 +739,7 @@ namespace Extract.SQLCDBEditor
                 {
                     _adapter.Fill(latestDataTable);
                     ApplySchema(latestDataTable);
+                    StoreColumnSizes(latestDataTable);
 
                     if (!DataIsValid)
                     {
@@ -1963,6 +1970,7 @@ namespace Extract.SQLCDBEditor
             // Fill the table with the data from the dataAdapter
             _adapter.Fill(_resultsTable);
             ApplySchema(_resultsTable);
+            StoreColumnSizes(_resultsTable);
 
             // Create a command builder for the adapter that allow edits made in the _resultsGrid
             // to be applied back to the database.
@@ -2028,6 +2036,19 @@ namespace Extract.SQLCDBEditor
                     "auto-increment columns or columns with default values may not auto-populate.",
                     ex);
                 ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Stores the MaxLength of all columns in <see paramref="dataTable"/>.
+        /// </summary>
+        /// <param name="dataTable">The <see cref="DataTable"/>.</param>
+        void StoreColumnSizes(DataTable dataTable)
+        {
+            _columnSizes.Clear();
+            for (int i = 0; i < dataTable.Columns.Count; i++)
+            {
+                _columnSizes[i] = dataTable.Columns[i].MaxLength;
             }
         }
 
@@ -2128,7 +2149,6 @@ namespace Extract.SQLCDBEditor
             {
                 // Allow the user to enter as much text as they wish; it will be marked invalid if
                 // it is too much.
-// This affects auto-sizing code. Max data lengths should be separately stored for columns sizing.
                 column.MaxLength = -1;
                 column.AllowDBNull = true;
             }
@@ -2162,11 +2182,9 @@ namespace Extract.SQLCDBEditor
                     else if (column.ValueType == typeof(string))
                     {
                         int maxLength = -1;
-                        if (!UsingPluginBindingSource)
-                        {
-                            DataColumn dataColumn = _resultsTable.Columns[i];
-                            maxLength = dataColumn.MaxLength;
 
+                        if (!UsingPluginBindingSource && _columnSizes.TryGetValue(i, out maxLength))
+                        {
                             // For text fields that can be > 10 chars but not unlimited, scale up from
                             // a fill weight of 1.0 logarithmically.
                             // MaxLength 10	 = 1.0

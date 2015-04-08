@@ -24,6 +24,16 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(ContextTagsPlugin).ToString();
 
+        /// <summary>
+        /// Database server tag name.
+        /// </summary>
+        static readonly string _DATABASE_SERVER_TAG = "<DatabaseServer>";
+
+        /// <summary>
+        /// Database name tag name.
+        /// </summary>
+        static readonly string _DATABASE_NAME_TAG = "<DatabaseName>";
+
         #endregion Constants
 
         #region Fields
@@ -48,6 +58,11 @@ namespace Extract.Utilities.ContextTags
         /// A <see cref="Button"/> that can be used to edit the available contexts.
         /// </summary>
         Button _editContextsButton;
+
+        /// <summary>
+        /// A <see cref="Button"/> that can be used to edit the available contexts.
+        /// </summary>
+        Button _addDatabaseTagsButton;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -145,6 +160,10 @@ namespace Extract.Utilities.ContextTags
                 _editContextsButton.Text = "Edit Contexts";
                 _editContextsButton.Click += HandleEditContextsButton_Click;
                 _editContextsButton.HandleCreated += HandleEditContextsButton_HandleCreated;
+
+                _addDatabaseTagsButton = pluginManager.GetNewButton();
+                _addDatabaseTagsButton.Text = "Add Database Tags";
+                _addDatabaseTagsButton.Click += HandleAddDatabaseTagsButton_Click;
             }
             catch (Exception ex)
             {
@@ -183,12 +202,16 @@ namespace Extract.Utilities.ContextTags
                     _database = new ContextTagDatabase((SqlCeConnection)_connection);
                 }
 
-                if (_contextTagsView == null)
+                // In cases where the data has been modified via the database and not the table, 
+                // a simple refresh of _contextTagsView seems to allow for a situation where the
+                // data is apparently not in sync with the DB and DataGridView.OnRowEnter will
+                // trigger an exception "index -1 does not have a value". While I am not sure what
+                // is specifically wrong, always re-creating _contextTagsView avoids the issue.
+                if (_contextTagsView != null)
                 {
-                    _contextTagsView = new ContextTagsEditorViewCollection(_database);
+                    _contextTagsView.Dispose();
                 }
-
-                _contextTagsView.Refresh();
+                _contextTagsView = new ContextTagsEditorViewCollection(_database);
 
                 // The AllowNew set needs to come after Refresh; if AllowNew is set before the data
                 // is initialized via the refresh call, errors will result as a the DataGridView is
@@ -268,6 +291,42 @@ namespace Extract.Utilities.ContextTags
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI38040");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of <see cref="_addDatabaseTagsButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleAddDatabaseTagsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string[] tagsToAdd = new[] { _DATABASE_SERVER_TAG, _DATABASE_NAME_TAG };
+                tagsToAdd = tagsToAdd.Except(_database.CustomTag.Select(tag => tag.Name)).ToArray();
+
+                if (!tagsToAdd.Any())
+                {
+                    UtilityMethods.ShowMessageBox("The database tags have already been added.",
+                        "Database tags already exist.", false);
+                    return;
+                }
+
+                foreach (string tagToAdd in tagsToAdd)
+                {
+                    var customTag = new CustomTagTableV1();
+                    customTag.Name = tagToAdd;
+                    _database.CustomTag.InsertOnSubmit(customTag);
+                }
+
+                _database.SubmitChanges();
+                OnDataChanged(true, true);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38093");
             }
         }
 

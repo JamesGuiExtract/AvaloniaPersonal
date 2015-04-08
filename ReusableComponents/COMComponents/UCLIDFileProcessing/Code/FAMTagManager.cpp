@@ -18,7 +18,7 @@ const string strFPS_FILENAME_TAG = "<FPSFileName>";
 const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 const string strDATABASE_SERVER_TAG = "<DatabaseServer>";
 const string strDATABASE_NAME_TAG = "<DatabaseName>";
-const string strDATABASE_ACTION_TAG = "<DatabaseAction>";
+const string strDATABASE_ACTION_TAG = "<ActionName>";
 
 //--------------------------------------------------------------------------------------------------
 // Statics
@@ -549,6 +549,79 @@ STDMETHODIMP CFAMTagManager::SetFAMDB(IFileProcessingDB *pFAMDB, long nActionID)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38079");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::ValidateConfiguration(BSTR bstrDatabaseServer, BSTR bstrDatabaseName,
+												   BSTR* pbstrWarning)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38105", bstrDatabaseServer != __nullptr);
+		ASSERT_ARGUMENT("ELI38106", bstrDatabaseName != __nullptr);
+		ASSERT_ARGUMENT("ELI38107", pbstrWarning != __nullptr);
+
+		IVariantVectorPtr ipUndefinedTags = ms_ipContextTagProvider->GetUndefinedTags();
+		ASSERT_RESOURCE_ALLOCATION("ELI38097", ipUndefinedTags != __nullptr);
+
+		long nUndefinedTagCount = ipUndefinedTags->Size;
+		if (nUndefinedTagCount > 0)
+		{
+			UCLIDException ue("ELI38098", 
+				"There are custom tag(s) that have not been defined in the current context.");
+			ue.addDebugInfo("Context", asString(ms_ipContextTagProvider->ActiveContext));
+			for (int i = 0; i < nUndefinedTagCount; i++)
+			{
+				ue.addDebugInfo("Undefined tag", asString(ipUndefinedTags->Item[i].bstrVal));
+			}
+			throw ue;
+		}
+
+		IVariantVectorPtr ipContextTagNames = ms_ipContextTagProvider->GetTagNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI38108", ipContextTagNames != __nullptr);
+
+		string strDBServer = asString(bstrDatabaseServer);
+		string strDBName = asString(bstrDatabaseName);
+		bool bConflictingTags = false;
+
+		long nCountTagNames = ipContextTagNames->Size;
+		for (int i = 0; i < nCountTagNames; i++)
+		{
+			if (asString(ipContextTagNames->Item[i].bstrVal) == strDATABASE_SERVER_TAG &&
+				strDBServer != strDATABASE_SERVER_TAG)
+			{
+				bConflictingTags = true;
+				break;
+			}
+
+			if (asString(ipContextTagNames->Item[i].bstrVal) == strDATABASE_NAME_TAG &&
+				strDBName != strDATABASE_NAME_TAG)
+			{
+				bConflictingTags = true;
+				break;
+			}
+		}
+
+		if (bConflictingTags)
+		{
+			string strWarning = "Since <DatabaseServer> and/or <DatabaseName> are defined they "
+				"should be used  to specify the server on the database tab. Otherwise, the "
+				"specified database of " + strDBServer + "/" + strDBName + " may conflict and "
+				"override the defined values of these tags depending on the context at the time of "
+				"execution.";
+
+			*pbstrWarning = _bstr_t(strWarning.c_str()).Detach();
+		}
+		else
+		{
+			*pbstrWarning = __nullptr;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38096");
 }
 
 //--------------------------------------------------------------------------------------------------

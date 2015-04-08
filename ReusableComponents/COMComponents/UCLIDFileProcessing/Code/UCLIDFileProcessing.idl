@@ -520,7 +520,12 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(56), helpstring("property AdvancedConnectionStringProperties")]
 			HRESULT AdvancedConnectionStringProperties([in] BSTR newVal);		
 		[propget, id(56), helpstring("property AdvancedConnectionStringProperties")]
-			HRESULT AdvancedConnectionStringProperties([out, retval] BSTR* pVal);	
+			HRESULT AdvancedConnectionStringProperties([out, retval] BSTR* pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Retrieves a message warning about any potential configuration issues. If there
+		//			are not potential configuration issues, pbstrWarning == __nullptr
+		[id(57), helpstring("method GetConfigurationWarnings")] HRESULT GetConfigurationWarnings(
+			[out, retval] BSTR *pbstrWarning);
 	};
 
 	[
@@ -2029,7 +2034,7 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([out, retval] BSTR *strFPSFileName);
 		[propput, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([in] BSTR strFPSFileName);
 		//-----------------------------------------------------------------------------------------
-		// IF VARIANT_TRUE, <DatabaseServer>, <DatabaseName> and <DatabaseAction> will be available
+		// IF VARIANT_TRUE, <DatabaseServer>, <DatabaseName> and <ActionName> will be available
 		// even if they haven't been defined as a CustomTag.
 		[propget, id(10), helpstring("property AlwaysShowDatabaseTags")] HRESULT AlwaysShowDatabaseTags([out, retval] VARIANT_BOOL *pbValue);
 		[propput, id(10), helpstring("property AlwaysShowDatabaseTags")] HRESULT AlwaysShowDatabaseTags([in] VARIANT_BOOL bValue);
@@ -2040,6 +2045,13 @@ library UCLID_FILEPROCESSINGLib
 		// tags will continue to return the old connection info. Thus, this call should be
 		// re-executed if at any point the database connection or action may have changed.
 		[id(11), helpstring("method SetFAMDB")] HRESULT SetFAMDB([in] IFileProcessingDB *pFAMDB, long nActionID);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Verifies that the tag manager has all necessary info to expand tags during processing.
+		//			bstrDatabaseServer and bstrDatabaseName refer to the FAM's literally configured
+		//			database parameters, not the path tag expansion of those parameters.
+		//			If non-null, pbstrWarning will describe any non-critical configurations issues.
+		[id(12), helpstring("method ValidateConfiguration")] HRESULT ValidateConfiguration(
+			[in] BSTR bstrDatabaseServer, [in] BSTR bstrDatabaseName, [out, retval] BSTR* pbstrWarning);
 	};
 
 	[

@@ -54,7 +54,7 @@ namespace Extract.FileActionManager.Forms
         /// <summary>
         /// Constant string for the database action tag.
         /// </summary>
-        public static readonly string DatabaseActionTag = "<DatabaseAction>";
+        public static readonly string DatabaseActionTag = "<ActionName>";
 
         #endregion Constants
 

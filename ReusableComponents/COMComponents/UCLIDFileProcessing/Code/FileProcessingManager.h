@@ -98,6 +98,7 @@ public:
 	STDMETHOD(AuthenticateService)(BSTR bstrValue);
 	STDMETHOD(get_AdvancedConnectionStringProperties)(BSTR *pVal);
 	STDMETHOD(put_AdvancedConnectionStringProperties)(BSTR newVal);
+	STDMETHOD(GetConfigurationWarnings)(BSTR *pbstrWarning);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -262,6 +263,9 @@ private:
 	// Prompts for user and DB admin passwords as appropriate to run. Returns true if processing is
 	// allowed to run, false if the user was prompted for a password they did not correctly enter.
 	bool authenticateForProcessing();
+
+	// Displays a message box warning about any potential configuration issues.
+	void showConfigurationWarnings();
 
 	// Gets the this pointer as smart com pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr getThisAsCOMPtr();

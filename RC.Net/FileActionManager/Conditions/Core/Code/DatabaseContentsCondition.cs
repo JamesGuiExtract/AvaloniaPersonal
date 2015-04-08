@@ -1438,22 +1438,15 @@ namespace Extract.FileActionManager.Conditions
 
                     if (reader.Version < 2)
                     {
-                        // Update tag name of <ActionName> to <DatabaseAction> and
-                        // <DatabaseServerName> to <DatabaseServer>
-                        DataConnectionString = DataConnectionString.Replace("<ActionName>",
-                            FileActionManagerPathTags.DatabaseActionTag);
+                        // Update tag name of <DatabaseServerName> to <DatabaseServer>
                         DataConnectionString = DataConnectionString.Replace("<DatabaseServerName>",
                             FileActionManagerPathTags.DatabaseServerTag);
-                        Query = Query.Replace("<ActionName>",
-                            FileActionManagerPathTags.DatabaseActionTag);
                         Query = Query.Replace("<DatabaseServerName>",
                             FileActionManagerPathTags.DatabaseServerTag);
                         for (int i = 0; i < SearchFields.Size(); i++)
                         {
                             var fieldConfiguration = (VariantVector)SearchFields.At(i);
                             string fieldValue = (string)fieldConfiguration[1];
-                            fieldValue = fieldValue.Replace("<ActionName>",
-                                FileActionManagerPathTags.DatabaseActionTag);
                             fieldValue = fieldValue.Replace("<DatabaseServerName>",
                                 FileActionManagerPathTags.DatabaseServerTag);
                             fieldConfiguration.Set(1, fieldValue);
