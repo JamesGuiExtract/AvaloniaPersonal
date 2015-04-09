@@ -134,7 +134,7 @@ namespace Extract.Utilities.ContextTags
         {
             get
             {
-                return _activeContext;
+                return (_activeContext == null) ? "": _activeContext;
             }
         }
 
@@ -224,6 +224,10 @@ namespace Extract.Utilities.ContextTags
                         // If the database didn't previously exist and no tags were added, don't
                         // keep the database file.
                         FileSystemMethods.DeleteFile(settingFileName);
+
+                        // Clear the "No context defined!" message if the database isn't to be
+                        // persisted.
+                        _activeContext = "";
                     }
                 }
             }
@@ -276,6 +280,9 @@ namespace Extract.Utilities.ContextTags
             {
                 _tagValues.Clear();
 
+                // Clear the active context
+                _activeContext = "";
+
                 // If no path is specified, don't load any tags.
                 if (string.IsNullOrWhiteSpace(contextPath))
                 {
@@ -322,14 +329,21 @@ namespace Extract.Utilities.ContextTags
                         // context.
                         if (_activeContext != null)
                         {
+                            // The row that is mapped to the new row in a DataGridView can end up being
+                            // persisted. Ignore any unnamed custom tags.
                             _tagValues = database.TagValue
-                                .Where(tagValue => tagValue.Context.Name.Equals(_activeContext))
+                                .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
+                                    tagValue.CustomTag.Name != "")
                                 .ToDictionary(tagValue => 
                                     tagValue.CustomTag.Name, tagValue => tagValue.Value);
                         }
-
-                        databasePopulated = database.Context.Any() || database.CustomTag.Any();
-                    }
+                        else
+                        {
+                            _activeContext = "No context defined!";
+                        }
+ 
+ 						databasePopulated = database.Context.Any() || database.CustomTag.Any();
+                   }
                 }
 
                 _tagValues.Add(_EDIT_CUSTOM_TAGS_LABEL, "");

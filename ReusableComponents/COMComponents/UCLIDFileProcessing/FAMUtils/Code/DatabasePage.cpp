@@ -34,6 +34,11 @@ const string gstrDBCFG_FILE_OPEN_FILTER = gstrDBCFG_FILE_FILTER +
 											gstrALL_FILE_FILTER;
 
 //-------------------------------------------------------------------------------------------------
+// Statics
+//-------------------------------------------------------------------------------------------------
+HCURSOR DatabasePage::g_hHandCursor = LoadCursor(NULL, IDC_HAND);
+
+//-------------------------------------------------------------------------------------------------
 // DatabasePage dialog
 //-------------------------------------------------------------------------------------------------
 
@@ -49,7 +54,8 @@ DatabasePage::DatabasePage()
 	m_pNotifyDBConfigChangedObject(NULL),
 	m_bBrowseEnabled(true),
 	m_bShowDBServerTag(false),
-	m_bShowDBNameTag(false)
+	m_bShowDBNameTag(false),
+	m_crContextTextColor(RGB(0,0,0) /* Black */)
 {
 	try
 	{
@@ -78,6 +84,8 @@ void DatabasePage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_DB_SERVER, m_editDBServer);
 	DDX_Control(pDX, IDC_EDIT_DB_NAME, m_editDBName);
 	DDX_Control(pDX, IDC_EDIT_CONN_STR, m_editAdvConnStrProperties);
+	DDX_Control(pDX, IDC_STATIC_CURRENT_CONTEXT_LABEL, m_labelCurrentContextLabel);
+	DDX_Control(pDX, IDC_STATIC_CURRENT_CONTEXT, m_labelCurrentContext);
 	DDX_Control(pDX, IDC_BUTTON_REFRESH, m_btnRefresh);
 	DDX_Control(pDX, IDC_BUTTON_SQL_SERVER_BROWSE, m_btnSqlServerBrowse);
 	DDX_Control(pDX, IDC_BUTTON_LAST_USED_DB, m_btnConnectLastUsedDB);
@@ -96,6 +104,10 @@ BEGIN_MESSAGE_MAP(DatabasePage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BUTTON_LAST_USED_DB, &DatabasePage::OnBnClickedButtonLastUsedDb)
 	ON_BN_CLICKED(IDC_BUTTON_CONN_STR, &DatabasePage::OnBnClickedButtonAdvConnStrProperties)
 	ON_BN_CLICKED(IDC_BUTTON_USE_CURRENT_CONTEXT, &DatabasePage::OnBnClickedButtonUseCurrentContextDatabase)
+	ON_BN_CLICKED(IDC_STATIC_CURRENT_CONTEXT_LABEL, &DatabasePage::OnBnClickedCurrentContextLabel)
+	ON_BN_CLICKED(IDC_STATIC_CURRENT_CONTEXT, &DatabasePage::OnBnClickedCurrentContextLabel)
+	ON_WM_CTLCOLOR()
+	ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -187,11 +199,7 @@ void DatabasePage::OnBnClickedButtonRefresh()
 
 	try
 	{
-		// Update control member variables
-		UpdateData();
-
-		// Notify the objects of config change
-		notifyObjects();
+		refreshConnection();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16110");
 }
@@ -211,7 +219,7 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 		}
 
 		int iLRMargin, iDistBetween, iBrowseBtnWidth, iRefreshBtnWidth;
-		CRect rectDlg, rectServer, rectBrowseBtn, rectRefreshBtn, rectConnectLastDBBtn;
+		CRect rectDlg, rectServer, rectBrowseBtn, rectRefreshBtn, rectConnectLastDBBtn, rectCurrContext;
 
 		// Get the Pages client window
 		GetClientRect(&rectDlg);
@@ -228,9 +236,13 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 		m_btnRefresh.GetWindowRect(&rectRefreshBtn);
 		ScreenToClient(&rectRefreshBtn);
 
-		// Get the ConnectLastDB buttons constrol's window rect
+		// Get the ConnectLastDB buttons control's window rect
 		m_btnConnectLastUsedDB.GetWindowRect(&rectConnectLastDBBtn);
 		ScreenToClient(&rectConnectLastDBBtn);
+
+		// Get the current context edit box size and position
+		m_labelCurrentContext.GetWindowRect(&rectCurrContext);
+		ScreenToClient(&rectCurrContext);
 
 		// Calculate the space to leave to the right and left
 		iLRMargin = rectServer.left - rectDlg.left;
@@ -268,14 +280,14 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 		rectBrowseBtn.bottom = rectResize.bottom;
 		m_btnBrowseDB.MoveWindow(&rectBrowseBtn);
 
-		// Resize the advanced connection propeties edit control
+		// Resize the advanced connection properties edit control
 		m_editAdvConnStrProperties.GetWindowRect(&rectResize);
 		ScreenToClient(&rectResize);
 		rectResize.left = rectServer.left;
 		rectResize.right = rectServer.right; 
 		m_editAdvConnStrProperties.MoveWindow(&rectResize);
 
-		// Resize the advanced connection propeties edit button
+		// Resize the advanced connection properties edit button
 		rectBrowseBtn.top = rectResize.top;
 		rectBrowseBtn.bottom = rectResize.bottom;
 		m_btnAdvConnStrProperties.MoveWindow(&rectBrowseBtn);
@@ -298,12 +310,16 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 		rectConnectLastDBBtn.bottom = rectConnectLastDBBtn.top + rectRefreshBtn.Height();
 		m_btnConnectLastUsedDB.MoveWindow(rectConnectLastDBBtn);
 
+		// Move the use current context database button
 		rectResize.left = rectConnectLastDBBtn.left - 4 - rectConnectLastDBBtn.Width();
 		rectResize.right = rectConnectLastDBBtn.left - 4;
 		rectResize.top = rectConnectLastDBBtn.top;
 		rectResize.bottom = rectConnectLastDBBtn.bottom;
 		
 		m_btnUseCurrentContextDatabase.MoveWindow(rectResize);
+
+		// Size the Current context edit box
+		positionContextLabel();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16160");
 }
@@ -397,6 +413,7 @@ void DatabasePage::OnBnClickedButtonAdvConnStrProperties()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35134");
 }
+//-------------------------------------------------------------------------------------------------
 void DatabasePage::OnBnClickedButtonUseCurrentContextDatabase()
 {
 	try
@@ -412,7 +429,81 @@ void DatabasePage::OnBnClickedButtonUseCurrentContextDatabase()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38064");
 }
+//-------------------------------------------------------------------------------------------------
+void DatabasePage::OnBnClickedCurrentContextLabel()
+{
+	try
+	{
+		// Send Control + E to use the FAM's shortcut to open context tags editor.
+		INPUT input = {0};
+		input.type = INPUT_KEYBOARD;
 
+		input.ki.dwFlags = 0; // key down
+
+		WORD vkey = VK_CONTROL; 
+		input.ki.wScan = MapVirtualKey(vkey, MAPVK_VK_TO_VSC);
+		input.ki.wVk = vkey;
+		SendInput(1, &input, sizeof(INPUT));
+
+		vkey = 'E'; 
+		input.ki.wScan = MapVirtualKey(vkey, MAPVK_VK_TO_VSC);
+		input.ki.wVk = vkey;
+		SendInput(1, &input, sizeof(INPUT));
+
+		input.ki.dwFlags = KEYEVENTF_KEYUP;
+
+		SendInput(1, &input, sizeof(INPUT));
+
+		vkey = VK_CONTROL; 
+		input.ki.wScan = MapVirtualKey(vkey, MAPVK_VK_TO_VSC);
+		input.ki.wVk = vkey;
+		SendInput(1, &input, sizeof(INPUT));
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38113");
+}
+//-------------------------------------------------------------------------------------------------
+HBRUSH DatabasePage::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = __nullptr;
+
+	try
+	{
+		// Call the base
+		hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+		// if this is the edit current context control set the color
+		if (pWnd->GetDlgCtrlID() == m_labelCurrentContext.GetDlgCtrlID())
+		{
+			// Set the text color to the current context control
+			pDC->SetTextColor(m_crContextTextColor);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38095");
+
+	return hbr;
+}
+//-------------------------------------------------------------------------------------------------
+BOOL DatabasePage::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+{
+	BOOL bResult = FALSE;
+
+	try
+	{
+		bResult = CDialog::OnSetCursor(pWnd, nHitTest, message);
+
+		// if this is the edit current context control set the color
+		if (pWnd->GetDlgCtrlID() == m_labelCurrentContextLabel.GetDlgCtrlID() ||
+			pWnd->GetDlgCtrlID() == m_labelCurrentContext.GetDlgCtrlID())
+		{
+			// Set the text color to the current context control
+			SetCursor(g_hHandCursor);
+			return TRUE;
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38114");
+
+	return bResult;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Public methods
@@ -465,6 +556,15 @@ void DatabasePage::clear()
 	UpdateData(FALSE);
 
 	// Notify the object of change
+	notifyObjects();
+}
+//-------------------------------------------------------------------------------------------------
+void DatabasePage::refreshConnection()
+{
+	// Update control member variables
+	UpdateData();
+
+	// Notify the objects of config change
 	notifyObjects();
 }
 //-------------------------------------------------------------------------------------------------
@@ -531,6 +631,49 @@ void DatabasePage::enableAllControls(bool bEnableAll)
 	m_editDBServer.EnableWindow(bEnable);
 	m_editAdvConnStrProperties.EnableWindow(bEnable);
 }
+//-------------------------------------------------------------------------------------------------
+void DatabasePage::setCurrentContextText(const string& strCurrentContextText, COLORREF crColor)
+{
+	// Make sure the current context edit control is visible if there is a context to display.
+	int nShow = strCurrentContextText.empty() ? SW_HIDE : SW_SHOW;
+	m_labelCurrentContextLabel.ShowWindow(nShow);
+	m_labelCurrentContext.ShowWindow(nShow);
+
+	// set the text color that should be used for the edit control
+	m_crContextTextColor = crColor;
+
+	// set the text of the Current context edit control
+	m_labelCurrentContext.SetWindowText(strCurrentContextText.c_str());
+
+	positionContextLabel();
+}
+//-------------------------------------------------------------------------------------------------
+void DatabasePage::positionContextLabel()
+{
+	CString zText;
+	m_labelCurrentContext.GetWindowText(zText);
+
+	CClientDC dc(this);
+	CFont *pFont = dc.SelectObject(m_labelCurrentContext.GetFont());
+	dc.SelectObject(&pFont);
+	CSize textSize = dc.GetTextExtent(zText, zText.GetLength());
+
+	CRect rectPage, rectLabel;
+	GetClientRect(&rectPage);
+	m_labelCurrentContextLabel.GetWindowRect(&rectLabel);
+	ScreenToClient(&rectLabel);
+	
+	rectLabel.top = rectPage.bottom - 5 - rectLabel.Height();
+	rectLabel.bottom = rectPage.bottom - 5;
+
+	m_labelCurrentContextLabel.MoveWindow(&rectLabel);
+
+	rectLabel.left = rectLabel.right + 3;
+	rectLabel.right = rectLabel.left + textSize.cx;
+
+	m_labelCurrentContext.MoveWindow(&rectLabel);
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // Private methods

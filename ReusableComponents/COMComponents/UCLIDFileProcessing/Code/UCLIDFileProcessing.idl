@@ -2034,7 +2034,7 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([out, retval] BSTR *strFPSFileName);
 		[propput, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([in] BSTR strFPSFileName);
 		//-----------------------------------------------------------------------------------------
-		// IF VARIANT_TRUE, <DatabaseServer>, <DatabaseName> and <ActionName> will be available
+		// IF VARIANT_TRUE, <DatabaseServer>, <DatabaseName> and <DatabaseAction> will be available
 		// even if they haven't been defined as a CustomTag.
 		[propget, id(10), helpstring("property AlwaysShowDatabaseTags")] HRESULT AlwaysShowDatabaseTags([out, retval] VARIANT_BOOL *pbValue);
 		[propput, id(10), helpstring("property AlwaysShowDatabaseTags")] HRESULT AlwaysShowDatabaseTags([in] VARIANT_BOOL bValue);
@@ -2052,6 +2052,8 @@ library UCLID_FILEPROCESSINGLib
 		//			If non-null, pbstrWarning will describe any non-critical configurations issues.
 		[id(12), helpstring("method ValidateConfiguration")] HRESULT ValidateConfiguration(
 			[in] BSTR bstrDatabaseServer, [in] BSTR bstrDatabaseName, [out, retval] BSTR* pbstrWarning);
+		// Returns the active context
+		[propget, id(13), helpstring("property ActiveContext")] HRESULT ActiveContext([out,retval] BSTR *strActiveContext);
 	};
 
 	[

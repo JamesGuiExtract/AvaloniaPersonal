@@ -62,6 +62,9 @@ public:
 	// PROMISE: To clear the UI
 	void clear();
 
+	// PROMISE: Refreshes the connection based on the currently specified parameters.
+	void refreshConnection();
+
 	// PROMISE: To set the m_bBrowseEnabled flag
 	void setBrowseEnabled(bool bBrowseEnabled);
 
@@ -77,6 +80,9 @@ public:
 
 	// PROMISE: To enable or disable the entire property page
 	void enableAllControls(bool bEnableAll);
+
+	// PROMISE: To Set the text for the current context with the indicated text color
+	void setCurrentContextText(const string& strCurrentContextText, COLORREF crColor = RGB(0, 0, 0) /* Black */);
 	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -92,6 +98,9 @@ protected:
 	afx_msg void OnBnClickedButtonLastUsedDb();
 	afx_msg void OnBnClickedButtonAdvConnStrProperties();
 	afx_msg void OnBnClickedButtonUseCurrentContextDatabase();
+	afx_msg void OnBnClickedCurrentContextLabel();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	virtual BOOL OnInitDialog();
 
 private:
@@ -113,6 +122,8 @@ private:
 	CEdit m_editDBName;
 	CEdit m_editAdvConnStrProperties;
 	CEdit m_editConnectStatus;
+	CStatic m_labelCurrentContextLabel;
+	CStatic m_labelCurrentContext;
 	CButton m_btnAdvConnStrProperties;
 	CButton m_btnRefresh;
 	CButton m_btnConnectLastUsedDB;
@@ -138,6 +149,12 @@ private:
 	// Registry Persistence managers
 	unique_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 
+	// Color of the text for the context
+	COLORREF m_crContextTextColor;
+
+	// The Windows hand cursor.
+	static HCURSOR g_hHandCursor;
+
 	////////////////////
 	// Methods
 	////////////////////
@@ -151,4 +168,7 @@ private:
 
 	// Applies a new database name setting (updates advanced connection properties if necessary).
 	void setDatabase(const string& strDatabase);
+
+	// Sizes and positions the current context label based on the current text value.
+	void positionContextLabel();
 };

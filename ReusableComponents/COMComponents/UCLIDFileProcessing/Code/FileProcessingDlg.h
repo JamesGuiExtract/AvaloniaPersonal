@@ -218,6 +218,11 @@ private:
 	// Stores the name of the currently loaded(or saved) fps file
 	string m_strCurrFPSFilename;
 
+	// Indicates that the database connection is currently being established based on the currently
+	// specified database parameters. Used to prevent displaying the edit custom tags UI at
+	// inappropriate times.
+	bool m_bUpdatingConnection;
+
 	// This flag is set to true when the user stop processing using the stop button or stop processing
 	// menu option.  If the user interacts with the system by stopping processing the system will not
 	// close on completion even if that option was specified.
@@ -385,4 +390,7 @@ private:
 	void displayPage(EDlgTabPage ePage);
 
 	string getDefaultFileName();
+
+	// Clears the settings that indicate a context
+	void clearContext();
 };

@@ -454,7 +454,17 @@ namespace Extract.Utilities.ContextTags
 
                 foreach (var customTag in _database.CustomTag)
                 {
-                    _contextRows.Add(new ContextTagsEditorViewRow(_database, customTag));
+                    // The row that is mapped to the new row in a DataGridView can end up being
+                    // persisted. Ignore and delete any unnamed custom tags on load.
+                    var row = new ContextTagsEditorViewRow(_database, customTag);
+                    if (string.IsNullOrWhiteSpace(customTag.Name))
+                    {
+                        row.Delete();
+                    }
+                    else
+                    {
+                        _contextRows.Add(row);
+                    }
                 }
             }
         }

@@ -108,7 +108,8 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
  m_bStatsOnlyRunning(false),
  m_bProcessingSkippedFiles(false),
  m_bPaused(false),
- m_nNumberOfDocsToExecute(0)
+ m_nNumberOfDocsToExecute(0),
+ m_bUpdatingConnection(false)
 {
 	try
 	{
@@ -1236,6 +1237,9 @@ void FileProcessingDlg::OnFileNew()
 		// Clear the FPM
 		getFPM()->Clear();
 
+		// Clear the current context
+		clearContext();
+
 		// Update the database page Server and DBName
 		m_propDatabasePage.setConnectionInfo("", "", "");
 		
@@ -1610,8 +1614,13 @@ void FileProcessingDlg::OnToolsEditCustomTags()
 	try
 	{
 		m_ipFAMTagUtility->EditCustomTags((long)m_hWnd);
+
+		m_bUpdatingConnection = true;
+		m_propDatabasePage.refreshConnection();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38104");
+
+	m_bUpdatingConnection = false;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnToolbarDropDown(NMHDR* pNMHDR, LRESULT *plr)
@@ -1743,8 +1752,7 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 			// The FPS file needs to have been saved
 			if (!bFPSFileSaved)
 			{
-				// TODO: Add dialog that informs user that the file needs to be saved so that the
-				// correct context will be used.
+				// Inform the users that the configuration needs to be saved
 				if (AfxMessageBox("The configuration needs to be saved for the context to be identified.\r\nSave now?",
 					MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
 				{
@@ -1756,7 +1764,6 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 			if (bFPSFileSaved)
 			{
 				ipFAMTag->FPSFileName = m_strCurrFPSFilename.c_str();
-				ipFAMTag->FPSFileDir = "";
 				ipFAMTag->FPSFileDir = getDirectoryFromFullPath(m_strCurrFPSFilename).c_str();
 
 				// Expand tags
@@ -1770,9 +1777,10 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 					asCppBool(ipFAMTag->StringContainsTags(strExpandedAdvConnStrProperties.c_str()));
 
 				// If tags still need to be expanded open the edit context tags UI
-				if (bTagsToExpand)
+				if (bTagsToExpand && !m_bUpdatingConnection)
 				{
 					m_ipFAMTagUtility->EditCustomTags((long)GetSafeHwnd());
+
 					ipFAMTag->FPSFileDir = getDirectoryFromFullPath(m_strCurrFPSFilename).c_str(); 
 					strExpandedServerName = ipFAMTag->ExpandTags(rstrServer.c_str(), "");
 					strExpandedDBName = ipFAMTag->ExpandTags(rstrDatabase.c_str(), "");
@@ -1782,16 +1790,16 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 					bTagsToExpand = asCppBool(ipFAMTag->StringContainsTags(strExpandedServerName.c_str())) || 
 						asCppBool(ipFAMTag->StringContainsTags(strExpandedDBName.c_str())) ||
 						asCppBool(ipFAMTag->StringContainsTags(strExpandedAdvConnStrProperties.c_str()));
-				}
 
-				// Now that the tags should be there save the info again - the tags get expanded
-				// for the FileProcessingDB - but will be saved in the FPM with the tags
-				getFPM()->DatabaseServer = rstrServer.c_str();
-				getFPM()->DatabaseName = rstrDatabase.c_str();
-				getFPM()->AdvancedConnectionStringProperties = rstrAdvConnStrProperties.c_str();
+					if (!bTagsToExpand)
+					{
+						m_bUpdatingConnection = true;
+						m_propDatabasePage.refreshConnection();
+					}
+				}
 			}
 		}
-		
+
 		// Only try to connect if no tags need to be expanded
 		if (!bTagsToExpand)
 		{
@@ -1811,9 +1819,12 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 
 		m_propDatabasePage.showDBServerTag(true);
 		m_propDatabasePage.showDBNameTag(true);
+		m_bUpdatingConnection = false;
 	}
 	catch ( ... )
 	{
+		m_bUpdatingConnection = false;
+
 		// Set the status string
 		try
 		{
@@ -2280,11 +2291,47 @@ void FileProcessingDlg::updateUI()
 
 	// Set the title bar text
 	CString szTitle = "File Action Manager";
+	
 	if (m_strCurrFPSFilename != "")
 	{
+		// Get the Context path	
+		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
+		ASSERT_RESOURCE_ALLOCATION("ELI38084", ipFAMTag != __nullptr);
+
+		string strActiveContext = ipFAMTag->ActiveContext;
+
 		string strFile = getFileNameFromFullPath(m_strCurrFPSFilename);
-		szTitle.Format("%s - %s on %s - File Action Manager", strFile.c_str(),
-			asString(getFPM()->DatabaseName).c_str(), asString(getFPM()->DatabaseServer).c_str());
+		
+		// if the context path is empty display the title without context
+		if (strActiveContext.empty())
+		{
+			szTitle.Format("%s - %s on %s - File Action Manager", strFile.c_str(),
+				asString(getFPM()->DatabaseName).c_str(), asString(getFPM()->DatabaseServer).c_str());
+			m_propDatabasePage.setCurrentContextText("");
+		}
+		else
+		{
+			
+			if (strActiveContext == "No context defined!")
+			{
+				// Set the context string to not defined in red
+				m_propDatabasePage.setCurrentContextText(strActiveContext, RGB(255,0,0) /* Red */);
+			}
+			else
+			{
+				// set the context string in default color
+				m_propDatabasePage.setCurrentContextText(strActiveContext);
+			}
+
+			// Setup title that contains the current context
+			szTitle.Format("%s - %s on %s - %s - File Action Manager", strFile.c_str(),
+				asString(getFPM()->DatabaseName).c_str(), asString(getFPM()->DatabaseServer).c_str(),
+				strActiveContext.c_str());
+		}
+	}
+	else
+	{
+		m_propDatabasePage.setCurrentContextText("");
 	}
 
 	// Add the Processing state string if 
@@ -2346,6 +2393,9 @@ void FileProcessingDlg::openFile(string strFileName)
 
 		CWaitCursor wait;
 		
+		// Clear the current context
+		clearContext();
+
 		// make sure the file exists
 		::validateFileOrFolderExistence(strFileName);
 
@@ -2419,6 +2469,8 @@ bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfiguratio
 			return false;
 		}
 
+		clearContext();
+
 		strFileName = (LPCTSTR) fileDlg.GetPathName();
 
 		// if the file already exists ask the user if they want to overwrite it
@@ -2452,6 +2504,9 @@ bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfiguratio
 		addFileToMRUList(strFileName);
 	}
 	setCurrFPSFile(strFileName);
+
+	// Reopen the file - this will reset the context so that tags will be interpreted correctly
+	openFile(m_strCurrFPSFilename);
 
 	return true;
 }
@@ -2515,42 +2570,54 @@ void FileProcessingDlg::setCurrFPSFile(const string& strFileName)
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::loadSettingsFromManager()
 {
-	// get the .FPS file first so that it will still be set even
-	// if an exception is thrown below here [p13 #4580]
-	// Get the .FPS filename and set it to the current FPS file
-	string strFPSFile = asString( getFPM()->FPSFileName );
-	setCurrFPSFile(strFPSFile);
-	if (!strFPSFile.empty())
-	{
-		// [LRCAU #6008] - Files opened on command line should be added the MRU list
-		addFileToMRUList(strFPSFile);
-	}
+	m_bUpdatingConnection = true;
 
-	// set the database file for the database page
-	if (isPageDisplayed(kDatabasePage))
+	try
 	{
-		m_propDatabasePage.setConnectionInfo(asString(getFPM()->DatabaseServer), 
-											 asString(getFPM()->DatabaseName),
-											 asString(getFPM()->AdvancedConnectionStringProperties));
-	}
+		// get the .FPS file first so that it will still be set even
+		// if an exception is thrown below here [p13 #4580]
+		// Get the .FPS filename and set it to the current FPS file
+		string strFPSFile = asString( getFPM()->FPSFileName );
+		setCurrFPSFile(strFPSFile);
+		if (!strFPSFile.empty())
+		{
+			// [LRCAU #6008] - Files opened on command line should be added the MRU list
+			addFileToMRUList(strFPSFile);
+		}
 
-	// If the action page is displayed refresh the data 
-	if (isPageDisplayed(kActionPage))
-	{
-		// Warn the user if the action name no longer exists [LRCAU #4825]
-		m_propActionPage.refresh(true);
-	}
+		// set the database file for the database page
+		if (isPageDisplayed(kDatabasePage))
+		{
+			m_propDatabasePage.setConnectionInfo(asString(getFPM()->DatabaseServer), 
+											asString(getFPM()->DatabaseName),
+											asString(getFPM()->AdvancedConnectionStringProperties));
+		}
 
-	// Set the File processors & number of threads
-	if (isPageDisplayed(kProcessingSetupPage))
-	{
-		m_propProcessSetupPage.refresh();
-	}
+		// If the action page is displayed refresh the data 
+		if (isPageDisplayed(kActionPage))
+		{
+			// Warn the user if the action name no longer exists [LRCAU #4825]
+			m_propActionPage.refresh(true);
+		}
 
-	// Set the File Suppliers
-	if (isPageDisplayed(kQueueSetupPage))
+		// Set the File processors & number of threads
+		if (isPageDisplayed(kProcessingSetupPage))
+		{
+			m_propProcessSetupPage.refresh();
+		}
+
+		// Set the File Suppliers
+		if (isPageDisplayed(kQueueSetupPage))
+		{
+			m_propQueueSetupPage.refresh();
+		}
+
+		m_bUpdatingConnection = false;
+	}
+	catch (...)
 	{
-		m_propQueueSetupPage.refresh();
+		m_bUpdatingConnection = false;
+		throw;
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -3047,4 +3114,11 @@ string FileProcessingDlg::getDefaultFileName()
 	}
 
 	return strActionName + ((bQueuing) ? "_Queue.fps" : "_Stats.fps" );
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::clearContext()
+{
+	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
+	ASSERT_RESOURCE_ALLOCATION("ELI38085", ipFAMTag != __nullptr);
+	ipFAMTag->FPSFileDir = "";
 }

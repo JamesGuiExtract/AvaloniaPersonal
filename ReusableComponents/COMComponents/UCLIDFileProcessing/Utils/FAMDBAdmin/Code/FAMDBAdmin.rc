@@ -186,6 +186,8 @@ BEGIN
     LTEXT           "Connection Status",IDC_STATIC,7,97,59,8
     LTEXT           "DO NOT MAKE CHANGES TO THIS FORM IN THIS PROJECT!  If changes need to be made to this form they should be made in the FAMUtils IDD_DATABASEPAGE dialog and copy them to this project.",IDC_STATIC,7,150,353,27,NOT WS_VISIBLE
     LTEXT           "Advanced Connection Properties",IDC_STATIC,7,68,105,8
+	LTEXT           "Current Context:",IDC_STATIC_CURRENT_CONTEXT_LABEL,7,183,51,8,SS_NOTIFY | NOT WS_VISIBLE
+	LTEXT           "",IDC_STATIC_CURRENT_CONTEXT,61,183,299,8,SS_NOTIFY | NOT WS_VISIBLE
 END
 
 IDD_DLG_DBSUMMARY DIALOGEX 0, 0, 405, 199

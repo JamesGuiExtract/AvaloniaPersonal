@@ -75,6 +75,7 @@ public:
 	STDMETHOD(SetFAMDB)(IFileProcessingDB *pFAMDB, long nActionID);
 	STDMETHOD(ValidateConfiguration)(BSTR bstrDatabaseServer, BSTR bstrDatabaseName,
 		BSTR* pbstrWarning);
+	STDMETHOD(get_ActiveContext)(BSTR *strActiveContext);
 
 private:
 

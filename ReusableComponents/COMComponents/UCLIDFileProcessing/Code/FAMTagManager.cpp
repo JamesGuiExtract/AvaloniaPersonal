@@ -623,6 +623,22 @@ STDMETHODIMP CFAMTagManager::ValidateConfiguration(BSTR bstrDatabaseServer, BSTR
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38096");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::get_ActiveContext(BSTR *strActiveContext)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38070", strActiveContext != __nullptr);
+
+		*strActiveContext = ms_ipContextTagProvider->ActiveContext;
+
+		return S_OK;		
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38071");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ILicensedComponent
