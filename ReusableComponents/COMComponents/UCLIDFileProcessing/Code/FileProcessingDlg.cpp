@@ -1753,8 +1753,8 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 			if (!bFPSFileSaved)
 			{
 				// Inform the users that the configuration needs to be saved
-				if (AfxMessageBox("The configuration needs to be saved for the context to be identified.\r\nSave now?",
-					MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
+				if (MessageBox("The configuration needs to be saved for the context to be identified.\r\nSave now?",
+					"Save Configuration?", MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
 				{
 					// Prompt for save
 					bFPSFileSaved = saveFile(string(""), false);
