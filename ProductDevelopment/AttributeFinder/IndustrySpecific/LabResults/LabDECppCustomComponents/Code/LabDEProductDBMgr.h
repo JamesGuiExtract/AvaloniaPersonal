@@ -119,6 +119,9 @@ private:
 	// Retrieves a map of each DBInfo value the LabDE specific DB component uses and its default
 	// value.
 	map<string, string> getDBInfoDefaultValues();
+
+	// Adds old tables that are no longer in the database
+	void addOldTables(vector<string>& vecTables);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(LabDEProductDBMgr), CLabDEProductDBMgr)

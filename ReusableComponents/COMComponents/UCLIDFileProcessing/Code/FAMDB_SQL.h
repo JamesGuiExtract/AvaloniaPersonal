@@ -335,6 +335,16 @@ static const string gstrCREATE_FEATURE_TABLE =
 	"[FeatureDescription] [nvarchar](max),"
 	"[AdminOnly] [bit] NOT NULL DEFAULT 1)";
 
+// For use in updating from version 125 and before
+static const string gstrCREATE_WORK_ITEM_GROUP_TABLE_V118 =
+	"CREATE TABLE [dbo].[WorkItemGroup]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_WorkItemGroup] PRIMARY KEY CLUSTERED,"
+	"[FileID] [int] NOT NULL,"
+	"[ActionID] [int] NOT NULL,"
+	"[StringizedSettings] [nvarchar](MAX) NULL,"
+	"[UPI] [nvarchar](450) NULL, "
+	"[NumberOfWorkItems] [int] NOT NULL)";
+
 static const string gstrCREATE_WORK_ITEM_GROUP_TABLE =
 	"CREATE TABLE [dbo].[WorkItemGroup]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_WorkItemGroup] PRIMARY KEY CLUSTERED,"

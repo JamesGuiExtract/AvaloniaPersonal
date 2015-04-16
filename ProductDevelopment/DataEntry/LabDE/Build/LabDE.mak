@@ -42,6 +42,7 @@ RDTInstallProjectRootDir=$(EngineeringRootDirectory)\ProductDevelopment\Attribut
 RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
 
 LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
+Demo_LabDE_DEP=$(RulesDir)\LabDE\Demo_LabDE\Demo_LabDE_DEP
 LabDERulesDir=$(RulesDir)\LabDE\Demo_LabDE\Rules
 
 DataEntryApplicationDir=$(RCNETDir)\DataEntry\Utilities\DataEntryApplication\Core\Code
@@ -100,6 +101,11 @@ BuildLabDEInstall: CopyFilesForLabDEInstall
     @ECHO Building Extract Systems LabDE Install...
 	$(SetProductVerScript) "$(LabDEInstallRootDir)\LabDE\LabDE.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\LabDE\LabDE.ism"
+	
+BuildDemoLabDE_DEP:
+	@ECHO Building DemoLabDE_DEP...
+	@CD $(Demo_LabDE_DEP)
+	@devenv Demo_LabDE.sln /BUILD $(BuildConfig) 
 
 CreateLabDEInstallCD: BuildLabDEInstall
 	@ECHO Copying DataEntry Install files ...
@@ -121,7 +127,7 @@ CreateDemoShieldInstall: CreateLabDEInstallCD
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\LabDE.ico" "$(LabDEInstallDir)"
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\autorun.inf" "$(LabDESetupFiles)"
 
-CreateDemo_LabDE: 
+CreateDemo_LabDE: BuildDemoLabDE_DEP
 	@ECHO Copying Demo_LabDE files...
     @IF NOT EXIST "$(LabDEDemo)\Solution\Rules" MKDIR "$(LabDEDemo)\Solution\Rules"
     @IF NOT EXIST "$(LabDEDemo)\Solution\Corepoint Integration" MKDIR "$(LabDEDemo)\Solution\Corepoint Integration"
@@ -131,6 +137,7 @@ CreateDemo_LabDE:
 	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEDemo)\" /v /s /e /y
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEDemo)\Input" /v /s /e /y
 	@XCOPY "$(RulesDir)\LabDE\Demo_LabDE\Solution\*.*" "$(LabDEDemo)\Solution" /v /s /e /y	
+	@COPY /y "$(Demo_LabDE_DEP)\Bin\$(BuildConfig)\Extract.DataEntry.DEP.Demo_LabDE.dll" $(LabDEDemo)\Solution\Bin\"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\AlternateTestNameManager.plugin" "$(LabDEDemo)\Solution\Database Files"
 	@ECHO Encrypting LabDE Demo Rules...
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"

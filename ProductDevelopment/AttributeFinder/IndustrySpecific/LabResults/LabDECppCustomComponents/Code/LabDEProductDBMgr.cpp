@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "LabDEProductDBMgr.h"
 #include "LabDE_DB_SQL.h"
+#include "LabDE_DB_SQL_Old_versions.h"
 
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
@@ -28,7 +29,7 @@ using namespace std;
 // Version 2: https://extract.atlassian.net/browse/ISSUE-12801
 // Version 3: https://extract.atlassian.net/browse/ISSUE-12805 
 //			  (Order.ReferenceDateTime and ORMMessage columns)
-static const long glLABDE_DB_SCHEMA_VERSION = 3;
+static const long glLABDE_DB_SCHEMA_VERSION = 4;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -50,20 +51,20 @@ int UpdateToSchemaVersion1(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vector<string> vecQueries;
 		vecQueries.push_back(gstrCREATE_PATIENT_TABLE_V1);
-		vecQueries.push_back(gstrCREATE_PATIENT_FIRSTNAME_INDEX);
-		vecQueries.push_back(gstrCREATE_PATIENT_LASTNAME_INDEX);
-		vecQueries.push_back(gstrCREATE_ORDER_STATUS_TABLE);
-		vecQueries.push_back(gstrPOPULATE_ORDER_STATUSES);
+		vecQueries.push_back(gstrCREATE_PATIENT_FIRSTNAME_INDEX_V1);
+		vecQueries.push_back(gstrCREATE_PATIENT_LASTNAME_INDEX_V1);
+		vecQueries.push_back(gstrCREATE_ORDER_STATUS_TABLE_V1);
+		vecQueries.push_back(gstrPOPULATE_ORDER_STATUSES_V2);
 		vecQueries.push_back(gstrCREATE_ORDER_TABLE_V1);
-		vecQueries.push_back(gstrADD_FK_ORDER_PATIENT_MRN);
-		vecQueries.push_back(gstrADD_FK_ORDER_ORDERSTATUS);
-		vecQueries.push_back(gstrCREATE_ORDER_MRN_INDEX);
+		vecQueries.push_back(gstrADD_FK_ORDER_PATIENT_MRN_V1);
+		vecQueries.push_back(gstrADD_FK_ORDER_ORDERSTATUS_V1);
+		vecQueries.push_back(gstrCREATE_ORDER_MRN_INDEX_V1);
 		vecQueries.push_back(gstrCREATE_ORDER_ORDERCODE_INDEX_V1);
-		vecQueries.push_back(gstrCREATE_ORDER_FILE_TABLE);
-		vecQueries.push_back(gstrADD_FK_ORDERFILE_ORDER);
-		vecQueries.push_back(gstrADD_FK_ORDERFILE_FAMFILE);
-		vecQueries.push_back(gstrCREATE_ORDERFILE_ORDER_INDEX);
-		vecQueries.push_back(gstrCREATE_ORDERFILE_FAMFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_ORDER_FILE_TABLE_V1);
+		vecQueries.push_back(gstrADD_FK_ORDERFILE_ORDER_V1);
+		vecQueries.push_back(gstrADD_FK_ORDERFILE_FAMFILE_V1);
+		vecQueries.push_back(gstrCREATE_ORDERFILE_ORDER_INDEX_V1);
+		vecQueries.push_back(gstrCREATE_ORDERFILE_FAMFILE_INDEX_V1);
 
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES ('" + 
 			gstrLABDE_SCHEMA_VERSION_NAME + "', '" + asString(nNewSchemaVersion) + "' )");
@@ -97,7 +98,7 @@ int UpdateToSchemaVersion2(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("EXEC sp_rename 'dbo.Order.RequestDateTime', 'ReceivedDateTime'");
 		vecQueries.push_back("ALTER TABLE [dbo].[Order] ADD DEFAULT GETDATE() FOR [ReceivedDateTime]");
 		vecQueries.push_back("ALTER TABLE [dbo].[Order] DROP COLUMN [CollectionDateTime]");
-
+		
 		// These indices all inappropriately had a unique constraint. Drop and re-add the indices to
 		// fix.
 		vecQueries.push_back("DROP INDEX [IX_Patient_FirstName] ON [dbo].[Patient]");
@@ -106,18 +107,18 @@ int UpdateToSchemaVersion2(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("DROP INDEX [IX_Order_PatientMRN] ON [dbo].[Order]");
 		vecQueries.push_back("DROP INDEX [IX_OrderFile_Order] ON [dbo].[OrderFile]");
 		vecQueries.push_back("DROP INDEX [IX_OrderFile_FAMFile] ON [dbo].[OrderFile]");
-		vecQueries.push_back(gstrCREATE_PATIENT_FIRSTNAME_INDEX);
-		vecQueries.push_back(gstrCREATE_PATIENT_LASTNAME_INDEX);
-		vecQueries.push_back(gstrCREATE_ORDER_MRN_INDEX);
-		vecQueries.push_back(gstrCREATE_ORDER_ORDERCODERECEIVEDDATETIME_INDEX);
-		vecQueries.push_back(gstrCREATE_ORDERFILE_ORDER_INDEX);
-		vecQueries.push_back(gstrCREATE_ORDERFILE_FAMFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_PATIENT_FIRSTNAME_INDEX_V1);
+		vecQueries.push_back(gstrCREATE_PATIENT_LASTNAME_INDEX_V1);
+		vecQueries.push_back(gstrCREATE_ORDER_MRN_INDEX_V1);
+		vecQueries.push_back(gstrCREATE_ORDER_ORDERCODERECEIVEDDATETIME_INDEX_V2);
+		vecQueries.push_back(gstrCREATE_ORDERFILE_ORDER_INDEX_V1);
+		vecQueries.push_back(gstrCREATE_ORDERFILE_FAMFILE_INDEX_V1);
 
 		// We have changed the code "O" for "Open" to "A" for "Available"
 		// This re-population would cause problems on databases that had existing orders, but at
 		// this point no such databases exist, so...
 		vecQueries.push_back("DELETE FROM [dbo].[OrderStatus]");
-		vecQueries.push_back(gstrPOPULATE_ORDER_STATUSES);
+		vecQueries.push_back(gstrPOPULATE_ORDER_STATUSES_V2);
 
 		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
 			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
@@ -146,7 +147,7 @@ int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vecQueries.push_back("ALTER TABLE [Order] ADD [ReferenceDateTime] DATETIME");
 		vecQueries.push_back("ALTER TABLE [Order] ADD [ORMMessage] XML");
-		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_V3);
 
 		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
 			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
@@ -156,6 +157,47 @@ int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37920");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 4;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		
+		vecQueries.push_back("ALTER TABLE [dbo].[Order] ADD DEFAULT 'A' FOR OrderStatus");
+		vecQueries.push_back("exec sp_rename 'Order', 'LabDEOrder'");
+		vecQueries.push_back("exec sp_rename 'OrderFile', 'LabDEOrderFile'");
+		vecQueries.push_back("exec sp_rename 'OrderStatus', 'LabDEOrderStatus'");
+		vecQueries.push_back("exec sp_rename 'Patient', 'LabDEPatient'");
+		vecQueries.push_back("ALTER TABLE LabDEOrderFile ADD [CollectionDate] DATETIME");
+		vecQueries.push_back("DROP PROCEDURE [AddOrUpdateLabDEOrder]");
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+
+		// Change Default value for ReceivedDateTime field on LabDEOrder
+		vecQueries.push_back("UPDATE LabDEOrder SET ReceivedDateTime = GETDATE() WHERE (ReceivedDateTime IS NULL)");
+		vecQueries.push_back("DROP INDEX IX_Order_OrderCodeReceivedDateTime ON LabDEOrder ");
+		vecQueries.push_back("ALTER TABLE LabDEOrder ALTER COLUMN [ReceivedDateTime] DATETIME NOT NULL ");
+		vecQueries.push_back(gstrCREATE_ORDER_ORDERCODERECEIVEDDATETIME_INDEX);
+
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38120");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -441,6 +483,10 @@ STDMETHODIMP CLabDEProductDBMgr::raw_GetTables(IVariantVector** ppTables)
 
 		const vector<string> vecTableCreationQueries = getTableCreationQueries(true);
 		vector<string> vecTablesNames = getTableNamesFromCreationQueries(vecTableCreationQueries);
+
+		// Add tables that have been deleted
+		addOldTables(vecTablesNames);
+
 		for (vector<string>::iterator iter = vecTablesNames.begin();
 			 iter != vecTablesNames.end();
 			 iter++)
@@ -548,7 +594,12 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					}
 					break;
 
-			case 3: break;
+			case 3: // The schema update from 3 to 4 needs to take place against FAM DB schema version 127
+					if (nFAMDBSchemaVersion == 127)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion4(ipConnection, pnNumSteps, NULL);
+					}
+					break;
 
 			default:
 				{
@@ -647,10 +698,10 @@ void CLabDEProductDBMgr::validateLicense()
 void CLabDEProductDBMgr::getLabDETables(vector<string>& rvecTables)
 {
 	rvecTables.clear();
-	rvecTables.push_back(gstrPATIENT_TABLE);
-	rvecTables.push_back(gstrORDER_STATUS_TABLE);
-	rvecTables.push_back(gstrORDER_TABLE);
-	rvecTables.push_back(gstrORDER_FILE_TABLE);
+	rvecTables.push_back(gstrLABDE_PATIENT_TABLE);
+	rvecTables.push_back(gstrLABDE_ORDER_STATUS_TABLE);
+	rvecTables.push_back(gstrLABDE_ORDER_TABLE);
+	rvecTables.push_back(gstrLABDE_ORDER_FILE_TABLE);
 }
 //-------------------------------------------------------------------------------------------------
 void CLabDEProductDBMgr::validateLabDESchemaVersion(bool bThrowIfMissing)
@@ -699,4 +750,14 @@ map<string, string> CLabDEProductDBMgr::getDBInfoDefaultValues()
 	mapDefaultValues[gstrLABDE_SCHEMA_VERSION_NAME] = asString(glLABDE_DB_SCHEMA_VERSION);
 
 	return mapDefaultValues;
-}//-------------------------------------------------------------------------------------------------
+}
+//-------------------------------------------------------------------------------------------------
+void CLabDEProductDBMgr::addOldTables(vector<string>& vecTables)
+{
+	// Version 4 renamed the tables
+	vecTables.push_back(gstrORDER_FILE_TABLE);
+	vecTables.push_back(gstrPATIENT_TABLE);
+	vecTables.push_back(gstrORDER_TABLE);
+	vecTables.push_back(gstrORDER_STATUS_TABLE);
+}
+//-------------------------------------------------------------------------------------------------

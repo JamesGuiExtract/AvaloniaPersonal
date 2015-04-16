@@ -222,6 +222,7 @@
     <ClInclude Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FAMDBHelperFunctions.h" />
     <ClInclude Include="LabDE_DB_SQL.h" />
     <ClInclude Include="LabDEProductDBMgr.h" />
+    <ClInclude Include="LabDE_DB_SQL_Old_versions.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

@@ -173,6 +173,10 @@ int UpdateToSchemaVersion102(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("DROP Table [ActionStatistics]");
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_TABLE);
 
+		// https://extract.atlassian.net/browse/ISSUE-12916
+		// Was added in 10.1 should have been added at the time the table was changed.
+		vecQueries.push_back(gstrADD_STATISTICS_ACTION_FK);
+
 		// Add new ActionStatisticsDelta table.
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_TABLE);
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
@@ -732,7 +736,7 @@ int UpdateToSchemaVersion118(_ConnectionPtr ipConnection, long *pnNumSteps,
 	}
 
 	vector<string> vecQueries;
-	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_TABLE);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_TABLE_V118);
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_TABLE_V118);
 	vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_ACTION_FK);
 	vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAMFILE_FK);
@@ -955,6 +959,14 @@ int UpdateToSchemaVersion127(_ConnectionPtr ipConnection, long *pnNumSteps,
 	vector<string> vecQueries;
 	vecQueries.push_back("ALTER TABLE dbo.FileMetadataFieldValue ALTER COLUMN Value nvarchar(400) NULL"); 
 	vecQueries.push_back(gstrMETADATA_FIELD_VALUE_VALUE_INDEX);
+
+	// https://extract.atlassian.net/browse/ISSUE-12916
+	// This was added so that an upgrade to 10.1 will fix existing problems if a database was previously
+	// upgraded and the FK_Statistics_Action was not added
+	string strCheckAndAdd_FK = "IF NOT EXISTS ( SELECT  name FROM sys.foreign_keys "
+                "WHERE   name = 'FK_Statistics_Action' ) " + gstrADD_STATISTICS_ACTION_FK;
+	vecQueries.push_back(strCheckAndAdd_FK);
+
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 	executeVectorOfSQL(ipConnection, vecQueries);
