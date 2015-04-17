@@ -739,6 +739,21 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets or sets a <see cref="IFFIFileSelectionPane"/> instance that should replace the
+        /// standard file selection pane.
+        /// </summary>
+        /// <value>
+        /// The <see cref="IFFIFileSelectionPane"/> instance that should replace the standard file
+        /// selection pane.
+        /// </value>
+        [CLSCompliant(false)]
+        public IFFIFileSelectionPane FileSelectorPane
+        { 
+            get; 
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the name database server being used.
         /// </summary>
         /// <value>
@@ -1051,9 +1066,21 @@ namespace Extract.FileActionManager.Utilities
 
                 if (UseDatabaseMode)
                 {
-                    string query = FileSelector.BuildQuery(FileProcessingDB,
-                        "[FAMFile].[ID], [FAMFile].[FileName], [FAMFile].[Pages]",
-                        " ORDER BY [FAMFile].[ID]");
+                    string query;
+                    if (FileSelectorPane != null)
+                    {
+                        query = "SELECT [ID], [FileName], [Pages]" +
+                            "   FROM [FAMFile]" +
+                            (FileSelectorPane.SelectedFileIds.Any()
+                                ? " WHERE [ID] IN (" + string.Join(",", FileSelectorPane.SelectedFileIds) + ")"
+                                : " WHERE 1 = 0");
+                    }
+                    else
+                    {
+                        query = FileSelector.BuildQuery(FileProcessingDB,
+                            "[FAMFile].[ID], [FAMFile].[FileName], [FAMFile].[Pages]",
+                            " ORDER BY [FAMFile].[ID]");
+                    }
 
                     // Run the query on a background thread so the UI remains responsive as rows are
                     // loaded.
@@ -1321,17 +1348,7 @@ namespace Extract.FileActionManager.Utilities
 
                 InitializeContextMenu();
 
-                // Set the visibility of the _selectFilesButton according to LockFileSelector.
-                if (LockFileSelector)
-                {
-                    ExtractException.Assert("ELI37441", "No file selector has been specified.",
-                        FileSelector != null);
-
-                    // If the file filter is locked, hide the "Change..." button and move the
-                    // refresh button up.
-                    _selectFilesButton.Visible = false;
-                    _refreshFileListButton.Location = _selectFilesButton.Location;
-                }
+                InitializeFileSelectionElements();
 
                 GenerateFileList(false);
 
@@ -2931,6 +2948,26 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="IFFIFileSelectionPane.RefreshRequired"/> event of the
+        /// <see cref="FileSelectorPane"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleFileSelectorPane_RefreshRequired(object sender, EventArgs e)
+        {
+            try
+            {
+                GenerateFileList(false);
+            }
+            catch (Exception ex)
+            {
+                // Throw here since we know this event is triggered our own UI event handler.
+                throw ex.AsExtract("ELI38121");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -3196,6 +3233,75 @@ namespace Extract.FileActionManager.Utilities
                 return _fileListDataGridView.SelectedRows
                     .OfType<DataGridViewRow>()
                     .Where(row => row.Visible);
+            }
+        }
+
+        /// <summary>
+        /// Initializes the configure UI elements for file selection.
+        /// </summary>
+        void InitializeFileSelectionElements()
+        {
+            bool openTopDockableWindow = false;
+
+            // _formToolStripContainer = the toolstrip container for the form as a whole
+            // _mainToolStripContainer = the toolstrip container for the left pane
+            //                           (non-image viewer controls).
+            // _customSearchTopDockableWindow = pane across the top that FileSelectorPane can be
+            //                           configured to occupy, hidden otherwise.
+
+            if (FileSelectorPane != null)
+            {
+                _dataSplitContainer.Panel1.Controls.Clear();
+
+                if (FileSelectorPane.PanePosition == SelectionPanePosition.Top)
+                {
+                    _mainToolStripContainer.TopToolStripPanel.Controls.Remove(_menuStrip);
+                    _mainToolStripContainer.TopToolStripPanelVisible = false;
+                    _formToolStripContainer.TopToolStripPanel.Visible = true;
+                    _formToolStripContainer.TopToolStripPanel.Controls.Add(_menuStrip);
+
+                    _dataSplitContainer.Panel1Collapsed = true;
+
+                    _customSearchTopDockableWindow.Controls.Add(FileSelectorPane.Control);
+                    _customSearchTopDockableWindow.Text = FileSelectorPane.Title;
+                    openTopDockableWindow = true;
+                }
+                else if (FileSelectorPane.PanePosition == SelectionPanePosition.Default)
+                {
+                    _dataSplitContainer.Panel1.Controls.Add(FileSelectorPane.Control);
+                }
+                else
+                {
+                    ExtractException.ThrowLogicException("ELI38165");
+                }
+
+                FileSelectorPane.Control.Dock = DockStyle.Fill;
+                FileSelectorPane.RefreshRequired += HandleFileSelectorPane_RefreshRequired;
+            }
+            else
+            {
+                // Set the visibility of the _selectFilesButton according to LockFileSelector.
+                if (LockFileSelector)
+                {
+                    ExtractException.Assert("ELI37441", "No file selector has been specified.",
+                        FileSelector != null);
+
+                    // If the file filter is locked, hide the "Change..." button and move the
+                    // refresh button up.
+                    _selectFilesButton.Visible = false;
+                    _refreshFileListButton.Location = _selectFilesButton.Location;
+                }
+            }
+
+            if (openTopDockableWindow)
+            {
+                _customSearchTopDockableWindow.Open();
+            }
+            else
+            {
+                // Despite being specified as collapsed in the designer, it seems to default to
+                // being displayed unless explicitly closed here.
+                _customSearchTopDockableWindow.Close();
             }
         }
 

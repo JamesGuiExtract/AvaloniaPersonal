@@ -31,6 +31,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            TD.SandDock.DockingRules dockingRules1 = new TD.SandDock.DockingRules();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FAMFileInspectorForm));
             this._selectFilesSummaryLabel = new System.Windows.Forms.Label();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
@@ -90,14 +91,14 @@
             this._resolutionToolStripStatusLabel = new Extract.Imaging.Forms.ResolutionToolStripStatusLabel();
             this._mousePositionToolStripStatusLabel = new Extract.Imaging.Forms.MousePositionToolStripStatusLabel();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
-            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
-            this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
             this._highlightNavigationToolStrip = new System.Windows.Forms.ToolStrip();
             this._previousLayerObjectToolStripButton = new Extract.Imaging.Forms.PreviousLayerObjectToolStripButton();
             this._nextLayerObjectToolStripButton = new Extract.Imaging.Forms.NextLayerObjectToolStripButton();
             this._imageViewerToolsToolStrip = new System.Windows.Forms.ToolStrip();
             this.zoomWindowToolStripButton1 = new Extract.Imaging.Forms.ZoomWindowToolStripButton();
             this.panToolStripButton1 = new Extract.Imaging.Forms.PanToolStripButton();
+            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
+            this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
             this._generalImageToolStrip = new System.Windows.Forms.ToolStrip();
             this._printImageToolStripButton = new Extract.Imaging.Forms.PrintImageToolStripButton();
             this._thumbnailViewerToolStripButton = new Extract.Imaging.Forms.ThumbnailViewerToolStripButton();
@@ -111,6 +112,9 @@
             this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
             this._dockContainer = new TD.SandDock.DockContainer();
+            this._formToolStripContainer = new System.Windows.Forms.ToolStripContainer();
+            this._customSearchTopDockContainer = new TD.SandDock.DockContainer();
+            this._customSearchTopDockableWindow = new TD.SandDock.DockableWindow();
             groupBox1 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
             groupBox1.SuspendLayout();
@@ -151,6 +155,9 @@
             this._generalImageToolStrip.SuspendLayout();
             this._thumbnailDockableWindow.SuspendLayout();
             this._dockContainer.SuspendLayout();
+            this._formToolStripContainer.ContentPanel.SuspendLayout();
+            this._formToolStripContainer.SuspendLayout();
+            this._customSearchTopDockContainer.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -253,7 +260,7 @@
             // 
             this._splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._splitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this._splitContainer.Location = new System.Drawing.Point(0, 0);
+            this._splitContainer.Location = new System.Drawing.Point(0, 219);
             this._splitContainer.Margin = new System.Windows.Forms.Padding(0);
             this._splitContainer.Name = "_splitContainer";
             // 
@@ -266,7 +273,7 @@
             // 
             this._splitContainer.Panel2.Controls.Add(this._imageToolStripContainer);
             this._splitContainer.Panel2MinSize = 0;
-            this._splitContainer.Size = new System.Drawing.Size(1211, 635);
+            this._splitContainer.Size = new System.Drawing.Size(992, 416);
             this._splitContainer.SplitterDistance = 468;
             this._splitContainer.TabIndex = 1;
             this._splitContainer.TabStop = false;
@@ -281,7 +288,7 @@
             // _mainToolStripContainer.ContentPanel
             // 
             this._mainToolStripContainer.ContentPanel.Controls.Add(this._mainLayoutPanel);
-            this._mainToolStripContainer.ContentPanel.Size = new System.Drawing.Size(468, 589);
+            this._mainToolStripContainer.ContentPanel.Size = new System.Drawing.Size(468, 370);
             this._mainToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             // 
             // _mainToolStripContainer.LeftToolStripPanel
@@ -293,7 +300,7 @@
             // _mainToolStripContainer.RightToolStripPanel
             // 
             this._mainToolStripContainer.RightToolStripPanel.Enabled = false;
-            this._mainToolStripContainer.Size = new System.Drawing.Size(468, 635);
+            this._mainToolStripContainer.Size = new System.Drawing.Size(468, 416);
             this._mainToolStripContainer.TabIndex = 0;
             this._mainToolStripContainer.Text = "toolStripContainer1";
             // 
@@ -349,7 +356,7 @@
             this._mainLayoutPanel.RowCount = 2;
             this._mainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this._mainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
-            this._mainLayoutPanel.Size = new System.Drawing.Size(468, 589);
+            this._mainLayoutPanel.Size = new System.Drawing.Size(468, 370);
             this._mainLayoutPanel.TabIndex = 3;
             // 
             // _okCancelPanel
@@ -357,7 +364,7 @@
             this._okCancelPanel.Controls.Add(this._cancelButton);
             this._okCancelPanel.Controls.Add(this._okButton);
             this._okCancelPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._okCancelPanel.Location = new System.Drawing.Point(0, 561);
+            this._okCancelPanel.Location = new System.Drawing.Point(0, 342);
             this._okCancelPanel.Margin = new System.Windows.Forms.Padding(0);
             this._okCancelPanel.Name = "_okCancelPanel";
             this._okCancelPanel.Size = new System.Drawing.Size(468, 28);
@@ -406,7 +413,7 @@
             // 
             this._dataSplitContainer.Panel2.Controls.Add(this._resultsSplitContainer);
             this._dataSplitContainer.Panel2MinSize = 0;
-            this._dataSplitContainer.Size = new System.Drawing.Size(468, 561);
+            this._dataSplitContainer.Size = new System.Drawing.Size(468, 342);
             this._dataSplitContainer.SplitterDistance = 78;
             this._dataSplitContainer.TabIndex = 0;
             this._dataSplitContainer.TabStop = false;
@@ -449,7 +456,7 @@
             // _resultsSplitContainer.Panel2
             // 
             this._resultsSplitContainer.Panel2.Controls.Add(this._resultsTableLayoutPanel);
-            this._resultsSplitContainer.Size = new System.Drawing.Size(468, 479);
+            this._resultsSplitContainer.Size = new System.Drawing.Size(468, 260);
             this._resultsSplitContainer.SplitterDistance = 117;
             this._resultsSplitContainer.TabIndex = 3;
             // 
@@ -691,7 +698,7 @@
             this._resultsTableLayoutPanel.RowCount = 2;
             this._resultsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
             this._resultsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this._resultsTableLayoutPanel.Size = new System.Drawing.Size(468, 358);
+            this._resultsTableLayoutPanel.Size = new System.Drawing.Size(468, 139);
             this._resultsTableLayoutPanel.TabIndex = 2;
             // 
             // _collapsedSearchPanel
@@ -797,14 +804,14 @@
             this._fileListDataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleFileListDataGridView_CellValueChanged);
             this._fileListDataGridView.CurrentCellChanged += new System.EventHandler(this.HandleResultsDataGridView_CurrentCellChanged);
             this._fileListDataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.HandleFileListDataGridView_CurrentCellDirtyStateChanged);
+            this._fileListDataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.HandleFileListDataGridView_EditingControlShowing);
             this._fileListDataGridView.SelectionChanged += new System.EventHandler(this.HandleFileListDataGridView_SelectionChanged);
-            this._fileListDataGridView.SizeChanged += new System.EventHandler(HandleFileListDataGridView_SizeChanged);
             this._fileListDataGridView.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.HandleFileListDataGridView_SortCompare);
+            this._fileListDataGridView.SizeChanged += new System.EventHandler(this.HandleFileListDataGridView_SizeChanged);
             this._fileListDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.HandleFileListDataGridView_KeyDown);
             this._fileListDataGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleFileListDataGridView_MouseDown);
             this._fileListDataGridView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.HandleFileListDataGridView_MouseMove);
             this._fileListDataGridView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HandleFileListDataGridView_MouseUp);
-            this._fileListDataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(HandleFileListDataGridView_EditingControlShowing);
             // 
             // _fileListFlagColumn
             // 
@@ -867,7 +874,7 @@
             // _imageToolStripContainer.ContentPanel
             // 
             this._imageToolStripContainer.ContentPanel.Controls.Add(this._imageViewer);
-            this._imageToolStripContainer.ContentPanel.Size = new System.Drawing.Size(739, 535);
+            this._imageToolStripContainer.ContentPanel.Size = new System.Drawing.Size(520, 316);
             this._imageToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             // 
             // _imageToolStripContainer.LeftToolStripPanel
@@ -879,16 +886,16 @@
             // _imageToolStripContainer.RightToolStripPanel
             // 
             this._imageToolStripContainer.RightToolStripPanel.Enabled = false;
-            this._imageToolStripContainer.Size = new System.Drawing.Size(739, 635);
+            this._imageToolStripContainer.Size = new System.Drawing.Size(520, 416);
             this._imageToolStripContainer.TabIndex = 0;
             this._imageToolStripContainer.Text = "toolStripContainer1";
             // 
             // _imageToolStripContainer.TopToolStripPanel
             // 
-            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._highlightNavigationToolStrip);
-            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._imageViewerToolsToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._navigationToolsImageViewerToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
+            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._highlightNavigationToolStrip);
+            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._imageViewerToolsToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._generalImageToolStrip);
             // 
             // _imageViewerStatusStrip
@@ -902,7 +909,7 @@
             this._mousePositionToolStripStatusLabel});
             this._imageViewerStatusStrip.Location = new System.Drawing.Point(0, 0);
             this._imageViewerStatusStrip.Name = "_imageViewerStatusStrip";
-            this._imageViewerStatusStrip.Size = new System.Drawing.Size(739, 22);
+            this._imageViewerStatusStrip.Size = new System.Drawing.Size(520, 22);
             this._imageViewerStatusStrip.TabIndex = 1;
             this._imageViewerStatusStrip.Text = "statusStrip1";
             // 
@@ -920,7 +927,7 @@
             this._imageViewerErrorStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this._imageViewerErrorStripStatusLabel.ForeColor = System.Drawing.Color.Red;
             this._imageViewerErrorStripStatusLabel.Name = "_imageViewerErrorStripStatusLabel";
-            this._imageViewerErrorStripStatusLabel.Size = new System.Drawing.Size(355, 17);
+            this._imageViewerErrorStripStatusLabel.Size = new System.Drawing.Size(136, 17);
             this._imageViewerErrorStripStatusLabel.Spring = true;
             this._imageViewerErrorStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -964,27 +971,9 @@
             this._imageViewer.Name = "_imageViewer";
             this._imageViewer.OcrTradeoff = Extract.Imaging.OcrTradeoff.Accurate;
             this._imageViewer.RedactionMode = false;
-            this._imageViewer.Size = new System.Drawing.Size(739, 535);
+            this._imageViewer.Size = new System.Drawing.Size(520, 316);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
-            // 
-            // _navigationToolsImageViewerToolStrip
-            // 
-            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(171, 0);
-            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
-            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
-            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
-            // 
-            // _viewCommandsImageViewerToolStrip
-            // 
-            this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(3, 39);
-            this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
-            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(348, 39);
-            this._viewCommandsImageViewerToolStrip.TabIndex = 1;
             // 
             // _highlightNavigationToolStrip
             // 
@@ -1052,6 +1041,24 @@
             this.panToolStripButton1.Name = "panToolStripButton1";
             this.panToolStripButton1.Size = new System.Drawing.Size(36, 36);
             // 
+            // _navigationToolsImageViewerToolStrip
+            // 
+            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(171, 0);
+            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
+            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
+            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
+            // 
+            // _viewCommandsImageViewerToolStrip
+            // 
+            this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(3, 39);
+            this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
+            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(348, 39);
+            this._viewCommandsImageViewerToolStrip.TabIndex = 1;
+            // 
             // _generalImageToolStrip
             // 
             this._generalImageToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -1094,7 +1101,7 @@
             this._thumbnailDockableWindow.Guid = new System.Guid("821a2840-0871-42ed-94a7-22df189299bc");
             this._thumbnailDockableWindow.Location = new System.Drawing.Point(4, 18);
             this._thumbnailDockableWindow.Name = "_thumbnailDockableWindow";
-            this._thumbnailDockableWindow.Size = new System.Drawing.Size(215, 593);
+            this._thumbnailDockableWindow.Size = new System.Drawing.Size(215, 374);
             this._thumbnailDockableWindow.TabIndex = 0;
             this._thumbnailDockableWindow.Text = "Page thumbnails";
             this._thumbnailDockableWindow.DockSituationChanged += new System.EventHandler(this.HandleThumbnailDockableWindowDockSituationChanged);
@@ -1105,7 +1112,7 @@
             this._thumbnailViewer.ImageViewer = this._imageViewer;
             this._thumbnailViewer.Location = new System.Drawing.Point(0, 0);
             this._thumbnailViewer.Name = "_thumbnailViewer";
-            this._thumbnailViewer.Size = new System.Drawing.Size(215, 593);
+            this._thumbnailViewer.Size = new System.Drawing.Size(215, 374);
             this._thumbnailViewer.TabIndex = 0;
             // 
             // _invertColorsToolStripButton
@@ -1170,11 +1177,62 @@
             this._dockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
             ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
                         ((TD.SandDock.DockControl)(this._thumbnailDockableWindow))}, this._thumbnailDockableWindow)))});
-            this._dockContainer.Location = new System.Drawing.Point(992, 0);
+            this._dockContainer.Location = new System.Drawing.Point(992, 219);
             this._dockContainer.Manager = this._sandDockManager;
             this._dockContainer.Name = "_dockContainer";
-            this._dockContainer.Size = new System.Drawing.Size(219, 635);
+            this._dockContainer.Size = new System.Drawing.Size(219, 416);
             this._dockContainer.TabIndex = 4;
+            // 
+            // _formToolStripContainer
+            // 
+            // 
+            // _formToolStripContainer.ContentPanel
+            // 
+            this._formToolStripContainer.ContentPanel.Controls.Add(this._splitContainer);
+            this._formToolStripContainer.ContentPanel.Controls.Add(this._dockContainer);
+            this._formToolStripContainer.ContentPanel.Controls.Add(this._customSearchTopDockContainer);
+            this._formToolStripContainer.ContentPanel.Size = new System.Drawing.Size(1211, 635);
+            this._formToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._formToolStripContainer.Location = new System.Drawing.Point(0, 0);
+            this._formToolStripContainer.Name = "_formToolStripContainer";
+            this._formToolStripContainer.Size = new System.Drawing.Size(1211, 635);
+            this._formToolStripContainer.TabIndex = 5;
+            this._formToolStripContainer.Text = "toolStripContainer1";
+            this._formToolStripContainer.TopToolStripPanelVisible = false;
+            // 
+            // _customSearchTopDockContainer
+            // 
+            this._customSearchTopDockContainer.ContentSize = 215;
+            this._customSearchTopDockContainer.Controls.Add(this._customSearchTopDockableWindow);
+            this._customSearchTopDockContainer.Dock = System.Windows.Forms.DockStyle.Top;
+            this._customSearchTopDockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._customSearchTopDockableWindow))}, this._customSearchTopDockableWindow)))});
+            this._customSearchTopDockContainer.Location = new System.Drawing.Point(0, 0);
+            this._customSearchTopDockContainer.Manager = this._sandDockManager;
+            this._customSearchTopDockContainer.Name = "_customSearchTopDockContainer";
+            this._customSearchTopDockContainer.Size = new System.Drawing.Size(1211, 219);
+            this._customSearchTopDockContainer.TabIndex = 5;
+            // 
+            // _customSearchTopDockableWindow
+            // 
+            this._customSearchTopDockableWindow.AllowClose = false;
+            this._customSearchTopDockableWindow.AllowCollapse = false;
+            this._customSearchTopDockableWindow.CloseAction = TD.SandDock.DockControlCloseAction.Dispose;
+            dockingRules1.AllowDockBottom = false;
+            dockingRules1.AllowDockLeft = false;
+            dockingRules1.AllowDockRight = false;
+            dockingRules1.AllowDockTop = true;
+            dockingRules1.AllowFloat = false;
+            dockingRules1.AllowTab = false;
+            this._customSearchTopDockableWindow.DockingRules = dockingRules1;
+            this._customSearchTopDockableWindow.Guid = new System.Guid("cfdc9bf0-340c-42a0-89c9-f2a857ad9954");
+            this._customSearchTopDockableWindow.Location = new System.Drawing.Point(0, 18);
+            this._customSearchTopDockableWindow.Name = "_customSearchTopDockableWindow";
+            this._customSearchTopDockableWindow.ShowOptions = false;
+            this._customSearchTopDockableWindow.Size = new System.Drawing.Size(1211, 173);
+            this._customSearchTopDockableWindow.TabIndex = 1;
+            this._customSearchTopDockableWindow.Text = "";
             // 
             // FAMFileInspectorForm
             // 
@@ -1182,8 +1240,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1211, 635);
-            this.Controls.Add(this._dockContainer);
-            this.Controls.Add(this._splitContainer);
+            this.Controls.Add(this._formToolStripContainer);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this._menuStrip;
             this.MinimumSize = new System.Drawing.Size(700, 400);
@@ -1242,6 +1299,10 @@
             this._generalImageToolStrip.PerformLayout();
             this._thumbnailDockableWindow.ResumeLayout(false);
             this._dockContainer.ResumeLayout(false);
+            this._formToolStripContainer.ContentPanel.ResumeLayout(false);
+            this._formToolStripContainer.ResumeLayout(false);
+            this._formToolStripContainer.PerformLayout();
+            this._customSearchTopDockContainer.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1327,6 +1388,9 @@
         private System.Windows.Forms.Panel _okCancelPanel;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
+        private System.Windows.Forms.ToolStripContainer _formToolStripContainer;
+        private TD.SandDock.DockContainer _customSearchTopDockContainer;
+        private TD.SandDock.DockableWindow _customSearchTopDockableWindow;
 
     }
 }

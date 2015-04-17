@@ -130,6 +130,11 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         Color _originalBackColor;
 
+        /// <summary>
+        /// Specifies whether the current instance is running in design mode
+        /// </summary>
+        bool _inDesignMode;
+
         #endregion Fields
 
         #region Constructors
@@ -141,6 +146,15 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
+                _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
+
+                // Load licenses in design mode
+                if (_inDesignMode)
+                {
+                    // Load the license files from folder
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
+
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.LabDECoreObjects, "ELI37953", _OBJECT_NAME);

@@ -443,7 +443,10 @@ namespace Extract.DataEntry
         /// <value>
         /// <see langword="true"/> if in design mode; otherwise, <see langword="false"/>.
         /// </value>
-        internal bool InDesignMode
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool InDesignMode
         {
             get
             {
@@ -840,7 +843,11 @@ namespace Extract.DataEntry
                         bold = cell.Style.Font.Bold;
                     }
 
-                    if (_isActive)
+                    // Don't show cells that aren't in DataEntryTableColumns as active. This check
+                    // is being added to prevent a greed background behind OrderPickerTableColumn
+                    // buttons, but in general this seems like a reasonable way to differentiate
+                    // table elements that are not mapped into the attribute hierarchy.
+                    if (_isActive && dataEntryCell != null)
                     {
                         style = bold ? _boldActiveCellStyle : _regularActiveCellStyle;
                     }
@@ -1972,7 +1979,7 @@ namespace Extract.DataEntry
                             {
                                 // See if the row's value is also mapped to a column so that it can be 
                                 // selected.
-                                foreach (IDataEntryTableCell cell in row.Cells)
+                                foreach (var cell in row.Cells.OfType<IDataEntryTableCell>())
                                 {
                                     if (cell.Attribute == attribute)
                                     {
@@ -2596,7 +2603,7 @@ namespace Extract.DataEntry
                 // is a cell (as opposed to a row which isn't visible on its own)
                 if (dataEntryCell != null)
                 {
-                    // Register to recieve notification that the spatial info for the cell has
+                    // Register to receive notification that the spatial info for the cell has
                     // changed.
                     dataEntryCell.CellSpatialInfoChanged += HandleCellSpatialInfoChanged;
                 }

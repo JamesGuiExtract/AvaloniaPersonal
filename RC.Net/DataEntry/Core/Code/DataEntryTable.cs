@@ -702,7 +702,8 @@ namespace Extract.DataEntry
                 // attributes corresponding to each cell for the AttributesSelected event,
                 // then find the attribute for the current row for the PropagateAttributes
                 // event.
-                foreach (IDataEntryTableCell selectedDataEntryCell in SelectedCells)
+                foreach (IDataEntryTableCell selectedDataEntryCell in SelectedCells
+                    .OfType<IDataEntryTableCell>())
                 {
                     // Keep track of the cells' attributes for OnAttributesSelected
                     IAttribute attribute = GetAttribute(selectedDataEntryCell);
@@ -2480,9 +2481,9 @@ namespace Extract.DataEntry
                             _draggedRows.Add((DataEntryTableRow)row);
 
                             // Update the style of each row being dragged.
-                            foreach (DataGridViewCell cell in row.Cells)
+                            foreach (var cell in row.Cells.OfType<IDataEntryTableCell>())
                             {
-                                ((IDataEntryTableCell)cell).IsBeingDragged = true;
+                                cell.IsBeingDragged = true;
                                 UpdateCellStyle(cell);
                             }
                         }
@@ -2504,9 +2505,9 @@ namespace Extract.DataEntry
                 // the special style applied to the dragged rows.
                 foreach (DataEntryTableRow row in _draggedRows)
                 {
-                    foreach (DataGridViewCell cell in row.Cells)
+                    foreach (var cell in row.Cells.OfType<IDataEntryTableCell>())
                     {
-                        ((IDataEntryTableCell)cell).IsBeingDragged = false;
+                        cell.IsBeingDragged = false;
                         UpdateCellStyle(cell);
                     }
                 }

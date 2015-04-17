@@ -708,6 +708,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LabDECppCustomComponents", 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.LabDE", "..\..\..\..\..\RC.Net\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj", "{882FDE16-73BE-4420-B89F-ABE418902983}"
+	ProjectSection(ProjectDependencies) = postProject
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.ContextTags", "..\..\..\..\..\RC.Net\Utilities\ContextTags\Core\Code\Extract.Utilities.ContextTags.csproj", "{4114A956-D3F0-4D89-B3BF-8BC45046129C}"
 EndProject

@@ -295,7 +295,7 @@ namespace Extract.Utilities
                     // Re-rank the retrieved data based on an updated score every time it is
                     // retrieved.
                     _rankedData.Remove(dataItem);
-                    dataItem.Score = _scoreDataDelegate(data);
+                    dataItem.Score = (_scoreDataDelegate == null) ? 0 : _scoreDataDelegate(data);
                     _rankedData.Add(dataItem);
 
                     return true;
@@ -340,7 +340,7 @@ namespace Extract.Utilities
                 }
 
                 // Check if the score meets the QualifyingPercentile if the cache is nearly full.
-                double score = _scoreDataDelegate(data);
+                double score = (_scoreDataDelegate == null) ? 0 : _scoreDataDelegate(data);
 
                 // Find the index that represents QualifyingPercentile. This index should be
                 // decreased by the number of open slots such that if more that QualifyingPercentile
