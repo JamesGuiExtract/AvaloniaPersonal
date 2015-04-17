@@ -34,7 +34,7 @@ namespace Extract.DataEntry.LabDE
         /// The name of the property grid category for <see cref="OrderPickerTableColumn"/>
         /// specific properties.
         /// </summary>
-        const string _PROPERTY_GRID_CATEGORY = "OrderPicker";
+        const string _PROPERTY_GRID_CATEGORY = "Order Picker";
 
         #endregion Constants
 
@@ -206,8 +206,29 @@ namespace Extract.DataEntry.LabDE
         [Category(_PROPERTY_GRID_CATEGORY)]
         public bool ShowUnavailableOrders
         {
-            get;
-            set;
+            get
+            {
+                try
+                {
+                    return FAMData.ShowUnavailableOrders;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38171");
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    FAMData.ShowUnavailableOrders = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38172");
+                }
+            }
         }
 
         /// <summary>
@@ -429,7 +450,7 @@ namespace Extract.DataEntry.LabDE
                 }
                 if (_famData != null)
                 {
-                    _famData.RowDataUpdated -= HandleFamData_RowDataUpdate;
+                    _famData.RowDataUpdated -= HandleFamData_RowDataUpdated;
                     _famData.OrderAttributeValueModified -= HandleFamData_OrderAttributeValueModified;
                     _famData.Dispose();
                     _famData = null;
@@ -579,12 +600,12 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Handles the <see cref="FAMData.RefreshRequired"/> event.
+        /// Handles the <see cref="E:FAMData.RowDataUpdated"/> event.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RowDataUpdatedArgs"/> instance containing the
         /// event data.</param>
-        void HandleFamData_RowDataUpdate(object sender, RowDataUpdatedArgs e)
+        void HandleFamData_RowDataUpdated(object sender, RowDataUpdatedArgs e)
         {
             try
             {
@@ -606,7 +627,7 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Handles the <see cref="OrderAttributeValueModified"/> event of the
+        /// Handles the <see cref="E:FAMData.OrderAttributeValueModified"/> event of the
         /// <see cref="FAMData"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -684,7 +705,7 @@ namespace Extract.DataEntry.LabDE
                 if (_famData == null)
                 {
                     _famData = new FAMData(FileProcessingDB);
-                    _famData.RowDataUpdated += HandleFamData_RowDataUpdate;
+                    _famData.RowDataUpdated += HandleFamData_RowDataUpdated;
                     _famData.OrderAttributeValueModified += HandleFamData_OrderAttributeValueModified;
                 }
 

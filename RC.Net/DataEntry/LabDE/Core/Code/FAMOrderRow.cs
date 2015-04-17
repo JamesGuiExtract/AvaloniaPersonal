@@ -346,7 +346,7 @@ namespace Extract.DataEntry.LabDE
 
         /// <summary>
         /// Handles the <see cref="AttributeStatusInfo.AttributeValueModified"/> event for one of
-        /// the <see cref="IAttributes"/> containing key data used in determining potential matching
+        /// the <see cref="IAttribute"/>s containing key data used in determining potential matching
         /// order codes.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -370,7 +370,7 @@ namespace Extract.DataEntry.LabDE
 
         /// <summary>
         /// Handles the <see cref="AttributeStatusInfo.AttributeValueModified"/> event for one of
-        /// the <see cref="IAttributes"/> containing key data used in determining potential matching
+        /// the <see cref="IAttribute"/>s containing key data used in determining potential matching
         /// order codes.
         /// </summary>
         /// <param name="sender">The source of the event.</param>

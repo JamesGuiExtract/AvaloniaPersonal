@@ -1,5 +1,6 @@
 ﻿using Extract.FileActionManager.Utilities;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -74,6 +75,29 @@ namespace Extract.DataEntry.LabDE
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Updates the data in <see cref="_ordersDataGridView"/> to display the current possible
+        /// matching orders in the FAM database.
+        /// </summary>
+        public void UpdateOrderSelectionGrid()
+        {
+            try
+            {
+                var disposableSource = _ordersDataGridView.DataSource as IDisposable;
+
+                _ordersDataGridView.DataSource = RowData.MatchingOrders.Copy();
+
+                if (disposableSource != null)
+                {
+                    disposableSource.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38149");
+            }
         }
 
         #endregion Public Members
@@ -164,7 +188,7 @@ namespace Extract.DataEntry.LabDE
         #region Overrides
 
         /// <summary>
-        /// Raises the <see cref="Control.VisibleChanged"/> event.
+        /// Raises the <see cref="E:Control.VisibleChanged"/> event.
         /// </summary>
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
         /// </param>
@@ -223,7 +247,7 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the <see cref="_okButton"/>.
+        /// Handles the <see cref="E:Control.Click"/> event of the <see cref="_okButton"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
@@ -234,6 +258,13 @@ namespace Extract.DataEntry.LabDE
             {
                 // On OK, set the SelectedOrderNumber property for the caller.
                 SelectedOrderNumber = GetSelectedOrderNumber();
+
+                if (string.IsNullOrWhiteSpace(SelectedOrderNumber))
+                {
+                    UtilityMethods.ShowMessageBox("No order has been selected.",
+                        "No order selected", true);
+                    return;
+                }
 
                 var ffi = TopLevelControl as FAMFileInspectorForm;
                 if (ffi != null)
@@ -248,7 +279,7 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the <see cref="_cancelButton"/>.
+        /// Handles the <see cref="E:Control.Click"/> event of the <see cref="_cancelButton"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
@@ -272,29 +303,6 @@ namespace Extract.DataEntry.LabDE
         #endregion Event Handlers
 
         #region Private Members
-
-        /// <summary>
-        /// Updates the data in <see cref="_ordersDataGridView"/> to display the current possible
-        /// matching orders in the FAM database.
-        /// </summary>
-        public void UpdateOrderSelectionGrid()
-        {
-            try
-            {
-                var disposableSource = _ordersDataGridView.DataSource as IDisposable;
-
-                _ordersDataGridView.DataSource = RowData.MatchingOrders.Copy();
-
-                if (disposableSource != null)
-                {
-                    disposableSource.Dispose();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38149");
-            }
-        }
 
         /// <summary>
         /// Gets the order number of the currently selected row in

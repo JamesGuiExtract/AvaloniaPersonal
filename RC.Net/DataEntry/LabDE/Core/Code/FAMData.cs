@@ -401,7 +401,7 @@ namespace Extract.DataEntry.LabDE
 
         /// <summary>
         /// Gets a <see cref="FAMOrderRow"/> instance that provides access to FAM database data for
-        /// the specified <see cref="dataEntryRow"/>.
+        /// the specified <see paramref="dataEntryRow"/>.
         /// </summary>
         /// <param name="dataEntryRow">The <see cref="DataEntryTableRow"/> for which data is needed.
         /// </param>
@@ -444,8 +444,8 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets a text description for the specified <see cref="orderNumber"/>. The description is
-        /// built using <see cref="OrderQueryColumns"/>.
+        /// Gets a text description for the specified <see paramref="orderNumber"/>. The description
+        /// is built using <see cref="OrderQueryColumns"/>.
         /// </summary>
         /// <param name="orderNumber">The order for which a description is needed.</param>
         /// <returns>A text description of the order.</returns>
@@ -760,7 +760,7 @@ namespace Extract.DataEntry.LabDE
     }
 
     /// <summary>
-    /// An <see cref="EventArgs"/> that represents data for the <see cref="FAMData.RowDataUpdate"/>
+    /// An <see cref="EventArgs"/> that represents data for the <see cref="FAMData.RowDataUpdated"/>
     /// event.
     /// </summary>
     internal class RowDataUpdatedArgs : EventArgs
