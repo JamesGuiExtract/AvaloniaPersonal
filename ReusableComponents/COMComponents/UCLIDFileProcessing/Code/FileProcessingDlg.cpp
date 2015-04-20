@@ -1808,9 +1808,9 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 		
 			// In case path tags were expanded, return the literal database connection properties we
 			// actually connected to.
-			rstrServer = getFPM()->DatabaseServer;
-			rstrDatabase = getFPM()->DatabaseName;
-			rstrAdvConnStrProperties = getFPM()->AdvancedConnectionStringProperties;
+			rstrServer = getDBPointer()->DatabaseServer;
+			rstrDatabase = getDBPointer()->DatabaseName;
+			rstrAdvConnStrProperties = getDBPointer()->AdvancedConnectionStringProperties;
 		}
 		else 
 		{
@@ -2306,7 +2306,7 @@ void FileProcessingDlg::updateUI()
 		if (strActiveContext.empty())
 		{
 			szTitle.Format("%s - %s on %s - File Action Manager", strFile.c_str(),
-				asString(getFPM()->DatabaseName).c_str(), asString(getFPM()->DatabaseServer).c_str());
+				asString(getDBPointer()->DatabaseName).c_str(), asString(getDBPointer()->DatabaseServer).c_str());
 			m_propDatabasePage.setCurrentContextText("");
 		}
 		else
@@ -2325,7 +2325,7 @@ void FileProcessingDlg::updateUI()
 
 			// Setup title that contains the current context
 			szTitle.Format("%s - %s on %s - %s - File Action Manager", strFile.c_str(),
-				asString(getFPM()->DatabaseName).c_str(), asString(getFPM()->DatabaseServer).c_str(),
+				asString(getDBPointer()->DatabaseName).c_str(), asString(getDBPointer()->DatabaseServer).c_str(),
 				strActiveContext.c_str());
 		}
 	}

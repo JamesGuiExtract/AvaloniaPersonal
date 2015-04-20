@@ -844,10 +844,8 @@ STDMETHODIMP CFileProcessingManager::get_DatabaseServer(/*[out, retval]*/ BSTR *
 	{
 		ASSERT_ARGUMENT("ELI17483", pVal != __nullptr);
 
-		// NOTE: The database server name returned will always be the literal name of the database
-		// server. This may differ from the value specified in the setter if the setter contained
-		// path tags or functions that were evaluated.
-		*pVal = getFPMDB()->DatabaseServer.Detach();
+		// This needs to return the set DatabaseServer with the tags
+		*pVal = get_bstr_t(m_strDBServer).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17482");
 	
@@ -873,10 +871,8 @@ STDMETHODIMP CFileProcessingManager::get_DatabaseName(/*[out, retval]*/ BSTR *pV
 	{
 		ASSERT_ARGUMENT("ELI17480", pVal != __nullptr);
 
-		// NOTE: The database name returned will always be the literal name of the database. This
-		// may differ from the value specified in the setter if the setter contained path tags or
-		// functions that were evaluated.
-		*pVal = getFPMDB()->DatabaseName.Detach();
+		// this needs to return the unexpanded database name
+		*pVal = get_bstr_t(m_strDBName).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17479");
 	
@@ -1198,10 +1194,8 @@ STDMETHODIMP CFileProcessingManager::get_AdvancedConnectionStringProperties(BSTR
 
 		ASSERT_ARGUMENT("ELI35135", pVal != __nullptr);
 
-		// NOTE: The advanced connection string returned will always be the literal connection
-		// string properties. This may differ from the value specified in the setter if the setter
-		// contained path tags or functions that were evaluated.
-		*pVal = getFPMDB()->AdvancedConnectionStringProperties.Detach();
+		// Needs to return the set AdvancecedConnectionString 
+		*pVal = get_bstr_t(m_strAdvConnString).Detach();
 
 		return S_OK;
 	}
