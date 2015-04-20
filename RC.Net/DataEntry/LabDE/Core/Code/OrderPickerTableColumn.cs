@@ -46,16 +46,6 @@ namespace Extract.DataEntry.LabDE
         DataEntryTableColumn _orderNumberColumn;
 
         /// <summary>
-        /// The <see cref="FAMFileInspectorForm"/> that will serve as the order-picker UI.
-        /// </summary>
-        FAMFileInspectorForm _fileInspectorForm;
-
-        /// <summary>
-        /// The pane that lists possible order matches for selection.
-        /// </summary>
-        OrderPickerSelectionPane _selectionPane;
-
-        /// <summary>
         /// The current <see cref="DataEntryControlHost"/>.
         /// </summary>
         DataEntryControlHost _dataEntryControlHost;
@@ -443,11 +433,6 @@ namespace Extract.DataEntry.LabDE
         {
             if (disposing)
             {
-                if (_fileInspectorForm != null)
-                {
-                    _fileInspectorForm.Dispose();
-                    _fileInspectorForm = null;
-                }
                 if (_famData != null)
                 {
                     _famData.RowDataUpdated -= HandleFamData_RowDataUpdated;
@@ -562,9 +547,10 @@ namespace Extract.DataEntry.LabDE
                         var initialValue = orderNumberCell.Value.ToString();
 
                         // If a selection was made, apply the new order number.
-                        if (ShowPickerFFI(dataEntryRow, initialValue) == DialogResult.OK)
+                        string orderNumber = ShowPickerFFI(dataEntryRow, initialValue);
+                        if (!string.IsNullOrWhiteSpace(orderNumber))
                         {
-                            orderNumberCell.Value = _selectionPane.SelectedOrderNumber;
+                            orderNumberCell.Value = orderNumber;
 
                             // Setting the order number cell as active helps indicate that a value
                             // was applied.
@@ -721,34 +707,33 @@ namespace Extract.DataEntry.LabDE
         /// <param name="dataEntryRow">The <see cref="DataEntryTableRow"/> to show the UI for.</param>
         /// <param name="defaultOrderNumber">The order number that should be selected by default in
         /// the picker UI.</param>
-        /// <returns>A <see cref="DialogResult"/> indicating the return value from the picker UI.
+        /// <returns>The order number that was selected from the picker UI; <see langword="null"/> if
+        /// the UI was cancelled without having chosen an order number.
         /// </returns>
-        DialogResult ShowPickerFFI(DataEntryTableRow dataEntryRow, string defaultOrderNumber)
+        string ShowPickerFFI(DataEntryTableRow dataEntryRow, string defaultOrderNumber)
         {
             FAMOrderRow rowData = FAMData.GetRowData(dataEntryRow);
             if (rowData != null)
             {
-                if (_fileInspectorForm == null)
+                using (var fileInspectorForm = new FAMFileInspectorForm())
+                using (var selectionPane = new OrderPickerSelectionPane())
                 {
-                    _fileInspectorForm = new FAMFileInspectorForm();
-                    _fileInspectorForm.UseDatabaseMode = true;
+                    fileInspectorForm.UseDatabaseMode = true;
+                    fileInspectorForm.FileProcessingDB.DuplicateConnection(FileProcessingDB);
 
-                    _fileInspectorForm.FileProcessingDB.DuplicateConnection(FileProcessingDB);
+                    fileInspectorForm.FileSelectorPane = selectionPane;
+                    selectionPane.SelectedOrderNumber = defaultOrderNumber;
+                    selectionPane.RowData = rowData;
+                    selectionPane.UpdateOrderSelectionGrid();
+
+                    if (fileInspectorForm.ShowDialog(DataEntryControlHost) == DialogResult.OK)
+                    {
+                        return selectionPane.SelectedOrderNumber;
+                    }
                 }
-
-                if (_fileInspectorForm.FileSelectorPane == null)
-                {
-                    _selectionPane = new OrderPickerSelectionPane();
-                    _fileInspectorForm.FileSelectorPane = _selectionPane;
-                }
-
-                _selectionPane.SelectedOrderNumber = defaultOrderNumber;
-                _selectionPane.RowData = rowData;
-                _selectionPane.UpdateOrderSelectionGrid();
-                return _fileInspectorForm.ShowDialog(DataEntryControlHost);
             }
 
-            return DialogResult.Cancel;
+            return null;
         }
 
         /// <summary>
