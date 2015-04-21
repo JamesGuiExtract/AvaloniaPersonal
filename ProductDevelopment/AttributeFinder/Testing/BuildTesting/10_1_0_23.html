@@ -1,0 +1,228 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.1.0.23 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.1.0.23 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed after <b>10.1.0.12</b> and up to <b>10.1.0.23</b>
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-12302]</b> Verification - Errors During Load Or Save
+        	<ul>
+			<li>Confirm that exceptions during the following situations 
+			result in the image ending up in <b>Failed</b> status.
+			<li><b>Redaction: Verify sensitive data</b>
+			<ul>
+				<li>Replace a TIF image with a renamed VOA file 
+				and confirm that verification handles the error 
+				properly.
+				<li>Make a VOA file read-only so that verification-related 
+				updates cannot be saved.
+			</ul>
+<p>
+			<li><b>Data Entry: Verify extracted data</b>
+			<ul>
+				<li>Replace a TIF image with a renamed VOA file 
+				and confirm that verification handles the error 
+				properly.
+				<li>Make a VOA file read-only so that verification-related 
+				updates cannot be saved.
+			</ul>
+<p>
+			<li><b>Core: View image</b>
+			<ul>
+				<li>Replace a TIF image with a renamed VOA file 
+				and confirm that the error is handled properly.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12315, ISSUE-12514]</b> Run FPS File
+        	<ul>
+			<li>Create an FPS with a clear error task such as <b>Core: 
+			Create file</b>.
+			<li>Configure other tasks and files such that processing will 
+			fail.
+			<li>Exercise the FPS file via <b>RunFPSFile.exe</b> with 
+			<b>/ignoreDB</b>.
+			<li>Confirm that the error task is executed.
+<p>
+			<li>Modify the configuration so that processing succeeds and is 
+			dependent on proper interpretation of the <b>&lt;SourceDocName&gt;</b> 
+			tag.
+			<li>Exercise the FPS file via <b>RunFPSFile.exe</b> with 
+			<b>/ignoreDB</b>.
+			<li>Confirm that <b>&lt;SourceDocName&gt;</b> is expanded correctly.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12472]</b> DBAdmin Manage Metadata Fields
+        	<ul>
+			<li>Exercise <b>Manage Metadata Fields</b> dialog from DBAdmin.
+			<ul>
+				<li>Confirm that the user interface works properly.
+				<li>Confirm that the functionality properly modifies 
+				data in the FAM database.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12631]</b> Remove Attributes OH
+        	<ul>
+			<li>Confirm that the user interface works properly.
+			<li>Confirm proper functionality when removing items compared 
+			to a <b>maximum</b> score.
+			<li>Confirm proper functionality when removing items compared 
+			to a <b>minimum</b> score.
+			<li>Confirm proper functionality when removing items compared 
+			to a <b>fixed value</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12740]</b> Confirm that the <b>Spatial String Searcher</b> 
+		automated tests all pass.
+<p>
+  	   	<LI><b>[ISSUE-12783] IN PROGRESS</b> LabDE Bidirectional Workflow
+        	<ul>
+			<li>Exercise <b>Demo_LabDE</b>.
+			<li>Explore usage of outstanding <b>Order</b> information by 
+			the <b>Order Mapper</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12785, ISSUE-12854]</b> Confirm proper resize behavior for 
+		the <b>Data Query</b> output handler rule object.
+<p>
+  	   	<LI><b>[ISSUE-12799]</b> LabDE Verification
+        	<ul>
+			<li>Modify <b>A02_Verify.fps</b> to use 2 threads.
+			<li>Rename or delete <b>C413.tif</b>.
+			<li>Start processing and skip the first document.
+			<li>Confirm that an <b>Unable to create image reader will be 
+			displayed</b> exception is displayed.
+			<li>Close the exception and confirm that the UI closes.
+			<li>Restart the FAM and confirm that an image is not loaded.
+			<li>Close the UI.
+			<li>If a <b>Timeout waiting for the verification window to close</b> 
+			exception is displayed, close it.
+			<li>Confirm that the FAM returns to a good state.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12800]</b> Verification
+        	<ul>
+			<li>Prepare an FPS file for verification such that the 
+			even-numbered files are corrupt.
+			<li>Confirm that appropriate exceptions are displayed.
+			<li>Confirm that the UI remains responsive.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12801]</b> LabDE Schema Changes
+        	<ul>
+			<li>Confirm that <b>Gender</b> is available in the <b>Patient</b> 
+			table.
+			<li>Confirm that the <b>Status</b> table includes <b>A</b> for 
+			Available instead of <b>O</b> for Open.
+			<li>Confirm that <b>CollectionDateTime</b> has been removed.
+			<li>Confirm that <b>RequestDateTime</b> has been replaced by 
+			<b>ReceivedDateTime</b> and defaults to the current time.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12802]</b> Confirm that <b>Silent Install</b> works to 
+		upgrade from an earlier 10.1 version that included RDT.
+<p>
+  	   	<LI><b>[ISSUE-12810]</b> Thumbnail Viewer For Data Entry Verification
+        	<ul>
+			<li>Confirm that a <b>Thumbnail Viewer</b> is available for 
+			Data Entry verification.
+			<li>Confirm that a corresponding menu item is available.
+			<li>Confirm that a corresponding toolbar button is available.
+			<li>Confirm that a corresponding shortcut key is available.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12811]</b> Confirm that <b>Extract.Database.dll</b> is 
+		included in <b>AFCore.nl</b>.
+<p>
+  	   	<LI><b>[ISSUE-12816]</b> Confirm that the <b>Entity Finder</b> 
+		tests within <b>Indexing NRS</b> all pass.
+<p>
+  	   	<LI><b>[ISSUE-12827]</b> Thread Safety For Data Query Rule Objects
+        	<ul>
+			<li>Create an FPS file to queue the <b>Demo_LabDE</b> images 
+			associated with Duplicate Documents. 
+			<li>Process the images in a multi-threaded FAM with the ruleset 
+			found at: <b>M:\PVCS_JIRA\JIRA\ISSUE-12827</b>.
+			<li>Repeat the test and confirm that processing finishes without 
+			error.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12836]</b> Multi-Thread Support For Data Query Ruleset
+        	<ul>
+			<li>Create or find a ruleset that uses a <b>Data Query OH</b> 
+			rule object.
+			<li>Exercise this ruleset in multi-threaded mode against a 
+			collection of images.
+			<li>Confirm that all images process successfully and that no 
+			unexpected exceptions are logged.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12841]</b> Confirm that FPS files can be saved without 
+		being runnable.
+<p>
+  	   	<LI><b>[ISSUE-12842]</b> Default Filenames When Saving FPS Files
+        	<ul>
+			<li>Confirm that FPS files will default to the following names 
+			based on activity being performed.
+			<ul>
+				<li><u>Queue</u> - &lt;ActionName&gt;_Queue.fps
+				<li><u>Queue+Statistics</u> - &lt;ActionName&gt;_Queue.fps
+				<li><u>None</u> - &lt;ActionName&gt;.fps
+				<li><u>Process</u> - &lt;ActionName&gt;.fps
+				<li><u>Process+Statistics</u> - &lt;ActionName&gt;.fps
+				<li><u>Statistics</u> - &lt;ActionName&gt;_Stats.fps
+				<li><u>Queue+Process</u> - &lt;ActionName&gt;_QueueAndProcess.fps
+				<li><u>Queue+Process+Statistics</u> - 
+				&lt;ActionName&gt;_QueueAndProcess.fps
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12847]</b> Confirm that the previously defined 
+		<b>&lt;DatabaseServerName&gt;</b> tag has been replaced by 
+		<b>&lt;DatabaseServer&gt;</b>.
+<p>
+  	   	<LI><b>[ISSUE-12856]</b> Confirm that <b>Extract.DataEntry.LabDE.dll</b> includes 
+		controls to support the <b>Duplicate Documents</b> feature.
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+	    		<li>All Tests
+			<li>Raster Zone Test
+			<li>Spatial String Searcher Test
+			<li>Spatial String Test
+	    	</ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<li>64-bit Operating System</li>
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

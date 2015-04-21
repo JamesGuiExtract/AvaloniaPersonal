@@ -1,0 +1,274 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.1.0.12 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.1.0.12 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed after <b>10.1.0.7</b> and up to <b>10.1.0.12</b>
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[CUST-654]</b> Duplicate Documents
+        	<ul>
+			<li>Exercise the <b>Duplicate Documents</b> feature within 
+			<b>Demo_LabDE</b>.
+			<li>Confirm that Patient information is not used to create the 
+			filename of a stapled output file.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-4669]</b> Confirm that a copied rule object that is disabled 
+		is pasted as disabled.
+<p>
+  	   	<LI><b>[ISSUE-7569]</b> IDShield.ini
+        	<ul>
+			<li>Start with clear <b>Demo_IDShield</b> database.
+			<li>Process the files.
+			<li>Add new action <b>auto</b>, copying status from 
+			<b>Verify</b> so that all files are Pending.
+			<li>Create a new FPS file with <b>Redaction: Create redacted 
+			image</b> using default settings on the <b>auto</b> action.
+			<li>Process the images.
+			<li><b>Verify</b> the output images.
+			<ul>
+				<li>Confirm that for <b>TestImage009.redacted.tif</b>, 
+				the single Clue item is not selected and highlighted for 
+				redaction.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-7590]</b> Core: Convert VOA To XML
+        	<ul>
+			<li>Confirm that the task now expands path functions.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-10460]</b> IRegularExprParser
+        	<ul>
+			<li>Confirm that the automated tests all pass.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12183]</b> Confirm that the automated tests for the 
+		<b>OrderMapper</b> all pass.
+<p>
+  	   	<LI><b>[ISSUE-12302]</b> Handling Exceptions Within Verification
+        	<ul>
+			<li>Exercise each test case for each verification task.
+			<ul>
+				<li>Core: View image
+				<li>Data Entry: Verify extracted data
+				<li>Redaction: Verify sensitive data
+			</ul>
+			<li>Test Cases:
+			<ul>
+				<li>Cause an exception while loading a document. 
+				Confirm that the document fails and that the user is 
+				prompted about continuing.
+				<li>Cause an exception while saving a document (or by 
+				skipping or stopping). Confirm that the document fails 
+				and that the user is prompted about continuing.
+				<li>Cause an exception during initialization of the 
+				verification UI. Confirm that the verification does 
+				not run.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12534]</b> ID Shield Verification
+        	<ul>
+			<li>Exercise <b>Fuzzy Search</b> within the <b>Find and Redact</b> 
+			feature.
+			<li>Confirm expected behavior.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12546, ISSUE-12760]</b> Daylight Savings Time
+        	<ul>
+			<li>Create an FPS file to OCR several 50-page documents 
+			using parallelization.
+			<li>Include display of the <b>Statistics</b> tab in the FPS file.
+			<li>Stop the <b>Windows Time</b> service.
+			<li>Stop the <b>VirtualBox Guest Additions</b> service.
+			<li>Set system time back one hour.
+			<li>Confirm that processing continues without exceptions.
+			<li>Confirm that the <b>Statistics</b> tab continues to display 
+			meaningful information.
+<p>
+			<li>Repeat the test but set system time forward one hour.
+			<li>Confirm that the currently processing files are not 
+			auto-reverted.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12551]</b> Data Entry Queries Fail To Populate Value
+        	<ul>
+			<li>Prepare a test machine to exercise the delivered 
+			<b>MN - Fairview Hospital</b> DEP.
+			<li>Verify an image.
+			<li>Fill in Patient Name, MRN, Order Number and Order Code.
+			<li>In the starred row of the Test table type <b>my</b> and 
+			confirm that the field is auto-completed to 
+			<b>Mycophenolic Acid (External)</b>.
+			<li><b>Do not</b> press any other keys.
+			<li>Press <b>Ctrl+Z</b> to undo the partially added row.
+			<li>Press <b>Ctrl+Y</b> to restore the partially added row.
+			<li>Press <b>TAB</b> and fill in a value.
+			<li>Save and Commit.
+			<li>Confirm that the output VOA file <b>does not</b> have a 
+			component without a test code.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12686]</b> DB Admin
+        	<ul>
+			<li>Install FLEX Index, ID Shield and LabDE.
+			<li>License only FLEX Index.
+			<li>Create a new database with DB Admin.
+			<li>Confirm that <b>ID Shield</b> tables are not included in the 
+			new database.
+			<li>License ID Shield but do not check for new components.
+			<li>Create a second new database.
+			<li>Confirm that the second database includes <b>ID Shield</b> 
+			tables.
+			<li>Remove the ID Shield license.
+			<li>Create a third new database.
+			<li>Confirm that <b>ID Shield</b> tables are not included in the 
+			third database.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12734]</b> Create Searchable PDF
+        	<ul>
+			<li>Configure a <b>Core: Convert to searchable PDF</b> task.
+			<li>Confirm that the <b>Browse</b> dialog includes different 
+			image file types.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12742, ISSUE-12762]</b> Confirm that <b>Order Mapper</b> 
+		automated tests all pass.
+<p>
+  	   	<LI><b>[ISSUE-12746]</b> RunFPSFile
+        	<ul>
+			<li>Exercise <b>RunFPSFile.exe</b> using a <b>Core: Conditionally 
+			execute task(s)</b> task and the <b>/ignoreDB</b> switch.
+			<li>Confirm that no exception is thrown.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12748]</b> Installation Without Auto-Restart
+        	<ul>
+			<li>Prepare a <b>64-bit Windows 7</b> test machine such that 
+			installed updates still require a reboot.
+			<li>Use the silent install batch file to install <b>LabDE</b>.
+			<li>Confirm that the installation works without automatically 
+			restarting the test machine.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12757]</b> Enhance OCR Licensing
+        	<ul>
+			<li>Confirm that the <b>Core: Enhance OCR</b> task is automatically 
+			licensed with a <b>Server</b> license.
+			<li>Confirm that the <b>Core: Enhance OCR</b> task is automatically 
+			licensed with a <b>Client</b> license.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12763]</b> LabDE Database Schema
+        	<ul>
+			<li>Confirm that a new <b>LabDE</b> database contains a <b>Patient</b> 
+			table with the following fields.
+			<ul>
+				<li>MRN
+				<li>FirstName
+				<li>MiddleName
+				<li>LastName
+				<li>DOB
+			</ul>
+			<li>Confirm that a new <b>LabDE</b> database contains an <b>Order</b> 
+			table with the following fields.
+			<ul>
+				<li>OrderNumber
+				<li>OrderCode
+				<li>Patient:MRN
+				<li>CollectionDateTime
+				<li>Status
+				<li>FAMFile:ID
+			</ul>
+			<li>Confirm that a <b>non-LabDE</b> database does not contain the 
+			above tables.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12764]</b> Data Query Rule Object
+        	<ul>
+			<li>Confirm that an option is available to use the current FAM 
+			database connection.
+			<li>Confirm that processing works as expected for a normal FAM.
+			<li>Confirm that processing works as expected with 
+			<b>RunFPSFile.exe</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12767]</b> Confirm that <b>LabDECppCC.dll</b> is included 
+		in the <b>LabDE</b> installation.
+<p>
+  	   	<LI><b>[ISSUE-12779]</b> Confirm that <b>LabDECppCC.dll</b> is included 
+		in the <b>LabDE.rl</b> file in the CommonComponents folder.
+<p>
+  	   	<LI><b>[ISSUE-12780, ISSUE-12781]</b> Uninstalling Extract Services
+        	<ul>
+			<li>Confirm that Extract Systems services are not uninstalled if 
+			<b>Extract Systems LM</b> remains installed.
+			<li>Confirm that all installed Extract Systems services are 
+			uninstalled when the last Extract Systems product is uninstalled.
+			<li>Confirm that the <b>Extract Systems Application Monitor 
+			Service</b> is uninstalled when the last Extract Systems product 
+			is uninstalled.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12787]</b> IFileRequestHandler
+        	<ul>
+			<li>Prepare <b>Demo_LabDE</b> images for verification with 
+			<b>Duplicate Documents</b> functionality.
+			<li>Using <b>SQL Management Studio</b>, add an extra record or two 
+			to the <b>FAMSession</b> table.
+			<li>Start verification.
+			<li>Confirm that the new records in the <b>FAMSession</b> and 
+			<b>ActiveFAM</b> tables have different IDs.
+			<li>Confirm that <b>Duplicate Documents</b> behavior works as 
+			expected.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+   	<ul>
+  	   	<LI>Confirm that the automated tests for <b>Duplicate and Separate Trees 
+		OH</b> all pass.
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+	    		<li>All Tests
+			<li>Raster Zone Test
+			<li>Spatial String Searcher Test
+			<li>Spatial String Test
+	    	</ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<li>64-bit Operating System</li>
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

@@ -1,0 +1,289 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.1.0.7 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.1.0.7 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed up to <b>10.1.0.7</b>
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-982]</b> Temporary Copies of OrderMapper DB
+        	<ul>
+			<li>Install <b>AutoHotKey</b> on the test machine.
+			<li>Copy files from 
+			<b>PD\AF\IS\LabResults\AutomatedTest\DE_DB_SimultaneousUsage</b> 
+			to a local testing folder.
+			<li>Confirm that the temporary OrderMapper copies are 
+			automatically cleaned up.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-4680, ISSUE-5254]</b> Rule Set Editor
+        	<ul>
+			<li>Open RuleSet Editor and add an attribute.
+			<li>Click <b>Insert</b> and select a rule.
+			<li>Apply some labeled value modifiers.
+			<li>Select and copy multiple value modifiers.
+			<li>Paste the copied value modifiers to the end of the list.
+			<li>Confirm that the value modifiers are pasted in the correct 
+			order.
+			<li>Confirm that the descriptions for each of the pasted 
+			modifiers matches the UI displayed text.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12744]</b> Rule Set Editor
+        	<ul>
+			<li>Open RuleSet Editor and add an attribute.
+			<li>Add multiple document preprocessors.
+			<li>Copy one of the document proeprocessors to the Clipboard.
+			<li>Confirm that the copied preprocessor can be pasted as a 
+			rule-specific document preprocessor.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-5877, ISSUE-12725]</b> Modify Attributes
+        	<ul>
+			<li>Confirm that the <b>Modify Attributes</b> automated tests 
+			all pass.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-6511, ISSUE-12653, ISSUE-12659]</b> Conditional Task
+        	<ul>
+			<li>Confirm that condition objects will propagate the processing 
+			result if a <b>Task Condition</b> is used.
+			<ul>
+				<li>Failed
+				<li>Skipped
+			</ul>
+			<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-10310]</b> Task Condition
+        	<ul>
+			<li>Prepare an FPS file using <b>Core: Conditionally execute task</b> 
+			using <b>Redaction: Verify sensitive data</b> as the task with a 
+			<b>Task condition</b>.
+			<li>Verify an image and click <b>Stop processing</b> in the FAM.
+			<li>Confirm that verification stops and that the active document 
+			reverts to <b>Pending</b> status.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12073, ISSUE-12610]</b> Order Mapper
+        	<ul>
+			<li>Exercise the Solution and sample image found at 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12073</b>.
+			<li>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12293]</b> Copy and Paste of Rule Objects
+        	<ul>
+			<li>Check in the code that a new GUID is applied to a pasted rule 
+			object.
+			<li>Confirm that ruleset profiling works without error.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12313]</b> Thumbnail Viewer Error
+        	<ul>
+			<li>Verify a corrupt image with an active thumbnail viewer.
+			<li>Confirm that a meaningful error is displayed in the thumbnail 
+			viewer.
+			<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12392]</b> Demo_LabDE Auto Update Query
+        	<ul>
+			<li>Confirm that the auto-update query for the <b>Message Sequence 
+			Number</b> file is correct.
+			<ul>
+				<li>&lt;Query StringList=''&gt;&lt;SolutionDirectory/&gt;
+				\MessageSequenceNumber.txt&lt;/Query&gt;
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12544]</b> Missing Mandatory Query
+        	<ul>
+			<li>Exercise the Solution and sample image found at 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12544</b>.
+			<li>Confirm that the <b>CBC WITH DIFFERENTIAL</b> order 
+			is invalid because of a missing <b>RBC</b> test.
+			<li>Swipe the whole RBC result using the Word highlight tool.
+			<li>Confirm that the result name is mis-OCR'd.
+			<li>Correct the result name and tab out of the name cell.
+			<li>Confirm that the Order is now valid.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12548]</b> Data Entry Framework
+        	<ul>
+			<li>Configure a DEP such that multiple controls are mapped 
+			to the same attribute.
+			<li>Confirm that a meaningful exception is presented.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12589]</b> Confirm that a reusable method exists to prompt 
+		for Windows / Domain credentials.
+<p>
+  	   	<LI><b>[ISSUE-12627]</b> Confirm that even using a script, two actions with 
+		the same name cannot be added to a FAM database.
+<p>
+  	   	<LI><b>[ISSUE-12662]</b> Data Entry Verification - Internal Logic Error
+        	<ul>
+			<li>Use <b>Demo_LabDE</b> to verify the image in 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12662</b>.
+			<li>Enter an order number for each of the orders.
+			<li>Select one of the middle orders and specify a lab name.
+			<li>Save and commit the document.
+			<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12688]</b> FAM Parallelization
+        	<ul>
+			<li>Exercise files from <b>M:\PVCS_JIRA\JIRA\ISSUE-12372</b>.
+			<li>Run <b>Queue.fps</b>.
+			<li>Run <b>Process-1.fps</b>.
+			<li>Confirm that processing begins on the test image.
+			<li>Run <b>Process-2.fps</b> making sure that the <b>Stop 
+			processing files once the queue is empty</b> setting is enabled.
+			<li>Confirm that <b>Process-2.fps</b> starts processing work items.
+			<li>Confirm that <b>Process-2.fps</b> continues to process work 
+			items until the file has finished processing.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12689]</b> Run FPS File
+        	<ul>
+			<li>Create an FPS file with a <b>Core: View image</b> task.
+			<li>Exercise the FPS file using <b>RunFPSFile.exe</b> and the 
+			<b>/ignoreDB</b> switch.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12692]</b> Confirm that <b>LogicNP.EZShellExtensions.dll</b> is 
+		included in the <b>AFCore.nl</b> file in CommonComponents.
+<p>
+  	   	<LI><b>[ISSUE-12696]</b> FAM Parallelization
+        	<ul>
+			<li>Confirm that the <b>Core: OCR document</b> task creates work items 
+			only if the document contains <b>5 or more</b> pages.
+			<li>Confirm that each <b>Core: OCR document</b> work item includes up 
+			to 5 pages.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12701]</b> Data Entry Framework - Multiple Simultaneous DB 
+		Connections
+        	<ul>
+			<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12709]</b> Long Runtime for UVA Images
+        	<ul>
+			<li>Copy the <b>Solution</b> folder from 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12709</b> to a test folder.
+			<li>Create an FPS file to supply the files from 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12709\List_Of_TestImages.txt</b> 
+			and exercise the rules from the Solution folder.
+			<li>Confirm that rule running requires significantly less 
+			than one hour.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12711]</b> Confirm that <b>LabDE.nl</b> is installed to 
+		the CommonComponents folder.
+<p>
+  	   	<LI><b>[ISSUE-12722]</b> Confirm that <b>TestImage003.tif.1.hybrid.uss</b> 
+		from <b>SpatialStringAutomatedTest</b> opens in <b>USSFileViewer.exe</b> 
+		without error.
+<p>
+  	   	<LI><b>[ISSUE-12724]</b> Non-Silent Installs Do Not Work
+        	<ul>
+			<li>Confirm that <b>FLEX Index</b> installs correctly from 
+			<b>setup.exe</b> or <b>Launch.exe</b>.
+			<li>Confirm that <b>ID Shield</b> installs correctly from 
+			<b>setup.exe</b> or <b>Launch.exe</b>.
+			<li>Confirm that <b>LabDE</b> installs correctly from 
+			<b>setup.exe</b> or <b>Launch.exe</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12726]</b> Tags Available In Verification
+        	<ul>
+			<li>Create an older version FPS file with a <b>Data Entry: Verify 
+			extracted data</b> task such that tags are available.
+			<li>Upgrade the FPS file and confirm that tags remain available.
+			<li>Create a new FPS file with a <b>Data Entry: Verify extracted 
+			data</b> task.
+			<li>Confirm that tags are available by default.
+<p>
+			<li>Create an older version FPS file with a <b>Redaction: Verify 
+			sensitive data</b> task such that tags are available.
+			<li>Upgrade the FPS file and confirm that tags remain available.
+			<li>Create a new FPS file with a <b>Redaction: Verify sensitive 
+			data</b> task.
+			<li>Confirm that tags are available by default.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12727]</b> Confirm that all <b>Spatial String</b> test cases 
+		pass.
+<p>
+  	   	<LI><b>[ISSUE-12728]</b> Data Entry Hang In Verification
+        	<ul>
+			<li>Exercise a LabDE DEP.
+			<li>Verify an image.
+			<li>Bring up the auto-complete list in the result component name 
+			column and use the arrow keys to navigate to the correct 
+			component name.
+			<li>Press the <b>TAB</b> key.
+			<li>Confirm that the UI is not stuck in an infinite loop.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12737]</b> Confirm that <b>StringPatternMatcher</b> test 
+		files are no longer installed with the RDT.
+<p>
+  	   	<LI><b>[ISSUE-12738]</b> RDT Start Menu
+        	<ul>
+			<li>Confirm that the following tests are available under the 
+			<b>Automated Tests</b> folder.
+			<ul>
+				<li>Raster Zone Tester
+				<li>Spatial String
+				<li>Spatial String Searcher
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12748]</b> Installation Does Automatic Restart
+        	<ul>
+			<li>Restore a clean 64-bit Windows 7 machine.
+			<li>Apply Windows Updates that require a restart but <b>do not</b> 
+			actually restart the test machine.
+			<li>Install <b>LabDE</b>.
+			<li>Confirm that the test machine is not automatically restarted 
+			during or at the end of the installation.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<li>64-bit Operating System</li>
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
