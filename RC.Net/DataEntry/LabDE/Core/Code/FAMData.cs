@@ -21,6 +21,12 @@ namespace Extract.DataEntry.LabDE
         #region Constants
 
         /// <summary>
+        /// An SQL column specification for the order name.
+        /// </summary>
+        const string _ORDER_NAME_XPATH =
+            "[ORMMessage].value('(/ORM_O01/ORM_O01.ORDER/ORM_O01.ORDER_DETAIL/ORM_O01.OBRRQDRQ1RXOODSODT_SUPPGRP/OBR/OBR.4/CE.2)[1]','NVARCHAR(MAX)')";
+
+        /// <summary>
         /// An SQL column specification for the ordering provider first name using an x-path query
         /// for the XML version of an ORM-O01 HL7 message.
         /// </summary>
@@ -87,7 +93,7 @@ namespace Extract.DataEntry.LabDE
 
                 OrderQueryColumns = new OrderedDictionary();
                 OrderQueryColumns.Add("Order #", "[LabDEOrder].[OrderNumber]");
-                OrderQueryColumns.Add("Code", "[LabDEOrder].[OrderCode]");
+                OrderQueryColumns.Add("Order Name", _ORDER_NAME_XPATH);
                 OrderQueryColumns.Add("Requested", "[LabDEOrder].[ReferenceDateTime]");
                 OrderQueryColumns.Add("Ordered by",
                     "(" + _ORDER_PROVIDER_LAST_NAME_XPATH + " + ', ' + " + _ORDER_PROVIDER_FIRST_NAME_XPATH + ")");
