@@ -20,6 +20,14 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(ContextTagsEditorViewRow).ToString();
 
+        /// <summary>
+        /// Keeps track of whether a warning prompt has been displayed for editing a context other
+        /// than the current context for the given database. (No need to prompt for each individual
+        /// value that is edited.)
+        /// </summary>
+        static HashSet<ContextTagDatabase> _promptedForCrossContextEdit =
+            new HashSet<ContextTagDatabase>();
+
         #endregion Constants
 
         #region Fields
@@ -35,6 +43,11 @@ namespace Extract.Utilities.ContextTags
         /// class type on the current thread. 
         /// </summary>
         PropertyDescriptorCollection _properties;
+
+        /// <summary>
+        /// The name of the context from <see cref="_database"/> that is currently active.
+        /// </summary>
+        string _activeContextName;
 
         #endregion Fields
 
@@ -238,6 +251,8 @@ namespace Extract.Utilities.ContextTags
                 GetTagNamePropertyDescriptor()
                 .Union(GetContextPropertyDescriptors())
                 .ToArray());
+
+            _activeContextName = _database.GetContextNameForDirectory(_database.DatabaseDirectory);
         }
 
         /// <summary>
@@ -374,7 +389,23 @@ namespace Extract.Utilities.ContextTags
                     _database.TagValue.InsertOnSubmit(targetValue);
                 }
 
-                targetValue.Value = ((string)value) ?? "";
+                string newValue = ((string)value) ?? "";
+
+                // If changing a tag value for another context, prompt to ensure user understands
+                // when this value will be used (but don't prompt again once the prompt has been
+                // displayed for this database).
+                if (newValue != targetValue.Value &&
+                    _activeContextName != null && _activeContextName != context.Name &&
+                    !_promptedForCrossContextEdit.Contains(_database))
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "You are editing a context other than the active context. The tag value " +
+                        "applied here will only be used once this CustomTags file is copied to " +
+                        "the directory: \"" + context.FPSFileDir + "\".", "Warning", false);
+                    _promptedForCrossContextEdit.Add(_database);
+                }
+
+                targetValue.Value = newValue;
                 _database.SubmitChanges();
             }
             catch (Exception ex)

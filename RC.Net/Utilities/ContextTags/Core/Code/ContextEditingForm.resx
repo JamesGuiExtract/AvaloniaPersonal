@@ -120,4 +120,22 @@
   <metadata name="_contextTableV1BindingSource.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="_fpsFileDirInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="_fpsFileDirInfoTip.TipText" xml:space="preserve">
+    <value>The FPSFileDir will determine when a context will be active. Specifically, when a context is
+stored in a CustomTags file in the corresponding FPSFileDir and an FPS file is then opened
+from that directory, the tag values associated with that context are the ones that will be used.
+
+This CustomTags file must also be copied to all defined FPSFileDir's in order for the tag
+values associated with the corresponding contexts to be available.</value>
+  </data>
 </root>

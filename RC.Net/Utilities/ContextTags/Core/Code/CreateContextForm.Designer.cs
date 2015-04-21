@@ -17,11 +17,13 @@
         {
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label2;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreateContextForm));
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this._contextNameTextBox = new System.Windows.Forms.TextBox();
             this._fpsFileDirTextBox = new System.Windows.Forms.TextBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this._fpsFileDirInfoTip = new Extract.Utilities.Forms.InfoTip();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -99,6 +101,17 @@
             this.textBox1.Text = "There doesn\'t appear to be a context associated with the current directory. You c" +
     "an create a context for this directory now; otherwise, press cancel.";
             // 
+            // _fpsFileDirInfoTip
+            // 
+            this._fpsFileDirInfoTip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._fpsFileDirInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._fpsFileDirInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_fpsFileDirInfoTip.BackgroundImage")));
+            this._fpsFileDirInfoTip.Location = new System.Drawing.Point(501, 91);
+            this._fpsFileDirInfoTip.Name = "_fpsFileDirInfoTip";
+            this._fpsFileDirInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._fpsFileDirInfoTip.TabIndex = 10;
+            this._fpsFileDirInfoTip.TipText = resources.GetString("_fpsFileDirInfoTip.TipText");
+            // 
             // CreateContextForm
             // 
             this.AcceptButton = this._okButton;
@@ -106,6 +119,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(529, 176);
+            this.Controls.Add(this._fpsFileDirInfoTip);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this._fpsFileDirTextBox);
             this.Controls.Add(label2);
@@ -134,5 +148,6 @@
         private System.Windows.Forms.TextBox _contextNameTextBox;
         private System.Windows.Forms.TextBox _fpsFileDirTextBox;
         private System.Windows.Forms.TextBox textBox1;
+        private Forms.InfoTip _fpsFileDirInfoTip;
     }
 }

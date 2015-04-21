@@ -320,10 +320,7 @@ namespace Extract.Utilities.ContextTags
                             UNCPath = UNCPath.Substring(0, UNCPath.Length - 1);
                         }
 
-                        _activeContext = database.Context
-                            .Where(context => context.FPSFileDir == UNCPath)
-                            .Select(context => context.Name)
-                            .FirstOrDefault();
+                        _activeContext = database.GetContextNameForDirectory(UNCPath);
 
                         // We were able to find a proper context; load all tag values for this
                         // context.

@@ -342,27 +342,13 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                // Retrieve the database's current directory, as a UNC path if possible.
-                var connectionStringBuilder = new DbConnectionStringBuilder();
-                connectionStringBuilder.ConnectionString = _connection.ConnectionString;
-
-                object databaseFile = null;
-                if (!connectionStringBuilder.TryGetValue("Data Source", out databaseFile) &&
-                    !connectionStringBuilder.TryGetValue("DataSource", out databaseFile))
+                // If there is any context matching the database's directory display a dialog that
+                // allows creating of a context for the current directory.
+                if (string.IsNullOrWhiteSpace(
+                    _database.GetContextNameForDirectory(_database.DatabaseDirectory)))
                 {
-                    ExtractException.ThrowLogicException("ELI38041");
-                }
-
-                string filename = (string)databaseFile;
-                FileSystemMethods.ConvertToNetworkPath(ref filename, false);
-                string fpsFileDir = Path.GetDirectoryName(filename);
-
-                // Check to see if there is any context matching this directory.
-                if (!_database.Context.Any(context => context.FPSFileDir == fpsFileDir))
-                {
-                    // If not, display a dialog that allows creating of a context for the current
-                    // directory.
-                    using (var createContextForm = new CreateContextForm(_connection, fpsFileDir))
+                    using (var createContextForm = new CreateContextForm(
+                        _connection, _database.DatabaseDirectory))
                     {
                         if (createContextForm.ShowDialog(this) == DialogResult.OK)
                         {

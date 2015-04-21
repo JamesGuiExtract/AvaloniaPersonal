@@ -1,7 +1,10 @@
 ﻿using Extract.Database;
+using System.Data.Common;
 using System.Data.Linq;
 using System.Data.Linq.Mapping;
 using System.Data.SqlServerCe;
+using System.IO;
+using System.Linq;
 
 namespace Extract.Utilities.ContextTags
 {
@@ -17,6 +20,17 @@ namespace Extract.Utilities.ContextTags
         /// The current schema version for the context-specific tag database
         /// </summary>
         public static readonly int CurrentSchemaVersion = 1;
+
+        /// <summary>
+        /// The connection string as of the last call to <see cref="DatabaseDirectory"/>. Used to
+        /// determine if <see cref="_databaseDirectory"/> needs to be re-calculated.
+        /// </summary>
+        string _lastConnectionString;
+
+        /// <summary>
+        /// The directory in which this database file resides.
+        /// </summary>
+        string _databaseDirectory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContextTagDatabase"/> class.
@@ -81,6 +95,71 @@ namespace Extract.Utilities.ContextTags
             get
             {
                 return GetTable<TagValueTableV1>();
+            }
+        }
+
+        /// <summary>
+        /// Gets the directory in which this database file resides.
+        /// </summary>
+        public string DatabaseDirectory
+        {
+            get
+            {
+                try 
+	            {
+                    // If the connection string has changed since the last time the
+                    // DatabaseDirectory was calculated, 
+                    if (string.IsNullOrEmpty(_lastConnectionString) ||
+                        _lastConnectionString != Connection.ConnectionString)
+                    {
+                        var connectionStringBuilder = new DbConnectionStringBuilder();
+                        connectionStringBuilder.ConnectionString = Connection.ConnectionString;
+
+                        object databaseFile = null;
+                        if (!connectionStringBuilder.TryGetValue("Data Source", out databaseFile) &&
+                            !connectionStringBuilder.TryGetValue("DataSource", out databaseFile))
+                        {
+                            ExtractException.ThrowLogicException("ELI38173");
+                        }
+
+                        // Attempt to retrieve the directory as a UNC path since UNC paths will
+                        // provide a more consistent way of comparing paths.
+                        string filename = (string)databaseFile;
+                        FileSystemMethods.ConvertToNetworkPath(ref filename, false);
+                        _databaseDirectory = Path.GetDirectoryName(filename);
+
+                        _lastConnectionString = Connection.ConnectionString;
+                    }
+
+                    return _databaseDirectory;
+	            }
+	            catch (System.Exception ex)
+	            {
+		            throw ex.AsExtract("ELI38174");
+	            }
+            }
+        }
+
+        /// <summary>
+        /// Gets or the name of the context that is mapped to the specified
+        /// <see paramref="directory"/>.
+        /// </summary>
+        /// <value>
+        /// The name of the context that is mapped to the specified <see paramref="directory"/> or
+        /// <see langword="null"/> if there is no context associated with the directory.
+        /// </value>
+        public string GetContextNameForDirectory(string directory)
+        {
+            try
+            {
+                return Context
+                    .Where(context => context.FPSFileDir == directory)
+                    .Select(context => context.Name)
+                    .FirstOrDefault();
+            }
+            catch (System.Exception ex)
+            {
+                throw ex.AsExtract("ELI38175");
             }
         }
     }

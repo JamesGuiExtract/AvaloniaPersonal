@@ -1157,6 +1157,8 @@ namespace Extract.DataEntry
         /// <returns>The <see cref="IAttribute"/>s output from the most recent call to
         /// <see cref="SaveData"/> or <see langword="null"/> if data has not been saved or new data
         /// has been loaded since the most recent save.</returns>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public IUnknownVector MostRecentlySavedAttributes
         {
             get
@@ -1178,6 +1180,8 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns><see langword="true"/> if a significant update of control values is in progress,
         /// <see langword="false"/> otherwise.</returns>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool UpdateInProgress
         {
             get
@@ -1190,6 +1194,8 @@ namespace Extract.DataEntry
         /// Gets the <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s that represents
         /// the currently loaded data.
         /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public IUnknownVector Attributes
         {
             get
@@ -1205,6 +1211,8 @@ namespace Extract.DataEntry
         /// <value><see langword="true"/> if this DEP should be monitoring events from the
         /// <see cref="_imageViewer"/>; otherwise, <see langword="false"/>.
         /// </value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Active
         {
             get
@@ -1247,6 +1255,8 @@ namespace Extract.DataEntry
         /// <value><see langword="true"/> if the loaded data is changing; otherwise,
         /// <see langword="false"/>.
         /// </value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ChangingData
         {
             get
