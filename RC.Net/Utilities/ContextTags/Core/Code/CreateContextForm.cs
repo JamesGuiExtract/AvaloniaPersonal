@@ -66,12 +66,7 @@ namespace Extract.Utilities.ContextTags
 
                 _database = new ContextTagDatabase(connection);
 
-                // To avoid a user from creating contexts mapped to physical drives without specific
-                // intention, only initialize FPSFileDir if it is a UNC path.
-                if (fpsFileDir.StartsWith(@"\\", StringComparison.OrdinalIgnoreCase))
-                {
-                    _fpsFileDirTextBox.Text = fpsFileDir;
-                }
+                _fpsFileDirTextBox.Text = fpsFileDir;
             }
             catch (Exception ex)
             {
@@ -143,7 +138,8 @@ namespace Extract.Utilities.ContextTags
                     DialogResult response = MessageBox.Show(null, "It is recommended that " +
                         "FPSFileDir be specified with a UNC path to avoid the risk that a " +
                         "context's FPSFileDir will refer to a different actual location " +
-                        "depending on what machine or drive mapping is currently being used.",
+                        "depending on what machine or drive mapping is currently being used." +
+                        "\r\n\r\nUse non-UNC path?",
                         "UNC path recommended", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation,
                         MessageBoxDefaultButton.Button1, 0);
                     if (response == DialogResult.No)

@@ -138,6 +138,8 @@ namespace Extract.Utilities.ContextTags
                 {
                     UtilityMethods.ShowMessageBox("FPSFileDir must be specified", 
                         "FPSFileDir missing", true);
+                    DialogResult = DialogResult.None;
+                    return;
                 }
 
                 if (_dataGridView.Rows.OfType<DataGridViewRow>()
@@ -149,7 +151,8 @@ namespace Extract.Utilities.ContextTags
                     DialogResult response = MessageBox.Show(null, "It is recommended that " +
                         "FPSFileDir be specified with a UNC path to avoid the risk that a " +
                         "context's FPSFileDir will refer to a different actual location " +
-                        "depending on what machine or drive mapping is currently being used.",
+                        "depending on what machine or drive mapping is currently being used." +
+                        "\r\n\r\nUse non-UNC path?",
                         "UNC path recommended", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation,
                         MessageBoxDefaultButton.Button1, 0);
                     if (response == DialogResult.No)
