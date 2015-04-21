@@ -64,7 +64,14 @@ CFileProcessingManager::~CFileProcessingManager()
 {
 	try
 	{
-		clear();
+		// https://extract.atlassian.net/browse/ISSUE-12926
+		// Clear calls into the interface pointers below and by this point the application scope
+		// itself may have ended rendering some of the COM object members inoperable. In particular,
+		// with the addition of custom tags, m_ipFAMTagManager will now fail if accessed after the 
+		// main application thread has ended. There should be no need for any of the contained code
+		// to run anyway.
+		//clear();
+
 		m_ipFPMDB = __nullptr;
 		m_ipFSMgmtRole = __nullptr;
 		m_ipFPMgmtRole = __nullptr;

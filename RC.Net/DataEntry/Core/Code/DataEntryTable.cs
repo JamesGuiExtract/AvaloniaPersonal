@@ -569,7 +569,7 @@ namespace Extract.DataEntry
                     Rows.CollectionChanged += HandleRowsCollectionChanged;
 
                     // Disable column header wrap mode, otherwise resizing columns widths can cause
-                    // wrapped text to increse the height of the header column thereby upsetting
+                    // wrapped text to increase the height of the header column thereby upsetting
                     // control sizing and possibly hiding data.
                     ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False;
 
@@ -652,7 +652,7 @@ namespace Extract.DataEntry
                 // Notify listeners new attribute(s) needs to be propagated
                 OnPropagateAttributes(selectedAttributes);
 
-                if (newRowSelection)
+                if (newRowSelection && TabOrderPlaceholderAttribute != null)
                 {
                     // [DataEntry:346]
                     // If the new row is the only row selected, report 
@@ -687,7 +687,9 @@ namespace Extract.DataEntry
                 // changed (include all subattributes to the row(s)'s attribute(s) in the 
                 // spatial info).
                 OnAttributesSelected(selectedAttributes, true, rowView,
-                    (_allowTabbingByRow && !Disabled) ? (IAttribute)selectedAttributes.At(0) : null);
+                    (_allowTabbingByRow && !Disabled && selectedAttributes.Size() > 0) 
+                        ? (IAttribute)selectedAttributes.At(0)
+                        : null);
             }
             else if (SelectedCells.Count > 0)
             {
@@ -872,7 +874,7 @@ namespace Extract.DataEntry
                     }
                     else if (e.RowIndex < Rows.Count)
                     {
-                        // If this is not the last row, select the same row index as was previous seleced.
+                        // If this is not the last row, select the same row index as was previous selected.
                         ClearSelection(-1, e.RowIndex, true);
                     }
                 }
@@ -1283,7 +1285,7 @@ namespace Extract.DataEntry
                         }
                     }
 
-                    // As long as selection occured, update the selection now.
+                    // As long as selection occurred, update the selection now.
                     if (changedSelection)
                     {
                         base.OnSelectionChanged(new EventArgs());
@@ -1361,7 +1363,7 @@ namespace Extract.DataEntry
             {
                 // If a drag and drop operation is in progress or a manual selection reset is in
                 // progress, prevent the table from being scrolled as the results are usually
-                // undesireable.
+                // undesirable.
                 if (_selectionIsBeingReset || DragOverInProgress)
                 {
                     e.NewValue = e.OldValue;
@@ -1606,7 +1608,7 @@ namespace Extract.DataEntry
         /// <para><b>Note:</b></para>
         /// The <see cref="CellSwipingEnabled"/> and <see cref="RowSwipingEnabled"/> properties 
         /// should be used to configure swiping on the <see cref="DataEntryTable"/> in place of the 
-        /// <see cref="SupportsSwiping"/> and is why this property is not browseable. If this 
+        /// <see cref="SupportsSwiping"/> and is why this property is not browsable. If this 
         /// property is set to <see langword="true"/>, both of the above properties will be set to 
         /// <see langword="true"/>; likewise setting <see cref="SupportsSwiping"/> to 
         /// <see langword="false"/> will set both properties to <see langword="false"/>.
@@ -2041,7 +2043,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case the the user requested to insert a new row.
+        /// Handles the case the user requested to insert a new row.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
@@ -2067,7 +2069,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case the the user requested to delete the selected row(s).
+        /// Handles the case the user requested to delete the selected row(s).
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
@@ -2086,7 +2088,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case the the user requested to copy the selected row(s).
+        /// Handles the case the user requested to copy the selected row(s).
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
@@ -2105,7 +2107,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case the the user requested to cut the selected row(s).
+        /// Handles the case the user requested to cut the selected row(s).
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
@@ -2126,7 +2128,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case the the user requested to paste the row(s) currently in the clipboard
+        /// Handles the case the user requested to paste the row(s) currently in the clipboard
         /// into the currently selected rows.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
@@ -2146,7 +2148,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case the the user requested to insert the row(s) in the clipboard.
+        /// Handles the case the user requested to insert the row(s) in the clipboard.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
@@ -2174,7 +2176,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case the the user requested to insert the row(s) in the clipboard.
+        /// Handles the case the user requested to insert the row(s) in the clipboard.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
@@ -2229,8 +2231,8 @@ namespace Extract.DataEntry
 
                     Rows.Add(rowAttributes.Count);
 
-                    // Add back each row at the appropriate possition. By allowing the row cache to
-                    // remain intact, this will have a minimal perfomance hit as opposed to
+                    // Add back each row at the appropriate position. By allowing the row cache to
+                    // remain intact, this will have a minimal performance hit as opposed to
                     // re-adding the attributes from scratch. Work from bottom to top so
                     // insertBeforeAttribute can be used to ensure attributes are being added to
                     // _sourceAttributes in the correct order.
@@ -2857,7 +2859,7 @@ namespace Extract.DataEntry
                         TabStopMode.Never, null, null, null);
                 }
 
-                // Swap out the existing attribute in the overall attribute heirarchy (either
+                // Swap out the existing attribute in the overall attribute hierarchy (either
                 // keeping attribute ordering the same as it was or explicitly inserting it at the
                 // specified position).
                 if (DataEntryMethods.InsertOrReplaceAttribute(_sourceAttributes, attribute,
@@ -2889,7 +2891,7 @@ namespace Extract.DataEntry
                 }
 
                 // If a new attribute was created for this row, ensure that it propagates all its
-                // sub-attributes to keep all status info's in the attribute heirarchy up-to-date.
+                // sub-attributes to keep all status info's in the attribute hierarchy up-to-date.
                 if (newAttributeCreated)
                 {
                     ProcessSelectionChange();
@@ -2931,7 +2933,7 @@ namespace Extract.DataEntry
         /// <param name="swipedText">The OCR'd text from the image swipe.</param>
         bool ProcessRowSwipe(SpatialString swipedText)
         {
-            // Row selecton mode. The swipe can only be applied via the results of
+            // Row selection mode. The swipe can only be applied via the results of
             // a row formatting rule.
             IUnknownVector formattedData = DataEntryMethods.RunFormattingRule(RowFormattingRule,
                 swipedText, AttributeName);
@@ -2966,12 +2968,12 @@ namespace Extract.DataEntry
                 "Cell swiping is supported only for one cell at a time!", 
                 SelectedCells.Count == 1);
 
-            // Obtain the row and column where the swipe occured. (One or both may not
+            // Obtain the row and column where the swipe occurred. (One or both may not
             // apply depending on the selection type).
             int rowIndex = CurrentCell.RowIndex;
             int columnIndex = CurrentCell.ColumnIndex;
 
-            // Cell selecton mode. The swipe can be applied either via the results of a
+            // Cell selection mode. The swipe can be applied either via the results of a
             // column formatting rule or the swiped text value can be applied directly to
             // the cell's mapped attribute.
             DataEntryTableColumn dataEntryColumn = (DataEntryTableColumn)Columns[columnIndex];
@@ -3474,7 +3476,7 @@ namespace Extract.DataEntry
                     // is included in the clipboard data.
                     else
                     {
-                        // Create a dictionary mapping clipboard data columnn names to the
+                        // Create a dictionary mapping clipboard data column names to the
                         // associated value.
                         Dictionary<string, string> columnData = new Dictionary<string, string>();
                         for (int i = 0; i < data.Length; i++)
@@ -3638,7 +3640,7 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                // Temporarily suppress selection changes as several will occur programatically in
+                // Temporarily suppress selection changes as several will occur programmatically in
                 // in the course of populating the table. In addition to making the code more
                 // efficient, this insures hints are updated before the control host processes the
                 // selection change and re-draws the highlights.
@@ -3753,7 +3755,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Checks to see if row and/or row paste tasks should be avaliable based on an event
+        /// Checks to see if row and/or row paste tasks should be available based on an event
         /// in the specified row and column index where -1 indicates a row or column header.
         /// </summary>
         /// <param name="originRowIndex">The index of the row from which an event originated.
@@ -3924,7 +3926,7 @@ namespace Extract.DataEntry
                 }
                 else if (initialValue.Length > 1)
                 {
-                    // For initial values > 1 char (ie, pasted text), simply re-apply the initial
+                    // For initial values > 1 char (i.e., pasted text), simply re-apply the initial
                     // value and refresh the attribute.
                     IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
                     if (dataEntryCell != null)
