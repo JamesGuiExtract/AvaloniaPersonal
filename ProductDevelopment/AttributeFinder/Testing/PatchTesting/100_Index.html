@@ -1,0 +1,280 @@
+<HTML>
+
+<HEAD>
+<TITLE>Testing of 10.0 Features and Enhancements</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE 10.0<br> 
+Features and Enhancements</h1>
+<hr>
+
+<h1>Initial Goals</h1>
+<ul>
+	<li>FAM Parallelization - <b>tested</b>
+	<li>SQL Server 2014 Express - <b>tested</b>
+	<li>Support for Duplicate Documents - <b>tested</b>
+	<li>Minor bug fixes - <b>tested</b>
+</ul>
+
+<hr>
+
+<h1>General</h1>
+<uL>
+	<li>Master DVDs
+	<ul>
+		<li><b>FLEX Index</b> - completed <b>12/xx/2014</b>
+		<li><b>ID Shield</b> - completed <b>12/xx/2014</b>
+		<li><b>LabDE</b> - completed <b>12/xx/2014</b>
+	</ul>
+	<li>Automated and NRS tests
+	<ul>
+		<li><b>10.0.0.5</b> completed <b>08/07/2014</b>
+		<li><b>10.0.0.8</b> completed <b>08/14/2014</b>
+		<li><b>10.0.0.28</b> completed <b>11/04/2014</b>
+		<li><b>10.0.0.31</b> completed <b>11/12/2014</b>
+		<li><b>10.0.0.37</b> completed <b>11/19/2014</b>
+		<li><b>10.0.0.42</b> completed <b>12/04/2014</b>
+		<li><b>10.0.0.50</b> completed <b>12/17/2014</b>
+	</ul>
+	<li>Testing <b>GET</b> messages
+	<ul>
+		<li><b>07/23/2014  8:45</b>, <b>10.0.0.2</b>, completed <b>07/23/2014</b>
+		<li><b>07/22/2014  9:47</b>, <b>10.0.0.2</b>, completed <b>07/23/2014</b>
+		<li><b>07/21/2014 11:04</b>, <b>10.0.0.2</b>, completed <b>07/23/2014</b>
+		<li><b>07/15/2014  2:09</b>, <b>10.0.0.2</b>, completed <b>07/23/2014</b>
+		<li><b>07/16/2014  3:04</b>, <b>10.0.0.2</b>, completed <b>07/23/2014</b>
+		<li><b>08/11/2014  1:49</b>, <b>10.0.0.6</b>, completed <b>08/12/2014</b>
+		<li><b>08/14/2014  9:23</b>, <b>10.0.0.8</b>, completed <b>08/14/2014</b>
+		<li><b>08/12/2014  1:17</b>, <b>10.0.0.8</b>, completed <b>08/14/2014</b>
+		<li><b>08/12/2014 11:23</b>, <b>10.0.0.8</b>, completed <b>08/14/2014</b>
+		<li><b>07/25/2014  8:41</b>, <b>10.0.0.9</b>, completed <b>08/16/2014</b>
+		<li><b>08/15/2014 10:25</b>, <b>10.0.0.9</b>, completed <b>08/16/2014</b>
+		<li><b>08/20/2014  9:37</b>, <b>10.0.0.10</b>, completed <b>08/22/2014</b>
+		<li><b>08/19/2014 11:34</b>, <b>10.0.0.10</b>, completed <b>08/22/2014</b>
+		<li><b>08/18/2014 11:20</b>, <b>10.0.0.10</b>, completed <b>09/07/2014</b>
+		<li><b>08/29/2014  5:41</b>, <b>10.0.0.12</b>, completed <b>09/08/2014</b>
+		<li><b>10/21/2014  1:23</b>, <b>10.0.0.21</b>, completed <b>10/22/2014</b>
+		<li><b>10/21/2014 10:54</b>, <b>10.0.0.21</b>, completed <b>10/23/2014</b>
+		<li><b>10/20/2014  5:31</b>, <b>10.0.0.21</b>, completed <b>10/23/2014</b>
+		<li><b>10/21/2014  9:26</b>, <b>10.0.0.22</b>, completed <b>10/24/2014</b>
+		<li><b>10/08/2014 11:10</b>, <b>10.0.0.21</b>, completed <b>10/26/2014</b>
+		<li><b>10/20/2014  1:11</b>, <b>10.0.0.21</b>, completed <b>10/26/2014</b>
+		<li><b>10/20/2014  9:34</b>, <b>10.0.0.21</b>, completed <b>10/26/2014</b>
+		<li><b>10/20/2014  9:16</b>, <b>10.0.0.21</b>, completed <b>10/26/2014</b>
+		<li><b>10/16/2014  3:22</b>, <b>10.0.0.22</b>, completed <b>10/27/2014</b>
+		<li><b>10/15/2014  2:39</b>, <b>10.0.0.22</b>, completed <b>10/27/2014</b>
+		<li><b>10/14/2014  2:41</b>, <b>10.0.0.21</b>, completed <b>10/27/2014</b>
+		<li><b>10/17/2014  4:04</b>, <b>10.0.0.22</b>, completed <b>10/27/2014</b>
+		<li><b>09/03/2014  2:14</b>, <b>10.0.0.13</b>, completed <b>10/27/2014</b>
+		<li><b>09/10/2014 12:16</b>, <b>10.0.0.22</b>, completed <b>10/27/2014</b>
+		<li><b>09/10/2014 11:09</b>, <b>10.0.0.22</b>, completed <b>10/27/2014</b>
+		<li><b>09/18/2014  8:01</b>, <b>10.0.0.22</b>, completed <b>10/27/2014</b>
+		<li><b>10/03/2014 10:01</b>, <b>10.0.0.23</b>, completed <b>10/27/2014</b>
+		<li><b>10/06/2014 11:51</b>, <b>10.0.0.21</b>, completed <b>10/27/2014</b>
+		<li><b>10/22/2014  9:16</b>, <b>10.0.0.31</b>, completed <b>11/12/2014</b>
+		<li><b>11/06/2014 11:04</b>, <b>10.0.0.31</b>, completed <b>11/12/2014</b>
+		<li><b>11/07/2014  9:53</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>11/05/2014  4:20</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>11/04/2014  8:51</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>11/03/2014 11:02</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>10/30/2014  2:08</b>, <b>10.0.0.33</b>, completed <b>11/13/2014</b>
+		<li><b>11/11/2014  3:55</b>, <b>10.0.0.33</b>, completed <b>11/13/2014</b>
+		<li><b>10/28/2014  5:32</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>10/27/2014 10:47</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>10/27/2014  9:04</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>10/23/2014  3:55</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>10/20/2014 11:41</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>10/17/2014 12:11</b>, <b>10.0.0.31</b>, completed <b>11/13/2014</b>
+		<li><b>10/08/2014  9:16</b>, <b>10.0.0.33</b>, completed <b>11/13/2014</b>
+		<li><b>10/14/2014  4:21</b>, <b>10.0.0.31</b>, completed <b>11/14/2014</b>
+		<li><b>08/18/2014  3:15</b>, <b>10.0.0.31</b>, completed <b>11/18/2014</b>
+		<li><b>10/02/2014 10:57</b>, <b>10.0.0.31</b>, completed <b>11/18/2014</b>
+		<li><b>08/29/2014  3:46</b>, <b>10.0.0.31</b>, completed <b>11/19/2014</b>
+		<li><b>09/09/2014  4:25</b>, <b>10.0.0.31</b>, completed <b>11/19/2014</b>
+		<li><b>12/09/2014  2:21</b>, <b>10.0.0.45</b>, completed <b>12/11/2014</b>
+		<li><b>11/21/2014  3:32</b>, <b>10.0.0.45</b>, completed <b>12/11/2014</b>
+		<li><b>12/04/2014  3:54</b>, <b>10.0.0.45</b>, completed <b>12/11/2014</b>
+		<li><b>10/07/2014  1:40</b>, <b>10.0.0.45</b>, completed <b>12/11/2014</b>
+		<li><b>11/25/2014  3:28</b>, <b>10.0.0.45</b>, completed <b>12/11/2014</b>
+		<li><b>11/26/2014  7:47</b>, <b>10.0.0.45</b>, completed <b>12/11/2014</b>
+		<li><b>11/26/2014  1:48</b>, <b>10.0.0.45</b>, completed <b>12/11/2014</b>
+<p>
+		<li><b>07/15/2014  2:01</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>07/15/2014  3:27</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>08/01/2014  1:38</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>08/13/2014  4:01</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>08/20/2014  3:52</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>09/03/2014  9:19</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>09/03/2014 10:44</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>09/03/2014  1:11</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>09/03/2014  3:59</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>09/15/2014  3:23</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>09/17/2014  3:56</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>09/17/2014  5:00</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/01/2014 11:45</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/03/2014 11:11</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/03/2014  4:04</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/06/2014 10:51</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/08/2014 12:18</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/09/2014  9:26</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/09/2014  9:30</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/09/2014  3:59</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/10/2014  4:04</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/13/2014 10:14</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/15/2014  3:19</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/16/2014  8:30</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/23/2014 10:47</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>10/23/2014  3:33</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/03/2014  4:50</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/04/2014  7:55</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/04/2014 10:03</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/04/2014 11:36</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/07/2014  2:59</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/10/2014  3:38</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/10/2014  5:12</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/11/2014 11:24</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/11/2014  3:15</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/12/2014  8:49</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/12/2014 10:20</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/12/2014 10:57</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/20/2014  9:33</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/20/2014  2:39</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/20/2014  4:11</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/21/2014  1:45</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/24/2014  9:57</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/25/2014  8:45</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>11/26/2014  9:28</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>12/02/2014 10:22</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>12/03/2014  3:43</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>12/10/2014 10:43</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>12/10/2014  4:24</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>12/10/2014 11:41</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>12/12/2014  9:13</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+		<li><b>12/12/2014 11:53</b>, <b>10.0.0.xx</b>, completed <b>12/xx/2014</b>
+	</ul>
+</uL>
+<hr>
+
+<h1>Features</h1>
+<uL>
+	<li>Testing <b>FAM Parallelization</b>
+	<ul>
+		<li><b>10.0.0.5</b> completed <b>08/16/2014</b>
+		<li><b>10.0.0.31</b> completed <b>11/17/2014</b>
+	</ul>
+	<li>Testing <b>Handling Duplicate Documents</b>
+	<ul>
+		<li><b>10.0.0.xx</b> completed <b>12/xx/2014</b>
+	</ul>
+	<u>Memory Leak Testing</u>
+	<ul>
+		<li>Core: Archive or Restore File #1 - completed <b>08/22/2014</b>
+		<li>Core: Archive or Restore File #2 - completed <b>08/22/2014</b>
+		<li>Core: Archive or Restore File #3 - completed <b>08/23/2014</b>
+		<li>Core: Archive or Restore File #4 - completed <b>08/24/2014</b>
+		<li>Core: Copy Move or Delete File #12 - completed <b>08/14/2014</b>
+		<li>Core: Copy Move or Delete File #13 - completed <b>08/15/2014</b>
+		<li>Core: Copy Move or Delete File #14 - completed <b>08/15/2014</b>
+		<li>Core: Copy Move or Delete File #15 - completed <b>08/16/2014</b>
+		<li>Core: Copy Move or Delete File #16 - completed <b>08/18/2014</b>
+		<li>Core: Copy Move or Delete File #17 - completed <b>08/18/2014</b>
+		<li>Core: Create File #1 - completed <b>08/19/2014</b>
+		<li>Core: Create File #2 - completed <b>08/20/2014</b>
+		<li>Core: Create File #3 - completed <b>08/20/2014</b>
+		<li>Core: Create File #4 - completed <b>08/21/2014</b>
+		<li>Core: Create File #5 - completed <b>08/21/2014</b>
+		<li>Core: Delete Empty Folder #1 - completed <b>08/25/2014</b>
+		<li>Core: Delete Empty Folder #2 - completed <b>08/25/2014</b>
+		<li>Core: Encrypt or Decrypt File #1 - completed <b>08/26/2014</b>
+		<li>Core: Encrypt or Decrypt File #2 - completed <b>08/26/2014</b>
+		<li>Core: Encrypt or Decrypt File #3 - completed <b>09/07/2014</b>
+		<li>Core: Encrypt or Decrypt File #4 - completed <b>09/09/2014</b>
+		<li>Core: OCR Document #4 - completed <b>08/04/2014</b>
+		<li>Core: OCR Document #5 - completed <b>08/05/2014</b>
+	</ul>
+</uL>
+
+<hr>
+
+<h1>Complete Sanity Tests</h1>
+<ul>
+	<li>Build <b>10.0.0.xx</b></a>
+	<ul>
+		<li>Operating System: 64-bit Server 2012 R2
+		<li>Date Started: 07/xx/2014
+		<li><b>Date Completed: 07/xx/2014</b>
+		<li>Tester: WL
+	</ul>
+</ul>
+
+<hr>
+
+<h1>Other Sanity Tests</h1>
+<uL>
+	<li><b>Server</b>
+	<ul>
+		<li>10.0.0.45, 64-bit Server 2012 R2, VM, 12/14/2014, WL
+	</ul>
+	<li><b>Workstation</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Tasks</b>
+	<ul>
+		<li>N/A
+	</ul>
+ 	<li><b>Suppliers</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Conditions</b>
+	<ul>
+		<li>10.0.0.9, 32-bit Vista, SWISS, 08/17/2014, WL
+	</ul>
+	<li><b>Internal</b>
+	<ul>
+		<li>N/A
+	</ul>
+</uL>
+
+<hr>
+
+<h1>Other Checklists</h1>
+<ul>
+	<li><b>10.0.0.31</b>, completed <b>11/21/2014</b>
+	<li><b>10.0.0.10</b>, completed <b>11/25/2014</b>
+	<li><b>10.0.0.x</b>, completed <b>12/xx/2014</b>
+</ul>
+
+<hr>
+
+<h1>Scalability and Stability Testing</h1>
+<uL>
+	<li><b>TBD</b>
+	<ul>
+		<li>Operating System: 64-bit Server 2008 R2, BEAST-W2k8r2-1
+		<li>Date Started: 12/06/2013
+		<li><b>Date Completed: 12/19/2013</b>
+		<li>Tester: WL
+		<li>Status: 
+		<ul>
+			<li>Build <b>9.8.0.xx</b>
+		</ul>
+	</ul>
+</uL>
+
+<hr>
+<h1>Miscellaneous</h1>
+<OL>
+	<li><b>Documentation</b> - Add 10.0 Enhancements
+	<ul>
+		<li>Updated Window Captions and Versions - completed <b>07/14/2014</b>
+		<li>Updated for issues noted in 9.9 - completed <b>07/28/2014</b>
+		<li>Updated for ABC - completed <b>07/xx/2014</b>
+	</ul>
+</OL>
+</BODY>
+</HTML>
