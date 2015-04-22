@@ -734,6 +734,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether any cancellation of a form closing event should
+        /// be disallowed. This is used to ensure that if the FAM requests a verification task to
+        /// stop, that the user can't cancel via a save dirty prompt.
+        /// </summary>
+        /// <value><see langword="true"/> if cancellation of a form closing event should be
+        /// disallowed; otherwise <see langword="false"/>.</value>
+        public bool PreventCloseCancel
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets the active <see cref="DataEntryControlHost"/>.
         /// </summary>
         public DataEntryControlHost ActiveDataEntryControlHost
@@ -3222,10 +3235,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Prompt if the data is not being committed.
                 else
                 {
+                    var buttons = PreventCloseCancel 
+                        ? MessageBoxButtons.YesNo 
+                        : MessageBoxButtons.YesNoCancel;
+
                     response = MessageBox.Show(this,
                         "Data has not been saved, would you like to save now?",
-                        "Data Not Saved", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
+                        "Data Not Saved", buttons, MessageBoxIcon.Question,
                         MessageBoxDefaultButton.Button1, 0);
+
+                    // If the user chose not to save, prevent any subsequent attempts to save this
+                    // document.
+                    if (response == DialogResult.No)
+                    {
+                        _dataEntryControlHost.Dirty = false;
+                    }
                 }
 
                 // If committing data or the user elected to save, attempt the save.

@@ -83,6 +83,19 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether any cancellation of a form closing event should
+        /// be disallowed. This is used to ensure that if the FAM requests a verification task to
+        /// stop, that the user can't cancel via a save dirty prompt.
+        /// </summary>
+        /// <value><see langword="true"/> if cancellation of a form closing event should be
+        /// disallowed; otherwise <see langword="false"/>.</value>
+        bool PreventCloseCancel
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// A thread-safe method that opens a document for verification.
         /// </summary>
         /// <param name="fileName">The filename of the document to open.</param>
@@ -125,7 +138,7 @@ namespace Extract.FileActionManager.Forms
         /// <para><b>Note</b></para>
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
-        /// it also means the form may be opened or closed while the Standby call is still ocurring.
+        /// it also means the form may be opened or closed while the Standby call is still occurring.
         /// If this happens, the return value of Standby will be ignored; however, Standby should
         /// promptly return in this case to avoid needlessly keeping a thread alive.
         /// </summary>

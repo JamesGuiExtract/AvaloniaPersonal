@@ -83,7 +83,7 @@ namespace Extract.Redaction.Verification
             @"Software\Extract Systems\AttributeFinder\IndustrySpecific\Redaction\RedactionCustomComponents\IDShield";
 
         /// <summary>
-        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// Name for the mutex used to serialize persistence of the control and form layout.
         /// </summary>
         static readonly string _MUTEX_STRING = "13D6A5A4-1E1E-4815-9B81-9A77E4FF4997";
 
@@ -611,7 +611,7 @@ namespace Extract.Redaction.Verification
 
                 // [FlexIDSCore:4482]
                 // Initialize a message filter to allow shortcuts to be handled even when focus is
-                // in an undocked Sandock pane.
+                // in an undocked Sanddock pane.
                 _shortcutsMessageFilter = new ShortcutsMessageFilter(
                     ShortcutsEnabled, _imageViewer.Shortcuts, this);
 
@@ -658,6 +658,19 @@ namespace Extract.Redaction.Verification
         /// <value><see langword="true"/> if the verification form should prevent any
         /// attempts at saving document data; otherwise, <see langword="false"/>.</value>
         public bool PreventSave
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether any cancellation of a form closing event should
+        /// be disallowed. This is used to ensure that if the FAM requests a verification task to
+        /// stop, that the user can't cancel via a save dirty prompt.
+        /// </summary>
+        /// <value><see langword="true"/> if cancellation of a form closing event should be
+        /// disallowed; otherwise <see langword="false"/>.</value>
+        public bool PreventCloseCancel
         {
             get;
             set;
@@ -763,7 +776,7 @@ namespace Extract.Redaction.Verification
 
         /// <summary>
         /// Saves and commits the currently viewed document. This includes adding a session to the
-        /// IDShieldData table (if applicable) and commiting the any comment for the file.
+        /// IDShieldData table (if applicable) and committing the any comment for the file.
         /// </summary>
         void Commit()
         {
@@ -794,7 +807,7 @@ namespace Extract.Redaction.Verification
                 if (savedVOAFile)
                 {
                     // [FlexIDSCore:5070]
-                    // Start a new verificatoin session to ensure we don't save a redaction session
+                    // Start a new verification session to ensure we don't save a redaction session
                     // twice.
                     StartNewSession();
                 }
@@ -887,7 +900,7 @@ namespace Extract.Redaction.Verification
 
             try
             {
-                // Create a dialog to prompt the user for the ouput location.
+                // Create a dialog to prompt the user for the output location.
                 using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                 {
                     saveFileDialog.InitialDirectory = Path.GetDirectoryName(memento.SourceDocument);
@@ -1017,8 +1030,7 @@ namespace Extract.Redaction.Verification
                 memento.Selection = _redactionGridView.SelectedRowIndexes;
 
                 // Keep track of the scale factor in use for this document in case the next document
-                // is being loaded loaded in tile mode and, therefore, should share the same
-                // scale factor.
+                // is being loaded in tile mode and, therefore, should share the same scale factor.
                 _previousDocumentScaleFactor = _imageViewer.ZoomInfo.ScaleFactor;
                 _previousDocumentFitMode = _imageViewer.FitMode;
             }
@@ -1196,7 +1208,7 @@ namespace Extract.Redaction.Verification
             else
             {
                 // If collecting expected data, the image will have already been collected and we
-                // we want to overwite any existing expected data file.
+                // we want to overwrite any existing expected data file.
                 File.Copy(memento.AttributesFile, memento.ExpectedAttributesFileName, true);
             }
         }
@@ -1277,8 +1289,8 @@ namespace Extract.Redaction.Verification
                     // If the max document history was reached, drop the first item
                     if (_history.Count == _history.Capacity)
                     {
-                        // If the document being removed from the history queue has been commited, apply
-                        // the number of pages in the document and time displayed to
+                        // If the document being removed from the history queue has been committed,
+                        // apply the number of pages in the document and time displayed to
                         // _preHistoricPageVerificationTime.
                         VerificationMemento memento = _history[0];
                         _preHistoricPageVerificationTime = new Tuple<int, double>(
@@ -1371,7 +1383,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Stops _screenTime and updates _verificationRateStatusLabel.
         /// </summary>
-        /// <returns>The <see cref="TimeInterval"/> elased between the time the timer was started
+        /// <returns>The <see cref="TimeInterval"/> elapsed between the time the timer was started
         /// and now.</returns>
         TimeInterval StopScreenTimeTimer()
         {
@@ -1517,7 +1529,11 @@ namespace Extract.Redaction.Verification
 
                     messageBox.AddButton("Save changes", "Save", false);
                     messageBox.AddButton("Discard changes", "Discard", false);
-                    messageBox.AddButton("Cancel", "Cancel", true);
+
+                    if (!PreventCloseCancel)
+                    {
+                        messageBox.AddButton("Cancel", "Cancel", true);
+                    }
 
                     string result = messageBox.Show(this);
                     if (result == "Cancel")
@@ -1576,7 +1592,7 @@ namespace Extract.Redaction.Verification
                 TimeInterval screenTime = StopScreenTimeTimer();
                 Save(screenTime, false);
 
-                // Always udpate the IDShieldData table here (if applicable).
+                // Always update the IDShieldData table here (if applicable).
                 SaveRedactionCounts();
             }
 
@@ -1685,7 +1701,7 @@ namespace Extract.Redaction.Verification
 
         /// <summary>
         /// Displays a warning message indicating the current document will be saved and the user 
-        /// is navigating to next document without explicity saving/committing the document. Allows
+        /// is navigating to next document without explicitly saving/committing the document. Allows
         /// the user to cancel.
         /// </summary>
         /// <returns><see langword="true"/> if there is invalid data or the user chose to cancel; 
@@ -1779,7 +1795,7 @@ namespace Extract.Redaction.Verification
             {
                 if (continueSlideshow)
                 {
-                    // Set _slideshowRunning back to true so that the slidshow will continue with
+                    // Set _slideshowRunning back to true so that the slideshow will continue with
                     // the next document.
                     _slideshowRunning = true;
                 }
@@ -1904,7 +1920,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Do not allow saving and commiting if the imageviewer is
+                // Do not allow saving and committing if the imageviewer is
                 // processing a tracking event
                 if (_imageViewer.IsImageAvailable && !_imageViewer.IsTracking && !_formClosing)
                 {
@@ -2488,7 +2504,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void UpdateControlsBasedOnSelection()
         {
-            // Layer-objects for read-only rows will be non-moveable.
+            // Layer-objects for read-only rows will be non-movable.
             bool editableControlSelected = _imageViewer.LayerObjects.Selection
                 .Where(layerObject => layerObject.Movable)
                 .Any();
@@ -4079,7 +4095,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public void DelayFile()
         {
-            throw new ExtractException("ELI37503", "Method not implmented.");
+            throw new ExtractException("ELI37503", "Method not implemented.");
         }
 
         #endregion IVerificationForm Members

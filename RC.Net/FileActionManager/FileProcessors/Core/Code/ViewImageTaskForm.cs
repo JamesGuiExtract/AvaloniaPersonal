@@ -210,6 +210,19 @@ namespace Extract.FileActionManager.FileProcessors
             set;
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether any cancellation of a form closing event should
+        /// be disallowed. This is used to ensure that if the FAM requests a verification task to
+        /// stop, that the user can't cancel via a save dirty prompt.
+        /// </summary>
+        /// <value><see langword="true"/> if cancellation of a form closing event should be
+        /// disallowed; otherwise <see langword="false"/>.</value>
+        public bool PreventCloseCancel
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Methods

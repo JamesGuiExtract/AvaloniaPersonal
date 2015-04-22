@@ -66,10 +66,9 @@ namespace Extract.FileActionManager.Forms
         EventWaitHandle _fileCompletedEvent = new AutoResetEvent(false);
 
         /// <summary>
-        /// An event to indicate processing has been cancelled either via <see cref="Cancel"/>
-        /// or <see cref="CloseForm"/>.
+        /// An event to indicate the verification session has been aborted.
         /// </summary>
-        EventWaitHandle _canceledEvent = new ManualResetEvent(false);
+        EventWaitHandle _abortedEvent = new ManualResetEvent(false);
 
         /// <summary>
         /// An event to indicate an exception was thrown from the <see cref="_form"/>.
@@ -102,6 +101,11 @@ namespace Extract.FileActionManager.Forms
         /// displayed is a file that has been delayed.
         /// </summary>
         EventWaitHandle _fileDelayedEvent = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Tracks whether <see cref="Cancel"/> has been called (and prevents multiple calls to it).
+        /// </summary>
+        int _canceledCalled = 0;
 
         /// <summary>
         /// If <see langword="true"/>, the <see cref="_form"/> is in the process of being closed. 
@@ -219,16 +223,16 @@ namespace Extract.FileActionManager.Forms
         #region VerificationForm Properties
 
         /// <summary>
-        /// Indicates whether work has been canceled.
+        /// Gets or sets whether the verification session has been aborted.
         /// </summary>
-        /// <returns><see langword="true"/> if work has been canceled since the 
+        /// <returns><see langword="true"/> if processing has been aborted since the 
         /// <see cref="_form"/> was shown, <see langword="false"/> if it has not.
         /// </returns>
-        public bool Canceled
+        public bool Aborted
         {
             get
             {
-                return _canceledEvent.WaitOne(0, false);
+                return _abortedEvent.WaitOne(0, false);
             }
         }
 
@@ -258,8 +262,8 @@ namespace Extract.FileActionManager.Forms
         {
             get
             {
-                return (!_closing && !_formIsClosing && !Canceled &&
-                        _uiThread != null &&_uiThread.IsAlive && MainForm != null);
+                return (!_closing && !_formIsClosing && !Aborted &&
+                        _uiThread != null && _uiThread.IsAlive && MainForm != null);
             }
         }
 
@@ -345,8 +349,9 @@ namespace Extract.FileActionManager.Forms
                         // Create and start the verification form thread if it doesn't already exist.
                         _closing = false;
                         _formIsClosing = false;
+                        _canceledCalled = 0;
                         _fileCompletedEvent.Reset();
-                        _canceledEvent.Reset();
+                        _abortedEvent.Reset();
                         _exceptionThrownEvent.Reset();
                         _closedEvent.Reset();
                         _lastException = null;
@@ -535,10 +540,11 @@ namespace Extract.FileActionManager.Forms
                 {
                     if (IsUIReady)
                     {
-                        // Whenever a new file is to be loaded, ensure the PreventSave property is
-                        // reset and any exception display blocks intended for the last document do
-                        // not carry over to the this document.
+                        // Whenever a new file is to be loaded, ensure the PreventSave and
+                        // PreventCloseCancel properties are reset so that any behavior intended for
+                        // the last document do not carry over to the this document.
                         MainForm.PreventSave = false;
+                        MainForm.PreventCloseCancel = false;
 
                         if (_exceptionDisplayBlockThreadId != -1)
                         {
@@ -570,7 +576,7 @@ namespace Extract.FileActionManager.Forms
                 // Wait until the document is either saved or the verification form is closed.
                 WaitForEvent(_fileCompletedEvent);
 
-                if (this.Canceled)
+                if (Aborted)
                 {
                     return EFileProcessingResult.kProcessingCancelled;
                 }
@@ -591,18 +597,19 @@ namespace Extract.FileActionManager.Forms
                 // Always display exceptions that arise from a verification task.
                 ex.ExtractDisplay("ELI37834");
 
-                if (!_promptToContinueOnError || MessageBox.Show(
+                if (IsUIReady &&
+                    (!_promptToContinueOnError || MessageBox.Show(
                     "An error was encountered while attempting to process the document '" +
                     fileName + "'.\r\n\r\nDo you wish to continue processing?",
                     "Error: Continue processing?", MessageBoxButtons.YesNo, MessageBoxIcon.Error,
-                    MessageBoxDefaultButton.Button1, 0) == DialogResult.No)
+                    MessageBoxDefaultButton.Button1, 0) == DialogResult.No))
                 {
                     // The file was not cleanly handled and will be failed with an exception; it is
                     // not appropriate to display any prompts to save the document on close as such
                     // attempts would likely meet with similar errors (which may not be able to be 
                     // handled cleanly in context of a form close).
                     MainForm.PreventSave = true;
-                    Cancel();
+                    _abortedEvent.Set();
                 }
 
                 ExtractException ee = ExtractException.AsExtractException("ELI23970", ex);
@@ -641,7 +648,7 @@ namespace Extract.FileActionManager.Forms
         {
             // Wait for the specified handle, cancellation, or exception
             WaitHandle[] waitHandles =
-                new WaitHandle[] { waitHandle, _canceledEvent, _exceptionThrownEvent };
+                new WaitHandle[] { waitHandle, _abortedEvent, _exceptionThrownEvent };
 
             WaitHandle.WaitAny(waitHandles);
 
@@ -656,7 +663,18 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                _canceledEvent.Set();
+                // Only the first call to cancel per verification session need be handled.
+                if (Interlocked.Increment(ref _canceledCalled) == 1)
+                {
+                    MainForm.Invoke((MethodInvoker)(() =>
+                    {
+                        // The FAM framework is not able to handle that a task can refuse the
+                        // cancel request so force that the user cannot choose to cancel if
+                        // prompted to save changes.
+                        MainForm.PreventCloseCancel = true;
+                        MainForm.Close();
+                    }));
+                }
             }
             catch (Exception ex)
             {
@@ -713,8 +731,8 @@ namespace Extract.FileActionManager.Forms
             {
                 if (!IsUIReady)
                 {
-                    // If the UI is gone or closing, cancel processing.
-                    Cancel();
+                    // If the UI is gone or closing, abort processing.
+                    _abortedEvent.Set();
                     return false;
                 }
                 else if (IsFileProcessing)
@@ -771,8 +789,8 @@ namespace Extract.FileActionManager.Forms
                             // processing before subscribing to FormClosed.
                             if (!IsUIReady)
                             {
-                                // If the UI is gone or closing, cancel processing.
-                                Cancel();
+                                // If the UI is gone or closing, abort processing.
+                                _abortedEvent.Set();
                                 return false;
                             }
                             else if (IsFileProcessing)
@@ -818,10 +836,10 @@ namespace Extract.FileActionManager.Forms
                         }
                     }
 
-                    // If this task will not standby, cancel the verification form.
+                    // If this task will not standby, abort verification.
                     if (!standby)
                     {
-                        Cancel();
+                        _abortedEvent.Set();
                     }
 
                     return standby;
@@ -958,10 +976,10 @@ namespace Extract.FileActionManager.Forms
                     _fileCompletedEvent.Dispose();
                     _fileCompletedEvent = null;
                 }
-                if (_canceledEvent != null)
+                if (_abortedEvent != null)
                 {
-                    _canceledEvent.Dispose();
-                    _canceledEvent = null;
+                    _abortedEvent.Dispose();
+                    _abortedEvent = null;
                 }
                 if (_exceptionThrownEvent != null)
                 {
@@ -1020,7 +1038,8 @@ namespace Extract.FileActionManager.Forms
 
             if (e.FileProcessingResult == EFileProcessingResult.kProcessingCancelled)
             {
-                _canceledEvent.Set();
+                // Once a file has been canceled, the verification session should be aborted.
+                _abortedEvent.Set();
             }
             else
             {
@@ -1063,10 +1082,10 @@ namespace Extract.FileActionManager.Forms
                 _formIsClosing = true;
 
                 // If _closing is not set, the user has closed the form as opposed to it being
-                // programmatically closed. Processing should be cancelled.
+                // programmatically closed. Signal that further processing should be aborted.
                 if (!_closing)
                 {
-                    Cancel();
+                    _abortedEvent.Set();
                 }
 
                 // Note the time to ensure processing doesn't hang here for an unreasonable amount
@@ -1374,7 +1393,7 @@ namespace Extract.FileActionManager.Forms
             {
                 try
                 {
-                    _canceledEvent.Set();
+                    _abortedEvent.Set();
 
                     try
                     {

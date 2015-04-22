@@ -139,6 +139,6 @@ stored in a CustomTags file in this directory and an FPS file is then opened fro
 the tag values associated with this context are the ones that will be used.
 
 If additional contexts are defined or created, this CustomTags file must also be copied to those
-context's FPSFileDir's in order for the tag values associated with those contexts to be available.</value>
+contexts' FPSFileDirs in order for the tag values associated with those contexts to be available.</value>
   </data>
 </root>
