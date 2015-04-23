@@ -82,6 +82,7 @@ function main(args) {
             } else {
                 var errorAllowance = "(?'_e')";
             }
+            var firstWord = true;
             return "(?#"+name.replace(/[()]/g,"_")+")"
               + errorAllowance
               + name
@@ -91,14 +92,20 @@ function main(args) {
                   return w.split("")
                   .map(function(c) {
                       c = substituteProblemChars(c);
-                      if (index == 0) {
-                          var result = "(([^\\xAB\\xBB\\s](?>(?'-_m')|(?'-_e'))|(\\x20(?!\\x20)|[_\\W-[\\x20\\t\\xAB\\xBB]])){0,4}?"
-                                       + c + "(?(_m)(?'-_m'))|(?'-_e')(?'_m'))";
+                      // Don't actually allow newlines if really short (just allow errors)
+                      if (index == 0 && name.length > 6) {
+                          var result = "(([^\\xAB\\xBB\\s](?>(?'-_m')|(?'-_e'))|((\\x20(?!\\x20)|[_\\W-[\\x20\\t\\xAB\\xBB]])){0,4}?";
+                          // Allow name to have values, etc in between parts if the name is long enough
+                          if (!firstWord && name.length > 12) {
+                              result += "|\\x20{4}[^\\r\\n]+[\\r\\n]+";
+                          }
+                          result += (")" + c + "(?(_m)(?'-_m'))|(?'-_e')(?'_m'))");
                       } else {
                           var result = "(([^\\xAB\\xBB\\s](?>(?'-_m')|(?'-_e'))|(\\x20(?!\\x20)|[_\\W-[\\x20\\r\\n\\t\\xAB\\xBB]])){0,4}?"
                                        + c + "(?(_m)(?'-_m'))|(?'-_e')(?'_m'))";
                       }
                       index += 1;
+                      firstWord = false;
                       return result;
                   })
                   .join("");
