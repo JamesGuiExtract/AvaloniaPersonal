@@ -259,9 +259,31 @@ namespace Extract.DataEntry.LabDE
         public DataTable GetMatchingOrders(FAMOrderRow order,
             out Dictionary<string, List<int>> correspondingFileIds)
         {
-            string selectedOrderNumbers = GetSelectedOrderNumbersQuery(order);
+            try 
+	        {
+                // Get the cached list of order numbers associated with the current FAMOrderRow or
+                // generate a query to retrieve them.
+                string selectedOrderNumbers =
+                    order.MatchingOrderIDs ?? GetSelectedOrderNumbersQuery(order);
 
-            return GetMatchingOrders(selectedOrderNumbers, out correspondingFileIds);
+                DataTable matchingOrderTable =
+                    GetMatchingOrders(selectedOrderNumbers, out correspondingFileIds);
+
+                // Cache the list of orders if they have not yet been.
+                if (order.MatchingOrderIDs == null)
+                {
+                    order.MatchingOrderIDs = "'" +
+                        string.Join("','", matchingOrderTable.Rows
+                            .OfType<DataRow>()
+                            .Select(row => row.ItemArray[0].ToString())) + "'";
+                }
+
+                return matchingOrderTable;
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.AsExtract("ELI38176");
+	        }
         }
 
         /// <summary>
@@ -284,15 +306,16 @@ namespace Extract.DataEntry.LabDE
 
             correspondingFileIds = new Dictionary<string, List<int>>();
 
-            string columnsClause = string.Join(", ",
+            string columnsClause = string.Join(", \r\n",
                 OrderQueryColumns
                     .OfType<DictionaryEntry>()
                     .Select(column => column.Value + " AS [" + column.Key + "]"));
 
             // Add a query against [LabDEOrderFile].[FileID] behind the scenes here to be able to collect
             // and return correspondingFileIds.
-            string query = "SELECT " + columnsClause + ", [LabDEOrderFile].[FileID] FROM [LabDEOrder] " +
-                "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] " +
+            string query = "SELECT " + columnsClause + "\r\n, [LabDEOrderFile].[FileID]\r\n " +
+                "FROM [LabDEOrder] \r\n" +
+                "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] \r\n" +
                 "WHERE [LabDEOrder].[OrderNumber] IN (" + selectedOrderNumbers + ")";
 
             string lastOrderNumber = null;
@@ -355,38 +378,67 @@ namespace Extract.DataEntry.LabDE
         {
             ExtractException.Assert("ELI38152",
                 "Order query columns have not been properly defined.",
-                ColorQueryConditions.Count > 0);
+                ColorQueryConditions.Count > 0);   
+                
+            // If we haven't yet cached the order numbers, set up query components to retrieve the
+            // possibly matching orders from the database.
+            string declarationsClause = "";
+            string columnsClause = "";
+            if (order.MatchingOrderIDs == null)
+            {
+                // Select the matching order numbers into a table variable.                
+                declarationsClause =
+                    "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
+                        "INSERT INTO @OrderNumbers " + GetSelectedOrderNumbersQuery(order);
+
+                // Create a column to select the order numbers in a comma delimited format that can
+                // be re-used in subsequent queries.
+                columnsClause =
+                    "(SELECT CAST([OrderNumber] AS NVARCHAR(20)) + ''','''  " +
+                        "FROM @OrderNumbers FOR XML PATH('')) [OrderNumbers], \r\n";
+            }
 
             // Convert ColorQueryConditions into a clause that will return 1 when the expression
             // evaluates as true.
-            string columnsClause = string.Join(", ",
-                ColorQueryConditions
+            columnsClause +=
+                string.Join(", \r\n", ColorQueryConditions
                     .OfType<DictionaryEntry>()
                     .Select(column =>
                         "CASE WHEN (" + column.Value + ") THEN 1 ELSE 0 END AS [" + column.Key + "]"));
 
-            string selectedOrderNumbers = GetSelectedOrderNumbersQuery(order);
-
             // Aggregate the data returned by a query for potentially matching orders into fields
             // accessible to the ColorQueryConditions.
-            string orderDataQuery = "SELECT [LabDEOrder].[OrderNumber], " +
-                "MAX([LabDEOrder].[OrderStatus]) AS [OrderStatus]," + 
-                "COUNT([LabDEOrderFile].[FileID]) AS [FileCount], " +
-                "MAX([LabDEOrder].[ReceivedDateTime]) AS [ReceivedDateTime], " +
-                "MAX([LabDEOrder].[ReferenceDateTime]) AS [ReferenceDateTime] " +
-                "FROM [LabDEOrder] " +
-                "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] " +
-                "WHERE [LabDEOrder].[OrderNumber] IN (" + selectedOrderNumbers + ") " +
+            string orderDataQuery = 
+                "SELECT [LabDEOrder].[OrderNumber], \r\n" +
+                "MAX([LabDEOrder].[OrderStatus]) AS [OrderStatus], \r\n" +
+                "COUNT([LabDEOrderFile].[FileID]) AS [FileCount], \r\n" +
+                "MAX([LabDEOrder].[ReceivedDateTime]) AS [ReceivedDateTime], \r\n" +
+                "MAX([LabDEOrder].[ReferenceDateTime]) AS [ReferenceDateTime] \r\n" +
+                "FROM [LabDEOrder] \r\n" +
+                "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] \r\n" +
+                "WHERE [LabDEOrder].[OrderNumber] IN (\r\n" +
+                    ((order.MatchingOrderIDs != null) 
+                        ? order.MatchingOrderIDs
+                        : "SELECT [OrderNumber] FROM @OrderNumbers") + "\r\n)" +
                 "GROUP BY [LabDEOrder].[OrderNumber]";
 
-            string colorQuery =
-                "SELECT " + columnsClause + " FROM (" + orderDataQuery + ") AS [OrderData]";
+            string colorQuery = declarationsClause + "\r\n" +
+                "SELECT " + columnsClause + " FROM (\r\n" + orderDataQuery + "\r\n) AS [OrderData]";
 
             // Iterate the columns of the resulting row to find the first color for which the
             // configured condition evaluates to true.
             using (DataTable results = DBMethods.ExecuteDBQuery(OleDbConnection, colorQuery))
             {
                 DataRow resultsRow = results.Rows[0];
+
+                // Cache the order numbers if they have not already been.
+                if (order.MatchingOrderIDs == null)
+                {
+                    order.MatchingOrderIDs = (resultsRow["OrderNumbers"] == DBNull.Value)
+                        ? ""
+                        // Remove trailing ',' then surround with apostrophes
+                        : "'" + resultsRow["OrderNumbers"].ToString().TrimEnd(new[] { ',', '\'' }) + "'";
+                }
 
                 foreach (string color in ColorQueryConditions.Keys)
                 {
@@ -427,6 +479,8 @@ namespace Extract.DataEntry.LabDE
                 if (!_rowData.TryGetValue(dataEntryRow, out rowData))
                 {
                     rowData = new FAMOrderRow(this, dataEntryRow);
+                    _rowData[dataEntryRow] = rowData;
+
                     rowData.DataUpdated += HandleRowData_DataUpdated;
 
                     // Register to track changes to the order number attribute's value for the purpose
@@ -676,9 +730,6 @@ namespace Extract.DataEntry.LabDE
                 {
                     queryParts.Add(CustomOrderMatchCriteriaQuery);
                 }
-
-                queryParts.Add(
-                    "SELECT [LabDEOrder].[OrderNumber] FROM [LabDEOrder] WHERE [OrderStatus] = 'A'");
             }
             else
             {

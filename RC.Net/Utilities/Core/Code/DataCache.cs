@@ -104,9 +104,9 @@ namespace Extract.Utilities
             /// the same position in the sort order as the other <see cref="DataItem"/>.
             /// </summary>
             /// <param name="other">A <see cref="DataItem"/> to compare with this instance.</param>
-            /// <returns>Less than zero if this instance preceedes <see paramref="other"/>;
+            /// <returns>Less than zero if this instance precedes <see paramref="other"/>;
             /// Zero if this instance is in the same position as <see paramref="other"/>;
-            /// Greate than zero if this instance follows <see paramref="other"/>.</returns>
+            /// Greater than zero if this instance follows <see paramref="other"/>.</returns>
             public int CompareTo(DataItem other)
             {
                 // If other is not a valid object reference, this instance is greater.
@@ -154,6 +154,13 @@ namespace Extract.Utilities
         ScoreCachedData<TDataType> _scoreDataDelegate;
 
         /// <summary>
+        /// If a <see cref="_scoreDataDelegate"/> is not provided, use _defaultScore as a value that
+        /// gets incremented every time it is accessed to score data elements in the order they were
+        /// last cached or accessed.
+        /// </summary>
+        double _defaultScore = 0;
+
+        /// <summary>
         /// To allow for quick retrieval of cached data referenced by a key.
         /// </summary>
         Dictionary<TKeyType, DataItem> _cachedData;
@@ -172,7 +179,10 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="maxCacheCount">The maximum number of <see typeref="TDataType"/> instances
         /// that can be cached.</param>
-        /// <param name="scoreDataDelegate"></param>
+        /// <param name="scoreDataDelegate">Delegate to produce a score indicating the likely
+        /// benefit of a particular data item to be cached. If <see langword="null"/>, data will be
+        /// ranked according to how recently it was cached/accessed with items that have been
+        /// cached/accessed more recently scored higher.</param>
         public DataCache(int maxCacheCount, ScoreCachedData<TDataType> scoreDataDelegate)
         {
             try
@@ -295,7 +305,9 @@ namespace Extract.Utilities
                     // Re-rank the retrieved data based on an updated score every time it is
                     // retrieved.
                     _rankedData.Remove(dataItem);
-                    dataItem.Score = (_scoreDataDelegate == null) ? 0 : _scoreDataDelegate(data);
+                    dataItem.Score = (_scoreDataDelegate == null) 
+                        ? _defaultScore++
+                        : _scoreDataDelegate(data);
                     _rankedData.Add(dataItem);
 
                     return true;
@@ -314,7 +326,7 @@ namespace Extract.Utilities
         /// Requests that <see paramref="data"/> be added to the cache.
         /// </summary>
         /// <param name="key">The <see typeref="TKeyType"/> value that will be used to reference the
-        /// data. (Must implment IComparable{TKeyType} and be unique amongst all data cached.</param>
+        /// data. (Must implement IComparable{TKeyType} and be unique amongst all data cached.</param>
         /// <param name="data">The <see typeref="TDataType"/> instance to cache.</param>
         /// <returns><see langword="true"/> if the data was added to the cache,
         /// <see langword="false"/> if the data was not added to the cache because the cache is full
@@ -330,7 +342,7 @@ namespace Extract.Utilities
                     return false;
                 }
 
-                // If data that is already cached is being-recached, re-add the data in case it has
+                // If data that is already cached is being re-cached, re-add the data in case it has
                 // been updated.
                 DataItem existingData;
                 if (_cachedData.TryGetValue(key, out existingData))
@@ -339,18 +351,25 @@ namespace Extract.Utilities
                     _cachedData.Remove(key);
                 }
 
-                // Check if the score meets the QualifyingPercentile if the cache is nearly full.
-                double score = (_scoreDataDelegate == null) ? 0 : _scoreDataDelegate(data);
+                double score = (_scoreDataDelegate == null)
+                    ? _defaultScore++
+                    : _scoreDataDelegate(data);
 
-                // Find the index that represents QualifyingPercentile. This index should be
-                // decreased by the number of open slots such that if more that QualifyingPercentile
-                // of the cache's slots are open, the data will be added regardless of its score.
-                int referenceIndex = _qualifyingIndex - (MaxCacheCount - _cachedData.Count);
-                if (referenceIndex >= 0)
+                // Check if the score meets the QualifyingPercentile if the cache is nearly full to
+                // minimize cache-thrashing. Find the index that represents QualifyingPercentile.
+                // This index should be decreased by the number of open slots such that if more
+                // that QualifyingPercentile of the cache's slots are open, the data will be added
+                // regardless of its score. No need for this check if _scoreDataDelegate has not
+                // been provided.
+                if (_scoreDataDelegate != null)
                 {
-                    if (score <= _rankedData.ElementAt(referenceIndex).Score)
+                    int referenceIndex = _qualifyingIndex - (MaxCacheCount - _cachedData.Count);
+                    if (referenceIndex >= 0)
                     {
-                        return false;
+                        if (score <= _rankedData.ElementAt(referenceIndex).Score)
+                        {
+                            return false;
+                        }
                     }
                 }
 

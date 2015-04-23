@@ -26,6 +26,12 @@ namespace Extract.DataEntry.LabDE
         IAttribute _orderCodeAttribute;
 
         /// <summary>
+        /// A comma delimited list to cache the potentially matching order numbers for the current
+        /// LabDE order.
+        /// </summary>
+        string _matchingOrderIds;
+
+        /// <summary>
         /// A cached <see cref="DataTable"/> of potential matching FAM DB orders for the current
         /// LabDE order.
         /// </summary>
@@ -241,6 +247,34 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
+        /// Gets or sets a comma delimited list to cache the potentially matching order numbers for
+        /// the current LabDE order.
+        /// </summary>
+        /// <value>
+        /// A comma delimited list to cache the potentially matching order numbers for the current
+        /// LabDE order. 
+        /// </value>
+        public string MatchingOrderIDs
+        {
+            get
+            {
+                return _matchingOrderIds;
+            }
+
+            set
+            {
+                _matchingOrderIds = value;
+
+                // If an empty list is to be cached, used a special value instead of blank (which
+                // would cause a syntax error when used in an SQL query).
+                if (_matchingOrderIds == string.Empty)
+                {
+                    _matchingOrderIds = "'__EMPTY__'";
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets a <see cref="DataTable"/> of potential matching FAM DB orders for the current LabDE
         /// order.
         /// </summary>
@@ -411,6 +445,7 @@ namespace Extract.DataEntry.LabDE
                 _matchingOrders.Dispose();
                 _matchingOrders = null;
             }
+            _matchingOrderIds = null;
             _correspondingFileIds.Clear();
             _statusColor = null;
         }
