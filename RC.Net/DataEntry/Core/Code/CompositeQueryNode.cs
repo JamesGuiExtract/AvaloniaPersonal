@@ -22,7 +22,7 @@ namespace Extract.DataEntry
     /// result should be returned.
     /// </summary>
     // This exception is to be created only by data queries. A standard set of constructors is not
-    // necesssary.
+    // necessary.
     [Serializable] 
     [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
     public class QueryAbortEvaluationException : Exception
@@ -48,7 +48,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Represents a distinct combination of results from sub-queries. When one or more
         /// sub-queries use the distinct selection mode and return multiple results,
-        /// there will be multitple instances returned from <see cref="GetChildNodeResults"/>
+        /// there will be multiple instances returned from <see cref="GetChildNodeResults"/>
         /// for a given evaluation.
         /// </summary>
         class DistinctResultSet
@@ -146,6 +146,9 @@ namespace Extract.DataEntry
             {
                 _rootAttribute = rootAttribute;
                 _dbConnections = dbConnections;
+
+                // Handle ClearCacheEvent to clear CachedResults as needed.
+                QueryNode.ClearCacheEvent += Handle_ClearCacheEvent;
             }
             catch (Exception ex)
             {
@@ -514,7 +517,7 @@ namespace Extract.DataEntry
                             childQueryNode =
                                 new AttributeQueryNode(RootAttribute, DatabaseConnections);
                         }
-                        // Maintain "Complex" keyword for compatilility with versions <= 9.0
+                        // Maintain "Complex" keyword for compatibility with versions <= 9.0
                         else if (childElement.Name.Equals("Complex",
                             StringComparison.OrdinalIgnoreCase) ||
                         childElement.Name.Equals("Composite",
@@ -665,7 +668,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                // Apply the spatial infomation of child nodes with "Force" spatial mode if necessary.
+                // Apply the spatial information of child nodes with "Force" spatial mode if necessary.
                 if (forcedSpatialResult != null && forcedSpatialResult.HasSpatialInfo())
                 {
                     List<SpatialString> spatialResults = new List<SpatialString>();
@@ -742,6 +745,29 @@ namespace Extract.DataEntry
         }
 
         #endregion Overrides
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="QueryNode.ClearCacheEvent"/> event to clear cached data as
+        /// required.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void Handle_ClearCacheEvent(object sender, EventArgs e)
+        {
+            try
+            {
+                CachedResult = null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38190");
+            }
+        }
+
+        #endregion Event Handlers
 
         #region Private Members
 

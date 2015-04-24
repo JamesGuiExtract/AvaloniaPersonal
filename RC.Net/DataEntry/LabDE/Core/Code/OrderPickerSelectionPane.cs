@@ -14,7 +14,7 @@ namespace Extract.DataEntry.LabDE
     /// by an <see cref="OrderPickerTableColumn"/>. This pane will display the orders that may be
     /// associated with the currently selected order row in a LabDE DEP.
     /// </summary>
-    public partial class OrderPickerSelectionPane : UserControl, IFFIFileSelectionPane
+    public partial class OrderPickerSelectionPane : UserControl, IFFIFileSelectionPane, IFFIDataManager
     {
         #region Constants
 
@@ -169,7 +169,117 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether FFI menu main and context menu options should be limited
+        /// to basic non-custom options. The main database menu and custom file handlers context
+        /// menu options will not be shown.
+        /// </summary>
+        /// <value><see langword="true"/> to limit menu options to basic options only; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public virtual bool BasicMenuOptionsOnly
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         #endregion IFFIFileSelectionPane
+
+        #region IFFIDataManager
+
+        /// <summary>
+        /// Gets if there is any changes that need to be applied. 
+        /// </summary>
+        public bool Dirty
+        {
+            get
+            {
+                try
+                {
+                    return (string.IsNullOrWhiteSpace(SelectedOrderNumber) !=
+                            string.IsNullOrWhiteSpace(GetSelectedOrderNumber())) &&
+                        SelectedOrderNumber != GetSelectedOrderNumber();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38200");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a description of changes that should be displayed to the user in a prompt when
+        /// applying changes. If <see langword="null"/>, no prompt will be displayed when applying
+        /// changed.
+        /// </summary>
+        public string ApplyPrompt
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets a description of changes that should be displayed to the user in a prompt when
+        /// the user is canceling changes. If <see langword="null"/>, no prompt will be displayed
+        /// when canceling except if the FFI is closed via the form's cancel button (red X).
+        /// </summary>
+        public string CancelPrompt
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Applies all uncommitted values specified via SetValue.
+        /// </summary>
+        /// <returns><see langword="true"/> if the changes were successfully applied; otherwise,
+        /// <see langword="false"/>.</returns>
+        public bool Apply()
+        {
+            try
+            {
+                // On OK, set the SelectedOrderNumber property for the caller.
+                string newSelectedOrderNumber = GetSelectedOrderNumber();
+
+                if (string.IsNullOrWhiteSpace(newSelectedOrderNumber))
+                {
+                    UtilityMethods.ShowMessageBox("No order has been selected.",
+                        "No order selected", true);
+                    return false;
+                }
+
+                SelectedOrderNumber = newSelectedOrderNumber;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38195");
+            }
+        }
+
+        /// <summary>
+        /// Cancels all uncommitted data changes specified via SetValue.
+        /// </summary>
+        public void Cancel()
+        {
+            try
+            {
+                ResetSelection();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38196");
+            }
+        }
+
+        #endregion IFFIDataManager
 
         #region Internal Members
 
@@ -202,18 +312,7 @@ namespace Extract.DataEntry.LabDE
                 // SelectedOrderNumber.
                 if (Visible)
                 {
-                    _ordersDataGridView.ClearSelection();
-                    _ordersDataGridView.CurrentCell =
-                        _ordersDataGridView.Rows
-                            .OfType<DataGridViewRow>()
-                            .Select(row => row.Cells[0])
-                            .Where(cell => !string.IsNullOrEmpty(SelectedOrderNumber) &&
-                                SelectedOrderNumber.Equals(cell.Value.ToString(), StringComparison.Ordinal))
-                            .SingleOrDefault();
-                    if (_ordersDataGridView.CurrentCell != null)
-                    {
-                        _ordersDataGridView.CurrentCell.OwningRow.Selected = true;
-                    }
+                    ResetSelection();
                 }
             }
             catch (Exception ex)
@@ -246,60 +345,6 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
-        /// <summary>
-        /// Handles the <see cref="E:Control.Click"/> event of the <see cref="_okButton"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleOkButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // On OK, set the SelectedOrderNumber property for the caller.
-                SelectedOrderNumber = GetSelectedOrderNumber();
-
-                if (string.IsNullOrWhiteSpace(SelectedOrderNumber))
-                {
-                    UtilityMethods.ShowMessageBox("No order has been selected.",
-                        "No order selected", true);
-                    return;
-                }
-
-                var ffi = TopLevelControl as FAMFileInspectorForm;
-                if (ffi != null)
-                {
-                    ffi.DialogResult = DialogResult.OK;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI38147");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="E:Control.Click"/> event of the <see cref="_cancelButton"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleCancelButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var ffi = TopLevelControl as FAMFileInspectorForm;
-                if (ffi != null)
-                {
-                    ffi.DialogResult = DialogResult.Cancel;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI38148");
-            }
-        }
-
         #endregion Event Handlers
 
         #region Private Members
@@ -320,6 +365,25 @@ namespace Extract.DataEntry.LabDE
                 .OfType<DataGridViewRow>()
                 .Single()
                 .Cells[0].Value.ToString();
+        }
+
+        /// <summary>
+        /// Resets the order selection to <see cref="SelectedOrderNumber"/>.
+        /// </summary>
+        void ResetSelection()
+        {
+            _ordersDataGridView.ClearSelection();
+            _ordersDataGridView.CurrentCell =
+                _ordersDataGridView.Rows
+                    .OfType<DataGridViewRow>()
+                    .Select(row => row.Cells[0])
+                    .Where(cell => !string.IsNullOrEmpty(SelectedOrderNumber) &&
+                        SelectedOrderNumber.Equals(cell.Value.ToString(), StringComparison.Ordinal))
+                    .SingleOrDefault();
+            if (_ordersDataGridView.CurrentCell != null)
+            {
+                _ordersDataGridView.CurrentCell.OwningRow.Selected = true;
+            }
         }
 
         /// <summary>

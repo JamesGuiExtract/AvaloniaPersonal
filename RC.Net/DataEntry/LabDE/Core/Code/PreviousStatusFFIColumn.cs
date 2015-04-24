@@ -147,57 +147,18 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// <see langword="true"/> if any values specified via <see cref="SetValue"/> are to be
-        /// applied via explicit click of an “OK” button or reverted via “Cancel”.
-        /// <see langword="false"/> if the column doesn't make any changes or the changes take
-        /// effect instantaneously.
-        /// The <see cref="FAMFileInspectorForm"/> will only display OK and Cancel buttons are if this
-        /// property is <see langword="true"/> for at least one provided
-        /// <see cref="IFAMFileInspectorColumn"/>.
+        /// Gets a value indicating whether FFI menu main and context menu options should be limited
+        /// to basic non-custom options. The main database menu and custom file handlers context
+        /// menu options will not be shown.
         /// </summary>
-        public bool RequireOkCancel
+        /// <value><see langword="true"/> to limit menu options to basic options only; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public virtual bool BasicMenuOptionsOnly
         {
             get
             {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets if there is any data that has been modified via <see cref="SetValue"/> that needs
-        /// to be applied. (Not used if <see cref="RequireOkCancel"/> is <see langword="false"/>).
-        /// </summary>
-        public bool Dirty
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets a description of changes that should be displayed to the user in a prompt when
-        /// applying changes. If <see langword="null"/>, no prompt will be displayed when applying
-        /// changed.
-        /// </summary>
-        public string ApplyPrompt
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Gets a description of changes that should be displayed to the user in a prompt when
-        /// the user is canceling changes. If <see langword="null"/>, no prompt will be displayed
-        /// when canceling except if the FFI is closed via the form's cancel button (red X).
-        /// </summary>
-        public string CancelPrompt
-        {
-            get
-            {
-                return null;
+                return true;
             }
         }
 
@@ -336,28 +297,6 @@ namespace Extract.DataEntry.LabDE
         public IEnumerable<int> GetValuesToRefresh()
         {
             yield break;
-        }
-
-        /// <summary>
-        /// Applies all uncommitted values specified via SetValue. (Unused if
-        /// <see cref="RequireOkCancel"/> is <see langword="false"/>.
-        /// </summary>
-        /// <returns>
-        ///   <see langword="true"/> if the changes were successfully applied; otherwise,
-        /// <see langword="false"/>.
-        /// </returns>
-        public bool Apply()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Cancels all uncommitted data changes specified via SetValue. (Unused if
-        /// <see cref="RequireOkCancel"/> is <see langword="false"/>).
-        /// </summary>
-        public void Cancel()
-        {
-            throw new NotImplementedException();
         }
 
         #endregion IFAMFileInspectorColumn Members

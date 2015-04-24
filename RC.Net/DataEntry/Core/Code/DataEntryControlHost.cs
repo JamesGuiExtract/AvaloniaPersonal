@@ -1267,18 +1267,6 @@ namespace Extract.DataEntry
 
         #endregion Properties
 
-        #region Methods
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected virtual void OnDataChanged()
-        {
-            _dirty = true;
-        }
-
-        #endregion Methods
-
         #region IImageViewerControl Members
 
         /// <summary>
@@ -1844,6 +1832,27 @@ namespace Extract.DataEntry
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Forces data that has been cached to be cleared so that any data in referenced databases
+        /// are re-queried for the latest changes.
+        /// </summary>
+        public virtual void ClearCache()
+        {
+            try
+            {
+                DataEntryQuery.ClearCache();
+                Refresh();
+
+                // This forces all validation queries to be re-evaluated.
+                AttributeStatusInfo.EnableValidationTriggers(false);
+                AttributeStatusInfo.EnableValidationTriggers(true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38191");
+            }
         }
 
         /// <summary>
@@ -4336,6 +4345,18 @@ namespace Extract.DataEntry
         }
 
         #endregion Internal Members
+
+        #region Protected Members
+
+        /// <summary>
+        /// Indicates document data has changed.
+        /// </summary>
+        protected virtual void OnDataChanged()
+        {
+            _dirty = true;
+        }
+
+        #endregion Protected Members
 
         #region Private Members
 

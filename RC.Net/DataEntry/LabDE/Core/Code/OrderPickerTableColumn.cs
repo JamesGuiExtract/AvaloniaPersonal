@@ -3,9 +3,11 @@ using Extract.FileActionManager.Utilities;
 using Extract.Licensing;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Linq;
@@ -186,6 +188,78 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
+        /// Gets or sets the attribute path for the attribute containing the collection date. The
+        /// path should either be rooted or be relative to the LabDE Order attribute.
+        /// </summary>
+        /// <value>
+        /// The attribute path for the attribute containing the collection date.
+        /// </value>
+        [DefaultValue(FAMData._DEFAULT_COLLECTION_DATE_ATTRIBUTE)]
+        [Category(_PROPERTY_GRID_CATEGORY)]
+        public string CollectionDateAttribute
+        {
+            get
+            {
+                try
+                {
+                    return FAMData.CollectionDateAttribute;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38178");
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    FAMData.CollectionDateAttribute = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38179");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the attribute path for the attribute containing the collection time. The
+        /// path should either be rooted or be relative to the LabDE Order attribute.
+        /// </summary>
+        /// <value>
+        /// The attribute path for the attribute containing the collection time.
+        /// </value>
+        [DefaultValue(FAMData._DEFAULT_COLLECTION_TIME_ATTRIBUTE)]
+        [Category(_PROPERTY_GRID_CATEGORY)]
+        public string CollectionTimeAttribute
+        {
+            get
+            {
+                try
+                {
+                    return FAMData.CollectionTimeAttribute;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38180");
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    FAMData.CollectionTimeAttribute = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38181");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether unavailable orders should be displayed in the
         /// picker UI.
         /// </summary>
@@ -352,6 +426,65 @@ namespace Extract.DataEntry.LabDE
         }
 
         #endregion Properties  
+
+        #region Methods
+
+        /// <summary>
+        /// Gets the descriptions of all orders on the active document that have previously been
+        /// submitted via LabDE.
+        /// </summary>
+        /// <returns>The descriptions of all orders on the active document that have previously been
+        /// submitted.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public IEnumerable<string> GetPreviouslySubmittedOrders()
+        {
+            try
+            {
+                return FAMData.GetPreviouslySubmittedOrders();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38188");
+            }
+        }
+
+        /// <summary>
+        /// Links the order numbers currently in the order table with the active document in the
+        /// FAM DB (via the LabDEOrderFile table). If the link already exists, the collection date
+        /// will be modified if necessary to match the currently specified collection date.
+        /// </summary>
+        public void LinkFileWithOrders()
+        {
+            try
+            {
+                string currentFileName = DataEntryControlHost.ImageViewer.ImageFile;
+                int fileId = FileProcessingDB.GetFileID(currentFileName);
+
+                FAMData.LinkFileWithCurrentOrders(fileId);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38182");
+            }
+        }
+
+        /// <summary>
+        /// Clears all data currently cached to force it to be re-retrieved from the FAM DB next
+        /// time it is needed.
+        /// </summary>
+        public void ClearCachedData()
+        {
+            try
+            {
+                FAMData.ClearCachedData();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38194");
+            }
+        }
+
+        #endregion Methods
 
         #region Overrides
 

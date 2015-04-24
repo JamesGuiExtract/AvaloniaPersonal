@@ -3,8 +3,8 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Xml;
 using UCLID_AFCORELib;
@@ -59,6 +59,28 @@ namespace Extract.DataEntry
             public DbConnectionWrapper(DbConnection dbConnection)
             {
                 DbConnection = dbConnection;
+
+                // Handle ClearCacheEvent to clear CachedResults as needed.
+                QueryNode.ClearCacheEvent += Handle_ClearCacheEvent;
+            }
+
+            /// <summary>
+            /// Handles the <see cref="QueryNode.ClearCacheEvent"/> event to clear cached data as
+            /// required.
+            /// </summary>
+            /// <param name="sender">The source of the event.</param>
+            /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+            /// </param>
+            void Handle_ClearCacheEvent(object sender, EventArgs e)
+            {
+                try
+                {
+                    CachedResults.Clear();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38190");
+                }
             }
         }
 

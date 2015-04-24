@@ -76,6 +76,7 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="IFFIDataManager.cs" />
     <Compile Include="IFFIFileSelectionPane.cs" />
     <Compile Include="DirectorySelectionForm.cs">
       <SubType>Form</SubType>

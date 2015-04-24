@@ -202,7 +202,7 @@ namespace Extract.DataEntry
         bool _parameterize = true;
 
         /// <summary>
-        /// Indicates whether the result from evaluating query node may be cached for perfomance
+        /// Indicates whether the result from evaluating query node may be cached for performance
         /// reasons if it is a node type that supports caching.
         /// </summary>
         bool _allowCaching = true;
@@ -347,9 +347,9 @@ namespace Extract.DataEntry
 
 
         /// <summary>
-        /// Gets or sets whether the result from evaluating query node may be cached for perfomance
+        /// Gets or sets whether the result from evaluating query node may be cached for performance
         /// reasons if it is a node type that supports caching. In some situations it may be
-        /// desireable to force re-evaluation of query, such as for an SQL query node that is
+        /// desirable to force re-evaluation of query, such as for an SQL query node that is
         /// updating a database.
         /// <b><para>Note</para></b>
         /// A value of <see langwor="true"/> does not guarantee that a result will be cached, only
@@ -453,7 +453,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets or set the name by which this result can be looked up a later time.
         /// Can be <see langword="null"/>, in which case the results will not be accessible
-        /// independently from the overal query result.
+        /// independently from the overall query result.
         /// </summary>
         /// <value>The name by which this result can be looked up a later time.</value>
         public string Name
@@ -580,7 +580,7 @@ namespace Extract.DataEntry
         /// between returned results or as literal whitespace.
         /// </summary>
         /// <value><see langword="true"/> to treat new line characters as literal whitespace;
-        /// <see langword="false"/> to treat new line charaters are delimeters between returned
+        /// <see langword="false"/> to treat new line characters are delimiters between returned
         /// results.</value>
         public bool TreatNewLinesAsWhiteSpace
         {
@@ -596,7 +596,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Informs the node that it's parent has completed evaluation. This may be needed to keep
-        /// track of all the different results of <see cref="Evaluate"/> that have occured in the
+        /// track of all the different results of <see cref="Evaluate"/> that have occurred in the
         /// course of evaluation the parent. These evaluations may have produced different results
         /// based on a sibling node with a Distinct selection mode.
         /// </summary>
@@ -638,6 +638,24 @@ namespace Extract.DataEntry
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Raised to notify all <see cref="QueryNode"/> sub-classes that cached data needs to be
+        /// cleared. Any sub-class that caches data should handle this event.
+        /// </summary>
+        protected static EventHandler<EventArgs> ClearCacheEvent;
+
+        /// <summary>
+        /// Clears all cached query results.
+        /// </summary>
+        internal static void ClearCache()
+        {
+            var eventHandler = ClearCacheEvent;
+            if (eventHandler != null)
+            {
+                eventHandler(null, new EventArgs());
+            }
         }
 
         /// <summary>
@@ -860,7 +878,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Retrieves a <see cref="NamedQueryReferences"/> instance from
         /// <see paramref="namedReferences"/> for the specified <see paramref="resultName"/>.
-        /// If one does not already exisit it will be created.
+        /// If one does not already exist it will be created.
         /// </summary>
         /// <param name="resultName">The name of the result in question.</param>
         /// <param name="namedReferences">A dictionary containing the set of

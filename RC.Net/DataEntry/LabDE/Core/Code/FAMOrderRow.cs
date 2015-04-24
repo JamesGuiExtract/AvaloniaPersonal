@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using UCLID_AFCORELib;
 
@@ -43,12 +44,6 @@ namespace Extract.DataEntry.LabDE
         /// current status.
         /// </summary>
         Color? _statusColor;
-
-        /// <summary>
-        /// A cached list of FAM file IDs that have already been submitted against each order in 
-        /// <see cref="_matchingOrders"/>.
-        /// </summary>
-        Dictionary<string, List<int>> _correspondingFileIds = new Dictionary<string, List<int>>();
 
         #endregion Fields
 
@@ -261,12 +256,14 @@ namespace Extract.DataEntry.LabDE
                 return _matchingOrderIds;
             }
 
+            [SuppressMessage("Microsoft.Performance", "CA1820:TestForEmptyStringsUsingStringLength")]
             set
             {
                 _matchingOrderIds = value;
 
                 // If an empty list is to be cached, used a special value instead of blank (which
-                // would cause a syntax error when used in an SQL query).
+                // would cause a syntax error when used in an SQL query). This is as opposed to null
+                // which indicates MatchingOrderIDs has not yet been queried.
                 if (_matchingOrderIds == string.Empty)
                 {
                     _matchingOrderIds = "'__EMPTY__'";
@@ -287,8 +284,7 @@ namespace Extract.DataEntry.LabDE
             {
                 if (_matchingOrders == null)
                 {
-                    _matchingOrders =
-                        FAMData.GetMatchingOrders(this, out _correspondingFileIds);
+                    _matchingOrders = FAMData.GetMatchingOrders(this);
                 }
 
                 return _matchingOrders;
@@ -332,12 +328,27 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                return _correspondingFileIds[orderNumber];
+                return FAMData.GetCorrespondingFileIDs(orderNumber);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38162");
             }
+        }
+
+        /// <summary>
+        /// Clears all data currently cached to force it to be re-retrieved from the FAM DB next
+        /// time it is needed.
+        /// </summary>
+        public void ClearCachedData()
+        {
+            if (_matchingOrders != null)
+            {
+                _matchingOrders.Dispose();
+                _matchingOrders = null;
+            }
+            _matchingOrderIds = null;
+            _statusColor = null;
         }
 
         #endregion Methods
@@ -433,22 +444,6 @@ namespace Extract.DataEntry.LabDE
         }
         
         #region Private Members
-
-        /// <summary>
-        /// Clears all data currently cached to force it to be re-retrieved from the FAM DB next
-        /// time it is needed.
-        /// </summary>
-        void ClearCachedData()
-        {
-            if (_matchingOrders != null)
-            {
-                _matchingOrders.Dispose();
-                _matchingOrders = null;
-            }
-            _matchingOrderIds = null;
-            _correspondingFileIds.Clear();
-            _statusColor = null;
-        }
 
         /// <summary>
         /// Raises the <see cref="DataUpdated"/> event.

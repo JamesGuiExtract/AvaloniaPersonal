@@ -1,5 +1,4 @@
-﻿using Extract.DataEntry.Properties;
-using Extract.Utilities;
+﻿using Extract.Utilities;
 using Spring.Core.TypeConversion;
 using Spring.Core.TypeResolution;
 using Spring.Expressions;
@@ -7,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -25,13 +25,24 @@ namespace Extract.DataEntry
         /// <summary>
         /// A cache of compiled queries that are frequently used and/or expensive.
         /// </summary>
-        static DataCache<string, CachedQueryData<IExpression>> _cachedExpressions =
-            new DataCache<string, CachedQueryData<IExpression>>(
-                QueryNode.QueryCacheLimit, CachedQueryData<IExpression>.GetScore);
+        [ThreadStatic]
+        static DataCache<string, CachedQueryData<IExpression>> _cachedExpressions;
 
         #endregion Statics
 
         #region Constructors
+
+        /// <summary>
+        /// Initializes the <see cref="ExpressionQueryNode"/> class.
+        /// </summary>
+        // The FX Cop rule against static constructors assumes the static constructor is being used
+        // to initialize static fields.
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
+        static ExpressionQueryNode()
+        {
+            // Handle ClearCacheEvent to clear _cachedExpressions as needed.
+            QueryNode.ClearCacheEvent += Handle_ClearCacheEvent;
+        }
 
         /// <overrides>
         /// Initializes a new <see cref="CompositeQueryNode"/> instance.
@@ -53,7 +64,7 @@ namespace Extract.DataEntry
             // results; when those results are subsequently combined before evaluation, there
             // will be no whitespace where the carriage return was. Since it can be assumed that
             // literal newline chars are not intended to delineate multiple results for an
-            // expression, allow newline chars to be treated as liternal newline chars.
+            // expression, allow newline chars to be treated as literal newline chars.
             TreatNewLinesAsWhiteSpace = true;
         }
 
@@ -82,7 +93,7 @@ namespace Extract.DataEntry
                     {
                         expressionBuilder.Append(childQueryResult);
                     }
-                    // Any parameterized nodes should be be treated as variables of a specific type
+                    // Any parameterized nodes should be treated as variables of a specific type
                     else
                     {
                         // Create a unique name for the variable.
@@ -148,6 +159,12 @@ namespace Extract.DataEntry
                     }
                 }
 
+                if (_cachedExpressions == null)
+                {
+                    _cachedExpressions = new DataCache<string, CachedQueryData<IExpression>>(
+                        QueryNode.QueryCacheLimit, CachedQueryData<IExpression>.GetScore);
+                }
+
                 if (FlushCache)
                 {
                     _cachedExpressions.Clear();
@@ -209,5 +226,28 @@ namespace Extract.DataEntry
         }
 
         #endregion Overrides
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="QueryNode.ClearCacheEvent"/> event to clear cached data as
+        /// required.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        static void Handle_ClearCacheEvent(object sender, EventArgs e)
+        {
+            try
+            {
+                _cachedExpressions = null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38189");
+            }
+        }
+
+        #endregion Event Handlers
     }
 }

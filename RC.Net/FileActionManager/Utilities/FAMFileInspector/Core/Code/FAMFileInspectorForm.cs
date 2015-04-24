@@ -342,7 +342,7 @@ namespace Extract.FileActionManager.Utilities
             new Dictionary<int, IFAMFileInspectorColumn>();
 
         /// <summary>
-        /// Indicates whether user should be prompted about uncommited data in custom columns when 
+        /// Indicates whether user should be prompted about uncommitted data in custom columns when 
         /// the form is closed.
         /// </summary>
         bool _explicitDataApplyOrCancel;
@@ -514,6 +514,11 @@ namespace Extract.FileActionManager.Utilities
         /// Indicates whether the search feature is licensed.
         /// </summary>
         bool _searchIsLicensed;
+
+        /// <summary>
+        /// Indicates whether the form is in the process of closing.
+        /// </summary>
+        bool _closing;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -1142,33 +1147,9 @@ namespace Extract.FileActionManager.Utilities
 
                 var newContextMenuStrip = new ContextMenuStrip();
 
-                // Populate context menu options for all enabled items available with the current
-                // log-on mode from the database's FileHandler table.
-                using (var queryResults = GetResultsForQuery(
-                    "SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], " +
-                        "[SupportsErrorHandling], [Blocking] " +
-                    "FROM [FileHandler] WHERE [Enabled] = 1 " +
-                    (InAdminMode ? "" : "AND [AdminOnly] = 0 ") +
-                    "ORDER BY [AppName]"))
+                if (!BasicMenuOptionsOnly)
                 {
-                    foreach (var row in queryResults.Rows.OfType<DataRow>())
-                    {
-                        // Create an FileHandlerItem instance representing the settings of this item.
-                        var fileHandlerItem = new FileHandlerItem();
-                        fileHandlerItem.Name = (string)row["AppName"];
-                        fileHandlerItem.ApplicationPath = (string)row["ApplicationPath"].ToString();
-                        fileHandlerItem.Arguments = (string)row["Arguments"].ToString();
-                        fileHandlerItem.AllowMultipleFiles = (bool)row["AllowMultipleFiles"];
-                        fileHandlerItem.SupportsErrorHandling = (bool)row["SupportsErrorHandling"];
-                        fileHandlerItem.Blocking = (bool)row["Blocking"];
-
-                        // Create a context menu option and add a handler for it.
-                        var menuItem = new ToolStripMenuItem(fileHandlerItem.Name);
-                        menuItem.Click += HandleFileHandlerMenuItem_Click;
-
-                        _fileHandlerItems.Add(menuItem, fileHandlerItem);
-                        newContextMenuStrip.Items.Add(menuItem);
-                    }
+                    AddCustomFileHandlerOptions(newContextMenuStrip);
                 }
 
                 // Add feature menu options
@@ -1340,6 +1321,20 @@ namespace Extract.FileActionManager.Utilities
                 _imageViewer.Shortcuts[Keys.Shift | Keys.F3] =
                     _previousLayerObjectToolStripButton.PerformClick;
 
+                // The OK and Cancel buttons should be present only in the case that there is at
+                // least one custom control that implements IFFIDataManager.
+                if (!CustomDataManagers.Any())
+                {
+                    _mainLayoutPanel.Controls.Remove(_okCancelPanel);
+                    _mainLayoutPanel.RowCount = 1;
+                    _okCancelPanel.Dispose();
+                }
+
+                if (BasicMenuOptionsOnly)
+                {
+                    _menuStrip.Visible = false;
+                }
+
                 InitializeCustomColumns();
 
                 // Initialize the search settings.
@@ -1500,16 +1495,18 @@ namespace Extract.FileActionManager.Utilities
 
                 // Ensure any modified data from custom columns is applied or explicitly disregarded
                 // by the user before allowing the form to close.
-                if (!PromptToApplyCustomColumnChanges(true))
+                if (!PromptToApplyCustomChanges(true))
                 {
                     e.Cancel = true;
                 }
 
                 if (!e.Cancel)
                 {
+                    _closing = true;
+
                     CancelBackgroundOperation();
 
-                    CancelCustomColumnData();
+                    CancelCustomData();
                 }
 
                 base.OnClosing(e);
@@ -2905,7 +2902,7 @@ namespace Extract.FileActionManager.Utilities
                 // an explicit prompt via the ApplyPrompt property.
                 _explicitDataApplyOrCancel = true;
 
-                if (PromptToApplyCustomColumnChanges(false))
+                if (PromptToApplyCustomChanges(false))
                 {
                     DialogResult = DialogResult.OK;
                     Close();
@@ -4027,7 +4024,7 @@ namespace Extract.FileActionManager.Utilities
                        new ExtractException("ELI35856",
                         string.Format(CultureInfo.CurrentCulture,
                         "There were error(s) searching {0:D} file(s).", exceptionCount)) });
-                    
+
                     ExtractException.AsAggregateException(exceptionsToAggregate).Display();
                 }
 
@@ -4118,6 +4115,12 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                // If any operations were invoked to start after closing the form, ignore them.
+                if (_closing)
+                {
+                    return;
+                }
+
                 // Update UI to reflect an ongoing operation.
                 OperationIsActive = true;
 
@@ -4732,6 +4735,26 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets a value indicating whether FFI menu main and context menu options should be limited
+        /// to basic non-custom options. The main database menu and custom file handlers context
+        /// menu options will not be shown.
+        /// </summary>
+        /// <value><see langword="true"/> to limit menu options to basic options only; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool BasicMenuOptionsOnly
+        {
+            get
+            {
+                bool basicMenuOptionsOnly =
+                    _customColumns.Values.Any(column => column.BasicMenuOptionsOnly) ||
+                    (FileSelectorPane != null && FileSelectorPane.BasicMenuOptionsOnly);
+                
+                return basicMenuOptionsOnly;
+            }
+        }
+
+        /// <summary>
         /// Updates the file selection summary label.
         /// </summary>
         void UpdateFileSelectionSummary()
@@ -4799,15 +4822,6 @@ namespace Extract.FileActionManager.Utilities
             if (_customColumns.Any(column => !column.Value.ReadOnly))
             {
                 _fileListDataGridView.EditMode = DataGridViewEditMode.EditOnKeystroke;
-            }
-
-            // The OK and Cancel buttons should be present only in the case that there is a
-            // custom column with the RequireOkCancel property set to true.
-            if (!_customColumns.Values.Any(column => column.RequireOkCancel))
-            {
-                _mainLayoutPanel.Controls.Remove(_okCancelPanel);
-                _mainLayoutPanel.RowCount = 1;
-                _okCancelPanel.Dispose();
             }
 
             // Loop through each custom column definition.
@@ -4978,43 +4992,87 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Prompts to apply custom column changes.
+        /// Gets all custom components implementing <see cref="IFFIDataManager"/>.
+        /// </summary>
+        IEnumerable<IFFIDataManager> CustomDataManagers
+        {
+            get
+            {
+                var dataManagers = _customColumns.Values.OfType<IFFIDataManager>();
+                var dataManagerPane = FileSelectorPane as IFFIDataManager;
+                if (dataManagerPane != null)
+                {
+                    dataManagers = dataManagers.Union(new[] {dataManagerPane});
+                }
+
+                return dataManagers;
+            }
+        }
+
+        /// <summary>
+        /// Gets any prompts <see cref="CustomDataManagers"/> need to display before committing
+        /// data.
+        /// </summary>
+        IEnumerable<string> CustomApplyPrompts
+        {
+            get
+            {
+                return CustomDataManagers.Where(manager =>
+                    manager.Dirty && !string.IsNullOrWhiteSpace(manager.ApplyPrompt))
+                    .Select(column => column.ApplyPrompt);
+            }
+        }
+
+        /// <summary>
+        /// Gets any prompts <see cref="CustomDataManagers"/> need to display before canceling
+        /// changes.
+        /// </summary>
+        IEnumerable<string> CustomCancelPrompts
+        {
+            get
+            {
+                return CustomDataManagers.Where(manager =>
+                    manager.Dirty && !string.IsNullOrWhiteSpace(manager.CancelPrompt))
+                    .Select(column => column.CancelPrompt);
+            }
+        }
+
+        /// <summary>
+        /// Prompts to apply custom control changes.
         /// </summary>
         /// <param name="canceling"><see langword="true"/> if the prompt is being displayed in the
         /// context of canceling, <see langword="false"/> if it is being displayed in the context of
         /// applying.</param>
-        /// <returns><see langword="true"/> if any prompting or applying of custom column data has
+        /// <returns><see langword="true"/> if any prompting or applying of custom control data has
         /// occurred and the form can be closed; <see langword="false"/> if the form should not be
         /// allowed to close.</returns>
-        bool PromptToApplyCustomColumnChanges(bool canceling)
+        bool PromptToApplyCustomChanges(bool canceling)
         {
             bool allowClose = true;
 
-            bool prompt = !_explicitDataApplyOrCancel ||
-                (canceling && _customColumns.Any(column => 
-                    !string.IsNullOrWhiteSpace(column.Value.CancelPrompt))) ||
-                (!canceling && _customColumns.Any(column => 
-                    !string.IsNullOrWhiteSpace(column.Value.ApplyPrompt)));
+            IEnumerable<string> customPrompts = canceling
+                ? CustomCancelPrompts
+                : CustomApplyPrompts;
 
-            if (prompt &&
-                _customColumns.Values.Any(column => !column.ReadOnly && column.Dirty))
+            bool prompt = customPrompts.Any() ||
+                (!_explicitDataApplyOrCancel && CustomDataManagers.Any(manager => manager.Dirty));
+
+            if (prompt)
             {
                 using (var messageBox = new CustomizableMessageBox())
                 {
                     StringBuilder message = new StringBuilder(
-                        canceling 
-                            ? "There are uncommitted changes." 
+                        canceling
+                            ? "There are uncommitted changes."
+                        // There must be prompts because _explicitDataApplyOrCancel will be true if !canceling
                             : "You have selected to:");
 
-                    string customMessages = string.Join("\r\n\r\n", _customColumns
-                        .Select(column => column.Value.CancelPrompt)
-                        .Where(customMessage => !string.IsNullOrWhiteSpace(customMessage)));
+                    message.AppendLine();
 
-                    if (!string.IsNullOrWhiteSpace(customMessages))
+                    if (customPrompts.Any())
                     {
                         message.AppendLine();
-                        message.AppendLine();
-                        message.AppendLine(customMessages);
+                        message.AppendLine(string.Join("\r\n\r\n", customPrompts));
                         message.AppendLine();
                     }
 
@@ -5040,41 +5098,56 @@ namespace Extract.FileActionManager.Utilities
                     }
                     else  // Yes or OK depending on if canceling.
                     {
-                        allowClose = ApplyCustomColumnData();
+                        allowClose = ApplyCustomData();
                     }
                 }
+            }
+            else if (canceling)
+            {
+                CancelCustomData();
+            }
+            else
+            {
+                allowClose = ApplyCustomData();
             }
 
             return allowClose;
         }
 
         /// <summary>
-        /// Applies uncommitted data in all custom columns.
+        /// Applies uncommitted data in all <see cref="CustomDataManagers"/>.
         /// </summary>
         /// <returns><see langword="true"/> if the changes were successfully applied; otherwise,
         /// <see langword="false"/>.</returns>
-        bool ApplyCustomColumnData()
+        bool ApplyCustomData()
         {
             bool success = true;
+            bool changesWereApplied = false;
 
-            foreach (IFAMFileInspectorColumn column in _customColumns.Values
-                .Where(column => column.RequireOkCancel))
+            foreach (IFFIDataManager manager in CustomDataManagers)
             {
-                success &= column.Apply();
+                success &= manager.Apply();
+                changesWereApplied |= success;
+            }
+
+            // Even if the FFI close was initiated via the form close button (red X), if they chose
+            // to commit changes, consider the dialog result OK.
+            if (success && changesWereApplied)
+            {
+                DialogResult = DialogResult.OK;
             }
 
             return success;
         }
 
         /// <summary>
-        /// Cancels uncommitted data changes in all custom columns.
+        /// Cancels uncommitted data changes in all <see cref="CustomDataManagers"/>.
         /// </summary>
-        void CancelCustomColumnData()
+        void CancelCustomData()
         {
-            foreach (IFAMFileInspectorColumn column in _customColumns.Values
-                .Where(column => column.RequireOkCancel))
+            foreach (IFFIDataManager manager in CustomDataManagers)
             {
-                column.Cancel();
+                manager.Cancel();
             }
         }
 
@@ -5195,6 +5268,44 @@ namespace Extract.FileActionManager.Utilities
             {
                 _clearFlagMenuItem.Dispose();
                 _clearFlagMenuItem = null;
+            }
+        }
+
+        /// <summary>
+        /// Adds any custom FileHandler options from the FAM DB to the
+        /// <see paramref="contextMenuStrip"/>.
+        /// </summary>
+        /// <param name="contextMenuStrip">The <see cref="ContextMenuStrip"/> to which the file
+        /// handlers should be added.</param>
+        void AddCustomFileHandlerOptions(ContextMenuStrip contextMenuStrip)
+        {
+            // Populate context menu options for all enabled items available with the current
+            // log-on mode from the database's FileHandler table.
+            using (var queryResults = GetResultsForQuery(
+                "SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], " +
+                    "[SupportsErrorHandling], [Blocking] " +
+                "FROM [FileHandler] WHERE [Enabled] = 1 " +
+                (InAdminMode ? "" : "AND [AdminOnly] = 0 ") +
+                "ORDER BY [AppName]"))
+            {
+                foreach (var row in queryResults.Rows.OfType<DataRow>())
+                {
+                    // Create an FileHandlerItem instance representing the settings of this item.
+                    var fileHandlerItem = new FileHandlerItem();
+                    fileHandlerItem.Name = (string)row["AppName"];
+                    fileHandlerItem.ApplicationPath = (string)row["ApplicationPath"].ToString();
+                    fileHandlerItem.Arguments = (string)row["Arguments"].ToString();
+                    fileHandlerItem.AllowMultipleFiles = (bool)row["AllowMultipleFiles"];
+                    fileHandlerItem.SupportsErrorHandling = (bool)row["SupportsErrorHandling"];
+                    fileHandlerItem.Blocking = (bool)row["Blocking"];
+
+                    // Create a context menu option and add a handler for it.
+                    var menuItem = new ToolStripMenuItem(fileHandlerItem.Name);
+                    menuItem.Click += HandleFileHandlerMenuItem_Click;
+
+                    _fileHandlerItems.Add(menuItem, fileHandlerItem);
+                    contextMenuStrip.Items.Add(menuItem);
+                }
             }
         }
 

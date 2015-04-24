@@ -702,20 +702,20 @@ namespace Extract.DataEntry.LabDE
                     "SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
                     "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = '{0}' AND LEN('{1}') > 0 AND [Value] = '{2}' " +
+                    "   WHERE [Name] = '{0}' AND LEN('{1}') > 0 AND [Value] = '{1}' " +
                     "INTERSECT " +
                     "SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
                     "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = '{3}' AND LEN('{4}') > 0 AND [Value] = '{5}' " +
+                    "   WHERE [Name] = '{2}' AND LEN('{3}') > 0 AND [Value] = '{3}' " +
                     "INTERSECT " +
                     "SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
                     "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = '{6}' AND LEN('{7}') > 0 AND [Value] = '{8}' ",
-                    PatientFirstNameMetadataField, FirstName.Replace("'", "''"), FirstName.Replace("'", "''"),
-                    PatientLastNameMetadataField, LastName.Replace("'", "''"), LastName.Replace("'", "''"),
-                    PatientDOBMetadataField, DOB.Replace("'", "''"), DOB.Replace("'", "''"));
+                    "   WHERE [Name] = '{4}' AND LEN('{5}') > 0 AND [Value] = '{5}' ",
+                    PatientFirstNameMetadataField, FirstName.Replace("'", "''"), 
+                    PatientLastNameMetadataField, LastName.Replace("'", "''"), 
+                    PatientDOBMetadataField, DOB.Replace("'", "''"));
 
                 query += " INTERSECT " +
                     "SELECT [FAMFile].[ID] FROM [FAMFile] " +

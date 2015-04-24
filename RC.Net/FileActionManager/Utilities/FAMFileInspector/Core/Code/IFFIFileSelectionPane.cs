@@ -56,6 +56,19 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets a value indicating whether FFI menu main and context menu options should be limited
+        /// to basic non-custom options. The main database menu and custom file handlers context
+        /// menu options will not be shown.
+        /// </summary>
+        /// <value><see langword="true"/> to limit menu options to basic options only; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool BasicMenuOptionsOnly
+        {
+            get;
+        }
+
+        /// <summary>
         /// The IDs of the files to be populated in the FFI file list.
         /// </summary>
         IEnumerable<int> SelectedFileIds

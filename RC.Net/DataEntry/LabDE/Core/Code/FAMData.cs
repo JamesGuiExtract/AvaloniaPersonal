@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Data.OleDb;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_FILEPROCESSINGLib;
@@ -50,7 +51,45 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         internal const string _DEFAULT_ORDER_CODE_ATTRIBUTE = "OrderCode";
 
+        /// <summary>
+        /// The default attribute path for the attribute containing the collection date.
+        /// </summary>
+        internal const string _DEFAULT_COLLECTION_DATE_ATTRIBUTE = "CollectionDate";
+
+        /// <summary>
+        /// The default attribute path for the attribute containing the collection time.
+        /// </summary>
+        internal const string _DEFAULT_COLLECTION_TIME_ATTRIBUTE = "CollectionTime";
+
         #endregion Constants
+
+        #region OrderInfo Class
+
+        /// <summary>
+        /// Information regarding an order retrieve from the FAM DB.
+        /// </summary>
+        class OrderInfo
+        {
+            /// <summary>
+            /// A description of the order compiled using <see cref="FAMData.OrderQueryColumns"/>.
+            /// </summary>
+            public string Description
+            {
+                get;
+                set;
+            }
+
+            /// <summary>
+            /// The FAM file IDs for files that have already been filed against this order.
+            /// </summary>
+            public List<int> CorrespondingFileIDs
+            {
+                get;
+                set;
+            }
+        }
+
+        #endregion OrderInfo Class
 
         #region Fields
 
@@ -68,9 +107,9 @@ namespace Extract.DataEntry.LabDE
             new Dictionary<DataEntryTableRow, FAMOrderRow>();
 
         /// <summary>
-        /// Cached text descriptions of orders.
+        /// Cached info for the most recently accessed orders from the FAM DB.
         /// </summary>
-        DataCache<string, string> _orderDescriptions = new DataCache<string, string>(100, null);
+        DataCache<string, OrderInfo> _orderInfoCache = new DataCache<string, OrderInfo>(100, null);
 
         #endregion Fields
 
@@ -90,13 +129,16 @@ namespace Extract.DataEntry.LabDE
                 // Initialize defaults.
                 PatientMRNAttribute = _DEFAULT_PATIENT_MRN_ATTRIBUTE;
                 OrderCodeAttribute = _DEFAULT_ORDER_CODE_ATTRIBUTE;
+                CollectionDateAttribute = _DEFAULT_COLLECTION_DATE_ATTRIBUTE;
+                CollectionTimeAttribute = _DEFAULT_COLLECTION_TIME_ATTRIBUTE;
 
                 OrderQueryColumns = new OrderedDictionary();
                 OrderQueryColumns.Add("Order #", "[LabDEOrder].[OrderNumber]");
                 OrderQueryColumns.Add("Order Name", _ORDER_NAME_XPATH);
-                OrderQueryColumns.Add("Requested", "[LabDEOrder].[ReferenceDateTime]");
+                OrderQueryColumns.Add("Patient", "[LabDEPatient].LastName + ', ' + [LabDEPatient].FirstName");
                 OrderQueryColumns.Add("Ordered by",
                     "(" + _ORDER_PROVIDER_LAST_NAME_XPATH + " + ', ' + " + _ORDER_PROVIDER_FIRST_NAME_XPATH + ")");
+                OrderQueryColumns.Add("Requested", "[LabDEOrder].[ReferenceDateTime]");
                 OrderQueryColumns.Add("Collection date/time", "[LabDEOrderFile].[CollectionDate]");
 
                 ColorQueryConditions = new OrderedDictionary();
@@ -181,6 +223,32 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
+        /// Gets or sets the attribute path for the attribute containing the collection date. The
+        /// path should either be rooted or be relative to the LabDE Order attribute.
+        /// </summary>
+        /// <value>
+        /// The attribute path for the attribute containing the collection date.
+        /// </value>
+        public string CollectionDateAttribute
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the attribute path for the attribute containing the collection time. The
+        /// path should either be rooted or be relative to the LabDE Order attribute.
+        /// </summary>
+        /// <value>
+        /// The attribute path for the attribute containing the collection time.
+        /// </value>
+        public string CollectionTimeAttribute
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether unavailable orders should be displayed in the
         /// picker UI.
         /// </summary>
@@ -253,11 +321,8 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <param name="order">The <see cref="FAMOrderRow"/> for which matching orders are to be
         /// retrieved.</param>
-        /// <param name="correspondingFileIds">A map for each order number in the list, the FAM file
-        /// IDs that have already been submitted against it.</param>
         /// <returns>A <see cref="DataTable"/> listing the possibly matching orders.</returns>
-        public DataTable GetMatchingOrders(FAMOrderRow order,
-            out Dictionary<string, List<int>> correspondingFileIds)
+        public DataTable GetMatchingOrders(FAMOrderRow order)
         {
             try 
 	        {
@@ -266,8 +331,9 @@ namespace Extract.DataEntry.LabDE
                 string selectedOrderNumbers =
                     order.MatchingOrderIDs ?? GetSelectedOrderNumbersQuery(order);
 
-                DataTable matchingOrderTable =
-                    GetMatchingOrders(selectedOrderNumbers, out correspondingFileIds);
+                // LoadOrderInfo has the side-effect of caching data from selectedOrderNumbers into
+                // _orderInfoCache
+                DataTable matchingOrderTable = LoadOrderInfo(selectedOrderNumbers);
 
                 // Cache the list of orders if they have not yet been.
                 if (order.MatchingOrderIDs == null)
@@ -289,22 +355,19 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Gets a <see cref="DataTable"/> with the orders specified by the order numbers in
         /// <see paramref="selectedOrderNumbers"/> with the columns being those defined in
-        /// <see cref="OrderQueryColumns"/>.
+        /// <see cref="OrderQueryColumns"/>. Info for the specified orders is also cached for
+        /// subsequent calls to <see cref="GetOrderDescription"/> or
+        /// <see cref="GetCorrespondingFileIDs"/>.
         /// </summary>
         /// <param name="selectedOrderNumbers">A comma delimited list of order numbers to be
         /// returned or an SQL query that selects the order numbers to be returned.</param>
-        /// <param name="correspondingFileIds">A map for each order number in the list, the FAM file
-        /// IDs that have already been submitted against it.</param>
-        /// <returns>A <see cref="DataTable"/> listing the possibly matching orders.</returns>
-        public DataTable GetMatchingOrders(string selectedOrderNumbers,
-            out Dictionary<string, List<int>> correspondingFileIds)
+        /// <returns>A <see cref="DataTable"/> listing specified orders.</returns>
+        public DataTable LoadOrderInfo(string selectedOrderNumbers)
         {
             ExtractException.Assert("ELI38151",
                 "Order query columns have not been properly defined.",
                 OrderQueryColumns.Count > 0 &&
                 OrderQueryColumns[0].ToString().ToUpperInvariant().Contains("ORDERNUMBER"));
-
-            correspondingFileIds = new Dictionary<string, List<int>>();
 
             string columnsClause = string.Join(", \r\n",
                 OrderQueryColumns
@@ -315,6 +378,7 @@ namespace Extract.DataEntry.LabDE
             // and return correspondingFileIds.
             string query = "SELECT " + columnsClause + "\r\n, [LabDEOrderFile].[FileID]\r\n " +
                 "FROM [LabDEOrder] \r\n" +
+                "INNER JOIN [LabDEPatient] ON [LabDEOrder].[PatientMRN] = [LabDEPatient].[MRN] \r\n" +
                 "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] \r\n" +
                 "WHERE [LabDEOrder].[OrderNumber] IN (" + selectedOrderNumbers + ")";
 
@@ -333,6 +397,8 @@ namespace Extract.DataEntry.LabDE
                 // used behind the scenes to compile correspondingFileIds.
                 matchingOrders.Columns.Remove("FileID");
 
+                OrderInfo orderInfo = null;
+
                 // Loop to copy a single row per distinct order into matchingOrders.
                 foreach (DataRow row in results.Rows)
                 {
@@ -342,22 +408,22 @@ namespace Extract.DataEntry.LabDE
                         matchingOrders.ImportRow(row);
                         lastOrderNumber = orderNumber;
 
-                        correspondingFileIds[orderNumber] = new List<int>();
-
-                        // Whenever retrieving order data, cache the description for use in
-                        // GetOrderDescription.
-                        _orderDescriptions.CacheData(orderNumber, 
-                            string.Join("\r\n", matchingOrders.Columns
-                                .OfType<DataColumn>()
-                                .Select(column => column.ColumnName + ": " +
-                                    row.ItemArray[column.Ordinal].ToString())));
+                        // Cache the order info for GetOrderDescription or GetCorrespondingFileIds.
+                        orderInfo = new OrderInfo();
+                        orderInfo.Description = string.Join("\r\n", matchingOrders.Columns
+                            .OfType<DataColumn>()
+                            .Select(column => column.ColumnName + ": " +
+                                row.ItemArray[column.Ordinal].ToString()));
+                        orderInfo.CorrespondingFileIDs = new List<int>();
+                        
+                        _orderInfoCache.CacheData(orderNumber, orderInfo);
                      }
 
                     // Collect all associated file IDs for the current order.
                     object fileIdValue = row.ItemArray.Last();
                     if (!(fileIdValue is System.DBNull))
                     {
-                        correspondingFileIds[orderNumber].Add((int)fileIdValue);
+                        orderInfo.CorrespondingFileIDs.Add((int)fileIdValue);
                     }
                 }
 
@@ -513,32 +579,48 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                // Attempt to retrieve a cached description of the order.
-                string description = null;
-                if (!string.IsNullOrWhiteSpace(orderNumber) &&
-                    !_orderDescriptions.TryGetData(orderNumber, out description))
+                if (!string.IsNullOrWhiteSpace(orderNumber))
                 {
-                    // If a description was not already cached, call GetMatchingOrders for this
-                    // orderNumber. (While the method is not publicly intended for generating and
-                    // caching text descriptions, it has said side-effect).
-                    Dictionary<string, List<int>> temp;
-                    using (GetMatchingOrders(orderNumber, out temp))
+                    OrderInfo orderInfo = GetOrderInfo(orderNumber);
+                    if (orderInfo != null)
                     {
-                        if (!_orderDescriptions.TryGetData(orderNumber, out description))
-                        {
-                            // If a description could not be retrieved, cache null to prevent
-                            // repeated fruitless attempts at getting a description for this order
-                            // number.
-                            _orderDescriptions.CacheData(orderNumber, description);
-                        }
+                        return orderInfo.Description;
                     }
                 }
 
-                return description;
+                return null;
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38166");
+            }
+        }
+
+        /// <summary>
+        /// Gets the file IDs for files that have already been filed against
+        /// <see paramref="orderNumber"/> in LabDE.
+        /// </summary>
+        /// <param name="orderNumber">The order number.</param>
+        /// <returns>The file IDs for files that have already been filed against the order number.
+        /// </returns>
+        public IEnumerable<int> GetCorrespondingFileIDs(string orderNumber)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(orderNumber))
+                {
+                    OrderInfo orderInfo = GetOrderInfo(orderNumber);
+                    if (orderInfo != null)
+                    {
+                        return orderInfo.CorrespondingFileIDs;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38187");
             }
         }
 
@@ -568,6 +650,116 @@ namespace Extract.DataEntry.LabDE
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38154");
+            }
+        }
+
+        /// <summary>
+        /// Gets the descriptions of all orders currently in <see cref="_rowData"/> that have
+        /// previously been submitted via LabDE.
+        /// </summary>
+        /// <returns>The descriptions of all orders on the active document that have previously been
+        /// submitted.</returns>
+        public IEnumerable<string> GetPreviouslySubmittedOrders()
+        {
+            foreach (KeyValuePair<DataEntryTableRow, FAMOrderRow> rowData in _rowData)
+            {
+                string orderNumber =
+                    GetAttribute(rowData.Key.Attribute, OrderNumberAttribute).Value.String;
+
+                OrderInfo orderInfo = GetOrderInfo(orderNumber);
+                if (orderInfo != null && orderInfo.CorrespondingFileIDs.Any()) 
+                {
+                    yield return orderInfo.Description;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Links the orders currently in <see cref="_rowData"/> with <see paramref="fileId"/>
+        /// FAM DB (via the LabDEOrderFile table). If the link already exists, the collection date
+        /// will be modified if necessary to match the currently specified collection date.
+        /// </summary>
+        /// <param name="fileId">The fileId the orders should be linked to.</param>
+        public void LinkFileWithCurrentOrders(int fileId)
+        {
+            try
+            {
+                foreach (KeyValuePair<DataEntryTableRow, FAMOrderRow> rowData in _rowData)
+                {
+                    string orderNumber =
+                        GetAttribute(rowData.Key.Attribute, OrderNumberAttribute).Value.String;
+                    IAttribute collectionDateAttribute =
+                        GetAttribute(rowData.Key.Attribute, CollectionDateAttribute);
+                    IAttribute collectionTimeAttribute =
+                        GetAttribute(rowData.Key.Attribute, CollectionTimeAttribute);
+                    DateTime collectionDateTime = DateTime.Parse(
+                        collectionDateAttribute.Value.String + " " + collectionTimeAttribute.Value.String,
+                        CultureInfo.CurrentCulture);
+
+                    LinkFileWithOrder(orderNumber, fileId, collectionDateTime);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38183");
+            }
+        }
+
+        /// <summary>
+        /// Links the specified <see paramref="orderNumber"/> with <see paramref="fileId"/>.
+        /// If the link already exists, the collection date time of the order will be modified if
+        /// necessary to match <see paramref="collectionDateTime"/>.
+        /// </summary>
+        /// <param name="orderNumber">The order number to link to the <see paramref="fileId"/>
+        /// </param>
+        /// <param name="fileId">The file ID to link to the <see paramref="orderNumber"/>.</param>
+        /// <param name="collectionDateTime">The collection date time to assign to the link.</param>
+        public void LinkFileWithOrder(string orderNumber, int fileId, DateTime collectionDateTime)
+        {
+            try
+            {
+                string query = string.Format(CultureInfo.CurrentCulture,
+                    "DECLARE @linkExists INT \r\n" +
+                    "   SELECT @linkExists = COUNT([OrderNumber]) \r\n" +
+                    "       FROM [LabDEOrderFile] WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
+                    "IF @linkExists = 1 \r\n" +
+                    "BEGIN \r\n" +
+                    "    UPDATE [LabDEOrderFile] SET [CollectionDate] = {2} \r\n" +
+                    "        WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
+                    "END \r\n" +
+                    "ELSE \r\n" +
+                    "BEGIN \r\n" +
+                    "    INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate]) \r\n" +
+                    "        VALUES ({0}, {1}, {2}) \r\n" +
+                    "END",
+                    "'" + orderNumber + "'", fileId, "'" + collectionDateTime + "'");
+
+                // The query has no results-- immediately dispose of the DataTable returned.
+                DBMethods.ExecuteDBQuery(OleDbConnection, query).Dispose();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38184");
+            }
+        }
+
+        /// <summary>
+        /// Clears all data currently cached to force it to be re-retrieved from the FAM DB next
+        /// time it is needed.
+        /// </summary>
+        public void ClearCachedData()
+        {
+            try
+            {
+                _orderInfoCache.Clear();
+                foreach (FAMOrderRow row in _rowData.Values)
+                {
+                    row.ClearCachedData();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38193");
             }
         }
 
@@ -703,6 +895,31 @@ namespace Extract.DataEntry.LabDE
 
                 return _oleDbConnection;
             }
+        }
+
+        /// <summary>
+        /// Retrieves the <see cref="OrderInfo"/> for the specified <see paramref="orderNumber"/>.
+        /// </summary>
+        /// <param name="orderNumber">The order number for which info should be retrieved.</param>
+        /// <returns>The <see cref="OrderInfo"/> for the specified <see paramref="orderNumber"/>.
+        /// </returns>
+        OrderInfo GetOrderInfo(string orderNumber)
+        {
+            OrderInfo orderInfo = null;
+
+            // First attempt to get the order info from the cache.
+            if (!string.IsNullOrWhiteSpace(orderNumber) &&
+                !_orderInfoCache.TryGetData(orderNumber, out orderInfo))
+            {
+                // If there's not cached info on-hand for this order, load it from the DB now.
+                // The resulting DataTable is not needed; immediately dispose of it.
+                LoadOrderInfo(orderNumber).Dispose();
+
+                // The order info should now be cached if the order exists.
+                _orderInfoCache.TryGetData(orderNumber, out orderInfo);
+            }
+
+            return orderInfo;
         }
 
         /// <summary>
