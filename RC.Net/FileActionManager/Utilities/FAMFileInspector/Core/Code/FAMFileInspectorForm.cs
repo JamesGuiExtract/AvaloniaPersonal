@@ -3260,6 +3260,7 @@ namespace Extract.FileActionManager.Utilities
                     _dataSplitContainer.Panel1Collapsed = true;
 
                     _customSearchTopDockableWindow.Controls.Add(FileSelectorPane.Control);
+                    _customSearchTopDockableWindow.PrimaryControl = FileSelectorPane.Control;
                     _customSearchTopDockableWindow.Text = FileSelectorPane.Title;
                     openTopDockableWindow = true;
                 }

@@ -191,7 +191,7 @@ STDMETHODIMP CFAMTagManager::ExpandTags(BSTR bstrInput, BSTR bstrSourceName, BST
 	
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14389");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38201");
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMTagManager::raw_ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceDocName,
@@ -740,13 +740,29 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 		IVariantVectorPtr ipTagNames = ms_ipContextTagProvider->GetTagNames();
 		ASSERT_RESOURCE_ALLOCATION("ELI37905", ipTagNames != __nullptr);
 
-		long nCount = ipTagNames->Size;
-		for (long i = 0; i < nCount; i++)
+		long nTagCount = ipTagNames->Size;
+		
+		// In order to allow custom tags to contain other custom tags (e.g., <OutputImage> could be
+		// defined as <OutputPath>\$FileOf(<SourceDocName>)), continue iterate tag expansion as long
+		// as the expanded path keeps changing, up to the number of custom tags defined.
+		long nIterations = min(nTagCount, 10);
+		for (long i = 0; i < nIterations; i++)
 		{
-			string strName = asString(ipTagNames->Item[i].bstrVal);
-			string strValue = ms_ipContextTagProvider->GetTagValue(ipTagNames->Item[i].bstrVal);
+			string strOriginal = rstrInput;
 
-			replaceVariable(rstrInput, strName, strValue);
+			for (long j = 0; j < nTagCount; j++)
+			{
+				string strName = asString(ipTagNames->Item[j].bstrVal);
+				string strValue = ms_ipContextTagProvider->GetTagValue(ipTagNames->Item[j].bstrVal);
+
+				replaceVariable(rstrInput, strName, strValue);
+			}
+
+			// If no tags were replaced, we can break out of the loop now.
+			if (rstrInput == strOriginal)
+			{
+				break;
+			}
 		}
 	}
 

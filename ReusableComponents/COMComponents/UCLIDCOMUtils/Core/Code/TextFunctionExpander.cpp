@@ -244,8 +244,24 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 				string strNextSection = str.substr(ulSearchPos, (ulSectionEnd == string::npos)
 					? string::npos
 					: ulSectionEnd - ulSearchPos);
-				strNextSection =
+				string strExpandedSection =
 					asString(ipTagUtility->ExpandTags(get_bstr_t(strNextSection), bstrSourceDocName, pData));
+				
+				// https://extract.atlassian.net/browse/ISSUE-12939
+				// Allow for the possibility that a tag function may be nested inside a custom tag.
+				// If any tag replacements were done and the expanded value looks like it may have a
+				// function, perform function expansion on strExpandedSection.
+				if (strNextSection != strExpandedSection)
+				{
+					if (strExpandedSection.find("$") != string::npos)
+					{
+						strExpandedSection = 
+							expandFunctions(strExpandedSection, ipTagUtility, bstrSourceDocName, pData);
+					}
+
+					strNextSection = strExpandedSection;
+				}
+
 				currentScope.strResult += strNextSection;
 			}
 
@@ -255,7 +271,7 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 				// the result for the current (top) scope.
 				if (!currentScope.strFunction.empty())
 				{
-					UCLIDException ue("ELI35254", "Missing cloing parenthesis for path tag function.");
+					UCLIDException ue("ELI35254", "Missing closing parenthesis for path tag function.");
 					ue.addDebugInfo("Function", currentScope.strFunction);
 					ue.addDebugInfo("Full string", str);
 				}
@@ -318,7 +334,7 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 			}
 
 			// If we've gotten here, we've closed the scope on currentScope.strFunction.
-			// For functions that accept 1 argument, an empty vecExpandedArgs is equivilant to "".
+			// For functions that accept 1 argument, an empty vecExpandedArgs is equivalent to "".
 			string strExpandedArg = (currentScope.vecExpandedArgs.size() == 0) 
 				? "" 
 				: currentScope.vecExpandedArgs[0];

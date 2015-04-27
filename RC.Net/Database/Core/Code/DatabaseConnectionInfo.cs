@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
+using System.Windows;
 
 namespace Extract.Database
 {
@@ -440,7 +441,7 @@ namespace Extract.Database
                 catch (Exception ex)
                 {
                     var ee = new ExtractException("ELI34797",
-                        "Failed to load connecton configuration; attempting to reset.", ex);
+                        "Failed to load connection configuration; attempting to reset.", ex);
                     ee.Log();
 
                     _connectionConfig.ResetConfiguration();
@@ -701,10 +702,15 @@ namespace Extract.Database
             }
 
             sqlceDatabaseFile = (string)sqlceDatabaseFileObject;
+
+            // https://extract.atlassian.net/browse/ISSUE-12935
+            // If a copy of the database file has been made, there should no longer be any concern
+            // with the database maintaining read-only status since changes to this copy will not
+            // affect the original. Ensure read-only is off so the database can be used.
             connectionStringBuilder.Add(parameterName,
                 _localDatabaseCopyManager.GetCurrentTemporaryFileName(
-                    sqlceDatabaseFile, this, true));
-            return connectionStringBuilder.ConnectionString; ;
+                    sqlceDatabaseFile, this, true, true));
+            return connectionStringBuilder.ConnectionString;
         }
 
         #endregion Private Members

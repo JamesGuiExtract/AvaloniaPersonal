@@ -342,11 +342,14 @@ namespace Extract.Utilities
         /// guaranteed to exist unmodified until the next call to GetCurrentTemporaryFileName using
         /// the specified instance or until it is explicitly dereferenced by all referencing
         /// instances.</param>
-        /// <param name="sensitive"><see langword="true"/>if the contents of the temporary file may
+        /// <param name="sensitive"><see langword="true"/> if the contents of the temporary file may
         /// be sensitive; otherwise, <see langword="false"/>.</param>
+        /// <param name="makeWritable"><see langword="true"/> if the temporary file copy should be
+        /// made writable regardless of the original copy's status.; otherwise,
+        /// <see langword="false"/>.</param>
         /// <returns>The filename of the temporary copy to use.</returns>
         public string GetCurrentTemporaryFileName(string originalFileName,
-            object referencingInstance, bool sensitive)
+            object referencingInstance, bool sensitive, bool makeWritable)
         {
             try
             {
@@ -354,6 +357,7 @@ namespace Extract.Utilities
                 lock (_lock)
                 {
                     TemporaryFileCopy temporaryFileCopy;
+                    string temporaryCopyFileName = null;
 
                     // If there is not an existing TemporaryFileCopy instance available for the
                     // specified file, create a new one.                    
@@ -362,9 +366,23 @@ namespace Extract.Utilities
                         temporaryFileCopy =
                             new TemporaryFileCopy(referencingInstance, originalFileName, sensitive);
                         _localFileCopies[originalFileName] = temporaryFileCopy;
+
+                        temporaryCopyFileName =
+                            temporaryFileCopy.GetCurrentTemporaryFileName(referencingInstance);
+
+                        if (makeWritable)
+                        {
+                            FileAttributes fileAttributes = File.GetAttributes(temporaryCopyFileName);
+                            if (fileAttributes.HasFlag(FileAttributes.ReadOnly))
+                            {
+                                File.SetAttributes(temporaryCopyFileName, 
+                                    fileAttributes & ~FileAttributes.ReadOnly);
+                            }
+                        }
                     }
 
-                    return temporaryFileCopy.GetCurrentTemporaryFileName(referencingInstance);
+                    return temporaryCopyFileName ??
+                        temporaryFileCopy.GetCurrentTemporaryFileName(referencingInstance);
                 }
             }
             catch (Exception ex)

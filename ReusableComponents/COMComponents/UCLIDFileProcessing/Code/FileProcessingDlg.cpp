@@ -389,7 +389,7 @@ void FileProcessingDlg::OnBtnRun()
 			IPersistStreamPtr ipPersist = ipFPM;
 			if (ipPersist->IsDirty() == S_OK)
 			{
-				// Only perform the frm save if the file is dirty
+				// Only perform the from save if the file is dirty
 				ipFPM->SaveTo(m_pFRM->getRecoveryFileName().c_str(), 
 					VARIANT_FALSE);
 			}
@@ -607,7 +607,7 @@ void FileProcessingDlg::OnBtnStop()
 				updateMenuAndToolbar();
 				updateUI();
 
-				// Reenable the process menu since no complete message will be sent
+				// Re-enable the process menu since no complete message will be sent
 				CMenu* pMenu = GetMenu();
 				pMenu->EnableMenuItem(1, MF_BYPOSITION | MF_ENABLED);
 
@@ -1728,16 +1728,6 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 
 		bool bFPSFileSaved = !m_strCurrFPSFilename.empty();
 
-		// The connection parameters only need to be change on the FPM since the FPM will set these
-		// values of the DB.
-		// [p13 #4581 && #4580]
-		// NOTE: do this before the call to ResetDBConnection
-		//		 because ResetDBConnection will throw exception if
-		//		 the Server or DBName do not exist
-		getFPM()->DatabaseServer = rstrServer.c_str();
-		getFPM()->DatabaseName = rstrDatabase.c_str();
-		getFPM()->AdvancedConnectionStringProperties = rstrAdvConnStrProperties.c_str();
-
 		// Using tags for server and/or database - attempt to expand the tags
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
 		ASSERT_RESOURCE_ALLOCATION("ELI38050", ipFAMTag != __nullptr);
@@ -1799,6 +1789,16 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 				}
 			}
 		}
+
+		// The connection parameters only need to be change on the FPM since the FPM will set these
+		// values of the DB.
+		// [p13 #4581 && #4580]
+		// NOTE: do this before the call to ResetDBConnection
+		//		 because ResetDBConnection will throw exception if
+		//		 the Server or DBName do not exist
+		getFPM()->DatabaseServer = rstrServer.c_str();
+		getFPM()->DatabaseName = rstrDatabase.c_str();
+		getFPM()->AdvancedConnectionStringProperties = rstrAdvConnStrProperties.c_str();
 
 		// Only try to connect if no tags need to be expanded
 		if (!bTagsToExpand)
@@ -2882,20 +2882,24 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 	// If the new database file connects to the database successfully the action tab should be displayed
 	if ( strCurrDBStatus == gstrCONNECTION_ESTABLISHED )
 	{
-		// Display the Action Page
-		setPages.insert(kActionPage);
-		updateTabs(setPages);
+		if (isPageDisplayed(kActionPage))
+		{
+			// https://extract.atlassian.net/browse/ISSUE-12936
+			// If the action page was already displayed, refresh it rather than resetting the tabs
+			// entirely (which would cause the current tab to be reset to the action tab rather than
+			// the tab it is currently on).
+			m_propActionPage.refresh();
+		}
+		else
+		{
+			setPages.insert(kActionPage);
+			updateTabs(setPages);
+		}
 	}
 	else
 	{
 		// Hide the Action page
 		updateTabs(setPages);
-	}
-
-	// If the action page is displayed refresh the data on the page
-	if (isPageDisplayed(kActionPage))
-	{
-		m_propActionPage.refresh();
 	}
 
 	updateUI();
