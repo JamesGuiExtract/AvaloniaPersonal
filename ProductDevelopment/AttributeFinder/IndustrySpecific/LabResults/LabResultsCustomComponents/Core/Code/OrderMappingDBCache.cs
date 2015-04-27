@@ -218,7 +218,8 @@ namespace Extract.LabResultsCustomComponents
                 // temp copy of the reference database file. Though multiple connections are allowed
                 // to a local file, the connections cannot see each other's changes.
                 string connectionString = "Data Source='" +
-                    _localDatabaseCopyManager.GetCurrentTemporaryFileName(databaseFile, this, true) + "';";
+                    _localDatabaseCopyManager.GetCurrentTemporaryFileName(
+                        databaseFile, this, true, true) + "';";
 
                 // Try to open the database connection, if there is a sqlce exception,
                 // just increment retry count, sleep, and try again
