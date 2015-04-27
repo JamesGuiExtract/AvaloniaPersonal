@@ -1728,6 +1728,16 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 
 		bool bFPSFileSaved = !m_strCurrFPSFilename.empty();
 
+		// The connection parameters only need to be change on the FPM since the FPM will set these
+		// values of the DB.
+		// [p13 #4581 && #4580]
+		// NOTE: do this before the call to ResetDBConnection
+		//		 because ResetDBConnection will throw exception if
+		//		 the Server or DBName do not exist
+		getFPM()->DatabaseServer = rstrServer.c_str();
+		getFPM()->DatabaseName = rstrDatabase.c_str();
+		getFPM()->AdvancedConnectionStringProperties = rstrAdvConnStrProperties.c_str();
+
 		// Using tags for server and/or database - attempt to expand the tags
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
 		ASSERT_RESOURCE_ALLOCATION("ELI38050", ipFAMTag != __nullptr);
@@ -1789,16 +1799,6 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 				}
 			}
 		}
-
-		// The connection parameters only need to be change on the FPM since the FPM will set these
-		// values of the DB.
-		// [p13 #4581 && #4580]
-		// NOTE: do this before the call to ResetDBConnection
-		//		 because ResetDBConnection will throw exception if
-		//		 the Server or DBName do not exist
-		getFPM()->DatabaseServer = rstrServer.c_str();
-		getFPM()->DatabaseName = rstrDatabase.c_str();
-		getFPM()->AdvancedConnectionStringProperties = rstrAdvConnStrProperties.c_str();
 
 		// Only try to connect if no tags need to be expanded
 		if (!bTagsToExpand)
@@ -2507,6 +2507,11 @@ bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfiguratio
 
 	// Reopen the file - this will reset the context so that tags will be interpreted correctly
 	openFile(m_strCurrFPSFilename);
+	
+	// The open file call above sometimes triggers the side-effect of a task description
+	// "disappearing" when on the processing setup tag. Invalidate to ensure the current tab is
+	// refreshed appropriately.
+	Invalidate(TRUE);
 
 	return true;
 }
