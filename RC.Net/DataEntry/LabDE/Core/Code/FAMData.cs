@@ -146,6 +146,8 @@ namespace Extract.DataEntry.LabDE
                 ColorQueryConditions.Add("Yellow", "COUNT([OrderNumber]) > 1 + COUNT(CASE WHEN ([OrderStatus] <> 'A' OR [FileCount] > 0) THEN 1 END)");
                 ColorQueryConditions.Add("Cyan", "COUNT([OrderNumber]) > 0");
                 ColorQueryConditions.Add("Red", "COUNT([OrderNumber]) = 0");
+
+                AttributeStatusInfo.DataReset += HandleAttributeStatusInfo_DataReset;
             }
             catch (Exception ex)
             {
@@ -865,6 +867,29 @@ namespace Extract.DataEntry.LabDE
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38168");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="AttributeStatusInfo.DataReset"/> event.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleAttributeStatusInfo_DataReset(object sender, EventArgs e)
+        {
+            try
+            {
+                // If AttributeStatusInfo data is being reset, we can no longer use any of the
+                // attributes associated with the rows. Dispose of them.
+                if (_rowData != null)
+                {
+                    CollectionMethods.ClearAndDispose(_rowData);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38202");
             }
         }
 
