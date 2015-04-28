@@ -1,10 +1,16 @@
-﻿using Extract.FileActionManager.Forms;
+﻿using Extract.AttributeFinder;
+using Extract.DataEntry;
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Data.Common;
+using System.Data.OleDb;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -83,7 +89,7 @@ namespace Extract.FileActionManager.FileProcessors
     [ComVisible(true)]
     [Guid("4D7F59D3-ECD2-46F0-8750-71194A131777")]
     [ProgId("Extract.FileActionManager.FileProcessors.CreateFileTask")]
-    public class CreateFileTask : ICreateFileTask
+    public class CreateFileTask : ICreateFileTask, IDisposable
     {
         #region Constants
 
@@ -100,6 +106,20 @@ namespace Extract.FileActionManager.FileProcessors
         #endregion Constants
 
         #region Fields
+
+        /// <summary>
+        /// Regex that parses text to find "matches" where each match is a section of the source
+        /// text that alternates between recognized queries and non-query text. The sum of all
+        /// matches = the original source text.
+        /// </summary>
+        static Regex _queryParserRegex =
+            new Regex(@"((?!<Query>[\s\S]+?</Query>)[\S\s])+|<Query>[\s\S]+?</Query>",
+                RegexOptions.Compiled);
+
+        /// <summary>
+        /// Regex that finds all shorthand attribute queries in text.
+        /// </summary>
+        static Regex _attributeQueryFinderRegex = new Regex(@"</[\s\S]+?>", RegexOptions.Compiled);
 
         /// <summary>
         /// The name of the file to be generated.
@@ -121,6 +141,27 @@ namespace Extract.FileActionManager.FileProcessors
         /// Indicates that settings have been changed, but not saved.
         /// </summary>
         bool _dirty;
+
+        /// <summary>
+        /// The name of the VOA file that should be used to expand any attribute queries.
+        /// </summary>
+        string _dataFileName = "<SourceDocName>.voa";
+
+        /// <summary>
+        /// Indicates whether data to run data entry queries has been initialized for the current
+        /// file.
+        /// </summary>
+        bool _queryDataInitialized;
+
+        /// <summary>
+        /// Indicates whether the VOA file was loaded.
+        /// </summary>
+        bool _dataFileLoaded;
+
+        /// <summary>
+        /// The <see cref="DbConnection"/> to use to resolve data queries.
+        /// </summary>
+        DbConnection _dbConnection;
 
         #endregion Fields
 
@@ -360,7 +401,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Gets the minimum stack size needed for the thread in which this task is to be run.
         /// </summary>
         /// <value>
-        /// The the minimum stack size needed for the thread in which this task is to be run.
+        /// The minimum stack size needed for the thread in which this task is to be run.
         /// </value>
         [CLSCompliant(false)]
         public uint MinStackSize
@@ -399,7 +440,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
         /// it also means that call to <see cref="ProcessFile"/> or <see cref="Close"/> may come
-        /// while the Standby call is still ocurring. If this happens, the return value of Standby
+        /// while the Standby call is still occurring. If this happens, the return value of Standby
         /// will be ignored; however, Standby should promptly return in this case to avoid
         /// needlessly keeping a thread alive.
         /// </summary>
@@ -456,14 +497,18 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                _queryDataInitialized = false;
+                _dataFileLoaded = false;
+                _dbConnection = null;
+
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI31836", _COMPONENT_DESCRIPTION);
 
                 FileActionManagerPathTags pathTags =
                     new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
-                string fileName = pathTags.Expand(_fileName);
-                string fileContents = pathTags.Expand(_fileContents);
+                string fileName = ExpandText(_fileName, pFileRecord, pathTags, pDB);
+                string fileContents = ExpandText(_fileContents, pFileRecord, pathTags, pDB);
 
                 ExtractException.Assert("ELI31854",
                     "\"Create file\" task cannot write to the source document",
@@ -513,6 +558,14 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI31837", "Unable to process the file.");
+            }
+            finally
+            {
+                if (_dbConnection != null)
+                {
+                    _dbConnection.Dispose();
+                    _dbConnection = null;
+                }
             }
         }
 
@@ -649,7 +702,220 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion
 
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="CreateFileTask"/>. Also deletes
+        /// the temporary file being managed by this class.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <overloads>Releases resources used by the <see cref="CreateFileTask"/>.
+        /// </overloads>
+        /// <summary>
+        /// Releases all resources used by the <see cref="CreateFileTask"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose of managed resources
+                if (_dbConnection != null)
+                {
+                    _dbConnection.Dispose();
+                    _dbConnection = null;
+                }
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable Members
+
         #region Private Members
+
+        /// <summary>
+        /// Expand all path tags/functions and data queries in the specified <see paramref="text"/>.
+        /// <para><b>Note</b></para>
+        /// This expansion supports shorthand attribute queries in the form &lt;/AttributeName&gt;
+        /// </summary>
+        /// <param name="text">The text to be expanded.</param>
+        /// <param name="fileRecord">The <see cref="FileRecord"/> relating to the text to be
+        /// expanded.</param>
+        /// <param name="pathTags">The <see cref="FileActionManagerPathTags"/> instance to use to
+        /// expand path tags and functions in the <see paramref="text"/>.</param>
+        /// <param name="fileProcessingDB">The File Action Manager database being used for
+        /// processing.</param>
+        /// <returns><see paramref="text"/> with all path tags/functions as well as data queries
+        /// expanded.</returns>
+        string ExpandText(string text, FileRecord fileRecord, FileActionManagerPathTags pathTags,
+            IFileProcessingDB fileProcessingDB)
+        {
+            try
+            {
+                // Don't attempt to expand a blank string.
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    return "";
+                }
+
+                string expandedOutput = "";
+
+                // Parse the source text into alternating "matches" where every other "match" is a
+                // query and the "matches" in-between are non-query text.
+                var matches = _queryParserRegex.Matches(text)
+                    .OfType<Match>()
+                    .ToList();
+
+                // Iterate all non-query text to see if it contains any shorthand query syntax that
+                // needs to be expanded.
+                // (</AttributeName> for <Query><Attribute>AttributeName</Attribute></Query>)
+                foreach (Match match in matches
+                    .Where(match => !IsQuery(match))
+                    .ToArray())
+                {
+                    // Substitute any attribute query shorthand with the full query syntax.
+                    string matchText =
+                        _attributeQueryFinderRegex.Replace(match.Value, SubstituteAttributeQuery);
+
+                    // If after substitutions the _queryParserRegex finds more than one partition, or
+                    // the one and only partition is a query, one or more shorthand queries were
+                    // expanded. Insert the expanded partitions in place of the original one.
+                    var subMatches = _queryParserRegex.Matches(matchText);
+                    if (subMatches.Count > 1 || IsQuery(subMatches[0]))
+                    {
+                        int index = matches.IndexOf(match);
+                        matches.RemoveAt(index);
+                        matches.InsertRange(index, subMatches.OfType<Match>());
+                    }
+                }
+
+                // Iterate all partitions of the source text, evaluating any queries as we go.
+                foreach (Match match in matches)
+                {
+                    if (IsQuery(match))
+                    {
+                        // The first time a query in encountered, load the database and data for all
+                        // subsequent queries for this files to use.
+                        if (!_queryDataInitialized)
+                        {
+                            if (fileProcessingDB != null)
+                            {
+                                _dbConnection = new OleDbConnection(fileProcessingDB.ConnectionString);
+                                _dbConnection.Open();
+                            }
+
+                            IUnknownVector sourceAttributes = new IUnknownVector();
+                            string dataFileName = pathTags.Expand(_dataFileName);
+                            if (File.Exists(dataFileName))
+                            {
+                                // If data file exists, load it.
+                                sourceAttributes.LoadFrom(dataFileName, false);
+
+                                // So that the garbage collector knows of and properly manages the associated
+                                // memory.
+                                sourceAttributes.ReportMemoryUsage();
+
+                                _dataFileLoaded = true;
+                            }
+
+                            AttributeStatusInfo.InitializeForQuery(sourceAttributes,
+                                fileRecord.Name, _dbConnection, pathTags);
+
+                            _queryDataInitialized = true;
+                        }
+
+                        // If data file does not exist and query appears to contain an attribute
+                        // query, note the issue for later logging.
+                        if (!_dataFileLoaded && match.Value.IndexOf(
+                                "<Attribute", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            throw new ExtractException("ELI38203", "The data file necessary to expand " +
+                                "text could not be found; some text may be missing/invalid.");
+                        }
+
+                        // If the database connection does not exist and query appears to contain an
+                        // SQL query, note the issue for later logging.
+                        if (_dbConnection == null && match.Value.IndexOf(
+                                "<SQL", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            throw new ExtractException("ELI38204", "No database connection was available " +
+                                "to expand text; some text may be missing/invalid.");
+                        }
+
+                        try
+                        {
+                            // Append the query result to the expanded output in place of the query.
+                            using (var dataQuery = DataEntryQuery.Create(match.Value, null, _dbConnection))
+                            {
+                                expandedOutput += string.Join("\r\n", dataQuery.Evaluate().ToStringArray());
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            expandedOutput += "<Unable to evaluate query>";
+                            var ee = new ExtractException("ELI38205",
+                                "Unable to expand data query for file.", ex);
+                            ee.AddDebugData("Query", match.Value, false);
+                            ee.AddDebugData("SourceDocName", fileRecord.Name, false);
+                            ee.AddDebugData("FPS",
+                                pathTags.Expand(FileActionManagerPathTags.FpsFileNameTag), false);
+                            ee.Log();
+                        }
+                    }
+                    else
+                    {
+                        // Append any non-query text as is.
+                        expandedOutput += match.Value;
+                    }
+                }
+
+                // Once all queries have been expanded, expand any path tags and functions as well.
+                expandedOutput = pathTags.Expand(expandedOutput);
+
+                return expandedOutput;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38206");
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see paramref="match"/> is a data query.
+        /// </summary>
+        /// <param name="match">The <see cref="Match"/> to check.</param>
+        /// <returns><see langword="true"/> if the match is a data query; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
+        static bool IsQuery(Match match)
+        {
+            return match.Value.StartsWith("<Query>", StringComparison.OrdinalIgnoreCase) &&
+                   match.Value.EndsWith("</Query>", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Substitutes full data query syntax for any shorthand attribute queries within the
+        /// specified <see paramref="match"/>.
+        /// </summary>
+        /// <param name="match">The <see cref="Match"/> for which substitution should be done.
+        /// </param>
+        /// <returns>The text of the match with full data query syntax substituted for any shorthand
+        /// attribute queries </returns>
+        static string SubstituteAttributeQuery(Match match)
+        {
+            string result = "<Query><Attribute>" +
+                match.Value.Substring(1, match.Length - 2) +
+                "</Attribute></Query>";
+
+            return result;
+        }
 
         /// <summary>
         /// Code to be executed upon registration in order to add this class to the

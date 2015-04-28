@@ -1,4 +1,5 @@
-﻿using Extract.Database;
+﻿using Extract.AttributeFinder;
+using Extract.Database;
 using Extract.DataEntry;
 using Extract.FileActionManager.Forms;
 using Extract.Interop;
@@ -1769,6 +1770,11 @@ namespace Extract.FileActionManager.Conditions
                             {
                                 // If data file exists, load it.
                                 sourceAttributes.LoadFrom(dataFileName, false);
+
+                                // So that the garbage collector knows of and properly manages the associated
+                                // memory.
+                                sourceAttributes.ReportMemoryUsage();
+
                                 _dataFileLoaded = true;
                             }
 

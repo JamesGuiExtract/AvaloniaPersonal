@@ -167,6 +167,9 @@
             // _fileContentsTextBox
             // 
             this._fileContentsTextBox.AcceptsReturn = true;
+            this._fileContentsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._fileContentsTextBox.Location = new System.Drawing.Point(12, 67);
             this._fileContentsTextBox.Name = "_fileContentsTextBox";
             this._fileContentsTextBox.Size = new System.Drawing.Size(408, 96);
@@ -179,6 +182,7 @@
             this._fileNameTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_fileNameTagsButton.Image")));
             this._fileNameTagsButton.Location = new System.Drawing.Point(426, 25);
             this._fileNameTagsButton.Name = "_fileNameTagsButton";
+            this._fileNameTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._fileNameTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileNameTagsButton.TabIndex = 2;
             this._fileNameTagsButton.TextControl = this._fileNameTextBox;
@@ -200,9 +204,9 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this._fileNameTagsButton);
             this.Controls.Add(this._fileNameTextBox);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(469, 370);
             this.Name = "CreateFileTaskSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

@@ -1,4 +1,5 @@
-﻿using Extract.DataEntry;
+﻿using Extract.AttributeFinder;
+using Extract.DataEntry;
 using Extract.FileActionManager.Database;
 using Extract.FileActionManager.Forms;
 using Extract.Interfaces;
@@ -55,7 +56,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The full paths of all files to attach to the email.
         /// </summary>
-        // In order to be COM assessible, the property type needs to be an array.
+        // In order to be COM accessible, the property type needs to be an array.
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         string[] Attachments { get; set; }
 
@@ -582,7 +583,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Gets the minimum stack size needed for the thread in which this task is to be run.
         /// </summary>
         /// <value>
-        /// The the minimum stack size needed for the thread in which this task is to be run.
+        /// The minimum stack size needed for the thread in which this task is to be run.
         /// </value>
         [CLSCompliant(false)]
         public uint MinStackSize
@@ -621,7 +622,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
         /// it also means that call to <see cref="ProcessFile"/> or <see cref="Close"/> may come
-        /// while the Standby call is still ocurring. If this happens, the return value of Standby
+        /// while the Standby call is still occurring. If this happens, the return value of Standby
         /// will be ignored; however, Standby should promptly return in this case to avoid
         /// needlessly keeping a thread alive.
         /// </summary>
@@ -962,7 +963,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
             }
 
-            // Dispose of ummanaged resources
+            // Dispose of unmanaged resources
         }
 
         #endregion IDisposable Members
@@ -970,7 +971,7 @@ namespace Extract.FileActionManager.FileProcessors
         #region Private Members
 
         /// <summary>
-        /// Finds and attaches to the <see paramref="emailMessage"/> any configured attachements
+        /// Finds and attaches to the <see paramref="emailMessage"/> any configured attachments
         /// and logs appropriate error information if any attachments are missing.
         /// </summary>
         /// <param name="emailMessage">The <see cref="ExtractEmailMessage"/> to which the
@@ -1040,7 +1041,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="fileProcessingDB">The File Action Manager database being used for
         /// processing.</param>
         /// <returns><see paramref="text"/> with all path tags/functions as well as data queries
-        /// expanced.</returns>
+        /// expanded.</returns>
         string ExpandText(string text, FileRecord fileRecord, FileActionManagerPathTags pathTags,
             IFileProcessingDB fileProcessingDB)
         {
@@ -1083,7 +1084,7 @@ namespace Extract.FileActionManager.FileProcessors
                     }
                 }
 
-                // Iterate all partitions of the source text, evaluating any queires as we go.
+                // Iterate all partitions of the source text, evaluating any queries as we go.
                 foreach (Match match in matches)
                 {
                     if (IsQuery(match))
@@ -1104,6 +1105,11 @@ namespace Extract.FileActionManager.FileProcessors
                             {
                                 // If data file exists, load it.
                                 sourceAttributes.LoadFrom(dataFileName, false);
+
+                                // So that the garbage collector knows of and properly manages the associated
+                                // memory.
+                                sourceAttributes.ReportMemoryUsage();
+
                                 _dataFileLoaded = true;
                             }
 
