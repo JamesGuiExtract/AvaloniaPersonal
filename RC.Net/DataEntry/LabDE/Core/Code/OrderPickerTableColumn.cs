@@ -440,6 +440,8 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
+                LoadDataForAllRows();
+
                 return FAMData.GetPreviouslySubmittedOrders();
             }
             catch (Exception ex)
@@ -457,6 +459,8 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
+                LoadDataForAllRows();
+
                 string currentFileName = DataEntryControlHost.ImageViewer.ImageFile;
                 int fileId = FileProcessingDB.GetFileID(currentFileName);
 
@@ -548,7 +552,7 @@ namespace Extract.DataEntry.LabDE
                     DataGridView.HandleCreated += DataGridView_HandleCreated;
                     DataGridView.CellContentClick += DataGridView_CellContentClick;
                     DataGridView.CellPainting += DataGridView_CellPainting;
-                    DataGridView.UserDeletedRow += DataGridView_UserDeletedRow;
+                    DataGridView.Rows.CollectionChanged += HandleDataGridViewRows_CollectionChanged;
                 }
             }
             catch (Exception ex)
@@ -699,18 +703,25 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Handles the <see cref="DataGridView.UserDeletedRow"/> event of the
-        /// <see cref="DataGridView"/>.
+        /// Handles the <see cref="DataGridViewRowCollection.CollectionChanged"/> event of the
+        /// <see cref="DataGridView"/>..
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.DataGridViewRowEventArgs"/>
+        /// <param name="e">The <see cref="System.ComponentModel.CollectionChangeEventArgs"/>
         /// instance containing the event data.</param>
-        void DataGridView_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
+        void HandleDataGridViewRows_CollectionChanged(object sender, CollectionChangeEventArgs e)
         {
             try
             {
                 // Notify FAMData not to track the deleted row anymore.
-                FAMData.DeleteRow(e.Row as DataEntryTableRow);
+                if (e.Action == CollectionChangeAction.Remove)
+                {
+                    var dataEntryRow = e.Element as DataEntryTableRow;
+                    if (dataEntryRow != null)
+                    {
+                        FAMData.DeleteRow(dataEntryRow);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -831,6 +842,18 @@ namespace Extract.DataEntry.LabDE
                 _famData.FileProcessingDB = FileProcessingDB;
 
                 return _famData;
+            }
+        }
+
+        /// <summary>
+        /// Ensures <see cref="FAMData"/> has loaded data from the DB for all rows in the
+        /// <see cref="DataGridView"/>.
+        /// </summary>
+        void LoadDataForAllRows()
+        {
+            foreach (DataGridViewRow row in DataGridView.Rows)
+            {
+                FAMOrderRow rowData = FAMData.GetRowData(row as DataEntryTableRow);
             }
         }
 

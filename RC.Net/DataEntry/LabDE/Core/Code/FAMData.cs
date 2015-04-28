@@ -642,7 +642,7 @@ namespace Extract.DataEntry.LabDE
                 }
 
                 FAMOrderRow rowData = null;
-                if (!_rowData.TryGetValue(dataEntryRow, out rowData))
+                if (_rowData.TryGetValue(dataEntryRow, out rowData))
                 {
                     rowData.DataUpdated -= HandleRowData_DataUpdated;
                     rowData.Dispose();
