@@ -704,7 +704,7 @@ namespace Extract.DataEntry.LabDE
 
         /// <summary>
         /// Handles the <see cref="DataGridViewRowCollection.CollectionChanged"/> event of the
-        /// <see cref="DataGridView"/>..
+        /// <see cref="DataGridView"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.ComponentModel.CollectionChangeEventArgs"/>
@@ -853,7 +853,7 @@ namespace Extract.DataEntry.LabDE
         {
             foreach (DataGridViewRow row in DataGridView.Rows)
             {
-                FAMOrderRow rowData = FAMData.GetRowData(row as DataEntryTableRow);
+                FAMData.GetRowData(row as DataEntryTableRow);
             }
         }
 
