@@ -182,7 +182,6 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>Common.Logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{57B7B6A7-22C7-4D9B-BADC-961F7AD7FB5A}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>common.logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DEPCompatibilityFiles.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{2071A6FF-5D9A-4B1D-BAA0-1758F26BD938}</td><td>DEP_COMPATIBILITY.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>readme.txt.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{26431AF3-29B3-4D12-9672-40A5214682D4}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>dataentryapplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{AC48C02C-A4E0-4362-B219-4E05B2AC825D}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{0A06E51C-1038-4613-AACE-79E968210746}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -385,8 +384,6 @@
 		<row><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.DLL|DataEntryCC.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryCC.dll</td><td>17</td><td/></row>
 		<row><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.DataEntry.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.dll</td><td>17</td><td/></row>
 		<row><td>interop.uclid_dataentrycusto.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>INTERO~1.DLL|Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>17</td><td/></row>
-		<row><td>make_deps_compatible.vbs.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DEPCompatibilityFiles.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>MAKEDE~1.VBS|Make DEPs Compatible.vbs</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DEP COMPATIBILI_FI&gt;\Make DEPs Compatible.vbs</td><td>1</td><td/></row>
-		<row><td>readme.txt.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DEPCompatibilityFiles.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Readme.txt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DEP COMPATIBILI_FI&gt;\Readme.txt</td><td>1</td><td/></row>
 		<row><td>spring.core.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Spring.Core.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SPRING~1.DLL|Spring.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Spring.Core.dll</td><td>1</td><td/></row>
 	</table>
 
@@ -504,7 +501,6 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>Common.Logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_F3FB7C2E_31E9_41EA_9A93_604685ECA431_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>DEPCompatibilityFiles.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_D0500720_A319_4223_9E90_DBEB02787C99_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_9E879378_D7C5_4840_9A1D_B25425D160EB_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_2B40FBD6_FCA9_4A23_B379_C74A24F5A282_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_1D662107_2612_4CA6_B3AF_26979F2ED520_FILTER</td><td/><td/><td/><td/></row>
@@ -780,7 +776,6 @@
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
-		<row><td>PATH_TO_DEP COMPATIBILI_FI</td><td>P:\AttributeFinder\DEP compatibility</td><td/><td>2</td></row>
 		<row><td>PATH_TO_LEADTOOLS_DOTNETDLLS</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGISTER_FI</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGISTER_FI1</td><td>P:\DataEntry\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
@@ -1324,7 +1319,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
 		<row><td>Common.Logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
-		<row><td>DEPCompatibilityFiles.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
