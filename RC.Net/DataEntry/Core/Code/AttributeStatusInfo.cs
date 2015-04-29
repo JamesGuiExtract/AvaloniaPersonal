@@ -2970,31 +2970,52 @@ namespace Extract.DataEntry
 
                     // Apply the remaining query to all attributes matching the current query.
                     int count = attributesToQuery.Size();
-                    for (int i = 0; i < count; i++)
+                    if (count > 0)
                     {
-                        IAttribute attribute = (IAttribute)attributesToQuery.At(i);
+                        // Syntax: [AttributeNameFilter](=[AttributeValueFilter])(@[AttributeTypeFilter])
+                        var filters = query.Split('@');
+                        ExtractException.Assert("ELI38207",
+                            "'@' character is reserved as a type filter delimiter in attribute queries",
+                            filters.Count() <= 2, "Query", query);
+                        string typeFilter = (filters.Length == 1) ? "" : filters[1];
 
-                        // Anything prior to (or in the absence of) an @ char is a filter on the
-                        // attribute name, whereas anything after is a filter on the attribute type.
-                        var queryFilters = query.Split('@');
-                        string nameFilter = queryFilters[0];
-                        string typeFilter = (queryFilters.Length == 1) ? "" : queryFilters[1];
-
-                        // Check if the attribute should be eliminated based on the type filter.
-                        if (!string.IsNullOrEmpty(typeFilter) && typeFilter != "*")
+                        filters = filters[0].Split('=');
+                        ExtractException.Assert("ELI38208",
+                            "'=' character is reserved as a value filter delimiter in attribute queries",
+                            filters.Count() <= 2, "Query", query);
+                        string nameFilter = filters[0];
+                        string valueFilter = (filters.Length == 1) ? "" : filters[1];
+                        
+                        for (int i = 0; i < count; i++)
                         {
-                            var types = attribute.Type.Split('+').Distinct();
-                            if (!types.Contains(typeFilter, StringComparer.OrdinalIgnoreCase))
+                            IAttribute attribute = (IAttribute)attributesToQuery.At(i);
+
+                            // Check if the attribute should be eliminated by a name filter
+                            if (!string.IsNullOrEmpty(nameFilter) && nameFilter != "*" &&
+                                !nameFilter.Equals(attribute.Name, StringComparison.OrdinalIgnoreCase))
                             {
                                 continue;
                             }
-                        }
-                        
-                        // If the query element is empty, * or the query element matches the
-                        // attribute name, select it.
-                        if (string.IsNullOrEmpty(nameFilter) || nameFilter == "*" ||
-                            nameFilter.Equals(attribute.Name, StringComparison.OrdinalIgnoreCase))
-                        {
+
+                            // Check if the attribute should be eliminated by a value filter
+                            if (!string.IsNullOrEmpty(valueFilter) && !valueFilter.Equals(
+                                attribute.Value.String, StringComparison.OrdinalIgnoreCase))
+                            {
+                                continue;
+                            }
+
+                            // Check if the attribute should be eliminated based a type filter.
+                            if (!string.IsNullOrEmpty(typeFilter) && typeFilter != "*")
+                            {
+                                var types = attribute.Type.Split('+').Distinct();
+                                if (!types.Contains(typeFilter, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    continue;
+                                }
+                            }
+
+                            // Select the attribute if it has not been eliminated by any of the
+                            // filters.
                             results.AddRange(
                                 ResolveAttributeQuery(attribute, nextQuery));
                         }

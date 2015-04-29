@@ -644,6 +644,7 @@ namespace Extract.DataEntry
         /// Raised to notify all <see cref="QueryNode"/> sub-classes that cached data needs to be
         /// cleared. Any sub-class that caches data should handle this event.
         /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2211:NonConstantFieldsShouldNotBeVisible")]
         protected static EventHandler<EventArgs> ClearCacheEvent;
 
         /// <summary>

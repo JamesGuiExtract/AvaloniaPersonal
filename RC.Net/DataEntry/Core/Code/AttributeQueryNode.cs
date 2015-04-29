@@ -691,12 +691,11 @@ namespace Extract.DataEntry
         {
             try
             {
-                // If it is the root attribute query that has been modified, force re-registration
-                // of the trigger attributes next time Evaluate is called.
-                if (sender == _rootAttributeResultQuery)
-                {
-                    _attributeQueryString = null;
-                }
+                // If a referenced query has been updated, force re-registration of the trigger
+                // attributes next time Evaluate is called. This may be raise per the explicit root
+                // node registration above, or it may be raised via CompositeQueryNode because a
+                // nested node in the value has changed.
+                _attributeQueryString = null;
 
                 base.HandleQueryValueModified(sender, e);
             }

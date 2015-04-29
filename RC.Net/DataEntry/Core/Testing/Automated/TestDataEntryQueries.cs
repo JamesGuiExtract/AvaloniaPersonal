@@ -326,6 +326,70 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
+        /// Tests the value filter element
+        /// </summary>
+        [Test, Category("AttributeQueryNode")]
+        public static void TestAttributeQueryNameFilter()
+        {
+            LoadDataFile(_testImages.GetFile(_FLEX_INDEX_DATA_FILE), null);
+
+            string xml = "<Attribute>*=n.a.</Attribute>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 3);
+        }
+
+        /// <summary>
+        /// Tests the value filter element in combination with the other filter elements
+        /// </summary>
+        [Test, Category("AttributeQueryNode")]
+        public static void TestAttributeQueryComplexNameFilter()
+        {
+            LoadDataFile(_testImages.GetFile(_FLEX_INDEX_DATA_FILE), null);
+
+            string xml = "<Attribute>Party=Contingent/PartyType|Party/PartyType=Trustor|LegalDescription/*=n.a.|ReturnAddress/Recipient1=CitiMortgage, Inc.@Company|*/*=123@FULL</Attribute>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 5);
+            Assert.That(results[0].ToString() == "Beneficiary");
+            Assert.That(results[1].ToString() == "Beneficiary");
+            Assert.That(results[2].ToString() == "Trustor");
+            Assert.That(results[3].ToString() == "CitiMortgage, Inc.");
+            Assert.That(results[4].ToString() == "123");
+        }
+
+        /// <summary>
+        /// Tests the value filter where the filter itself uses a separate node.
+        /// </summary>
+        [Test, Category("AttributeQueryNode")]
+        public static void TestAttributeFilterWithReference()
+        {
+            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            string xml = "<Attribute Exclude='True' SelectionMode='Distinct' Name='UnitAttribute'>Test/Component/Units=%</Attribute>\r\n" +
+                         "<Attribute Root='UnitAttribute'>..</Attribute>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 7);
+            Assert.That(results[0].ToString() == "HCT");
+            Assert.That(results[1].ToString() == "RDW");
+            Assert.That(results[2].ToString() == "SEG");
+            Assert.That(results[3].ToString() == "LYMPH");
+            Assert.That(results[4].ToString() == "MONO");
+            Assert.That(results[5].ToString() == "EOSIN");
+            Assert.That(results[6].ToString() == "BASO");
+        }
+
+        /// <summary>
         /// Tests the <see cref="SqlQueryNode"/>
         /// </summary>
         [Test, Category("TestSqlQuery")]
