@@ -179,7 +179,7 @@ namespace Extract.LabResultsCustomComponents
                 {
                     OutstandingOrderCodes.UnionWith(newGroup.OutstandingOrderCodes);
                 }
-                
+
                 // Groups could potentially be merged, find the best order
                 KeyValuePair<string, List<LabTest>> bestOrder =
                     FindBestOrder(new List<LabTest>(combinedTests.Values),
@@ -486,8 +486,7 @@ namespace Extract.LabResultsCustomComponents
                     ISortCompare attributeSorter =
                                 (ISortCompare)new SpatiallyCompareAttributesClass();
 
-                    // Add each order to the output collection (sorting the subattributes)
-                    List<IAttribute> temp = new List<IAttribute>();
+                    // Sort the subattributes spatially
                     foreach (IAttribute newAttribute in mappedAttributes)
                     {
                         // Remove duplicate subattributes if specified
@@ -495,18 +494,14 @@ namespace Extract.LabResultsCustomComponents
                         {
                             EliminateDuplicates(newAttribute.SubAttributes);
                         }
-
                         // Sort the sub attributes spatially
                         newAttribute.SubAttributes.Sort(attributeSorter);
-
-                        // Add the attribute to the temporary list
-                        temp.Add(newAttribute);
                     }
                     
-                    // Sort the orders spatially
-                    temp.Sort((x, y) => CompareTestAttributes(attributeSorter, x, y));
-                    
-                    foreach (IAttribute newAttribute in temp)
+                    // Sort the orders spatially, using the first component subattribute
+                    // and add to the output collection
+                    foreach (IAttribute newAttribute in mappedAttributes
+                        .OrderBy(a => a, new CompareTestAttributes(attributeSorter)))
                     {
                         // Add the attribute to the vector
                         newAttributes.PushBack(newAttribute);
@@ -902,11 +897,11 @@ namespace Extract.LabResultsCustomComponents
 
             Dictionary<string, LabOrder> orders =
                 new Dictionary<string, LabOrder>(StringComparer.OrdinalIgnoreCase);
-            
+
             string query = hasFilledRequirement
                 ? "SELECT [Code], [Name], [EpicCode], [TieBreaker], "
                     + "[FilledRequirement] FROM [LabOrder] WHERE [EpicCode] IS NOT NULL"
-                
+
                 : "SELECT [Code], [Name], [EpicCode], [TieBreaker] "
                     + "FROM [LabOrder] WHERE [EpicCode] IS NOT NULL";
 
@@ -1289,7 +1284,7 @@ namespace Extract.LabResultsCustomComponents
             OrderGroupingPermutation bestGroup = null;
             foreach (OrderGroupingPermutation group in possibleGroupings)
             {
-                if (requireMandatory && group.CombinedGroup.LabOrder != null && 
+                if (requireMandatory && group.CombinedGroup.LabOrder != null &&
                     !group.CombinedGroup.ContainsAllMandatoryTests(dbCache))
                 {
                     continue;
@@ -1314,7 +1309,7 @@ namespace Extract.LabResultsCustomComponents
                     bestTieBreakerString = tieBreakerString;
                 }
                 // 2. Has same number of contained groups AND a lesser TieBreakerString.
-                else if (groupCount == bestGroupCount && 
+                else if (groupCount == bestGroupCount &&
                          string.Compare(
                             tieBreakerString, bestTieBreakerString, StringComparison.Ordinal) < 0)
                 {
@@ -1640,38 +1635,77 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Compares two Test hierarchies using the first Component sub-attribute of each hierarchy
-        /// or else the top-level attribute there are no Components.
+        /// Helper class used to compare Test hierarchies
         /// </summary>
-        /// <param name="sorter">The <see cref="ISortCompare"/> to perform the comparison.</param>
-        /// <param name="x">The attribute representing the first Test hierarchy.</param>
-        /// <param name="y">The attribute representing the second Test hierarchy.</param>
-        /// <returns>1 if the second argument is greater than the first else -1</returns>
-        static int CompareTestAttributes(ISortCompare sorter, IAttribute x, IAttribute y)
+        private class CompareTestAttributes : IComparer<IAttribute>
         {
-            IAttribute componentX = x.SubAttributes.ToIEnumerable<IAttribute>()
-                .FirstOrDefault(attribute =>
-                    attribute.Name.Equals("Component", StringComparison.OrdinalIgnoreCase));
+            private ISortCompare _sorter;
+            
+            /// <summary>
+            /// Create a new instance of CompareTestAttributes
+            /// </summary>
+            /// <param name="sorter">The <see cref="ISortCompare"/> used to compare
+            /// <see cref="IAttribute"/>s</param>
+            public CompareTestAttributes(ISortCompare sorter)
+            {
+                _sorter = sorter;
+            }
 
-            IAttribute componentY = y.SubAttributes.ToIEnumerable<IAttribute>()
-                .FirstOrDefault(attribute =>
-                    attribute.Name.Equals("Component", StringComparison.OrdinalIgnoreCase));
+            /// <summary>
+            /// Compares two Test hierarchies spatially using the first Component sub-attribute of
+            /// each hierarchy or else the top-level attribute there are no Components.
+            /// </summary>
+            /// <param name="x">The attribute representing the first Test hierarchy.</param>
+            /// <param name="y">The attribute representing the second Test hierarchy.</param>
+            /// <returns>-1 if x &lt; y, 1 if x &gt; y, and 0 if x == y</returns>
+            int IComparer<IAttribute>.Compare(IAttribute x, IAttribute y)
+            {
+                IAttribute componentX = x.SubAttributes.ToIEnumerable<IAttribute>()
+                    .FirstOrDefault(attribute =>
+                        attribute.Name.Equals("Component", StringComparison.OrdinalIgnoreCase));
 
-            if (componentX == null && componentY == null)
-            {
-                return sorter.LessThan(x, y) ? -1 : 1;
-            }
-            else if (componentX == null)
-            {
-                return -1;
-            }
-            else if (componentY == null)
-            {
-                return 1;
-            }
-            else
-            {
-                return sorter.LessThan(componentX, componentY) ? -1 : 1;
+                IAttribute componentY = y.SubAttributes.ToIEnumerable<IAttribute>()
+                    .FirstOrDefault(attribute =>
+                        attribute.Name.Equals("Component", StringComparison.OrdinalIgnoreCase));
+
+                if (componentX == null && componentY == null)
+                {
+                    if (_sorter.LessThan(x, y))
+                    {
+                        return -1;
+                    }
+                    else if (_sorter.LessThan(y, x))
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+                else if (componentX == null)
+                {
+                    return -1;
+                }
+                else if (componentY == null)
+                {
+                    return 1;
+                }
+                else
+                {
+                    if (_sorter.LessThan(componentX, componentY))
+                    {
+                        return -1;
+                    }
+                    else if (_sorter.LessThan(componentY, componentX))
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
             }
         }
 

@@ -32,3 +32,8 @@
 
 // [DataEntry:1258]
 // Test cases 12 & 13 test additional cases that test names can potentially be mapped to more than one test code.
+<TESTCASE>;Test12.rsd;Empty.txt;;test12.eav
+<TESTCASE>;Test13.rsd;Empty.txt;;test13.eav
+
+// Maintain input ordering for spatially equivalent test hierarchies
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;test14.eav
