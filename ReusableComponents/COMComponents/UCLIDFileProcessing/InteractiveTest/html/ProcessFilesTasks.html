@@ -962,7 +962,7 @@
         <li><b>Core: Encrypt/Decrypt file</b>
         <ul>
             <li>Select <b>Core: Encrypt/Decrypt file</b> as the task using the Add button.</li>
-            <li>Confirm that the task must configured.</li>
+            <li>Confirm that the task must be configured.</li>
         <p>
             <li>Confirm that the config dialog includes the following elements:
             <ul>
@@ -1016,15 +1016,74 @@
 <p>
     	<li><b>Core: Enhance OCR</b>
         <ul> 
+            	<li>Select <b>Core: Enhance OCR</b> as the task using the Add button.</li>
+            	<li>Confirm that the task must be configured.</li>
 <p>
-  	   	<LI><b>[ISSUE-12532, ISSUE-12533]</b> Enhance OCR
-        	<ul>
-			<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12521</b>.
-			<li>Copy <b>nuance19.11_A_0102.tif.uss</b> to <b>A_0102.tif.uss</b>.
-			<li>Exercise <b>test.rsd</b> against <b>A_0102.tif.uss</b>.
-			<li>Confirm that the rules run without error.
-			<li>Confirm that the found output is from <b>page 4</b>.
-        	</ul>
+            	<li><u>User Interface</u>: Confirm that the config dialog includes the following 
+		elements:
+            	<ul>
+                	<li>An edit box to specify a percentage for: <b>Find text not previously 
+			in OCR or enhance existing text up to a confidence level of</b>.
+			<ul>
+				<li>Confirm that the default percentage is <b>60</b>.
+			</ul>
+			<li>A selection of radio buttons to choose the <b>Enhancement technique</b>.
+			<ul>
+				<li>Use general enhancement techniques
+				<ul>
+					<li>Confirm that choices are <b>Low (fast)</b>, <b>Medium</b>, 
+					and <b>High (slow)</b>.
+					<li>Confirm that the default is <b>Medium</b>.
+				</ul>
+				<li>Focus enhancement on shaded or speckled regions
+				<li>Focus enhancement on diffuse or underexposed text
+				<li>Focus enhancement on smudged or overexposed text
+				<li>Use custom enhancement
+				<ul>
+					<li>Confirm that an edit box is provided.
+					<li>Confirm that a tag selector button is provided.
+					<li>Confirm that a browse button is provided.
+					<li>Confirm that the Open dialog allows selection of *.txt, 
+					*.dat, *.etf, or *.* files.
+					<li>Confirm that file selection from the Open dialog is 
+					copied to the edit box. 
+				</ul>
+			</ul>
+			<li>Confirm that an edit box is provided to <b>Prefer text containing a match 
+			for the regex specified in this file</b>.
+			<ul>
+				<li>Confirm that a tag selector button is provided.
+				<li>Confirm that a browse button is provided.
+				<li>Confirm that the Open dialog allows selection of *.txt, 
+				*.dat, *.etf, or *.* files.
+				<li>Confirm that file selection from the Open dialog is 
+				copied to the edit box. 
+			</ul>
+			<li>Confirm that an edit box is provided to <b>Prevent enhancement from adding 
+			any of the following characters</b>.
+			<ul>
+				<li>Confirm that an <b>underscore</b> character is specified by default.
+			</ul>
+			<li>Confirm that an <b>Output filtered images alongside original (debug)</b> 
+			checkbox is available
+            	</ul>
+<p>
+		<li><u>Functionality</u>
+		<ul>
+			<li>TBD
+		</ul>
+<p>
+		<li><u>Miscellaneous</u>
+		<ul>
+	  	   	<LI><b>[ISSUE-12532, ISSUE-12533]</b> Enhance OCR
+        		<ul>
+				<li>Make a local copy of <b>M:\PVCS_JIRA\JIRA\ISSUE-12521</b>.
+				<li>Copy <b>nuance19.11_A_0102.tif.uss</b> to <b>A_0102.tif.uss</b>.
+				<li>Exercise <b>test.rsd</b> against <b>A_0102.tif.uss</b>.
+				<li>Confirm that the rules run without error.
+				<li>Confirm that the found output is from <b>page 4</b>.
+	        	</ul>
+		</ul>
         </ul></li>
 <p>
         <li><b>Core: Execute rules</b>
