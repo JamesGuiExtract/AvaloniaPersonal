@@ -21,4 +21,5 @@
 <FILE>;..\SelectMultipleOutputHandlers\SelectMultipleOutputHandlers.dat
 <FILE>;..\SelectOnlyUniqueAttributes\SelectOnlyUniqueAttributes.dat
 <FILE>;..\SelectUsingMajority\SelectUsingMajority.dat
+<FILE>;..\SpatiallySortAttributes\SpatiallySortAttributes.dat
 <FILE>;..\TranslateValuesOrTypes\TranslateValueOrType.dat
