@@ -17,7 +17,11 @@ FileRecoveryManager::FileRecoveryManager(const string& strSuffix,
 {
 	// Get the user app data folder
 	getSpecialFolderPath(CSIDL_LOCAL_APPDATA, m_strRecoveryFileFolder);
-	m_strRecoveryFileFolder += "\\Extract Systems\\RecoveryFiles\\";
+	
+	// Changed "Extract Systems" to "Extract_Systems" so that .NET config files and this 
+	// will all be in the same folder in local appdata
+	// https://extract.atlassian.net/browse/ISSUE-12960
+	m_strRecoveryFileFolder += "\\Extract_Systems\\RecoveryFiles\\";
 
 	// get this EXE's full path
 	char pszThisModuleFullPath[MAX_PATH + 1] = {0};

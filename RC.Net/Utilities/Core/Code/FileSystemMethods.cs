@@ -46,9 +46,13 @@ namespace Extract.Utilities
 
         /// <summary>
         /// The full path to the Extract Systems application data folder.
+		///
+		/// https://extract.atlassian.net/browse/ISSUE-12960
+		/// Changed "Extract Systems" to "Extract_Systems" so that .NET config files and this 
+		/// will all be in the same folder in local appdata
         /// </summary>
         static readonly string _USER_APPLICATION_DATA_PATH = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.DoNotVerify), "Extract Systems");
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.DoNotVerify), "Extract_Systems");
 
         /// <summary>
         /// The full path to the extract systems common application data folder
@@ -137,7 +141,7 @@ namespace Extract.Utilities
         /// <summary>
         /// Gets the path to the extract systems folder in the common application
         /// data location of a remote machine. The path will be returned in the format
-        /// of a UNC path using an adimistrative share.
+        /// of a UNC path using an administrative share.
         /// <example>
         /// If the path on the remote machine 'Chuck' is 'C:\ProgramData' then the
         /// returned path will be '\\Chuck\C$\ProgramData\Extract Systems'
@@ -607,7 +611,7 @@ namespace Extract.Utilities
         {
             try
             {
-                // Get the file's extention
+                // Get the file's extension
                 string extension = Path.GetExtension(fileName);
 
                 if (!String.IsNullOrEmpty(extension))
@@ -755,7 +759,7 @@ namespace Extract.Utilities
         /// The performance (speed) of this method may be poor. 
         /// <para><b>Note</b></para>
         /// When attempting to generate a UNC for a local path there may be more than one shared
-        /// directory that can be used to generate the UNC. It is indeterminant which will be
+        /// directory that can be used to generate the UNC. It is indeterminate which will be
         /// used in this case. Administrative shares will not be used as the basis for a UNC path.
         /// </summary>
         /// <param name="path">The path to be converted to a UNC path.</param>
@@ -962,7 +966,7 @@ namespace Extract.Utilities
         /// <param name="secureDeleteFile"><see langword="true"/> to delete the file securely;
         /// <see langword="false"/> otherwise.</param>
         /// <param name="throwIfUnableToDeleteSecurely">If <see langword="true"/>, when securely
-        /// deleteing a file, but the file could not be securely overwritten, an exception will be
+        /// deleting a file, but the file could not be securely overwritten, an exception will be
         /// throw before attempting the actual deletion.</param>
         /// <param name="doRetries"><see langword="true"/> if retries should be attempted when
         /// sharing violations occur; <see langword="false"/> otherwise.</param>
