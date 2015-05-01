@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SplitMultiPageImage")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("SplitMultiPageImage")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2015")]
 [assembly: AssemblyTrademark("")]

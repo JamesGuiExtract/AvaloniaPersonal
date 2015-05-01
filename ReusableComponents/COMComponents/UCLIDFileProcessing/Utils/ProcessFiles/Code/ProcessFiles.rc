@@ -91,7 +91,7 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "CompanyName", "\0"
+            VALUE "CompanyName", "Extract Systems\0"
             VALUE "FileDescription", "ProcessFiles MFC Application\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "ProcessFiles\0"

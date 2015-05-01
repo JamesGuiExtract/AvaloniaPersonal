@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Extract Systems ID Shield for Laserfiche Service")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems, LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract Systems ID Shield for Laserfiche Service")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems 2008")]
 [assembly: AssemblyTrademark("")]

@@ -9,7 +9,7 @@ using System.Resources;
 [assembly: AssemblyTitle("Extract.ExceptionService")]
 [assembly: AssemblyDescription("Extract Systems exception logging service")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems, LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.ExceptionService")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2015")]
 [assembly: AssemblyTrademark("")]

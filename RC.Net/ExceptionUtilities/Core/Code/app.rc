@@ -75,7 +75,7 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "Extract Systems, LLC"
+            VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "Extract Exception Utilities"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Extract.ExceptionUtilities.dll"

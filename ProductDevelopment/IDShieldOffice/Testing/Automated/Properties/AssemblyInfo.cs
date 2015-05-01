@@ -9,7 +9,7 @@ using System;
 [assembly: AssemblyTitle("IDShieldOffice.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems, LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("IDShieldOffice.Test")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2008")]
 [assembly: AssemblyTrademark("")]

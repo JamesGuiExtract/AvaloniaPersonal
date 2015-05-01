@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RunFPSFile")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems, LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("RunFPSFile")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2015")]
 [assembly: AssemblyTrademark("")]

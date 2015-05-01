@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("AlternateTestNameManager")]
 [assembly: AssemblyDescription("Provides easy review of and acceptance of test AKAs for LabDE.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("AlternateTestNameManager")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2015")]
 [assembly: AssemblyTrademark("")]

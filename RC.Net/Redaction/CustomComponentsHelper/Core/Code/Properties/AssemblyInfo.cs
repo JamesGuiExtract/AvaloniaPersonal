@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Extract.Redaction.CustomComponentsHelper")]
 [assembly: AssemblyDescription("A collection of helper interfaces and classes for use in RedactionCustomComponents")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems, LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.Redaction.CustomComponentsHelper")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2015")]
 [assembly: AssemblyTrademark("")]

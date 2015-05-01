@@ -102,7 +102,7 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Extract Systems, LLC"
+            VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "Extract Systems sleep executable"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Sleep.exe"

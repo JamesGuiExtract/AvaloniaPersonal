@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RemoveExtractSPColumns")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems, LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("RemoveExtractSPColumns")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems 2015")]
 [assembly: AssemblyTrademark("")]

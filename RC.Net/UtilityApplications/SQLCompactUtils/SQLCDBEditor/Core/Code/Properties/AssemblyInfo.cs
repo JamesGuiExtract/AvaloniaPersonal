@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 "The Scintilla control used by this application is Copyright 1998-2006 by Neil Hodgson <neilh@scintilla.org>\r\n" +
 "The ScintillaNET bindings are Copyright 2002-2006 by Garrett Serack")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("SQLCDBEditor")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2015")]
 [assembly: AssemblyTrademark("")]

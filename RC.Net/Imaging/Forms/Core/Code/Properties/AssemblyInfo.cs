@@ -10,7 +10,7 @@ using System.Resources;
 [assembly: AssemblyTitle("Extract.Imaging.Forms")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.Imaging.Forms")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2015")]
 [assembly: AssemblyTrademark("")]

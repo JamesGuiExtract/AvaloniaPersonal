@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Extract.DataEntry.DEP.HealthNetworkLabs")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems, LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.DataEntry.DEP.HealthNetworkLabs.Properties")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2015")]
 [assembly: AssemblyTrademark("")]

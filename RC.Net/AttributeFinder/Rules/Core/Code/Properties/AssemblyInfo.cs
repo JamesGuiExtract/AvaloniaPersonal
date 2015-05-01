@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Extract.AttributeFinder.Rules")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.AttributeFinder.Rules")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2015")]
 [assembly: AssemblyTrademark("")]

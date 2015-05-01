@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("StandardLabDE.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems, LLC")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("StandardLabDE.Test")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2009")]
 [assembly: AssemblyTrademark("")]
