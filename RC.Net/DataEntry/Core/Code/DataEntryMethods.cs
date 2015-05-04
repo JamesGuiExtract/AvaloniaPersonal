@@ -1228,6 +1228,12 @@ namespace Extract.DataEntry
                 else if (autoCompleteMode != AutoCompleteMode.None)
                 {
                     autoCompleteMode = AutoCompleteMode.None;
+
+                    // https://extract.atlassian.net/browse/ISSUE-12966
+                    // Unless the auto-complete list is also reset, it seems controls are prone to
+                    // displaying the list anyway (not sure if AutoCompleteMode is getting
+                    // automatically turned back on or what).
+                    autoCompleteList = new AutoCompleteStringCollection();
                     return true;
                 }
 
