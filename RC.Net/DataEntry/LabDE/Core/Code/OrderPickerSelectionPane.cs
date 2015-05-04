@@ -295,35 +295,8 @@ namespace Extract.DataEntry.LabDE
 
         #endregion Internal Members
 
-        #region Overrides
-
-        /// <summary>
-        /// Raises the <see cref="E:Control.VisibleChanged"/> event.
-        /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
-        /// </param>
-        protected override void OnVisibleChanged(EventArgs e)
-        {
-            try
-            {
-                base.OnVisibleChanged(e);
-
-                // When initially being made visible, set the initial selection bases on
-                // SelectedOrderNumber.
-                if (Visible)
-                {
-                    ResetSelection();
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI38170");
-            }
-        }
-
-        #endregion Overrides
-
         #region Event Handlers
+
 
         /// <summary>
         /// Handles the <see cref="DataGridView.SelectionChanged"/>event of the
@@ -342,6 +315,30 @@ namespace Extract.DataEntry.LabDE
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI38146");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.DataBindingComplete"/> event of the
+        /// <see cref="_ordersDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridViewBindingCompleteEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleOrdersDataGridView_DataBindingComplete(object sender,
+            DataGridViewBindingCompleteEventArgs e)
+        {
+            try
+            {
+                // Upon completion of binding, selection will automatically be set to the first row
+                // of the grid unless an alternate selection is applied here. Set the initial
+                // selection to SelectedOrderNumber (if specified), otherwise, don't start with any
+                // selection.
+                ResetSelection();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38209");
             }
         }
 

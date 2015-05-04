@@ -40,7 +40,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._ordersDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._ordersDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._ordersDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this._ordersDataGridView.Location = new System.Drawing.Point(3, 3);
             this._ordersDataGridView.MultiSelect = false;
             this._ordersDataGridView.Name = "_ordersDataGridView";
@@ -49,6 +49,7 @@
             this._ordersDataGridView.Size = new System.Drawing.Size(1139, 189);
             this._ordersDataGridView.TabIndex = 0;
             this._ordersDataGridView.SelectionChanged += new System.EventHandler(this.HandleOrdersDataGridView_SelectionChanged);
+            this._ordersDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(HandleOrdersDataGridView_DataBindingComplete);
             // 
             // OrderPickerSelectionPane
             // 

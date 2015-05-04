@@ -1458,6 +1458,37 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Sets the control to the specified visible state.
+        /// </summary>
+        /// <param name="value"><see langword="true"/> to make the control visible; otherwise,
+        /// <see langword="false"/>.</param>
+        protected override void SetVisibleCore(bool value)
+        {
+            var autoSizeMode = _fileListDataGridView.ColumnHeadersHeightSizeMode;
+
+            try
+            {
+                // https://extract.atlassian.net/browse/ISSUE-12964
+                // The sequence of events that occurs when displaying the FFI via
+                // Extract.DataEntry.LabDE.OrderPicker sometimes results in an
+                // InvalidOperationException related to column sizing during layout. The call stack
+                // at the time of the exception is completely outside of Extract code. However,
+                // since the situation seems to be related to enforcing ColumnHeadersHeightSizeMode,
+                // temporarily disable any column header resizing while changing visibility.
+                _fileListDataGridView.ColumnHeadersHeightSizeMode =
+                    DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+
+                base.SetVisibleCore(value);
+
+                _fileListDataGridView.ColumnHeadersHeightSizeMode = autoSizeMode;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38210");
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Form.Closing"/> event.
         /// </summary>
         /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs"/> that contains
