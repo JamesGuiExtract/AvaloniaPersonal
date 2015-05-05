@@ -227,6 +227,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._splitContainer.Panel1.Controls.Add(this._documentTypePanel);
             this._splitContainer.Panel1.Controls.Add(this._scrollPanel);
+            this._splitContainer.Panel1.Padding = new System.Windows.Forms.Padding(0, 0, 0, 3);
             // 
             // _splitContainer.Panel2
             // 
@@ -275,10 +276,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _scrollPanel
             // 
-            this._scrollPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this._scrollPanel.AutoScroll = true;
+            this._scrollPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._scrollPanel.Location = new System.Drawing.Point(0, 46);
             this._scrollPanel.Name = "_scrollPanel";
             this._scrollPanel.Size = new System.Drawing.Size(181, 563);
