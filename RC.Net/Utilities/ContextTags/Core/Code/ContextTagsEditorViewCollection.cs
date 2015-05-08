@@ -82,6 +82,15 @@ namespace Extract.Utilities.ContextTags
 
         #endregion Constructors
 
+        #region Events
+
+        /// <summary>
+        /// Raised when data has been changed.
+        /// </summary>
+        public event EventHandler<EventArgs> DataChanged;
+
+        #endregion Events
+
         #region Methods
 
         /// <summary>
@@ -409,6 +418,8 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                bool dataChanged = false;
+
                 // As rows are added to or deleted from _contextRows, reflect the change back to the
                 // database.
                 if (e.Action == NotifyCollectionChangedAction.Add)
@@ -416,19 +427,49 @@ namespace Extract.Utilities.ContextTags
                     foreach (var row in e.NewItems.OfType<ContextTagsEditorViewRow>())
                     {
                         row.Initialize(_database);
+                        dataChanged = true;
+                        row.DataChanged += HandleRow_DataChanged;
                     }
                 }
                 else if (e.Action == NotifyCollectionChangedAction.Remove)
                 {
                     foreach (var row in e.OldItems.OfType<ContextTagsEditorViewRow>())
                     {
+                        if (row.HasBeenCommitted)
+                        {
+                            dataChanged = true;
+                        }
                         row.Delete();
                     }
+                }
+
+                if (dataChanged)
+                {
+                    OnDataChanged();
                 }
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38020");
+                ex.ExtractDisplay("ELI38020");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ContextTagsEditorViewRow.DataChanged"/> event of a
+        /// <see cref="ContextTagsEditorViewRow"/> in this collection.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleRow_DataChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                OnDataChanged();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38229");
             }
         }
 
@@ -466,6 +507,18 @@ namespace Extract.Utilities.ContextTags
                         _contextRows.Add(row);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataChanged"/> event.
+        /// </summary>
+        protected void OnDataChanged()
+        {
+            var eventHandler = DataChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
             }
         }
 

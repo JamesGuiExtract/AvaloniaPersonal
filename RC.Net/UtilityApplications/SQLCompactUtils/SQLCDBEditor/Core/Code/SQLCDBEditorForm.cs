@@ -420,6 +420,11 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
+                // Don't allow any tab to abort the close. Specifically if a RowValidating event is
+                // canceled for a plugin, that can end up triggering the cancel property to be true
+                // here. But this shouldn't prevent the user from closing the application.
+                e.Cancel = false;
+
                 // Check for unsaved changes.
                 if (!CheckForSaveAndConfirm())
                 {
@@ -1746,16 +1751,16 @@ namespace Extract.SQLCDBEditor
                 queryAndResultsControl.EndDataEdit();
             }
 
-            var invalidDataTable = _tableList
-                .Where(table => table.IsLoaded && !table.DataIsValid)
+            var invalidQueryAndResultsControl = _tableList.Union(_pluginList)
+                .Where(control => control.IsLoaded && !control.DataIsValid)
                 .FirstOrDefault();
 
-            if (invalidDataTable != null)
+            if (invalidQueryAndResultsControl != null)
             {
-                OpenTableOrQuery(invalidDataTable, false);
-                string errorText = invalidDataTable.ShowInvalidData();
-                var ee = new ExtractException("ELI34626", "Unable to save; table \"" +
-                    invalidDataTable.DisplayName + "\" has invalid data.");
+                OpenTableOrQuery(invalidQueryAndResultsControl, false);
+                string errorText = invalidQueryAndResultsControl.ShowInvalidData();
+                var ee = new ExtractException("ELI34626", "Unable to save; \"" +
+                    invalidQueryAndResultsControl.DisplayName + "\" has invalid data.");
                 ee.AddDebugData("Error", errorText, false);
                 ee.Display();
                 

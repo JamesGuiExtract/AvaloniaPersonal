@@ -49,6 +49,11 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         string _activeContextName;
 
+        /// <summary>
+        /// The <see cref="CustomTagTableV1"/> row represented by this instance.
+        /// </summary>
+        CustomTagTableV1 _customTag;
+
         #endregion Fields
 
         #region Constructors
@@ -92,7 +97,10 @@ namespace Extract.Utilities.ContextTags
 
                 SetDatabase(database);
 
-                CustomTag = customTag;
+                _customTag = customTag;
+
+                // If we loaded this row from the database, it is committed to the database.
+                HasBeenCommitted = true;
             }
             catch (Exception ex)
             {
@@ -101,6 +109,32 @@ namespace Extract.Utilities.ContextTags
         }
 
         #endregion Constructors
+
+        #region Events
+
+        /// <summary>
+        /// Raised when the row's data has been changed.
+        /// </summary>
+        public event EventHandler<EventArgs> DataChanged;
+
+        #endregion Events
+
+        #region Properties
+
+        /// <summary>
+        /// Gets a value indicating whether this instance's data has been successfully committed to
+        /// the database.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance's data has been successfully committed to
+        /// the database; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool HasBeenCommitted
+        {
+            get;
+            private set;
+        }
+
+        #endregion Properties
 
         #region Methods
 
@@ -115,27 +149,10 @@ namespace Extract.Utilities.ContextTags
             {
                 SetDatabase(database);
 
-                if (CustomTag == null)
-                {
-                    // Create the CustomTagTableV1 row to be represented by this instance.
-                    CustomTag = new CustomTagTableV1();
-                    CustomTag.Name = "";
-                    _database.CustomTag.InsertOnSubmit(CustomTag);
-                    
-                    // Submit the new row to get the ID which can then be used to initialize values
-                    // for all the contexts.
-                    _database.SubmitChanges();
-
-                    foreach (var context in _database.Context)
-                    {
-                        var tagValue = new TagValueTableV1();
-                        tagValue.ContextID = context.ID;
-                        tagValue.TagID = CustomTag.ID;
-                        tagValue.Value = "";
-                        _database.TagValue.InsertOnSubmit(tagValue);
-                    }
-                    _database.SubmitChanges();
-                }
+                // Do not attempt to commit any data to the database for this row as part of
+                // initialization. At this point the row should not be represented in the database.
+                // Also, at this point the tag name will be null and invalid which would cause an
+                // error glyph for the new row of the table just by clicking on it.
             }
             catch (Exception ex)
             {
@@ -150,15 +167,20 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                foreach (var tagValue in _database.TagValue
-                        .Where(tagValue => tagValue.TagID == CustomTag.ID))
+                // If _customTag is not set, this row has not been initialized and there is nothing
+                // to delete.
+                if (_customTag != null)
                 {
-                    _database.TagValue.DeleteOnSubmit(tagValue);
-                }
-                _database.SubmitChanges();
+                    // Deletes will cascade.
+                    _database.CustomTag.DeleteOnSubmit(CustomTag);
+                    _database.SubmitChanges();
 
-                _database.CustomTag.DeleteOnSubmit(CustomTag);
-                _database.SubmitChanges();
+                    // Only consider this a data change if the row had not yet been committed to the DB.
+                    if (HasBeenCommitted)
+                    {
+                        OnDataChanged();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -234,8 +256,39 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         CustomTagTableV1 CustomTag
         {
-            get;
-            set;
+            get
+            {
+                if (_customTag == null)
+                {
+                    // Create the CustomTagTableV1 row to be represented by this instance.
+                    _customTag = new CustomTagTableV1();
+                    // Set the name to non-null so that it can be submitted (the name column has a
+                    // non-null constraint.
+                    _customTag.Name = "";
+                    _database.CustomTag.InsertOnSubmit(_customTag);
+
+                    // Submit the new row to get the ID which can then be used to initialize values
+                    // for all the contexts.
+                    _database.SubmitChanges();
+
+                    foreach (var context in _database.Context)
+                    {
+                        var tagValue = new TagValueTableV1();
+                        tagValue.ContextID = context.ID;
+                        tagValue.TagID = _customTag.ID;
+                        tagValue.Value = "";
+                        _database.TagValue.InsertOnSubmit(tagValue);
+                    }
+                    _database.SubmitChanges();
+
+                    // After the custom tag has been added, set the name back to null to ensure it
+                    // gets set before the row as a whole can be committed. (row will remain invalid
+                    // until the user enters a proper name).
+                    _customTag.Name = null;
+                }
+
+                return _customTag;
+            }
         }
 
         /// <summary>
@@ -298,39 +351,35 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                string originalName = row.CustomTag.Name;
-                string newName = (string)value;
-                newName = newName.Trim();
-                if (!newName.StartsWith("<", StringComparison.OrdinalIgnoreCase))
+                string newName = value as string;
+                if (string.IsNullOrWhiteSpace(newName))
                 {
-                    newName = "<" + newName;
+                    // If the tag name is blank, for it to null to deliberately set it to null to
+                    // force a constraint violation so the row's data will appear as invalid.
+                    newName = null;
                 }
-                if (!newName.EndsWith(">", StringComparison.OrdinalIgnoreCase))
+                else
                 {
-                    newName += ">";
+                    newName = newName.Trim();
+                    if (!newName.StartsWith("<", StringComparison.OrdinalIgnoreCase))
+                    {
+                        newName = "<" + newName;
+                    }
+                    if (!newName.EndsWith(">", StringComparison.OrdinalIgnoreCase))
+                    {
+                        newName += ">";
+                    }
                 }
 
                 row.CustomTag.Name = newName;
 
-                try
-                {
-                    _database.SubmitChanges();
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI38043");
-
-                    // If we failed to apply the new value, it may be because of a constraint
-                    // violation. Short of a local lifetime of _database (which might actually be
-                    // most appropriate), reverting to the original name stands the best chance of
-                    // preventing _database from getting stuck in a bad state.
-                    row.CustomTag.Name = originalName;
-                    _database.SubmitChanges();
-                }
+                _database.SubmitChanges();
+                row.HasBeenCommitted = true;
+                row.OnDataChanged();
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI37998");
+                throw AsDataErrorException("ELI37998", ex);
             }
         }
 
@@ -407,10 +456,50 @@ namespace Extract.Utilities.ContextTags
 
                 targetValue.Value = newValue;
                 _database.SubmitChanges();
+                row.HasBeenCommitted = true;
+                row.OnDataChanged();
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38000");
+                throw AsDataErrorException("ELI38000", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the specified exception relating to a data error as a more user-friendly exception.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to use.</param>
+        /// <param name="ex">The <see cref="Exception"/> pertaining to a data error.</param>
+        /// <returns>A user-friendly data error exception.</returns>
+        static ExtractException AsDataErrorException(string eliCode, Exception ex)
+        {
+            ExtractException ee = null;
+            if (ex.Message.Contains("Column name = Name") && ex.Message.Contains("null"))
+            {
+                ee = new ExtractException(eliCode, "Tag name has not been specified", ex);
+            }
+            else if (ex.Message.Contains("UC_CustomTagName"))
+            {
+                ee = new ExtractException(eliCode, "Tag name has already been used", ex);
+            }
+
+            if (ee == null)
+            {
+                ee = ex.AsExtract(eliCode);
+            }
+
+            return ee;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataChanged"/> event.
+        /// </summary>
+        protected void OnDataChanged()
+        {
+            var eventHandler = DataChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
             }
         }
 

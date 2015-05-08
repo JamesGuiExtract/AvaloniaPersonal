@@ -3,9 +3,7 @@ using Extract.SQLCDBEditor;
 using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
-using System.Data.Common;
 using System.Data.SqlServerCe;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -140,6 +138,29 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
+        /// Gets a value indicating whether this plugin's data is valid.
+        /// </summary>
+        /// <value><see langword="true"/> if the plugin data is valid; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public override bool DataIsValid
+        {
+            get
+            {
+                try
+                {
+                    _database.SubmitChanges();
+
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Allows plugin to initialize.
         /// </summary>
         /// <param name="pluginManager">The <see cref="ISQLCDBEditorPluginManager"/> manager for
@@ -212,6 +233,7 @@ namespace Extract.Utilities.ContextTags
                     _contextTagsView.Dispose();
                 }
                 _contextTagsView = new ContextTagsEditorViewCollection(_database);
+                _contextTagsView.DataChanged += HandleContextTagsView_DataChanged;
 
                 // The AllowNew set needs to come after Refresh; if AllowNew is set before the data
                 // is initialized via the refresh call, errors will result as a the DataGridView is
@@ -327,6 +349,25 @@ namespace Extract.Utilities.ContextTags
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI38093");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ContextTagsEditorViewCollection.DataChanged"/> event of the
+        /// <see cref="_contextTagsView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleContextTagsView_DataChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                OnDataChanged(true, false);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38228");
             }
         }
 

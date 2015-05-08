@@ -72,6 +72,7 @@ namespace Extract.Utilities
         /// will replace with the backup if available otherwise the user.config file will be deleted
         /// https://extract.atlassian.net/browse/ISSUE-12830
         /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         UserConfigChecker _userConfigChecker = new UserConfigChecker();
 
         #endregion Fields

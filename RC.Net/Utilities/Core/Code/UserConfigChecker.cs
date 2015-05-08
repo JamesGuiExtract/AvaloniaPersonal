@@ -105,7 +105,7 @@ namespace Extract.Utilities
                     try
                     {
                         // Check that the file name on the exception is the user.config file.
-                        if (e.Filename.EndsWith("user.config", StringComparison.InvariantCultureIgnoreCase))
+                        if (e.Filename.EndsWith("user.config", StringComparison.OrdinalIgnoreCase))
                         {
                             // Check if the user.config file is readonly
                             // if the backup file is readonly don't copy over it

@@ -162,6 +162,16 @@ namespace Extract.SQLCDBEditor
         bool _initialLayoutComplete;
 
         /// <summary>
+        /// Indicates whether this control's data is valid.
+        /// </summary>
+        bool _dataIsValid;
+
+        /// <summary>
+        /// A data error encountered for a table row that has yet to be resolved.
+        /// </summary>
+        DataGridViewDataErrorEventArgs _activeDataError;
+
+        /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
         readonly bool _inDesignMode;
@@ -387,16 +397,56 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Gets a value indicating whether database table data is valid.
+        /// Gets a value indicating whether this control's data is valid.
         /// </summary>
         /// <value>
-        /// <see langword="true"/> if this instance represents a database table whose data is
-        /// invalid; otherwise, <see langword="false"/>.
+        /// <see langword="true"/> if the data represented by this instance is valid; otherwise,
+        /// <see langword="false"/>.
         /// </value>
         public bool DataIsValid
         {
-            get;
-            private set;
+            get
+            {
+                return _dataIsValid;
+            }
+
+            private set
+            {
+                try
+                {
+                    if (value != _dataIsValid)
+                    {
+                        _dataIsValid = value;
+
+                        if (value)
+                        {
+                            _activeDataError = null;
+
+                            if (IsLoaded)
+                            {
+                                // Ensure ErrorText is cleared for all rows in the table.
+                                foreach (var row in _resultsGrid.Rows
+                                    .OfType<DataGridViewRow>()
+                                    .Where(row => !string.IsNullOrEmpty(row.ErrorText)))
+                                {
+                                    row.ErrorText = null;
+                                }
+                            }
+                        }
+
+                        // As long as this instance is loaded (and the validity change is per user
+                        // interaction) update control to reflect the current validity status.
+                        if (IsLoaded)
+                        {
+                            UpdateResultsStatus(value);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38222");
+                }
+            }
         }
 
         /// <summary>
@@ -598,8 +648,15 @@ namespace Extract.SQLCDBEditor
 
             _connection = connection;
             _plugin.LoadPlugin(this, _connection);
+
             _resultsGrid.DataSource = _plugin.BindingSource;
-            
+
+            // For a plugin that provides its own data source, we will not be able to keep track of
+            // more that one data error simultaneously. The RowValidating should be used to prevent
+            // the user from moving on from any row until any error has been resolved.
+            _resultsGrid.RowValidating += HandleResultsGrid_RowValidating;
+            _resultsGrid.RowsRemoved += HandleResultsGrid_DataBoundRowsRemoved;
+
             IsLoaded = true;
         }
 
@@ -721,7 +778,7 @@ namespace Extract.SQLCDBEditor
             {
                 // If the results table has not been created or it currently contains invalid data,
                 // prevent a refresh.
-                if (_resultsTable == null && !UsingPluginBindingSource)
+                if ((_resultsTable == null && !UsingPluginBindingSource) || !DataIsValid)
                 {
                     return;
                 }
@@ -750,8 +807,6 @@ namespace Extract.SQLCDBEditor
                         DataIsValid = MergeRowsIntoTable(latestDataTable, _resultsTable.Rows
                             .OfType<DataRow>()
                             .Where(row => row.HasErrors));
-
-                        UpdateResultsStatus(DataIsValid);
                     }
                     else
                     {
@@ -1490,8 +1545,6 @@ namespace Extract.SQLCDBEditor
 
                 // Flag the offending row.
                 e.Row.RowError = ex.Message;
-
-                UpdateResultsStatus(false);
             }
         }
 
@@ -1655,9 +1708,23 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                e.Exception.ExtractDisplay("ELI34660");
-
                 e.ThrowException = false;
+
+                // Don't think it is possible to have a null exception, but in case of one, just
+                // ignore the error.
+                if (e.Exception == null)
+                {
+                    return;
+                }
+
+                // Apply the exception text to the row corresponding to the error.
+                if (e.RowIndex >= 0 && e.RowIndex < _resultsGrid.RowCount)
+                {
+                    _resultsGrid.Rows[e.RowIndex].ErrorText = e.Exception.Message;
+                }
+
+                _activeDataError = e;
+                DataIsValid = false;
             }
             catch (Exception ex)
             {
@@ -1842,6 +1909,13 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
+                // If binding data source is being used, any time data is changed re-check to see
+                // if the data is now valid.
+                if (!DataIsValid && UsingPluginBindingSource && _plugin.DataIsValid)
+                {
+                    DataIsValid = true;
+                }
+
                 OnDataChanged(e.DataCommitted, e.RefreshSource);
             }
             catch (Exception ex)
@@ -1866,6 +1940,63 @@ namespace Extract.SQLCDBEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI37597");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.RowValidating"/> event of the
+        /// <see cref="_resultsGrid"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridViewCellCancelEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleResultsGrid_RowValidating(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            try
+            {
+                ExtractException.Assert("ELI38226","Internal logic error", UsingPluginBindingSource);
+
+                // If there is an active data error for this row, do not allow the user to move on
+                // from this row until the error has been corrected.
+                if (_activeDataError != null && _activeDataError.RowIndex == e.RowIndex)
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38223");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.RowsRemoved"/> event of the
+        /// <see cref="_resultsGrid"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridViewRowsRemovedEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleResultsGrid_DataBoundRowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
+        {
+            try
+            {
+                // The DataGridView will automatically delete a new row that has not yet been
+                // successfully committed into the database if it has data errors. I spent a great
+                // deal of time trying to figure out how to prevent this behavior, but for now I am
+                // settling on at least informing the user what has happened.
+                if (_activeDataError != null &&
+                    e.RowIndex <= _activeDataError.RowIndex &&
+                    (e.RowIndex + e.RowCount) > _activeDataError.RowIndex)
+                {
+                    ExtractException ee = new ExtractException("ELI38224",
+                        "Row could not be added because of an error in the data:\r\n" +
+                        _activeDataError.Exception.Message, _activeDataError.Exception);
+                    ee.Display();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38225");
             }
         }
 
@@ -2448,6 +2579,19 @@ namespace Extract.SQLCDBEditor
                     ExtractException.Assert("ELI34602", "Unexpected table state.", !DataIsValid);
                     _resultsStatusLabel.Text = "Invalid has been entered. (click here to view)";
                 }
+                else if (UsingPluginBindingSource)
+                {
+                    ExtractException.Assert("ELI38227", "Invalid data.", !DataIsValid);
+                    if (_activeDataError != null)
+                    {
+                        _resultsStatusLabel.Text =
+                            "Invalid has been entered: " + _activeDataError.Exception.Message;
+                    }
+                    else
+                    {
+                        _resultsStatusLabel.Text = "Invalid has been entered.";
+                    }
+                }
                 else if (_resultsChanged)
                 {
                     _resultsStatusLabel.Text = "Query results are out of date";
@@ -2558,8 +2702,6 @@ namespace Extract.SQLCDBEditor
                 }
 
                 DataIsValid = false;
-                
-                UpdateResultsStatus(false);
             }
 
             _resultsGrid.Invalidate();
@@ -2579,7 +2721,6 @@ namespace Extract.SQLCDBEditor
 
                 // If the update was successful, all data is now valid.
                 DataIsValid = true;
-                UpdateResultsStatus(true);
             }
             // If there are any exceptions in this block, there is no need to display them. It
             // just means the table data will remain marked as invalid.

@@ -109,6 +109,20 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
+        /// Gets a value indicating whether this plugin's data is valid.
+        /// </summary>
+        /// <value><see langword="true"/> if the plugin data is valid; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public virtual bool DataIsValid
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Performs any custom refresh logic needed by the plugin. Generally a plugin where
         /// <see cref="ProvidesBindingSource"/> is <see langword="true"/> will need to perform the
         /// refresh of the data here.
