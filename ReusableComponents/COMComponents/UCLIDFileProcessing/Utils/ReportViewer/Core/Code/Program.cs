@@ -38,6 +38,13 @@ namespace Extract.ReportViewer
             ExtractReport report = null;
             try
             {
+                // Make sure user.config file is not corrupt - This is needed because if the file
+                // is corrupt an exception will be thrown by the Crystal reports dlls when they are
+                // loaded and attempt to get settings. Using the UserConfigChecker Class will have
+                // the file checked now and when the application exists
+                // related to https://extract.atlassian.net/browse/ISSUE-12830
+                UserConfigChecker _userConfigChecker = new UserConfigChecker();
+
                 // These two lines must be called before any window is shown [LRCAU #5261]
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);

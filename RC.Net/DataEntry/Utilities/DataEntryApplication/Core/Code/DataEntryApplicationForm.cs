@@ -480,6 +480,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         bool _invisible;
 
+        /// <summary>
+        /// This checks the user.config file to make sure it is not corrupt when the each instance 
+        /// is created and when each instance is destroyed and if it is good makes a backup and 
+        /// if corrupted will replace with the backup if available otherwise the config file will be deleted
+        /// https://extract.atlassian.net/browse/ISSUE-12830
+        /// </summary>
+        UserConfigChecker _userConfigChecker = new UserConfigChecker();
+
         #endregion Fields
 
         #region Constructors
@@ -1095,6 +1103,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                // Before Loading the state make sure the config is still valid
+				// https://extract.atlassian.net/browse/ISSUE-12830
+                UserConfigChecker.EnsureValidUserConfigFile();
+
                 base.OnLoad(e);
 
                 // Set the application name
@@ -1516,6 +1528,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                // Before closing windows make sure the config is still valid.               
+				// https://extract.atlassian.net/browse/ISSUE-12830
+                UserConfigChecker.EnsureValidUserConfigFile();
+
                 if (!PreventSave)
                 {
                     // Check for unsaved data and cancel the close if necessary.

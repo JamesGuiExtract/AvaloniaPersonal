@@ -722,6 +722,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // Make sure the user.config file is in a good state
+				// https://extract.atlassian.net/browse/ISSUE-12830
+                UserConfigChecker.EnsureValidUserConfigFile();
+
                 if (_pendingDocuments.Any(document => !document.InOriginalForm))
                 {
                     DialogResult response = MessageBox.Show(

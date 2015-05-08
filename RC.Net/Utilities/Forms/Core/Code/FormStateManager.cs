@@ -101,7 +101,7 @@ namespace Extract.Utilities.Forms
         AutoHideScreenTab _fullScreenTab;
 
         /// <summary>
-        /// Mutex used to serialize persistance of control and form layout.
+        /// Mutex used to serialize persistence of control and form layout.
         /// </summary>
         Mutex _layoutMutex;
 
@@ -120,7 +120,7 @@ namespace Extract.Utilities.Forms
         /// <param name="form">The <see cref="Form"/> whose state is to be managed.</param>
         /// <param name="persistenceFileName">The name of the file to which form properties will be
         /// maintained.</param>
-        /// <param name="mutexName">Name for the mutex used to serialize persistance of the
+        /// <param name="mutexName">Name for the mutex used to serialize persistence of the
         /// control and form layout.</param>
         /// <param name="manageToolStrips">If <see langword="true"/>, the form's
         /// <see cref="ToolStrip"/> will be persisted.</param>
@@ -145,7 +145,7 @@ namespace Extract.Utilities.Forms
         /// <param name="form">The <see cref="Form"/> whose state is to be managed.</param>
         /// <param name="persistenceFileName">The name of the file to which form properties will be
         /// maintained.</param>
-        /// <param name="mutexName">Name for the mutex used to serialize persistance of the
+        /// <param name="mutexName">Name for the mutex used to serialize persistence of the
         /// control and form layout.</param>
         /// <param name="sandDockManager">If specified, this <see cref="SandDockManager"/>'s state
         /// info will be persisted.</param>
@@ -166,7 +166,7 @@ namespace Extract.Utilities.Forms
         /// <param name="form">The <see cref="Form"/> whose state is to be managed.</param>
         /// <param name="persistenceFileName">The name of the file to which form properties will be
         /// maintained.</param>
-        /// <param name="mutexName">Name for the mutex used to serialize persistance of the
+        /// <param name="mutexName">Name for the mutex used to serialize persistence of the
         /// control and form layout.</param>
         /// <param name="sandDockManager">If specified, this <see cref="SandDockManager"/>'s state
         /// info will be persisted.</param>
@@ -318,7 +318,11 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                // Synchronize access to persistance data [DNRCAU #???]
+                // Check user.config file for corruption and create backup when this gets destroyed
+				// https://extract.atlassian.net/browse/ISSUE-12830
+                UserConfigChecker.EnsureValidUserConfigFile();
+
+                // Synchronize access to persistence data [DNRCAU #???]
                 _layoutMutex.WaitOne();
 
                 // Convert the manage UI properties to XML
@@ -364,7 +368,7 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                // Synchronize access to persistance data [DNRCAU #???]
+                // Synchronize access to persistence data [DNRCAU #???]
                 _layoutMutex.WaitOne();
 
                 // Load form position info from file if it exists
@@ -406,6 +410,10 @@ namespace Extract.Utilities.Forms
         {
             try
             {
+                // Before restoring the state make sure the config is still valid
+				// https://extract.atlassian.net/browse/ISSUE-12830
+                UserConfigChecker.EnsureValidUserConfigFile();
+                
                 _updatingStateReferenceCount++;
 
                 _form.StartPosition = FormStartPosition.Manual;
@@ -671,7 +679,7 @@ namespace Extract.Utilities.Forms
                 }
             }
 
-            // Dispose of ummanaged resources
+            // Dispose of unmanaged resources
         }
 
         #endregion IDisposable Members
@@ -689,7 +697,7 @@ namespace Extract.Utilities.Forms
             {
                 // To force the form to display on top of the taskbar, make it TopMost. But
                 // immediately remove the TopMost property so that the user is able to alt-tab to
-                // other applicatons and have the managed form fall to the background.
+                // other applications and have the managed form fall to the background.
                 _form.TopMost = true;
                 _form.TopMost = false;
             }

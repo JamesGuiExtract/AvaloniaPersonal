@@ -2,12 +2,12 @@ using Extract.Licensing;
 using System;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Globalization;
 
 namespace Extract.Utilities
 {
@@ -430,6 +430,5 @@ namespace Extract.Utilities
                 throw ex.AsExtract("ELI34517");
             }
         }
-
     }
 }

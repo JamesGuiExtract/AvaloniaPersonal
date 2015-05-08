@@ -319,6 +319,27 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs"/> that contains
+        /// the event data.</param>
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            try
+            {
+                // Make sure the user.config file is in a good state
+				// https://extract.atlassian.net/browse/ISSUE-12830
+                UserConfigChecker.EnsureValidUserConfigFile();
+
+                base.OnClosing(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38211");
+            }
+        }
+
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>

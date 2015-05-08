@@ -66,6 +66,14 @@ namespace Extract.Utilities
         /// </summary>
         bool _constructed;
 
+        /// <summary>
+        /// This checks the user.config file to make sure it is not corrupt when each instance is  
+        /// created and when each instance is destroyed and if it is good makes a backup and if corrupted  
+        /// will replace with the backup if available otherwise the user.config file will be deleted
+        /// https://extract.atlassian.net/browse/ISSUE-12830
+        /// </summary>
+        UserConfigChecker _userConfigChecker = new UserConfigChecker();
+
         #endregion Fields
         
         #region Constructors
