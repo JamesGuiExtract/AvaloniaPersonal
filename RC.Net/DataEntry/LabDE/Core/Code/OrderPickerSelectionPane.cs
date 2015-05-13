@@ -87,7 +87,7 @@ namespace Extract.DataEntry.LabDE
             {
                 var disposableSource = _ordersDataGridView.DataSource as IDisposable;
 
-                _ordersDataGridView.DataSource = RowData.MatchingOrders.Copy();
+                _ordersDataGridView.DataSource = RowData.UnmappedMatchingOrders;
 
                 if (disposableSource != null)
                 {

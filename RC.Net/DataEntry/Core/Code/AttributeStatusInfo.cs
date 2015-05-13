@@ -1380,24 +1380,9 @@ namespace Extract.DataEntry
                         statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo, true);
                     }
 
-                    KeyValuePair<bool, SpatialString> existingModification;
-                    if (_attributesBeingModified.TryGetValue(attribute, out existingModification))
-                    {
-                        // If the attribute already exists in _attributesBeingModified, but is
-                        // marked as a non-spatial change, mark it as a spatial change instead.
-                        if (existingModification.Key == false)
-                        {
-                            _attributesBeingModified[attribute] =
-                                new KeyValuePair<bool, SpatialString>(
-                                    true, existingModification.Value);
-                        }
-                    }
-                    else
-                    {
-                        // If the attribute has not been added to _attributesBeingModified, add it.
-                        _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
-                            true, modifiedAttributeMemento.OriginalValue);
-                    }
+                    // Ensure there is a spatial change recorded for this attribute in
+                    //_attributesBeingModified.
+                    RecordSpatialChange(attribute, modifiedAttributeMemento.OriginalValue);
 
                     // After queuing the modification, call EndEdit if directed.
                     if (endOfEdit)
@@ -2788,9 +2773,11 @@ namespace Extract.DataEntry
 
                 bool spatialInfoRemoved = false;
 
+                var modifiedAttributeMemento = new DataEntryModifiedAttributeMemento(attribute);
+
                 // AddMemento needs to be called before changing the value so that the
                 // DataEntryModifiedAttributeMemento knows of the attribute's original value.
-                _undoManager.AddMemento(new DataEntryModifiedAttributeMemento(attribute));
+                _undoManager.AddMemento(modifiedAttributeMemento);
 
                 // Removing spatial info will not trigger an EndEdit call to separate this as an
                 // independent operation but it should considered one.
@@ -2821,6 +2808,10 @@ namespace Extract.DataEntry
 
                     // Notify listeners that spatial info has changed.
                     statusInfo.OnAttributeValueModified(attribute, true, false, true);
+
+                    // Ensure there is a spatial change recorded for this attribute in
+                    //_attributesBeingModified.
+                    RecordSpatialChange(attribute, modifiedAttributeMemento.OriginalValue);
                 }
 
                 return spatialInfoRemoved;
@@ -3528,6 +3519,34 @@ namespace Extract.DataEntry
                 AttributeStatusInfo statusInfo = GetStatusInfo(modifiedAttribute.Key);
                 statusInfo.OnAttributeValueModified(modifiedAttribute.Key, false, false,
                     modifiedAttribute.Value.Key);
+            }
+        }
+
+        /// <summary>
+        /// Ensures there is a spatial change in <see cref="_attributesBeingModified"/> for the
+        /// specified <see paramref="attribute"/>.
+        /// </summary>
+        /// <param name="attribute">The attribute that has been modified spatially.</param>
+        /// <param name="originalValue">The original value of <see paramref="attribute"/>.</param>
+        static void RecordSpatialChange(IAttribute attribute, SpatialString originalValue)
+        {
+            KeyValuePair<bool, SpatialString> existingModification;
+            if (_attributesBeingModified.TryGetValue(attribute, out existingModification))
+            {
+                // If the attribute already exists in _attributesBeingModified, but is
+                // marked as a non-spatial change, mark it as a spatial change instead.
+                if (existingModification.Key == false)
+                {
+                    _attributesBeingModified[attribute] =
+                        new KeyValuePair<bool, SpatialString>(
+                            true, existingModification.Value);
+                }
+            }
+            else
+            {
+                // If the attribute has not been added to _attributesBeingModified, add it.
+                _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
+                    true, originalValue);
             }
         }
 

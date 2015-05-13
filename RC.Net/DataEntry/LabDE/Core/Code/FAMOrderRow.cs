@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
+using System.Linq;
 using UCLID_AFCORELib;
 
 namespace Extract.DataEntry.LabDE
@@ -25,6 +28,12 @@ namespace Extract.DataEntry.LabDE
         /// LabDE order.
         /// </summary>
         IAttribute _orderCodeAttribute;
+
+        /// <summary>
+        /// The <see cref="IAttribute"/> currently representing the order number associated with the
+        /// LabDE order.
+        /// </summary>
+        IAttribute _orderNumberAttribute;
 
         /// <summary>
         /// A comma delimited list to cache the potentially matching order numbers for the current
@@ -76,7 +85,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Raised to indicate data associated with this instance has changed.
         /// </summary>
-        public event EventHandler<EventArgs> DataUpdated;
+        public event EventHandler<RowDataUpdatedArgs> RowDataUpdated;
 
         #endregion Events
 
@@ -138,7 +147,7 @@ namespace Extract.DataEntry.LabDE
                             statusInfo.AttributeDeleted += Handle_AttributeDeleted;
                         }
 
-                        ClearCachedData();
+                        ClearCachedData(true);
                         // If the FAMData instance is updating this property, it knows of the
                         // changing data (it is in the process of querying row data). No need to
                         // raise DataUpdated.
@@ -147,6 +156,69 @@ namespace Extract.DataEntry.LabDE
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI38158");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IAttribute"/> representing this order in LabDE
+        /// </summary>
+        /// <value>
+        /// The <see cref="IAttribute"/> representing this order in LabDE.
+        /// </value>
+        public IAttribute OrderAttribute
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IAttribute"/> currently representing the order number
+        /// associated with the LabDE order.
+        /// </summary>
+        /// <value>
+        /// The <see cref="IAttribute"/> currently representing the order number associated with the
+        /// LabDE order.
+        /// </value>
+        public IAttribute OrderNumberAttribute
+        {
+            get
+            {
+                return _orderNumberAttribute;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _orderNumberAttribute)
+                    {
+                        if (_orderNumberAttribute != null)
+                        {
+                            var statusInfo = AttributeStatusInfo.GetStatusInfo(_orderNumberAttribute);
+                            statusInfo.AttributeValueModified -= Handle_AttributeValueModified;
+                            statusInfo.AttributeDeleted -= Handle_AttributeDeleted;
+                        }
+
+                        _orderNumberAttribute = value;
+
+                        if (value != null)
+                        {
+                            var statusInfo = AttributeStatusInfo.GetStatusInfo(value);
+                            statusInfo.AttributeValueModified += Handle_AttributeValueModified;
+                            statusInfo.AttributeDeleted += Handle_AttributeDeleted;
+                        }
+
+                        // Changes to the order number don't require the database to be re-queried.
+                        ClearCachedData(false);
+                        // If the FAMData instance is updating this property, it knows of the
+                        // changing data (it is in the process of querying row data). No need to
+                        // raise DataUpdated.
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38232");
                 }
             }
         }
@@ -188,7 +260,7 @@ namespace Extract.DataEntry.LabDE
                             statusInfo.AttributeDeleted += Handle_AttributeDeleted;
                         }
 
-                        ClearCachedData();
+                        ClearCachedData(true);
                         // If the FAMData instance is updating this property, it knows of the
                         // changing data (it is in the process of querying row data). No need to
                         // raise DataUpdated.
@@ -237,6 +309,26 @@ namespace Extract.DataEntry.LabDE
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI38161");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the order number associated with the LabDE order.
+        /// </summary>
+        public string OrderNumber
+        {
+            get
+            {
+                try
+                {
+                    return (OrderNumberAttribute != null)
+                            ? OrderNumberAttribute.Value.String
+                            : "";
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38234");
                 }
             }
         }
@@ -292,6 +384,48 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
+        /// Gets the matching orders that haven't already been mapped to another
+        /// <see cref="FAMOrderRow"/>.
+        /// </summary>
+        /// <returns>A <see cref="DataView"/> representing matching orders that haven't already been
+        /// mapped to another <see cref="FAMOrderRow"/>.</returns>
+        public DataView UnmappedMatchingOrders
+        {
+            get
+            {
+                try
+                {
+                    // Put the unmapped orders in to a string list excluding this row's currently
+                    // mapped order number. (order numbers will be quoted for SQL).
+                    string otherAlreadyMappedOrders = string.Join(",",
+                        FAMData.AlreadyMappedOrderNumbers
+                            .Except(new[] { "'" + OrderNumber + "'" }, 
+                                StringComparer.OrdinalIgnoreCase));
+
+                    // If there are any already mapped orders to be excluded, add a row filter for
+                    // the view.
+                    DataView unmappedOrdersView = new DataView(MatchingOrders);
+                    if (!string.IsNullOrWhiteSpace(otherAlreadyMappedOrders))
+                    {
+                        string orderNumberColumnName = (string)FAMData.OrderQueryColumns
+                            .OfType<DictionaryEntry>()
+                            .First()
+                            .Key;
+
+                        unmappedOrdersView.RowFilter = string.Format(CultureInfo.InvariantCulture,
+                            "[{0}] NOT IN ({1})", orderNumberColumnName, otherAlreadyMappedOrders);
+                    }
+
+                    return unmappedOrdersView;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38233");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets a <see cref="Color"/> indicating the availability of matching FAM DB orders for the
         /// current LabDE order.
         /// </summary>
@@ -337,17 +471,25 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Clears all data currently cached to force it to be re-retrieved from the FAM DB next
-        /// time it is needed.
+        /// Clears all data currently cached to force it to be re-retrieved next time it is needed.
         /// </summary>
-        public void ClearCachedData()
+        /// <param name="clearDatabaseData"><see langword="true"/> to clear data cached from the
+        /// database; <see langword="false"/> to clear only data obtained from the UI.</param>
+        public void ClearCachedData(bool clearDatabaseData)
         {
-            if (_matchingOrders != null)
+            if (clearDatabaseData)
             {
-                _matchingOrders.Dispose();
-                _matchingOrders = null;
+                if (_matchingOrders != null)
+                {
+                    _matchingOrders.Dispose();
+                    _matchingOrders = null;
+                }
+
+                _matchingOrderIds = null;
             }
-            _matchingOrderIds = null;
+
+            // Status color depends both on DB and UI data... it must be cleared for all calls into
+            // ClearCachedData.
             _statusColor = null;
         }
 
@@ -403,8 +545,7 @@ namespace Extract.DataEntry.LabDE
             {
                 if (!e.IncrementalUpdate)
                 {
-                    ClearCachedData();
-                    OnDataUpdated();
+                    OnRowDataUpdated(e.Attribute == OrderNumberAttribute);
                 }
             }
             catch (Exception ex)
@@ -425,6 +566,10 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
+                var statusInfo = AttributeStatusInfo.GetStatusInfo(e.DeletedAttribute);
+                statusInfo.AttributeValueModified -= Handle_AttributeValueModified;
+                statusInfo.AttributeDeleted -= Handle_AttributeDeleted;
+
                 if (e.DeletedAttribute == PatientMRNAttribute)
                 {
                     PatientMRNAttribute = null;
@@ -434,8 +579,7 @@ namespace Extract.DataEntry.LabDE
                     OrderCodeAttribute = null;
                 }
 
-                ClearCachedData();
-                OnDataUpdated();
+                OnRowDataUpdated(e.DeletedAttribute == OrderNumberAttribute);
             }
             catch (Exception ex)
             {
@@ -446,13 +590,15 @@ namespace Extract.DataEntry.LabDE
         #region Private Members
 
         /// <summary>
-        /// Raises the <see cref="DataUpdated"/> event.
+        /// Raises the <see cref="RowDataUpdated"/> event.
         /// </summary>
-        void OnDataUpdated()
+        /// <param name="orderNumberUpdated"><see langword="true"/> if the order number has been
+        /// changed; otherwise, <see langword="false"/>.</param>
+        void OnRowDataUpdated(bool orderNumberUpdated)
         {
-            if (DataUpdated != null)
+            if (RowDataUpdated != null)
             {
-                DataUpdated(this, new EventArgs());
+                RowDataUpdated(this, new RowDataUpdatedArgs(this, orderNumberUpdated));
             }
         }
 

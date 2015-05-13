@@ -13,6 +13,7 @@ using System.Drawing.Design;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry.LabDE
@@ -56,6 +57,12 @@ namespace Extract.DataEntry.LabDE
         /// Provides access to the outstanding order data in the FAM database.
         /// </summary>
         FAMData _famData;
+
+        /// <summary>
+        /// Indicates whether there is a pending request to invalidate the column (to force a
+        /// re-paint).
+        /// </summary>
+        bool _pendingInvalidate;
 
         /// <summary>
         /// Specifies whether the current instance is running in design mode
@@ -473,14 +480,15 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Clears all data currently cached to force it to be re-retrieved from the FAM DB next
-        /// time it is needed.
+        /// Clears all data currently cached to force it to be re-retrieved next time it is needed.
         /// </summary>
-        public void ClearCachedData()
+        /// <param name="clearDatabaseData"><see langword="true"/> to clear data cached from the
+        /// database; <see langword="false"/> to clear only data obtained from the UI.</param>
+        public void ClearCachedData(bool clearDatabaseData)
         {
             try
             {
-                FAMData.ClearCachedData();
+                FAMData.ClearCachedData(clearDatabaseData);
             }
             catch (Exception ex)
             {
@@ -573,7 +581,6 @@ namespace Extract.DataEntry.LabDE
                 if (_famData != null)
                 {
                     _famData.RowDataUpdated -= HandleFamData_RowDataUpdated;
-                    _famData.OrderAttributeValueModified -= HandleFamData_OrderAttributeValueModified;
                     _famData.Dispose();
                     _famData = null;
                 }
@@ -620,7 +627,14 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                e.PaintBackground(e.CellBounds, false);
+                if (DataEntryControlHost != null && DataEntryControlHost.UpdateInProgress)
+                {
+                    // If the UI data is currently being updated, postpone the paint until the
+                    // update is complete to prevent unnecessary cache thrashing and DB hits.
+                    _pendingInvalidate = true;
+                    e.Handled = true;
+                    return;
+                }
 
                 // Paint the with the appropriate status color.
                 if (e.RowIndex >= 0 && e.ColumnIndex == Index)
@@ -628,9 +642,23 @@ namespace Extract.DataEntry.LabDE
                     var dataEntryRow = DataGridView.Rows[e.RowIndex] as DataEntryTableRow;
                     if (dataEntryRow != null)
                     {
-                        FAMOrderRow rowData = FAMData.GetRowData(dataEntryRow);
-                        if (rowData != null && rowData.StatusColor.HasValue)
+                        // If this appears to be first row data is being loaded for, load the data
+                        // for all rows right now. This is needed for
+                        // FAMData.AlreadyMappedOrderNumbers to be able to correctly reflect all
+                        // rows whether or not they are currently visible.
+                        if (!FAMData.HasRowData)
                         {
+                            LoadDataForAllRows();
+                        }
+
+                        var orderNumberCell = dataEntryRow.Cells[_orderNumberColumn.Index];
+                        var orderNumber = orderNumberCell.Value.ToString();
+                        FAMOrderRow rowData = FAMData.GetRowData(dataEntryRow);
+                        if (string.IsNullOrWhiteSpace(orderNumber) &&
+                            rowData != null && rowData.StatusColor.HasValue)
+                        {
+                            e.PaintBackground(e.CellBounds, false);
+
                             // By making the brush color be translucent, some of the original button
                             // shading shows through giving a more polished appearance than a flat
                             // color.
@@ -722,6 +750,10 @@ namespace Extract.DataEntry.LabDE
                         FAMData.DeleteRow(dataEntryRow);
                     }
                 }
+                else if (e.Action == CollectionChangeAction.Refresh)
+                {
+                    FAMData.ResetRowData();
+                }
             }
             catch (Exception ex)
             {
@@ -745,7 +777,32 @@ namespace Extract.DataEntry.LabDE
                     var cell = row.Cells[Index];
                     if (cell != null && cell.DataGridView == DataGridView)
                     {
-                        DataGridView.InvalidateCell(cell);
+                        ClearCachedData(false);
+
+                        // If the order number has changed, update the tooltip text for the order
+                        // number and picker cells to be a summary of the currently selected order.
+                        if (e.OrderNumberUpdated)
+                        {
+                            var dataEntryTable = DataGridView as DataEntryTableBase;
+                            if (dataEntryTable != null)
+                            {
+                                IAttribute orderNumberAttribute = e.FAMOrderRow.OrderNumberAttribute;
+                                IDataEntryTableCell orderCell =
+                                    dataEntryTable.GetAttributeUIElement(orderNumberAttribute)
+                                        as IDataEntryTableCell;
+                                if (orderCell != null)
+                                {
+                                    DataGridViewCell pickerButtonCell =
+                                        orderCell.AsDataGridViewCell.OwningRow.Cells[Index];
+                                    string orderDescription =
+                                        FAMData.GetOrderDescription(e.FAMOrderRow.OrderNumber);
+                                    orderCell.AsDataGridViewCell.ToolTipText = orderDescription;
+                                    pickerButtonCell.ToolTipText = orderDescription;
+                                }
+                            }
+                        }
+
+                        InvokeInvalidate();
                     }
                 }
             }
@@ -757,34 +814,29 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Handles the <see cref="E:FAMData.OrderAttributeValueModified"/> event of the
-        /// <see cref="FAMData"/>.
+        /// Handles the <see cref="E:DataEntryControlHost.UpdateEnded"/> event of
+        /// <see cref="DataEntryControlHost"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Extract.DataEntry.AttributeValueModifiedEventArgs"/>
-        /// instance containing the event data.</param>
-        void HandleFamData_OrderAttributeValueModified(object sender, AttributeValueModifiedEventArgs e)
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleDataEntryControlHost_UpdateEnded(object sender, EventArgs e)
         {
             try
             {
-                var dataEntryTable = DataGridView as DataEntryTableBase;
-                if (dataEntryTable != null)
+                // At the end of an update, if a paint was postponed, invoke an invalidate now.
+                if (_pendingInvalidate)
                 {
-                    // Update the tooltip text for both the order number and picker cells of the row
-                    // affected by the change to display a text summary of the currently selected
-                    // order.
-                    IDataEntryTableCell orderCell =
-                        dataEntryTable.GetAttributeUIElement(e.Attribute) as IDataEntryTableCell;
-                    DataGridViewCell pickerButtonCell =
-                        orderCell.AsDataGridViewCell.OwningRow.Cells[Index];
-                    string orderDescription = FAMData.GetOrderDescription(e.Attribute.Value.String);
-                    orderCell.AsDataGridViewCell.ToolTipText = orderDescription;
-                    pickerButtonCell.ToolTipText = orderDescription;
+                    // Set _pendingInvalidate first since it will be used as a flag in
+                    // InvokeInvalidate to ensure multiple invalidates are not invoked at the same
+                    // time.
+                    _pendingInvalidate = false;
+                    InvokeInvalidate();
                 }
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38169");
+                ex.ExtractDisplay("ELI38230");
             }
         }
 
@@ -802,9 +854,10 @@ namespace Extract.DataEntry.LabDE
                 if (_dataEntryControlHost == null)
                 {
                     var dataEntryTable = DataGridView as DataEntryTableBase;
-                    if (dataEntryTable != null)
+                    if (dataEntryTable != null && dataEntryTable.DataEntryControlHost != null)
                     {
                         _dataEntryControlHost = dataEntryTable.DataEntryControlHost;
+                        _dataEntryControlHost.UpdateEnded += HandleDataEntryControlHost_UpdateEnded;
                     }
                 }
                 return _dataEntryControlHost;
@@ -836,7 +889,6 @@ namespace Extract.DataEntry.LabDE
                 {
                     _famData = new FAMData(FileProcessingDB);
                     _famData.RowDataUpdated += HandleFamData_RowDataUpdated;
-                    _famData.OrderAttributeValueModified += HandleFamData_OrderAttributeValueModified;
                 }
 
                 _famData.FileProcessingDB = FileProcessingDB;
@@ -890,6 +942,34 @@ namespace Extract.DataEntry.LabDE
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Invoke an invalidate call to occur after any current UI events are complete.
+        /// </summary>
+        void InvokeInvalidate()
+        {
+            // Don't invoke the invalidate multiple times (multiple rows may all trigger this call
+            // in response to the same UI event).
+            if (!_pendingInvalidate && DataEntryControlHost != null)
+            {
+                if (DataEntryControlHost.UpdateInProgress)
+                {
+                    // Postpone until the current update is complete.
+                    _pendingInvalidate = true;
+                }
+                else
+                {
+                    // Prevent simultaneous invokes of invalidate.
+                    _pendingInvalidate = true;
+
+                    DataEntryControlHost.ExecuteOnIdle("ELI38231", () => 
+                    {
+                        _pendingInvalidate = false;
+                        DataGridView.InvalidateColumn(Index);
+                    });
+                }
+            }
         }
 
         /// <summary>

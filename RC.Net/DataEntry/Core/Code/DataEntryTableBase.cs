@@ -2145,9 +2145,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                var ee = new ExtractException("ELI37290", "Attribute not mapped to table element");
-                ee.AddDebugData("AttributeName", attribute.Name, false);
-                throw ee;
+                return null;
             }
             catch (Exception ex)
             {
@@ -2776,6 +2774,11 @@ namespace Extract.DataEntry
                         clearedAttributes.Add(dataEntryCell.Attribute);
                     }
                 }
+
+                // While AttributeStatusInfo.SetValue() is called as a consequence of the
+                // cell.Value = "" call above, it will register only as an incremental change that
+                // will not trigger query execution. This call should constitute an end-of-edit.
+                AttributeStatusInfo.EndEdit();
 
                 // As long as spatial info was removed for at least one attribute,
                 // refresh those attributes.

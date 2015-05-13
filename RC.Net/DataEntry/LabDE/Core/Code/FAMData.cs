@@ -9,6 +9,7 @@ using System.Data.OleDb;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using UCLID_AFCORELib;
 using UCLID_FILEPROCESSINGLib;
 
@@ -111,6 +112,11 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         DataCache<string, OrderInfo> _orderInfoCache = new DataCache<string, OrderInfo>(100, null);
 
+        /// <summary>
+        /// A single-quoted list of order numbers that are currently assigned in the UI.
+        /// </summary>
+        List<string> _alreadyMappedOrderNumbers = null;
+
         #endregion Fields
 
         #region Constructors
@@ -142,10 +148,10 @@ namespace Extract.DataEntry.LabDE
                 OrderQueryColumns.Add("Collection date/time", "[LabDEOrderFile].[CollectionDate]");
 
                 ColorQueryConditions = new OrderedDictionary();
-                ColorQueryConditions.Add("Lime", "COUNT([OrderNumber]) = 1 + COUNT(CASE WHEN ([OrderStatus] <> 'A' OR [FileCount] > 0) THEN 1 END)");
-                ColorQueryConditions.Add("Yellow", "COUNT([OrderNumber]) > 1 + COUNT(CASE WHEN ([OrderStatus] <> 'A' OR [FileCount] > 0) THEN 1 END)");
-                ColorQueryConditions.Add("Cyan", "COUNT([OrderNumber]) > 0");
-                ColorQueryConditions.Add("Red", "COUNT([OrderNumber]) = 0");
+                ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END) = 1");
+                ColorQueryConditions.Add("Red", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) = 0");
+                ColorQueryConditions.Add("Yellow", "COUNT(CASE WHEN ([OrderStatus] = 'A' OR [OrderStatus] = '*') THEN 1 END) > 1");
+                ColorQueryConditions.Add("Cyan", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) > 0"); 
 
                 AttributeStatusInfo.DataReset += HandleAttributeStatusInfo_DataReset;
             }
@@ -163,11 +169,6 @@ namespace Extract.DataEntry.LabDE
         /// Raised to indicate data associated with one of the table rows being managed has changed.
         /// </summary>
         public event EventHandler<RowDataUpdatedArgs> RowDataUpdated;
-
-        /// <summary>
-        /// Raised to indicate the value of an OrderNumber attribute has changed.
-        /// </summary>
-        public event EventHandler<AttributeValueModifiedEventArgs> OrderAttributeValueModified;
 
         #endregion Events
 
@@ -293,6 +294,21 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
+        /// Gets a value indicating whether this instance currently has any
+        /// <see cref="FAMOrderRow"/> instances.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance has any
+        /// <see cref="FAMOrderRow"/> instance; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool HasRowData
+        {
+            get
+            {
+                return (_rowData.Count > 0);
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the different possible status colors for the buttons and their SQL query
         /// conditions. The keys are the color name (from <see cref="System.Drawing.Color"/>) while
         /// the values are SQL query expression that evaluates to true if the color should be used
@@ -314,6 +330,26 @@ namespace Extract.DataEntry.LabDE
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets a single-quoted list of order numbers that are currently assigned in the UI.
+        /// </summary>
+        public List<string> AlreadyMappedOrderNumbers
+        {
+            get
+            {
+                if (_alreadyMappedOrderNumbers == null)
+                {
+                    _alreadyMappedOrderNumbers = _rowData.Keys
+                        .Select(row => GetAttribute(row.Attribute, OrderNumberAttribute).Value.String)
+                        .Where(orderNumber => !string.IsNullOrWhiteSpace(orderNumber))
+                        .Select(orderNumber => "'" + orderNumber + "'")
+                        .ToList();
+                }
+
+                return _alreadyMappedOrderNumbers;
+            }
         }
 
         /// <summary>
@@ -352,6 +388,73 @@ namespace Extract.DataEntry.LabDE
 	        {
 		        throw ex.AsExtract("ELI38176");
 	        }
+        }
+
+        /// <summary>
+        /// Gets data all other order rows that match the criteria used for identifying potential
+        /// matching orders in the database that have not already been mapped to an order number.
+        /// </summary>
+        /// <param name="order">The <see cref="FAMOrderRow"/> for which matching order rows are
+        /// needed.
+        /// </param>
+        /// <returns>SQL queries that will select the data for the order rows into a result set that
+        /// can be joined with data for potentially matching orders in the LabDEOrder database table.
+        /// </returns>
+        List<string> GetMatchingUnmappedOrderRows(FAMOrderRow order)
+        {
+            List<string> unmappedOrders = new List<string>();
+
+            int tempID = 0;
+
+            // If this orders is missing and MRN or OrderCode, it is not possible to match to other
+            // orders.
+            if (string.IsNullOrWhiteSpace(order.OrderCode) ||
+                string.IsNullOrWhiteSpace(order.PatientMRN))
+            {
+                return unmappedOrders;
+            }
+
+            // Loop through all other order attributes
+            foreach (FAMOrderRow otherOrder in _rowData.Values.Except(new[] {order}))
+            {
+                // For each matching but unmapped row.
+                if (otherOrder.PatientMRN.Equals(order.PatientMRN, StringComparison.OrdinalIgnoreCase) &&
+                    otherOrder.OrderCode.Equals(order.OrderCode, StringComparison.OrdinalIgnoreCase) &&
+                    string.IsNullOrWhiteSpace(otherOrder.OrderNumber))
+                {
+                    // Generate an SQL statement that can select data from the UI into query results
+                    // that can be combined with actual UI data.
+                    StringBuilder unmappedOrder = new StringBuilder();
+                    unmappedOrder.Append("SELECT '' AS [OrderNumber], ");
+
+                    unmappedOrder.Append("'");
+                    unmappedOrder.Append(order.OrderCode);
+                    unmappedOrder.Append("'");
+                    unmappedOrder.Append(" AS [OrderCode], ");
+
+                    unmappedOrder.Append("'");                    
+                    unmappedOrder.Append(order.PatientMRN);
+                    unmappedOrder.Append("'"); 
+                    unmappedOrder.Append(" AS [PatientMRN], ");
+
+                    unmappedOrder.Append("GETDATE() AS [ReceivedDateTime], ");
+
+                    unmappedOrder.Append("'*' AS [OrderStatus], ");
+
+                    unmappedOrder.Append("GETDATE() AS [ReferenceDateTime], ");
+
+                    unmappedOrder.Append("'' AS [ORMMessage], ");
+
+                    // TempID is a special column used to prevent these rows from being grouped in
+                    // the context of GetOrdersStatusColor's DB query.
+                    unmappedOrder.Append(tempID++.ToString(CultureInfo.InvariantCulture));
+                    unmappedOrder.AppendLine(" AS [TempID]");
+
+                    unmappedOrders.Add(unmappedOrder.ToString());
+                }
+            }
+
+            return unmappedOrders;
         }
 
         /// <summary>
@@ -474,21 +577,40 @@ namespace Extract.DataEntry.LabDE
                     .Select(column =>
                         "CASE WHEN (" + column.Value + ") THEN 1 ELSE 0 END AS [" + column.Key + "]"));
 
-            // Aggregate the data returned by a query for potentially matching orders into fields
-            // accessible to the ColorQueryConditions.
-            string orderDataQuery = 
-                "SELECT [LabDEOrder].[OrderNumber], \r\n" +
-                "MAX([LabDEOrder].[OrderStatus]) AS [OrderStatus], \r\n" +
+            // Queries to select data all other order rows that would match to the same LabDEOrder
+            // table rows.
+            List<string> unmappedOrders = GetMatchingUnmappedOrderRows(order);
+
+            // Aggregate the data returned by a query for potentially matching orders (including
+            // unmapped orders currently in the UI into fields accessible to the ColorQueryConditions.
+            string orderDataQuery =
+                "SELECT [CombinedOrders].[OrderNumber], \r\n" +
+                "MAX([CombinedOrders].[OrderStatus]) AS [OrderStatus], \r\n" +
                 "COUNT([LabDEOrderFile].[FileID]) AS [FileCount], \r\n" +
-                "MAX([LabDEOrder].[ReceivedDateTime]) AS [ReceivedDateTime], \r\n" +
-                "MAX([LabDEOrder].[ReferenceDateTime]) AS [ReferenceDateTime] \r\n" +
-                "FROM [LabDEOrder] \r\n" +
-                "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] \r\n" +
-                "WHERE [LabDEOrder].[OrderNumber] IN (\r\n" +
+                "MAX([CombinedOrders].[ReceivedDateTime]) AS [ReceivedDateTime], \r\n" +
+                "MAX([CombinedOrders].[ReferenceDateTime]) AS [ReferenceDateTime] \r\n" +
+                "FROM ( \r\n" +
+                // TempID is a special column used to prevent these matching unmapped rows from
+                // being grouped together.
+                "SELECT *, NULL AS [TempID] FROM [LabDEOrder] \r\n" +
+                (unmappedOrders.Any()
+                    ? "UNION ALL\r\n" + string.Join("\r\nUNION ALL\r\n", unmappedOrders)
+                    : "") +
+                ") AS [CombinedOrders]\r\n" +
+                "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [CombinedOrders].[OrderNumber] \r\n" +
+                "WHERE OrderStatus = '*'\r\n" +
+                "OR\r\n" +
+                "(\r\n" +
+                "[CombinedOrders].[OrderNumber] IN (" +
                     ((order.MatchingOrderIDs != null) 
                         ? order.MatchingOrderIDs
-                        : "SELECT [OrderNumber] FROM @OrderNumbers") + "\r\n)" +
-                "GROUP BY [LabDEOrder].[OrderNumber]";
+                        : "SELECT [OrderNumber] FROM @OrderNumbers") + ")\r\n" +
+                (AlreadyMappedOrderNumbers.Any()
+                    ? "AND ([CombinedOrders].[OrderNumber] NOT IN (" + string.Join(",", AlreadyMappedOrderNumbers) + "))\r\n"
+                    : "") +
+                ")" +
+                // Group by TempID as well so that all matching orders from the UI end up as separate rows.
+                "GROUP BY [CombinedOrders].[OrderNumber], [CombinedOrders].[TempID]";
 
             string colorQuery = declarationsClause + "\r\n" +
                 "SELECT " + columnsClause + " FROM (\r\n" + orderDataQuery + "\r\n) AS [OrderData]";
@@ -543,17 +665,16 @@ namespace Extract.DataEntry.LabDE
                 }
 
                 // Create a new FAMOrderRow instance if one does not already exist for this row.
+                bool newRow = false;
                 FAMOrderRow rowData = null;
                 if (!_rowData.TryGetValue(dataEntryRow, out rowData))
                 {
+                    newRow = true;
                     rowData = new FAMOrderRow(this, dataEntryRow);
                     _rowData[dataEntryRow] = rowData;
-
-                    rowData.DataUpdated += HandleRowData_DataUpdated;
-
-                    // Register to track changes to the order number attribute's value for the purpose
-                    // of raising OrderAttributeValueModified when appropriate.
-                    TrackOrderAttribute(dataEntryRow);
+                    
+                    rowData.OrderAttribute = dataEntryRow.Attribute;
+                    rowData.RowDataUpdated += HandleRowData_DataUpdated;
                 }
 
                 // Provide rowData instance with access to the attributes that currently represent
@@ -562,6 +683,15 @@ namespace Extract.DataEntry.LabDE
                     GetAttribute(dataEntryRow.Attribute, PatientMRNAttribute);
                 rowData.OrderCodeAttribute =
                     GetAttribute(dataEntryRow.Attribute, OrderCodeAttribute);
+                rowData.OrderNumberAttribute =
+                    GetAttribute(dataEntryRow.Attribute, OrderNumberAttribute);
+
+                if (newRow)
+                {
+                    // After initially creating a new FAMOrderRow, raise OnRowDataUpdated so the
+                    // order picker column will know of the order number's initial value.
+                    OnRowDataUpdated(new RowDataUpdatedArgs(rowData, true));
+                }
                 
                 return rowData;
             }
@@ -644,15 +774,35 @@ namespace Extract.DataEntry.LabDE
                 FAMOrderRow rowData = null;
                 if (_rowData.TryGetValue(dataEntryRow, out rowData))
                 {
-                    rowData.DataUpdated -= HandleRowData_DataUpdated;
+                    rowData.RowDataUpdated -= HandleRowData_DataUpdated;
                     rowData.Dispose();
                     _rowData.Remove(dataEntryRow);
                 }
+
+                ClearCachedData(true);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38154");
             }
+        }
+
+        /// <summary>
+        /// Resets the row data.
+        /// </summary>
+        public void ResetRowData()
+        {
+            var deletedRows = _rowData.ToArray();
+            _rowData.Clear();
+
+            foreach (var row in deletedRows)
+            {
+                _rowData.Remove(row.Key);
+                row.Value.RowDataUpdated -= HandleRowData_DataUpdated;
+                row.Value.Dispose();
+            }
+
+            ClearCachedData(true);
         }
 
         /// <summary>
@@ -746,17 +896,25 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Clears all data currently cached to force it to be re-retrieved from the FAM DB next
-        /// time it is needed.
+        /// Clears all data currently cached to force it to be re-retrieved next time it is needed.
         /// </summary>
-        public void ClearCachedData()
+        /// <param name="clearDatabaseData"><see langword="true"/> to clear data cached from the
+        /// database; <see langword="false"/> to clear only data obtained from the UI.</param>
+        public void ClearCachedData(bool clearDatabaseData)
         {
             try
             {
-                _orderInfoCache.Clear();
+                if (clearDatabaseData)
+                {
+                    _orderInfoCache.Clear();
+                }
+
+                // _alreadyMappedOrderNumbers is generated from date in the UI, not the DB.
+                _alreadyMappedOrderNumbers = null;
+
                 foreach (FAMOrderRow row in _rowData.Values)
                 {
-                    row.ClearCachedData();
+                    row.ClearCachedData(clearDatabaseData);
                 }
             }
             catch (Exception ex)
@@ -808,65 +966,22 @@ namespace Extract.DataEntry.LabDE
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="FAMOrderRow.DataUpdated"/> event of one of the
+        /// Handles the <see cref="FAMOrderRow.RowDataUpdated"/> event of one of the
         /// <see cref="FAMOrderRow"/>s from <see cref="_rowData"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleRowData_DataUpdated(object sender, EventArgs e)
+        void HandleRowData_DataUpdated(object sender, RowDataUpdatedArgs e)
         {
             try
             {
-                OnRowDataUpdated((FAMOrderRow)sender);
+                OnRowDataUpdated(e);
             }
             catch (Exception ex)
             {
                 // Throw here since we know this event is triggered by our own UI event handler.
                 throw ex.AsExtract("ELI38155");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="AttributeStatusInfo.AttributeValueModified"/> event for an order
-        /// number attribute.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Extract.DataEntry.AttributeValueModifiedEventArgs"/>
-        /// instance containing the event data.</param>
-        public void Handle_AttributeValueModified(object sender, AttributeValueModifiedEventArgs e)
-        {
-            try
-            {
-                if (!e.IncrementalUpdate)
-                {
-                    OnOrderAttributeValueModified(e);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38167");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="AttributeStatusInfo.AttributeValueModified"/> event for an order
-        /// number attribute.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Extract.DataEntry.AttributeValueModifiedEventArgs"/>
-        /// instance containing the event data.</param>
-        public void Handle_AttributeDeleted(object sender, AttributeDeletedEventArgs e)
-        {
-            try
-            {
-                var statusInfo = AttributeStatusInfo.GetStatusInfo(e.DeletedAttribute);
-                statusInfo.AttributeValueModified -= Handle_AttributeValueModified;
-                statusInfo.AttributeDeleted -= Handle_AttributeDeleted;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38168");
             }
         }
 
@@ -1007,51 +1122,14 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Registers to track changes to the order number attribute's value for the purpose
-        /// of raising OrderAttributeValueModified when appropriate.
-        /// </summary>
-        /// <param name="dataEntryRow">The <see cref="DataEntryTableRow"/> for which attribute value
-        /// changes should be tracked.</param>
-        void TrackOrderAttribute(DataEntryTableRow dataEntryRow)
-        {
-            IAttribute orderNumberAttribute =
-                GetAttribute(dataEntryRow.Attribute, OrderNumberAttribute);
-            if (orderNumberAttribute != null)
-            {
-                var statusInfo = AttributeStatusInfo.GetStatusInfo(orderNumberAttribute);
-                statusInfo.AttributeValueModified += Handle_AttributeValueModified;
-                statusInfo.AttributeDeleted += Handle_AttributeDeleted;
-
-                // When initially registering to track an attribute, raise
-                // OrderAttributeValueModified right away. (In this case, the order picker column
-                // will not otherwise know of the order number's initial value).
-                var eventArgs = new AttributeValueModifiedEventArgs(
-                    orderNumberAttribute, false, false, false);
-                OnOrderAttributeValueModified(eventArgs);
-            }
-        }
-
-        /// <summary>
         /// Raises the <see cref="RowDataUpdated"/> event.
         /// </summary>
-        /// <param name="orderRow"></param>
-        void OnRowDataUpdated(FAMOrderRow orderRow)
+        /// <param name="e">The <see cref="RowDataUpdatedArgs"/> representing this event.</param>
+        void OnRowDataUpdated(RowDataUpdatedArgs e)
         {
             if (RowDataUpdated != null)
             {
-                RowDataUpdated(this, new RowDataUpdatedArgs(orderRow));
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="OrderAttributeValueModified"/> event.
-        /// </summary>
-        /// <param name="eventArgs"></param>
-        void OnOrderAttributeValueModified(AttributeValueModifiedEventArgs eventArgs)
-        {
-            if (OrderAttributeValueModified != null)
-            {
-                OrderAttributeValueModified(this, eventArgs);
+                RowDataUpdated(this, e);
             }
         }
 
@@ -1068,16 +1146,30 @@ namespace Extract.DataEntry.LabDE
         /// Initializes a new instance of the <see cref="RowDataUpdatedArgs"/> class.
         /// </summary>
         /// <param name="rowData">The <see cref="FAMOrderRow"/> for which data was updated.</param>
-        public RowDataUpdatedArgs(FAMOrderRow rowData)
+        /// <param name="orderNumberUpdated"><see langword="true"/> if the order number has been
+        /// changed; otherwise, <see langword="false"/>.</param>
+        public RowDataUpdatedArgs(FAMOrderRow rowData, bool orderNumberUpdated)
             : base()
         {
             FAMOrderRow = rowData;
+            OrderNumberUpdated = orderNumberUpdated;
         }
 
         /// <summary>
         /// The <see cref="FAMOrderRow"/> for which data was updated.
         /// </summary>
         public FAMOrderRow FAMOrderRow
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the order number has been changed.
+        /// </summary>
+        /// <value><see langword="true"/> if the order number has been changed; otherwise, 
+        /// <see langword="false"/>.</value>
+        public bool OrderNumberUpdated
         {
             get;
             private set;
