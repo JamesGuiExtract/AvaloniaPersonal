@@ -545,7 +545,10 @@ namespace Extract.DataEntry.LabDE
             {
                 if (!e.IncrementalUpdate)
                 {
-                    OnRowDataUpdated(e.Attribute == OrderNumberAttribute);
+                    bool orderNumberUpdated = (e.Attribute == OrderNumberAttribute);
+                    ClearCachedData(!orderNumberUpdated);
+
+                    OnRowDataUpdated(orderNumberUpdated);
                 }
             }
             catch (Exception ex)
@@ -579,6 +582,7 @@ namespace Extract.DataEntry.LabDE
                     OrderCodeAttribute = null;
                 }
 
+                ClearCachedData(true);
                 OnRowDataUpdated(e.DeletedAttribute == OrderNumberAttribute);
             }
             catch (Exception ex)
