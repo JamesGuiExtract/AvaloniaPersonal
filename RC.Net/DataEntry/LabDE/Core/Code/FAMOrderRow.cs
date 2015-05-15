@@ -36,10 +36,9 @@ namespace Extract.DataEntry.LabDE
         IAttribute _orderNumberAttribute;
 
         /// <summary>
-        /// A comma delimited list to cache the potentially matching order numbers for the current
-        /// LabDE order.
+        /// A HashSet of potentially matching order numbers for the current LabDE order.
         /// </summary>
-        string _matchingOrderIds;
+        HashSet<string> _matchingOrderIds;
 
         /// <summary>
         /// A cached <see cref="DataTable"/> of potential matching FAM DB orders for the current
@@ -334,32 +333,21 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets or sets a comma delimited list to cache the potentially matching order numbers for
-        /// the current LabDE order.
+        /// Gets or sets a HashSet of potentially matching order numbers for the current LabDE order.
         /// </summary>
         /// <value>
-        /// A comma delimited list to cache the potentially matching order numbers for the current
-        /// LabDE order. 
+        /// A of potentially matching order numbers for the current LabDE order. 
         /// </value>
-        public string MatchingOrderIDs
+        public HashSet<string> MatchingOrderIDs
         {
             get
             {
                 return _matchingOrderIds;
             }
 
-            [SuppressMessage("Microsoft.Performance", "CA1820:TestForEmptyStringsUsingStringLength")]
             set
             {
                 _matchingOrderIds = value;
-
-                // If an empty list is to be cached, used a special value instead of blank (which
-                // would cause a syntax error when used in an SQL query). This is as opposed to null
-                // which indicates MatchingOrderIDs has not yet been queried.
-                if (_matchingOrderIds == string.Empty)
-                {
-                    _matchingOrderIds = "'__EMPTY__'";
-                }
             }
         }
 

@@ -366,8 +366,7 @@ namespace Extract.DataEntry.LabDE
 	        {
                 // Get the cached list of order numbers associated with the current FAMOrderRow or
                 // generate a query to retrieve them.
-                string selectedOrderNumbers =
-                    order.MatchingOrderIDs ?? GetSelectedOrderNumbersQuery(order);
+                string selectedOrderNumbers = GetSelectedOrderNumbersQuery(order);
 
                 // LoadOrderInfo has the side-effect of caching data from selectedOrderNumbers into
                 // _orderInfoCache
@@ -376,10 +375,10 @@ namespace Extract.DataEntry.LabDE
                 // Cache the list of orders if they have not yet been.
                 if (order.MatchingOrderIDs == null)
                 {
-                    order.MatchingOrderIDs = "'" +
-                        string.Join("','", matchingOrderTable.Rows
+                    order.MatchingOrderIDs = new HashSet<string>(
+                        matchingOrderTable.Rows
                             .OfType<DataRow>()
-                            .Select(row => row.ItemArray[0].ToString())) + "'";
+                            .Select(row => "'" + row.ItemArray[0].ToString() + "'"));
                 }
 
                 return matchingOrderTable;
@@ -425,7 +424,7 @@ namespace Extract.DataEntry.LabDE
                     // Generate an SQL statement that can select data from the UI into query results
                     // that can be combined with actual UI data.
                     StringBuilder unmappedOrder = new StringBuilder();
-                    unmappedOrder.Append("SELECT '' AS [OrderNumber], ");
+                    unmappedOrder.Append("SELECT '*' AS [OrderNumber], ");
 
                     unmappedOrder.Append("'");
                     unmappedOrder.Append(order.OrderCode);
@@ -555,13 +554,14 @@ namespace Extract.DataEntry.LabDE
             // possibly matching orders from the database.
             string declarationsClause = "";
             string columnsClause = "";
-            if (order.MatchingOrderIDs == null)
-            {
+            
                 // Select the matching order numbers into a table variable.                
                 declarationsClause =
                     "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
-                        "INSERT INTO @OrderNumbers " + GetSelectedOrderNumbersQuery(order);
+                        "INSERT INTO @OrderNumbers\r\n" + GetSelectedOrderNumbersQuery(order);
 
+            if (order.MatchingOrderIDs == null)
+            {
                 // Create a column to select the order numbers in a comma delimited format that can
                 // be re-used in subsequent queries.
                 columnsClause =
@@ -598,17 +598,11 @@ namespace Extract.DataEntry.LabDE
                     : "") +
                 ") AS [CombinedOrders]\r\n" +
                 "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [CombinedOrders].[OrderNumber] \r\n" +
-                "WHERE OrderStatus = '*'\r\n" +
-                "OR\r\n" +
-                "(\r\n" +
-                "[CombinedOrders].[OrderNumber] IN (" +
-                    ((order.MatchingOrderIDs != null) 
-                        ? order.MatchingOrderIDs
-                        : "SELECT [OrderNumber] FROM @OrderNumbers") + ")\r\n" +
+                "INNER JOIN @OrderNumbers ON [CombinedOrders].[OrderNumber] = [@OrderNumbers].[OrderNumber] " +
+                    "OR [CombinedOrders].[OrderNumber] = '*'\r\n" +
                 (AlreadyMappedOrderNumbers.Any()
-                    ? "AND ([CombinedOrders].[OrderNumber] NOT IN (" + string.Join(",", AlreadyMappedOrderNumbers) + "))\r\n"
+                    ? "WHERE ([CombinedOrders].[OrderNumber] NOT IN (" + string.Join(",", AlreadyMappedOrderNumbers) + "))\r\n"
                     : "") +
-                ")" +
                 // Group by TempID as well so that all matching orders from the UI end up as separate rows.
                 "GROUP BY [CombinedOrders].[OrderNumber], [CombinedOrders].[TempID]";
 
@@ -625,9 +619,11 @@ namespace Extract.DataEntry.LabDE
                 if (order.MatchingOrderIDs == null)
                 {
                     order.MatchingOrderIDs = (resultsRow["OrderNumbers"] == DBNull.Value)
-                        ? ""
+                        ? new HashSet<string>()
+                        : new HashSet<string>(
                         // Remove trailing ',' then surround with apostrophes
-                        : "'" + resultsRow["OrderNumbers"].ToString().TrimEnd(new[] { ',', '\'' }) + "'";
+                            ("'" + resultsRow["OrderNumbers"].ToString().TrimEnd(new[] { ',', '\'' }) + "'")
+                            .Split(','));
                 }
 
                 foreach (string color in ColorQueryConditions.Keys)
@@ -1070,9 +1066,20 @@ namespace Extract.DataEntry.LabDE
         /// </returns>
         string GetSelectedOrderNumbersQuery(FAMOrderRow order)
         {
-            List<string> queryParts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(order.PatientMRN) && !string.IsNullOrWhiteSpace(order.OrderCode))
+            string selectedOrderNumbersQuery = null;
+
+            if (order.MatchingOrderIDs != null)
             {
+                // If the matching order IDs have been cached, select them directly rather than
+                //querying for them.
+                selectedOrderNumbersQuery = string.Join("\r\nUNION\r\n",
+                    order.MatchingOrderIDs
+                        .Select(orderNum => "SELECT " + orderNum));
+            }
+            else if (!string.IsNullOrWhiteSpace(order.PatientMRN) &&
+                !string.IsNullOrWhiteSpace(order.OrderCode))
+            {
+                List<string> queryParts = new List<string>();
                 queryParts.Add("SELECT [LabDEOrder].[OrderNumber] FROM [LabDEOrder] " +
                     "WHERE [PatientMRN] = '" + order.PatientMRN.Replace("'", "''") + "'");
                 queryParts.Add("SELECT [LabDEOrder].[OrderNumber] FROM [LabDEOrder] " +
@@ -1087,16 +1094,17 @@ namespace Extract.DataEntry.LabDE
                 {
                     queryParts.Add(CustomOrderMatchCriteriaQuery);
                 }
+
+                selectedOrderNumbersQuery = string.Join("\r\nINTERSECT\r\n", queryParts);
             }
             else
             {
                 // If missing MRN or order code, prevent any orders from being looked up.
-                queryParts.Add("SELECT [LabDEOrder].[OrderNumber] FROM [LabDEOrder] WHERE 1 = 0");
+                selectedOrderNumbersQuery = 
+                    "SELECT [LabDEOrder].[OrderNumber] FROM [LabDEOrder] WHERE 1 = 0";
             }
-            
 
-            string selectedOrderNumbers = string.Join("\r\nINTERSECT\r\n", queryParts);
-            return selectedOrderNumbers;
+            return selectedOrderNumbersQuery;
         }
 
         /// <summary>
