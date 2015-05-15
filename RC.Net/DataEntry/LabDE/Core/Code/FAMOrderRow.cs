@@ -336,7 +336,7 @@ namespace Extract.DataEntry.LabDE
         /// Gets or sets a HashSet of potentially matching order numbers for the current LabDE order.
         /// </summary>
         /// <value>
-        /// A of potentially matching order numbers for the current LabDE order. 
+        /// A HashSet of potentially matching order numbers for the current LabDE order. 
         /// </value>
         public HashSet<string> MatchingOrderIDs
         {

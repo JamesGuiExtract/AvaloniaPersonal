@@ -148,9 +148,9 @@ namespace Extract.DataEntry.LabDE
                 OrderQueryColumns.Add("Collection date/time", "[LabDEOrderFile].[CollectionDate]");
 
                 ColorQueryConditions = new OrderedDictionary();
-                ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END) = 1");
                 ColorQueryConditions.Add("Red", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) = 0");
                 ColorQueryConditions.Add("Yellow", "COUNT(CASE WHEN ([OrderStatus] = 'A' OR [OrderStatus] = '*') THEN 1 END) > 1");
+                ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END) = 1");
                 ColorQueryConditions.Add("Cyan", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) > 0"); 
 
                 AttributeStatusInfo.DataReset += HandleAttributeStatusInfo_DataReset;
@@ -364,13 +364,11 @@ namespace Extract.DataEntry.LabDE
         {
             try 
 	        {
-                // Get the cached list of order numbers associated with the current FAMOrderRow or
-                // generate a query to retrieve them.
-                string selectedOrderNumbers = GetSelectedOrderNumbersQuery(order);
+                string selectedOrderNumberQuery = GetSelectedOrderNumbersQuery(order);
 
                 // LoadOrderInfo has the side-effect of caching data from selectedOrderNumbers into
                 // _orderInfoCache
-                DataTable matchingOrderTable = LoadOrderInfo(selectedOrderNumbers);
+                DataTable matchingOrderTable = LoadOrderInfo(selectedOrderNumberQuery, true);
 
                 // Cache the list of orders if they have not yet been.
                 if (order.MatchingOrderIDs == null)
@@ -465,13 +463,27 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         /// <param name="selectedOrderNumbers">A comma delimited list of order numbers to be
         /// returned or an SQL query that selects the order numbers to be returned.</param>
+        /// <param name="selectViaQuery"><see langword="true"/> if
+        /// <see paramref="selectedOrderNumbers"/> represents an SQL query to select the
+        /// appropriate order numbers, <see langword="false"/> if the order numbers are specified
+        /// via a comma separated list (in which case the order numbers should be single-quoted for
+        /// proper string comparisons).</param>
         /// <returns>A <see cref="DataTable"/> listing specified orders.</returns>
-        public DataTable LoadOrderInfo(string selectedOrderNumbers)
+        public DataTable LoadOrderInfo(string selectedOrderNumbers, bool selectViaQuery)
         {
             ExtractException.Assert("ELI38151",
                 "Order query columns have not been properly defined.",
                 OrderQueryColumns.Count > 0 &&
                 OrderQueryColumns[0].ToString().ToUpperInvariant().Contains("ORDERNUMBER"));
+
+            // If selectedOrderNumbers is a query, select the results into a table that can be
+            // joined with LabDEOrderFile.
+            string declarationsClause = "";
+            if (selectViaQuery)
+            {
+                declarationsClause = "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
+                    "INSERT INTO @OrderNumbers\r\n" + selectedOrderNumbers;
+            }
 
             string columnsClause = string.Join(", \r\n",
                 OrderQueryColumns
@@ -480,11 +492,14 @@ namespace Extract.DataEntry.LabDE
 
             // Add a query against [LabDEOrderFile].[FileID] behind the scenes here to be able to collect
             // and return correspondingFileIds.
-            string query = "SELECT " + columnsClause + "\r\n, [LabDEOrderFile].[FileID]\r\n " +
+            string query = declarationsClause +
+                "SELECT " + columnsClause + "\r\n, [LabDEOrderFile].[FileID]\r\n " +
                 "FROM [LabDEOrder] \r\n" +
                 "INNER JOIN [LabDEPatient] ON [LabDEOrder].[PatientMRN] = [LabDEPatient].[MRN] \r\n" +
                 "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] \r\n" +
-                "WHERE [LabDEOrder].[OrderNumber] IN (" + selectedOrderNumbers + ")";
+                (selectViaQuery
+                    ? "INNER JOIN @OrderNumbers ON [LabDEOrder].[OrderNumber] = [@OrderNumbers].[OrderNumber]"
+                    : "WHERE [LabDEOrder].[OrderNumber] IN (" + selectedOrderNumbers + ")");
 
             string lastOrderNumber = null;
             using (DataTable results = DBMethods.ExecuteDBQuery(OleDbConnection, query))
@@ -550,16 +565,14 @@ namespace Extract.DataEntry.LabDE
                 "Order query columns have not been properly defined.",
                 ColorQueryConditions.Count > 0);   
                 
+            // Select the matching order numbers into a table variable.                
+            string declarationsClause =
+                "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
+                    "INSERT INTO @OrderNumbers\r\n" + GetSelectedOrderNumbersQuery(order);
+
             // If we haven't yet cached the order numbers, set up query components to retrieve the
             // possibly matching orders from the database.
-            string declarationsClause = "";
             string columnsClause = "";
-            
-                // Select the matching order numbers into a table variable.                
-                declarationsClause =
-                    "DECLARE @OrderNumbers TABLE ([OrderNumber] NVARCHAR(20)) \r\n" +
-                        "INSERT INTO @OrderNumbers\r\n" + GetSelectedOrderNumbersQuery(order);
-
             if (order.MatchingOrderIDs == null)
             {
                 // Create a column to select the order numbers in a comma delimited format that can
@@ -1037,7 +1050,8 @@ namespace Extract.DataEntry.LabDE
         /// Retrieves the <see cref="OrderInfo"/> for the specified <see paramref="orderNumber"/>.
         /// </summary>
         /// <param name="orderNumber">The order number for which info should be retrieved.</param>
-        /// <returns>The <see cref="OrderInfo"/> for the specified <see paramref="orderNumber"/>.
+        /// <returns>
+        /// The <see cref="OrderInfo"/> for the specified <see paramref="orderNumber"/>.
         /// </returns>
         OrderInfo GetOrderInfo(string orderNumber)
         {
@@ -1049,7 +1063,9 @@ namespace Extract.DataEntry.LabDE
             {
                 // If there's not cached info on-hand for this order, load it from the DB now.
                 // The resulting DataTable is not needed; immediately dispose of it.
-                LoadOrderInfo(orderNumber).Dispose();
+                // Order number is a string field; single quotes should be used for SQL
+                // string comparisons.
+                LoadOrderInfo("'" + orderNumber + "'", false).Dispose();
 
                 // The order info should now be cached if the order exists.
                 _orderInfoCache.TryGetData(orderNumber, out orderInfo);
