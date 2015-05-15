@@ -10,7 +10,7 @@ const unsigned long gulFOLDER_LISTENER_BUF_SIZE	 = 65536;
 const string gstrTIME_BETWEEN_LISTENING_RESTARTS_KEY = "FEL_TimeBetweenListeningRestarts";
 const unsigned long gulDEFAULT_TIME_BETWEEN_RESTARTS = 5000; // 5 seconds
 const unsigned long gulTIME_TO_WAIT_FOR_THREAD_EXIT = 10000; // 10 seconds
-const unsigned long gulTIME_TO_WAIT_FOR_CHANGES = 30000; // 30 seconds
+const unsigned long gulTIME_TO_WAIT_BETWEEN_ACCESS_CHECKS = 30000; // 30 seconds
 
 //-------------------------------------------------------------------------------------------------
 FolderEventsListener::FolderEvent::FolderEvent(EFileEventType nEvent, string strFileNameNew, string strFileNameOld)
@@ -44,7 +44,10 @@ void FolderEventsListener::startListening(const std::string &strFolder, bool bRe
 		m_eventKillThreads.reset();
 		m_eventListeningExited.reset();
 		m_eventListeningStarted.reset();
-
+		
+		// Reset the monitor event before starting the main listening thread
+		m_eventFolderInaccessable.reset();
+		
 		m_strFolderToListenTo = strFolder;
 		m_bRecursive = bRecursive;
 		AfxBeginThread(threadFuncListen, this);
@@ -75,6 +78,21 @@ void FolderEventsListener::startListening(const std::string &strFolder, bool bRe
 
 			// There was a problem starting the dispatch thread
 			UCLIDException ue("ELI30298", "Listening dispatch thread did not start.");
+			ue.addDebugInfo("Folder", strFolder);
+			throw ue;
+		}
+
+		// Make sure the events are reset for the monitor folder access is start
+		m_eventMonitorFolderThreadStarted.reset();
+		m_eventMonitorFolderThreadExited.reset();
+		AfxBeginThread(threadMonitorFolderAccess, this);
+
+		if (m_eventMonitorFolderThreadStarted.wait(gulTIME_TO_WAIT_FOR_THREAD_EXIT) == WAIT_TIMEOUT)
+		{
+			m_eventKillThreads.signal();
+
+			// There was a problem starting the Monitor thread
+			UCLIDException ue("ELI38237", "Listening monitor folder access thread did not start.");
 			ue.addDebugInfo("Folder", strFolder);
 			throw ue;
 		}
@@ -137,7 +155,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 
 		bool bRecursive = fl->m_bRecursive;
 
-		// let the the creating thread know it is ok to continue
+		// let the creating thread know it is OK to continue
 		fl->m_eventListeningStarted.signal();
 		
 		unsigned long ulTimeBetweenRestarts = fl->getTimeBetweenListeningRestarts();
@@ -175,6 +193,9 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 				continue;
 			}
 
+			// Folder was accessible to get here so reset the folderInaccessable event
+			fl->m_eventFolderInaccessable.reset();
+
 			// Setup events for changes
 			Win32Event eventFileChangesReady;
 
@@ -192,15 +213,16 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 			_lastCodePos = "60";
 
 			// set up handle array for the handles to wait for
-			HANDLE handles[2];
+			HANDLE handles[3];
 			handles[0] = oFileChanges.hEvent;
-			handles[1] = fl->m_eventKillThreads.getHandle();
+			handles[1] = fl->m_eventFolderInaccessable.getHandle();
+			handles[2] = fl->m_eventKillThreads.getHandle();
 			_lastCodePos = "80";
 
 			// Listening handle for changes in the files
 			HANDLE hFile = NULL;
 
-			// Indicates whether listenting started correctly this iteration.
+			// Indicates whether listening started correctly this iteration.
 			bool bListeningStarted = false;
 
 			try
@@ -237,7 +259,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 						_lastCodePos = "100";
 
 						// Wait for changes or a kill signal
-						DWORD dwWaitResult = WaitForMultipleObjects( 2, (HANDLE *)&handles, FALSE, gulTIME_TO_WAIT_FOR_CHANGES );
+						DWORD dwWaitResult = WaitForMultipleObjects( 2, (HANDLE *)&handles, FALSE, INFINITE );
 						_lastCodePos = "110";
 
 						if ( dwWaitResult == WAIT_OBJECT_0 )
@@ -247,13 +269,13 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 
 							DWORD dwBytesTransfered;
 
-							// This call will wait for the event in the oChanges to be signalled so don't 
+							// This call will wait for the event in the oChanges to be signaled so don't 
 							// reset it until after this call
 							int iResult = GetOverlappedResult( hFile, &oFileChanges, &dwBytesTransfered, TRUE );
 							_lastCodePos = "130";
 							if ( iResult == FALSE )
 							{
-								// Error geting the results
+								// Error getting the results
 								UCLIDException ue ("ELI13017", "Error getting file changes.");
 								ue.addWin32ErrorInfo();
 								ue.addDebugInfo("Folder", fl->m_strFolderToListenTo);
@@ -274,7 +296,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 							bDone = fl->m_eventKillThreads.isSignaled();
 							_lastCodePos = "170";
 						}
-						else if ( dwWaitResult == WAIT_TIMEOUT)
+						else if ( dwWaitResult == WAIT_OBJECT_0 + 1)
 						{
 							_lastCodePos = "175";
 
@@ -422,6 +444,46 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 			
 }
 //-------------------------------------------------------------------------------------------------
+UINT FolderEventsListener::threadMonitorFolderAccess(LPVOID pParam)
+{
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	try
+	{
+		FolderEventsListener* fl = (FolderEventsListener*)pParam;
+		ASSERT_RESOURCE_ALLOCATION("ELI38235", fl != __nullptr);
+
+		// Signal that the thread started
+		fl->m_eventMonitorFolderThreadStarted.signal();
+		try
+		{
+			// Wait on the kill event
+			while ( fl->m_eventKillThreads.wait(gulTIME_TO_WAIT_BETWEEN_ACCESS_CHECKS) == WAIT_TIMEOUT )
+			{
+				// Only check the file if the event is not already signaled
+				if (!fl->m_eventFolderInaccessable.isSignaled())
+				{
+					// Check that the folder is valid (if the network connection is 
+					// no longer valid this will return false)
+					if (!isValidFolder(fl->m_strFolderToListenTo))
+					{
+						// Signal event that indicates that the folder is inaccessible
+						fl->m_eventFolderInaccessable.signal();
+					}
+				}
+			}
+		}
+		catch(...)
+		{
+			fl->m_eventMonitorFolderThreadExited.signal();
+			throw;
+		}
+		fl->m_eventMonitorFolderThreadExited.signal();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38236");
+	CoUninitialize();
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
 bool FolderEventsListener::fileReadyForAccess(std::string strFileName)
 {
 	// if we cannot read the file we will try to run it later
@@ -489,7 +551,7 @@ void FolderEventsListener::processChanges(string strBaseDir, Win32Event &eventKi
 		LPBYTE pCurrByte = rlpBuffer;
 		PFILE_NOTIFY_INFORMATION pFileInfo = NULL;
 
-		// rename events happen in two peices, rename old and rename new
+		// rename events happen in two pieces, rename old and rename new
 		// when a rename old event happens we keep track of it so that we 
 		// can have one event handler for rename that takes the old and new
 		// names

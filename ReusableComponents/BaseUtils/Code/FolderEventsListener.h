@@ -27,9 +27,9 @@ protected:
 	// listen to change events in the specified folder.  This method
 	// will immediately return and events will be dispatched onFileXXXXX() methods
 	// will be called from the worker thread when the events take place.
-	// Currenlty this will stop listing to previous folders and 
+	// Currently this will stop listing to previous folders and 
 	// start listening on the given folder
-	// If eventTypeFlags is specified, the method will only listen for the the OR'd
+	// If eventTypeFlags is specified, the method will only listen for the OR'd
 	// EFileEventTypes provided.
 	void startListening(const std::string &strFolder, bool bRecursive,
 		BYTE eventTypeFlags = 0xFF);
@@ -73,7 +73,7 @@ private:
 	// The folder being listened to
 	string m_strFolderToListenTo;
 	
-	// Specifies it the listening should be for all subfolders of the folder being listened to
+	// Specifies it the listening should be for all sub-folders of the folder being listened to
 	volatile bool m_bRecursive;
 
 	class FolderEvent
@@ -132,6 +132,19 @@ private:
 	Win32Event m_eventDispatchThreadExited;
 	Win32Event m_eventDispatchThreadStarted;
 
+	// Thread method that checks the accessibility as a way of checking if the network connection
+	// was lost. This is in its own thread so that it doesn't cause files to be not seen
+	// https://extract.atlassian.net/browse/ISSUE-12988
+	static UINT threadMonitorFolderAccess(LPVOID pParam);
+
+	// Events to indicate that the MonitorFolder thread has started and exited
+	Win32Event m_eventMonitorFolderThreadStarted;
+	Win32Event m_eventMonitorFolderThreadExited;
+
+	// Event used to signal that the folder being listened to is inaccessible - this will 
+	// trigger an attempt to start listening on the folder again
+	Win32Event m_eventFolderInaccessable;
+
 	// Utility functions
 	bool fileReadyForAccess(std::string strFileName);
 
@@ -139,7 +152,7 @@ private:
 	// on the queEvents argument 
 	// if the bFileChange 
 	//		true it is for file changes (kFileAdded, kFileRemoved, kFileModified, kFileRenamed)
-	//		false is is for directory changes (	kFolderAdded, kFolderRemoved, kFolderRenamed)
+	//		false is for directory changes (	kFolderAdded, kFolderRemoved, kFolderRenamed)
 	void processChanges(std::string strBaseDir, Win32Event &eventKill, LPBYTE & rlpBuffer, MTSafeQueue<FolderEvent> & queEvents, bool bFileChange );
 
 	// This method gets a handle opened for listening on the given directory
