@@ -149,7 +149,7 @@ namespace Extract.DataEntry.LabDE
 
                 ColorQueryConditions = new OrderedDictionary();
                 ColorQueryConditions.Add("Red", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) = 0");
-                ColorQueryConditions.Add("Yellow", "COUNT(CASE WHEN ([OrderStatus] = 'A' OR [OrderStatus] = '*') THEN 1 END) > 1");
+                ColorQueryConditions.Add("Yellow", "COUNT(CASE WHEN (([OrderStatus] = 'A' OR [OrderStatus] = '*') AND [FileCount] = 0) THEN 1 END) > 1");
                 ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END) = 1");
                 ColorQueryConditions.Add("Cyan", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) > 0"); 
 
@@ -847,17 +847,26 @@ namespace Extract.DataEntry.LabDE
             {
                 foreach (KeyValuePair<DataEntryTableRow, FAMOrderRow> rowData in _rowData)
                 {
-                    string orderNumber =
-                        GetAttribute(rowData.Key.Attribute, OrderNumberAttribute).Value.String;
+                    if (string.IsNullOrWhiteSpace(rowData.Value.OrderNumber))
+                    {
+                        continue;
+                    }
+
                     IAttribute collectionDateAttribute =
                         GetAttribute(rowData.Key.Attribute, CollectionDateAttribute);
+
+                    if (collectionDateAttribute == null)
+                    {
+                        continue;
+                    }
+                        
                     IAttribute collectionTimeAttribute =
                         GetAttribute(rowData.Key.Attribute, CollectionTimeAttribute);
                     DateTime collectionDateTime = DateTime.Parse(
                         collectionDateAttribute.Value.String + " " + collectionTimeAttribute.Value.String,
                         CultureInfo.CurrentCulture);
 
-                    LinkFileWithOrder(orderNumber, fileId, collectionDateTime);
+                    LinkFileWithOrder(rowData.Value.OrderNumber, fileId, collectionDateTime);
                 }
             }
             catch (Exception ex)

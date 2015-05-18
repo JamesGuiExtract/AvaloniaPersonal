@@ -4,6 +4,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -72,6 +73,40 @@ namespace Extract.DataEntry.LabDE
         /// Gets the order number that was selected in the UI.
         /// </summary>
         public string SelectedOrderNumber
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the filter on the displayed matching rows that determine which rows are
+        /// candidates for auto-selection when the picker UI is displayed. If <see langword="null"/>
+        /// orders will not be automatically selected (unless an order number had already been
+        /// assigned).
+        /// </summary>
+        /// <value>
+        /// The filter on the displayed matching rows that determine which rows are candidates for
+        /// auto-selection. The syntax is as specified for the <see cref="DataColumn.Expression"/>
+        /// property.
+        /// </value>
+        public virtual string AutoSelectionFilter
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the order in which rows matching <see cref="AutoSelectionOrder"/> are to be
+        /// considered for auto-selection where the first matching row is the row that is selected.
+        /// <see langword="null"/> if a row should be auto-selected only if it is the only row
+        /// matching <see cref="AutoSelectionFilter"/>.
+        /// </summary>
+        /// <value>
+        /// The order in which rows matching <see cref="AutoSelectionOrder"/> are to be considered
+        /// for auto-selection. The syntax is as described for the <see cref="DataView.Sort"/>
+        /// property.
+        /// </value>
+        public virtual string AutoSelectionOrder
         {
             get;
             set;
@@ -370,12 +405,38 @@ namespace Extract.DataEntry.LabDE
         void ResetSelection()
         {
             _ordersDataGridView.ClearSelection();
+
+            string orderNumberToSelect = SelectedOrderNumber;
+
+            // If there is not already a selected order, see if there is an order that matches any
+            // AutoSelectionFilter and AutoSelectionOrder criteria
+            if (string.IsNullOrWhiteSpace(orderNumberToSelect) &&
+                !string.IsNullOrWhiteSpace(AutoSelectionFilter))
+            {
+                using (DataTable selectionTable = RowData.UnmappedMatchingOrders.ToTable())
+                using (DataView selectionView = new DataView(selectionTable))
+                {
+                    selectionView.RowFilter = AutoSelectionFilter;
+                    selectionView.Sort = AutoSelectionOrder;
+
+                    if (selectionView.Count > 0)
+                    {
+                        if (selectionView.Count == 1 ||
+                            !string.IsNullOrWhiteSpace(AutoSelectionOrder))
+                        {
+                            orderNumberToSelect = (string)(selectionView[0].Row.ItemArray[0]);
+                        }
+                    }
+                }
+            }
+
+            // Select the row with orderNumberToSelect (if any).
             _ordersDataGridView.CurrentCell =
                 _ordersDataGridView.Rows
                     .OfType<DataGridViewRow>()
                     .Select(row => row.Cells[0])
-                    .Where(cell => !string.IsNullOrEmpty(SelectedOrderNumber) &&
-                        SelectedOrderNumber.Equals(cell.Value.ToString(), StringComparison.Ordinal))
+                    .Where(cell => !string.IsNullOrEmpty(orderNumberToSelect) &&
+                        orderNumberToSelect.Equals(cell.Value.ToString(), StringComparison.Ordinal))
                     .SingleOrDefault();
             if (_ordersDataGridView.CurrentCell != null)
             {

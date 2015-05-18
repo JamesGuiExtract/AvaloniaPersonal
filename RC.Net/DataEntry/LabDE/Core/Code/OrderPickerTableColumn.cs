@@ -432,6 +432,40 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        /// <summary>
+        /// Gets or sets the filter on the displayed matching rows that determine which rows are
+        /// candidates for auto-selection when the picker UI is displayed. If <see langword="null"/>
+        /// orders will not be automatically selected (unless an order number had already been
+        /// assigned).
+        /// </summary>
+        /// <value>
+        /// The filter on the displayed matching rows that determine which rows are candidates for
+        /// auto-selection. The syntax is as specified for the DataColumn.Expression property.
+        /// </value>
+        [Category(_PROPERTY_GRID_CATEGORY)]
+        public string AutoSelectionFilter
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the order in which rows matching <see cref="AutoSelectionOrder"/> are to be
+        /// considered for auto-selection where the first matching row is the row that is selected.
+        /// <see langword="null"/> if a row should be auto-selected only if it is the only row
+        /// matching <see cref="AutoSelectionFilter"/>.
+        /// </summary>
+        /// <value>
+        /// The order in which rows matching <see cref="AutoSelectionOrder"/> are to be considered
+        /// for auto-selection. The syntax is as described for the DataView.Sort property.
+        /// </value>
+        [Category(_PROPERTY_GRID_CATEGORY)]
+        public string AutoSelectionOrder
+        {
+            get;
+            set;
+        }
+
         #endregion Properties  
 
         #region Methods
@@ -511,6 +545,8 @@ namespace Extract.DataEntry.LabDE
                 OrderPickerTableColumn column = (OrderPickerTableColumn)base.Clone();
 
                 // Copy OrderPickerTableColumn specific properties
+                column.AutoSelectionFilter = this.AutoSelectionFilter;
+                column.AutoSelectionOrder = this.AutoSelectionOrder;
                 column.OrderNumberColumn = this.OrderNumberColumn;
                 column.PatientMRNAttribute = this.PatientMRNAttribute;
                 column.OrderCodeAttribute = this.OrderCodeAttribute;
@@ -930,6 +966,8 @@ namespace Extract.DataEntry.LabDE
                     fileInspectorForm.FileProcessingDB.DuplicateConnection(FileProcessingDB);
 
                     fileInspectorForm.FileSelectorPane = selectionPane;
+                    selectionPane.AutoSelectionFilter = AutoSelectionFilter;
+                    selectionPane.AutoSelectionOrder = AutoSelectionOrder;
                     selectionPane.SelectedOrderNumber = defaultOrderNumber;
                     selectionPane.RowData = rowData;
                     selectionPane.UpdateOrderSelectionGrid();
