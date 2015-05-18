@@ -132,6 +132,18 @@ void FolderEventsListener::stopListening()
 				ue.log();
 			}
 		}
+		
+		// Check if the monitoring thread was started
+		if (m_eventMonitorFolderThreadStarted.isSignaled())
+		{
+			// Wait for monitoring to exit
+			if (m_eventListeningExited.wait(gulTIME_TO_WAIT_FOR_THREAD_EXIT) == WAIT_TIMEOUT )
+			{
+				UCLIDException ue("ELI38238", "Application Trace: Listening monitoring thread did not exit properly.");
+				ue.addDebugInfo("Folder", m_strFolderToListenTo);
+				ue.log();
+			}
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27786");
 }
@@ -259,7 +271,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 						_lastCodePos = "100";
 
 						// Wait for changes or a kill signal
-						DWORD dwWaitResult = WaitForMultipleObjects( 2, (HANDLE *)&handles, FALSE, INFINITE );
+						DWORD dwWaitResult = WaitForMultipleObjects( 3, (HANDLE *)&handles, FALSE, INFINITE );
 						_lastCodePos = "110";
 
 						if ( dwWaitResult == WAIT_OBJECT_0 )
