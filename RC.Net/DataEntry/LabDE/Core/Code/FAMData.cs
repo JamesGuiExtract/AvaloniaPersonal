@@ -149,9 +149,9 @@ namespace Extract.DataEntry.LabDE
 
                 ColorQueryConditions = new OrderedDictionary();
                 ColorQueryConditions.Add("Red", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) = 0");
-                ColorQueryConditions.Add("Yellow", "COUNT(CASE WHEN (([OrderStatus] = 'A' OR [OrderStatus] = '*') AND [FileCount] = 0) THEN 1 END) > 1");
-                ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END) = 1");
-                ColorQueryConditions.Add("Cyan", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) > 0"); 
+                ColorQueryConditions.Add("Yellow", "COUNT(CASE WHEN ([OrderStatus] = '*') THEN 1 END) >= " +
+		            "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END)");
+                ColorQueryConditions.Add("Lime", "COUNT(CASE WHEN ([OrderStatus] = 'A' AND [FileCount] = 0) THEN 1 END) > 0");
 
                 AttributeStatusInfo.DataReset += HandleAttributeStatusInfo_DataReset;
             }
