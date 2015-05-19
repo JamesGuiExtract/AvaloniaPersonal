@@ -53,6 +53,11 @@ namespace Extract.Utilities.ContextTags
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
+        /// A cached <see cref="VariantVector"/> for each thread that calls into GetTagNames.
+        /// </summary>
+        Dictionary<int, VariantVector> _tagNamesVectors = new Dictionary<int, VariantVector>();
+
+        /// <summary>
         /// The path for which the tags apply (the directory where the FPS files that will use
         /// these settings are).
         /// </summary>
@@ -150,7 +155,19 @@ namespace Extract.Utilities.ContextTags
             {
                 lock (_lock)
                 {
-                    return _tagValues.Keys.ToVariantVector();
+                    // https://extract.atlassian.net/browse/ISSUE-13001
+                    // Besides the processing overhead of re-generating the VariantVector for each
+                    // call, it was leading to memory leaks (the ReportMemoryUsage framework doesn't
+                    // currently support use on VariantVectors). Generate and re-use a single
+                    // VariantVector instance for each thread that calls in.
+                    VariantVector tagNamesVector;
+                    if (!_tagNamesVectors.TryGetValue(Thread.CurrentThread.ManagedThreadId, out tagNamesVector))
+                    {
+                        tagNamesVector = _tagValues.Keys.ToVariantVector();
+                        _tagNamesVectors[Thread.CurrentThread.ManagedThreadId] = tagNamesVector;
+                    }
+
+                    return tagNamesVector;
                 }
             }
             catch (Exception ex)
@@ -279,6 +296,7 @@ namespace Extract.Utilities.ContextTags
             lock (_lock)
             {
                 _tagValues.Clear();
+                _tagNamesVectors.Clear();
 
                 // Clear the active context
                 _activeContext = "";

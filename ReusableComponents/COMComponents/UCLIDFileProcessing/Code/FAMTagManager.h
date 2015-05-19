@@ -93,6 +93,9 @@ private:
 	// the same for a given context path.
 	static IContextTagProviderPtr ms_ipContextTagProvider;
 
+	// A cache of the tag values from ms_ipContextTagProvider.
+	static map<string, string> ms_mapContextTags;
+
 	// Controls access to the above static variables.
 	static CMutex ms_mutex;
 
@@ -105,7 +108,7 @@ private:
 	string m_strDatabaseAction;
 
 	// Programmatically added path tags.
-	map<string, string> m_mapAddedTags;
+	map<string, string> m_mapAddedTags;	
 
 	// pointer to the utility object to use for path function expansion.
 	IMiscUtilsPtr m_ipMiscUtils;

@@ -27,6 +27,7 @@ string CFAMTagManager::ms_strFPSDir;
 string CFAMTagManager::ms_strFPSFileName;
 CMutex CFAMTagManager::ms_mutex;
 IContextTagProviderPtr CFAMTagManager::ms_ipContextTagProvider;
+map<string, string> CFAMTagManager::ms_mapContextTags;
 
 //--------------------------------------------------------------------------------------------------
 // CFAMTagManager
@@ -107,6 +108,22 @@ STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
 		ms_strFPSDir = asString(strFPSDir);
 
 		ms_ipContextTagProvider->ContextPath = ms_strFPSDir.c_str();
+		
+		// https://extract.atlassian.net/browse/ISSUE-13001
+		// Cache the context the tag values to avoid frequent COM calls which also tend to leak
+		// memory since the returned VariantVector type is not currently supported by the
+		// ReportMemoryUsage framework.
+		ms_mapContextTags.clear();
+		IVariantVectorPtr ipTagNames = ms_ipContextTagProvider->GetTagNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI37905", ipTagNames != __nullptr);
+
+		long nTagCount = ipTagNames->Size;
+		for (long i = 0; i < nTagCount; i++)
+		{
+			string strName = asString(ipTagNames->Item[i].bstrVal);
+			string strValue = ms_ipContextTagProvider->GetTagValue(ipTagNames->Item[i].bstrVal);
+			ms_mapContextTags[strName] = strValue;
+		}
 
 		return S_OK;
 	}
@@ -735,12 +752,9 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 	// Expand these before the built-in tags so that built-in tags can be used within custom
 	// environment tags.
 	CSingleLock lock(&ms_mutex, TRUE);
-	if (!ms_strFPSDir.empty())
+	if (!ms_mapContextTags.empty())
 	{
-		IVariantVectorPtr ipTagNames = ms_ipContextTagProvider->GetTagNames();
-		ASSERT_RESOURCE_ALLOCATION("ELI37905", ipTagNames != __nullptr);
-
-		long nTagCount = ipTagNames->Size;
+		long nTagCount = ms_mapContextTags.size();
 		
 		// In order to allow custom tags to contain other custom tags (e.g., <OutputImage> could be
 		// defined as <OutputPath>\$FileOf(<SourceDocName>)), continue iterate tag expansion as long
@@ -750,12 +764,9 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 		{
 			string strOriginal = rstrInput;
 
-			for (long j = 0; j < nTagCount; j++)
+			for each (pair<string, string> contextTag in ms_mapContextTags)
 			{
-				string strName = asString(ipTagNames->Item[j].bstrVal);
-				string strValue = ms_ipContextTagProvider->GetTagValue(ipTagNames->Item[j].bstrVal);
-
-				replaceVariable(rstrInput, strName, strValue);
+				replaceVariable(rstrInput, contextTag.first, contextTag.second);
 			}
 
 			// If no tags were replaced, we can break out of the loop now.
