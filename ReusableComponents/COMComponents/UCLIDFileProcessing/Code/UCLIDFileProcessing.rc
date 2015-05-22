@@ -67,6 +67,7 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
+            VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "UCLIDFileProcessing Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "UCLIDFileProcessing"
@@ -323,7 +324,7 @@ BEGIN
     LTEXT           "DO NOT MAKE CHANGES TO THIS FORM IN THIS PROJECT!  If changes need to be made to this form they should be made in the FAMUtils IDD_DATABASEPAGE dialog and copy them to this project.",IDC_STATIC,7,150,353,27,NOT WS_VISIBLE
     LTEXT           "Advanced Connection Properties",IDC_STATIC,7,68,105,8
     LTEXT           "Current Context:",IDC_STATIC_CURRENT_CONTEXT_LABEL,7,183,51,8,SS_NOTIFY | NOT WS_VISIBLE
-	LTEXT           "",IDC_STATIC_CURRENT_CONTEXT,61,183,299,8,SS_NOTIFY | NOT WS_VISIBLE
+    LTEXT           "",IDC_STATIC_CURRENT_CONTEXT,61,183,299,8,SS_NOTIFY | NOT WS_VISIBLE
 END
 
 IDD_DIALOG_SET_SCHEDULE DIALOGEX 0, 0, 346, 289
@@ -769,7 +770,7 @@ BEGIN
         MENUITEM "&Enable/disable auto-scrolling", ID_TOOLS_AUTOSCROLL
         MENUITEM SEPARATOR
         MENUITEM "&Database Administration Utility...\tCtrl+D", ID_TOOLS_DATABASEADMINISTRATIONUTILITY
-		MENUITEM "&Edit Custom Tags...\tCtrl+E", ID_TOOLS_EDITCUSTOMTAGS
+        MENUITEM "&Edit Custom Tags...\tCtrl+E", ID_TOOLS_EDITCUSTOMTAGS
         MENUITEM SEPARATOR
         MENUITEM "&Options...",                 ID_TOOLS_OPTIONS
     END
@@ -838,7 +839,7 @@ BEGIN
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
     "D",            ID_TOOLS_DATABASEADMINISTRATIONUTILITY, VIRTKEY, CONTROL, NOINVERT
-	"E",			ID_TOOLS_EDITCUSTOMTAGS, VIRTKEY, CONTROL, NOINVERT
+    "E",			ID_TOOLS_EDITCUSTOMTAGS, VIRTKEY, CONTROL, NOINVERT
 END
 
 

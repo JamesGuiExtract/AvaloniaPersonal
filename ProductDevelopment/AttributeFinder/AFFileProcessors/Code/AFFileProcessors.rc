@@ -67,6 +67,7 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
+            VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "AFFileProcessors Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFFileProcessors"
@@ -155,13 +156,13 @@ BEGIN
     CONTROL         "",IDC_FILTER_LEVEL,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,41,41,248,25
     CONTROL         "Focus enhancement on shaded or speckled regions",IDC_RADIO_HALFTONE_FILTERS,
                     "Button",BS_AUTORADIOBUTTON,12,85,179,10
-	CONTROL         IDB_BITMAP_HALFTONE_SPECKLED,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | WS_BORDER,206,80,119,20
+    CONTROL         IDB_BITMAP_HALFTONE_SPECKLED,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | WS_BORDER,206,80,119,20
     CONTROL         "Focus enhancement on diffuse or underexposed text",IDC_RADIO_ALIASED_FILTERS,
                     "Button",BS_AUTORADIOBUTTON,12,109,185,10
-	CONTROL         IDB_BITMAP_ALIASED_DIFFUSE,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | WS_BORDER,206,104,119,20
+    CONTROL         IDB_BITMAP_ALIASED_DIFFUSE,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | WS_BORDER,206,104,119,20
     CONTROL         "Focus enhancement on smudged or overexposed text",IDC_RADIO_SMUDGED_FILTERS,
                     "Button",BS_AUTORADIOBUTTON,12,133,185,10
-	CONTROL         IDB_BITMAP_SMUDGED,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | WS_BORDER,206,128,119,20
+    CONTROL         IDB_BITMAP_SMUDGED,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | WS_BORDER,206,128,119,20
     CONTROL         "Use custom enhancement:",IDC_RADIO_CUSTOM_FILTERS,
                     "Button",BS_AUTORADIOBUTTON,12,156,97,10
     LTEXT           "Low (fast)",IDC_STATIC_FILTER_LABEL1,34,66,33,8
@@ -211,7 +212,7 @@ BEGIN
     BEGIN
     END
 
-	IDD_ENHANCEOCRTASKPP, DIALOG
+    IDD_ENHANCEOCRTASKPP, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 333

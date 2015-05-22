@@ -69,6 +69,7 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
+            VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "RedactionCustomComponents Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "RedactionCustomComponents"
@@ -357,7 +358,7 @@ BEGIN
     PUSHBUTTON      "SelectTag",IDC_BUTTON_REDACTION_TEXT_TAG,193,30,10,12,BS_ICON
     LTEXT           "Sample text that uses above pattern",IDC_STATIC,14,49,124,8
     EDITTEXT        IDC_EDIT_SAMPLE_TEXT,14,61,188,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-	PUSHBUTTON		"Advanced text settings...",IDC_BUTTON_ADVANCED_TEXT_SETTINGS,107,81,95,14
+    PUSHBUTTON		"Advanced text settings...",IDC_BUTTON_ADVANCED_TEXT_SETTINGS,107,81,95,14
     GROUPBOX        "Redaction colors",IDC_STATIC,7,104,199,42
     LTEXT           "Border color",IDC_STATIC,14,117,42,8
     LTEXT           "Fill color",IDC_STATIC,85,117,42,8

@@ -81,15 +81,15 @@ BEGIN
 	BEGIN
         BLOCK "040904B0"
 		BEGIN 
-			VALUE "CompanyName",     "Extract Systems\0"
-			VALUE "FileDescription", "COMLMCore DLL\0"
-			VALUE "FileVersion",     "1, 0, 0, 1\0"
-			VALUE "InternalName",    "COMLMCore\0"
-			VALUE "LegalCopyright",  "Copyright (C) 2015\0"
-			VALUE "LegalTrademarks", "\0"
-			VALUE "OriginalFilename","COMLMCore.DLL\0"
-			VALUE "ProductName",     "COMLMCore Dynamic Link Library\0"
-			VALUE "ProductVersion",  "1, 0, 0, 1\0"
+			VALUE "CompanyName",     "Extract Systems"
+			VALUE "FileDescription", "COMLMCore DLL"
+			VALUE "FileVersion",     "1, 0, 0, 1"
+			VALUE "InternalName",    "COMLMCore"
+			VALUE "LegalCopyright",  "Copyright (C) 2015"
+			VALUE "LegalTrademarks", ""
+			VALUE "OriginalFilename","COMLMCore.DLL"
+			VALUE "ProductName",     "COMLMCore Dynamic Link Library"
+			VALUE "ProductVersion",  "1, 0, 0, 1"
 		END
 	END
 	BLOCK "VarFileInfo" 

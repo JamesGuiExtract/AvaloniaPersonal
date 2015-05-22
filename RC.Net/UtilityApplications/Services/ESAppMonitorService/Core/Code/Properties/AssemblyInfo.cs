@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("AppMonitorService")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract System, LLC")]
+[assembly: AssemblyCompany("Extract System")]
 [assembly: AssemblyProduct("AppMonitorService")]
 [assembly: AssemblyCopyright("Copyright © Extract System, LLC 2015")]
 [assembly: AssemblyTrademark("")]

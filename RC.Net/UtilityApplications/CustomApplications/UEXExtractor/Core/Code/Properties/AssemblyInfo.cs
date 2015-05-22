@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ExtractDebugData")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract System, LLC")]
+[assembly: AssemblyCompany("Extract System")]
 [assembly: AssemblyProduct("ExtractDebugData")]
 [assembly: AssemblyCopyright("Copyright © Extract System, LLC 2015")]
 [assembly: AssemblyTrademark("")]

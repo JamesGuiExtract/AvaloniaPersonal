@@ -82,6 +82,7 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
+            VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "AFUtils Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFUtils"
