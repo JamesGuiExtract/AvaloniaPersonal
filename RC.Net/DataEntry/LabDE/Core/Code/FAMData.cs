@@ -492,7 +492,7 @@ namespace Extract.DataEntry.LabDE
 
             // Add a query against [LabDEOrderFile].[FileID] behind the scenes here to be able to collect
             // and return correspondingFileIds.
-            string query = declarationsClause +
+            string query = declarationsClause + "\r\n\r\n" +
                 "SELECT " + columnsClause + "\r\n, [LabDEOrderFile].[FileID]\r\n " +
                 "FROM [LabDEOrder] \r\n" +
                 "INNER JOIN [LabDEPatient] ON [LabDEOrder].[PatientMRN] = [LabDEPatient].[MRN] \r\n" +
@@ -619,7 +619,7 @@ namespace Extract.DataEntry.LabDE
                 // Group by TempID as well so that all matching orders from the UI end up as separate rows.
                 "GROUP BY [CombinedOrders].[OrderNumber], [CombinedOrders].[TempID]";
 
-            string colorQuery = declarationsClause + "\r\n" +
+            string colorQuery = declarationsClause + "\r\n\r\n" +
                 "SELECT " + columnsClause + " FROM (\r\n" + orderDataQuery + "\r\n) AS [OrderData]";
 
             // Iterate the columns of the resulting row to find the first color for which the
@@ -698,8 +698,10 @@ namespace Extract.DataEntry.LabDE
                 if (newRow)
                 {
                     // After initially creating a new FAMOrderRow, raise OnRowDataUpdated so the
-                    // order picker column will know of the order number's initial value.
-                    OnRowDataUpdated(new RowDataUpdatedArgs(rowData, true));
+                    // order picker column will know of the order number's initial value (if the
+                    // order number exists).
+                    OnRowDataUpdated(new RowDataUpdatedArgs(rowData, 
+                        !string.IsNullOrWhiteSpace(rowData.OrderNumber)));
                 }
                 
                 return rowData;
@@ -1097,9 +1099,20 @@ namespace Extract.DataEntry.LabDE
             {
                 // If the matching order IDs have been cached, select them directly rather than
                 //querying for them.
-                selectedOrderNumbersQuery = string.Join("\r\nUNION\r\n",
-                    order.MatchingOrderIDs
-                        .Select(orderNum => "SELECT " + orderNum));
+                if (order.MatchingOrderIDs.Count > 0)
+                {
+                    selectedOrderNumbersQuery = string.Join("\r\nUNION\r\n",
+                        order.MatchingOrderIDs
+                            .Select(orderNum => "SELECT " + orderNum));
+                }
+                else
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-13003
+                    // In the case that we've cached MatchingOrderIDs, but there are none, use a
+                    // query of "SELECT NULL"-- without anything at all an SQL syntax error will
+                    // result when selectedOrderNumbersQuery is plugged into a larger query.
+                    selectedOrderNumbersQuery = "SELECT NULL";
+                }
             }
             else if (!string.IsNullOrWhiteSpace(order.PatientMRN) &&
                 !string.IsNullOrWhiteSpace(order.OrderCode))

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Design;
@@ -63,6 +64,13 @@ namespace Extract.DataEntry.LabDE
         /// re-paint).
         /// </summary>
         bool _pendingInvalidate;
+
+        /// <summary>
+        /// Contains rows for which auto-population of the order number should not be allowed. Used
+        /// to enforce that auto-population of order numbers only happens regarding changes that
+        /// directly affect the row rather than as a side-effect of edits to other rows.
+        /// </summary>
+        HashSet<FAMOrderRow> _autoPopulationExemptions = new HashSet<FAMOrderRow>();
 
         /// <summary>
         /// Specifies whether the current instance is running in design mode
@@ -453,7 +461,8 @@ namespace Extract.DataEntry.LabDE
         /// Gets or sets the order in which rows matching <see cref="AutoSelectionOrder"/> are to be
         /// considered for auto-selection where the first matching row is the row that is selected.
         /// <see langword="null"/> if a row should be auto-selected only if it is the only row
-        /// matching <see cref="AutoSelectionFilter"/>.
+        /// matching <see cref="AutoSelectionFilter"/> (or only row period if
+        /// <see cref="AutoSelectionFilter"/> is not specified).
         /// </summary>
         /// <value>
         /// The order in which rows matching <see cref="AutoSelectionOrder"/> are to be considered
@@ -461,6 +470,23 @@ namespace Extract.DataEntry.LabDE
         /// </value>
         [Category(_PROPERTY_GRID_CATEGORY)]
         public string AutoSelectionOrder
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the order number should be auto-populated for a
+        /// row when there is only a single candidate row that would appear in the order picker grid
+        /// that also matches <see cref="AutoSelectionFilter"/> (and there are not other rows in the
+        /// table for which this is also true).
+        /// </summary>
+        /// <value><see langword="true"/> to allow auto-population of the order number; otherwise, 
+        /// <see langword="false"/>.
+        /// </value>
+        [DefaultValue(false)]
+        [Category(_PROPERTY_GRID_CATEGORY)]
+        public bool AutoPopulate
         {
             get;
             set;
@@ -547,6 +573,7 @@ namespace Extract.DataEntry.LabDE
                 // Copy OrderPickerTableColumn specific properties
                 column.AutoSelectionFilter = this.AutoSelectionFilter;
                 column.AutoSelectionOrder = this.AutoSelectionOrder;
+                column.AutoPopulate = this.AutoPopulate;
                 column.OrderNumberColumn = this.OrderNumberColumn;
                 column.PatientMRNAttribute = this.PatientMRNAttribute;
                 column.OrderCodeAttribute = this.OrderCodeAttribute;
@@ -684,6 +711,7 @@ namespace Extract.DataEntry.LabDE
                         // rows whether or not they are currently visible.
                         if (!FAMData.HasRowData)
                         {
+                            _autoPopulationExemptions.Clear();
                             LoadDataForAllRows();
                         }
 
@@ -819,6 +847,11 @@ namespace Extract.DataEntry.LabDE
                         // number and picker cells to be a summary of the currently selected order.
                         if (e.OrderNumberUpdated)
                         {
+                            // If the row number specifically is being changed, block
+                            // auto-population to prevent a deleted order number from being
+                            // automatically replaced.
+                            _autoPopulationExemptions.Add(e.FAMOrderRow);
+
                             var dataEntryTable = DataGridView as DataEntryTableBase;
                             if (dataEntryTable != null)
                             {
@@ -836,6 +869,13 @@ namespace Extract.DataEntry.LabDE
                                     pickerButtonCell.ToolTipText = orderDescription;
                                 }
                             }
+                        }
+                        // If an edit is being made that directly affects this row and the order
+                        // number has not yet been filled in, allow the edit to auto-populate an
+                        // order number (if applicable).
+                        else if (string.IsNullOrWhiteSpace(e.FAMOrderRow.OrderNumber))
+                        {
+                            _autoPopulationExemptions.Remove(e.FAMOrderRow);
                         }
 
                         InvokeInvalidate();
@@ -1004,8 +1044,73 @@ namespace Extract.DataEntry.LabDE
                     DataEntryControlHost.ExecuteOnIdle("ELI38231", () => 
                     {
                         _pendingInvalidate = false;
+
+                        if (AutoPopulate)
+                        {
+                            AutoPopulateOrderNumbers();
+                        }
                         DataGridView.InvalidateColumn(Index);
                     });
+                }
+            }
+        }
+
+        /// <summary>
+        /// Auto-populates all order numbers that qualify for auto population.
+        /// </summary>
+        void AutoPopulateOrderNumbers()
+        {
+            var pendingAutoPopulation = new Dictionary<string, DataGridViewCell>();
+
+            foreach (DataGridViewRow tableRow in DataGridView.Rows)
+            {
+                FAMOrderRow rowData = FAMData.GetRowData(tableRow as DataEntryTableRow);
+                var orderNumberCell = tableRow.Cells[_orderNumberColumn.Index];
+
+                // Only consider rows for which we have data, currently do not have an order number
+                // and haven't been exempted from auto-population.
+                if (rowData != null && !_autoPopulationExemptions.Contains(rowData) &&
+                    string.IsNullOrWhiteSpace(orderNumberCell.Value as string))
+                {
+                    // Get a view for all un-mapped matching orders that qualify under
+                    // AutoSelectionFilter.
+                    using (DataTable table = rowData.UnmappedMatchingOrders.ToTable())
+                    using (DataView view = new DataView(table))
+                    {
+                        if (!string.IsNullOrWhiteSpace(AutoSelectionFilter))
+                        {
+                            view.RowFilter = AutoSelectionFilter;
+                        }
+
+                        // If there is only one qualifying row, add it to the list of rows to
+                        // auto-populate as long as there are no other rows that qualify for the
+                        // same order number.
+                        if (view.Count == 1)
+                        {
+                            string orderNumber = (string)(view[0].Row.ItemArray[0]);
+                            if (pendingAutoPopulation.ContainsKey(orderNumber))
+                            {
+                                pendingAutoPopulation[orderNumber] = null;
+                            }
+                            else
+                            {
+                                pendingAutoPopulation[orderNumber] = orderNumberCell;
+                            }
+                        }
+                    }
+
+                    // Once a row has been tested for auto-population qualification, do not consider
+                    // it again until explicitly allowed to do so.
+                    _autoPopulationExemptions.Add(rowData);
+                }
+            }
+
+            // Apply the qualifying auto-populated order numbers.
+            foreach (KeyValuePair<string, DataGridViewCell> autoPopulation in pendingAutoPopulation)
+            {
+                if (autoPopulation.Value != null)
+                {
+                    autoPopulation.Value.Value = autoPopulation.Key;
                 }
             }
         }

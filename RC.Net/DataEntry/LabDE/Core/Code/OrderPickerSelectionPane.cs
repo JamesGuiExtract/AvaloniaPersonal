@@ -15,6 +15,7 @@ namespace Extract.DataEntry.LabDE
     /// by an <see cref="OrderPickerTableColumn"/>. This pane will display the orders that may be
     /// associated with the currently selected order row in a LabDE DEP.
     /// </summary>
+    [ToolboxItem(false)]
     public partial class OrderPickerSelectionPane : UserControl, IFFIFileSelectionPane, IFFIDataManager
     {
         #region Constants
