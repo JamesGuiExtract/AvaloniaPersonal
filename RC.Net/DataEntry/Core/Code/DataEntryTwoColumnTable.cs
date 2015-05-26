@@ -1000,7 +1000,9 @@ namespace Extract.DataEntry
         /// </summary>
         void ApplyAttribute()
         {
-            // Iterate through all rows to set map attrbute for each.
+            bool mappedPrimaryAttribute = false;
+
+            // Iterate through all rows to set map attribute for each.
             foreach (DataEntryTableRow row in base.Rows)
             {
                 IDataEntryTableCell dataEntryCell = (IDataEntryTableCell)row.Cells[0];
@@ -1018,6 +1020,7 @@ namespace Extract.DataEntry
                         false, row.TabStopMode, dataEntryCell.ValidatorTemplate, row.AutoUpdateQuery,
                         row.ValidationQuery);
                     row.Cells[0].Value = _attribute;
+                    mappedPrimaryAttribute = true;
                 }
                 else
                 {
@@ -1049,6 +1052,15 @@ namespace Extract.DataEntry
             }
             else
             {
+                // https://extract.atlassian.net/browse/ISSUE-13005
+                // If the primary attribute is not displayed as one of the table rows, map it to the
+                // table itself. Otherwise, attribute will not be able to be propagated to any child
+                // controls of this table.
+                if (!mappedPrimaryAttribute)
+                {
+                    base.MapAttribute(_attribute, this);
+                }
+
                 // Raise PropagateAttributes to propagate the new attribute to any dependent controls.
                 OnPropagateAttributes(DataEntryMethods.AttributeAsVector(_attribute));
             }

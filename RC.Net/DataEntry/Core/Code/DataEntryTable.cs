@@ -3953,8 +3953,13 @@ namespace Extract.DataEntry
             get
             {
                 // A TabOrderPlaceholderAttribute is not needed if there is no currently propagated
-                // attributes, the table does not support new rows or the table is not visible.
-                if (_sourceAttributes == null || !AllowUserToAddRows || !Visible)
+                // attributes, the table does not support new rows.
+                // https://extract.atlassian.net/browse/ISSUE-13005
+                // I have removed the check that is preventing the placeholder attribute creation in
+                // cases where the control is not visible. To support the case that controls may
+                // programmatically shown and hidden, do not assume that because a control is not
+                // currently visible that it never will be.
+                if (_sourceAttributes == null || !AllowUserToAddRows)
                 {
                     return null;
                 }

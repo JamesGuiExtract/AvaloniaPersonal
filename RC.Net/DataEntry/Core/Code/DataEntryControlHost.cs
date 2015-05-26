@@ -4632,10 +4632,80 @@ namespace Extract.DataEntry
             // depend on an auto-update.
             AttributeStatusInfo.EndEdit();
 
-            Stack<IAttribute> nextTabStopGenealogy = null;
-            bool selectGroup = _dataEntryApp.AllowTabbingByGroup;
+            IAttribute originalActiveAttribute = GetActiveAttribute(!forward);
+            IAttribute activeAttribute = originalActiveAttribute;
+            Stack<IAttribute> activeGenealogy = ActiveAttributeGenealogy(!forward,
+                _dataEntryApp.AllowTabbingByGroup ? _currentlySelectedGroupAttribute : null);
+            bool repeat = false;
 
-            if (_dataEntryApp.AllowTabbingByGroup)
+            // https://extract.atlassian.net/browse/ISSUE-13005
+            // Per comment below, this loop to select the next attribute may need to be repeated to
+            // find one that is currently visible and enabled.
+            do
+            {
+                repeat = false;
+
+                // Find the next attribute genealogy in the tab order and whether it should be
+                // selected individually or as a group (row).
+                bool tabByGroup;
+                Stack<IAttribute> nextTabStopGenealogy = GetNextTabStopGenealogy(
+                    forward, activeAttribute, activeGenealogy, out tabByGroup);
+
+                if (nextTabStopGenealogy != null)
+                {
+                    // Indicate a manual focus event so that HandleControlGotFocus allows the
+                    // new attribute selection rather than overriding it.
+                    _manualFocusEvent = true;
+
+                    activeGenealogy = new Stack<IAttribute>(nextTabStopGenealogy.Reverse());
+                    activeAttribute = PropagateAttributes(nextTabStopGenealogy, true, tabByGroup);
+
+                    // https://extract.atlassian.net/browse/ISSUE-13005
+                    // To support programmatic changes of controls, we need to expect that the
+                    // attribute in question may be in a control that is not currently visible or
+                    // enabled. In this case, we need to continue on until we get to the next
+                    // attribute from a visible control.
+                    // NOTE: Because visibility of a control could change via propagation, an
+                    // attempt needs to be made to propagate an attribute before checking visibility
+                    // rather than making the check for visibility part of GetNextTabStopGenealogy.
+                    var owningControl =
+                        AttributeStatusInfo.GetOwningControl(activeAttribute) as Control;
+                    if (owningControl != null && (!owningControl.Visible || !owningControl.Enabled))
+                    {
+                        ExtractException.Assert("ELI38240", "Failed to advance selection.",
+                            activeAttribute != originalActiveAttribute);
+
+                        repeat = true;
+                    }
+                }
+            }
+            while (repeat);
+        }
+
+        /// <summary>
+        /// Finds the next attribute genealogy after <see paramref="activeAttribute"/> and
+        /// <see paramref="activeGenealogy"/> in the tab order (<see paramref="forward"/> or
+        /// backward) and whether it should be selected individually or as a group (row).
+        /// </summary>
+        /// <param name="forward"><see langword="true"/> if the next tab stop should be found,
+        /// <see langword="false"/> if the previous should be found.</param>
+        /// <param name="startingPoint">The attribute that best represents the starting point of the
+        /// search in the specified search direction.</param>
+        /// <param name="activeGenealogy">The attribute genealogy that best represents the starting
+        /// point of the search in the specified search direction.</param>
+        /// <param name="tabByGroup"><see langword="true"/> if the resulting genealogy should be
+        /// selected as a group, otherwise, <see langword="false"/>.</param>
+        /// <returns>A Stack of <see cref="IAttribute"/>s describing the next tab stop in the
+        /// specified direction.
+        /// </returns>
+        Stack<IAttribute> GetNextTabStopGenealogy(bool forward, IAttribute startingPoint,
+            Stack<IAttribute> activeGenealogy, out bool tabByGroup)
+        {
+            Stack<IAttribute> nextTabStopGenealogy = null;
+            tabByGroup = _dataEntryApp.AllowTabbingByGroup;
+            nextTabStopGenealogy = null;
+
+            if (tabByGroup)
             {
                 // If _dataEntryApp.AllowTabbingByGroup and a group is currently selected,
                 // use GetNextTabGroupAttribute to search for the next attribute
@@ -4646,8 +4716,7 @@ namespace Extract.DataEntry
                 {
                     nextTabStopGenealogy =
                         AttributeStatusInfo.GetNextTabGroupAttribute(_attributes,
-                            ActiveAttributeGenealogy(!forward,
-                                _currentlySelectedGroupAttribute), forward);
+                            activeGenealogy, forward);
                 }
                 // If no attribute group is currently selected, use
                 // GetNextTabStopOrGroupAttribute to find either the next tab
@@ -4661,15 +4730,14 @@ namespace Extract.DataEntry
                     // is not currently selected and the previous navigation was via tab in the same
                     // direction as the current navigation, select the tab group without advancing
                     // the active attribute.
-                    IAttribute activeAttribute = GetActiveAttribute(!forward);
-                    if (activeAttribute != null && _lastNavigationViaTabKey != null &&
+                    if (startingPoint != null && _lastNavigationViaTabKey != null &&
                         _lastNavigationViaTabKey.Value == forward)
                     {
                         List<IAttribute> tabGroup =
-                            AttributeStatusInfo.GetAttributeTabGroup(activeAttribute);
+                            AttributeStatusInfo.GetAttributeTabGroup(startingPoint);
                         if (tabGroup != null && tabGroup.Count > 0)
                         {
-                            nextTabStopGenealogy = GetAttributeGenealogy(activeAttribute);
+                            nextTabStopGenealogy = GetAttributeGenealogy(startingPoint);
                         }
                     }
 
@@ -4678,15 +4746,14 @@ namespace Extract.DataEntry
                     {
                         nextTabStopGenealogy =
                             AttributeStatusInfo.GetNextTabStopOrGroupAttribute(_attributes,
-                                ActiveAttributeGenealogy(!forward,
-                                    _currentlySelectedGroupAttribute), forward);
+                                activeGenealogy, forward);
 
                         // [DataEntry:754]
                         // If the next tab stop attribute represents an attribute group and that
                         // group contains the currently active attribute and is a tab stop on its
                         // own, don't select the group, rather first select the attribute
                         // independently (set selectGroup = false).
-                        if (activeAttribute != null)
+                        if (startingPoint != null)
                         {
                             IAttribute nextTabStopAttribute = null;
                             foreach (IAttribute attribute in nextTabStopGenealogy)
@@ -4699,16 +4766,16 @@ namespace Extract.DataEntry
                                 // [DataEntry:840]
                                 // If nextTabStopAttribute is null, the control owning it does not
                                 // support tabbing by group. Don't select by group.
-                                selectGroup = false;
+                                tabByGroup = false;
                             }
                             else if (AttributeStatusInfo.IsAttributeTabStop(nextTabStopAttribute))
                             {
                                 List<IAttribute> tabGroup =
                                     AttributeStatusInfo.GetAttributeTabGroup(nextTabStopAttribute);
 
-                                if (tabGroup != null && tabGroup.Contains(activeAttribute))
+                                if (tabGroup != null && tabGroup.Contains(startingPoint))
                                 {
-                                    selectGroup = false;
+                                    tabByGroup = false;
                                 }
                             }
                         }
@@ -4720,17 +4787,10 @@ namespace Extract.DataEntry
             {
                 nextTabStopGenealogy =
                     AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
-                        ActiveAttributeGenealogy(!forward, null), forward);
+                        activeGenealogy, forward);
             }
 
-            if (nextTabStopGenealogy != null)
-            {
-                // Indicate a manual focus event so that HandleControlGotFocus allows the
-                // new attribute selection rather than overriding it.
-                _manualFocusEvent = true;
-
-                PropagateAttributes(nextTabStopGenealogy, true, selectGroup);
-            }
+            return nextTabStopGenealogy;
         }
 
         /// <summary>

@@ -637,6 +637,11 @@ namespace Extract.DataEntry
             {
                 using (new SelectionProcessingSuppressor(this))
                 {
+                    // https://extract.atlassian.net/browse/ISSUE-702
+                    // To prevent exceptions when changing selection in a table which has vertical
+                    // sizing which cuts off a row, call PerformLayout first.
+                    PerformLayout();
+
                     base.CurrentCell = value;
                 }
                 OnSelectionChanged(new EventArgs());
@@ -1960,6 +1965,16 @@ namespace Extract.DataEntry
 
                 ExtractException.Assert("ELI24737", "Unexpected attribute!",
                     _attributeMap.ContainsKey(attribute));
+
+                // https://extract.atlassian.net/browse/ISSUE-13005
+                // In the case of the DataEntryTwoColumnTable, the primary attribute may not end up
+                // getting mapped to a row in which it will be mapped to this control in general. In
+                // this case, there is no particular selection to make.
+                if (_attributeMap[attribute] == this)
+                {
+                    ProcessSelectionChange();
+                    return;
+                }
 
                 // Within this method, prevent derived classes from processing selection changes
                 // until specifically commanded with a ProcessSelectionChange call.
