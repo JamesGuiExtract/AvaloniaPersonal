@@ -1842,7 +1842,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                DataEntryQuery.ClearCache();
+                AttributeStatusInfo.ClearQueryCache();
                 Refresh();
 
                 // This forces all validation queries to be re-evaluated.

@@ -146,9 +146,6 @@ namespace Extract.DataEntry
             {
                 _rootAttribute = rootAttribute;
                 _dbConnections = dbConnections;
-
-                // Handle ClearCacheEvent to clear CachedResults as needed.
-                QueryNode.ClearCacheEvent += Handle_ClearCacheEvent;
             }
             catch (Exception ex)
             {
@@ -744,30 +741,29 @@ namespace Extract.DataEntry
             }
         }
 
-        #endregion Overrides
-
-        #region Event Handlers
-
         /// <summary>
-        /// Handles the <see cref="QueryNode.ClearCacheEvent"/> event to clear cached data as
-        /// required.
+        /// Clears any data this query node has cached.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void Handle_ClearCacheEvent(object sender, EventArgs e)
+        internal override void ClearCache()
         {
             try
             {
+                base.ClearCache();
+
                 CachedResult = null;
+
+                foreach (QueryNode childNode in ChildNodes)
+                {
+                    childNode.ClearCache();
+                }
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38190");
+                throw ex.AsExtract("ELI38249");
             }
         }
 
-        #endregion Event Handlers
+        #endregion Overrides
 
         #region Private Members
 

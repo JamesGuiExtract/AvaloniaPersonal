@@ -32,18 +32,6 @@ namespace Extract.DataEntry
 
         #region Constructors
 
-        /// <summary>
-        /// Initializes the <see cref="ExpressionQueryNode"/> class.
-        /// </summary>
-        // The FX Cop rule against static constructors assumes the static constructor is being used
-        // to initialize static fields.
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
-        static ExpressionQueryNode()
-        {
-            // Handle ClearCacheEvent to clear _cachedExpressions as needed.
-            QueryNode.ClearCacheEvent += Handle_ClearCacheEvent;
-        }
-
         /// <overrides>
         /// Initializes a new <see cref="CompositeQueryNode"/> instance.
         /// </overrides>
@@ -225,29 +213,23 @@ namespace Extract.DataEntry
             }
         }
 
-        #endregion Overrides
-
-        #region Event Handlers
-
         /// <summary>
-        /// Handles the <see cref="QueryNode.ClearCacheEvent"/> event to clear cached data as
-        /// required.
+        /// Clears any data this query node has cached.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        static void Handle_ClearCacheEvent(object sender, EventArgs e)
+        internal override void ClearCache()
         {
             try
             {
+                base.ClearCache();
+
                 _cachedExpressions = null;
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38189");
+                throw ex.AsExtract("ELI38250");
             }
         }
 
-        #endregion Event Handlers
+        #endregion Overrides
     }
 }

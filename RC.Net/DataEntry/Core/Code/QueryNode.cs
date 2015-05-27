@@ -605,6 +605,13 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Clears any data this query node has cached.
+        /// </summary>
+        internal virtual void ClearCache()
+        {
+        }
+
+        /// <summary>
         /// The active distinct <see cref="QueryResult"/> for a node with the selection mode of 
         /// "Distinct" that is currently being evaluated.
         /// </summary>
@@ -638,25 +645,6 @@ namespace Extract.DataEntry
         {
             get;
             set;
-        }
-
-        /// <summary>
-        /// Raised to notify all <see cref="QueryNode"/> sub-classes that cached data needs to be
-        /// cleared. Any sub-class that caches data should handle this event.
-        /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2211:NonConstantFieldsShouldNotBeVisible")]
-        protected static EventHandler<EventArgs> ClearCacheEvent;
-
-        /// <summary>
-        /// Clears all cached query results.
-        /// </summary>
-        internal static void ClearCache()
-        {
-            var eventHandler = ClearCacheEvent;
-            if (eventHandler != null)
-            {
-                eventHandler(null, new EventArgs());
-            }
         }
 
         /// <summary>

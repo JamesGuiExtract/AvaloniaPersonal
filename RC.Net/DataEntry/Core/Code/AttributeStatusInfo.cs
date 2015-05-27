@@ -1315,6 +1315,27 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Clears any data cached by the <see cref="DataEntryQuery"/>s of any auto-update or
+        /// validation queries being tracked.
+        /// </summary>
+        [ComVisible(false)]
+        public static void ClearQueryCache()
+        {
+            try
+            {
+                foreach (AutoUpdateTrigger trigger in _autoUpdateTriggers.Values
+                    .Union(_validationTriggers.Values))
+                {
+                    trigger.ClearQueryCache();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38247");
+            }
+        }
+
         /// <overloads>Applies the specified value to the specified <see cref="IAttribute"/> and
         /// raises <see cref="AttributeValueModified"/> when appropriate.</overloads>
         /// <summary>

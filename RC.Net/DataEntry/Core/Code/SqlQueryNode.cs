@@ -59,28 +59,6 @@ namespace Extract.DataEntry
             public DbConnectionWrapper(DbConnection dbConnection)
             {
                 DbConnection = dbConnection;
-
-                // Handle ClearCacheEvent to clear CachedResults as needed.
-                QueryNode.ClearCacheEvent += Handle_ClearCacheEvent;
-            }
-
-            /// <summary>
-            /// Handles the <see cref="QueryNode.ClearCacheEvent"/> event to clear cached data as
-            /// required.
-            /// </summary>
-            /// <param name="sender">The source of the event.</param>
-            /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-            /// </param>
-            void Handle_ClearCacheEvent(object sender, EventArgs e)
-            {
-                try
-                {
-                    CachedResults.Clear();
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI38190");
-                }
             }
         }
 
@@ -292,6 +270,23 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI26755");
+            }
+        }
+
+        /// <summary>
+        /// Clears any data this query node has cached.
+        /// </summary>
+        internal override void ClearCache()
+        {
+            try
+            {
+                base.ClearCache();
+
+                _currentConnection.CachedResults.Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38246");
             }
         }
 
