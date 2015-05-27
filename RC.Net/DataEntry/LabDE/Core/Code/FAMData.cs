@@ -139,13 +139,13 @@ namespace Extract.DataEntry.LabDE
                 CollectionTimeAttribute = _DEFAULT_COLLECTION_TIME_ATTRIBUTE;
 
                 OrderQueryColumns = new OrderedDictionary();
-                OrderQueryColumns.Add("Order #", "[LabDEOrder].[OrderNumber]");
+                OrderQueryColumns.Add("Order Number", "[LabDEOrder].[OrderNumber]");
                 OrderQueryColumns.Add("Order Name", _ORDER_NAME_XPATH);
                 OrderQueryColumns.Add("Patient", "[LabDEPatient].LastName + ', ' + [LabDEPatient].FirstName");
-                OrderQueryColumns.Add("Ordered by",
+                OrderQueryColumns.Add("Ordered By",
                     "(" + _ORDER_PROVIDER_LAST_NAME_XPATH + " + ', ' + " + _ORDER_PROVIDER_FIRST_NAME_XPATH + ")");
-                OrderQueryColumns.Add("Requested", "[LabDEOrder].[ReferenceDateTime]");
-                OrderQueryColumns.Add("Collection date/time", "[LabDEOrderFile].[CollectionDate]");
+                OrderQueryColumns.Add("Request Date/Time", "[LabDEOrder].[ReferenceDateTime]");
+                OrderQueryColumns.Add("Collection Date/Time", "[LabDEOrderFile].[CollectionDate]");
 
                 ColorQueryConditions = new OrderedDictionary();
                 ColorQueryConditions.Add("Red", "COUNT(CASE WHEN ([OrderStatus] = 'A') THEN 1 END) = 0");

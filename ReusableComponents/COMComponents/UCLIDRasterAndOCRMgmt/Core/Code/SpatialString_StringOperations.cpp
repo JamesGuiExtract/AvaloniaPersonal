@@ -881,7 +881,7 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long nPag
 
 		// If all the required characters-to-remove were found, remove the characters in
 		// setLettersToRemove.
-		if (nFirstPosition != -1 && setLettersToRemove.size() >= nNumLettersRequiredToRemove)
+		if (nFirstPosition != -1 && setLettersToRemove.size() >= (size_t)nNumLettersRequiredToRemove)
 		{
 			long nNewLetterCount = nLetterCount - setLettersToRemove.size();
 			vector<CPPLetter> vecNewLetters;

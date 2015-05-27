@@ -2349,7 +2349,7 @@ namespace Extract.Redaction.Verification
                 // the exception for VerificationForm to handle.
                 if (IsInHistory)
                 {
-                    throw ex;
+                    throw ex.AsExtract("ELI38251");
                 }
                 else
                 {

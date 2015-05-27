@@ -2706,7 +2706,7 @@ void CTestSpatialString::runTestCase25()
 
 		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));		
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI37810", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI38278", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 bool CTestSpatialString::testCase25Helper(vector<string>& rvecFilesToJoin, string& expected)
@@ -2720,11 +2720,11 @@ bool CTestSpatialString::testCase25Helper(vector<string>& rvecFilesToJoin, strin
 	ASSERT_RESOURCE_ALLOCATION("ELI37800", ipSS != __nullptr);
 
 	// load the strings to combine
-	for (int i = 0; i < rvecFilesToJoin.size(); i++)
+	for (size_t i = 0; i < rvecFilesToJoin.size(); i++)
 	{
 		// Create string used to temp load from uss file
 		ISpatialStringPtr ipSS(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI37800", ipSS != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI38277", ipSS != __nullptr);
 
 		ipSS->LoadFrom(get_bstr_t(rvecFilesToJoin[i]), VARIANT_FALSE);
 

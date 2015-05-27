@@ -532,7 +532,7 @@ namespace Extract.FileActionManager.RunFPSFile
                 if (_fileProcessingManagementRole.LogErrorDetails)
                 {
                     string logFileName = _tagManager.ExpandTagsAndFunctions(_fileProcessingManagementRole.ErrorLogName, _fileRecord.Name);
-                    if (Path.GetExtension(logFileName).ToLower() == ".uex")
+                    if (Path.GetExtension(logFileName).ToLowerInvariant() == ".uex")
                     {
                         taskException.ExtractLog("ELI37893", logFileName);
                     }

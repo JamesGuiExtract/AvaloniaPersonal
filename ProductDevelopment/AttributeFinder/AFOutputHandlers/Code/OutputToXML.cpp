@@ -782,7 +782,7 @@ string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
 		else
 		{
 			ITagUtilityPtr ipTagUtility(CLSID_AFUtility);
-			ASSERT_RESOURCE_ALLOCATION("ELI26301", ipTagUtility != __nullptr);
+			ASSERT_RESOURCE_ALLOCATION("ELI38256", ipTagUtility != __nullptr);
 
 			strFileName = asString(ipTagUtility->ExpandTagsAndFunctions(
 				m_strFileName.c_str(), "", ipDoc));

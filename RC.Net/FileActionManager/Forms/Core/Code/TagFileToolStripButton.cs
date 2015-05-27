@@ -156,7 +156,7 @@ namespace Extract.FileActionManager.Forms
                 }
                 catch (Exception ex)
                 {
-                    throw new ExtractException("ELI28730",
+                    throw new ExtractException("ELI38260",
                         "Unable to set database.", ex);
                 }
             }

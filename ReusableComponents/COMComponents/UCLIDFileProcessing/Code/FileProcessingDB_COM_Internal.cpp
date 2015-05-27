@@ -7274,7 +7274,7 @@ bool CFileProcessingDB::SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long W
 				
 				// Create a pointer to a recordset
 				_RecordsetPtr ipWorkItemSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI37105", ipWorkItemSet != __nullptr);
+				ASSERT_RESOURCE_ALLOCATION("ELI38273", ipWorkItemSet != __nullptr);
 
 				// Execute the query to get the WorkItemID if it exists
 				ipWorkItemSet->Open(strWorkItemQuery.c_str(), 
@@ -7285,7 +7285,7 @@ bool CFileProcessingDB::SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long W
 				{
 					// Get the fields from the file set
 					FieldsPtr ipFields = ipWorkItemSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI37106", ipFields != __nullptr);
+					ASSERT_RESOURCE_ALLOCATION("ELI38274", ipFields != __nullptr);
 
 					setIPersistObjToField(ipFields, "BinaryOutput", pBinaryOutput);
 
@@ -7300,7 +7300,7 @@ bool CFileProcessingDB::SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long W
 
 				tg.CommitTrans();
 				
-			END_CONNECTION_RETRY(ipConnection, "ELI37171");
+			END_CONNECTION_RETRY(ipConnection, "ELI38275");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37172");
 	}
@@ -7837,7 +7837,7 @@ bool CFileProcessingDB::AddMetadataField_Internal(bool bDBLocked, const string& 
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipMetadataFieldSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27355", ipMetadataFieldSet != __nullptr);
+				ASSERT_RESOURCE_ALLOCATION("ELI38257", ipMetadataFieldSet != __nullptr);
 
 				// Open Recordset that contains the metadata field names
 				ipMetadataFieldSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
@@ -7845,7 +7845,7 @@ bool CFileProcessingDB::AddMetadataField_Internal(bool bDBLocked, const string& 
 
 				if (ipMetadataFieldSet->adoEOF == VARIANT_FALSE)
 				{
-					UCLIDException ue("ELI27356", "Specified metadata field already exists!");
+					UCLIDException ue("ELI38258", "Specified metadata field already exists!");
 					ue.addDebugInfo("Metadata Field Name", strMetadataFieldName);
 					throw ue;
 				}
@@ -7855,7 +7855,7 @@ bool CFileProcessingDB::AddMetadataField_Internal(bool bDBLocked, const string& 
 
 					// Get the fields
 					FieldsPtr ipFields = ipMetadataFieldSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI27357", ipFields != __nullptr);
+					ASSERT_RESOURCE_ALLOCATION("ELI38259", ipFields != __nullptr);
 
 					// Set the fields
 					setStringField(ipFields, "Name", strMetadataFieldName);
@@ -7929,7 +7929,7 @@ bool CFileProcessingDB::DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMe
 
 			END_CONNECTION_RETRY(ipConnection, "ELI37702");
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30675");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38263");
 	}
 	catch(UCLIDException &ue)
 	{

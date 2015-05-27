@@ -165,6 +165,7 @@ namespace Extract.DataEntry.LabDE
         /// <value>
         /// The <see cref="IAttribute"/> representing this order in LabDE.
         /// </value>
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public IAttribute OrderAttribute
         {
             get;

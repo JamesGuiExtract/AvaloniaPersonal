@@ -255,7 +255,7 @@ STDMETHODIMP CEnhanceOCRTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	{
 		// nothing to do
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17792");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38253");
 
 	return S_OK;
 }

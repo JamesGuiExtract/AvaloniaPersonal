@@ -38,8 +38,7 @@ static const string gstrIDSO_GUID = "{A8DDFDC1-069D-42DE-AF69-A78FC232A86A}";
 static const string gstrIDSO_KEY_FILE = "\\IDShieldOffice.exe";
 
 static const string gstrLABDE_GUID = "{0E412937-E4FA-4737-A321-00AED69497C7}";
-static const string gstrLABDE_KEY_FILE = "\\Extract.LabResultsCustomComponents.dll";
-static const string gstrLABDE_VERSION_FILE = "\\Extract.DataEntry.DEP.StandardLabDE.dll";
+static const string gstrLABDE_KEY_FILE = "\\Extract.DataEntry.LabDE.dll";
 
 static const string gstrICOMAP_GUID = "{0B7B53B1-B2F3-4EA0-97F9-D1280C11A892}";
 static const string gstrICOMAP_KEY_FILE = gstrRELATIVE_PATH_TO_ICOMAP_APP_DLL;
@@ -336,12 +335,6 @@ void CStep1::checkForProduct(const string &strGUID, const string &strKeyFile,
 
 			// Verify we can find the specified key file.
 			validateFileOrFolderExistence(strKeyFileFullPath);
-
-			// For LabDE, use the version of DataEntry dll instead.
-			if (strKeyFile == gstrLABDE_KEY_FILE)
-			{
-				strKeyFileFullPath = strPath + gstrLABDE_VERSION_FILE;
-			}
 
 			// Retrieve the product version from the key file.
 			productInfo.strVersion = ::getFileVersion(strKeyFileFullPath);

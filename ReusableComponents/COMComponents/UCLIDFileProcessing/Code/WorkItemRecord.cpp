@@ -337,7 +337,7 @@ STDMETHODIMP CWorkItemRecord::put_BinaryInput(IUnknown *pBinaryInput)
 		// Throw exception if the object passed in does not implement IPersistStream.
 		if ( pBinaryInput != __nullptr && m_ipBinaryInput == __nullptr)
 		{
-			UCLIDException ue("ELI37217", "WorkItem BinaryInput value should implement IPersistStream");
+			UCLIDException ue("ELI38276", "WorkItem BinaryInput value should implement IPersistStream");
 			throw ue;
 		}
 

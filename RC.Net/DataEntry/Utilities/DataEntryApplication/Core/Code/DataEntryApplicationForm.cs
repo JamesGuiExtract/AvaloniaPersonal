@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -486,6 +487,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// if corrupted will replace with the backup if available otherwise the config file will be deleted
         /// https://extract.atlassian.net/browse/ISSUE-12830
         /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         UserConfigChecker _userConfigChecker = new UserConfigChecker();
 
         #endregion Fields

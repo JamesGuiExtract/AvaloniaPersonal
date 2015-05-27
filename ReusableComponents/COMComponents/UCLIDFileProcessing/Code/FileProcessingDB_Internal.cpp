@@ -4378,7 +4378,7 @@ void CFileProcessingDB::validateMetadataFieldName(const string& strMetadataField
 	if (strMetadataFieldName.length() > 50 || !isValidIdentifier(strMetadataFieldName))
 	{
 		// Throw an exception
-		UCLIDException ue("ELI29706", "Specified metadata field name is invalid.");
+		UCLIDException ue("ELI38261", "Specified metadata field name is invalid.");
 		ue.addDebugInfo("Metadata Field Name", strMetadataFieldName);
 		ue.addDebugInfo("Valid Pattern", "[_a-zA-Z][_a-zA-Z0-9]*" );
 		ue.addDebugInfo("Metadata Field Name Length", strMetadataFieldName.length());
@@ -5015,7 +5015,7 @@ set<string> getDBFeatureNames(const _ConnectionPtr& ipConnection)
 	set<string> setDBInfoRows;
 
 	_RecordsetPtr ipResultSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI31392", ipResultSet != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI38262", ipResultSet != __nullptr);
 
 	// Query for all rows in the Feature table
 	string strFeaturesQuery = "SELECT [FeatureName] FROM [" + gstrDB_FEATURE + "]";

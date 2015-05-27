@@ -306,7 +306,7 @@ void SelectDBDialog::OnBnClickedButtonAdvanced()
 			UpdateData(FALSE);
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18119");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38254");
 }
 //--------------------------------------------------------------------------------------------------
 void SelectDBDialog::OnChangeServerName()

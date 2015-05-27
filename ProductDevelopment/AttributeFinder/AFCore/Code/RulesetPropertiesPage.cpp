@@ -47,7 +47,7 @@ CRuleSetPropertiesPage::~CRuleSetPropertiesPage()
 	{
 		m_ipRuleSet = __nullptr;
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34021");
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38264");
 }//-------------------------------------------------------------------------------------------------
 void CRuleSetPropertiesPage::DoDataExchange(CDataExchange* pDX)
 {

@@ -668,7 +668,7 @@ namespace Extract.SQLCDBEditor
         /// <param name="query">The query.</param>
         void LoadQueryCore(SqlCeConnection connection, string query)
         {
-            ExtractException.Assert("ELI34580", "No query can be loaded from this control type.",
+            ExtractException.Assert("ELI38266", "No query can be loaded from this control type.",
                 QueryAndResultsType == QueryAndResultsType.Query ||
                 QueryAndResultsType == QueryAndResultsType.Plugin);
 
@@ -712,7 +712,7 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                ExtractException.Assert("ELI34580", "Cannot load as a plugin",
+                ExtractException.Assert("ELI38267", "Cannot load as a plugin",
                     QueryAndResultsType == QueryAndResultsType.Plugin);
 
                 // Put the query results in Panel1 (if the plugin has a query) and the plugin

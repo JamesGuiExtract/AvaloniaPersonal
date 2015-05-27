@@ -129,7 +129,7 @@ void WorkItemsPage::OnTimer(UINT nIDEvent)
 			CPropertyPage::OnTimer(nIDEvent);
 		}
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI11636");
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38252");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ using Extract.ReportViewer.Properties;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -31,6 +32,7 @@ namespace Extract.ReportViewer
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
+        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "_userConfigChecker")]
         static void Main(string[] args)
         {
             string exceptionLogFile = null;
