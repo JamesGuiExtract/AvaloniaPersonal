@@ -3106,10 +3106,10 @@ IIUnknownVectorPtr CFileProcessingDB::getLicensedProductSpecificMgrs()
 	return ipProdSpecMgrs;
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::removeProductSpecificDB(bool bOnlyTables, bool bRetainUserTables)
+IIUnknownVectorPtr CFileProcessingDB::removeProductSpecificDB(bool bOnlyTables, bool bRetainUserTables)
 {
 	try
-	{
+	{	
 		// Get vector of all license product specific managers
 		IIUnknownVectorPtr ipProdSpecMgrs = getLicensedProductSpecificMgrs();
 		ASSERT_RESOURCE_ALLOCATION("ELI18951", ipProdSpecMgrs != __nullptr);
@@ -3122,21 +3122,29 @@ void CFileProcessingDB::removeProductSpecificDB(bool bOnlyTables, bool bRetainUs
 			ASSERT_RESOURCE_ALLOCATION("ELI18952", ipMgr != __nullptr);
 
 			// Remove the schema for the product specific manager
-			ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr(), 
-				asVariantBool(bOnlyTables), asVariantBool(bRetainUserTables));
+			bool bSchemaRemoved = asCppBool(ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr(),
+				asVariantBool(bOnlyTables), asVariantBool(bRetainUserTables)));
+
+			// If the schema had not been present in the database, remove it from the return value
+			// which represents the schemas that were removed.
+			if (!bSchemaRemoved)
+			{
+				ipProdSpecMgrs->Remove(n);
+				n--;
+				nSize--;
+			}
 		}
+
+		return ipProdSpecMgrs;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27610")
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::addProductSpecificDB(bool bOnlyTables, bool bAddUserTables)
+void CFileProcessingDB::addProductSpecificDB(IIUnknownVectorPtr ipProdSpecMgrs,
+											 bool bOnlyTables, bool bAddUserTables)
 {
 	try
 	{
-		// Get vector of all license product specific managers
-		IIUnknownVectorPtr ipProdSpecMgrs = getLicensedProductSpecificMgrs();
-		ASSERT_RESOURCE_ALLOCATION("ELI19790", ipProdSpecMgrs != __nullptr);
-
 		// Loop through all of the objects and call the AddProductSpecificSchema
 		long nSize = ipProdSpecMgrs->Size();
 		for (long n = 0; n < nSize; n++)
@@ -3481,10 +3489,14 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 			}
 
 			// First remove all Product Specific stuff
-			removeProductSpecificDB(true, retainUserValues);
-
-			// Drop the tables
-			dropTables(retainUserValues);
+			IIUnknownVectorPtr ipProdSpecMgrs = __nullptr;
+			if (!bInitializing)
+			{
+				ipProdSpecMgrs = removeProductSpecificDB(true, retainUserValues);
+				ASSERT_RESOURCE_ALLOCATION("ELI38283", ipProdSpecMgrs != __nullptr);
+					
+				dropTables(retainUserValues);
+			}
 
 			// Add the tables back
 			addTables(!retainUserValues);
@@ -3506,11 +3518,20 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 
 			tg.CommitTrans();
 
-			// Check for new Product specific DB managers
-			checkForNewDBManagers();
+			if (bInitializing)
+			{
+				// https://extract.atlassian.net/browse/ISSUE-12686
+				// When creating a new database to ensure we are adding all schema currently
+				// installed and licensed, do a check for any schema manager whose components are
+				// not yet registered.
+				checkForNewDBManagers();
+
+				ipProdSpecMgrs = getLicensedProductSpecificMgrs();
+				ASSERT_RESOURCE_ALLOCATION("ELI38284", ipProdSpecMgrs != __nullptr);
+			}
 
 			// Add the Product specific db after the base tables have been committed
-			addProductSpecificDB(!bInitializing, !retainUserValues);
+			addProductSpecificDB(ipProdSpecMgrs, !bInitializing, !retainUserValues);
 
 			// Reset the database connection
 			resetDBConnection();

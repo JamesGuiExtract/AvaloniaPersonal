@@ -29,7 +29,10 @@ using namespace std;
 // Version 2: https://extract.atlassian.net/browse/ISSUE-12801
 // Version 3: https://extract.atlassian.net/browse/ISSUE-12805 
 //			  (Order.ReferenceDateTime and ORMMessage columns)
-static const long glLABDE_DB_SCHEMA_VERSION = 4;
+// Version 4: https://extract.atlassian.net/browse/ISSUE-12902
+//			  Prefixed table names with "LabDE", added CollectionDate column to LabDEOrderFile
+// Version 5: Added DOB index on LabDEPatient table.
+static const long glLABDE_DB_SCHEMA_VERSION = 5;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -199,6 +202,40 @@ int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38120");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion5(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 5;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		
+		// Update existing patient table indices
+		vecQueries.push_back("DROP INDEX [IX_Patient_FirstName] ON [dbo].[LabDEPatient]");
+		vecQueries.push_back("DROP INDEX [IX_Patient_LastName] ON [dbo].[LabDEPatient]");
+		vecQueries.push_back(gstrCREATE_PATIENT_FIRSTNAME_INDEX);
+		vecQueries.push_back(gstrCREATE_PATIENT_LASTNAME_INDEX);
+
+		// Add new DOB index.
+		vecQueries.push_back(gstrCREATE_PATIENT_DOB_INDEX);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38279");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CLabDEProductDBMgr
@@ -339,6 +376,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
 		// Add the queries to create keys/constraints.
 		vecCreateQueries.push_back(gstrCREATE_PATIENT_FIRSTNAME_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_PATIENT_LASTNAME_INDEX);
+		vecCreateQueries.push_back(gstrCREATE_PATIENT_DOB_INDEX);
 		vecCreateQueries.push_back(gstrPOPULATE_ORDER_STATUSES);
 		vecCreateQueries.push_back(gstrADD_FK_ORDER_PATIENT_MRN);
 		vecCreateQueries.push_back(gstrADD_FK_ORDER_ORDERSTATUS);
@@ -384,15 +422,31 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema80(IFileProcessingD
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLabDEProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB,
 																 VARIANT_BOOL bOnlyTables,
-																 VARIANT_BOOL bRetainUserTables)
+																 VARIANT_BOOL bRetainUserTables,
+																 VARIANT_BOOL *pbSchemaExists)
 {
 	try
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+		ASSERT_ARGUMENT("ELI38282", pbSchemaExists != __nullptr);
+
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI37850", ipDB != __nullptr);
+
+		string strValue = asString(ipDB->GetDBInfoSetting(
+			gstrLABDE_SCHEMA_VERSION_NAME.c_str(), VARIANT_FALSE));
+
+		if (strValue.empty())
+		{
+			*pbSchemaExists = VARIANT_FALSE;
+			return S_OK;
+		}
+		else
+		{
+			*pbSchemaExists = VARIANT_TRUE;
+		}
 
 		// Create the connection object
 		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
@@ -598,6 +652,14 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					if (nFAMDBSchemaVersion == 127)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion4(ipConnection, pnNumSteps, NULL);
+					}
+					// Intentionally leaving out break since both updates 4 and 5 take place within
+					// FAM schema 127.
+
+			case 4: // The schema update from 4 to 5 needs to take place against FAM DB schema version 127
+					if (nFAMDBSchemaVersion == 127)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion5(ipConnection, pnNumSteps, NULL);
 					}
 					break;
 

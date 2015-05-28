@@ -23,11 +23,15 @@ static const string gstrCREATE_PATIENT_TABLE =
 
 static const string gstrCREATE_PATIENT_FIRSTNAME_INDEX =
 	"CREATE NONCLUSTERED INDEX [IX_Patient_FirstName] "
-	"	ON [LabDEPatient]([FirstName], [LastName])";
+	"	ON [LabDEPatient]([FirstName], [LastName], [DOB])";
 
 static const string gstrCREATE_PATIENT_LASTNAME_INDEX =
 	"CREATE NONCLUSTERED INDEX [IX_Patient_LastName] "
-	"	ON [LabDEPatient]([LastName], [FirstName])";
+	"	ON [LabDEPatient]([LastName], [FirstName], [DOB])";
+
+static const string gstrCREATE_PATIENT_DOB_INDEX =
+	"CREATE NONCLUSTERED INDEX [IX_Patient_DOB] "
+	"	ON [LabDEPatient]([DOB], [LastName], [FirstName])";
 
 //--------------------------------------------------------------------------------------------------
 // LabDEOrderStatus Table

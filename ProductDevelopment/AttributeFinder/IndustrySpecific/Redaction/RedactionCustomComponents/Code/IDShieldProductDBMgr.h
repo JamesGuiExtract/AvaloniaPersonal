@@ -63,7 +63,7 @@ public:
 		VARIANT_BOOL bOnlyTables, VARIANT_BOOL bAddUserTables);
 	STDMETHOD(raw_AddProductSpecificSchema80)(IFileProcessingDB *pDB);
 	STDMETHOD(raw_RemoveProductSpecificSchema)(IFileProcessingDB *pDB,
-		VARIANT_BOOL bOnlyTables, VARIANT_BOOL bRetainUserTables);
+		VARIANT_BOOL bOnlyTables, VARIANT_BOOL bRetainUserTables, VARIANT_BOOL *pbSchemaExists);
 	STDMETHOD(raw_ValidateSchema)(IFileProcessingDB* pDB);
 	STDMETHOD(raw_GetDBInfoRows)(IVariantVector** ppDBInfoRows);
 	STDMETHOD(raw_GetTables)(IVariantVector** ppTables);

@@ -1641,8 +1641,10 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To remove any relationships and tables that were added in a call to AddProductSpecificSchema
 		// ARGS:	bOnlyTables- VARIANT_TRUE if only tables are to be added (and not stored procedures, etc).
 		// ARGS:	bAddUserTables- VARIANT_TRUE if user tables need to be retained.
+		// RETURNS: pbSchemaExists- VARIANT_TRUE if the schema elements existed or VARIANT_FALSE if they did not.
 		[id(2), helpstring("method RemoveProductSpecificSchema")] HRESULT RemoveProductSpecificSchema(
-			[in] IFileProcessingDB* pDB, [in] VARIANT_BOOL bOnlyTables, [in] VARIANT_BOOL bRetainUserTables);
+			[in] IFileProcessingDB* pDB, [in] VARIANT_BOOL bOnlyTables, [in] VARIANT_BOOL bRetainUserTables,
+			[out, retval] VARIANT_BOOL* pbSchemaExists);
 
 		// PROMISE: Ensures the product database schema is up-to-date.
 		[id(3), helpstring("method ValidateSchema")] HRESULT ValidateSchema([in] IFileProcessingDB* pDB);

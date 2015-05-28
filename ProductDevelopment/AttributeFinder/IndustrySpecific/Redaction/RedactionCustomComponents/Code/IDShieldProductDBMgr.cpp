@@ -292,15 +292,31 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema80(IFileProcessi
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB,
 																	VARIANT_BOOL bOnlyTables,
-																	VARIANT_BOOL bRetainUserTables)
+																	VARIANT_BOOL bRetainUserTables,
+																	VARIANT_BOOL *pbSchemaExists)
 {
 	try
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+		ASSERT_ARGUMENT("ELI38281", pbSchemaExists != __nullptr);
+
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI18956", ipDB != __nullptr);
+
+		string strValue = asString(ipDB->GetDBInfoSetting(
+			gstrID_SHIELD_SCHEMA_VERSION_NAME.c_str(), VARIANT_FALSE));
+
+		if (strValue.empty())
+		{
+			*pbSchemaExists = VARIANT_FALSE;
+			return S_OK;
+		}
+		else
+		{
+			*pbSchemaExists = VARIANT_TRUE;
+		}
 
 		// Create the connection object
 		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
