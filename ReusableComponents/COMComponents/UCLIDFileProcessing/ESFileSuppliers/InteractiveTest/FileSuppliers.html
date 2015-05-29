@@ -432,6 +432,66 @@
 			<li>Confirm that the queuing rate is not significantly slower as 
 			the number of queued files increases.
         	</ul>
+<p>
+		<LI><b>[ISSUE-12988]</b> Missing Dropped Files
+		<ul>
+			<li>Copy the <b>Testfiles</b> folder from <b>M:\PVCS_JIRA\JIRA\ISSUE-12988</b>.
+			<li>Create a local <b>Test</b> database with a <b>Test</b> action.
+			<li>Open a <b>Powershell</b> command window as administrator.
+			<li>Type <b>Set-ExecutionPolicy RemoteSigned</b>
+			<li>Execute <b>RunTest.ps1</b> from the Scripts folder.
+			<ul>
+				<li>It may be necessary to use the following argument on the command 
+				line.
+				<li><b>RunTest.ps1 C:\Testfiles\Files</b> if the test folder was copied 
+				to the root of C:\.
+			</ul>
+			<li><u>Desired Behavior</u>
+			<ul>
+				<li>Powershell will create 5000 text files.
+				<li>Listen.fps will queue the text files.
+				<li>After a delay, DeleteFiles.fps will delete the files.
+				<li>If any files remain in the <b>Files</b> folder, the test stops.
+				<li>The test is successful if 10 iterations of the test succeed.
+			</ul>
+       		</ul>
+<p>
+		<LI><b>[ISSUE-12923]</b> Paginated Files Not Picked Up
+		<ul>
+			<li><u>First Test</u>
+			<ul>
+				<li>Copy <b>01000pages.tif</b> from 
+				<b>I:\Common\Testing\Test_Images\ManyPage Images</b>.
+				<li>Prepare a testing machine with folders for paginated images 
+				and processing results.
+				<li>Create an FPS file to listen for paginated files.
+				<li>Run the <b>Pagination</b> utility.
+				<li><u>Desired Behavior</u>
+				<ul>
+					<li>Divide the 1000-page source image into multiple smaller files.
+					<li>Create output files such that several are created at a time.
+					<li>Listen.fps will queue the paginated files.
+					<li>Confirm that the number of paginated files is equal to the 
+					number of queued files.
+				</ul>
+			</ul>
+			<li><u>Alternate Test</u>
+			<ul>
+				<li>Copy single-page TIFs from 
+				<b>I:\Common\Testing\Product Testing\IDShield_Sanity\SourceImages</b> 
+				to a test folder.
+				<li>Create an FPS file to listen for paginated files.
+				<li>Run the <b>Pagination</b> utility.
+				<li><u>Desired Behavior</u>
+				<ul>
+					<li>Save each of the single-page source images.
+					<li>Generate output files several at a time.
+					<li>Listen.fps will queue the paginated files.
+					<li>Confirm that the number of paginated files is equal to 
+					the number of queued files.
+				</ul>
+			</ul>
+       		</ul>
     	</ul></li>
 <p>
     	<li>Select <b>Files from FTP site</b> as the file supplier in the Select File Supplier dialog,
