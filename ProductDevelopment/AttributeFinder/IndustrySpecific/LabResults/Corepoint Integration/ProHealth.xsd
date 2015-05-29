@@ -218,6 +218,13 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
+							<xs:element name="Status" minOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 							<xs:element name="ResultDate" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
@@ -321,6 +328,13 @@
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="PDFFile" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FullText" type="xs:string" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="DocumentType">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" type="xs:string" />
