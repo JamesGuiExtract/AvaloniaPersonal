@@ -374,6 +374,14 @@
         	<li>Confirm that all and only the components currently licensed are updated 
 		(i.e., confirm that product-specific tables are not affected by the schema 
 		updater).</li>
+<p>
+  	   	<LI><b>[ISSUE-12902, ISSUE-12916]</b> Updating Database Schema
+        	<ul>
+			<li>Confirm that the result of an update to an <b>8.0</b> database 
+			includes the FK_Statistics_Action foreign key in the ActionStatistics table.
+			<li>Confirm that the <b>ReceivedDateTime</b> column in <b>LabDEOrder</b> 
+			table is not NULL when updated from an older schema.
+        	</ul>
     	</ul></li>
 <p>
     	<li><b>Database options</b>
