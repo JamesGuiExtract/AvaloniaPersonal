@@ -649,6 +649,34 @@ LabDE<BR>
 <p>
   	   	<LI><b>[ISSUE-12604]</b> Confirm that the automatic installation of MSMQ via 
 		<b>Silent Install</b> of LabDE does not do an automatic restart.
+<p>
+  	   	<LI><b>[ISSUE-12763]</b> LabDE Database Schema
+        	<ul>
+			<li>Confirm that a new <b>LabDE</b> database contains a <b>LabDEPatient</b> 
+			table with the following fields.
+			<ul>
+				<li>MRN
+				<li>FirstName
+				<li>MiddleName
+				<li>LastName
+				<li>Suffix
+				<li>DOB
+				<li>Gender
+			</ul>
+			<li>Confirm that a new <b>LabDE</b> database contains an <b>LabDEOrder</b> 
+			table with the following fields.
+			<ul>
+				<li>OrderNumber
+				<li>OrderCode
+				<li>Patient:MRN
+				<li>ReceivedDateTime
+				<li>OrderStatus
+				<li>ReferenceDateTime
+				<li>ORMMessage
+			</ul>
+			<li>Confirm that a <b>non-LabDE</b> database does not contain the 
+			above tables.
+        	</ul>
 	</UL>
 </OL>
 </BODY>
