@@ -64,6 +64,8 @@
 				saved FPS file's folder.
 				<li>Confirm that a <b>CustomTags.sdf</b> file is also open for 
 				editing.
+				<li>Confirm that the prompt dialog is modal to the SQLCDBEditor 
+				window.
 			</ul>
 		</ul>
 <p>
@@ -71,16 +73,16 @@
 		<ul>
   	   		<li>Confirm that the following menu items are available.
 			<ul>
-				<li>File
+				<li><u>File</u>
 				<ul>
 					<li>Save
 					<li>Exit
 				</ul>
-				<li>Tools
+				<li><u>Tools</u>
 				<ul>
 					<li>Update to current schema
 				</ul>
-				<li>Help
+				<li><u>Help</u>
 				<ul>
 					<li>About
 				</ul>
@@ -89,6 +91,12 @@
 			<li>Confirm that the only tab is <b>CustomTags</b>.
 			<li>Confirm that the tab includes an <b>Edit Contexts</b> button.
 			<li>Confirm that the tab includes an <b>Add Database Tags</b> button.
+			<li>Confirm that a <b>Tag name</b> column exists.
+			<li>Confirm that one column for each defined context exists.
+			<li>Confirm that cells are fully editable.
+			<li>Confirm that full rows cannot be cut, copied, pasted or dragged.
+			<li>Confirm that angle brackets are automatically added, if necessary.
+			<li>Confirm that duplicate <b>Tag name</b> values are not allowed.
 <p>
 			<li><u>Edit Contexts</u>
 			<ul>
@@ -101,6 +109,9 @@
 						<li>Name
 						<li>FPSFileDir
 					</ul>
+					<li>Confirm that cells are fully editable.
+					<li>Confirm that full rows cannot be cut, copied, pasted or 
+					dragged.
 					<li>Confirm that clicking the <b>OK</b> button allows the 
 					changes to be reflected in the <b>CustomTags</b> tab.
 					<li>Confirm that clicking the <b>Cancel</b> button discards 
@@ -111,6 +122,10 @@
 				<li>Confirm that if, after editing, any FPSFileDir values are 
 				non-UNC paths, a <b>UNC path recommended</b> warning message is 
 				presented.
+				<li>Confirm that the window is modal to the SQLCDBEditor window.
+				<li>Confirm that an <b>FPSFileDir</b> with a trailing backslash is 
+				saved without the backslash.
+				<li>Confirmed that an <b>empty</b> dialog can be closed without error.
 			</ul>
 <p>
 			<li><u>Add Database Tags</u>
@@ -131,6 +146,12 @@
 			empty ContextTags database.
 			<li>Confirm that a warning dialog is presented when saving database tags that 
 			are defined but not used.
+			<li>Confirm <b>CustomTags.sdf</b> can be saved with:
+			<ul>
+				<li>Multiple contexts without tags.
+				<li>Multiple tags without contexts.
+			</ul>
+			<li>Confirm that the user is prompted to save changes upon close.
 		</ul>
     	</ul>
 <p>
@@ -146,6 +167,8 @@
 		</ul>
 		<li>Confirm that a FAM cannot be run if tag values are missing for the 
 		current context.
+		<li>Confirm that an <b>FPSFileDir</b> with a trailing backslash is saved without 
+		the backslash.
 <p>
   	   	<LI><b>[ISSUE-12905]</b> FPSFileDir
         	<ul>
@@ -169,7 +192,7 @@
         	<ul>
 			<li>Confirm that invalid data does not throw an exception in SQLCDBEditor.
 			<li>Confirm that a glyph is shown in the row header if an error is present.
-			<li>Confirm that only a signle row at a time is allowed to have an unresolved 
+			<li>Confirm that only a single row at a time is allowed to have an unresolved 
 			error.
         	</ul>
     	</ul>
