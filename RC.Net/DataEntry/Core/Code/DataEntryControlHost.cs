@@ -7311,7 +7311,7 @@ namespace Extract.DataEntry
             // Keep track of the currently selected attribute and whether selection is changed by
             // this method so that the selection can be restored at the end of this method.
             Stack<IAttribute> currentlySelectedAttribute = ActiveAttributeGenealogy(true, null);
-            if (currentlySelectedAttribute == null)
+            if (currentlySelectedAttribute == null || !currentlySelectedAttribute.Any())
             {
                 // https://extract.atlassian.net/browse/ISSUE-12548
                 // In the case that nothing is selected, navigate to the first invalid attribute as
@@ -7321,7 +7321,7 @@ namespace Extract.DataEntry
                         true, null, true, false);
 
                 // If there are no invalid attributes, we can return early from this call.
-                if (currentlySelectedAttribute == null)
+                if (currentlySelectedAttribute == null || !currentlySelectedAttribute.Any())
                 {
                     return true;
                 }
