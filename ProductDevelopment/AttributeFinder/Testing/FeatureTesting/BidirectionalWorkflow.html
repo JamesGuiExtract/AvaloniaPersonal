@@ -1,0 +1,633 @@
+<HTML>
+
+<HEAD>
+<TITLE>Bidirectional Workflow Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield Feature Testing<br>Bidirectional Workflow<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>Goals</h2>
+       	<ul>
+	        <li>Use Demo_LabDE as a platform for demonstrating bidirectional workflow.
+		<li>Exercise basic features of bidirectional workflow.
+		<li>Exercise special cases and error conditions associated with bidirectional 
+		workflow.
+       	</ul>
+<p>
+	<LI><h2>Setup</h2>
+       	<ul>
+		<li>Install LabDE as <b>local admin</b>.
+		<li>Copy <b>Demo_LabDE</b> from install folder to test machine.
+		<ul>
+			<li>Run <b>Clean.bat</b> to install a clean Demo_LabDE database.
+			<li>Open  Demo_LabDE with <b>DB Admin</b> and confirm that the 
+			database is using the current schema.
+		</ul>
+		<li>Confirm that the following tables contain meaningful data
+		<ul>
+			<li>LabDEOrders
+			<li>LabDEPatients
+		</ul>
+		<li><b>IF PREVIOUS TABLES NEED DATA</b>
+		<ul>
+	       		<li>Exercise <b>A01_InsertPatients.sql</b> and <b>A01_InsertOrders.sql</b> from 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-12783</b>.
+		</ul>
+		<li>Run <b>A01_ExtractData.fps</b> to prepare VOA files.
+       	</ul>
+<p>
+	<LI><h2>User Interface</h2>
+       	<ul>
+  	   	<LI>Run <b>A02_Verify.fps</b> for verification.
+		<li><u>F003.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000006</b>.
+			<li>Confirm that 1 <b>CREATININE</b> Order is defined and that the Order 
+			Number field is empty.
+			<li>Confirm that the Order Picker button is <b>green</b>.
+			<li>Click the Order Picker button.
+			<li><b>[ISSUE-13016]</b> Confirm that a modal FFI window appears with the 
+			following columns in an <b>Available orders</b> table.
+			<ul>
+				<li>Order Number
+				<li>Order Name
+				<li>Patient
+				<li>Ordered By
+				<li>Request Date/Time
+				<li>Collection Date/Time
+			</ul>
+			<li>Confirm that <b>1</b> order is available for selection.
+		</ul>
+		<li><u>A418.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000001</b>.
+			<li>Confirm that <b>3</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>GLUCOSE with green order picker button
+				<li>GLYCOHEMOGLOBIN A1C with green order picker button
+				<li>CBC AND AUTO DIFFERENTIAL with green order picker button
+			</ul>
+		</ul>
+		<li><u>B221.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000002</b>.
+			<li>Confirm that 1 <b>CBC AND AUTO DIFFERENTIAL</b> Order is defined and 
+			that the Order Number field is empty.
+			<li>Confirm that the Order Picker button is <b>green</b>.
+		</ul>
+		<li><u>C413.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000003</b>.
+			<li>Confirm that <b>18</b> Orders are defined each with <b>green</b> Order 
+			Picker buttons and that the Order Number fields are empty.
+			<ul>
+				<li>CBC AND AUTO DIFFERENTIAL at 08/08/2008 and 05:33
+				<li>CBC AND AUTO DIFFERENTIAL at 08/09/2008 and 04:45
+				<li>D DIMER QUANTITATIVE at 08/08/2008 and 05:33
+				<li>BASIC METABOLIC PANEL at 08/08/2008 and 05:33
+				<li>BASIC METABOLIC PANEL at 08/09/2008 and 04:45
+				<li>CALCIUM IONIZED at 08/08/2008 and 05:33
+				<li>CPK at 08/08/2008 and 11:52
+				<li>CPK at 08/08/2008 and 18:25
+				<li>CREATININE KINASE MB at 08/08/2008 and 11:52
+				<li>CREATININE KINASE MB at 08/08/2008 and 18:25
+				<li>TROPONIN I ULTRA SENSITIVE at 08/08/2008 and 11:52
+				<li>TROPONIN I ULTRA SENSITIVE at 08/08/2008 and 18:25
+				<li>TROPONIN I ULTRA SENSITIVE at 08/09/2008 and 14:50
+				<li>B-TYPE NATRIURETIC PEPTIDE BNP at 08/08/2008 and 05:33
+				<li>TROPONIN I ULTRA SENSITIVE at 08/08/2008 and 05:57
+				<li>LIPID PANEL at 08/09/2008 and 04:45
+				<li>POTASSIUM at 08/08/2008 and 18:25
+				<li>TSH at 08/08/2008 and 11:52
+			</ul>
+		</ul>
+		<li><u>D498.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000004</b>.
+			<li>Confirm that 1 <b>CBC AND AUTO DIFFERENTIAL</b> Order is defined and 
+			that the Order Number field is empty.
+			<li>Confirm that the Order Picker button is <b>green</b>.
+		</ul>
+		<li><u>H350.tif</u>
+		<ul>
+			<li>Confirm that <b>Patient Name</b> fields are empty.
+			<li><b>BUG</b> Confirm that the <b>Medical Record #</b> is automatically 
+			populated with <b>00000008</b>.
+			<li>Confirm that <b>2</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>LIPID PANEL with green order picker button
+				<li>GOT/AST with green order picker button
+			</ul>
+		</ul>
+		<li><u>I004.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000009</b>.
+			<li>Confirm that 1 <b>CBC AND AUTO DIFFERENTIAL</b> Order is defined and 
+			that the Order Number field is empty.
+			<li>Confirm that the Order Picker button is <b>green</b>.
+		</ul>
+		<li><u>J057.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000010</b>.
+			<li>Confirm that <b>2</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>GLUCOSE with green order picker button
+				<li>GLYCOHEMOGLOBIN A1C with green order picker button
+			</ul>
+		</ul>
+		<li><u>K151.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000011</b>.
+			<li>Confirm that 1 <b>BASIC METABOLIC PANEL</b> Order is defined and 
+			that the Order Number field is empty.	
+			<ul>
+				<li>Confirm that the required <b>CO2</b> test is missing from the 
+				test results.
+				<li>Confirm that the required <b>K</b> test is missing from the 
+				test results.
+			</ul>
+			<li>Confirm that the Order Picker button is <b>green</b>.
+		</ul>
+		<li><u>L191.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000012</b>.
+			<li>Confirm that 1 <b>PSA,FREE AND TOTAL</b> Order is defined and 
+			that the Order Number field is empty.	
+		</ul>
+		<li><u>M348.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000013</b>.
+			<li>Confirm that 1 <b>BASIC METABOLIC PANEL</b> Order is defined and 
+			that the Order Number field is empty.	
+		</ul>
+		<li><u>N352.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000014</b>.
+			<li>Confirm that <b>3</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>COMP METABOLIC PANEL with green order picker button
+				<li>LIPID PANEL with green order picker button
+				<li>TSH with green order picker button
+			</ul>
+		</ul>
+		<li><u>O402.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000015</b>.
+			<li>Confirm that 1 <b>URINALYSIS & REFLEX MICRO WITH CULTURE IF INDICATE</b> 
+			Order is defined and that the Order Number field is empty.	
+		</ul>
+		<li><u>P403.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000016</b>.
+			<li>Confirm that <b>2</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>TSH with green order picker button
+				<li>FREE T4 with green order picker button
+			</ul>
+		</ul>
+		<li><u>Q1270.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000017</b>.
+			<li>Confirm that <b>3</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>TSH with green order picker button
+				<li>FREE T4 with green order picker button
+				<li>FREE T3 with green order picker button
+			</ul>
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>User Interface With Duplicate Documents</h2>
+       	<ul>
+  	   	<LI>Run <b>A01_ExtractData.fps</b> after enabling the second file supplier.
+		<ul>
+			<li>This will queue and process the <b>Extended</b> subfolder that 
+			includes the images used for <b>Duplicate Documents</b> testing.
+		</ul>
+  	   	<LI>Run <b>A02_Verify.fps</b> for verification.
+		<li><u>R226.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000018</b>.
+			<li>Confirm that <b>6</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>BUN with green order picker button
+				<li>CREATININE with green order picker button
+				<li>GLUCOSE with green order picker button
+				<li>POTASSIUM with green order picker button
+				<li>HEMATOCRIT with green order picker button
+				<li>WHITE BLOOD CELL COUNT with green order picker button
+			</ul>
+			<li>Confirm that <b>1</b> Duplicate Document is available. 
+		</ul>
+		<li><u>S227.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000019</b>.
+			<li>Confirm that 1 <b>WHITE BLOOD CELL COUNT</b> Order is defined and that 
+			the Order Number field is empty.	
+			<li>Confirm that <b>3</b> Duplicate Documents are available. 
+		</ul>
+		<li><u>W228.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000024</b>.
+			<li>Confirm that <b>9</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>GLUCOSE with green order picker button
+				<li>POTASSIUM with green order picker button
+				<li>BUN with green order picker button
+				<li>CREATININE with green order picker button
+				<li>AMYLASE with green order picker button
+				<li>LIPASE LEVEL with green order picker button
+				<li>TACROLIMUS with green order picker button
+				<li>CBC AND AUTO DIFFERENTIAL with green order picker button
+				<li>CMV DNA Quant with green order picker button
+			</ul>
+			<li>Confirm that <b>1</b> Duplicate Document is available. 
+		</ul>
+		<li><u>Y229.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000021</b>.
+			<li>Confirm that <b>8</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>CYCLOSPORINE with yellow order picker button
+				<li>CYCLOSPORINE with yellow order picker button
+				<li>CYCLOSPORINE with yellow order picker button
+				<li>BASIC METABOLIC PANEL with red order picker button
+				<li>CBC NO DIFFERENTIAL with red order picker button
+				<li>AMYLASE with red order picker button
+				<li>LIPASE LEVEL with red order picker button
+				<li>GLYCOHEMOGLOBIN A1C with red order picker button
+			</ul>
+			<li>Confirm that <b>0</b> Duplicate Documents are available. 
+		</ul>
+		<li><u>Z226.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000018</b>.
+			<li>Confirm that <b>7</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>BUN with green order picker button
+				<li>CREATININE with green order picker button
+				<li>GLUCOSE with green order picker button
+				<li>POTASSIUM with green order picker button
+				<li>HEMATOCRIT with green order picker button
+				<li>WHITE BLOOD CELL COUNT with green order picker button
+				<li>TACROLIMUS with green order picker button
+			</ul>
+			<li>Confirm that <b>1</b> Duplicate Document is available. 
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>Workflow Behavior</h2>
+       	<ul>
+  	   	<LI>Reset the <b>Demo_LabDE</b> database and re-run the scripts that populate 
+		the <b>LabDEPatients</b> and <b>LabDEOrders</b> tables.
+		<li>Run the rules again.
+		<li>Start verification again.
+		<li><u>F003.tif</u>
+		<ul>
+			<li>Add an incorrect <b>Order Number</b> such as 12.
+			<li>Confirm that a <b>The specified order number does not exist in the 
+			LabDE database</b> warning icon is displayed.
+			<li>Confirm that the order picker button is no longer green.
+			<li>Remove the incorrect order number.
+			<li>Confirm that the order picker button is again green.
+<p>
+			<li>Modify the <b>Medical Record Number</b>.
+			<li>Confirm that a <b>The specified MRN does not exist in the LabDE 
+			database</b> warning icon is displayed.
+			<li>Confirm that Patient Name and DOB fields display error icons with 
+			appropriate error text.
+			<li>Confirm that the order picker button turns <b>red</b>.
+			<li>Restore the medical record number.
+			<li>Confirm that the error and warning icons disappear.
+			<li>Confirm that the order picker button returns to <b>green</b>.
+		</ul>
+		<li><u>A418.tif</u>
+		<ul>
+			<li>Confirm three orders each with green order picker buttons.
+			<li>Manually add another <b>GLUCOSE</b> order.
+			<ul>
+				<li>Confirm that the order picker button for the new GLUCOSE 
+				order is yellow.
+				<li>Confirm that the order picker button for the previously 
+				existing GLUCOSE order is yellow.
+			</ul>
+			<li>Click the Order Picker button for the first GLUCOSE order.
+			<li>Select the single order from the FFI window.
+			<ul>
+				<li>Confirm that a valid order number is provided for the first 
+				GLUCOSE order.
+				<li>Confirm that the order picker button for the first GLUCOSE 
+				order turns white.
+				<li>Confirm that the order picker button for the other GLUCOSE 
+				order turns <b>red</b>.
+			</ul>
+			<li><b>[ISSUE-13003]</b> Exceptions raised when extra orders added
+			<ul>
+				<li>Add a second extra <b>GLUCOSE</b> order.
+				<li>Add another unecessary order.
+				<li>Confirm that Order Picker buttons for the new orders are red.
+				<li>Confirm that no exceptions are thrown.
+			</ul>
+			<li>Delete the extra orders.
+			<li><b>[ISSUE-12944, ISSUE-12949]</b> Confirm that no exception is raised 
+			when the document is saved.
+		</ul>
+		<li><u>B221.tif</u>
+		<ul>
+			<li>Before verifying this document use SQL Management Studio to modify 
+			the <b>LabDEOrder</b> table.
+			<ul>
+				<li>For the Order with OrderNumber 02000001, modify the 
+				<b>OrderCode</b> from <b>CBCA</b> to <b>CPK</b>.
+			</ul>
+			<li>Verify the document and confirm that the OrderPicker button is <b>red</b>.
+			<li>Execute the <b>Z01_InsertExtraOrder.sql</b> query.
+			<li>Confirm that the OrderPicker button remains <b>red</b>.
+			<li>Click the <b>Refresh database data</b> button.
+			<li>Confirm that the OrderPicker button is <b>green</b>.
+			<li>Restore the original <b>OrderCode</b> from CPK back to CBCA.
+			<li>Click the <b>Refresh database data</b> button.
+			<li>Confirm that the OrderPicker button remains <b>green</b>.
+			<li>Click the order Picker button.
+			<li>Confirm that two orders are available for selection.
+			<li>Confirm that switching between the <b>Order Picker FFI</b> and the 
+			<b>Duplicate Documents FFI</b> does not cause an error.
+			<li>Select the Order with Order Number <b>02000001</b>.
+		</ul>
+		<li><u>C413.tif</u>
+		<ul>
+			<li>Click the Order Picker button for the first BASIC METABOLIC PANEL order.
+			<ul>
+				<li>Confirm that the <b>Available orders</b> list contains <b>2</b> 
+				entries.
+				<li>Select the <b>03000005</b> Order Number with the <b>8/7/2008 
+				5:33 AM</b> Requested Date/Time. Note that the time matches the 
+				collection time in the DEP.
+				<li>Confirm that the following information is contained in the tooltip 
+				that displays when hovering over a valid Order Number.
+				<ul>
+					<li>Order Number
+					<li>Order Name
+					<li>Patient
+					<li>Ordered By
+					<li>Requested Date/Time
+					<li>Collection Date/Time
+				</ul>
+			</ul>
+			<li>Delete one of the <b>CPK</b> orders.
+			<ul>
+				<li>Confirm that the order picker button for the other CPK order 
+				remains green.
+			</ul>
+			<li>Undo the delete of the CPK order.
+			<li>Confirm that no errors occur.
+		</ul>
+		<li><u>D498.tif</u>
+		<ul>
+			<li>Change the <b>Medical Record Number</b>.
+			<li>Confirm that Patient Name and DOB fields become invalid.
+			<li>Confirm that the <b>Order Picker</b> button turns red.
+			<li>Click the order picker button.
+			<ul>
+				<li><b>[ISSUE-13017]</b> Confirm that no exception occurs.
+				<li>Confirm that TBD.
+			</ul>
+			<li>Restore the correct Medical Record Number. Confirm that Patient 
+			Information is valid again.
+			<li>Click the order picker button and select the available order.
+		</ul>
+		<li><u>H350.tif</u>
+		<ul>
+			<li>Click the Order Picker for the <b>LIPID PANEL</b> order and select 
+			the appropriate order.
+			<li>Confirm that clicking the Order Picker button again displays the 
+			same order in the FFI window.
+			<li>Change the <b>Medical Record Number</b>.
+			<li>Confirm that Patient Name and DOB fields become invalid.
+			<li>Confirm that the <b>Order Picker</b> button for the <b>LIPID PANEL</b> 
+			order does not change color.
+			<ul>
+				<li>Confirm that the <b>08000001</b> Order Number becomes invalid.
+			</ul>
+			<li>Confirm that the <b>Order Picker</b> button for the <b>GOT/AST</b> 
+			order turns red.
+			<li>Click the Order Picker for the <b>LIPID PANEL</b> order.
+			<ul>
+				<li>Confirm that the FFI window contains no matching Orders.
+			</ul>
+		</ul>
+		<li><u>I004.tif</u>
+		<ul>
+			<li>
+		</ul>
+		<li><u>J057.tif</u>
+		<ul>
+			<li>
+		</ul>
+		<li><u>K151.tif</u>
+		<ul>
+			<li>Confirm that the order picker feature works properly even while the 
+			<b>BASIC METABOLIC PANEL</b> results are invalid due to missing test results.
+		</ul>
+		<li><u>H350.tif</u>
+		<ul>
+			<li>
+		</ul>
+		<li><u>H350.tif</u>
+		<ul>
+			<li>
+		</ul>
+		<li><u>N352.tif</u>
+		<ul>
+			<li>Confirm that <b>Undo</b> and <b>Redo</b> work properly after using the 
+			Order Picker button and the Order Picker FFI.
+		</ul>
+		<li><u>O402.tif</u>
+		<ul>
+			<li>
+		</ul>
+		<li><u>P403.tif</u>
+		<ul>
+			<li>
+		</ul>
+		<li><u>Q1270.tif</u>
+		<ul>
+			<li>
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>Workflow Behavior With Duplicate Documents</h2>
+       	<ul>
+		<li><u>R226.tif</u>
+		<ul>
+			<li>From the Duplicate Documents FFI, <b>Ignore</b> this document.
+			<li>Confirm that verification automatically advances to the next document.
+		</ul>
+		<li><u>S227.tif</u>
+		<ul>
+			<li>Confirm that the Duplicate Documents FFI and the Order Picker FFI cannot 
+			both be active at the same time.
+			<li>Use the Order Picker FFI to select the <b>19000001</b> Order Number.
+			<li>Open the Duplicate Documents FFI.
+			<li>Staple all 4 documents together.
+			<ul>
+				<li>Save the unsaved changes in <b>S227.tif</b>.
+			</ul>
+			<li>Confirm that verification automatically advances to <b>W228.tif</b>.
+		</ul>
+		<li><u>W228.tif</u>
+		<ul>
+			<li>From the Duplicate Documents FFI, <b>Ignore</b> the second image in the list.
+			<li>Apply the changes.
+			<li>Confirm that verification remains on <b>W228.tif</b>.
+			<li>Use Order Picker FFI to apply each Order Number.
+			<li>Modify the Order Number for the BUN order to <b>24000001</b>.
+			<ul>
+				<li>Confirm that the BUN order number is invalid.
+				<li>Confirm that the AMYLASE order number is invalid.
+				<li>Use Order Picker FFI to fix the BUN Order Number.
+				<li>Confirm that all Order Numbers are valid.
+			</ul>
+		</ul>
+		<li><u>Y229.tif</u>
+		<ul>
+			<li>Delete the second and third <b>CYCLOSPORINE</b> orders.
+			<li>Confirm that the remaining <b>CYCLOSPORINE</b> order has a green Order 
+			Picker button.
+			<li>Use Order Picker FFI to select the available matching order.
+			<li><b>[ISSUE-13019]</b> Confirm that no exception is thrown.
+		</ul>
+		<li><u>Z226.tif</u>
+		<ul>
+			<li>Select multiple orders and click an Order Picker button.
+			<li>Confirm that only the order for the clicked button is displayed in the 
+			Order Picker FFI.
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>Other User Interface</h2>
+       	<ul>
+		<li><u>Order Picker FFI</u>
+		<ul>
+                    	<li>Confirm that clicking the <b>Cancel</b> button closes the FFI window 
+			without applying the selected order.
+                    	<li>Confirm that clicking the <b>Close</b> button displays an <b>Apply 
+			changes?</b> dialog.
+			<ul>
+				<li>Confirm that <b>Cancel</b> returns to the Order Picker FFI 
+				window.
+				<li>Confirm that <b>No</b> closes the Order Picker FFI and does not 
+				apply the selected order.
+				<li>Confirm that <b>Yes</b> closes the Order Picker FFI and applies 
+				the seelcted order.
+			</ul>
+                    	<li>Confirm that clicking the <b>OK</b> button closes the Order Picker FFI 
+			and applies the seelcted order.
+			<li>Confirm that the Order Picker FFI window cannot be resized too small for 
+			effective use.
+    		</ul></li>
+       	</ul>
+<p>
+	<LI><h2>Miscellaneous</h2>
+       	<ul>
+  	   	<LI><b>[ISSUE-12783, ISSUE-12803, ISSUE-12919, ISSUE-12938, ISSUE-12993, 
+		ISSUE-12997]</b> Order Picker Issues
+        	<ul>
+			<li>Confirm that the <b>Demo_LabDE</b> DEP uses the new order picker column.
+			<li>Confirm that the <b>Demo_LabDE</b> DEP automatically updates Patient MRN.
+			<li>Confirm no crashes when exercising the order picker column.
+			<li>Confirm that no excessive delay is noted when using the order picker 
+			control.
+			<li>Confirm that no error occurs after alternating opening the order picker 
+			FFI and the duplicate documents FFI.
+			<li>Confirm that no error occurs if the order picker FFI is closed very 
+			quickly after opening.
+			<li>Confirm that the initial load in the order picker context does not generate 
+			an <b>System.InvalidOperationException</b> exception.
+			<li>Confirm that the order selection grid resizes properly when its pane 
+			is resized.
+			<li>Confirm that the patient name is included in the order picker / order 
+			number tooltip.
+			<li>Confirm that submitting something other than the first document per 
+			session from the order picker column works and does not throw an 
+			exception.
+			<li>Confirm that the order selection grid in the order picker FFI appears 
+			correctly even if a <b>FAMFileInspector.xml</b> file has been saved in 
+			the local app data folder.
+			<li>Confirm that <b>Patient MRN</b> auto-populates if 2 out of 3 of first name, 
+			last name, date of birth are present.
+			<li>Confirm that the <b>Demo_LabDE</b> validation queries are not unusually slow 
+			when run against a FAM database with a large amount of data in the LabDE schema 
+			elements.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12801]</b> LabDE Schema Changes
+        	<ul>
+			<li>Confirm that <b>Gender</b> is available in the <b>LabDEPatient</b> 
+			table.
+			<li>Confirm that the <b>LabDEOrderStatus</b> table includes <b>A</b> for 
+			Available instead of <b>O</b> for Open.
+			<li>Confirm that <b>CollectionDateTime</b> has been removed.
+			<li>Confirm that <b>RequestDateTime</b> has been replaced by 
+			<b>ReceivedDateTime</b> and defaults to the current time.
+        	</ul>
+<p>
+		<li><b>[ISSUE-12964]</b> Confirm that <b>Order Picker FFI</b> did not throw any 
+		exceptions when opening.
+<p>
+		<li><b>[ISSUE-12966]</b> Confirm that <b>Patient MRN</b> is not incorrectly 
+		auto-populated by clicking the <b>Refresh Database Data</b> button and noticing a 
+		change. (The MRN should not change.)
+<p>
+		<li><b>[ISSUE-12967]</b> Confirm that the Demo_LabDE DEP does not extend offscreen.
+<p>
+		<li><b>[ISSUE-13006]</b> Confirm that <b>Order Number</b> is automatically populated 
+		in the <b>Orders</b> table when there is exactly one matching unfilled order.
+<p>
+		<li><u>Documentation</u>
+		<ul>
+                    	<li>Confirm that the LabDE Help file includes a <b>Bidirectional Workflow For 
+			LabDE</b> page under Getting Started - Workflows.
+			<li>Confirm that this page is not present in the FLEX Index Help file.
+			<li>Confirm that this page is not present in the ID Shield Help file.
+    		</ul></li>
+       	</ul>
+</OL>
+</BODY>
+</HTML>
