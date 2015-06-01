@@ -1,0 +1,177 @@
+<html>
+<head>
+<title>FAM Context Testing Checklist</title>
+    <link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>FAM Context Testing Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>	
+<hr>
+
+	<h3>Goals</h3>
+    	<ul>
+  	   	<li>Exercise various aspects of context definition and use with File Action Manager.
+		<li>Contain test cases for bug fixes associated with FAM context.
+    	</ul>
+<p>
+	<h3>User Interface</h3>
+    	<ul>
+		<li><u>Create Context Dialog</u>
+		<ul>
+  	   		<li>Confirm that a <b>Create context</b> dialog appears after selecting 
+			<b>Tools - Edit Custom Tags...</b> from the FAM.
+  	   		<li>Confirm that a <b>Create context</b> dialog appears after selecting 
+			<b>Ctrl+E</b> from the FAM.
+			<li>Confirm that the dialog includes a <b>Context name</b> edit box.
+			<li>Confirm that the dialog includes an <b>FPSFileDir</b> edit box.
+			<li>Confirm that the dialog includes balloon help for <b>FPSFileDir</b>.
+			<ul>
+				<li>Confirm that the balloon help discusses when the context will 
+				be active and that the SDF file must be copied to folders associated 
+				with other contexts.
+			</ul>
+			<li><b>[ISSUE-12899]</b> Confirm that a <b>UNC path recommended</b> warning 
+			message is presented if <b>FPSFileDir</b> is not a UNC path.
+		</ul>
+<p>
+		<li><u>Save Configuration</u>
+		<ul>
+  	   		<li>Confirm that a <b>Save Configuration?</b> message appears after clicking 
+			<b>Use current context's database</b> from a new FAM.
+  	   		<li>Confirm that a <b>Save Configuration?</b> message appears after selecting 
+			<b>&lt;DatabaseServer&gt;</b> from the Database Server browse button on a 
+			new FAM.
+			<ul>
+				<li>Confirm that clicking <b>No</b> sets the Database Server to 
+				<b>&lt;DatabaseServer&gt;</b>.
+			</ul>
+  	   		<li>Confirm that a <b>Save Configuration?</b> message appears after selecting 
+			<b>&lt;DatabaseName&gt;</b> from the Database Name browse button on a 
+			new FAM.
+			<ul>
+				<li>Confirm that clicking <b>No</b> sets the Database Name to 
+				<b>&lt;DatabaseName&gt;</b>.
+			</ul>
+			<li>Confirm that clicking <b>Yes</b> brings up a <b>Save As</b> dialog 
+			defaulting to the last folder in which an FPS file was saved.
+			<li>Confirm that after saving the FPS file, a <b>Create context</b> dialog 
+			appears.
+			<ul>
+				<li>Confirm that <b>FPSFileDir</b> is defaulted to the recently 
+				saved FPS file's folder.
+				<li>Confirm that a <b>CustomTags.sdf</b> file is also open for 
+				editing.
+			</ul>
+		</ul>
+<p>
+		<li><u>CustomTags.sdf</u>
+		<ul>
+  	   		<li>Confirm that the following menu items are available.
+			<ul>
+				<li>File
+				<ul>
+					<li>Save
+					<li>Exit
+				</ul>
+				<li>Tools
+				<ul>
+					<li>Update to current schema
+				</ul>
+				<li>Help
+				<ul>
+					<li>About
+				</ul>
+			</ul>
+  	   		<li>Confirm that a <b>Save</b> button is available on the toolbar.
+			<li>Confirm that the only tab is <b>CustomTags</b>.
+			<li>Confirm that the tab includes an <b>Edit Contexts</b> button.
+			<li>Confirm that the tab includes an <b>Add Database Tags</b> button.
+<p>
+			<li><u>Edit Contexts</u>
+			<ul>
+				<li>Confirm that clicking the button displays an <b>Edit contexts</b> 
+				dialog.
+				<ul>
+					<li>Confirm that the dialog includes a table with the 
+					following columns.
+					<ul>
+						<li>Name
+						<li>FPSFileDir
+					</ul>
+					<li>Confirm that clicking the <b>OK</b> button allows the 
+					changes to be reflected in the <b>CustomTags</b> tab.
+					<li>Confirm that clicking the <b>Cancel</b> button discards 
+					the changes and that no changes appear in the <b>CustomTags</b> 
+					tab.
+				</ul>
+				<li>Confirm that duplicate <b>FPSFileDir</b> values are not allowed.
+				<li>Confirm that if, after editing, any FPSFileDir values are 
+				non-UNC paths, a <b>UNC path recommended</b> warning message is 
+				presented.
+			</ul>
+<p>
+			<li><u>Add Database Tags</u>
+			<ul>
+				<li>Confirm that clicking the button adds <b>&lt;DatabaseServer&gt;</b> 
+				and <b>&lt;DatabaseName&gt;</b> to the <b>Tag name</b> column.
+				<li>Confirm that clicking the button again displays a <b>Database 
+				tags already exist</b> message box.
+			</ul>
+<p>
+			<li>Confirm that expandable tag functions can be used as tag values.
+			<li>Confirm that after closing the tag editor, all of the context tag 
+			information (including context name) and the database connection are 
+			refreshed properly.
+			<li>Confirm that auto-column sizing in SQLCDBEditor takes max data length for 
+			table columns into account.
+			<li>Confirm that an exception is displayed when the user tries to create an 
+			empty ContextTags database.
+			<li>Confirm that a warning dialog is presented when saving database tags that 
+			are defined but not used.
+		</ul>
+    	</ul>
+<p>
+	<h3>Miscellaneous</h3>
+    	<ul>
+		<li>Confirm that the active context is displayed in the FAM title bar.
+  	   	<li>Confirm that closing the <b>Create context</b> dialog without providing a context 
+		name still allows <b>CustomTags.sdf</b> to be edited and saved.
+		<ul>
+			<li>Confirm that the Current Context on the FAM Database tab is <b>No 
+			context defined!</b> and is red in color.
+			<li>Confirm that the FAM Connection Status remains <b>Not Connected</b>.
+		</ul>
+		<li>Confirm that a FAM cannot be run if tag values are missing for the 
+		current context.
+<p>
+  	   	<LI><b>[ISSUE-12905]</b> FPSFileDir
+        	<ul>
+			<li>Open a <b>CustomTags.sdf</b> file for editing (either directly or 
+			via an "Edit Custom Tags" option in the FAM).
+			<li>Click the <b>Edit Contexts</b> button to open the context editing dialog.
+			<li>Add a new row by entering a name, but do not add an FPSFileDir.
+			<li>Click <b>OK</b>.
+			<li>Confirm that a message box is displayed notifying that an FPSFileDir is 
+			needed.
+			<li>Confirm that an exception is not thrown after closing the message box.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12918]</b> Confirm that database tags remain in the FPS file after 
+		running then saving.
+<p>
+  	   	<LI><b>[ISSUE-12935]</b> Confirm that FPS files can now be loaded and run when the 
+		corresponding CustomTags.sdf file is read-only.
+<p>
+  	   	<LI><b>[ISSUE-12977]</b> Context Tags Plugin
+        	<ul>
+			<li>Confirm that invalid data does not throw an exception in SQLCDBEditor.
+			<li>Confirm that a glyph is shown in the row header if an error is present.
+			<li>Confirm that only a signle row at a time is allowed to have an unresolved 
+			error.
+        	</ul>
+    	</ul>
+</body> 
+</html>
