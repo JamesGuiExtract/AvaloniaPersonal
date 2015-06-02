@@ -10,12 +10,19 @@ IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	SET PROGRAM_ROOT=%ProgramFiles%
 )
 
-SET LabDE=%InstallShieldFolder%\{0E412937-E4FA-4737-A321-00AED69497C7}\setup.exe
-SET IdShield=%InstallShieldFolder%\{158160CD-7B55-462F-8477-7E18B2937D40}\setup.exe
-SET FlexIndex=%InstallShieldFolder%\{A7DFE34D-A07E-4D57-A624-B758E42A69D4}\setup.exe
-SET LM=%InstallShieldFolder%\{EB8DE231-8B66-4DE6-A56D-39452D8CF35F}\setup.exe
-SET IDShieldSPClient=%InstallShieldFolder%\{6BF486D7-B930-4B82-A0A0-D8450F5C7BAB}\setup.exe
-SET RDT=%InstallShieldFolder%\{735E1622-3990-445F-9E5D-B0D7FDE292A3}\setup.exe
+SET LabDE_GUID={0E412937-E4FA-4737-A321-00AED69497C7}
+SET IdShield_GUID={158160CD-7B55-462F-8477-7E18B2937D40}
+SET FlexIndex_GUID={A7DFE34D-A07E-4D57-A624-B758E42A69D4}
+SET LM_GUID={EB8DE231-8B66-4DE6-A56D-39452D8CF35F}
+SET IDShieldSPClient_GUID={6BF486D7-B930-4B82-A0A0-D8450F5C7BAB}
+SET RDT_GUID={735E1622-3990-445F-9E5D-B0D7FDE292A3}
+
+SET LabDE=%InstallShieldFolder%\%LabDE_GUID%\setup.exe
+SET IdShield=%InstallShieldFolder%\%IdShield_GUID%\setup.exe
+SET FlexIndex=%InstallShieldFolder%\%FlexIndex_GUID%\setup.exe
+SET LM=%InstallShieldFolder%\%LM_GUID%\setup.exe
+SET IDShieldSPClient=%InstallShieldFolder%\%IDShieldSPClient_GUID%\setup.exe
+SET RDT=%InstallShieldFolder%\%IDShieldSPClient_GUID%\setup.exe
 
 :UninstRDT
 :: UnInstall RDT
@@ -85,6 +92,37 @@ SET CLEARIMAGE_DIR=%PROGRAM_ROOT%\Inlite\ClearImage 7 PDK
 
 IF EXIST "%CLEARIMAGE_DIR%\UNWISE.EXE" (
 	for %%f in ("%CLEARIMAGE_DIR%") do %%~sf\UNWISE.EXE /s %%~sf\INSTALL.LOG
+)
+
+:: Remove keys in the registry that should have been removed
+IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LabDE_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IdShield_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%FlexIndex_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LM_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IDShieldSPClient_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%RDT_GUID% /f >NUL	
+
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%LabDE_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%IdShield_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%FlexIndex_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%LM_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%IDShieldSPClient_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%RDT_GUID% /f >NUL	
+) ELSE )
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LabDE_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IdShield_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%FlexIndex_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LM_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IDShieldSPClient_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%RDT_GUID% /f >NUL	
+
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%LabDE_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%IdShield_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%FlexIndex_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%LM_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%IDShieldSPClient_GUID% /f >NUL
+	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%RDT_GUID% /f >NUL	
 )
 
 endlocal
