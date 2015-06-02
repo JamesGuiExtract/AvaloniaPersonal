@@ -109,7 +109,7 @@ IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%LM_GUID% /f >NUL
 	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%IDShieldSPClient_GUID% /f >NUL
 	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%RDT_GUID% /f >NUL	
-) ELSE )
+) ELSE (
 	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LabDE_GUID% /f >NUL
 	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IdShield_GUID% /f >NUL
 	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%FlexIndex_GUID% /f >NUL
