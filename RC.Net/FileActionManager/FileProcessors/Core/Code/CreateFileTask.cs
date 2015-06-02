@@ -859,14 +859,13 @@ namespace Extract.FileActionManager.FileProcessors
                         }
                         catch (Exception ex)
                         {
-                            expandedOutput += "<Unable to evaluate query>";
                             var ee = new ExtractException("ELI38205",
                                 "Unable to expand data query for file.", ex);
                             ee.AddDebugData("Query", match.Value, false);
                             ee.AddDebugData("SourceDocName", fileRecord.Name, false);
                             ee.AddDebugData("FPS",
                                 pathTags.Expand(FileActionManagerPathTags.FpsFileNameTag), false);
-                            ee.Log();
+                            throw ee;
                         }
                     }
                     else
