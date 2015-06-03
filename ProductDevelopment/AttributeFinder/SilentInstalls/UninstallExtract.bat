@@ -17,50 +17,50 @@ SET LM_GUID={EB8DE231-8B66-4DE6-A56D-39452D8CF35F}
 SET IDShieldSPClient_GUID={6BF486D7-B930-4B82-A0A0-D8450F5C7BAB}
 SET RDT_GUID={735E1622-3990-445F-9E5D-B0D7FDE292A3}
 
-SET LabDE=%InstallShieldFolder%\%LabDE_GUID%\setup.exe
-SET IdShield=%InstallShieldFolder%\%IdShield_GUID%\setup.exe
-SET FlexIndex=%InstallShieldFolder%\%FlexIndex_GUID%\setup.exe
-SET LM=%InstallShieldFolder%\%LM_GUID%\setup.exe
-SET IDShieldSPClient=%InstallShieldFolder%\%IDShieldSPClient_GUID%\setup.exe
-SET RDT=%InstallShieldFolder%\%IDShieldSPClient_GUID%\setup.exe
+SET LabDE=%InstallShieldFolder%\%LabDE_GUID%\setup
+SET IdShield=%InstallShieldFolder%\%IdShield_GUID%\setup
+SET FlexIndex=%InstallShieldFolder%\%FlexIndex_GUID%\setup
+SET LM=%InstallShieldFolder%\%LM_GUID%\setup
+SET IDShieldSPClient=%InstallShieldFolder%\%IDShieldSPClient_GUID%\setup
+SET RDT=%InstallShieldFolder%\%IDShieldSPClient_GUID%\setup
 
 :UninstRDT
 :: UnInstall RDT
-IF NOT EXIST "%RDT%" GOTO UninstLabDE
+IF NOT EXIST "%RDT%.ini" GOTO UninstLabDE
 
 start /wait "" "%RDT%"  -l0x0409  /removeonly /s /w /f1"%~dp0rdtuninst.iss"
 
 :UninstLabDE
 :: UnInstall LabDE
-IF NOT EXIST "%LabDE%" GOTO UninstFlexIndex
+IF NOT EXIST "%LabDE%.ini" GOTO UninstFlexIndex
 
 start /wait "" "%LabDE%" -l0x0409  /removeonly /s /w /f1"%~dp0labdeuninst.iss"
 
 :UninstFlexIndex
 
 :: UnInstall FlexIndex
-IF NOT EXIST "%FlexIndex%" GOTO UninstIDShield
+IF NOT EXIST "%FlexIndex%.ini" GOTO UninstIDShield
 
 start /wait "" "%FlexIndex%"  -l0x0409  /removeonly /s /w /f1"%~dp0flexindexuninst.iss"
 
 :UninstIDShield
 
 :: UnInstall IDShield
-IF NOT EXIST "%IdShield%" GOTO UninstLM
+IF NOT EXIST "%IdShield%.ini" GOTO UninstLM
 
 start /wait "" "%IdShield%" -l0x0409  /removeonly /s /w /f1"%~dp0idshielduninst.iss"
 
 :UninstLM
 
 :: UnInstall LM
-IF NOT EXIST "%LM%" GOTO UninstIDShieldSPClient
+IF NOT EXIST "%LM%.ini" GOTO UninstIDShieldSPClient
 
 start /wait "" "%LM%"  -l0x0409  -uninst /s /w /f1"%~dp0lmuninst.iss"
 
 :UninstIDShieldSPClient
 
 :: UnInstall IDShieldSPClient
-IF NOT EXIST "%IDShieldSPClient%" GOTO done
+IF NOT EXIST "%IDShieldSPClient%.ini" GOTO done
 
 start /wait "" "%IDShieldSPClient%"  -l0x0409  -uninst /s /w 
 
