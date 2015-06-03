@@ -650,14 +650,14 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the verification form should prevent any
-        /// attempts at saving document data. This may be used after experiencing an error or when
-        /// the form is being programmatically closed. (when prompts to save in response to events
-        /// that occur are not appropriate)
+        /// Gets or sets a value indicating whether the verification form should prevent
+        /// any attempts to save dirty data. This may be used after experiencing an error or
+        /// when the form is being programmatically closed. (when prompts to save in response to
+        /// events that occur are not appropriate)
         /// </summary>
         /// <value><see langword="true"/> if the verification form should prevent any
-        /// attempts at saving document data; otherwise, <see langword="false"/>.</value>
-        public bool PreventSave
+        /// attempts to save dirty data; otherwise, <see langword="false"/>.</value>
+        public bool PreventSaveOfDirtyData
         {
             get;
             set;
@@ -1494,11 +1494,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <returns><see langword="false"/> if the user chose to cancel or the user tried to save 
         /// with invalid data; otherwise true <see langword="true"/>.</returns>
-        bool PromptAndSaveIfDirty()
+        public bool PromptAndSaveIfDirty()
         {
-            // If the PreventSave property is set, allow the current operation to proceed without
-            // prompting for or attempting any save of data.
-            if (PreventSave)
+            // If the PreventSaveOfDirtyData property is set, allow the current operation to proceed
+            // without prompting for or attempting any save of data.
+            if (PreventSaveOfDirtyData)
             {
                 return true;
             }

@@ -197,14 +197,14 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the verification form should prevent any
-        /// attempts at saving document data. This may be used after experiencing an error or when
-        /// the form is being programmatically closed. (when prompts to save in response to events
-        /// that occur are not appropriate)
+        /// Gets or sets a value indicating whether the verification form should prevent
+        /// any attempts to save dirty data. This may be used after experiencing an error or
+        /// when the form is being programmatically closed. (when prompts to save in response to
+        /// events that occur are not appropriate)
         /// </summary>
         /// <value><see langword="true"/> if the verification form should prevent any
-        /// attempts at saving document data; otherwise, <see langword="false"/>.</value>
-        public bool PreventSave
+        /// attempts to save dirty data; otherwise, <see langword="false"/>.</value>
+        public bool PreventSaveOfDirtyData
         {
             get;
             set;

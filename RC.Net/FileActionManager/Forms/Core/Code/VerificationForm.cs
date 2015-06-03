@@ -540,10 +540,10 @@ namespace Extract.FileActionManager.Forms
                 {
                     if (IsUIReady)
                     {
-                        // Whenever a new file is to be loaded, ensure the PreventSave and
+                        // Whenever a new file is to be loaded, ensure the PreventSaveOfDirtyData and
                         // PreventCloseCancel properties are reset so that any behavior intended for
                         // the last document do not carry over to the this document.
-                        MainForm.PreventSave = false;
+                        MainForm.PreventSaveOfDirtyData = false;
                         MainForm.PreventCloseCancel = false;
 
                         if (_exceptionDisplayBlockThreadId != -1)
@@ -597,6 +597,12 @@ namespace Extract.FileActionManager.Forms
                 // Always display exceptions that arise from a verification task.
                 ex.ExtractDisplay("ELI37834");
 
+                // The file was not cleanly handled and will be failed with an exception; it is
+                // not appropriate to display any prompts to save the document on close as such
+                // attempts would likely meet with similar errors (which may not be able to be 
+                // handled cleanly in context of a form close).
+                MainForm.PreventSaveOfDirtyData = true;
+
                 if (IsUIReady &&
                     (!_promptToContinueOnError || MessageBox.Show(
                     "An error was encountered while attempting to process the document '" +
@@ -604,11 +610,6 @@ namespace Extract.FileActionManager.Forms
                     "Error: Continue processing?", MessageBoxButtons.YesNo, MessageBoxIcon.Error,
                     MessageBoxDefaultButton.Button1, 0) == DialogResult.No))
                 {
-                    // The file was not cleanly handled and will be failed with an exception; it is
-                    // not appropriate to display any prompts to save the document on close as such
-                    // attempts would likely meet with similar errors (which may not be able to be 
-                    // handled cleanly in context of a form close).
-                    MainForm.PreventSave = true;
                     _abortedEvent.Set();
                 }
 

@@ -901,8 +901,11 @@ namespace Extract.DataEntry.LabDE
                     "END \r\n" +
                     "ELSE \r\n" +
                     "BEGIN \r\n" +
-                    "    INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate]) \r\n" +
-                    "        VALUES ({0}, {1}, {2}) \r\n" +
+                    "    IF {0} IN (SELECT [OrderNumber] FROM [LabDEOrder]) \r\n" +
+                    "    BEGIN \r\n" +
+                    "        INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate]) \r\n" +
+                    "            VALUES ({0}, {1}, {2}) \r\n" +
+                    "   END \r\n" +
                     "END",
                     "'" + orderNumber + "'", fileId, "'" + collectionDateTime + "'");
 

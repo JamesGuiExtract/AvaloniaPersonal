@@ -730,14 +730,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the verification form should prevent any
-        /// attempts at saving document data. This may be used after experiencing an error or when
-        /// the form is being programmatically closed. (when prompts to save in response to events
-        /// that occur are not appropriate)
+        /// Gets or sets a value indicating whether the verification form should prevent
+        /// any attempts to save dirty data. This may be used after experiencing an error or
+        /// when the form is being programmatically closed. (when prompts to save in response to
+        /// events that occur are not appropriate)
         /// </summary>
         /// <value><see langword="true"/> if the verification form should prevent any
-        /// attempts at saving document data; otherwise, <see langword="false"/>.</value>
-        public bool PreventSave
+        /// attempts to save dirty data; otherwise, <see langword="false"/>.</value>
+        public bool PreventSaveOfDirtyData
         {
             get;
             set;
@@ -1534,7 +1534,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 				// https://extract.atlassian.net/browse/ISSUE-12830
                 UserConfigChecker.EnsureValidUserConfigFile();
 
-                if (!PreventSave)
+                if (!PreventSaveOfDirtyData)
                 {
                     // Check for unsaved data and cancel the close if necessary.
                     if (AttemptSave(false) == DialogResult.Cancel)
@@ -1975,7 +1975,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (!PreventSave)
+                if (!PreventSaveOfDirtyData)
                 {
                     // Check for unsaved data and cancel the close if necessary.
                     if (AttemptSave(false) == DialogResult.Cancel)
@@ -1990,6 +1990,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             RecordFileProcessingDatabaseStatistics(false, null);
                         }
 
+                        // https://extract.atlassian.net/browse/ISSUE-13051
+                        // Consider removing code that would cancel processing in response to the
+                        // ImageFileClosing event.
                         OnFileComplete(EFileProcessingResult.kProcessingCancelled);
                     }
                 }
@@ -3172,7 +3175,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     // Since data has been saved, prevent any other attempts that might be triggered
                     // by events raised during this process.
-                    PreventSave = true;
+                    PreventSaveOfDirtyData = true;
 
                     _imageViewer.CloseImage();
 
@@ -3298,7 +3301,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // Since data has been saved, prevent any other attempts that might be triggered
                 // by events raised during this process.
-                PreventSave = true;
+                PreventSaveOfDirtyData = true;
 
                 _imageViewer.CloseImage();
 
@@ -3341,6 +3344,25 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             else
             {
+                // https://extract.atlassian.net/browse/ISSUE-13048
+                // In case of error, we don't want to let HandleImageFileClosing to cancel the image
+                // if the user doesn't choose to stop. Set PreventSaveOfDirtyData now and close the
+                // image so the image isn't later closed when PreventSaveOfDirtyData has been reset.
+                PreventSaveOfDirtyData = true;
+                try
+                {
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        _imageViewer.CloseImage();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var ee2 = new ExtractException("ELI38287", 
+                        "Image did not properly close after error.", ex);
+                    ee2.Log();
+                }
+
                 var verificationException =
                     new VerificationExceptionGeneratedEventArgs(ee, canProcessingContinue);
                 OnExceptionGenerated(verificationException);
