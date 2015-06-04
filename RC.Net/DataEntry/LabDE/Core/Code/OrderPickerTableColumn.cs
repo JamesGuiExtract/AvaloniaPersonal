@@ -618,7 +618,7 @@ namespace Extract.DataEntry.LabDE
                 // (The extra test for DataEntryTableBase is because of unreliability of the
                 // _inDesignMode checks. DataGridView will not be a DataEntryTableBase when editing
                 // the column in the designer.
-                if (!_inDesignMode && DataGridView is DataEntryTableBase)
+                if (!_inDesignMode && Visible && DataGridView is DataEntryTableBase)
                 {
                     DataGridView.HandleCreated += DataGridView_HandleCreated;
                     DataGridView.CellContentClick += DataGridView_CellContentClick;
@@ -1029,7 +1029,7 @@ namespace Extract.DataEntry.LabDE
         {
             // Don't invoke the invalidate multiple times (multiple rows may all trigger this call
             // in response to the same UI event).
-            if (!_pendingInvalidate && DataEntryControlHost != null)
+            if (!_pendingInvalidate && DataEntryControlHost != null && Visible)
             {
                 if (DataEntryControlHost.UpdateInProgress)
                 {
