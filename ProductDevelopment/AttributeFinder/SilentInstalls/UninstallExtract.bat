@@ -96,33 +96,33 @@ IF EXIST "%CLEARIMAGE_DIR%\UNWISE.EXE" (
 
 :: Remove keys in the registry that should have been removed
 IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LabDE_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IdShield_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%FlexIndex_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LM_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IDShieldSPClient_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%RDT_GUID% /f 2>NUL	
-
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%LabDE_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%IdShield_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%FlexIndex_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%LM_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%IDShieldSPClient_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%RDT_GUID% /f 2>NUL	
+	IF NOT EXIST "%LabDE%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LabDE_GUID% /f 2>NUL
+	IF NOT EXIST "%IdShield%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IdShield_GUID% /f 2>NUL
+	IF NOT EXIST "%FlexIndex%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%FlexIndex_GUID% /f 2>NUL
+	IF NOT EXIST "%LM%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LM_GUID% /f 2>NUL
+	IF NOT EXIST "%IDShieldSPClient%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IDShieldSPClient_GUID% /f 2>NUL
+	IF NOT EXIST "%RDT%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%RDT_GUID% /f 2>NUL	
+    
+	IF NOT EXIST "%LabDE%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%LabDE_GUID% /f 2>NUL
+	IF NOT EXIST "%IdShield%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%IdShield_GUID% /f 2>NUL
+	IF NOT EXIST "%FlexIndex%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%FlexIndex_GUID% /f 2>NUL
+	IF NOT EXIST "%LM%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%LM_GUID% /f 2>NUL
+	IF NOT EXIST "%IDShieldSPClient%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%IDShieldSPClient_GUID% /f 2>NUL
+	IF NOT EXIST "%RDT%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%RDT_GUID% /f 2>NUL	
 ) ELSE (
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LabDE_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IdShield_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%FlexIndex_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LM_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IDShieldSPClient_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%RDT_GUID% /f 2>NUL	
-
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%LabDE_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%IdShield_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%FlexIndex_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%LM_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%IDShieldSPClient_GUID% /f 2>NUL
-	REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%RDT_GUID% /f 2>NUL	
+	IF NOT EXIST "%LabDE%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LabDE_GUID% /f 2>NUL
+	IF NOT EXIST "%IdShield%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IdShield_GUID% /f 2>NUL
+	IF NOT EXIST "%FlexIndex%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%FlexIndex_GUID% /f 2>NUL
+	IF NOT EXIST "%LM%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%LM_GUID% /f 2>NUL
+	IF NOT EXIST "%IDShieldSPClient%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%IDShieldSPClient_GUID% /f 2>NUL
+	IF NOT EXIST "%RDT%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\InstallShield_%RDT_GUID% /f 2>NUL	
+    
+	IF NOT EXIST "%LabDE%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%LabDE_GUID% /f 2>NUL
+	IF NOT EXIST "%IdShield%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%IdShield_GUID% /f 2>NUL
+	IF NOT EXIST "%FlexIndex%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%FlexIndex_GUID% /f 2>NUL
+	IF NOT EXIST "%LM%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%LM_GUID% /f 2>NUL
+	IF NOT EXIST "%IDShieldSPClient%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%IDShieldSPClient_GUID% /f 2>NUL
+	IF NOT EXIST "%RDT%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%RDT_GUID% /f 2>NUL	
 )
 
 endlocal
