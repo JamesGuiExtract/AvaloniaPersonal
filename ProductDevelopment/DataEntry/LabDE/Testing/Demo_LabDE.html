@@ -1,0 +1,248 @@
+<HTML>
+
+<HEAD>
+<TITLE>Demo_LabDE Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Demo_LabDE Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>NOTE: See the Bidirectional Workflow checklist for additional test cases.</h2>
+
+<OL>
+
+    	<LI><h2>Instructions and Installation</h2>
+    	<UL>
+        	<LI>Confirm that the latest <b>Demo_LabDE</b> folder can be copied from the current 
+        	build folder to C:\.</li>
+        	<li>Confirm that all files under the <b>Rules</b> folder are encrypted.</li>
+        	<li>Confirm that <b>DataEntry: Verify extracted data</b> requires only a <b>LabDE 
+        	Client</b> license.</li>
+        	<li>Confirm that the blank database associated with the demo has the current schema 
+        	version.</li>
+    	</UL></li>
+<p>
+    	<LI><h2>Demo Images</h2>
+    	<UL>
+        	<LI>Exercise the installed rules and images.
+        	<LI>Review the following items after finishing the verification
+        	<ul>
+            		<li>Confirm that VOA files were updated for each file in which changes 
+            		were made.</li>
+        	</ul></li>
+    	</UL></li>
+<p>
+    	<LI><h2>FPS Files and Context</h2>
+    	<UL>
+        	<LI>Confirm that the FPS folder contains <b>CustomTags.sdf</b>.
+		<li>Confirm that each FPS file uses <b>&lt;DatabaseServer&gt;</b> and 
+		<b>&lt;DatabaseName&gt;</b> tags in a <b>Demo</b> context.
+		<li>Confirm that the following tags are defined.
+		<ul>
+			<li>DatabaseServer
+			<li>DatabaseName
+			<li>InputFolder
+			<li>RulesFile
+			<li>VerifyConfigFile
+		</ul>
+	</UL></li>
+<p>
+    	<LI><h2>User Interface</h2>
+    	<UL>
+        	<LI><b>General</b>
+        	<ul>
+            		<li>Confirm that unviewed text is displayed in <b>Bold</b> font.</li>
+            		<li>Confirm that viewed text is displayed in <b>normal</b> font.</li>
+            		<li>Confirm that presence and of an <b>Undo</b> command. Test its 
+			behavior:
+            		<ul>
+                		<li>in different controls (party table, address table, 
+				text boxes...)</li>
+                		<li>after saving</li>
+                		<li>editing multiple attributes at once</li>
+                		<li>using the button, keyboard shortcut, and menu item</li>
+                		<li>any other situations that come to mind</li>
+            		</ul></li>
+	    		<li><b>[ISSUE-12810]</b> Confirm that the toolbar includes a toggle button 
+			for showing and hiding the <b>Thumbnails</b> pane.
+        	</ul></li>
+<p>
+        	<LI><b>Comments (for operator's use)</b>
+        	<ul>
+            		<li>Confirm that a multi-line edit box exists for Comments.</li>
+            		<li>Confirm that text can be swiped into the edit box.</li>
+        	</ul></li>
+<p>
+        	<LI><b>Duplicate Documents</b>
+        	<ul>
+            		<li>Confirm that a <b>Duplicate document(s)</b> button is available.</li>
+            		<li>Confirm that the number preceding the text on the button changes 
+			as appropriate.</li>
+			<ul>
+				<li>It should be non-zero when processing the <b>Extended</b> folder 
+				of images.
+			</ul>
+        	</ul></li>
+<p>
+        	<LI><b>Refresh Database Data</b>
+        	<ul>
+            		<li>Confirm that a <b>Refresh database data</b> button is available.</li>
+        	</ul></li>
+<p>
+        	<LI><b>Patient Information</b>
+        	<ul>
+            		<li>Confirm that a single-row table is present with the following column 
+			headings.</li>
+			<ul>
+				<li>First Name
+				<li>Middle Name
+				<li>Last Name
+				<li>Suffix
+			</ul>
+            		<li>Confirm that a Patient name can be swiped into the selected row.</li>
+            		<li>Confirm that a <b>Date of Birth</b> edit box is present.</li>
+            		<li>Confirm that a <b>Gender</b> combo box is present with the following 
+			options.</li>
+			<ul>
+				<li>M
+				<li>F
+				<li>U
+			</ul>
+            		<li>Confirm that a <b>Medical Record #</b> edit box is present.</li>
+        	</ul></li>
+<p>
+        	<LI><b>Physicians</b>
+        	<ul>
+            		<li>Confirm that a single-row table for <b>Ordering Physician</b> is present 
+			with the following column headings.</li>
+            		<ul>
+				<li>Last Name
+				<li>First Name
+				<li>Middle Name
+				<li>Code
+            		</ul></li>
+            		<li>Confirm that a Physician name can be swiped into the selected row.</li>
+			<ul>
+				<li>Confirm that <b>Code</b> is automatically updated for a valid 
+				Physician.
+			</ul>
+            		<li>Confirm that a multiple-row table for <b>CopyTo Physician</b> is present 
+			with the following column headings.</li>
+            		<ul>
+				<li>Last Name
+				<li>First Name
+				<li>Middle Name
+				<li>Code
+            		</ul></li>
+            		<li>Confirm that a Physician name can be swiped into the selected row.</li>
+			<ul>
+				<li>Confirm that <b>Code</b> is automatically updated for a valid 
+				Physician.
+			</ul>
+        	</ul></li>
+<p>
+        	<LI><b>Orders</b>
+        	<ul>
+            		<li>Confirm that columns exist for
+            		<ul>
+                		<li>Order Num
+                		<li>Order Picker (button, without a header label)
+                		<li>Order Name
+                		<li>Collection Date
+                		<li>Collection Time
+            		</ul></li>
+            		<li>Confirm that an Order can be swiped into the selected row.</li>
+            		<li>Confirm that text can be swiped into the following individual cells.
+            		<ul>
+                		<li>Order Name
+                		<li>Collection Date
+                		<li>Collection Time
+            		</ul>
+        	</ul></li>
+<p>
+        	<LI><b>Selected Order Details</b>
+        	<ul>
+            		<li>Confirm that Lab Filter edit boxes exist for
+            		<ul>
+                		<li>Name
+                		<li>City
+                		<li>State
+            		</ul></li>
+            		<li>Confirm that a single-line edit box is provided for <b>Lab Name</b>.
+			<li>Confirm that the displayed <b>Lab Name</b> is a concatenation of Lab 
+			Name, Street address, and City.
+			<li>Confirm that a <b>Result Date</b> edit box is available.
+			<li>Confirm that a <b>Result Time</b> edit box is available.
+            		<li>Confirm that a multiple-line edit box is provided for order-level 
+			<b>Comment</b>.
+			<ul>
+				<li>Confirm that the default text is <b>Verified by $UserName() 
+				on MM/DD/YYYY.</b>
+			</ul>
+            		<li>Confirm that an unlabeled multiple-line table is provided for Test 
+			Components.
+            		<ul>
+                		<li>Test Name
+                		<li>Value
+                		<li>Units
+                		<li>Ref. Range
+                		<li>Flag
+				<ul>
+					<li>[BLANK]
+					<li>A
+					<li>H
+					<li>HH
+					<li>I
+					<li>L
+					<li>LL
+					<li>N
+					<li>R
+					<li>S
+				</ul>
+                		<li>Status
+				<ul>
+					<li>C
+					<li>F
+					<li>P
+				</ul>
+            		</ul>
+            		<li>Confirm that a multiple-line edit box is provided for test-level 
+			<b>Comment</b>.
+        	</ul></li>
+	</UL></li>
+<p>
+    	<LI><h2>Validation</h2>
+    	<UL>
+        	<LI><u>Patient</u>
+		<ul>
+			<li>
+		</ul>
+        	<LI><u>Physician</u>
+		<ul>
+			<li>
+		</ul>
+        	<LI><u>Order</u>
+		<ul>
+			<li>
+		</ul>
+        	<LI><u>Selected Order Details</u>
+		<ul>
+			<li>
+		</ul>
+    	</UL></li>
+<p>
+    	<LI><h2>Miscellaneous</h2>
+    	<UL>
+       		<li><b>[DataEntry #1024]</b> TBD
+       		<ul>
+              		<li>TBD
+            	</ul></li>
+    	</UL></li>
+</OL>
+</BODY>
+</HTML>
