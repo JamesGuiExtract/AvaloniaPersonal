@@ -22,7 +22,7 @@ SET IdShield=%InstallShieldFolder%\%IdShield_GUID%\setup
 SET FlexIndex=%InstallShieldFolder%\%FlexIndex_GUID%\setup
 SET LM=%InstallShieldFolder%\%LM_GUID%\setup
 SET IDShieldSPClient=%InstallShieldFolder%\%IDShieldSPClient_GUID%\setup
-SET RDT=%InstallShieldFolder%\%IDShieldSPClient_GUID%\setup
+SET RDT=%InstallShieldFolder%\%RDT_GUID%\setup
 
 :UninstRDT
 :: UnInstall RDT
