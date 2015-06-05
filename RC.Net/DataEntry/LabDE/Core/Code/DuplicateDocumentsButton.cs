@@ -2,12 +2,12 @@
 using Extract.FileActionManager.Utilities;
 using Extract.Licensing;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry.LabDE
@@ -83,11 +83,6 @@ namespace Extract.DataEntry.LabDE
         #region Fields
 
         /// <summary>
-        /// Used to launch a <see cref="FAMFileInspectorForm"/> to display the duplicate documents.
-        /// </summary>
-        FAMFileInspectorComLibrary _famFileInspector = new FAMFileInspectorComLibrary();
-
-        /// <summary>
         /// A custom column for the FFI that allows for various actions to be performed on the
         /// displayed documents.
         /// </summary>
@@ -100,9 +95,9 @@ namespace Extract.DataEntry.LabDE
         PreviousStatusFFIColumn _ffiStatusColumn;
 
         /// <summary>
-        /// A vector of all custom columns to be used in the FFI.
+        /// A list of all custom columns to be used in the FFI.
         /// </summary>
-        IUnknownVector _ffiCustomColumns = new IUnknownVector();
+        List<IFAMFileInspectorColumn> _ffiCustomColumns = new List<IFAMFileInspectorColumn>();
 
         /// <summary>
         /// The patient first name for the current document.
@@ -163,10 +158,10 @@ namespace Extract.DataEntry.LabDE
 
                 ExtractException.Assert("ELI37947", "ActionColumn is not defined.",
                     ActionColumn != null);
-                _ffiCustomColumns.PushBack(ActionColumn);
+                _ffiCustomColumns.Add(ActionColumn);
                 if (StatusColumn != null)
                 {
-                    _ffiCustomColumns.PushBack(StatusColumn);
+                    _ffiCustomColumns.Add(StatusColumn);
                 }
 
                 TagForIgnore = _DEFAULT_TAG_FOR_IGNORE;
@@ -593,9 +588,20 @@ namespace Extract.DataEntry.LabDE
                     "Collection date(s): {3}",
                     LastName, FirstName, DOB, collectionDates);
 
-                _famFileInspector.OpenFAMFileInspector(
-                    FileProcessingDB, selector, true, selectorSummary, _ffiCustomColumns,
-                    TopLevelControl.Handle);
+                using (var fileInspectorForm = new FAMFileInspectorForm())
+                {
+                    fileInspectorForm.UseDatabaseMode = true;
+                    fileInspectorForm.FileProcessingDB.DuplicateConnection(FileProcessingDB);
+                    fileInspectorForm.FileSelector = selector;
+                    fileInspectorForm.LockFileSelector = true;
+                    fileInspectorForm.LockedFileSelectionSummary = selectorSummary;
+                    foreach (var column in _ffiCustomColumns)
+                    {
+                        fileInspectorForm.AddCustomColumn(column);
+                    }
+
+                    fileInspectorForm.ShowDialog(DataEntryControlHost);
+                }
             }
             catch (Exception ex)
             {

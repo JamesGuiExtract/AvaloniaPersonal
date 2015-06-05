@@ -772,6 +772,11 @@ namespace Extract.DataEntry.LabDE
                     var dataEntryRow = tableRow as DataEntryTableRow;
                     if (dataEntryRow != null)
                     {
+                        // https://extract.atlassian.net/browse/ISSUE-13063
+                        // Select the row associated with the button clicked so that selection is
+                        // not lost (clearing the order details section).
+                        tableRow.Selected = true;
+
                         var orderNumberCell = tableRow.Cells[_orderNumberColumn.Index];
                         var initialValue = orderNumberCell.Value.ToString();
 
@@ -783,6 +788,7 @@ namespace Extract.DataEntry.LabDE
 
                             // Setting the order number cell as active helps indicate that a value
                             // was applied.
+                            DataGridView.ClearSelection();
                             DataGridView.CurrentCell = orderNumberCell;
                         }
                     }
