@@ -1,6 +1,6 @@
 <FlexData>
 	<MessageSequenceNumberFile>
-		<FullText>C:\LabDE_UWC\Solution\MessageSequenceNumber.txt</FullText>
+		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\MessageSequenceNumber.txt</FullText>
 	</MessageSequenceNumberFile>
 	<Filename>
 		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\131733523.tif</FullText>
@@ -37,6 +37,9 @@
 	</PatientInfo>
 	<Test>
 		<FullText>N/A</FullText>
+		<OrderNumber>
+			<FullText>11111111</FullText>
+		</OrderNumber>
 		<Name>
 			<FullText>BASIC METABOLIC PANEL</FullText>
 		</Name>
@@ -55,9 +58,6 @@
 		<OrderStatus>
 			<FullText>F</FullText>
 		</OrderStatus>
-		<OrderNumber>
-			<FullText>11111111</FullText>
-		</OrderNumber>
 		<ResultDate>
 			<FullText>08/25/2014</FullText>
 		</ResultDate>
@@ -199,6 +199,9 @@
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
+		<OrderNumber>
+			<FullText>22222222</FullText>
+		</OrderNumber>
 		<Name>
 			<FullText>AST/SGOT</FullText>
 		</Name>
@@ -217,9 +220,6 @@
 		<OrderStatus>
 			<FullText>F</FullText>
 		</OrderStatus>
-		<OrderNumber>
-			<FullText>22222222</FullText>
-		</OrderNumber>
 		<ResultDate>
 			<FullText>08/25/2014</FullText>
 		</ResultDate>
@@ -265,6 +265,9 @@
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
+		<OrderNumber>
+			<FullText>33333333</FullText>
+		</OrderNumber>
 		<Name>
 			<FullText>ALKALINE PHOSPHATASE</FullText>
 		</Name>
@@ -283,9 +286,6 @@
 		<OrderStatus>
 			<FullText>F</FullText>
 		</OrderStatus>
-		<OrderNumber>
-			<FullText>33333333</FullText>
-		</OrderNumber>
 		<ResultDate>
 			<FullText>08/25/2014</FullText>
 		</ResultDate>
@@ -331,6 +331,9 @@
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
+		<OrderNumber>
+			<FullText>44444444</FullText>
+		</OrderNumber>
 		<Name>
 			<FullText>BILIRUBIN, TOTAL</FullText>
 		</Name>
@@ -349,9 +352,6 @@
 		<OrderStatus>
 			<FullText>F</FullText>
 		</OrderStatus>
-		<OrderNumber>
-			<FullText>44444444</FullText>
-		</OrderNumber>
 		<ResultDate>
 			<FullText>08/25/2014</FullText>
 		</ResultDate>
@@ -397,6 +397,9 @@
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
+		<OrderNumber>
+			<FullText>55555555</FullText>
+		</OrderNumber>
 		<Name>
 			<FullText>LD, TOTAL</FullText>
 		</Name>
@@ -415,9 +418,6 @@
 		<OrderStatus>
 			<FullText>F</FullText>
 		</OrderStatus>
-		<OrderNumber>
-			<FullText>55555555</FullText>
-		</OrderNumber>
 		<ResultDate>
 			<FullText>08/25/2014</FullText>
 		</ResultDate>
