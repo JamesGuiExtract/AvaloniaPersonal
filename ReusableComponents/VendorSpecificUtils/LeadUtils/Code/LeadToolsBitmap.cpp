@@ -11,8 +11,8 @@
 // LeadToolsBitmap constructor
 const L_INT gnMIN_ROTATION = 10;
 
-// The most significant bit of an unsigned char
-const UCHAR gucFIRST_BIT = 0x80;
+// A COLORREF representation of black.
+const COLORREF gnCOLOR_BLACK = RGB(0, 0, 0);
 
 //-------------------------------------------------------------------------------------------------
 // LeadToolsBitmap
@@ -102,14 +102,7 @@ bool LeadToolsBitmap::isPixelBlack(CPoint point)
 //-------------------------------------------------------------------------------------------------
 bool LeadToolsBitmap::isPixelBlack(int x, int y)
 {
-	// Get a pointer to the character containing the pixel we are looking for.
-	UCHAR *pChar = m_hBitmap.Addr.Windows.pData + y * m_hBitmap.BytesPerLine + x / 8;
-			
-	// Set a mask to obtain the bit we need.
-	UCHAR ucMask = gucFIRST_BIT >> (x % 8);
-
-	// Return the value of the bit of at this position
-	return (*pChar & ucMask) != 0;
+	return (L_GetPixelColor(&m_hBitmap, y, x) == gnCOLOR_BLACK);
 }
 //-------------------------------------------------------------------------------------------------
 bool LeadToolsBitmap::contains(CPoint point)

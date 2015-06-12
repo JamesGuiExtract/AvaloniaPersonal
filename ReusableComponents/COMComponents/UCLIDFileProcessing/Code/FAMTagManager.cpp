@@ -650,7 +650,7 @@ STDMETHODIMP CFAMTagManager::get_ActiveContext(BSTR *strActiveContext)
 
 		ASSERT_ARGUMENT("ELI38070", strActiveContext != __nullptr);
 
-		*strActiveContext = ms_ipContextTagProvider->ActiveContext;
+		*strActiveContext = _bstr_t(ms_ipContextTagProvider->ActiveContext).Detach();
 
 		return S_OK;		
 	}

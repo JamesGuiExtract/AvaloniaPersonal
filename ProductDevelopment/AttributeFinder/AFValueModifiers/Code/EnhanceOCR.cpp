@@ -1921,7 +1921,7 @@ void CEnhanceOCR::eraseImageZones(LeadToolsBitmap &ltBitmap,
 void CEnhanceOCR::generateFilteredImage(string strFilter, set<ILongRectanglePtr> *psetRectsToFilter)
 {
 	// Work off a copy of the currently loaded m_apPageBitmap
-	BITMAPHANDLE hBitmapCopy;
+	BITMAPHANDLE hBitmapCopy = {0};
 	LeadToolsBitmapFreeer bitmapCopyFreer(hBitmapCopy, true);
 
 	L_INT nRes = L_CopyBitmap(&hBitmapCopy, &m_apPageBitmap->m_hBitmap, sizeof(BITMAPHANDLE));
@@ -1989,7 +1989,7 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 	}
 
 	// Make a copy of the specified bitmap to work with.
-	BITMAPHANDLE hBitmapFilterCopy;
+	BITMAPHANDLE hBitmapFilterCopy = {0};
 	LeadToolsBitmapFreeer bitmapFilterCopyFreer(hBitmapFilterCopy, true);
 
 	L_INT nRet = L_CopyBitmapRect(&hBitmapFilterCopy, phBitmap,
@@ -1998,7 +1998,7 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 
 	// If filtering using a combination of multiple filters, we will need to store the result of the
 	// first pass in a separate bitmap.
-	BITMAPHANDLE hBitmapCopy;
+	BITMAPHANDLE hBitmapCopy = {0};
 	unique_ptr<LeadToolsBitmapFreeer> apBitmapCopy;
 
 	// Parse out the individual filter(s) to be used.

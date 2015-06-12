@@ -2298,7 +2298,7 @@ void FileProcessingDlg::updateUI()
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
 		ASSERT_RESOURCE_ALLOCATION("ELI38084", ipFAMTag != __nullptr);
 
-		string strActiveContext = ipFAMTag->ActiveContext;
+		string strActiveContext = asString(ipFAMTag->ActiveContext);
 
 		string strFile = getFileNameFromFullPath(m_strCurrFPSFilename);
 		

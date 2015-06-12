@@ -58,6 +58,7 @@ const string gstrDEFAULT_GOOD_OCR_TYPE				= "ProbableText";
 const string gstrDEFAULT_POOR_OCR_TYPE				= "ProbableHandwriting";
 const long	 gnDEFAULT_OCR_THRESHOLD				= 60;
 const string gstrSPATIAL_STRING_ATTRIBUTE_NAME		= "SpatialString";
+const COLORREF gnCOLOR_WHITE						= RGB(255, 255, 255);
 
 //-------------------------------------------------------------------------------------------------
 // CSplitRegionIntoContentAreas
@@ -1009,74 +1010,27 @@ void CSplitRegionIntoContentAreas::PixelProcessor::process()
 		// Cycle through each row of image data
 		for (int y = m_rect.top; y <= m_rect.bottom && !bAbort; y++)
 		{
-			int nPixelX = m_rect.left;
-			int nByte = m_rect.left / 8;
-			int nLastByte = m_rect.right / 8;
-
-			// Obtain a pointer to the raw image data.
-			UCHAR *pucImageRow = m_parent.m_apPageBitmap->m_hBitmap.Addr.Windows.pData;
-			// Adjust the pointer to the row that contains the pixels we need.
-			pucImageRow += y * m_parent.m_apPageBitmap->m_hBitmap.BytesPerLine;
-
-			// Cycle through each byte in the row.
-			while (nByte <= nLastByte && !bAbort)
+			for (int x = m_rect.left; x <= m_rect.right && !bAbort; x++)
 			{
-				// Obtain a pointer to the byte of raw image data we need.
-				UCHAR *pucImageByte = pucImageRow + nByte;
-
-				// Use a bit mask to check each pixel (bit) within the byte taking care to not read
-				// bits to the left or right of m_rect.
-				int nBit = nPixelX % 8;
-
-				while (nBit < 8)
+				if (m_parent.m_apPageBitmap->isPixelBlack(x, y))
 				{
-					if (nPixelX > m_rect.right)
+					// This pixel is black; process it.
+					int nRes = processPixel(x, y);
+					if (nRes < 0)
 					{
-						// We are now to the right of m_rect, go to the next row.
+						// The processor has requested for processing to stop.
+						bAbort = true;
 						break;
 					}
 
-					// Set a mask to read the correct pixel from the byte.
-					UCHAR ucMask = gucFIRST_BIT >> nBit;
-					if ((ucMask & *pucImageByte) != 0)
+					if (nRes > 0)
 					{
-						// This pixel is black; process it.
-						int nRes = processPixel(nPixelX, y);
-						if (nRes < 0)
-						{
-							// The processor has requested for processing to stop.
-							bAbort = true;
-							break;
-						}
-
-						if (nRes > 0)
-						{
-							// The processor has requested that nRes pixels should be skipped before
-							// processing continues.
-							nPixelX += nRes;
-
-							if (nPixelX / 8 != nByte)
-							{
-								// Skipping ahead to a byte that follows this one
-								// (subtract one to account for the fact that nByte
-								// will be incremented)
-								nByte = nPixelX / 8 - 1;  
-								break;
-							}
-							else
-							{
-								// Skipping ahead to a bit within this same byte.
-								nBit = nPixelX % 8;
-								continue;
-							}
-						}
+						// The processor has requested that nRes pixels should be skipped before
+						// processing continues.
+						x += nRes;
+						continue;
 					}
-
-					nPixelX ++;
-					nBit ++;
 				}
-
-				nByte ++;
 			}
 		}
 	}
@@ -1241,18 +1195,8 @@ int CSplitRegionIntoContentAreas::PixelEraser::processPixel(int x, int y)
 	{
 		try
 		{
-			// Obtain a pointer to the raw image data.
-			UCHAR *pucImageData = m_parent.m_apPageBitmap->m_hBitmap.Addr.Windows.pData;
-			// Adjust the pointer to the byte that contains the pixels we need.
-			pucImageData += y * m_parent.m_apPageBitmap->m_hBitmap.BytesPerLine;
-			pucImageData += x / 8;
-
-			// Set a mask to obtain the bit we need.
-			UCHAR ucMask = gucFIRST_BIT >> (x % 8);
-
-			// Flip the bit (since the pixel was black for processPixel to be called,
-			// we know we are flipping it to white).
-			*pucImageData = *pucImageData ^ ucMask;
+			// "Erase" pixel by making it white.
+			L_PutPixelColor(&m_parent.m_apPageBitmap->m_hBitmap, y, x, gnCOLOR_WHITE);
 
 			return 0;
 		}
@@ -1490,9 +1434,9 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 				// Take each line and attempt to expand it to ensure it encapsulates all content,
 				// even pixels that didn't OCR.
 				long nLineCount = ipLines->Size();
-				for (long i = 0; i < nLineCount; i++)
+				for (long j = 0; j < nLineCount; j++)
 				{
-					ISpatialStringPtr ipLine = ipLines->At(i);
+					ISpatialStringPtr ipLine = ipLines->At(j);
 					ASSERT_RESOURCE_ALLOCATION("ELI22102", ipLine != __nullptr);
 
 					ContentAreaInfo area(ipLine, ipSpatialPageInfos);
