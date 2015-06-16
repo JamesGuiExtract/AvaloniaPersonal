@@ -83,15 +83,34 @@ REM Copy the license file to the release folder for EncryptFile will work
 IF NOT EXIST %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release MKDIR %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release
 copy %BUILD_DRIVE%\BuildMachine_RDT*.lic %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release\
 
+SET BUILD_STATUS="Started"
+
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '.\SendBuildStatuseMail.ps1' '%~1' '%BUILD_STATUS%'"
+
+
 nmake /F AttributeFinderSDK.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
+IF ERRORLEVEL 1 (
+	SET BUILD_STATUS="Failed"
+	GOTO exit_script
+)
 
 IF "%BuildScriptTarget%"=="DoBuilds" GOTO exit_script
 nmake /F RuleDevelopmentKit.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" DoEverything 2>&1 | tee "%LOGFILE2%"
+IF ERRORLEVEL 1 (
+	SET BUILD_STATUS="Failed"
+	GOTO exit_script
+)
+
+SET BUILD_STATUS="Completed successfully"
 
 :exit_script
 
 REM remove the drive mappings
 net use P: /DELETE
 net use R: /DELETE
+
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '.\SendBuildStatuseMail.ps1' '%~1' '%BUILD_STATUS%'"
+
+SET BUILD_STATUS=
 
 pause

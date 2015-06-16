@@ -26,7 +26,7 @@ vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite
 IF %ERRORLEVEL% NEQ 0 (
 	Echo Vault exited with error.
 	Echo.
-	goto Exit_Batch
+	goto ExitWithError
 )
 
 CD "%~p0"
@@ -35,7 +35,7 @@ vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite
 IF %ERRORLEVEL% NEQ 0 (
 	Echo Vault exited with error.
 	Echo.
-	goto Exit_Batch
+	goto ExitWithError
 )
 
 cd "%~p0..\..\Common"
@@ -48,11 +48,17 @@ vault COMMIT -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% "%BATCH_COMMO
 IF %ERRORLEVEL% NEQ 0 (
 	Echo Vault exited with error.
 	Echo.
-	goto Exit_Batch
+	goto ExitWithError
 )
 
 :: Label
 nmake /F LabelFromLatestVersions.mak Branch=%Branch%
+
+IF %ERRORLEVEL% NEQ 0 (
+	Echo Labeling exited with error.
+	Echo.
+	goto ExitWithError
+)
 
 :: Get the version to build from the LatestComponentVersion.mak files
 for /F "tokens=2 delims==" %%i in ( 'findstr FlexIndex LatestComponentVersions.mak') do set VersionToBuild=%%i
@@ -65,6 +71,12 @@ if "%Branch%"=="" (
 ) else (
 	call AttributeFinderSDK.bat "%VersionToBuild%" "%Branch%"
 )
+
+goto Exit_Batch
+
+:ExitWithError
+
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '.\SendBuildStatuseMail.ps1' ' that was started' 'Failed'"
 
 :Exit_Batch
 
