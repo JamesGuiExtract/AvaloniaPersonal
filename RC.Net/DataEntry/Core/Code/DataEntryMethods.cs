@@ -421,14 +421,20 @@ namespace Extract.DataEntry
                 ExtractException.Assert("ELI24009", "Internal Logic Error!",
                     removedCount == 0 || sourceAttributes != null);
                
-                for (int i = 0; i < removedCount; i++)
+                foreach (IAttribute removedAttribute in removedMatches.ToIEnumerable<IAttribute>())
                 {
                     // [DataEntry:693]
                     // Since these attributes will no longer be accessed by the DataEntry, they need
                     // to be released with FinalReleaseComObject to prevent handle leaks.
                     // Call DeleteAttribute rather than ReleaseAttribute so proper events are raised to
                     // remove references to the attribute from the DatEntry framework.
-                    AttributeStatusInfo.DeleteAttribute((IAttribute)removedMatches.At(i));
+                    AttributeStatusInfo.DeleteAttribute(removedAttribute);
+
+                    // https://extract.atlassian.net/browse/ISSUE-13043
+                    // The disregarded attributes also need to be removed from sourceAttributes,
+                    // otherwise subsequent calls to InitializeAttribute using sourceAttributes will
+                    // still see the attributes.
+                    sourceAttributes.RemoveValue(removedAttribute);
                 }
 
                 attributeCount = attributes.Size();
