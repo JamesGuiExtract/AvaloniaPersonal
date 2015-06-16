@@ -1528,9 +1528,24 @@ bool CSpatialString::getIsEndOfLine(size_t index, CRect rectCurrentLineZone)
 	// Otherwise, if the next character of a line is a spatial character that is either completely
 	// above or below rectCurrentZone or whose right side is less that the right side of
 	// rectCurrentLineZone, this should be considered the end of the line.
-	index++;
-	if (index < m_vecLetters.size() && m_vecLetters[index].m_bIsSpatial)
+	while (true)
 	{
+		// If the next char is past the end of the string, the original index value was the last
+		// spatial char in the string, thus the end of the line.
+		index++;
+		if (index >= m_vecLetters.size())
+		{
+			return true;
+		}
+
+		// https://extract.atlassian.net/browse/ISSUE-12998
+		// Keep searching for the next spatial char in case the next spatial char represents a new
+		// line compared to rectCurrentLineZone.
+		if (!m_vecLetters[index].m_bIsSpatial)
+		{
+			continue;
+		}
+
 		// Get the spatial area of the next character.
 		CRect rectNextLetter(m_vecLetters[index].m_ulLeft, m_vecLetters[index].m_ulTop,
 			m_vecLetters[index].m_ulRight, m_vecLetters[index].m_ulBottom);
@@ -1540,6 +1555,10 @@ bool CSpatialString::getIsEndOfLine(size_t index, CRect rectCurrentLineZone)
 			rectNextLetter.right < rectCurrentLineZone.right)
 		{
 			return true;
+		}
+		else
+		{
+			break;
 		}
 	}
 
