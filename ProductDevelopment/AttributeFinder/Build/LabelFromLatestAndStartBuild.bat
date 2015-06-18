@@ -42,6 +42,13 @@ cd "%~p0..\..\Common"
 
 cscript IncrementBuildVersion.vbs
 
+:: Get the version to build from the LatestComponentVersion.mak files
+for /F "tokens=2 delims==" %%i in ( 'findstr FlexIndex LatestComponentVersions.mak') do set VersionToBuild=%%i
+
+SET BUILD_STATUS="Started"
+
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%VersionToBuild%' '%BUILD_STATUS%'"
+
 :: Commit the modified LatestComponentVersions.mak file
 vault COMMIT -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% "%BATCH_COMMON_PATH%/LatestComponentVersions.mak"
 
@@ -60,9 +67,6 @@ IF %ERRORLEVEL% NEQ 0 (
 	goto ExitWithError
 )
 
-:: Get the version to build from the LatestComponentVersion.mak files
-for /F "tokens=2 delims==" %%i in ( 'findstr FlexIndex LatestComponentVersions.mak') do set VersionToBuild=%%i
-
 cd "%~p0"
 
 ::this needs the version from latest component versions
@@ -76,7 +80,9 @@ goto Exit_Batch
 
 :ExitWithError
 
-PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '.\SendBuildStatuseMail.ps1' ' that was started' 'Failed'"
+SET BUILD_STATUS="Failed"
+
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' ' %VersionToBuild% that was started' '%BUILD_STATUS%"
 
 :Exit_Batch
 
