@@ -63,6 +63,7 @@ function main(args) {
         }
         catch (err) {
             handleScriptError("ELI37750", "Unable to load ruleset", err, "RSD File", rsdfilename);
+            continue;
         }
 
         var modified = false;
