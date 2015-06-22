@@ -1,0 +1,186 @@
+<html>
+
+<head>
+<title>File Action Manager Sanity Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css" />
+</head>
+
+<body>
+
+<h1>FAM Sanity Test - New Employee Training<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif" />
+</h1>
+<hr>
+	<h2>Goals</h2>
+	<ul>
+		<li>Help employee learn about installing and licensing Extract software.
+		<li>Teach employee a little about <b>DB Admin</b> and <b>FAM</b>.
+		<li>Teach employee a little about each standard demo.
+		<li>Prepare employee for further training and/or testing using mainstream 
+		checklists.
+	</ul>
+<p>
+	<h2>Installation</h2>
+	<ul>
+		<li>Start from one of the following installation folders. Note that version 
+		numbers change with each release.
+		<ul>
+			<li>I:\Common\Engineering\ProductReleases\FlexIndex\External\Current
+			<li>M:\ProductReleases\FlexIndex\Internal\BleedingEdge
+		</ul>
+		<li>Select an appropriate version number and navigate to the <b>FlexIndexInstall</b> 
+		folder.
+		<li>Double-click on <b>Launch.exe</b>.
+		<li>Find and install <b>Microsoft .NET 3.5 and 4.0</b>.
+		<ul>
+			<li>Note that it may or may not be installable depending on the operating 
+			system.
+		</ul>
+		<li>Find and install <b>SQL Server 2014</b> and <b>SQL Management Studio</b>.
+		<ul>
+			<li>Note that it may or may not be installable depending on the operating 
+			system.
+			<li>SQL Server 2008 R2 and the associated Management Studio can be found 
+			in any pre-10.0 software release. SQL 2008 R2 is compatible with later 
+			releases of Extract Systems software.
+		</ul>
+		<li>Install <b>FLEX Index</b>.
+		<li>Back up to the <b>ProductReleases</b> folder and change to ID Shield.
+		<li>Install <b>ID Shield</b>.
+		<li>Back up to the <b>ProductReleases</b> folder and change to LabDE.
+		<li>Install <b>LabDE</b>.
+		<li>Install <b>Extract Systems License Manager</b>.
+<p>
+		<li>If you expect to use <b>Rule Development Toolkit</b>, the corresponding version 
+		of the RDT must be installed. Start from one of the following installation folders. 
+		<ul>
+			<li>M:\ProductReleases_InternalUseOnly\FlexIndex\External\Current
+			<li>M:\ProductReleases_InternalUseOnly\FlexIndex\Internal\BleedingEdge
+		</ul>
+		<li>Confirm that RDT installs correctly.
+	</ul>
+<p>
+	<h2>Licensing</h2>
+	<ul>
+		<li>Start from the <b>I:\Common\Engineering\Tools\SecureClients</b> 
+		licensing folder.
+		<ul>
+			<li>COMLicense - used for customer licenses
+			<li>COMLicense_RuleWriter - used for internal rule-writer licenses
+			<li>COMLicense_Developer - used for internal development and testing licenses
+		</ul>
+		<li>Select the approriate software version. Note that FlexIndex9_x works for any 9.0, 
+		9.2, ..., 9.9 version as well as 10.0, 10.1 and 10.2.
+		<li>If you are testing on a new or clean machine, run <b>ocx-install.bat</b> as 
+		local administrator. A confirmation message should be displayed.
+		<li>Run <b>COMLicenseGenerator.exe</b>
+		<ul>
+			<li>One or more <b>Package</b> items must be selected
+			<li>Some text must be entered in the <b>Licensee Name</b> text box.
+			<li>Some text must be entered in the <b>Organization Name</b> text box.
+			<li>A valid <b>User License String</b> must be entered.
+			<ul>
+				<li>The <b>Generate User License String</b> button provides the 
+				string for the machine that is currently running the utility. This 
+				is useful for licensing your own workstation or an internal test 
+				machine.
+				<li>A string can be generated via <b>UserLicense.exe</b>. This is 
+				how a customer provides the string for a server or workstation 
+				that is to be licensed.
+			</ul>
+			<li>Set the <b>Licensing Mode</b>.
+			<ul>
+				<li>A <b>Fully Licensed</b> license is almost always used for 
+				internal use.
+				<li>An <b>Evaluation License</b> license is sometimes used for 
+				customers or testing.
+				<li>The default period for an evaluation license is 30 days.
+			</ul>
+			<li>Run <b>UserLicense.exe</b> and click the <b>Open License Folder</b> 
+			button to create and open the folder to which the license files (for the 
+			computer to be licensed) should be saved.
+			<li>The following separate license files are typically created for use 
+			in testing.
+			<ul>
+				<li>One or more of FLEX Index Server, ID Shield Server, LabDE Server.
+				<li>All of the <b>FLEX Index / ID Shield Utilities</b> items EXCEPT 
+				<b>Disable USB Key Serial Numbers <RWOnly></b>.
+				<li>Rule Development Toolkit - only used by Rule Writers and Testers.
+			</ul>
+			<li>Contact Wayne or another member of the Development team to create a 
+			<b>Disable USB Key</b> license file. This is for internal use only except 
+			in rare circumstances.
+		</ul>
+	</ul>
+<p>
+	<h2>Demos</h2>
+	<ul>
+		<li>Start from one of the following installation folders. Note that version 
+		numbers change with each release.
+		<ul>
+			<li>I:\Common\Engineering\ProductReleases\FlexIndex\External\Current
+			<li>M:\ProductReleases\FlexIndex\Internal\BleedingEdge
+		</ul>
+		<li>Select an appropriate version number and navigate to each <b>SetupFiles</b> 
+		folder.
+		<li>Copy Demo_FLEXIndex, Demo_IDShield, and Demo_LabDE folders to the 
+		C:\ drive on the test machine.
+		<li><b>Install</b> each demo by exercising the associated <b>CleanAll</b> 
+		batch files.
+		<li>Use <b>SQL Server Management Server</b> to exercise <b>I:\Common\Testing
+		\Product Testing\IDShield_Sanity\CreateDomainLogin_AddForDemoDBs.sql</b> 
+		to allow Domain Users to access the demo databases.
+	</ul>
+<p>
+	<h2>Database Administration (DB Admin)</h2>
+	<ul>
+		<li>Exercise <b>DB Admin</b> for one of the demo databases noted above.
+		<li>Review the various menu items and the Summary tab.
+		<li>Exercise the <b>Manage Actions</b> dialog and add a new TEST action that 
+		you can use for other experimentation. Note that clearing the database via 
+		<b>CleanAll.bat</b> will clean up any inadvertent messes.
+		<li>The <b>Tools - Export file list</b> menu item will be used repeatedly in 
+		later FAM testing.
+	</ul>
+<p>
+	<h2>File Action Manager (FAM)</h2>
+	<ul>
+		<li>Use <b>Tools - File Action Manager</b> from DB Admin to open a new FAM 
+		instance to use for testing.
+		<li>On the <b>Action</b> tab, select the new action that was created in the 
+		Manage Actions dialog.
+		<li>Check the <b>Queue files</b> checkbox to allow adding files to be processed.
+		<li>Click the <b>Add...</b> button on the <b>Queue Setup</b> tab.
+		<li>Select <b>Files from folder</b>.
+		<ul>
+			<li>Choose some settings and click OK.
+			<li>Click the <b>Start processing</b> button and watch the <b>Queue Log</b> 
+			tab to see what happens.
+			<li>Export a file list and use Notepad to review the files that were queued.
+			<li>Experiment with other settings such as <b>Recursively supply</b>
+		</ul>
+		<li>Click the lower <b>Commands - Select Condition</b> button on the Queue Setup tab.
+		<li>Select the <b>File name pattern condition</b>.
+		<li>Specify a simple expression that will <b>pass</b> for some but not all of the files 
+		being tested.
+		<li>Export a file list and use Notepad to review the files that were queued and also to 
+		see that certain files were not queued.
+		<li>Clear the database via <b>Database - Clear</b> from DB Admin.
+		<li>Create a new FAM and select <b>Files from dynamic list</b> on the Queue Setup tab.
+		<li>Browse to and select an exported file list.
+		<li>Start processing and confirm that the expected files have been queued.
+<p>
+		<li><b>EXERCISES:</b>
+		<ul>
+			<li>Confirm that settings can be selected such that files can be 
+			<b>dropped</b> into a specific folder and then queued.
+			<li>Confirm that a condition can be defined to exclude multi-page images 
+			from being queued.
+			<li>Confirm that <b>Mathematical condition</b> can be used to randomly 
+			queue files from a folder.
+			<li>Confirm that <b>Mathematical condition</b> can be used to randomly 
+			queue files from a list.
+		</ul>
+	</ul>
+</body>
+</html>
