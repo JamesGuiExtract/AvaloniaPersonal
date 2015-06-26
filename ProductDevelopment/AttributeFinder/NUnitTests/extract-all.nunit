@@ -5,7 +5,6 @@
     <assembly path="Extract.DataEntry.Test.dll" />
     <assembly path="Extract.Encryption.Test.dll" />
     <assembly path="Extract.FileActionManager.Database.Test.dll" />
-    <assembly path="Extract.Geometry.Test.dll" />
     <assembly path="Extract.Imaging.Forms.Test.dll" />
     <assembly path="Extract.SetOperations.Test.dll" />
     <assembly path="Extract.Utilities.Test.dll" />

@@ -109,6 +109,10 @@ STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
 
 		ms_ipContextTagProvider->ContextPath = ms_strFPSDir.c_str();
 
+		// Want to always refresh the tags from the database, even when 
+		// the folder has not changed
+		// https://extract.atlassian.net/browse/ISSUE-13068
+		// https://extract.atlassian.net/browse/ISSUE-13078
 		ms_ipContextTagProvider->RefreshTags();
 		
 		// https://extract.atlassian.net/browse/ISSUE-13001
