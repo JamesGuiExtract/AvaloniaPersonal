@@ -59,7 +59,7 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 :: Label
-nmake /F LabelFromLatestVersions.mak Branch=%Branch%
+nmake /K /F LabelFromLatestVersions.mak Branch=%Branch%
 
 IF %ERRORLEVEL% NEQ 0 (
 	Echo Labeling exited with error.

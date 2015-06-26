@@ -89,14 +89,14 @@ IF "%BUILD_STATUS%" NEQ "Started" (
 	PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%~1' '%BUILD_STATUS%'"
 )
 
-nmake /F AttributeFinderSDK.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
+nmake /K /F AttributeFinderSDK.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
 IF ERRORLEVEL 1 (
 	SET BUILD_STATUS="Failed"
 	GOTO exit_script
 )
 
 IF "%BuildScriptTarget%"=="DoBuilds" GOTO exit_script
-nmake /F RuleDevelopmentKit.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" DoEverything 2>&1 | tee "%LOGFILE2%"
+nmake /K /F RuleDevelopmentKit.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" DoEverything 2>&1 | tee "%LOGFILE2%"
 IF ERRORLEVEL 1 (
 	SET BUILD_STATUS="Failed"
 	GOTO exit_script
