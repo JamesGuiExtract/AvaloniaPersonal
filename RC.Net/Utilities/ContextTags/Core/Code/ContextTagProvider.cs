@@ -279,6 +279,21 @@ namespace Extract.Utilities.ContextTags
 	        }
         }
 
+        /// <summary>
+        /// Clears the loaded tags and reloads the tags from the database 
+        /// </summary>
+        public void RefreshTags()
+        {
+            try
+            {
+                LoadTagsForPath(_contextPath);
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI38306", "Failed to load tags.");
+            }
+        }
+
         #endregion IContextTagProvider
 
         #region Private Members

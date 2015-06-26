@@ -2,7 +2,7 @@
 //
 
 // This file will be processed by the MIDL tool to
-// produce the type library (UCLIDFileProcessing.tlb) and marshalling code.
+// produce the type library (UCLIDFileProcessing.tlb) and marshaling code.
 
 import "oaidl.idl";
 import "ocidl.idl";
@@ -520,6 +520,10 @@ library UCLID_FILEPROCESSINGLib
 		//			are not potential configuration issues, pbstrWarning == __nullptr
 		[id(57), helpstring("method GetConfigurationWarnings")] HRESULT GetConfigurationWarnings(
 			[out, retval] BSTR *pbstrWarning);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Refreshes the database settings so that if tags are being used the latest
+		//			values in the customDB are used
+		[id(58), helpstring("method RefreshDBSettings")] HRESULT RefreshDBSettings();
 	};
 
 	[
@@ -1983,7 +1987,7 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To be used to notify the FileActionManager that the Supplying is complete
 		[id(2), helpstring("method NotifySupplyingCompleted")] HRESULT NotifySupplyingCompleted(void);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To be used to notify the FileActionManager that the Processing is cancelling
+		// PURPOSE: To be used to notify the FileActionManager that the Processing is canceling
 		[id(3), helpstring("method NotifyProcessingCancelling")] HRESULT NotifyProcessingCancelling();
 	};
 
@@ -2035,13 +2039,6 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(10), helpstring("property AlwaysShowDatabaseTags")] HRESULT AlwaysShowDatabaseTags([out, retval] VARIANT_BOOL *pbValue);
 		[propput, id(10), helpstring("property AlwaysShowDatabaseTags")] HRESULT AlwaysShowDatabaseTags([in] VARIANT_BOOL bValue);
 		//-----------------------------------------------------------------------------------------
-		// Specifies the IFileProcessingDB currently being used for processing that should be used to
-		// expand database path tags.
-		// NOTE: If the currently connected database is changed after this making this call, the path
-		// tags will continue to return the old connection info. Thus, this call should be
-		// re-executed if at any point the database connection or action may have changed.
-		[id(11), helpstring("method SetFAMDB")] HRESULT SetFAMDB([in] IFileProcessingDB *pFAMDB, long nActionID);
-		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Verifies that the tag manager has all necessary info to expand tags during processing.
 		//			bstrDatabaseServer and bstrDatabaseName refer to the FAM's literally configured
 		//			database parameters, not the path tag expansion of those parameters.
@@ -2050,6 +2047,18 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrDatabaseServer, [in] BSTR bstrDatabaseName, [out, retval] BSTR* pbstrWarning);
 		// Returns the active context
 		[propget, id(13), helpstring("property ActiveContext")] HRESULT ActiveContext([out,retval] BSTR *strActiveContext);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Sets the database server - this may contain tags 
+		[propget, id(14), helpstring("property DatabaseServer")] HRESULT DatabaseServer([out, retval] BSTR *strDatabaseServer);
+		[propput, id(14), helpstring("property DatabaseServer")] HRESULT DatabaseServer([in] BSTR strDatabaseServer);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Sets the database name - this may contain tags 
+		[propget, id(15), helpstring("property DatabaseName")] HRESULT DatabaseName([out, retval] BSTR *strDatabaseName);
+		[propput, id(15), helpstring("property DatabaseName")] HRESULT DatabaseName([in] BSTR strDatabaseName);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Sets the Action name
+		[propget, id(16), helpstring("property ActionName")] HRESULT ActionName([out, retval] BSTR *strActionName);
+		[propput, id(16), helpstring("property ActionName")] HRESULT ActionName([in] BSTR strActionName);
 	};
 
 	[

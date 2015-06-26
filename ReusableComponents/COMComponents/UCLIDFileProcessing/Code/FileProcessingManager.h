@@ -99,6 +99,7 @@ public:
 	STDMETHOD(get_AdvancedConnectionStringProperties)(BSTR *pVal);
 	STDMETHOD(put_AdvancedConnectionStringProperties)(BSTR newVal);
 	STDMETHOD(GetConfigurationWarnings)(BSTR *pbstrWarning);
+	STDMETHOD(RefreshDBSettings)();
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -126,7 +127,7 @@ private:
 	// a flag to indicate the process in on going
 	volatile bool m_bProcessing;
 
-	// A flag to indicate the process is cancelling
+	// A flag to indicate the process is canceling
 	volatile bool m_bCancelling;
 	
 	// a flag to indicate that supplying is going on
@@ -229,6 +230,10 @@ private:
 	
 	// Applies a new DB name, where any path tags or functions in strDBServer are evaluated.
 	void setDBName(string strDBName);
+
+	// Updates the FAMDB settings with expansion - to make sure the most current values of the
+	// custom tags are used
+	void refreshDatabaseSettings();
 
 	// Applies a new advanced connection string properties value, where any path tags or functions
 	// in strDBServer are evaluated.

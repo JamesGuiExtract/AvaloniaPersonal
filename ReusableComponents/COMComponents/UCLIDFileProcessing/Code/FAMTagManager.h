@@ -72,10 +72,15 @@ public:
 	STDMETHOD(StringContainsTags)(BSTR strInput, VARIANT_BOOL *pbValue);
 	STDMETHOD(get_AlwaysShowDatabaseTags)(VARIANT_BOOL *pbValue);
 	STDMETHOD(put_AlwaysShowDatabaseTags)(VARIANT_BOOL bValue);
-	STDMETHOD(SetFAMDB)(IFileProcessingDB *pFAMDB, long nActionID);
 	STDMETHOD(ValidateConfiguration)(BSTR bstrDatabaseServer, BSTR bstrDatabaseName,
 		BSTR* pbstrWarning);
 	STDMETHOD(get_ActiveContext)(BSTR *strActiveContext);
+	STDMETHOD(get_DatabaseServer)(BSTR *strDatabaseServer);
+	STDMETHOD(put_DatabaseServer)(BSTR strDatabaseServer);
+	STDMETHOD(get_DatabaseName)(BSTR *strDatabaseName);
+	STDMETHOD(put_DatabaseName)(BSTR strDatabaseName);
+	STDMETHOD(get_ActionName)(BSTR *strActionName);
+	STDMETHOD(put_ActionName)(BSTR strActionName);
 
 private:
 

@@ -2,7 +2,7 @@
 //
 
 // This file will be processed by the MIDL tool to
-// produce the type library (UCLIDCOMUtils.tlb) and marshalling code.
+// produce the type library (UCLIDCOMUtils.tlb) and marshaling code.
 
 import "oaidl.idl";
 import "ocidl.idl";
@@ -201,11 +201,11 @@ library UCLID_COMUTILSLib
 		[id(20), helpstring("method At2")] HRESULT At2([in] long lPos,
 			[out, retval] IDispatch **pObj);
 		//-----------------------------------------------------------------------------------------
-		// Pushes pObj onto the end of the vector if pObj is not already in the vector (by refrence)
+		// Pushes pObj onto the end of the vector if pObj is not already in the vector (by reference)
 		[id(21), helpstring("method PushBackIfNotContained")] HRESULT PushBackIfNotContained(
 			[in] IUnknown *pObj);
 		//-----------------------------------------------------------------------------------------
-		// Pushes pObj onto the end of the vector if pObj is not already in the vector (by refrence)
+		// Pushes pObj onto the end of the vector if pObj is not already in the vector (by reference)
 		[id(22), helpstring("method FindByReference")] HRESULT FindByReference([in] IUnknown *pObj,
 			[in] long nStartPos, long* pRetVal);
 		//-----------------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ library UCLID_COMUTILSLib
 		// PARAM:	bFindFirstMatch -- true: Find first match and return
 		//							   false: Find all matches and then return
 		//			bReturnNamedMatches -- true: Named group captures specified in the regular
-		//										 expression will be returned as named submatches
+		//										 expression will be returned as named sub-matches
 		//										 unless the group name starts with a number or an
 		//										 underscore.
 		//							    -- false: Object2 parameter of ObjectPairs in the 
@@ -476,7 +476,7 @@ library UCLID_COMUTILSLib
 		//				bstrCategory- The registered category name (ie, FP_FAM_REPORTS_CATEGORYNAME)
 		//				pObj- An ObjectWithDescription to initialize the object selection box 
 		//					and configuration info receive the user's changes. 
-		//				NOTE: The ObjectWithDescription's descripton will never be set or modified
+		//				NOTE: The ObjectWithDescription's description will never be set or modified
 		//				nNumRequiredIIDs- If user should only be allowed to select from objects that implement
 		//					particular interfaces, how many interfaces are to be specified?
 		//				pRequiredIIDs- The array interface IDs the object is required to
@@ -522,7 +522,7 @@ library UCLID_COMUTILSLib
 		//											   key from pMapToMerge not this map
 		//						  kAppend			 = If a specified key already exists, insert the 
 		//											   key from pMapToMerge under a new name
-		//											   (append _x to the key where x is an interger)
+		//											   (append _x to the key where x is an integer)
 		[id(10), helpstring("method Merge")] HRESULT Merge([in] IStrToStrMap *pMapToMerge, 
 			[in] EMergeMethod eMergeMethod);
 
@@ -536,7 +536,7 @@ library UCLID_COMUTILSLib
 		//											   key from pMapToMerge not this map
 		//						  kAppend			 = If a specified key already exists, insert the 
 		//											   key from pMapToMerge under a new name
-		//											   (append _x to the key where x is an interger)
+		//											   (append _x to the key where x is an integer)
 		[id(11), helpstring("method MergeKeyValue")] HRESULT MergeKeyValue(
 			[in] BSTR bstrKey, [in] BSTR bstrValue, [in] EMergeMethod eMergeMethod);
 
@@ -1070,7 +1070,7 @@ library UCLID_COMUTILSLib
 			[out, retval] VARIANT_BOOL* pvbDirty);
 		//---------------------------------------------------------------------------------------------
 		// PROMISE: Requests windows shell to open the specified document with the application registered
-		//			to the filetype of the document. Throws an execption if the request fails.
+		//			to the filetype of the document. Throws an exception if the request fails.
 		// ARGS:	bstrFilename- The filename of the document to open
 		[id(22), helpstring("method ShellOpenDocument")] HRESULT ShellOpenDocument([in] BSTR bstrFilename);
 		//-----------------------------------------------------------------------------------------
@@ -1103,14 +1103,14 @@ library UCLID_COMUTILSLib
 		//			bstrSourceDocName and/or pData.
 		//			[LegacyRCAndUtils:6337] 11/17/2012 SNK 
 		//		    NOTE: pData type is specific to the calling class (such as IAFDocument instance).
-		//			While this is admitedly not the best design, it allows for modifying path tag
+		//			While this is admittedly not the best design, it allows for modifying path tag
 		//			expansion so that it occurs per parameter within path tag functions with as
 		//			little changes as possible to existing code.
 		[id(26), helpstring("method ExpandTagsAndFunctions")] HRESULT ExpandTagsAndFunctions(
 			[in] BSTR bstrInput, [in] ITagUtility *pTagUtility, [in] BSTR bstrSourceDocName,
 			[in] IUnknown *pData, [out, retval] BSTR* pbstrOutput);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Allows for additional path tags to be added programatically. May be called
+		// PURPOSE: Allows for additional path tags to be added programmatically. May be called
 		//			repeatedly for the same bstrTagName to update the expansion value.
 		// PARAMS:	bstrTagName - The name of the tag (not including the angle brackets that are
 		//						  used to denote path tags).
@@ -1263,9 +1263,9 @@ library UCLID_COMUTILSLib
 		//				an exception will be thrown.  If bstrMutexName is the same as 
 		//				the first call, no exception will be thrown
 		[id(1), helpstring("method CreateNamed")] HRESULT CreateNamed(BSTR bstrMutexName);
-		// PROMISE:		To return after the Mutex named with a call to CreateNamed is aquired
+		// PROMISE:		To return after the Mutex named with a call to CreateNamed is acquired
 		[id(2), helpstring("method Acquire")] HRESULT Acquire(void);
-		// PROMISE:		To releas the named mutex
+		// PROMISE:		To release the named mutex
 		[id(3), helpstring("method ReleaseNamedMutex")] HRESULT ReleaseNamedMutex(void);
 	};
 
@@ -1298,7 +1298,7 @@ library UCLID_COMUTILSLib
 		//			bstrSourceDocName and/or pData.
 		//			[LegacyRCAndUtils:6337] 11/17/2012 SNK 
 		//		    NOTE: pData type is specific to the calling class (such as IAFDocument instance).
-		//			While this is admitedly not the best design, it allows for modifying path tag
+		//			While this is admittedly not the best design, it allows for modifying path tag
 		//			expansion so that it occurs per parameter within path tag functions with as
 		//			little changes as possible to existing code.e.
 		[id(1), helpstring("method ExpandTags")] HRESULT ExpandTags([in] BSTR bstrInput,
@@ -1373,6 +1373,9 @@ library UCLID_COMUTILSLib
 		// PURPOSE: Gets any tag names for values that have not been defined in the active context.
 		//			Returns an empty list if there is no active context.
 		[id(6), helpstring("method GetUndefinedTags")] HRESULT GetUndefinedTags([out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Reloads the custom tag values from storage
+		[id(7), helpstring("method RefreshTags")] HRESULT RefreshTags();
 	}
 
 	//---------------------------------------------------------------------------------------------
@@ -1546,7 +1549,7 @@ library UCLID_COMUTILSLib
 		//			arguments to this method.  The window title and top level progress status 
 		//			object can be changed while the progress status window is up (see documentation
 		//			for the ProgressStatusObject and Title properties).
-		//			Since this method brings up the progress status dialog as a modelesss dialog,
+		//			Since this method brings up the progress status dialog as a modeless dialog,
 		//			the dialog will still be open after this method call returns.  The dialog is
 		//			closed automatically when this object goes out of scope, or when the Close()
 		//			method is called.
@@ -1687,7 +1690,7 @@ library UCLID_COMUTILSLib
 	{
 		// Requests the object to report its memory usage via the Extract.Interop.MemoryManager
 		// class so that the garbage collector is aware of the unmanaged memory being used.
-		// NOTE: Any implmenting class needs to be sure to follow up with a report of zero bytes
+		// NOTE: Any implementing class needs to be sure to follow up with a report of zero bytes
 		// used when the instance is released so the garbage collector doesn't continue to believe
 		// that memory to be in use.
 		// NOTE: Any implementing class needs to call this method on of any IManageableMemory child
@@ -1732,7 +1735,7 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To initialize the loaded pDataToInit.
 		// ARGS:	pDataToInit - The IUnknownVector of objects that have just been loaded, but
-		//				need special initializaton having been persisted using an IStorageManager.
+		//				need special initialization having been persisted using an IStorageManager.
 		[id(2), helpstring("method InitFromStorage")] HRESULT InitFromStorage(
 			[in] IIUnknownVector *pDataToInit);
 	}

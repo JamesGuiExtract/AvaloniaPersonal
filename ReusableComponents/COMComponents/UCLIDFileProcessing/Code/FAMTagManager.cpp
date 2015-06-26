@@ -108,6 +108,8 @@ STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
 		ms_strFPSDir = asString(strFPSDir);
 
 		ms_ipContextTagProvider->ContextPath = ms_strFPSDir.c_str();
+
+		ms_ipContextTagProvider->RefreshTags();
 		
 		// https://extract.atlassian.net/browse/ISSUE-13001
 		// Cache the context the tag values to avoid frequent COM calls which also tend to leak
@@ -540,34 +542,6 @@ STDMETHODIMP CFAMTagManager::put_AlwaysShowDatabaseTags(VARIANT_BOOL bValue)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38078");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::SetFAMDB(IFileProcessingDB *pFAMDB, long nActionID)
-{
-	try
-	{
-		// Check license
-		validateLicense();
-
-		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB(pFAMDB);
-		if (ipFAMDB == __nullptr)
-		{
-			m_strDatabaseServer.clear();
-			m_strDatabaseName.clear();
-			m_strDatabaseAction.clear();
-		}
-		else
-		{
-			m_strDatabaseServer = asString(ipFAMDB->DatabaseServer);
-			m_strDatabaseName = asString(ipFAMDB->DatabaseName);
-			m_strDatabaseAction = (nActionID != -1) 
-				? asString(ipFAMDB->GetActionName(nActionID))
-				: "";
-		}
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38079");
-}
-//--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMTagManager::ValidateConfiguration(BSTR bstrDatabaseServer, BSTR bstrDatabaseName,
 												   BSTR* pbstrWarning)
 {
@@ -655,6 +629,102 @@ STDMETHODIMP CFAMTagManager::get_ActiveContext(BSTR *strActiveContext)
 		return S_OK;		
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38071");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::get_DatabaseServer(BSTR *strDatabaseServer)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38303", strDatabaseServer != __nullptr);
+
+		CSingleLock lock(&ms_mutex, TRUE);
+		*strDatabaseServer = _bstr_t(m_strDatabaseServer.c_str()).Detach();
+		
+		return S_OK;		
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38305");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::put_DatabaseServer(BSTR strDatabaseServer)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		CSingleLock lock(&ms_mutex, TRUE);
+		m_strDatabaseServer = asString(strDatabaseServer);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38309");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::get_DatabaseName(BSTR *strDatabaseName)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38304", strDatabaseName != __nullptr);
+
+		CSingleLock lock(&ms_mutex, TRUE);
+		*strDatabaseName = _bstr_t(m_strDatabaseName.c_str()).Detach();
+		
+		return S_OK;		
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38310");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::put_DatabaseName(BSTR strDatabaseName)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		CSingleLock lock(&ms_mutex, TRUE);
+		m_strDatabaseName = asString(strDatabaseName);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38311");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::get_ActionName(BSTR *strActionName)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38312", strActionName != __nullptr);
+
+		CSingleLock lock(&ms_mutex, TRUE);
+		*strActionName = _bstr_t(m_strDatabaseAction.c_str()).Detach();
+		
+		return S_OK;		
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38313");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::put_ActionName(BSTR strActionName)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		CSingleLock lock(&ms_mutex, TRUE);
+		m_strDatabaseAction = asString(strActionName);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38314");
 }
 
 //--------------------------------------------------------------------------------------------------

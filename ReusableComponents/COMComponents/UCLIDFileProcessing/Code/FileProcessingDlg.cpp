@@ -356,10 +356,24 @@ void FileProcessingDlg::OnBtnRun()
 
 	try
 	{
-		// Reset the db connection
-		getDBPointer()->ResetDBConnection(VARIANT_FALSE);
-		
-		// set all parameters for file proc manager
+		// Make sure the database settings are using the latest value in customTags if tags
+		// are being used
+		try
+		{
+			getFPM()->RefreshDBSettings();
+		}
+		catch(...)
+		{
+			try
+			{
+				updateUIForCurrentDBStatus();
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38308");
+
+			throw;
+		}
+
+		// set all parameters for file processing manager
 		// if saving a setting fails we will not run
 		if (!flushSettingsToManager())
 		{
@@ -1803,9 +1817,9 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 		// Only try to connect if no tags need to be expanded
 		if (!bTagsToExpand)
 		{
-			// Reset the database connection
-			getDBPointer()->ResetDBConnection(VARIANT_FALSE);
-		
+			// Reset the database connection with current tags refreshed
+			getFPM()->RefreshDBSettings();
+
 			// In case path tags were expanded, return the literal database connection properties we
 			// actually connected to.
 			rstrServer = getDBPointer()->DatabaseServer;
@@ -2621,6 +2635,15 @@ void FileProcessingDlg::loadSettingsFromManager()
 	}
 	catch (...)
 	{
+		// If the database settings are invalid that exception would be caught here and
+		// the UI needs to be updated based on the current DB status
+		// https://extract.atlassian.net/browse/ISSUE-13100
+		try
+		{
+			updateMenuAndToolbar();
+			updateUI();
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38315")
 		m_bUpdatingConnection = false;
 		throw;
 	}
@@ -2628,8 +2651,8 @@ void FileProcessingDlg::loadSettingsFromManager()
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingDlg::flushSettingsToManager()
 {
-		getFPM()->RestrictNumStoredRecords = VARIANT_TRUE;
-		getFPM()->MaxStoredRecords = m_dlgOptions.getMaxDisplayRecords();
+	getFPM()->RestrictNumStoredRecords = VARIANT_TRUE;
+	getFPM()->MaxStoredRecords = m_dlgOptions.getMaxDisplayRecords();
 
 	return true;
 }

@@ -244,9 +244,8 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		m_ipFPMDB->RegisterActiveFAM(lActionId, ipSupplyingActionMgmtRole->Enabled,
 			ipProcessingActionMgmtRole->Enabled);
 
-		// Assign the DB connection info currently being used to the tag manager to be able to
-		// expand any database tags.
-		m_ipFAMTagManager->SetFAMDB(m_ipFPMDB, lActionId);
+		// Set the ActionName in the tag manager so that it can expand ActionName tags
+		m_ipFAMTagManager->ActionName = strExpandedAction.c_str();
 		
 		// Try/catch in case of a failure to start processing so UnregisterProcessingFAM can be
 		// called and to stop supplying if it was started.
@@ -353,7 +352,7 @@ STDMETHODIMP CFileProcessingManager::StopProcessing()
 
 	try
 	{
-		// If we are already cancelling, we are done.
+		// If we are already canceling, we are done.
 		if (m_bCancelling)
 		{
 			return S_OK;
@@ -372,7 +371,7 @@ STDMETHODIMP CFileProcessingManager::StopProcessing()
 			throw UCLIDException("ELI12735", "Processing cannot be stopped when it is in a paused state!");
 		}
 
-		// Set the flag that cancelling has started
+		// Set the flag that canceling has started
 		m_bCancelling = true;
 
 		// Log stop processing information
@@ -418,6 +417,9 @@ STDMETHODIMP CFileProcessingManager::LoadFrom(BSTR strFullFileName, VARIANT_BOOL
 
 		// Wait for the file to be accessible
 		waitForFileAccess(strFileName, giMODE_READ_ONLY);
+		
+		// This will update tags in tag manager and set the database settings 
+		refreshDatabaseSettings();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19281");
 
@@ -1052,9 +1054,8 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				long nActionId = getFPMDB()->GetActionID(bstrActionName);
 				getFPMDB()->RegisterActiveFAM(nActionId, vbQueue, vbProcess);
 
-				// Assign the DB connection info currently being used to the tag manager to be able to
-				// expand any database tags.
-				m_ipFAMTagManager->SetFAMDB(getFPMDB(), nActionId);
+				// Set the ActionName on the tag manager so that the ActionName tag can be expanded
+				m_ipFAMTagManager->ActionName = bstrActionName;
 
 				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord = __nullptr;
 				if (bQueue)
@@ -1254,6 +1255,20 @@ STDMETHODIMP CFileProcessingManager::GetConfigurationWarnings(BSTR *pbstrWarning
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38269");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::RefreshDBSettings()
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		refreshDatabaseSettings();
+		m_ipFPMDB->ResetDBConnection(VARIANT_FALSE);
+				
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38307");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
@@ -1427,6 +1442,7 @@ void CFileProcessingManager::setDBServer(string strDBServer)
 	{
 		m_bDirty = true;
 	}
+	m_ipFAMTagManager->DatabaseServer = strDBServer.c_str();
 
 	getFPMDB()->DatabaseServer = m_ipFAMTagManager->ExpandTagsAndFunctions(strDBServer.c_str(), "");
 	m_strDBServer = strDBServer;
@@ -1439,7 +1455,7 @@ void CFileProcessingManager::setDBName(string strDBName)
 	{
 		m_bDirty = true;
 	}
-
+	m_ipFAMTagManager->DatabaseName = strDBName.c_str();
 	getFPMDB()->DatabaseName = m_ipFAMTagManager->ExpandTagsAndFunctions(strDBName.c_str(), "");
 	m_strDBName = strDBName;
 }
@@ -1455,6 +1471,19 @@ void CFileProcessingManager::setAdvConnString(string strAdvConnString)
 	getFPMDB()->AdvancedConnectionStringProperties =
 		m_ipFAMTagManager->ExpandTagsAndFunctions(strAdvConnString.c_str(), "");
 	m_strAdvConnString = strAdvConnString;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingManager::refreshDatabaseSettings()
+{
+	// Make sure the FPSFileDir is set to the current path to the FPS file - this will also refresh
+	// the tags from the custom tags database
+	m_ipFAMTagManager->FPSFileDir = getDirectoryFromFullPath(m_strFPSFileName).c_str();
+	
+	// Update the Database settings
+	getFPMDB()->DatabaseServer = m_ipFAMTagManager->ExpandTagsAndFunctions(m_strDBServer.c_str(), "");
+	getFPMDB()->DatabaseName = m_ipFAMTagManager->ExpandTagsAndFunctions(m_strDBName.c_str(), "");
+	getFPMDB()->AdvancedConnectionStringProperties =
+		m_ipFAMTagManager->ExpandTagsAndFunctions(m_strAdvConnString.c_str(), "");
 }
 //-------------------------------------------------------------------------------------------------
 string CFileProcessingManager::getExpandedActionName()
