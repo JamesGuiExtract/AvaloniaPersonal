@@ -11,6 +11,20 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="Filename">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FullText" type="xs:string" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ResultStatus" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FullText" type="xs:string" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="OperatorComments" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
@@ -22,14 +36,6 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" type="xs:string" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="Filename">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string">
-							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -79,14 +85,14 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="MR_Number" minOccurs="1">
+							<xs:element name="Gender" minOccurs="0">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="FullText" type="xs:string" />
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="Gender" minOccurs="0">
+							<xs:element name="MR_Number" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="FullText" type="xs:string" />
@@ -97,6 +103,48 @@
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="FullText" type="xs:string" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="PhysicianInfo" minOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FullText" minOccurs="1" type="xs:string" />
+							<xs:element name="OrderingPhysicianName" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
+										<xs:element name="Last">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="FullText" type="xs:string" />
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="First">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="FullText" type="xs:string" />
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Middle" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="FullText" type="xs:string" />
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Code" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="FullText" type="xs:string" />
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -163,7 +211,6 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element ref="LabInfo" />
 							<xs:element name="Comment" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
@@ -248,60 +295,11 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
+							<xs:element ref="LabInfo" />
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
 				<xs:element ref="LabInfo" minOccurs="0" />
-				<xs:element name="ResultStatus" minOccurs="0">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="PhysicianInfo" minOccurs="1">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" minOccurs="1" type="xs:string" />
-							<xs:element name="OrderingPhysicianName" minOccurs="0">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="FullText" type="xs:string" />
-										<xs:element name="Last">
-											<xs:complexType>
-												<xs:sequence>
-													<xs:element name="FullText" type="xs:string" />
-												</xs:sequence>
-											</xs:complexType>
-										</xs:element>
-										<xs:element name="First">
-											<xs:complexType>
-												<xs:sequence>
-													<xs:element name="FullText" type="xs:string" />
-												</xs:sequence>
-											</xs:complexType>
-										</xs:element>
-										<xs:element name="Middle" minOccurs="0">
-											<xs:complexType>
-												<xs:sequence>
-													<xs:element name="FullText" type="xs:string" />
-												</xs:sequence>
-											</xs:complexType>
-										</xs:element>
-										<xs:element name="Code" minOccurs="0">
-											<xs:complexType>
-												<xs:sequence>
-													<xs:element name="FullText" type="xs:string" />
-												</xs:sequence>
-											</xs:complexType>
-										</xs:element>
-										
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
 				<xs:element name="ResultDate" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
@@ -360,6 +358,13 @@
 				<xs:element name="FullText" minOccurs="1" type="xs:string" />
 				<xs:element ref="Address" minOccurs="0" />
 				<xs:element name="Name" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FullText" type="xs:string" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="LabDisplay" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" type="xs:string" />

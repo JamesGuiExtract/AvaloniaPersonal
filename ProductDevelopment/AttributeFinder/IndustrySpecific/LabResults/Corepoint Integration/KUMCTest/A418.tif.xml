@@ -1,16 +1,19 @@
 <FlexData>
 	<MessageSequenceNumberFile>
-		<FullText>C:\Engineering\Rules\LabDE\KS - KUMC\Solution\MessageSequenceNumber.txt</FullText>
+		<FullText>C:\LabDE_KUMC\Solution\MessageSequenceNumber.txt</FullText>
 	</MessageSequenceNumberFile>
+	<Filename>
+		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\KUMCTest\A418.tif</FullText>
+	</Filename>
+	<ResultStatus>
+		<FullText>Final</FullText>
+	</ResultStatus>
 	<OperatorComments>
 		<FullText/>
 	</OperatorComments>
 	<ClueOnFirstPage>
-		<FullText/>
+		<FullText>No</FullText>
 	</ClueOnFirstPage>
-	<Filename>
-		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\KUMCTest\A418.tif</FullText>
-	</Filename>
 	<PatientInfo>
 		<FullText/>
 		<Name>
@@ -31,92 +34,44 @@
 		<DOB>
 			<FullText>12/12/1970</FullText>
 		</DOB>
-		<MR_Number>
-			<FullText>00000001</FullText>
-		</MR_Number>
 		<Gender>
 			<FullText>M</FullText>
 		</Gender>
-	</PatientInfo>
-	<Test>
-		<FullText/>
-		<OrderNumber>
+		<MR_Number>
 			<FullText>00000001</FullText>
-		</OrderNumber>
-		<Name>
-			<FullText>GLUCOSE, RANDOM</FullText>
-		</Name>
-		<OrderCode>
-			<FullText>812</FullText>
-		</OrderCode>
-		<EpicCode>
-			<FullText>812</FullText>
-		</EpicCode>
-		<CollectionDate>
-			<FullText>09/09/2009</FullText>
-		</CollectionDate>
-		<CollectionTime>
-			<FullText>09:00</FullText>
-		</CollectionTime>
-		<ResultDate>
+		</MR_Number>
+	</PatientInfo>
+	<PhysicianInfo>
+		<FullText/>
+		<OrderingPhysicianName>
 			<FullText/>
-		</ResultDate>
-		<ResultTime>
-			<FullText/>
-		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>00000000</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>Lab Corp</FullText>
-			</LabIdentifier>
-		</LabInfo>
-		<Comment>
-			<FullText>Verified by Steve N. Kurth on 06/11/2015.</FullText>
-		</Comment>
-		<Component>
-			<FullText>GLUCOSE,RANDOM</FullText>
-			<TestCode>
-				<FullText>2010</FullText>
-			</TestCode>
-			<Value>
-				<FullText>91</FullText>
-			</Value>
-			<Units>
-				<FullText>MG/DL</FullText>
-			</Units>
-			<Range>
-				<FullText>70-99</FullText>
-			</Range>
-			<Flag>
+			<Last>
+				<FullText>Thomas</FullText>
+			</Last>
+			<First>
+				<FullText>Tashra</FullText>
+			</First>
+			<Middle>
 				<FullText/>
-			</Flag>
-			<Status>
-				<FullText>F</FullText>
-			</Status>
-			<OriginalName>
-				<FullText>GLUCOSE,RANDOM</FullText>
-			</OriginalName>
-			<Comment>
-				<FullText/>
-			</Comment>
-		</Component>
-	</Test>
+			</Middle>
+			<Code>
+				<FullText>TTHOMAS</FullText>
+			</Code>
+		</OrderingPhysicianName>
+	</PhysicianInfo>
 	<Test>
 		<FullText/>
 		<OrderNumber>
 			<FullText>00000002</FullText>
 		</OrderNumber>
 		<Name>
-			<FullText>HEMOGLOBIN A1C</FullText>
+			<FullText>HEMOGLOBIN A1c</FullText>
 		</Name>
 		<OrderCode>
-			<FullText>828</FullText>
+			<FullText>HBA1C</FullText>
 		</OrderCode>
 		<EpicCode>
-			<FullText>828</FullText>
+			<FullText>HBA1C</FullText>
 		</EpicCode>
 		<CollectionDate>
 			<FullText>09/09/2009</FullText>
@@ -125,27 +80,18 @@
 			<FullText>09:00</FullText>
 		</CollectionTime>
 		<ResultDate>
-			<FullText/>
+			<FullText>09/09/2009</FullText>
 		</ResultDate>
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>00000000</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>Lab Corp</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 06/11/2015.</FullText>
 		</Comment>
 		<Component>
-			<FullText>HEMOGLOBIN A1C</FullText>
+			<FullText>HB A1C</FullText>
 			<TestCode>
-				<FullText>2034</FullText>
+				<FullText>HBA1C</FullText>
 			</TestCode>
 			<Value>
 				<FullText>6.5</FullText>
@@ -169,6 +115,18 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<LabInfo>
+			<FullText/>
+			<LabDisplay>
+				<FullText>Lab Corp, 713 Omaha  Street Rapid City</FullText>
+			</LabDisplay>
+			<LabCode>
+				<FullText>ES_0486</FullText>
+			</LabCode>
+			<LabIdentifier>
+				<FullText>Lab Corp</FullText>
+			</LabIdentifier>
+		</LabInfo>
 	</Test>
 	<Test>
 		<FullText/>
@@ -179,10 +137,10 @@
 			<FullText>CBC</FullText>
 		</Name>
 		<OrderCode>
-			<FullText>1698</FullText>
+			<FullText>HP</FullText>
 		</OrderCode>
 		<EpicCode>
-			<FullText>1698</FullText>
+			<FullText>HP</FullText>
 		</EpicCode>
 		<CollectionDate>
 			<FullText>09/09/2009</FullText>
@@ -191,27 +149,18 @@
 			<FullText>09:00</FullText>
 		</CollectionTime>
 		<ResultDate>
-			<FullText/>
+			<FullText>09/09/2009</FullText>
 		</ResultDate>
 		<ResultTime>
 			<FullText/>
 		</ResultTime>
-		<LabInfo>
-			<FullText/>
-			<LabCode>
-				<FullText>00000000</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>Lab Corp</FullText>
-			</LabIdentifier>
-		</LabInfo>
 		<Comment>
 			<FullText>Verified by Steve N. Kurth on 06/11/2015.</FullText>
 		</Comment>
 		<Component>
 			<FullText>WBC COUNT</FullText>
 			<TestCode>
-				<FullText>3009</FullText>
+				<FullText>WBC</FullText>
 			</TestCode>
 			<Value>
 				<FullText>4.85</FullText>
@@ -236,36 +185,9 @@
 			</Comment>
 		</Component>
 		<Component>
-			<FullText>RBC COUNT</FullText>
+			<FullText>Hemoglobin</FullText>
 			<TestCode>
-				<FullText>3041</FullText>
-			</TestCode>
-			<Value>
-				<FullText>4.36</FullText>
-			</Value>
-			<Units>
-				<FullText>M/UL</FullText>
-			</Units>
-			<Range>
-				<FullText>4.5-6.1</FullText>
-			</Range>
-			<Flag>
-				<FullText>L</FullText>
-			</Flag>
-			<Status>
-				<FullText>F</FullText>
-			</Status>
-			<OriginalName>
-				<FullText>RBC COUNT</FullText>
-			</OriginalName>
-			<Comment>
-				<FullText/>
-			</Comment>
-		</Component>
-		<Component>
-			<FullText>HEMOGLOBIN</FullText>
-			<TestCode>
-				<FullText>3000</FullText>
+				<FullText>HGB</FullText>
 			</TestCode>
 			<Value>
 				<FullText>12.7</FullText>
@@ -290,9 +212,9 @@
 			</Comment>
 		</Component>
 		<Component>
-			<FullText>HEMATOCRIT</FullText>
+			<FullText>Hematocrit</FullText>
 			<TestCode>
-				<FullText>3004</FullText>
+				<FullText>HCT</FullText>
 			</TestCode>
 			<Value>
 				<FullText>40.5</FullText>
@@ -317,90 +239,9 @@
 			</Comment>
 		</Component>
 		<Component>
-			<FullText>MCV</FullText>
+			<FullText>Platelet Count</FullText>
 			<TestCode>
-				<FullText>3042</FullText>
-			</TestCode>
-			<Value>
-				<FullText>92.9</FullText>
-			</Value>
-			<Units>
-				<FullText>FL</FullText>
-			</Units>
-			<Range>
-				<FullText>81-99</FullText>
-			</Range>
-			<Flag>
-				<FullText/>
-			</Flag>
-			<Status>
-				<FullText>F</FullText>
-			</Status>
-			<OriginalName>
-				<FullText>MCV</FullText>
-			</OriginalName>
-			<Comment>
-				<FullText/>
-			</Comment>
-		</Component>
-		<Component>
-			<FullText>MCH</FullText>
-			<TestCode>
-				<FullText>3043</FullText>
-			</TestCode>
-			<Value>
-				<FullText>29.1</FullText>
-			</Value>
-			<Units>
-				<FullText>PG</FullText>
-			</Units>
-			<Range>
-				<FullText>27-33</FullText>
-			</Range>
-			<Flag>
-				<FullText/>
-			</Flag>
-			<Status>
-				<FullText>F</FullText>
-			</Status>
-			<OriginalName>
-				<FullText>MCH</FullText>
-			</OriginalName>
-			<Comment>
-				<FullText/>
-			</Comment>
-		</Component>
-		<Component>
-			<FullText>MCHC</FullText>
-			<TestCode>
-				<FullText>3044</FullText>
-			</TestCode>
-			<Value>
-				<FullText>31.4</FullText>
-			</Value>
-			<Units>
-				<FullText>%</FullText>
-			</Units>
-			<Range>
-				<FullText>32-36</FullText>
-			</Range>
-			<Flag>
-				<FullText>L</FullText>
-			</Flag>
-			<Status>
-				<FullText>F</FullText>
-			</Status>
-			<OriginalName>
-				<FullText>MCHC</FullText>
-			</OriginalName>
-			<Comment>
-				<FullText/>
-			</Comment>
-		</Component>
-		<Component>
-			<FullText>PLATELET COUNT</FullText>
-			<TestCode>
-				<FullText>3008</FullText>
+				<FullText>PLT</FullText>
 			</TestCode>
 			<Value>
 				<FullText>210</FullText>
@@ -424,80 +265,17 @@
 				<FullText/>
 			</Comment>
 		</Component>
-		<Component>
-			<FullText>RDW</FullText>
-			<TestCode>
-				<FullText>3046</FullText>
-			</TestCode>
-			<Value>
-				<FullText>60.1</FullText>
-			</Value>
-			<Units>
-				<FullText>FL</FullText>
-			</Units>
-			<Range>
-				<FullText>37-53</FullText>
-			</Range>
-			<Flag>
-				<FullText>H</FullText>
-			</Flag>
-			<Status>
-				<FullText>F</FullText>
-			</Status>
-			<OriginalName>
-				<FullText>RDW-SD</FullText>
-			</OriginalName>
-			<Comment>
-				<FullText/>
-			</Comment>
-		</Component>
-		<Component>
-			<FullText>MPV</FullText>
-			<TestCode>
-				<FullText>3045</FullText>
-			</TestCode>
-			<Value>
-				<FullText>10.8</FullText>
-			</Value>
-			<Units>
-				<FullText>FL</FullText>
-			</Units>
-			<Range>
-				<FullText>8-14</FullText>
-			</Range>
-			<Flag>
-				<FullText/>
-			</Flag>
-			<Status>
-				<FullText>F</FullText>
-			</Status>
-			<OriginalName>
-				<FullText>MPV</FullText>
-			</OriginalName>
-			<Comment>
-				<FullText/>
-			</Comment>
-		</Component>
-	</Test>
-	<ResultStatus>
-		<FullText>Final</FullText>
-	</ResultStatus>
-	<PhysicianInfo>
-		<FullText/>
-		<OrderingPhysicianName>
+		<LabInfo>
 			<FullText/>
-			<Last>
-				<FullText>Thomas</FullText>
-			</Last>
-			<First>
-				<FullText>James</FullText>
-			</First>
-			<Middle>
-				<FullText/>
-			</Middle>
-			<Code>
-				<FullText>1619079936</FullText>
-			</Code>
-		</OrderingPhysicianName>
-	</PhysicianInfo>
+			<LabDisplay>
+				<FullText>Lab Corp, 713 Omaha  Street Rapid City</FullText>
+			</LabDisplay>
+			<LabCode>
+				<FullText>ES_0486</FullText>
+			</LabCode>
+			<LabIdentifier>
+				<FullText>Lab Corp</FullText>
+			</LabIdentifier>
+		</LabInfo>
+	</Test>
 </FlexData>
