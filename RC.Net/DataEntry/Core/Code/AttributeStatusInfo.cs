@@ -907,9 +907,9 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    _pathTags = (string.IsNullOrEmpty(_sourceDocName))
+                    _pathTags = (string.IsNullOrEmpty(sourceDocName))
                         ? new FileActionManagerPathTags()
-                        : new FileActionManagerPathTags(null, AttributeStatusInfo.SourceDocName);
+                        : new FileActionManagerPathTags(null, sourceDocName);
                 }
 
                 // Ensure data entry queries no longer react to changes in the attribute hierarchy.
