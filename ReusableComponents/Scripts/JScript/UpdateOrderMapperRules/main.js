@@ -248,13 +248,19 @@ function main(args) {
                 var errorAllowance = "(?'_e')";
                 var cleanupErrorAllowance = "(?(_e)(?'-_e'))(?(_m)(?'-_m'))";
             }
+            var index = 0;
+            var chars = name.replace(/[^0-9a-z#%]+/ig, "").split("");
             return errorAllowance
               + "[^0-9A-Z#%`]{0,4}?"
-              + name.replace(/[^0-9a-z#%]+/ig, "")
-              .split("")
-              .map(function(c) {
+              + chars.map(function(c) {
                   c = substituteProblemChars(c);
-                  return "(([^#%`](?>(?'-_m')|(?'-_e'))|[^0-9a-z#%`]){0,4}?"+c+"(?(_m)(?'-_m'))|(?'-_e')(?'_m'))";
+                  var ret = "(([^#%`](?>(?'-_m')|(?'-_e'))|[^0-9a-z#%`]){0,4}?"+c;
+                  if (index < chars.length - 1) {
+                    index += 1;
+                    return ret + "(?(_m)(?'-_m'))|(?'-_e')(?'_m'))";
+                  } else {
+                    return ret + "(?(_m)(?'-_m'))|(?'-_e')(?'_m')([^0-9a-z#%`]{0,4}?[^#%`](?>(?'-_m')|(?'-_e')))?)";
+                  }
               })
               .join("")
               + "([^#%`](?>(?'-_m')|(?'-_e'))){0,2}"
