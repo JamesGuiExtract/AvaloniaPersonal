@@ -2,6 +2,7 @@
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
+using Microsoft.Win32;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -55,7 +56,7 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Gets or sets whether the menu option should be availab only beneath
+        /// Gets or sets whether the menu option should be available only beneath
         /// <see cref="PathRoot"/>.
         /// </summary>
         /// <value>
@@ -135,7 +136,7 @@ namespace Extract.FileActionManager.FileSuppliers
         const string _PARENT_MENU_NAME = "Send to FAM";
         
         /// <summary>
-        /// The file containing the icon that should be used for the adde sub-menu.
+        /// The file containing the icon that should be used for the add sub-menu.
         /// </summary>
         static readonly string _ICON_FILE =
             Path.Combine(FileSystemMethods.CommonComponentsPath, "ProcessFiles.ico");
@@ -297,7 +298,7 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Gets or sets whether the menu option should be availab only beneath
+        /// Gets or sets whether the menu option should be available only beneath
         /// <see cref="PathRoot"/>.
         /// </summary>
         /// <value>
@@ -354,6 +355,16 @@ namespace Extract.FileActionManager.FileSuppliers
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI33143", _COMPONENT_DESCRIPTION);
 
+                // Check for registration
+                if (!areShellExtentionsRegistered())
+                {
+                    ExtractException exNotRegistered = new ExtractException("ELI38340", "Required components are not registered.");
+                    exNotRegistered.AddDebugData("Dll to register", "Extract.Utilities.ShellExtensions.dll", false);
+                    exNotRegistered.AddDebugData("Dll to register", "LogicNP.EZShellExtensions.dll", false);
+                    exNotRegistered.AddDebugData("How to Fix", "Run RegisterShellExtension.bat in CommonComponents", false);
+                    throw exNotRegistered;
+                }
+
                 _fileTarget = pTarget;
 
                 _stopSupplying.Reset();
@@ -374,7 +385,15 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI33144", "Failed to start " +_COMPONENT_DESCRIPTION);
+                // Tell the any threads that started that they should stop
+                _stopSupplying.Set();
+
+                // Notify the target that suppling has failed and pass the exception
+                ExtractException ee = new ExtractException("ELI33144", "Failed to start " + _COMPONENT_DESCRIPTION, ex);
+                pTarget.NotifyFileSupplyingFailed(this, ee.AsStringizedByteStream());
+
+                // Signal that suppling has stopped
+                _supplyingStopped.Set();
             }
         }
 
@@ -544,7 +563,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// if the component is not licensed.</returns>
         public bool IsLicensed()
         {
-            return LicenseUtilities.IsLicensed(_LICENSE_ID);
+            return LicenseUtilities.IsLicensed(_LICENSE_ID) && areShellExtentionsRegistered();
         }
 
         #endregion ILicensedComponent Members
@@ -723,7 +742,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 }
             }
 
-            // Dispose of ummanaged resources
+            // Dispose of unmanaged resources
         }
 
         #endregion IDisposable Members
@@ -951,7 +970,7 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 while (!_stopSupplying.WaitOne(0))
                 {
-                    // If paused, don't collect any more files until supplyling is resumed.
+                    // If paused, don't collect any more files until supplying is resumed.
                     _supplyingActivated.WaitOne();
 
                     IEnumerable<string> suppliedFiles = null;
@@ -1175,6 +1194,26 @@ namespace Extract.FileActionManager.FileSuppliers
                     Monitor.Exit(_serviceLock);
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks the registry to determine if the LogicNP.EZShellExtensions.dll and
+        /// Extract.Utilities.ShellExtensions.dll are registered.
+        /// </summary>
+        /// <returns></returns>
+        bool areShellExtentionsRegistered()
+        {
+			// The keys that need to exist if Extract.Utilities.ShellExtensions.dll an d
+            // LogicNP.EZShellExtensions.dll are registered - there are other keys but one is
+            // sufficient to check for registration
+            // these keys are in HKEY_Classes_Root
+            string shellExtentionsKey = "Extract.Utilities.ShellExtensions.ExtractContextMenu";
+            string loginNP = "LogicNP.EZShellExtensions.ContextMenuExtension";
+
+            // Check that both keys exist
+            RegistryKey root = Registry.ClassesRoot;
+            return RegistryMethods.RegistrySubkeyExists(root, shellExtentionsKey) &&
+                RegistryMethods.RegistrySubkeyExists(root, loginNP);
         }
 
         #endregion Private Members

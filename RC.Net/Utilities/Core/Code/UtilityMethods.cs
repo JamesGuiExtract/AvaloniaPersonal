@@ -430,5 +430,22 @@ namespace Extract.Utilities
                 throw ex.AsExtract("ELI34517");
             }
         }
+
+        /// <summary>
+        /// Executes the given action with try catch block that logs any exceptions
+        /// </summary>
+        /// <param name="strELI">ELI code for the logged exception</param>
+        /// <param name="action">The action that should be ran</param>
+        public static void PerformWithExceptionLog(string strELI, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog(strELI);
+            }
+        }
     }
 }

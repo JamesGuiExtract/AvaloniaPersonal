@@ -978,7 +978,12 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI32000", "Unable to start supplying object.");
+                // Make sure the restarter and helper are left in a good state
+                UtilityMethods.PerformWithExceptionLog("ELI38341", StopRestarter);
+                UtilityMethods.PerformWithExceptionLog("ELI38342", StopHelper);
+
+                ExtractException ee = new ExtractException("ELI32000", "Unable to start supplying object.", ex);
+                pTarget.NotifyFileSupplyingFailed(this, ee.AsStringizedByteStream());
             }
         }
 
@@ -1365,7 +1370,7 @@ namespace Extract.FileActionManager.FileSuppliers
                         ee.Log();
 
                         // Make sure any subsequent failure is logged regardless of how long ago the
-                        // last failure occured.
+                        // last failure occurred.
                         _restartCount = 0;
                         _lastRestartLogTime = null;
                     }
@@ -1374,7 +1379,7 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             catch (Exception ex)
             {
-                // If a failure has occured and a polling method is enabled, attempt to restart the
+                // If a failure has occurred and a polling method is enabled, attempt to restart the
                 // supplier.
                 if (PollingMethod != FileSuppliers.PollingMethod.NoPolling)
                 {
@@ -1413,7 +1418,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 return;
             }
 
-            // The supplier has exitied
+            // The supplier has exited
             StopRestarter();
 
             _fileTarget.NotifyFileSupplyingDone(this);
@@ -1553,7 +1558,7 @@ namespace Extract.FileActionManager.FileSuppliers
                             ex.ExtractLog("ELI33977");
 
                             // If at least _CONSECUTIVE_FAILURES_BEFORE_RE_POLLING files have failed
-                            // since the last one was succesfully downloaded and the polling timer 
+                            // since the last one was successfully downloaded and the polling timer 
                             // has fired since the last poll, re-poll before trying anymore downloads
                             // in case the files in our list are no longer available on the server.
                             if (Interlocked.Increment(ref _consecutiveDownloadFailures)
@@ -1608,7 +1613,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <summary>
         /// Copies settings from the given file suppler
         /// </summary>
-        /// <param name="fileSupplier">The FtpFileSupplier to copy setttings from </param>
+        /// <param name="fileSupplier">The FtpFileSupplier to copy settings from </param>
         void CopyFrom(FtpFileSupplier fileSupplier)
         {
             try
@@ -1665,7 +1670,7 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Peforms tasks that should occur after a failure in a retry block before the next retry
+        /// Performs tasks that should occur after a failure in a retry block before the next retry
         /// is attempted.
         /// </summary>
         /// <param name="runningConnection">The <see cref="SecureFTPConnection"/> in use.</param>
@@ -1741,7 +1746,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 OnFtpError(ee);
 
                 // Raising an exception from within the AttemptFailed handler prevents additional
-                // retries from occuring.
+                // retries from occurring.
                 throw ee;
             }
         }
@@ -2046,7 +2051,7 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Intializes properties and fields to initial default values
+        /// Initializes properties and fields to initial default values
         /// </summary>
         void InitializeDefaults()
         {
@@ -2142,7 +2147,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// file.</param>
         /// <param name="recorder">The <see cref="FtpEventRecorder"/> recording the current FTP
         /// operation.</param>
-        /// <returns>The <see cref="IFileRecord"/> associated with the dowloaded file if the
+        /// <returns>The <see cref="IFileRecord"/> associated with the downloaded file if the
         /// download and supplying succeeded; otherwise <see langword="null"/>.</returns>
         string DownloadFileFromFtpServer(SecureFTPConnection runningConnection,
             FtpFileInfo currentFtpFileInfo, FtpEventRecorder recorder)
@@ -2205,7 +2210,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     {
                         if (e.Succeeded)
                         {
-                            // Verify that the files is exists localy
+                            // Verify that the files is exists locally
                             if (File.Exists(e.LocalPath) && e.LocalFileSize == e.RemoteFileSize)
                             {
                                 // Add the local file that was just downloaded to the database

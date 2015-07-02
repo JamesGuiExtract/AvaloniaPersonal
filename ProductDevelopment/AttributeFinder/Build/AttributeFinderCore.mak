@@ -290,6 +290,8 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY "$(RCNETDir)\APIs\MSSQLConnectionDialog\References\Microsoft.SqlServerCe.Client.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
 	@COPY /v "$(ReusableComponentsRootDirectory)\Scripts\BatchFiles\KillAllOCRInstances.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(PDCommonDir)\SetNuanceServicePermissions.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(PDCommonDir)\RegisterShellExtension.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(PDCommonDir)\UnRegisterShellExtension.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\ClearImage_7_0\Installer\*.*" "$(ClearImageInstallFilesDir)\" /v /s /e /y
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Reports\*.*" "$(AFCoreInstallFilesRootDir)\Reports" /Y/E
 	@COPY "$(RCNETDir)\APIs\MSOffice\Office2007\installer\o2007pia.msi" "$(AFCoreInstallFilesRootDir)\OfficeRedist"
@@ -339,8 +341,6 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.FileActionManager.Conditions.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.FileActionManager.Forms.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.AttributeFinder.Rules.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
-	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\LogicNP.EZShellExtensions.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
-	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Utilities.ShellExtensions.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Redaction.dll" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\IDShield.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\IDShieldStatisticsReporter.exe" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\IDShield.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.DataEntry.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
