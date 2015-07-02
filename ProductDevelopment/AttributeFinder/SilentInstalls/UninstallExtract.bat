@@ -15,6 +15,15 @@ NET FILE 1>NUL 2>NUL
 if '%errorlevel%' == '0' ( goto gotPrivileges ) else ( goto getPrivileges ) 
 
 :getPrivileges 
+
+:: Determine if elevation is possible by checking registry to determine if uac is enabled
+REG QUERY HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ /v EnableLUA 2>&1 | FIND "0x1" >NUL
+if ERRORLEVEL 1 (
+	ECHO Must be an administrator to run this file.
+	ECHO.
+	GOTO endOfBatch
+)
+
 if '%1'=='ELEV' (shift & goto gotPrivileges)  
 ECHO. 
 ECHO **************************************
@@ -35,7 +44,7 @@ exit /B
 ::::::::::::::::::::::::::::
 setlocal & pushd .
 
-setlocal
+
 
 SET InstallShieldFolder=%ProgramFiles(x86)%\InstallShield Installation Information
 SET PROGRAM_ROOT=%ProgramFiles(x86)%
@@ -161,3 +170,5 @@ IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 )
 
 endlocal
+
+:endOfBatch
