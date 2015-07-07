@@ -1,0 +1,78 @@
+<HTML>
+<HEAD>
+<TITLE>String Pattern Matcher Finder</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>String Pattern Matcher Finder</h1>
+<hr>
+	<h3>Uses</h3>
+	<ul>
+		<li>The String Pattern Matcher is very useful for finding data between clues in paragraphs.</li>
+		<li>One of the most common uses for it is for Grantor-Grantee rule writing, and examples of string pattern matcher dat files can be found in Component Data.</li>
+	</ul>
+
+<hr>
+	<h3>Basic usage</h3>
+	<ul>
+		<li>The String Pattern Matcher rules can be written in a .dat file and directly in the rule set editor.</li>
+		<li>It is usually preferable to use a .dat file, and we will use dat files for this tutorial.</li>
+		<li>Open SPMTraining.rsd, and note that it contains an attributecalled Grantor with only one rule.</li>
+		<li>Open this rule, and note that <b>Find patterns from file:</b> is configured to point to <b>&lt;RSDFileDir&gt;\Grantor.dat.etf</b>.</li>
+		<li>In the same directory as SPMTraining.rsd, create an empty text file called Grantor.dat.</li>
+		<li>Open this file in a text editor, and type this:<br />
+		<tt>
+		[PATTERNS_BEGIN]<br />
+		[PATTERNS_END]
+		</tt></li>
+		<li>All of the rules in a string pattern matcher .dat file must be between these tags for the rules in the<br />
+		file to work.</li>
+		<li>Open a Rule Tester and load <b>TestImage002.tif</b> in the Rule Tester.
+		<li>Open <b>TestImage002.tif.uss</b> in the .uss file viewer.
+		<li>We will be writing rules to find the party names in the first paragraph of this document, beginning with<br />
+		"This Indenture". Read this paragraph, thinking of possible clue words around the party names.</li>
+		<li>Note that the name of the first party falls between the words "between" and "grantor*, and", and that<br />
+		between is less than 50 characters after "This Indenture".</li>
+		<li>In <b>Grantor.dat</b> on a line after <b>[PATTERNS_BEGIN]</b> type:<br />
+		<b>rule01=this indenture^50~between^?Grantor^250~grantor^5~[and]</b></li>
+		<li>Save this file, and run the Rule Tester with <b>TestImage002.tif</b></li>
+		<li>Note that the name of the first party was found, along with a lot of other text. We will learn how<br />
+		to remove this other text, but first, let's examine the structure of the rule.</li>
+		<li>Every rule must begin with a <b>Rule ID</b> followed by the equals sign: <b>rule01=</b></li>
+		<li>Next, we have the first token, <b>this indenture</b>, followed by the token separator, <b>^</b><br />
+		followed by <b>50~</b>, meaning that there can be up to 50 characters before the next token. It is<br />
+		possible to use the <b>^</b> by itself, allowing for up to 1000 characters,  but it is almost always better to require<br /> the tokens to be within a certain distance<br />
+		of each other because the proximity of the words to each other helps differentiate the clue text<br/>
+		from other random text.</li>
+		<li>There is another token separator, <b>^</b>, followed by a special token <b>?Grantor</b>, which is a variable<br />			that holds the data we are searching for. This is followed by <b>^250~</b>, allowing the data contained<br />
+		in <b>?Grantor</b> to be up to 250 characters in length.</li>
+		<li>This is followed by another clue token, <b>grantor</b>, within 5 characters of  the last token <b>[and]</b>. The
+		left and right<br>
+		square brackets are word boundaries, ensuring that the token matches the word <b>and</b> but not,<br>
+		for example, <b>grand</b> or <b>Andrew</b>. Word boundaries are not used around grantor because,<br>
+		in this case, we want to also match <b>grantors</b> and <b>grantor(s)</b>.</li>
+		<li>Now we will address the question of how to remove the extra text around the party names.</li>
+		<li>The <b>Entity name DataScorer</b> contains methods to distinguish person and company names from<br>
+		other text.
+		<li>Open the rule you created in the <b>Rule set editor</b>, click the <b>Select</b> button below<br>
+		<b>Use following DataScorer object to determine validity of match</b> and select <b>&lt;Entity name data<br>
+		scorer&gt;</b> from the list.</li>
+		<li>Set <b>Minimum match</b> to <b>5</b> and configure <b>Return Options</b> to <b>Return first match
+		&gt;&#61; 10 or best match</b> </li>
+		<li>These are the same settings used internally by the <b>GrantorGrantee finder</b> and are a good<br>
+		starting point.</li>
+		<li>Now run the rule tester again on the same file.
+		<li>Note that the correct party name has been found and and split into person name subattributes.
+	</ul>
+	<h3>Advanced topics</h3>
+	<h4>Variables<h4>
+	
+
+<hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>TBD.</li>
+	</ol>
+
+</BODY>
+</HTML>

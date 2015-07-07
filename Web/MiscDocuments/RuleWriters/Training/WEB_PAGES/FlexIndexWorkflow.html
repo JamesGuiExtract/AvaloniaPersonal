@@ -1,0 +1,325 @@
+<!--File updated by Bill Rahn on 07/30/08
+			"	"    on 07/31/08
+Please note the comments included throughout for notes on possible areas of improvement.
+
+We also still need to pick some Sample Images to work with.  If we go with Trimin-Marion-IN, we would have to drop Legal Description.-->
+<HTML>
+<HEAD>
+<TITLE>FLEX Index Workflow</TITLE>
+<link type="text/css" rel="stylesheet" href="./UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>FLEX Index Workflow</h1>
+<hr>
+	<h3>Information From Customer</h3>
+	<ul>
+		<li><b>Sample files</b></li>
+		<ul>
+			<li>Found on K:\Common\Engineering\Sample Files</li>
+			<li>Folders are sorted by company, then by state and county</li> 
+			<li>Within each county's folder, documents for each county are arranged in folders<br>
+			by numbered sets, Set001, Set002, etc.</li>	
+			<li>Typically, a set is a group of images received for one project or to resolve one support issue.</li>	
+			<li>Parallel to the folders for each set is a folder callled Misc</li>
+			<li>Information about each set of images needs to be recorded in a file called<br />
+			SetInfo.txt, located in the Misc folder and containing the following information:
+			<ul>
+			<li>TBD</li>
+			</ul>
+			</li>
+		</ul>
+		<li><b>List of fields for which to write rules.</b></li>
+		<ul>
+			<li>Listed in the accompanying SOW</li>
+			<li>Determine top 80% of Doc Types, and focus on those.</li>
+			<!--note: it would be helpful to include a method of how to determine the top 80%, I'm wondering if this should be addressed in the Analysis section of the workflow?-->
+		</ul>
+		<li><b>Index data</b></li>
+		<ul>
+			<li>Provided by customers in text files.</li> 
+			<li>This data is used to create eav files which are used to test how well the rules perform.  Usually each index field has a text file containing data separated by a delimiter character, typically pipes(|) or commas(,).  These files can usually be opened and viewed in Excel but should not be saved or edited in Excel, as Excel has a tendency to cause undesired changes.</li>
+			<li>The index data files are usually put in a folder near the corresponding images, in a folder, such as "K:\Common\Engineering\Sample Files\<i>Set001</i>\IndexData" (<i>Set001</i> is an example.  The set number depends on the number of sets of images we receive from the customer).</li>
+			<li>The index data files are copied and separated into two folders, "OriginalsFromCustomer" and "Working."  The originals from customer should not be changed.</li>
+			<li>Often, the index files have to be edited and manipulated with a text editor in order to use them to create eav files. These changes should be made in the working folder.</li>
+			<!--"discuss two or three typical ways in which the index data is provided"
+			I'm not sure what to do with this.-->
+		</ul>
+	</ul>
+
+<hr>
+	<h3>Analysis</h3>
+	<ul>
+		<li><b>Staple images if necessary</b>
+		<ul>
+			<li>Stapling can be done by two methods:
+			<ol>
+				<li>Sequential file names or extensions:<br>
+					<ul>
+						<li><b>Image.001</b> , <b>Image.002</b>, <b>Image.003</b> will be stapled to <b>Image.tif</b> using the command:<br>
+						<tt>createmultipageimage SinglePage\ </tt><br>
+						assuming that the single page images are in a folder called <b>SinglePage</b>.
+						</li>
+						<li>The disadvantage of this method is that the multi page images are created in the same<br>
+						folder as the single page images.
+						</li>
+					</ul>
+				</li>
+				<li>Using columns in a text file:<br>
+					<ul>
+						<li>Given a file <b>PageInfo.csv</b> with the lines:<br>
+						<tt>Image001.tif,Image</tt><br>
+						<tt>Image002.tif,Image</tt><br>
+						<tt>Image003.tif,Image</tt><br>
+						</li>
+						<li>	
+						where the first column is the image page, the second column is the image name, and the comma is the delimiter,<br>
+						<b>Image.tif</b> will be stapled from <b>Image001.tif</b>, <b>Image002.tif</b>, and <b>Image003.tif</b><br>
+						using the command<br>
+						<tt>createmultipageimage PageInfo.csv 2 1 SinglePage\ MultiPage\</tt><br>
+						assuming that the single page and multi page images will be in folders called <b>SinglePage</b> and <b>MultiPage</b>, respectively.
+						</li>
+					</ul>
+				</li>	
+			</ol>
+		</ul>
+
+			<!--" The Staple images section should describe two or three typical scenarios ( image1.001, image1.002, etc. or via index data )."
+			I think I understand what Stapling images is, but I do not know how to go about such a practice.-->
+		</li>
+		<li><b>Move Documents to Appropriate Folders by Document Type</b>
+		<ul>
+			<li>It is helpful to have the documents arranged in folders by document type.</li>
+			<li>The index data often contains a text file with information that can be used to do this.</li>
+			<li>Given a file <b>ImagesDocTypes.txt</b> with the structure:<br>
+			<tt>Image1.tif,Mortgage</tt><br>
+			<tt>Image2.tif,Warranty Deed</tt><br>
+			<tt>Image3.tif,Satisfaction of Mortgage</tt><br>
+
+			</li>
+			<li>The documents can be moved to the folders <b>Mortgage</b>, <b>Warranty Deed</b>, and <b>Satisfaction of Mortgage</b> using<br>
+			the <b>Index Data Converter</b>. The details of how to do this will be discussed in the exercises below.</li>
+			
+			
+		</ul>
+		</li>	
+		<li><b>Create field-specific EAV files from index data</b></li>
+		<ul>
+			<li>To test indexing rules, eav files are needed.  Eav files are created using the Index File Converter utility.</li> 
+			<li>On the Index File Converter enter the path to the appropriate csv file in the Index File box.</li>
+			<li>Open the csv file and note what delimiter is used. Specify the delimiter by entering it into the Delimiter box on the Index File Converter.</li> 
+			<li>Make a new folder named EAV in the directory that contains the Images and IndexData folders.</li> 
+			<li>Enter the eav path and file name into the Index File Converter. The path name should lead to the EAV folder. The file name depends on the index data in the csv file. Use % followed by a digit to denote which field contains the file name--.eav should be the file's extension. 
+Enter the Attribute Name.</li> 
+			<li>To enter the Attribute Value, use % followed by the number that represents the field that contains the Attribute Value.</li> 
+			<li>Enter the Attribute Type.</li> 
+			<li>Check the <b>Write above attribute only if</b> box. This should usually be configured so that it writes the attribute only if the field that should contain the attribute is not empty. 
+Test the Index File Converter's settings by clicking the <b>Process Next button</b>. Do this a few times and verify that the output appears correct.</li> 
+			<li>If the <b>Process Next</b> button is getting satisfactory output, click the <b>Process Remaining</b> button to create the rest of the eav files.</li> 
+		</ul>
+		
+		<li><b>Create basic rule set from previous deliveries</b></li>
+		<ul>
+			<li>As a first step to constructing a ruleset, look in SourceSafe for a pre-existing ruleset from a project with similar documents (preferably from the same state) that can be applied to the new project and used as a starting point.</li>
+			<li>Test these baseline rules. Each rules delivery is tailored for a specific project, so the existing rules will probably not get great results.</li>
+			<li>Use the test results to help you rebuild and alter the rules as needed.</li>
+		</ul>
+		
+		<li><b>Use Test Harness output files</b></li>
+		<ul>
+			<li>Create appropriate .dat and .tcl files</li>
+			<li>Look at files from similar projects if available.  These files can often be adapted quickly to your new purposes.</li>
+			<!--This looks like it could be expanded more, but I'm not sure what else could be added.-->
+		</ul>
+	</ul>
+</ul>
+
+<hr>
+	<h3>Typical items for rules improvement</h3>
+	<ul>
+		
+		<li><b>Find Grantors and Grantees by document type</b></li>
+		<ul>
+			<li>Most finding rules should only be applied to specific document types. This is done by using the Document Classifier Preprocessor, typically added to the master rsd file.</li>
+			<li>The Document Classifier Preprocessor attempts to classify each document by searching for identifying key words and phrases. Based on the clues found, a document type value is assigned (some documents cannot be classified and are not given a document type). This information can then be used to conditionally run additional rules on each document.</li>
+			<li>Set up a Master rsd file with the various attributes that the customer requests.  The Grantor and Grantee attribute rules are typically separated into two rsd files called from the master using the Find from RSD file rule finder.</li>
+			<li>The Grantor and Grantee rsd files should be configured to <b>Stop searching after first value found</b>, this way only one grantor and one grantee are found per document.</li>
+			<li>Typically each document type gets its own rule, which is configured to run conditionally depending on Document type using the Conditionally find value finding rule.</li>
+			<li>A string Pattern Matcher finder rule for each document type will usually find most of the attributes.</li>
+			<li>For the rules to run correctly and efficiently, rules are put in order with the rules which are more likely to find an attribute placed before those less likely to find an attribute.</li>
+		</ul>
+
+		<li><b>Use of special rules and document classification</b></li>
+		<ul>
+			<li>Sometimes images OCR poorly and cannot be easily classified.  In these instances, some more advanced Conditionals would be used.</li>
+			<li>A common way of doing this is to make a Regular Expression that finds text often found in that specific type of document.</li>
+			<li>This can also be useful for finding one type of form in a document type.</li>
+			<!--This looks like something that should be expanded upon, but how?-->
+		</ul>
+		
+		<li><b>Minimize false positives</b></li>
+		<ul>
+			<li>With Flex Index, false positives are less common, as the rules written are more specific.</li>
+			<li>Generally speaking, improving rules in general will cut down on false positives.</li>
+			<li>In specific instances, however, it may be useful to use Preprocessors to remove certain parts of the text.</li>
+			<!--There's many ways, and it depends on what you're working on.  This will be a tough one to generalize, I think.-->
+		</ul>
+	</ul>
+</ul>
+<hr>
+	<h3>QA and Packaging</h3>
+	<ul>
+		<li>TBD.</li>
+		<!--Possible Removal.  Perhaps give detail about what is done?-->
+	</ul>
+
+<hr>
+	<h3>Exercises</h3> 
+	<h4>Staple Images and Sort By Document Type</h4>
+	<ol>
+		<li><b>Exercise 1 - Stapling Images- Filename and folder based usage</b>
+		<ul>
+			<li>Locate the <b>\FlexIndexWorkFlowExercises\Exercise1</b> folder and open a command prompt there.</li>
+			<li>Enter: <tt>createmultipageimage</tt> without arguments at the command prompt to see the instructions for usage.</li>
+			<li>Open an Explorer window in the <b>\FlexIndexWorkFlowExercises\Exercise1\SinglePage</b> folder and note that the files have<br>
+			numerical extensions which are in order.</li>
+			<li>Enter the following command: <tt>createmultipageimage SinglePage\</tt></li>
+			<li>Close the command prompt.</li>
+			<li>The disadvantage of this method is that the multipage images are created the same folder as the single page images.<br>
+			One method to do this is by creation date.
+			<li>In the Explorer window in the Single page, sort the images by date modified, select the most recently modified images which were just created, cut them,<br>
+			and paste them into the <b>MultiPage\</b> folder.</li>
+			<li>Run <b>Exercise1_Clean.bat</b> to remove the files created in this exercise.</li>
+			
+		</ul>
+		</li><br>
+		<li><b>Exercise 2a - Stapling Images- Input file usage</b>
+		<ul>
+			<li>Locate the <b>\FlexIndexWorkFlowExercises\Exercise2</b> folder and open a command prompt there.</li>
+			<li>Open an Explorer window in that same folder, and open the file <b>Exercise2PageInfo.txt</b></li>
+			<li>Look at the comma separated fields in the file. The first field contains single page file names. The second field contains the output<br>
+			image file name minus the .tif extension, and the third field contains the document type.</li> 
+			<li>Enter the command <tt>createmultipageimage Exercise2PageInfo.txt , 2 1 SinglePage\ MultiPage\</tt> at the command prompt.</li>
+			<li>This command will create multi page images using Exercise2PageInfo.txt as the input file, a comma as the delimiter, the multi page image<br>
+			name in field 2
+			<li>Confirm that multi page images were created in the <b>MultiPage\</b> folder.</li>
+		</ul>
+		</li><br>
+		<li><b>Exercise 2b - Moving Files to Directories By Document Type</b>
+		<ul>
+			<li>Open the <b>Index File Converter</b> and enter the full path to <b>Exercise2PageInfo.txt</b>  in the <b>Index File</b> text box.</li>
+			<li>Enter a comma in the <b>Delimiter</b> edit box.</li>
+			<li>Check the checkbox labeled <b>Move files only (i.e. use this utility for moving files only).</b></li>
+			<li>Check the checkbox labeled <b>Move file(s) with name:.</b></li>
+			<li>The <b>Index File Converter</b> uses variables like %1, %2, %3 to indicate a column in the index file, starting with %1 for the first column.</li> 
+			<li>Enter the full path to the <b>MultiPage\</b> folder, followed by <b>%2</b> for the partial file name in the second column of the index file, followed by <b>.tif</b> to<br>
+			complete the partial file name.  Depending on the location of your files,<br>
+			it should look something like this:<br>
+			<b>D:\Engineering\Web\MiscDocuments\RuleWriters\Training\FlexIndexWorkFlowExercises\Exercise2\MultiPage\%2.tif</b></li>
+			<li>Enter the full path to the <b>MultiPage\</b> folder, followed by <b>%3</b> for the folder name in the third column of the index file.
+			Depending on the location of your files,<br>
+			it should look something like this:<br>
+			<b>D:\Engineering\Web\MiscDocuments\RuleWriters\Training\FlexIndexWorkFlowExercises\Exercise2\MultiPage\%3</b></li>
+			<li>Click the <b>Process One</b> button. If the file is successfully moved, click the <b>Process Remaining</b> button.<br>
+			If the file is not moved successfully, click the <b>Reset</b>  button after determining why it could not be moved and correcting the problem.</li>
+			<li>Confirm that subdirectories were created in the <b>MultiPage\</b> folder and that images were moved to those subdirectories.</li>
+			<li>Run <b>Exercise2_Clean.bat</b> to remove the files and folders created in this exercise.</li>
+		</ul>
+		</li><br>
+		<li><b>Exercise 3 - Stapling Images and Moving Files</b>
+		<ul>
+			<li>Using the file <b>Exercise3PageInfo.txt</b> in the <b>Exercise3</b> folder, create multipage images and move them<br>
+			to the appropriate subdirectories by document type.</li>
+			<li>Run <b>Exercise3_Clean.bat</b> to remove the files and folders created in this exercise.</li>
+		</ul>
+		</li><br>
+			
+		<li><b>Exercise 4a - Grantor-Grantee</b></li>
+		<ul>
+			<li>Copy images from network to test machine.</li> 
+			<li>Create random subset although the random set will not be used during these exercises.</li> 
+			<li>Create EAV files for this field.</li>
+			<li>Create test .tcl and .dat files for Grantor and Grantee.</li>
+			<li>Use Test Harness and basic rule set to compute initial capture rates.</li> 
+			<li>Update spreadsheet. The template in<br>
+			<b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Customer Specific Files\_NEW_COUNTY_TEMPLATE\Performance Results\County Performance.xls</b></li> 
+			should be adapted for this purpose.</li>
+			<li>Seek assistance from someone experienced in using <b>Excel</b> if needed</li>
+			<li>Analyze results and improve rules to maximize capture rates.</li> 
+		</ul>
+		
+		<li><b>Exercise 4b - Add Return Address</b></li>
+		<ul>
+			<!--Should we alter this to take the Basic Ruleset into account?-->
+			<li>Modify the initial rules <b>Exercise4\Rules\ReturnAddress</b> to improve the capture rate.</li>
+			<li>Create EAV files for this field.
+			<ul>
+				<li>Note that the file <b>ReturnAddress.csv</b> in the directory <br>
+				<b>I:\Common\Testing\Product Testing\FLEXIndex_Training\Exercise4\IndexData\OriginalsFromCustomer</b><br>contains a column <b>INSTNUMBER</b> which by itself cannot be used to correlate return address information to document file names.</li>
+				<li>The file <b>InstrumentIndex.csv</b> in the same directory contains both <b>INSTNUMBER</b> and <b>INSTNAME</b> columns. Both files will be used<br>
+				to generate a text file containing both return address and image name information.</li>
+				<li>This may be accomplished using an inner join in an SQL query.</li>
+				<li>Copy the .csv files for this exercise into the<br>
+				<b>I:\Common\Testing\Product Testing\FLEXIndex_Training\Exercise4\IndexData\Working</b><br>
+				directory and use <b>Access</b> to create a blank database in this directory.</li>					
+				<li>Import both the <b>InstrumentIndex.csv</b> and <b>ReturnAddress.csv</b> as tables in the database.</li>
+				<li>Create a query to select <b>INSTNAME</b>, <b>ACCT_NAME</b>, <b>ACCT_ADDRESS1</b>, <b>ACCT_ADDRESS2</b>, <b>ACCT_CITY</b>, <b>ACCT_STATE</b>, and <b>ACCT_ZIPCODE</b><br>
+				from an inner join between the two tables on the <b>INSTNUMBER</b> column.</li>
+				<li>Export this query to a comma delimited text file in the <b>Working</b> directory.Ask someone with experience using <b>Access</b><br>
+				 for assistance if needed.</li><br>
+				<li>In data fields where subattributes are output, the top level attribute often output as a default value such as &quot;n.a.&quot;</li>
+				<li>The <b>Index Data Converter</b> does not currently support subattributes, but there is a way to work around this.</li>
+				<li>First, output eav files containing the top level attribute of <b>ReturnAddress</b> with the value set to &quot;n.a.&quot;</li>
+				<li>Next, create the first subattribute, <b>Recipient</b>. The syntax for eav files requires a period before the subattribute name,<br>
+				two periods before the names of the subattributes' subattributes, and so on.</li>
+				<li>For example, if the <b>Recipient</b> subattribute were further broken down into <b>First</b>, <b>Last</b> and <b>Middle</b> names<br>
+				the eav files would look like this:<br>
+				<tt>ReturnAddress|n.a.</tt><br>
+				<tt>.Recipient|JOHN W DOE</tt><br>
+				<tt>..First|JOHN</tt><br>
+				<tt>..Last|DOE</tt><br>
+				<tt>..Middle|W</tt><br>
+				</li>
+				<li>The above is provided as an example only. For this exercise the recipient names will not be split.</li>
+				<li>The <b>Recipient</b> subattriute should be created with <b>.Recipient</b> as the attribute name and <b>%2</b> as the value.</li>
+				<li>The <b>Index File Converter</b> should be configured to write an attribute only if <b>%2</b> is not equal to (<b>!=</b>) an empty<br>
+				string (leave the text box to the right of <b>!=</b> blank).</li>
+				<li>Continue this for each of the subattributes, choosing reasonable subattribute names and outputting each subattribute only if the<br>
+				relevant column is not empty.</li>
+			<li>Create test .tcl and .dat files for ReturnAddress.</li>
+			<li>Use Test Harness and new rule set to compute initial capture rates.</li>
+			<li>Analyze results and improve rules to maximize capture rates.</li>
+			<li>Update spreadsheet.</li>
+			</ul>
+			</li>
+		</ul>
+		
+		<br>	
+		<li><b>Excercise 4c -  Add Assoc. Reference Instrument #</b></li>
+		<ul>
+			<li>Expand Rules to include Assoc. Reference Instrument #</li>
+			<li>Create EAV files for this field.</li>
+			<li>Create Test .tcl and .dat files.</li>
+			<li>Use Test Harness and new rule set to compute initial capture rates.</li> 
+			<li>Analyze results and improve rules to maximize capture rates.</li>
+			<li>Update spreadsheet.</li>
+		</ul>
+		
+		<!--
+		TriMin - Marion - IN does not have Legal Description.  Other counties could have all of the fields listed here.
+		Possibly pick a different county, or a different field.
+		<li><b>Test Set #4</b> – Add Legal Description</li>
+		<ul>
+			<li>Expand Rules to include Assoc. Reference Instrument #</li>
+			<li>Create EAV files for this field.</li>
+			<li>Create Test .tcl and .dat files.</li>
+			<li>Use Test Harness and new rule set to compute initial capture rates.</li>
+			<li>Analyze results and improve rules to maximize capture rates.</li>
+			<li>Update spreadsheet.</li>
+		</ul>
+		-->
+		<li><b>QA and Packaging TBD</b></li>
+		<!--Possible removal.  Maybe the steps for getting it checked by others and uploading it to SourceSafe.-->
+	</ol>
+
+</BODY>
+</HTML>

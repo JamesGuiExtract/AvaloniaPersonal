@@ -1,0 +1,35 @@
+<HTML>
+	<HEAD>
+		<TITLE>Remove Spatial Information</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Remove Spatial Information Output Handler</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Remove Spatial Information output handler is used to remove the spatial information from the found data.</li>
+			<li>The spatial information is sometimes removed so that the coordinates of the found data are not included in output .xml files.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>The Remove Spatial Information output handler requires no configuration.</li>
+		</ul>
+		<hr>
+		<p>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Add a Select Multiple Document Output Handlers output handler to <b>Output.rsd</b>.</li>
+				<ul>
+					<li>Add an Output Data to XML File output handler to the Select Multiple Document Output Handlers output handler.  Make sure the Output Data to XML File output handler is configured to output a Version 2 XML file to &ltSourceDocName&gt.xml.</li>
+					<li>Run the rules on <b>TestImage001.tif</b> to create a .xml file.</li>
+					<li>Add a Remove Spatial Information output handler before the Output Data to XML File output handler.</li>
+					<li>Change the Output Data to XML File output handler to output a .xml file to &ltSourceDocName&gt2.xml</li>
+					<li>Run the rules on <b>TestImage001.tif</b> to create a second .xml file.</li>
+					<li>Compare the two .xml files. What is the difference between the files?</li>
+				</ul>
+			</li>
+		</ol>
+	</BODY>
+</HTML>

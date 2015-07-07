@@ -1,0 +1,56 @@
+<HTML>
+<HEAD>
+<TITLE>Conditional Document Preprocessor</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>Conditional Document Preprocessor</h1>
+<hr>
+	<h3>Uses</h3>
+	<ul>
+		<li>The Conditional Document Preprocessor is used to conditionally run a preprocessor on a document.</li>
+		<li>Conditional Document Proprocessor allows rule writers to run a preprocessor on a document only if a specified condition is true, or only if a specified condition is false.</li>
+		<li>The specified condition can be a Document Type Condition, a Finding Rule Condition, or a RSD File Condition.</li>
+		<li>Any preprocessor can be called through Condtional Document Preprocessor.
+	</ul>
+
+<hr>
+	<h3>Usage</h3>
+	<ul>
+		<li>To use the Conditional Preprocessor, click the Commands button and select it as the Document Preprocessor.  Then click the Configure button.</li>
+		<li>To specify if the specified preprocessor will run if the condition is true or false, select <i>true</i> or <i>false</i> from the true/false drop menu.</li>
+		<li>To specify the type of condition select if from the drop down menu.</li>
+	
+		<li>Document type condition allows rule writers to specify the type(s) of documents that must be matched for the specified rule to run.</li>
+				<ul><li>Select whether the type of documents selected should be matched or not matched from the drop-down menu.</li>
+				<li>Click the Select button to select the type(s) of documents from the list of document types.</li>
+				<li>Next set the level of probablity of the classification to <i>maybe</i>, <i>probable</i> or <i>sure</i>.  This sets the classification level the document must at least have for the condition to pass.</li>
+				</ul>
+			<li>RSD file condition allows the output of a seperate RSD file as the condition that is met or not met to apply a specified document preprocessor.  The Conditionally find value rule will call a specified RSD file configured by specifying the path name of the RSD file's etf file.  The condition is met if the specified rule set finds at least one attribute.</li>
+				<ul><li>A seperate RSD file must exsit for this preprocessor, and is usually created specifically for this purpose.  Any appropriate rules should be created in the RSD file set to act as the condition.</li>
+				<li>Note: Always call the etf file of the RSD file you wish to call.</li>
+				</ul>
+		<li>Select the preprocessor that will run conditionally.  Click the configure button to configure the rule appropriately.</li>
+		
+	</ul>
+	
+<hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>Open <b>ConditionallyPreprocess.rsd</b> and run it on <b>TestImage001.tiff</b>.  Note that two social security numbers are found.</li>
+			<ul>
+			<li>Run <b>ConditionallyPreprocess.rsd</b> on <b>TestImage006.tiff</b>.  Note that the rule finds a serial number as a false positive.</li>
+			<li>Open the Conditionally preprocess preprocessor.  Notice that the condition for the preprocessor to run is a regular expression that looks for text, "notice of federal tax lien."</li>
+			<li>Notice that the preprocessor is a Select Page Region preprocessor that excludes the top 30% of the document if the condition is met.</li>
+			<li>Run <b>ConditionallyPreprocess.rsd</b> on <b>TestImage006.tiff</b> and <b>TestImage006.tiff</b> again after checking the box for the preprocessor.  Notice that this prevents the false positive of the serial number of <b>TestImage006.tiff</b> but still finds the correct social security number on <b>TestImage001.tiff</b>.</li>
+			</ul>
+		<li>Open <b>ConditionallyPreprocess2.rsd</b> and run it on <b>TestImage001.tiff</b> and <b>TestImage006.tiff</b>.</li>
+			<ul>
+			<li>Open the select multiple preprocessor preprocessor.  Notice that there is a document classifier and a conditional preprocessor that runs the preprocessor only if the document classifies as a Notice of Federal Tax Lien.</li>
+			<li>Open the Conditionally preprocess preprocessor.  Notice that the condition for the preprocessor to run is a regular expression that looks for text, "notice of federal tax lien."</li>
+			<li>Notice that the preprocessor is the same Select Page Region preprocessor that excludes the top 30% of the document and the combination of these preprocessors prevent the false positive of the serial number of <b>TestImage006.tiff</b>.</li>
+			</ul>
+	</ol>
+
+</BODY>
+</HTML>

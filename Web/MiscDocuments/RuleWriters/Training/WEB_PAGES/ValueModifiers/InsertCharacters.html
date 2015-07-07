@@ -1,0 +1,45 @@
+<HTML>
+	<HEAD>
+		<TITLE>Insert Characters Value Modifier</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Insert Characters Value Modifier</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Insert Characters value modifier is used to insert one or more characters into the found text at a specified position.</li>
+			<li>For example, you could use this modifier to insert a dash after the first five digits of a zip code.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>To use the Insert Characters value modifier, you must first specify which characters you would like to insert into the found text.</li>
+			<li>You must then select where you want to insert the specified characters.
+				<ul>
+					<li>You can choose to append the specified characters to the end of the found text.</li>
+					<li>Alternately, you can choose to insert the specified characters at a specified position in the found text.
+						<ul>
+							<li>For example, inserting a dash at position "6" will change "123456789" into "12345-6789".</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>You also have the option of only executing this modifier on strings of a specified length.
+				<ul>
+					<li>To use this option, specify a string length and then choose to whether you want to run this modifier on strings that are equal to, greater than or equal to, greater than, less then or equal to, less then, or not equal to the specified string length.</li>
+					<li>By default, this modifier will run on strings of any length.</li>
+				</ul>
+			</li>
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Open <b>InsertChars.rsd</b> and run it on <b>InsertCharactersEasy.txt</b>.  Add several Insert Character value modifiers that will change the format of the found telephone numbers to <b>(###) ###-####</b>.</li>
+			<li>Now run <b>InsertChars.rsd</b> on <b>InsertCharactersDiffcult.txt</b>.  Change your Insert Character value modifiers so that phone numbers without an area code are output in the <b>###-####</b> format, while numbers with an area code are output in the <b>(###) ###-####</b> format.
+				<ul>
+					<li>HINT: You can use the string length to determine if the phone number has an area code.</li>
+				</ul>
+		</ol>
+	</BODY>
+</HTML>

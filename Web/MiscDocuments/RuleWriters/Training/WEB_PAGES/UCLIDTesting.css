@@ -1,0 +1,22 @@
+body {
+	background-color: white;
+	color: black;
+	font-family: Verdana,Arial;
+	font-size: 13;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+
+UL {
+	list-style: url(box.gif) disc;
+}
+
+h1 {
+	text-align: center;
+	font-size: 22;
+}
+
+h2 {
+	font-weight: bold;
+	font-size: 13;
+}

@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>Create Value Value Finder</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>Create Value Value Finder</h1>
+<hr>
+	<h3>Uses</h3>
+	<ul>
+		<li>Creates an arbitrary value without spatial data.</li>
+	</ul>
+
+<hr>
+	<h3>Usage</h3>
+	<ul>
+		<li>In the <b>Add Attribute Finding Rule</b> window:</li>
+		<ul>
+			<li>Select <b>Create value</b> from the dropdown menu and click <b>Configure...</b>.</li>
+			<li>Fill in the desired <b>Value</b> and/or <b>Type</b> in their respective fields.</li>
+			<li>These fields also resolve tags, such as &lt;DocType&gt;, &lt;RSDFileDir&gt;, or &lt;SourceDocName&gt;.</li>
+		</ul>
+	</ul>
+
+<hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>Open the <b>RuleSet Editor</b> and load ".\Files\CreateValue.rsd". Open the <b>Rule Tester</b> and load ".\Files\CreateValue.tif". Execute the rules.</li>
+		<li>Note that a file named ".\Files\CreateValue.tif.voa" was created. Open it using the <b>VOA File Viewer</b>. Note that it contains an entry named 'SSN' with a value of '000-00-0000'.</li>
+		<li>We would like the .voa file to also contain Document Type data. Make a new attribute named 'DocumentType' that accomplishes this. Note that the <b>Create Value</b> value finder expands tags.</li>
+		<li>The value of the DocumentType entry should be 'Notice of State Tax Lien'.</li>
+	</ol>
+
+</BODY>
+</HTML>

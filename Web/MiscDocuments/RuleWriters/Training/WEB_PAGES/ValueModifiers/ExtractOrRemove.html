@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+<TITLE>Extract Or Remove Characters Value Modifiers</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>Extract Or Remove Value Modifiers</h1>
+<hr>
+	<h3>Uses</h3>
+	<ul>
+		<li><b>Extract or Remove Characters</b> Value Modifiers can be helpful when you have a broad search, but need to pull out one piece of it.</li>
+		<li>The most common application is to remove the last 4 digits from a Social Security Number.</li>
+		<li>Another common use is to remove unneccessary filing numbers from around needed data.</li>
+		<ul>
+			<li>Example: A search picked up A-###-##-####-12.  You could use <b>Extract or Remove Middle Characters</b> to get just the Social Security Number.</li>
+		</ul>
+		<li><b>Extract or Remove Characters</b> Value Modifiers are most useful in situations where Regular Expression based modification produces inconsistent results, such as when things OCR poorly.</li>
+		<br><br>
+		<li><b>Extract Or Remove Leftmost Characters</b></li>
+		<ul>
+			<li>This extracts or removes characters at the start of a string.</li>
+			<li>This could be used to remove Mr. or Dr. from the start of names, or to grab the first 5 digits of a zip-code.</li>
+		</ul>
+		<li><b>Extract or Remove Middle Characters</b></li>
+		<ul>
+			<li>This allows you to set a starting point and ending point for what you need extracted/removed.</li>
+			<li>This allows you to extract/remove characters from either side without running both a Leftmost and Rightmost modifier.</li>
+		</ul>
+		<li><b>Extract or Remove Rightmost Characters</b></li>
+		<ul>
+			<li>This extracts or removes characters at the end of a string.</li>
+			<li>This is useful for removing things such as the last 4 digits of a Social Security Number, or the year from a Date of Birth.</li>
+		</ul>
+	</ul>
+
+<hr>
+	<h3>Usage</h3>
+	<ul>
+		<li><b>Extract or Remove Rightmost Characters</b> and <b>Extract or Remove Leftmost Characters</b> work the same, with the exception of operating on different ends of the string.</li>
+		<ul>
+			<li>First, select if you will be removing or extracting.</li>  
+			<li>If you choose extract, then only the targeted characters will appear from the output.</li>
+			<li>If you choose remove, then the targeted characters will not appear in the output.</li>
+			<li>Next, decide how many characters you need to operate on.  For Rightmost, this will start at the end and work to toward the beginning.  For Leftmost it will start at the beginning and work toward the end.</li>
+			<li>The <b>Accept if total number of characters	found less than specified above</b> checkbox will allow you to remove your desired number of characters regardless of the string length.</li>
+			<ul>
+				<li>Example:  If the box is checked, then Removing the last 10 letters from <i>Thomas</i> will remove the entire string.  If unchecked, then the string will be unaffected.</li>
+			</ul>
+		</ul>
+		<li><b>Extract or Remove Middle Characters</b> has the option of Extracting or Removing, as well as the<b>Accept if total number of characters found less than specified above</b>.  The main difference is the method of collection.</li>
+		<ul>
+			<li>Input the numerical location of the first character you would like to extract or remove, as well as the last.  This is the range that will be effected.</li>
+		</ul>
+	</ul>
+
+<hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>Open a new Ruleset Editor, and write a Regular Expression rule to find dates.</li>
+		<ul>
+			<li>Run your rule on <b>Date.txt</b> to confirm that it works.</li>
+			<li>Add an <b>Extract or Remove Rightmost Characters</b> Value Modifier so that only the month and day are displayed.</li>
+			<li>Uncheck the previous Value Modifier, and add an <b>Extract or Remove Middle Characters</b> Value Modifier to only show the Month's abbreviation (Jan, Feb, etc) and the year.</li>
+		</ul>
+	</ol>
+
+</BODY>
+</HTML>

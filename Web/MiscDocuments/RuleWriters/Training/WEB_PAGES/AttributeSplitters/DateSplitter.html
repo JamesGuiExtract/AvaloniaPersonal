@@ -1,0 +1,81 @@
+<HTML>
+	<HEAD>
+		<TITLE>Split Date and/or Time Attribute Splitter</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Split Date and/or Time Attribute Splitter</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Split Date and/or Time attribute splitter is used to split dates and times into appropriate sub-attributes, such as Month, Day, Year, Hour, Minute, etc.</li>
+			<li>This splitter can also be used to reformat dates and times.</li>
+				<ul>
+					<li>For example, you can change the date "May 23, 2008" into "05/23/08".</li>
+				</ul>
+			</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>To use the Split Date and/or Time attribute splitter you must choose which sub-attributes you would like to output:</li>
+				<ul>
+					<li>If you choose the <b>Generate Default sub-attributes</b> option, the splitter will output the default date and time sub-attributes.</li>
+						<ul>
+							<li>For dates, the default sub-attributes are <b>Day</b>, <b>Month</b>, and <b>Year</b>.
+								<ul>
+									<li>If you choose the <b>Number</b> option in the <b>Split Month as:</b> box, the <b>Month</b> sub-attribute will automatically be translated into the appropriate number.  (For example, "August" will be translated into "08".)</li>
+									<li>Similarly, if you choose the <b>Name</b> option in the <b>Split Month as:</b> box, the <b>Month</b> sub-attribute will automatically be translated into the appropriate month name.  (For example, "08" will be translated into "August".)</li>
+								</ul>
+							</li>
+							<li>For times, the default sub-attributes are <b>Hour</b>, <b>Minute</b>, and <b>Second</b>.
+								<ul>
+									<li>If you choose the <b>Normal</b> option in the <b>Display Time as:</b> box, the splitter will also output an <b>AMPM</b> sub-attribute that will contain "AM" or "PM" as appropriate.
+										<ul>
+											<li>Choosing the <b>Normal</b> option will also automatically convert military times into AM/PM times.</li>
+										</ul>
+									</li>
+									<li>If you choose the <b>Military</b> option in the <b>Display Time as:</b> box, AM/PM times will automatically be converted into military time.</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li>If you check the <b>Generate Day of Week sub-attribute</b> checkbox, the splitter will output a <b>DayOfWeek</b> sub-attribute that contains the day of the week that the input date occurred or will occur on.</li>
+					<li>If you check the <b>Generate Formatted sub-attribute from specified format string</b> option, the splitter will generate a <b>Formatted</b> sub-attribute that contains the date and/or time reformatted based on a specified format string.
+						<ul>
+							<li>You can use the following tags in the format string:
+								<ul>
+									<li><b>%d</b>: day of the month</li>
+									<li><b>%B</b>: month (full name)</li>
+									<li><b>%m</b>: month (numerical)</li>
+									<li><b>%y</b>: year (two-digit)</li>
+									<li><b>%Y</b>: year (four-digit)</li>
+									<li><b>%I</b>: hour (AM/PM time)</li>
+									<li><b>%H</b>: hour (military time)</li>
+									<li><b>%M</b>: minute</li>
+									<li><b>%S</b>: second</li>
+									<li><b>%p</b>: AM or PM</li>
+								</ul>
+							</li>
+							<li>For example, the format string <b>%m/%d/%Y</b> would take change the date "July 3, 2008" into "07/03/2008".</li>
+							<li>You can test your format string by clicking the <b>Test</b> button.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Open <b>Dates.rsd</b> and run it on <b>Dates.txt</b>.  Note that two dates are found.</li>
+				<ul>
+					<li>Add a Split Date and/or Time attribute splitter that will divided the found dates into <b>Day</b>, <b>Month</b>, and <b>Year</b>.</li>
+					<li>Change the splitter so that the <b>Month</b> sub-attribute contains the full name of the month.</li>
+					<li>Change the splitter to output a <b>Formatted</b> sub-attribute that contains the date reformatted to be similar to "July 02, 2009".</li>
+				</ul>
+			</li>
+		</ol>
+
+	</BODY>
+</HTML>
+

@@ -1,0 +1,122 @@
+<HTML>
+    <HEAD>
+        <TITLE>Party Finder</TITLE>
+        <link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+    </HEAD>
+    <BODY>
+        <h1>Party Finder</h1>
+        <hr>
+        <h3>Party Finder</h3>
+        <ul>
+            <li>The Party Finder captures, trims, and splits parties on land record documents.</li>
+            <li>The party finder rules can be called from<b> &ltComponentDataDir&gt\Indexing\PartyFinder\Master.rsd.etf </b></li>
+            <li>The best practice for using the party finder is to use a Document Type Condition to select the document type you want to work with, and then call the attribute of the party you want to find.
+                <ul>
+                    <li>For example, if you wanted to find mortgagors on mortgage documents, you would create a Conditionally Find Value value finder, give it a Document Type Condition that will pass if the document type is <b>Mortgage</b>, and then call the <b>Mortgagor</b> attribute from <b> &ltComponentDataDir&gt\Indexing\PartyFinder\Master.rsd.etf </b>.</li>
+                </ul>
+            </li>
+            <li>The most useful parties that are available are:
+                <ul>
+                    <p>
+                        <li>Mortgage
+                            <ul>
+                                <li><b>Mortgagor</b> - The party that is borrowing money.</li>
+                                <li><b>Mortgagor_backup</b> - Backup rules for the Mortgagor party.</li>
+                                <li><b>Mortgagee</b> - The party that is lending money.</li>
+                                <li><b>Mortgagee_backup</b> - Backup rules for the Mortgagee party.</li>
+                            </ul>
+                        </li>
+                    </p>
+                    <p>
+                        <li>Deed of Trust
+                            <ul>
+                                <li><b>Beneficiary</b> - The party that is lending money.</li>
+                                <li><b>Trustee</b> - The party that serving as trustee.  This party holds the title to the property.</li> 
+                                <li><b>Trustor</b> - The party that is borrowing money.</li> 
+                                <li><b>Trustor_backup</b> - Backup rules for the Trustor party.</li>
+                            </ul>
+                        </li>
+                    </p>
+                    <p>
+                        <li>Assignment of Mortgage
+                            <ul>
+                                <li><b>Assignee</b> - The party that is receiving the rights to the loan.</li>
+                                <li><b>Assignee_backup</b> - Backup rules for the Assignee party.</li>
+                                <li><b>Assignor</b> - The party that is giving up the rights to the loan.</li>
+                                <li><b>Assignor_backup</b> - Backup rules for the Assignor party.</li>
+                                <li><b>OriginalMortgagee</b> - The lender that originally made the loan.</li>
+                                <li><b>OriginalMortgagor</b> - The borrower that originally made the loan.</li>
+                            </ul>
+                        </li>
+                    </p>
+                    <p>
+                        <li>Assignment of Deed of Trust
+                            <ul>
+                                <li><b>Assignee</b> - The party that is receiving the rights to the loan.</li>
+                                <li><b>Assignee_backup</b> - Backup rules for the Assignee party.</li>
+                                <li><b>Assignor</b> - The party that is giving up the rights to the loan.</li>
+                                <li><b>Assignor_backup</b> - Backup rules for the Assignor party.</li>
+                                <li><b>OriginalBeneficiary</b> - The lender that originally made the loan.</li>
+                                <li><b>OriginalTrustee</b> - The trustee of the original loan.</li>
+                                <li><b>OriginalTrustor</b> - The borrower that originally made the loan.</li>
+                            </ul>
+                        </li>
+                    </p>
+                    <p>
+                        <li>Reconveyance
+                            <ul>
+                                <li><b>Beneficiary</b> - The lender that is releasing the loan.</li>
+                                <li><b>OriginalBeneficiary</b> - The lender that originally made the loan.</li>
+                                <li><b>OriginalTrustee</b> - The trustee of the original loan.</li>
+                                <li><b>OriginalTrustor</b> - The borrower that originally made the loan.</li>
+                                <li><b>Trustee</b> - The party that is reconveying the property.</li>
+                                <li><b>Trustee_backup</b> - Backup rules for the Trustee party.</li>
+                            </ul>
+                        </li>
+                    </p>
+                    <p>
+                        <li>Satisfaction of Mortgage
+                            <ul>
+                                <li><b>Mortgagee</b> - The lender that is releasing the loan.</li> 
+                                <li><b>Mortgagee_backup</b> - Backup rules for the Mortgagee party.</li>
+                                <li><b>OriginalMortgagee</b> - The lender that originally made the loan.</li>
+                                <li><b>OriginalMortgagor</b> - The borrower that originally made the loan.</li>
+                            </ul>
+                        </li>
+                    </p>
+                    <p>
+                        <li>Substitution of Trustee
+                            <ul>
+                                <li><b>Beneficiary</b> - The lender that currently holds the rights to the loan.</li> 
+                                <li><b>Beneficiary_backup</b> - Backup rules for the Beneficiary party.</li>
+                                <li><b>OriginalBeneficiary</b> - The lender that originally made the loan.</li>
+                                <li><b>OriginalTrustee</b> - The trustee that is being replaced.</li>
+                                <li><b>OriginalTrustor</b> - The borrower that originally made the loan.</li>
+                                <li><b>Trustee</b> - The trustee that is being substituted by the Beneficiary.</li> 
+                                <li><b>Trustee_backup</b> - Backup rules for the Trustee party.</li>
+                            </ul>
+                        </li>
+                    </p>
+                    <p>
+                        <li>Warranty Deed
+                            <ul>
+                                <li><b>Grantee</b> - The party that is obtaining the rights to the property.</li>
+                                <li><b>Grantor</b> - The party giving up rights to the property.</li> 
+                                <li><b>Grantor_backup</b> - Backup rules for the Grantor field.</li>
+                            </ul>
+                        </li>
+                    </p>
+                    <p>
+                        <li>Quit Claim Deed
+                            <ul>
+                                <li><b>Grantee</b> - The party that is obtaining the rights to the property.</li>
+                                <li><b>Grantor</b> - The party giving up rights to the property.</li> 
+                                <li><b>Grantor_backup</b> - Backup rules for the Grantor field.</li>
+                            </ul>
+                        </li>
+                    </p>
+                </ul>
+            </li>
+        </ul>
+    </BODY>
+</HTML>
