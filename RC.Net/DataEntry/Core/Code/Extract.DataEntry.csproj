@@ -246,6 +246,7 @@
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
     <Compile Include="IDataEntryValidator.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="LiteralQueryNode.cs">
       <SubType>Code</SubType>
       <DependentUpon>DataEntryQuery.cs</DependentUpon>

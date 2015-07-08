@@ -47,7 +47,7 @@
 !IDShield,6005:$FlexIndexAndIDShieldCore:$RedactionCore
 
 // RDT = special components + FlexServer + IDShieldServer + IDShieldClient + RuleSetEditor
-!RuleDevelopmentToolkit,6006:$FlexServer:$IDShield:6026:6027:6044:6045:6046:6077:6081
+!RuleDevelopmentToolkit,6006:$FlexServer:$IDShield:6026:6027:6044:6045:6046:6077:6081:6086
 
 // Laserfiche = IDShieldServer + IDShieldClient + Laserfiche_Integration
 !LaserficheVerification,$IDShield:6044:6045:6101
@@ -98,6 +98,7 @@ FLEX Index / ID Shield Utilities,0
 -    Pagination Utility,6051
 -    PDF Read+Write,6073
 -    Remove Image Pages,6085
+-    Data Entry Verification Logging,6086
 
 ID Shield Office 1.0,0
 -    ID Shield Office,$IDShieldOffice

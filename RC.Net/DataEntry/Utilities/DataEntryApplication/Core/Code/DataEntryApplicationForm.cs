@@ -6,6 +6,7 @@ using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
@@ -576,9 +577,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 AttributeStatusInfo.DisableValidationQueries =
                     _applicationConfig.Settings.DisableValidationQueries;
-
-                AttributeStatusInfo.EnableTrace =
-                    _applicationConfig.Settings.EnableTrace;
 
                 // Since SpotIR compatibility is not required for data entry applications, avoid the
                 // performance hit it exacts.
@@ -1396,6 +1394,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 SetDataEntryControlHost((_activeDataEntryConfig == null)
                     ? null : _activeDataEntryConfig.DataEntryControlHost);
 
+                if (_applicationConfig.Settings.EnableLogging)
+                {
+                    AttributeStatusInfo.Logger = Logger.CreateLogger(
+                        _applicationConfig.Settings.LogToFile,
+                        _applicationConfig.Settings.LogFilter,
+                        _applicationConfig.Settings.InputEventFilter,
+                        this);
+                }
+
                 _isLoaded = true;
                 OnInitialized();
             }
@@ -1583,97 +1590,107 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             if (disposing)
             {
-                if (_brandingResources != null)
+                try
                 {
-                    _brandingResources.Dispose();
-                    _brandingResources = null;
-                }
+                    if (_brandingResources != null)
+                    {
+                        _brandingResources.Dispose();
+                        _brandingResources = null;
+                    }
 
-                if (_documentTypeConfigurations != null)
-                {
-                    CollectionMethods.ClearAndDispose(_documentTypeConfigurations);
-                    _documentTypeConfigurations = null;
-                }
+                    if (_documentTypeConfigurations != null)
+                    {
+                        CollectionMethods.ClearAndDispose(_documentTypeConfigurations);
+                        _documentTypeConfigurations = null;
+                    }
 
-                if (_inputEventTracker != null)
-                {
-                    _inputEventTracker.Dispose();
-                    _inputEventTracker = null;
-                }
+                    if (_inputEventTracker != null)
+                    {
+                        _inputEventTracker.Dispose();
+                        _inputEventTracker = null;
+                    }
 
-                if (_imageWindowShortcutsMessageFilter != null)
-                {
-                    _imageWindowShortcutsMessageFilter.Dispose();
-                    _imageWindowShortcutsMessageFilter = null;
-                }
+                    if (AttributeStatusInfo.Logger != null)
+                    {
+                        AttributeStatusInfo.Logger.Dispose();
+                        AttributeStatusInfo.Logger = null;
+                    }
 
-                if (_imageViewerForm != null)
-                {
-                    _imageViewerForm.Dispose();
-                    _imageViewerForm = null;
-                }
+                    if (_imageWindowShortcutsMessageFilter != null)
+                    {
+                        _imageWindowShortcutsMessageFilter.Dispose();
+                        _imageWindowShortcutsMessageFilter = null;
+                    }
 
-                if (_magnifierDockableWindow != null)
-                {
-                    _magnifierDockableWindow.Dispose();
-                    _magnifierDockableWindow = null;
-                }
+                    if (_imageViewerForm != null)
+                    {
+                        _imageViewerForm.Dispose();
+                        _imageViewerForm = null;
+                    }
 
-                if (_thumbnailDockableWindow != null)
-                {
-                    _thumbnailDockableWindow.Dispose();
-                    _thumbnailDockableWindow = null;
-                }
+                    if (_magnifierDockableWindow != null)
+                    {
+                        _magnifierDockableWindow.Dispose();
+                        _magnifierDockableWindow = null;
+                    }
 
-                if (components != null)
-                {
-                    components.Dispose();
-                    components = null;
-                }
+                    if (_thumbnailDockableWindow != null)
+                    {
+                        _thumbnailDockableWindow.Dispose();
+                        _thumbnailDockableWindow = null;
+                    }
 
-                if (_dataEntryControlHost != null)
-                {
-                    // Will cause the control host to be disposed of.
-                    SetDataEntryControlHost(null);
-                }
+                    if (components != null)
+                    {
+                        components.Dispose();
+                        components = null;
+                    }
 
-                if (_dbConnections != null)
-                {
-                    CollectionMethods.ClearAndDispose(_dbConnections);
-                    _dbConnections = null;
-                }
+                    if (_dataEntryControlHost != null)
+                    {
+                        // Will cause the control host to be disposed of.
+                        SetDataEntryControlHost(null);
+                    }
 
-                // Dispose of menu items
-                if (_closeImageToolStripMenuItem != null)
-                {
-                    _closeImageToolStripMenuItem.Dispose();
-                    _closeImageToolStripMenuItem = null;
+                    if (_dbConnections != null)
+                    {
+                        CollectionMethods.ClearAndDispose(_dbConnections);
+                        _dbConnections = null;
+                    }
+
+                    // Dispose of menu items
+                    if (_closeImageToolStripMenuItem != null)
+                    {
+                        _closeImageToolStripMenuItem.Dispose();
+                        _closeImageToolStripMenuItem = null;
+                    }
+                    if (_saveAndCommitMenuItem != null)
+                    {
+                        _saveAndCommitMenuItem.Dispose();
+                        _saveAndCommitMenuItem = null;
+                    }
+                    if (_saveMenuItem != null)
+                    {
+                        _saveMenuItem.Dispose();
+                        _saveMenuItem = null;
+                    }
+                    if (_printMenuItem != null)
+                    {
+                        _printMenuItem.Dispose();
+                        _printMenuItem = null;
+                    }
+                    if (_skipProcessingMenuItem != null)
+                    {
+                        _skipProcessingMenuItem.Dispose();
+                        _skipProcessingMenuItem = null;
+                    }
+                    if (_exitToolStripMenuItem != null)
+                    {
+                        _exitToolStripMenuItem.Dispose();
+                        _exitToolStripMenuItem = null;
+                    }
                 }
-                if (_saveAndCommitMenuItem != null)
-                {
-                    _saveAndCommitMenuItem.Dispose();
-                    _saveAndCommitMenuItem = null;
-                }
-                if (_saveMenuItem != null)
-                {
-                    _saveMenuItem.Dispose();
-                    _saveMenuItem = null;
-                }
-                if (_printMenuItem != null)
-                {
-                    _printMenuItem.Dispose();
-                    _printMenuItem = null;
-                }
-                if (_skipProcessingMenuItem != null)
-                {
-                    _skipProcessingMenuItem.Dispose();
-                    _skipProcessingMenuItem = null;
-                }
-                if (_exitToolStripMenuItem != null)
-                {
-                    _exitToolStripMenuItem.Dispose();
-                    _exitToolStripMenuItem = null;
-                }
+                catch { }
             }
 
             base.Dispose(disposing);
@@ -2570,6 +2587,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (CurrentlyRecordingStatistics && _inputEventTracker != null)
                 {
                     _inputEventTracker.NotifyOfInputEvent();
+                }
+
+                if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.InputEvent))
+                {
+                    AttributeStatusInfo.Logger.NotifyMessageHandled(e);
                 }
             }
             catch (Exception ex)

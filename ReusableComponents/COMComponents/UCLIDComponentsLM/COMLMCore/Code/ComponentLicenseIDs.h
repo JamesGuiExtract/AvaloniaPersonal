@@ -229,6 +229,9 @@ const unsigned int gnFILE_INSPECTOR_SEARCH				= gnBASE_OFFSET + 84;
 // For the /RemovePages option on ImageFormatConverter.
 const unsigned int gnREMOVE_IMAGE_PAGES					= gnBASE_OFFSET + 85;
 
+// Enables logging of input and events in the data entry verification UI.
+const unsigned int gnDATA_ENTRY_VERIFICATION_LOGGING	= gnBASE_OFFSET + 86;
+
 //-------------------------------------------------------------------------------------------------
 // Constants for items licensed for FLEX Index / ID Shield integration
 //-------------------------------------------------------------------------------------------------

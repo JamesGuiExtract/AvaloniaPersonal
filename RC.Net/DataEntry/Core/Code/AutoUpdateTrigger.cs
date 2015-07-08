@@ -474,16 +474,24 @@ namespace Extract.DataEntry
                 // Prevent recursion via HandleQueryValueModified.
                 _updatingValue = true;
 
-                AttributeStatusInfo.Trace(
-                    _validationTrigger ? "ValidationQuery" : "AutoUpdateQuery", _targetAttribute,
-                    dataEntryQuery.QueryText);
+                if (AttributeStatusInfo.IsLoggingEnabled(
+                    _validationTrigger ? LogCategories.ValidationQuery : LogCategories.AutoUpdateQuery))
+                {
+                    AttributeStatusInfo.Logger.LogEvent(
+                        _validationTrigger ? LogCategories.ValidationQuery : LogCategories.AutoUpdateQuery,
+                        _targetAttribute, dataEntryQuery.QueryText);
+                }
 
                 // Evaluate the query.
                 queryResult = dataEntryQuery.Evaluate();
 
-                AttributeStatusInfo.Trace(
-                    _validationTrigger ? "ValidationResult" : "AutoUpdateResult", _targetAttribute,
-                    queryResult.ToStringArray());
+                if (AttributeStatusInfo.IsLoggingEnabled(
+                    _validationTrigger ? LogCategories.ValidationResult : LogCategories.AutoUpdateResult))
+                {
+                    AttributeStatusInfo.Logger.LogEvent(
+                        _validationTrigger ? LogCategories.ValidationResult : LogCategories.AutoUpdateResult,
+                        _targetAttribute, queryResult.ToStringArray());
+                }
 
                 // Use the results to update the target attribute's validation list if the
                 // AutoUpdateTrigger is a validation trigger.

@@ -231,9 +231,11 @@ namespace Extract.DataEntry
         static bool _pauseQueries;
 
         /// <summary>
-        /// Indicates whether trace statements will be output.
+        /// An instance of the <see cref="T:Logger"/> class used to log input and events to the data
+        /// entry verification UI.
         /// </summary>
-        static bool _enableTrace;
+        [ThreadStatic]
+        static Logger _logger;
 
         #endregion static fields
 
@@ -614,6 +616,27 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or set an instance of the <see cref="T:Logger"/> class used to log input and events
+        /// to the data entry verification UI.
+        /// </summary>
+        /// <value>
+        /// An instance of the <see cref="T:Logger"/> class used to log input and events to the data
+        /// entry verification UI. <see langword="null"/> if logging is not active.
+        /// </value>
+        public static Logger Logger
+        {
+            get
+            {
+                return _logger;
+            }
+
+            set
+            {
+                _logger = value;
+            }
+        }
+
+        /// <summary>
         /// Gets the filename of the currently open document.
         /// </summary>
         /// <returns>The filename of the currently open document.</returns>
@@ -718,91 +741,17 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether trace statements will be output.
+        /// Indicates if logging is currently enabled for the specified <see paramref="category"/>.
         /// </summary>
-        /// <value><see langword="true"/> to output trace statements; otherwise, 
-        /// <see langword="false"/>.
-        /// </value>
-        public static bool EnableTrace
-        {
-            get
-            {
-                return _enableTrace;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _enableTrace)
-                    {
-                        if (value &&
-                            !LicenseUtilities.IsLicensed(LicenseIdName.RuleDevelopmentToolkitObjects))
-                        {
-                            var ee = new ExtractException("ELI37010",
-                                "An RDT license is required to enable trace.");
-                            ee.Log();
-                            return;
-                        }
-
-                        _enableTrace = value;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI37011");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Outputs <see paramref="traceLines"/> if tracing is enabled.
-        /// </summary>
-        /// <param name="category">The category <see paramref="traceLines"/> should be associated
-        /// with.</param>
-        /// <param name="attribute">The <see cref="IAttribute"/> the trace line pertains to.</param>
-        /// <param name="traceLines">The lines to output. If any specified line contains carriage
-        /// returns it will automatically be split into separate lines.</param>
+        /// <param name="category">The <see cref="LogCategories"/> to check for whether logging is
+        /// enabled.</param>
+        /// <returns><see langword="true"/> if logging is enabled for the specified category;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
         [ComVisible(false)]
-        public static void Trace(string category, IAttribute attribute,
-            params string[] traceLines)
+        public static bool IsLoggingEnabled(LogCategories category)
         {
-            try
-            {
-                if (EnableTrace)
-                {
-                    if (attribute == null)
-                    {
-                        category += " [] ()";
-                    }
-                    else
-                    {
-                        Control owningControl = GetOwningControl(attribute) as Control;
-                        if (owningControl == null)
-                        {
-                            category += " []";
-                        }
-                        else
-                        {
-                            category += " [" + owningControl.Name + "]";
-                        }
-
-                        category += " (" + attribute.Name + ")";
-                    }
-
-                    // Ensure each supplied line is actually a separate line.
-                    foreach (string queryLine in traceLines
-                        .SelectMany(line => line.Split('\n')))
-                    {
-                        System.Diagnostics.Trace.WriteLine(
-                            string.IsNullOrEmpty(queryLine) ? "[EMPTY]" : queryLine, category);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI37009");
-            }
+            return (Logger != null && Logger.LogCategories.HasFlag(category));
         }
 
         /// <summary>
@@ -894,6 +843,42 @@ namespace Extract.DataEntry
                     LicenseIdName.DataEntryCoreComponents, "ELI26133", _OBJECT_NAME);
 
                 InitializeStatics();
+
+                string traceFileName = "";
+                try
+                {
+                    if (Logger != null && Logger.LogToMemory && 
+                        !string.IsNullOrWhiteSpace(_sourceDocName))
+                    {
+                        // Generate the trace output filename.
+                        for (int i = 0; i < 8; i++)
+                        {
+                            string format = "yyyy-MM-dd HH-mm-ss";
+                            // If the previous name was taken, add more precision to the datetime
+                            // stamp.
+                            if (i > 0)
+                            {
+                                format += "." + new string('f', i);
+                            }
+                            traceFileName = _sourceDocName + "." +
+                                DateTime.Now.ToString(format, CultureInfo.InvariantCulture) + ".trace";
+                            if (!File.Exists(traceFileName))
+                            {
+                                // This filename is unused; use it.
+                                break;
+                            }
+                        }
+
+                        Logger.SaveLoggedData(traceFileName);
+                        Logger.ClearLoggedData();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var ee = new ExtractException("ELI38344", "Failed to output trace log.", ex);
+                    ee.AddDebugData("Log filename", traceFileName, false);
+                    ee.Log();
+                }
 
                 _statusInfoMap.Clear();
                 _subAttributesToParentMap.Clear();
@@ -1116,6 +1101,12 @@ namespace Extract.DataEntry
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI26134", _OBJECT_NAME);
+
+                if (IsLoggingEnabled(LogCategories.AttributeInitialized))
+                {
+                    Logger.LogEvent(LogCategories.AttributeInitialized, attribute,
+                        owningControl as Control, attribute.Value.String);
+                }
 
                 InitializeStatics();
 
@@ -3587,9 +3578,9 @@ namespace Extract.DataEntry
         void OnAttributeValueModified(IAttribute attribute, bool incrementalUpdate,
             bool acceptSpatialInfo, bool spatialInfoChanged)
         {
-            if (!incrementalUpdate)
+            if (!incrementalUpdate && IsLoggingEnabled(LogCategories.AttributeUpdated))
             {
-                AttributeStatusInfo.Trace("FieldUpdated", attribute, attribute.Value.String);
+                Logger.LogEvent(LogCategories.AttributeUpdated, attribute, attribute.Value.String);
             }
 
             var eventHandler = AttributeValueModified;
@@ -3629,6 +3620,11 @@ namespace Extract.DataEntry
         /// <param name="attribute">The <see cref="IAttribute"/> that was deleted.</param>
         void OnAttributeDeleted(IAttribute attribute)
         {
+            if (IsLoggingEnabled(LogCategories.AttributeDeleted))
+            {
+                Logger.LogEvent(LogCategories.AttributeDeleted, attribute, attribute.Value.String);
+            }
+
             var eventHandler = AttributeDeleted;
             if (eventHandler != null)
             {

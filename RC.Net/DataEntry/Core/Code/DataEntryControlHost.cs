@@ -396,6 +396,18 @@ namespace Extract.DataEntry
         IDataEntryControl _activeDataControl;
 
         /// <summary>
+        /// In order to prevent logging the same focus change multiple times, keep track of the last
+        /// attribute for which focus was logged.
+        /// </summary>
+        IAttribute _lastLoggedFocusAttribute;
+
+        /// <summary>
+        /// In order to prevent logging the same focus change multiple times, keep track of the last
+        /// control for which focus was logged.
+        /// </summary>
+        Control _lastLoggedFocusControl;
+
+        /// <summary>
         /// Keeps track of the last active cursor tool so that the highlight cursor tools can be
         /// automatically re-enabled after focus passes through control that doesn't support
         /// swiping.
@@ -1516,11 +1528,18 @@ namespace Extract.DataEntry
         {
             try
             {
+                if (attributes != null && attributes.Size() > 0 && 
+                    AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataLoad))
+                {
+                    AttributeStatusInfo.Logger.LogEvent(LogCategories.DataLoad, null,
+                        "Begin: ----------------------------------------------------");
+                }
+
                 HighlightDictionary preCreatedHighlights = null;
 
                 using (new TemporaryWaitCursor())
                 {
-                    // De-activate any existing control that is active to prevent problemswith
+                    // De-activate any existing control that is active to prevent problems with
                     // last selected control remaining active when the next document is loaded.
                     if (_activeDataControl != null)
                     {
@@ -1532,7 +1551,7 @@ namespace Extract.DataEntry
                     // that will occur as data is loaded.
                     LockControlUpdates(true);
 
-                    // Ensure the data in the contols is cleared prior to loading any new data.
+                    // Ensure the data in the controls is cleared prior to loading any new data.
                     ClearData();
 
                     // Set flag to indicate that a document change is in progress so that highlights
@@ -1716,7 +1735,7 @@ namespace Extract.DataEntry
                 try
                 {
                     // If any problem was encountered loading the data, clear the data again
-                    // to ensure the controls are in a useable state.
+                    // to ensure the controls are in a usable state.
                     ClearData();
                 }
                 catch (Exception ex2)
@@ -1810,6 +1829,12 @@ namespace Extract.DataEntry
                             // If all attributes passed validation, save the data.
                             _mostRecentlySaveAttributes.SaveTo(_imageViewer.ImageFile + ".voa",
                                 true, typeof(AttributeStorageManagerClass).GUID);
+
+                            if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataSave))
+                            {
+                                AttributeStatusInfo.Logger.LogEvent(LogCategories.DataSave, null,
+                                    "----------------------------------------------------");
+                            }
 
                             _dirty = false;
                         }
@@ -2184,6 +2209,13 @@ namespace Extract.DataEntry
                         // that would have been set by these queries.
                         AttributeStatusInfo.EndEdit();
 
+                        if (AttributeStatusInfo.IsLoggingEnabled(
+                            undo ? LogCategories.Undo : LogCategories.Redo))
+                        {
+                            AttributeStatusInfo.Logger.LogEvent(
+                                undo ? LogCategories.Undo : LogCategories.Redo, null, "BEGIN");
+                        }
+
                         // [DataEntry:1186]
                         // Unless blocked, the changes that are undone/redone here may trigger
                         // auto-update queries to fire which then result in data that is not in the
@@ -2191,7 +2223,7 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.BlockAutoUpdateQueries = true;
                         _controlUpdateReferenceCount++;
 
-                        // If the smart tag manager is active, de-activate it before the undo/redo
+                        // If the smart tag manager is active, deactivate it before the undo/redo
                         // so that it doesn't try to apply any value.
                         if (_smartTagManager != null && _smartTagManager.IsActive)
                         {
@@ -2246,6 +2278,12 @@ namespace Extract.DataEntry
                                     {
                                         AttributeStatusInfo.UndoManager.EndUndo();
                                         AttributeStatusInfo.BlockAutoUpdateQueries = false;
+                                        
+                                        if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.Undo))
+                                        {
+                                            AttributeStatusInfo.Logger.LogEvent(
+                                                LogCategories.Undo, null, "END");
+                                        }
                                     });
                             }
                             else
@@ -2254,6 +2292,12 @@ namespace Extract.DataEntry
                                     {
                                         AttributeStatusInfo.UndoManager.EndRedo();
                                         AttributeStatusInfo.BlockAutoUpdateQueries = false;
+
+                                        if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.Redo))
+                                        {
+                                            AttributeStatusInfo.Logger.LogEvent(
+                                                LogCategories.Redo, null, "END");
+                                        }
                                     });
                             }
                         });
@@ -2532,6 +2576,9 @@ namespace Extract.DataEntry
 
                 // Reset the map of error icon sizes to use.
                 _errorIconSizes.Clear();
+
+                _lastLoggedFocusAttribute = null;
+                _lastLoggedFocusControl = null;
             }
             catch (Exception ex)
             {
@@ -4814,7 +4861,11 @@ namespace Extract.DataEntry
                 // complete.
                 ControlUpdateReferenceCount++;
 
-                AttributeStatusInfo.Trace("SwipedText", GetActiveAttribute(false), ocrText.String);
+                if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.SwipedText))
+                {
+                    AttributeStatusInfo.Logger.LogEvent(LogCategories.SwipedText,
+                        GetActiveAttribute(false), ocrText.String);
+                }
 
                 using (new TemporaryWaitCursor())
                 {
@@ -4909,6 +4960,25 @@ namespace Extract.DataEntry
         /// </summary>
         void OnItemSelectionChanged()
         {
+            if (!_changingData && AttributeStatusInfo.IsLoggingEnabled(LogCategories.Focus))
+            {
+                // While this is a good place to guarantee all focus changes are logged, it often
+                // results in multiple calls relating to the same focus change. Prevent logging the
+                // same focus change multiple times.
+                IAttribute focusedAttribute = GetActiveAttribute(null);
+                Control focusedControl = _activeDataControl as Control;
+
+                if (focusedAttribute != _lastLoggedFocusAttribute ||
+                    focusedControl != _lastLoggedFocusControl)
+                {
+                    AttributeStatusInfo.Logger.LogEvent(LogCategories.Focus, focusedAttribute,
+                        focusedControl, "");
+
+                    _lastLoggedFocusAttribute = focusedAttribute;
+                    _lastLoggedFocusControl = focusedControl;
+                }
+            }
+
             if (ItemSelectionChanged != null)
             {
                 ItemSelectionChanged(this, new ItemSelectionChangedEventArgs(
@@ -7622,6 +7692,14 @@ namespace Extract.DataEntry
                 // that they don't get used later on after the value has been changed to something
                 // else.
                 ExecuteOnIdle("ELI37382", () => AttributeStatusInfo.ForgetLastAppliedStringValues());
+
+                if (_attributes != null && _attributes.Size() > 0 &&
+                    AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataLoad))
+                {
+                    ExecuteOnIdle("ELI38345", () => AttributeStatusInfo.Logger.LogEvent(
+                        LogCategories.DataLoad, null,
+                        "END: ----------------------------------------------------"));
+                }
             }
             catch (Exception ex)
             {
@@ -7664,7 +7742,10 @@ namespace Extract.DataEntry
         /// <param name="message">The message to be displayed to the user.</param>
         void ShowUserNotificationTooltip(string message)
         {
-            AttributeStatusInfo.Trace("TooltipNotification", null, message);
+            if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.TooltipNotification))
+            {
+                AttributeStatusInfo.Logger.LogEvent(LogCategories.TooltipNotification, null, message);
+            }
 
             // Re-create the tooltip every time-- otherwise sometimes the text of the tooltip
             // doesn't seem to be properly updated and/or the tooltip will disappear really quickly.

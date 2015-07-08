@@ -708,7 +708,11 @@ namespace Extract.DataEntry
                         return (IAttribute)results.At(resultsCount - 1);
                     }
 
-                    AttributeStatusInfo.Trace("FormattingRuleResult", null, "No result selected");
+                    if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.FormattingRuleResult))
+                    {
+                        AttributeStatusInfo.Logger.LogEvent(LogCategories.FormattingRuleResult, null,
+                            "No result selected");
+                    }
                 }
 
                 // No attribute could be found using the supplied parameters.
@@ -757,11 +761,14 @@ namespace Extract.DataEntry
                 IUnknownVector results =
                     rule.ExecuteRulesOnText(afDoc, attributeNames, AlternateComponentDataDir, null);
 
-                AttributeStatusInfo.Trace("FormattingRuleResult", null,
-                    results
-                        .ToIEnumerable<IAttribute>()
-                        .Select(attribute => attribute.Value.String)
-                        .ToArray());
+                if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.FormattingRuleResult))
+                {
+                    AttributeStatusInfo.Logger.LogEvent(LogCategories.FormattingRuleResult, null,
+                        results
+                            .ToIEnumerable<IAttribute>()
+                            .Select(attribute => attribute.Value.String)
+                            .ToArray());
+                }
 
                 return results;
             }

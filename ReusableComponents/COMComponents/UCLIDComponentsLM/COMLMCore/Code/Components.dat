@@ -69,6 +69,7 @@
 6083,FTP_SFTP_File_Transfer
 6084,FileInspectorSearch
 6085,RemoveImagePages
+6086,DataEntryVerification_Logging
 
 // IDs for FLEX Index / ID Shield integration efforts
 6101,Laserfiche_Integration_Verification
