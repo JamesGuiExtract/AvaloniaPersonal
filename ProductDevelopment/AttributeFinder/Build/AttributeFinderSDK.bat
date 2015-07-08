@@ -88,20 +88,30 @@ IF "%BUILD_STATUS%" NEQ "Started" (
 
 	PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%~1' '%BUILD_STATUS%'"
 )
+IF EXIST "%TEMP%\nmakeErrors" del "%TEMP%\nmakeErrors"
 
-nmake /K /F AttributeFinderSDK.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
-IF ERRORLEVEL 1 (
-	SET BUILD_STATUS="Failed"
-	GOTO exit_script
+nmake /X "%TEMP%\nmakeErrors" /F AttributeFinderSDK.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
+IF EXIST "%TEMP%\nmakeErrors" (
+	FIND "NMAKE : fatal error" "%TEMP%\nmakeErrors"
+:: If there were no errors nothing will be found and FIND will return an errorlevel of 1
+	IF NOT ERRORLEVEL 1 (
+		SET BUILD_STATUS="Failed"
+		GOTO exit_script
+	)
 )
 
 IF "%BuildScriptTarget%"=="DoBuilds" GOTO exit_script
-nmake /K /F RuleDevelopmentKit.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" DoEverything 2>&1 | tee "%LOGFILE2%"
-IF ERRORLEVEL 1 (
-	SET BUILD_STATUS="Failed"
-	GOTO exit_script
-)
 
+IF EXIST "%TEMP%\nmakeErrors" del "%TEMP%\nmakeErrors"
+nmake /X "%TEMP%\nmakeErrors" /F RuleDevelopmentKit.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" DoEverything 2>&1 | tee "%LOGFILE2%"
+IF EXIST "%TEMP%\nmakeErrors" (
+	FIND "NMAKE : fatal error" "%TEMP%\nmakeErrors"
+:: If there were no errors nothing will be found and FIND will return an errorlevel of 1
+	IF NOT ERRORLEVEL 1 (
+		SET BUILD_STATUS="Failed"
+		GOTO exit_script
+	)
+)
 SET BUILD_STATUS="Completed successfully"
 
 :exit_script

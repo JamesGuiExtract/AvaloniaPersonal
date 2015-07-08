@@ -59,12 +59,15 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 :: Label
-nmake /K /F LabelFromLatestVersions.mak Branch=%Branch%
-
-IF %ERRORLEVEL% NEQ 0 (
-	Echo Labeling exited with error.
-	Echo.
-	goto ExitWithError
+IF EXIST "%TEMP%\nmakeErrors" del "%TEMP%\nmakeErrors"
+nmake /F LabelFromLatestVersions.mak Branch=%Branch%
+IF EXIST "%TEMP%\nmakeErrors" (
+	FIND "NMAKE : fatal error" "%TEMP%\nmakeErrors"
+:: If there were no errors nothing will be found and FIND will return an errorlevel of 1
+	IF NOT ERRORLEVEL 1 (
+		SET BUILD_STATUS="Failed"
+		GOTO ExitWithError
+	)
 )
 
 cd "%~p0"
