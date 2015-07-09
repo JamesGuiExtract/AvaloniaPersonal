@@ -365,22 +365,13 @@ STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn,
 		else if (m_bTargetsMustContainReferences)
 		{
 			// If we are looking for attributes that completely contain a reference region.
-			vecContainmentPairs = findContainmentPairs(ipTargetAttributes, ipReferenceAttributes);
+			ipSelectedAttributes = findContainerAttributes(ipTargetAttributes, ipReferenceAttributes);
 		}
 		else
 		{
 			// If we are looking for attributes either completely or partially contained in the 
 			// reference regions.
-			vecContainmentPairs = findContainmentPairs(ipReferenceAttributes, ipTargetAttributes);
-		}
-
-		for each (pair<IAttributePtr, IAttributePtr> containmentPair in vecContainmentPairs)
-		{
-			// For each pairing, select the appropriate attribute based upon the
-			// m_bTargetsMustContainReferences setting.
-			ipSelectedAttributes->PushBackIfNotContained(m_bTargetsMustContainReferences 
-														 ? containmentPair.first
-														 : containmentPair.second);
+			ipSelectedAttributes = findContainedAttributes(ipReferenceAttributes, ipTargetAttributes);
 		}
 
 		// Copy the results to pAttrOut.
@@ -987,71 +978,151 @@ long CSpatialProximityAS::getExpansionOffset(const BorderInfo &borderInfo, long 
 	return (long) dExpansionOffset;
 }
 //--------------------------------------------------------------------------------------------------
-vector< pair<IAttributePtr, IAttributePtr> > CSpatialProximityAS::findContainmentPairs(
+IIUnknownVectorPtr CSpatialProximityAS::findContainedAttributes(
 	IIUnknownVectorPtr ipContainerAttributes, IIUnknownVectorPtr ipContainedAttributes)
 {
 	ASSERT_ARGUMENT("ELI23498", ipContainerAttributes != __nullptr);
 	ASSERT_ARGUMENT("ELI23499", ipContainedAttributes != __nullptr);
 
-	vector< pair<IAttributePtr, IAttributePtr> > vecContainmentPairs;
+	IIUnknownVectorPtr ipSelectedAttributes(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI38355", ipSelectedAttributes != __nullptr);
 
-	// Cycle through each container attribute to find attributes contained within
-	// the container attribute.
-	long nContainerAttributesCount = ipContainerAttributes->Size();
-	for (long i = 0; i < nContainerAttributesCount; i++)
+	// Collect vectors of rects for all contained attribute candidates to avoid repeating work
+	vector< vector< pair<CRect, long> > > vecContainerAttributesRectsCache;
+	long nContainerAttributeCount = ipContainerAttributes->Size();
+	for (int i = 0; i < nContainerAttributeCount; i++)
 	{
 		IAttributePtr ipContainerAttribute = ipContainerAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI22675", ipContainerAttribute != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI38361", ipContainerAttribute != __nullptr);
 
-		long nAttributeCount = ipContainedAttributes->Size();
-		for (int j = 0; j < nAttributeCount; j++)
+		// Obtain a rect describing the area of the container attribute's lines.
+		// If m_bTargetsMustContainReferences is false, ipContainerAttribute is
+		// a reference rect and so it must be converted so that it reflects
+		// the specified bounds which are not necessarily the bounds of the 
+		// attribute itself.
+		vector< pair<CRect, long> > vecContainerAttributeRects = getAttributeRects(
+			ipContainerAttribute, m_bCompareLinesSeparately, !m_bTargetsMustContainReferences);
+
+		vecContainerAttributesRectsCache.push_back(vecContainerAttributeRects);
+	}
+
+	// Cycle through each possible contained attribute to find out whether it is contained by a
+	// container attribute
+	long nContainedAttributesCount = ipContainedAttributes->Size();
+	for (long i = 0; i < nContainedAttributesCount; i++)
+	{
+		IAttributePtr ipContainedAttribute = ipContainedAttributes->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI22675", ipContainedAttribute != __nullptr);
+
+		// Obtain a rect describing the area of the contained candidate's lines.
+		// If m_bTargetsMustContainReferences is true, ipContainedAttribute is
+		// a reference rect and so it must be converted so that it reflects
+		// the specified bounds which are not necessarily the bounds of the 
+		// attribute itself.
+		vector< pair<CRect, long> > vecContainedAttributeRects = 
+				getAttributeRects(ipContainedAttribute, m_bCompareLinesSeparately,
+					m_bTargetsMustContainReferences);
+
+		for (int j = 0; j < nContainerAttributeCount; j++)
 		{
-			IAttributePtr ipContainedAttribute = ipContainedAttributes->At(j);
-			ASSERT_RESOURCE_ALLOCATION("ELI22704", ipContainedAttribute != __nullptr);
+			IAttributePtr ipContainerAttribute = ipContainerAttributes->At(j);
+			ASSERT_RESOURCE_ALLOCATION("ELI22704", ipContainerAttribute != __nullptr);
 
 			// Don't allow an attribute to be selected based on itself.
 			if (ipContainedAttribute == ipContainerAttribute)
 			{
 				continue;
 			}
-					
-			if (isAttributeContainedIn(ipContainedAttribute, ipContainerAttribute))
+
+			if (isAttributeContainedIn(vecContainedAttributeRects, vecContainerAttributesRectsCache.at(j)))
 			{
 				// If ipContainedAttribute is indeed contained with containerRect,
-				// add that attribute pair to the return result.
-				vecContainmentPairs.push_back(pair<IAttributePtr, IAttributePtr>(
-					ipContainerAttribute, ipContainedAttribute));
+				// add that attribute the return result.
+				ipSelectedAttributes->PushBack(ipContainedAttribute);
+
+				// No need to try any more container attributes
+				break;
 			}
 		}
 	}
 
-	return vecContainmentPairs;
+	return ipSelectedAttributes;
 }
 //--------------------------------------------------------------------------------------------------
-bool CSpatialProximityAS::isAttributeContainedIn(IAttributePtr ipContainedAttribute,
-												 IAttributePtr ipContainerAttribute)
+IIUnknownVectorPtr CSpatialProximityAS::findContainerAttributes(
+	IIUnknownVectorPtr ipContainerAttributes, IIUnknownVectorPtr ipContainedAttributes)
 {
-	ASSERT_ARGUMENT("ELI22702", ipContainedAttribute != __nullptr);
-	ASSERT_ARGUMENT("ELI34157", ipContainerAttribute != __nullptr);
+	ASSERT_ARGUMENT("ELI38356", ipContainerAttributes != __nullptr);
+	ASSERT_ARGUMENT("ELI38357", ipContainedAttributes != __nullptr);
 
-	// Obtain a rect describing the area of each container attribute's lines.
-	// If m_bTargetsMustContainReferences is false, ipContainerAttribute is
-	// a reference rect and so it must be converted so that it reflects
-	// the specified bounds which are not necessarily the bounds of the 
-	// attribute itself.
-	vector< pair<CRect, long> > vecContainerRectsAttributeRects =
-		getAttributeRects(ipContainerAttribute, m_bCompareLinesSeparately,
-		!m_bTargetsMustContainReferences);
+	IIUnknownVectorPtr ipSelectedAttributes(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI38358", ipSelectedAttributes != __nullptr);
 
-	// Obtain a rect describing the area of each contained candidate's lines.
-	// If m_bTargetsMustContainReferences is true, ipContainedAttribute is
-	// a reference rect and so it must be converted so that it reflects
-	// the specified bounds which are not necessarily the bounds of the 
-	// attribute itself.
-	vector< pair<CRect, long> > vecContainedAttributeRects = 
-		getAttributeRects(ipContainedAttribute, m_bCompareLinesSeparately,
-		m_bTargetsMustContainReferences);
+	// Collect vectors of rects for all container attribute candidates to avoid repeating work
+	long nContainedAttributesCount = ipContainedAttributes->Size();
+	vector< vector <pair<CRect, long> > > vecContainedAttributesRectsCache;
+	for (int i = 0; i < nContainedAttributesCount; i++)
+	{
+		IAttributePtr ipContainedAttribute = ipContainedAttributes->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI38362", ipContainedAttribute != __nullptr);
 
+		// Obtain a rect describing the area of each contained candidate's lines.
+		// If m_bTargetsMustContainReferences is true, ipContainedAttribute is
+		// a reference rect and so it must be converted so that it reflects
+		// the specified bounds which are not necessarily the bounds of the 
+		// attribute itself.
+		vector< pair<CRect, long> > vecContainedAttributeRects = getAttributeRects(
+			ipContainedAttribute, m_bCompareLinesSeparately, m_bTargetsMustContainReferences);
+
+		vecContainedAttributesRectsCache.push_back(vecContainedAttributeRects);
+	}
+
+	// Cycle through each container attribute to find out whether it contains a contained attribute
+	long nContainerAttributesCount = ipContainerAttributes->Size();
+	for (long i = 0; i < nContainerAttributesCount; i++)
+	{
+		IAttributePtr ipContainerAttribute = ipContainerAttributes->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI38359", ipContainerAttribute != __nullptr);
+
+		// Obtain a rect describing the area of the container attribute's lines.
+		// If m_bTargetsMustContainReferences is false, ipContainerAttribute is
+		// a reference rect and so it must be converted so that it reflects
+		// the specified bounds which are not necessarily the bounds of the 
+		// attribute itself.
+		vector< pair<CRect, long> > vecContainerAttributeRects =
+			getAttributeRects(ipContainerAttribute, m_bCompareLinesSeparately,
+				!m_bTargetsMustContainReferences);
+
+		for (int j = 0; j < nContainedAttributesCount; j++)
+		{
+			IAttributePtr ipContainedAttribute = ipContainedAttributes->At(j);
+			ASSERT_RESOURCE_ALLOCATION("ELI38360", ipContainedAttribute != __nullptr);
+
+			// Don't allow an attribute to be selected based on itself.
+			if (ipContainedAttribute == ipContainerAttribute)
+			{
+				continue;
+			}
+
+			if (isAttributeContainedIn(vecContainedAttributesRectsCache.at(j), vecContainerAttributeRects))
+			{
+				// If ipContainedAttribute is indeed contained with containerRect,
+				// add the container attribute to the return result.
+				ipSelectedAttributes->PushBack(ipContainerAttribute);
+
+				// No need to try any more contained attributes
+				break;
+			}
+		}
+	}
+
+	return ipSelectedAttributes;
+}
+//--------------------------------------------------------------------------------------------------
+bool CSpatialProximityAS::isAttributeContainedIn(
+	vector< pair<CRect, long> > vecContainedAttributeRects,
+	vector< pair<CRect, long> > vecContainerRectsAttributeRects)
+{
 	// Loop through each candidate attribute to see if it is contained in one of the container
 	// attributes.
 	for each (pair<CRect, long> rectContained in vecContainedAttributeRects)

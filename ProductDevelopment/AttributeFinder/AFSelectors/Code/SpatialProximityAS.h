@@ -216,23 +216,31 @@ private:
 	// false if the result is not a valid page area (no area or completely off-page)
 	bool convertToTargetRegion(CRect &rrect, long nPage);
 
-	// Retrives a reference to the specified border of rect.
+	// Retrieves a reference to the specified border of rect.
 	long &getRectBorder(CRect &rect, EBorder eBorder);
 
 	// Given the border settings specified by borderInfo and the page being searched, determines
 	// the number of pixels the border should be expanded (negative for left or up).
 	long getExpansionOffset(const BorderInfo &borderInfo, long nPage);
 
-	// Searches for all attributes in ipContainedAttributes that are completely contained
-	// in an attribute from ipContainerAttributes. Each such pair that is found is added
-	// as an item in the return result vector. The pairings that are made adhere to the 
+	// Searches for all attributes in ipContainedAttributes that are contained
+	// in an attribute from ipContainerAttributes. Each attribute that is found is added
+	// as an item in the return result vector. The comparisons adhere to the 
 	// m_bRequireCompleteInclusion and m_bCompareLinesSeparately settings.
-	vector< pair<IAttributePtr, IAttributePtr> > findContainmentPairs(
+	IIUnknownVectorPtr findContainedAttributes(
+		IIUnknownVectorPtr ipContainerAttributes, IIUnknownVectorPtr ipContainedAttributes);
+	
+	// Searches for all attributes in ipContainerAttributes that contain
+	// an attribute from ipContainedAttributes. Each attribute that is found is added
+	// as an item in the return result vector. The comparisons adhere to the 
+	// m_bRequireCompleteInclusion and m_bCompareLinesSeparately settings.
+	IIUnknownVectorPtr findContainerAttributes(
 		IIUnknownVectorPtr ipContainerAttributes, IIUnknownVectorPtr ipContainedAttributes);
 
-	// Returns true if ipContainedAttribute is contained in ipContainerAttribute. The result is
-	// dependent upon the m_bCompareLinesSeparately and m_bTargetsMustContainReferences settings.
-	bool isAttributeContainedIn(IAttributePtr ipContainedAttribute, IAttributePtr ipContainerAttribute);
+	// Returns true if vecContainedAttributeRects is contained in vecContainerRectsAttributeRects.
+	// The result is dependent upon the m_bCompareLinesSeparately and m_bTargetsMustContainReferences settings.
+	bool isAttributeContainedIn(vector< pair<CRect, long> > vecContainedAttributeRects,
+		vector< pair<CRect, long> > vecContainerRectsAttributeRects);
 
 	// Adds the rule's defined reference spatial regions to be tested as subattributes to the
 	// attributes used to describe the regions.
