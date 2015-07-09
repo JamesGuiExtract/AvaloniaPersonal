@@ -77,11 +77,15 @@ namespace Extract.FileActionManager.FileProcessors
                 _useValueAsAddressRadioButton.Checked = _settings.UseValueAsAddress;
                 _useStaticAddressRadioButton.Checked = !_settings.UseValueAsAddress;
                 _hyperlinkAddressTextBox.Text = _settings.HyperlinkAddress;
+                _addHighlightsCheckBox.Checked = _settings.AddHighlights;
+                _highlightAttributesTextBox.Text = _settings.HighlightAttributes;
                 _dataFileTextBox.Text = _settings.DataFileName;
 
                 SetControlsEnabledState();
 
                 _addHyperLinksCheckBox.CheckedChanged +=
+                    (sender, eventArgs) => SetControlsEnabledState();
+                _addHighlightsCheckBox.CheckedChanged +=
                     (sender, eventArgs) => SetControlsEnabledState();
                 _useStaticAddressRadioButton.CheckedChanged +=
                     (sender, eventArgs) => SetControlsEnabledState();
@@ -117,6 +121,8 @@ namespace Extract.FileActionManager.FileProcessors
                 _settings.HyperlinkAttributes = _hyperlinkAttributesTextBox.Text;
                 _settings.UseValueAsAddress = _useValueAsAddressRadioButton.Checked;
                 _settings.HyperlinkAddress = _hyperlinkAddressTextBox.Text;
+                _settings.AddHighlights = _addHighlightsCheckBox.Checked;
+                _settings.HighlightAttributes = _highlightAttributesTextBox.Text;
                 _settings.DataFileName = _dataFileTextBox.Text;
 
                 // Set the dialog result
@@ -151,7 +157,8 @@ namespace Extract.FileActionManager.FileProcessors
                 return true;
             }
 
-            if (!_removeAnnotationsCheckBox.Checked && !_addHyperLinksCheckBox.Checked)
+            if (!_removeAnnotationsCheckBox.Checked && !_addHyperLinksCheckBox.Checked &&
+                !_addHighlightsCheckBox.Checked)
             {
                 MessageBox.Show("Task has not been configured to do anything",
                     "Incomplete configuration",
@@ -185,13 +192,31 @@ namespace Extract.FileActionManager.FileProcessors
 
                     return true;
                 }
+            }
 
+            if (_addHighlightsCheckBox.Checked)
+            {
+                if (string.IsNullOrWhiteSpace(_highlightAttributesTextBox.Text))
+                {
+                    MessageBox.Show(
+                        "Please specify which attributes should be used to create highlights",
+                        "Missing attribute names", MessageBoxButtons.OK, MessageBoxIcon.None,
+                        MessageBoxDefaultButton.Button1, 0);
+                    _highlightAttributesTextBox.Focus();
+
+                    return true;
+                }
+            }
+
+            if (_addHyperLinksCheckBox.Checked || _addHighlightsCheckBox.Checked)
+            {
                 if (string.IsNullOrWhiteSpace(_dataFileTextBox.Text) ||
                     tagManager.StringContainsInvalidTags(_dataFileTextBox.Text))
                 {
                     MessageBox.Show("Please specify a valid data file containing the attributes " +
-                        "to use for creating hyperlinks", "Invalid data file", MessageBoxButtons.OK,
-                        MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                        "to use for creating hyperlinks or highlights", "Invalid data file",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1,
+                        0);
                     _dataFileTextBox.Focus();
 
                     return true;
@@ -235,7 +260,9 @@ namespace Extract.FileActionManager.FileProcessors
                 _useStaticAddressRadioButton.Enabled = _addHyperLinksCheckBox.Checked;
                 _hyperlinkAddressTextBox.Enabled =
                     _addHyperLinksCheckBox.Checked && _useStaticAddressRadioButton.Checked;
-                _dataFileTextBox.Enabled = _addHyperLinksCheckBox.Checked;
+                _highlightAttributesTextBox.Enabled = _addHighlightsCheckBox.Checked;
+                _dataFileTextBox.Enabled =
+                    _addHyperLinksCheckBox.Checked || _addHighlightsCheckBox.Checked;
             }
             catch (Exception ex)
             {

@@ -98,6 +98,7 @@ namespace Extract.Utilities
                 bool removeAnnotations = false;
                 string[] hyperlinkAttributes = null;
                 string hyperlinkAddress = "";
+                string[] highlightAttributes = null;
                 string dataFileName = "";
                 bool overWrite = false;
 
@@ -117,7 +118,7 @@ namespace Extract.Utilities
                     {
                         overWrite = true;
                     }
-                    else if (temp.Equals("/h", StringComparison.OrdinalIgnoreCase))
+                    else if (temp.Equals("/l", StringComparison.OrdinalIgnoreCase))
                     {
                         if ((++i) >= argumentCount)
                         {
@@ -128,7 +129,7 @@ namespace Extract.Utilities
                         hyperlinkAttributes =
                             args[i].Split(new[] { ',', ';', ' '}, StringSplitOptions.RemoveEmptyEntries);
                     }
-                    else if (temp.Equals("/ha", StringComparison.OrdinalIgnoreCase))
+                    else if (temp.Equals("/la", StringComparison.OrdinalIgnoreCase))
                     {
                         if ((++i) >= argumentCount)
                         {
@@ -137,6 +138,17 @@ namespace Extract.Utilities
                         }
 
                         hyperlinkAddress = args[i];
+                    }
+                    else if (temp.Equals("/h", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if ((++i) >= argumentCount)
+                        {
+                            DisplayUsage("No attribute names specified.");
+                            return;
+                        }
+
+                        highlightAttributes =
+                            args[i].Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     }
                     else if (temp.Equals("/voa", StringComparison.OrdinalIgnoreCase))
                     {
@@ -179,11 +191,11 @@ namespace Extract.Utilities
                     ImageMethods.IsPdf(pdfSource), "PDF Source", pdfSource);
 
                 ExtractException.Assert("ELI36286", "No PDF modifications have been configured.",
-                    removeAnnotations || hyperlinkAttributes != null);
+                    removeAnnotations || hyperlinkAttributes != null || highlightAttributes != null);
 
                 ExtractException.Assert("ELI36268", "Data file for hyperlinks not specified.",
-                    hyperlinkAttributes == null || !string.IsNullOrWhiteSpace(dataFileName),
-                    "Data file", dataFileName);
+                    (hyperlinkAttributes == null && highlightAttributes == null) || 
+                    !string.IsNullOrWhiteSpace(dataFileName), "Data file", dataFileName);
 
                 if (!overWrite && File.Exists(pdfDest))
                 {
@@ -213,8 +225,17 @@ namespace Extract.Utilities
 
                         if (hyperlinkAttributes != null)
                         {
-                            modified |= AddHyperlinks(pdfDocument, dataFileName,
-                                hyperlinkAttributes,hyperlinkAddress, exceptions);
+                            AnnotationCreatorDelegate hyperlinkCreator = (page, rectangle, attribute) =>
+                                HyperlinkCreator(page, rectangle, attribute, hyperlinkAddress);
+
+                            modified |= AddAnnotations(pdfDocument, dataFileName,
+                                hyperlinkAttributes, "hyperlink", hyperlinkCreator, exceptions);
+                        }
+
+                        if (highlightAttributes != null)
+                        {
+                            modified |= AddAnnotations(pdfDocument, dataFileName,
+                                highlightAttributes, "highlight", HighlightCreator, exceptions);
                         }
 
                         // Save output as long as either something has been modified or no
@@ -267,18 +288,21 @@ namespace Extract.Utilities
                 sb.AppendLine();
             }
             sb.Append(Environment.GetCommandLineArgs()[0]);
-            sb.AppendLine(" <PDFSource> <PDFDestination> [/ra] [/h <AttributeNames> /voa " +
-                "<DataFilename> [/ha <HyperlinkAddress>]] [/o] [/ef <ExceptionFile>]");
+            sb.AppendLine(" <PDFSource> <PDFDestination> [/ra] [/l <AttributeNames> " +
+                "[/la <LinkAddress>] [/h <AttributeNames>] [/voa <DataFilename>] " +
+                "[/o] [/ef <ExceptionFile>]");
             sb.AppendLine();
             sb.AppendLine("Usage:");
             sb.AppendLine("-------------------");
             sb.AppendLine("<PDFSource>: The source pdf file.");
             sb.AppendLine("<PDFDestination>: The destination pdf file.");
             sb.AppendLine("/ra: Indicates that annotations should be removed from the PDF file.");
+            sb.AppendLine("/l <AttributeNames>: Indicates that hyperlinks should be added for " +
+                "attributes whose names are indicated in a comma separated list.");
+            sb.AppendLine("/la <LinkAddress>: Specify the address that should be used for " +
+                "hyperlinks. If not specified, the value of the attributes will be used.");
             sb.AppendLine("/h <AttributeNames>: Indicates that hyperlinks should be added for " +
                 "attributes whose names are indicated in a comma separated list.");
-            sb.AppendLine("/ha <HyperlinkAddress>: Specify the address that should be used for " +
-                "hyperlinks. If not specified, the value of the attributes will be used.");
             sb.AppendLine("/voa <DataFileName>: The name of the datafile containing the " +
                 "attributes to use for hyperlinks.");
             sb.AppendLine("/o: Will overwrite the destination file if it exists.");
@@ -334,40 +358,40 @@ namespace Extract.Utilities
             return modified;
         }
 
-
         /// <summary>
-        /// Adds hyperlinks to the the <see paramref="pdfDocument"/>.
+        /// Adds annotations to the <see paramref="pdfDocument"/>.
         /// </summary>
-        /// <param name="pdfDocument">The <see cref="Document"/> instance to which hyperlinks
+        /// <param name="pdfDocument">The <see cref="Document"/> instance to which annotations
         /// should be added.</param>
         /// <param name="dataFileName">The name of the VOA providing that <see cref="IAttribute"/>s to
-        /// use to define where hyperlinks are added.</param>
-        /// <param name="hyperlinkAttributes">A list of attribute names that should be used from
+        /// use to define where annotations are added.</param>
+        /// <param name="annotationAttributes">A list of attribute names that should be used from
         /// the <see paramref="dataFileName"/>.</param>
-        /// <param name="hyperlinkAddress">The address that should be used for all hyperlinks. If
-        /// not specified, the value of each <see cref="IAttribute"/> will be used as the link
-        /// address.</param>
+        /// <param name="annotationTypeName">The name of annotation type being added.</param>
+        /// <param name="annotationCreatorDelegate">A <see cref="AnnotationCreatorDelegate"/> that
+        /// will create each <see paramref="annotationTypeName"/> annotation.</param>
         /// <param name="exceptions">Collects any exceptions modifying the PDF that should not be
         /// treated as errors that should prevent output from being generated.</param>
         /// <returns><see langword="true"/> if the <see paramref="pdfDocument"/> was modified;
         /// otherwise, <see langword="true"/>.</returns>
-        static bool AddHyperlinks(Document pdfDocument, string dataFileName,
-            string[] hyperlinkAttributes, string hyperlinkAddress, List<ExtractException> exceptions)
+        static bool AddAnnotations(Document pdfDocument, string dataFileName,
+            string[] annotationAttributes, string annotationTypeName,
+            AnnotationCreatorDelegate annotationCreatorDelegate, List<ExtractException> exceptions)
         {
             bool modified = false;
 
             // Load a list of all attributes to use from the data file.
             IUnknownVector attributes = new IUnknownVector();
             attributes.LoadFrom(dataFileName, false);
-            string attributeQuery = string.Join("|", hyperlinkAttributes);
+            string attributeQuery = string.Join("|", annotationAttributes);
             AFUtility afUtility = new AFUtility();
             IUnknownVector selectedAttributes =
                 afUtility.QueryAttributes(attributes, attributeQuery, false);
 
             int attributeCount = 0;
-            var hyperlinkExceptions = new List<ExtractException>();
+            var annotationExceptions = new List<ExtractException>();
 
-            // Add a hyperlink for each selected attribute.
+            // Add an annotation for each selected attribute.
             foreach (var attribute in selectedAttributes.ToIEnumerable<IAttribute>())
             {
                 attributeCount++;
@@ -375,10 +399,10 @@ namespace Extract.Utilities
                 try
                 {
                     ExtractException.Assert("ELI36272",
-                        "Hyperlinks cannot be added for non-spatial attributes.",
+                        "Annotations cannot be added for non-spatial attributes.",
                         attribute.Value.HasSpatialInfo());
 
-                    // If an attribute spans pages, add a hyperlink for the attribute area on each
+                    // If an attribute spans pages, add an annotation for the attribute area on each
                     // page the attribute spans.
                     foreach (var line in
                         attribute.Value.GetLines().ToIEnumerable<SpatialString>())
@@ -396,67 +420,139 @@ namespace Extract.Utilities
 
                         LongRectangle attributeBounds = line.GetOriginalImageBounds();
 
-                        // NOTE: The coordinate origin in the Apose API is the bottom left.
+                        // NOTE: The coordinate origin in the Aspose API is the bottom left.
                         double left = attributeBounds.Left * xFactor;
-                        double top = asposeRect.URY - (attributeBounds.Top * yFactor);
+                        double top = asposeRect.URY - (attributeBounds.Top * yFactor);  
                         double right = attributeBounds.Right * xFactor;
                         double bottom = asposeRect.URY - (attributeBounds.Bottom * yFactor);
-                        bottom = Math.Max(bottom - HyperlinkUnderlineOffset, 0);
+                        var rectangle = new Aspose.Pdf.Rectangle(left, bottom, right, top);
 
-                        SpatialPageInfo pageInfo = line.GetPageInfo(pageNum);
-                        // If the page is rotated, we will need to add a border on all sides rather
-                        // than just an underline (so the "underline" doesn't end up on the right,
-                        // top or bottom). Accordingly, expand the other boundaries out by the
-                        // HyperlinkUnderlineOffset distance so the border is not drawn on top of
-                        // the text.
-                        if (pageInfo.Orientation != EOrientation.kRotNone)
-                        {
-                            left = Math.Max(left - HyperlinkUnderlineOffset, 0);
-                            top = Math.Min(top + HyperlinkUnderlineOffset, asposeRect.Height);
-                            right = Math.Min(right + HyperlinkUnderlineOffset, asposeRect.Width);
-                        }
-
-                        // Create the hyperlink annotation.
-                        LinkAnnotation link = new LinkAnnotation(
-                            page, new Aspose.Pdf.Rectangle(left, bottom, right, top));
-                        link.Border = new Border(link);
-                        // If the page is rotated, we will need to add a border on all sides rather
-                        // than just an underline (so the "underline" doesn't end up on the right,
-                        // top or bottom).
-                        link.Border.Style = (pageInfo.Orientation == EOrientation.kRotNone)
-                            ? BorderStyle.Underline
-                            : BorderStyle.Solid;
-                        link.Border.Width = _HYPERLINK_UNDERLINE_WIDTH;
-                        link.Color = Aspose.Pdf.Color.FromRgb(System.Drawing.Color.Blue);
-                        link.Action = new GoToURIAction(
-                            string.IsNullOrWhiteSpace(hyperlinkAddress)
-                                ? attribute.Value.String
-                                : hyperlinkAddress);
-
-                        page.Annotations.Add(link);
+                        Annotation annotation = annotationCreatorDelegate(page, rectangle, attribute);
+                        page.Annotations.Add(annotation);
                         modified = true;
                     }
                 }
                 catch (Exception ex)
                 {
                     // Go ahead and allow output to be generated even if there are errors adding
-                    // hyperlinks as long as at least some hyperlinks were successfully added.
-                    hyperlinkExceptions.Add(ex.AsExtract("ELI36269"));
+                    // annotations as long as at least some were successfully added.
+                    annotationExceptions.Add(ex.AsExtract("ELI36269"));
                 }
             }
 
-            if (hyperlinkExceptions.Count > 0)
+            if (annotationExceptions.Count > 0)
             {
                 var ee = new ExtractException("ELI36270",
                     string.Format(CultureInfo.CurrentCulture,
-                        "Failed to add {0} of {1} hyperlink(s).",
-                        hyperlinkExceptions.Count, attributeCount),
-                    hyperlinkExceptions.AsAggregateException());
+                        "Failed to add {0} of {1} {2}(s).",
+                        annotationExceptions.Count, attributeCount, annotationTypeName),
+                    annotationExceptions.AsAggregateException());
 
                 exceptions.Add(ee);
             }
 
             return modified;
+        }
+
+        /// <summary>
+        /// A delegate used to create <see cref="Annotation"/>s of the required type within
+        /// <see cref="AddAnnotations"/>.
+        /// </summary>
+        /// <param name="page">The <see cref="Aspose.Pdf.Page"/> the annotation should be added to.
+        /// </param>
+        /// <param name="rectangle">A <see cref="Aspose.Pdf.Rectangle"/> describing the bounds of the
+        /// annotation.</param>
+        /// <param name="attribute">The <see cref="IAttribute"/> from the voa file the annotation is
+        /// associated with.</param>
+        /// <returns>The <see cref="Annotation"/>.</returns>
+        delegate Annotation AnnotationCreatorDelegate(Aspose.Pdf.Page page,
+            Aspose.Pdf.Rectangle rectangle, IAttribute attribute);
+
+        /// <summary>
+        /// Creates a hyperlink annotation.
+        /// </summary>
+        /// <param name="page">The <see cref="Aspose.Pdf.Page"/> the hyperlink should be added to.
+        /// </param>
+        /// <param name="rectangle">A <see cref="Aspose.Pdf.Rectangle"/> describing the bounds of the
+        /// hyperlink.</param>
+        /// <param name="attribute">The <see cref="IAttribute"/> from the voa file the hyperlink is
+        /// associated with.</param>
+        /// <param name="hyperlinkAddress">The address to assign to the hyperlink (if not provided
+        /// by the <see paramref="attribute"/> value.</param>
+        /// <returns>The <see cref="Annotation"/>.</returns>
+        static Annotation HyperlinkCreator(Aspose.Pdf.Page page, Aspose.Pdf.Rectangle rectangle,
+            IAttribute attribute, string hyperlinkAddress)
+        {
+            try
+            {
+                Aspose.Pdf.Rectangle pageRect = page.GetPageRect(false);
+                SpatialPageInfo pageInfo = attribute.Value.GetPageInfo(page.Number);
+
+                // Expand the zone down so that the underline appears under the zone rather than on
+                // top of it.
+                rectangle.LLY = Math.Max(rectangle.LLY - HyperlinkUnderlineOffset, 0);
+
+                // If the page is rotated, we will need to add a border on all sides rather
+                // than just an underline (so the "underline" doesn't end up on the right,
+                // top or bottom). Accordingly, expand the other boundaries out by the
+                // HyperlinkUnderlineOffset distance so the border is not drawn on top of
+                // the text.
+                if (pageInfo.Orientation != EOrientation.kRotNone)
+                {
+                    rectangle.LLX = Math.Max(rectangle.LLX - HyperlinkUnderlineOffset, 0);
+                    rectangle.URY = Math.Min(rectangle.URY + HyperlinkUnderlineOffset, pageRect.Height);
+                    rectangle.URX = Math.Min(rectangle.URX + HyperlinkUnderlineOffset, pageRect.Width);
+                }
+
+                // Create the hyperlink annotation.
+                LinkAnnotation link = new LinkAnnotation(page, rectangle);
+                link.Border = new Border(link);
+
+                // If the page is rotated, we will need to add a border on all sides rather
+                // than just an underline (so the "underline" doesn't end up on the right,
+                // top or bottom).
+                link.Border.Style = (pageInfo.Orientation == EOrientation.kRotNone)
+                    ? BorderStyle.Underline
+                    : BorderStyle.Solid;
+                link.Border.Width = _HYPERLINK_UNDERLINE_WIDTH;
+                link.Color = Aspose.Pdf.Color.FromRgb(System.Drawing.Color.Blue);
+                link.Action = new GoToURIAction(
+                    string.IsNullOrWhiteSpace(hyperlinkAddress)
+                        ? attribute.Value.String
+                        : hyperlinkAddress);
+
+                return link;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38368");
+            }
+        }
+
+        /// <summary>
+        /// Creates a highlight annotation.
+        /// </summary>
+        /// <param name="page">The <see cref="Aspose.Pdf.Page"/> the highlight should be added to.
+        /// </param>
+        /// <param name="rectangle">A <see cref="Aspose.Pdf.Rectangle"/> describing the bounds of the
+        /// highlight.</param>
+        /// <param name="attribute">The <see cref="IAttribute"/> from the voa file the highlight is
+        /// associated with.</param>
+        /// <returns>The <see cref="Annotation"/>.</returns>
+        static Annotation HighlightCreator(Aspose.Pdf.Page page, Aspose.Pdf.Rectangle rectangle,
+            IAttribute attribute)
+        {
+            try
+            {
+                HighlightAnnotation highlight = new HighlightAnnotation(page, rectangle);
+                highlight.Color = Color.Yellow;
+
+                return highlight;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38369");
+            }
         }
 
         #endregion Methods

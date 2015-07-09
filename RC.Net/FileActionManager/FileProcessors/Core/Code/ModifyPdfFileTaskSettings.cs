@@ -54,6 +54,17 @@ namespace Extract.FileActionManager.FileProcessors
         string _hyperlinkAddress;
 
         /// <summary>
+        /// Indicates whether highlights should be added or not.
+        /// </summary>
+        bool _addHighlights;
+
+        /// <summary>
+        /// If <see cref="AddHighlights"/> is <see langword="true"/>, the names of the attributes
+        /// for which highlights should be added.
+        /// </summary>
+        string _highlightAttributes;
+
+        /// <summary>
         /// The VOA file containing the attributes to use to create the hyperlinks.
         /// </summary>
         string _dataFileName = "<SourceDocName>.voa";
@@ -92,6 +103,8 @@ namespace Extract.FileActionManager.FileProcessors
                 _hyperlinkAttributes = settings.HyperlinkAttributes;
                 _useValueAsAddress = settings.UseValueAsAddress;
                 _hyperlinkAddress = settings.HyperlinkAddress;
+                _addHighlights = settings.AddHighlights;
+                _highlightAttributes = settings.HighlightAttributes;
                 _dataFileName = settings.DataFileName;
             }
             catch (Exception ex)
@@ -284,6 +297,65 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Gets or sets whether highlights should be added or not.
+        /// </summary>
+        /// <value><see langword="true"/> if highlights should be added to the PDF; otherwise,
+        /// <see langword="false"/>.</value>
+        public bool AddHighlights
+        {
+            get
+            {
+                return _addHighlights;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _addHighlights)
+                    {
+                        _addHighlights = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38366");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the names of the attributes for which highlights should be added. 
+        /// </summary>
+        /// <value>
+        /// The names of the attributes for which highlights should be added. 
+        /// </value>
+        public string HighlightAttributes
+        {
+            get
+            {
+                return _highlightAttributes;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _highlightAttributes)
+                    {
+                        _highlightAttributes = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38367");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the VOA file containing the attributes to use to create the hyperlinks.
         /// </summary>
         /// <value>
@@ -330,15 +402,15 @@ namespace Extract.FileActionManager.FileProcessors
                     // Settings are valid iff:
                     // 1. A pdf file name is defined
                     // 2. The pdf file name does not contain any invalid doc tags
-                    // 3. Either annotations are configured to be removed or hyperlinks are
-                    //  configured to be added.
-                    // 4. If hyperlinks are being added, both the attribute names and data file have
-                    //  been specified.
+                    // 3. Either annotations are configured to be removed or hyperlinks/highlights
+                    //  are configured to be added.
+                    // 4. If hyperlinks/highlights are being added, both the attribute names and
+                    //  data file have been specified.
                     // 5. If configured to use a hard-coded hyperlink address, the address has been
                     //  specified.
                     bool valid = !string.IsNullOrEmpty(_pdfFile)
                         && !(tagManager.StringContainsInvalidTags(_pdfFile))
-                        && (_removeAnnotations || _addHyperlinks);
+                        && (_removeAnnotations || _addHyperlinks || _addHighlights);
 
                     if (valid && _addHyperlinks)
                     {
@@ -346,6 +418,13 @@ namespace Extract.FileActionManager.FileProcessors
                         valid &= !string.IsNullOrEmpty(_dataFileName) &&
                             !tagManager.StringContainsInvalidTags(_dataFileName);
                         valid &= _useValueAsAddress || !string.IsNullOrWhiteSpace(_hyperlinkAddress);
+                    }
+
+                    if (valid && _addHighlights)
+                    {
+                        valid &= !string.IsNullOrEmpty(_highlightAttributes);
+                        valid &= !string.IsNullOrEmpty(_dataFileName) &&
+                            !tagManager.StringContainsInvalidTags(_dataFileName);
                     }
 
                     return valid;
@@ -400,6 +479,12 @@ namespace Extract.FileActionManager.FileProcessors
                     settings.DataFileName = reader.ReadString();
                 }
 
+                if (reader.Version >= 3)
+                {
+                    settings.AddHighlights = reader.ReadBoolean();
+                    settings.HighlightAttributes = reader.ReadString();
+                }
+
                 return settings;
             }
             catch (Exception ex)
@@ -423,11 +508,17 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 writer.Write(_pdfFile);
                 writer.Write(_removeAnnotations);
+
+                // Version 2
                 writer.Write(_addHyperlinks);
                 writer.Write(_hyperlinkAttributes);
                 writer.Write(_useValueAsAddress);
                 writer.Write(_hyperlinkAddress);
                 writer.Write(_dataFileName);
+
+                // Version 3
+                writer.Write(_addHighlights);
+                writer.Write(_highlightAttributes);
 
                 if (clearDirty)
                 {

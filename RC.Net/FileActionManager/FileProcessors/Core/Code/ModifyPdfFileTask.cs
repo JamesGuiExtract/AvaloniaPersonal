@@ -37,8 +37,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// Version 2:
         /// Added AddHyperlinks, HyperlinkAttributes, UseValueAsAddress, HyperlinkAddress and
         /// DataFileName
+        /// Version 3:
+        /// Added AddHighlights, HighlightAttributes
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         /// <summary>
         /// The path to the modify pdf file executable (looks for the exe alongside this assembly).
@@ -305,7 +307,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Gets the minimum stack size needed for the thread in which this task is to be run.
         /// </summary>
         /// <value>
-        /// The the minimum stack size needed for the thread in which this task is to be run.
+        /// The minimum stack size needed for the thread in which this task is to be run.
         /// </value>
         [CLSCompliant(false)]        
         public uint MinStackSize
@@ -352,7 +354,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
         /// it also means that call to <see cref="ProcessFile"/> or <see cref="Close"/> may come
-        /// while the Standby call is still ocurring. If this happens, the return value of Standby
+        /// while the Standby call is still occurring. If this happens, the return value of Standby
         /// will be ignored; however, Standby should promptly return in this case to avoid
         /// needlessly keeping a thread alive.
         /// </summary>
@@ -435,17 +437,25 @@ namespace Extract.FileActionManager.FileProcessors
                     }
                     if (_settings.AddHyperlinks)
                     {
-                        args.Add("/h");
+                        args.Add("/l");
                         args.Add(_settings.HyperlinkAttributes);
-
-                        args.Add("/voa");
-                        args.Add(pathTags.Expand(_settings.DataFileName));
 
                         if (!_settings.UseValueAsAddress)
                         {
-                            args.Add("/ha");
+                            args.Add("/la");
                             args.Add(_settings.HyperlinkAddress);
                         }
+                    }
+                    if (_settings.AddHighlights)
+                    {
+                        args.Add("/h");
+                        args.Add(_settings.HighlightAttributes);
+                    }
+
+                    if (_settings.AddHyperlinks || _settings.AddHighlights)
+                    {
+                        args.Add("/voa");
+                        args.Add(pathTags.Expand(_settings.DataFileName));
                     }
 
                     try
