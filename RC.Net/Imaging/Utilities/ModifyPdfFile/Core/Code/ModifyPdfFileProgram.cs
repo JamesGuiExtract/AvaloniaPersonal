@@ -421,9 +421,13 @@ namespace Extract.Utilities
                         LongRectangle attributeBounds = line.GetOriginalImageBounds();
 
                         // NOTE: The coordinate origin in the Aspose API is the bottom left.
-                        double left = attributeBounds.Left * xFactor;
-                        double top = asposeRect.URY - (attributeBounds.Top * yFactor);  
-                        double right = attributeBounds.Right * xFactor;
+                        // https://extract.atlassian.net/browse/ISSUE-2292
+                        // For reasons that are unclear, the X-coordinates needs to be compensated
+                        // by the left coordinate of asposeRect, while the Y-coordinates should not
+                        // be.
+                        double left = attributeBounds.Left * xFactor + asposeRect.LLX;
+                        double top = asposeRect.URY - (attributeBounds.Top * yFactor);
+                        double right = attributeBounds.Right * xFactor + asposeRect.LLX;
                         double bottom = asposeRect.URY - (attributeBounds.Bottom * yFactor);
                         var rectangle = new Aspose.Pdf.Rectangle(left, bottom, right, top);
 
