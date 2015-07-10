@@ -208,6 +208,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         LongToObjectMap _pageInfoMap;
 
+        /// <summary>
+        /// The source document for the redactions
+        /// </summary>
+        string _sourceDocument;
+
         #endregion Fields
 
         #region Events
@@ -738,7 +743,7 @@ namespace Extract.Redaction.Verification
                 // Save a temporary RedactionItem for the row right away so that it can be sorted
                 // into the correct position amongst any other existing redactions in the grid.
                 LongToObjectMap pageInfoMap = GetPageInfoMap();
-                row.SaveRedactionItem("", pageInfoMap);
+                row.SaveRedactionItem(_sourceDocument, pageInfoMap);
             }
 
             // Find the index at which to add the new item to the grid based on its spatial location
@@ -1300,6 +1305,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                _sourceDocument = file.SourceDocument;
+
                 // Disable handling of all events relating to changing data until the file has
                 // finished loading.
                 Active = false;

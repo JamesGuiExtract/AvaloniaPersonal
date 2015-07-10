@@ -305,6 +305,16 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets the source document
+        /// </summary>
+        public string SourceDocument
+        {
+            get
+            {
+                return _sourceDocument;
+            }
+        }
         #endregion Properties
 
         #region Methods
