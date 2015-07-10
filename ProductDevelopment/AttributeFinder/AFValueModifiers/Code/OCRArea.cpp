@@ -22,9 +22,9 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 // Version 2: Added CIdentifiableObject
 const unsigned long gnCurrentVersion = 2;
 
-// default filter for new OCRArea objects (all the filter options except kCustomFilter)
+// default filter for new OCRArea objects (all the filter options except kUnderscoreFilter)
 const EFilterCharacters geDEFAULT_FILTER = EFilterCharacters(kAlphaFilter | kNumeralFilter | 
-	kPeriodFilter | kHyphenFilter |	kUnderscoreFilter |	kCommaFilter | kForwardSlashFilter);
+	kPeriodFilter | kHyphenFilter |	kCommaFilter | kForwardSlashFilter | kCustomFilter);
 
 //-------------------------------------------------------------------------------------------------
 // COCRArea
@@ -32,7 +32,7 @@ const EFilterCharacters geDEFAULT_FILTER = EFilterCharacters(kAlphaFilter | kNum
 COCRArea::COCRArea()
   : m_bDirty(false),
     m_eFilter(geDEFAULT_FILTER),
-	m_strCustomFilterCharacters(""),
+	m_strCustomFilterCharacters("!@#$%&*()=+:;\"'<>,.?"),
 	m_bDetectHandwriting(false),
 	m_bReturnUnrecognized(false), 
 	m_bClearIfNoneFound(true)

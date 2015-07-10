@@ -449,7 +449,6 @@ BEGIN
     EDITTEXT        IDC_EDIT_CHARS_TO_IGNORE,7,220,318,12,ES_AUTOHSCROLL
     CONTROL         "Output filtered images alongside original (debug)",IDC_CHK_OUTPUT_FILTERED_IMAGES,
                     "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,7,236,288,10
-    LTEXT           "NOTE: When the processing machine is not licensed for Enhance OCR, this rule object will ""run"" but not attempt to enhance the text. The text from the uss file will be used as-is.",IDC_STATIC,7,249,326,16
 END
 
 
