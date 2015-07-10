@@ -70,47 +70,6 @@
 			</li>
 		</ul>
 		<hr>
-		<h3>The Execute Rules Task</h3>
-		<ul>
-			<li>You can generate .voa or .xml files for a large number of images using the <b>Execute Rules</b> task.</li>
-			<li>To use the execute rules task you will need to specify the .rsd file that you want to execute.</li>
-			<li>If you created .uss files for the images earlier, you can choose to use the pre-existing .uss files.</li>
-			<li>If you did not create .uss files for the images earlier, you can choose to create .uss files while the rules are run on the images.</li>
-			<p>
-				<li><b>Example</b>:
-					<ul>
-						<li>Add an <b>Output Data to VOA File</b> that outputs to <i>&ltSourceDocName&gt.voa </i>to <b>Output.rsd</b>.</li>
-						<li>Queue up <b>TestImage001.tif</b>, <b>TestImage002.tif</b>, and <b>TestImage003.tif</b> in a new action in a new database.</li>
-						<li>Add an <b>Execute Rules</b> task and execute <b>Output.rsd</b>.</li>
-						<li>Click the "Play" button. Note that as each document finishes processing the .voa files appears.</li>
-					</ul>
-				</li>
-			</p>
-			<li>These output .voa files have two main uses for rule writing:
-				<ul>
-					<p>
-						<li>They can be used to pre-populate the verification window when using the <b>Verify Redactions</b> task.</li>
-						<li><b>Example</b>:
-							<ul>
-								<li>Replace the <b>Execute Rules</b> task with a <b>Verify redactions</b> task.</li>
-								<li>Set that status of the files in the database to "Pending" and then begin processing. Note how the redactions stored in the .voa files are now displayed in the verification window.</li>
-							</ul>
-						</li>
-						<li>By default, the verification window accepts only attributes named <i>HCData</i>, <i>MCData</i>, <i>LCData</i>, and <i>Clues</i>.</li>
-					</p>
-					<p>
-						<li>They can be compared to the Expected Redaction .voa files using the Test Harness.</li>
-						<li><b>Example</b>:
-							<ul>
-								<li>Set up a .tcl file and a .dat file to test <b>Output.rsd</b> on <b>TestImage001.tif</b>, <b>TestImage002.tif</b>, and <b>TestImage003.tif</b>. Make sure that the third token points to <i>&ltSourceDocName&gt.voa</i>.</li>
-								<li>Run the .tcl file.  Note how the Expected Redactions are compared to the output .voa files rather than taking the time to run the rules on each document.</li>
-							</ul>
-						</li>
-					</p>
-				</ul>
-			</li>
-		</ul>
-		<hr>
         <a href="../../START_HERE.html">HOME</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./EliminateDuplicates.html">NEXT -></a>
         <br/><br/>
 	</BODY>
