@@ -247,7 +247,7 @@ namespace Extract.FileActionManager.Utilities
         #region Thread Methods
 
         /// <summary>
-        /// Thread function that sleeps on intial startup and then sets the startThreads event.
+        /// Thread function that sleeps on initial startup and then sets the startThreads event.
         /// </summary>
         void SleepAndCheckDependentServices(object serviceDBManager)
         {
@@ -460,6 +460,18 @@ namespace Extract.FileActionManager.Utilities
                     // it is done with this batch of files, when it is not at risk of having been
                     // shut down unexpectedly.
                     keepProcessing = famProcess.KeepProcessingAsFilesAdded;
+                    
+                    // Log an exception if keepProcessing is not enabled since it is not a 
+                    // recommended setting when running fps file in a service
+                    // https://extract.atlassian.net/browse/ISSUE-2039
+                    if (!keepProcessing)
+                    {
+                        ExtractException keepProcessingEx = new ExtractException("ELI38370",
+                            "Application Trace: Inadvisable configuration -- It is not recommended to " +
+                            "configure a FPS file used by a service to stop processing once the queue is empty.");
+                        keepProcessingEx.AddDebugData("FPSFile", fpsFileName, false);
+                        keepProcessingEx.Log();
+                    }
 
                     // Ensure that processing has not been stopped before starting processing
                     if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
@@ -503,20 +515,13 @@ namespace Extract.FileActionManager.Utilities
                         // stop because the queue was empty, this should not have any ill effects as
                         // the queue will be empty and the new process will get another chance to
                         // exit cleanly.
-                        keepProcessing = ProcessShouldRestart(famProcess, process, numberOfFilesToProcess);
+                        keepProcessing = ProcessShouldRestart(famProcess, process, numberOfFilesToProcess, fpsFileName);
                     }
 
                     // Safely close the running process (any exceptions logged rather than thrown).
                     CloseProcess(ref famProcess, ref process);
                 }
                 while (keepProcessing && _stopProcessing != null && !_stopProcessing.WaitOne(0));
-
-                // Check if the process is still running
-                if (process != null && !process.HasExited && famProcess != null && famProcess.IsRunning)
-                {
-                    // Tell the process to stop
-                    famProcess.Stop();
-                }
             }
             catch (Exception ex)
             {
@@ -535,78 +540,41 @@ namespace Extract.FileActionManager.Utilities
             }
             finally
             {
-                if (famProcess != null)
+                if (process != null)
                 {
                     // Wrap in a try/catch and log to ensure no exceptions thrown
                     // from the finally block.
                     try
                     {
                         // Ensure stop has been called on the fam process
-                        if (process != null && !process.HasExited && famProcess.IsRunning)
+                        if (!process.HasExited && famProcess != null && famProcess.IsRunning)
                         {
                             famProcess.Stop();
                         }
 
                         // Wait for the famprocess to stop
-                        while (process != null && !process.HasExited
-                            && famProcess != null && famProcess.IsRunning)
+                        while (!process.HasExited && famProcess != null && famProcess.IsRunning)
                         {
                             Thread.Sleep(1000);
                         }
-                        
+
                         // [DNRCAU #876] 
                         // Release the COM object so the FAMProcess.exe is cleaned up
-                        try
-                        {
-                            Marshal.FinalReleaseComObject(famProcess);
-                        }
-                        finally
-                        {
-                            famProcess = null;
-                        }
-                        
+                        Marshal.FinalReleaseComObject(famProcess);
+
                         // Perform a GC to force the object to clean up
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
-
-                        // Wait for the process to exit
-                        if (process != null)
-                        {
-                            // Wait for up to a minute for the process to stop
-                            int i = 0;
-                            while (!process.HasExited && i < 60)
-                            {
-                                Thread.Sleep(1000);
-                                i++;
-                            }
-
-                            // If after a minute the process has not exited, then kill it
-                            if (!process.HasExited)
-                            {
-                                try
-                                {
-                                    var ee = new ExtractException("ELI35308", "Killing hung process.");
-                                    ee.AddDebugData("FPS Filename", fpsFileName, false);
-                                    ee.AddDebugData("Process ID", processID, false);
-                                    ee.Log();
-                                    process.Kill();
-                                }
-                                catch (Exception ex)
-                                {
-                                    ExtractException.Log("ELI30038", ex);
-                                }
-                            }
-                        }
                     }
                     catch (Exception ex)
                     {
                         ExtractException.Log("ELI28505", ex);
                     }
-                }
-
-                if (process != null)
-                {
-                    process.Dispose();
+                    finally
+                    {
+                        WaitForProcessToExitAndDispose(ref process, fpsFileName);
+                        famProcess = null;
+                    }
                 }
 
                 // [DotNetRCAndUtils:695]
@@ -639,6 +607,57 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Makes sure the process has exited, if not kills it after 1 minute and then disposes of the process
+        /// </summary>
+        /// <param name="process">The process to wait for exit</param>
+        /// <param name="fpsFileName">The FPS file that is being processed</param>
+        private static void WaitForProcessToExitAndDispose(ref Process process, string fpsFileName)
+        {
+            try
+            {
+                if (process == null)
+                {
+                    return;
+                }
+
+                // Wait for the process to exit
+                // Wait for up to a minute for the process to stop
+                int i = 0;
+                while (!process.HasExited && i < 60)
+                {
+                    Thread.Sleep(1000);
+                    i++;
+                }
+
+                // If after a minute the process has not exited, then kill it
+                if (!process.HasExited)
+                {
+                    try
+                    {
+                        var ee = new ExtractException("ELI35308", "Killing hung process.");
+                        ee.AddDebugData("FPS Filename", fpsFileName, false);
+                        ee.AddDebugData("Process ID", process.Id, false);
+                        ee.Log();
+                        process.Kill();
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException.Log("ELI30038", ex);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI38365", ex);
+            }
+            finally
+            {
+                process.Dispose();
+                process = null;
+            }
+        }
+
+        /// <summary>
         /// Checks if the specified <see paramref="famProcess"/> needs to be restarted.
         /// </summary>
         /// <param name="famProcess">The <see cref="FileProcessingManagerProcessClass"/>.</param>
@@ -646,10 +665,11 @@ namespace Extract.FileActionManager.Utilities
         /// in.</param>
         /// <param name="numberOfFilesToProcess">The number of files to process for
         /// this processing thread, before respawning the FAM process.</param>
+        /// <param name="fpsFileName">Name of FPS file that is running.</param>
         /// <returns><see langword="true"/> if the process should be restarted, otherwise, 
         /// <see langword="false"/>.</returns>
         static bool ProcessShouldRestart(FileProcessingManagerProcessClass famProcess,
-            Process process, int numberOfFilesToProcess)
+            Process process, int numberOfFilesToProcess, string fpsFileName)
         {
             try
             {
@@ -667,11 +687,22 @@ namespace Extract.FileActionManager.Utilities
                     filesProcessed = processedSuccessfully + processingErrors;
                 }
 
-                // If the number of files to proces is 0 OR the number of files actually
+                // If the number of files to process is 0 OR the number of files actually
                 // processed is less than the number of files specified, then just
                 // exit the loop and do not respawn a new FAM instance
                 if (numberOfFilesToProcess == 0 || filesProcessed < numberOfFilesToProcess)
                 {
+                    // Log exception so users can figure out why processing did not restart
+                    // fpsFileName is used instead of famProcess.FPSFile because famProcess could be 
+                    // unavailable if it has exited
+                    // https://extract.atlassian.net/browse/ISSUE-2039
+                    ExtractException ee = new ExtractException("ELI38371",
+                        "Application Trace: Service FPS file has stopped processing and will not be restarted.");
+                    ee.AddDebugData("FPSFile", fpsFileName, false);
+                    ee.AddDebugData("Reason",
+                        "FPS file set to stop once the queue is empty and the queue was empty " +
+                        "or the FAMProcess terminated unexpectedly.", false);
+                    ee.Log();
                     return false;
                 }
             }
@@ -708,18 +739,13 @@ namespace Extract.FileActionManager.Utilities
                 // Release the current FAM process before looping around and spawning a new one
                 // this way the memory is released and we are not leaving extra orphaned
                 // EXE's lying around.
-                if (famProcess != null) // Sanity check, it should never be null at this point
+                // If the process.HasExited  is true famProcess EXE has already exited and if the it
+                // has exited the call to FinalReleaseComObject will throw an exception
+                if (!process.HasExited && famProcess != null) // Sanity check, it should never be null at this point
                 {
                     // [DNRCAU #429, 876] 
                     // Force release the COM object so the EXE will exit
-                    try
-                    {
-                        Marshal.FinalReleaseComObject(famProcess);
-                    }
-                    finally
-                    {
-                        famProcess = null;
-                    }
+                    Marshal.FinalReleaseComObject(famProcess);
 
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
@@ -736,13 +762,6 @@ namespace Extract.FileActionManager.Utilities
                         }
                     }
                 }
-
-                // If there is a valid process handle for an exited process, dispose of it
-                if (process != null && process.HasExited)
-                {
-                    process.Dispose();
-                    process = null;
-                }
             }
             catch (Exception ex)
             {
@@ -758,6 +777,17 @@ namespace Extract.FileActionManager.Utilities
                     // Just log any exceptions from the process threads
                     ExtractException.Log("ELI35381", ex);
                 }
+            }
+            finally
+            {
+                // If there is a valid process handle for an exited process, dispose of it
+                if (process != null)
+                {
+                    process.Dispose();
+                }
+                
+                process = null;
+                famProcess = null;
             }
         }
 
