@@ -47,22 +47,8 @@
 			<li>Enter an angle (in degrees) to rotate the image being OCR'd.</li>
 		</ul>
 	</ul>
-
-<hr>
-	<h3>Exercises</h3>
-	<ol>
-		<li>Open the <b>RuleSet Editor</b>, load ".\Files\TestImageSSN.rsd", open the <b>Rule Tester</b>, load ".\Files\TestImage004.tif" and execute the rules.</li>
-		<li>Note that both SSN's found are on page one of this document. A more efficient approach would be to only process the first page.</li>
-		<li>Set up a <b>Select page region</b> preprocessor to include only the first page.</li>
-		<li>Additionally the SSN's are in a header to the document, so we can restrict the page horizontally as well. Adjust your preprocessor to do this.</li>
-		<li>Now load ".\Files\BadOCR.rsd" in the <b>RuleSet Editor</b> and ".\Files\BadOCR.tif" in the <b>Rule Tester</b>. Execute the rules.</li>
-		<li>They don't find anything. Let's investigate a bit. Open ".\Files\BadOCR.tif" in a <b>Spot Recognition</b> window and ".\Files\BadOCR.tif.uss" in the <b>USS File Viewer</b>.</li>
-		<li>In the top right corner of the document there is a "Taxpayer number" field which contains a number that could be based on a SSN. Note that the phrase<br>
-			"Taxpayer number" is not included in the USS file. Also note the fuzzy black borders in the image. These can confuse the OCR engine and prevent text from being<br>
-			correctly identified.</li>
-		<li>Create a <b>Select page region</b> preprocessor to allow the rule to find the SSN.</li>
-		<li>Hint: exclude the borders of the image and re-OCR it.</li>
-	</ol>
-
+    <hr>
+    <a href="../../START_HERE.html">HOME</a>
+    <br/><br/>
 </BODY>
 </HTML>
