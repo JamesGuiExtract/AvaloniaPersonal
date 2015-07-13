@@ -105,6 +105,13 @@
     </Compile>
     <Compile Include="ApplyBatesNumberTask.cs" />
     <Compile Include="BatesNumberGeneratorWithDatabase.cs" />
+    <Compile Include="ValidateXmlTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ValidateXmlTaskSettingsDialog.Designer.cs">
+      <DependentUpon>ValidateXmlTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ValidateXmlTask.cs" />
     <Compile Include="ViewImageTaskSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -361,6 +368,9 @@
     <EmbeddedResource Include="ApplyBatesNumberSettingsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ValidateXMLTaskSettingsDialog.resx">
+      <DependentUpon>ValidateXmlTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ViewImageTaskSettingsDialog.resx">
       <DependentUpon>ViewImageTaskSettingsDialog.cs</DependentUpon>
