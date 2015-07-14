@@ -669,11 +669,16 @@ namespace Extract.FileActionManager.Forms
                 {
                     MainForm.Invoke((MethodInvoker)(() =>
                     {
-                        // The FAM framework is not able to handle that a task can refuse the
-                        // cancel request so force that the user cannot choose to cancel if
-                        // prompted to save changes.
-                        MainForm.PreventCloseCancel = true;
-                        MainForm.Close();
+                        // Don't call close if form is already closing
+                        // https://extract.atlassian.net/browse/ISSUE-13125
+                        if (!_formIsClosing)
+                        {
+                            // The FAM framework is not able to handle that a task can refuse the
+                            // cancel request so force that the user cannot choose to cancel if
+                            // prompted to save changes.
+                            MainForm.PreventCloseCancel = true;
+                            MainForm.Close();
+                        }
                     }));
                 }
             }
@@ -1074,7 +1079,7 @@ namespace Extract.FileActionManager.Forms
             try
             {
                 // [FlexIDSCore:5008]
-                // If the close has been cancelled, there is nothing to do here.
+                // If the close has been canceled, there is nothing to do here.
                 if (e.Cancel)
                 {
                     return;

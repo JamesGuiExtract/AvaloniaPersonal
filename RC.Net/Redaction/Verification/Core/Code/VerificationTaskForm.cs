@@ -823,10 +823,10 @@ namespace Extract.Redaction.Verification
             // Commit
             if (_actionStatusTask != null)
             {
-				// Set up file record for call to processfile
-				FileRecordClass fileRecord = new FileRecordClass();
-				fileRecord.Name = memento.SourceDocument;
-				fileRecord.FileID = memento.FileId;
+                // Set up file record for call to processfile
+                FileRecordClass fileRecord = new FileRecordClass();
+                fileRecord.Name = memento.SourceDocument;
+                fileRecord.FileID = memento.FileId;
 
                 _actionStatusTask.ProcessFile(fileRecord, memento.ActionId,
                     _tagManager, _fileDatabase, null, false);
@@ -844,13 +844,13 @@ namespace Extract.Redaction.Verification
 
                 if (_slideshowActionStatusTask != null)
                 {
-					// Set up file record for call to processfile
-					FileRecordClass fileRecord = new FileRecordClass();
-					fileRecord.Name = memento.SourceDocument;
-					fileRecord.FileID = memento.FileId;
+                    // Set up file record for call to processfile
+                    FileRecordClass fileRecord = new FileRecordClass();
+                    fileRecord.Name = memento.SourceDocument;
+                    fileRecord.FileID = memento.FileId;
 
-					_slideshowActionStatusTask.ProcessFile(fileRecord,
-						memento.ActionId, _tagManager, _fileDatabase,
+                    _slideshowActionStatusTask.ProcessFile(fileRecord,
+                        memento.ActionId, _tagManager, _fileDatabase,
                         null, false);
                 }
             }
@@ -1584,7 +1584,7 @@ namespace Extract.Redaction.Verification
                 UpdateMemento();
             }
 
-            // Even if the user choses not to save changes or there have been no changes,
+            // Even if the user chooses not to save changes or there have been no changes,
             // per discussion with Arvind, metadata (a verification session node) should still be
             // saved.
             if (_imageViewer.IsImageAvailable)
@@ -1668,7 +1668,7 @@ namespace Extract.Redaction.Verification
                 }
 
                 // A second prompt for whether a redacted document should be output. Displayed
-                // regardless of whether the voa file was saved (unless the close was cancelled).
+                // regardless of whether the voa file was saved (unless the close was canceled).
                 using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
                 {
                     messageBox.Caption = "Output redacted document?";
@@ -2805,7 +2805,7 @@ namespace Extract.Redaction.Verification
                     e.Cancel = true;
                 }
 
-                // Don't call base.OnFormClosing until we know know if the close is being canceled
+                // Don't call base.OnFormClosing until we know if the close is being canceled
                 // (If VerificationForm receives a FormClosing event, it expects that the form will
                 // indeed close).
                 base.OnFormClosing(e);
@@ -2818,7 +2818,7 @@ namespace Extract.Redaction.Verification
             {
                 if (e.Cancel)
                 {
-                    // The close was cancelled. Reset _formClosing;
+                    // The close was canceled. Reset _formClosing;
                     _formClosing = false;
                 }
             }
@@ -3428,7 +3428,7 @@ namespace Extract.Redaction.Verification
             {
                 case DocumentNavigationTarget.FirstItem:
                     {
-                        // Go to the first redaction iff:
+                        // Go to the first redaction if:
                         // 1) We are not visiting all pages OR
                         // 2) We are visiting all pages and there is a redaction on page 1
                         if (_redactionGridView.Rows.Count > 0 &&
@@ -3449,7 +3449,7 @@ namespace Extract.Redaction.Verification
 
                 case DocumentNavigationTarget.FirstPage:
                     {
-                        // Go to the first redaction iff:
+                        // Go to the first redaction if:
                         // 1) The first redaction is on the first page.
                         if (_redactionGridView.Rows.Count > 0 &&
                             _redactionGridView.Rows[0].PageNumber == 1)
@@ -3465,7 +3465,7 @@ namespace Extract.Redaction.Verification
 
                 case DocumentNavigationTarget.LastItem:
                     {
-                        // Go to the last redaction iff:
+                        // Go to the last redaction if:
                         // 1) We are not visiting all pages OR
                         // 2) We are visiting all pages and there is a redaction on the last page.
                         int lastRow = _redactionGridView.Rows.Count - 1;
@@ -3488,7 +3488,7 @@ namespace Extract.Redaction.Verification
 
                 case DocumentNavigationTarget.LastPage:
                     {
-                        // Go to the last redaction iff:
+                        // Go to the last redaction if:
                         // 1) The last redaction is on the last page.
                         int lastRow = _redactionGridView.Rows.Count - 1;
                         int lastPage = _imageViewer.PageCount;
@@ -4049,12 +4049,12 @@ namespace Extract.Redaction.Verification
         ///	has been supplied. If the processor will standby until the next file is supplied it
         ///	should return <see langword="true"/>. If the processor wants to cancel processing,
         ///	it should return <see langword="false"/>. If the processor does not immediately know
-        ///	whether processing should be cancelled right away, it may block until it does know,
+        ///	whether processing should be canceled right away, it may block until it does know,
         ///	and return at that time.
         /// <para><b>Note</b></para>
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
-        /// it also means the form may be opened or closed while the Standby call is still ocurring.
+        /// it also means the form may be opened or closed while the Standby call is still occurring.
         /// If this happens, the return value of Standby will be ignored; however, Standby should
         /// promptly return in this case to avoid needlessly keeping a thread alive.
         /// </summary>
