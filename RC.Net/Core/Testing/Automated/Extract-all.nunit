@@ -5,6 +5,7 @@
     <assembly path="Extract.Imaging.Forms.Test.dll" />
     <assembly path="Extract.FileActionManager.Database.Test.dll" />
 	<assembly path="Extract.FileActionManager.Forms.Test.dll" />
+	<assembly path="Extract.FileActionManager.FileProcessors.Test.dll" />
     <assembly path="Extract.Utilities.Test.dll" />
     <assembly path="Extract.Encryption.Test.dll" />
     <assembly path="Extract.Test.dll" />
@@ -16,6 +17,7 @@
     <assembly path="Extract.Imaging.Forms.Test.dll" />
     <assembly path="Extract.FileActionManager.Database.Test.dll" />
 	<assembly path="Extract.FileActionManager.Forms.Test.dll" />
+	<assembly path="Extract.FileActionManager.FileProcessors.Test.dll" />
     <assembly path="Extract.Utilities.Test.dll" />
     <assembly path="Extract.Encryption.Test.dll" />
     <assembly path="Extract.Test.dll" />

@@ -1,0 +1,29 @@
+<FlexData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="LabDE.xsd">
+	<DocumentType FieldType="AsgtTrustDeed">
+		<FullText>ASGT TRUST DEED</FullText>
+	</DocumentType>
+	<Grantee FieldType="AsgtTrustDeed">
+		<FullText AverageCharConfidence="99">STRUCTURED ASSET MTG INVEST II INC BEAR STEARNS ARM TRUST</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="99">STRUCTURED ASSET MTG INVEST II INC BEAR STEARNS ARM TRUST</LineText>
+			<SpatialLineZone StartX="156" StartY="1151" EndX="2323" EndY="1179" Height="79"/>
+			<SpatialLineBounds Top="1112" Left="155" Bottom="1217" Right="2323"/>
+		</SpatialLine>
+	</Grantee>
+	<Grantor FieldType="AsgtTrustDeed">
+		<FullText AverageCharConfidence="100">BANK OF AMER N A</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">BANK OF AMER N A</LineText>
+			<SpatialLineZone StartX="918" StartY="1088" EndX="1408" EndY="1094" Height="33"/>
+			<SpatialLineBounds Top="1072" Left="917" Bottom="1109" Right="1408"/>
+		</SpatialLine>
+	</Grantor>
+	<GrantorGrantee FieldType="AsgtTrustDeed">
+		<FullText AverageCharConfidence="99">MURPHY ERIN E TR</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="99">MURPHY ERIN E TR</LineText>
+			<SpatialLineZone StartX="205" StartY="1319" EndX="549" EndY="1323" Height="31"/>
+			<SpatialLineBounds Top="1304" Left="204" Bottom="1337" Right="549"/>
+		</SpatialLine>
+	</GrantorGrantee>
+</FlexData>

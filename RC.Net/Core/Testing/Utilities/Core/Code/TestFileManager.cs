@@ -146,30 +146,32 @@ namespace Extract.Testing.Utilities
         /// </summary>
         /// <param name="resource">The name of the embedded resource to stream
         /// to the temporary file.</param>
-        /// <param name="fileName">The name to assign to the temporary file. If
-        /// <see langword="null"/> or empty string will auto-generate a temporary
-        /// file name.</param>
+        /// <param name="fileName">The name to assign to the temporary file.  If
+        /// <see langword="null"/> or empty string then an auto-generated temporary
+        /// file name will be used. Otherwise the resource will be streamed to the
+        /// specified file name.</param>
         /// <returns>A <see cref="TemporaryFile"/> for the embedded resource.</returns>
         TemporaryFile CreateTemporaryFile(string resource, string fileName)
         {
             // If specified file name is null or empty just generate a new temp file.
-            // If a file name is specified then associate a tempoary file with the specified name.
+            // If a file name is specified then associate a temporary file with the specified name.
             TemporaryFile tempFile = null;
             try
             {
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
-                    tempFile = new TemporaryFile(false);
+                    tempFile = GeneralMethods.WriteEmbeddedResourceToTemporaryFile<T>(
+                        _assembly, resource);
                 }
                 else
                 {
                     // Create a new TemporaryFile associated with the specified file name
                     FileInfo fileInfo = new FileInfo(fileName);
                     tempFile = new TemporaryFile(fileInfo, false);
-                }
 
-                GeneralMethods.WriteEmbeddedResourceToFile<T>(_assembly,
-                    resource, tempFile.FileName);
+                    GeneralMethods.WriteEmbeddedResourceToFile<T>(
+                        _assembly, resource, tempFile.FileName);
+                }
 
                 return tempFile;
             }

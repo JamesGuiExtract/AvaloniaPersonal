@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Extract.Testing.Utilities
 {
@@ -85,6 +86,65 @@ namespace Extract.Testing.Utilities
                 ee.AddDebugData("Type", type.ToString(), false);
                 ee.AddDebugData("Resource Name", resourceName, false);
                 ee.AddDebugData("File Name", fileName, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Writes the embedded resource to a <see cref="TemporaryFile"/> instance that is named
+        /// based on the name of the resource file (but in the temp file directory).
+        /// </summary>
+        /// <typeparam name="T">The type used to resolve the resource location.</typeparam>
+        /// <param name="assembly">The assembly containing the embedded resource.</param>
+        /// <param name="resourceName">Name of the resource.</param>
+        /// <returns>A <see cref="TemporaryFile"/> instance to manage the </returns>
+        // User needs to supply the type parameter since it is used to get the calling assembly
+        // and find the embedded resource to export.
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        public static TemporaryFile WriteEmbeddedResourceToTemporaryFile<T>(Assembly assembly,
+            string resourceName)
+        {
+            // Get the type
+            Type type = typeof(T);
+
+            try
+            {
+                // If no assembly was specified, get the assembly
+                if (assembly == null)
+                {
+                    assembly = Assembly.GetAssembly(type);
+                }
+
+                // Write the embedded resource to the stream
+                using (Stream stream =
+                    assembly.GetManifestResourceStream(type, resourceName))
+                {
+                    // Remove any project-prefix to the resource name that is not related to the
+                    // original filename.
+                    string outputFileName = Regex.Replace(resourceName,
+                        @"^(Properties\.)?Resources\.", "", RegexOptions.IgnoreCase);
+
+                    outputFileName = Path.Combine(Path.GetTempPath(), outputFileName);
+
+                    // Since a static filename is being specified (and TemporaryFile will not be
+                    // able to guarantee uniqueness), delete any existing instance of the file so
+                    // that this operation acts as an overwrite.
+                    File.Delete(outputFileName);
+
+                    FileInfo fileInfo = new FileInfo(outputFileName);
+                    var temporaryFile = new TemporaryFile(fileInfo, false);
+                    
+                    File.WriteAllBytes(temporaryFile.FileName,
+                        StreamMethods.ConvertStreamToByteArray(stream));
+
+                    return temporaryFile;
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = ExtractException.AsExtractException("ELI38404", ex);
+                ee.AddDebugData("Type", type.ToString(), false);
+                ee.AddDebugData("Resource Name", resourceName, false);
                 throw ee;
             }
         }

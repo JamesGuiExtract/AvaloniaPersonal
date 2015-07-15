@@ -1,0 +1,191 @@
+<FlexData>
+	<APN>
+		<FullText AverageCharConfidence="92">13210221</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="92">13210221</LineText>
+			<SpatialLineZone StartX="929" StartY="760" EndX="1112" EndY="761" Height="31"/>
+			<SpatialLineBounds Top="745" Left="928" Bottom="775" Right="1112"/>
+		</SpatialLine>
+	</APN>
+	<DocumentType FieldType="TrustDeed">
+		<FullText>TRUST DEED</FullText>
+	</DocumentType>
+	<DocumentType FieldType="AssignmentRnt">
+		<FullText>ASSIGNMENT RNT</FullText>
+	</DocumentType>
+	<DocumentType FieldType="AssignmentLse">
+		<FullText>ASSIGNMENT LSE</FullText>
+	</DocumentType>
+	<DocumentType FieldType="UccFS">
+		<FullText>UCC - F S</FullText>
+	</DocumentType>
+	<Grantee FieldType="TrustDeed">
+		<FullText AverageCharConfidence="100">BANC OF CA N A</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">BANC OF CA N A</LineText>
+			<SpatialLineZone StartX="799" StartY="1419" EndX="1698" EndY="1426" Height="33"/>
+			<SpatialLineBounds Top="1403" Left="798" Bottom="1441" Right="1698"/>
+		</SpatialLine>
+	</Grantee>
+	<Grantee FieldType="AssignmentRnt">
+		<FullText AverageCharConfidence="100">BANC OF CA N A</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">BANC OF CA N A</LineText>
+			<SpatialLineZone StartX="799" StartY="1419" EndX="1698" EndY="1426" Height="33"/>
+			<SpatialLineBounds Top="1403" Left="798" Bottom="1441" Right="1698"/>
+	</Grantee>
+	<Grantee FieldType="AssignmentLse">
+		<FullText AverageCharConfidence="100">BANC OF CA N A</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">BANC OF CA N A</LineText>
+			<SpatialLineZone StartX="799" StartY="1419" EndX="1698" EndY="1426" Height="33"/>
+			<SpatialLineBounds Top="1403" Left="798" Bottom="1441" Right="1698"/>
+		</SpatialLine>
+	</Grantee>
+	<Grantee FieldType="UccFS">
+		<FullText AverageCharConfidence="100">BANC OF CA N A</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">BANC OF CA N A</LineText>
+			<SpatialLineZone StartX="799" StartY="1419" EndX="1698" EndY="1426" Height="33"/>
+			<SpatialLineBounds Top="1403" Left="798" Bottom="1441" Right="1698"/>
+		</SpatialLine>
+	</Grantee>
+	<Grantee FieldType="UccFS">
+		<FullText AverageCharConfidence="100">BANC OF CA N A TR</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">BANC OF CA N A TR</LineText>
+			<SpatialLineZone StartX="581" StartY="1350" EndX="1959" EndY="1361" Height="71"/>
+			<SpatialLineBounds Top="1315" Left="580" Bottom="1395" Right="1959"/>
+		</SpatialLine>
+	</Grantee>
+	<Grantor FieldType="TrustDeed">
+		<FullText AverageCharConfidence="100">MAUREEN APT NO 2 L P</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">MAUREEN APT NO 2 L P</LineText>
+			<SpatialLineZone StartX="574" StartY="1284" EndX="1107" EndY="1288" Height="31"/>
+			<SpatialLineBounds Top="1269" Left="573" Bottom="1302" Right="1107"/>
+		</SpatialLine>
+	</Grantor>
+	<Grantor FieldType="AssignmentRnt">
+		<FullText AverageCharConfidence="100">MAUREEN APT NO 2 L P</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">MAUREEN APT NO 2 L P</LineText>
+			<SpatialLineZone StartX="574" StartY="1284" EndX="1107" EndY="1288" Height="31"/>
+			<SpatialLineBounds Top="1269" Left="573" Bottom="1302" Right="1107"/>
+		</SpatialLine>
+	</Grantor>
+	<Grantor FieldType="AssignmentLse">
+		<FullText AverageCharConfidence="100">MAUREEN APT NO 2 L P</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">MAUREEN APT NO 2 L P</LineText>
+			<SpatialLineZone StartX="574" StartY="1284" EndX="1107" EndY="1288" Height="31"/>
+			<SpatialLineBounds Top="1269" Left="573" Bottom="1302" Right="1107"/>
+		</SpatialLine>
+	</Grantor>
+	<Grantor FieldType="UccFS">
+		<FullText AverageCharConfidence="100">MAUREEN APT NO 2 L P</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">MAUREEN APT NO 2 L P</LineText>
+			<SpatialLineZone StartX="574" StartY="1284" EndX="1107" EndY="1288" Height="31"/>
+			<SpatialLineBounds Top="1269" Left="573" Bottom="1302" Right="1107"/>
+		</SpatialLine>
+	</Grantor>
+	<LegalDescription>
+		<FullText AverageCharConfidence="97">Real property in the City of Garden Grove, County of Orange, State of California, described as follows:
+LOT(S) 32 AND 33 OF TRACT NO. 3264, IN THE CITY OF GARDEN GROVE, COUNTY OF ORANGE, STATE
+OF CALIFORNIA, AS PER MAP RECORDED IN BOOK 101, PAGE(S) 37, 38 AND 39 OF MISCELLANEOUS
+MAPS, IN THE OFFICE OF THE COUNTY RECORDER OF SAID COUNTY.</FullText>
+		<SpatialLine PageNumber="20">
+			<LineText AverageCharConfidence="98">Real property in the City of Garden Grove, County of Orange, State of California, described as follows:</LineText>
+			<SpatialLineZone StartX="376" StartY="679" EndX="2082" EndY="716" Height="41"/>
+			<SpatialLineBounds Top="659" Left="375" Bottom="735" Right="2082"/>
+		</SpatialLine>
+		<SpatialLine PageNumber="20">
+			<LineText AverageCharConfidence="98">LOT(S) 32 AND 33 OF TRACT NO. 3264, IN THE CITY OF GARDEN GROVE, COUNTY OF ORANGE, STATE</LineText>
+			<SpatialLineZone StartX="374" StartY="772" EndX="2135" EndY="810" Height="41"/>
+			<SpatialLineBounds Top="752" Left="373" Bottom="829" Right="2135"/>
+		</SpatialLine>
+		<SpatialLine PageNumber="20">
+			<LineText AverageCharConfidence="96">OF CALIFORNIA, AS PER MAP RECORDED IN BOOK 101, PAGE(S) 37, 38 AND 39 OF MISCELLANEOUS</LineText>
+			<SpatialLineZone StartX="372" StartY="819" EndX="2088" EndY="856" Height="41"/>
+			<SpatialLineBounds Top="799" Left="371" Bottom="875" Right="2088"/>
+		</SpatialLine>
+		<SpatialLine PageNumber="20">
+			<LineText AverageCharConfidence="98">MAPS, IN THE OFFICE OF THE COUNTY RECORDER OF SAID COUNTY.</LineText>
+			<SpatialLineZone StartX="371" StartY="864" EndX="1559" EndY="891" Height="39"/>
+			<SpatialLineBounds Top="845" Left="370" Bottom="909" Right="1559"/>
+		</SpatialLine>
+		<Lot>
+			<FullText AverageCharConfidence="100">32-33</FullText>
+			<SpatialLine PageNumber="20">
+				<LineText AverageCharConfidence="100">32-33</LineText>
+				<SpatialLineZone StartX="501" StartY="770" EndX="679" EndY="774" Height="33"/>
+				<SpatialLineBounds Top="754" Left="500" Bottom="789" Right="679"/>
+			</SpatialLine>
+		</Lot>
+		<Tract>
+			<FullText AverageCharConfidence="97">3264</FullText>
+			<SpatialLine PageNumber="20">
+				<LineText AverageCharConfidence="97">3264</LineText>
+				<SpatialLineZone StartX="953" StartY="782" EndX="1035" EndY="784" Height="33"/>
+				<SpatialLineBounds Top="766" Left="952" Bottom="799" Right="1035"/>
+			</SpatialLine>
+		</Tract>
+	</LegalDescription>
+	<ReturnAddress>
+		<FullText AverageCharConfidence="100">N/A</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">N/A</LineText>
+			<SpatialLineZone StartX="356" StartY="578" EndX="378" EndY="578" Height="31"/>
+			<SpatialLineBounds Top="563" Left="356" Bottom="593" Right="378"/>
+		</SpatialLine>
+		<Name>
+			<FullText AverageCharConfidence="97">BANC OF CALIFORNIA NATIONAL ASSOCIATION</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="97">BANC OF CALIFORNIA NATIONAL ASSOCIATION</LineText>
+				<SpatialLineZone StartX="356" StartY="579" EndX="1015" EndY="584" Height="35"/>
+				<SpatialLineBounds Top="562" Left="355" Bottom="600" Right="1015"/>
+			</SpatialLine>
+		</Name>
+		<Address1>
+			<FullText AverageCharConfidence="98">18300 VON KARMAN STE 720</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="98">18300 VON KARMAN STE 720</LineText>
+				<SpatialLineZone StartX="358" StartY="623" EndX="861" EndY="627" Height="33"/>
+				<SpatialLineBounds Top="607" Left="357" Bottom="642" Right="861"/>
+			</SpatialLine>
+		</Address1>
+		<City>
+			<FullText AverageCharConfidence="95">IRVINE</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="95">IRVINE</LineText>
+				<SpatialLineZone StartX="356" StartY="666" EndX="444" EndY="667" Height="31"/>
+				<SpatialLineBounds Top="651" Left="355" Bottom="681" Right="444"/>
+			</SpatialLine>
+		</City>
+		<State>
+			<FullText AverageCharConfidence="100">CA</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">CA</LineText>
+				<SpatialLineZone StartX="467" StartY="667" EndX="519" EndY="667" Height="31"/>
+				<SpatialLineBounds Top="652" Left="467" Bottom="682" Right="519"/>
+			</SpatialLine>
+		</State>
+		<ZipCode>
+			<FullText AverageCharConfidence="100">92612</FullText>
+			<SpatialLine PageNumber="1">
+				<LineText AverageCharConfidence="100">92612</LineText>
+				<SpatialLineZone StartX="531" StartY="669" EndX="633" EndY="669" Height="31"/>
+				<SpatialLineBounds Top="654" Left="531" Bottom="684" Right="633"/>
+			</SpatialLine>
+		</ZipCode>
+	</ReturnAddress>
+	<City>
+		<FullText AverageCharConfidence="100">65</FullText>
+		<SpatialLine PageNumber="1">
+			<LineText AverageCharConfidence="100">65</LineText>
+			<SpatialLineZone StartX="1349" StartY="450" EndX="2540" EndY="460" Height="901"/>
+			<SpatialLineBounds Top="0" Left="1345" Bottom="909" Right="2540"/>
+		</SpatialLine>
+	</City>
+</FlexData>

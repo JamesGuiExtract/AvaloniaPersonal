@@ -92,7 +92,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _noSchemaValidationRadioButton.Checked =
                     (Settings.XmlSchemaValidation == XmlSchemaValidation.None);
                 _validateInlineSchemaRadioButton.Checked =
-                    (Settings.XmlSchemaValidation == XmlSchemaValidation.InLineSchema);
+                    (Settings.XmlSchemaValidation == XmlSchemaValidation.InlineSchema);
                 _validateSpecifiedSchemaRadioButton.Checked =
                     (Settings.XmlSchemaValidation == XmlSchemaValidation.SpecifiedSchema);
                 _requireInlineSchemaCheckBox.Checked = Settings.RequireInlineSchema;
@@ -137,7 +137,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 else if (_validateInlineSchemaRadioButton.Checked)
                 {
-                    Settings.XmlSchemaValidation = XmlSchemaValidation.InLineSchema;
+                    Settings.XmlSchemaValidation = XmlSchemaValidation.InlineSchema;
                 }
                 else if (_validateSpecifiedSchemaRadioButton.Checked)
                 {

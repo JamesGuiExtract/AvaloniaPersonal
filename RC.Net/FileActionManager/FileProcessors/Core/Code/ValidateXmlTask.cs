@@ -34,7 +34,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Any in-line schema defined in the XML files themselves will be used to perform schema
         /// validation.
         /// </summary>
-        InLineSchema = 1,
+        InlineSchema = 1,
 
         /// <summary>
         /// A specified schema will be used to perform schema validation.
@@ -134,7 +134,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The method of schema validation that should be used.
         /// </summary>
-        XmlSchemaValidation _xmlSchemaValidation = XmlSchemaValidation.InLineSchema;
+        XmlSchemaValidation _xmlSchemaValidation = XmlSchemaValidation.InlineSchema;
 
         /// <summary>
         /// Indicates whether the XML file should be failed if no in-line schema is specified.
@@ -582,7 +582,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                     // Validate in-line schema exists if required, only after reading the XML;
                     // The in-line schema is not initialized until the file is read.
-                    if (XmlSchemaValidation == XmlSchemaValidation.InLineSchema &&
+                    if (XmlSchemaValidation == XmlSchemaValidation.InlineSchema &&
                         RequireInlineSchema && reader.Settings.Schemas.Count == 0)
                     {
                         throw new ExtractException("ELI38399", "No in-line schema definition found.");
@@ -837,7 +837,7 @@ namespace Extract.FileActionManager.FileProcessors
                     }
                     break;
 
-                case XmlSchemaValidation.InLineSchema:
+                case XmlSchemaValidation.InlineSchema:
                     {
                         xmlReaderSettings.ValidationFlags |= XmlSchemaValidationFlags.ProcessInlineSchema;
                         xmlReaderSettings.ValidationFlags |= XmlSchemaValidationFlags.ProcessSchemaLocation;
