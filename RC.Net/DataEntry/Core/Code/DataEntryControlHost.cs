@@ -91,7 +91,13 @@ namespace Extract.DataEntry
         /// <summary>
         /// Require all data to meet validation requirements before saving.
         /// </summary>
-        Disallow = 3
+        Disallow = 3,
+
+        /// <summary>
+        /// Allow data to be saved without prompting only if the data is all valid or only
+        /// validation warnings are present, but prompt for each field that has a warning first.
+        /// </summary>
+        PromptForEachWarning = 4
     }
 
     #endregion Enums
@@ -5893,6 +5899,24 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Determines whether there is an <see cref="IAttribute"/> whose data has failed
+        /// validation.
+        /// </summary>
+        /// <param name="includeValidationWarnings"><see langword="true"/> if attributes marked
+        /// AllowWithWarnings should be considered as invalid.</param>
+        /// <returns><see langword="true"/> if there are any invalid <see cref="IAttribute"/>s
+        /// else <see langword="false"/></returns>
+        bool HasInvalidAttribute(bool includeValidationWarnings)
+        {
+            // Look for any attributes whose data failed validation.
+            Stack<IAttribute> invalidAttributeGenealogy =
+                AttributeStatusInfo.FindNextInvalidAttribute(_attributes,
+                    includeValidationWarnings, ActiveAttributeGenealogy(true, null), true, true);
+
+            return invalidAttributeGenealogy != null;
+        }
+
+        /// <summary>
         /// Attempts to find the next <see cref="IAttribute"/> (in display order) whose data
         /// has failed validation.
         /// </summary>
@@ -7396,25 +7420,40 @@ namespace Extract.DataEntry
                     return true;
                 }
             }
-            bool changedSelection = false;
 
-            // If saving should be or can be prevented by invalid data, check for invalid data.
-            if (_invalidDataSaveMode != InvalidDataSaveMode.Allow)
+            bool changedSelection = false;
+            bool hasError = HasInvalidAttribute(false);
+
+            // Don't prompt or display exception about validation warnings if we are allowing them
+            // or if prompting for each warning but there are truly invalid attributes.
+            bool ignoreWarnings =
+                   _invalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings
+                || _invalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && hasError;
+
+            // If saving could be prevented by invalid data, iterate through the invalid attributes
+            // in order to display the appropriate exception or prompt user for confirmation.
+            if (   _invalidDataSaveMode == InvalidDataSaveMode.Disallow
+                || _invalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings && hasError
+                || _invalidDataSaveMode == InvalidDataSaveMode.PromptForEach
+                || _invalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning
+               )
+
             {
                 // Find the first attribute that doesn't pass validation.
                 IAttribute firstInvalidAttribute = null;
                 IAttribute currentAttribute = currentlySelectedAttribute.Last();
                 DataValidity validity = AttributeStatusInfo.GetDataValidity(currentAttribute);
-                if (validity == DataValidity.Invalid ||
-                    (validity == DataValidity.ValidationWarning &&
-                        _invalidDataSaveMode != InvalidDataSaveMode.AllowWithWarnings))
+                if (   validity == DataValidity.Invalid
+                    || validity == DataValidity.ValidationWarning && !ignoreWarnings)
                 {
                     firstInvalidAttribute = currentAttribute;
                 }
                 else
                 {
-                    firstInvalidAttribute = GetNextInvalidAttribute(
-                        _invalidDataSaveMode != InvalidDataSaveMode.AllowWithWarnings);
+                    firstInvalidAttribute = GetNextInvalidAttribute(!ignoreWarnings);
+
+                    // If GetNextInvalidAttribute found something, the selection has been changed.
+                    changedSelection = firstInvalidAttribute != null;
                 }
 
                 IAttribute invalidAttribute = firstInvalidAttribute;
@@ -7423,9 +7462,6 @@ namespace Extract.DataEntry
                 // prompt for each invalid field).
                 while (invalidAttribute != null)
                 {
-                    // If GetNextInvalidAttribute found something, the selection has been changed.
-                    changedSelection = true;
-                    
                     try
                     {
                         using (new TemporaryWaitCursor())
@@ -7453,7 +7489,9 @@ namespace Extract.DataEntry
                     {
                         // If saving is allowed after prompting, prompt for each attribute that
                         // currently does not meet validation requirements.
-                        if (_invalidDataSaveMode == InvalidDataSaveMode.PromptForEach)
+                        if (   _invalidDataSaveMode == InvalidDataSaveMode.PromptForEach
+                            || _invalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && !hasError
+                           )
                         {
                             string message = validationException.Message + Environment.NewLine +
                                 Environment.NewLine + "Do you wish to save the data anyway?";
@@ -7466,12 +7504,11 @@ namespace Extract.DataEntry
                             {
                                 return false;
                             }
-                            // If the user choses to continue with the save, look for any further
+                            // If the user chooses to continue with the save, look for any further
                             // invalid attributes before returning true.
                             else
                             {
-                                invalidAttribute = GetNextInvalidAttribute(
-                                    _invalidDataSaveMode != InvalidDataSaveMode.AllowWithWarnings);
+                                invalidAttribute = GetNextInvalidAttribute(!ignoreWarnings);
 
                                 // If the next invalid attribute is the first one that was found,
                                 // the user has responded to prompts for each-- exit the prompting
@@ -7502,7 +7539,7 @@ namespace Extract.DataEntry
             {
                 if (GetNextUnviewedAttribute() != null)
                 {
-                    // If GetNextInvalidAttribute found something, the selection has been changed.
+                    // If GetNextUnviewedAttribute found something, the selection has been changed.
                     changedSelection = true;
 
                     // If saving should be allowed after a prompting, prompt.
