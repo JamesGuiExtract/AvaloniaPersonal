@@ -32,7 +32,8 @@ using namespace std;
 // Version 4: https://extract.atlassian.net/browse/ISSUE-12902
 //			  Prefixed table names with "LabDE", added CollectionDate column to LabDEOrderFile
 // Version 5: Added DOB index on LabDEPatient table.
-static const long glLABDE_DB_SCHEMA_VERSION = 5;
+// Version 6: Changed AddOrUpdateLabDEOrder stored procedure to be created as dbo.
+static const long glLABDE_DB_SCHEMA_VERSION = 6;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -235,6 +236,36 @@ int UpdateToSchemaVersion5(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38279");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 6;
+
+		if (pnNumSteps != __nullptr)
+		{
+			// This is such a small tweak-- use a single step as opposed to the usual 3.
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		
+		// Update AddOrUpdateLabDEOrder stored procedure to make it dbo
+		vecQueries.push_back("DROP PROCEDURE [AddOrUpdateLabDEOrder]");
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38405");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -577,7 +608,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 				ipDB->GetDBInfoSetting(gstrLABDE_SCHEMA_VERSION_NAME.c_str(), VARIANT_FALSE));
 			
 			// If upgrading past the FAMDBSchemaVersion where the LabDE specific components first
-			// became available, offer the user the choice whether to add them. If the user choses
+			// became available, offer the user the choice whether to add them. If the user chooses
 			// not to add the LabDE specific components, they will not be prompted again once the
 			// schema is upgraded beyond FAMDBSchemaVersion 123.
 			if (nFAMDBSchemaVersion == 123 && strVersion.empty())
@@ -660,6 +691,14 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					if (nFAMDBSchemaVersion == 127)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion5(ipConnection, pnNumSteps, NULL);
+					}
+					// Intentionally leaving out break since both updates 4 and 5 take place within
+					// FAM schema 127.
+
+			case 5: // The schema update from 5 to 6 needs to take place against FAM DB schema version 127
+					if (nFAMDBSchemaVersion == 127)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion6(ipConnection, pnNumSteps, NULL);
 					}
 					break;
 

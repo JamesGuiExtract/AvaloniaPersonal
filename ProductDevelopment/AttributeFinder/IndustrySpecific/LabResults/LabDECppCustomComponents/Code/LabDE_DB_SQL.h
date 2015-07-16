@@ -125,7 +125,7 @@ static const string gstrCREATE_ORDERFILE_FAMFILE_INDEX =
 // Stored procedures
 //--------------------------------------------------------------------------------------------------
 static const string gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER =
-	"CREATE PROCEDURE [AddOrUpdateLabDEOrder] "
+	"CREATE PROCEDURE [dbo].[AddOrUpdateLabDEOrder] "
 	"	@OrderNumber NVARCHAR(20), "
 	"	@OrderCode NVARCHAR(30), "
 	"	@PatientMRN NVARCHAR(20), "
