@@ -345,7 +345,7 @@ BOOL CSpatialStringViewerDlg::OnInitDialog()
 		loadSpatialStringFromFile();
 		configureToolBarButtons();
 
-        // Set the postion to the first character
+        // Set the position to the first character
 		m_editText.SetSel(0,0);
 
 		// Set focus to edit text control
@@ -759,7 +759,7 @@ void CSpatialStringViewerDlg::OnChangeGotoPage()
 						m_editText.SetSel(newPos, newPos);
 
 						// Reposition to first char of next line
-						repositionToFirstCharOfNextLine();
+						repositionViewToFirstCharOfNextLine();
 					}
 				}
 				else
@@ -793,7 +793,7 @@ void CSpatialStringViewerDlg::OnButtonLastPage()
 		m_editText.SetSel(nFirstCharOnLastPage, nFirstCharOnLastPage);
 		
 		// Reposition to first char of next line
-		repositionToFirstCharOfNextLine();
+		repositionViewToFirstCharOfNextLine();
 		
 		updateStatusBar();
 		m_editText.SetFocus();
@@ -817,7 +817,7 @@ void CSpatialStringViewerDlg::OnButtonNextPage()
 			m_editText.SetSel(newPos, newPos);
 
 			// Reposition to first char of next line
-			repositionToFirstCharOfNextLine();
+			repositionViewToFirstCharOfNextLine();
 		}
 		
 		updateStatusBar();
@@ -840,7 +840,7 @@ void CSpatialStringViewerDlg::OnButtonPrevPage()
 			m_editText.SetSel(newPos, newPos);
 
 			// Reposition to first char of next line
-			repositionToFirstCharOfNextLine();
+			repositionViewToFirstCharOfNextLine();
 		}
 		
 		updateStatusBar();
@@ -1118,7 +1118,7 @@ void CSpatialStringViewerDlg::createToolBar()
 		IDC_BUTTON_LAST_PAGE
 	};
 
-	// number of buttons (including sperators) for toolbar buttons
+	// number of buttons (including separators) for toolbar buttons
 	int nNumButtons = sizeof(nButtonIds)/sizeof(nButtonIds[0]);
 
 	m_apToolBar->SetButtons(nButtonIds, nNumButtons);
@@ -1381,12 +1381,20 @@ void CSpatialStringViewerDlg::updateStatusBar()
 	setStatusBarText(zPage, zPageConfidence, zStart, zEnd, zConfidence, zPercentage);
 }
 //-------------------------------------------------------------------------------------------------
-void CSpatialStringViewerDlg::repositionToFirstCharOfNextLine()
+void CSpatialStringViewerDlg::repositionViewToFirstCharOfNextLine()
 {
 	int nCurrentLine = m_editText.LineFromChar();
 	if(nCurrentLine < m_editText.GetLineCount() && nCurrentLine != 0)
 	{
 		int newPos = m_editText.LineIndex(nCurrentLine + 1);
+		int firstVisLine = m_editText.GetFirstVisibleLine();
+
+		// Scroll so that the new location is at the top of the page
+		int numberOfLinesToScroll = m_editText.LineFromChar(newPos) - firstVisLine;
+		if (numberOfLinesToScroll > 0)
+		{
+			m_editText.LineScroll(numberOfLinesToScroll);
+		}
 		m_editText.SetSel(newPos, newPos);
 	}
 }

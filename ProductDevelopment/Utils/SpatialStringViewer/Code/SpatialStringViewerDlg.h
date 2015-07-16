@@ -128,8 +128,9 @@ private:
 	void updateStatusBar();
 
 	// Used to move to the first character of the next line for the current position
+	// and reposition the view so the new position is displayed at the top of the edit control
 	// This does nothing if the current line is the first line or the last line
-	void repositionToFirstCharOfNextLine();
+	void repositionViewToFirstCharOfNextLine();
 
 	///////
 	// Data
