@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aspose.Pdf">
-      <HintPath>..\..\..\..\..\APIs\Aspose\Aspose.Pdf for .NET\Bin\net4.0\Aspose.Pdf.dll</HintPath>
+      <HintPath>..\..\..\..\..\APIs\Aspose\Aspose.Pdf for .Net 9.8\Bin\net4.0\Aspose.Pdf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
