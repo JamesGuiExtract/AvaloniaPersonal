@@ -2392,6 +2392,29 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Manually raises the CellValueChanged event so that _lastType is set, even if focus doesn't change
+        /// before a new attribute is added.
+        /// https://extract.atlassian.net/browse/ISSUE-7363
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void HandleDataGridViewCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_dataGridView.IsCurrentCellDirty && IsTypeColumn(_dataGridView.CurrentCell.ColumnIndex))
+                {
+                    // This fires the cell value changed event below
+                    _dataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI38408", ex);
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="DataGridView.CellValueChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
