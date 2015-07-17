@@ -47,11 +47,13 @@ setlocal & pushd .
 :: Register the dlls for 32 bit applications
 %windir%\Microsoft.NET\Framework\v4.0.30319\regasm "%~dp0\LogicNP.EZShellExtensions.dll"
 %windir%\Microsoft.NET\Framework\v4.0.30319\regasm "%~dp0\Extract.Utilities.ShellExtensions.dll"
+"%~dp0\RegisterExtensionDotNet40_x86" -i "%~dp0\LogicNP.EZShellExtensions.dll" "%~dp0\Extract.Utilities.ShellExtensions.dll"
 
 :: If running on 64 bit OS both dlls for 64 bit
 IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	%windir%\Microsoft.NET\Framework64\v4.0.30319\regasm "%~dp0\LogicNP.EZShellExtensions.dll"
 	%windir%\Microsoft.NET\Framework64\v4.0.30319\regasm "%~dp0\Extract.Utilities.ShellExtensions.dll"
+	"%~dp0\RegisterExtensionDotNet40_x64" -i "%~dp0\LogicNP.EZShellExtensions.dll" "%~dp0\Extract.Utilities.ShellExtensions.dll"
 )
 
 :endOfBatch
