@@ -104,9 +104,7 @@ private:
 	// and populate the list view
 	void loadReplacements();
 	// return true if OK is clicked and valid entries are provided
-	// nItemIndex - if zEnt1 already exists in the list, this
-	//				is the index of the existing item in the list
-	bool promptForReplacements(CString& zEnt1, CString& zEnt2, int& nItemIndex);
+	bool promptForReplacements(CString& zEnt1, CString& zEnt2);
 	// save list items to m_ipInternalReplacements
 	// Return true if there is at least one replacement info
 	bool saveReplacements();

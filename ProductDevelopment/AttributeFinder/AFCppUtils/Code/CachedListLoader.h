@@ -48,13 +48,13 @@ public:
 	//			specified it will be used to expand any AFTags, otherwise any AFTags will not be
 	//			expanded.
 	// PARAMS:	cDelimeter: Specifies the separator used to designate where the filename ends and
-	//			the delimeter specification begins. For example "file://list.dat;*" specifies
+	//			the delimiter specification begins. For example "file://list.dat;*" specifies
 	//			that the character in list.dat that separates the two columns is "*".
 	// RETURNS: A IIUnknownVectorPtr list of StringPairs where any item specifying a file is
 	//			replaced with the values in the specified file.
 	// REQUIRES: Any specified file must be compatible with StringLoader.
 	IIUnknownVectorPtr expandTwoColumnList(IIUnknownVectorPtr ipSourceList, char cDelimeter,
-		IAFDocumentPtr ipAFDoc = __nullptr);
+		IAFDocumentPtr ipAFDoc = __nullptr, bool filterOutDuplicateKeys = false);
 
 private:
 
@@ -92,5 +92,6 @@ private:
 
 	// Checks to see if the specified key has already been used in the specified set of keys and
 	// adds it to the set if it is not already there.
-	void checkForDuplicateKey(set<_bstr_t>& rsetStringKeys, _bstr_t bstrKey);
+	// RETURNS: true if the key is was already in the set, else false
+	bool checkForDuplicateKey(set<_bstr_t>& rsetStringKeys, _bstr_t bstrKey);
 };

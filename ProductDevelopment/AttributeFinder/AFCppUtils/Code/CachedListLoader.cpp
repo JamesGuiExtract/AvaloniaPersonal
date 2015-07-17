@@ -183,7 +183,8 @@ IVariantVectorPtr CCachedListLoader::expandList(IVariantVectorPtr ipSourceList,
 //--------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CCachedListLoader::expandTwoColumnList(IIUnknownVectorPtr ipSourceList,
 														  char cDelimeter,
-														  IAFDocumentPtr ipAFDoc/* = NULL*/)
+														  IAFDocumentPtr ipAFDoc/* = NULL*/,
+														  bool filterOutDuplicateKeys/* = false*/)
 {
 	_bstr_t bstrCurrentEntry = "";
 
@@ -213,12 +214,15 @@ IIUnknownVectorPtr CCachedListLoader::expandTwoColumnList(IIUnknownVectorPtr ipS
 				char cColumnDelimeter = cDelimeter;
 				IVariantVectorPtr ipFileValues = getList(bstrCurrentEntry, ipAFDoc, &cColumnDelimeter);
 
+				// Not a file; add this KeyValuePair to the expanded list as is
 				if (ipFileValues == __nullptr)
 				{
-					checkForDuplicateKey(setStringKeys, bstrCurrentEntry);
-
-					// Not a file; add this KeyValuePair to the expanded list as is
-					ipExpandedList->PushBack(ipKeyValuePair);
+					// If not filtering out duplicate key rows or this key has not already been added
+					// add to the expanded list
+					if (!filterOutDuplicateKeys || !checkForDuplicateKey(setStringKeys, bstrCurrentEntry))
+					{
+						ipExpandedList->PushBack(ipKeyValuePair);
+					}
 				}
 				else
 				{
@@ -255,10 +259,12 @@ IIUnknownVectorPtr CCachedListLoader::expandTwoColumnList(IIUnknownVectorPtr ipS
 						ipReplacement->StringKey = bstrStringKey;
 						ipReplacement->StringValue = get_bstr_t(vecTokens[1]);
 
-						checkForDuplicateKey(setStringKeys, bstrStringKey);
-
-						// Push the string pair object into IUnknownVector
-						ipExpandedList->PushBack(ipReplacement);
+						// If not filtering out duplicate key rows or this key has not already been added
+						// push the string pair object into IUnknownVector
+						if (!filterOutDuplicateKeys || !checkForDuplicateKey(setStringKeys, bstrStringKey))
+						{
+							ipExpandedList->PushBack(ipReplacement);
+						}
 					}
 				}
 			}
@@ -320,15 +326,16 @@ IVariantVectorPtr CCachedListLoader::getCachedList(const string& strFileName)
 	return ipList;
 }
 //--------------------------------------------------------------------------------------------------
-void CCachedListLoader::checkForDuplicateKey(set<_bstr_t>& rsetStringKeys, _bstr_t bstrKey)
+bool CCachedListLoader::checkForDuplicateKey(set<_bstr_t>& rsetStringKeys, _bstr_t bstrKey)
 {
 	if (rsetStringKeys.find(bstrKey) != rsetStringKeys.end())
 	{
-		UCLIDException ue("ELI30063", "Duplicate list entry found.");
-		ue.addDebugInfo("Value", asString(bstrKey));
-		throw ue;
+		return true;
 	}
-
-	rsetStringKeys.insert(bstrKey);
+	else
+	{
+		rsetStringKeys.insert(bstrKey);
+		return false;
+	}
 }
 //--------------------------------------------------------------------------------------------------

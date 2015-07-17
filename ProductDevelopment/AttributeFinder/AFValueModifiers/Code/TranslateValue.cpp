@@ -110,7 +110,7 @@ STDMETHODIMP CTranslateValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 				}
 				
 				IIUnknownVectorPtr ipExpandedTranslationPairs =
-					m_cachedListLoader.expandTwoColumnList(m_ipTranslationStringPairs, ';', ipAFDoc);
+					m_cachedListLoader.expandTwoColumnList(m_ipTranslationStringPairs, ';', ipAFDoc, true);
 				ASSERT_RESOURCE_ALLOCATION("ELI30072", ipExpandedTranslationPairs != __nullptr);
 
 				long nSize = ipExpandedTranslationPairs->Size();
@@ -177,7 +177,7 @@ STDMETHODIMP CTranslateValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 					}
 
 					IIUnknownVectorPtr ipExpandedTranslationPairs =
-						m_cachedListLoader.expandTwoColumnList(m_ipTranslationStringPairs, ';', ipAFDoc);
+						m_cachedListLoader.expandTwoColumnList(m_ipTranslationStringPairs, ';', ipAFDoc, true);
 					ASSERT_RESOURCE_ALLOCATION("ELI30073", ipExpandedTranslationPairs != __nullptr);
 
 					long nSize = ipExpandedTranslationPairs->Size();

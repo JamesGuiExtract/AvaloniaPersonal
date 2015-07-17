@@ -200,8 +200,7 @@ LRESULT CReplaceStringsPP::OnClickedBtnAddReplacement(WORD wNotifyCode, WORD wID
 	{
 		// show prompt dialog for entering translation infos
 		CString zEnt1, zEnt2;
-		int nExistingItemIndex = -1;
-		bool bSuccess = promptForReplacements(zEnt1, zEnt2, nExistingItemIndex);
+		bool bSuccess = promptForReplacements(zEnt1, zEnt2);
 
 		if (bSuccess)
 		{
@@ -213,29 +212,14 @@ LRESULT CReplaceStringsPP::OnClickedBtnAddReplacement(WORD wNotifyCode, WORD wID
 				nNewIndex = nTotalItems;
 			}
 
-			if (nExistingItemIndex>=0)
+			int nActualIndex = m_listReplacement.InsertItem(nNewIndex, zEnt1);
+			m_listReplacement.SetItemText(nActualIndex, REPLACEMENT_COLUMN, zEnt2);
+			
+			for (int i = 0; i <= m_listReplacement.GetItemCount(); i++)
 			{
-				m_listReplacement.SetItemText(nExistingItemIndex, TO_BE_REPLACED_COLUMN, zEnt1);
-				m_listReplacement.SetItemText(nExistingItemIndex, REPLACEMENT_COLUMN, zEnt2);
-
-				for (int i = 0; i <= m_listReplacement.GetItemCount(); i++)
-				{
-					int nState = (i == nExistingItemIndex) ? LVIS_SELECTED : 0;
-					
-					m_listReplacement.SetItemState(i, nState, LVIS_SELECTED);
-				}
-			}
-			else
-			{
-				int nActualIndex = m_listReplacement.InsertItem(nNewIndex, zEnt1);
-				m_listReplacement.SetItemText(nActualIndex, REPLACEMENT_COLUMN, zEnt2);
+				int nState = (i == nNewIndex) ? LVIS_SELECTED : 0;
 				
-				for (int i = 0; i <= m_listReplacement.GetItemCount(); i++)
-				{
-					int nState = (i == nNewIndex) ? LVIS_SELECTED : 0;
-					
-					m_listReplacement.SetItemState(i, nState, LVIS_SELECTED);
-				}
+				m_listReplacement.SetItemState(i, nState, LVIS_SELECTED);
 			}
 
 			updateUpAndDownButtons();
@@ -326,7 +310,7 @@ LRESULT CReplaceStringsPP::OnClickedBtnModifyReplacement(WORD wNotifyCode, WORD 
 			CString zEnt2 = getItemText(nSelectedItemIndex, REPLACEMENT_COLUMN).c_str();
 
 			int nExistingItemIndex = nSelectedItemIndex;
-			bool bSuccess = promptForReplacements(zEnt1, zEnt2, nExistingItemIndex);
+			bool bSuccess = promptForReplacements(zEnt1, zEnt2);
 			// show prompt dialog for entering translation infos
 			if (bSuccess)
 			{
@@ -693,7 +677,7 @@ void CReplaceStringsPP::loadReplacements()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool CReplaceStringsPP::promptForReplacements(CString& zEnt1, CString& zEnt2, int& nItemIndex)
+bool CReplaceStringsPP::promptForReplacements(CString& zEnt1, CString& zEnt2)
 {
 	CString zHeader(m_strFileHeader.c_str());
 	Prompt2Dlg promptDlg("Enter Replacement String Pair",
@@ -732,24 +716,6 @@ bool CReplaceStringsPP::promptForReplacements(CString& zEnt1, CString& zEnt2, in
 				}
 			}
 
-			// check whether or not the entered string already exists in the list
-			int nExistingItemIndex = existsStringToBeReplaced((LPCTSTR)zEnt1);
-			if (nExistingItemIndex>=0 && nExistingItemIndex != nItemIndex) // entry already exists in the list
-			{
-				CString zMsg("");
-				zMsg.Format("<%s> already exists in the list. Do you wish to overwrite the existing entry?", zEnt1);
-				nRes = MessageBox(zMsg, "Overwrite Existing?", MB_YESNO);
-				if (nRes == IDYES)
-				{
-					nItemIndex = nExistingItemIndex;
-					return true;
-				}
-				
-				// user clicked NO, let's keep the prompt dlg
-				continue;
-			}
-			
-			// no duplicates found
 			return true;
 		}
 
