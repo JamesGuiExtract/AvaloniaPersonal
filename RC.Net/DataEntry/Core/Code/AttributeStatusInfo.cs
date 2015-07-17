@@ -222,6 +222,30 @@ namespace Extract.DataEntry
         static UndoManager _undoManager;
 
         /// <summary>
+        /// Indicates whether auto-update queries should be disabled. The queries will not be loaded
+        /// for any attributes.
+        /// </summary>
+        [ThreadStatic]
+        static bool _disableAutoUpdateQueries;
+
+        /// <summary>
+        /// Indicates whether validation queries should be disabled.
+        /// </summary>
+        [ThreadStatic]
+        static bool _disableValidationQueries;
+
+        /// <summary>
+        /// Indicates whether auto-update queries should be temporarily prevented from updating text.
+        /// The queries will still be loaded for all attributes, but they will not be triggered
+        /// while blocked. Un-blocking the queries will not execute the queries that would have been
+        /// triggered while blocked.
+        /// Queries that are using the <see cref="DataEntryQuery.TargetProperty"/> property to
+        /// update something other than the control's text/value will continue to execute.
+        /// </summary>
+        [ThreadStatic]
+        static bool _blockAutoUpdateQueries;
+
+        /// <summary>
         /// Indicates whether auto-update and validation queries should be temporarily prevented
         /// from updating data. The queries will still be loaded for all attributes, but they will
         /// not be triggered until un-paused, at which point all queries that would have been
@@ -236,6 +260,42 @@ namespace Extract.DataEntry
         /// </summary>
         [ThreadStatic]
         static Logger _logger;
+
+        /// <summary>
+        /// Registered event handlers for the <see cref="DataReset"/> event.
+        /// </summary>
+        static ThreadSpecificEventHandler<EventArgs> _dataResetHandler =
+            new ThreadSpecificEventHandler<EventArgs>();
+
+        /// <summary>
+        /// Registered event handlers for the <see cref="AttributeInitialized"/> event.
+        /// </summary>
+        static ThreadSpecificEventHandler<AttributeInitializedEventArgs> _attributeInitializedHandler =
+            new ThreadSpecificEventHandler<AttributeInitializedEventArgs>();
+
+        /// <summary>
+        /// Registered event handlers for the <see cref="ViewedStateChanged"/> event.
+        /// </summary>
+        static ThreadSpecificEventHandler<ViewedStateChangedEventArgs> _viewedStateChangedHandler =
+            new ThreadSpecificEventHandler<ViewedStateChangedEventArgs>();
+
+        /// <summary>
+        /// Registered event handlers for the <see cref="ValidationStateChanged"/> event.
+        /// </summary>
+        static ThreadSpecificEventHandler<ValidationStateChangedEventArgs> _validationStateChangedHandler =
+            new ThreadSpecificEventHandler<ValidationStateChangedEventArgs>();
+
+        /// <summary>
+        /// Registered event handlers for the <see cref="EditEnded"/> event.
+        /// </summary>
+        static ThreadSpecificEventHandler<EventArgs> _editEndedHandler =
+            new ThreadSpecificEventHandler<EventArgs>();
+
+        /// <summary>
+        /// Registered event handlers for the <see cref="QueryDelayEnded"/> event.
+        /// </summary>
+        static ThreadSpecificEventHandler<EventArgs> _queryDelayEndedHandler =
+            new ThreadSpecificEventHandler<EventArgs>();
 
         #endregion static fields
 
@@ -671,8 +731,15 @@ namespace Extract.DataEntry
         /// </value>
         public static bool DisableAutoUpdateQueries
         {
-            get;
-            set;
+            get
+            {
+                return _disableAutoUpdateQueries;
+            }
+
+            set
+            {
+                _disableAutoUpdateQueries = value;
+            }
         }
 
         /// <summary>
@@ -688,8 +755,15 @@ namespace Extract.DataEntry
         /// </value>
         public static bool BlockAutoUpdateQueries
         {
-            get;
-            set;
+            get
+            {
+                return _blockAutoUpdateQueries;
+            }
+
+            set
+            {
+                _blockAutoUpdateQueries = value;
+            }
         }
 
         /// <summary>
@@ -736,8 +810,15 @@ namespace Extract.DataEntry
         /// </value>
         public static bool DisableValidationQueries
         {
-            get;
-            set;
+            get
+            {
+                return _disableValidationQueries;
+            }
+
+            set
+            {
+                _disableValidationQueries = value;
+            }
         }
 
         /// <summary>
@@ -3212,47 +3293,121 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Raised whenever ResetData is called.
+        /// <para><b>Note</b></para>
+        /// The static members of this class are ThreadStatic. Event handlers will only be invoked
+        /// on the thread on which they were added.
         /// </summary>
-        public static event EventHandler<EventArgs> DataReset;
+        public static event EventHandler<EventArgs> DataReset
+        {
+            add
+            {
+                _dataResetHandler.AddEventHandler(value);
+            }
+
+            remove
+            {
+                _dataResetHandler.RemoveEventHander(value);
+            }
+        }
 
         /// <summary>
         /// An event that indicates an attribute is being initialized into an 
         /// <see cref="IDataEntryControl"/>.
         /// <para><b>Note</b></para>
-        /// The static members of this class are ThreadStatic. Handlers of this event must be able
-        /// to distinguish and ignore events raised on a thread other than the one they are
-        /// concerned with.
+        /// The static members of this class are ThreadStatic. Event handlers will only be invoked
+        /// on the thread on which they were added.
         /// </summary>
-        public static event EventHandler<AttributeInitializedEventArgs> AttributeInitialized;
+        public static event EventHandler<AttributeInitializedEventArgs> AttributeInitialized
+        {
+            add
+            {
+                _attributeInitializedHandler.AddEventHandler(value);
+            }
+
+            remove
+            {
+                _attributeInitializedHandler.RemoveEventHander(value);
+            }
+        }
 
         /// <summary>
         /// Fired to notify listeners that an <see cref="IAttribute"/> that was previously marked 
         /// as unviewed has now been marked as viewed (or vice-versa).
-        /// </summary>
         /// <para><b>Note</b></para>
-        /// The static members of this class are ThreadStatic. Handlers of this event must be able
-        /// to distinguish and ignore events raised on a thread other than the one they are
-        /// concerned with.
-        public static event EventHandler<ViewedStateChangedEventArgs> ViewedStateChanged;
+        /// The static members of this class are ThreadStatic. Event handlers will only be invoked
+        /// on the thread on which they were added.
+        /// </summary>
+        public static event EventHandler<ViewedStateChangedEventArgs> ViewedStateChanged
+        {
+            add
+            {
+                _viewedStateChangedHandler.AddEventHandler(value);
+            }
+
+            remove
+            {
+                _viewedStateChangedHandler.RemoveEventHander(value);
+            }
+        }
 
         /// <summary>
         /// Fired to notify listeners that an <see cref="IAttribute"/> that was previously marked 
         /// as having invalid data has now been marked as valid (or vice-versa).
-        /// </summary>
         /// <para><b>Note</b></para>
-        /// The static members of this class are ThreadStatic. Handlers of this event must be able
-        /// to distinguish and ignore events raised on a thread other than the one they are
-        /// concerned with.
-        public static event EventHandler<ValidationStateChangedEventArgs> ValidationStateChanged;
+        /// The static members of this class are ThreadStatic. Event handlers will only be invoked
+        /// on the thread on which they were added.
+        /// </summary>
+        public static event EventHandler<ValidationStateChangedEventArgs> ValidationStateChanged
+        {
+            add
+            {
+                _validationStateChangedHandler.AddEventHandler(value);
+            }
+
+            remove
+            {
+                _validationStateChangedHandler.RemoveEventHander(value);
+            }
+        }
 
         /// <summary>
         /// Raised at the end of an <see cref="EndEdit"/> call.
-        /// </summary>
         /// <para><b>Note</b></para>
-        /// The static members of this class are ThreadStatic. Handlers of this event must be able
-        /// to distinguish and ignore events raised on a thread other than the one they are
-        /// concerned with.
-        public static event EventHandler<EventArgs> EditEnded;
+        /// The static members of this class are ThreadStatic. Event handlers will only be invoked
+        /// on the thread on which they were added.
+        /// </summary>
+        public static event EventHandler<EventArgs> EditEnded
+        {
+            add
+            {
+                _editEndedHandler.AddEventHandler(value);
+            }
+
+            remove
+            {
+                _editEndedHandler.RemoveEventHander(value);
+            }
+        }
+
+        /// <summary>
+        /// Raised to notify listeners that a delay of query execution that had been in place has
+        /// been removed.
+        /// <para><b>Note</b></para>
+        /// The static members of this class are ThreadStatic. Event handlers will only be invoked
+        /// on the thread on which they were added.
+        /// </summary>
+        public static event EventHandler<EventArgs> QueryDelayEnded
+        {
+            add
+            {
+                _queryDelayEndedHandler.AddEventHandler(value);
+            }
+
+            remove
+            {
+                _queryDelayEndedHandler.RemoveEventHander(value);
+            }
+        }
 
         /// <summary>
         /// Raised to notify listeners that an Attribute's value was modified.
@@ -3263,12 +3418,6 @@ namespace Extract.DataEntry
         /// Raised to notify listeners that an Attribute was deleted.
         /// </summary>
         public event EventHandler<AttributeDeletedEventArgs> AttributeDeleted;
-
-        /// <summary>
-        /// Raised to notify listeners that a delay of query execution that had been in place has
-        /// been removed.
-        /// </summary>
-        public static event EventHandler<EventArgs> QueryDelayEnded;
 
         #endregion Events
 
@@ -3321,7 +3470,7 @@ namespace Extract.DataEntry
         /// </summary>
         static void OnDataReset()
         {
-            var eventHandler = AttributeStatusInfo.DataReset;
+            var eventHandler = _dataResetHandler.ThreadEventHandler;
             if (eventHandler != null)
             {
                 eventHandler(null, new EventArgs());
@@ -3337,7 +3486,7 @@ namespace Extract.DataEntry
         /// unviewed.</param>
         static void OnViewedStateChanged(IAttribute attribute, bool dataIsViewed)
         {
-            var eventHandler = AttributeStatusInfo.ViewedStateChanged;
+            var eventHandler = _viewedStateChangedHandler.ThreadEventHandler;
             if (eventHandler != null)
             {
                 eventHandler(null, new ViewedStateChangedEventArgs(attribute, dataIsViewed));
@@ -3352,7 +3501,7 @@ namespace Extract.DataEntry
         /// attribute's value is now valid.</param>
         static void OnValidationStateChanged(IAttribute attribute, DataValidity dataValidity)
         {
-            var eventHandler = AttributeStatusInfo.ValidationStateChanged;
+            var eventHandler = _validationStateChangedHandler.ThreadEventHandler;
             if (eventHandler != null)
             {
                 eventHandler(null, new ValidationStateChangedEventArgs(attribute, dataValidity));
@@ -3370,7 +3519,7 @@ namespace Extract.DataEntry
         static void OnAttributeInitialized(IAttribute attribute,
             IUnknownVector sourceAttributes, IDataEntryControl dataEntryControl)
         {
-            var eventHandler = AttributeStatusInfo.AttributeInitialized;
+            var eventHandler = _attributeInitializedHandler.ThreadEventHandler;
             if (eventHandler != null)
             {
                 eventHandler(null,
@@ -3383,7 +3532,19 @@ namespace Extract.DataEntry
         /// </summary>
         static void OnEditEnded()
         {
-            var eventHandler = AttributeStatusInfo.EditEnded;
+            var eventHandler = _editEndedHandler.ThreadEventHandler;
+            if (eventHandler != null)
+            {
+                eventHandler(null, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="QueryDelayEnded"/> event.
+        /// </summary>
+        static void OnQueryDelayEnded()
+        {
+            var eventHandler = _queryDelayEndedHandler.ThreadEventHandler;
             if (eventHandler != null)
             {
                 eventHandler(null, new EventArgs());
@@ -3629,18 +3790,6 @@ namespace Extract.DataEntry
             if (eventHandler != null)
             {
                 eventHandler(this, new AttributeDeletedEventArgs(attribute));
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="QueryDelayEnded"/> event.
-        /// </summary>
-        static void OnQueryDelayEnded()
-        {
-            var eventHandler = QueryDelayEnded;
-            if (eventHandler != null)
-            {
-                eventHandler(null, new EventArgs());
             }
         }
 

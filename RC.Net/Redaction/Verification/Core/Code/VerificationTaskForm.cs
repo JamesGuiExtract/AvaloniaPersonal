@@ -1496,107 +1496,114 @@ namespace Extract.Redaction.Verification
         /// with invalid data; otherwise true <see langword="true"/>.</returns>
         public bool PromptAndSaveIfDirty()
         {
-            // If the PreventSaveOfDirtyData property is set, allow the current operation to proceed
-            // without prompting for or attempting any save of data.
-            if (PreventSaveOfDirtyData)
+            try
             {
-                return true;
-            }
-
-            // [FlexIDSCore:4708]
-            // If in stand-alone mode, there are different prompts that need to be displayed.
-            if (_standAloneMode)
-            {
-                return PromptAndSaveStandAlone();
-            }
-
-            // Check if the viewed document is dirty
-            if (_redactionGridView.Dirty)
-            {
-                // Stop the slideshow until we get the user's response.
-                bool slideshowRunning = _slideshowRunning;
-                if (_slideshowRunning)
+                // If the PreventSaveOfDirtyData property is set, allow the current operation to proceed
+                // without prompting for or attempting any save of data.
+                if (PreventSaveOfDirtyData)
                 {
-                    StopSlideshow(false);
+                    return true;
                 }
 
-                using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                // [FlexIDSCore:4708]
+                // If in stand-alone mode, there are different prompts that need to be displayed.
+                if (_standAloneMode)
                 {
-                    messageBox.Caption = "Save changes?";
-                    messageBox.Text = "Changes made to this document have not been saved." +
-                                      Environment.NewLine + Environment.NewLine +
-                                      "Would you like to save them now?";
+                    return PromptAndSaveStandAlone();
+                }
 
-                    messageBox.AddButton("Save changes", "Save", false);
-                    messageBox.AddButton("Discard changes", "Discard", false);
-
-                    if (!PreventCloseCancel)
+                // Check if the viewed document is dirty
+                if (_redactionGridView.Dirty)
+                {
+                    // Stop the slideshow until we get the user's response.
+                    bool slideshowRunning = _slideshowRunning;
+                    if (_slideshowRunning)
                     {
-                        messageBox.AddButton("Cancel", "Cancel", true);
+                        StopSlideshow(false);
                     }
 
-                    string result = messageBox.Show(this);
-                    if (result == "Cancel")
+                    using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
                     {
-                        if (slideshowRunning)
+                        messageBox.Caption = "Save changes?";
+                        messageBox.Text = "Changes made to this document have not been saved." +
+                                          Environment.NewLine + Environment.NewLine +
+                                          "Would you like to save them now?";
+
+                        messageBox.AddButton("Save changes", "Save", false);
+                        messageBox.AddButton("Discard changes", "Discard", false);
+
+                        if (!PreventCloseCancel)
                         {
-                            // Display the Slideshow Stopped message
-                            StopSlideshow(true);
+                            messageBox.AddButton("Cancel", "Cancel", true);
                         }
 
-                        return false;
-                    }
-                    else if (result == "Save")
-                    {
-                        if (IsInHistory)
+                        string result = messageBox.Show(this);
+                        if (result == "Cancel")
                         {
-                            // Prompt for invalid data only if in the history queue [FIDSC #3863]
-                            if (WarnIfInvalid())
+                            if (slideshowRunning)
                             {
-                                return false;
+                                // Display the Slideshow Stopped message
+                                StopSlideshow(true);
                             }
 
-                            Commit();
-
-                            // We're done.
-                            return true;
+                            return false;
                         }
-                        else
+                        else if (result == "Save")
                         {
-                            CommitComment();
-                        }
+                            if (IsInHistory)
+                            {
+                                // Prompt for invalid data only if in the history queue [FIDSC #3863]
+                                if (WarnIfInvalid())
+                                {
+                                    return false;
+                                }
 
-                        if (slideshowRunning)
-                        {
-                            // Resume the slideshow
-                            StartSlideshow();
+                                Commit();
+
+                                // We're done.
+                                return true;
+                            }
+                            else
+                            {
+                                CommitComment();
+                            }
+
+                            if (slideshowRunning)
+                            {
+                                // Resume the slideshow
+                                StartSlideshow();
+                            }
                         }
-                    }
-                    else if (result == "Discard")
-                    {
-                        // If discarding changes, revert to last saved data.
-                        LoadCurrentMemento();
+                        else if (result == "Discard")
+                        {
+                            // If discarding changes, revert to last saved data.
+                            LoadCurrentMemento();
+                        }
                     }
                 }
+                else
+                {
+                    UpdateMemento();
+                }
+
+                // Even if the user chooses not to save changes or there have been no changes,
+                // per discussion with Arvind, metadata (a verification session node) should still
+                // be saved.
+                if (_imageViewer.IsImageAvailable)
+                {
+                    TimeInterval screenTime = StopScreenTimeTimer();
+                    Save(screenTime, false);
+
+                    // Always update the IDShieldData table here (if applicable).
+                    SaveRedactionCounts();
+                }
+
+                return true;
             }
-            else
+            catch (Exception ex)
             {
-                UpdateMemento();
+                throw ex.AsExtract("ELI38406");
             }
-
-            // Even if the user chooses not to save changes or there have been no changes,
-            // per discussion with Arvind, metadata (a verification session node) should still be
-            // saved.
-            if (_imageViewer.IsImageAvailable)
-            {
-                TimeInterval screenTime = StopScreenTimeTimer();
-                Save(screenTime, false);
-
-                // Always update the IDShieldData table here (if applicable).
-                SaveRedactionCounts();
-            }
-
-            return true;
         }
 
         /// <summary>
