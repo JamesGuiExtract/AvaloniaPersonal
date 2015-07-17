@@ -204,7 +204,9 @@
             this.Controls.Add(this._treatWarningsAsErrorCheckBox);
             this.Controls.Add(label1);
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(1000, 263);
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(375, 263);
             this.Name = "ValidateXmlTaskSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

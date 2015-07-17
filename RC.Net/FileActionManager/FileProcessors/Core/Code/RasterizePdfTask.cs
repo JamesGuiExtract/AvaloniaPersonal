@@ -157,7 +157,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Indicates whether the color depth of the input document should be preserved in the
         /// output. Otherwise the output will be a bitonal tif.
         /// </summary>
-        bool _preserveColorDepth = false;
+        bool _preserveColorDepth = true;
 
         /// <summary>
         /// Indicates that settings have been changed, but not saved.
@@ -777,10 +777,17 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         _useAlternateMethod = reader.ReadBoolean();
                     }
-                   
+
                     if (reader.Version >= 4)
                     {
                         _preserveColorDepth = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        // https://extract.atlassian.net/browse/ISSUE-12795
+                        // The default is now true, but to ensure we are not modifying behavior of
+                        // existing workflows, set to false for a legacy version.
+                        _preserveColorDepth = false;
                     }
                 }
 
