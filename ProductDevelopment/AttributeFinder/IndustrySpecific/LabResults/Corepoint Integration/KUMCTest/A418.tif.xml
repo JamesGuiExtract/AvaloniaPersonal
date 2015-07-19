@@ -115,18 +115,6 @@
 				<FullText/>
 			</Comment>
 		</Component>
-		<LabInfo>
-			<FullText/>
-			<LabDisplay>
-				<FullText>Lab Corp, 713 Omaha  Street Rapid City</FullText>
-			</LabDisplay>
-			<LabCode>
-				<FullText>ES_0486</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>Lab Corp</FullText>
-			</LabIdentifier>
-		</LabInfo>
 	</Test>
 	<Test>
 		<FullText/>
@@ -265,20 +253,5 @@
 				<FullText/>
 			</Comment>
 		</Component>
-		<LabInfo>
-			<FullText/>
-			<LabDisplay>
-				<FullText>Lab Corp, 713 Omaha  Street Rapid City</FullText>
-			</LabDisplay>
-			<LabCode>
-				<FullText>ES_0486</FullText>
-			</LabCode>
-			<LabIdentifier>
-				<FullText>Lab Corp</FullText>
-			</LabIdentifier>
-		</LabInfo>
 	</Test>
-	<LabInfo>
-		<FullText/>
-	</LabInfo>
 </FlexData>

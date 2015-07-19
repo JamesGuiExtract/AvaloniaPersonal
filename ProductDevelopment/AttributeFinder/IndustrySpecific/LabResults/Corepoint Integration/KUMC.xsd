@@ -295,11 +295,9 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element ref="LabInfo" />
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element ref="LabInfo" minOccurs="0" />
 				<xs:element name="ResultDate" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
@@ -343,42 +341,6 @@
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="ZipCode">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="LabInfo">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="FullText" minOccurs="1" type="xs:string" />
-				<xs:element ref="Address" minOccurs="0" />
-				<xs:element name="Name" minOccurs="0" maxOccurs="unbounded">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="LabDisplay" minOccurs="0">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="LabCode" minOccurs="0">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="LabIdentifier" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" type="xs:string" />
