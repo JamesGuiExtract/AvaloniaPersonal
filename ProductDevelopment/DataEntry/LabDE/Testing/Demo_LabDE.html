@@ -236,12 +236,64 @@
 		</ul>
     	</UL></li>
 <p>
+    	<LI><h2>Enable Logging</h2>
+    	<UL>
+		<li>Confirm that the test machine includes a utility license for 
+		<b>Data Entry Verification Logging</b>.
+       		<li>Prepare files for verification.
+		<li>Modify the <b>.CONFIG</b> file to include the following text within the 
+		<b>Extract.DataEntry.Utilities.DataEntryApplication.Properties.Settings</b> section.
+       		<ul>
+			<li>&lt;setting name="EnableLogging" serializeAs="String"&gt;
+			<li>&nbsp;&nbsp;&lt;value&gt;True&lt;/value&gt;
+			<li>&lt;/setting&gt;
+            	</ul></li>
+		<li>Run the <b>I:\users\Steve_Kurth\Public\Utilities\DbgView.exe</b> utility that 
+		will capture and display real-time logging results.
+		<li>Verify an image. Swipe some text, exercise Undo and Redo functionality, and delete 
+		an attribute.
+		<li>Confirm that <b>DbgView</b> displays trace information as:
+		<ul>
+			<li>Category [control name] (attribute name): Trace text...
+		</ul>
+		<li>Confirm that the following <b>Category</b> information is presented by default.
+		<ul>
+			<li>AutoUpdateResult
+			<li>DataLoad
+			<li>DataSave
+			<li>AttributeInitialized
+			<li>AttributeUpdated
+			<li>AttributeDeleted
+			<li>SwipedText
+			<li>TooltipNotification
+			<ul>
+				<li>Swipe empty text into an Order or Test field
+			</ul>
+			<li>Undo
+			<li>Redo
+			<li>Focus
+			<li>InputEvent
+			<li>FormattingRuleResult
+		</ul>
+		<li>Exercise filtering with the following syntax. Note that <b>*</b> is replaced 
+		by a comma-delimited list of categories.
+		<ul>
+			<li>&lt;setting name="LogFilter" serializeAs="String"&gt;
+			<li>&nbsp;&nbsp;&lt;value&gt;*&lt;/value&gt;
+			<li>&lt;/setting&gt;
+		</ul>
+		<li>Confirm that the following categories can also be logged - via filtering.
+		<ul>
+			<li>AutoUpdateQuery
+			<li>ValidationQuery
+			<li>ValidationResult
+		</ul>
+    	</UL></li>
+<p>
     	<LI><h2>Miscellaneous</h2>
     	<UL>
-       		<li><b>[DataEntry #1024]</b> TBD
-       		<ul>
-              		<li>TBD
-            	</ul></li>
+  	   	<LI><b>[ISSUE-13135]</b> Confirm that a meaningful exception is displayed and 
+		that verification halts if logging is enabled but not licensed.
     	</UL></li>
 </OL>
 </BODY>
