@@ -126,7 +126,7 @@ namespace Extract.DataEntry
         /// The <see cref="WindowsMessage"/> IDs that should be logged for LogCategories.InputEvent
         /// if that event is enabled.
         /// </summary>
-        HashSet<int> _intputEventsToTrack;
+        HashSet<int> _inputEventsToTrack;
 
         /// <summary>
         /// The default buffer size to use store logged input when <see cref="LogToMemory"/> is
@@ -237,8 +237,7 @@ namespace Extract.DataEntry
                 {
                     var ee = new ExtractException("ELI38347",
                         "A data entry verification logging license is required.");
-                    ee.Log();
-                    return;
+                    throw ee;
                 }
 
                 _logToMemory = logToMemory;
@@ -246,11 +245,11 @@ namespace Extract.DataEntry
 
                 if (eventsToTrack == null)
                 {
-                    _intputEventsToTrack = new HashSet<int>();
+                    _inputEventsToTrack = new HashSet<int>();
                 }
                 else
                 {
-                    _intputEventsToTrack = new HashSet<int>(eventsToTrack);
+                    _inputEventsToTrack = new HashSet<int>(eventsToTrack);
                 }
             }
             catch (Exception ex)
@@ -446,7 +445,7 @@ namespace Extract.DataEntry
             try
             {
                 // Only check the message if event tracking is on
-                if (_intputEventsToTrack.Contains(message.Msg))
+                if (_inputEventsToTrack.Contains(message.Msg))
                 {
                     string line = ((WindowsMessage.Codes)message.Msg).ToString();
 
@@ -472,7 +471,6 @@ namespace Extract.DataEntry
                             }
                             break;
                     }
-
 
                     LogLine("InputEvent", line);
                 }
