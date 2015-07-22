@@ -1,0 +1,9 @@
+<ExtractReportParameterData Version="2">
+	<ReportParameters>
+		<DateRangeParameter Name="ReportingPeriod" Default="" />
+		<ValueListParameter Name="QAAction" Query="SELECT ASCName FROM Action" Default=""/>
+		<ValueListParameter Name="TagName1" Query="SELECT TagName FROM Tag" Default=""/>
+		<ValueListParameter Name="TagName2" Query="SELECT TagName FROM Tag UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
+		<ValueListParameter Name="TagName3" Query="SELECT TagName FROM Tag UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
+	</ReportParameters>
+</ExtractReportParameterData>
