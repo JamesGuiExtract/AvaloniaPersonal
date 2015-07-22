@@ -77,11 +77,11 @@
             // 
             this._schemaFileNamePathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._schemaFileNamePathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_schemaFileNamePathTagButton.Image")));
-            this._schemaFileNamePathTagButton.Location = new System.Drawing.Point(417, 143);
+            this._schemaFileNamePathTagButton.Location = new System.Drawing.Point(385, 143);
             this._schemaFileNamePathTagButton.Name = "_schemaFileNamePathTagButton";
             this._schemaFileNamePathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._schemaFileNamePathTagButton.Size = new System.Drawing.Size(18, 21);
-            this._schemaFileNamePathTagButton.TabIndex = 9;
+            this._schemaFileNamePathTagButton.TabIndex = 8;
             this._schemaFileNamePathTagButton.TextControl = this._schemaFilenameTextBox;
             this._schemaFileNamePathTagButton.UseVisualStyleBackColor = true;
             // 
@@ -89,10 +89,10 @@
             // 
             this._schemaFileNameBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._schemaFileNameBrowseButton.FileFilter = "XSD Files (*.xsd)|*.xsd|All files (*.*)|*.*";
-            this._schemaFileNameBrowseButton.Location = new System.Drawing.Point(385, 143);
+            this._schemaFileNameBrowseButton.Location = new System.Drawing.Point(409, 143);
             this._schemaFileNameBrowseButton.Name = "_schemaFileNameBrowseButton";
             this._schemaFileNameBrowseButton.Size = new System.Drawing.Size(26, 21);
-            this._schemaFileNameBrowseButton.TabIndex = 8;
+            this._schemaFileNameBrowseButton.TabIndex = 9;
             this._schemaFileNameBrowseButton.Text = "...";
             this._schemaFileNameBrowseButton.TextControl = this._schemaFilenameTextBox;
             this._schemaFileNameBrowseButton.UseVisualStyleBackColor = true;
@@ -211,7 +211,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Core: Validate XML";
+            this.Text = "Core: Validate XML settings";
             this.ResumeLayout(false);
             this.PerformLayout();
 
