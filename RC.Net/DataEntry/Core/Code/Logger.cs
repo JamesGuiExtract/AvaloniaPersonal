@@ -154,7 +154,7 @@ namespace Extract.DataEntry
         /// <param name="logCategories">A comma-delimited list representing the
         /// <see cref="LogCategories"/> to be logged or "*" to log all categories.</param>
         /// <param name="inputEventsToTrack">A comma-delimited list representing the
-        /// <see cref="WindowsMessage.Codes"/> that should be recorded when LogCategories.InputEvent
+        /// <see cref="WindowsMessageCode"/> that should be recorded when LogCategories.InputEvent
         /// is enabled or "*" to log all <see cref="WindowsMessage"/> codes.</param>
         /// <param name="controls">The <see cref="Control"/>(s) for which InputEvents is to be
         /// tracked.</param>
@@ -189,7 +189,7 @@ namespace Extract.DataEntry
                 {
                     if (inputEventsToTrack.Trim() == "*")
                     {
-                        inputFilter = Enum.GetValues(typeof(WindowsMessage.Codes)).Cast<int>();
+                        inputFilter = Enum.GetValues(typeof(WindowsMessageCode)).Cast<int>();
                     }
                     else
                     {
@@ -197,7 +197,7 @@ namespace Extract.DataEntry
                             .Split(',', ';')
                             .Where(eventName => !string.IsNullOrWhiteSpace(eventName))
                             .Select(eventName =>
-                                (int)Enum.Parse(typeof(WindowsMessage.Codes), eventName.Trim()));
+                                (int)Enum.Parse(typeof(WindowsMessageCode), eventName.Trim()));
                     }
                 }
 
@@ -220,7 +220,7 @@ namespace Extract.DataEntry
         /// <param name="logCategories">A <see cref="LogCategories"/> value representing the event
         /// categories to be logged.</param>
         /// <param name="eventsToTrack">An <see cref="int"/> <see cref="IEnumerable{T}"/> of
-        /// the <see cref="T:WindowsMessage.Codes"/> that should be recorded when
+        /// the <see cref="T:WindowsMessageCode"/> that should be recorded when
         /// LogCategories.InputEvent is enabled.</param>
         /// <param name="controls">The <see cref="Control"/>(s) for which InputEvents is to be
         /// tracked.</param>
@@ -447,7 +447,7 @@ namespace Extract.DataEntry
                 // Only check the message if event tracking is on
                 if (_inputEventsToTrack.Contains(message.Msg))
                 {
-                    string line = ((WindowsMessage.Codes)message.Msg).ToString();
+                    string line = ((WindowsMessageCode)message.Msg).ToString();
 
                     switch (message.Msg)
                     {

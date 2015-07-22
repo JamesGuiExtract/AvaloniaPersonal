@@ -2,7 +2,6 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -81,28 +80,16 @@ namespace Extract.DataEntry
         [ThreadStatic]
         static bool _executingPendingTriggers;
 
+        /// <summary>
+        /// Indicates whether ThreadStatic fields and event handlers have been initialized on
+        /// the current thread.
+        /// </summary>
+        [ThreadStatic]
+        static bool _staticsInitialized;
+
         #endregion Fields
 
         #region Constructors
-
-        /// <summary>
-        /// Provides static initialization for the <see cref="AutoUpdateTrigger"/> class.
-        /// </summary>
-        // FXCop believes static members are being initialized here.
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
-        static AutoUpdateTrigger()
-        {
-            try
-            {
-                AttributeStatusInfo.EditEnded += HandleAttributeStatusInfo_EditEnded;
-                AttributeStatusInfo.UndoManager.OperationEnded += HandleUndoManager_OperationEnded;
-                AttributeStatusInfo.QueryDelayEnded += HandleQueryDelayEnded;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI36173");
-            }
-        }
 
         /// <summary>
         /// Initializes a new <see cref="AutoUpdateTrigger"/> instance.
@@ -127,13 +114,11 @@ namespace Extract.DataEntry
                 ExtractException.Assert("ELI26112", "Null argument exception!", query != null);
 
                 // [DataEntry:1292]
-                // Since _queriesPendingUpdate is ThreadStatic, it needs to be constructed as needed
-                // in every thread rather than with a default constructor (otherwise it will be null
-                // in subsequent verification sessions.
-                if (_queriesPendingUpdate == null)
-                {
-                    _queriesPendingUpdate = new List<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
-                }
+                // https://extract.atlassian.net/browse/ISSUE-13149
+                // ThreadStatic fields need to be constructed in every thread rather than with a
+                // default constructor (otherwise they will be null in subsequent verification
+                // sessions).
+                InitializeStatics();
 
                 // Initialize the fields.
                 _targetAttribute = targetAttribute;
@@ -443,6 +428,23 @@ namespace Extract.DataEntry
         #region Private Members
 
         /// <summary>
+        /// Ensures all ThreadStatic fields and event handlers are initialized.
+        /// </summary>
+        static void InitializeStatics()
+        {
+            if (!_staticsInitialized)
+            {
+                AttributeStatusInfo.EditEnded += HandleAttributeStatusInfo_EditEnded;
+                AttributeStatusInfo.UndoManager.OperationEnded += HandleUndoManager_OperationEnded;
+                AttributeStatusInfo.QueryDelayEnded += HandleQueryDelayEnded;
+
+                _queriesPendingUpdate = new List<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
+
+                _staticsInitialized = true;
+            }
+        }
+
+        /// <summary>
         /// Attempts to update the target <see cref="IAttribute"/> using the result of the
         /// evaluated query.
         /// </summary>
@@ -713,13 +715,11 @@ namespace Extract.DataEntry
                 _executingPendingTriggers = true;
 
                 // [DataEntry:1292]
-                // Since _queriesPendingUpdate is ThreadStatic, it needs to be constructed as needed
-                // in every thread rather than with a default constructor (otherwise it will be null
-                // in subsequent verification sessions.
-                if (_queriesPendingUpdate == null)
-                {
-                    _queriesPendingUpdate = new List<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
-                }
+                // https://extract.atlassian.net/browse/ISSUE-13149
+                // ThreadStatic fields need to be constructed in every thread rather than with a
+                // default constructor (otherwise they will be null in subsequent verification
+                // sessions).
+                InitializeStatics();
 
                 while (_queriesPendingUpdate.Count > 0)
                 {

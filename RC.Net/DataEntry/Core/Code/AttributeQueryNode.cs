@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using System.Xml;
 using UCLID_AFCORELib;
 
@@ -65,18 +63,16 @@ namespace Extract.DataEntry
             /// </summary>
             AttributeQueryNode _queryNode;
 
+            /// <summary>
+            /// Indicates whether ThreadStatic fields and event handlers have been initialized on
+            /// the current thread.
+            /// </summary>
+            [ThreadStatic]
+            static bool _staticsInitialized;
+
             #endregion Fields
 
-            #region Construstors
-
-            /// <summary>
-            /// Initializes the <see cref="AttributeReferenceManager"/> class.
-            /// </summary>
-            [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
-            static AttributeReferenceManager()
-            {
-                AttributeStatusInfo.AttributeInitialized += HandleAttributeInitialized;
-            }
+            #region Constructors
 
             /// <summary>
             /// Initializes a new instance of the <see cref="AttributeReferenceManager"/> class.
@@ -189,7 +185,7 @@ namespace Extract.DataEntry
                             }
                         }
 
-                        // Find all existing attributes matching the refernce path relative to this
+                        // Find all existing attributes matching the reference path relative to this
                         // root attribute.
                         foreach (IAttribute attribute in
                             AttributeStatusInfo.ResolveAttributeQuery((rootAttribute == _ROOT_ATTRIBUTE)
@@ -351,15 +347,19 @@ namespace Extract.DataEntry
             #region Private Members
 
             /// <summary>
-            /// Ensures all ThreadStatic variables are initialized.
+            /// Ensures all ThreadStatic fields and event handlers are initialized.
             /// </summary>
             static void InitializeStatics()
             {
-                if (_descendantQueryReferences == null)
+                if (!_staticsInitialized)
                 {
                     _descendantQueryReferences =
                         new Dictionary<IAttribute, AttributeReferenceManager>();
                     _ROOT_ATTRIBUTE = new UCLID_AFCORELib.Attribute();
+
+                    AttributeStatusInfo.AttributeInitialized += HandleAttributeInitialized;
+
+                    _staticsInitialized = true;
                 }
             }
 
@@ -384,7 +384,7 @@ namespace Extract.DataEntry
                         yield return _queryNode.RootAttribute;
                     }
                 }
-                // If there is an an attribute result that specifies the root attribute(s), evaluate
+                // If there is an attribute result that specifies the root attribute(s), evaluate
                 // it to obtain the root attribute(s).
                 else
                 {
@@ -743,7 +743,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Informs the node that it's parent has completed evaluation. This may be needed to keep
-        /// track of all the different results of <see cref="Evaluate"/> that have occured in the
+        /// track of all the different results of <see cref="Evaluate"/> that have occurred in the
         /// course of evaluation the parent. These evaluations may have produced different results
         /// based on a sibling node with a Distinct selection mode.
         /// </summary>
@@ -823,7 +823,7 @@ namespace Extract.DataEntry
         /// <param name="attribute">The <see cref="IAttribute"/> to unregister.
         /// </param>
         /// <param name="unregisterAsTrigger"><see langword="true"/> to prevent this attribute from
-        /// triggering this node to be re-evaluatied, <see langword="false"/> to continue to update
+        /// triggering this node to be re-evaluated, <see langword="false"/> to continue to update
         /// this node in response to updates of this <see paramref="attribute"/>.</param>
         void UnregisterAttribute(IAttribute attribute, bool unregisterAsTrigger)
         {

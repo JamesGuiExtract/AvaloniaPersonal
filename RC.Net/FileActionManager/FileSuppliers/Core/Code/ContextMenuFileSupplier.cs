@@ -1201,7 +1201,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Extract.Utilities.ShellExtensions.dll are registered.
         /// </summary>
         /// <returns></returns>
-        bool areShellExtentionsRegistered()
+        static bool areShellExtentionsRegistered()
         {
 			// The keys that need to exist if Extract.Utilities.ShellExtensions.dll an d
             // LogicNP.EZShellExtensions.dll are registered - there are other keys but one is

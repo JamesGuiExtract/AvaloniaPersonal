@@ -1,6 +1,7 @@
 ﻿using Extract.Licensing;
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Extract.Utilities
@@ -13,6 +14,7 @@ namespace Extract.Utilities
     /// specific <see cref="T:EventHandler&lt;T&gt;.TargetObject"/>
     /// </summary>
     /// <typeparam name="T">The type of <see cref="EventArgs"/> the events use.</typeparam>
+    [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
     public class ThreadSpecificEventHandler<T> where T : EventArgs
     {
         #region Constants

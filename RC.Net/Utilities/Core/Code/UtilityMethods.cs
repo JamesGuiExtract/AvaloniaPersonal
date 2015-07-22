@@ -434,9 +434,9 @@ namespace Extract.Utilities
         /// <summary>
         /// Executes the given action with try catch block that logs any exceptions
         /// </summary>
-        /// <param name="strELI">ELI code for the logged exception</param>
+        /// <param name="eliCode">ELI code for the logged exception</param>
         /// <param name="action">The action that should be ran</param>
-        public static void PerformWithExceptionLog(string strELI, Action action)
+        public static void PerformWithExceptionLog(string eliCode, Action action)
         {
             try
             {
@@ -444,7 +444,7 @@ namespace Extract.Utilities
             }
             catch (Exception ex)
             {
-                ex.ExtractLog(strELI);
+                ex.ExtractLog(eliCode);
             }
         }
     }
