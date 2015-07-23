@@ -28,8 +28,8 @@
 			<li>I:\Common\Engineering\ProductReleases\FlexIndex\External\Current
 			<li>M:\ProductReleases\FlexIndex\Internal\BleedingEdge
 		</ul>
-		<li>Select an appropriate version number and navigate to the <b>FlexIndexInstall</b> 
-		folder.
+		<li>Select an appropriate version number and navigate to the 
+		<b>FlexIndex\SetupFiles\FlexIndexInstall</b> folder.
 		<li>Double-click on <b>Launch.exe</b>.
 		<li>Find and install <b>Microsoft .NET 3.5 and 4.0</b>.
 		<ul>
@@ -43,6 +43,8 @@
 			<li>SQL Server 2008 R2 and the associated Management Studio can be found 
 			in any pre-10.0 software release. SQL 2008 R2 is compatible with later 
 			releases of Extract Systems software.
+			<li>Copy the two SQL folders to the desktop because the path is too long 
+			for successful installation using a network path.
 		</ul>
 		<li>Install <b>FLEX Index</b>.
 		<li>Back up to the <b>ProductReleases</b> folder and change to ID Shield.
@@ -135,6 +137,7 @@
 	<h2>Database Administration (DB Admin)</h2>
 	<ul>
 		<li>Exercise <b>DB Admin</b> for one of the demo databases noted above.
+		<li>The password is <b>a</b>.
 		<li>Review the various menu items and the Summary tab.
 		<li>Exercise the <b>Manage Actions</b> dialog and add a new TEST action that 
 		you can use for other experimentation. Note that clearing the database via 
@@ -147,8 +150,8 @@
 	<ul>
 		<li>Use <b>Tools - File Action Manager</b> from DB Admin to open a new FAM 
 		instance to use for testing.
-		<li>On the <b>Action</b> tab, select the new action that was created in the 
-		Manage Actions dialog.
+		<li>On the <b>Action</b> tab in the FAM, select the new action that was created in 
+		the Manage Actions dialog.
 		<li>Check the <b>Queue files</b> checkbox to allow adding files to be processed.
 		<li>Click the <b>Add...</b> button on the <b>Queue Setup</b> tab.
 		<li>Select <b>Files from folder</b>.
@@ -181,6 +184,20 @@
 			<li>Confirm that <b>Mathematical condition</b> can be used to randomly 
 			queue files from a list.
 		</ul>
+	</ul>
+<p>
+	<h2>Rule Development Toolkit (RDT)</h2>
+	<ul>
+		<li><b>FLEX Index</b> or <b>ID Shield</b> must be installed before RDT.
+		<li>Start from one of the following installation folders. Note that version 
+		numbers change with each release.
+		<ul>
+			<li>M:\ProductReleases_InternalUseOnly\FlexIndex\External\Current
+			<li>M:\ProductReleases_InternalUseOnly\FlexIndex\Internal\BleedingEdge
+		</ul>
+		<li>Select an appropriate version number and navigate to the 
+		<b>RDT</b> folder.
+		<li>Double-click on <b>Setup.exe</b>.
 	</ul>
 </body>
 </html>
