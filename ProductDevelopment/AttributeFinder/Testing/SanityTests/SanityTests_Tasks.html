@@ -51,7 +51,7 @@
 			<li>Confirm that files can be restored.
 		</ul>
 <p>
-		<li><b>Core: Clean up image</b>
+		<li><b>Core: Clean up image</b> - requires USB dongle
 		<ul>
 			<li>Confirm that the configuration dialog can be displayed and that 
 			settings are persistent.
@@ -179,6 +179,8 @@
 			PDF image.
 			<li>Confirm that hyperlinks can be added to the specified PDF 
 			image.
+			<li>Confirm that highlights can be added to the specified PDF 
+			image.
 		</ul>
 <p>
 		<li><b>Core: Modify source document name in database</b>
@@ -250,6 +252,14 @@
 			</ul>
 		</ul>
 <p>
+		<li><b>Core: Validate XML</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that 
+			settings are persistent.
+			<li>Confirm that XML can be validated against a hard-coded XSD file.
+			<li>Confirm that XML syntax can be validated without XSD.
+		</ul>
+<p>
 		<li><b>Core: View image</b>
 		<ul>
 			<li>Confirm that no settings are available.
@@ -300,6 +310,11 @@
 			<li>Confirm that the configuration dialog can be displayed and that 
 			settings are persistent.
 			<li>Confirm that surrounding context can be redacted.
+			<ul>
+				<li>This task operates on an existing VOA file.
+				<li>Results can be viewed by subsequently running the 
+				<b>Redaction: Create redacted image</b> task.
+			</ul>
 			<li>Confirm that redaction height can be adjusted to further obscure 
 			context.
 		</ul>
