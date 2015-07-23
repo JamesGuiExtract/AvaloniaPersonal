@@ -59,3 +59,12 @@
 
 //test17 "Type" is selected. There are three entries.
 <TESTCASE>;Test17.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test17.eav
+
+//test18 Test duplicate patterns from dat file
+<TESTCASE>;Test18.rsd;Test18through20.txt;;Test18and19.eav
+
+//test19 Test hard-coded duplicate patterns
+<TESTCASE>;Test19.rsd;Test18through20.txt;;Test18and19.eav
+
+//test20 Test duplicate patterns against type field
+<TESTCASE>;Test20.rsd;Test18through20.txt;;Test20.eav

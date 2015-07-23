@@ -65,3 +65,9 @@
 
 // Attribute Referencing test case
 <TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
+
+//test21 Test whether duplicate patterns in dat file work
+<TESTCASE>;Test21.rsd;Test21and22.txt;;Test21and22.eav
+
+//test22 Test whether duplicate hard-coded patterns work
+<TESTCASE>;Test22.rsd;Test21and22.txt;;Test21and22.eav

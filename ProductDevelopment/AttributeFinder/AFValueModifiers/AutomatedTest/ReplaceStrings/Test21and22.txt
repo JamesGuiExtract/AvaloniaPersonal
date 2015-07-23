@@ -1,0 +1,4 @@
+Some text
+and remove this phrase
+some more
+text
