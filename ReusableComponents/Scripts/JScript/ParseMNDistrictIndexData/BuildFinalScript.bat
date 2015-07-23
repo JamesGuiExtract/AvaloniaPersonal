@@ -14,5 +14,9 @@
 ::
 :: The master.js file is named after the batch file's parent dir
 
+PUSHD %~dp0
+
 for /f "delims=\" %%a in ("%~dp0") do set name=%%~nxa.js
 copy "main.js" + "%~dp0..\Common\ScriptWrapper.js" "..\%name%" /B /Y
+
+POPD
