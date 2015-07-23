@@ -3295,7 +3295,8 @@ namespace Extract.DataEntry
         /// Raised whenever ResetData is called.
         /// <para><b>Note</b></para>
         /// The static members of this class are ThreadStatic. Event handlers will only be invoked
-        /// on the thread on which they were added.
+        /// on the thread on which they were added. Ensure that the event is registered on all
+        /// threads that need to handle it.
         /// </summary>
         public static event EventHandler<EventArgs> DataReset
         {
@@ -3315,7 +3316,8 @@ namespace Extract.DataEntry
         /// <see cref="IDataEntryControl"/>.
         /// <para><b>Note</b></para>
         /// The static members of this class are ThreadStatic. Event handlers will only be invoked
-        /// on the thread on which they were added.
+        /// on the thread on which they were added. Ensure that the event is registered on all
+        /// threads that need to handle it.
         /// </summary>
         public static event EventHandler<AttributeInitializedEventArgs> AttributeInitialized
         {
@@ -3335,7 +3337,8 @@ namespace Extract.DataEntry
         /// as unviewed has now been marked as viewed (or vice-versa).
         /// <para><b>Note</b></para>
         /// The static members of this class are ThreadStatic. Event handlers will only be invoked
-        /// on the thread on which they were added.
+        /// on the thread on which they were added. Ensure that the event is registered on all
+        /// threads that need to handle it.
         /// </summary>
         public static event EventHandler<ViewedStateChangedEventArgs> ViewedStateChanged
         {
@@ -3355,7 +3358,8 @@ namespace Extract.DataEntry
         /// as having invalid data has now been marked as valid (or vice-versa).
         /// <para><b>Note</b></para>
         /// The static members of this class are ThreadStatic. Event handlers will only be invoked
-        /// on the thread on which they were added.
+        /// on the thread on which they were added. Ensure that the event is registered on all
+        /// threads that need to handle it.
         /// </summary>
         public static event EventHandler<ValidationStateChangedEventArgs> ValidationStateChanged
         {
@@ -3374,7 +3378,8 @@ namespace Extract.DataEntry
         /// Raised at the end of an <see cref="EndEdit"/> call.
         /// <para><b>Note</b></para>
         /// The static members of this class are ThreadStatic. Event handlers will only be invoked
-        /// on the thread on which they were added.
+        /// on the thread on which they were added. Ensure that the event is registered on all
+        /// threads that need to handle it.
         /// </summary>
         public static event EventHandler<EventArgs> EditEnded
         {
@@ -3394,7 +3399,8 @@ namespace Extract.DataEntry
         /// been removed.
         /// <para><b>Note</b></para>
         /// The static members of this class are ThreadStatic. Event handlers will only be invoked
-        /// on the thread on which they were added.
+        /// on the thread on which they were added. Ensure that the event is registered on all
+        /// threads that need to handle it.
         /// </summary>
         public static event EventHandler<EventArgs> QueryDelayEnded
         {

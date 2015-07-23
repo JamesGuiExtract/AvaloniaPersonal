@@ -34,6 +34,19 @@ namespace Extract.Utilities
         ConcurrentDictionary<int, EventHandler<T>> _eventHandlers =
             new ConcurrentDictionary<int, EventHandler<T>>();
 
+        /// <summary>
+        /// An ID for the current thread. This ID is specific to this class and is used in place of
+        /// of the windows or .Net thread ID because it can't be re-used in future threads the way
+        /// the windows or .Net thread ID can.
+        /// </summary>
+        [ThreadStatic]
+        static int _currentThreadID;
+
+        /// <summary>
+        /// The ID used for the last thread's _currentThreadID.
+        /// </summary>
+        static int _lastThreadID;
+
         #endregion Fields
 
         #region Constructors
@@ -70,10 +83,8 @@ namespace Extract.Utilities
             {
                 try
                 {
-                    int threadId = Thread.CurrentThread.ManagedThreadId;
-
                     EventHandler<T> existingEventHandler = null;
-                    _eventHandlers.TryGetValue(threadId, out existingEventHandler);
+                    _eventHandlers.TryGetValue(CurrentThreadID, out existingEventHandler);
 
                     return existingEventHandler;
                 }
@@ -96,10 +107,8 @@ namespace Extract.Utilities
         {
             try
             {
-                int threadId = Thread.CurrentThread.ManagedThreadId;
-
                 EventHandler<T> existingEventHandler;
-                _eventHandlers.TryGetValue(threadId, out existingEventHandler);
+                _eventHandlers.TryGetValue(CurrentThreadID, out existingEventHandler);
 
                 // It is okay if existingEventHandler does not exist (is null). The concatenation
                 // operator will initialize it.
@@ -107,7 +116,7 @@ namespace Extract.Utilities
 
                 // The += operator creates a new instance rather than updating the original
                 // instance. The dictionary needs to be updated with the new value.
-                _eventHandlers[threadId] = existingEventHandler;
+                _eventHandlers[CurrentThreadID] = existingEventHandler;
             }
             catch (Exception ex)
             {
@@ -124,10 +133,8 @@ namespace Extract.Utilities
         {
             try
             {
-                int threadId = Thread.CurrentThread.ManagedThreadId;
-
                 EventHandler<T> existingEventHandler = null;
-                if (_eventHandlers.TryGetValue(threadId, out existingEventHandler))
+                if (_eventHandlers.TryGetValue(CurrentThreadID, out existingEventHandler))
                 {
                     existingEventHandler -= eventHandler;
                 }
@@ -139,5 +146,26 @@ namespace Extract.Utilities
         }
 
         #endregion Methods
+
+        #region Private Members
+
+        /// <summary>
+        /// Gets and ID for the current thread. This ID is specific to this class and is used in
+        /// place of the windows or .Net thread ID because it won't be re-used.
+        /// </summary>
+        static int CurrentThreadID
+        {
+            get
+            {
+                if (_currentThreadID == 0)
+                {
+                    _currentThreadID = Interlocked.Increment(ref _lastThreadID);
+                }
+
+                return _currentThreadID;
+            }
+        }
+
+        #endregion Private Members
     }
 }
