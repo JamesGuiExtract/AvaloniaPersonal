@@ -1358,22 +1358,29 @@
 		<li>Confirm that the following address option includes an associated edit box.
 		<li>Confirm that the edit box is enabled only when the radio button is 
 		selected.
+		<li>Confirm that the settings dialog for the <b>Core: Modify PDF file</b> task 
+		includes a <b>Highlights</b> group box.
+		<li>Confirm that the group box includes an <b>Add highlights to attributes 
+		with any of the following names (comma delimited)</b> checkbox.
+		<li>Confirm that the associated edit box is enabled only when the checkbox 
+		is checked.
 		<li>Confirm that the group box contains a <b>Data filename</b> edit box.
 		<li>Confirm presence of an associated <b>tag selector</b> button with the 
 		usual options.
 		<li>Confirm presence of an associated <b>...</b> browse button.
 		<li>Confirm that the default filename is <b>&lt;SourceDocName&gt;.voa</b>.
+		<li>Confirm that the settings are persistent.
 <p>
             	<li>Confirm that an informative exception is thrown if the specified PDF 
 		file does not exist.
-		<li>Confirm that the <b>Core: Modify PDF</b> task can do the 
+		<li>Confirm that the <b>Core: Modify PDF file</b> task can do the 
 		following:
 		<ul>
 			<li>Remove existing annotations from a PDF.
 			<li>Add a hyperlink based on attribute value to a PDF.
 			<li>Add a hard-coded hyperlink to a PDF.
-			<li>Remove existing annotations and add a hyperlink to 
-			a PDF.
+			<li>Remove existing annotations and add a hyperlink to a PDF.
+			<li>Add highlights to a PDF according to specified attributes.
 		</ul>
 <p>
             	<li><b>[DotNet #398, #597]</b> Single threading
@@ -1944,6 +1951,35 @@ ORDER BY DateTimeStamp<br>
 				can download documents from the root folder.
 			</ul>
 		</ul></li>
+        </ul></li>
+<p>
+	<li><b>Core: Validate XML</b>
+	<ul>
+		<li>Use the Add button to select <b>Core: Validate XML</b> as the the task.</li>
+		<li>Confirm that the <b>Configure:</b> button is enabled.</li>
+		<li>Confirm that the settings dialog includes an <b>XML filename</b> 
+		edit box.
+		<li>Confirm that the associated tag selector works properly.
+		<li>Confirm that the settings dialog includes a <b>Treat warnings as errors</b> 
+		checkbox.
+		<li>Confirm that the settings dialog includes a <b>Validate against in-line schema 
+		if specified</b> radio button.
+		<li>Confirm that the settings dialog includes an associated <b>Consider XML file 
+		invalid if in-line schema is not specified</b> checkbox.
+		<li>Confirm that the checkbox is only enabled when the radion button is selected.
+		<li>Confirm that the settings dialog includes a <b>Validate against specified 
+		schema</b> radio button.
+		<li>Confirm that the settings dialog includes an associated edit box, tag 
+		selector and browse button.
+		<li>Confirm that the associated controls are only enabled when the radion button 
+		is selected.
+		<li>Confirm that the edit box is updated when the tag selector is used.
+		<li>Confirm that the edit box is updated when the browse button is used.
+		<li>Confirm that the settings dialog includes a <b>Validate XML syntax only, 
+		do not validate schema</b> radio button.
+		<li>Confirm that settings are persistent.
+<p>
+		<li><b>[ISSUE-13129]</b> Confirm that the settings dialog resizes properly.
         </ul></li>
 <p>
 	<li><b>Core: View image</b>
