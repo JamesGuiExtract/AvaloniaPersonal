@@ -99,7 +99,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _schemaFilenameTextBox.Text = Settings.SchemaFileName;
 
                 _validateInlineSchemaRadioButton.CheckedChanged += (o, args) => UpdateUI();
-                _validateInlineSchemaRadioButton.CheckedChanged += (o, args) => UpdateUI();
+                _validateSpecifiedSchemaRadioButton.CheckedChanged += (o, args) => UpdateUI();
 
                 UpdateUI();
             }
