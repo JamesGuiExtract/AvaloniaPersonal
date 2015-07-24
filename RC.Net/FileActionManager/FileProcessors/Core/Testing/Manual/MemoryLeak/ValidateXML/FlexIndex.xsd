@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="FlexData" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="FullText" nillable="true">
+    <xs:complexType>
+      <xs:simpleContent msdata:ColumnName="FullText_Text" msdata:Ordinal="1">
+        <xs:extension base="xs:string">
+          <xs:attribute name="AverageCharConfidence" type="xs:string" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SpatialLine">
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element name="LineText" nillable="true" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:simpleContent msdata:ColumnName="LineText_Text" msdata:Ordinal="1">
+              <xs:extension base="xs:string">
+                <xs:attribute name="AverageCharConfidence" type="xs:string" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SpatialLineZone" minOccurs="0">
+          <xs:complexType>
+            <xs:attribute name="StartX" type="xs:string" />
+            <xs:attribute name="StartY" type="xs:string" />
+            <xs:attribute name="EndX" type="xs:string" />
+            <xs:attribute name="EndY" type="xs:string" />
+            <xs:attribute name="Height" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SpatialLineBounds" minOccurs="0">
+          <xs:complexType>
+            <xs:attribute name="Top" type="xs:string" />
+            <xs:attribute name="Left" type="xs:string" />
+            <xs:attribute name="Bottom" type="xs:string" />
+            <xs:attribute name="Right" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="PageNumber" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FlexData" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="FullText" />
+        <xs:element ref="SpatialLine" />
+        <xs:element name="APN">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="City">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="DocumentType">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FullText" type="xs:string" minOccurs="0" msdata:Ordinal="0" />
+            </xs:sequence>
+            <xs:attribute name="FieldType" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Grantee">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+            <xs:attribute name="FieldType" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Grantor">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+            <xs:attribute name="FieldType" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="GrantorGrantee">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+            <xs:attribute name="FieldType" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="LegalDescription">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element name="Block" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Lot" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Tract" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Unit" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="RecordedDate">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceNumber">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReturnAddress">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element name="Name" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Address1" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Address2" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="City" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="State" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="ZipCode" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TransferTax">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="FullText" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="SpatialLine" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
