@@ -1,0 +1,286 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.2.0.14 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.2.0.14 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed after <b>10.2.0.1</b> and up to <b>10.2.0.14</b>
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-7591]</b> Elevated Privileges For Silent Installs
+        	<ul>
+			<li>Configure a test machine so that <b>Domain Users</b> are 
+			part of the <b>Administrators</b> group.
+			<li>Create a local user without admin privileges. Note that the 
+			local user must be added the the <b>Remote Dektop Users</b> group.
+			<li>Log in as the local user.
+			<li>Navigate to the desired install folder.
+			<li>Run a silent install batch file.
+			<li>Confirm that elevated privileges are requested.
+			<li>Provide username and password for a domain user.
+			<li>Confirm that the installation is successful.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12236, ISSUE-13093]</b> Diagnostic Logging For Data Entry Verification
+        	<ul>
+			<li>Confirm that logging is now available by default in <b>Demo_FLEXIndex</b>.
+			<li>Confirm that the following syntax is used for logging.
+			<ul>
+				<li>&lt;setting name="EnableLogging" serializeAs="String"&gt;
+				<li>&nbsp;&nbsp;&lt;value&gt;True&lt;/value&gt;
+				<li>&lt;/setting&gt;
+			</ul>
+			<li>Confirm that the following events are logged by default.
+			<ul>
+				<li>AutoUpdateResult
+				<li>DataLoad
+				<li>DataSave
+				<li>AttributeInitialized
+				<li>AttributeUpdated
+				<li>AttributeDeleted
+				<li>SwipedText
+				<li>TooltipNotification
+				<li>Undo
+				<li>Redo
+				<li>Focus
+				<li>InputEvent
+			</ul>
+			<li>Confirm that the following syntax is used for filtering.
+			<ul>
+				<li>&lt;setting name="LogFilter" serializeAs="String"&gt;
+				<li>&nbsp;&nbsp;&lt;value&gt;*&lt;/value&gt;
+				<li>&lt;/setting&gt;
+			</ul>
+			<li>Confirm that the following events can be logged
+			<ul>
+				<li>AutoUpdateQuery
+				<li>ValidationQuery
+				<li>ValidationResult
+				<li>FormattingRuleResult
+			</ul>
+			<li>Confirm that a <b>LogToFile</b> setting is supported that will write 
+			the logged output to &lt;SourceDocName&gt;.trace after a document is 
+			closed in the verification UI.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12425]</b> Unused Items In Vault
+		<ul>
+			<li>Confirm that the following unused items have been removed from Vault.
+			<ul>
+				<li>ProductDevelopment/IcoMapCore
+				<li>ProductDevelopment/IcoMapESRI
+				<li>PlatformSpecificUtils/ArcGISUtils
+				<li>PlatformSpecificUtils/GISPlatInterfaces
+				<li>ProductDevelopment/Utils/CurveCalculator
+				<li>ProductDevelopment/Utils/GridGenerator
+				<li>ReusableComponents/ArcGIS
+				<li>ReusableComponents/RogueWave
+				<li>ReusableComponents/Geometry/CurveCalculationEngine
+				<li>ReusableComponents/InputFunnel/Build
+				<li>ReusableComponents/InputFunnel/Installation
+				<li>ReusableComponents/InputFunnel/Packages
+				<li>ReusableComponents/VendorSpecificUtils/RWUtils
+				<li>ProductDevelopment/AttributeFinder/Utils/Feedback
+				<li>ProductDevelopment/AttributeFinder/Utils/FeedbackManager
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-12692]</b> Right-Click Crashes Windows Explorer
+        	<ul>
+			<li>Confirm that <b>Context Menu File Supplier</b> is not registered 
+			by default and is not available in a fresh installation.
+			<li>Confirm that <b>TBD.bat</b> in the CommonComponents folder 
+			registers the file supplier.
+			<li>Confirm that <b>TBD.bat</b> in the CommonComponents folder 
+			unregisters the file supplier.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12907]</b> Excel Generated Crystal Reports
+        	<ul>
+			<li>Run the <b>Usage report during custom date range broken down by user</b> 
+			report.
+			<li>Export the report to a Microsoft Excel output file.
+			<li>Open the result in Microsoft Excel.
+			<li>Confirm that all report headers and data are visible and correct.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12913]</b> Confirm that notification emails are sent when a build 
+		is started and when a build finishes.
+<p>
+  	   	<LI><b>[ISSUE-12955]</b> Extraneous Attribute Saved To VOA
+        	<ul>
+			<li>Modify the <b>Demo_LabDE</b> DEP such that <b>MultipleMatchSelectionMode</b> 
+			is set to <b>None</b> for the component TestCode field.
+			<li>Execute the rules for <b>C413.tif</b> and confirm that 2 TestCode attributes 
+			are saved for the <b>CHOL</b> component.
+			<li>Verify the <b>C413.tif</b> image.
+			<li>Confirm that exactly 1 TestCode sub-attribute is saved for the 
+			<b>CHOL</b> component.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13013]</b> General DEP Issues
+        	<ul>
+			<li>Confirm that the <b>OrderPickerSelectionPane</b> is not shown 
+			in the Toolbox.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12998, ISSUE-13043]</b> Rutgers DEP
+        	<ul>
+			<li>Temporarily modify the <b>Breast</b> DEP such that 
+			<b>MultipleMatchSelectionMode</b> is set to <b>None</b> for the 
+			<b>AllMargins</b> field.
+			<li>Select a <b>Breast</b> synoptic report for validation.
+			<ul>
+				<li>Confirm that the selected VOA file includes more than one 
+				<b>DistanceFromClosestMarginMM</b> sub-attribute for the first 
+				<b>AllMargins</b> attribute.
+			</ul>
+			<li>Exercise validation for the selected document.
+			<li>Select the <b>Tumor Size Category</b> text box.
+			<li>Confirm that the tooltip is right-side up.
+			<li>Specify a value for <b>AllMargins/DistanceFromClosestMarginMM</b>.
+			<li>Save the changes and confirm that the value specified above is 
+			the only persisted <b>DistanceFromClosestMarginMM</b> sub-attribute.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13061]</b> Gender Validation In Demo_LabDE
+        	<ul>
+			<li>Confirm that modifying the <b>Gender</b> value for an image with a 
+			valid MRN results in a validation error icon.
+			<li>Confirm that the validation error message is appropriate.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13068]</b> Immediate Use Of Custom Tags Info
+        	<ul>
+			<li>Copy a FPS that uses database tags on the database tab along with 
+			the CustomTags.sdf file to a new location.
+			<li>Open the FPS file and note the database tab reports <b>No context 
+			defined!</b>.
+			<li>Use <b>Tools - Edit Custom Tags</b> to open the editor.
+			<li>Add a new context for the current folder and add the appropriate values.
+			<li>Save and close the editor.
+			<li>Confirm that the FPS file correctly connects to the context.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13070]</b> Confirm that the <b>Publisher</b> for the RDT install 
+		is <b>Extract Systems, LLC</b>.
+<p>
+  	   	<LI><b>[ISSUE-13078]</b> SDF Change Not Propogated To FPS
+        	<ul>
+			<li>Create an FPS file using standard database tags.
+			<li>Update CustomTags.sdf to use (local) and an existing valid database.
+			<li>Confirm that the connection succeeds.
+			<li>Edit the SDF file and change the db name to a nonexistent db.
+			<li>Save and close the SDF file.
+			<li>Confirm that the FPS file reports an error.
+			<li>Edit the SDF file again and add a new, silly tag such as &lt;Temp&gt; and 
+			$Now().
+			<li>Save and close the SDF file.
+			<li>Confirm that the FPS file reports another error message.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13091]</b> IDShieldOffice Projects Removed From AFCoreTest SLN
+        	<ul>
+			<li>Confirm that the following projects are no longer included in 
+			<b>AFCoreTest.sln</b>.
+			<ul>
+				<li>ESActMaskPCE
+				<li>ESPrintCaptureCore
+				<li>ESPrintManager
+				<li>InstallPCE
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13100]</b> Edit Custom Tags Disabled Inappropriately
+        	<ul>
+			<li>Modify <b>CustomTags.sdf</b> from Demo_IDShield so that the DatabaseName 
+			tag is pointing to a non-existent database.
+			<li>Open an FPS file from Demo_IDShield.
+			<li>Confirm that the error message is appropriate.
+			<li>Confirm that <b>Tools - Edit Custom Tags</b> is enabled.
+			<li>Use the menu item to correct the changed setting.
+			<li>Confirm that the FPS file now opens and runs as expected.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13101]</b> RunFPSFile and Database Tags
+        	<ul>
+			<li>Exercise a <b>Demo_IDShield</b> FPS file via RunFPSFile with 
+			/queue and /process options.
+			<li>Confirm that the file processes as expected.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13102]</b> FAM Service and Database Tags
+        	<ul>
+			<li>Exercise a <b>Demo_IDShield</b> FPS file via FAM Service.
+			<li>Confirm that files process as expected.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13108]</b> Path Tag Functions and Data Queries
+        	<ul>
+			<li>Confirm that a path tag function is expanded correctly when 
+			used within a data entry query.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13110]</b> Context Menu FS and FTP FS
+        	<ul>
+			<li>Register the context menu file supplier.
+			<li>Create and test an FPS file that uses the file supplier.
+			<li>Unregister the file supplier.
+			<li>Repeat the test with the FPS file.
+			<li>Confirm that a meaningful exception is logged and that the 
+			FPS file stops queuing and processing as expected.
+			<li>Repeat the above steps licensing and unlicensing the FTP file 
+			supplier.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13111, ISSUE-13112]</b> .NET Install
+        	<ul>
+			<li>Confirm that each DemoShield application notes that <b>.NET 3.5</b> 
+			is only required for SQL Server (or Corepoint).
+			<li>Confirm that <b>FLEX Index</b> will successfully install to a 
+			clean test machine without previous installation of <b>.NET 3.5</b>.
+			<li>Confirm that <b>ID Shield</b> will successfully install to a 
+			clean test machine without previous installation of <b>.NET 3.5</b>.
+			<li>Confirm that <b>LabDE</b> will successfully install to a 
+			clean test machine without previous installation of <b>.NET 3.5</b>.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+	    		<li>All Tests
+			<li>Raster Zone Test
+			<li>Spatial String Searcher Test
+			<li>Spatial String Test
+	    	</ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<li>64-bit Operating System</li>
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

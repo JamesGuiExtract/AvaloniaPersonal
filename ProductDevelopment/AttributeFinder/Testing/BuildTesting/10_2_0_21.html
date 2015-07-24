@@ -1,0 +1,312 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.2.0.21 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.2.0.21 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed starting with <b>10.2.0.15</b> and up through <b>10.2.0.21</b>.
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-2039]</b> FAM Service
+        	<ul>
+			<li>Configure an FPS file with both queuing (with listening) and processing 
+			to run via FAM Service.
+			<li>Configure another FPS file with just processing to run via FAM Service.
+			<li>Configure Service settings so that an automatic restart will happen without 
+			a long delay. Used 25 files as the setting.
+			<li>Start the FAM service.
+			<li>Confirm that the processing-only FPS file restarts automatically.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-2292]</b> Core: Modify PDF
+        	<ul>
+			<li>Open the VOA file found at <b>M:\PVCS_JIRA\JIRA\ISSUE-2292</b>.
+			<li>Confirm that the highlights for the attributes are properly aligned 
+			with the image text.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-7363]</b> Find Or Redact Text Bugs
+        	<ul>
+			<li>Start verification.
+			<li>Make a manual redaction at the beginning of a document (e.g., in the top 
+			margin of the first page) using the highlighter tool.
+			<li>Set the type of the redaction to be SSN.
+			<li>Use the <b>find or redact</b> tool to redact all occurrences of a word 
+			that occurs multiple times in the document.
+			<li>Confirm that each occurrence of the word has type <b>SSN</b>.
+			<li>Save/commit the document and stop verification.
+			<li>Move the VOA file that contains the redactions to a different folder than 
+			the associated image.
+			<li>Open the VOA file and click on each redaction attribute.
+			<li>Confirm that the VOA Viewer is able to display all redactions created with 
+			the <b>find and redact</b> tool.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-7375]</b> Replace Strings and Translate Values / Types
+        	<ul>
+			<li>Confirm that the automated tests all pass.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12692]</b> Context Menu File Supplier
+		<ul>
+			<li>Confirm that after a new installation and <b>Check for new components</b>, 
+			that the <b>Files from context menu</b> file supplier is not registered.
+			<li>Confirm that <b>RegisterShellExtension.bat</b> registers the file supplier.
+			<li>Create and save an FPS file that supplies files via context menu.
+			<li>Confirm that <b>UnregisterShellExtension.bat</b> unregisters the file 
+			supplier.
+			<li>Confirm that the FPS file can still be opened.
+			<li>Confirm that a meaningful exception is displayed if the FPS file is run.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-12714]</b> Confirm that the USS Viewer scrolls to the top of the page 
+		after it has been selected in the Page Navigation edit box.
+<p>
+  	   	<LI><b>[ISSUE-12795]</b> Confirm that the default setting for <b>Preserve 
+		color depth</b> in the <b>Core: Rasterize PDF</b> task is checked.
+<p>
+  	   	<LI><b>[ISSUE-12821]</b> Special Image Format Converter
+        	<ul>
+			<li>Exercise <b>SpecialImageFormatConverter.exe</b> with the sample 
+			documents found in <b>\\engsvr\Internal\PVCS_JIRA\JIRA\ISSUE-12821</b>.
+			<li>Confirm that each document processes successfully with the 
+			<b>/8bpp</b> option.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12931]</b> LabDE QA Accuracy Report
+        	<ul>
+			<li>Confirm that the <b>LabDE QA Accuracy</b> report is installed with 
+			LabDE.
+			<li>Confirm that a <b>Parameter Entry Form</b> dialog is presented with the 
+			following parameters.
+			<ul>
+				<li>Reporting Period
+				<li>QAAction
+				<li>TagName1
+				<li>TagName2
+				<li>TagName3
+			</ul>
+			<li>Confirm that each defined action can be selected in the <b>QAAction</b> 
+			dropdown list.
+			<li>Confirm that each defined tag can be selected in each of the <b>TagName</b> 
+			dropdown lists.
+			<li>Confirm that the report includes a section for <b>Database Information</b>.
+			<ul>
+				<li>Database server
+				<li>Database name
+			</ul>
+			<li>Confirm that the report includes a section for <b>Reporting Period</b>.
+			<ul>
+				<li>Start time
+				<li>End time
+				<li>Report duration
+			</ul>
+			<li>Confirm that the report includes a section for <b>Report Parameters</b>.
+			<ul>
+				<li>QA action
+				<li>Tags to analyze
+			</ul>
+			<li>Confirm that the report includes a section for <b>Verification Results</b>.
+			<ul>
+				<li>User
+				<li>Documents
+				<li>Orders
+				<li>Tests
+				<li>Confirm that one column is provided for each selected <b>TagName</b>.
+				<li>Confirm that some explanation text is provided below the table of 
+				<b>Verification Results</b>
+			</ul>
+			<li>Confirm that the report header is correct.
+			<li>Confirm that the report footer is correct.
+			<li>Confirm that the report looks good at high magnification.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12983, ISSUE-13129, ISSUE-13145, ISSUE-13148]</b> Core: Validate XML
+        	<ul>
+			<li>Confirm that the settings dialog includes an <b>XML filename</b> 
+			edit box.
+			<li>Confirm that the associated tag selector works properly.
+			<li>Confirm that the settings dialog includes a <b>Treat warnings as errors</b> 
+			checkbox.
+			<li>Confirm that the settings dialog includes a <b>Validate against in-line schema 
+			if specified</b> radio button.
+			<li>Confirm that the settings dialog includes an associated <b>Consider XML file 
+			invalid if in-line schema is not specified</b> checkbox.
+			<li>Confirm that the checkbox is only enabled when the radion button is selected.
+			<li>Confirm that the settings dialog includes a <b>Validate against specified 
+			schema</b> radio button.
+			<li>Confirm that the settings dialog includes an associated edit box, tag 
+			selector and browse button.
+			<li>Confirm that the associated controls are only enabled when the radion button 
+			is selected.
+			<li>Confirm that the edit box is updated when the tag selector is used.
+			<li>Confirm that the edit box is updated when the browse button is used.
+			<li>Confirm that the settings dialog includes a <b>Validate XML syntax only, 
+			do not validate schema</b> radio button.
+			<li>Confirm that settings are persistent.
+<p>
+			<li>Confirm that the caption on the settings dialog includes <b>settings</b>.
+			<li>Confirm that the settings dialog fields are edit box, tag selector, and 
+			browse button from left to right.
+			<li>Confirm that the settings dialog resizes properly.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13049]</b> Confirm that the <b>Manage - Metadata fields...</b> menu 
+		item in DB Admin is disabled if the database has an out-of-date schema.
+<p>
+  	   	<LI><b>[ISSUE-13061, ISSUE-13062, ISSUE-13124]</b> Demo_LabDE Validation
+        	<ul>
+			<li>Exercise <b>Demo_LabDE</b> verification.
+			<li>Confirm that an image with a valid MRN also validates <b>Gender</b>.
+			<li>Confirm that an image with an invalid MRN does not validate Patient Name 
+			or DOB against the Patient database.
+			<li>Confirm that specifying a lab name for an Order auto-populates the lab name 
+			field for other Orders that originally had no defined lab names.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13073]</b> OCR Image Area
+        	<ul>
+			<li>Confirm that the <b>OCR Image Area</b> value modifier includes at least the 
+			following <b>Other characters</b> by default: <b>! @ # $ % & * ( ) = + : ; ' " 
+			&lt; &gt; , . ?</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13076]</b> Collection Was Modified Exception
+        	<ul>
+			<li>Exercise a stress or memory leak test using Demo_LabDE images and rules 
+			where the test runs rules with a subsequent update metadata task.
+			<li>Confirm that no <b>Collection was modified</b> exceptions are seen.
+			<li>Exercise a stress or memory leak test using Demo_LabDE images and rules 
+			where an auto-hotkey script saves repeatedly from verification with metadata 
+			updated via <b>RunFPSFile</b>.
+			<li>Confirm that no <b>Collection was modified</b> exceptions are seen.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13081]</b> Confirm that <b>Core: Enhance OCR</b> does not mention 
+		any requirement for special licensing on its setting dialog.
+<p>
+  	   	<LI><b>[ISSUE-13085]</b> Confirm that silent installs correctly uninstall an older 
+		version and remove associated registry keys before installing the new version.
+<p>
+  	   	<LI><b>[ISSUE-13120]</b> Confirm that the <b>AddOrupdateLabDEOrder</b> 
+		stored procedure in Demo_LabDE uses the <b>dbo</b> schema.
+<p>
+  	   	<LI><b>[ISSUE-13122]</b> Core: Modify PDF File
+        	<ul>
+			<li>Confirm that the settings dialog for the <b>Core: Modify PDF file</b> task 
+			includes a <b>Highlights</b> group box.
+			<li>Confirm that the group box includes an <b>Add highlights to attributes 
+			with any of the following names (comma delimited)</b> checkbox.
+			<li>Confirm that the associated edit box is enabled only when the checkbox 
+			is checked.
+			<li>Confirm that the settings are persistent.
+			<li>Confirm that highlights are properly added to a PDF according to specified 
+			attributes.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13125]</b> Duplicate Redactions Saved
+        	<ul>
+			<li>Configure a verification FPS file using default options for the redaction 
+			verification task. Make sure the advanced option is set to use four threads 
+			to process (either "Achieve peak performance" or explicitly set to use four 
+			threads).
+			<li>Queue four images for redaction verification.
+			<li>Run the verification FPS file on quad-core machine.
+			<li>Use the rectangular highlight tool to create a manual redaction.
+			<li>Select <b>File - Stop processing</b> and save changes when prompted.
+			<li>Confirm that the VOA file does not contain duplicate attributes with the 
+			same ID and Revision.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13130]</b> Confirm that the batch files for Memory Leak Tests #1 - #3 
+		for <b>OCR Document</b> use the correct relative path to reference the test file.
+<p>
+  	   	<LI><b>[ISSUE-13133]</b> Confirm that <b>Gender</b> can be set to an empty string 
+		for a record in the <b>LabDEPatient</b> table and that validation stills works as 
+		expected.
+<p>
+  	   	<LI><b>[ISSUE-13135]</b> Confirm that a single, meaningful exception is logged 
+		when trying to use <b>Data Entry Logging</b> without a valid license. Note that no 
+		<b>Null reference</b> exceptions should be logged.
+<p>
+  	   	<LI><b>[ISSUE-13136]</b> Confirm that the <b>RDT</b> installs <b>extract-all.nunit</b> 
+		to the CommonComponents folder and that it contains project definitions for both 
+		Debug and Release.
+<p>
+  	   	<LI><b>[ISSUE-13137, ISSUE-13138]</b> Help File
+        	<ul>
+			<li>Confirm that the <b>FLEX Index</b> Help file includes the following 
+			corrections.
+			<ul>
+				<li><b>Core: Modify PDF file</b> - Information and screenshots 
+				for adding highlights to PDFs.
+				<li><b>Core: Extract image area</b> - The example string to define 
+				the output filename includes <b>$DirOf()</b>.
+				<li><b>Core: Validate XML</b> - Information and screenshots for 
+				the task.
+				<li><b>Data Entry Logging</b> - Information for this new feature.
+			</ul>
+			<li>Confirm that the <b>ID Shield</b> Help file includes the following 
+			corrections.
+			<ul>
+				<li><b>Core: Modify PDF file</b> - Information and screenshots 
+				for adding highlights to PDFs.
+				<li><b>Core: Extract image area</b> - The example string to define 
+				the output filename includes <b>$DirOf()</b>.
+				<li><b>Core: Validate XML</b> - Information and screenshots for 
+				the task.
+			</ul>
+			<li>Confirm that the <b>LabDE</b> Help file includes the following 
+			corrections.
+			<ul>
+				<li><b>Core: Modify PDF file</b> - Information and screenshots 
+				for adding highlights to PDFs.
+				<li><b>Core: Extract image area</b> - The example string to define 
+				the output filename includes <b>$DirOf()</b>.
+				<li><b>Core: Validate XML</b> - Information and screenshots for 
+				the task.
+				<li><b>LabDE QA Accuracy</b> - information and screenshots for 
+				the new report
+				<li><b>Data Entry Logging</b> - Information for this new feature.
+			</ul>
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+	    		<li>All Tests
+			<li>Raster Zone Test
+			<li>Spatial String Searcher Test
+			<li>Spatial String Test
+	    	</ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<li>64-bit Operating System</li>
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

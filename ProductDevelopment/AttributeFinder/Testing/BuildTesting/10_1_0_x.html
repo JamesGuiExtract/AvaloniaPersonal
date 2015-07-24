@@ -1,0 +1,412 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.1.0.x Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.1.0.x Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed after <b>10.1.0.23</b> and up to <b>10.1</b> release
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-7115]</b> Regular Expression Rule UI
+        	<ul>
+			<li>Confirm that the following items have been corrected in the help 
+			message for the first-match-only setting.
+			<ul>
+				<li><b>attribute</b> is spelled correctly.
+				<li>The first phrase of the sentence is grammatically correct.
+				<li>The trailing clause should be replaced.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-11803]</b> Custom Path Tags
+        	<ul>
+			<li><u>UI</u>
+			<ul>
+				<li>Create Context dialog
+				<ul>
+					<li>Confirm that the dialog includes a <b>Context name</b> 
+					edit box.
+					<li>Confirm that the dialog includes an <b>FPSFileDir</b> 
+					edit box.
+					<li>Confirm that the edit box defaults to the fodler of 
+					the current FPS file.
+					<li>Confirm that a baloon help button is provided with 
+					information about FPSFileDir.
+				</ul>
+				<li>Confirm that the current context is noted at the bottom of 
+				the FAM's Database tab when one is in use.
+			</ul>
+			<li><u>Performance</u>
+			<ul>
+				<li>Confirm that a <b>Create context</b> dialog is presented if 
+				a context has not yet been created in the associated FPS file 
+				folder.
+				<li>Confirm that a <b>UNC path recommended</b> warning is 
+				presented if the user tries to save a context using a local 
+				directory path.
+				<li>Confirm that the warning is not presented if a UNC path 
+				is specified for <b>FPSFileDir</b>.
+				<li>Confirm that a <b>Save Configuration?</b> message is 
+				presented if a context tag is used before an FPS file has been 
+				saved.
+				<ul>
+					<li>Confirm that a new <b>CustomTags.sdf</b> file 
+					is copied to a different folder if the new FPS file is 
+					saved to a different folder.
+				</ul>
+				<li>Create some custom tags and confirm that they can be used 
+				within a <b>Core: Create file</b> task.
+				<li>Confirm that text functions are expanded properly when used 
+				with context tags.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12302]</b> Errors During Load Or Save For Verification Should 
+		Cause A File To Fail
+        	<ul>
+			<li><b>ID Shield</b>
+			<ul>
+				<li>Replace a TIF image with a renamed VOA file 
+				and confirm that verification handles the error 
+				properly.
+				<li>Make a VOA file read-only so that verification-related 
+				updates cannot be saved.
+			</ul>
+<p>
+			<li><b>LabDE</b>
+			<ul>
+				<li>Replace a TIF image with a renamed VOA file 
+				and confirm that verification handles the error 
+				properly.
+				<li>Make a VOA file read-only so that verification-related 
+				updates cannot be saved.
+			</ul>
+<p>
+			<li><b>Core: View image</b>
+			<ul>
+				<li>Confirm proper behavior for problems with image loading.
+			</ul>
+<p>
+			<li><b>Run FPS File</b>
+			<ul>
+				<li>Exercise with <b>/ignoreDB</b> option and confirm that 
+				exceptions get thrown out.
+				<li>Exercise without <b>/ignoreDB</b> option and confirm that 
+				exceptions are displayed on top of the verification form.
+			</ul>
+<p>
+			<li><b>ID Shield On Demand</b>
+			<ul>
+				<li>Confirm that the prompt to continue verification is not 
+				displayed.
+			</ul>
+<p>
+			<li><b>Data Entry Application</b>
+			<ul>
+				<li>Confirm that the prompt to continue verification is not 
+				displayed.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12621]</b> Data Entry Control Host Properties
+        	<ul>
+			<li>Confirm that the following properties are hidden from the DEP 
+			Designer.
+			<ul>
+				<li>Active
+				<li>Attributes
+				<li>MostRecentlySavedAttributes
+				<li>UpdateInProgress
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12752]</b> Stopping Verification
+        	<ul>
+			<li>Exercise stopping verification from FAM and confirm that no problems 
+			are seen.
+			<li>Exercise stopping verification from verification window and confirm that 
+			no problems are seen.
+			<li>Confirm that processing is recorded as stopped only after the dirty 
+			prompt is closed.
+			<li>Confirm that any failures in saving from the dirty prompt are reflected 
+			as a file failure.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12783, ISSUE-12803, ISSUE-12919, ISSUE-12938, ISSUE-12944, ISSUE-12964, 
+		ISSUE-12993, ISSUE-12997]</b> Order Picker Issues
+        	<ul>
+			<li>Confirm that exercising Demo_LabDE populates the <b>LabDEOrder</b> and 
+			<b>LabDEPatient</b> tables.
+			<li>Confirm that the <b>Demo_LabDE</b> DEP uses the new order picker column.
+			<li>Confirm that the <b>Demo_LabDE</b> DEP automatically updates Patient MRN.
+			<li>Confirm no crashes when exercising the order picker column.
+			<li>Confirm that no excessive delay is noted when using the order picker 
+			control.
+			<li>Confirm that no error occurs after alternating opening the order picker 
+			FFI and the duplicate documents FFI.
+			<li>Confirm that no error occurs if the order picker FFI is closed very 
+			quickly after opening.
+			<li>Confirm that the initial load in the order picker context does not generate 
+			an <b>System.InvalidOperationException</b> exception.
+			<li>Confirm that the order selection grid resizes properly when its pane 
+			is resized.
+			<li>Confirm that the patient name is included in the order picker / order 
+			number tooltip.
+			<li>Confirm that submitting something other than the first document per 
+			session from the order picker column works and does not throw an 
+			exception.
+			<li>Confirm that the order selection grid in the order picker FFI appears 
+			correctly even if a <b>FAMFileInspector.xml</b> file has been saved in 
+			the local app data folder.
+			<li>Confirm that <b>Patient MRN</b> auto-populates if 2 out of 3 of first name, 
+			last name, date of birth are present.
+			<li>Confirm that the <b>Demo_LabDE</b> validation queries are not unusually slow 
+			when run against a FAM database with a large amount of data in the LabDE schema 
+			elements.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12798, ISSUE-12843, ISSUE-12895]</b> Context
+        	<ul>
+			<li>Confirm that the active context is displayed in the FAM title bar.
+			<li>Confirm that the active context is displayed at the bottom of the FAM 
+			Database tab.
+			<li>Confirm that the context is correctly updated when saving an FPS file 
+			to a different directory.
+			<li>Confirm that after closing the tag editor, all of the context tag 
+			information (including context name) and the database connection are 
+			refreshed properly.
+			<li>Confirm that the <b>Edit custom tags</b> dialog does not appear as an 
+			FPS file is loaded when there are database tags that need definitions.
+			<li>Confirm that deleting all tags from <b>CustomTags.sdf</b> and saving the 
+			result does not result in a blank row.
+			<li>Confirm that clicking on the current context label launches the 
+			<b>Edit custom tags</b> dialog.
+<p>
+			<li>Confirm that auto-column sizing in SQLCDBEditor takes max data length for 
+			table columns into account.
+			<li>Confirm that a button exists in the context tags plugin to automatically 
+			create the <b>&lt;DatabaseServer&gt;</b> and <b>&lt;DatabaseName&gt;</b> tags.
+			<li>Confirm that <b>Edit custom tags...</b> has been added to the FAM Tools 
+			menu.
+			<li>Confirm that an exception is displayed when the user tries to create an 
+			empty ContextTags database.
+			<li>Confirm that a warning dialog is presented when saving database tags that 
+			are defined but not used.
+			<li>Confirm that a FAM cannot be run if tag values are missing for the 
+			current context.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12803, ISSUE-12806, ISSUE-12985, ISSUE-13006]</b> Order Picker Behavior
+        	<ul>
+			<li>Confirm that Demo_LabDE includes the ability to check and prompt about 
+			order results that have already been submitted.
+			<li>Confirm that Demo_LabDE includes the ability to associate orders being 
+			committed with the source documents.
+			<li>Confirm that the order picker button has the following colors.
+			<ul>
+				<li><u>Red</u> - the database has no matching orders
+				<li><u>Yellow</u> - the database has fewer unmapped matching orders 
+				than are present on the document
+				<li><u>Green</u> - the database has at least as many unmapped matching 
+				orders as are present on the document
+			</ul>
+			<li>Confirm that <b>Order Number</b> is auto-populated iff there is exactly 
+			one available matching order in the database.
+			<li>Confirm that the order picker button responds properly after the MRN 
+			is modified.
+			<li>Confirm that once an order on a document has been mapped to a particular 
+			order number, that order number is no longer available to other orders on 
+			the document.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12830]</b> User.Config File
+        	<ul>
+			<li>Confirm that a backup file is created on save.
+			<li>Confirm that the backup file is used if the main file is corrupted.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12856]</b> Confirm that <b>Extract.DataEntry.LabDE.dll</b> includes 
+		controls to support the <b>Duplicate Documents</b> feature.
+<p>
+  	   	<LI><b>[ISSUE-12900]</b> Custom Tags
+        	<ul>
+			<li>Open a new FAM instance.
+			<li>Click on <b>Use current context's database</b>.
+			<li>Confirm that the user prompt is presented with a meaningful caption.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12902, ISSUE-12908, ISSUE-12915, ISSUE-12916]</b> 
+		Updating Database Schema
+        	<ul>
+			<li>Confirm that the result of an update to an <b>8.0</b> database 
+			includes the FK_Statistics_Action foreign key in the ActionStatistics table.
+			<li>Confirm that an automatic schema update result includes a default 
+			value for OrderStatus.
+			<li>Confirm that an automatic schema update result correctly handles the 
+			<b>WorkItemGroup</b> table.
+			<li>Confirm that the <b>ReceivedDateTime</b> column in <b>LabDEOrder</b> 
+			table is not NULL when updated from an older schema.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12903]</b> Confirm that bubble help is available for FPSFileDir in 
+		the Custom Tags dialog.
+<p>
+  	   	<LI><b>[ISSUE-12904]</b> Confirm that a meaningful prompt is provided in the Custom 
+		Tags dialog about editing tag values for contexts other than the current context.
+<p>
+  	   	<LI><b>[ISSUE-12918]</b> Confirm that database tags remain in the FPS file after 
+		running then saving.
+<p>
+  	   	<LI><b>[ISSUE-12921]</b> Confirm that all sample VOA files can be loaded in the 
+		prototype Rutgers (sectional) DEP.
+<p>
+  	   	<LI><b>[ISSUE-12926]</b> Confirm that no exception is thrown when closing the FAM.
+<p>
+  	   	<LI><b>[ISSUE-12935]</b> Confirm that FPS files can now be loaded and run when the 
+		corresponding CustomTags.sdf file is read-only.
+<p>
+  	   	<LI><b>[ISSUE-12936]</b> Confirm that saving an FPS file no longer changes the 
+		active tab.
+<p>
+  	   	<LI><b>[ISSUE-12939]</b> Confirm that path functions contained in Custom Tags 
+		definitions are properly expanded.
+<p>
+  	   	<LI><b>[ISSUE-12952]</b> Data Query Support For Core: Create File
+        	<ul>
+			<li>Test any UI changes.
+			<li>Confirm that <b>&lt;SourceDocName&gt;.voa</b> is the hard-coded 
+			data source for queries.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12954]</b> Confirm that the DataEntry merge module no longer installs 
+		<b>Make DEPs Compatible.vbs</b>.
+<p>
+  	   	<LI><b>[ISSUE-12957]</b> AF Query Syntax Support For Value
+        	<ul>
+			<li>Confirm that the associated <b>NUnit</b> tests all pass.
+			<li>Exercise AF queries using filtering by value within attribute nodes.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12960]</b> Company Name
+        	<ul>
+			<li>Confirm that all deployed DLLs and EXEs use <b>Extract Systems</b> as 
+			the Company Name.
+			<li>Confirm that the local user application data path uses a single 
+			company name.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12966]</b> Demo_LabDE
+        	<ul>
+			<li>Review contents of the <b>LabDEPatient</b> table.
+			<li>Verify an image matching patient info from the <b>LabDEPatient</b> 
+			table.
+			<li>In the <b>MRN</b> field, press [SPACE] and ensure the appropriate option 
+			is displayed.
+			<li>Change the patient information so that it no longer matches any patient 
+			in the database.
+			<li>In the <b>MRN</b> field, press [SPACE].
+			<li>Confirm that no options are available in the auto complete list.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12967]</b> Confirm that the Rutgers DEP no longer extends offscreen 
+		and that the entire vertical scrollbar is visible.
+<p>
+  	   	<LI><b>[ISSUE-12977]</b> Context Tags Plugin
+        	<ul>
+			<li>Confirm that invalid data does not throw an exception in SQLCDBEditor.
+			<li>Confirm that a glyph is shown in the row header if an error is present.
+			<li>Confirm that only a signle row at a time is allowed to have an unresolved 
+			error.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12988, ISSUE-12995, ISSUE-13000]</b> Folder File Supplier
+        	<ul>
+			<li>Create a test of the <b>Folder File Supplier</b>.
+			<ul>
+				<li>Prepare the file supplier to watch a folder.
+				<li>Create a processing task to delete the file from the folder.
+				<li>Note any files that remain in the folder after processing 
+				is complete since these files failed to be queued.
+			</ul>
+			<li>Exercise the test with a single drop of a large number of files.
+			<li>Exercise the test again with multiple drops of files.
+			<li>Confirm that no <b>Listening thread did not exit properly</b> exceptions 
+			are logged.
+<p>
+			<li>Create another test of the <b>Folder File Supplier</b>.
+			<ul>
+				<li>Prepare the file supplier to watch a folder, including delete 
+				messages.
+				<li>Drop a large number of files into the folder.
+				<li>Delete the files from the folder.
+				<li>Note any files that remain in <b>Pending</b> since these files 
+				failed to be dequeued.
+			</ul>
+			<li>Exercise the test with a single drop of a large number of files.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13001]</b> Memory Leak Using DataQuery OH, DB Contents Condition and 
+		Create File
+        	<ul>
+			<li>Exercise a <b>Memory Leak</b> test for <b>Core: Create file</b> that uses 
+			context tags.
+			<li>Exercise a <b>Memory Leak</b> test for <b>Database contents condition</b> 
+			that uses context tags.
+			<li>Exercise a <b>Memory Leak</b> test for <b>Data Query OH</b> that uses 
+			context tags.
+        	</ul>
+<p>
+  	   	<LI><b>Miscellaneous</b>
+        	<ul>
+			<li>Confirm that <b>Demo_LabDE</b> FPS files use context-specific tags.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>JIRA Entries For Relevant Updates
+	    	<ul>
+	    		<li><b>[ISSUE-5829]</b> Regular Expression Rule Named Groups
+	    		<li><b>[ISSUE-12102]</b> Three Character State Abbreviations In Address 
+			Splitter Results
+	    		<li><b>[ISSUE-12452]</b> Document Classifier
+	    		<li><b>[ISSUE-12539]</b> SSN Clues - Redaction
+	    		<li><b>[ISSUE-12xxx]</b> 
+	    	</ul>
+<p>
+  	   	<LI>Automated Tests
+	    	<ul>
+	    		<li>All Tests
+			<li>Raster Zone Test
+			<li>Spatial String Searcher Test
+			<li>Spatial String Test
+	    	</ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<li>64-bit Operating System</li>
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
