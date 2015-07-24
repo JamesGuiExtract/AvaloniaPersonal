@@ -426,6 +426,8 @@ namespace Extract.DataEntry
                 EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
 
                 ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+
+                AttributeStatusInfo.ValidationStateChanged += HandleValidationStateChanged;
             }
             catch (Exception ex)
             {
@@ -3030,6 +3032,43 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI27847", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="AttributeStatusInfo.ValidationStateChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.DataEntry.ValidationStateChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleValidationStateChanged(object sender, ValidationStateChangedEventArgs e)
+        {
+            try
+            {
+                // https://extract.atlassian.net/browse/ISSUE-13153
+                // There seem to be cases where the cell doesn't get redrawn properly after the
+                // validation state changes-- as a way to try to ensure it does get drawn properly
+                // in the end, invoke an InvalidateCell call for any attributes whose validation
+                // state changed in the table.
+                if (_attributeMap.ContainsKey(e.Attribute))
+                {
+                    this.SafeBeginInvoke("ELI38419", () =>
+                    {
+                        object tableElement = null;
+                        if (_attributeMap.TryGetValue(e.Attribute, out tableElement))
+                        {
+                            var cell = tableElement as DataGridViewCell;
+                            if (cell != null)
+                            {
+                                InvalidateCell(cell);
+                            }
+                        }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38420");
             }
         }
 
