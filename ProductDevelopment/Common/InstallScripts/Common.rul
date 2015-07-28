@@ -44,6 +44,7 @@
     #define RDT_PRODUCT_CODE "{735E1622-3990-445F-9E5D-B0D7FDE292A3}"
     #define IDSHIELD_CUSTOMER_RDT_PRODUCT_CODE "{EAA7E74D-09C3-42EB-949F-C8F02D075B45}"  
     #define FLEX_INDEX_CUSTOMER_RDT_PRODUCT_CODE "{0096DE46-974F-48D5-956C-695B2E4A30F6}"
+    #define EXTRACT_CATEGORYFILES "Extract Systems\\CategoryFiles"
     
 //////////////////// installation declarations ///////////////////
 
@@ -1149,7 +1150,7 @@ begin
 	endif;
 	
 	// Delete all lst files
-	DeleteFile(CommonAppDataFolder + "\\*.LST");
+	DeleteFile("\"" + CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST\"");
 
 end;
 
