@@ -15,14 +15,22 @@ public:
 	void UseNamedAttributes(bool bUseNamedAttributes);
 
 	void UseSchemaName(const string& strSchemaName);
+	
+	void ValueAsFullText(bool bValueAsFullText);
+
+	void RemoveEmptyNodes(bool bRemoveEmpytNodes);
 
 	void WriteFile(const string& strFile, IIUnknownVector *pAttributes);
 
 private:
-	// Data memebers
+	// Data members
 	bool m_bUseNamedAttributes;
 
 	string m_strSchemaName;
+
+	bool m_bValueAsFullText;
+
+	bool m_bRemoveEmptyNodes;
 
 	// If true then spatial info will not be written out when the XML is written
 	bool m_bRemoveSpatialInfo;
@@ -33,6 +41,10 @@ private:
 
 	MSXML::IXMLDOMElementPtr getLineElement(MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument, 
 		IAttributePtr ipAttribute, ISpatialStringPtr ipLine, long nLineNum);
+
+	// Adds value and AverageCharConfidence of the ipValue to the given element
+	void addValueToElement(MSXML::IXMLDOMElementPtr ipElement, ISpatialStringPtr ipValue);
+
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Returns a valid xml DOM element created from ipXMLDOMDocument containing as 
 	//          attributes the simplified rectangular bounds of ipZone.
@@ -53,4 +65,8 @@ private:
 	
 	void addNodesForAttributes(MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument,
 		MSXML::IXMLDOMNodePtr ipNode, IIUnknownVectorPtr ipAttributes);
+
+	// Checks the attribute to see if it is empty
+	// it is empty if the value is empty and there are no sub attributes
+	bool isAttributeEmpty(IAttributePtr ipAttribute);
 };

@@ -23,7 +23,8 @@
 // Version 5: Store m_bFAMTags
 // Version 6: Store m_bRemoveSpatialInfo
 // Version 7: Added CIdentifiableObject
-const unsigned long gnCurrentVersion = 7;
+// Version 8: Added m_bValueAsFullText and m_bRemoveEmptyNodes
+const unsigned long gnCurrentVersion = 8;
 
 //-------------------------------------------------------------------------------------------------
 // COutputToXML
@@ -34,7 +35,9 @@ COutputToXML::COutputToXML()
 	m_bUseNamedAttributes(false),
 	m_bFAMTags(false),
 	m_bRemoveSpatialInfo(false),
-	m_bSchemaName(false)
+	m_bSchemaName(false),
+	m_bValueAsFullText(true),
+	m_bRemoveEmptyNodes(false)
 {
 	try
 	{
@@ -368,6 +371,82 @@ STDMETHODIMP COutputToXML::put_RemoveSpatialInfo(VARIANT_BOOL newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26327");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputToXML::get_ValueAsFullText(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI38395", pVal != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		// Retrieve setting
+		*pVal = asVariantBool(m_bValueAsFullText);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38396");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputToXML::put_ValueAsFullText(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Store setting
+		m_bValueAsFullText = asCppBool(newVal);
+
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38397");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputToXML::get_RemoveEmptyNodes(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI38421", pVal != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		// Retrieve setting
+		*pVal = asVariantBool(m_bRemoveEmptyNodes);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38422");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputToXML::put_RemoveEmptyNodes(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Store setting
+		m_bRemoveEmptyNodes = asCppBool(newVal);
+
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38423");
+
+	return S_OK;
+}
 
 //-------------------------------------------------------------------------------------------------
 // IOutputHandler
@@ -408,6 +487,12 @@ STDMETHODIMP COutputToXML::raw_ProcessOutput(IIUnknownVector *pAttributes,
 			{
 				xml2.UseSchemaName( m_strSchemaName.c_str() );
 			}
+
+			// Set flag for full text value
+			xml2.ValueAsFullText(m_bValueAsFullText);
+
+			// Set flag for remove empty nodes
+			xml2.RemoveEmptyNodes(m_bRemoveEmptyNodes);
 
 			// Write the XML file
 			xml2.WriteFile( strFileName.c_str(), pAttributes );
@@ -519,6 +604,12 @@ STDMETHODIMP COutputToXML::raw_CopyFrom(IUnknown *pObject)
 
 		// Copy the Remove spatial info value
 		m_bRemoveSpatialInfo = asCppBool(ipSource->RemoveSpatialInfo);
+
+		// Copy the Value as Full text flag
+		m_bValueAsFullText = asCppBool(ipSource->ValueAsFullText);
+
+		// Copy the value for Remove empty nodes flag
+		m_bRemoveEmptyNodes = asCppBool(ipSource->RemoveEmptyNodes);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12816");
 
@@ -585,6 +676,11 @@ STDMETHODIMP COutputToXML::Load(IStream *pStream)
 		// Version 2 format by default
 		m_eOutputFormat = kXMLSchema;
 		m_bUseNamedAttributes = false;
+
+		// Set remove empty nodes to false for default behavior < version 8
+		m_bRemoveEmptyNodes = false;
+		// Set value as full text to true for default behavior < version 8
+		m_bValueAsFullText = true;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -656,6 +752,12 @@ STDMETHODIMP COutputToXML::Load(IStream *pStream)
 			dataReader >> m_bRemoveSpatialInfo;
 		}
 
+		if (nDataVersion >=8)
+		{
+			dataReader >> m_bValueAsFullText;
+			dataReader >> m_bRemoveEmptyNodes;
+		}
+
 		if (nDataVersion >= 7)
 		{
 			// Load the GUID for the IIdentifiableObject interface.
@@ -703,6 +805,10 @@ STDMETHODIMP COutputToXML::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		dataWriter << m_bFAMTags;
 		dataWriter << m_bRemoveSpatialInfo;
+
+		dataWriter << m_bValueAsFullText;
+
+		dataWriter << m_bRemoveEmptyNodes;
 
 		dataWriter.flushToByteStream();
 

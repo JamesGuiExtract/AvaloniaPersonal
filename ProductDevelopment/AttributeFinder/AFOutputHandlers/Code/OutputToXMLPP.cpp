@@ -38,7 +38,7 @@ STDMETHODIMP COutputToXMLPP::Apply(void)
 			// get the output handler object
 			UCLID_AFOUTPUTHANDLERSLib::IOutputToXMLPtr ipOutputToXML = m_ppUnk[i];
 
-			// if the edit box does not have text, then it's an error conditition
+			// if the edit box does not have text, then it's an error condition
 			CComBSTR bstrFileName;
 			GetDlgItemText(IDC_EDIT_FILENAME, bstrFileName.m_str);
 			_bstr_t _bstrFileName(bstrFileName);
@@ -65,6 +65,8 @@ STDMETHODIMP COutputToXMLPP::Apply(void)
 				ipOutputToXML->NamedAttributes = VARIANT_FALSE;
 				ipOutputToXML->UseSchemaName = VARIANT_FALSE;
 				ipOutputToXML->SchemaName = _bstrNoSchema;
+				ipOutputToXML->ValueAsFullText = VARIANT_TRUE;
+				ipOutputToXML->RemoveEmptyNodes = VARIANT_FALSE;
 			}
 			else
 			{
@@ -84,6 +86,11 @@ STDMETHODIMP COutputToXMLPP::Apply(void)
 					// Store the schema name (can be empty if m_bSchemaName == false)
 					ipOutputToXML->SchemaName = bstrSchemaName;
 				}
+				ipOutputToXML->ValueAsFullText = 
+					asVariantBool(m_chkValueAsFullTextNode.GetCheck() == BST_CHECKED);
+
+				ipOutputToXML->RemoveEmptyNodes = 
+					asVariantBool(m_chkRemoveEmptyNodes.GetCheck() == BST_CHECKED);
 			}
 
 			// Set the remove spatial info value
@@ -151,6 +158,8 @@ LRESULT COutputToXMLPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			m_btnSchema = GetDlgItem( IDC_CHECK_SCHEMA );
 			m_editSchemaName = GetDlgItem( IDC_EDIT_SCHEMANAME );
 			m_chkRemoveSpatialInfo = GetDlgItem(IDC_CHK_XML_OUT_REMOVE_SPATIAL);
+			m_chkValueAsFullTextNode = GetDlgItem(IDC_CHECK_FULLTEXTNODE);
+			m_chkRemoveEmptyNodes = GetDlgItem(IDC_CHECK_REMOVE_EMPTY);
 
 			string strFileName = asString(ipOutputToXML->FileName);
 			m_editFileName.SetWindowText(strFileName.c_str());
@@ -174,6 +183,8 @@ LRESULT COutputToXMLPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 				m_btnNames.EnableWindow( FALSE );
 				m_btnSchema.EnableWindow( FALSE );
 				m_editSchemaName.EnableWindow( FALSE );
+				m_chkRemoveEmptyNodes.EnableWindow( FALSE );
+				m_chkValueAsFullTextNode.EnableWindow( FALSE );
 			}
 			else if (m_iXMLFormat == (int)kXMLSchema)
 			{
@@ -198,6 +209,12 @@ LRESULT COutputToXMLPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
 			// Set the checked state on the remove spatial info check box
 			m_chkRemoveSpatialInfo.SetCheck(asBSTChecked(ipOutputToXML->RemoveSpatialInfo));
+
+			// Set the checked state on the ValueAsFullText check box
+			m_chkValueAsFullTextNode.SetCheck(asBSTChecked(ipOutputToXML->ValueAsFullText));
+
+			// Set the checked state on the Remove empty nodes check box
+			m_chkRemoveEmptyNodes.SetCheck(asBSTChecked(ipOutputToXML->RemoveEmptyNodes));
 
 			// set focus to the editbox
 			m_editFileName.SetSel(0, -1);
@@ -274,6 +291,8 @@ LRESULT COutputToXMLPP::OnBnClickedRadioOriginal(WORD /*wNotifyCode*/, WORD /*wI
 		m_btnNames.EnableWindow( FALSE );
 		m_btnSchema.EnableWindow( FALSE );
 		m_editSchemaName.EnableWindow( FALSE );
+		m_chkRemoveEmptyNodes.EnableWindow( FALSE );
+		m_chkValueAsFullTextNode.EnableWindow( FALSE );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12893");
 
@@ -292,6 +311,8 @@ LRESULT COutputToXMLPP::OnBnClickedRadioSchema(WORD /*wNotifyCode*/, WORD /*wID*
 		// Enable checkboxes
 		m_btnNames.EnableWindow( TRUE );
 		m_btnSchema.EnableWindow( TRUE );
+		m_chkRemoveEmptyNodes.EnableWindow( TRUE );
+		m_chkValueAsFullTextNode.EnableWindow( TRUE );
 
 		// Enable or disable the edit box
 		m_editSchemaName.EnableWindow(asMFCBool(m_btnSchema.GetCheck() == BST_CHECKED));

@@ -1144,12 +1144,13 @@ begin
 		
 		UninstallInliteKeyDrivers();
 
-		// Delete all lst files
-		DeleteFile(PROGRAMFILES + EXTRACT_DIR + "\\*.LST");
-
 		UnRegisterAll();
 		
 	endif;
+	
+	// Delete all lst files
+	DeleteFile(CommonAppDataFolder + "\\*.LST");
+
 end;
 
 //---------------------------------------------------------------------------

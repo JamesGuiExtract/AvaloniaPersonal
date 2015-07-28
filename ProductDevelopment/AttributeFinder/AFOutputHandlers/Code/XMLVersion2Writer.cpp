@@ -33,7 +33,8 @@ const string gstrXSI_NAME = "xsi:noNamespaceSchemaLocation";
 // XMLVersion2Writer
 //-------------------------------------------------------------------------------------------------
 XMLVersion2Writer::XMLVersion2Writer(bool bRemoveSpatialInfo)
-:	m_bUseNamedAttributes(false), m_bRemoveSpatialInfo(bRemoveSpatialInfo)
+:	m_bUseNamedAttributes(false), m_bRemoveSpatialInfo(bRemoveSpatialInfo), m_bValueAsFullText(true),
+m_bRemoveEmptyNodes(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -55,6 +56,16 @@ void XMLVersion2Writer::UseSchemaName(const string& strSchemaName)
 		m_strSchemaName = strSchemaName;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI12916")
+}
+//-------------------------------------------------------------------------------------------------
+void XMLVersion2Writer::ValueAsFullText(bool bValueAsFullText)
+{
+	m_bValueAsFullText = bValueAsFullText;
+}
+//-------------------------------------------------------------------------------------------------
+void XMLVersion2Writer::RemoveEmptyNodes(bool bRemoveEmptyNodes)
+{
+	m_bRemoveEmptyNodes = bRemoveEmptyNodes;
 }
 //-------------------------------------------------------------------------------------------------
 void XMLVersion2Writer::WriteFile(const string& strFile, IIUnknownVector *pAttributes)
@@ -133,6 +144,12 @@ void XMLVersion2Writer::addNodesForAttributes(MSXML::IXMLDOMDocumentPtr ipXMLDOM
 		UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(i);
 		ASSERT_RESOURCE_ALLOCATION("ELI19168", ipAttribute != __nullptr);
 
+		// Check if attribute is empty
+		if (m_bRemoveEmptyNodes && isAttributeEmpty(ipAttribute))
+		{
+			continue;
+		}
+
 		/////////////////////////
 		// Create an "Field" node for the current attribute
 		/////////////////////////
@@ -170,10 +187,18 @@ void XMLVersion2Writer::addNodesForAttributes(MSXML::IXMLDOMDocumentPtr ipXMLDOM
 		//////////////////////////////
 		// Create the FullText element
 		//////////////////////////////
-		MSXML::IXMLDOMElementPtr ipValueElement = getValueElement(ipXMLDOMDocument, ipText);
+		if (m_bValueAsFullText)
+		{
+			MSXML::IXMLDOMElementPtr ipValueElement = getValueElement(ipXMLDOMDocument, ipText);
 
-		// Append the FullText node to the attribute
-		ipAttributeNode->appendChild(ipValueElement);
+			// Append the FullText node to the attribute
+			ipAttributeNode->appendChild(ipValueElement);
+		}
+		else
+		{
+			// Add to the current node
+			addValueToElement(ipAttributeNode, ipText);
+		}
 
 		// Only add the spatial line information if not removing spatial info [FlexIDSCore #3557]
 		if (!m_bRemoveSpatialInfo)
@@ -231,18 +256,26 @@ MSXML::IXMLDOMElementPtr XMLVersion2Writer::getValueElement(MSXML::IXMLDOMDocume
 		gstrFULLTEXT_LEVEL_ATTRIBUTE_NAME.c_str() );
 	ASSERT_RESOURCE_ALLOCATION("ELI19172", ipValueNode != __nullptr);
 
+	// Add the value to the new node
+	addValueToElement(ipValueNode, ipValue);
+
+	return ipValueNode;
+}
+//-------------------------------------------------------------------------------------------------
+void XMLVersion2Writer::addValueToElement(MSXML::IXMLDOMElementPtr ipElement, ISpatialStringPtr ipValue)
+{
+	ASSERT_ARGUMENT("ELI38416", ipValue != __nullptr);
+
+	MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument = ipElement->ownerDocument;
+
 	// Create a text node with the actual attribute value's text
 	// removing any unprintable characters (P16 #1413)
 	string strTest = asString(ipValue->String);
 	string strValue = removeUnprintableCharacters( strTest );
 	MSXML::IXMLDOMNodePtr ipValueNodeText = ipXMLDOMDocument->createTextNode( 
 		strValue.c_str() );
-	ASSERT_RESOURCE_ALLOCATION("ELI19174", ipValueNodeText != __nullptr);
-	ipValueNode->appendChild( ipValueNodeText );
-
-	// Get access to the XML element interface of the Value node
-	MSXML::IXMLDOMElementPtr ipValueElement = ipValueNode;
-	ASSERT_RESOURCE_ALLOCATION("ELI19175", ipValueElement != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI38417", ipValueNodeText != __nullptr);
+	ipElement->appendChild( ipValueNodeText );
 
 	if (!m_bRemoveSpatialInfo && ipValue->HasSpatialInfo() == VARIANT_TRUE)
 	{
@@ -255,10 +288,8 @@ MSXML::IXMLDOMElementPtr XMLVersion2Writer::getValueElement(MSXML::IXMLDOMDocume
 
 		// Add Average Character Confidence - P16 #1680
 		_bstr_t _bstrConfAttrName = gstrCONFIDENCE_ATTRIBUTE_NAME.c_str();
-		ipValueElement->setAttribute( _bstrConfAttrName, strAvg.c_str() );
+		ipElement->setAttribute( _bstrConfAttrName, strAvg.c_str() );
 	}
-
-	return ipValueElement;
 }
 //-------------------------------------------------------------------------------------------------
 MSXML::IXMLDOMElementPtr XMLVersion2Writer::getLineElement(MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument, 
@@ -450,3 +481,42 @@ void XMLVersion2Writer::appendSpatialElements(MSXML::IXMLDOMNodePtr ipLineNode,
 	}
 }
 //-------------------------------------------------------------------------------------------------
+bool XMLVersion2Writer::isAttributeEmpty(IAttributePtr ipAttribute)
+{
+	// Get the value
+	ISpatialStringPtr ipText = ipAttribute->Value;
+
+	// If the value is not empty return false
+	if (ipText != __nullptr && !asCppBool(ipText->IsEmpty()))
+	{
+		return false;
+	}
+
+	// Get the sub attribute
+	IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
+	
+	// If sub attributes null then attribute is empty
+	if (ipSubAttributes == __nullptr)
+	{
+		return true;
+	}
+	
+	// If no sub attributes attribute is empty
+	long numberOfSubAttributes = ipSubAttributes->Size(); 
+	if (numberOfSubAttributes == 0)
+	{
+		return true;
+	}
+
+	// Check sub attribute with a recursive call
+	for (long l = 0; l < numberOfSubAttributes; l++)
+	{
+		if (!isAttributeEmpty(ipSubAttributes->At(l)))
+		{
+			return false;
+		}
+	}
+	
+	// If we get here the attribute is empty
+	return true;
+}

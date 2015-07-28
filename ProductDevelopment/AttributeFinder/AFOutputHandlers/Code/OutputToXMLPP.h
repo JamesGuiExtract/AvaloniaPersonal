@@ -78,6 +78,8 @@ private:
 	ATLControls::CButton m_btnSchema;
 	ATLControls::CEdit m_editSchemaName;
 	ATLControls::CButton m_chkRemoveSpatialInfo;
+	ATLControls::CButton m_chkValueAsFullTextNode;
+	ATLControls::CButton m_chkRemoveEmptyNodes;
 
 	// helper functions
 	void validateLicense();

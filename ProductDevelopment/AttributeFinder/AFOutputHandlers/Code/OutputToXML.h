@@ -76,6 +76,10 @@ public:
 	STDMETHOD(put_FAMTags)(VARIANT_BOOL newVal);
 	STDMETHOD(get_RemoveSpatialInfo)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_RemoveSpatialInfo)(VARIANT_BOOL newVal);
+	STDMETHOD(get_ValueAsFullText)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_ValueAsFullText)(VARIANT_BOOL newVal);
+	STDMETHOD(get_RemoveEmptyNodes)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_RemoveEmptyNodes)(VARIANT_BOOL newVal);
 
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
@@ -129,6 +133,12 @@ private:
 
 	// Flag to indicate whether spatial info should be removed from the XML output
 	bool m_bRemoveSpatialInfo;
+
+	// Flag to indicate whether the outputted XML should use a <FullText/> tag for the value
+	bool m_bValueAsFullText;
+
+	// Flag to indicate whether to remove empty nodes
+	bool m_bRemoveEmptyNodes;
 
 	void validateLicense();
 

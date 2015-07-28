@@ -46,6 +46,9 @@ begin
 	// Install the readme file
 	InstallReadme();
 	
+	// Delete all lst files
+	DeleteFile(CommonAppDataFolder + "\\*.LST");
+
     Disable(STATUSEX);
 
 	if ( gbInstalled ) then

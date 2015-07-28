@@ -137,6 +137,10 @@ library UCLID_AFOUTPUTHANDLERSLib
 			RemoveSpatialInfo([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(7), helpstring("property RemoveSpatialInfo")] HRESULT
 			RemoveSpatialInfo([in] VARIANT_BOOL newVal);
+		[propget, id(8), helpstring("property ValueAsFullText")] HRESULT ValueAsFullText([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(8), helpstring("property ValueAsFullText")] HRESULT ValueAsFullText([in] VARIANT_BOOL newVal);
+		[propget, id(9), helpstring("property RemoveEmptyNodes")] HRESULT RemoveEmptyNodes([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(9), helpstring("property RemoveEmptyNodes")] HRESULT RemoveEmptyNodes([in] VARIANT_BOOL newVal);
 	};
 	[
 		object,

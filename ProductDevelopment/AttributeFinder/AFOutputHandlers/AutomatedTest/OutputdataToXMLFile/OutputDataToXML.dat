@@ -14,3 +14,13 @@
 
 //test5 "Output XML with spatial information and spatial information removed (all versions)
 <TESTCASE>;TestRemoveSpatialXMLOutput.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;TestRemoveSpatialXMLOutput.eav
+
+//test6 "Version 2 format with <SpatialLine> and Nest values in FullText node unchecked
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 "Version 2 format with <SpatialLine> and Remove empty nodes/branches checked 
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 "Version 2 format with <SpatialLine> and Remove empty nodes/branches checked 
+// and Next values in FullText node checked
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;Test8.eav

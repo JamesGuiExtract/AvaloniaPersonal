@@ -118,10 +118,8 @@
 #define IDC_RADIO_ORIGINAL              241
 #define IDC_RADIO_SCHEMA                242
 #define IDC_CHECK_NAMES                 243
-#define IDC_CHECK_NAMES2                245
 #define IDC_CHECK_SCHEMA                245
 #define IDC_COMBO_ATTRIBUTE_SELECTOR    245
-#define IDC_BUTTON1                     246
 #define IDC_BUTTON_CONFIGURE_SELECTOR   246
 #define IDC_BTN_SELECT_DOC_TAG          251
 #define IDC_GRID                        260
@@ -181,6 +179,8 @@
 #define IDC_CHK_USE_SELECTOR            352
 #define IDC_TXT_MUST_CONFIGURE_SELECTOR 353
 #define IDR_SPATIALLYSORTATTRIBUTES     354
+#define IDC_CHECK_FULLTEXTNODE          355
+#define IDC_CHECK_REMOVE_EMPTY          356
 
 // Next default values for new objects
 // 
@@ -188,7 +188,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        355
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         354
+#define _APS_NEXT_CONTROL_VALUE         357
 #define _APS_NEXT_SYMED_VALUE           164
 #endif
 #endif
