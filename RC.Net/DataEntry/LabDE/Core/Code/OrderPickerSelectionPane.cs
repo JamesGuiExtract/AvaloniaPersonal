@@ -234,9 +234,8 @@ namespace Extract.DataEntry.LabDE
             {
                 try
                 {
-                    return (string.IsNullOrWhiteSpace(SelectedOrderNumber) !=
-                            string.IsNullOrWhiteSpace(GetSelectedOrderNumber())) &&
-                        SelectedOrderNumber != GetSelectedOrderNumber();
+                    return ( !string.IsNullOrWhiteSpace(GetSelectedOrderNumber()) &&
+                        SelectedOrderNumber != GetSelectedOrderNumber() );
                 }
                 catch (Exception ex)
                 {

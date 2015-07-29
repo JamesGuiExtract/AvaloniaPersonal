@@ -342,12 +342,6 @@ namespace Extract.FileActionManager.Utilities
             new Dictionary<int, IFAMFileInspectorColumn>();
 
         /// <summary>
-        /// Indicates whether user should be prompted about uncommitted data in custom columns when 
-        /// the form is closed.
-        /// </summary>
-        bool _explicitDataApplyOrCancel;
-        
-        /// <summary>
         /// Associates pre-defined search terms from the database's FieldSearch table with their
         /// associated queries.
         /// </summary>
@@ -2928,11 +2922,6 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                // If the user has hit the OK button, they are explicitly intending to apply any
-                // uncommitted changes. Don't prompt about the changes if the column doesn't require
-                // an explicit prompt via the ApplyPrompt property.
-                _explicitDataApplyOrCancel = true;
-
                 if (PromptToApplyCustomChanges(false))
                 {
                     DialogResult = DialogResult.OK;
@@ -2942,10 +2931,6 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI37439");
-            }
-            finally
-            {
-                _explicitDataApplyOrCancel = false;
             }
         }
 
@@ -2959,20 +2944,11 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                // If the user has hit the cancel button, they are explicitly intending to disregard
-                // any uncommitted changes. Don't prompt about uncommitted changes if the column
-                // doesn't require an explicit prompt via the CancelPrompt property.
-                _explicitDataApplyOrCancel = true;
-
                 Close();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI37440");
-            }
-            finally
-            {
-                _explicitDataApplyOrCancel = true;
             }
         }
 
@@ -5086,27 +5062,25 @@ namespace Extract.FileActionManager.Utilities
                 ? CustomCancelPrompts
                 : CustomApplyPrompts;
 
-            bool prompt = customPrompts.Any() ||
-                (!_explicitDataApplyOrCancel && CustomDataManagers.Any(manager => manager.Dirty));
-
-            if (prompt)
+            // JIRA ISSUE-13058 - Order picker doesn't display Apply changes dialog when closing
+            // JIRA ISSUE-13164 - Modify FFI IDataManager Cancel/Close button behavior
+            // The desired behavior is:
+            //      1) The Close Button and the go-away box should act the same
+            //      2) Both close methods should not prompt, even if the user has made changes that will be lost.
+            //
+            if (customPrompts.Any())
             {
                 using (var messageBox = new CustomizableMessageBox())
                 {
                     StringBuilder message = new StringBuilder(
                         canceling
                             ? "There are uncommitted changes."
-                        // There must be prompts because _explicitDataApplyOrCancel will be true if !canceling
                             : "You have selected to:");
 
                     message.AppendLine();
-
-                    if (customPrompts.Any())
-                    {
-                        message.AppendLine();
-                        message.AppendLine(string.Join("\r\n\r\n", customPrompts));
-                        message.AppendLine();
-                    }
+                    message.AppendLine();
+                    message.AppendLine(string.Join("\r\n\r\n", customPrompts));
+                    message.AppendLine();
 
                     message.Append("Apply changes?");
                     messageBox.Caption = "Apply changes?";
