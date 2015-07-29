@@ -46,6 +46,9 @@ begin
 			LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
 		endif;
 		
+		// Delete all lst files
+		DeleteFile(CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST");
+		
 		// Removed Corepoint install because not sure if silent install works properly
    		//InstallCorepoint();
    		InstallMSMQ();    

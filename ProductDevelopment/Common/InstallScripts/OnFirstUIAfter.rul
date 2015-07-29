@@ -47,7 +47,7 @@ begin
 	InstallReadme();
 	
 	// Delete all lst files
-	DeleteFile("\"" + CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST\"");
+	DeleteFile(CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST");
 
     Disable(STATUSEX);
 

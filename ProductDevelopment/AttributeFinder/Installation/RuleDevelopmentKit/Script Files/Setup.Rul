@@ -126,6 +126,10 @@ begin
                                                                                                                                   
     // Register Dlls
 	RunRegisterAll();
+	
+	// Delete all lst files
+	DeleteFile(CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST");
+
     Disable(STATUSEX);
 	
     bOpt1  = FALSE;
