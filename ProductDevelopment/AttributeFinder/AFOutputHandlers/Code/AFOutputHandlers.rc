@@ -169,13 +169,13 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON,15,49,140,11
     CONTROL         "Version 2 format with <SpatialLine>",IDC_RADIO_SCHEMA,
                     "Button",BS_AUTORADIOBUTTON,15,65,124,11
-    CONTROL         "Formatted with attribute names",IDC_CHECK_NAMES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,81,111,11
-    CONTROL         "Include schema name in output",IDC_CHECK_SCHEMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,97,116,11
+    CONTROL         "Formatted with attribute names",IDC_CHECK_NAMES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,81,128,11
+    CONTROL         "Include schema name in output",IDC_CHECK_SCHEMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,97,128,11
     EDITTEXT        IDC_EDIT_SCHEMANAME,40,113,102,14,ES_AUTOHSCROLL
     CONTROL         "Nest values in <FullText> node",IDC_CHECK_FULLTEXTNODE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,132,111,11
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,132,128,11
     CONTROL         "Remove empty nodes/branches",IDC_CHECK_REMOVE_EMPTY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,148,111,11
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,148,128,11
     CONTROL         "Remove spatial information in output",IDC_CHK_XML_OUT_REMOVE_SPATIAL,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,169,150,11
 END
