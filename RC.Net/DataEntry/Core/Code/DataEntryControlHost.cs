@@ -521,7 +521,7 @@ namespace Extract.DataEntry
         /// Indicates whether all data must conform to validation rules before saving and, if not,
         /// whether a prompt will be displayed before allowing invalid data to be saved.
         /// </summary>
-        InvalidDataSaveMode _invalidDataSaveMode = InvalidDataSaveMode.Disallow;
+        InvalidDataSaveMode _invalidDataSaveMode = InvalidDataSaveMode.PromptForEachWarning;
 
         /// <summary>
         /// Keeps track of whether the highlights associated with the active control need to be
@@ -891,6 +891,7 @@ namespace Extract.DataEntry
         /// <see langword="UnviewedDataSaveMode.Disallow"/> if all data must be viewed before
         /// saving.</returns>
         [Category("Data Entry Control Host")]
+        [DefaultValue(UnviewedDataSaveMode.Allow)]
         public UnviewedDataSaveMode UnviewedDataSaveMode
         {
             get
@@ -920,6 +921,7 @@ namespace Extract.DataEntry
         /// requirements before saving.
         /// </returns>
         [Category("Data Entry Control Host")]
+        [DefaultValue(InvalidDataSaveMode.PromptForEachWarning)]
         public InvalidDataSaveMode InvalidDataSaveMode
         {
             get
