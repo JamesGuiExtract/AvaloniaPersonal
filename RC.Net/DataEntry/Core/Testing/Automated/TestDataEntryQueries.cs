@@ -54,7 +54,7 @@ namespace Extract.DataEntry.Test
         static AFUtility _utility = new AFUtility();
 
         /// <summary>
-        /// Setup method to initalize the testing environment.
+        /// Setup method to initialize the testing environment.
         /// </summary>
         [TestFixtureSetUp]
         public static void Setup()

@@ -118,6 +118,17 @@ namespace Extract.DataEntry
                                     value = TypeConversionUtils.ConvertValueIfNecessary(
                                         type, childQueryResult.ToStringArray(), variableName);
                                 }
+                                // The following type checks may end up being useful for use in query
+                                // utility classes such as LabDEQueryUtilities, but aren't needed as
+                                // of yet.
+//                                else if (type == typeof(IAttribute))
+//                                {
+//                                    value = childQueryResult.FirstAttributeValue;
+//                                }
+//                                else if (type == typeof(SpatialString))
+//                                {
+//                                    value = childQueryResult.ToSpatialString();
+//                                }
                                 else
                                 {
                                     value = TypeConversionUtils.ConvertValueIfNecessary(type, stringValue, variableName);
