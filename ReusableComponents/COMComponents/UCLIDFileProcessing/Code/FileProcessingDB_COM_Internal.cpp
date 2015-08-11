@@ -7436,7 +7436,7 @@ bool CFileProcessingDB::SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* 
 			// match the UPI of the current process.
 			string strLockedFileQuery =
 				"SELECT [StatusBeforeLock] FROM [LockedFile] "
-				"	INNER JOIN [FAMSession] ON [FAMSession].[ID] = [LockedFile].[UPIID] "
+				"	INNER JOIN [ActiveFAM] ON [ActiveFAM].[ID] = [LockedFile].[UPIID] "
 				"	WHERE [FileID] = " + asString(nFileId) +
 				"	AND [UPI] = '" + UPI::getCurrentProcessUPI().getUPI() + "'";
 
