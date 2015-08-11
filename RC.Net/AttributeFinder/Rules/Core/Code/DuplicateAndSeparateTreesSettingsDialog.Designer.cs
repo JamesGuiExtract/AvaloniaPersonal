@@ -30,11 +30,13 @@
         {
             System.Windows.Forms.Label label1;
             System.Windows.Forms.GroupBox groupBox1;
-            this._cancelButton = new System.Windows.Forms.Button();
-            this._okButton = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
+            this._runOutputHandlerCheckBox = new System.Windows.Forms.CheckBox();
+            this._outputHandlerControl = new Extract.AttributeFinder.Rules.ConfigurableObjectControl();
             this._dividingAttributeTextBox = new System.Windows.Forms.TextBox();
             this._attributeSelectorControl = new Extract.AttributeFinder.Rules.ConfigurableObjectControl();
+            this.label2 = new System.Windows.Forms.Label();
+            this._cancelButton = new System.Windows.Forms.Button();
+            this._okButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
@@ -49,36 +51,41 @@
             label1.TabIndex = 0;
             label1.Text = "Select the attributes to be duplicated and separated:";
             // 
-            // _cancelButton
+            // groupBox1
             // 
-            this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(293, 157);
-            this._cancelButton.Name = "_cancelButton";
-            this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 2;
-            this._cancelButton.Text = "Cancel";
-            this._cancelButton.UseVisualStyleBackColor = true;
+            groupBox1.Controls.Add(this._runOutputHandlerCheckBox);
+            groupBox1.Controls.Add(this._outputHandlerControl);
+            groupBox1.Controls.Add(label1);
+            groupBox1.Controls.Add(this._dividingAttributeTextBox);
+            groupBox1.Controls.Add(this._attributeSelectorControl);
+            groupBox1.Controls.Add(this.label2);
+            groupBox1.Location = new System.Drawing.Point(12, 12);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new System.Drawing.Size(356, 212);
+            groupBox1.TabIndex = 0;
+            groupBox1.TabStop = false;
             // 
-            // _okButton
+            // _runOutputHandlerCheckBox
             // 
-            this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(212, 157);
-            this._okButton.Name = "_okButton";
-            this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 1;
-            this._okButton.Text = "OK";
-            this._okButton.UseVisualStyleBackColor = true;
-            this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
+            this._runOutputHandlerCheckBox.AutoSize = true;
+            this._runOutputHandlerCheckBox.Location = new System.Drawing.Point(11, 142);
+            this._runOutputHandlerCheckBox.Name = "_runOutputHandlerCheckBox";
+            this._runOutputHandlerCheckBox.Size = new System.Drawing.Size(261, 17);
+            this._runOutputHandlerCheckBox.TabIndex = 4;
+            this._runOutputHandlerCheckBox.Text = "Run output handler on each tree after it is created";
+            this._runOutputHandlerCheckBox.UseVisualStyleBackColor = true;
+            this._runOutputHandlerCheckBox.CheckedChanged += new System.EventHandler(this.HandleRunOutputHandlerCheckedChanged);
             // 
-            // label2
+            // _outputHandlerControl
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 88);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(202, 13);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Specify the name of the dividing attribute:";
+            this._outputHandlerControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._outputHandlerControl.CategoryName = "UCLID AF-API Output Handlers";
+            this._outputHandlerControl.ConfigurableObject = null;
+            this._outputHandlerControl.Location = new System.Drawing.Point(6, 160);
+            this._outputHandlerControl.Name = "_outputHandlerControl";
+            this._outputHandlerControl.Size = new System.Drawing.Size(344, 49);
+            this._outputHandlerControl.TabIndex = 5;
             // 
             // _dividingAttributeTextBox
             // 
@@ -98,24 +105,43 @@
             this._attributeSelectorControl.Size = new System.Drawing.Size(345, 48);
             this._attributeSelectorControl.TabIndex = 1;
             // 
-            // groupBox1
+            // label2
             // 
-            groupBox1.Controls.Add(label1);
-            groupBox1.Controls.Add(this._dividingAttributeTextBox);
-            groupBox1.Controls.Add(this._attributeSelectorControl);
-            groupBox1.Controls.Add(this.label2);
-            groupBox1.Location = new System.Drawing.Point(12, 12);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(356, 136);
-            groupBox1.TabIndex = 0;
-            groupBox1.TabStop = false;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(10, 88);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(202, 13);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Specify the name of the dividing attribute:";
+            // 
+            // _cancelButton
+            // 
+            this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this._cancelButton.Location = new System.Drawing.Point(293, 233);
+            this._cancelButton.Name = "_cancelButton";
+            this._cancelButton.Size = new System.Drawing.Size(75, 23);
+            this._cancelButton.TabIndex = 2;
+            this._cancelButton.Text = "Cancel";
+            this._cancelButton.UseVisualStyleBackColor = true;
+            // 
+            // _okButton
+            // 
+            this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._okButton.Location = new System.Drawing.Point(212, 233);
+            this._okButton.Name = "_okButton";
+            this._okButton.Size = new System.Drawing.Size(75, 23);
+            this._okButton.TabIndex = 1;
+            this._okButton.Text = "OK";
+            this._okButton.UseVisualStyleBackColor = true;
+            this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
             // 
             // DuplicateAndSeparateTreesSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(380, 192);
+            this.ClientSize = new System.Drawing.Size(380, 268);
             this.Controls.Add(groupBox1);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
@@ -141,5 +167,7 @@
         private ConfigurableObjectControl _attributeSelectorControl;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox _dividingAttributeTextBox;
+        private ConfigurableObjectControl _outputHandlerControl;
+        private System.Windows.Forms.CheckBox _runOutputHandlerCheckBox;
     }
 }

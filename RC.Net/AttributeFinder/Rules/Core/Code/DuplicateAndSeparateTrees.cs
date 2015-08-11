@@ -27,12 +27,12 @@ namespace Extract.AttributeFinder.Rules
     {
 
         /// <summary>
-        /// Gets or sets the <see cref="IAttributeSelector"/> used to specifiy which attribute(s)
-        /// are to be duplidated and separated.
+        /// Gets or sets the <see cref="IAttributeSelector"/> used to specify which attribute(s)
+        /// are to be duplicated and separated.
         /// </summary>
         /// <value>
-        /// The <see cref="IAttributeSelector"/> used to specifiy which attribute(s) are to be
-        /// duplidated and separated.
+        /// The <see cref="IAttributeSelector"/> used to specify which attribute(s) are to be
+        /// duplicated and separated.
         /// </value>
         IAttributeSelector AttributeSelector
         {
@@ -57,7 +57,7 @@ namespace Extract.AttributeFinder.Rules
     /// An <see cref="IOutputHandler"/> that will duplicate selected attributes along with their
     /// descendant trees within the output by using child attributes of a specific name such that the
     /// final result will contain as many copies of the original tree as there are child attributes
-    /// matching the divinding attribute name. Each copy of the tree will have only one of the
+    /// matching the dividing attribute name. Each copy of the tree will have only one of the
     /// original dividing attribute instances, but a copy of all non-dividing attribute instances.
     /// </summary>
     [ComVisible(true)]
@@ -74,10 +74,10 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Current version.
-        /// <para><b>Version 2</b></para>
-        /// Added IdentifiableObject inheritance
+        /// <para>Version 2: Added IdentifiableObject inheritance</para>
+        /// <para>Version 3: Added feature to run an output handler on resulting trees.</para>
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -94,8 +94,8 @@ namespace Extract.AttributeFinder.Rules
         AFUtility _afUtility;
 
         /// <summary>
-        /// The <see cref="IAttributeSelector"/> used to specifiy which attribute(s) are to be
-        /// duplidated and separated.
+        /// The <see cref="IAttributeSelector"/> used to specify which attribute(s) are to be
+        /// duplicated and separated.
         /// </summary>
         IAttributeSelector _attributeSelector;
 
@@ -103,6 +103,16 @@ namespace Extract.AttributeFinder.Rules
         /// The name of the dividing attribute.
         /// </summary>
         string _dividingAttributeName;
+
+        /// <summary>
+        /// The <see cref="IOutputHandler"/> to be run on each tree after it is created.
+        /// </summary>
+        IOutputHandler _outputHandler;
+
+        /// <summary>
+        /// Indicates whether to run an output handler on resulting trees.
+        /// </summary>
+        bool _runOutputHandler;
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to this instance since it was created;
@@ -151,12 +161,12 @@ namespace Extract.AttributeFinder.Rules
         #region Properties
 
         /// <summary>
-        /// Gets or sets the <see cref="IAttributeSelector"/> used to specifiy which attribute(s)
-        /// are to be duplidated and separated.
+        /// Gets or sets the <see cref="IAttributeSelector"/> used to specify which attribute(s)
+        /// are to be duplicated and separated.
         /// </summary>
         /// <value>
-        /// The <see cref="IAttributeSelector"/> used to specifiy which attribute(s) are to be
-        /// duplidated and separated.
+        /// The <see cref="IAttributeSelector"/> used to specify which attribute(s) are to be
+        /// duplicated and separated.
         /// </value>
         public IAttributeSelector AttributeSelector
         {
@@ -214,6 +224,62 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
+        /// <summary>
+        /// Gets or sets whether to run an output handler on resulting trees.
+        /// </summary>
+        public bool RunOutputHandler
+        {
+            get
+            {
+                return _runOutputHandler;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_runOutputHandler != value)
+                    {
+                        _runOutputHandler = value;
+
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38446");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the output handler to run on resulting trees
+        /// </summary>
+        public IOutputHandler OutputHandler
+        {
+            get
+            {
+                return _outputHandler;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_outputHandler != value)
+                    {
+                        _outputHandler = value;
+
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38437");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region IOutputHandler Members
@@ -222,7 +288,7 @@ namespace Extract.AttributeFinder.Rules
         /// Processes the output (<see paramref="pAttributes"/>) by duplicating selected attributes
         /// along with their descendant trees by using child attributes of a specific name such that
         /// the final result will contain as many copies of the original tree as there are child
-        /// attributes matching the divinding attribute name. Each copy of the tree will have only
+        /// attributes matching the dividing attribute name. Each copy of the tree will have only
         /// one of the original dividing attribute instances, but a copy of all non-dividing
         /// attribute instances.
         /// </summary>
@@ -259,10 +325,20 @@ namespace Extract.AttributeFinder.Rules
                     // So that the garbage collector knows of and properly manages the associated
                     // memory.
                     attribute.ReportMemoryUsage();
-                    DuplicateAndSeparateTree(pAttributes, attribute);
+
+                    // https://extract.atlassian.net/browse/ISSUE-13189
+                    // TODO: post-10.2 remove this condition and call the three argument version of the method only.
+                    if (RunOutputHandler)
+                    {
+                        DuplicateAndSeparateTree(pAttributes, attribute, pDoc);
+                    }
+                    else
+                    {
+                        DuplicateAndSeparateTree(pAttributes, attribute);
+                    }
                 }
 
-                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // Report memory usage of hierarchy after processing to ensure all COM objects
                 // referenced in final result are reported.
                 pAttributes.ReportMemoryUsage();
             }
@@ -325,8 +401,10 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                if (AttributeSelector == null ||
-                    !UtilityMethods.IsValidIdentifier(DividingAttributeName))
+                if (   AttributeSelector == null
+                    || RunOutputHandler && OutputHandler == null
+                    || !UtilityMethods.IsValidIdentifier(DividingAttributeName)
+                    )
                 {
                     return false;
                 }
@@ -449,6 +527,15 @@ namespace Extract.AttributeFinder.Rules
                     AttributeSelector = reader.ReadIPersistStream() as IAttributeSelector;
                     DividingAttributeName = reader.ReadString();
 
+                    if (reader.Version >= 3)
+                    {
+                        RunOutputHandler = reader.ReadBoolean();
+                        if (RunOutputHandler)
+                        {
+                            OutputHandler = reader.ReadIPersistStream() as IOutputHandler;
+                        }
+                    }
+
                     if (reader.Version >= 2)
                     {
                         // Load the GUID for the IIdentifiableObject interface.
@@ -482,6 +569,11 @@ namespace Extract.AttributeFinder.Rules
                 {
                     writer.Write((IPersistStream)AttributeSelector, clearDirty);
                     writer.Write(DividingAttributeName);
+                    writer.Write(RunOutputHandler);
+                    if (RunOutputHandler)
+                    {
+                        writer.Write((IPersistStream)OutputHandler, clearDirty);
+                    }
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -556,7 +648,17 @@ namespace Extract.AttributeFinder.Rules
                 AttributeSelector = (IAttributeSelector)copyThis.Clone();
             }
             DividingAttributeName = source.DividingAttributeName;
+            RunOutputHandler = source.RunOutputHandler;
 
+            if (source.OutputHandler == null)
+            {
+                OutputHandler = null;
+            }
+            else
+            {
+                ICopyableObject copyThis = (ICopyableObject)source.OutputHandler;
+                OutputHandler = (IOutputHandler)copyThis.Clone();
+            }
             _dirty = true;
         }
 
@@ -670,6 +772,134 @@ namespace Extract.AttributeFinder.Rules
 
                 outputVector.InsertVector(index + 1,
                     duplicatedTrees.ToIUnknownVector<ComAttribute>());
+            }
+        }
+
+        /// <summary>
+        /// Creates a duplicate of <see paramref="attribute"/> for each child attribute having the
+        /// <see cref="DividingAttributeName"/>. Each will contain copies of all non-dividing
+        /// attributes, but only one dividing attribute instance.
+        /// </summary>
+        /// <param name="rootAttributes">All attributes being processed by this output handler.
+        /// </param>
+        /// <param name="attribute">The <see cref="ComAttribute"/> to duplicate and separate if
+        /// appropriate.</param>
+        /// <param name="pDoc">The <see cref="AFDocument"/> the output is from.</param>
+        void DuplicateAndSeparateTree(IUnknownVector rootAttributes, ComAttribute attribute, AFDocument pDoc)
+        {
+            // Contains any new hierarchies that are produced.
+            var duplicatedTreeRoots = new List<ComAttribute>();
+            var duplicatedTrees = new List<IUnknownVector>();
+
+            // Contains all non-dividing attributes encountered.
+            List<ComAttribute> nonDividingAttributes = new List<ComAttribute>();
+
+            // Loop through all sub-attributes. Build a collection of root attributes and their trees
+            // by copying references only. Deep copies will be made later, after all the trees have been constructed.
+            foreach (ComAttribute subAttribute in attribute.SubAttributes
+                .ToIEnumerable<ComAttribute>())
+            {
+                if (subAttribute.Name.Equals(DividingAttributeName,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    duplicatedTreeRoots.Add(attribute);
+                    var newTree = new IUnknownVector();
+                    duplicatedTrees.Add(newTree);
+                    newTree.Append(nonDividingAttributes.ToIUnknownVector());
+                    newTree.PushBack(subAttribute);
+                }
+                else
+                {
+                    // Add this attribute to all duplicate trees created thus far.
+                    foreach (IUnknownVector duplicateTree in duplicatedTrees)
+                    {
+                        duplicateTree.PushBack(subAttribute);
+                    }
+
+                    nonDividingAttributes.Add(subAttribute);
+                }
+            }
+
+            // If more than one dividing attribute was found and/or an output handler will be run
+            // then it is necessary to find the place in the original vector where the result vector
+            // will be spliced.
+            int spliceIndex = 0;
+            IUnknownVector outputVector = rootAttributes;
+            if (RunOutputHandler || duplicatedTrees.Count > 1)
+            {
+                ComAttribute parentAttribute =
+                    AFUtility.GetAttributeParent(rootAttributes, attribute);
+                if (parentAttribute != null)
+                {
+                    outputVector = parentAttribute.SubAttributes;
+                }
+
+                outputVector.FindByReference(attribute, 0, ref spliceIndex);
+                ExtractException.Assert("ELI38441", "Internal logic error.", spliceIndex >= 0);
+
+                // The original tree will be replaced with zero or more trees so remove the existing tree
+                outputVector.Remove(spliceIndex);
+            }
+
+            // Process the resulting trees
+            // If no dividing attributes were found just process the input attribute if necessary
+            if (duplicatedTreeRoots.Count == 0 && RunOutputHandler)
+            {
+                var resultVector = new IUnknownVector();
+                resultVector.PushBack(attribute);
+
+                OutputHandler.ProcessOutput(resultVector, pDoc, null);
+
+                // Add new tree(s)
+                if (resultVector.Size() > 0)
+                {
+                    outputVector.InsertVector(spliceIndex, resultVector);
+                }
+            }
+            else
+            {
+                // Process each tree.
+                IUnknownVector resultVector;
+                for (int i = 0; i < duplicatedTrees.Count; i++)
+                {
+                    resultVector = new IUnknownVector();
+
+                    // All but the last tree needs to be cloned from the original pieces
+                    if (i < duplicatedTrees.Count - 1)
+                    {
+                        ComAttribute newAttribute = (ComAttribute)((ICopyableObject)duplicatedTreeRoots[i]).Clone();
+                        newAttribute.SubAttributes = (IUnknownVector) ((ICopyableObject)duplicatedTrees[i]).Clone();
+                        resultVector.PushBack(newAttribute);
+                    }
+                    else
+                    {
+                        // The last tree's parts don't need to be cloned because no more copies will
+                        // be made from the originals.
+                        ComAttribute lastAttribute = duplicatedTreeRoots[i];
+                        lastAttribute.SubAttributes = duplicatedTrees[i];
+                        resultVector.PushBack(lastAttribute);
+                    }
+
+                    // Process the result if required
+                    if (RunOutputHandler)
+                    {
+                        try
+                        {
+                            OutputHandler.ProcessOutput(resultVector, pDoc, null);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex.AsExtract("ELI38442");
+                        }
+                    }
+
+                    // Add new tree(s)
+                    if (resultVector.Size() > 0)
+                    {
+                        outputVector.InsertVector(spliceIndex, resultVector);
+                    }
+                    spliceIndex += resultVector.Size();
+                }
             }
         }
 

@@ -19,7 +19,7 @@ namespace Extract.AttributeFinder.Rules
         /// The object name.
         /// </summary>
         static readonly string _OBJECT_NAME =
-            typeof(NumericSequencerSettingsDialog).ToString();
+            typeof(DuplicateAndSeparateTreesSettingsDialog).ToString();
 
         #endregion Constants
 
@@ -82,6 +82,10 @@ namespace Extract.AttributeFinder.Rules
                     _attributeSelectorControl.ConfigurableObject =
                         (ICategorizedComponent)Settings.AttributeSelector;
                     _dividingAttributeTextBox.Text = Settings.DividingAttributeName;
+                    _runOutputHandlerCheckBox.Checked = Settings.RunOutputHandler;
+                    _outputHandlerControl.Enabled = Settings.RunOutputHandler;
+                    _outputHandlerControl.ConfigurableObject =
+                        (ICategorizedComponent)Settings.OutputHandler;
                 }
             }
             catch (Exception ex)
@@ -114,6 +118,9 @@ namespace Extract.AttributeFinder.Rules
                 Settings.AttributeSelector =
                     (IAttributeSelector)_attributeSelectorControl.ConfigurableObject;
                 Settings.DividingAttributeName = _dividingAttributeTextBox.Text;
+                Settings.RunOutputHandler = _runOutputHandlerCheckBox.Checked;
+                Settings.OutputHandler =
+                    (IOutputHandler)_outputHandlerControl.ConfigurableObject;
 
                 DialogResult = DialogResult.OK;
             }
@@ -123,6 +130,24 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="T:CheckBox.CheckChanged"/> event for
+        /// <see cref="_runOutputHandlerCheckBox"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleRunOutputHandlerCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _outputHandlerControl.Enabled = _runOutputHandlerCheckBox.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38436");
+            }
+        }
         #endregion Event Handlers
 
         #region Private Members
@@ -163,6 +188,26 @@ namespace Extract.AttributeFinder.Rules
                 return true;
             }
 
+            if (_runOutputHandlerCheckBox.Checked)
+            {
+                if (_outputHandlerControl.ConfigurableObject == null)
+                {
+                    _outputHandlerControl.Focus();
+                    UtilityMethods.ShowMessageBox("Please specify an output handler to use.",
+                        "Specify attribute selector", false);
+                    return true;
+                }
+
+                configurable = _outputHandlerControl.ConfigurableObject as IMustBeConfiguredObject;
+                if (configurable != null && !configurable.IsConfigured())
+                {
+                    _outputHandlerControl.Focus();
+                    UtilityMethods.ShowMessageBox("The selected output handler has not been " +
+                        "properly configured.",
+                        "Output handler not configured", false);
+                    return true;
+                }
+            }
             return false;
         }
 

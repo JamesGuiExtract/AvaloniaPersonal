@@ -3,3 +3,6 @@
 
 // Tests copying of non-dividing attributes to each new hierarchy
 <TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+// Tests running an output handler on each resulting tree
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
