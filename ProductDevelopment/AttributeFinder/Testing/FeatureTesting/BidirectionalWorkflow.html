@@ -226,95 +226,6 @@
 		</ul>
        	</ul>
 <p>
-	<LI><h2>User Interface With Duplicate Documents</h2>
-       	<ul>
-  	   	<LI>Run <b>A01_ExtractData.fps</b> after enabling the second file supplier.
-		<ul>
-			<li>This will queue and process the <b>Extended</b> subfolder that 
-			includes the images used for <b>Duplicate Documents</b> testing.
-		</ul>
-  	   	<LI>Run <b>A02_Verify.fps</b> for verification.
-		<li><u>R226.tif</u>
-		<ul>
-			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
-			with <b>00000018</b>.
-			<li>Confirm that <b>6</b> Orders are defined and that the Order 
-			Number fields are each automatically populated.
-			<ul>
-				<li>BUN with white order picker button
-				<li>CREATININE with white order picker button
-				<li>GLUCOSE with white order picker button
-				<li>POTASSIUM with white order picker button
-				<li>HEMATOCRIT with white order picker button
-				<li>WHITE BLOOD CELL COUNT with white order picker button
-			</ul>
-			<li>Confirm that <b>1</b> Duplicate Document is available. 
-		</ul>
-		<li><u>S227.tif</u>
-		<ul>
-			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
-			with <b>00000019</b>.
-			<li>Confirm that 1 <b>WHITE BLOOD CELL COUNT</b> Order is defined and that 
-			the Order Number field is automatically populated.
-			<li>Confirm that the Order Picker button is <b>white</b>.
-			<li>Confirm that <b>3</b> Duplicate Documents are available. 
-		</ul>
-		<li><u>W228.tif</u>
-		<ul>
-			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
-			with <b>00000024</b>.
-			<li>Confirm that <b>9</b> Orders are defined and that the Order 
-			Number fields are each automatically populated.
-			<ul>
-				<li>GLUCOSE with white order picker button
-				<li>POTASSIUM with white order picker button
-				<li>BUN with white order picker button
-				<li>CREATININE with white order picker button
-				<li>AMYLASE with white order picker button
-				<li>LIPASE LEVEL with white order picker button
-				<li>TACROLIMUS with white order picker button
-				<li>CBC AND AUTO DIFFERENTIAL with white order picker button
-				<li>CMV DNA Quant with white order picker button
-			</ul>
-			<li>Confirm that <b>1</b> Duplicate Document is available. 
-		</ul>
-		<li><u>Y229.tif</u>
-		<ul>
-			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
-			with <b>00000021</b>.
-			<li>Confirm that <b>8</b> Orders are defined and that the Order 
-			Number fields are empty.
-			<ul>
-				<li>CYCLOSPORINE with yellow order picker button
-				<li>CYCLOSPORINE with yellow order picker button
-				<li>CYCLOSPORINE with yellow order picker button
-				<li>BASIC METABOLIC PANEL with red order picker button
-				<li>CBC NO DIFFERENTIAL with red order picker button
-				<li>AMYLASE with red order picker button
-				<li>LIPASE LEVEL with red order picker button
-				<li>GLYCOHEMOGLOBIN A1C with red order picker button
-			</ul>
-			<li>Confirm that <b>0</b> Duplicate Documents are available. 
-		</ul>
-		<li><u>Z226.tif</u>
-		<ul>
-			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
-			with <b>00000018</b>.
-			<li>Confirm that <b>7</b> Orders are defined and that the Order 
-			Number fields are empty.
-			<ul>
-				<li>BUN with green order picker button
-				<li>CREATININE with green order picker button
-				<li>GLUCOSE with green order picker button
-				<li>POTASSIUM with green order picker button
-				<li>HEMATOCRIT with green order picker button
-				<li>WHITE BLOOD CELL COUNT with green order picker button
-				<li>TACROLIMUS with green order picker button
-			</ul>
-			<li>Confirm that <b>1</b> Duplicate Document is available. 
-		</ul>
-       	</ul>
-<p>
 	<LI><h2>Workflow Behavior</h2>
        	<ul>
   	   	<LI>Reset the <b>Demo_LabDE</b> database.
@@ -586,19 +497,173 @@
 		</ul>
        	</ul>
 <p>
-	<LI><h2>Workflow Behavior With Duplicate Documents</h2>
+	<LI><h2>User Interface With Duplicate Documents</h2>
        	<ul>
+		<li>Clear the Demo_LabDE database.
+  	   	<LI>Run <b>A01_ExtractData.fps</b> after enabling the second file supplier.
+		<ul>
+			<li>This will queue and process the <b>Extended</b> subfolder that 
+			includes the images used for <b>Duplicate Documents</b> testing.
+			<li>Leave the FPS file running so that it can queue and process the image 
+			that will later be created by stapling indiviudal files.
+		</ul>
+		<li>Manually add a row to the <b>ActiveFAM</b> table and then delete it. This will 
+		cause the IDs of the ActiveFAM and FAMSession tables to be out of sync.
+  	   	<LI>Run <b>A02_Verify.fps</b> for verification.
+		<ul>
+			<li>Start processing.
+			<li>Confirm that the <b>ActiveFAM</b> and <b>FAMSession</b> IDs are out 
+			of sync.
+		</ul>
+<p>
 		<li><u>R226.tif</u>
 		<ul>
-			<li>From the Duplicate Documents FFI, <b>Ignore</b> this document.
-			<li>Confirm that verification automatically advances to the next document.
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000018</b>.
+			<li>Confirm that <b>6</b> Orders are defined and that the Order 
+			Number fields are each automatically populated.
+			<ul>
+				<li>BUN with white order picker button
+				<li>CREATININE with white order picker button
+				<li>GLUCOSE with white order picker button
+				<li>POTASSIUM with white order picker button
+				<li>HEMATOCRIT with white order picker button
+				<li>WHITE BLOOD CELL COUNT with white order picker button
+			</ul>
+			<li>Confirm that <b>1</b> Duplicate Document is available. 
+		</ul>
+		<li><u>Z226.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000018</b>.
+			<li>Confirm that <b>7</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>BUN with green order picker button
+				<li>CREATININE with green order picker button
+				<li>GLUCOSE with green order picker button
+				<li>POTASSIUM with green order picker button
+				<li>HEMATOCRIT with green order picker button
+				<li>WHITE BLOOD CELL COUNT with green order picker button
+				<li>TACROLIMUS with green order picker button
+			</ul>
+			<li>Confirm that <b>1</b> Duplicate Document is available. 
+		</ul>
+		<li><u>S227.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000019</b>.
+			<li>Confirm that 1 <b>WHITE BLOOD CELL COUNT</b> Order is defined and that 
+			the Order Number field is automatically populated.
+			<li>Confirm that the Order Picker button is <b>white</b>.
+			<li>Confirm that <b>3</b> Duplicate Documents are available. 
+		</ul>
+		<li><u>W228.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000024</b>.
+			<li>Confirm that <b>9</b> Orders are defined and that the Order 
+			Number fields are each automatically populated.
+			<ul>
+				<li>GLUCOSE with white order picker button
+				<li>POTASSIUM with white order picker button
+				<li>BUN with white order picker button
+				<li>CREATININE with white order picker button
+				<li>AMYLASE with white order picker button
+				<li>LIPASE LEVEL with white order picker button
+				<li>TACROLIMUS with white order picker button
+				<li>CBC AND AUTO DIFFERENTIAL with white order picker button
+				<li>CMV DNA Quant with white order picker button
+			</ul>
+			<li>Confirm that <b>1</b> Duplicate Document is available. 
+		</ul>
+		<li><u>X228.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000024</b>.
+			<li>Confirm that <b>9</b> Orders are defined and that the Order 
+			Number fields are each automatically populated.
+			<ul>
+				<li>GLUCOSE with yellow order picker button
+				<li>POTASSIUM with yellow order picker button
+				<li>BUN with yellow order picker button
+				<li>CREATININE with yellow order picker button
+				<li>AMYLASE with yellow order picker button
+				<li>LIPASE LEVEL with yellow order picker button
+				<li>TACROLIMUS with yellow order picker button
+				<li>CBC AND AUTO DIFFERENTIAL with yellow order picker button
+				<li>CMV DNA Quant with yellow order picker button
+			</ul>
+			<li>Confirm that <b>1</b> Duplicate Document is available. 
+		</ul>
+		<li><u>Y229.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000021</b>.
+			<li>Confirm that <b>8</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>CYCLOSPORINE with yellow order picker button
+				<li>CYCLOSPORINE with yellow order picker button
+				<li>CYCLOSPORINE with yellow order picker button
+				<li>BASIC METABOLIC PANEL with red order picker button
+				<li>CBC NO DIFFERENTIAL with red order picker button
+				<li>AMYLASE with red order picker button
+				<li>LIPASE LEVEL with red order picker button
+				<li>GLYCOHEMOGLOBIN A1C with red order picker button
+			</ul>
+			<li>Confirm that <b>0</b> Duplicate Documents are available. 
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>Workflow Behavior With Duplicate Documents</h2>
+       	<ul>
+		<li>Use <b>SQL Server Management Studio</b> to repeatedly exercise the 
+		<b>Demo_LabDE_FileVerifyStatusSummary</b> query from 
+		<b>M:\PVCS_JIRA\JIRA\ISSUE-13192</b>. This query is used to confirm that the various 
+		duplicate documents have the expected FAM status for the A02_Verify action before, 
+		during, and after the duplicate documents operations.
+		<li><u>File Status</u>
+		<ul>
+			<li>All (9) files <b>Pending</b>.
+		</ul>
+<p>
+		<li><u>R226.tif</u>
+		<ul>
+			<li>From the Duplicate Documents FFI, 
+			<ul>
+				<li><b>Ignore</b> this document.
+				<li>Make <b>Z226.tif</b> the current document.
+				<li>Apply the changes.
+			</ul>
+			<li>Confirm that verification automatically advances to <b>Z226.tif</b>.
+		</ul>
+		<li><u>Z226.tif</u>
+		<ul>
+			<li>Select multiple orders and click an Order Picker button.
+			<li>Confirm that only the order for the clicked button is displayed in the 
+			Order Picker FFI.
+			<li><u>File Status</u>
+			<ul>
+				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
+				<li>7 files <b>Pending</b>.
+				<li><b>Z226.tif</b> is Processing.
+			</ul>
+			<li>Save and commit the document.
 		</ul>
 		<li><u>S227.tif</u>
 		<ul>
 			<li>Confirm that the Duplicate Documents FFI and the Order Picker FFI cannot 
 			both be active at the same time.
-			<li>Use the Order Picker FFI to select the <b>19000001</b> Order Number.
 			<li>Open the Duplicate Documents FFI.
+			<li><u>File Status</u>
+			<ul>
+				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
+				<li><b>S227.tif</b>, <b>T227.tif</b>, <b>U227.tif</b>, <b>V227.tif</b> 
+				are Processing.
+				<li>3 files <b>Pending</b>.
+				<li><b>Z226.tif</b> is Processing.
+			</ul>
 			<li>Staple all 4 documents together.
 			<ul>
 				<li>Save the unsaved changes in <b>S227.tif</b>.
@@ -607,13 +672,27 @@
 		</ul>
 		<li><u>W228.tif</u>
 		<ul>
+			<li><u>File Status</u>
+			<ul>
+				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
+				<li><b>S227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>T227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>U227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>V227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>W228.tif</b> is Processing.
+				<li><b>X228.tif</b> is Pending.
+				<li><b>Y229.tif</b> is Pending.
+				<li><b>Z226.tif</b> is Completed.
+				<li><b>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</b> is Pending.
+			</ul>
 			<li>From the Duplicate Documents FFI, right-click on the second image in 
-			the to <b>Ignore</b> that image.
+			the list to <b>Ignore</b> that image.
 			<li><b>[ISSUE-12649]</b> Confirm that the FFI window remains in the 
 			foreground.
 			<li><b>[ISSUE-13064]</b> Confirm that CPU usage does not max out for 
 			this thread.
-			<li>Apply the changes.
+			<li><b>Cancel</b> the changes. 
+			<li>Confirm cancellation via <b>No</b> to Apply Changes.
 			<li>Confirm that verification remains on <b>W228.tif</b>.
 			<li>Modify the Order Number for the BUN order to <b>24000001</b>.
 			<ul>
@@ -622,20 +701,162 @@
 				<li>Use Order Picker FFI to fix the BUN Order Number.
 				<li>Confirm that all Order Numbers are valid.
 			</ul>
+			<li>Save and commit the document.
+		</ul>
+		<li><u>X228.tif</u>
+		<ul>
+			<li>From the Duplicate Documents FFI, 
+			<ul>
+				<li>Confirm that <b>W228.tif</b> is shown as <b>Completed</b>.
+				<li><b>Do nothing</b> for this document (X228.tif).
+				<li>Make <b>W228.tif</b> the current document.
+				<li>Apply the changes.
+			</ul>
+			<li>Confirm that <b>W228.tif</b> comes up for verification again.
+		</ul>
+		<li><u>W228.tif</u>
+		<ul>
+			<li><u>File Status</u>
+			<ul>
+				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
+				<li><b>S227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>T227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>U227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>V227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>W228.tif</b> is Processing.
+				<li><b>X228.tif</b> is Processing.
+				<li><b>Y229.tif</b> is Pending.
+				<li><b>Z226.tif</b> is Completed.
+				<li><b>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</b> is Pending.
+			</ul>
+			<li>Save and commit the document.
+			<ul>
+				<li>Confirm that a Warning message is presented noting that the 
+				various orders have already been submitted via LabDE.
+				<li>Confirm that the following data are presented for each order 
+				in the message.
+				<ul>
+					<li>Order Number
+					<li>Order Name
+					<li>Patient
+					<li>Ordered By
+					<li>Request Date/Time
+					<li>Collection Date/Time
+				</ul>
+			</ul>
+			<li>Confirm that the results should be re-submitted.
+		</ul>
+		<li><u>X228.tif</u>
+		<ul>
+			<li>From the Duplicate Documents FFI, 
+			<ul>
+				<li>Confirm that <b>W228.tif</b> is shown as <b>Completed</b>.
+				<li><b>Ignore</b> this document (X228.tif).
+				<li>Apply the changes.
+			</ul>
 		</ul>
 		<li><u>Y229.tif</u>
 		<ul>
-			<li>Delete the second and third <b>CYCLOSPORINE</b> orders.
-			<li>Confirm that the remaining <b>CYCLOSPORINE</b> order has a green Order 
-			Picker button.
-			<li>Use Order Picker FFI to select the available matching order.
-			<li><b>[ISSUE-13019]</b> Confirm that no exception is thrown.
+			<li><u>File Status</u>
+			<ul>
+				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
+				<li><b>S227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>T227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>U227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>V227.tif</b> is Completed, SpecialStatus = Stapled.
+				<li><b>W228.tif</b> is Completed.
+				<li><b>X228.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
+				<li><b>Y229.tif</b> is Processing.
+				<li><b>Z226.tif</b> is Completed.
+				<li><b>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</b> is Pending.
+			</ul>
+			<li>Apply the <b>User_MultiplePatients</b> tag.
+			<li>Save and commit the document.
 		</ul>
-		<li><u>Z226.tif</u>
+		<li><u>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</u>
 		<ul>
-			<li>Select multiple orders and click an Order Picker button.
-			<li>Confirm that only the order for the clicked button is displayed in the 
-			Order Picker FFI.
+			<li>Swipe the <b>Ordering Physician</b> to clear the error indication.
+			<li>Save and commit the document.
+		</ul>
+		<li>Minimize the verification FPS file while paginating the multiple patient document.
+       	</ul>
+<p>
+	<LI><h2>Pagination</h2>
+       	<ul>
+		<li>Open the <b>Demo_LabDE\Pagination</b> folder. Confirm that the folder contains the 
+		following.
+		<ul>
+                    	<li>Pagination.config
+			<li>Run Pagination (shortcut)
+			<li>Y229.tif
+		</ul>
+		<li>Double-click the <b>Run Pagination</b> shortcut.
+		<li>Confirm that the Pagination UI appears with Y229.tif pages preloaded.
+		<ul>
+			<li>Delete pages <b>1</b> and <b>6</b>.
+			<li>Combine pages <b>2</b> and <b>4</b> into one document.
+			<li>Save page <b>3</b> as a separate document.
+			<li>Save page <b>5</b> as a separate document.
+			<li>Close the Pagination utility.
+		</ul>
+		<li>Confirm that Y229.tif has been deleted from the Pagination folder.
+		<li>Confirm that 3 files are automatically picked up and processed by 
+		<b>A01_ExtractData.fps</b>.
+       	</ul>
+<p>
+	<LI><h2>Processing Paginated Images</h2>
+       	<ul>
+		<li>Note that the following images may be processed in a different order.
+		<li><u>Y229_&lt;RANDOM_A&gt;.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000022</b>.
+			<li>Confirm that <b>1</b> Order is defined and that the Order 
+			Number field is <b>22000001</b>.
+			<ul>
+				<li>CYCLOSPORINE with white order picker button
+			</ul>
+			<li>Confirm that <b>0</b> Duplicate Documents are available. 
+			<li>Re-swipe the Collection Date and Collection Time to clear the error 
+			indication.
+			<li>Save and commit the document.
+		</ul>
+		<li><u>Y229_&lt;RANDOM_B&gt;.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000021</b>.
+			<li>Confirm that <b>2</b> Orders are defined and that the Order 
+			Number fields are empty.
+			<ul>
+				<li>CYCLOSPORINE with yellow order picker button
+				<li>CYCLOSPORINE with yellow order picker button
+			</ul>
+			<li>Confirm that <b>1</b> Duplicate Document is available. 
+			<li>Re-swipe the Collection Date and Collection Time for one order to clear the error 
+			indication.
+			<li>Delete the duplicate order.
+			<li>Save and commit the document.
+		</ul>
+		<li><u>Y229_&lt;RANDOM_C&gt;.tif</u>
+		<ul>
+			<li>Confirm that the <b>Medical Record #</b> is automatically populated 
+			with <b>00000023</b>.
+			<li>Confirm that <b>9</b> Orders are defined and that the Order 
+			Number fields are populated.
+			<ul>
+				<li>POTASSIUM with white order picker button
+				<li>BUN with white order picker button
+				<li>CREATININE with white order picker button
+				<li>GLUCOSE with white order picker button
+				<li>WHITE BLOOD CELL COUNT with white order picker button
+				<li>HEMATOCRIT with white order picker button
+				<li>AMYLASE with white order picker button
+				<li>LIPASE LEVEL with white order picker button
+				<li>GLYCOHEMOGLOBIN A1C with white order picker button
+			</ul>
+			<li>Confirm that <b>0</b> Duplicate Documents are available. 
+			<li>Select a <b>Lab Name</b> to clear the error indication.
+			<li>Save and commit the document.
 		</ul>
        	</ul>
 <p>
