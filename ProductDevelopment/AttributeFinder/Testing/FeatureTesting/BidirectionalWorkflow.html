@@ -43,6 +43,22 @@
 		<li>Run <b>A01_ExtractData.fps</b> to prepare VOA files.
        	</ul>
 <p>
+	<LI><h2>Multi-User Test Setup</h2>
+       	<ul>
+		<li>Create backup of original <b>Demo_LabDE</b> folder.
+		<li>Share the Demo_LabDE folder so that other users can access the files.
+		<li>Confirm that Windows Firewall is modified to allow required access and has 
+		SQL Server and SQL Browser added.
+		<li>Enable TCP/IP and SQL Browser in SQL Server Configuration manager.
+		<li>Update FAM Context
+		<ul>
+			<li>Context Name = MultiUser
+			<li>&lt;DatabaseServer&gt; = test_machine_name
+			<li>&lt;DatabaseName&gt; = Demo_LabDE
+			<li>Other entries = copied from Demo context
+		</ul>
+       	</ul>
+<p>
 	<LI><h2>User Interface</h2>
        	<ul>
   	   	<LI>Run <b>A02_Verify.fps</b> for verification.
@@ -499,7 +515,6 @@
 <p>
 	<LI><h2>User Interface With Duplicate Documents</h2>
        	<ul>
-		<li>Clear the Demo_LabDE database.
   	   	<LI>Run <b>A01_ExtractData.fps</b> after enabling the second file supplier.
 		<ul>
 			<li>This will queue and process the <b>Extended</b> subfolder that 
@@ -623,9 +638,23 @@
 		<b>M:\PVCS_JIRA\JIRA\ISSUE-13192</b>. This query is used to confirm that the various 
 		duplicate documents have the expected FAM status for the A02_Verify action before, 
 		during, and after the duplicate documents operations.
-		<li><u>File Status</u>
+		<li>Exercise this query three times for each image.
 		<ul>
-			<li>All (9) files <b>Pending</b>.
+			<li>Before the Duplicate Documents FFI is opened, 
+			<li>while the Duplicate Documents FFI is open, and 
+			<li>after the Duplicate Documents FFI is closed
+		</ul>
+		<li>Several items should be considered when reviewing the query results.
+		<ul>
+			<li>All documents displayed in FFI should show as <b>Processing</b>.
+			<li>Once FFI is closed, all documents not acted upon should return to their 
+			previous status.
+			<li>A document that was changed to <b>Do nothing</b> in the FFI should 
+			remain in <b>Processing</b> status for the active user after the FFI is 
+			closed.
+			<li>A document that was <b>Completed</b> and subsequently made the current 
+			document will revert to <b>Pending</b> if its processing was canceled.
+			<li>Check SpecialStatus such as applied tags, as appropriate.
 		</ul>
 <p>
 		<li><u>R226.tif</u>
@@ -643,12 +672,6 @@
 			<li>Select multiple orders and click an Order Picker button.
 			<li>Confirm that only the order for the clicked button is displayed in the 
 			Order Picker FFI.
-			<li><u>File Status</u>
-			<ul>
-				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
-				<li>7 files <b>Pending</b>.
-				<li><b>Z226.tif</b> is Processing.
-			</ul>
 			<li>Save and commit the document.
 		</ul>
 		<li><u>S227.tif</u>
@@ -656,14 +679,6 @@
 			<li>Confirm that the Duplicate Documents FFI and the Order Picker FFI cannot 
 			both be active at the same time.
 			<li>Open the Duplicate Documents FFI.
-			<li><u>File Status</u>
-			<ul>
-				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
-				<li><b>S227.tif</b>, <b>T227.tif</b>, <b>U227.tif</b>, <b>V227.tif</b> 
-				are Processing.
-				<li>3 files <b>Pending</b>.
-				<li><b>Z226.tif</b> is Processing.
-			</ul>
 			<li>Staple all 4 documents together.
 			<ul>
 				<li>Save the unsaved changes in <b>S227.tif</b>.
@@ -672,19 +687,6 @@
 		</ul>
 		<li><u>W228.tif</u>
 		<ul>
-			<li><u>File Status</u>
-			<ul>
-				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
-				<li><b>S227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>T227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>U227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>V227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>W228.tif</b> is Processing.
-				<li><b>X228.tif</b> is Pending.
-				<li><b>Y229.tif</b> is Pending.
-				<li><b>Z226.tif</b> is Completed.
-				<li><b>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</b> is Pending.
-			</ul>
 			<li>From the Duplicate Documents FFI, right-click on the second image in 
 			the list to <b>Ignore</b> that image.
 			<li><b>[ISSUE-12649]</b> Confirm that the FFI window remains in the 
@@ -694,13 +696,6 @@
 			<li><b>Cancel</b> the changes. 
 			<li>Confirm cancellation via <b>No</b> to Apply Changes.
 			<li>Confirm that verification remains on <b>W228.tif</b>.
-			<li>Modify the Order Number for the BUN order to <b>24000001</b>.
-			<ul>
-				<li>Confirm that the BUN order number is invalid.
-				<li>Confirm that the AMYLASE order number is invalid.
-				<li>Use Order Picker FFI to fix the BUN Order Number.
-				<li>Confirm that all Order Numbers are valid.
-			</ul>
 			<li>Save and commit the document.
 		</ul>
 		<li><u>X228.tif</u>
@@ -716,19 +711,6 @@
 		</ul>
 		<li><u>W228.tif</u>
 		<ul>
-			<li><u>File Status</u>
-			<ul>
-				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
-				<li><b>S227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>T227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>U227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>V227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>W228.tif</b> is Processing.
-				<li><b>X228.tif</b> is Processing.
-				<li><b>Y229.tif</b> is Pending.
-				<li><b>Z226.tif</b> is Completed.
-				<li><b>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</b> is Pending.
-			</ul>
 			<li>Save and commit the document.
 			<ul>
 				<li>Confirm that a Warning message is presented noting that the 
@@ -757,27 +739,31 @@
 		</ul>
 		<li><u>Y229.tif</u>
 		<ul>
-			<li><u>File Status</u>
-			<ul>
-				<li><b>R226.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
-				<li><b>S227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>T227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>U227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>V227.tif</b> is Completed, SpecialStatus = Stapled.
-				<li><b>W228.tif</b> is Completed.
-				<li><b>X228.tif</b> is Completed, SpecialStatus = User_IgnoreDocument.
-				<li><b>Y229.tif</b> is Processing.
-				<li><b>Z226.tif</b> is Completed.
-				<li><b>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</b> is Pending.
-			</ul>
 			<li>Apply the <b>User_MultiplePatients</b> tag.
 			<li>Save and commit the document.
 		</ul>
-		<li><u>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</u>
-		<ul>
-			<li>Swipe the <b>Ordering Physician</b> to clear the error indication.
-			<li>Save and commit the document.
-		</ul>
+       	</ul>
+<p>
+	<LI><h2>Multi-User Testing</h2>
+       	<ul>
+		<li><u>User 1</u>: Start verification and confirm that 
+		<b>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</b> is the active image.
+		<li><u>User 1</u>: Open the Duplicate Documents FFI, select <b>S227.tif</b> and 
+		select the <b>Make current</b> option.
+		<li><u>User 1</u>: Apply changes and confirm that <b>S227.tif</b> is being verified.
+		<li><u>User 1</u>: Stop processing. Confirm that both S227.tif and the stapled 
+		document are each <b>Pending</b>.
+		<li><u>User 1</u>: Start verification and confirm that <b>S227.tif</b> is being verified.
+		<li><u>User 2</u>: Start verification and confirm that 
+		<b>Stapled_Patricia_Patt_&lt;timestamp&gt;.tif</b> is the current document.
+		<li><u>User 1</u>: Open the Duplicate Documents FFI, select <b>T227.tif</b> and 
+		select the <b>Make current</b> option.
+		<li><u>User 1</u>: Apply changes and confirm that <b>T227.tif</b> is being verified.
+		<li><u>User 1</u>: Confirm that <b>S227.tif</b> has reverted to <b>Pending</b>.
+		<li><u>User 2</u>: Swipe the <b>Ordering Physician</b> to clear the error indication.
+		<li><u>User 2</u>: Save and commit the document. Stop processing.
+		<li><u>User 1</u>: Save and commit the document.
+<p>
 		<li>Minimize the verification FPS file while paginating the multiple patient document.
        	</ul>
 <p>
