@@ -57,6 +57,40 @@ namespace Extract.Imaging
 
         #endregion Constructors
 
+        #region Methods
+
+        /// <summary>
+        /// Convert an ImagePage into a RasterImage. JIRA ISSUE-13114, Print from Pagination
+        /// </summary>
+        /// <returns>RasterImage associated with the ImagePage</returns>
+        public RasterImage ToRasterImage()
+        {
+            try
+            {
+                using (ImageCodecs codecs = new ImageCodecs())
+                {
+                    using (ImageReader reader = codecs.CreateReader(this.DocumentName))
+                    {
+                        RasterImage rasterPage = reader.ReadPage(this.PageNumber);
+
+                        // Image must be rotated with forceTrueRotation to true, otherwise
+                        // the output page is not rendered with the correct orientation
+                        // (unclear why).
+                        ImageMethods.RotateImageByDegrees(rasterPage,
+                                                          this.ImageOrientation,
+                                                          true);
+                        return rasterPage;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38445");
+            }
+        }
+
+        #endregion Methods
+
         #region Properties
 
         /// <summary>
