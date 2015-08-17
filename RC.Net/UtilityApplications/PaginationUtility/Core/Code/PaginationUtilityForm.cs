@@ -723,7 +723,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 // Make sure the user.config file is in a good state
-				// https://extract.atlassian.net/browse/ISSUE-12830
+                // https://extract.atlassian.net/browse/ISSUE-12830
                 UserConfigChecker.EnsureValidUserConfigFile();
 
                 if (_pendingDocuments.Any(document => !document.InOriginalForm))
@@ -1612,6 +1612,29 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ex.ExtractDisplay("ELI35592");
             }
         }
+
+        /// <summary>
+        /// handler for selection of "Print selected document(s)" from File menu
+        /// </summary>
+        /// <param name="sender">unused</param>
+        /// <param name="e">unused</param>
+        void HandlePrintMenuItem_Click(object sender, EventArgs e)
+        {
+            _primaryPageLayoutControl.HandlePrintSelectedItems();
+        }
+
+        /// <summary>
+        /// Handler invoked when the file menu is opened, so that the print item in that menu can 
+        /// be enabled/disabled depending on presence/absence of appropriate selection. 
+        /// </summary>
+        /// <param name="sender">unused</param>
+        /// <param name="e">unused</param>
+        void FileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            bool enable = _primaryPageLayoutControl.EnableSelectionBasedCommands();
+            _printMenuItem.Enabled = enable;
+        }
+        
 
         #endregion Event Handlers
 

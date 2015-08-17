@@ -1,11 +1,16 @@
-﻿using Extract.Imaging.Forms;
+﻿using Extract.Imaging;
+using Extract.Imaging.Forms;
 using Extract.Licensing;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
+using Leadtools;
+using Leadtools.Drawing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -250,6 +255,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         ApplicationCommand _deleteCommand;
 
         /// <summary>
+        /// Context menu option that allows the PaginationControls to be printed.
+        /// </summary>
+        readonly ToolStripMenuItem _printMenuItem = new ToolStripMenuItem("Print selected document(s)");
+
+        /// <summary>
+        /// The <see cref="ApplicationCommand"/> that controls the availability of the print operation.
+        /// </summary>
+        ApplicationCommand _printCommand;
+
+        /// <summary>
         /// Context menu option that allows the copied PaginationControls to be inserted.
         /// </summary>
         readonly ToolStripMenuItem _insertCopiedMenuItem =
@@ -316,6 +331,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         PageThumbnailControl _toolTipControl;
 
+        /// <summary>
+        /// Used for printing. This is a member because there is an event handler attached to it, so it 
+        /// would leak memory if not explicitly cleaned up after each use. 
+        /// </summary>
+        PrintDocument _printDocument = null;
+
+        /// <summary>
+        /// Used for printing, to maintain the pages to print.
+        /// </summary>
+        List<RasterImage> _rastersForPrinting = null;
+
+        /// <summary>
+        /// Used for printing, to maintain the index of the page being printed.
+        /// </summary>
+        int _printPageCounter;
+
         #endregion Fields
 
         #region Constructors
@@ -362,6 +393,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     PaginationLayoutEngine_RedundantControlsFound;
                 _loadNextDocumentButtonControl.ButtonClick +=
                     HandleLoadNextDocumentButtonControl_ButtonClick;
+
+                _printPageCounter = 0;
             }
             catch (Exception ex)
             {
@@ -933,6 +966,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     new[] { _deleteMenuItem, _paginationUtility._deleteMenuItem }, false, true, false);
                 _deleteMenuItem.Click += HandleDeleteMenuItem_Click;
 
+                _printMenuItem.ShortcutKeyDisplayString = "Crtl + P";
+                _printMenuItem.ShowShortcutKeys = true;
+                _printCommand = new ApplicationCommand(ImageViewer.Shortcuts,
+                    new Keys[] { Keys.Control | Keys.P }, HandlePrintSelectedItems,
+                    new[] { _printMenuItem, _paginationUtility._printMenuItem }, false, true, false);
+                _printMenuItem.Click += HandlePrintMenuItem_Click;
+
                 _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Space";
                 _toggleDocumentSeparatorMenuItem.ShowShortcutKeys = true;
                 _toggleDocumentSeparatorCommand = new ApplicationCommand(ImageViewer.Shortcuts,
@@ -1006,6 +1046,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ContextMenuStrip.Items.Add(_cutMenuItem);
                 ContextMenuStrip.Items.Add(_copyMenuItem);
                 ContextMenuStrip.Items.Add(_deleteMenuItem);
+                ContextMenuStrip.Items.Add(_printMenuItem);
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_insertCopiedMenuItem);
                 ContextMenuStrip.Items.Add(_toggleDocumentSeparatorMenuItem);
@@ -1572,6 +1613,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_printMenuItem"/> 
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePrintMenuItem_Click(object sender, EventArgs e)
+        {
+            HandlePrintSelectedItems();
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
         /// <see cref="_toggleDocumentSeparatorMenuItem"/>.
         /// </summary>
@@ -1709,6 +1761,26 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return selectedControls;
             }
         }
+
+        /// <summary>
+        /// Gets the currently selected "Valid" <see cref="PaginationControl"/>s. The "Valid"
+        /// controls are all controls EXCEPT the _loadNextDocumentButtonControl control.
+        /// </summary>
+        /// <returns>The currently selected <see cref="PaginationControl"/>s.</returns>
+        IEnumerable<PaginationControl> SelectedPageControls
+        {
+            get
+            {
+                var selectedControls = _flowLayoutPanel.Controls
+                    .OfType<PaginationControl>()
+                    .Where(control => control.Selected && 
+                           control != _loadNextDocumentButtonControl &&
+                           control.GetType() != typeof(PaginationSeparator));
+
+                return selectedControls;
+            }
+        }
+
 
         /// <summary>
         /// Gets the active <see cref="PaginationControl"/>.
@@ -2278,6 +2350,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// This method detects when conditions are valid for selection-based commands to be enabled.
+        /// </summary>
+        /// <returns>true when selection-based commands are valid, false otherwise</returns> 
+        /// https://extract.atlassian.net/browse/ISSUE-13187: In PaginationUtility, Cut and Copy menu items 
+        /// should be disabled if only separators are selected. 
+        internal bool EnableSelectionBasedCommands()
+        {
+            bool enableSelectionBasedCommands =
+                _commandTargetControl != null && _commandTargetControl.Selected &&
+                SelectedPageControls.ToArray().Length > 0 /*&&
+                SelectedControls.Where(control => control != _loadNextDocumentButtonControl).Any()*/;
+
+            return enableSelectionBasedCommands;
+        }
+
+        /// <summary>
         /// Updates the availability of the context menu and shortcut key commands based on the
         /// current selection and control state.
         /// </summary>
@@ -2288,14 +2376,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                 : _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
             // Commands that operate on the active selection require there to be a selection and for
-            // the _commandTargetControl to be one of the selected items.
-            bool enableSelectionBasedCommands =
+            // the _commandTargetControl to be one of the selected items - AND these commands do NOT
+            // operate on pagination separators.
+            bool enableSelectionBasedCommands = EnableSelectionBasedCommands();
+
+            // The delete command is applicable to separators.
+            bool enableDeleteCommand =
                 _commandTargetControl != null && _commandTargetControl.Selected &&
                 SelectedControls.Where(control => control != _loadNextDocumentButtonControl).Any();
+            _deleteCommand.Enabled = enableDeleteCommand;
 
-            _cutCommand.Enabled = enableSelectionBasedCommands;
-            _copyCommand.Enabled = enableSelectionBasedCommands;
-            _deleteCommand.Enabled = enableSelectionBasedCommands;
+            _cutCommand.Enabled =       enableSelectionBasedCommands;
+            _copyCommand.Enabled =      enableSelectionBasedCommands;
+            _printMenuItem.Enabled =    enableSelectionBasedCommands;
+            _printCommand.Enabled =     enableSelectionBasedCommands;
 
             // Adjust the text of the insertion commands to be append commands if there is no
             // _commandTargetControl.
@@ -2871,6 +2965,156 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35469");
+            }
+        }
+
+        /// <summary>
+        /// Handles a UI command to print the selected items. 
+        /// https://extract.atlassian.net/browse/ISSUE-13114, Print from Pagination
+        /// </summary>
+        internal void HandlePrintSelectedItems()
+        {
+            try
+            {
+                using (PrintDialog printDialog = new PrintDialog())
+                {
+
+                    _printDocument = new PrintDocument();
+                    _printDocument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);       // reset margins to none - default is 1"
+                    _printDocument.DefaultPageSettings.Color = true;
+
+                    printDialog.Document = _printDocument;
+                    printDialog.UseEXDialog = true;
+                    printDialog.AllowSomePages = false;     // disable - user to specify a range of pages
+                    printDialog.AllowSelection = true;      // enable current selection only
+                    printDialog.PrinterSettings.PrintRange = PrintRange.Selection;  // set the Selection radio button
+                    printDialog.AllowCurrentPage = false;
+
+                    DialogResult result = printDialog.ShowDialog();
+                    if (result != DialogResult.OK)
+                    {
+                        return;
+                    }
+                }
+
+                // Now add the event handlers, so that a cancel won't cause a memory leak... ;-)
+                _printDocument.PrintPage += HandlePrintPage;
+                _printDocument.EndPrint += HandlePrintHasEnded;
+
+                // Setup for printing
+                var imagePages = SelectedControls
+                    .OfType<PageThumbnailControl>()
+                    .Select(pageControl =>
+                                new ImagePage(pageControl.Page.OriginalDocumentName,
+                                              pageControl.Page.OriginalPageNumber,
+                                              pageControl.Page.ImageOrientation));
+
+                _rastersForPrinting = ImagePagesToRasterImages( imagePages );
+                _printPageCounter = 0;
+
+                _printDocument.Print();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38440"); 
+            }
+        }
+
+        /// <summary>
+        /// Utility function to convert image pages into raster images, which can be converted 
+        /// into a image, which can then be printed. 
+        /// </summary>
+        /// <param name="imagePages">The collection of image pages to convert.</param>
+        /// <returns>Array of RasterImage objects</returns>
+        static List<RasterImage> ImagePagesToRasterImages(IEnumerable<ImagePage> imagePages)
+        {
+            List<RasterImage> rasters = new List<RasterImage>(imagePages.Count());
+            foreach (var imagePage in imagePages)
+            {
+                var raster = imagePage.ToRasterImage();
+                rasters.Add(raster);
+            }
+
+            return rasters;
+        }
+
+        /// <summary>
+        /// This function handles the actual printing of a page - it writes the graphics device context. 
+        /// Note that the original code was copied from ImagePrinter.cs, HandlePrintPage(), then 
+        /// substantially modified. See NOTE: below. What that note doesn't mention is that the original 
+        /// assumes it is printing from a file, and it also assumes that it is printing annotations. 
+        /// </summary>
+        /// <param name="pageImage">The RasterImage object to print.</param>
+        /// <param name="e">The PrintPageEventArgs associated with the print task.</param>
+        /// <returns></returns>
+        static void PrintOnePage( RasterImage pageImage, PrintPageEventArgs e )
+        {
+            // [IDSD #318], [DotNetRCAndUtils:1078]
+            // The margin bounds should be the margin rectangle intersected with the
+            // printable area offset by the inverse of the top-left of the printable area.
+            // NOTE: I have modified this after some testing - basically the best fit comes
+            // from setting the margin bounds as follows, and then directly mapping the 
+            // source to the margin bounds. I found that the previous algorithm compressed the
+            // image vertically a little.
+            var printableArea = Rectangle.Round( e.PageSettings.PrintableArea );
+            Rectangle marginBounds = e.MarginBounds;
+            marginBounds.Height = printableArea.Height;
+            marginBounds.Width = printableArea.Width;
+            Rectangle sourceBounds = new Rectangle( 0, 0, pageImage.Width, pageImage.Height );
+
+            using (var image = RasterImageConverter.ConvertToImage( pageImage, ConvertToImageOptions.None))
+            {
+                e.Graphics.DrawImage(image, marginBounds, sourceBounds, GraphicsUnit.Pixel);
+            }
+        }
+
+        /// <summary>
+        /// The Handle Print Page event handler. This handler is responsible for retrieving and tracking 
+        /// the correct image, printing the current page, and tracking whether there are more pages 
+        /// to process. 
+        ///  
+        /// </summary>
+        /// <param name="sender">Not used</param>
+        /// <param name="e">PrintPageEventArgs, passed to page print function</param>
+        /// <returns></returns>
+        void HandlePrintPage(object sender, PrintPageEventArgs e)
+        {
+            try
+            {
+                var image = _rastersForPrinting[_printPageCounter];
+                ++_printPageCounter;
+
+                PrintOnePage(image, e);
+
+                e.HasMorePages = _printPageCounter < _rastersForPrinting.Count;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38443");
+            }
+        }
+
+        /// <summary>
+        /// Print Ended event handler. This function resets internal state and removes event handlers 
+        /// from the print document so that the print document memory can be GC'ed. 
+        /// </summary>
+        /// <param name="sender">Unused</param>
+        /// <param name="e">Unused</param>
+        /// <returns></returns>
+        void HandlePrintHasEnded(object sender, PrintEventArgs e)
+        {
+            try
+            {
+                CollectionMethods.ClearAndDispose(_rastersForPrinting);
+                _rastersForPrinting = null;
+
+                _printDocument.PrintPage -= HandlePrintPage;
+                _printDocument.EndPrint -= HandlePrintHasEnded;
+                _printDocument = null;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI38444");
             }
         }
 

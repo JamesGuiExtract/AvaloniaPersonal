@@ -24,6 +24,7 @@
             this._outputFileNameBrowseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._pagesToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this._imageToolStripContainer = new System.Windows.Forms.ToolStripContainer();
+            this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._basicTools = new System.Windows.Forms.ToolStrip();
             this._zoomWindowToolStripButton = new Extract.Imaging.Forms.ZoomWindowToolStripButton();
@@ -45,6 +46,7 @@
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._loadNextDocumentMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._outputSelectedDocumentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._printMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this._restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -60,7 +62,6 @@
             this._settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
             ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).BeginInit();
             this._splitContainer.Panel1.SuspendLayout();
             this._splitContainer.Panel2.SuspendLayout();
@@ -202,12 +203,23 @@
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._basicTools);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommands);
             // 
+            // _imageViewerStatusStrip
+            // 
+            this._imageViewerStatusStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._imageViewerStatusStrip.Location = new System.Drawing.Point(0, 0);
+            this._imageViewerStatusStrip.Name = "_imageViewerStatusStrip";
+            this._imageViewerStatusStrip.ShowBackgroundProcessStatus = false;
+            this._imageViewerStatusStrip.Size = new System.Drawing.Size(529, 24);
+            this._imageViewerStatusStrip.TabIndex = 0;
+            // 
             // _imageViewer
             // 
             this._imageViewer.AutoOcr = false;
             this._imageViewer.AutoZoomScale = 0;
+            this._imageViewer.DisplayAnnotations = false;
             this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._imageViewer.FrameColor = System.Drawing.Color.Transparent;
+            this._imageViewer.InvertColors = false;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
             this._imageViewer.MinimumAngularHighlightHeight = 16;
             this._imageViewer.MinimumSize = new System.Drawing.Size(5, 5);
@@ -407,6 +419,7 @@
             this._fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._loadNextDocumentMenuItem,
             this._outputSelectedDocumentsMenuItem,
+            this._printMenuItem,
             this.toolStripSeparator3,
             this._restartToolStripMenuItem,
             this.toolStripSeparator1,
@@ -414,12 +427,13 @@
             this._fileToolStripMenuItem.Name = "_fileToolStripMenuItem";
             this._fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this._fileToolStripMenuItem.Text = "&File";
+            this._fileToolStripMenuItem.DropDownOpening += new System.EventHandler(this.FileToolStripMenuItem_DropDownOpening);
             // 
             // _loadNextDocumentMenuItem
             // 
             this._loadNextDocumentMenuItem.Enabled = false;
             this._loadNextDocumentMenuItem.Name = "_loadNextDocumentMenuItem";
-            this._loadNextDocumentMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
+            this._loadNextDocumentMenuItem.ShortcutKeyDisplayString = "Ctrl+G";
             this._loadNextDocumentMenuItem.Size = new System.Drawing.Size(269, 22);
             this._loadNextDocumentMenuItem.Text = "&Load next document";
             this._loadNextDocumentMenuItem.Click += new System.EventHandler(this.HandleLoadNextDocumentMenuItem_Click);
@@ -428,32 +442,40 @@
             // 
             this._outputSelectedDocumentsMenuItem.Enabled = false;
             this._outputSelectedDocumentsMenuItem.Name = "_outputSelectedDocumentsMenuItem";
-            this._outputSelectedDocumentsMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this._outputSelectedDocumentsMenuItem.ShortcutKeyDisplayString = "Ctrl+S";
             this._outputSelectedDocumentsMenuItem.Size = new System.Drawing.Size(269, 22);
-            this._outputSelectedDocumentsMenuItem.Text = "Output selected document(s)";
+            this._outputSelectedDocumentsMenuItem.Text = "&Output selected document(s)";
             this._outputSelectedDocumentsMenuItem.Click += new System.EventHandler(this.HandleOutputDocuments_Click);
+            // 
+            // _printMenuItem
+            // 
+            this._printMenuItem.Name = "_printMenuItem";
+            this._printMenuItem.ShortcutKeyDisplayString = "Ctrl+P";
+            this._printMenuItem.Size = new System.Drawing.Size(269, 22);
+            this._printMenuItem.Text = "&Print selected document(s)";
+            this._printMenuItem.Click += new System.EventHandler(this.HandlePrintMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(266, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(268, 6);
             // 
             // _restartToolStripMenuItem
             // 
             this._restartToolStripMenuItem.Name = "_restartToolStripMenuItem";
-            this._restartToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
+            this._restartToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this._restartToolStripMenuItem.Text = "&Restart";
             this._restartToolStripMenuItem.Click += new System.EventHandler(this.HandleRestartToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(266, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(268, 6);
             // 
             // _exitToolStripMenuItem
             // 
             this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
-            this._exitToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
+            this._exitToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this._exitToolStripMenuItem.Text = "E&xit";
             this._exitToolStripMenuItem.Click += new System.EventHandler(this.HandleExitToolStripMenuItem_Click);
             // 
@@ -546,15 +568,6 @@
             this._aboutToolStripMenuItem.Text = "&About...";
             this._aboutToolStripMenuItem.Click += new System.EventHandler(this.HandleAboutToolStripMenuItem_Click);
             // 
-            // _imageViewerStatusStrip
-            // 
-            this._imageViewerStatusStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._imageViewerStatusStrip.Location = new System.Drawing.Point(0, 0);
-            this._imageViewerStatusStrip.Name = "_imageViewerStatusStrip";
-            this._imageViewerStatusStrip.ShowBackgroundProcessStatus = false;
-            this._imageViewerStatusStrip.Size = new System.Drawing.Size(529, 24);
-            this._imageViewerStatusStrip.TabIndex = 0;
-            // 
             // PaginationUtilityForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -641,6 +654,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private Imaging.Forms.OneToOneZoomToolStripButton _oneToOneZoomToolStripButton;
         private Imaging.Forms.ImageViewerStatusStrip _imageViewerStatusStrip;
+        internal System.Windows.Forms.ToolStripMenuItem _printMenuItem;
     }
 }
 
