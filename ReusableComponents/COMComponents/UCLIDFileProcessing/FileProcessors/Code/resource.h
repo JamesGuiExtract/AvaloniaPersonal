@@ -154,7 +154,9 @@
 #define IDC_CHECK_PROP_ERRORS           297
 #define IDC_BTN_ACTION_TAG              298
 #define IDI_ICON_INFO                   299
+#define IDC_BTN_DOCUMENT_TAG            299
 #define IDC_HELP_PAGENUMBERS            300
+#define IDC_BTN_FILE_SELECTOR           300
 #define IDC_EDIT_SLEEP_TIME             301
 #define IDC_COMBO_SLEEP_UNITS           302
 #define IDC_CHECK_SLEEP_RANDOM          303
@@ -164,7 +166,10 @@
 #define IDC_BTN_TAG_DOC_TAG             307
 #define IDC_CHECK_SECURE_DELETE         308
 #define IDC_CHECK_SECURE_DELETE_THROW   309
-#define IDC_CHECK_PARALLEL				310
+#define IDC_CHECK_PARALLEL              310
+#define IDC_EDIT_DOCUMENT_NAME          312
+#define IDC_RADIO_QUEUE_FILE            313
+#define IDC_RADIO_REPORT_ERROR          314
 
 // Next default values for new objects
 // 
@@ -172,7 +177,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        155
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         311
+#define _APS_NEXT_CONTROL_VALUE         315
 #define _APS_NEXT_SYMED_VALUE           145
 #endif
 #endif

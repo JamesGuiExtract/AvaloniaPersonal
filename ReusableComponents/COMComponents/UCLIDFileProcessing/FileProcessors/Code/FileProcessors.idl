@@ -210,12 +210,14 @@ library UCLID_FILEPROCESSORSLib
 		[propget, id(1), helpstring("property ActionName")] HRESULT ActionName([out, retval] BSTR *pstrRetVal);
 		[propput, id(1), helpstring("property ActionName")] HRESULT ActionName([in] BSTR strNewVal);
 
-		// TODO: why does this not work?
-		//[propget, id(2), helpstring("property ActionStatus")] HRESULT ActionStatus([out, retval] UCLID_FILEPROCESSINGLib.EActionStatus *pRetVal);
-		//[propput, id(2), helpstring("property ActionStatus")] HRESULT ActionStatus([in] UCLID_FILEPROCESSINGLib.EActionStatus newVal);
-		
 		[propget, id(2), helpstring("property ActionStatus")] HRESULT ActionStatus([out, retval] long *pRetVal);
 		[propput, id(2), helpstring("property ActionStatus")] HRESULT ActionStatus([in] long newVal);
+
+		[propget, id(3), helpstring("property DocumentName")] HRESULT DocumentName([out, retval] BSTR *pstrRetVal);
+		[propput, id(3), helpstring("property DocumentName")] HRESULT DocumentName([in] BSTR strNewVal);
+
+		[propget, id(4), helpstring("property ReportError")] HRESULT ReportErrorWhenFileNotQueued([out, retval] VARIANT_BOOL *pbVal);
+		[propput, id(4), helpstring("property ReportError")] HRESULT ReportErrorWhenFileNotQueued([in] VARIANT_BOOL bVal);
 	};
 
 	[
