@@ -15,13 +15,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -86,7 +84,7 @@ BEGIN
             VALUE "FileDescription", "GetFullUserName Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "GetFullUserName"
-            VALUE "LegalCopyright", "Copyright (C) 2015"
+            VALUE "LegalCopyright", "Copyright (C) 2015 Extract Systems, LLC"
             VALUE "OriginalFilename", "GetFullUserName.exe"
             VALUE "ProductName", "GetFullUserName"
             VALUE "ProductVersion", "1, 0, 0, 1"
@@ -104,13 +102,13 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_APP_TITLE           "GetFullUserName"
     IDC_GETFULLUSERNAME     "GETFULLUSERNAME"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -12,42 +12,48 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
     "#define _AFX_NO_TRACKER_RESOURCES\r\n"
     "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
-	"\r\n"
-	"#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
-	"#ifdef _WIN32\r\n"
-	"LANGUAGE 9, 1\r\n"
-	"#pragma code_page(1252)\r\n"
-	"#endif //_WIN32\r\n"
-	"#include ""res\\RunRules.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
-	"#include ""afxres.rc""  	// Standard components\r\n"
-	"#endif\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\RunRules.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
     "\0"
 END
 
-/////////////////////////////////////////////////////////////////////////////
 #endif    // APSTUDIO_INVOKED
 
 
@@ -58,38 +64,33 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\RunRules.ico"
+IDR_MAINFRAME           ICON                    "res\\RunRules.ico"
 
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
-LANGUAGE 9, 1
-#pragma code_page(1252)
-#endif //_WIN32
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_RUNRULES_DIALOG DIALOGEX  0, 0, 320, 200 
-STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_RUNRULES_DIALOG DIALOGEX 0, 0, 320, 200
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "RunRules"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,260,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,260,23,50,14
-	LTEXT           "TODO: Place dialog controls here.",IDC_STATIC,50,90,200,8
+    LTEXT           "TODO: Place dialog controls here.",IDC_STATIC,50,90,200,8
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
-VS_VERSION_INFO     VERSIONINFO
-  FILEVERSION       1,0,0,1
-  PRODUCTVERSION    1,0,0,1
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -100,26 +101,25 @@ VS_VERSION_INFO     VERSIONINFO
  FILETYPE 0x1L
  FILESUBTYPE 0x0L
 BEGIN
-	BLOCK "StringFileInfo"
-	BEGIN
-        BLOCK "040904B0"
-		BEGIN 
-			VALUE "CompanyName",     "\0"
-			VALUE "FileDescription", "RunRules MFC Application\0"
-			VALUE "FileVersion",     "1, 0, 0, 1\0"
-			VALUE "InternalName",    "RunRules\0"
-			VALUE "LegalCopyright",  "Copyright (C) 2015\0"
-			VALUE "LegalTrademarks", "\0"
-			VALUE "OriginalFilename","RunRules.EXE\0"
-			VALUE "ProductName",     "RunRules Application\0"
-			VALUE "ProductVersion",  "1, 0, 0, 1\0"
-		END
-	END
-	BLOCK "VarFileInfo" 
-	BEGIN 
-		VALUE "Translation", 0x409, 1200
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "RunRules MFC Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "RunRules"
+            VALUE "LegalCopyright", "Copyright (C) 2015 Extract Systems, LLC"
+            VALUE "OriginalFilename", "RunRules.EXE"
+            VALUE "ProductName", "RunRules Application"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
     END
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -127,26 +127,22 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_RUNRULES_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 313
         TOPMARGIN, 7
-        BOTTOMMARGIN,193 
+        BOTTOMMARGIN, 193
     END
 END
 #endif    // APSTUDIO_INVOKED
 
-
-
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
 
-#endif
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -163,8 +159,8 @@ END
 LANGUAGE 9, 1
 #pragma code_page(1252)
 #endif //_WIN32
-#include "res\\RunRules.rc2"  // non-Microsoft Visual C++ edited resources
-#include "afxres.rc"  	// Standard components
+#include "res\RunRules.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

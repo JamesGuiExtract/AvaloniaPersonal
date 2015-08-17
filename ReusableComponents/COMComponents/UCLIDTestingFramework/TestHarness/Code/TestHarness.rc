@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -27,18 +25,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -66,8 +64,8 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON_TEST           ICON    DISCARDABLE     "res\\TestHarness.ico"
-IDI_ICON_NOTEPAD        ICON    DISCARDABLE     "res\\notepad.ico"
+IDI_ICON_TEST           ICON                    "res\\TestHarness.ico"
+IDI_ICON_NOTEPAD        ICON                    "res\\notepad.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -75,27 +73,24 @@ IDI_ICON_NOTEPAD        ICON    DISCARDABLE     "res\\notepad.ico"
 //
 
 IDD_TESTHARNESS_DIALOG DIALOGEX 0, 0, 288, 87
-STYLE WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "TestHarness"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_EDIT_TCLFILENAME,5,38,232,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_BTN_BROWSE,240,38,16,14
     PUSHBUTTON      "",IDC_BTN_OPEN_NOTEPAD,262,38,16,14,BS_ICON
     PUSHBUTTON      "Run Automated Tests",IDC_BTN_AUTOMATED_TESTS,5,63,82,14
-    PUSHBUTTON      "Run Interactive Tests",IDC_BTN_INTERACTIVE_TESTS,101,63,
-                    82,14
+    PUSHBUTTON      "Run Interactive Tests",IDC_BTN_INTERACTIVE_TESTS,101,63,82,14
     PUSHBUTTON      "Run All Tests",IDC_BTN_ALL_TESTS,197,63,82,14
-    CONTROL         "Select a TCL file for Automated/Interactive test",
-                    IDC_RADIO_TCL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,5,7,
-                    164,10
-    CONTROL         "Select an ITC file for Interactive test only",
-                    IDC_RADIO_ITC,"Button",BS_AUTORADIOBUTTON,5,21,143,10
+    CONTROL         "Select a TCL file for Automated/Interactive test",IDC_RADIO_TCL,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,5,7,164,10
+    CONTROL         "Select an ITC file for Interactive test only",IDC_RADIO_ITC,
+                    "Button",BS_AUTORADIOBUTTON,5,21,143,10
 END
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -118,18 +113,14 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "\0"
-            VALUE "CompanyName", "Extract Systems\0"
-            VALUE "FileDescription", "TestHarness MFC Application\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
-            VALUE "InternalName", "TestHarness\0"
-            VALUE "LegalCopyright", "Copyright (C) 2015\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "TestHarness.EXE\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "TestHarness Application\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
-            VALUE "SpecialBuild", "\0"
+            VALUE "CompanyName", "Extract Systems"
+            VALUE "FileDescription", "TestHarness MFC Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "TestHarness"
+            VALUE "LegalCopyright", "Copyright (C) 2015 Extract Systems, LLC"
+            VALUE "OriginalFilename", "TestHarness.EXE"
+            VALUE "ProductName", "TestHarness Application"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"
@@ -138,8 +129,6 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -147,7 +136,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_TESTHARNESS_DIALOG, DIALOG
     BEGIN
@@ -156,7 +145,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

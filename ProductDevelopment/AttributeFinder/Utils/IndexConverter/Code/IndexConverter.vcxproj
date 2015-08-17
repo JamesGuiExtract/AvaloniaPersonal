@@ -177,6 +177,7 @@
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\..\ReusableComponents\BaseUtils\Code\res\icon_info.ico" />
     <None Include="res\IndexConverter.ico" />
     <None Include="res\IndexConverter.rc2" />
   </ItemGroup>

@@ -17,6 +17,7 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -70,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "LogProcessStats.exe"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "LogProcessStats.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2015"
+            VALUE "LegalCopyright", "Copyright (C) 2015 Extract Systems, LLC"
             VALUE "OriginalFilename", "LogProcessStats.exe"
             VALUE "ProductName", "LogProcessStats.exe"
             VALUE "ProductVersion", "1.0.0.1"
