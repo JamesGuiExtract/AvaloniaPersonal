@@ -31,25 +31,27 @@
 
 <h2>Test Execution</h2>
 <ul>
+	<li>From the <b>Categories</b> tab, select the <b>Interactive</b> category and Add it to the 
+	<b>Selected Categories</b> group.
+	<li>Also, check the <b>Exclude these categories</b> checkbox.
+<p>
 	<li>Load the comprehensive <b>Extract-All.nunit</b> testing project from <b>CommonComponents</b> 
 	that loads the following DLLs.
 	<ul>
+		<li>Extract.AttributeFinder.OutputHandlers.Test.dll
 		<li>Extract.DataEntry.Test.dll
+		<li>Extract.DataEntry.LabDE.Test.dll
 		<li>Extract.Encryption.Test.dll
 		<li>Extract.FileActionManager.Database.Test.dll
-		<li>Extract.Geometry.Test.dll
+		<li>Extract.FileActionManager.FileProcessors.Test.dll
+		<li>Extract.FileActionManager.Forms.Test.dll
 		<li>Extract.Imaging.Forms.Test.dll
-		<ul>
-			<li>Automated
-			<li>Interactive
-		</ul>
 		<li>Extract.SetOperations.Test.dll
 		<li>Extract.Test.dll
 		<li>Extract.Utilities.Test.dll
 	</ul>
 	<li>Confirm that the project loads without error.
-	<li>Exercise the automated and interactive tests.  Each is expected to complete 
-	without error.
+	<li>Exercise the automated tests.  Each is expected to complete without error.
 </ul>
 </BODY>
 </HTML>
