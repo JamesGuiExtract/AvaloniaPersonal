@@ -87,6 +87,7 @@ LabDE,0
 
 FLEX Index / ID Shield Utilities,0
 -    Create Searchable PDF,6079
+-    Data Entry Verification Logging,6086
 -    Disable USB Counters (locked to PC) <DevOnly>,6072
 -    Disable USB Key Serial Numbers <RWOnly>,6071
 -    File Inspector Search,6084
@@ -98,7 +99,6 @@ FLEX Index / ID Shield Utilities,0
 -    Pagination Utility,6051
 -    PDF Read+Write,6073
 -    Remove Image Pages,6085
--    Data Entry Verification Logging,6086
 
 ID Shield Office 1.0,0
 -    ID Shield Office,$IDShieldOffice
