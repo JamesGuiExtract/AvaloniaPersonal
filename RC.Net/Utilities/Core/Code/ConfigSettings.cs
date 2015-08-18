@@ -1014,9 +1014,11 @@ namespace Extract.Utilities
                     .SingleOrDefault();
                 if (xmlAttribute != null)
                 {
+                    expandTags = xmlAttribute.Value.ToBoolean();
+
                     ExtractException.Assert("ELI37924", "Conflicting config node settings; Path " +
                         "tags cannot be expanded on values interpreted as XML.",
-                        !valueIsXml || !explicitSetting, "Setting Value", node.InnerXml);
+                        !expandTags || !valueIsXml || !explicitSetting, "Setting Value", node.InnerXml);
 
                     // If the node value is explicitly indicated to have path tags expanded, assume
                     // it is not to be interpreted as XML.

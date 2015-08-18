@@ -76,6 +76,9 @@
     <Compile Include="FAMData.cs" />
     <Compile Include="FAMOrderRow.cs" />
     <Compile Include="LabDEQueryUtilities.cs" />
+    <Compile Include="FAMMetadataManager.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="OrderPickerSelectionPane.cs">
       <SubType>UserControl</SubType>
     </Compile>

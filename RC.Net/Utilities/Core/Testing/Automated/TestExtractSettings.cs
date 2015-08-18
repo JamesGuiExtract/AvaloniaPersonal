@@ -1,9 +1,11 @@
+using Extract.Testing.Utilities;
 using Extract.Utilities.Test.Properties;
 using Microsoft.Win32;
 using NUnit.Framework;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities.Test
 {
@@ -14,6 +16,19 @@ namespace Extract.Utilities.Test
     [Category("ExtractSettings")]
     public class TestExtractSettings
     {
+        #region Overhead Methods
+
+        /// <summary>
+        /// Setup method to initialize the testing environment.
+        /// </summary>
+        [TestFixtureSetUp]
+        public static void Setup()
+        {
+            GeneralMethods.TestSetup();
+        }
+
+        #endregion Overhead Methods
+
         /// <summary>
         /// Tests the static vs dynamic behavior against the same config file.
         /// </summary>
@@ -46,7 +61,7 @@ namespace Extract.Utilities.Test
                 Assert.That(staticConfig.Settings.TestInt == 0,
                     "Dynamic ConfigSettings did not update value.");
 
-                // A new value specifyied in the static instance should not affect the value in the
+                // A new value specified in the static instance should not affect the value in the
                 // dynamic instance.
                 staticConfig.Settings.TestInt = 1;
                 Assert.That(dynamicConfig.Settings.TestInt == 0,
@@ -135,7 +150,7 @@ namespace Extract.Utilities.Test
                         File.Delete(configFileName);
                     }
 
-                    // Test that an execption is thrown if a ConfigSettings instance is initialized
+                    // Test that an exception is thrown if a ConfigSettings instance is initialized
                     // with no existing config file and createIfMissing set to false. 
                     ConfigSettings<Settings> noFileCreationConfig =
                         new ConfigSettings<Settings>(configFileName, true, false);
@@ -170,6 +185,192 @@ namespace Extract.Utilities.Test
         }
 
         /// <summary>
+        /// Tests use of the XML attribute on a config file node.
+        /// https://extract.atlassian.net/browse/ISSUE-12804
+        /// </summary>
+        [Test]
+        public static void ConfigFileXml()
+        {
+             using (TemporaryFile configFile = new TemporaryFile(".config", false))
+             {
+                 File.Delete(configFile.FileName);
+
+                 // Initialize a dynamic ConfigSettings instance and ensure the proper default value.
+                 ConfigSettings<Settings> config = new ConfigSettings<Settings>(configFile.FileName, true, true);
+                 config.Settings.TestString = "TEST";
+
+                 string fileText = File.ReadAllText(configFile.FileName);
+                 fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"False\">&lt;root/&gt;</value>");
+                 File.Delete(configFile.FileName);
+                 File.WriteAllText(configFile.FileName, fileText);
+
+                 Assert.That(config.Settings.TestString == "<root/>");
+             }
+        }
+
+        /// <summary>
+        /// Tests use of the XML attribute on a config file node.
+        /// https://extract.atlassian.net/browse/ISSUE-12804
+        /// </summary>
+        [Test]
+        public static void ConfigFileXml2()
+        {
+            using (TemporaryFile configFile = new TemporaryFile(".config", false))
+            {
+                File.Delete(configFile.FileName);
+
+                // Initialize a dynamic ConfigSettings instance and ensure the proper default value.
+                ConfigSettings<Settings> config = new ConfigSettings<Settings>(configFile.FileName, true, true);
+                config.Settings.TestString = "TEST";
+
+                string fileText = File.ReadAllText(configFile.FileName);
+                fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"True\">&lt;root/&gt;</value>");
+                File.Delete(configFile.FileName);
+                File.WriteAllText(configFile.FileName, fileText);
+
+                Assert.That(config.Settings.TestString == "&lt;root/&gt;");
+            }
+        }
+
+        /// <summary>
+        /// Tests use of the expandTags attribute on a config file node
+        /// https://extract.atlassian.net/browse/ISSUE-12804
+        /// </summary>
+        [Test]
+        public static void ConfigFileExpandTags()
+        {
+            using (TemporaryFile configFile = new TemporaryFile(".config", false))
+            {
+                File.Delete(configFile.FileName);
+
+                // Initialize a dynamic ConfigSettings instance and ensure the proper default value.
+                ConfigSettings<Settings> config = new ConfigSettings<Settings>(configFile.FileName, true, true, 
+                    (ITagUtility)new MiscUtils());
+                config.Settings.TestString = "TEST";
+
+                string fileText = File.ReadAllText(configFile.FileName);
+                fileText = fileText.Replace("<value>TEST</value>", "<value expandTags=\"True\">$DirOf(C:\\Test\\Test.tif)</value>");
+                File.Delete(configFile.FileName);
+                File.WriteAllText(configFile.FileName, fileText);
+
+                Assert.That(config.Settings.TestString == "C:\\Test");
+            }
+        }
+
+        /// <summary>
+        /// Tests use of the expandTags attribute on a config file node
+        /// https://extract.atlassian.net/browse/ISSUE-12804
+        /// </summary>
+        [Test]
+        public static void ConfigFileExpandTags2()
+        {
+            using (TemporaryFile configFile = new TemporaryFile(".config", false))
+            {
+                File.Delete(configFile.FileName);
+
+                // Initialize a dynamic ConfigSettings instance and ensure the proper default value.
+                ConfigSettings<Settings> config = new ConfigSettings<Settings>(configFile.FileName, true, true,
+                    (ITagUtility)new MiscUtils());
+                config.Settings.TestString = "TEST";
+
+                string fileText = File.ReadAllText(configFile.FileName);
+                fileText = fileText.Replace("<value>TEST</value>", "<value expandTags=\"False\">$DirOf(C:\\Test\\Test.tif)</value>");
+                File.Delete(configFile.FileName);
+                File.WriteAllText(configFile.FileName, fileText);
+
+                Assert.That(config.Settings.TestString == "$DirOf(C:\\Test\\Test.tif)");
+            }
+        }
+
+        /// <summary>
+        /// Tests that expandTags and XML attributes can both be explicitly specified.
+        /// https://extract.atlassian.net/browse/ISSUE-13196
+        /// </summary>
+        [Test]
+        public static void ConfigFileXmlAndExpandTags()
+        {
+            using (TemporaryFile configFile = new TemporaryFile(".config", false))
+            {
+                File.Delete(configFile.FileName);
+
+                // Initialize a dynamic ConfigSettings instance and ensure the proper default value.
+                ConfigSettings<Settings> config = new ConfigSettings<Settings>(configFile.FileName, true, true,
+                    (ITagUtility)new MiscUtils());
+                config.Settings.TestString = "TEST";
+
+                string fileText = File.ReadAllText(configFile.FileName);
+                fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"False\" expandTags=\"True\">$DirOf(C:\\Test\\Test.tif)</value>");
+                File.Delete(configFile.FileName);
+                File.WriteAllText(configFile.FileName, fileText);
+
+                Assert.That(config.Settings.TestString == "C:\\Test");
+            }
+        }
+
+        /// <summary>
+        /// Tests that expandTags and XML attributes can both be explicitly specified.
+        /// https://extract.atlassian.net/browse/ISSUE-13196
+        /// </summary>
+        [Test]
+        public static void ConfigFileXmlAndExpandTags2()
+        {
+            using (TemporaryFile configFile = new TemporaryFile(".config", false))
+            {
+                File.Delete(configFile.FileName);
+
+                // Initialize a dynamic ConfigSettings instance and ensure the proper default value.
+                ConfigSettings<Settings> config = new ConfigSettings<Settings>(configFile.FileName, true, true,
+                    (ITagUtility)new MiscUtils());
+                config.Settings.TestString = "TEST";
+
+                string fileText = File.ReadAllText(configFile.FileName);
+                fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"True\" expandTags=\"False\">&lt;root/&gt;</value>");
+                File.Delete(configFile.FileName);
+                File.WriteAllText(configFile.FileName, fileText);
+
+                Assert.That(config.Settings.TestString == "<root/>");
+            }
+        }
+
+        /// <summary>
+        /// Tests that expandTags and XML attributes cannot both be true.
+        /// https://extract.atlassian.net/browse/ISSUE-12804
+        /// </summary>
+        [Test]
+        public static void ConfigFileXmlAndExpandTags3()
+        {
+            using (TemporaryFile configFile = new TemporaryFile(".config", false))
+            {
+                File.Delete(configFile.FileName);
+
+                // Initialize a dynamic ConfigSettings instance and ensure the proper default value.
+                ConfigSettings<Settings> config = new ConfigSettings<Settings>(configFile.FileName, true, true,
+                    (ITagUtility)new MiscUtils());
+                config.Settings.TestString = "TEST";
+
+                string fileText = File.ReadAllText(configFile.FileName);
+                fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"True\" expandTags=\"True\">&lt;root/&gt;</value>");
+                File.Delete(configFile.FileName);
+                File.WriteAllText(configFile.FileName, fileText);
+
+                bool exceptionThrown = false;
+                try
+                {
+                    // Triggers TestString to be read from disk.
+                    exceptionThrown = config.Settings.TestString == "BOGUS";
+                    
+                }
+                catch
+                {
+                    exceptionThrown = true;
+                }
+
+
+                Assert.That(exceptionThrown);
+            }
+        }
+
+        /// <summary>
         /// Tests the static vs dynamic behavior against the same registry key.
         /// </summary>
         [Test]
@@ -199,7 +400,7 @@ namespace Extract.Utilities.Test
                 Assert.That(staticConfig.Settings.TestInt == 0,
                     "Dynamic RegistrySettings did not update value.");
 
-                // A new value specifyied in the static instance should not affect the value in the
+                // A new value specified in the static instance should not affect the value in the
                 // dynamic instance.
                 staticConfig.Settings.TestInt = 1;
                 Assert.That(dynamicConfig.Settings.TestInt == 0,

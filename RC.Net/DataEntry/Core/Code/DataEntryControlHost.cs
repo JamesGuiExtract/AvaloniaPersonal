@@ -1838,6 +1838,8 @@ namespace Extract.DataEntry
                             _mostRecentlySaveAttributes.SaveTo(_imageViewer.ImageFile + ".voa",
                                 true, typeof(AttributeStorageManagerClass).GUID);
 
+                            OnDataSaved();
+
                             if (AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataSave))
                             {
                                 AttributeStatusInfo.Logger.LogEvent(LogCategories.DataSave, null,
@@ -2637,6 +2639,11 @@ namespace Extract.DataEntry
         /// controls.
         /// </summary>
         public event EventHandler<EventArgs> UpdateEnded;
+
+        /// <summary>
+        /// Raised whenever the DEP's data has been saved.
+        /// </summary>
+        public event EventHandler<EventArgs> DataSaved;
 
         #endregion Events
 
@@ -7897,6 +7904,24 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException.Log("ELI30114", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataSaved"/> event.
+        /// </summary>
+        void OnDataSaved()
+        {
+            try
+            {
+                if (DataSaved != null)
+                {
+                    DataSaved(this, new EventArgs());
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI38427", ex);
             }
         }
 
