@@ -500,4 +500,9 @@ function main(args) {
     args = " \"SELECT ('a'+a.TestCode), a.OfficialName FROM LabTest a UNION "
             + "SELECT ('a'+b.TestCode+'_Fuzzy'), (b.OfficialName+'_Fuzzy') FROM LabTest b\" \""+ translateFile + "\" /cd |";
     WSHShell.Run(exporter + args, 0, true);
+
+    var largeValuesFile = fso.BuildPath(fso.GetParentFolderName(outputDir), "largeValueTests.dat");
+    args = " \"SELECT a.Name FROM AlternateTestName a JOIN LabTest l on a.TestCode = l.TestCode " +
+        "WHERE OrderOfMagnitude >= 4\" \"" + largeValuesFile + "\" /fp \"\\b( \" /fs \"\\r\\n)\\b\" /rd \"\\r\\n  | \" /esc";
+    WSHShell.Run(exporter + args, 0, true);
 }
