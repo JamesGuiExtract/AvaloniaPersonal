@@ -1,0 +1,305 @@
+<HTML>
+
+<HEAD>
+<TITLE>Testing of 10.2 Features and Enhancements</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE 10.2<br> 
+Features and Enhancements</h1>
+<hr>
+
+<h1>Initial Goals</h1>
+<ul>
+	<li>Data Entry: Enable Logging - completed <b>07/20/2015</b>
+	<li>Core: Modify PDF task - completed <b>07/23/2015</b>
+	<li>Core: Validate XML task - completed <b>07/20/2015</b>
+	<li>LabDE QA Accuracy report - completed <b>07/22/2015</b>
+</ul>
+
+<hr>
+
+<h1>General</h1>
+<uL>
+	<li><u>Master DVDs</u>
+	<ul>
+		<li><b>FLEX Index</b> - completed <b>8/17/2015</b>
+		<li><b>ID Shield</b> - completed <b>8/xx/2015</b>
+		<li><b>LabDE</b> - completed <b>8/xx/2015</b>
+	</ul>
+<p>
+	<li><u>Automated and NRS tests</u>
+	<ul>
+		<li><b>10.2.0.9</b> completed <b>06/29/2015</b>
+		<li><b>10.2.0.14</b> completed <b>07/09/2015</b>
+		<li><b>10.2.0.21</b> completed <b>07/23/2015</b>
+		<li><b>10.2.0.28</b> completed <b>08/01/2015</b>
+		<li><b>10.2.0.30</b> completed <b>08/11/2015</b>
+	</ul>
+<p>
+	<li><u>Testing <b>GET</b> messages</u>
+	<ul>
+		<li><b>06/05/2015  9:45</b>, <b>10.2.0.9</b>, completed <b>07/01/2015</b>
+		<li><b>06/05/2015 11:11</b>, <b>10.2.0.9</b>, completed <b>07/01/2015</b>
+		<li><b>06/16/2015  9:27</b>, <b>10.2.0.9</b>, completed <b>07/01/2015</b>
+		<li><b>06/17/2015  3:49</b>, <b>10.2.0.9</b>, completed <b>07/01/2015</b>
+		<li><b>06/26/2015  3:48</b>, <b>10.2.0.9</b>, completed <b>07/01/2015</b>
+		<li><b>07/02/2015  1:28</b>, <b>10.2.0.14</b>, completed <b>07/09/2015</b>
+		<li><b>07/06/2015  3:11</b>, <b>10.2.0.14</b>, completed <b>07/10/2015</b>
+		<li><b>06/16/2015 10:40</b>, <b>10.2.0.14</b>, completed <b>07/10/2015</b>
+		<li><b>06/16/2015  1:26</b>, <b>10.2.0.14</b>, completed <b>07/10/2015</b>
+		<li><b>06/26/2015  1:21</b>, <b>10.2.0.14</b>, completed <b>07/11/2015</b>
+		<li><b>07/02/2015  2:22</b>, <b>10.2.0.14</b>, completed <b>07/11/2015</b> FAIL
+		<li><b>06/30/2015  5:05</b>, <b>10.2.0.14</b>, completed <b>07/11/2015</b>
+		<li><b>06/30/2015  9:06</b>, <b>10.2.0.14</b>, completed <b>07/17/2015</b>
+		<li><b>06/26/2015  2:23</b>, <b>10.2.0.18</b>, completed <b>07/17/2015</b>
+		<li><b>07/17/2015  5:06</b>, <b>10.2.0.19</b>, completed <b>07/20/2015</b>
+		<li><b>07/07/2015 11:45</b>, <b>10.2.0.14</b>, completed <b>07/20/2015</b>
+		<li><b>07/17/2015 11:20</b>, <b>10.2.0.19</b>, completed <b>07/20/2015</b>
+		<li><b>07/17/2015  3:43</b>, <b>10.2.0.19</b>, completed <b>07/20/2015</b>
+		<li><b>07/15/2015  1:58</b>, <b>10.2.0.19</b>, completed <b>07/20/2015</b>
+		<li><b>07/17/2015 10:45</b>, <b>10.2.0.19</b>, completed <b>07/21/2015</b>
+		<li><b>07/17/2015 10:23</b>, <b>10.2.0.19</b>, completed <b>07/21/2015</b>
+		<li><b>07/16/2015 10:10</b>, <b>10.2.0.19</b>, completed <b>07/21/2015</b>
+		<li><b>07/13/2015  2:09</b>, <b>10.2.0.19</b>, completed <b>07/21/2015</b>
+		<li><b>07/09/2015  1:01</b>, <b>10.2.0.19</b>, completed <b>07/23/2015</b>
+		<li><b>07/22/2015 11:23</b>, <b>10.2.0.21</b>, completed <b>07/23/2015</b>
+		<li><b>07/20/2015  5:35</b>, <b>10.2.0.21</b>, completed <b>07/23/2015</b>
+		<li><b>07/09/2015 12:59</b>, <b>10.2.0.21</b>, completed <b>07/23/2015</b>
+		<li><b>07/21/2015  4:51</b>, <b>10.2.0.21</b>, completed <b>07/23/2015</b>
+		<li><b>07/20/2015  1:41</b>, <b>10.2.0.21</b>, completed <b>07/23/2015</b> OK
+		<li><b>07/17/2015  4:03</b>, <b>10.2.0.21</b>, completed <b>07/24/2015</b>
+		<li><b>07/10/2015 10:34</b>, <b>10.2.0.21</b>, completed <b>07/24/2015</b>
+		<li><b>07/29/2015  1:51</b>, <b>10.2.0.26</b>, completed <b>07/30/2015</b>
+		<li><b>07/30/2015 10:57</b>, <b>10.2.0.26</b>, completed <b>07/31/2015</b>
+		<li><b>07/29/2015  2:28</b>, <b>10.2.0.26</b>, completed <b>07/31/2015</b>
+		<li><b>08/11/2015 11:19</b>, <b>10.2.0.30</b>, completed <b>08/11/2015</b>
+		<li><b>08/11/2015 11:35</b>, <b>10.2.0.30</b>, completed <b>08/12/2015</b>
+<p>
+		<li><b>06/06/2015  2:09</b>, <b>10.2.0.xx</b>, completed <b>08/xx/2015</b>
+		<li><b>07/17/2015 12:06</b>, <b>10.2.0.xx</b>, completed <b>08/xx/2015</b>
+		<li><b>07/22/2015  4:57</b>, <b>10.2.0.xx</b>, completed <b>08/xx/2015</b>
+		<li><b>07/23/2015 11:12</b>, <b>10.2.0.xx</b>, completed <b>08/xx/2015</b>
+		<li><b>07/24/2015 10:41</b>, <b>10.2.0.xx</b>, completed <b>08/xx/2015</b>
+		<li><b>07/24/2015 11:00</b>, <b>10.2.0.xx</b>, completed <b>08/xx/2015</b>
+		<li><b>07/31/2015 10:28</b>, <b>10.2.0.xx</b>, completed <b>08/xx/2015</b>
+	</ul>
+</uL>
+<hr>
+
+<h1>Features</h1>
+<uL>
+	<u>Memory Leak Testing - Rule Objects</u>
+	<ul>
+		<li>Locate Image Region VF #1 - completed <b>07/01/2015</b>
+		<li>Locate Image Region VF #2 - completed <b>07/02/2015</b>
+<p>
+		<li>Character Confidence Data Scorer #1 - completed <b>07/02/2015</b> 835 FAILURES
+		<li>Character Confidence Data Scorer #1 - completed <b>07/03/2015</b> 1 FAILURE
+		<li>Entity Name Data Scorer #1 - completed <b>07/02/2015</b>
+		<li>RSD Based Data Scorer #1 - completed <b>07/02/2015</b>
+<p>
+		<li>Advanced Replace String VM #1 - completed <b>07/03/2015</b>
+		<li>Advanced Replace String VM #2 - completed <b>07/07/2015</b>
+		<li>Block Finder VM #1 - completed <b>07/07/2015</b>
+		<li>Block Finder VM #2 - completed <b>07/07/2015</b>
+		<li>Change Case VM #1 - completed <b>07/10/2015</b>
+		<li>Conditionally Modify Attribute VM #1 - completed <b>07/10/2015</b>
+		<li>Extract OCR Text In Image Area VM #1 - completed <b>07/16/2015</b>
+		<li>Extract or Remove Leftmost VM #1 - completed <b>07/11/2015</b>
+		<li>Extract or Remove Middle VM #1 - completed <b>07/13/2015</b>
+		<li>Extract or Remove Rightmost VM #1 - completed <b>07/13/2015</b>
+		<li>Find Company Or Persons VM #1 - completed <b>07/15/2015</b>
+		<li>Find SSNs Within Image Area VM #1 - completed <b>07/17/2015</b>
+		<li>Insert Characters VM #1 - completed <b>07/17/2015</b>
+		<li>Locate Image Region VM #1 - completed <b>07/20/2015</b>
+		<li>MERS Modifier VM #1 - completed <b>07/21/2015</b>
+		<li>MERS Modifier VM #2 - completed <b>07/22/2015</b>
+		<li>MERS Modifier VM #3 - completed <b>07/22/2015</b>
+		<li>Modify Spatial Mode VM #1 - completed <b>07/23/2015</b>
+		<li>Numeric Sequence VM #1 - completed <b>07/23/2015</b>
+		<li>Numeric Sequence VM #2 - completed <b>07/24/2015</b>
+		<li>OCR Image Area VM #1 - completed <b>07/24/2015</b>
+		<li>OCR Image Area VM #2 - completed <b>07/24/2015</b>
+		<li>OCR Image Area VM #3 - completed <b>07/25/2015</b>
+		<li>Pad Value VM #1 - completed <b>07/25/2015</b>
+		<li>Regular Expression Rule VM #1 - completed <b>07/27/2015</b>
+		<li>Remove Characters VM #1 - completed <b>07/28/2015</b>
+		<li>Remove Spatial Information VM #1 - completed <b>07/28/2015</b>
+		<li>Replace Strings VM #1 - completed <b>07/29/2015</b>
+		<li>Replace Strings VM #2 - completed <b>07/29/2015</b>
+		<li>Split Region Into Content Areas VM #1 - completed <b>07/30/2015</b>
+		<li>String Tokenizer VM #1 - completed <b>07/31/2015</b>
+		<li>Translate To Closest Value VM #1 - completed <b>07/31/2015</b>
+		<li>Translate Values Or Types VM #1 - completed <b>07/31/2015</b>
+<p>
+		<li>Split Using RSD #1 - completed <b>08/01/2015</b>
+		<li>Split Using Tokens #1 - completed <b>08/01/2015</b>
+		<li>Split Using Tokens #2 - completed <b>08/02/2015</b>
+		<li>Split Date and/or Time #1 - completed <b>08/06/2015</b>
+		<li>Split Date and/or Time #2 - completed <b>08/06/2015</b>
+		<li>Split Date and/or Time #3 - completed <b>08/07/2015</b>
+		<li>Split Date and/or Time #4 - completed <b>08/07/2015</b>
+		<li>Split Company or Person #1 - completed <b>08/10/2015</b>
+		<li>Split Company or Person #2 - completed <b>08/11/2015</b>
+		<li>Split Company or Person #3 - completed <b>08/11/2015</b>
+		<li>Split Company or Person #4 - completed <b>08/12/2015</b>
+		<li>Split Name of Person #1 - completed <b>08/12/2015</b>
+		<li>Split Region Into Content Areas #1 - completed <b>08/13/2015</b>
+<p>
+		<li>Duplicate And Separate Trees OH #1 - completed <b>08/12/2015</b>
+	</ul>
+<p>
+	<u>Memory Leak Testing - Task Objects</u>
+	<ul>
+		<li>Core: Enhance OCR #1 - completed <b>07/08/2015</b>
+		<li>Core: Enhance OCR #2 - completed <b>07/09/2015</b>
+		<li>Core: Enhance OCR #3 - completed <b>07/09/2015</b>
+		<li>Core: Enhance OCR #4 - completed <b>07/11/2015</b>
+		<li>Core: Enhance OCR #5 - completed <b>07/13/2015</b>
+		<li>Core: Enhance OCR #6 - completed <b>07/15/2015</b>
+		<li>Core: Modify PDF File #1 - completed <b>07/27/2015</b>
+		<li>Core: Modify PDF File #2 - completed <b>07/27/2015</b>
+		<li>Core: Modify PDF File #3 - completed <b>07/27/2015</b>
+		<li>Core: OCR Document #1 - completed <b>07/16/2015</b>
+		<li>Core: OCR Document #2 - completed <b>07/17/2015</b>
+		<li>Core: OCR Document #3 - completed <b>07/20/2015</b>
+		<li>Core: OCR Document #4 - completed <b>07/21/2015</b>
+		<li>Core: Validate XML #1 - completed <b>07/24/2015</b>
+		<li>Core: Validate XML #2 - completed <b>07/24/2015</b>
+		<li>Core: Validate XML #3 - completed <b>07/25/2015</b>
+		<li>Redaction: Create Metadata XML #1 - completed <b>08/03/2015</b>
+		<li>Redaction: Create Redacted Image #1 - completed <b>08/03/2015</b>
+		<li>Redaction: Create Redacted Image #2 - completed <b>08/03/2015</b>
+		<li>Redaction: Create Redacted Image #3 - completed <b>08/04/2015</b>
+		<li>Redaction: Create Redacted Image #4 - completed <b>08/04/2015</b>
+		<li>Redaction: Create Redacted Image #5 - completed <b>08/04/2015</b>
+		<li>Redaction: Create Redacted Image #6 - completed <b>08/05/2015</b>
+		<li>Redaction: Create Redacted Image #7 - completed <b>08/05/2015</b>
+		<li>Redaction: Extend Redactions #1 - completed <b>08/06/2015</b>
+		<li>Redaction: Extend Redactions #2 - completed <b>08/07/2015</b>
+		<li>Redaction: Extend Redactions #3 - completed <b>08/10/2015</b>
+		<li>Redaction: Filter ID Shield Data File #1 - completed <b>08/11/2015</b>
+		<li>Redaction: Merge ID Shield Data Files #1 - completed <b>08/11/2015</b>
+		<li>Redaction: Merge ID Shield Data Files #2 - completed <b>08/13/2015</b>
+		<li>Redaction: Verify Sensitive Data #1 - completed <b>08/13/2015</b>
+		<li>Redaction: Verify Sensitive Data #2 - completed <b>08/14/2015</b>
+		<li>Redaction: Verify Sensitive Data #3 - completed <b>08/17/2015</b>
+		<li>Redaction: Verify Sensitive Data #4 - completed <b>08/xx/2015</b>
+		<li>Redaction: Verify Sensitive Data #5 - completed <b>08/xx/2015</b>
+		<li>Redaction: Verify Sensitive Data #6 - completed <b>08/xx/2015</b>
+	</ul>
+<p>
+	<li>Testing <b>Data Entry: Enable Logging</b> feature
+	<ul>
+		<li><b>10.2.0.14</b> completed <b>07/20/2015</b>
+	</ul>
+<p>
+	<li>Testing <b>Core: Modify PDF</b> task
+	<ul>
+		<li><b>10.2.0.21</b> completed <b>07/23/2015</b>
+	</ul>
+<p>
+	<li>Testing <b>Core: Validate XML</b> task
+	<ul>
+		<li><b>10.2.0.19</b> completed <b>07/20/2015</b>
+	</ul>
+<p>
+	<li>Testing <b>LabDE QA Accuracy</b> report
+	<ul>
+		<li><b>10.2.0.19</b> completed <b>07/22/2015</b>
+	</ul>
+</uL>
+
+<hr>
+
+<h1>Complete Sanity Tests</h1>
+<ul>
+	<li>Build <b>10.2.0.21</b></a>
+	<ul>
+		<li>Operating System: 64-bit Server 2008 R2
+		<li>Date Started: 07/24/2015
+		<li><b>Date Completed: 07/27/2015</b>
+		<li>Tester: WL
+	</ul>
+</ul>
+
+<hr>
+
+<h1>Other Sanity Tests</h1>
+<uL>
+	<li><b>Server</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Workstation</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Tasks</b>
+	<ul>
+		<li>10.2.0.16, 32-bit Windows 7, COLBY, 07/21/2015, DB
+	</ul>
+ 	<li><b>Suppliers</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Conditions</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Internal</b>
+	<ul>
+		<li>N/A
+	</ul>
+</uL>
+
+<hr>
+
+<h1>Other Checklists</h1>
+<ul>
+	<li><b>Sanity Test - New Employee</b>, completed <b>07/17/2015</b>, DB
+	<li><b>10.2.0.14</b>, completed <b>07/20/2015</b>
+	<li><b>NUnit Testing</b>, completed <b>07/20/2015</b>
+	<li><b>Demo_FLEXIndex</b>, completed <b>07/22/2015</b>, DB
+	<li><b>Demo_LabDE</b>, completed <b>07/23/2015</b>, DB
+	<li><b>Bidirectional Workflow</b>, completed <b>07/23/2015</b>, DB
+	<li><b>10.2.0.21</b>, completed <b>07/24/2015</b>
+	<li><b>FAM Service</b>, completed <b>07/28/2015</b>
+	<li><b>Installation for 64-bit Windows 10</b>, completed <b>07/31/2015</b>
+</ul>
+
+<hr>
+
+<h1>Scalability and Stability Testing</h1>
+<uL>
+	<li><b>TBD</b>
+	<ul>
+		<li>Operating System: 64-bit Server 2008 R2, BEAST-W2k8r2-1
+		<li>Date Started: 12/06/2015
+		<li><b>Date Completed: 12/19/2015</b>
+		<li>Tester: WL
+		<li>Status: 
+		<ul>
+			<li>Build <b>10.2.0.xx</b>
+		</ul>
+	</ul>
+</uL>
+
+<hr>
+<h1>Miscellaneous</h1>
+<OL>
+	<li><b>Documentation</b> - Add 10.2 Enhancements
+	<ul>
+		<li>Updated Window Captions and Versions - completed <b>07/02/2015</b>
+		<li>Updated for Data Entry: Enable Logging - completed <b>07/21/2015</b>
+		<li>Updated for Core: Modify PDF - completed <b>07/21/2015</b>
+		<li>Updated for Core: Validate XML - completed <b>07/21/2015</b>
+		<li>Updated for LabDE QA Accuracy - completed <b>07/22/2015</b>
+		<li>Updated for new company logo - completed <b>08/11/2015</b>
+	</ul>
+</OL>
+</BODY>
+</HTML>
