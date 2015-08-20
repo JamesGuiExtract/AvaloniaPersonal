@@ -94,7 +94,8 @@ function main(args) {
                       c = substituteProblemChars(c);
                       // Don't actually allow newlines if really short (just allow errors)
                       if (index == 0 && name.length > 6) {
-                          var result = "(([^\\xAB\\xBB\\s](?>(?'-_m')|(?'-_e'))|((\\x20(?!\\x20)|[_\\W-[\\x20\\t\\xAB\\xBB]])){0,4}?";
+                          var result = "((([^\\xAB\\xBB\\s](?>(?'-_m')|(?'-_e'))|(\\x20(?!\\x20)|[_\\W-[\\s\\xAB\\xBB]])){0,4}?"
+                                     + "|[_\\W-[\\s\\xAB\\xBB]]?[\\r\\n]{2,4}[_\\W-[\\s\\xAB\\xBB]]?";
                           // Allow name to have values, etc in between parts if the name is long enough
                           if (!firstWord && name.length > 12) {
                               result += "|\\x20{4}[^\\r\\n]+[\\r\\n]+";
