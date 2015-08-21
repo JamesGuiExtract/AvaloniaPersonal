@@ -73,6 +73,14 @@ static const string gstrWORK_ITEM_GROUP="WorkItemGroup";
 static const string gstrMETADATA_FIELD="MetadataField";
 static const string gstrFILE_METADATA_FIELD_VALUE="FileMetadataFieldValue";
 
+// 10.3 table (name) additions
+static const string gstrATTRIBUTE_SET_NAME = "AttributeSetName";
+static const string gstrATTRIBUTE_SET_FOR_FILE = "AttributeSetForFile";
+static const string gstrATTRIBUTE_NAME = "AttributeName";
+static const string gstrATTRIBUTE_TYPE = "AttributeType";
+static const string gstrATTRIBUTE = "Attribute";
+static const string gstrRASTER_ZONE = "RasterZone";
+
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
 //-------------------------------------------------------------------------------------------------

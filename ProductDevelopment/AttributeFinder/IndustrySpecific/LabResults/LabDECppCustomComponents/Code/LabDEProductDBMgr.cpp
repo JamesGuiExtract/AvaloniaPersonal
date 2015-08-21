@@ -33,6 +33,7 @@ using namespace std;
 //			  Prefixed table names with "LabDE", added CollectionDate column to LabDEOrderFile
 // Version 5: Added DOB index on LabDEPatient table.
 // Version 6: Changed AddOrUpdateLabDEOrder stored procedure to be created as dbo.
+// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 static const long glLABDE_DB_SCHEMA_VERSION = 6;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
@@ -655,6 +656,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 			*pnProdSchemaVersion = asLong(strVersion);
 		}
 
+		// WARNING!!! - Fix up this switch when the version has been changed.
 		switch (*pnProdSchemaVersion)
 		{
 			case 0:	// The initial schema should be added against FAM DB schema version 123
@@ -700,16 +702,18 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion6(ipConnection, pnNumSteps, NULL);
 					}
+
+			case 6:	// current schema
 					break;
 
 			default:
-				{
-					UCLIDException ue("ELI37861",
-						"Automatic updates are not supported for the current schema.");
-					ue.addDebugInfo("FAM Schema Version", nFAMDBSchemaVersion, false);
-					ue.addDebugInfo("LabDE Schema Version", *pnProdSchemaVersion, false);
-					throw ue;
-				}
+			{
+				UCLIDException ue("ELI37861",
+					"Automatic updates are not supported for the current schema.");
+				ue.addDebugInfo("FAM Schema Version", nFAMDBSchemaVersion, false);
+				ue.addDebugInfo("LabDE Schema Version", *pnProdSchemaVersion, false);
+				throw ue;
+			}
 		}
 
 		return S_OK;
