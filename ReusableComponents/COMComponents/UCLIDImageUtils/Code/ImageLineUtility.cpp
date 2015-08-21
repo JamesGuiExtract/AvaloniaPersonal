@@ -1534,7 +1534,7 @@ STDMETHODIMP CImageLineUtility::Load(IStream *pStream)
 		dataReader >> m_LineGrouper.m_Settings.m_nOverallWidthMin;
 		dataReader >> m_LineGrouper.m_Settings.m_nOverallWidthMax;
 		
-		// The following are not currently configureable, but load them anyway for future convenience
+		// The following are not currently configurable, but load them anyway for future convenience
 		dataReader >> m_LineGrouper.m_Settings.m_nCombineGroupPercentage;
 		dataReader >> m_LineGrouper.m_Settings.m_nColumnAlignmentRequirement;
 		dataReader >> m_LineGrouper.m_Settings.m_nColumnLineDiffAllowance;
@@ -1602,7 +1602,7 @@ STDMETHODIMP CImageLineUtility::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_LineGrouper.m_Settings.m_nColumnWidthMax;
 		dataWriter << m_LineGrouper.m_Settings.m_nOverallWidthMin;
 		dataWriter << m_LineGrouper.m_Settings.m_nOverallWidthMax;
-		// The following are not currently configureable, but save them anyway for future convenience
+		// The following are not currently configurable, but save them anyway for future convenience
 		dataWriter << m_LineGrouper.m_Settings.m_nCombineGroupPercentage;
 		dataWriter << m_LineGrouper.m_Settings.m_nColumnAlignmentRequirement;
 		dataWriter << m_LineGrouper.m_Settings.m_nColumnLineDiffAllowance;
@@ -1711,16 +1711,28 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
 	lfo.PageNumber = nPageNum;
 
-	// Load the image as a 1 bit image.  LeadTool's line finding only works on 1 bit images.
-	L_INT nRet = L_LoadBitmap((char*) strImageFileName.c_str(), &hBitmap, sizeof(BITMAPHANDLE), 1, 
-		ORDER_RGB, &lfo, &fileInfo);
+	// Load the image in its original bits-per-pixel color depth so that current default-dithering
+	// method doesn't affect how the image is loaded.
+	// https://extract.atlassian.net/browse/ISSUE-13210
+	const long nORIGINAL_PIXEL_DEPTH = 0;
+	L_INT nRet = L_LoadBitmap((char*) strImageFileName.c_str(), &hBitmap, sizeof(BITMAPHANDLE),
+		nORIGINAL_PIXEL_DEPTH, ORDER_RGB, &lfo, &fileInfo);
 	throwExceptionIfNotSuccess(nRet, "ELI19845", 
 		"Internal error: Unable to load image!", strImageFileName);
+
+	// Convert to bitonal since LeadTool's line finding only works on 1 bit images.
+	// No dithering gives better results than the default (ordered?) dither method
+	// https://extract.atlassian.net/browse/ISSUE-13210
+	const long nDEFAULT_NUMBER_OF_COLORS = 0;
+	nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), 1, CRF_NODITHERING | CRF_FIXEDPALETTE,
+		 NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
+	throwExceptionIfNotSuccess(nRet, "ELI38459", 
+		"Internal error: Unable to convert image to bi-tonal!", strImageFileName);
 	
 	// ViewPerspective appears to be valid in situations where ELO_IGNOREVIEWPERSPECTIVE
-	// does not work.  (For instance bmps can be loaded with a valid BOTTOM_LEFT view perspective,
-	// but ELO_IGNOREVIEWPERSPECTIVE will not ignore that view perpective).  For that reason, 
-	// compensate for view perpective.  Its important to use fileInfo's ViewPerspective here
+	// does not work.  (For instance BMPs can be loaded with a valid BOTTOM_LEFT view perspective,
+	// but ELO_IGNOREVIEWPERSPECTIVE will not ignore that view perspective).  For that reason, 
+	// compensate for view perspective.  Its important to use fileInfo's ViewPerspective here
 	// rather than hBitmap's.  
 	if (fileInfo.ViewPerspective != TOP_LEFT)
 	{

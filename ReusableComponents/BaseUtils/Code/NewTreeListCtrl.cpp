@@ -17,7 +17,7 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 CTLItem::CTLItem()
 {
-	m_cEnding = '¶';
+	m_cEnding = '\a';
 	m_itemString = "";
 	m_Color = ::GetSysColor(COLOR_WINDOWTEXT);
 	m_HasChildren = FALSE;
@@ -299,21 +299,27 @@ void CNewTreeListCtrl::DrawItemText (CDC* pDC, CString text, CRect rect, int nWi
     // Make sure the text will fit in the prescribed rectangle, and truncate
     // it if it won't.
     //
-    BOOL bNeedDots = FALSE;
     int nMaxWidth = nWidth - 4;
+    int nMaxTextWidth = nMaxWidth - 4;
 
-    while ((text.GetLength()>0) && (pDC->GetTextExtent((LPCTSTR) text).cx > (nMaxWidth - 4))) 
-	{
-        text = text.Left (text.GetLength () - 1);
-        bNeedDots = TRUE;
-    }
+	int nCurrentWidth = pDC->GetTextExtent((LPCTSTR) text).cx;
+	int nCurrentLength = text.GetLength();
 
-    if (bNeedDots) 
+    if (nCurrentLength > 0 && nCurrentWidth > nMaxTextWidth) 
 	{
-        if (text.GetLength () >= 1)
+		// Save time by estimating the number of characters that will fit
+		// https://extract.atlassian.net/browse/ISSUE-13151
+		int nApproximateCharWidth = nCurrentWidth / nCurrentLength;
+		int nApproximateMaxNumberOfChars = nMaxTextWidth / nApproximateCharWidth;
+        text = text.Left(nApproximateMaxNumberOfChars * 2);
+
+		while (nCurrentLength > 0 && pDC->GetTextExtent((LPCTSTR) text).cx >= nMaxTextWidth) 
 		{
-            text = text.Left (text.GetLength () - 1);
+			text = text.Left(--nCurrentLength);
+		}
 
+        if (nCurrentLength > 0)
+		{
 			text += "...";
 		}
     }
