@@ -5,6 +5,7 @@
 #include "FAMUtils.h"
 
 #include <afxmt.h>
+#include <memory>
 
 using namespace ADODB;
 
@@ -22,9 +23,9 @@ public:
 	//			or any operations that involve updating multiple tables related to the same record. It
 	//			is important that the status of the related table rows don't change via other threads/
 	//			processes in the midst of such calls, otherwise the records may end up in an
-	//			inconsisent state. For example, a file could end up complete in the FileActionStatus
+	//			inconsistent state. For example, a file could end up complete in the FileActionStatus
 	//			table, but still be in the LockedFile table. adXactRepeatableRead will ensure the
-	//			relevant records do not change beforevia other threads/processes before this operation
+	//			relevant records do not change via other threads/processes before this operation
 	//			is complete.
 	//			NOTE: Take care when using elevated isolation levels, however, as doing so can create
 	//			deadlock situations.
@@ -37,7 +38,7 @@ public:
 	TransactionGuard(ADODB::_ConnectionPtr ipConnection, IsolationLevelEnum isolationLevel,
 		CMutex *pMutex);
 
-	// PROMISE: To Rollback a started transaction if it has not been commited
+	// PROMISE: To Rollback a started transaction if it has not been committed
 	~TransactionGuard();
 
 	// PROMISE: To commit currently open transaction
@@ -50,7 +51,11 @@ private:
 	bool m_bTransactionStarted;
 
 	// Mutex that, if non-null, should be locked for the duration of the transaction.
-	CSingleLock *m_pLock;
+	
+	// Use a unique_ptr for the CSingleLock object that is created so that 
+	// if an exception is generated the lock gets released
+	// https://extract.atlassian.net/browse/ISSUE-12694
+	std::unique_ptr <CSingleLock> m_upLock;
 
 	// Connection Pointer
 	ADODB::_ConnectionPtr m_ipConnection;

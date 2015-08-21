@@ -12,20 +12,24 @@
 TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection,
 	IsolationLevelEnum isolationLevel, CMutex *pMutex)
 : m_ipConnection(ipConnection)
-, m_pLock(__nullptr)
+, m_upLock(__nullptr)
 {
 	ASSERT_ARGUMENT("ELI14624", ipConnection != __nullptr );
 
-	if (pMutex != __nullptr)
+	try
 	{
-		m_pLock = new CSingleLock(pMutex, TRUE);
-	}
+		if (pMutex != __nullptr)
+		{
+			m_upLock.reset(new CSingleLock(pMutex, TRUE));
+		}
 
-	ipConnection->IsolationLevel = isolationLevel;
+		ipConnection->IsolationLevel = isolationLevel;
 	
-	// Start a transaction
-	ipConnection->BeginTrans();
-	m_bTransactionStarted = true;
+		// Start a transaction
+		ipConnection->BeginTrans();
+		m_bTransactionStarted = true;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38458");
 }
 //-------------------------------------------------------------------------------------------------
 TransactionGuard::~TransactionGuard()
@@ -54,10 +58,7 @@ TransactionGuard::~TransactionGuard()
 
 	try
 	{
-		if (m_pLock != __nullptr)
-		{
-			delete m_pLock;
-		}
+		m_upLock.reset(__nullptr);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI35398");
 }
@@ -72,11 +73,7 @@ void TransactionGuard::CommitTrans()
 		// There is no longer a transaction in progress-- so reset the started flag
 		m_bTransactionStarted = false;
 
-		if (m_pLock != __nullptr)
-		{
-			delete m_pLock;
-			m_pLock = __nullptr;
-		}
+		m_upLock.reset(__nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27607")
 }
