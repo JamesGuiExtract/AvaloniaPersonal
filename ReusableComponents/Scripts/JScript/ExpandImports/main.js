@@ -16,7 +16,7 @@
 function main(args) {
     var inputDat = args[0];
     var outputDat = args[1];
-    writeText(outputDat, expandImports(fso.getAbsolutePathName(inputDat)));
+    writeText(outputDat, expandImports(fso.getAbsolutePathName(inputDat)).replace(/\/\/.*/g,"").replace(/\s+/g,""));
 
     //--------------------------------------------------------------------------------------------------
     // Get text replacement from a filename
