@@ -1892,8 +1892,9 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 	if (!strTestOutputVOAFile.empty())
 	{
 		// write the testoutput.voa file
+		string strStorageManagerIID = asString(CLSID_AttributeStorageManager);
 		m_ipTestOutputVOAVector->SaveTo(
-			strTestOutputVOAFile.c_str(), VARIANT_TRUE, CLSID_AttributeStorageManager);
+			strTestOutputVOAFile.c_str(), VARIANT_TRUE, strStorageManagerIID.c_str());
 
 		// clear the vector
 		m_ipTestOutputVOAVector->Clear();

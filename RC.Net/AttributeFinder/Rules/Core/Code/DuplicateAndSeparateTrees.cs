@@ -326,16 +326,7 @@ namespace Extract.AttributeFinder.Rules
                     // memory.
                     attribute.ReportMemoryUsage();
 
-                    // https://extract.atlassian.net/browse/ISSUE-13189
-                    // TODO: post-10.2 remove this condition and call the three argument version of the method only.
-                    if (RunOutputHandler)
-                    {
-                        DuplicateAndSeparateTree(pAttributes, attribute, pDoc);
-                    }
-                    else
-                    {
-                        DuplicateAndSeparateTree(pAttributes, attribute);
-                    }
+                    DuplicateAndSeparateTree(pAttributes, attribute, pDoc);
                 }
 
                 // Report memory usage of hierarchy after processing to ensure all COM objects
@@ -675,103 +666,6 @@ namespace Extract.AttributeFinder.Rules
                 }
 
                 return _afUtility;
-            }
-        }
-
-        /// <summary>
-        /// Creates a duplicate of <see paramref="attribute"/> for each child attribute having the
-        /// <see cref="DividingAttributeName"/>. Each will contain copies of all non-dividing
-        /// attributes, but only one dividing attribute instance.
-        /// </summary>
-        /// <param name="rootAttributes">All attributes being processed by this output handler.
-        /// </param>
-        /// <param name="attribute">The <see cref="ComAttribute"/> to duplicate and separate if
-        /// appropriate.</param>
-        void DuplicateAndSeparateTree(IUnknownVector rootAttributes, ComAttribute attribute)
-        {
-            bool foundDividingAttribute = false;
-            // Contains the original hierarchy beneath the attribute.
-            IUnknownVector originalAttributeTree = attribute.SubAttributes;
-            // Make a new subattribute list
-            IUnknownVector newAttributeTree = new IUnknownVector();
-            // Contains any new hierarchies that are produced.
-            List<ComAttribute> duplicatedTrees = new List<ComAttribute>();
-
-            // Contains all non-dividing attributes encountered.
-            List<ComAttribute> nonDividingAttributes = new List<ComAttribute>();
-
-            // Loop through all sub-attributes.
-            foreach (ComAttribute subAttribute in originalAttributeTree
-                .ToIEnumerable<ComAttribute>())
-            {
-                if (subAttribute.Name.Equals(DividingAttributeName,
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    if (!foundDividingAttribute)
-                    {
-                        foundDividingAttribute = true;
-                        // During processing, separate the original tree beneath the attribute
-                        // so it can be cloned without bringing the entire tree along with it.
-                        attribute.SubAttributes = new IUnknownVector();
-                        // Add this attribute to the new subattribute tree
-                        newAttributeTree.PushBack(subAttribute);
-                    }
-                    else
-                    {
-                        // Starting with the second dividing attribute found, create a new tree
-                        // for this dividing attribute instance by cloning the top attribute.
-                        ICopyableObject copyThis = (ICopyableObject)attribute;
-                        ComAttribute duplicatedAttribute = (ComAttribute)copyThis.Clone();
-                        duplicatedTrees.Add(duplicatedAttribute);
-
-                        // Copy over all non-dividing attributes encountered thus far.
-                        // (Preserves attribute ordering).
-                        copyThis = (ICopyableObject)nonDividingAttributes.ToIUnknownVector();
-                        duplicatedAttribute.SubAttributes.Append((IUnknownVector)copyThis.Clone());
-
-                        // Add the dividing attribute to the new tree.
-                        duplicatedAttribute.SubAttributes.PushBack(subAttribute);
-                    }
-                }
-                else
-                {
-                    // Add this attribute to the new subattribute tree
-                    newAttributeTree.PushBack(subAttribute);
-
-                    // Copy this attribute to all duplicate trees created thus far.
-                    foreach (ComAttribute duplicatedAttribute in duplicatedTrees)
-                    {
-                        ICopyableObject copyThis = (ICopyableObject)subAttribute;
-                        ComAttribute nonDividingAttribute = (ComAttribute)copyThis.Clone();
-                        duplicatedAttribute.SubAttributes.PushBack(nonDividingAttribute);
-                    }
-
-                    nonDividingAttributes.Add(subAttribute);
-                }
-            }
-
-            // If at least one dividing attribute was found we need to set the subattributes
-            if (foundDividingAttribute)
-            {
-                attribute.SubAttributes = newAttributeTree;
-            }
-
-            // If there were any duplicate trees created, add them to the output.
-            if (duplicatedTrees.Any())
-            {
-                ComAttribute parentAttribute =
-                    AFUtility.GetAttributeParent(rootAttributes, attribute);
-                IUnknownVector outputVector = (parentAttribute == null)
-                    ? rootAttributes
-                    : parentAttribute.SubAttributes;
-
-                // Insert the new trees immediately after the original tree to preserve order.
-                int index = 0;
-                outputVector.FindByReference(attribute, 0, ref index);
-                ExtractException.Assert("ELI33497", "Internal logic error.", index >= 0);
-
-                outputVector.InsertVector(index + 1,
-                    duplicatedTrees.ToIUnknownVector<ComAttribute>());
             }
         }
 

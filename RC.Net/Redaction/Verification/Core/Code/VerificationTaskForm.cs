@@ -1201,7 +1201,7 @@ namespace Extract.Redaction.Verification
                         // save verified data as found data at a later point in time.
                         IUnknownVector emptyVector = new IUnknownVector();
                         emptyVector.SaveTo(memento.FoundAttributesFileName, false,
-                            typeof(AttributeStorageManagerClass).GUID);
+                            typeof(AttributeStorageManagerClass).GUID.ToString("B"));
                     }
                 }
             }

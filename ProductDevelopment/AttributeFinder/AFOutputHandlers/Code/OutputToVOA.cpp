@@ -154,8 +154,9 @@ STDMETHODIMP COutputToVOA::raw_ProcessOutput(IIUnknownVector *pAttributes, IAFDo
 		}
 
 		// Save the Attributes to the file
+		string strStorageManagerIID = asString(CLSID_AttributeStorageManager);
 		pAttributes->SaveTo(_bstr_t(strFileName.c_str()), VARIANT_TRUE,
-			CLSID_AttributeStorageManager);
+			strStorageManagerIID.c_str());
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08869")
 	

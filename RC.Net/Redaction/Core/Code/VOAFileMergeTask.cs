@@ -711,7 +711,7 @@ namespace Extract.Redaction
                         new List<ComAttribute>(set1NonSpatial), new List<ComAttribute>(set2NonSpatial));
                     outputAttributes.Append(mergedNonSpatialAttributes.ToIUnknownVector<ComAttribute>());
 
-                    outputAttributes.SaveTo(outputFile, false, typeof(AttributeStorageManagerClass).GUID);
+                    outputAttributes.SaveTo(outputFile, false, typeof(AttributeStorageManagerClass).GUID.ToString("B"));
 
                     // Load the output using the RedactionFileLoader in order to add the metadata for
                     // this session.

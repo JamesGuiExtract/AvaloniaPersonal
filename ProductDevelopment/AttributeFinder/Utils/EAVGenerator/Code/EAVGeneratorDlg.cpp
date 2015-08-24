@@ -1052,7 +1052,8 @@ void CEAVGeneratorDlg::saveAttributesToVOA(const CString& zFileName)
 	}
 
 	// Write the VOA file
-	ipAttributes->SaveTo(_bstr_t(LPCTSTR(zFileName)), VARIANT_TRUE, CLSID_AttributeStorageManager);
+	string strStorageManagerIID = asString(CLSID_AttributeStorageManager);
+	ipAttributes->SaveTo(_bstr_t(LPCTSTR(zFileName)), VARIANT_TRUE, strStorageManagerIID.c_str());
 }
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::selectListItem(int iIndex)

@@ -54,7 +54,7 @@ END_COM_MAP()
 
 // IIUnknownVector
 	STDMETHOD(SaveTo)(/*[in]*/ BSTR strFullFileName, /*[in]*/ VARIANT_BOOL bClearDirty,
-		/*[in]*/ GUID guidStorageManager);
+		/*[in]*/ BSTR bstrStorageManager);
 	STDMETHOD(LoadFrom)(/*[in]*/ BSTR strFullFileName, /*[in]*/ VARIANT_BOOL bSetDirtyFlagToTrue);
 	STDMETHOD(Append)(/*[in]*/ IIUnknownVector *pVector);
 	STDMETHOD(Remove)(/*[in]*/ long nIndex);

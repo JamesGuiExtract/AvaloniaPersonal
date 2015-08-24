@@ -1836,7 +1836,7 @@ namespace Extract.DataEntry
 
                             // If all attributes passed validation, save the data.
                             _mostRecentlySaveAttributes.SaveTo(_imageViewer.ImageFile + ".voa",
-                                true, typeof(AttributeStorageManagerClass).GUID);
+                                true, typeof(AttributeStorageManagerClass).GUID.ToString("B"));
 
                             OnDataSaved();
 

@@ -786,7 +786,7 @@ STDMETHODIMP CIUnknownVector::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDi
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CIUnknownVector::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
-									 GUID guidStorageManager)
+									 BSTR bstrStorageManager)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -796,8 +796,11 @@ STDMETHODIMP CIUnknownVector::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDi
 		validateLicense();
 
 		// If a storage manager was specified, use it to prepare the data before persisting it.
-		if (guidStorageManager != GUID_NULL)
+		if (SysStringLen(bstrStorageManager) != 0)
 		{
+			GUID guidStorageManager;
+			IIDFromString(bstrStorageManager, &guidStorageManager);
+
 			UCLID_COMUTILSLib::IStorageManagerPtr ipStorageManager(guidStorageManager);
 			ASSERT_RESOURCE_ALLOCATION("ELI36346", ipStorageManager != __nullptr);
 			

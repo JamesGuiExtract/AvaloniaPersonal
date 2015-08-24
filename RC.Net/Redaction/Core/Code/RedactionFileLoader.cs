@@ -1068,7 +1068,7 @@ namespace Extract.Redaction
             string fileName)
         {
             IUnknownVector output = GetOutputVector(sensitiveItems, attributes);
-            output.SaveTo(fileName, false, typeof(AttributeStorageManagerClass).GUID);
+            output.SaveTo(fileName, false, typeof(AttributeStorageManagerClass).GUID.ToString("B"));
 
             // Update the sensitive items
             _sensitiveItems = sensitiveItems;

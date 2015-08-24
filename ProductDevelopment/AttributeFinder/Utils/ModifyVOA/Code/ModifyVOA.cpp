@@ -191,7 +191,7 @@ void changeAttributePath(const string& strNewPath, const vector<string>& vecVOAF
 				ASSERT_RESOURCE_ALLOCATION("ELI20351", ipValue != __nullptr);
 				_lastCodePos = "70";
 
-				// get the underlyinh SourceDocName
+				// get the underlying SourceDocName
 				string strNewFileName = asString(ipValue->SourceDocName);
 				_lastCodePos = "80";
 
@@ -211,7 +211,8 @@ void changeAttributePath(const string& strNewPath, const vector<string>& vecVOAF
 			}
 
 			// save the modified IUnknownVector back to the VOA file
-			ipAttributes->SaveTo(bstrVOAFileName, VARIANT_TRUE, CLSID_AttributeStorageManager);
+			string strStorageManagerIID = asString(CLSID_AttributeStorageManager);
+			ipAttributes->SaveTo(bstrVOAFileName, VARIANT_TRUE, strStorageManagerIID.c_str());
 			_lastCodePos = "110";
 		}
 	}
