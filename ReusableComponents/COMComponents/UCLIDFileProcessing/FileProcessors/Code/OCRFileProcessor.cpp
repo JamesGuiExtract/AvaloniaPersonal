@@ -166,8 +166,16 @@ STDMETHODIMP COCRFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 		// reset the cancel event
 		m_CancelEvent.reset();
 
-		_bstr_t bstrAllowRestartable = pDB->GetDBInfoSetting("AllowRestartableProcessing", VARIANT_FALSE);
-		m_bAllowCancelBeforeComplete = asString(bstrAllowRestartable) == "1";
+		// https://extract.atlassian.net/browse/ISSUE-13214
+		// If a FAM DB is not available, parallelization will not occur; the
+		// AllowRestartableProcessing setting is therefore irrelevant, so avoid checking it in order
+		// to allow this task to be used without a database.
+		IFileProcessingDBPtr ipDB(pDB);
+		if (ipDB != __nullptr)
+		{
+			_bstr_t bstrAllowRestartable = ipDB->GetDBInfoSetting("AllowRestartableProcessing", VARIANT_FALSE);
+			m_bAllowCancelBeforeComplete = asString(bstrAllowRestartable) == "1";
+		}
 		
 		getOCRSettings();
 	}
