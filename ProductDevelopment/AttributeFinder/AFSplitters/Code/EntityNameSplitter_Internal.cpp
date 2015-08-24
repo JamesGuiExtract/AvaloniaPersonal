@@ -2023,19 +2023,23 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 			// This will begin another name, so check for pending name
 			if (bNamePending)
 			{
-				// Build the complete name string
-				ISpatialStringPtr	ipName = ipText->GetSubString( 
-					iLastCharUsed + 1, iLastCharSoFar );
+				// Protect against inappropriate Start & End values
+				if (iLastCharUsed < iLastCharSoFar)
+				{
+					// Build the complete name string
+					ISpatialStringPtr	ipName = ipText->GetSubString( 
+						iLastCharUsed + 1, iLastCharSoFar );
 
-				// Trim leading and trailing whitespace
-				ipName->Trim( _bstr_t( " " ), _bstr_t( " " ) );
+					// Trim leading and trailing whitespace
+					ipName->Trim( _bstr_t( " " ), _bstr_t( " " ) );
 
-				// Add the name to the vector
-				ipNames->PushBack( ipName );
+					// Add the name to the vector
+					ipNames->PushBack( ipName );
 
-				// Update the last used variables
-				iLastWordUsed = i - 1;
-				iLastCharUsed = iLastCharSoFar;
+					// Update the last used variables
+					iLastWordUsed = i - 1;
+					iLastCharUsed = iLastCharSoFar;
+				}
 			}
 
 			// Set flags and continue with the next word
@@ -2054,7 +2058,7 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 			if (bNamePending)
 			{
 				// Protect against inappropriate Start & End values (P16 #2927)
-				if (iLastCharUsed + 1 <= iLastCharSoFar)
+				if (iLastCharUsed < iLastCharSoFar)
 				{
 					// Build the complete name string
 					ISpatialStringPtr	ipName = ipText->GetSubString( 
