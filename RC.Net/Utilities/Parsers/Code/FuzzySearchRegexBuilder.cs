@@ -118,7 +118,7 @@ namespace Extract.Utilities.Parsers
                 // Initialize the unique string to be added to each stack name.
                 string termIdentifier = id.ToString(CultureInfo.InvariantCulture);
 
-                // Initialze the stack names using termIdentifier.
+                // Initialize the stack names using termIdentifier.
                 _initialErrorStack = "_ie" + termIdentifier;
                 _initialExtraSpaceStack = "_ies" + termIdentifier;
                 _initialMissedStack = "_im" + termIdentifier;
@@ -394,14 +394,14 @@ namespace Extract.Utilities.Parsers
 
                     // Leading whitespace will be allowed for the first token of the fast method.
                     bool allowLeadingSpace =
-                        options.SearchMethod != FuzzySearchOptions.Method.BetterFit;
+                        options.SearchMethod != FuzzySearchOptions.Method.BetterFit
+                        && options.ExtraWhitespaceAllowed > 0;
 
                     // Create a term that searches for each token in the search string and adjusts
                     // stack counts accordingly for each miss.
                     for (int i = 0; i < searchTokens.Count; i++)
                     {
                         string searchToken = searchTokens[i];
-                        bool zeroWidthAssertion = isZeroWidthAssertion(searchToken);
 
                         AddTokenSearchTerm(expandedSearchString, searchToken, stackNames,
                             options.SearchMethod == FuzzySearchOptions.Method.BetterFit,
@@ -409,7 +409,10 @@ namespace Extract.Utilities.Parsers
 
                         // Allow leading whitespace starting with the first token following a
                         // non zero width assertion token.
-                        allowLeadingSpace |= !zeroWidthAssertion;
+                        if (options.ExtraWhitespaceAllowed > 0)
+                        {
+                            allowLeadingSpace |= !isZeroWidthAssertion(searchToken);
+                        }
                     }
 
                     // If using better fit method, create another set of token search terms that
@@ -424,12 +427,25 @@ namespace Extract.Utilities.Parsers
                         expandedSearchString.AppendLine(@"(?<=");
 
                         expandedSearchString.Append(@"(?!");
+
+                        // Decrement the error or extra space stack
+                        if (allowLeadingSpace)
+                        {
+                            expandedSearchString.Append(@"(");
+                            expandedSearchString.Append(
+                                IncrementStack(stackNames.FinalExtraSpaceStack, -1));
+                            expandedSearchString.Append(@"|");
+                        }
                         expandedSearchString.Append(
                             IncrementStack(stackNames.FinalErrorStack, -1));
+                        if (allowLeadingSpace)
+                        {
+                            expandedSearchString.Append(@")");
+                        }
                         expandedSearchString.Append(@"(");
                         expandedSearchString.Append(
                             IncrementStack(stackNames.AllowableLookAheadStack, -1));
-                        expandedSearchString.AppendLine(@".\s*)+?");
+                        expandedSearchString.AppendLine(@"[\S\s])+?");
 
                         // Switch to use the final stack name set for the following group of token
                         // search terms.
@@ -449,7 +465,10 @@ namespace Extract.Utilities.Parsers
 
                             // Allow leading whitespace starting with the first token following a
                             // non zero width assertion token.
-                            allowLeadingSpace |= !zeroWidthAssertion;
+                            if (options.ExtraWhitespaceAllowed > 0)
+                            {
+                                allowLeadingSpace |= !zeroWidthAssertion;
+                            }
                         }
 
                         // End the lookahead term.
@@ -522,13 +541,7 @@ namespace Extract.Utilities.Parsers
             regEx.Append(@"  (");
 
             // Add a term to reflect a char that does not correspond to the search token.
-            AddIgnoreTokenTerm(regEx, stackNames, initialBetterFitTerm);
-
-            // Allow for space chars before matching the search token if specified.
-            if (allowLeadingSpace)
-            {
-                AddExtraSpaceTerm(regEx, stackNames, initialBetterFitTerm);
-            }
+            AddIgnoreTokenTerm(regEx, stackNames, initialBetterFitTerm, allowLeadingSpace);
 
             AddMatchTokenTerm(regEx, stackNames, searchToken);
 
@@ -574,12 +587,15 @@ namespace Extract.Utilities.Parsers
         /// <param name="stackNames">The set of stack names to be modified.</param>
         /// <param name="initialBetterFitTerm"><see langword="true"/> to build a term for the
         /// first part of a better fit expression.</param>
+        /// <param name="allowLeadingSpace"><see langword="true"/> to allow for a space prior to
+        /// matching the search token, <see langword="false"/> to require the next char to match
+        /// the search token.</param>
         static void AddIgnoreTokenTerm(StringBuilder term, BalancingRegexStackNames stackNames,
-            bool initialBetterFitTerm)
+            bool initialBetterFitTerm, bool allowLeadingSpace)
         {
-            // Decrement the error stack as well the last miss that had been added to the missed
+            // Decrement the error stack or the last miss that had been added to the missed
             // chars stack.
-            term.Append(@"(?>.(");
+            term.Append(@"(.(?>");
             term.Append(IncrementStack(stackNames.MissedStack, -1));
             term.Append(@"|");
             term.Append(IncrementStack(stackNames.ErrorStack, -1));
@@ -596,6 +612,14 @@ namespace Extract.Utilities.Parsers
             {
                 term.Append(@")");
             }
+
+            // Allow for space chars before matching the search token if specified.
+            if (allowLeadingSpace)
+            {
+                term.Append(@"|");
+                AddExtraSpaceTerm(term, stackNames, initialBetterFitTerm);
+            }
+
 
             term.Append(@")*?");
         }
@@ -635,7 +659,6 @@ namespace Extract.Utilities.Parsers
             bool initialBetterFitTerm)
         {
             // Decrement the extra space stack
-            term.Append(@"(");
             term.Append(IncrementStack(stackNames.ExtraSpaceStack, -1));
 
             // Increment the number of extra spaces the better fit mode will try to remove from the
@@ -645,7 +668,7 @@ namespace Extract.Utilities.Parsers
                 term.Append(IncrementStack(stackNames.FinalExtraSpaceStack, 1));
             }
 
-            term.Append(@"\s)*");
+            term.Append(@"\s");
         }
 
         /// <summary>
