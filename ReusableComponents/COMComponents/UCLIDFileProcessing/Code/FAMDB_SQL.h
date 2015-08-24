@@ -19,7 +19,7 @@ static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [dbo].[Action] "
 static const string gstrCREATE_ATTRIBUTE_SET_NAME_TABLE = 
 	"CREATE TABLE [dbo].[AttributeSetName] "
 	"([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_AttributeSetName] PRIMARY KEY CLUSTERED, "
-	"[Description] [nvarchar](255) NULL UNIQUE(Description))";
+	"[Description] [nvarchar](255) NULL CONSTRAINT [Attribute_Set_Name_Description_Unique] UNIQUE(Description))";
 
 static const string gstrCREATE_ATTRIBUTE_SET_FOR_FILE_TABLE = 
 	"CREATE TABLE [dbo].[AttributeSetForFile] "
@@ -30,12 +30,12 @@ static const string gstrCREATE_ATTRIBUTE_SET_FOR_FILE_TABLE =
 static const string gstrCREATE_ATTRIBUTE_NAME_TABLE = 
 	"CREATE TABLE [dbo].[AttributeName] "
 	"([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_AttributeName] PRIMARY KEY CLUSTERED, "
-	"[Name] [nvarchar](255) NULL UNIQUE(Name))";
+	"[Name] [nvarchar](255) NULL CONSTRAINT [Attribute_Name_Name_Unique] UNIQUE(Name))";
 
 static const string gstrCREATE_ATTRIBUTE_TYPE_TABLE = 
 	"CREATE TABLE [dbo].[AttributeType] "
 	"([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_AttributeType] PRIMARY KEY CLUSTERED, "
-	"[Type] [nvarchar](255) NULL UNIQUE(Type))";
+	"[Type] [nvarchar](255) NULL CONSTRAINT [Attribute_Type_Type_Unique] UNIQUE(Type))";
 
 static const string gstrCREATE_ATTRIBUTE_TABLE = 
 	"CREATE TABLE [dbo].[Attribute] "
@@ -45,7 +45,7 @@ static const string gstrCREATE_ATTRIBUTE_TABLE =
 	"[AttributeTypeId] [int], "						//FK, AttributeType.ID, null allowed 
 	"[Value] [nvarchar](max) NOT NULL, "
 	"[ParentAttributeID] [int],	"					//FK, Atribute.ID, null allowed
-	"[GUID] [uniqueidentifier] NOT NULL CONSTRAINT [Atribute_GUID_UniqueIdentifier] UNIQUE(GUID))";
+	"[GUID] [uniqueidentifier] NOT NULL CONSTRAINT [Attribute_GUID_Unique] UNIQUE(GUID))";
 
 static const string gstrCREATE_RASTER_ZONE_TABLE = 
 	"CREATE TABLE [dbo].[RasterZone] "
