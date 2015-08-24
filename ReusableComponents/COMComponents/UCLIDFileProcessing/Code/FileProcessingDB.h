@@ -78,6 +78,7 @@ static const string gstrATTRIBUTE_SET_NAME = "AttributeSetName";
 static const string gstrATTRIBUTE_SET_FOR_FILE = "AttributeSetForFile";
 static const string gstrATTRIBUTE_NAME = "AttributeName";
 static const string gstrATTRIBUTE_TYPE = "AttributeType";
+static const string gstrATTRIBUTE_INSTANCE_TYPE = "AttributeInstanceType";
 static const string gstrATTRIBUTE = "Attribute";
 static const string gstrRASTER_ZONE = "RasterZone";
 

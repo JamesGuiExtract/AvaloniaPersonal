@@ -1278,8 +1278,10 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_ATTRIBUTE_SET_FOR_FILEID_FK);
 		vecQueries.push_back(gstrADD_ATTRIBUTE_ATTRIBUTE_SET_FILE_FILEID_FK);
 		vecQueries.push_back(gstrADD_ATTRIBUTE_ATTRIBUTE_NAMEID_FK);
-		vecQueries.push_back(gstrADD_ATTRIBUTE_ATTRIBUTE_TYPEID_FK);
+		vecQueries.push_back(gstrADD_ATTRIBUTE_INSTANCE_TYPE_ATTRIBUTEID);
+		vecQueries.push_back(gstrADD_ATTRIBUTE_INSTANCE_TYPE_ATTRIBUTETYPEID);
 		vecQueries.push_back(gstrADD_ATTRIBUTE_PARENT_ATTRIBUTEID_FK);
+		vecQueries.push_back(gstrADD_RASTER_ZONE_ATTRIBUTEID_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1419,6 +1421,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_ATTRIBUTE_NAME_TABLE);
 	vecQueries.push_back(gstrCREATE_ATTRIBUTE_TYPE_TABLE);
 	vecQueries.push_back(gstrCREATE_ATTRIBUTE_TABLE);
+	vecQueries.push_back(gstrCREATE_ATTRIBUTE_INSTANCE_TYPE);
 	vecQueries.push_back(gstrCREATE_RASTER_ZONE_TABLE);
 
 	return vecQueries;
@@ -2751,6 +2754,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrATTRIBUTE_SET_FOR_FILE);
 	vecTables.push_back(gstrATTRIBUTE_NAME);
 	vecTables.push_back(gstrATTRIBUTE_TYPE);
+	vecTables.push_back(gstrATTRIBUTE_INSTANCE_TYPE);
 	vecTables.push_back(gstrATTRIBUTE);
 	vecTables.push_back(gstrRASTER_ZONE);
 }
