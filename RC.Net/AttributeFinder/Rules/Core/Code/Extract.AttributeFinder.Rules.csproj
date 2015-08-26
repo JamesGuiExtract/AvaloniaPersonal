@@ -70,6 +70,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoShrinkRedactionZones.cs" />
+    <Compile Include="AutoShrinkRedactionZonesSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AutoShrinkRedactionZonesSettingsDialog.Designer.cs">
+      <DependentUpon>AutoShrinkRedactionZonesSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfigurableObjectControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -169,6 +176,15 @@
     </COMReference>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFSELECTORSLib">
+      <Guid>{B2548FD4-6D38-4849-828E-FE0660B45935}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>

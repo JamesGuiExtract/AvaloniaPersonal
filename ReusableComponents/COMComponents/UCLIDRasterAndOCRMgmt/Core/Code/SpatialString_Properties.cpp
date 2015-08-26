@@ -2617,3 +2617,33 @@ STDMETHODIMP CSpatialString::GetFirstCharPositionOfPage(long nPageNum, long *pFi
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36357");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::GetUnrotatedPageInfoMap(ILongToObjectMap** pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI38489", pVal != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		// Make sure this string is spatial
+		if( m_eMode == kNonSpatialMode )
+		{
+			UCLIDException ue( "ELI38490", 
+				"GetSpatialPageInfos() requires a string with spatial info!");
+			throw ue;
+		}
+
+		// Return map of page infos that have no rotation or deskew
+		ILongToObjectMapPtr ipPageInfos = getUnrotatedPageInfoMap();
+		ASSERT_RESOURCE_ALLOCATION("ELI38491", ipPageInfos != __nullptr);
+
+		*pVal = ipPageInfos.Detach();
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38492")
+}

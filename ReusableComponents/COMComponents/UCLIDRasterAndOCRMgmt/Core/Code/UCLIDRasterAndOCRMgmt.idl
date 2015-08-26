@@ -1268,6 +1268,12 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			will be place on separate lines
 		[id(106), helpstring("method CreateFromSpatialStrings")] HRESULT CreateFromSpatialStrings
 			([in] IIUnknownVector* pStrings);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Returns the spatial page info map of the spatial string without any deskew or
+		//			rotation set on the PageInfos
+		// REQUIRE: GetMode() != kNonSpatialMode
+		[id(107), helpstring("method GetUnrotatedPageInfoMap")] HRESULT GetUnrotatedPageInfoMap
+			([out, retval]  ILongToObjectMap** pVal);
 	};
 
 	[

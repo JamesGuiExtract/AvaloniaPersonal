@@ -1,0 +1,15 @@
+<SETTING>;VerificationCondition=HCData
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=HCData
+<SETTING>;AutomatedCondition=HCData
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+
+// Test shrinking an attribute that is found with a regex rules (and so is sized by the OCR result)
+<TESTFOLDER>;.\Test01.rsd;..\MergeAttributes\Images;;$DirOf(<SourceDocName>)\..\..\AutoShrinkRedactionZones\Test01.voa
+
+// Test shrinking an attribute that is found with a Locate Image Region (and so is sized too large)
+<TESTFOLDER>;.\Test02.rsd;..\MergeAttributes\Images;;$DirOf(<SourceDocName>)\..\..\AutoShrinkRedactionZones\Test02.voa
+
+// Test shrinking an attribute on rotated and skewed pages
+<TESTFOLDER>;.\Test03.rsd;..\MergeAttributes\Images\RotationOrientationSkew;;$DirOf(<SourceDocName>)\..\..\..\AutoShrinkRedactionZones\Test03.voa

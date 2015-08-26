@@ -177,6 +177,7 @@ public:
 	STDMETHOD(TranslateToNewPageInfo)(ILongToObjectMap* pPageInfoMap);
 	STDMETHOD(ValidatePageDimensions)();
 	STDMETHOD(CreateFromSpatialStrings)(IIUnknownVector *pStrings);
+	STDMETHOD(GetUnrotatedPageInfoMap)( ILongToObjectMap **pVal);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);
@@ -631,5 +632,8 @@ private:
 	// Returns the position at which pString is prepared to be added following the adjustments in
 	//whitespace.
 	void setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipString, long& rnPos);
+	//----------------------------------------------------------------------------------------------
+	// Gets the spatial page info map of the spatial string without any deskew or rotation applied.
+	ILongToObjectMapPtr getUnrotatedPageInfoMap();
 	//----------------------------------------------------------------------------------------------
 };

@@ -13,9 +13,7 @@ using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
-using EOrientation = UCLID_RASTERANDOCRMGMTLib.EOrientation;
 using ESpatialEntity = UCLID_RASTERANDOCRMGMTLib.ESpatialEntity;
-using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 using SpatialStringSearcher = UCLID_RASTERANDOCRMGMTLib.SpatialStringSearcher;
 
@@ -197,7 +195,7 @@ namespace Extract.Redaction
 
             // Create the result for the spatial string
             SpatialString resultValue = new SpatialString();
-            LongToObjectMap pageInfoMap = GetUnrotatedSpatialPageInfoMap(source);
+            LongToObjectMap pageInfoMap = source.GetUnrotatedPageInfoMap();
             resultValue.CreateHybridString(resultZones.ToIUnknownVector(), value.String, 
                 source.SourceDocName, pageInfoMap);
 
@@ -278,54 +276,6 @@ namespace Extract.Redaction
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets the spatial page info map of the spatial string without any deskew or rotation 
-        /// applied.
-        /// </summary>
-        /// <param name="value">The spatial string from which to retrieve the unrotated spatial 
-        /// info map.</param>
-        /// <returns>The spatial page info map of <paramref name="value"/> without any deskew or 
-        /// rotation applied.</returns>
-        static LongToObjectMap GetUnrotatedSpatialPageInfoMap(SpatialString value)
-        {
-            LongToObjectMap pageInfoMap = value.SpatialPageInfos;
-            LongToObjectMap result = new LongToObjectMap();
-
-            int size = pageInfoMap.Size;
-            for (int i = 0; i < size; i++)
-            {
-                int page;
-                object pageInfoObject;
-                pageInfoMap.GetKeyValue(i, out page, out pageInfoObject);
-
-                SpatialPageInfo pageInfo = (SpatialPageInfo)pageInfoObject;
-
-                SpatialPageInfo newPageInfo = GetUnrotatedPageInfo(pageInfo);
-
-                result.Set(page, newPageInfo);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Gets the spatial page info without any deskew or rotation applied.
-        /// </summary>
-        /// <param name="pageInfo">The spatial string from which to retrieve the unrotated spatial 
-        /// info map.</param>
-        /// <returns>The <paramref name="pageInfo"/> without any deskew or rotation applied.
-        /// </returns>
-        static SpatialPageInfo GetUnrotatedPageInfo(SpatialPageInfo pageInfo)
-        {
-            int width, height;
-            pageInfo.GetWidthAndHeight(out width, out height);
-
-            SpatialPageInfo newPageInfo = new SpatialPageInfo();
-            newPageInfo.Initialize(width, height, EOrientation.kRotNone, 0);
-
-            return newPageInfo;
         }
 
         /// <summary>

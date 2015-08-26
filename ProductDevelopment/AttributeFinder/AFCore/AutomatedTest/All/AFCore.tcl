@@ -13,3 +13,4 @@ EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFSelectors\AutomatedTest\Spat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFOutputHandlers\AutomatedTest\MergeAttributes\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\..\..\RC.Net\AttributeFinder\Rules\Core\AutomatedTest\ModifySpatialMode\TopLevelAttributes.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\..\..\RC.Net\AttributeFinder\Rules\Core\AutomatedTest\ModifySpatialMode\SubAttributes.dat
+EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFOutputHandlers\AutomatedTest\AutoShrinkRedactionZones\IDShieldTester.dat

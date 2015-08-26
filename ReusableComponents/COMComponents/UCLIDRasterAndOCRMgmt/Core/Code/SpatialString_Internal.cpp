@@ -4074,3 +4074,41 @@ void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatia
 		m_bDirty = true;
 	}
 }
+//-------------------------------------------------------------------------------------------------
+ILongToObjectMapPtr CSpatialString::getUnrotatedPageInfoMap()
+{
+	// If page info map is null there is nothing to do
+	if (m_ipPageInfoMap == __nullptr)
+	{
+		return __nullptr;
+	}
+
+	ILongToObjectMapPtr ipResult;
+	ipResult.CreateInstance(CLSID_LongToObjectMap);
+	ASSERT_RESOURCE_ALLOCATION("ELI38485", ipResult != __nullptr);
+
+	// Zero the deskew and set the rotation to none all page infos
+    IVariantVectorPtr ipKeys = m_ipPageInfoMap->GetKeys();
+    ASSERT_RESOURCE_ALLOCATION("ELI38486", ipKeys != __nullptr);
+
+    long nCount = ipKeys->Size;
+	for (long i = 0; i < nCount; i++)
+	{
+		long nPage = ipKeys->GetItem(i);
+
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = m_ipPageInfoMap->GetValue(nPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI38487", ipPageInfo != __nullptr);
+
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo(CLSID_SpatialPageInfo);
+		ASSERT_RESOURCE_ALLOCATION("ELI38488", ipNewPageInfo != __nullptr);
+
+		// Make a new spatial page info without orientation or deskew.
+		long nWidth, nHeight;
+		ipPageInfo->GetWidthAndHeight(&nWidth, &nHeight);
+		ipNewPageInfo->Initialize(nWidth, nHeight, (UCLID_RASTERANDOCRMGMTLib::EOrientation)0, 0.0);
+
+		ipResult->Set(nPage, ipNewPageInfo);
+	}
+
+	return ipResult;
+}

@@ -1119,9 +1119,8 @@ STDMETHODIMP CSpatialString::TranslateToNewPageInfo(ILongToObjectMap* pPageInfoM
 
 		if (m_eMode == kHybridMode)
 		{
-			for each (UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipRasterZone in m_vecRasterZones)
-			{
-				translateToNewPageInfo(ipRasterZone, ipPageInfoMap);
+			for(size_t i = 0; i < m_vecRasterZones.size(); ++i) {
+				m_vecRasterZones[i] = translateToNewPageInfo(m_vecRasterZones[i], ipPageInfoMap);
 			}
 		}
 		else
