@@ -16,6 +16,7 @@
 static const long gnCURRENT_VERSION = 2;        // updated 8/12/2015 - added document name
 static const long gnVERSION_2 = 2;
 
+const std::string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
 
 //--------------------------------------------------------------------------------------------------
 // CSetActionStatusFileProcessor
@@ -23,7 +24,7 @@ static const long gnVERSION_2 = 2;
 CSetActionStatusFileProcessor::CSetActionStatusFileProcessor():
 m_bDirty(false), 
 m_eActionStatus(kActionPending), 
-m_strActionName(""),
+m_strActionName(strSOURCE_DOC_NAME_TAG),
 m_documentName(""),
 m_reportErrorWhenFileNotQueued(true)
 {
@@ -552,6 +553,8 @@ STDMETHODIMP CSetActionStatusFileProcessor::Load(IStream *pStream)
         // Check license state
         validateLicense();
 
+		ResetMemberVariables();
+
         // reset member variables
         m_strActionName = "";
         m_eActionStatus = kActionUnattempted;
@@ -674,3 +677,15 @@ void CSetActionStatusFileProcessor::validateLicense()
     VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI15125", "SetActionStatus File Processor");
 }
 //-------------------------------------------------------------------------------------------------
+void CSetActionStatusFileProcessor::ResetMemberVariables()
+{
+	m_bDirty = false;
+	m_eActionStatus = kActionPending; 
+	m_strActionName = "";
+	m_documentName = strSOURCE_DOC_NAME_TAG;
+	m_reportErrorWhenFileNotQueued = true;
+}
+
+
+
+

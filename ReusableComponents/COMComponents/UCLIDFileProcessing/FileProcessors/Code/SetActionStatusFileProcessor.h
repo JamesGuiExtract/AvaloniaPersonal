@@ -120,6 +120,8 @@ private:
 
     // method to validate license
     void validateLicense();
+
+	void ResetMemberVariables();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(SetActionStatusFileProcessor), CSetActionStatusFileProcessor)
