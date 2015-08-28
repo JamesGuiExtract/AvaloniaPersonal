@@ -758,7 +758,7 @@ private:
 		char pszCause[256] = {0}; \
 		ex.GetErrorMessage(pszCause, 255); \
 		UCLIDException ue; \
-		ue.createFromString(strELI, pszCause == "" ? "OLE exception caught." : pszCause); \
+		ue.createFromString(strELI, *pszCause == '\0' ? "OLE exception caught." : pszCause); \
 		ue.addDebugInfo("Status Code", ex.m_sc); \
 		__if_exists(_lastCodePos) \
 		{ \
@@ -843,7 +843,7 @@ private:
 		char pszCause[256] = {0}; \
 		ex.GetErrorMessage(pszCause, 255); \
 		UCLIDException ue; \
-		ue.createFromString(strELICode, pszCause == "" ? "OLE exception caught." : pszCause); \
+		ue.createFromString(strELICode, *pszCause == '\0' ? "OLE exception caught." : pszCause); \
 		ue.addDebugInfo("Status Code", ex.m_sc); \
 		__if_exists(_lastCodePos) \
 		{ \
@@ -857,7 +857,7 @@ private:
 		pEx->GetErrorMessage(pszCause, 255); \
 		pEx->Delete(); \
 		UCLIDException ue; \
-		ue.createFromString(strELICode, pszCause == "" ? "C Exception caught." : pszCause); \
+		ue.createFromString(strELICode, *pszCause == '\0' ? "C Exception caught." : pszCause); \
 		__if_exists(_lastCodePos) \
 		{ \
 			ue.addDebugInfo(_lastCodePos); \
@@ -992,7 +992,7 @@ private:
 		char pszCause[256] = {0}; \
 		ex.GetErrorMessage(pszCause, 255); \
 		UCLIDException ue; \
-		ue.createFromString(strELICode, pszCause == "" ? "OLE exception caught." : pszCause); \
+		ue.createFromString(strELICode, *pszCause == '\0' ? "OLE exception caught." : pszCause); \
 		ue.addDebugInfo("Status Code", ex.m_sc); \
 		__if_exists(_lastCodePos) \
 		{ \
@@ -1006,7 +1006,7 @@ private:
 		pEx->GetErrorMessage(pszCause, 255); \
 		pEx->Delete(); \
 		UCLIDException ue; \
-		ue.createFromString(strELICode, pszCause == "" ? "C Exception caught." : pszCause); \
+		ue.createFromString(strELICode, *pszCause == '\0' ? "C Exception caught." : pszCause); \
 		__if_exists(_lastCodePos) \
 		{ \
 			ue.addDebugInfo(_lastCodePos); \
@@ -1130,7 +1130,7 @@ private:
 		char pszCause[256] = {0}; \
 		ex.GetErrorMessage(pszCause, 255); \
 		UCLIDException ue; \
-		ue.createFromString(strELI, pszCause == "" ? "OLE exception caught." : pszCause); \
+		ue.createFromString(strELI, *pszCause == '\0' ? "OLE exception caught." : pszCause); \
 		ue.addDebugInfo("Status Code", ex.m_sc); \
 		__if_exists(_lastCodePos) \
 		{ \
@@ -1145,7 +1145,7 @@ private:
 		pEx->GetErrorMessage(pszCause, 255); \
 		pEx->Delete(); \
 		UCLIDException ue; \
-		ue.createFromString(strELI, pszCause == "" ? "C Exception caught." : pszCause); \
+		ue.createFromString(strELI, *pszCause == '\0' ? "C Exception caught." : pszCause); \
 		__if_exists(_lastCodePos) \
 		{ \
 			ue.addDebugInfo(_lastCodePos); \
@@ -1268,7 +1268,7 @@ private:
 		char pszCause[256] = {0}; \
 		ex.GetErrorMessage(pszCause, 255); \
 		UCLIDException ue; \
-		ue.createFromString(strELI, pszCause == "" ? "OLE exception caught." : pszCause); \
+		ue.createFromString(strELI, *pszCause == '\0' ? "OLE exception caught." : pszCause); \
 		ue.addDebugInfo("Status Code", ex.m_sc); \
 		__if_exists(_lastCodePos) \
 		{ \
@@ -1282,7 +1282,7 @@ private:
 		pEx->GetErrorMessage(pszCause, 255); \
 		pEx->Delete(); \
 		UCLIDException ue; \
-		ue.createFromString(strELI, pszCause == "" ? "C Exception caught." : pszCause); \
+		ue.createFromString(strELI, *pszCause == '\0' ? "C Exception caught." : pszCause); \
 		__if_exists(_lastCodePos) \
 		{ \
 			ue.addDebugInfo(_lastCodePos); \
@@ -1399,7 +1399,7 @@ private:
 		char pszCause[256] = {0}; \
 		ex.GetErrorMessage(pszCause, 255); \
 		UCLIDException ue; \
-		ue.createFromString(strELICode, pszCause == "" ? "OLE exception caught." : pszCause); \
+		ue.createFromString(strELICode, *pszCause == '\0' ? "OLE exception caught." : pszCause); \
 		ue.addDebugInfo("Status Code", ex.m_sc); \
 		ue.addDebugInfo("CatchID", strELICode); \
 		__if_exists(_lastCodePos) \
@@ -1415,7 +1415,7 @@ private:
 		pEx->GetErrorMessage(pszCause, 255); \
 		pEx->Delete(); \
 		UCLIDException ue; \
-		ue.createFromString(strELICode, pszCause == "" ? "C Exception caught." : pszCause); \
+		ue.createFromString(strELICode, *pszCause == '\0' ? "C Exception caught." : pszCause); \
 		ue.addDebugInfo("CatchID", strELICode); \
 		__if_exists(_lastCodePos) \
 		{ \
@@ -1509,7 +1509,7 @@ private:
 		char pszCause[256] = {0}; \
 		ex.GetErrorMessage(pszCause, 255); \
 		UCLIDException ue; \
-		ue.createFromString(strELI, pszCause == "" ? "OLE exception caught." : pszCause); \
+		ue.createFromString(strELI, *pszCause == '\0' ? "OLE exception caught." : pszCause); \
 		ue.addDebugInfo("Status Code", ex.m_sc); \
 		__if_exists(_lastCodePos) \
 		{ \
@@ -1523,7 +1523,7 @@ private:
 		pEx->GetErrorMessage(pszCause, 255); \
 		pEx->Delete(); \
 		UCLIDException ue; \
-		ue.createFromString(strELI, pszCause == "" ? "C Exception caught." : pszCause); \
+		ue.createFromString(strELI, *pszCause == '\0' ? "C Exception caught." : pszCause); \
 		__if_exists(_lastCodePos) \
 		{ \
 			ue.addDebugInfo(_lastCodePos); \
