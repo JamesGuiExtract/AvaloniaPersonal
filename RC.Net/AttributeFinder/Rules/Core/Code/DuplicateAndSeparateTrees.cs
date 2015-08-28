@@ -765,7 +765,9 @@ namespace Extract.AttributeFinder.Rules
                         newAttribute.SubAttributes = (IUnknownVector) ((ICopyableObject)duplicatedTrees[i]).Clone();
                         resultVector.PushBack(newAttribute);
                     }
-                    else
+                    // Only rebuild the original tree if there was more than one dividing attribute
+                    // or there was an output handler to run on the results.
+                    else if (RunOutputHandler || duplicatedTrees.Count > 1)
                     {
                         // The last tree's parts don't need to be cloned because no more copies will
                         // be made from the originals.

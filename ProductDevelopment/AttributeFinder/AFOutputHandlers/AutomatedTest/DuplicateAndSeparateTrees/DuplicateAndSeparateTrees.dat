@@ -6,3 +6,15 @@
 
 // Tests running an output handler on each resulting tree
 <TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+// Tests if only one dividing attribute with processing
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+// Tests if only one dividing attribute and no processing
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+// Tests if no dividing attribute and processing
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+// Tests if no dividing attribute and no processing
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
