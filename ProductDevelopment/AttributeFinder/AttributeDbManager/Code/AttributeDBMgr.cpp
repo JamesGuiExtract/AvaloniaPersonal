@@ -485,6 +485,69 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38540");
 }
 
+STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile(long /*fileID*/,
+														   long /*attributeSetNameID*/,
+														   BSTR /*VOAFileName*/)
+{
+	return Error("Not implemented");
+}
+STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** /*pAttributes*/, 
+													 long /*fileID*/, 
+													 long /*attributeSetForFileID*/)
+{
+	return Error("Not implemented");
+
+}
+
+STDMETHODIMP CAttributeDBMgr::GetNewestAttributeSetForFile(IIUnknownVector** /*pAttributes*/, 
+														   long /*fileID*/)
+{
+	return Error("Not implemented");
+}
+
+
+STDMETHODIMP CAttributeDBMgr::GetOldestAttributeSetForFile(IIUnknownVector** /*pAttributes*/, 
+														   long /*fileID*/)
+{
+	return Error("Not implemented");
+}
+
+STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFileID(long* /*pSetID*/, 
+													   long /*fileID*/, 
+													   long /*attributeSetNameID*/)
+{
+	return Error("Not implemented");
+}
+
+
+STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetForFileID(long /*fileID*/, 
+														  long /*AttributeSetForFileID*/)
+{
+	return Error("Not implemented");
+}
+
+STDMETHODIMP CAttributeDBMgr::DeleteHistoricalAttributeSetsForFile(long /*fileID*/)
+{
+	return Error("Not implemented");
+}
+
+STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR /*name*/, 
+														long* /*pAttributeSetNameID*/)
+{
+	return Error("Not implemented");
+}
+
+STDMETHODIMP CAttributeDBMgr::RenameAttributeSetName(long /*attributeNameSetID*/, 
+													 BSTR /*newName*/)
+{
+	return Error("Not implemented");
+}
+
+STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetName(long /*attributeNameSetID*/)
+{
+	return Error("Not implemented");
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------

@@ -77,7 +77,19 @@ public:
 											   IProgressStatus* pProgressStatus);
 // IAttributeDBMgr Methods
 	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
-
+	STDMETHOD(CreateNewAttributeSetForFile)(long fileID,
+												long attributeSetNameID,
+												BSTR VOAFileName);
+	STDMETHOD(GetAttributeSetForFile)(IIUnknownVector** pAttributes, long fileID, long attributeSetForFileID);
+	STDMETHOD(GetNewestAttributeSetForFile)(IIUnknownVector** pAttributes, long fileID);
+	STDMETHOD(GetOldestAttributeSetForFile)(IIUnknownVector** pAttributes, long fileID);
+	STDMETHOD(GetAttributeSetForFileID)(long* pSetID, long fileID, long attributeSetNameID);
+	STDMETHOD(DeleteAttributeSetForFileID)(long fileID, long AttributeSetForFileID);
+	STDMETHOD(DeleteHistoricalAttributeSetsForFile)(long fileID);
+	STDMETHOD(CreateNewAttributeSetName)(BSTR name, long* pAttributeSetNameID);
+	STDMETHOD(RenameAttributeSetName)(long attributeNameSetID, BSTR newName);
+	STDMETHOD(DeleteAttributeSetName)(long attributeNameSetID);
+	
 private:
 
 	//////////////
@@ -97,8 +109,6 @@ private:
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
 
-	// Indicates where the user has opted to add LabDE DB schema elements as part of a schema update.
-	bool m_bAddLabDESchemaElements;
 
 	//////////////
 	// Methods
