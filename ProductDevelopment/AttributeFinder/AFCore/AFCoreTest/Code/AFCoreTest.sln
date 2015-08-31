@@ -688,6 +688,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Out
 		{835D9667-E21E-460F-BC05-EE5E39551CFA} = {835D9667-E21E-460F-BC05-EE5E39551CFA}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AttributeDBMgrComponents", "..\..\..\AttributeDbManager\Code\AttributeDBMgrComponents.vcxproj", "{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3812,6 +3814,24 @@ Global
 		{3C7C09F6-926E-4103-9430-EB3488295C4E}.Template|Mixed Platforms.Build.0 = Release|Any CPU
 		{3C7C09F6-926E-4103-9430-EB3488295C4E}.Template|Win32.ActiveCfg = Release|Any CPU
 		{3C7C09F6-926E-4103-9430-EB3488295C4E}.Template|x86.ActiveCfg = Release|Any CPU
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Debug|Win32.Build.0 = Debug|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Debug|x86.ActiveCfg = Debug|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Release|Any CPU.ActiveCfg = Release|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Release|Win32.ActiveCfg = Release|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Release|Win32.Build.0 = Release|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Release|x86.ActiveCfg = Release|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Template|Any CPU.ActiveCfg = Template|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Template|Mixed Platforms.ActiveCfg = Template|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Template|Mixed Platforms.Build.0 = Template|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Template|Win32.ActiveCfg = Template|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Template|Win32.Build.0 = Template|Win32
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Template|x86.ActiveCfg = Template|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
