@@ -1,0 +1,52 @@
+// AttributeDbMgrComponents.idl : IDL source for AttributeDbMgrComponents
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AttributeDbMgrComponents.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+[
+	uuid(0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38),
+	version(1.0),
+	helpstring("AttributeDbMgrComponents 1.0 Type Library")
+]
+library UCLID_AttributeDbMgrComponentsLib
+{
+	importlib("stdole2.tlb");
+	importlib("stdole32.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+	importlib("Common Files\System\ADO\msado27.tlb");
+
+	[
+		object,
+		uuid(A92F35D7-1784-4D3B-9980-4D9AE244DA1A),
+		dual,
+		nonextensible,
+		helpstring("IAttributeDBMgr Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeDBMgr : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To set the FAMDB
+		[propput, id(1), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
+	};
+
+	[
+		uuid(02F47B53-FD6A-403F-8BC3-20B96D36A9E7),
+		helpstring("AttributeDBMgr Class")
+	]
+	coclass AttributeDBMgr
+	{
+		[default] interface IAttributeDBMgr;
+		interface IProductSpecificDBMgr;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+	};
+};

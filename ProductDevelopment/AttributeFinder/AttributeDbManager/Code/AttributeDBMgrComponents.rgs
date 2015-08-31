@@ -1,0 +1,26 @@
+HKCR
+{
+	AttributeDBMgrComponents.AttributeDBMgr.1 = s 'AttributeDBMgr Class'
+	{
+		CLSID = s '{02F47B53-FD6A-403F-8BC3-20B96D36A9E7}'
+	}
+	AttributeDBMgrComponents.AttributeDBMgr = s 'AttributeDBMgr Class'
+	{
+		CLSID = s '{02F47B53-FD6A-403F-8BC3-20B96D36A9E7}'		
+		CurVer = s 'AttributeDBMgrComponents.AttributeDBMgr.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {02F47B53-FD6A-403F-8BC3-20B96D36A9E7} = s 'AttributeDBMgr Class'
+		{
+			ProgID = s 'AttributeDBMgrComponents.AttributeDBMgr.1'
+			VersionIndependentProgID = s 'AttributeDBMgrComponents.AttributeDBMgr'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38}'
+		}
+	}
+}
