@@ -62,6 +62,8 @@ _bstr_t EXPORT_BaseUtils get_bstr_t(BSTR strVal);
 //-------------------------------------------------------------------------------------------------
 string EXPORT_BaseUtils asString(BSTR strVal);
 //-------------------------------------------------------------------------------------------------
+long EXPORT_BaseUtils asLong(BSTR strValue);
+//-------------------------------------------------------------------------------------------------
 _bstr_t EXPORT_BaseUtils writeObjectToBSTR(IPersistStreamPtr& ipObj, BOOL bClearDirty);
 //-------------------------------------------------------------------------------------------------
 void EXPORT_BaseUtils readObjectFromBSTR(IPersistStreamPtr& ipObj, _bstr_t _bstr);

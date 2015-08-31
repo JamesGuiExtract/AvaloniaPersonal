@@ -377,6 +377,12 @@ std::string EXPORT_BaseUtils asString(BSTR strVal)
 	return strTemp;
 }
 //-------------------------------------------------------------------------------------------------
+long EXPORT_BaseUtils asLong(BSTR strValue)
+{
+	auto value = asString(strValue);
+	return asLong(value);
+}
+//-------------------------------------------------------------------------------------------------
 _bstr_t EXPORT_BaseUtils writeObjectToBSTR(IPersistStreamPtr& ipObj, BOOL bClearDirty)
 {
 	// Create a stream
