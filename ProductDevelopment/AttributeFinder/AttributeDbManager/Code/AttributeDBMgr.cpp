@@ -526,7 +526,7 @@ ADODB::_ConnectionPtr CAttributeDBMgr::getDBConnection()
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::validateLicense()
 {
-	VALIDATE_LICENSE( gnEXTRACT_CORE_OBJECTS, "ELI38544", gstrDESCRIPTION);
+	VALIDATE_LICENSE( gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI38544", gstrDESCRIPTION);
 }
 
 //-------------------------------------------------------------------------------------------------
