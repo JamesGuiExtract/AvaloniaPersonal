@@ -316,8 +316,8 @@ STDMETHODIMP CSpatialProximityAS::put_IncludeDebugAttributes(VARIANT_BOOL newVal
 //--------------------------------------------------------------------------------------------------
 // IAttributeSelector
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn, IAFDocument *pAFDoc, 
-													   IIUnknownVector **pAttrOut)
+STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn, IAFDocument *pAFDoc,
+	IIUnknownVector *pAttrContext, IIUnknownVector **pAttrOut)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	
@@ -328,6 +328,8 @@ STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn,
 
 		IIUnknownVectorPtr ipAttributes(pAttrIn);
 		ASSERT_ARGUMENT("ELI22562", ipAttributes != __nullptr);
+		IIUnknownVectorPtr ipContextAttributes(pAttrContext);
+		ASSERT_ARGUMENT("ELI38510", ipAttributes != __nullptr);
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 		ASSERT_ARGUMENT("ELI22563", ipAFDoc != __nullptr);
 		ASSERT_ARGUMENT("ELI22564", pAttrOut != __nullptr);
@@ -347,7 +349,7 @@ STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn,
 		// Obtain the set of attributes to be used to describe the location selected attributes
 		// must occupy.
 		IIUnknownVectorPtr ipReferenceAttributes = 
-			m_ipAFUtility->QueryAttributes(ipAttributes, m_strReferenceQuery.c_str(), VARIANT_FALSE);
+			m_ipAFUtility->QueryAttributes(ipContextAttributes, m_strReferenceQuery.c_str(), VARIANT_FALSE);
 		ASSERT_RESOURCE_ALLOCATION("ELI22708", ipReferenceAttributes  != __nullptr);
 
 		// Create the collection of selected attributes that will be returned as the final result.

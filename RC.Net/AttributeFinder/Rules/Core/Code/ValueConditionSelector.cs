@@ -148,8 +148,10 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="pAttrIn">The domain of attributes from which to select.</param>
         /// <param name="pAFDoc">The <see cref="AFDocument"/> context for this execution.</param>
+        /// <param name="pAttrContext">The parent object's input attributes (or, if the parent object
+        /// is an attribute selector, its context attributes).</param>
         /// <returns>The attributes whose values satisfy the <see cref="Condition"/>.</returns>
-        public IUnknownVector SelectAttributes(IUnknownVector pAttrIn, AFDocument pAFDoc)
+        public IUnknownVector SelectAttributes(IUnknownVector pAttrIn, AFDocument pAFDoc, IUnknownVector pAttrContext)
         {
             try
             {
@@ -164,6 +166,7 @@ namespace Extract.AttributeFinder.Rules
                 // So that the garbage collector knows of and properly manages the associated
                 // memory.
                 pAttrIn.ReportMemoryUsage();
+                pAttrContext.ReportMemoryUsage();
                 selectedAttributeVector.ReportMemoryUsage();
 
                 return selectedAttributeVector;

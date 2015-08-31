@@ -305,7 +305,7 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 				PROFILE_RULE_OBJECT("", "", m_ipAS, 0);
 
 				// Select the attributes
-				ipFoundAttributes = m_ipAS->SelectAttributes( ipAttributes, pAFDoc );
+				ipFoundAttributes = m_ipAS->SelectAttributes( ipAttributes, pAFDoc, ipAttributes );
 			}
 
 			// Get the Data scorer object
@@ -381,7 +381,7 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 			PROFILE_RULE_OBJECT("", "", m_ipAS, 0);
 
 			// Select the attributes
-			ipFoundAttributes = m_ipAS->SelectAttributes( ipAttributes, pAFDoc );
+			ipFoundAttributes = m_ipAS->SelectAttributes( ipAttributes, pAFDoc, ipAttributes );
 		}
 		// if attributes were found(selected) remove them form the source vector
 		if ( ipFoundAttributes != __nullptr && ipFoundAttributes->Size() > 0 )

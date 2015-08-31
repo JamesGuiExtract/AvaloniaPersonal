@@ -243,8 +243,10 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="pAttrIn">The domain of attributes from which to select.</param>
         /// <param name="pAFDoc">The <see cref="AFDocument"/> context for this execution.</param>
+        /// <param name="pAttrContext">The parent object's input attributes (or, if the parent object
+        /// is an attribute selector, its context attributes).</param>
         /// <returns></returns>
-        public IUnknownVector SelectAttributes(IUnknownVector pAttrIn, AFDocument pAFDoc)
+        public IUnknownVector SelectAttributes(IUnknownVector pAttrIn, AFDocument pAFDoc, IUnknownVector pAttrContext)
         {
             try
             {
@@ -254,13 +256,13 @@ namespace Extract.AttributeFinder.Rules
                 // So that the garbage collector knows of and properly manages the associated
                 // memory.
                 pAttrIn.ReportMemoryUsage();
+                pAttrContext.ReportMemoryUsage();
 
-                IEnumerable<ComAttribute> selectedAttributes =
-                    GetSelectedAttributes(pAttrIn, pAFDoc);
+                IEnumerable<ComAttribute> selectedAttributes = GetSelectedAttributes(pAttrIn, pAFDoc, pAttrContext);
 
                 IUnknownVector selectedAttributeVector = selectedAttributes.ToIUnknownVector();
 
-                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // Report memory usage of hierarchy after processing to ensure all COM objects
                 // referenced in final result are reported.
                 selectedAttributeVector.ReportMemoryUsage();
 
@@ -279,33 +281,32 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sourceAttributeVector">The domain of attributes from which to select.</param>
         /// <param name="afDocument">The <see cref="AFDocument"/> context for this execution.</param>
+        /// <param name="contextAttributeVector">The parent object's input attributes (or, if the
+        /// parent object is an attribute selector, its context attributes).</param>
         /// <returns></returns>
         IEnumerable<ComAttribute> GetSelectedAttributes(IUnknownVector sourceAttributeVector,
-            AFDocument afDocument)
+            AFDocument afDocument, IUnknownVector contextAttributeVector)
         {
             ExtractException.Assert("ELI33887",
                     "Corrupt " + _COMPONENT_DESCRIPTION + " configuration.",
                     NegatedSelectors.Length == Selectors.Size());
 
-            // If there are no source attributes, there is nothing to to.
+            // If there are no source attributes, there is nothing to do.
             if (sourceAttributeVector.Size() == 0)
             {
                 return new List<ComAttribute>();
             }
 
-            // So that the garbage collector knows of and properly manages the associated
-            // memory.
-            sourceAttributeVector.ReportMemoryUsage();
-
-            HashSet<ComAttribute> sourceAttributes =
+            HashSet<ComAttribute> candidateAttributes =
                 new HashSet<ComAttribute>(sourceAttributeVector.ToIEnumerable<ComAttribute>());
 
-            // If selecting exclusively, start with all attributes and narrow the selection with
-            // each selector; if selecting inclusively, start with no selectors and add the
-            // attributes selected from each selector.
-            HashSet<ComAttribute> resultingAttributes = SelectExclusively
-                ? new HashSet<ComAttribute>(sourceAttributes)
-                : new HashSet<ComAttribute>();
+            // If selecting exclusively, the remaining candidateAttributes will be the result;
+            // if selecting inclusively, build the result by moving selected candidates into a new set.
+            HashSet<ComAttribute> resultingAttributes = null;
+            if (!SelectExclusively)
+            {
+                resultingAttributes = new HashSet<ComAttribute>();
+            }
 
             // Iterate through each selector.
             for (int i = 0; i < NegatedSelectors.Length; i++)
@@ -316,42 +317,51 @@ namespace Extract.AttributeFinder.Rules
                     continue;
                 }
                 IAttributeSelector selector = (IAttributeSelector)owd.Object;
-
-                using (RuleObjectProfiler profiler = new RuleObjectProfiler("", "", selector, 0))
+                HashSet<ComAttribute> selectedAttributes = null;
+                using (RuleObjectProfiler profiler = new RuleObjectProfiler
+                    (owd.Description, "", selector, 0))
                 {
                     // Get the attributes selected by this selector.
-                    HashSet<ComAttribute> selectedAttributes = new HashSet<ComAttribute>(
-                        selector.SelectAttributes(sourceAttributeVector, afDocument)
+                    selectedAttributes = new HashSet<ComAttribute>(
+                        selector
+                        .SelectAttributes(candidateAttributes.ToIUnknownVector(),
+                                          afDocument, contextAttributeVector)
                         .ToIEnumerable<ComAttribute>());
-
-                    // If negating the selection, select only those attributes in sourceAttributes
-                    // that are not in selectedAttributes.
-                    if (NegatedSelectors[i])
-                    {
-                        selectedAttributes = new HashSet<ComAttribute>(sourceAttributes
-                            .Where(attribute => !selectedAttributes.Contains(attribute)));
-                    }
-
-                    // If selecting exclusively, narrow sourceAttributes to only the attributes that
-                    // have qualified for all selectors.
-                    if (SelectExclusively)
-                    {
-                        resultingAttributes.IntersectWith(selectedAttributes);
-                    }
-                    // If selecting inclusively, add the selected attributes to those already
-                    // selected by other selectors.
-                    else
-                    {
-                        resultingAttributes.UnionWith(selectedAttributes);
-                    }
                 }
 
-                // If we have either eliminated all attributes when and'ing or selected all
-                // attributes when or'ing, there is no need to run the remaining selectors.
-                if ((SelectExclusively && resultingAttributes.Count == 0) ||
-                    (!SelectExclusively && resultingAttributes.Count == sourceAttributes.Count))
+                // If negating the selection, select only those attributes in sourceAttributes
+                // that are not in selectedAttributes.
+                if (NegatedSelectors[i])
                 {
-                    break;
+                    selectedAttributes = new HashSet<ComAttribute>(candidateAttributes
+                        .Where(attribute => !selectedAttributes.Contains(attribute)));
+                }
+
+                // If selecting exclusively, the candidates for the next selector are
+                // the selected attributes.
+                if (SelectExclusively)
+                {
+                    candidateAttributes = resultingAttributes = selectedAttributes;
+                    
+                    // If there are no more candidates then no need to run remaining selectors.
+                    if (candidateAttributes.Count == 0)
+                    {
+                        break;
+                    }
+                }
+                // Else, if selecting inclusively and some attributes were selected by this
+                // selector, add the selected attributes to those already selected by other
+                // selectors and remove them from the candidate set.
+                else if (selectedAttributes.Count > 0)
+                {
+                    resultingAttributes.UnionWith(selectedAttributes);
+                    candidateAttributes.ExceptWith(selectedAttributes);
+
+                    // If no more candidates no need to run remaining selectors.
+                    if (candidateAttributes.Count == 0)
+                    {
+                        break;
+                    }
                 }
             }
 

@@ -159,8 +159,6 @@ STDMETHODIMP CRunObjectOnQuery::GetObjectAndIID(IID *pIID, ICategorizedComponent
 		// Set the Object for return
 		CComQIPtr<ICategorizedComponent> ipTemp = m_ipObject;
 		ipTemp.CopyTo(pObject);
-
-		m_bDirty = true;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10400")
 
@@ -326,7 +324,7 @@ STDMETHODIMP CRunObjectOnQuery::raw_ProcessOutput(IIUnknownVector* pAttributes, 
 		{
 			PROFILE_RULE_OBJECT("", "", m_ipSelector, 0);
 
-			ipQueriedAttributes = m_ipSelector->SelectAttributes(ipQueriedAttributes, ipAFDoc);
+			ipQueriedAttributes = m_ipSelector->SelectAttributes(ipQueriedAttributes, ipAFDoc, ipQueriedAttributes);
 		}
 
 		// update the progress status if it exists

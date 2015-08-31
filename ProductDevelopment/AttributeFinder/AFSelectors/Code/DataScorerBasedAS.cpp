@@ -224,7 +224,8 @@ STDMETHODIMP CDataScorerBasedAS::GetSizeMax(_ULARGE_INTEGER * pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IAttributeSelector Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDataScorerBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn, IAFDocument * pAFDoc, IIUnknownVector * * pAttrOut)
+STDMETHODIMP CDataScorerBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn, IAFDocument * pAFDoc,
+	IIUnknownVector * pAttrContext, IIUnknownVector * * pAttrOut)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	

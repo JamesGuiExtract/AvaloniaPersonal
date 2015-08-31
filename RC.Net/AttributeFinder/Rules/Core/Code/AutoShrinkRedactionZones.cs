@@ -211,7 +211,7 @@ namespace Extract.AttributeFinder.Rules
                 using (RuleObjectProfiler profiler =
                     new RuleObjectProfiler("", "", AttributeSelector, 0))
                 {
-                    selectedAttributes = AttributeSelector.SelectAttributes(pAttributes, pDoc)
+                    selectedAttributes = AttributeSelector.SelectAttributes(pAttributes, pDoc, pAttributes)
                         .ToIEnumerable<ComAttribute>();
                 }
 

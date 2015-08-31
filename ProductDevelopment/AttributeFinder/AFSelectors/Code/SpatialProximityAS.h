@@ -86,7 +86,7 @@ public:
 
 // IAttributeSelector
 	STDMETHOD(raw_SelectAttributes)(IIUnknownVector *pAttrIn, IAFDocument *pAFDoc, 
-		IIUnknownVector **pAttrOut);
+		IIUnknownVector *pAttrContext, IIUnknownVector **pAttrOut);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);

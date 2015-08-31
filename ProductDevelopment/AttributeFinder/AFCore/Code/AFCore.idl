@@ -700,8 +700,16 @@ library UCLID_AFCORELib
 	{
 		//---------------------------------------------------------------------------------------------
 		// PROMISE: Will return an IUnknownVector with attributes that are selected from the input IUnknownVector
-		//			by the implementation of this method 
-		[id(1), helpstring("method SelectAttributes")] HRESULT SelectAttributes( [in] IIUnknownVector *pAttrIn, [in] IAFDocument *pAFDoc, [out, retval] IIUnknownVector **pAttrOut);
+		//			by the implementation of this method
+		// ARGUMENTS:
+		//			pAttrIn - Attributes eligible to be selected and returned.
+		//			pAFDoc - The document context for the selector.
+		//			pAttrContext - Parent object's input attributes (or, if the parent object is an
+		//						   attribute selector, its context attributes). These attributes
+		//						   might not be selectable but could be used to select attributes
+		//						   (e.g., with SpatialProximityAS to define reference areas).
+		[id(1), helpstring("method SelectAttributes")] HRESULT SelectAttributes( [in] IIUnknownVector *pAttrIn,
+			[in] IAFDocument *pAFDoc, [in] IIUnknownVector *pAttrContext, [out, retval] IIUnknownVector **pAttrOut);
 	};
 
 	//[

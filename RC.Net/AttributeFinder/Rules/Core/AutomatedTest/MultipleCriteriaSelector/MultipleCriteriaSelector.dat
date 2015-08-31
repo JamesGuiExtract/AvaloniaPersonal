@@ -27,3 +27,12 @@
 
 // !(>95%) Confidence AND Date AND OFF(!(Year <2000))
 <TESTCASE>;Test10.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//---------------------------------------------------------------------------
+// https://extract.atlassian.net/browse/ISSUE-7651
+
+// Chaining subattribute query with value selector
+<TESTCASE>;Test11.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+// Chaining subattribute query with SPAS
+<TESTCASE>;Test12.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav

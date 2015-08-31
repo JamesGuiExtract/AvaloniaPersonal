@@ -80,7 +80,8 @@ public:
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
 	// IAttributeSelector Methods
-	STDMETHOD(raw_SelectAttributes)(IIUnknownVector * pAttrIn, IAFDocument * pAFDoc, IIUnknownVector * * pAttrOut);
+	STDMETHOD(raw_SelectAttributes)(IIUnknownVector * pAttrIn, IAFDocument * pAFDoc,
+		IIUnknownVector * pAttrContext, IIUnknownVector * * pAttrOut);
 
 	// ICategorizedComponent Methods
 	STDMETHOD(raw_GetComponentDescription)(BSTR * pstrComponentDescription);

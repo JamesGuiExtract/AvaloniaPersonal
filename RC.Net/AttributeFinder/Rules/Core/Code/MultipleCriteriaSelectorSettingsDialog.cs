@@ -141,9 +141,11 @@ namespace Extract.AttributeFinder.Rules
 
                     _commandButton.Enabled = false;
                     _deleteButton.Enabled = false;
+                    _downButton.Enabled = false;
+                    _upButton.Enabled = false;
 
-                    _andRadioButton.Checked = Settings.SelectExclusively;
-                    _orRadioButton.Checked = !Settings.SelectExclusively;
+                    _chainSelectorsRadioButton.Checked = Settings.SelectExclusively;
+                    _unionSelectedRadioButton.Checked = !Settings.SelectExclusively;
                 }
             }
             catch (Exception ex)
@@ -185,7 +187,7 @@ namespace Extract.AttributeFinder.Rules
                     Settings.NegatedSelectors[row.Index] = (bool)row.Cells[1].Value;
                 }
 
-                Settings.SelectExclusively = _andRadioButton.Checked;
+                Settings.SelectExclusively = _chainSelectorsRadioButton.Checked;
 
                 DialogResult = DialogResult.OK;
             }
@@ -299,10 +301,10 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                bool bEnable = (_selectorDataGridView.SelectedRows.Count != 0);
-
-                _commandButton.Enabled = bEnable;
-                _deleteButton.Enabled = bEnable;
+                int count = _selectorDataGridView.SelectedRows.Count;
+                _commandButton.Enabled = _deleteButton.Enabled = count != 0;
+                _upButton.Enabled = count == 1 && !_selectorDataGridView.Rows[0].Selected;
+                _downButton.Enabled = count == 1 && !_selectorDataGridView.Rows[_selectorDataGridView.Rows.Count - 1].Selected;
             }
             catch (Exception ex)
             {
@@ -378,6 +380,62 @@ namespace Extract.AttributeFinder.Rules
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI33886");
+            }
+        }
+
+        /// <summary>
+        /// Handles up clicked.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        private void HandleUpClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                DataGridViewSelectedRowCollection selected = _selectorDataGridView.SelectedRows;
+                if (selected.Count == 1)
+                {
+                    DataGridViewRow row = selected[0];
+                    int index = row.Index;
+                    if (index > 0)
+                    {
+                        _selectorDataGridView.Rows.RemoveAt(index);
+                        _selectorDataGridView.Rows.Insert(index - 1, row);
+                        row.Selected = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI31740");
+            }
+        }
+
+        /// <summary>
+        /// Handles down clicked.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        private void HandleDownClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                DataGridViewSelectedRowCollection selected = _selectorDataGridView.SelectedRows;
+                if (selected.Count == 1)
+                {
+                    DataGridViewRow row = selected[0];
+                    int index = row.Index;
+                    if (index < _selectorDataGridView.Rows.Count - 1)
+                    {
+                        _selectorDataGridView.Rows.RemoveAt(index);
+                        _selectorDataGridView.Rows.Insert(index + 1, row);
+                        row.Selected = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI31741");
             }
         }
 

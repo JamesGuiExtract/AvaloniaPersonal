@@ -168,7 +168,8 @@ STDMETHODIMP CQueryBasedAS::GetSizeMax(_ULARGE_INTEGER * pcbSize)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13273");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CQueryBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn, IAFDocument * pAFDoc, IIUnknownVector * * pAttrOut)
+STDMETHODIMP CQueryBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn, IAFDocument * pAFDoc,
+	IIUnknownVector * pAttrContext, IIUnknownVector * * pAttrOut)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	
