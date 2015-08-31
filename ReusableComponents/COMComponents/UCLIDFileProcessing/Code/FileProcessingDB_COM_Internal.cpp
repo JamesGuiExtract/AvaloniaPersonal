@@ -31,7 +31,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 129;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 127;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -966,79 +966,6 @@ int UpdateToSchemaVersion127(_ConnectionPtr ipConnection, long *pnNumSteps,
 	string strCheckAndAdd_FK = "IF NOT EXISTS ( SELECT  name FROM sys.foreign_keys "
                 "WHERE   name = 'FK_Statistics_Action' ) " + gstrADD_STATISTICS_ACTION_FK;
 	vecQueries.push_back(strCheckAndAdd_FK);
-
-	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-
-	executeVectorOfSQL(ipConnection, vecQueries);
-
-	return nNewSchemaVersion;
-}
-
-
-int UpdateToSchemaVersion128(_ConnectionPtr ipConnection, 
-							 long *pnNumSteps,
-							 IProgressStatusPtr ipProgressStatus)
-{
-	const int nNewSchemaVersion = 128;
-
-	if (pnNumSteps != __nullptr)
-	{
-		*pnNumSteps += 3;
-		return nNewSchemaVersion;
-	}
-
-	vector<string> vecQueries;
-	// new 10.3 tables
-	vecQueries.push_back(gstrCREATE_ATTRIBUTE_SET_NAME_TABLE);
-	vecQueries.push_back(gstrCREATE_ATTRIBUTE_SET_FOR_FILE_TABLE);
-	vecQueries.push_back(gstrCREATE_ATTRIBUTE_NAME_TABLE);
-	vecQueries.push_back(gstrCREATE_ATTRIBUTE_TYPE_TABLE);
-	vecQueries.push_back(gstrCREATE_ATTRIBUTE_TABLE_128);
-	vecQueries.push_back(gstrCREATE_RASTER_ZONE_TABLE);
-
-	// create FKs for new tables
-	vecQueries.push_back(gstrADD_ATTRIBUTE_SET_FOR_FILEID_FK);
-	vecQueries.push_back(gstrADD_ATTRIBUTE_ATTRIBUTE_SET_FILE_FILEID_FK);
-	vecQueries.push_back(gstrADD_ATTRIBUTE_ATTRIBUTE_NAMEID_FK);
-	vecQueries.push_back(gstrADD_ATTRIBUTE_ATTRIBUTE_TYPEID_FK);
-	vecQueries.push_back(gstrADD_ATTRIBUTE_PARENT_ATTRIBUTEID_FK);
-
-	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-
-	executeVectorOfSQL(ipConnection, vecQueries);
-
-	return nNewSchemaVersion;
-}
-
-
-int UpdateToSchemaVersion129(_ConnectionPtr ipConnection, 
-							 long *pnNumSteps,
-							 IProgressStatusPtr ipProgressStatus)
-{
-	const int nNewSchemaVersion = 129;
-
-	if (pnNumSteps != __nullptr)
-	{
-		*pnNumSteps += 3;
-		return nNewSchemaVersion;
-	}
-
-	vector<string> vecQueries;
-	// new 10.3 table addition...
-	vecQueries.push_back(gstrCREATE_ATTRIBUTE_INSTANCE_TYPE);
-
-	// drop unused FK
-	string dropFK("ALTER TABLE [dbo].[Attribute] DROP CONSTRAINT [FK_Attribute_AttributeTypeID];");
-	vecQueries.push_back(dropFK);
-
-	// drop unused column
-	string dropColumn("ALTER TABLE Attribute DROP COLUMN AttributeTypeID;");
-	vecQueries.push_back(dropColumn);
-
-	// create FKs for new tables
-	vecQueries.push_back(gstrADD_ATTRIBUTE_INSTANCE_TYPE_ATTRIBUTEID);
-	vecQueries.push_back(gstrADD_ATTRIBUTE_INSTANCE_TYPE_ATTRIBUTETYPEID);
-	vecQueries.push_back(gstrADD_RASTER_ZONE_ATTRIBUTEID_FK);
 
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -6027,9 +5954,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 124:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion125);
 				case 125:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion126);
 				case 126:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion127);
-				case 127:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion128);
-				case 128:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion129);
-				case 129:	break;
+				case 127:	break;
 
 				default:
 					{
