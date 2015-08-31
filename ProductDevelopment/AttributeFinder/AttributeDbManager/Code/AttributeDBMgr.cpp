@@ -148,7 +148,6 @@ CAttributeDBMgr::CAttributeDBMgr()
 , m_ipDBConnection(nullptr)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
-, m_bAddLabDESchemaElements(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -445,15 +444,14 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 					*pnProdSchemaVersion = UpdateToSchemaVersion1(ipConnection, pnNumSteps, nullptr);
 				}
 				break;
-/*	Future...
 			case 1:
 				break;
-*/
+
 			default:
 			{
 				UCLIDException ue("ELI38537", "Automatic updates are not supported for the current schema.");
 				ue.addDebugInfo("FAM Schema Version", nFAMDBSchemaVersion, false);
-				ue.addDebugInfo("LabDE Schema Version", *pnProdSchemaVersion, false);
+				ue.addDebugInfo("Attribute Schema Version", *pnProdSchemaVersion, false);
 				throw ue;
 			}
 		}
@@ -464,7 +462,7 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 }
 
 //-------------------------------------------------------------------------------------------------
-// ILabDEProductDBMgr Methods
+// IAttributeProductDBMgr Methods
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 {
@@ -528,8 +526,7 @@ ADODB::_ConnectionPtr CAttributeDBMgr::getDBConnection()
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::validateLicense()
 {
-	// May eventually want to create & use a gnLABDE_CORE_OBJECTS license ID.
-	VALIDATE_LICENSE( gnLABDE_CORE_OBJECTS, "ELI38544", gstrDESCRIPTION);
+	VALIDATE_LICENSE( gnEXTRACT_CORE_OBJECTS, "ELI38544", gstrDESCRIPTION);
 }
 
 //-------------------------------------------------------------------------------------------------
