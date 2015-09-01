@@ -24,8 +24,8 @@ const std::string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
 CSetActionStatusFileProcessor::CSetActionStatusFileProcessor():
 m_bDirty(false), 
 m_eActionStatus(kActionPending), 
-m_strActionName(strSOURCE_DOC_NAME_TAG),
-m_documentName(""),
+m_strActionName(""),
+m_documentName(strSOURCE_DOC_NAME_TAG),
 m_reportErrorWhenFileNotQueued(true)
 {
     try
