@@ -108,7 +108,7 @@ STDMETHODIMP CSetActionStatusFileProcessorPP::Apply()
 
             // apply radiobuttons setting
             bool reportError = BST_CHECKED == m_radioBtnReportError.GetCheck();
-            ipFP->ReportErrorWhenFileNotQueued = reportError;
+            ipFP->ReportErrorWhenFileNotQueued = asVariantBool(reportError);
         }
 
         SetDirty(FALSE);

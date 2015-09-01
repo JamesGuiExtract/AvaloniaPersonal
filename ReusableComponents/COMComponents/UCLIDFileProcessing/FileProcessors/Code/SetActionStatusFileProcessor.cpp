@@ -225,7 +225,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::get_ReportErrorWhenFileNotQueued(VAR
 
         ASSERT_ARGUMENT("ELI38456", pbVal != __nullptr);
 
-        *pbVal = m_reportErrorWhenFileNotQueued;
+        *pbVal = asVariantBool(m_reportErrorWhenFileNotQueued);
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38454");     
 
