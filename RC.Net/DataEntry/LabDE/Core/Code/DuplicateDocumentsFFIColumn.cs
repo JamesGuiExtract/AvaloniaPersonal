@@ -938,8 +938,7 @@ namespace Extract.DataEntry.LabDE
                 adoRecordset = FileProcessingDB.GetResultsForQuery(
                     "SELECT [UserName] FROM [FAMUser] " +
                     "   INNER JOIN [FAMSession] ON [FAMUserID] = [FAMUser].[ID] " +
-                    "   INNER JOIN [ActiveFAM] ON [ActiveFAM].[UPI] = [FAMSession].[UPI] " +
-                    "   INNER JOIN [LockedFile] ON [UPIID] = [ActiveFAM].[ID] " +
+                    "   INNER JOIN [LockedFile] ON [FAMSessionID] = [FAMSession].[ID] " +
                     "   WHERE [FileID] = " + fileId.ToString(CultureInfo.InvariantCulture));
 
                 string user = adoRecordset.EOF ? "" : (string)adoRecordset.Fields[0].Value;

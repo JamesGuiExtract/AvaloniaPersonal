@@ -59,7 +59,9 @@ m_bUpdateFASTTable(true),
 m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
-m_nUPIID(0),
+m_nActiveFAMID(0),
+m_nFAMSessionID(0),
+m_strUPI(""),
 m_bFAMRegistered(false),
 m_nActionStatisticsUpdateFreqInSeconds(5),
 m_bValidatingOrUpdatingSchema(false),
@@ -1050,7 +1052,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		// Create a connection object to the master db to create the database
 		ADODB::_ConnectionPtr ipDBConnection(__uuidof(Connection)); 
 
-		// Open a connection to the the master database on the database server
+		// Open a connection to the master database on the database server
 		ipDBConnection->Open(createConnectionString(m_strDatabaseServer, "master").c_str(),
 			"", "", adConnectUnspecified);
 
@@ -1100,7 +1102,7 @@ STDMETHODIMP CFileProcessingDB::CreateNew80DB(BSTR bstrNewDBName)
 		// Create a connection object to the master db to create the database
 		ADODB::_ConnectionPtr ipDBConnection(__uuidof(Connection)); 
 
-		// Open a connection to the the master database on the database server
+		// Open a connection to the master database on the database server
 		ipDBConnection->Open(createConnectionString(m_strDatabaseServer, "master").c_str(),
 			"", "", adConnectUnspecified);
 
@@ -1832,14 +1834,19 @@ STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnReco
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27686");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RegisterActiveFAM(long lActionID, VARIANT_BOOL vbQueuing,
-	VARIANT_BOOL vbProcessing)
+STDMETHODIMP CFileProcessingDB::RegisterActiveFAM()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
 		validateLicense();
+
+		if (m_nFAMSessionID == 0)
+		{
+			throw UCLIDException("ELI38466",
+				"Cannot register active FAM for session that does not exist.");
+		}
 
 		// Always lock the database for this call.
 		// Not having a lock here may have had to do with some of the errors reported in
@@ -1849,12 +1856,10 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM(long lActionID, VARIANT_BOOL v
 		// This creates a record in the ActiveFAM table and the LastPingTime
 		// is set to the current time by default.
 		executeCmdQuery(getDBConnection(), 
-			string("INSERT INTO ActiveFAM (UPI, ActionID, Queuing, Processing) ")
+			string("INSERT INTO ActiveFAM (FAMSessionID) ")
 				+ "OUTPUT INSERTED.ID "
-				+ "VALUES ('" + m_strUPI + "', '" + asString(lActionID) + "', '" 
-				+ (asCppBool(vbQueuing) ? "1" : "0") + "', '"
-				+ (asCppBool(vbProcessing) ? "1" : "0") + "') ",
-			false, (long*)&m_nUPIID);
+				+ "VALUES ('" + asString(m_nFAMSessionID) + "')",
+			false, (long*)&m_nActiveFAMID);
 
 		m_eventStopMaintainenceThreads.reset();
 		m_eventPingThreadExited.reset();
@@ -1863,7 +1868,6 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM(long lActionID, VARIANT_BOOL v
 		// set FAM registered flag
 		m_bFAMRegistered = true;
 		m_dwLastPingTime = 0;
-		m_nActiveActionID = lActionID;
 
 		// Start thread here
 		AfxBeginThread(maintainLastPingTimeForRevert, this);
@@ -2079,7 +2083,8 @@ STDMETHODIMP CFileProcessingDB::OffsetUserCounter(BSTR bstrCounterName, LONGLONG
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27817");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RecordFAMSessionStart(BSTR bstrFPSFileName)
+STDMETHODIMP CFileProcessingDB::RecordFAMSessionStart(BSTR bstrFPSFileName, long lActionID,
+												VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -2090,7 +2095,7 @@ STDMETHODIMP CFileProcessingDB::RecordFAMSessionStart(BSTR bstrFPSFileName)
 		// [LegacyRCAndUtils:6154]
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-		RecordFAMSessionStart_Internal(true, bstrFPSFileName);
+		RecordFAMSessionStart_Internal(true, bstrFPSFileName, lActionID, vbQueuing, vbProcessing);
 
 		return S_OK;
 	}
@@ -2885,7 +2890,8 @@ STDMETHODIMP CFileProcessingDB::AddWorkItems(long nWorkItemGroupID, IIUnknownVec
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36894");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetWorkItemToProcess(long nActionID, VARIANT_BOOL vbRestrictToUPI, IWorkItemRecord **pWorkItem)
+STDMETHODIMP CFileProcessingDB::GetWorkItemToProcess(long nActionID,
+								VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **pWorkItem)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -2893,11 +2899,11 @@ STDMETHODIMP CFileProcessingDB::GetWorkItemToProcess(long nActionID, VARIANT_BOO
 	{
 		validateLicense();
 		
-		if (!GetWorkItemToProcess_Internal(false, nActionID, vbRestrictToUPI, pWorkItem))
+		if (!GetWorkItemToProcess_Internal(false, nActionID, vbRestrictToFAMSession, pWorkItem))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
-			GetWorkItemToProcess_Internal(true, nActionID, vbRestrictToUPI, pWorkItem);
+			GetWorkItemToProcess_Internal(true, nActionID, vbRestrictToFAMSession, pWorkItem);
 		}
 
 		return S_OK;
@@ -3190,7 +3196,7 @@ STDMETHODIMP CFileProcessingDB::SetFallbackStatus(IFileRecord* pFileRecord,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37459");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetWorkItemsToProcess(long nActionID, VARIANT_BOOL vbRestrictToUPI, 
+STDMETHODIMP CFileProcessingDB::GetWorkItemsToProcess(long nActionID, VARIANT_BOOL vbRestrictToFAMSessionID, 
 			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **pWorkItems)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -3199,14 +3205,14 @@ STDMETHODIMP CFileProcessingDB::GetWorkItemsToProcess(long nActionID, VARIANT_BO
 	{
 		validateLicense();
 
-		if (!GetWorkItemsToProcess_Internal(false, nActionID, vbRestrictToUPI, nMaxWorkItemsToReturn, 
-			eMinPriority, pWorkItems))
+		if (!GetWorkItemsToProcess_Internal(false, nActionID, vbRestrictToFAMSessionID,
+			nMaxWorkItemsToReturn, eMinPriority, pWorkItems))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrWORKITEM_DB_LOCK);
 
-			GetWorkItemsToProcess_Internal(true, nActionID, vbRestrictToUPI, nMaxWorkItemsToReturn,
-				eMinPriority, pWorkItems);
+			GetWorkItemsToProcess_Internal(true, nActionID, vbRestrictToFAMSessionID,
+				nMaxWorkItemsToReturn, eMinPriority, pWorkItems);
 		}
 
 		return S_OK;
@@ -3406,6 +3412,41 @@ STDMETHODIMP CFileProcessingDB::GetMetadataFieldNames(IVariantVector **ppMetadat
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37656");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_ActiveFAMID(long *pnActiveFAMID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38461", pnActiveFAMID != __nullptr);
+
+		*pnActiveFAMID = m_nActiveFAMID;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38462");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_FAMSessionID(long *pnFAMSessionID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38550", pnFAMSessionID != __nullptr);
+
+		*pnFAMSessionID = m_nFAMSessionID;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38551");
+}
+
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
 //-------------------------------------------------------------------------------------------------

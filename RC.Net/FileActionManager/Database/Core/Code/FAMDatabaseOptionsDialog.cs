@@ -35,7 +35,6 @@ namespace Extract.FileActionManager.Database
         const string _UPDATE_QUEUE_EVENT_TABLE = "UpdateQueueEventTable";
         const string _STORE_SOURCE_DOC_NAME_CHANGE_HISTORY = "StoreDocNameChangeHistory";
         const string _STORE_DOC_TAG_HISTORY = "StoreDocTagHistory";
-        const string _STORE_FAM_SESSION_HISTORY = "StoreFAMSessionHistory";
         const string _ENABLE_INPUT_EVENT_TRACKING = "EnableInputEventTracking";
         const string _INPUT_EVENT_HISTORY_SIZE = "InputEventHistorySize";
         const string _STORE_DB_INFO_HISTORY = "StoreDBInfoChangeHistory";
@@ -402,7 +401,6 @@ namespace Extract.FileActionManager.Database
             dictionary[_REQUIRE_PASSWORD_TO_PROCESS_SKIPPED] = _checkRequirePasswordForSkipped;
             dictionary[_REQUIRE_AUTHENTICATION_BEFORE_RUN] = _checkRequireAuthenticationToRun;
             dictionary[_STORE_DB_INFO_HISTORY] = _checkStoreDBSettingsChangeHistory;
-            dictionary[_STORE_FAM_SESSION_HISTORY] = _checkStoreFAMSessionHistory;
             dictionary[_STORE_FTP_EVENT_HISTORY] = _checkStoreFTPEventHistory;
 
             return dictionary;

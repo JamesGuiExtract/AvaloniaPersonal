@@ -657,8 +657,8 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(4), helpstring ("property Input")] HRESULT Input([in] BSTR Input);
 		[propget, id(5), helpstring ("property Output")] HRESULT Output([out, retval] BSTR *pOutput);
 		[propput, id(5), helpstring ("property Output")] HRESULT Output([in] BSTR Output);
-		[propget, id(6), helpstring ("property UPI")] HRESULT UPI([out, retval] BSTR *pUPI);
-		[propput, id(6), helpstring ("property UPI")] HRESULT UPI([in] BSTR UPI);
+		[propget, id(6), helpstring ("property FAMSessionID")] HRESULT FAMSessionID([out, retval] long *pnFAMSessionID);
+		[propput, id(6), helpstring ("property FAMSessionID")] HRESULT FAMSessionID([in] long nFAMSessionID);
 		[propget, id(7), helpstring ("property StringizedException")] HRESULT StringizedException([out, retval] BSTR *pStringizedException);
 		[propput, id(7), helpstring ("property StringizedException")] HRESULT StringizedException([in] BSTR StringizedException);
 		
@@ -678,8 +678,8 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(11), helpstring ("property FileID")] HRESULT FileID([out, retval] long *pnFileID);
 		[propput, id(11), helpstring ("property FileID")] HRESULT FileID([in] long nFileID);
 
-		[propget, id(12), helpstring ("property WorkGroupUPI")] HRESULT WorkGroupUPI([out, retval] BSTR *pOutput);
-		[propput, id(12), helpstring ("property WorkGroupUPI")] HRESULT WorkGroupUPI([in] BSTR Input);
+		[propget, id(12), helpstring ("property WorkGroupFAMSessionID")] HRESULT WorkGroupFAMSessionID([out, retval] long *pnFAMSessionID);
+		[propput, id(12), helpstring ("property WorkGroupFAMSessionID")] HRESULT WorkGroupFAMSessionID([in] long nFAMSessionID);
 		
 		[propget, id(13), helpstring("property Priority")] HRESULT Priority(
 			[out, retval] EFilePriority* pePriority);
@@ -1090,7 +1090,7 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To set the specified file to skipped status for the specified action. 
 		//			If bRemovePreviousSkipped is VARIANT_FALSE the SkippedFileTable will only
-		//			update the UPIID in an existing record, if VARIANT_TRUE then any record in the
+		//			update the FAMSessionID in an existing record, if VARIANT_TRUE then any record in the
 		//			skipped table will be replaced with a new record.
 		//			If vbAllowQueuedStatusOverride is VARIANT_TRUE and the QueuedActionStatusChange table
 		//			has a pending change for the file, that change will be applied. If
@@ -1275,7 +1275,8 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To record the start time for the current FAM session
 		[id(81), helpstring("method RecordFAMSessionStart")] HRESULT RecordFAMSessionStart(
-			[in] BSTR bstrFPSFileName);
+			[in] BSTR bstrFPSFileName, [in] long lActionID, [in] VARIANT_BOOL vbQueuing,
+			[in] VARIANT_BOOL vbProcessing);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To record the stop time for the current FAM session
 		[id(82), helpstring("method RecordFAMSessionStop")] HRESULT RecordFAMSessionStop();
@@ -1365,11 +1366,9 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to auto-resetting of files stuck in processing
 		// -----------------------------------------------------------------------------------------------
-		// PURPOSE: To add a new record to the ActiveFAM table with the current processes UPI, ActionID
-		// and whether it is queuing, processing, or both. A thread is started to update the LastPingTime
-		// at a regular interval.
-		[id(100), helpstring("method RegisterActiveFAM")] HRESULT RegisterActiveFAM(
-			[in] long lActionID, [in] VARIANT_BOOL vbQueuing, [in] VARIANT_BOOL vbProcessing);
+		// PURPOSE: To add a new record to the ActiveFAM table associated with the current FAMSession.
+		// A thread is started to update the LastPingTime at a regular interval.
+		[id(100), helpstring("method RegisterActiveFAM")] HRESULT RegisterActiveFAM();
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To remove the record for in the ActiveFAM table and stop the thread updating
 		//			the LastPingTime
@@ -1487,14 +1486,15 @@ library UCLID_FILEPROCESSINGLib
 			[in] long nWorkItemGroupID, [out] WorkItemGroupStatus *pWorkGroupStatus,
 			[out, retval] EWorkItemStatus *pStatus);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To return a workitem for the nActionID and bstrUPI - if bstrUPI is an empty 
-		//			string the workitem returned will be the next one to be processed for the nActionID
-		//			regardless of the UPI, if vbRestrictToUPI is VARIANT_TRUE only work items for the nActionID and
-		//			the specific UPI of the current process will be returned
+		// PURPOSE: To return a workitem for the nActionID. If vbRestrictToFAMSession is
+		//			VARIANT_FALSE the workitem returned will be the next one to be processed for
+		//			the nActionID regardless of the FAMSession, but if vbRestrictToFAMSession is
+		//			VARIANT_TRUE only work items for the nActionID and the curring FAM session will
+		//			be returned
 		// NOTE:	The FileName property in the WorkItem returned will be set to the current FileName
 		//			in the database for the FileID for the WorkItemGroup
 		[id(120), helpstring("method GetWorkItemToProcess")] HRESULT GetWorkItemToProcess([in] long nActionID,
-			[in] VARIANT_BOOL vbRestrictToUPI, [out, retval] IWorkItemRecord **ppWorkItem);
+			[in] VARIANT_BOOL vbRestrictToFAMSession, [out, retval] IWorkItemRecord **ppWorkItem);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set the status of the nWorkItemID to failed
 		[id(121), helpstring("method NotifyWorkItemFailed")] HRESULT NotifyWorkItemFailed(
@@ -1564,13 +1564,13 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Gets up to nMaxWorkItemsToReturn from the database that have a minimum 
 		//			priority of eMinPriority for the given nActionID will be returned in ppWorkItems
-		//			if VBRestrictToUPI is VARIANT_TRUE only work items that are in a work item group
-		//			that is being processed in the current instance.
+		//			if vbRestrictToFAMSession is VARIANT_TRUE only work items that are in a work
+		//			item group that is being processed in the current instance.
 		// NOTE:	Work items associated with a work item group with an empty string as the UPI
 		//			will not be included. This is to limit processing of work items that are not 
 		//			associated with a Work item group that is currently active.
 		[id(133), helpstring("method GetWorkItemsToProcess")] HRESULT GetWorkItemsToProcess([in] long nActionID,
-			[in] VARIANT_BOOL vbRestrictToUPI, 
+			[in] VARIANT_BOOL vbRestrictToFAMSession, 
 			[in] long nMaxWorkItemsToReturn,
 			[in] EFilePriority eMinPriority,
 			[out, retval] IIUnknownVector **ppWorkItems);
@@ -1624,6 +1624,12 @@ library UCLID_FILEPROCESSINGLib
 		// and that is what will be used here.
 		[id(142), helpstring("method GetLastConnectionStringConfiguredThisProcess ")]
 			HRESULT GetLastConnectionStringConfiguredThisProcess([out, retval] BSTR *pbstrConnectionString);
+		// -----------------------------------------------------------------------------------------------
+		// Gets the ActiveFAMID for any currently active FAM; otherwise, 0.
+		[propget, id(143), helpstring("property ActiveFAMID")] HRESULT ActiveFAMID([out, retval] long* pnActiveFAMID);
+		// -----------------------------------------------------------------------------------------------
+		// Gets the FAMSessionID for the current FAM session; 0 if there is no current FAMSession.
+		[propget, id(144), helpstring("property FAMSessionID")] HRESULT FAMSessionID([out, retval] long* pnFAMSessionID);
 	};
 
 	[

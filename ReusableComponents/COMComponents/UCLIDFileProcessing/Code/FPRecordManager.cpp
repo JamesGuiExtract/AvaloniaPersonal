@@ -37,7 +37,7 @@ FPRecordManager::FPRecordManager()
   m_vecSleepTimes(gnNUMBER_OF_SLEEP_INTERVALS),
   m_bSleepTimeCalculated(false),
   m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB),
-  m_bRestrictToCurrentUPI(false),
+  m_bRestrictToCurrentFAMSessionID(false),
   m_eLastFilePriority(kPriorityDefault),
   m_bAllowRestartableProcessing(false),
   m_bAllowRestartableFlagRetrievedFromDB(false)
@@ -103,7 +103,7 @@ void FPRecordManager::discardProcessingQueue()
 	ASSERT_ARGUMENT("ELI14002", m_ipFPMDB != __nullptr);
 
 	// Set the Work Item processing to the current UPI
-	m_bRestrictToCurrentUPI = true;
+	m_bRestrictToCurrentFAMSessionID = true;
 
 	discardWorkItems();
 
@@ -122,7 +122,7 @@ void FPRecordManager::discardProcessingQueue()
 		return;
 	}
 
-	// set event to indicate the queue has been discared
+	// set event to indicate the queue has been discarded
 	m_queueDiscardedEvent.signal();
 
 	// Close the queue
@@ -302,7 +302,8 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 		// this is only used when deciding if the processing is done
 		long nNumTasksLoaded = 0;
 		
-		// Need to make sure that the the queue gets loaded from the db if it is empty but only from one thread at a time
+		// Need to make sure that the  queue gets loaded from the db if it is empty but only from
+		// one thread at a time
 		CSingleLock lockDBLoad(&m_LoadDBLock, TRUE );
 
 		// if the queue is discarded, then return false immediately
@@ -425,7 +426,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 				m_nNumberOfFilesProcessed++;
 			}
 
-			// Aquire the semaphore before calling
+			// Acquire the semaphore before calling
 			Win32SemaphoreLockGuard lg(processSemaphore, true);
 			changeState(task);
 
@@ -433,7 +434,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			// that the effect is that a single file was allowed to skip ahead of the delayed file.
 			requeueDelayedTasks();
 
-			// return with the semaphore still aquired
+			// return with the semaphore still acquired
 			lg.NoRelease();
 			return true;
 		}
@@ -548,7 +549,7 @@ void FPRecordManager::clear(bool bClearUI)
 	resetSleepIntervals();
 
 	m_bParallelizableEnabled = false;
-	m_bRestrictToCurrentUPI = false;
+	m_bRestrictToCurrentFAMSessionID = false;
 	m_bAllowRestartableFlagRetrievedFromDB = false;
 	m_bAllowRestartableProcessing = false;
 
@@ -726,7 +727,7 @@ bool FPRecordManager::getWorkItemToProcess(FPWorkItem& workItem, Win32Event &sto
 			continue;
 		}
 	
-		// Reset the sleeptime
+		// Reset the sleep time
 		if (m_bSleepTimeCalculated)
 		{
 			m_currentWorkItemTime = m_vecSleepTimes.begin();
@@ -780,9 +781,9 @@ void FPRecordManager::enableParallelizable(bool bEnable)
 	m_bParallelizableEnabled = bEnable;
 }
 //-------------------------------------------------------------------------------------------------
-void FPRecordManager::setRestrictToUPI(bool bRestrictToUPI)
+void FPRecordManager::setRestrictToFAMSessionID(bool bRestrictToFAMSessionID)
 {
-	m_bRestrictToCurrentUPI = bRestrictToUPI;
+	m_bRestrictToCurrentFAMSessionID = bRestrictToFAMSessionID;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1152,7 +1153,7 @@ void FPRecordManager::setActionID(long nActionID)
 		}
 
 		// Get the action name from the database (will throw exception
-		// if the action ID is not found in the databse)
+		// if the action ID is not found in the database)
 		m_strAction = asString(m_ipFPMDB->GetActionName(m_nActionID));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26723");
@@ -1384,31 +1385,31 @@ void FPRecordManager::discardWorkItems()
 	loadAllowRestartableFromDB();
 
 	// If Restartable processing is not enabled then work items in the queue for file that are 
-	// processing in the current UPI should be kept in the queue to be processed. 
+	// processing in the current FAM session should be kept in the queue to be processed. 
 	// If Restartable processing is enabled all of the work items in the queue waiting to be processed
 	// will be cleared if processing is stopped (discardWorkItems will be called if m_bKeepProcessingAsAdded is false
 	// and the last file has been queued but processingIsStopped() will be false in this case 
 	// no new files will be added but the work items for the currently processing files in this 
 	// instance need to be processed)
-	bool bKeepCurrentUPI = !m_bAllowRestartableProcessing || !processingIsStopped();
+	bool bKeepCurrentFAMSession = !m_bAllowRestartableProcessing || !processingIsStopped();
 
 	// go through the list of waiting items
 	long nNumberInQueue = m_queWorkItemIds.size();
 	
-	string currUPI = UPI::getCurrentProcessUPI().getUPI();
 	for (int i = 0; i < nNumberInQueue; i ++)
 	{
 		// Get the first Work item on the queue
 		long workItemID = m_queWorkItemIds.front();
 
-		// Take the first work itme off the queue
+		// Take the first work item off the queue
 		m_queWorkItemIds.pop_front();
 
 		CSingleLock lgMap(&m_mapReadWorkItems, TRUE);
 		FPWorkItem fpRecord = m_mapWorkItems[workItemID];
 		
 		UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItemRecord = fpRecord.getWorkItemRecord();
-		if (bKeepCurrentUPI &&  asString(ipWorkItemRecord->WorkGroupUPI) == currUPI)
+		if (bKeepCurrentFAMSession && 
+			ipWorkItemRecord->WorkGroupFAMSessionID == m_ipFPMDB->FAMSessionID)
 		{
 			// push the item on the back of the list because it should be processed
 			m_queWorkItemIds.push_back(workItemID);
@@ -1440,7 +1441,7 @@ long FPRecordManager::loadWorkItemsFromDB(long nNumToLoad, UCLID_FILEPROCESSINGL
 	CSingleLock lg(&m_queWorkItemsMutex, TRUE);
 
 	IIUnknownVectorPtr ipWorkItems = 
-		m_ipFPMDB->GetWorkItemsToProcess(m_nActionID, asVariantBool(m_bRestrictToCurrentUPI), 
+		m_ipFPMDB->GetWorkItemsToProcess(m_nActionID, asVariantBool(m_bRestrictToCurrentFAMSessionID), 
 			nNumToLoad, eMinPriority);
 
 	numberWorkItemsLoaded = ipWorkItems->Size();

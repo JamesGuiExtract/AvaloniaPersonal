@@ -211,7 +211,7 @@ FAMUTILS_API string createConnectionString(const string& strServer, const string
 FAMUTILS_API csis_map<string>::type getConnectionStringProperties(const string& strConnectionString);
 
 // Attempts to case-insensitively find the specified property in the specified connection string.
-// Returns true if the propety is found. If pstrValue is non-null and the property is found,
+// Returns true if the property is found. If pstrValue is non-null and the property is found,
 // pstrValue will be assigned the value of the property.
 FAMUTILS_API bool findConnectionStringProperty(const string& strConnectionString,
 	const string& strName, string *pstrValue = __nullptr);
@@ -242,7 +242,7 @@ FAMUTILS_API long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const st
 FAMUTILS_API long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, const string& strKeyCol,
 						   string& rstrKey, bool bAddKey = true);
  
-// PROMISE: To drop all of the contraints that have any of the tables in vecTables as Foreign key table.
+// PROMISE: To drop all of the constraints that have any of the tables in vecTables as Foreign key table.
 FAMUTILS_API void dropFKContraintsOnTables(const _ConnectionPtr& ipDBConnection, const vector<string>& vecTables);
 
 // PROMISE: To drop the constraint named strConstraint on the table strTableName

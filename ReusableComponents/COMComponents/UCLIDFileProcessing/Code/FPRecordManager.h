@@ -20,11 +20,11 @@ class FPRecordManager
 {
 public:
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: Will create an empty queue with no window to recieve update messages
+	// PROMISE: Will create an empty queue with no window to receive update messages
 	FPRecordManager();
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: Will set a dlg to recieve update messages
-	//			hDlg specifies the FileProcessingDlg that will recieve update messages as the 
+	// PROMISE: Will set a dlg to receive update messages
+	//			hDlg specifies the FileProcessingDlg that will receive update messages as the 
 	//			queue is updated
 	void setDlg(HWND hDlg);
 	//---------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ public:
 	//			returned and the task method parameter is untouched.
 	//			In all cases, if pbProcessingActive is not null, when returned the value will
 	//			indicate whether the processing queue is still active.
-	//			processSemaphore will always be aquired if this returns true and not aquired if
+	//			processSemaphore will always be acquired if this returns true and not acquired if
 	//			this returns false
 	bool pop(FileProcessingRecord& task, bool bWait, Win32Semaphore &processSemaphore, bool* pbProcessingActive = __nullptr);
 	//---------------------------------------------------------------------------------------------
@@ -207,9 +207,9 @@ public:
 	// PROMISE: Sets the flag to indicate that work units will processed
 	void enableParallelizable(bool bEnable);
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: Set the flag to only retieve work items for files being processed in the current
+	// PROMISE: Set the flag to only retrieve work items for files being processed in the current
 	// instance
-	void setRestrictToUPI(bool bRestrictToUPI);
+	void setRestrictToFAMSessionID(bool bRestrictToFAMSessionID);
 
 private:
 
@@ -309,7 +309,7 @@ private:
 	// Define the workItemMap type - currently only used once by make have same as other tasks
 	typedef map<long, FPWorkItem> workItemMap;
 
-	// Map of work items being proceessed by this FAM
+	// Map of work items being processed by this FAM
 	workItemMap m_mapWorkItems;
 
 	typedef list<long> WorkItemIdList;
@@ -331,7 +331,7 @@ private:
 
 	// Flag to indicate that only workitems for files being processed in the current instance 
 	// should be retrieved from the database
-	bool m_bRestrictToCurrentUPI;
+	bool m_bRestrictToCurrentFAMSessionID;
 
 	// Flag to indicate that restartable processing is enabled. This is only used 
 	// if m_bParallelizableEnabled is true
@@ -360,7 +360,7 @@ private:
 	// Loads specified file from the database. Returns true if the file was loaded.
 	bool loadTaskFromDB(long nFileId, EActionStatus *peaPreviousStatus);
 	// Loads max of nNumToLoad workitems from the database to the workItem processing queue
-	// returns the nubmer of records loaded
+	// returns the number of records loaded
 	long loadWorkItemsFromDB(long nNumToLoad, UCLID_FILEPROCESSINGLib::EFilePriority eMinPriority);
 
 	//---------------------------------------------------------------------------------------------

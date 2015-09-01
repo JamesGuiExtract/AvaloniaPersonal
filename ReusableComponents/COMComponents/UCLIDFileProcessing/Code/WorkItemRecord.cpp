@@ -16,8 +16,8 @@ m_nWorkItemGroupID(0),
 m_eWorkItemStatus(kWorkUnitPending),
 m_strInput(""),
 m_strOutput(""),
-m_strUPI(""),
-m_strWorkGroupUPI(""),
+m_nFAMSessionID(0),
+m_nWorkGroupFAMSessionID(0),
 m_ePriority(kPriorityNormal)
 {
 }
@@ -189,28 +189,28 @@ STDMETHODIMP CWorkItemRecord::put_Output(BSTR Output)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CWorkItemRecord::get_UPI(BSTR *pUPI)
+STDMETHODIMP CWorkItemRecord::get_FAMSessionID(long *pnFAMSessionID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI37515", pUPI != __nullptr);
+		ASSERT_ARGUMENT("ELI37515", pnFAMSessionID != __nullptr);
 
-		*pUPI = _bstr_t(m_strUPI.c_str()).Detach();
+		*pnFAMSessionID = m_nFAMSessionID;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37033");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CWorkItemRecord::put_UPI(BSTR UPI)
+STDMETHODIMP CWorkItemRecord::put_FAMSessionID(long nFAMSessionID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		m_strUPI = asString(UPI);
+		m_nFAMSessionID = nFAMSessionID;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37034");
 
@@ -374,28 +374,28 @@ STDMETHODIMP CWorkItemRecord::put_FileID(long nFileID)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37274");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CWorkItemRecord::get_WorkGroupUPI(BSTR *pUPI)
+STDMETHODIMP CWorkItemRecord::get_WorkGroupFAMSessionID(long *pnFAMSessionID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI37521", pUPI != __nullptr);
+		ASSERT_ARGUMENT("ELI37521", pnFAMSessionID != __nullptr);
 
-		*pUPI = _bstr_t(m_strWorkGroupUPI.c_str()).Detach();
+		*pnFAMSessionID = m_nWorkGroupFAMSessionID;
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37433");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CWorkItemRecord::put_WorkGroupUPI(BSTR UPI)
+STDMETHODIMP CWorkItemRecord::put_WorkGroupFAMSessionID(long nFAMSessionID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		m_strWorkGroupUPI = asString(UPI);
+		m_nWorkGroupFAMSessionID = nFAMSessionID;
 
 		return S_OK;
 	}

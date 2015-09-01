@@ -61,7 +61,7 @@ public:
 	//---------------------------------------------------------------------------------------------
 	void refresh();
 
-	// Enum for the page indexes of the embeded property pages
+	// Enum for the page indexes of the embedded property pages
 	typedef enum EProcessingDlgTabPage:int
 	{
 		kFilesPage = 0,
@@ -85,7 +85,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	
 private:
-	// Flag to idicate if the page has been initialized
+	// Flag to indicate if the page has been initialized
 	bool m_bInitialized;
 
 	// Number of Currently processing files or work items

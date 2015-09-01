@@ -137,7 +137,7 @@ static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [dbo].[Ski
 	"[ActionID] [int] NULL, "
 	"[DateTimeStamp] [datetime] NOT NULL CONSTRAINT [DF_SkippedFile_DateTimeStamp] DEFAULT((GETDATE())), "
 	"[TimeSinceSkipped] AS (DATEDIFF(second,[DateTimeStamp],GETDATE())), " // Computed column for time skipped
-	"[UPIID] [int] NOT NULL DEFAULT(0), "
+	"[FAMSessionID] [int] NULL, "
 	"CONSTRAINT [PK_FAMSkippedFile] PRIMARY KEY CLUSTERED ([ID] ASC))";
 
 static const string gstrCREATE_FAM_TAG_TABLE = "CREATE TABLE [dbo].[Tag] ("
@@ -151,28 +151,17 @@ static const string gstrCREATE_FAM_FILE_TAG_TABLE = "CREATE TABLE [dbo].[FileTag
 	"[FileID] [int] NOT NULL, "
 	"[TagID] [int] NOT NULL)";
 
-// The ProcessingFAM table is now the ActiveFAM table, but this definition needs to remain for the
-// schema update process.
-static const string gstrCREATE_PROCESSING_FAM_TABLE = 
-	"CREATE TABLE [dbo].[ProcessingFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ProcessingFAM] PRIMARY KEY CLUSTERED, "
-	"[ActionID] [int] NOT NULL, "
-	"[UPI] [nvarchar](450), "
-	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ProcessingFAM_LastPingTime]  DEFAULT (GETDATE()))";
-
 static const string gstrCREATE_ACTIVE_FAM_TABLE = 
 	"CREATE TABLE [dbo].[ActiveFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ActiveFAM] PRIMARY KEY CLUSTERED, "
-	"[ActionID] [int] NOT NULL, "
-	"[UPI] [nvarchar](450), "
 	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ActiveFAM_LastPingTime]  DEFAULT (GETUTCDATE()),"
-	"[Queuing] [bit] NOT NULL,"
-	"[Processing] [bit] NOT NULL)";
+	"[FAMSessionID] [int] NOT NULL)";
 
 static const string gstrCREATE_LOCKED_FILE_TABLE = 
 	"CREATE TABLE [dbo].[LockedFile]([FileID] [int] NOT NULL,"
 	"[ActionID] [int] NOT NULL, "
-	"[UPIID] [int] , "
 	"[StatusBeforeLock] [nvarchar](1) NOT NULL, "
-	"CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED ([FileID], [ActionID], [UPIID]))";
+	"[ActiveFAMID] [int] NOT NULL, "
+	"CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED ([FileID], [ActionID], [ActiveFAMID]))";
 
 static const string gstrCREATE_USER_CREATED_COUNTER_TABLE =
 	"CREATE TABLE [dbo].[UserCreatedCounter] ("
@@ -192,7 +181,10 @@ static const string gstrCREATE_FAM_SESSION =
 	"[UPI] [nvarchar](450), "
 	"[StartTime] datetime NOT NULL CONSTRAINT [DF_FAMSession_StartTime] DEFAULT((GETDATE())), "
 	"[StopTime] datetime, "
-	"[FPSFileID] int NOT NULL)";
+	"[FPSFileID] int NOT NULL, "
+	"[ActionID] [int], "
+	"[Queuing] [bit],"
+	"[Processing] [bit])";
 
 static const string gstrCREATE_INPUT_EVENT =
 	"CREATE TABLE [dbo].[InputEvent] ("
@@ -203,18 +195,6 @@ static const string gstrCREATE_INPUT_EVENT =
 	"[MachineID] int NOT NULL, "
 	"[PID] int NOT NULL, "
 	"[SecondsWithInputEvents] int NOT NULL)";
-
-// This is an old version of the FileActionStatus table that is used only for schema updates.
-static const string gstrCREATE_FILE_ACTION_STATUS_LEGACY = 
-	"CREATE TABLE [dbo].[FileActionStatus]( "
-	"[ActionID] [int] NOT NULL, "
-	"[FileID] [int] NOT NULL, "
-	"[ActionStatus] [nvarchar](1) NOT NULL, "
-	"CONSTRAINT [PK_FileActionStatus] PRIMARY KEY CLUSTERED "
-	"( "
-	"	[ActionID] ASC, "
-	"	[FileID] ASC "
-	")) ";
 
 static const string gstrCREATE_FILE_ACTION_STATUS = 
 	"CREATE TABLE [dbo].[FileActionStatus]( "
@@ -288,8 +268,8 @@ static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE =
 	"[DateTimeStamp] [datetime] NULL,"
 	"[MachineID] int NOT NULL, "
 	"[FAMUserID] int NOT NULL, "
-	"[UPI] [nvarchar](450) NULL, "
-	"[ChangeStatus][nvarchar](1) NOT NULL)";
+	"[ChangeStatus][nvarchar](1) NOT NULL, "
+	"[FAMSessionID] int NULL)";
 
 static const string gstrCREATE_FIELD_SEARCH_TABLE =
 	"CREATE TABLE [dbo].[FieldSearch]("
@@ -297,21 +277,6 @@ static const string gstrCREATE_FIELD_SEARCH_TABLE =
 	"[Enabled] [bit] NOT NULL DEFAULT 1,"
 	"[FieldName] [nvarchar](64) NOT NULL UNIQUE,"
 	"[AttributeQuery] [nvarchar](256) NOT NULL)";
-
-// FileHandlers table used to be named LaunchApp; LaunchApp table definition needs to be kept
-// for the schema update process.
-static const string gstrCREATE_LAUNCH_APP_TABLE =
-	"CREATE TABLE [dbo].[LaunchApp]("
-	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_LaunchApp] PRIMARY KEY CLUSTERED,"
-	"[Enabled] [bit] NOT NULL DEFAULT 1,"
-	"[AppName] [nvarchar](64) NOT NULL UNIQUE,"
-	"[IconPath] [nvarchar](260),"
-	"[ApplicationPath] [nvarchar](260) NOT NULL,"
-	"[Arguments] [ntext],"
-	"[AdminOnly] [bit] NOT NULL DEFAULT 0,"
-	"[AllowMultipleFiles] [bit] NOT NULL DEFAULT 0,"
-	"[SupportsErrorHandling] [bit] NOT NULL DEFAULT 0,"
-	"[Blocking] [bit] NOT NULL DEFAULT 1)";
 
 // Was LaunchApp in versions 114 and 115
 static const string gstrCREATE_FILE_HANDLER_TABLE =
@@ -335,36 +300,15 @@ static const string gstrCREATE_FEATURE_TABLE =
 	"[FeatureDescription] [nvarchar](max),"
 	"[AdminOnly] [bit] NOT NULL DEFAULT 1)";
 
-// For use in updating from version 125 and before
-static const string gstrCREATE_WORK_ITEM_GROUP_TABLE_V118 =
-	"CREATE TABLE [dbo].[WorkItemGroup]("
-	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_WorkItemGroup] PRIMARY KEY CLUSTERED,"
-	"[FileID] [int] NOT NULL,"
-	"[ActionID] [int] NOT NULL,"
-	"[StringizedSettings] [nvarchar](MAX) NULL,"
-	"[UPI] [nvarchar](450) NULL, "
-	"[NumberOfWorkItems] [int] NOT NULL)";
-
 static const string gstrCREATE_WORK_ITEM_GROUP_TABLE =
 	"CREATE TABLE [dbo].[WorkItemGroup]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_WorkItemGroup] PRIMARY KEY CLUSTERED,"
 	"[FileID] [int] NOT NULL,"
 	"[ActionID] [int] NOT NULL,"
 	"[StringizedSettings] [nvarchar](MAX) NULL,"
-	"[UPI] [nvarchar](450) NULL, "
 	"[NumberOfWorkItems] [int] NOT NULL, "
-	"RunningTaskDescription [nvarchar](256) NULL)";
-
-static const string gstrCREATE_WORK_ITEM_TABLE_V118 =
-	"CREATE TABLE [dbo].[WorkItem]("
-	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_WorkItem] PRIMARY KEY CLUSTERED ,"
-	"[WorkItemGroupID] [int] NOT NULL,"
-	"[Status] [nchar](1) NOT NULL,"
-	"[Input] [nvarchar](MAX) NULL,"
-	"[Output] [nvarchar](MAX) NULL,"
-	"[UPI] [nvarchar](450) NULL,"
-	"[Sequence] [int] NOT NULL,"
-	"[StringizedException] [nvarchar](MAX) NULL)";
+	"[RunningTaskDescription] [nvarchar](256) NULL, "
+	"[FAMSessionID] [int] NULL)";
 
 static const string gstrCREATE_WORK_ITEM_TABLE =
 	"CREATE TABLE [dbo].[WorkItem]("
@@ -375,9 +319,9 @@ static const string gstrCREATE_WORK_ITEM_TABLE =
 	"[BinaryInput] [varbinary](MAX) NULL,"
 	"[Output] [nvarchar](MAX) NULL,"
 	"[BinaryOutput] [varbinary](MAX) NULL,"
-	"[UPI] [nvarchar](450) NULL,"
 	"[Sequence] [int] NOT NULL,"
-	"[StringizedException] [nvarchar](MAX) NULL)";
+	"[StringizedException] [nvarchar](MAX) NULL, "
+	"[FAMSessionID] [int] NULL)";
 
 static const string gstrCREATE_METADATA_FIELD_TABLE =
 	"CREATE TABLE [dbo].[MetadataField] ("
@@ -408,14 +352,14 @@ static const string gstrCREATE_FILE_ACTION_COMMENT_INDEX = "CREATE UNIQUE NONCLU
 static const string gstrCREATE_SKIPPED_FILE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_Skipped_File] ON [SkippedFile]([FileID], [ActionID])";
 
-static const string gstrCREATE_SKIPPED_FILE_UPI_INDEX = "CREATE NONCLUSTERED INDEX "
-	"[IX_Skipped_File_UPI] ON [SkippedFile]([UPIID])";
+static const string gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX = "CREATE NONCLUSTERED INDEX "
+	"[IX_Skipped_File_FAMSession] ON [SkippedFile]([FAMSessionID])";
 
 static const string gstrCREATE_FILE_TAG_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_File_Tag] ON [FileTag]([FileID], [TagID])";
 
-static const string gstrCREATE_ACTIVE_FAM_UPI_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
-	"[IX_ActiveFAM_UPI] ON [ActiveFAM]([UPI])";
+static const string gstrCREATE_ACTIVE_FAM_SESSION_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_ActiveFAM_FAMSession] ON [ActiveFAM]([FAMSessionID])";
 
 static const string gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX = "CREATE NONCLUSTERED INDEX "
 	"[IX_UserCreatedCounter_Value] ON [UserCreatedCounter]([Value])";
@@ -425,12 +369,6 @@ static const string gstrCREATE_FPS_FILE_NAME_INDEX = "CREATE NONCLUSTERED INDEX 
 
 static const string gstrCREATE_INPUT_EVENT_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_Input_Event] ON [InputEvent]([TimeStamp], [ActionID], [MachineID], [FAMUserID], [PID])";
-
-// No longer part of the database; definition for schema update use only.
-static const string gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX = 
-	"CREATE NONCLUSTERED INDEX "
-	"[IX_FileActionStatus_ActionID_ActionStatus] ON [dbo].[FileActionStatus] "
-	"([ActionID] ASC, [ActionStatus] ASC)";
 
 static const string gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX = 
 	"CREATE UNIQUE NONCLUSTERED INDEX "
@@ -446,13 +384,13 @@ static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX =
 	"CREATE NONCLUSTERED INDEX "
 	"[IX_QueuedActionStatusChange] ON [QueuedActionStatusChange]([ChangeStatus], [ActionID], [FileID])";
 
-static const string gstrCREATE_WORK_ITEM_GROUP_UPI_INDEX =
+static const string gstrCREATE_WORK_ITEM_GROUP_FAM_SESSION_INDEX =
 	"CREATE NONCLUSTERED INDEX "
-	"[IX_WorkItemGroupUPI] ON [WorkItemGroup]([UPI])";
+	"[IX_WorkItemGroup_FAMSession] ON [WorkItemGroup]([FAMSessionID])";
 
-static const string gstrCREATE_WORK_ITEM_UPI_INDEX =
+static const string gstrCREATE_WORK_ITEM_FAM_SESSION_INDEX =
 	"CREATE NONCLUSTERED INDEX "
-	"[IX_WorkItemUPI] ON [WorkItem]([UPI])";
+	"[IX_WorkItem_FAMSession] ON [WorkItem]([FAMSessionID])";
 
 static const string gstrCREATE_WORK_ITEM_STATUS_INDEX =
 	"CREATE NONCLUSTERED INDEX "
@@ -586,6 +524,13 @@ static const string gstrADD_SKIPPED_FILE_ACTION_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+// https://extract.atlassian.net/browse/ISSUE-13223
+// Deletes cannot be cascaded until ActionID is factored out of the table.
+static const string gstrADD_SKIPPED_FILE_FAM_SESSION_FK =
+	"ALTER TABLE [dbo].[SkippedFile] "
+	"WITH CHECK ADD CONSTRAINT [FK_SkippedFile_FAMSession] FOREIGN KEY([FAMSessionID])"
+	"REFERENCES [dbo].[FAMSession] ([ID])";
+
 static const string gstrADD_FILE_TAG_FAM_FILE_FK =
 	"ALTER TABLE [FileTag] "
 	"WITH CHECK ADD CONSTRAINT [FK_FileTag_FamFile] FOREIGN KEY([FileID]) "
@@ -621,36 +566,24 @@ static const string gstrADD_LOCKED_FILE_FAMFILE_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
-// The ProcessingFAM table is now the ActiveFAM table, but this definition needs to remain for the
-// schema update process.
-static const string gstrADD_LOCKED_FILE_PROCESSINGFAM_FK =
-	"ALTER TABLE [dbo].[LockedFile]  "
-	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_ProcessingFAM] FOREIGN KEY([UPIID])"
-	"REFERENCES [dbo].[ProcessingFAM] ([ID])"
-	"ON UPDATE CASCADE "
-	"ON DELETE CASCADE";
-
 static const string gstrADD_LOCKED_FILE_ACTIVEFAM_FK =
 	"ALTER TABLE [dbo].[LockedFile]  "
-	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_ActiveFAM] FOREIGN KEY([UPIID])"
+	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_ActiveFAM] FOREIGN KEY([ActiveFAMID])"
 	"REFERENCES [dbo].[ActiveFAM] ([ID])"
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
-// The ProcessingFAM table is now the ActiveFAM table, but this definition needs to remain for the
-// schema update process.
-static const string gstrADD_ACTION_PROCESSINGFAM_FK =
-	"ALTER TABLE [dbo].[ProcessingFAM]  "
-	"WITH CHECK ADD  CONSTRAINT [FK_ProcessingFAM_Action] FOREIGN KEY([ActionID])"
-	"REFERENCES [dbo].[Action] ([ID])";
-
-// Do not want ON UPDATE CASCADE or ON DELETE CASCADE because if
-// there are records in the ActiveFAM table there is a FAM processing or Records that need
-// to be reverted.
-static const string gstrADD_ACTION_ACTIVEFAM_FK =
+static const string gstrADD_ACTION_ACTIVEFAM_FAM_SESSION_FK =
 	"ALTER TABLE [dbo].[ActiveFAM]  "
-	"WITH CHECK ADD  CONSTRAINT [FK_ActiveFAM_Action] FOREIGN KEY([ActionID])"
-	"REFERENCES [dbo].[Action] ([ID])";
+	"WITH CHECK ADD  CONSTRAINT [FK_ActiveFAM_FAMSession] FOREIGN KEY([FAMSessionID])"
+	"REFERENCES [dbo].[FAMSession] ([ID])";
+
+static const string gstrADD_FAM_SESSION_ACTION_FK =
+	"ALTER TABLE [dbo].[FAMSession] "
+	"WITH CHECK ADD CONSTRAINT [FK_FAMSession_Action] FOREIGN KEY([ActionID])"
+	"REFERENCES [dbo].[Action] ([ID])"
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
 
 static const string gstrADD_FAM_SESSION_MACHINE_FK =
 	"ALTER TABLE [dbo].[FAMSession] "
@@ -855,6 +788,13 @@ static const string gstrADD_QUEUED_ACTION_STATUS_CHANGE_USER_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+// https://extract.atlassian.net/browse/ISSUE-13223
+// Deletes cannot be cascaded until ActionID is factored out of the table.
+static const string gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAM_SESSION_FK =
+	"ALTER TABLE [dbo].[QueuedActionStatusChange] "
+	"WITH CHECK ADD CONSTRAINT [FK_QueuedActionStatusChange_FAMSession] FOREIGN KEY([FAMSessionID]) "
+	"REFERENCES [dbo].[FAMSession] ([ID])";
+
 static const string gstrADD_WORK_ITEM_GROUP_FAMFILE_FK = 
 	"ALTER TABLE [dbo].[WorkItemGroup]  "
 	"WITH CHECK ADD  CONSTRAINT [FK_WorkItemGroup_FAMFile] FOREIGN KEY([FileID])"
@@ -869,12 +809,26 @@ static const string gstrADD_WORK_ITEM_GROUP_ACTION_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+// https://extract.atlassian.net/browse/ISSUE-13223
+// Deletes cannot be cascaded until ActionID is factored out of the table.
+static const string gstrADD_WORK_ITEM_GROUP_FAM_SESSION_FK = 
+	"ALTER TABLE [dbo].[WorkItemGroup]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_WorkItemGroup_FAMSession] FOREIGN KEY([FAMSessionID])"
+	"REFERENCES [dbo].[FAMSession] ([ID])";
+
 static const string gstrADD_WORK_ITEM__WORK_ITEM_GROUP_FK =
 	"ALTER TABLE [dbo].[WorkItem]  "
 	"WITH CHECK ADD  CONSTRAINT [FK_WorkItem_WorkItemGroup] FOREIGN KEY([WorkItemGroupID])"
 	"REFERENCES [dbo].[WorkItemGroup] ([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
+
+// https://extract.atlassian.net/browse/ISSUE-13223
+// Deletes cannot be cascaded until ActionID is factored out of WorkItemGroup
+static const string gstrADD_WORK_ITEM_FAM_SESSION_FK =
+	"ALTER TABLE [dbo].[WorkItem]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_WorkItem_FAMSession] FOREIGN KEY([FAMSessionID])"
+	"REFERENCES [dbo].[FAMSession] ([ID]) ";
 
 static const string gstrADD_METADATA_FIELD_VALUE_FAMFILE_FK =
 	"ALTER TABLE [FileMetadataFieldValue] "
@@ -1085,7 +1039,7 @@ static const string gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA =
 //		<ActionID> - The ID of the action being processed
 //		<UserID> - ID for the files are being processed under
 //		<MachineID> - ID for the machine processing the files
-//		<UPIID> - UPIID of the processing FAM
+//		<ActiveFAMID> - ID of the active FAM session
 //		<RecordFASTEntry> = 1 to record an entry in the FAST table for all file set to processing.
 static const string gstrGET_FILES_TO_PROCESS_QUERY = 
 	"DECLARE @OutputTableVar table ( \r\n"
@@ -1111,8 +1065,8 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 	"		SELECT id, <ActionID> as ActionID, ASC_From, 'R' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
 	"			<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
 	"	END; \r\n"
-	"	INSERT INTO LockedFile(FileID,ActionID,UPIID,StatusBeforeLock) \r\n"
-	"		SELECT ID, <ActionID> as ActionID, <UPIID> AS UPIID, ASC_From AS StatusBeforeLock FROM @OutputTableVar; \r\n"
+	"	INSERT INTO LockedFile(FileID,ActionID,ActiveFAMID,StatusBeforeLock) \r\n"
+	"		SELECT ID, <ActionID> as ActionID, <ActiveFAMID> AS ActiveFAMID, ASC_From AS StatusBeforeLock FROM @OutputTableVar; \r\n"
 	"	SET NOCOUNT OFF \r\n"
 	"END TRY \r\n"
 	"BEGIN CATCH"
@@ -1249,22 +1203,22 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 "		[Status] [nchar](1) NOT NULL,\r\n"
 "		[Input] [text] NULL,\r\n"
 "		[Output] [text] NULL,\r\n"
-"		[UPI] [nvarchar](512) NULL,\r\n"	
+"		[FAMSessionID] [int] NULL,\r\n"	
 "		[FileName] [nvarchar](255) NULL,\r\n"
 "		[StringizedException] [nvarchar](MAX) NULL,\r\n"
 "		[BinaryOutput] [varbinary](MAX) NULL,\r\n"
 "		[BinaryInput] [varbinary](MAX) NULL, \r\n"
 "		[FileID] [int] NULL, \r\n"
-"		[WorkGroupUPI] [nvarchar](512) NULL, \r\n"
+"		[WorkGroupFAMSessionID] [int] NULL, \r\n"
 "		[Priority] [int] NULL, \r\n"
 "		[RunningTaskDescription] [nvarchar](256) NULL \r\n"
 "	); \r\n"
 "	SET NOCOUNT ON \r\n"
 "	BEGIN TRY \r\n"
-"		UPDATE [dbo].WorkItem Set Status = 'R', UPI = '<UPI>'  \r\n"
+"		UPDATE [dbo].WorkItem Set Status = 'R', FAMSessionID = <FAMSessionID>  \r\n"
 "		OUTPUT DELETED.ID, DELETED.WorkItemGroupID, WorkItemGroup.ActionID, INSERTED.Status, DELETED.[Input], "
-"			DELETED.[Output], INSERTED.UPI, FAMFile.FileName, DELETED.StringizedException, NULL, "
-"			DELETED.BinaryInput, FAMFile.ID, WorkItemGroup.UPI, FileActionStatus.Priority, "
+"			DELETED.[Output], INSERTED.FAMSessionID, FAMFile.FileName, DELETED.StringizedException, NULL, "
+"			DELETED.BinaryInput, FAMFile.ID, WorkItemGroup.FAMSessionID, FileActionStatus.Priority, "
 "			WorkItemGroup.RunningTaskDescription INTO @OutputTableVar  \r\n"
 "		FROM  WorkItem INNER JOIN WorkItemGroup ON WorkItemGroup.ID = WorkItem.WorkItemGroupID "
 "		INNER JOIN FAMFile ON FAMFile.ID = WorkItemGroup.FileID "
@@ -1277,10 +1231,10 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 "		INNER JOIN FAMFile ON FAMFile.ID = WorkItemGroup.FileID "
 "		INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND  "
 "				FileActionStatus.ActionID = <ActionID> "
-"		INNER JOIN ActiveFAM ON ActiveFAM.UPI = WorkItemGroup.UPI "
+"		INNER JOIN ActiveFAM ON ActiveFAM.FAMSessionID = WorkItemGroup.FAMSessionID "
 "		WHERE STATUS = 'P' "
 "			AND WorkItemGroup.ActionID = <ActionID> "
-"			AND ('<GroupUPI>' = '' OR WorkItemGroup.UPI = '<GroupUPI>') "
+"			AND ('<GroupFAMSessionID>' = '' OR WorkItemGroup.FAMSessionID = '<GroupFAMSessionID>') "
 "			AND ActiveFAM.LastPingTime >= DATEADD(SECOND, -90, GetUTCDate()) "
 "			AND FileActionStatus.Priority >= <MinPriority> "
 "		ORDER BY FileActionStatus.Priority DESC, FAMFile.ID ASC "
@@ -1316,19 +1270,19 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 "	SELECT * FROM @OutputTableVar ;\r\n";
 
 const string gstrADD_WORK_ITEM_GROUP_QUERY = 
-	"INSERT INTO [dbo].WorkItemGroup (FileID, ActionID, StringizedSettings, UPI, "
+	"INSERT INTO [dbo].WorkItemGroup (FileID, ActionID, StringizedSettings, FAMSessionID, "
 	"NumberOfWorkItems, RunningTaskDescription) "
 	"OUTPUT INSERTED.ID ";
 
 const string gstrADD_WORK_ITEM_QUERY =
-	"INSERT INTO [dbo].WorkItem (WorkItemGroupID, Status, Input, BinaryInput, Output, UPI, Sequence)  VALUES ";
+	"INSERT INTO [dbo].WorkItem (WorkItemGroupID, Status, Input, BinaryInput, Output, FAMSessionID, Sequence)  VALUES ";
 
 const string gstrRESET_TIMEDOUT_WORK_ITEM_QUERY =
-	"UPDATE dbo.WorkItem SET [Status] = 'P', [UPI] = '' "
+	"UPDATE dbo.WorkItem SET [Status] = 'P', [FAMSessionID] = NULL "
 	"FROM dbo.WorkItem wi LEFT JOIN dbo.ActiveFAM af "
-	"ON wi.UPI = af.UPI "
+	"ON wi.FAMSessionID = af.FAMSessionID "
 	"WHERE [Status] = 'R' AND "
-	"	 (af.UPI IS NULL OR af.LastPingTime < DATEADD(SECOND, -<TimeOutInSeconds>,GetUTCDate()))";
+	"	 (af.FAMSessionID IS NULL OR af.LastPingTime < DATEADD(SECOND, -<TimeOutInSeconds>,GetUTCDate()))";
 
 const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE = 
 	"SELECT [WorkItem].ID "
@@ -1336,14 +1290,14 @@ const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE =
     "  ,[Status] "
     "  ,[Input] "
     "  ,[Output] "
-    "  ,[WorkItem].UPI "
+	"  ,[WorkItem].[FAMSessionID] "
     "  ,[Sequence] "
 	"  ,[stringizedException] "
 	"  ,[FileName] "
 	"  ,[BinaryOutput] "
 	"  ,[BinaryInput] "
 	"  ,[FileID] "
-	"  ,[WorkItemGroup].[UPI] as WorkGroupUPI "
+	"  ,[WorkItemGroup].[FAMSessionID] as WorkGroupFAMSessionID "
 	"  ,[Priority] "
 	"  ,[RunningTaskDescription] "
 	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
@@ -1357,14 +1311,14 @@ const string gstrGET_FAILED_WORK_ITEM_FOR_GROUP =
     "  ,[Status] "
     "  ,[Input] "
     "  ,[Output] "
-    "  ,[WorkItem].UPI "
+	"  ,[WorkItem].[FAMSessionID] "
     "  ,[Sequence] "
 	"  ,[stringizedException] "
 	"  ,[FileName] "
 	"  ,[BinaryOutput] "
 	"  ,[BinaryInput] "
 	"  ,[FileID] "
-	"  ,[WorkItemGroup].[UPI] as WorkGroupUPI "
+	"  ,[WorkItemGroup].[FAMSessionID] as WorkGroupFAMSessionID "
 	"  ,[Priority] "
 	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
 	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "

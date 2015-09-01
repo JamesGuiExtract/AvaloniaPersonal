@@ -57,7 +57,6 @@
             this._checkStoreInputEventTracking = new System.Windows.Forms.CheckBox();
             this._checkStoreQueueEventHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreFASTHistory = new System.Windows.Forms.CheckBox();
-            this._checkStoreFAMSessionHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreSourceDocChangeHistory = new System.Windows.Forms.CheckBox();
             this._tabSecurity = new System.Windows.Forms.TabPage();
             this._buttonRemoveMachine = new System.Windows.Forms.Button();
@@ -130,7 +129,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(254, 122);
+            label1.Location = new System.Drawing.Point(254, 99);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(35, 13);
             label1.TabIndex = 20;
@@ -353,12 +352,11 @@
             this._tabHistory.Controls.Add(this._checkStoreInputEventTracking);
             this._tabHistory.Controls.Add(this._checkStoreQueueEventHistory);
             this._tabHistory.Controls.Add(this._checkStoreFASTHistory);
-            this._tabHistory.Controls.Add(this._checkStoreFAMSessionHistory);
             this._tabHistory.Controls.Add(this._checkStoreSourceDocChangeHistory);
             this._tabHistory.Location = new System.Drawing.Point(4, 22);
             this._tabHistory.Name = "_tabHistory";
             this._tabHistory.Padding = new System.Windows.Forms.Padding(3);
-            this._tabHistory.Size = new System.Drawing.Size(458, 307);
+            this._tabHistory.Size = new System.Drawing.Size(458, 311);
             this._tabHistory.TabIndex = 4;
             this._tabHistory.Text = "History";
             this._tabHistory.ToolTipText = "FAM history settings";
@@ -367,7 +365,7 @@
             // _checkStoreFTPEventHistory
             // 
             this._checkStoreFTPEventHistory.AutoSize = true;
-            this._checkStoreFTPEventHistory.Location = new System.Drawing.Point(6, 167);
+            this._checkStoreFTPEventHistory.Location = new System.Drawing.Point(6, 144);
             this._checkStoreFTPEventHistory.Name = "_checkStoreFTPEventHistory";
             this._checkStoreFTPEventHistory.Size = new System.Drawing.Size(137, 17);
             this._checkStoreFTPEventHistory.TabIndex = 21;
@@ -377,7 +375,7 @@
             // _checkStoreDBSettingsChangeHistory
             // 
             this._checkStoreDBSettingsChangeHistory.AutoSize = true;
-            this._checkStoreDBSettingsChangeHistory.Location = new System.Drawing.Point(6, 144);
+            this._checkStoreDBSettingsChangeHistory.Location = new System.Drawing.Point(6, 121);
             this._checkStoreDBSettingsChangeHistory.Name = "_checkStoreDBSettingsChangeHistory";
             this._checkStoreDBSettingsChangeHistory.Size = new System.Drawing.Size(209, 17);
             this._checkStoreDBSettingsChangeHistory.TabIndex = 7;
@@ -396,7 +394,7 @@
             // 
             // _upDownInputEventHistory
             // 
-            this._upDownInputEventHistory.Location = new System.Drawing.Point(208, 120);
+            this._upDownInputEventHistory.Location = new System.Drawing.Point(208, 97);
             this._upDownInputEventHistory.Maximum = new decimal(new int[] {
             365,
             0,
@@ -420,7 +418,7 @@
             // _checkStoreInputEventTracking
             // 
             this._checkStoreInputEventTracking.AutoSize = true;
-            this._checkStoreInputEventTracking.Location = new System.Drawing.Point(6, 121);
+            this._checkStoreInputEventTracking.Location = new System.Drawing.Point(6, 98);
             this._checkStoreInputEventTracking.Name = "_checkStoreInputEventTracking";
             this._checkStoreInputEventTracking.Size = new System.Drawing.Size(196, 17);
             this._checkStoreInputEventTracking.TabIndex = 5;
@@ -448,16 +446,6 @@
             this._checkStoreFASTHistory.Text = "Store file action state transition history";
             this._checkStoreFASTHistory.UseVisualStyleBackColor = true;
             // 
-            // _checkStoreFAMSessionHistory
-            // 
-            this._checkStoreFAMSessionHistory.AutoSize = true;
-            this._checkStoreFAMSessionHistory.Location = new System.Drawing.Point(6, 98);
-            this._checkStoreFAMSessionHistory.Name = "_checkStoreFAMSessionHistory";
-            this._checkStoreFAMSessionHistory.Size = new System.Drawing.Size(250, 17);
-            this._checkStoreFAMSessionHistory.TabIndex = 4;
-            this._checkStoreFAMSessionHistory.Text = "Store File Action Manager (FAM) session history";
-            this._checkStoreFAMSessionHistory.UseVisualStyleBackColor = true;
-            // 
             // _checkStoreSourceDocChangeHistory
             // 
             this._checkStoreSourceDocChangeHistory.AutoSize = true;
@@ -480,7 +468,7 @@
             this._tabSecurity.Location = new System.Drawing.Point(4, 22);
             this._tabSecurity.Name = "_tabSecurity";
             this._tabSecurity.Padding = new System.Windows.Forms.Padding(3);
-            this._tabSecurity.Size = new System.Drawing.Size(458, 307);
+            this._tabSecurity.Size = new System.Drawing.Size(458, 311);
             this._tabSecurity.TabIndex = 1;
             this._tabSecurity.Text = "Security";
             this._tabSecurity.ToolTipText = "FAM security settings";
@@ -556,7 +544,7 @@
             this._tabProductSpecific.Controls.Add(this._productSpecificLayout);
             this._tabProductSpecific.Location = new System.Drawing.Point(4, 22);
             this._tabProductSpecific.Name = "_tabProductSpecific";
-            this._tabProductSpecific.Size = new System.Drawing.Size(458, 307);
+            this._tabProductSpecific.Size = new System.Drawing.Size(458, 311);
             this._tabProductSpecific.TabIndex = 5;
             this._tabProductSpecific.Text = "Product Specific";
             this._tabProductSpecific.ToolTipText = "Product specific settings";
@@ -570,7 +558,7 @@
             this._productSpecificLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this._productSpecificLayout.Location = new System.Drawing.Point(0, 0);
             this._productSpecificLayout.Name = "_productSpecificLayout";
-            this._productSpecificLayout.Size = new System.Drawing.Size(458, 307);
+            this._productSpecificLayout.Size = new System.Drawing.Size(458, 311);
             this._productSpecificLayout.TabIndex = 1;
             // 
             // _groupIDShield
@@ -630,7 +618,7 @@
             this._tabEmail.Location = new System.Drawing.Point(4, 22);
             this._tabEmail.Name = "_tabEmail";
             this._tabEmail.Padding = new System.Windows.Forms.Padding(3);
-            this._tabEmail.Size = new System.Drawing.Size(458, 307);
+            this._tabEmail.Size = new System.Drawing.Size(458, 311);
             this._tabEmail.TabIndex = 6;
             this._tabEmail.Text = "Email";
             this._tabEmail.UseVisualStyleBackColor = true;
@@ -744,7 +732,6 @@
         private System.Windows.Forms.CheckBox _checkStoreInputEventTracking;
         private System.Windows.Forms.CheckBox _checkStoreQueueEventHistory;
         private System.Windows.Forms.CheckBox _checkStoreFASTHistory;
-        private System.Windows.Forms.CheckBox _checkStoreFAMSessionHistory;
         private System.Windows.Forms.CheckBox _checkStoreSourceDocChangeHistory;
         private System.Windows.Forms.Button _buttonRemoveEmail;
         private System.Windows.Forms.Button _buttonModifyEmail;

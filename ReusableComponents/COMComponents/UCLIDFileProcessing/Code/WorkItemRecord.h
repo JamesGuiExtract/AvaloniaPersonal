@@ -60,8 +60,8 @@ public:
 	STDMETHOD(put_Input)(BSTR Input);
 	STDMETHOD(get_Output)(BSTR* pOutput);
 	STDMETHOD(put_Output)(BSTR Output);
-	STDMETHOD(get_UPI)(BSTR* pUPI);
-	STDMETHOD(put_UPI)(BSTR UPI);
+	STDMETHOD(get_FAMSessionID)(long* pnFAMSessionID);
+	STDMETHOD(put_FAMSessionID)(long nFAMSessionID);
 	STDMETHOD(get_StringizedException)(BSTR *pStringizedException);
 	STDMETHOD(put_StringizedException)(BSTR StringizedException);
 	STDMETHOD(get_FileName)(BSTR *pFileName);
@@ -72,8 +72,8 @@ public:
 	STDMETHOD(put_BinaryInput)(IUnknown *pBinaryInput);
 	STDMETHOD(get_FileID)(long* pnFileID);
 	STDMETHOD(put_FileID)(long nFileID);
-	STDMETHOD(get_WorkGroupUPI)(BSTR* pUPI);
-	STDMETHOD(put_WorkGroupUPI)(BSTR UPI);
+	STDMETHOD(get_WorkGroupFAMSessionID)(long* pnFAMSessionID);
+	STDMETHOD(put_WorkGroupFAMSessionID)(long nFAMSessionID);
 	STDMETHOD(get_Priority)(EFilePriority* pePriority);
 	STDMETHOD(put_Priority)(EFilePriority ePriority);
 	STDMETHOD(get_RunningTaskDescription)(BSTR* pbstrRunningTaskDescription);
@@ -87,13 +87,13 @@ private:
 	EWorkItemStatus m_eWorkItemStatus;
 	string m_strInput;
 	string m_strOutput;
-	string m_strUPI;
+	long m_nFAMSessionID;
 	string m_strStringizedException;
 	string m_strFileName;
 	IPersistStreamPtr m_ipBinaryOutput;
 	IPersistStreamPtr m_ipBinaryInput;
 	long m_nFileID;
-	string m_strWorkGroupUPI;
+	long m_nWorkGroupFAMSessionID;
 	EFilePriority m_ePriority;
 	string m_strRunningTaskDescription;
 };

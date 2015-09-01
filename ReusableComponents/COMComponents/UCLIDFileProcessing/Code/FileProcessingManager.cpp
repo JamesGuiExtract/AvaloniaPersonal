@@ -36,7 +36,6 @@ CFileProcessingManager::CFileProcessingManager()
 m_isDBConnectionReady(false),
 m_nNumberOfFilesToExecute(0),
 m_bCancelling(false),
-m_bRecordFAMSessions(false),
 m_bIsAuthenticated(false),
 m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
 {
@@ -207,10 +206,6 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		// Reset the DB Connection
 		getFPMDB()->ResetDBConnection(VARIANT_FALSE);
 
-		// Check whether or not FAM Session history should be recorded
-		m_bRecordFAMSessions = asString(
-			getFPMDB()->GetDBInfoSetting(gstrSTORE_FAM_SESSION_HISTORY.c_str(), VARIANT_TRUE)) == "1";
-
 		// Set the number of files to process
 		m_recordMgr.setNumberOfFilesToProcess(m_nNumberOfFilesToExecute);
 
@@ -238,11 +233,14 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			getActionMgmtRole(m_ipFSMgmtRole);
 
 		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipProcessingActionMgmtRole =
-				getActionMgmtRole(m_ipFPMgmtRole);
+			getActionMgmtRole(m_ipFPMgmtRole);
+		
+		getFPMDB()->RecordFAMSessionStart(m_strFPSFileName.c_str(), lActionId,
+			ipSupplyingActionMgmtRole->Enabled, ipProcessingActionMgmtRole->Enabled);
+		
 		
 		// Register this FAM as active (allows for files stuck processing to be reverted)
-		m_ipFPMDB->RegisterActiveFAM(lActionId, ipSupplyingActionMgmtRole->Enabled,
-			ipProcessingActionMgmtRole->Enabled);
+		m_ipFPMDB->RegisterActiveFAM();
 
 		// Set the ActionName in the tag manager so that it can expand ActionName tags
 		m_ipFAMTagManager->ActionName = strExpandedAction.c_str();
@@ -280,11 +278,19 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 				// set flag to indicate that processing was started
 				m_bProcessing = true;
 
-				m_ipFPMgmtRole->OkToStopWhenQueueIsEmpty = m_bSupplying ? VARIANT_FALSE : VARIANT_TRUE;
+				try
+				{
+					m_ipFPMgmtRole->OkToStopWhenQueueIsEmpty = m_bSupplying ? VARIANT_FALSE : VARIANT_TRUE;
 
-				ipProcessingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
-					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager,
-					ipThis, m_strFPSFileName.c_str());
+					ipProcessingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
+						(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager,
+						ipThis, m_strFPSFileName.c_str());
+				}
+				catch (...)
+				{
+					m_bProcessing = false;
+					throw;
+				}
 			}
 		}
 		catch (...)
@@ -1037,10 +1043,6 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 					throw ue;
 				}
 
-				// Check whether or not FAM Session history should be recorded
-				m_bRecordFAMSessions = asString(getFPMDB()->GetDBInfoSetting(
-					gstrSTORE_FAM_SESSION_HISTORY.c_str(), VARIANT_TRUE)) == "1";
-
 				logStatusInfo(kStart, false);
 
 				// Expand the action name (note this also sets the FPSFileDir value for the
@@ -1052,7 +1054,11 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 
 				// Register as an active FAM (allows for stuck files to be reverted)
 				long nActionId = getFPMDB()->GetActionID(bstrActionName);
-				getFPMDB()->RegisterActiveFAM(nActionId, vbQueue, vbProcess);
+
+				getFPMDB()->RecordFAMSessionStart(
+					m_strFPSFileName.c_str(), nActionId, vbQueue, vbProcess);
+
+				getFPMDB()->RegisterActiveFAM();
 
 				// Set the ActionName on the tag manager so that the ActionName tag can be expanded
 				m_ipFAMTagManager->ActionName = bstrActionName;
@@ -1094,6 +1100,7 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				}
 
 				getFPMDB()->UnregisterActiveFAM();
+				getFPMDB()->RecordFAMSessionStop();
 
 				logStatusInfo(kEndStop, false);
 
@@ -1277,79 +1284,111 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCompleted(void)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	m_bProcessing = false;
+	try
+	{
+		m_bProcessing = false;
 	
-	if (m_bSupplying)
-	{
-		if (m_nNumberOfFilesToExecute > 0)
+		if (m_bSupplying)
 		{
-			UCLIDException ue("ELI35277", "Application trace: The specified number of files have been "
-				"processed, but supplying is active so this instance will not stop or restart.");
-			ue.addDebugInfo("FPS File", m_strFPSFileName);
-			ue.log();
+			if (m_nNumberOfFilesToExecute > 0)
+			{
+				UCLIDException ue("ELI35277", "Application trace: The specified number of files have been "
+					"processed, but supplying is active so this instance will not stop or restart.");
+				ue.addDebugInfo("FPS File", m_strFPSFileName);
+				ue.log();
+			}
 		}
-	}
-	else
-	{
-		// Unregister Active FAM to reset file back to previous state if any remaining
-		m_ipFPMDB->UnregisterActiveFAM();
-
-		// Log processing has finished information
-		EStartStopStatus eStatus = kEndStop;
-		logStatusInfo(eStatus);
-
-		// Only post a message to the dialog if it exists
-		if (m_apDlg.get() != __nullptr)
+		else
 		{
-			::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
-		}
-	}
+			try
+			{
+				// Unregister Active FAM to reset file back to previous state if any remaining
+				m_ipFPMDB->UnregisterActiveFAM();
+				m_ipFPMDB->RecordFAMSessionStop();
+			}
+			catch (...)
+			{
+				// Notify the FAM that processing has stopped even if it stopped due to an exception.
+				// Otherwise, the FAM can get "stuck" in the processing state.
+				try
+				{
+					if (m_apDlg.get() != __nullptr)
+					{
+						::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
+					}
+				}
+				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38477");
 
-	return S_OK;
+				throw;
+			}
+
+			// Log processing has finished information
+			EStartStopStatus eStatus = kEndStop;
+			logStatusInfo(eStatus);
+
+			// Only post a message to the dialog if it exists
+			if (m_apDlg.get() != __nullptr)
+			{
+				::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
+			}
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38548");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingManager::NotifySupplyingCompleted(void)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	m_bSupplying = false;
-
-	if ( !m_bProcessing )
+	try
 	{
-		// Unregister Active FAM to reset file back to previous state if any remaining
-		m_ipFPMDB->UnregisterActiveFAM();
+		m_bSupplying = false;
 
-		// Log processing has finished information
-		EStartStopStatus eStatus = kEndStop;
-		logStatusInfo(eStatus);
-
-		// Only post a message to the dialog if it exists
-		if (m_apDlg.get() != __nullptr)
+		if ( !m_bProcessing )
 		{
-			::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
-		}
-	}
-	else
-	{
-		m_ipFPMgmtRole->OkToStopWhenQueueIsEmpty = VARIANT_TRUE;
-	}
+			// Unregister Active FAM to reset file back to previous state if any remaining
+			m_ipFPMDB->UnregisterActiveFAM();
+			m_ipFPMDB->RecordFAMSessionStop();
 
-	return S_OK;
+			// Log processing has finished information
+			EStartStopStatus eStatus = kEndStop;
+			logStatusInfo(eStatus);
+
+			// Only post a message to the dialog if it exists
+			if (m_apDlg.get() != __nullptr)
+			{
+				::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
+			}
+		}
+		else
+		{
+			m_ipFPMgmtRole->OkToStopWhenQueueIsEmpty = VARIANT_TRUE;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38547");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingManager::NotifyProcessingCancelling()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	StopProcessing();
-
-	// Only post a message to the dialog if it exists
-	if (m_apDlg.get() != __nullptr)
+	try
 	{
-		::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_CANCELLING, 0, 0);
-	}
+		StopProcessing();
 
-	return S_OK;
+		// Only post a message to the dialog if it exists
+		if (m_apDlg.get() != __nullptr)
+		{
+			::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_CANCELLING, 0, 0);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38549");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1601,12 +1640,6 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus, bool bLogAp
 				ue.addDebugInfo("FPS File", strFileName);
 				ue.log();
 			}
-
-			if (m_bRecordFAMSessions)
-			{
-				// Record the FAM session start
-				getFPMDB()->RecordFAMSessionStart(m_strFPSFileName.c_str());
-			}
 		}
 		break;
 	case kBeginStop:
@@ -1630,12 +1663,6 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus, bool bLogAp
 					"Application trace: " + strMessageName + " has stopped processing.");
 				ue.addDebugInfo("FPS File", strFileName);
 				ue.log();
-			}
-
-			if (m_bRecordFAMSessions)
-			{
-				// Record the FAM session stop
-				getFPMDB()->RecordFAMSessionStop();
 			}
 		}
 		break;

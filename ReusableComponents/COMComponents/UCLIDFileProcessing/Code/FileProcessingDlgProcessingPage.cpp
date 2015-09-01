@@ -105,7 +105,7 @@ void FileProcessingDlgProcessingPage::OnSize(UINT nType, int cx, int cy)
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgProcessingPage::refresh()
 {
-	// refreshs the dispay of pages
+	// refreshes the display of pages
 	set<EProcessingTabPage> setPages;
 	setPages.insert(kFilesPage);
 	setPages.insert(kWorkItemsPage);
@@ -356,7 +356,7 @@ void FileProcessingDlgProcessingPage::updateTabs(const set<EProcessingTabPage>& 
 		}
 	}
 
-	// Add pages that should be displayedd
+	// Add pages that should be displayed
 	for ( EProcessingTabPage ePage = kFilesPage; ePage <= kWorkItemsPage; ePage = (EProcessingTabPage)(ePage + 1))
 	{
 		// Check if the current page is in the set of pages to display

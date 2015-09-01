@@ -368,6 +368,7 @@
     <ClInclude Include="FAMDB_SQL.h" />
     <ClInclude Include="FAMDBUtils.h" />
     <ClInclude Include="FAMDB_SQL_80.h" />
+    <ClInclude Include="FAMDB_SQL_Legacy.h" />
     <ClInclude Include="FAMFileSelector.h" />
     <ClInclude Include="FAMTagManager.h" />
     <ClInclude Include="FileSetCondition.h" />

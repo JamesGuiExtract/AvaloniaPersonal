@@ -209,9 +209,10 @@ public:
 	STDMETHOD(GetUserCounterNamesAndValues)(IStrToStrMap** ppmapUserCounters);
 	STDMETHOD(IsUserCounterValid)(BSTR bstrCounterName, VARIANT_BOOL* pbCounterValid);
 	STDMETHOD(OffsetUserCounter)(BSTR bstrCounterName, LONGLONG llOffsetValue, LONGLONG* pllNewValue);
-	STDMETHOD(RegisterActiveFAM)(long lActionID, VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing);
+	STDMETHOD(RegisterActiveFAM)();
 	STDMETHOD(UnregisterActiveFAM)();
-	STDMETHOD(RecordFAMSessionStart)(BSTR bstrFPSFileName);
+	STDMETHOD(RecordFAMSessionStart)(BSTR bstrFPSFileName, long lActionID, VARIANT_BOOL vbQueuing,
+		VARIANT_BOOL vbProcessing);
 	STDMETHOD(RecordFAMSessionStop)();
 	STDMETHOD(RecordInputEvent)(BSTR bstrTimeStamp, long nActionID, long nEventCount,
 		long nProcessID); 
@@ -254,7 +255,7 @@ public:
 	STDMETHOD(GetWorkItemsForGroup)(long nWorkItemGroupID, long nStartPos, long nCount, IIUnknownVector **pWorkItems);
 	STDMETHOD(GetWorkItemGroupStatus)(long nWorkItemGroupID, WorkItemGroupStatus *pWorkGroupStatus,
 		EWorkItemStatus *pStatus);
-	STDMETHOD(GetWorkItemToProcess)(long nActionID, VARIANT_BOOL vbRestrictToUPI, IWorkItemRecord **ppWorkItem);
+	STDMETHOD(GetWorkItemToProcess)(long nActionID, VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **ppWorkItem);
 	STDMETHOD(NotifyWorkItemFailed)(long nWorkItemID, BSTR stringizedException);
 	STDMETHOD(NotifyWorkItemCompleted)(long nWorkItemID);
 	STDMETHOD(GetWorkGroupData)(long WorkItemGroupID, long *pnNumberOfWorkItems, BSTR *pstringizedTask);
@@ -268,7 +269,7 @@ public:
 	STDMETHOD(GetFileSetFileNames)(BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
 	STDMETHOD(GetFileToProcess)(long nFileID, BSTR strAction, IFileRecord** ppFileRecord);
 	STDMETHOD(SetFallbackStatus)(IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);
-	STDMETHOD(GetWorkItemsToProcess)(long nActionID, VARIANT_BOOL vbRestrictToUPI, 
+	STDMETHOD(GetWorkItemsToProcess)(long nActionID, VARIANT_BOOL vbRestrictToFAMSessionID, 
 			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems);
 	STDMETHOD(SetWorkItemToPending)(long nWorkItemID);
 	STDMETHOD(GetFailedWorkItemsForGroup)(long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
@@ -279,6 +280,8 @@ public:
 	STDMETHOD(RenameMetadataField)(BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
 	STDMETHOD(GetMetadataFieldNames)(IVariantVector** ppvecMetadataFieldNames);
 	STDMETHOD(GetLastConnectionStringConfiguredThisProcess)(BSTR *pbstrConnectionString);
+	STDMETHOD(get_ActiveFAMID)(long *pnActiveFAMID);
+	STDMETHOD(get_FAMSessionID)(long *pnFAMSessionID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -344,9 +347,13 @@ private:
 	// This contains the UniqueProcess Identifier (UPI)
 	string m_strUPI;
 
-	// This contains the ID for the registered UPI in the ActiveFAM table in the DB
-	// If 0 there is not a registered UPI
-	int m_nUPIID;
+	// This contains the ID for the registered row in the ActiveFAM table in the DB
+	// If 0 there is not a registered ActiveFAM row.
+	int m_nActiveFAMID;
+
+	// This contains the ID for the registered entry in the ActiveFAM table in the DB
+	// If 0 there is not a registered FAM session.
+	int m_nFAMSessionID;
 
 	// Machine username
 	string m_strFAMUserName;
@@ -461,7 +468,7 @@ private:
 	// Flag to indicate that the FAM has been registered for auto revert
 	// if this is false and then pingDB just returns without doing anything
 	// if this is true pingDB updates the LastPingTime in ActiveFAM record 
-	// and will log changes of the m_nUPIID
+	// and will log changes of the m_nActiveFAMID
 	volatile bool m_bFAMRegistered;
 
 	// The tick count from the last time the ping time was updated.
@@ -607,7 +614,7 @@ private:
 	// NOTE:	The outer scope should always lock the DB if required and create transaction if required
 	//			If bRemovePreviousSkipped is true and strState == "S" then the skipped file table
 	//			will be updated for the file with the information for the current user and process.
-	//			If bRemovePreviousSkipped is false and strState == "S" the UPIID will be updated,
+	//			If bRemovePreviousSkipped is false and strState == "S" the FAMSessionID will be updated,
 	//			but all other skipped file fields will be unmodified.
 	//			If bQueueChangeIfProcessing is true and the document is already processing, queue
 	//			the new strState via the QueuedActionStatusChange table such that when it is done
@@ -873,7 +880,7 @@ private:
 
 	// Reverts file in the LockedFile table to the previous status if the current
 	// status is still processing.
-	void revertLockedFilesToPreviousState(const _ConnectionPtr& ipConnection, long nUPIID,
+	void revertLockedFilesToPreviousState(const _ConnectionPtr& ipConnection, long nActiveFAMID,
 		const string& strFASTComment = "", UCLIDException* pUE = NULL);
 
 	// Method checks for timed out FAM's and reverts file status for ones that are found.
@@ -986,9 +993,9 @@ private:
 
 	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr getWorkItemFromFields(const FieldsPtr& ipFields);
 	IIUnknownVectorPtr setWorkItemsToProcessing(bool bDBLocked, long nActionID, long nNumberToGet,
-		bool bRestrictToUPI, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection);
+		bool bRestrictToFAMSessionID, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection);
 	UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr setWorkItemToProcessing(bool bDBLocked, long nActionID, 
-		bool bRestrictToUPI, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection);
+		bool bRestrictToFAMSessionID, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection);
 
 	// Checks for new Product Specific DB managers
 	void checkForNewDBManagers();
@@ -1078,7 +1085,8 @@ private:
 	bool IsUserCounterValid_Internal(bool bDBLocked, BSTR bstrCounterName, VARIANT_BOOL* pbCounterValid);
 	bool OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCounterName, LONGLONG llOffsetValue,
 		LONGLONG* pllNewValue);
-	bool RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName);
+	bool RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName, long lActionID,
+		VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing);
 	bool RecordFAMSessionStop_Internal(bool bDBLocked);
 	bool RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeStamp, long nActionID,
 		long nEventCount, long nProcessID);
@@ -1109,7 +1117,7 @@ private:
 	bool GetWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, long nStartPos, long nCount, IIUnknownVector **ppWorkItems);
 	bool GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWorkItemGroupID,
 		WorkItemGroupStatus *pWorkGroupStatus, EWorkItemStatus *pStatus);
-	bool GetWorkItemToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToUPI, IWorkItemRecord **ppWorkItem);
+	bool GetWorkItemToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **ppWorkItem);
 	bool NotifyWorkItemFailed_Internal(bool bDBLocked, long nWorkItemID, BSTR strizedException);
 	bool NotifyWorkItemCompleted_Internal(bool bDBLocked, long nWorkItemID);
 	bool GetWorkGroupData_Internal(bool bDBLocked, long WorkItemGroupID, long *pnNumberOfWorkItems, BSTR *pstringizedTask);
@@ -1119,7 +1127,7 @@ private:
 	bool SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long WorkItemID, IUnknown *pBinaryOutput);
 	bool GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
 	bool SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);
-	bool GetWorkItemsToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToUPI, 
+	bool GetWorkItemsToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToFAMSessionID, 
 			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems);
 	bool SetWorkItemToPending_Internal(bool bDBLocked, long nWorkItemID);
 	bool GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, IIUnknownVector **ppWorkItems);

@@ -974,17 +974,6 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 		long nTotalDocs = 0;
 		long nTotalPages = 0;
 		unsigned long unTotalProcTime = 0;
-		m_nNumCurrentlyProcessing = 0;
-
-		// Get the total Processing time in order to update the time statistics
-		if (isPageDisplayed(kProcessingLogPage))
-		{
-			// If the processing log page doesn't exist, these will remain 0 and be used
-			// as a flag for the enabling or disabling the local page.
-			unTotalProcTime = m_propProcessingPage.getTotalProcTime();
-			m_propProcessingPage.getLocalStats( nTotalBytes, nTotalDocs, nTotalPages );
-			m_nNumCurrentlyProcessing = m_propProcessingPage.getCurrentlyProcessingCount();
-		}
 
 		// Cast the wParam objects
 		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStatsNew;
@@ -1000,31 +989,9 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 				nTotalPages, unTotalProcTime );
 		}
 
-		// If we have new stats, update the status bar and make the new stats the old stats for the
-		// next time the function is called.
-		if( ipActionStatsNew != __nullptr )
-		{
-			ipActionStatsNew->GetAllStatistics(&m_nNumTotalDocs, &m_nNumPending, 
-				&m_nNumCompletedProcessing, &m_nNumFailed, &m_nNumSkipped,
-				NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+		updateStatusBarStats(ipActionStatsNew);
 
-			if (m_nNumInitialCompleted == gnUNINITIALIZED || m_nNumInitialFailed == gnUNINITIALIZED)
-			{
-				m_nNumInitialCompleted = m_nNumCompletedProcessing;
-				m_nNumInitialFailed = m_nNumFailed;
-			}
-
-			// There is a slight lag on the initial polling while the DB is updating an existing action. 
-			// This can result in -1 for number pending.
-			if( m_nNumPending < 0 )
-			{
-				// prevent negative number of documents
-				m_nNumPending = 0;
-			}
-
-			// Update the status bar
-			updateUI();
-		}
+		updateUI();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS( "ELI14508" )
 
@@ -1119,6 +1086,7 @@ LRESULT FileProcessingDlg::OnClearUI(WPARAM wParam, LPARAM lParam)
 		m_nNumCompletedProcessing = 0;
 		m_nNumFailed = 0;
 		m_nNumPending = 0;
+		m_nNumSkipped = 0;
 		m_nNumCurrentlyProcessing = 0;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11611");
@@ -2213,6 +2181,45 @@ void FileProcessingDlg::doResize()
 	UpdateWindow();
 }
 //-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::updateStatusBarStats(UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats)
+{
+	if(ipActionStats == __nullptr)
+	{
+		m_nNumTotalDocs = 0;
+		m_nNumCompletedProcessing = 0;
+		m_nNumFailed = 0;
+		m_nNumPending = 0;
+		m_nNumSkipped = 0;
+		m_nNumCurrentlyProcessing = 0;
+	}
+	else
+	{
+		ipActionStats->GetAllStatistics(&m_nNumTotalDocs, &m_nNumPending, 
+			&m_nNumCompletedProcessing, &m_nNumFailed, &m_nNumSkipped,
+			NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+		m_nNumCurrentlyProcessing = m_nNumTotalDocs -
+			(m_nNumPending + m_nNumCompletedProcessing + m_nNumFailed + m_nNumSkipped);
+
+		if (m_nNumInitialCompleted == gnUNINITIALIZED || m_nNumInitialFailed == gnUNINITIALIZED)
+		{
+			m_nNumInitialCompleted = m_nNumCompletedProcessing;
+			m_nNumInitialFailed = m_nNumFailed;
+		}
+
+		// There is a slight lag on the initial polling while the DB is updating an existing action. 
+		// This can result in -1 for number pending.
+		if( m_nNumPending < 0 )
+		{
+			// prevent negative number of documents
+			m_nNumPending = 0;
+		}
+	}
+
+	// Update the status bar
+	updateUI();
+}
+//-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::updateUI()
 {
 	// update the connect to last database button [p13 #4855]
@@ -2265,10 +2272,11 @@ void FileProcessingDlg::updateUI()
 		pMenu->EnableMenuItem(ID_FILE_OPEN, MF_BYCOMMAND | MF_ENABLED );
 	}
 
+	string strCurrDBStatus = asString(getDBPointer()->GetCurrentConnectionStatus());
 	// Display comma-separated numbers in status bar
 	// only if an Action has been selected (P13 #4355)
 	string strAction = getFPM()->ActionName;
-	if (strAction != "")
+	if (strCurrDBStatus == gstrCONNECTION_ESTABLISHED && strAction != "")
 	{
 		zCompletedProcessing.Format( "%s %s", gstrCOMPLETED_STATUS_PANE_LABEL.c_str(), 
 			commaFormatNumber( (LONGLONG)m_nNumCompletedProcessing ).c_str() );
@@ -2923,11 +2931,21 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 			setPages.insert(kActionPage);
 			updateTabs(setPages);
 		}
+
+		long nActionID = getDBPointer()->GetActionID(getFPM()->GetExpandedActionName());
+
+		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats = 
+			getDBPointer()->GetStats(nActionID, VARIANT_FALSE);
+		ASSERT_RESOURCE_ALLOCATION("ELI38476", ipActionStats != __nullptr);
+	
+		updateStatusBarStats(ipActionStats);
 	}
 	else
 	{
 		// Hide the Action page
 		updateTabs(setPages);
+
+		updateStatusBarStats(__nullptr);
 	}
 
 	updateUI();

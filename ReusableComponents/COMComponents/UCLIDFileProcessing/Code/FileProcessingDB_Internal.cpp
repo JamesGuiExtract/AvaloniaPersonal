@@ -363,10 +363,11 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 
 				// Add a new QueuedActionStatusChange entry to queue this change.
 				executeCmdQuery(ipConnection, "INSERT INTO [QueuedActionStatusChange]"
-						" (FileID, ActionID, ASC_To, DateTimeStamp, MachineID, FAMUserID, UPI, ChangeStatus)"
+						" (FileID, ActionID, ASC_To, DateTimeStamp, MachineID, FAMUserID, FAMSessionID, ChangeStatus)"
 						" VALUES(" + strFileId + ", " + strActionID + ", '" + strNewState +
 						"', GETDATE(), " + strMachine + ", " + strFAMUser +
-						", '" + m_strUPI + "', 'P');");
+						", " + ((m_nFAMSessionID == 0) ? "NULL" : asString(m_nFAMSessionID)) + 
+						", 'P');");
 
 				return easRtn;
 			}
@@ -419,7 +420,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						_lastCodePos = "156";
 					}
 
-					// While there should only ever be on pending row in QueuedActionStatusChange for
+					// While there should only ever be one pending row in QueuedActionStatusChange for
 					// each FileID/ActionID pair, this call ensures sure that all pending changes for
 					// this file are reset here (whether or not the change was applied.
 					executeCmdQuery(ipConnection,
@@ -488,9 +489,10 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					_lastCodePos = "220";
 
 					// Remove record from the LockedFileTable
-					executeCmdQuery(ipConnection, "DELETE FROM LockedFile WHERE FileID = " + 
-						asString(nFileID) + " AND ActionID = " + asString(nActionID) + 
-						" AND UPIID = " + asString(m_nUPIID));
+					executeCmdQuery(ipConnection, "DELETE FROM [LockedFile] "
+						"WHERE [FileID] = " + asString(nFileID) +
+						"	AND [ActionID] = " + asString(nActionID) +
+						"AND [ActiveFAMID] = " + asString(m_nActiveFAMID));
 				}
 				_lastCodePos = "250";
 				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strNewState),
@@ -531,13 +533,20 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					else 
 					{
 						_lastCodePos = "320";
-						// Update the UPIID to current process so it will be not be selected
+
+						if (m_nFAMSessionID == 0)
+						{
+							throw UCLIDException("ELI38468",
+								"Cannot skip a file outside of a FAM session.");
+						}
+
+						// Update the FAMSessionID to current process so it will be not be selected
 						// again as a skipped file for the current process
 						// Also update the time stamp and the UserName (since the user
 						// could be processing all files skipped by any user)
 						// [LRCAU #5853]
-						executeCmdQuery(ipConnection, "Update SkippedFile Set UPIID = " + 
-							asString(m_nUPIID) + ", DateTimeStamp = GETDATE(), UserName = '"
+						executeCmdQuery(ipConnection, "Update SkippedFile Set FAMSessionID = " + 
+							asString(m_nFAMSessionID) + ", DateTimeStamp = GETDATE(), UserName = '"
 							+ getCurrentUserName() + "' WHERE FileID = " + asString(nFileID));
 					}
 				}
@@ -557,14 +566,14 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			_lastCodePos = "340";
 
 			// If Restartable processing is enabled and the new state will be pending update the 
-			// WorkItemGroup record (if there is one) to not have a UPI to indicate that the
-			// file has been split into work items but the file is not currently processing in
+			// WorkItemGroup record (if there is one) to not have a FAMSessionID to indicate that
+			// the file has been split into work items but the file is not currently processing in
 			// any FAMs
 			if (m_bAllowRestartableProcessing && strNewState == "P")
 			{
-				// need to update the UPI to the current UPI
-				string setUPI = "UPDATE WorkItemGroup SET UPI = '' WHERE FileID = " + asString(nFileID);
-				executeCmdQuery(ipConnection, setUPI);
+				string setFAMSessionID =
+					"UPDATE WorkItemGroup SET FAMSessionID = NULL WHERE FileID = " + asString(nFileID);
+				executeCmdQuery(ipConnection, setFAMSessionID);
 			}
 
 			_lastCodePos = "345";
@@ -1190,18 +1199,18 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
-		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_UPI_INDEX);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
-		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_UPI_INDEX);
+		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
 		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX);
-		vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_UPI_INDEX);
+		vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_STATUS_INDEX);
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_ID_STATUS_INDEX);
-		vecQueries.push_back(gstrCREATE_WORK_ITEM_UPI_INDEX);
+		vecQueries.push_back(gstrCREATE_WORK_ITEM_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrMETADATA_FIELD_VALUE_INDEX);
 		vecQueries.push_back(gstrMETADATA_FIELD_VALUE_VALUE_INDEX);
 		vecQueries.push_back(gstrCREATE_FAST_ACTIONID_INDEX);
@@ -1232,12 +1241,15 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_FAM_FILE_FK);
 		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_FILE_FK);
 		vecQueries.push_back(gstrADD_SKIPPED_FILE_ACTION_FK);
+		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_FILE_TAG_FAM_FILE_FK);
 		vecQueries.push_back(gstrADD_FILE_TAG_TAG_ID_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_STATE_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTIVEFAM_FK);
+		vecQueries.push_back(gstrADD_ACTION_ACTIVEFAM_FAM_SESSION_FK);
+		vecQueries.push_back(gstrADD_FAM_SESSION_ACTION_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_MACHINE_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_FAMUSER_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_FPSFILE_FK);
@@ -1247,7 +1259,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
-		vecQueries.push_back(gstrADD_ACTION_ACTIVEFAM_FK);
 		vecQueries.push_back(gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK);
 		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMUSER_FK);
@@ -1268,9 +1279,12 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_ACTION_FK);
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_MACHINE_FK);
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_USER_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_ACTION_FK);
 		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_WORK_ITEM__WORK_ITEM_GROUP_FK);
+		vecQueries.push_back(gstrADD_WORK_ITEM_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_METADATA_FIELD_FK);
 
@@ -1577,7 +1591,7 @@ void CFileProcessingDB::initializeTableValues80()
 			+ "', '120')";
 		vecQueries.push_back(strSQL);
 
-		// Add StoreFAMSessionHistory setting (default to true)
+		// (LEGACY) Add StoreFAMSessionHistory setting (default to true)
 		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrSTORE_FAM_SESSION_HISTORY
 			+ "', '1')";
 		vecQueries.push_back(strSQL);
@@ -1722,9 +1736,10 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 			string strDeleteSkipped = "DELETE FROM SkippedFile WHERE ActionID = " + strToActionID;
 
 			// Need to add any new skipped records (files may be entering skipped status)
-			string strAddSkipped = "INSERT INTO SkippedFile (FileID, ActionID, UserName, UPIID) SELECT "
+			string strAddSkipped = "INSERT INTO SkippedFile (FileID, ActionID, UserName, FAMSessionID) SELECT "
 				" FAMFile.ID, " + strToActionID + " AS NewActionID, '" + getCurrentUserName()
-				+ "' AS NewUserName, " + asString(m_nUPIID) + " AS UPIID FROM FAMFile "
+				+ "' AS NewUserName, " + ((m_nFAMSessionID == 0) ? "NULL" : asString(m_nFAMSessionID)) + 
+				" AS FAMSessionID FROM FAMFile "
 				"INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND "
 				"FileActionStatus.ActionID = " + strFromActionID + " WHERE ActionStatus = 'S'";
 
@@ -2174,7 +2189,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 		// this needs to be initialized each time through the loop
 		bool bConnectionGood = false;
 
-		// put this in a try catch block to catch the possiblity that another 
+		// put this in a try catch block to catch the possibility that another 
 		// instance is trying to lock the DB at exactly the same time
 		try
 		{
@@ -3253,6 +3268,11 @@ void CFileProcessingDB::addSkipFileRecord(const _ConnectionPtr &ipConnection,
 {
 	try
 	{
+		if (m_nFAMSessionID == 0)
+		{
+			throw UCLIDException("ELI38469", "Cannot skip a file outside of a FAM session.");
+		}
+
 		string strSkippedSQL = "SELECT * FROM SkippedFile WHERE FileID = "
 			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
 
@@ -3285,7 +3305,7 @@ void CFileProcessingDB::addSkipFileRecord(const _ConnectionPtr &ipConnection,
 			setStringField(ipFields, "UserName", strUserName);
 			setLongField(ipFields, "FileID", nFileID);
 			setLongField(ipFields, "ActionID", nActionID);
-			setLongField(ipFields, "UPIID", m_nUPIID);
+			setLongField(ipFields, "FAMSessionID", m_nFAMSessionID);
 
 			// Update the row
 			ipSkippedSet->Update();
@@ -3836,19 +3856,20 @@ long CFileProcessingDB::getTagID(const _ConnectionPtr &ipConnection, string &rst
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& ipConnection, 
-														 long nUPIID, const string& strFASTComment, 
+														 long nActiveFAMID,
+														 const string& strFASTComment, 
 														 UCLIDException *pUE)
 {
 	try
 	{
 		// Setup Setting Query
-		string strSQL = "SELECT LockedFile.FileID, Action.ID as ActionID, UPI, StatusBeforeLock, ASCName "
-			" FROM LockedFile INNER JOIN ActiveFAM ON LockedFile.UPIID = ActiveFAM.ID"
-			" INNER JOIN Action ON LockedFile.ActionID = Action.ID"
-			" INNER JOIN FileActionStatus ON LockedFile.ActionID = FileActionStatus.ActionID"
-			"	AND LockedFile.FileID = FileActionStatus.FileID"
-			" WHERE LockedFile.UPIID = " + asString(nUPIID) +
-			"	AND FileActionStatus.ActionStatus = 'R'";
+		string strSQL = "SELECT [LockedFile].[FileID], [Action].[ID] as ActionID, StatusBeforeLock, ASCName "
+			" FROM LockedFile "
+			" INNER JOIN [Action] ON [LockedFile].[ActionID] = [Action].[ID]"
+			" INNER JOIN [FileActionStatus] ON [LockedFile].[ActionID] = [FileActionStatus].[ActionID]"
+			"	AND [LockedFile].[FileID] = [FileActionStatus].[FileID]"
+			" WHERE [LockedFile].[ActiveFAMID] = " + asString(nActiveFAMID) +
+			"	AND [FileActionStatus].[ActionStatus] = 'R'";
 
 		// Open a recordset that has the action names that need to have files reset
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
@@ -3861,7 +3882,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		map<string, map<string, int>> map_StatusCounts;
 		map_StatusCounts.clear();
 
-		// Step through all of the file records in the LockedFile table for the dead UPI
+		// Step through all of the file records in the LockedFile table for the dead ActiveFAMID
 		while(ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			FieldsPtr ipFields = ipFileSet->Fields;
@@ -3883,8 +3904,8 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			ipFileSet->MoveNext();
 		}
 
-		// Delete the UPI record from the ActiveFAM table
-		string strQuery = "DELETE FROM ActiveFAM WHERE ID = " + asString(nUPIID); 
+		// Delete the record from the ActiveFAM table
+		string strQuery = "DELETE FROM [ActiveFAM] WHERE [ID] = " + asString(nActiveFAMID); 
 		executeCmdQuery(ipConnection, strQuery);
 
 		// Set up the logged exception if it is not null
@@ -3938,7 +3959,7 @@ void CFileProcessingDB::pingDB()
 
 	// Use ms_mutexPingDBLock to ensure no other thread from this process is also trying to add or
 	// update the same entry in ActiveFAM (any thread from this process would be using the same
-	// UPIID). If another thread has the lock, there is no need to block; we can assume the other
+	// ActiveFAMID). If another thread has the lock, there is no need to block; we can assume the other
 	// thread will update the ActiveFAM table appropriately.
 	CSingleLock lock(&ms_mutexPingDBLock);
 	if (!asCppBool(lock.Lock(0)))
@@ -3952,12 +3973,17 @@ void CFileProcessingDB::pingDB()
 	{
 		try
 		{
-			long nUPIID = getKeyID(getDBConnection(), "ActiveFAM", "UPI", m_strUPI, false);
-			if (nUPIID != m_nUPIID)
+			// Will throw an exception if m_nActiveFAMID does not exist in the ActiveFAM table.
+			long nFAMSessionID = 0;
+			// Return FAMSessionID as ID so it will populate nFAMSessionID.
+			executeCmdQuery(getDBConnection(),
+				"SELECT [FAMSessionID] AS [ID] FROM [ActiveFAM] WHERE [ID] = " + asString(m_nActiveFAMID),
+				false, &nFAMSessionID);
+			if (nFAMSessionID != m_nFAMSessionID)
 			{
-				UCLIDException ue("ELI34118", "Unexpected UPIID.");
-				ue.addDebugInfo("Expected", m_nUPIID);
-				ue.addDebugInfo("New UPIID", nUPIID);
+				UCLIDException ue("ELI34118", "Unexpected FAMSessionID.");
+				ue.addDebugInfo("Expected ID", m_nFAMSessionID);
+				ue.addDebugInfo("New ID", nFAMSessionID);
 				throw ue;
 			}
 		}
@@ -3966,13 +3992,14 @@ void CFileProcessingDB::pingDB()
 	catch (UCLIDException &ue)
 	{
 		UCLIDException ueOuter("ELI34115", "ActiveFAM registration has been lost.", ue);
-		ueOuter.addDebugInfo("UPIID", m_nUPIID);
+		ueOuter.addDebugInfo("ActiveFAM ID", m_nActiveFAMID);
+		ueOuter.addDebugInfo("FAMSession ID", m_nFAMSessionID);
 		throw ueOuter;
 	}
 
 	// Update the ping record. 
 	executeCmdQuery(getDBConnection(), 
-		"UPDATE ActiveFAM SET LastPingTime=GETUTCDATE() WHERE ID = " + asString(m_nUPIID));
+		"UPDATE [ActiveFAM] SET [LastPingTime]=GETUTCDATE() WHERE [ID] = " + asString(m_nActiveFAMID));
 
 	m_dwLastPingTime = GetTickCount();
 }
@@ -4231,7 +4258,8 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 		}
 
 		// Query to show the elapsed time since last ping for all ActiveFAM records
-		string strElapsedSQL = "SELECT [ID], DATEDIFF(minute,[LastPingTime],GetUTCDate()) as Elapsed "
+		string strElapsedSQL = "SELECT [ID], "
+			"DATEDIFF(minute,[LastPingTime],GetUTCDate()) as Elapsed "
 			"FROM [ActiveFAM]";
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
@@ -4257,7 +4285,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 					throw  ue;
 				}
 
-				long nUPIID = getLongField(ipFields, "ID");
+				long nActiveFAMID = getLongField(ipFields, "ID");
 				long nMinutesSinceLastPing = getLongField(ipFields, "Elapsed");
 
 				UCLIDException ue("ELI27814", "Application Trace: Files were reverted to original status.");
@@ -4267,7 +4295,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 				string strRevertComment = "Auto reverted after " + asString(nMinutesSinceLastPing) + " minutes.";
 
 				// Revert the files for this dead FAM to there previous status
-				revertLockedFilesToPreviousState(ipConnection, nUPIID, strRevertComment, &ue);
+				revertLockedFilesToPreviousState(ipConnection, nActiveFAMID, strRevertComment, &ue);
 			}
 			// move to next Processing FAM record
 			ipFileSet->MoveNext();
@@ -4292,17 +4320,16 @@ void CFileProcessingDB::ensureFAMRegistration(string strActionName)
 
 		ipConnection = getDBConnection();
 
-		// Re-add a new "Processing" ActiveFAM table entry. (The circumstances where this
-		// code will be used are rare, and not worth finding a way to pass on whether
-		// queuing is active).
+		// Re-add a new ActiveFAM table entry. (The circumstances where this code will be used are
+		// rare, and not worth finding a way to pass on whether queuing is active).
 		UnregisterActiveFAM();
-		RegisterActiveFAM(getActionID(ipConnection, strActionName), VARIANT_FALSE, VARIANT_TRUE);
+		RegisterActiveFAM();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI37456");
 
 		UCLIDException ue("ELI37457",
 			"Application trace: ActiveFAM registration has been restored.");
-		ue.addDebugInfo("UPIID", m_nUPIID);
+		ue.addDebugInfo("ActiveFAM ID", m_nActiveFAMID);
 		ue.log();
 	}
 }
@@ -4563,7 +4590,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						replaceVariable(strQuery, "<ActionID>", asString(nActionID));
 						replaceVariable(strQuery, "<UserID>", asString(getFAMUserID(ipConnection)));
 						replaceVariable(strQuery, "<MachineID>", asString(getMachineID(ipConnection)));
-						replaceVariable(strQuery, "<UPIID>", asString(m_nUPIID));
+						replaceVariable(strQuery, "<ActiveFAMID>", asString(m_nActiveFAMID));
 						replaceVariable(strQuery, "<RecordFASTEntry>", m_bUpdateFASTTable ? "1" : "0");
 
 						// Loop to retry getting files until there are either no records returned 
@@ -4793,58 +4820,22 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 	}
 
 	// Check for active processing 
-	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI34336", ipProcessingSet != __nullptr);
+	long nActiveFAMCount = 0;
+	executeCmdQuery(ipConnection,
+		"SELECT Count([ID]) AS [ID] FROM [ActiveFAM]", false, &nActiveFAMCount);
 
-	// Open recordset with ActiveFAM records that show processing on the action
-	string strSQL = "SELECT UPI FROM ActiveFAM";
-	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-		adLockReadOnly, adCmdText);
-
-	return (ipProcessingSet->RecordCount > 0);
+	return (nActiveFAMCount > 0);
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 {
 	_ConnectionPtr ipConnection = getDBConnection();
 
-	// If the ActiveFAM table does not exist nothing is processing so return
-	if (!doesTableExist(ipConnection, gstrACTIVE_FAM))
-	{
-		return;
-	}
-
-	// Run the revert method before checking for in processing file
-	{
-		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
-
-		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-		tgRevert.CommitTrans();
-	}
-
 	// Check for active processing 
-	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI30609", ipProcessingSet != __nullptr);
-
-	// Open recordset with ActiveFAM records that show processing on the action
-	string strSQL = "SELECT UPI FROM ActiveFAM";
-	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-		adLockReadOnly, adCmdText);
-
-	// if there are any records in ipProcessingSet there is active processing.
-	if (!asCppBool(ipProcessingSet->adoEOF))
+	if (isFAMActiveForAnyAction(bDBLocked))
 	{
 		// Since processing is occurring need to throw an exception.
-		UCLIDException ue("ELI30608", "Database has active processing.");
-		FieldsPtr ipFields = ipProcessingSet->Fields;
-		if (ipFields != __nullptr)
-		{
-			string strUPI = getStringField(ipFields, "UPI");
-			ue.addDebugInfo("First UPI", strUPI.c_str());
-		}
-		throw ue;
+		throw UCLIDException("ELI30608", "Database has active processing.");
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -5198,6 +5189,9 @@ void CFileProcessingDB::addOldDBInfoValues(map<string, string>& mapOldValues)
 	// https://extract.atlassian.net/browse/ISSUE-12373
 	// Version 122 - Removed ability to turn off auto-revert
 	mapOldValues["AutoRevertLockedFiles"] = "";
+	// https://extract.atlassian.net/browse/ISSUE-12789
+	// Version 128 - Storing FAMSession data is now mandatory.
+	mapOldValues["StoreFAMSessionHistory"] = "";
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addOldTables(vector<string>& vecTables)
@@ -5262,13 +5256,13 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::getWorkItemFromFi
 
 	ipWorkItemRecord->Input = getStringField(ipFields, "Input").c_str();
 	ipWorkItemRecord->Output = getStringField(ipFields, "Output").c_str();
-	ipWorkItemRecord->UPI = getStringField(ipFields, "UPI").c_str();
+	ipWorkItemRecord->FAMSessionID = getLongField(ipFields, "FAMSessionID");
 	ipWorkItemRecord->StringizedException = getStringField(ipFields, "StringizedException").c_str();
 	ipWorkItemRecord->FileName = getStringField(ipFields, "FileName").c_str();
 	ipWorkItemRecord->BinaryOutput = getIPersistObjFromField(ipFields, "BinaryOutput");
 	ipWorkItemRecord->BinaryInput = getIPersistObjFromField(ipFields, "BinaryInput");
 	ipWorkItemRecord->FileID = getLongField(ipFields, "FileID");
-	ipWorkItemRecord->WorkGroupUPI = getStringField(ipFields, "WorkGroupUPI").c_str();
+	ipWorkItemRecord->WorkGroupFAMSessionID = getLongField(ipFields, "WorkGroupFAMSessionID");
 	ipWorkItemRecord->Priority = (UCLID_FILEPROCESSINGLib::EFilePriority) getLongField(ipFields, "Priority");
 	ipWorkItemRecord->RunningTaskDescription = getStringField(ipFields, "RunningTaskDescription").c_str();
 
@@ -5276,10 +5270,11 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::getWorkItemFromFi
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::setWorkItemToProcessing(bool bDBLocked, 
-	long nActionID, bool bRestrictToUPI, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection)
+	long nActionID, bool bRestrictToFAMSessionID, EFilePriority eMinPriority,
+	const _ConnectionPtr &ipConnection)
 {
-	IIUnknownVectorPtr ipWorkItems = setWorkItemsToProcessing(bDBLocked, nActionID, 1, bRestrictToUPI,
-		kPriorityDefault, ipConnection);
+	IIUnknownVectorPtr ipWorkItems = setWorkItemsToProcessing(bDBLocked, nActionID, 1,
+		bRestrictToFAMSessionID, kPriorityDefault, ipConnection);
 	ASSERT_RESOURCE_ALLOCATION("ELI37421", ipWorkItems != __nullptr);
 
 	// if the size is not 1 then return a null pointer
@@ -5291,7 +5286,8 @@ UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr CFileProcessingDB::setWorkItemToProc
 }
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, long nActionID, 
-	long nNumberToGet, bool bRestrictToUPI, EFilePriority eMinPriority, const _ConnectionPtr &ipConnection)
+	long nNumberToGet, bool bRestrictToFAMSessionID, EFilePriority eMinPriority,
+	const _ConnectionPtr &ipConnection)
 {
 	// Declare query string so that if there is an exception the query can be added to debug info
 	string strQuery;
@@ -5308,11 +5304,14 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, l
 			StopWatch swTransactionRetryTimeout;
 			swTransactionRetryTimeout.start();
 
+			string strFAMSessionID = asString(m_nFAMSessionID);
+
 			// Set to the query to get workitems to process
 			strQuery = gstrGET_WORK_ITEM_TO_PROCESS;
 			replaceVariable(strQuery, "<ActionID>", asString(nActionID));
-			replaceVariable(strQuery, "<UPI>", m_strUPI);
-			replaceVariable(strQuery, "<GroupUPI>", (bRestrictToUPI) ? m_strUPI:"");
+			replaceVariable(strQuery, "<FAMSessionID>", strFAMSessionID);
+			replaceVariable(strQuery, "<GroupFAMSessionID>",
+				(bRestrictToFAMSessionID) ? strFAMSessionID : "");
 			replaceVariable(strQuery, "<MaxWorkItems>", asString(nNumberToGet));
 			replaceVariable(strQuery, "<MinPriority>", asString(eMinPriority));
 			

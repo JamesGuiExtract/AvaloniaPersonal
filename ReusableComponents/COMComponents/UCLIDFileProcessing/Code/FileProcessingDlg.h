@@ -81,6 +81,8 @@ public:
 	//---------------------------------------------------------------------------------------------
 	void updateUI();
 	//---------------------------------------------------------------------------------------------
+	void updateStatusBarStats(UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats);
+	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To return true if the FAM is "Ready" (i.e. FAM is able to Run) and false otherwise
 	bool isFAMReady();
 	

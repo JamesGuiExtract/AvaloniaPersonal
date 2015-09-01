@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "FileProcessingDB.h"
 #include "FAMDB_SQL.h"
+#include "FAMDB_SQL_Legacy.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -31,7 +32,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 127;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 128;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -71,13 +72,13 @@ int UpdateToSchemaVersion101(_ConnectionPtr ipConnection, long* pnNumSteps,
 		// No need to transfer data. It will be assumed that all entries are crashed/hung instances.
 		vecQueries.push_back("ALTER TABLE [LockedFile] DROP CONSTRAINT [FK_LockedFile_ProcessingFAM]");
 		vecQueries.push_back("DROP TABLE [ProcessingFAM]");
-		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE);
-		vecQueries.push_back(gstrADD_LOCKED_FILE_PROCESSINGFAM_FK);
+		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE_V101);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_PROCESSINGFAM_FK_V101);
 
 		// Create the FileActionStatus table and associated indexes/constraints.
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_LEGACY);
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX);
-		vecQueries.push_back(gstrADD_ACTION_PROCESSINGFAM_FK);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX_V101);
+		vecQueries.push_back(gstrADD_ACTION_PROCESSINGFAM_FK_V101);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
@@ -457,10 +458,10 @@ int UpdateToSchemaVersion110(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("ALTER TABLE [LockedFile] DROP CONSTRAINT [FK_LockedFile_ProcessingFAM]");
 		vecQueries.push_back("ALTER TABLE [ProcessingFAM] DROP CONSTRAINT [FK_ProcessingFAM_Action]");
 		vecQueries.push_back("DROP TABLE [ProcessingFAM]");
-		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_TABLE);
-		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_UPI_INDEX);
-		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTIVEFAM_FK);
-		vecQueries.push_back(gstrADD_ACTION_ACTIVEFAM_FK);
+		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_TABLE_V110);
+		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_UPI_INDEX_V110);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTIVEFAM_FK_V110);
+		vecQueries.push_back(gstrADD_ACTION_ACTIVEFAM_FK_V110);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -604,7 +605,7 @@ int UpdateToSchemaVersion114(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vector<string> vecQueries;
 
 		vecQueries.push_back(gstrCREATE_FIELD_SEARCH_TABLE);
-		vecQueries.push_back(gstrCREATE_LAUNCH_APP_TABLE);
+		vecQueries.push_back(gstrCREATE_LAUNCH_APP_TABLE_V114);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -741,10 +742,10 @@ int UpdateToSchemaVersion118(_ConnectionPtr ipConnection, long *pnNumSteps,
 	vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_ACTION_FK);
 	vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAMFILE_FK);
 	vecQueries.push_back(gstrADD_WORK_ITEM__WORK_ITEM_GROUP_FK);
-	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_UPI_INDEX);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_UPI_INDEX_V118);
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_STATUS_INDEX);
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_ID_STATUS_INDEX);
-	vecQueries.push_back(gstrCREATE_WORK_ITEM_UPI_INDEX);
+	vecQueries.push_back(gstrCREATE_WORK_ITEM_UPI_INDEX_V118);
 
 	vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -972,6 +973,96 @@ int UpdateToSchemaVersion127(_ConnectionPtr ipConnection, long *pnNumSteps,
 	executeVectorOfSQL(ipConnection, vecQueries);
 
 	return nNewSchemaVersion;
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion128(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 128;
+
+		if (pnNumSteps != __nullptr)
+		{
+			if (doesTableExist(ipConnection, "WorkItem"))
+			{
+				long nWorkItemRowCount = 0;
+				executeCmdQuery(ipConnection,
+					"SELECT Count([ID]) AS [ID] FROM [WorkItem]", false, &nWorkItemRowCount);
+				if (nWorkItemRowCount > 0)
+				{
+					throw UCLIDException("ELI38473",
+						"Database cannot be upgraded with incomplete WorkItems");
+				}
+			}
+
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("DROP INDEX [ActiveFAM].[IX_ActiveFAM_UPI]");
+		vecQueries.push_back("ALTER TABLE [ActiveFAM] DROP CONSTRAINT [FK_ActiveFAM_Action]");
+		vecQueries.push_back("ALTER TABLE [ActiveFAM] DROP COLUMN [ActionID]");
+		vecQueries.push_back("ALTER TABLE [ActiveFAM] DROP COLUMN [UPI]");
+		vecQueries.push_back("ALTER TABLE [ActiveFAM] DROP COLUMN [Queuing]");	
+		vecQueries.push_back("ALTER TABLE [ActiveFAM] DROP COLUMN [Processing]");
+		vecQueries.push_back("ALTER TABLE [ActiveFAM] ADD [FAMSessionID] INT NOT NULL");
+		vecQueries.push_back(gstrADD_ACTION_ACTIVEFAM_FAM_SESSION_FK);
+		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_SESSION_INDEX);
+		vecQueries.push_back("ALTER TABLE [FAMSession] ADD [ActionID] INT");
+		vecQueries.push_back("ALTER TABLE [FAMSession] ADD [Queuing] BIT");
+		vecQueries.push_back("ALTER TABLE [FAMSession] ADD [Processing] BIT");
+		vecQueries.push_back(gstrADD_FAM_SESSION_ACTION_FK);
+		vecQueries.push_back("DROP INDEX [SkippedFile].[IX_Skipped_File_UPI]");
+
+		// Need to drop the unnamed default value constraint on SkippedFile.UPIID.
+		// Credit to: https://skuppa.wordpress.com/2010/02/11/working-with-default-constraints/
+		vecQueries.push_back(
+			"DECLARE @defname VARCHAR(100), @cmd VARCHAR(1000) "
+			"SET @defname = "
+			"( "
+			"	SELECT name "
+			"	FROM sysobjects so JOIN sysconstraints sc ON so.id = sc.constid "
+			"	WHERE object_name(so.parent_obj) = 'SkippedFile' AND so.xtype = 'D' "
+			"	AND sc.colid = (SELECT colid FROM syscolumns WHERE id = object_id('dbo.SkippedFile') AND name = 'UPIID') "
+			") "
+			"SET @cmd = 'ALTER TABLE [SkippedFile] DROP CONSTRAINT ' + @defname "
+			"EXEC(@cmd)");
+
+		vecQueries.push_back("ALTER TABLE [SkippedFile] DROP COLUMN [UPIID]");
+		vecQueries.push_back("ALTER TABLE [SkippedFile] ADD [FAMSessionID] INT NULL");
+		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_SESSION_FK);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX);
+		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] DROP COLUMN [UPI]");
+		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] ADD [FAMSessionID] INT NULL");
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAM_SESSION_FK);
+		vecQueries.push_back("DROP INDEX [WorkItemGroup].[IX_WorkItemGroupUPI]");
+		vecQueries.push_back("ALTER TABLE [WorkItemGroup] DROP COLUMN [UPI]");
+		vecQueries.push_back("ALTER TABLE [WorkItemGroup] ADD [FAMSessionID] INT");
+		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAM_SESSION_FK);
+		vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_FAM_SESSION_INDEX);
+		vecQueries.push_back("DROP INDEX [WorkItem].[IX_WorkItemUPI]");
+		vecQueries.push_back("ALTER TABLE [WorkItem] DROP COLUMN [UPI]");
+		vecQueries.push_back("ALTER TABLE [WorkItem] ADD [FAMSessionID] INT");
+		vecQueries.push_back(gstrADD_WORK_ITEM_FAM_SESSION_FK);
+		vecQueries.push_back(gstrCREATE_WORK_ITEM_FAM_SESSION_INDEX);
+		vecQueries.push_back("ALTER TABLE [LockedFile] DROP CONSTRAINT [PK_LockedFile]");
+		vecQueries.push_back("ALTER TABLE [LockedFile] DROP CONSTRAINT [FK_LockedFile_ActiveFAM]");
+		vecQueries.push_back("ALTER TABLE [LockedFile] DROP COLUMN [UPIID]");
+		vecQueries.push_back("ALTER TABLE [LockedFile] ADD [ActiveFAMID] INT NOT NULL");
+		vecQueries.push_back("ALTER TABLE [LockedFile] ADD CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED ([FileID], [ActionID], [ActiveFAMID])");
+		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTIVEFAM_FK);
+		vecQueries.push_back("DELETE FROM [DBInfo] WHERE [Name] = 'StoreFAMSessionHistory'");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33184");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1354,7 +1445,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					}
 					else
 					{
-						// Set the file size and and page count for the file record to
+						// Set the file size and page count for the file record to
 						// the file size and page count stored in the database
 						ipNewFileRecord->FileSize = ipOldRecord->FileSize;
 						ipNewFileRecord->Pages = ipOldRecord->Pages;
@@ -2128,8 +2219,6 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 
 			static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
 
-			string strUPIID = asString(m_nUPIID);
-
 			string strWhere = "";
 			string strTop = "TOP (" + asString(nMaxFiles) + ") ";
 			if (bGetSkippedFiles == VARIANT_TRUE)
@@ -2145,8 +2234,8 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 					strWhere += strUserAnd;
 				}
 
-				// Only get files that have not been skipped by the current process
-				strWhere += " AND SkippedFile.UPIID <> " + strUPIID;
+				// Only get files that have not been skipped by the current session.
+				strWhere += " AND COALESCE(SkippedFile.FAMSessionID, 0) <> " + asString(m_nFAMSessionID);
 			}
 			else
 			{
@@ -4410,11 +4499,11 @@ bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 			// and if there are records reset there status to StatusBeforeLock if there current
 			// state for the action is processing.
 			UCLIDException uex("ELI30304", "Application Trace: Files were reverted to original status.");
-			revertLockedFilesToPreviousState(getDBConnection(), m_nUPIID,
+			revertLockedFilesToPreviousState(getDBConnection(), m_nActiveFAMID,
 				"Processing FAM is exiting.", &uex);
 
-			// Reset m_nUPIID to 0 to specify that it is not registered.
-			m_nUPIID = 0;
+			// Reset m_nActiveFAMID to 0 to specify that it is not registered.
+			m_nActiveFAMID = 0;
 
 			// Commit the transaction
 			tg.CommitTrans();
@@ -5149,7 +5238,8 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName)
+bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName,
+								long lActionID, VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing)
 {
 	try
 	{
@@ -5158,8 +5248,11 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 			// Get the FPS File name
 			string strFPSFileName = asString(bstrFPSFileName);
 
-			string strFAMSessionQuery = "INSERT INTO [" + gstrFAM_SESSION + "] ([MachineID], ";
-			strFAMSessionQuery += "[FAMUserID], [UPI], [FPSFileID]) VALUES (";
+			string strFAMSessionQuery = "INSERT INTO [" + gstrFAM_SESSION + "] ";
+			strFAMSessionQuery += "([MachineID], [FAMUserID], [UPI], [FPSFileID], [ActionID], "
+				"[Processing], [Queuing]) ";
+			strFAMSessionQuery += "OUTPUT INSERTED.ID ";
+			strFAMSessionQuery += "VALUES (";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -5180,12 +5273,16 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 					strFPSFileName.empty() ? "<Unsaved FPS File>" : strFPSFileName);
 				long nMachineID = getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName);
 				long nUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
+				string strQueuing = (asCppBool(vbQueuing) ? "1" : "0");
+				string strProcessing = (asCppBool(vbProcessing) ? "1" : "0");
 
 				strFAMSessionQuery += asString(nMachineID) + ", " + asString(nUserID) + ", '"
-					+ m_strUPI + "', " + asString(nFPSFileID) + ")";
+					+ m_strUPI + "', " + asString(nFPSFileID) + ", " + asString(lActionID) +
+					", " + strQueuing + ", " + strProcessing + ")";
 
 				// Insert the record into the FAMSession table
-				executeCmdQuery(ipConnection, strFAMSessionQuery);
+				executeCmdQuery(ipConnection, strFAMSessionQuery, false, (long*)&m_nFAMSessionID);
+				m_nActiveActionID = lActionID;
 
 				// Commit the transaction
 				tg.CommitTrans();
@@ -5211,9 +5308,14 @@ bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 	{
 		try
 		{
+			if (m_nFAMSessionID == 0)
+			{
+				throw UCLIDException("ELI38465", "Cannot stop FAM session that does not exist.");
+			}
+
 			// Build the update query to set stop time
 			string strFAMSessionQuery = "UPDATE [" + gstrFAM_SESSION + "] SET [StopTime] = GETDATE() "
-				"WHERE [" + gstrFAM_SESSION + "].[UPI] = '" + m_strUPI + "' AND [StopTime] IS NULL";
+				"WHERE [" + gstrFAM_SESSION + "].[ID] = " + asString(m_nFAMSessionID) + " AND [StopTime] IS NULL";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -5236,11 +5338,15 @@ bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 				tg.CommitTrans();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI28905");
+
+			m_nFAMSessionID = 0;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30697");
 	}
 	catch(UCLIDException &ue)
 	{
+		m_nFAMSessionID = 0;
+
 		if (!bDBLocked)
 		{
 			return false;
@@ -5954,7 +6060,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 124:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion125);
 				case 125:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion126);
 				case 126:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion127);
-				case 127:	break;
+				case 127:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion128);
+				case 128:	break;
 
 				default:
 					{
@@ -6786,8 +6893,8 @@ bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFile
 
 			// Add the values to the query
 			strAddWorkItemGroupSQL += " VALUES(" + strFileID + ", " + strActionID +
-				", '" + strStringizedTask + "', '" +
-				m_strUPI + "', " + strNumberOfWorkItems + ", '" + strRunningTaskDescription + "')";
+				", '" + strStringizedTask + "', " +
+				asString(m_nFAMSessionID) + ", " + strNumberOfWorkItems + ", '" + strRunningTaskDescription + "')";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -6913,11 +7020,12 @@ bool CFileProcessingDB::AddWorkItems_Internal(bool bDBLocked, long nWorkItemGrou
 					{
 						strBinaryInput = "0x" + asString(m_ipMiscUtils->GetObjectAsStringizedByteStream(ipWorkItem->BinaryInput));
 					}
+					long nFAMSessionID = ipWorkItem->FAMSessionID;
+					string strFAMSessionID = (nFAMSessionID == 0) ? "NULL" : asString(nFAMSessionID);
 					strWorkItemSQL += (i==0) ? "": ", ";
 					strWorkItemSQL += " (" + strWorkItemGroupID + ", '" + strStatus +
 						"', '" + asString(ipWorkItem->Input) + "', " + strBinaryInput + 
-						", '" + asString(ipWorkItem->Output) + "', '" + asString(ipWorkItem->UPI) + 
-						"', " + asString(nNextSequence) + ")";
+						", '" + asString(ipWorkItem->Output) + "', " + strFAMSessionID + ", " + asString(nNextSequence) + ")";
 
 					nNextSequence++;
 				}
@@ -6940,8 +7048,8 @@ bool CFileProcessingDB::AddWorkItems_Internal(bool bDBLocked, long nWorkItemGrou
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetWorkItemToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToUPI,
-	IWorkItemRecord **ppWorkItem)
+bool CFileProcessingDB::GetWorkItemToProcess_Internal(bool bDBLocked, long nActionID,
+	VARIANT_BOOL vbRestrictToFAMSession, IWorkItemRecord **ppWorkItem)
 {
 	try
 	{
@@ -6961,8 +7069,8 @@ bool CFileProcessingDB::GetWorkItemToProcess_Internal(bool bDBLocked, long nActi
 				validateDBSchemaVersion();
 
 				UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = 
-					setWorkItemToProcessing(bDBLocked, nActionID, asCppBool(vbRestrictToUPI),
-					kPriorityDefault, ipConnection);
+					setWorkItemToProcessing(bDBLocked, nActionID,
+					asCppBool(vbRestrictToFAMSession), kPriorityDefault, ipConnection);
 
 				*ppWorkItem = (IWorkItemRecord *)ipWorkItem.Detach();
 
@@ -7222,11 +7330,12 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 					*pnWorkItemGroupID = getLongField(ipFields, "ID");
 
 					TransactionGuard tg(ipConnection,adXactRepeatableRead, &m_mutex);
-					// need to update the UPI to the current UPI
-					string setUPI = "UPDATE WorkItemGroup SET UPI = '" + m_strUPI + 
-						"', RunningTaskDescription = '" + strRunningTaskDescription + 
+					// need to update the FAMSessionID to the current FAMSessionID
+					string setFAMSessionID = 
+						"UPDATE WorkItemGroup SET FAMSessionID = " + asString(m_nFAMSessionID) + 
+						", RunningTaskDescription = '" + strRunningTaskDescription + 
 						"' WHERE ID = " + asString(*pnWorkItemGroupID);
-					executeCmdQuery(ipConnection, setUPI);
+					executeCmdQuery(ipConnection, setFAMSessionID);
 					tg.CommitTrans();
 				}
 				else
@@ -7411,6 +7520,12 @@ bool CFileProcessingDB::SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* 
 	{
 		try
 		{
+			if (m_nFAMSessionID == 0)
+			{
+				throw UCLIDException("ELI38467",
+					"Cannot set fallback status without an active FAM session.");
+			}
+
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(pFileRecord);
 			ASSERT_ARGUMENT("ELI37464", ipFileRecord != __nullptr);
 
@@ -7432,13 +7547,11 @@ bool CFileProcessingDB::SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* 
 			_RecordsetPtr ipFileSet(__uuidof(Recordset));
 			ASSERT_RESOURCE_ALLOCATION("ELI37465", ipFileSet != __nullptr);
 
-			// Query for the existing record in the lock table; it is expected that the UPI will
-			// match the UPI of the current process.
+			// Query for the existing record in the lock table
 			string strLockedFileQuery =
 				"SELECT [StatusBeforeLock] FROM [LockedFile] "
-				"	INNER JOIN [ActiveFAM] ON [ActiveFAM].[ID] = [LockedFile].[UPIID] "
 				"	WHERE [FileID] = " + asString(nFileId) +
-				"	AND [UPI] = '" + UPI::getCurrentProcessUPI().getUPI() + "'";
+				"	AND [ActiveFAMID] = " + asString(m_nActiveFAMID);
 
 			ipFileSet->Open(strLockedFileQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
 				adOpenDynamic, adLockOptimistic, adCmdText);
@@ -7481,8 +7594,9 @@ bool CFileProcessingDB::SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* 
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetWorkItemsToProcess_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbRestrictToUPI, 
-			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems)
+bool CFileProcessingDB::GetWorkItemsToProcess_Internal(bool bDBLocked, long nActionID,
+	VARIANT_BOOL vbRestrictToFAMSessionID, long nMaxWorkItemsToReturn, EFilePriority eMinPriority,
+	IIUnknownVector **ppWorkItems)
 {
 	try
 	{
@@ -7503,7 +7617,7 @@ bool CFileProcessingDB::GetWorkItemsToProcess_Internal(bool bDBLocked, long nAct
 
 				IIUnknownVectorPtr ipWorkItems = 
 					setWorkItemsToProcessing(bDBLocked, nActionID, nMaxWorkItemsToReturn, 
-						asCppBool(vbRestrictToUPI), eMinPriority, ipConnection);
+						asCppBool(vbRestrictToFAMSessionID), eMinPriority, ipConnection);
 
 				*ppWorkItems = (IIUnknownVector *)ipWorkItems.Detach();
 
