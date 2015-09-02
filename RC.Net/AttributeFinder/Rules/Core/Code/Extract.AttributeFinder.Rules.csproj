@@ -156,6 +156,13 @@
       <DependentUpon>RSDDataScorerSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="RuleObjectProfiler.cs" />
+    <Compile Include="SetDocumentTags.cs" />
+    <Compile Include="SetDocumentTagsSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetDocumentTagsSettingsDialog.Designer.cs">
+      <DependentUpon>SetDocumentTagsSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ValueConditionSelector.cs" />
     <Compile Include="ValueConditionSelectorSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -352,6 +359,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="RSDDataScorerSettingsDialog.resx">
       <DependentUpon>RSDDataScorerSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetDocumentTagsSettingsDialog.resx">
+      <DependentUpon>SetDocumentTagsSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ValueConditionSelectorSettingsDialog.resx">
       <DependentUpon>ValueConditionSelectorSettingsDialog.cs</DependentUpon>
