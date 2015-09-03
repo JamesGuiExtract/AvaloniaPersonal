@@ -200,8 +200,8 @@ namespace Extract.Redaction
                 source.SourceDocName, pageInfoMap);
 
             // Don't modify the original attribute since the RedactionFileLoader is still using it
-            ICopyableObject copy = (ICopyableObject)item.ComAttribute;
-            ComAttribute attribute = (ComAttribute)copy.Clone();
+            ICloneIdentifiableObject copy = (ICloneIdentifiableObject)item.ComAttribute;
+            ComAttribute attribute = (ComAttribute)copy.CloneIdentifiableObject();
             attribute.Value = resultValue;
 
             return new RedactionItem(attribute);
@@ -390,7 +390,7 @@ namespace Extract.Redaction
         /// Gets the minimum stack size needed for the thread in which this task is to be run.
         /// </summary>
         /// <value>
-        /// The the minimum stack size needed for the thread in which this task is to be run.
+        /// The minimum stack size needed for the thread in which this task is to be run.
         /// </value>
         [CLSCompliant(false)]
         public uint MinStackSize
@@ -451,7 +451,7 @@ namespace Extract.Redaction
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
         /// it also means that call to <see cref="ProcessFile"/> or <see cref="Close"/> may come
-        /// while the Standby call is still ocurring. If this happens, the return value of Standby
+        /// while the Standby call is still occurring. If this happens, the return value of Standby
         /// will be ignored; however, Standby should promptly return in this case to avoid
         /// needlessly keeping a thread alive.
         /// </summary>

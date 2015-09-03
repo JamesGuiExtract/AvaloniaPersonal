@@ -5,7 +5,7 @@
 //
 // FILE:	IdentifiableObject.h
 //
-// PURPOSE:	Provides implmentation for IdentifiableObject that can be used by objects.
+// PURPOSE:	Provides implementation for IdentifiableObject that can be used by objects.
 //
 // NOTES:	
 //
@@ -32,6 +32,8 @@ public:
 	~CIdentifiableObject(void);
 
 protected:
+	// Only to be used when copy should be an exact copy
+    void setGUID(const GUID& guid);
 
 	GUID getGUID(bool bRegenerate = false);
 	void loadGUID(IStream *pStream);

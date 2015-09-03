@@ -309,7 +309,7 @@ namespace Extract.Redaction
         /// Retrieves the revision number from the specified _IDAndRevision attribute.
         /// </summary>
         /// <param name="idAttribute">The _IDAndRevision attribute.</param>
-        /// <returns>The revisiion number of the <paramref name="idAttribute"/>.</returns>
+        /// <returns>The revision number of the <paramref name="idAttribute"/>.</returns>
         static int GetRevisionFromIdAttribute(ComAttribute idAttribute)
         {
             // Drop the initial underscore from the ID attribute

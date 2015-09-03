@@ -196,6 +196,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="COMMutex.cpp" />
+    <ClCompile Include="COMUtilsMethods.cpp" />
     <ClCompile Include="DoublePoint.cpp" />
     <ClCompile Include="IdentifiableObject.cpp" />
     <ClCompile Include="IUnknownVector.cpp">
@@ -400,6 +401,7 @@
     <ClInclude Include="ClipboardManagerWnd.h" />
     <ClInclude Include="ClipboardObjectManager.h" />
     <ClInclude Include="COMMutex.h" />
+    <ClInclude Include="COMUtilsMethods.h" />
     <ClInclude Include="DoublePoint.h" />
     <ClInclude Include="ComUtilsExport.h" />
     <ClInclude Include="IdentifiableObject.h" />

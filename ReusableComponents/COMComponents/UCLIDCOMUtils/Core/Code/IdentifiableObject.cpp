@@ -121,6 +121,23 @@ void CIdentifiableObject::saveGUID(IStream * pStream)
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33629");
 }
+//--------------------------------------------------------------------------------------------------
+void CIdentifiableObject::setGUID(const GUID& guid)
+{
+    try
+    {
+        validateLicense();
+
+        // Create the GUID to copy guid into
+        if ( m_upGUID.get() == __nullptr)
+        {
+            m_upGUID.reset(new GUID());
+        }
+
+        *m_upGUID.get() = guid;
+    }
+    CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38464");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private functions

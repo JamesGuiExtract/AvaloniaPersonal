@@ -43,7 +43,7 @@ namespace Extract.AttributeFinder
             {
                 ExtractException ee = new ExtractException("ELI28541",
                     "Unable to get attribute by name.", ex);
-                ee.AddDebugData("Attrbiute name", name, false);
+                ee.AddDebugData("Attribute name", name, false);
                 throw ee;
             }
         }

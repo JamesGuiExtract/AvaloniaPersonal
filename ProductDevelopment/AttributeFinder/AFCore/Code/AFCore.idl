@@ -2,7 +2,7 @@
 //
 
 // This file will be processed by the MIDL tool to
-// produce the type library (AFCore.tlb) and marshalling code.
+// produce the type library (AFCore.tlb) and marshaling code.
 
 //--------------------------------------------------------------------------------------------------
 // NOTES
@@ -109,7 +109,7 @@ library UCLID_AFCORELib
 		[propget, id(4), helpstring("property Attribute")] HRESULT Attribute([out, retval] IAttribute* *pVal);
 		[propput, id(4), helpstring("property Attribute")] HRESULT Attribute([in] IAttribute* newVal);
 		// Clones all members except clone the sub-attribute hierarchy of Attribute only if bCloneAttributes
-		// is VARIANT_TRUE and clone the document Text onlyl if bCloneText is VARIANT_TRUE).
+		// is VARIANT_TRUE and clone the document Text only if bCloneText is VARIANT_TRUE).
 		[id(5), helpstring("method PartialClone")] HRESULT PartialClone([in] VARIANT_BOOL bCloneAttributes,
 			[in] VARIANT_BOOL bCloneText, [out, retval] IAFDocument **pAFDoc);
 	};
@@ -141,7 +141,7 @@ library UCLID_AFCORELib
 	interface IAttributeFindingRule : IDispatch
 	{
 		//------------------------------------------------------------------------------------------
-		// PURPOSE: To parse the text in the input documetn and return a vector of found
+		// PURPOSE: To parse the text in the input document and return a vector of found
 		//			IAttribute objects.
 		// ARGUMENTS:
 		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
@@ -541,7 +541,7 @@ library UCLID_AFCORELib
 		// Following methods allow push/pop/get access to the RSD file
 		// name associated with the currently executing thread.
 		// NOTE: we have the stack concept here because RSD files can execute
-		// other RSD files which execeute other RSD files, etc.
+		// other RSD files which execute other RSD files, etc.
 		// PROMISE:	The PushRSDFileName() method will push a filename onto the stack and
 		//			the PopRSDFileName() method will pop a filename from the stack.  Both operations
 		//			return the size of the stack at the end of the respective operations.
@@ -712,22 +712,6 @@ library UCLID_AFCORELib
 			[in] IAFDocument *pAFDoc, [in] IIUnknownVector *pAttrContext, [out, retval] IIUnknownVector **pAttrOut);
 	};
 
-	//[
-	//	object,
-	//	uuid(9B270563-F873-4F63-A460-2D701E73F4F7),
-	//	dual,
-	//	helpstring("IIdentifiableObject Interface"),
-	//	pointer_default(unique)
-	//]
-	//interface IIdentifiableObject : IDispatch
-	//{
-	//	//---------------------------------------------------------------------------------------------
-	//	// PROMISE: Will return a GUID that uniquely identifies this instance. An instance is
-	//	// considered a unique persistence of a rule of which there may be multiple copies in
-	//	// memory if the ruleset has been loaded from different callers.
-	//	[propget, id(1), helpstring("property InstanceGUID")] HRESULT InstanceGUID([out, retval] GUID *pGUID);
-	//};
-
 	//---------------------------------------------------------------------------------------------
 	/////////////////
 	// CoClasses
@@ -764,6 +748,8 @@ library UCLID_AFCORELib
 		interface ILicensedComponent;
 		interface ICopyableObject;
 		interface IManageableMemory;
+		interface IIdentifiableObject;
+		interface ICloneIdentifiableObject;
 	};
 	[
 		uuid(BBDE6205-9193-4959-8922-630A9F920ADB),

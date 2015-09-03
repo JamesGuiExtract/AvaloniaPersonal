@@ -18,7 +18,8 @@ class ATL_NO_VTABLE CIUnknownVector :
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IComparableObject, &IID_IComparableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IShallowCopyable, &IID_IShallowCopyable, &LIBID_UCLID_COMUTILSLib>,
-	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>
+	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<ICloneIdentifiableObject, &IID_ICloneIdentifiableObject, &LIBID_UCLID_COMUTILSLib>
 {
 public:
 	CIUnknownVector();
@@ -40,6 +41,7 @@ BEGIN_COM_MAP(CIUnknownVector)
 	COM_INTERFACE_ENTRY(IShallowCopyable)
 	COM_INTERFACE_ENTRY(IComparableObject)
 	COM_INTERFACE_ENTRY(IManageableMemory)
+	COM_INTERFACE_ENTRY(ICloneIdentifiableObject)
 END_COM_MAP()
 
 // ISupportsErrorInfo
@@ -94,6 +96,10 @@ END_COM_MAP()
 // IManageableMemory
 	STDMETHOD(ReportMemoryUsage)();
 
+// ICloneIdentifiableObject
+	STDMETHOD(CloneIdentifiableObject)(IUnknown ** pObject);
+	STDMETHOD(CopyFromIdentifiableObject)(IUnknown *pObject);
+
 private:
 	////////////////
 	// Classes
@@ -122,7 +128,11 @@ private:
 	// Clears this vector
 	void clear();
 	//----------------------------------------------------------------------------------------------
-
+	// Copies the properties of source to this object using the ICloneIdentifiableObject interface
+	// if bWithCloneIdentifiableObject is true and exists on the properties that need to be cloned,
+	// otherwise uses the ICopyableObject interface
+	void copyFrom(UCLID_COMUTILSLib::IIUnknownVectorPtr ipSource, bool bWithCloneIdentifiableObject);
+	
 	////////////////
 	// Data
 	////////////////
@@ -135,7 +145,7 @@ private:
 	// the stream name used to store the vector within a storage object
 	_bstr_t m_bstrStreamName;
 
-	// Allows reporting of memory usage to the garabage collector when being referenced by managed
+	// Allows reporting of memory usage to the garbage collector when being referenced by managed
 	// code.
 	IMemoryManagerPtr m_ipMemoryManager;
 };

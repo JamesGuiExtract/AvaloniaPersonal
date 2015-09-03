@@ -3,6 +3,7 @@
 #pragma once
 
 #include "resource.h"       // main symbols
+#include "IdentifiableObject.h"
 
 #include <string>
 
@@ -19,7 +20,10 @@ class ATL_NO_VTABLE CAttribute :
 	public IDispatchImpl<IAttribute, &IID_IAttribute, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<IComparableObject, &IID_IComparableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IPersistStream,
-	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>
+	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<ICloneIdentifiableObject, &IID_ICloneIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	public CIdentifiableObject
 {
 public:
 	CAttribute();
@@ -40,6 +44,8 @@ BEGIN_COM_MAP(CAttribute)
 	COM_INTERFACE_ENTRY(IComparableObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(IManageableMemory)
+	COM_INTERFACE_ENTRY(IIdentifiableObject)
+	COM_INTERFACE_ENTRY(ICloneIdentifiableObject)
 END_COM_MAP()
 
 public:
@@ -86,6 +92,13 @@ public:
 	STDMETHOD(Save)(IStream *pStream, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
+// IIdentifiableObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
+
+// ICloneIdentifiableObject
+	STDMETHOD(raw_CloneIdentifiableObject)(IUnknown ** pObject);
+	STDMETHOD(raw_CopyFromIdentifiableObject)(IUnknown *pObject);
+
 private:
 	//////////////
 	// Variables
@@ -116,6 +129,11 @@ private:
 
 	// Gets the sub attribute collection (will create an empty one if it doesn't exist)
 	IIUnknownVectorPtr getSubAttributes();
+
+	// Copies the properties of source to this object using the ICloneIdentifiableObject interface
+	// if bWithCloneIdentifiableObject is true and exists on the properties that need to be cloned,
+	// otherwise uses the ICopyableObject interface
+	void copyFrom(UCLID_AFCORELib::IAttributePtr ipSource, bool bWithCloneIdentifiableObject);
 
 	void validateLicense();
 };

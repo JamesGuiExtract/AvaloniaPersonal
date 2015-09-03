@@ -57,6 +57,8 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 		m_zType = _T("");
 		m_zValue = _T("");
 		m_zAttributePath = _T("");
+		m_zAttributeGUID = _T("");
+
 		//}}AFX_DATA_INIT
 		// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 		m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -65,7 +67,7 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 		UseSingletonInputManager();
 		ASSERT_RESOURCE_ALLOCATION("ELI06190", getInputManager() != __nullptr);
 
-		// get registry persistance manager
+		// get registry persistence manager
 		RegistryPersistenceMgr rpmVOA(HKEY_CURRENT_USER, gstrREG_ROOT_KEY);
 
 		// check for the AutoOpenImage key
@@ -213,10 +215,12 @@ void CEAVGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_DOWN, m_btnDown);
 	DDX_Control(pDX, IDC_BTN_DELETE, m_btnDelete);
 	DDX_Control(pDX, IDC_BTN_SPLIT, m_btnSplit);
+	DDX_Control(pDX, IDC_EDIT_ATTRIBUTE_GUID, m_editAttributeGUID);
 	DDX_Text(pDX, IDC_EDIT_NAME, m_zName);
 	DDX_Text(pDX, IDC_EDIT_TYPE, m_zType);
 	DDX_Text(pDX, IDC_EDIT_VALUE, m_zValue);
 	DDX_Text(pDX, IDC_EDIT_ATTRIBUTE_PATH, m_zAttributePath);
+	DDX_Text(pDX, IDC_EDIT_ATTRIBUTE_GUID, m_zAttributeGUID);
 	DDX_Control(pDX, IDC_BTN_MERGE, m_btnMerge);
 	DDX_Control(pDX, IDC_LABEL_FILENAME, m_labelFilename);
 	DDX_Control(pDX, IDC_RADIO_REPLACE, m_radioReplace);
@@ -227,6 +231,7 @@ void CEAVGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_NAME, m_labelName);
 	DDX_Control(pDX, IDC_STATIC_TYPE, m_labelType);
 	DDX_Control(pDX, IDC_STATIC_VALUE, m_labelValue);
+	DDX_Control(pDX, IDC_STATIC_ATTRIBUTE_GUID, m_labelAttributeGUID);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CEAVGeneratorDlg, CDialog)
@@ -444,6 +449,9 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
 		// Retrieve this sub-attribute
 		IAttributePtr	ipThisSub = ipSubAttributes->At( i );
 
+		// Add the instanceGUID to the set of GUID's
+		addGUIDToSet(ipThisSub);
+
 		// Get Value
 		ISpatialStringPtr ipValue = ipThisSub->Value;
 		ASSERT_RESOURCE_ALLOCATION("ELI15605", ipValue != __nullptr);
@@ -543,6 +551,9 @@ void CEAVGeneratorDlg::displayAttributes(IIUnknownVectorPtr ipAttributes)
 			IAttributePtr	ipAttribute = ipAttributes->At( i );
 			ASSERT_RESOURCE_ALLOCATION("ELI18142", ipAttribute != __nullptr);
 
+			// Add the instanceGUID to the set of GUID's
+			addGUIDToSet(ipAttribute);
+
 			// Get Value
 			ISpatialStringPtr ipValue = ipAttribute->Value;
 			ASSERT_RESOURCE_ALLOCATION("ELI19437", ipValue != __nullptr);
@@ -580,7 +591,7 @@ void CEAVGeneratorDlg::displayAttributes(IIUnknownVectorPtr ipAttributes)
 			// Add any sub attributes to end of list
 			addSubAttributes( ipAttribute, 0, 1 );
 
-			// get the attribute pointer from the smartpointer
+			// get the attribute pointer from the smart pointer
 			IAttribute* pipAttribute = ipAttribute.Detach();
 			ASSERT_RESOURCE_ALLOCATION("ELI18275", pipAttribute != __nullptr);
 
@@ -1112,6 +1123,20 @@ void CEAVGeneratorDlg::updateButtons()
 
 		m_zAttributePath = getAttributePath(iSelectedItemIndex).c_str();
 
+		// Initialize GUID text to empty string
+		m_zAttributeGUID = "";
+
+		// Get the attribute from the list box
+		IAttribute* pAttribute = (IAttribute*) m_listAttributes.GetItemData(iSelectedItemIndex);
+		if (pAttribute != __nullptr)
+		{
+			IIdentifiableObjectPtr ipIdentifible(pAttribute);
+			if (ipIdentifible != __nullptr)
+			{
+				m_zAttributeGUID = asString(ipIdentifible->InstanceGUID).c_str();
+			}
+		}
+
 		// First item cannot move up
 		m_btnUp.EnableWindow( asMFCBool(iSelectedItemIndex != 0) );
 
@@ -1125,6 +1150,7 @@ void CEAVGeneratorDlg::updateButtons()
 		m_zValue = "";
 		m_zType = "";
 		m_zAttributePath = "";
+		m_zAttributeGUID = "";
 
 		// Disable the up and down arrows
 		m_btnUp.EnableWindow(FALSE);
@@ -1587,6 +1613,7 @@ void CEAVGeneratorDlg::clearListControl()
 			_lastCodePos = "10: " + asString(i+1) + " of " + asString(nCount);
 		}
 		_lastCodePos = "20";
+		m_setOfGUIDs.clear();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18209");
 }
@@ -1944,6 +1971,7 @@ void CEAVGeneratorDlg::doResize()
 	m_wMgr.moveAnchoredBottomLeft(m_labelValue, m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredBottomLeft(m_labelType, m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredBottomLeft(m_labelAttributePath, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeft(m_labelAttributeGUID, m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredBottomLeft(m_labelFilename, m_nDefaultW, m_nDefaultH, FALSE);
 
 	// Move controls anchored bottom, left and right
@@ -1951,6 +1979,7 @@ void CEAVGeneratorDlg::doResize()
 	m_wMgr.moveAnchoredBottomLeftRight(m_editValue, m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredBottomLeftRight(m_editType, m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredBottomLeftRight(m_editAttributePath, m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredBottomLeftRight(m_editAttributeGUID, m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredBottomLeftRight(m_currentFilename, m_nDefaultW, m_nDefaultH, FALSE);
 
 	// Update default values
@@ -1964,3 +1993,36 @@ void CEAVGeneratorDlg::doResize()
 	UpdateWindow();
 }
 //-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::addGUIDToSet(IIdentifiableObjectPtr ipIdentityObject)
+{
+	// if not IIdentifiableObject there is no guid
+	if (ipIdentityObject == __nullptr)
+	{
+		return;
+	}
+
+	// Get the instanceGUID
+	string strGUID = asString(ipIdentityObject->InstanceGUID);
+
+	// Look for GUID in set
+	set<string>::iterator setIterator = m_setOfGUIDs.find(strGUID);
+	
+	// If GUID not in set put it in		
+	if(setIterator == m_setOfGUIDs.end())
+	{
+		m_setOfGUIDs.insert(strGUID);
+	}
+	else
+	{
+		IAttributePtr ipAttribute = ipIdentityObject;
+		// Log exception that GUID already exists
+		UCLIDException ue("ELI38559", "Duplicate instanceID");
+		ue.addDebugInfo("instanceID", strGUID);
+		if (ipAttribute != __nullptr)
+		{
+			ue.addDebugInfo("Attribute Name", asString(ipAttribute->Name));
+			ue.addDebugInfo("Attribute Value", asString(ipAttribute->Value->String));
+		}
+		ue.log();
+	}
+}

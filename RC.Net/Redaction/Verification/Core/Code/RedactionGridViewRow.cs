@@ -569,7 +569,7 @@ namespace Extract.Redaction.Verification
         /// Creates a <see cref="Extract.Redaction.RedactionItem"/> that corresponds to the row.
         /// </summary>
         /// <param name="sourceDocument">The source document to use for the new attribute.</param>
-        /// <param name="pageInfoMap">The page infomation map to use for the new attribute.</param>
+        /// <param name="pageInfoMap">The page information map to use for the new attribute.</param>
         /// <returns>A new <see cref="Extract.Redaction.RedactionItem"/> that corresponds to the row.</returns>
         RedactionItem CreateRedactionItem(string sourceDocument, LongToObjectMap pageInfoMap)
         {
@@ -586,13 +586,13 @@ namespace Extract.Redaction.Verification
         /// Creates a <see cref="Extract.Redaction.RedactionItem"/> from the current row and <see cref="_attribute"/>.
         /// </summary>
         /// <param name="sourceDocument">The source document to use for the new attribute.</param>
-        /// <param name="pageInfoMap">The page infomation map to use for the new attribute.</param>
+        /// <param name="pageInfoMap">The page information map to use for the new attribute.</param>
         /// <returns>A <see cref="Extract.Redaction.RedactionItem"/> that corresponds to the row.</returns>
         RedactionItem GetUpdatedRedactionItem(string sourceDocument, LongToObjectMap pageInfoMap)
         {
             // Don't modify the original attribute as it may be in use elsewhere
-            ICopyableObject copy = (ICopyableObject)_attribute.ComAttribute;
-            ComAttribute attribute = (ComAttribute)copy.Clone();
+            ICloneIdentifiableObject copy = (ICloneIdentifiableObject)_attribute.ComAttribute;
+            ComAttribute attribute = (ComAttribute)copy.CloneIdentifiableObject();
 
             // Update the value
             if (_layerObjectsDirty)

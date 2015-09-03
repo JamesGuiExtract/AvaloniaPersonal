@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "UCLIDCOMUtils.h"
 #include "IUnknownVector.h"
+#include "COMUtilsMethods.h"
 
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
@@ -32,7 +33,8 @@ STDMETHODIMP CIUnknownVector::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IShallowCopyable,
 		&IID_ILicensedComponent,
 		&IID_IComparableObject,
-		&IID_IManageableMemory
+		&IID_IManageableMemory,
+		&IID_ICloneIdentifiableObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -806,9 +808,9 @@ STDMETHODIMP CIUnknownVector::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDi
 			
 			// We don't want the preparation to have side-effects on the data, so clone the vector
 			// first.
-			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopySource(getThisAsCOMPtr());
+			UCLID_COMUTILSLib::ICloneIdentifiableObjectPtr ipCopySource(getThisAsCOMPtr());
 			ASSERT_RESOURCE_ALLOCATION("ELI36347", ipCopySource != __nullptr);
-			UCLID_COMUTILSLib::IIUnknownVectorPtr ipClone = ipCopySource->Clone();
+			UCLID_COMUTILSLib::IIUnknownVectorPtr ipClone = ipCopySource->CloneIdentifiableObject();
 			ASSERT_RESOURCE_ALLOCATION("ELI36348", ipClone != __nullptr);
 
 			ipStorageManager->PrepareForStorage(ipClone);
@@ -882,21 +884,7 @@ STDMETHODIMP CIUnknownVector::CopyFrom(IUnknown *pObject)
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipSource = pObject;
 		ASSERT_RESOURCE_ALLOCATION("ELI08207", ipSource != __nullptr);
 	
-		// Clear this vector
-		clear();
-
-		long lSize = ipSource->Size();
-		for (long i = 0; i < lSize; i++)
-		{
-			// if this method is being called, it is expected that the IUnknowns
-			// stored in the input vector implement ICopyableObject
-			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyableObject = ipSource->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08208", ipCopyableObject != __nullptr);
-			
-			IUnknownPtr ipUnknownClone = ipCopyableObject->Clone();
-
-			m_vecIUnknowns.push_back(ipUnknownClone);
-		}
+		copyFrom(ipSource, false);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08209");
 
@@ -1250,6 +1238,46 @@ STDMETHODIMP CIUnknownVector::IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 }
 
 //-------------------------------------------------------------------------------------------------
+// ICloneIdentifiableObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CIUnknownVector::CloneIdentifiableObject(IUnknown ** pObject)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		UCLID_COMUTILSLib::ICloneIdentifiableObjectPtr ipCloneIdentifiable;
+		ipCloneIdentifiable.CreateInstance(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI38479", ipCloneIdentifiable != __nullptr);
+
+		IUnknownPtr ipUnk = this;
+		ipCloneIdentifiable->CopyFromIdentifiableObject(ipUnk);
+
+		*pObject = ipCloneIdentifiable.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38478");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CIUnknownVector::CopyFromIdentifiableObject(IUnknown *pObject)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		copyFrom(pObject, true);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38480");
+}
+
+//-------------------------------------------------------------------------------------------------
 // Helper function
 //-------------------------------------------------------------------------------------------------
 UCLID_COMUTILSLib::IIUnknownVectorPtr CIUnknownVector::getThisAsCOMPtr()
@@ -1318,3 +1346,19 @@ void CIUnknownVector::clear()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26061");
 }
 //-------------------------------------------------------------------------------------------------
+void CIUnknownVector::copyFrom(UCLID_COMUTILSLib::IIUnknownVectorPtr ipSource, bool bWithCloneIdentifiableObject)
+{
+	// Ensure that the object is a Vector
+	ASSERT_ARGUMENT("ELI08207", ipSource != __nullptr);
+	
+	// Clear this vector
+	clear();
+
+	long lSize = ipSource->Size();
+	for (long i = 0; i < lSize; i++)
+	{
+		IUnknownPtr ipUnknownClone = cloneObject("ELI38484", ipSource->At(i), bWithCloneIdentifiableObject);
+
+		m_vecIUnknowns.push_back(ipUnknownClone);
+	}
+}

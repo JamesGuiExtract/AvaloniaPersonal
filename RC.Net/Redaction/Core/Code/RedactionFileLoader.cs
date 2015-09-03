@@ -355,7 +355,7 @@ namespace Extract.Redaction
         /// <summary>
         /// Loads the contents of the voa file from the specified file.
         /// </summary>
-        /// <param name="attributes">The attribute heirarchy to load.</param>
+        /// <param name="attributes">The attribute hierarchy to load.</param>
         /// <param name="sourceDocument">The source document corresponding to the 
         /// <paramref name="attributes"/>.</param>
         [CLSCompliant(false)]
@@ -995,7 +995,7 @@ namespace Extract.Redaction
             if (!allowDuplicateSave && _alreadySaved)
             {
                 new ExtractException("ELI34362",
-                    "Unexepected VOA save detected; attribute duplication is possible.").Log();
+                    "Unexpected VOA save detected; attribute duplication is possible.").Log();
             }
 
             List<SensitiveItem> sensitiveItems = new List<SensitiveItem>(_sensitiveItems);
@@ -1228,8 +1228,8 @@ namespace Extract.Redaction
             IUnknownVector attributes = new IUnknownVector();
             foreach (ComAttribute attribute in _metadata)
             {
-                ICopyableObject copy = (ICopyableObject)attribute;
-                attributes.PushBack(copy.Clone());
+                ICloneIdentifiableObject copy = (ICloneIdentifiableObject)attribute;
+                attributes.PushBack(copy.CloneIdentifiableObject());
             }
 
             return attributes;
@@ -1402,7 +1402,8 @@ namespace Extract.Redaction
                 foreach (RedactionItem entry in entries)
                 {
                     ComAttribute changeEntry = entry.GetIdAttribute();
-                    subAttributes.PushBack(changeEntry);
+                    ICopyableObject clone = (ICopyableObject)changeEntry;
+                    subAttributes.PushBack((clone == null) ? changeEntry : clone.Clone());
                 }
             }
 
@@ -1445,8 +1446,8 @@ namespace Extract.Redaction
         ComAttribute CreateNonOutputAttribute(RedactionItem item)
         {
             // Copy the original attribute so other references to this object are not changed
-            ICopyableObject copy = (ICopyableObject) item.ComAttribute;
-            ComAttribute result = (ComAttribute) copy.Clone();
+            ICloneIdentifiableObject copy = (ICloneIdentifiableObject)item.ComAttribute;
+            ComAttribute result = (ComAttribute) copy.CloneIdentifiableObject();
 
             // Append the archive action attribute to this attribute
             ComAttribute archiveAction =

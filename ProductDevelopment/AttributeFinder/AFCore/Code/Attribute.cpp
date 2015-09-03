@@ -9,15 +9,15 @@
 #include <LicenseMgmt.h>
 #include <StringTokenizer.h>
 #include <cpputil.h>
-#include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <COMUtilsMethods.h>
 
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+const unsigned long gnCurrentVersion = 3;
 static const GUID gProfilingGUID = { 0x3f9058ec, 0x77e3, 0x43a5, 
 			{ 0x95, 0x35, 0x22, 0x97, 0x88, 0x67, 0x1d, 0x6a } };
 
@@ -85,7 +85,9 @@ STDMETHODIMP CAttribute::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IComparableObject,
 		&IID_IPersistStream,
-		&IID_IManageableMemory
+		&IID_IManageableMemory,
+		&IID_IIdentifiableObject,
+		&IID_ICloneIdentifiableObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -681,57 +683,7 @@ STDMETHODIMP CAttribute::raw_CopyFrom(IUnknown * pObject)
 		UCLID_AFCORELib::IAttributePtr ipSource = pObject;
 		ASSERT_RESOURCE_ALLOCATION("ELI08214", ipSource != __nullptr);
 
-		m_strAttributeName = asString(ipSource->Name);
-
-		ICopyableObjectPtr ipAttrSS(ipSource->Value);
-		ASSERT_RESOURCE_ALLOCATION("ELI08215", ipAttrSS != __nullptr);
-
-		m_ipAttributeValue = ipAttrSS->Clone();
-
-		m_strAttributeType = asString(ipSource->Type);
-
-		m_ipInputValidator = __nullptr;
-		IInputValidatorPtr ipIV = ipSource->InputValidator;
-		if (ipIV != __nullptr)
-		{
-			// only make a copy if the input validator is not null
-			ICopyableObjectPtr ipCopyableIV = ipIV;
-			ASSERT_RESOURCE_ALLOCATION("ELI08216", ipCopyableIV != __nullptr);
-
-			m_ipInputValidator = ipCopyableIV->Clone();
-		}
-
-		m_ipAttributeSplitter = __nullptr;
-		UCLID_AFCORELib::IAttributeSplitterPtr ipAS = ipSource->AttributeSplitter;
-		if (ipAS != __nullptr)
-		{
-			// only make a copy if the splitter is not null
-			ICopyableObjectPtr ipCopyableSplitter = ipAS;
-			ASSERT_RESOURCE_ALLOCATION("ELI08217", ipCopyableSplitter != __nullptr);
-
-			m_ipAttributeSplitter = ipCopyableSplitter->Clone();
-		}
-
-		m_ipSubAttributes = __nullptr;
-		IIUnknownVectorPtr ipSub = ipSource->SubAttributes;
-		if (ipSub != __nullptr)
-		{
-			ICopyableObjectPtr ipCopyableSubAttributes = ipSub; 
-			ASSERT_RESOURCE_ALLOCATION("ELI19119", ipCopyableSubAttributes != __nullptr);
-
-			m_ipSubAttributes = ipCopyableSubAttributes->Clone();
-		}
-
-		m_ipDataObject = __nullptr;
-		IUnknownPtr ipDataObject = ipSource->DataObject;
-		if (ipDataObject != __nullptr)
-		{
-			// only make a copy if the data object is not null
-			ICopyableObjectPtr ipCopyableDataObject = ipDataObject;
-			ASSERT_RESOURCE_ALLOCATION("ELI24913", ipCopyableDataObject != __nullptr);
-
-			m_ipDataObject = ipCopyableDataObject->Clone();
-		}
+		copyFrom (pObject, false);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08218");
 
@@ -1248,6 +1200,16 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 			m_ipDataObject = __nullptr;
 		}
 
+		if (nDataVersion >= 3)
+		{
+			loadGUID(pStream);
+		}
+		else
+		{
+			// This will create a GUID for older versions
+			getGUID();
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -1321,7 +1283,7 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 			writeObjectToStream(ipPersistentObj, pStream, "ELI09900", fClearDirty);
 		}
 
-		// Write Attribute Value to stream, this should always hava a value
+		// Write Attribute Value to stream, this should always have a value
 		ipPersistentObj = m_ipAttributeValue;
 		if (ipPersistentObj == __nullptr)
 		{
@@ -1368,6 +1330,8 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 			writeObjectToStream(ipPersistentObj, pStream, "ELI24406", fClearDirty);
 		}
 
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -1385,6 +1349,64 @@ STDMETHODIMP CAttribute::GetSizeMax(ULARGE_INTEGER * pcbSize)
 		return E_POINTER;
 		
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttribute::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38460")
+}
+
+//-------------------------------------------------------------------------------------------------
+// ICloneIdentifiableObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttribute::raw_CloneIdentifiableObject(IUnknown ** pObject)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ICloneIdentifiableObjectPtr ipCloneIdentifiable;
+		ipCloneIdentifiable.CreateInstance(CLSID_Attribute);
+		ASSERT_RESOURCE_ALLOCATION("ELI38472", ipCloneIdentifiable != __nullptr);
+
+		IUnknownPtr ipUnk = this;
+		ipCloneIdentifiable->CopyFromIdentifiableObject(ipUnk);
+
+		*pObject= ipCloneIdentifiable.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38470")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttribute::raw_CopyFromIdentifiableObject(IUnknown *pObject)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		copyFrom(pObject, true);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38470")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1492,3 +1514,36 @@ void CAttribute::validateLicense()
 	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI04900", "Attribute" );
 }
 //-------------------------------------------------------------------------------------------------
+void CAttribute::copyFrom(UCLID_AFCORELib::IAttributePtr ipSource, bool bWithCloneIdentifiableObject)
+{
+	ASSERT_ARGUMENT("ELI38483", ipSource != __nullptr);
+
+	m_strAttributeName = asString(ipSource->Name);
+
+	m_ipAttributeValue = cloneObject("ELI08215", ipSource->Value, bWithCloneIdentifiableObject);
+
+	m_strAttributeType = asString(ipSource->Type);
+
+	// only make a copy if the input validator is not null
+	m_ipInputValidator = cloneObject("ELI08216", ipSource->InputValidator, bWithCloneIdentifiableObject);
+
+	// only make a copy if the splitter is not null
+	m_ipAttributeSplitter = cloneObject("ELI08217", ipSource->AttributeSplitter, bWithCloneIdentifiableObject);
+
+	m_ipSubAttributes = cloneObject("ELI19119", ipSource->SubAttributes, bWithCloneIdentifiableObject);
+
+	// only make a copy if the data object is not null
+	m_ipDataObject = cloneObject("ELI24913", ipSource->DataObject, bWithCloneIdentifiableObject);
+
+	// if the ICloneIdentifiableObject should be used and the IdentifiableObject interface is implemented
+	// copy the GUID from the source
+	if (bWithCloneIdentifiableObject)
+	{
+		// Copy the GUID
+		IIdentifiableObjectPtr ipIdentifiable(ipSource);
+		if (ipIdentifiable != __nullptr)
+		{
+			setGUID(ipIdentifiable->InstanceGUID);
+		}
+	}
+}

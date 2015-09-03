@@ -3345,6 +3345,13 @@ namespace Extract.DataEntry
                     IUnknownVector attributesToPaste = (IUnknownVector)
                         MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
 
+                    // Make a copy of the attributes before using them
+                    ICopyableObject ipCopy = attributesToPaste;
+                    if (ipCopy != null)
+                    {
+                        attributesToPaste = (IUnknownVector)ipCopy.Clone();
+                    }
+
                     bool renameAttributesFromOtherTable = dataType != RowDataFormatName;
                     int count = attributesToPaste.Size();
                     for (int i = 0; i < count; i++)

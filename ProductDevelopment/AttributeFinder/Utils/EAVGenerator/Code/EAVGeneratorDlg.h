@@ -34,6 +34,7 @@ public:
 	CEdit	m_editType;
 	CEdit	m_editName;
 	CEdit	m_editAttributePath;
+	CEdit	m_editAttributeGUID;
 	CListCtrl	m_listAttributes;
 	CImageButtonWithStyle	m_btnUp;
 	CButton	m_btnAdd;
@@ -46,6 +47,7 @@ public:
 	CString	m_zValue;
 	CButton m_btnMerge;
 	CString m_zAttributePath;
+	CString m_zAttributeGUID;
 	CStatic m_labelFilename;
 	CButton m_radioReplace;
 	CButton m_radioAppend;
@@ -55,6 +57,7 @@ public:
 	CStatic m_labelName;
 	CStatic m_labelType;
 	CStatic m_labelValue;
+	CStatic m_labelAttributeGUID;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -127,7 +130,7 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// Constants
 	//----------------------------------------------------------------------------------------------
-	// static idenitifiers for the columns in the display list
+	// static identifiers for the columns in the display list
 	static const int	NAME_COLUMN	= 0;
 	static const int	VALUE_COLUMN = 1;
 	static const int	TYPE_COLUMN = 2;
@@ -186,6 +189,9 @@ private:
 
 	// Window position mgr
 	WindowPersistenceMgr m_wMgr;
+
+	// GUID's of attributes currently loaded
+	set<string> m_setOfGUIDs;
 
 	//////////
 	// Methods
@@ -346,6 +352,11 @@ private:
 
 	// PURPOSE: To handle moving/resizing the controls
 	void doResize();
+
+	// PURPOSE: To add attribute instanceGUID's to the set of GUID's and log an exception if
+	// a GUID is duplicated
+	void addGUIDToSet(IIdentifiableObjectPtr ipIdentityObject);
+
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

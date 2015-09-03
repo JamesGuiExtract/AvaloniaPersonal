@@ -1756,6 +1756,24 @@ library UCLID_COMUTILSLib
 		// memory if the object has been loaded from different callers.
 		[propget, id(1), helpstring("property InstanceGUID")] HRESULT InstanceGUID([out, retval] GUID *pGUID);
 	};
+
+	[
+		object,
+		uuid(934FF93C-E92C-4826-A4A0-E4D26A295FD7),
+		dual,
+		helpstring("ICloneIdentifiableObject"),
+		pointer_default(unique)
+	]
+	interface ICloneIdentifiableObject : IDispatch
+	{
+		// PURPOSE: To Clone the object including the GUID for an IIdentifiableObject
+		// NOTE: This assumes that the ICopyableObject interface does not copy the GUID
+		[id(1), helpstring("method CloneIdentifiableObject")] HRESULT CloneIdentifiableObject([out, retval] IUnknown* *pObject);
+
+		// PURPOSE: To Copy all properties from pObject to this object, including the GUID for an IIdentifiableObject
+		[id(2), helpstring("method CopyFromIdentifiableObject")] HRESULT CopyFromIdentifiableObject([in] IUnknown *pObject);
+	}
+
 	//---------------------------------------------------------------------------------------------
 	//-C O C L A S S E S --------------------------------------------------------------------------
 	//---------------------------------------------------------------------------------------------
@@ -1770,6 +1788,7 @@ library UCLID_COMUTILSLib
 		interface ICopyableObject;
 		interface IShallowCopyable;
 		interface IManageableMemory;
+		interface ICloneIdentifiableObject;
 	};
 	[
 		uuid(90BDF690-D7A8-4AFD-96DF-2816E789CBB3),

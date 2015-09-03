@@ -14,6 +14,7 @@
 #include <StopWatch.h>
 #include <MiscLeadUtils.h>
 #include <DateUtil.h>
+#include <COMUtilsMethods.h>
 
 #include <string>
 #include <set>
@@ -2504,7 +2505,7 @@ IAttributePtr CRedactionTask::createRedactedEntriesAttribute(const string& strSo
             IAttributePtr ipAttribute = ipRedactedAttributes->At(i);
             ASSERT_RESOURCE_ALLOCATION("ELI28417", ipAttribute != __nullptr);
 
-            IAttributePtr ipIdAttribute = getIdAttribute(ipAttribute);
+            IAttributePtr ipIdAttribute = cloneObject("ELI38558", getIdAttribute(ipAttribute), false);
             ASSERT_RESOURCE_ALLOCATION("ELI28418", ipIdAttribute != __nullptr);
 
             // Append the ID attribute

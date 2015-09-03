@@ -1786,8 +1786,8 @@ namespace Extract.DataEntry
 
                 // Create a copy of the data to be saved so that attributes that should
                 // not be persisted can be removed.
-                ICopyableObject copyThis = _attributes;
-                _mostRecentlySaveAttributes = (IUnknownVector)copyThis.Clone();
+                ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject)_attributes;
+                _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
 
                 PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
@@ -1829,8 +1829,8 @@ namespace Extract.DataEntry
                         {
                             // Create a copy of the data to be saved so that attributes that should
                             // not be persisted can be removed.
-                            ICopyableObject copyThis = _attributes;
-                            _mostRecentlySaveAttributes = (IUnknownVector)copyThis.Clone();
+                            ICloneIdentifiableObject copyThis = (ICloneIdentifiableObject) _attributes;
+                            _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
 
                             PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
@@ -2241,7 +2241,7 @@ namespace Extract.DataEntry
                         }
 
                         // Before performing the undo/redo, remove the active control status from
-                        // the the currently active control. Otherwise if undo attempts to revert
+                        // the currently active control. Otherwise if undo attempts to revert
                         // the status of currently selected attributes, it will not properly take
                         // effect even if a different control will be active once the operation is
                         // complete.

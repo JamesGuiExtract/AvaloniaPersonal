@@ -512,7 +512,7 @@ void CEAVGeneratorDlg::OnBtnSplit()
 				ipSplitter->SplitAttribute(ipAttribToSplit, NULL, NULL);
 
 				// get the level of the attribute that was split [P16 #2863]
-				// (ie. the number of periods preceeding its name)
+				// (ie. the number of periods preceding its name)
 				string strName = (LPCTSTR) 
 					m_listAttributes.GetItemText(nSelectedItemIndex, NAME_COLUMN);
 				int iLevel = strName.find_first_not_of('.', 0);
@@ -725,6 +725,7 @@ void CEAVGeneratorDlg::OnBtnNew()
 		m_zName.Empty();
 		m_zValue.Empty();
 		m_zType.Empty();
+		m_zAttributeGUID.Empty();
 		_lastCodePos = "40";
 
 		// clear current file name
@@ -758,7 +759,7 @@ void CEAVGeneratorDlg::OnBtnDown()
 		{
 			// get the index of the item right below currently selected item
 			int nBelowIndex = nSelectedItemIndex+1;
-
+			
 			// get selected item text from list
 			CString zName = m_listAttributes.GetItemText(nSelectedItemIndex, NAME_COLUMN);
 			CString zValue = m_listAttributes.GetItemText(nSelectedItemIndex, VALUE_COLUMN);
