@@ -78,8 +78,8 @@ public:
 // IAttributeDBMgr Methods
 	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
 	STDMETHOD(CreateNewAttributeSetForFile)(long fileID,
-												long attributeSetNameID,
-												BSTR VOAFileName);
+											long attributeSetNameID,
+											IIUnknownVector* pAttributes);
 	STDMETHOD(GetAttributeSetForFile)(IIUnknownVector** pAttributes, long fileID, long attributeSetForFileID);
 	STDMETHOD(GetNewestAttributeSetForFile)(IIUnknownVector** pAttributes, long fileID);
 	STDMETHOD(GetOldestAttributeSetForFile)(IIUnknownVector** pAttributes, long fileID);

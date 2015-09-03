@@ -38,7 +38,7 @@ library UCLID_AttributeDbMgrComponentsLib
 		[propput, id(1), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
 
 		[id(2), helpstring("method CreateNewAttributeSetForFile")] HRESULT CreateNewAttributeSetForFile([in] long fileID,
-			[in] long attributeSetNameID, [in] BSTR VOAFileName);
+			[in] long attributeSetNameID, [in] IIUnknownVector* pAttributes);
 		[id(3), helpstring("method GetAttributeSetForFile")] HRESULT GetAttributeSetForFile([out]IIUnknownVector** pAttributes, 
 			[in] long fileID, [in] long attributeSetNameID);
 		[id(4), helpstring("method GetNewestAttributeSetForFile")] HRESULT GetNewestAttributeSetForFile([out]IIUnknownVector** pAttributes,
