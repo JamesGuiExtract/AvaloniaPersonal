@@ -314,8 +314,8 @@ STDMETHODIMP CRandomMathCondition::raw_CheckCondition(IFileRecord* pFileRecord,
 			m_bSeeded = true;
 		}
 			
-		// Get a random number between 1 and 99 (inclusive)
-		int nNum = rand() % 99 + 1;
+		// Get a random number between 1 and 100 (inclusive)
+		int nNum = rand() % 100 + 1;
 
 		// Return true if the nNum <= m_nPercent
 		*pbResult = asVariantBool(nNum <= m_nPercent);
