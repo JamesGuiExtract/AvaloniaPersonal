@@ -257,7 +257,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the PaginationControls to be printed.
         /// </summary>
-        readonly ToolStripMenuItem _printMenuItem = new ToolStripMenuItem("Print selected document(s)");
+        readonly ToolStripMenuItem _printMenuItem = new ToolStripMenuItem("Print selected document(s)...");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the print operation.
