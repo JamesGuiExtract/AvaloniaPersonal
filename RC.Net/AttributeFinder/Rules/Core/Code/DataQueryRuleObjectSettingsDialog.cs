@@ -55,6 +55,7 @@ namespace Extract.AttributeFinder.Rules
                     ((o, e) => 
                         {
                             _useFAMDBCheckBox.Checked &= !_useSpecifiedDBCheckBox.Checked;
+                            _openSqlCompactReadOnlyCheckBox.Enabled = 
                             _databaseConnectionControl.Enabled = _useSpecifiedDBCheckBox.Checked;
                         });
 
@@ -66,6 +67,7 @@ namespace Extract.AttributeFinder.Rules
                     _queryScintillaBox.Text = Settings.Query;
                     _useFAMDBCheckBox.Checked = Settings.UseFAMDBConnection;
                     _useSpecifiedDBCheckBox.Checked = Settings.UseSpecifiedDBConnection;
+                    _openSqlCompactReadOnlyCheckBox.Checked = Settings.OpenSqlCompactReadOnly;
                     _databaseConnectionControl.DatabaseConnectionInfo =
                         new DatabaseConnectionInfo(Settings.DatabaseConnectionInfo);
                 }
@@ -269,6 +271,7 @@ namespace Extract.AttributeFinder.Rules
                 Settings.Query = _queryScintillaBox.Text;
                 Settings.UseFAMDBConnection = _useFAMDBCheckBox.Checked;
                 Settings.UseSpecifiedDBConnection = _useSpecifiedDBCheckBox.Checked;
+                Settings.OpenSqlCompactReadOnly = _openSqlCompactReadOnlyCheckBox.Checked;
                 Settings.DatabaseConnectionInfo = new DatabaseConnectionInfo(
                     _databaseConnectionControl.DatabaseConnectionInfo);
 

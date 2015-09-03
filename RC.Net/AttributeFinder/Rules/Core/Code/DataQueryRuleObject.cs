@@ -100,6 +100,15 @@ namespace Extract.AttributeFinder.Rules
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets whether to open SQL Compact DBs in a read-only fashion.
+        /// </summary>
+        bool OpenSqlCompactReadOnly
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
@@ -122,8 +131,9 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// <para>Version 2: Added UseFAMDbConnection and UseSpecifiedDbConnection.</para>
+        /// <para>Version 3: Added OpenSqlCompactReadOnly.</para>
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -161,6 +171,16 @@ namespace Extract.AttributeFinder.Rules
         AttributeFinderPathTags _pathTags = new AttributeFinderPathTags();
 
         /// <summary>
+        /// For each instance, keeps track of the local database copy to use.
+        /// </summary>
+        TemporaryFileCopyManager _localDatabaseCopyManager;
+
+        /// <summary>
+        /// Whether to open SQL Compact DBs in a read-only fashion.
+        /// </summary>
+        bool _openSqlCompactReadOnly;
+
+        /// <summary>
         /// <see langword="true"/> if changes have been made to <see cref="DataQueryRuleObject"/>
         /// since it was created; <see langword="false"/> if no changes have been made since it was
         /// created.
@@ -179,6 +199,7 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 _databaseConnectionInfo.PathTags = _pathTags;
+                _localDatabaseCopyManager = new TemporaryFileCopyManager();
             }
             catch (Exception ex)
             {
@@ -198,6 +219,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 CopyFrom(dataQueryRuleObject);
                 _databaseConnectionInfo.PathTags = _pathTags;
+                _localDatabaseCopyManager = new TemporaryFileCopyManager();
             }
             catch (Exception ex)
             {
@@ -386,6 +408,33 @@ namespace Extract.AttributeFinder.Rules
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI34785");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether to open SQL Compact DBs in a read-only fashion
+        /// </summary>
+        public bool OpenSqlCompactReadOnly
+        {
+            get
+            {
+                return _openSqlCompactReadOnly;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _openSqlCompactReadOnly)
+                    {
+                        _openSqlCompactReadOnly = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI38598");
                 }
             }
         }
@@ -659,6 +708,8 @@ namespace Extract.AttributeFinder.Rules
                     UseSpecifiedDBConnection = (reader.Version >= 2) ? reader.ReadBoolean() :
                         !string.IsNullOrWhiteSpace(DataProviderName);
 
+                    OpenSqlCompactReadOnly = reader.Version >= 3 ? reader.ReadBoolean() : false;
+
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
@@ -694,6 +745,8 @@ namespace Extract.AttributeFinder.Rules
 
                     writer.Write(UseFAMDBConnection);
                     writer.Write(UseSpecifiedDBConnection);
+
+                    writer.Write(OpenSqlCompactReadOnly);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -806,6 +859,12 @@ namespace Extract.AttributeFinder.Rules
                     _databaseConnectionInfo.Dispose();
                     _databaseConnectionInfo = null;
                 }
+
+                if (_localDatabaseCopyManager != null)
+                {
+                    _localDatabaseCopyManager.Dispose();
+                    _localDatabaseCopyManager = null;
+                }
             }
 
             // Dispose of unmanaged resources
@@ -853,6 +912,7 @@ namespace Extract.AttributeFinder.Rules
             DataConnectionString = source.DataConnectionString;
             UseFAMDBConnection = source.UseFAMDBConnection;
             UseSpecifiedDBConnection = source.UseSpecifiedDBConnection;
+            OpenSqlCompactReadOnly = source.OpenSqlCompactReadOnly;
 
             _dirty = true;
         }
@@ -882,7 +942,7 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 // Get a database connection. If an SQL CE DB, the database will be opened under a
-                // a temporary name (prefixed with '~').
+                // a temporary name.
                 string databaseWorkingCopyFileName = "";
                 string originalSQLCEDBFileName = "";
 
@@ -991,60 +1051,81 @@ namespace Extract.AttributeFinder.Rules
                         var connectionStringBuilder = new SqlConnectionStringBuilder(DataConnectionString);
                         originalFileName = _pathTags.Expand(connectionStringBuilder.DataSource);
 
-                        workingCopyFileName = Path.Combine(
-                            Path.GetDirectoryName(originalFileName),
-                            "~" + Path.GetFileName(originalFileName));
-
-                        if (File.Exists(workingCopyFileName))
+                        // If opening read-only then just create a temp copy of the DB
+                        if (OpenSqlCompactReadOnly)
                         {
-                            try
-                            {
-                                // If there is a previous copy of the working copy, if it can be deleted
-                                // the instance that created it is not still open and it can therefore
-                                // be ignored.
-                                FileSystemMethods.DeleteFile(workingCopyFileName);
-                            }
-                            catch
-                            {
-                                // But if it couldn't be deleted, another instance of SQLCDBEditor likely
-                                // already has the database open for editing; prevent it from being opened.
-                                ExtractException ee = new ExtractException("ELI35291",
-                                    "This database is currently being edited by another process.");
-                                ee.AddDebugData("Database Filename", originalFileName, false);
+                            workingCopyFileName = _localDatabaseCopyManager.GetCurrentTemporaryFileName(
+                                originalFileName, this, true, true);
 
-                                throw ee;
-                            }
-                        }
-
-                        // Create the new working copy.
-                        string sourceFileName = originalFileName;
-                        string destinationFileName = workingCopyFileName;
-                        FileSystemMethods.PerformFileOperationWithRetry(() =>
-                            File.Copy(sourceFileName, destinationFileName),
-                            true);
-                        File.SetAttributes(workingCopyFileName, FileAttributes.Hidden);
-
-                        // Set the new connection string.
-                        connectionStringBuilder.DataSource = workingCopyFileName;
-                        tempDatabaseConnectionInfo.ConnectionString =
-                            connectionStringBuilder.ConnectionString;
-
-                        try
-                        {
-                            // The path is already expanded, so there is no need to provide _pathTags.
-                            return tempDatabaseConnectionInfo.OpenConnection();
-                        }
-                        catch
-                        {
-                            // Cleanup the working copy.
-                            FileSystemMethods.DeleteFile(workingCopyFileName);
+                            // Set the new connection string.
+                            connectionStringBuilder.DataSource = workingCopyFileName;
+                            tempDatabaseConnectionInfo.ConnectionString =
+                                connectionStringBuilder.ConnectionString;
 
                             // Ensure the outer scope won't attempt to "clean up" a temporary database
                             // created by a different process.
                             workingCopyFileName = null;
-                            originalFileName = null;
 
-                            throw;
+                            return tempDatabaseConnectionInfo.OpenConnection();
+                        }
+                        // Else create a special version along side the original
+                        else
+                        {
+                            workingCopyFileName = Path.Combine(
+                                Path.GetDirectoryName(originalFileName),
+                                "~" + Path.GetFileName(originalFileName));
+
+                            if (File.Exists(workingCopyFileName))
+                            {
+                                try
+                                {
+                                    // If there is a previous copy of the working copy, if it can be deleted
+                                    // the instance that created it is not still open and it can therefore
+                                    // be ignored.
+                                    FileSystemMethods.DeleteFile(workingCopyFileName);
+                                }
+                                catch
+                                {
+                                    // But if it couldn't be deleted, another instance of SQLCDBEditor likely
+                                    // already has the database open for editing; prevent it from being opened.
+                                    ExtractException ee = new ExtractException("ELI35291",
+                                        "This database is currently being edited by another process.");
+                                    ee.AddDebugData("Database Filename", originalFileName, false);
+
+                                    throw ee;
+                                }
+                            }
+
+                            // Create the new working copy.
+                            string sourceFileName = originalFileName;
+                            string destinationFileName = workingCopyFileName;
+                            FileSystemMethods.PerformFileOperationWithRetry(() =>
+                                File.Copy(sourceFileName, destinationFileName),
+                                true);
+                            File.SetAttributes(workingCopyFileName, FileAttributes.Hidden);
+
+                            // Set the new connection string.
+                            connectionStringBuilder.DataSource = workingCopyFileName;
+                            tempDatabaseConnectionInfo.ConnectionString =
+                                connectionStringBuilder.ConnectionString;
+
+                            try
+                            {
+                                // The path is already expanded, so there is no need to provide _pathTags.
+                                return tempDatabaseConnectionInfo.OpenConnection();
+                            }
+                            catch
+                            {
+                                // Cleanup the working copy.
+                                FileSystemMethods.DeleteFile(workingCopyFileName);
+
+                                // Ensure the outer scope won't attempt to "clean up" a temporary database
+                                // created by a different process.
+                                workingCopyFileName = null;
+                                originalFileName = null;
+
+                                throw;
+                            }
                         }
                     }
                 }
