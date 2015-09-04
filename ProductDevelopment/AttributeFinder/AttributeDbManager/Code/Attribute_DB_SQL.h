@@ -168,35 +168,35 @@ static const std::string gstrDROP_CONSTRAINTS =
 static const std::string gstrREDEFINE_COLUMN_TYPES = 
 "ALTER TABLE [dbo].[AttributeSetName] ALTER COLUMN ID bigint;\n"
 "ALTER TABLE [dbo].[AttributeSetForFile] ALTER COLUMN [ID] bigint;\n"
-"ALTER TABLE [dbo].[AttributeSetForFile] ALTER COLUMN [AttributeSetNameID] bigint;\n"
+"ALTER TABLE [dbo].[AttributeSetForFile] ALTER COLUMN [AttributeSetNameID] bigint NOT NULL;\n"
 "ALTER TABLE [dbo].[AttributeName] ALTER COLUMN ID bigint;\n"
 "ALTER TABLE [dbo].[AttributeType] ALTER COLUMN ID bigint;\n"
 "ALTER TABLE [dbo].[AttributeInstanceType] ALTER COLUMN [AttributeID] bigint NOT NULL;\n"
 "ALTER TABLE [dbo].[AttributeInstanceType] ALTER COLUMN [AttributeTypeID] bigint NOT NULL;\n"
 "ALTER TABLE [dbo].[Attribute] ALTER COLUMN [ID] bigint;\n"
-"ALTER TABLE [dbo].[Attribute] ALTER COLUMN [AttributeSetForFileID] bigint;\n"
-"ALTER TABLE [dbo].[Attribute] ALTER COLUMN [AttributeNameID] bigint;\n"
+"ALTER TABLE [dbo].[Attribute] ALTER COLUMN [AttributeSetForFileID] bigint NOT NULL;\n"
+"ALTER TABLE [dbo].[Attribute] ALTER COLUMN [AttributeNameID] bigint NOT NULL;\n"
 "ALTER TABLE [dbo].[Attribute] ALTER COLUMN [ParentAttributeID] bigint;\n"
 "ALTER TABLE [dbo].[RasterZone] ALTER COLUMN [ID] bigint;\n"
-"ALTER TABLE [dbo].[RasterZone] ALTER COLUMN [AttributeID] bigint;";
+"ALTER TABLE [dbo].[RasterZone] ALTER COLUMN [AttributeID] bigint NOT NULL;";
 
 // define PKs and FKs *********************************************************
 static const std::string gstrDEFINE_PKS_AND_FKS = 
 "ALTER TABLE [dbo].[AttributeSetName] ADD CONSTRAINT [PK_AttributeSetName] PRIMARY KEY CLUSTERED ([ID] ASC);\n"
 "ALTER TABLE [dbo].[AttributeSetForFile] ADD CONSTRAINT [PK_AttributeSetForFile] PRIMARY KEY CLUSTERED ([ID] ASC);\n"
-"ALTER TABLE [dbo].[AttributeSetForFile] WITH CHECK ADD CONSTRAINT [FK_AttributeSetForFile_AttributeSetNameID] FOREIGN KEY([AttributeSetNameID]) REFERENCES [AttributeSetName] ([ID]);\n"
+"ALTER TABLE [dbo].[AttributeSetForFile] WITH CHECK ADD CONSTRAINT [FK_AttributeSetForFile_AttributeSetNameID] FOREIGN KEY([AttributeSetNameID]) REFERENCES [AttributeSetName] ([ID]) ON DELETE CASCADE ON UPDATE CASCADE;\n"
 "CREATE UNIQUE NONCLUSTERED INDEX [IX_FileID_AttributeSetNameID] ON [dbo].[AttributeSetForFile]([FileID] ASC, [AttributeSetNameID] ASC);\n"
 "ALTER TABLE [dbo].[AttributeName] ADD CONSTRAINT [PK_AttributeName] PRIMARY KEY CLUSTERED ([ID] ASC);\n"
 "ALTER TABLE [dbo].[AttributeType] ADD CONSTRAINT [PK_AttributeType] PRIMARY KEY CLUSTERED ([ID] ASC);\n"
 "ALTER TABLE [dbo].[AttributeInstanceType] ADD CONSTRAINT [PK_AttributeInstanceType] PRIMARY KEY CLUSTERED ([AttributeID] ASC, [AttributeTypeID] ASC);\n"
 "ALTER TABLE [dbo].[Attribute] ADD CONSTRAINT [PK_Attribute] PRIMARY KEY CLUSTERED ([ID] ASC);\n"
-"ALTER TABLE [dbo].[Attribute] WITH CHECK ADD CONSTRAINT [FK_Attribute_AttributeSetForFileID] FOREIGN KEY([AttributeSetForFileID]) REFERENCES [AttributeSetForFile] ([ID]);\n"
-"ALTER TABLE [dbo].[Attribute] WITH CHECK ADD CONSTRAINT [FK_Attribute_AttributeNameID] FOREIGN KEY([AttributeNameID]) REFERENCES [AttributeName] ([ID]);\n"
+"ALTER TABLE [dbo].[Attribute] WITH CHECK ADD CONSTRAINT [FK_Attribute_AttributeSetForFileID] FOREIGN KEY([AttributeSetForFileID]) REFERENCES [AttributeSetForFile] ([ID]) ON DELETE CASCADE ON UPDATE CASCADE;\n"
+"ALTER TABLE [dbo].[Attribute] WITH CHECK ADD CONSTRAINT [FK_Attribute_AttributeNameID] FOREIGN KEY([AttributeNameID]) REFERENCES [AttributeName] ([ID]) ON DELETE CASCADE ON UPDATE CASCADE;\n"
 "ALTER TABLE [dbo].[Attribute] WITH CHECK ADD CONSTRAINT [FK_Attribute_ParentAttributeID] FOREIGN KEY([ParentAttributeID]) REFERENCES [Attribute] ([ID]);\n"
-"ALTER TABLE [dbo].[AttributeInstanceType] WITH CHECK ADD CONSTRAINT [FK_Attribute_Instance_Type_AttributeID] FOREIGN KEY([AttributeID]) REFERENCES [Attribute] ([ID]);\n"
-"ALTER TABLE [dbo].[AttributeInstanceType] WITH CHECK ADD CONSTRAINT [FK_Attribute_Instance_Type_AttributeTypeID] FOREIGN KEY([AttributeTypeID]) REFERENCES [AttributeType] ([ID]);\n"
+"ALTER TABLE [dbo].[AttributeInstanceType] WITH CHECK ADD CONSTRAINT [FK_Attribute_Instance_Type_AttributeID] FOREIGN KEY([AttributeID]) REFERENCES [Attribute] ([ID]) ON DELETE CASCADE ON UPDATE CASCADE;\n"
+"ALTER TABLE [dbo].[AttributeInstanceType] WITH CHECK ADD CONSTRAINT [FK_Attribute_Instance_Type_AttributeTypeID] FOREIGN KEY([AttributeTypeID]) REFERENCES [AttributeType] ([ID]) ON DELETE CASCADE ON UPDATE CASCADE;\n"
 "ALTER TABLE [dbo].[RasterZone] ADD CONSTRAINT [PK_RasterZone] PRIMARY KEY CLUSTERED ([ID] ASC);\n"
-"ALTER TABLE [dbo].[RasterZone] WITH CHECK ADD CONSTRAINT [FK_RasterZone_AttributeID] FOREIGN KEY([AttributeID]) REFERENCES [Attribute] ([ID]);";
+"ALTER TABLE [dbo].[RasterZone] WITH CHECK ADD CONSTRAINT [FK_RasterZone_AttributeID] FOREIGN KEY([AttributeID]) REFERENCES [Attribute] ([ID]) ON DELETE CASCADE ON UPDATE CASCADE;";
 
 // All version 2 tables are redefined here.
 // 10.3 table (name) additions
