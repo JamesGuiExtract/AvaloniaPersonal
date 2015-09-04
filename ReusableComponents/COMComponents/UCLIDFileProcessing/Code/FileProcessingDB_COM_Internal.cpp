@@ -570,7 +570,7 @@ int UpdateToSchemaVersion113(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vector<string> vecQueries;
 
-		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE);
+		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE_V113);
 		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX);
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_ACTION_FK);

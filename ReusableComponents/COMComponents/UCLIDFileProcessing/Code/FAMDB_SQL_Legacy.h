@@ -5,16 +5,6 @@
 
 #include <string>
 
-// For use in updating from version 127 and before
-static const std::string gstrCREATE_FAM_SKIPPED_FILE_TABLE_V17 = "CREATE TABLE [dbo].[SkippedFile] ("
-	"[ID] [int] IDENTITY(1,1) NOT NULL, "
-	"[UserName] [nvarchar](50) NULL, "
-	"[FileID] [int] NULL, "
-	"[ActionID] [int] NULL, "
-	"[DateTimeStamp] [datetime] NOT NULL CONSTRAINT [DF_SkippedFile_DateTimeStamp] DEFAULT((GETDATE())), "
-	"[TimeSinceSkipped] AS (DATEDIFF(second,[DateTimeStamp],GETDATE())), " // Computed column for time skipped
-	"[UPIID] [int] NOT NULL DEFAULT(0), "
-	"CONSTRAINT [PK_FAMSkippedFile] PRIMARY KEY CLUSTERED ([ID] ASC))";
 
 // The ProcessingFAM table is now the ActiveFAM table, but this definition needs to remain for the
 // schema update process.
@@ -70,10 +60,6 @@ static const std::string gstrCREATE_WORK_ITEM_GROUP_TABLE_V118 =
 	"[StringizedSettings] [nvarchar](MAX) NULL,"
 	"[UPI] [nvarchar](450) NULL, "
 	"[NumberOfWorkItems] [int] NOT NULL)";
-
-// For use in updating from version 127 and before
-static const std::string gstrCREATE_SKIPPED_FILE_UPI_INDEX_V17 = "CREATE NONCLUSTERED INDEX "
-	"[IX_Skipped_File_UPI] ON [SkippedFile]([UPIID])";
 
 // For use in updating from version 127 and before
 static const std::string gstrCREATE_ACTIVE_FAM_UPI_INDEX_V110 = "CREATE UNIQUE NONCLUSTERED INDEX "
