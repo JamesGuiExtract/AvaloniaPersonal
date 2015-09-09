@@ -34,9 +34,6 @@ library UCLID_DATAENTRYCUSTOMCOMPONENTSLib
 	interface IDataEntryProductDBMgr : IDispatch
 	{
 		//-----------------------------------------------------------------------------------------
-		// PROMISE: To set the FAMDB
-		[propput, id(2), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
-		//-----------------------------------------------------------------------------------------
 		// PROMISE: To record counts into the DataEntryCounterValue table for all counters defined
 		//			in the DataEntryCounterDefinition table. 
 		// ARGS:	-plInstanceToken: -1 to calculate counter values associated with OnLoad.
@@ -56,6 +53,12 @@ library UCLID_DATAENTRYCUSTOMCOMPONENTSLib
 		[id(4), helpstring("method AddDataEntryData")] HRESULT AddDataEntryData([in] long lFileID, 
 			[in] long nActionID, [in] double dDuration, [in] double dOverheadTime,
 			[out, retval] long* plInstanceID);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Initializes the class instance to record DataEntry data against the specified
+		//			pFAMDB for the FAM task represented by guidTaskClass (The GUID of the
+		//			IFileProcessingTask's implementing class).
+		[id(5), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB* pFAMDB,
+			[in] GUID guidTaskClass);
 	};
 
 	[

@@ -51,7 +51,7 @@ CRedactionTask::CRedactionTask()
 {
     ASSERT_RESOURCE_ALLOCATION("ELI19993", m_ipAttributeNames != __nullptr);
 
-    // set members to their inital states
+    // set members to their initial states
     clear();
 
     // Add the default selected Attributes to the collection (P16 #2751)
@@ -659,11 +659,11 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         if (ipFAMDB != __nullptr)
         {
             // Set the FAMDB pointer
-            UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipIDSDB = getIDShieldDBPtr();
-            ipIDSDB->FAMDB = ipFAMDB;
+            UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipIDSDB =
+				getIDShieldDBPtr(ipFAMDB);
 
             // Add the IDShieldData record to the database
-            ipIDSDB->AddIDShieldData(nFileID, VARIANT_FALSE, swProcessingTime.getElapsedTime(), 0, 
+            ipIDSDB->AddIDShieldData(nFileID, swProcessingTime.getElapsedTime(), 0, 
                 idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
                 idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions,
                 idsData.m_lNumPagesAutoAdvanced);
@@ -2578,7 +2578,8 @@ void CRedactionTask::fillAttributeSet(IVariantVectorPtr ipAttributeNames, set<st
     }
 }
 //-------------------------------------------------------------------------------------------------
-UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr CRedactionTask::getIDShieldDBPtr()
+UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr CRedactionTask::getIDShieldDBPtr(
+	IFileProcessingDBPtr ipFAMDB)
 {
     if (m_ipIDShieldDB == __nullptr)
     {
@@ -2587,7 +2588,10 @@ UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr CRedactionTask::get
 		
         m_ipIDShieldDB.CreateInstance((LPCSTR)ipFAMDBUtils->GetIDShieldDBProgId());
         ASSERT_RESOURCE_ALLOCATION("ELI19794", m_ipIDShieldDB != __nullptr);		
+
+		m_ipIDShieldDB->Initialize(ipFAMDB, CLSID_RedactionTask);
     }
+
     return m_ipIDShieldDB;
 }
 //-------------------------------------------------------------------------------------------------

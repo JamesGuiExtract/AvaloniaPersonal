@@ -1215,6 +1215,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrMETADATA_FIELD_VALUE_VALUE_INDEX);
 		vecQueries.push_back(gstrCREATE_FAST_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_FAST_FILEID_ACTIONID_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX);
 		
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -1248,7 +1250,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_STATE_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTIVEFAM_FK);
-		vecQueries.push_back(gstrADD_ACTION_ACTIVEFAM_FAM_SESSION_FK);
+		vecQueries.push_back(gstrADD_ACTIVEFAM_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_ACTION_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_MACHINE_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_FAMUSER_FK);
@@ -1287,6 +1289,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_WORK_ITEM_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_METADATA_FIELD_VALUE_METADATA_FIELD_FK);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAM_SESSION_FK);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_TASK_CLASS_FK);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAMFILE_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1419,6 +1424,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_TABLE);
 	vecQueries.push_back(gstrCREATE_WORK_ITEM_TABLE);
 	vecQueries.push_back(gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE);
+	vecQueries.push_back(gstrCREATE_TASK_CLASS);
+	vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION);
 
 	return vecQueries;
 }
@@ -2745,6 +2752,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrWORK_ITEM_GROUP);
 	vecTables.push_back(gstrMETADATA_FIELD);
 	vecTables.push_back(gstrFILE_METADATA_FIELD_VALUE);
+	vecTables.push_back(gstrTASK_CLASS);
+	vecTables.push_back(gstrFILE_TASK_SESSION);
 
 }
 //--------------------------------------------------------------------------------------------------

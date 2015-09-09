@@ -28,7 +28,7 @@ using namespace std;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-static const long glDATAENTRY_DB_SCHEMA_VERSION = 3;
+static const long glDATAENTRY_DB_SCHEMA_VERSION = 4;
 static const string gstrDATA_ENTRY_SCHEMA_VERSION_NAME = "DataEntrySchemaVersion";
 static const string gstrSTORE_DATAENTRY_PROCESSING_HISTORY = "StoreDataEntryProcessingHistory";
 static const string gstrSTORE_HISTORY_DEFAULT_SETTING = "1"; // TRUE
@@ -66,6 +66,42 @@ int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33952");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 4;
+
+		if (pnNumSteps != __nullptr)
+		{
+			long nSteps = 0;
+			executeCmdQuery(ipConnection, 
+				"SELECT COUNT(*) AS [ID] FROM [DataEntryData]", false, &nSteps);
+
+			nSteps /= 100;
+			nSteps += 3;
+			*pnNumSteps += nSteps;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE [DataEntryCounterValue] DROP CONSTRAINT [FK_DataEntryCounterValue_Instance]");
+		vecQueries.push_back(gstrPORT_DATAENTRYDATA_TO_FILETASKSESSION);
+		vecQueries.push_back("DROP TABLE [DataEntryData]");
+		vecQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_INSTANCE_V4);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '4' WHERE [Name] = '" + 
+			gstrDATA_ENTRY_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38600");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CDataEntryProductDBMgr
@@ -78,6 +114,7 @@ CDataEntryProductDBMgr::CDataEntryProductDBMgr()
 , m_lNextInstanceToken(0)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
+, m_strTaskClassID()
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -207,13 +244,8 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 		vector<string> vecCreateQueries(vecTableCreationQueries.begin(), vecTableCreationQueries.end());
 
 		// Add the queries to create keys/constraints.
-		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_FAMFILE);
-		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_FAMUSER);
-		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_ACTION);
-		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_MACHINE);
-		vecCreateQueries.push_back(gstrCREATE_FILEID_DATETIMESTAMP_INDEX);
 		vecCreateQueries.push_back(gstrPOPULATE_DATAENTRY_COUNTER_TYPES);
-		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_INSTANCE);
+		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_INSTANCE_V4);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_ID);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_TYPE);
 
@@ -421,6 +453,10 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_GetTables(IVariantVector** ppTables)
 			ipTables->PushBack(iter->c_str());
 		}
 
+		// Legacy table names:
+		// FileTaskSession replaces DataEntryData in schema version 4
+		ipTables->PushBack(gstrDATA_ENTRY_DATA.c_str());
+
 		*ppTables = ipTables.Detach();
 
 		return S_OK;
@@ -465,7 +501,15 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion3(ipConnection, pnNumSteps, NULL);
 					}
-			case 3: break;
+					break;
+
+			case 3:	if (nFAMDBSchemaVersion == 129)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion4(ipConnection, pnNumSteps, NULL);
+					}
+					break;
+
+			case 4: break;
 
 			default:
 				{
@@ -508,29 +552,6 @@ STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nAction
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29008");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDataEntryProductDBMgr::put_FAMDB(IFileProcessingDB* newVal)
-{
-	try
-	{
-		AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-		ASSERT_ARGUMENT("ELI28996", newVal != __nullptr);
-
-		// Only update if it is a new value
-		if (m_ipFAMDB != newVal)
-		{
-			m_ipFAMDB = newVal;
-			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
-		
-			// Reset the database connection
-			m_ipDBConnection = __nullptr;
-		}
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28997");
-}
-//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 									long lDataEntryDataInstanceID, IIUnknownVector* pAttributes)
 {
@@ -548,6 +569,34 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29056");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDataEntryProductDBMgr::Initialize(IFileProcessingDB* pFAMDB, GUID guidTaskClass)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		ASSERT_ARGUMENT("ELI38615", pFAMDB != nullptr);
+
+		// m_ipFAMDB needs to be set before Initialize_Internal can properly attempt optimistic
+		// locking.
+		m_ipFAMDB = pFAMDB;
+		ASSERT_RESOURCE_ALLOCATION("ELI38616", m_ipFAMDB != nullptr);
+
+		m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
+
+		if (!Initialize_Internal(false, guidTaskClass))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
+
+			Initialize_Internal(true, guidTaskClass);
+		}
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38609");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -613,7 +662,6 @@ void CDataEntryProductDBMgr::validateLicense()
 void CDataEntryProductDBMgr::getDataEntryTables(vector<string>& rvecTables)
 {
 	rvecTables.clear();
-	rvecTables.push_back(gstrDATA_ENTRY_DATA);
 	rvecTables.push_back(gstrDATAENTRY_DATA_COUNTER_DEFINITION);
 	rvecTables.push_back(gstrDATAENTRY_DATA_COUNTER_TYPE);
 	rvecTables.push_back(gstrDATAENTRY_DATA_COUNTER_VALUE);
@@ -673,6 +721,11 @@ bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFil
 		{
 			ASSERT_ARGUMENT("ELI29051", plInstanceID != __nullptr);
 
+			if (m_strTaskClassID.empty())
+			{
+				throw UCLIDException("ELI38610", "TaskClass ID has not been set.");
+			}
+
 			// Validate data entry schema
 			validateDataEntrySchemaVersion(true);
 
@@ -691,10 +744,12 @@ bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFil
 			long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
 
 			// Build insert SQL query 
-			string strInsertSQL = gstrINSERT_DATAENTRY_DATA_RCD + "(" + strFileId
-				+ ", " + asString(nUserID) + ", " + asString(nActionID) + ", "
-				+ asString(nMachineID) + ", GETDATE(), " + asString(dDuration) + ", "
-				+ asString(dOverheadTime) + ")";
+			string strInsertSQL = gstrINSERT_FILETASKSESSION_DATA_RCD;
+			replaceVariable(strInsertSQL, "<FAMSessionID>", asString(m_ipFAMDB->FAMSessionID));
+			replaceVariable(strInsertSQL, "<TaskClassID>", m_strTaskClassID);
+			replaceVariable(strInsertSQL, "<FileID>", strFileId);
+			replaceVariable(strInsertSQL, "<Duration>", asString(dDuration));
+			replaceVariable(strInsertSQL, "<OverheadTime>", asString(dOverheadTime));
 
 			// Create a transaction guard
 			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -703,6 +758,7 @@ bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFil
 			if (!m_bStoreDataEntryProcessingHistory)
 			{
 				string strDeleteQuery = gstrDELETE_PREVIOUS_STATUS_FOR_FILEID;
+				replaceVariable(strDeleteQuery, "<TaskClassID>", m_strTaskClassID);
 				replaceVariable(strDeleteQuery, "<FileID>", strFileId);
 
 				// Delete previous records with the fileID
@@ -865,6 +921,55 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CDataEntryProductDBMgr::Initialize_Internal(bool bDBLocked, GUID guidTaskClass)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+			_ConnectionPtr ipConnection = __nullptr;
+			string strTaskClassID;
+
+			BEGIN_ADO_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			long nTaskClassID = 0;
+			executeCmdQuery(ipConnection,
+				"SELECT [ID] FROM [TaskClass] WHERE [GUID] = '" + asString(guidTaskClass) + "'",
+				false, &nTaskClassID);
+
+			ASSERT_RESOURCE_ALLOCATION("ELI38611", nTaskClassID != 0);
+
+			strTaskClassID = asString(nTaskClassID);
+
+			END_ADO_CONNECTION_RETRY(
+				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI38612");
+
+			if (!m_strTaskClassID.empty() && strTaskClassID != m_strTaskClassID)
+			{
+				UCLIDException ue("ELI38613", "A different task class ID has already been assigned.");
+				ue.addDebugInfo("GUID", asString(guidTaskClass));
+				throw ue;
+			}
+
+			m_strTaskClassID = strTaskClassID;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38614");
+	}
+	catch(UCLIDException ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
 const vector<string> CDataEntryProductDBMgr::getTableCreationQueries(bool bAddUserTables)
 {
 	vector<string> vecQueries;
@@ -872,7 +977,6 @@ const vector<string> CDataEntryProductDBMgr::getTableCreationQueries(bool bAddUs
 	// WARNING: If any table is removed, code needs to be modified so that
 	// findUnrecognizedSchemaElements does not treat the element on old schema versions as
 	// unrecognized.
-	vecQueries.push_back(gstrCREATE_DATAENTRY_DATA);
 	if (bAddUserTables)
 	{
 		vecQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_DEFINITION);
@@ -895,4 +999,4 @@ map<string, string> CDataEntryProductDBMgr::getDBInfoDefaultValues()
 	mapDefaultValues[gstrENABLE_DATA_ENTRY_COUNTERS] = gstrENABLE_DATA_ENTRY_COUNTERS_DEFAULT_SETTING;
 
 	return mapDefaultValues;
-}//-------------------------------------------------------------------------------------------------
+}

@@ -193,7 +193,8 @@ private:
 	void fillAttributeSet(IVariantVectorPtr ipAttributeNames, set<string>& rsetAttributeNames);
 
 	// Allocates m_ipIDShieldDB pointer if it does not exist and returns m_ipIDShieldDB
-	UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr getIDShieldDBPtr();
+	UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr getIDShieldDBPtr(
+		IFileProcessingDBPtr ipFAMDB);
 
 	// Gets the exemption codes associated with the specified attribute
 	string getExemptionCodes(IAttributePtr ipAttribute);

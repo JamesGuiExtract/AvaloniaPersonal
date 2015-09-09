@@ -558,9 +558,6 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
     interface IIDShieldProductDBMgr : IDispatch
     {
         //-----------------------------------------------------------------------------------------
-        // PROMISE: To set the FAMDB
-        [propput, id(2), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
-        //-----------------------------------------------------------------------------------------
         // PROMISE: To return a recordset opened with the results of the query in bstrQuery
         [id(3), helpstring("method GetResultsForQuery")] HRESULT GetResultsForQuery([in] BSTR bstrQuery, 
             [out,retval] _Recordset** ppVal);
@@ -572,10 +569,16 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
         // PROMISE: To add a record in the IDShieldData table in the database for the file with the
         //          given values.
         [id(5), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData([in] long lFileID, 
-            [in] VARIANT_BOOL vbVerified, [in] double dDuration, [in] double dOverheadTime,
-			[in] long lNumHCDataFound, [in] long lNumMCDataFound, [in] long lNumLCDataFound,
-			[in] long lNumCluesDataFound, [in] long lTotalRedactions,
-			[in] long lTotalManualRedactions, [in] long lNumPagesAutoAdvanced);
+            [in] double dDuration, [in] double dOverheadTime, [in] long lNumHCDataFound,
+			[in] long lNumMCDataFound, [in] long lNumLCDataFound, [in] long lNumCluesDataFound,
+			[in] long lTotalRedactions, [in] long lTotalManualRedactions,
+			[in] long lNumPagesAutoAdvanced);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Initializes the class instance to record IDShield data against the specified
+		//			pFAMDB for the FAM task represented by guidTaskClass (The GUID of the
+		//			IFileProcessingTask's implementing class).
+		[id(6), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB* pFAMDB,
+			[in] GUID guidTaskClass);
     };
 
     [

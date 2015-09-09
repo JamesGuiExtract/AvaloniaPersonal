@@ -1000,7 +1000,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     Type mgrType = Type.GetTypeFromProgID(famDBUtils.GetDataEntryDBProgId());
 
                     _dataEntryDatabaseManager = (DataEntryProductDBMgr)Activator.CreateInstance(mgrType);
-                    _dataEntryDatabaseManager.FAMDB = fileProcessingDB;
+                    _dataEntryDatabaseManager.Initialize(fileProcessingDB, typeof(ComClass).GUID);
                 }
 
                 _imageViewer.OpenImage(fileName, false);

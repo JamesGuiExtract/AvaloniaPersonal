@@ -176,12 +176,12 @@ static const string gstrCREATE_FPS_FILE_TABLE =
 static const string gstrCREATE_FAM_SESSION =
 	"CREATE TABLE [dbo].[FAMSession] ("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FAMSession] PRIMARY KEY CLUSTERED, "
-	"[MachineID] int NOT NULL, "
-	"[FAMUserID] int NOT NULL, "
+	"[MachineID] [int] NOT NULL, "
+	"[FAMUserID] [int] NOT NULL, "
 	"[UPI] [nvarchar](450), "
-	"[StartTime] datetime NOT NULL CONSTRAINT [DF_FAMSession_StartTime] DEFAULT((GETDATE())), "
-	"[StopTime] datetime, "
-	"[FPSFileID] int NOT NULL, "
+	"[StartTime] [datetime] NOT NULL CONSTRAINT [DF_FAMSession_StartTime] DEFAULT((GETDATE())), "
+	"[StopTime] [datetime], "
+	"[FPSFileID] [int], "
 	"[ActionID] [int], "
 	"[Queuing] [bit],"
 	"[Processing] [bit])";
@@ -336,6 +336,24 @@ static const string gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE =
 	"[MetadataFieldID] INT NOT NULL, "
 	"[Value] NVARCHAR(400))";
 
+static const string gstrCREATE_TASK_CLASS = 
+	"CREATE TABLE [dbo].[TaskClass]( "
+	" [ID] [INT] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_TaskClass] PRIMARY KEY CLUSTERED, "
+	" [GUID] [UNIQUEIDENTIFIER] NOT NULL, "
+	" [Name] [NVARCHAR](400) NOT NULL "
+	"CONSTRAINT [IX_TaskClass_GUID] UNIQUE NONCLUSTERED ([GUID] ASC), "
+	"CONSTRAINT [IX_TaskClass_Name] UNIQUE NONCLUSTERED ([Name] ASC))";
+
+static const string gstrCREATE_FILE_TASK_SESSION = 
+	"CREATE TABLE [dbo].[FileTaskSession]( "
+	" [ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FileTaskSession] PRIMARY KEY CLUSTERED, "
+	" [FAMSessionID] [int] NOT NULL, "
+	" [TaskClassID] [int] NOT NULL, "
+	" [FileID] [int] NOT NULL, "
+	" [DateTimeStamp] [datetime] NULL, "
+	" [Duration] [float] NULL, "
+	" [OverheadTime] [float] NULL)";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -417,6 +435,14 @@ static const string gstrCREATE_FAST_FILEID_ACTIONID_INDEX =
 	"CREATE NONCLUSTERED INDEX IX_FAST_FILEID_ACTIONID "
 	"ON [dbo].[FileActionStateTransition] ([FileID],[ActionID]) "
 	"INCLUDE ([ID]) ";
+
+static const string gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX = 
+	"CREATE NONCLUSTERED INDEX [IX_FileTaskSession_DateTimeStamp] ON [dbo].[FileTaskSession] "
+	"([FileID] ASC, [DateTimeStamp] ASC)";
+
+static const string gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX = 
+	"CREATE NONCLUSTERED INDEX [IX_FileTaskSession_FAMSession] ON [dbo].[FileTaskSession] "
+	"([FAMSessionID] ASC)";
 
 	// Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
@@ -573,7 +599,7 @@ static const string gstrADD_LOCKED_FILE_ACTIVEFAM_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
-static const string gstrADD_ACTION_ACTIVEFAM_FAM_SESSION_FK =
+static const string gstrADD_ACTIVEFAM_FAM_SESSION_FK =
 	"ALTER TABLE [dbo].[ActiveFAM]  "
 	"WITH CHECK ADD  CONSTRAINT [FK_ActiveFAM_FAMSession] FOREIGN KEY([FAMSessionID])"
 	"REFERENCES [dbo].[FAMSession] ([ID])";
@@ -843,6 +869,21 @@ static const string gstrADD_METADATA_FIELD_VALUE_METADATA_FIELD_FK =
 	"REFERENCES [MetadataField] ([ID])  "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
+
+static const string gstrADD_FILE_TASK_SESSION_FAM_SESSION_FK =
+	"ALTER TABLE [dbo].[FileTaskSession]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_FAMSession] FOREIGN KEY([FAMSessionID])"
+	"REFERENCES [dbo].[FAMSession] ([ID])";
+
+static const string gstrADD_FILE_TASK_SESSION_TASK_CLASS_FK =
+	"ALTER TABLE [dbo].[FileTaskSession]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_TaskClass] FOREIGN KEY([TaskClassID])"
+	"REFERENCES [dbo].[TaskClass] ([ID])";
+
+static const string gstrADD_FILE_TASK_SESSION_FAMFILE_FK =
+	"ALTER TABLE [dbo].[FileTaskSession]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_FAMFile] FOREIGN KEY([FileID])"
+	"REFERENCES [dbo].[FAMFile] ([ID])";
 
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_NAME_VAL = "<LockName>";

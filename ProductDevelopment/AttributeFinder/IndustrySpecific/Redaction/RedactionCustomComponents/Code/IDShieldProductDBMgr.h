@@ -72,13 +72,13 @@ public:
 		long* pnNumSteps, IProgressStatus* pProgressStatus);
 
 // IIDShieldProductDBMgr Methods
-	STDMETHOD(AddIDShieldData)(long lFileID, VARIANT_BOOL vbVerified, double dDuration,
-		double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound,
+	STDMETHOD(AddIDShieldData)(long lFileID, double dDuration, double dOverheadTime,
+		long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound,
 		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
 		long lNumPagesAutoAdvanced);
-	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* plFileID);
+	STDMETHOD(Initialize)(IFileProcessingDB* pFAMDB, GUID guidTaskClass);
 
 private:
 	// Variables
@@ -99,6 +99,10 @@ private:
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
 
+	// The GUID for the class implementing the IFileProcessingTask instance for which data is to be
+	// logged.
+	string m_strTaskClassID;
+
 	// Methods
 	
 	// Returns the m_ipDBConnection value, if it is NULL it is created using the 
@@ -116,14 +120,16 @@ private:
 	void validateLicense();
 
 	// Internal versions of external methods that may require database locking
-	bool AddIDShieldData_Internal(bool bDBLocked, long lFileID, VARIANT_BOOL vbVerified,
-		double dDuration, double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
+	bool AddIDShieldData_Internal(bool bDBLocked, long lFileID, double dDuration,
+		double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
 		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
 		long lTotalManualRedactions, long lNumPagesAutoAdvanced);
 
 	bool GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery, _Recordset** ppVal);
 
 	bool GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, long* plFileID);
+
+	bool Initialize_Internal(bool bDBLocked, GUID guidTaskClass);
 
 	// Retrieves the set of SQL queries used to create the IDShield specific database tables.
 	const vector<string> getTableCreationQueries();

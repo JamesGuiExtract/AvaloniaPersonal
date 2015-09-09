@@ -72,6 +72,8 @@ static const string gstrWORK_ITEM="WorkItem";
 static const string gstrWORK_ITEM_GROUP="WorkItemGroup";
 static const string gstrMETADATA_FIELD="MetadataField";
 static const string gstrFILE_METADATA_FIELD_VALUE="FileMetadataFieldValue";
+static const string gstrTASK_CLASS="TaskClass";
+static const string gstrFILE_TASK_SESSION="FileTaskSession";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB

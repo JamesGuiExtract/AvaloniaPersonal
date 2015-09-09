@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-
+	
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
@@ -73,9 +73,9 @@ public:
 // IDataEntryProductDBMgr Methods
 	STDMETHOD(AddDataEntryData)(long lFileID, long nActionID, double dDuration,
 		double dOverheadTime, long* plInstanceID);
-	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
 	STDMETHOD(RecordCounterValues)(long* plInstanceToken, long lDataEntryDataInstanceID,
 		IIUnknownVector* pAttributes);
+	STDMETHOD(Initialize)(IFileProcessingDB* pFAMDB, GUID guidTaskClass);
 
 private:
 
@@ -109,6 +109,10 @@ private:
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
 
+	// The GUID for the class implementing the IFileProcessingTask instance for which data is to be
+	// logged.
+	string m_strTaskClassID;
+
 	//////////////
 	// Methods
 	//////////////
@@ -138,6 +142,7 @@ private:
 		double dDuration, double dOverheadTime, long* plInstanceID);
 	bool RecordCounterValues_Internal(bool bDBLocked, long* plInstanceToken,
 		long lDataEntryDataInstanceID, IIUnknownVector* pAttributes);
+	bool Initialize_Internal(bool bDBLocked, GUID guidTaskClass);
 
 	// Retrieves the set of SQL queries used to create the DataEntry specific database tables.
 	const vector<string> getTableCreationQueries(bool bAddUserTables);

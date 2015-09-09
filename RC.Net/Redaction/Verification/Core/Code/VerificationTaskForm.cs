@@ -1010,7 +1010,7 @@ namespace Extract.Redaction.Verification
         void AddDatabaseData(int fileId, RedactionCounts counts, double screenTime,
             double overheadTime)
         {
-            _idShieldDatabase.AddIDShieldData(fileId, true, screenTime, overheadTime,
+            _idShieldDatabase.AddIDShieldData(fileId, screenTime, overheadTime,
                 counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence,
                 counts.Clues, counts.Total, counts.Manual, _setSlideshowAdvancedPages.Count);
         }
@@ -2620,7 +2620,7 @@ namespace Extract.Redaction.Verification
                 Type mgrType = Type.GetTypeFromProgID(dbUtils.GetIDShieldDBProgId());
                 _idShieldDatabase = (IDShieldProductDBMgr)Activator.CreateInstance(mgrType);
 
-                _idShieldDatabase.FAMDB = _fileDatabase;
+                _idShieldDatabase.Initialize(_fileDatabase, typeof(VerificationTask).GUID);
             }
         }
 

@@ -32,7 +32,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 128;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 129;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -1009,7 +1009,7 @@ int UpdateToSchemaVersion128(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("ALTER TABLE [ActiveFAM] DROP COLUMN [Queuing]");	
 		vecQueries.push_back("ALTER TABLE [ActiveFAM] DROP COLUMN [Processing]");
 		vecQueries.push_back("ALTER TABLE [ActiveFAM] ADD [FAMSessionID] INT NOT NULL");
-		vecQueries.push_back(gstrADD_ACTION_ACTIVEFAM_FAM_SESSION_FK);
+		vecQueries.push_back(gstrADD_ACTIVEFAM_FAM_SESSION_FK);
 		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_SESSION_INDEX);
 		vecQueries.push_back("ALTER TABLE [FAMSession] ADD [ActionID] INT");
 		vecQueries.push_back("ALTER TABLE [FAMSession] ADD [Queuing] BIT");
@@ -1063,6 +1063,39 @@ int UpdateToSchemaVersion128(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33184");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion129(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 129;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_TASK_CLASS);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAM_SESSION_FK);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_TASK_CLASS_FK);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAMFILE_FK);
+		vecQueries.push_back("ALTER TABLE [FAMSession] ALTER COLUMN [FPSFileID] INT NULL");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38602");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -5250,7 +5283,7 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 
 			string strFAMSessionQuery = "INSERT INTO [" + gstrFAM_SESSION + "] ";
 			strFAMSessionQuery += "([MachineID], [FAMUserID], [UPI], [FPSFileID], [ActionID], "
-				"[Processing], [Queuing]) ";
+				"[Queuing], [Processing]) ";
 			strFAMSessionQuery += "OUTPUT INSERTED.ID ";
 			strFAMSessionQuery += "VALUES (";
 
@@ -6061,7 +6094,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 125:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion126);
 				case 126:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion127);
 				case 127:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion128);
-				case 128:	break;
+				case 128:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion129);
+				case 129:	break;
 
 				default:
 					{
@@ -6142,8 +6176,18 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			for (int i = 0; i < nStageCount; i++)
 			{
 				CString zMessage;
-				zMessage.Format("Updating database schema... (Step %i of %i)", i + 1, nStageCount);
+				if (vecStepCounts[i] > 100)
+				{
+					zMessage.Format(
+						"Updating database schema... (Step %i of %i; this may take a while)",
+						i + 1, nStageCount);
+				}
+				else
+				{
+					zMessage.Format("Updating database schema... (Step %i of %i)", i + 1, nStageCount);
+				}
 				ipProgressStatus->StartNextItemGroup(zMessage.GetString(), vecStepCounts[i]);
+
 
 				executeProdSpecificSchemaUpdateFuncs(ipConnection, ipProdSpecificMgrs,
 					nSchemaVersion, NULL, ipProgressStatus->SubProgressStatus,
