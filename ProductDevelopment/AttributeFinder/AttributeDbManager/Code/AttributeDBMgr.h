@@ -122,9 +122,7 @@ private:
 	std::vector<std::string> getAttributeTables();
 
 	// Throws an exception if the schema version in the database does not match current version
-	// If bThrowIfMissing is true, an exception will be thrown if the version number is missing
-	// from the database; if false if the DB setting is missing, it will be considered valid.
-	void validateSchemaVersion(bool bThrowIfMissing);
+	void validateSchemaVersion(/*bool bThrowIfMissing*/);
 
 	void validateLicense();
 

@@ -29,8 +29,8 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 2;
-	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 127;
+	const long glSCHEMA_VERSION = 1;
+	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
 	VectorOfString GetCurrentTableNames( bool excludeUserTables = false )
@@ -71,49 +71,22 @@ namespace
 		return tables;
 	}
 
-	VectorOfString GetTables_v2( bool bAddUserTables )
-	{
-		VectorOfString tables;
-	
-		if ( bAddUserTables )
-		{
-			tables.push_back(gstrCREATE_ATTRIBUTE_SET_NAME_TABLE_v2);
-		}
-
-		tables.push_back(gstrCREATE_ATTRIBUTE_SET_FOR_FILE_TABLE_v2);
-		tables.push_back(gstrCREATE_ATTRIBUTE_NAME_TABLE_v2);
-		tables.push_back(gstrCREATE_ATTRIBUTE_TYPE_TABLE_v2);
-		tables.push_back(gstrCREATE_ATTRIBUTE_INSTANCE_TYPE_v2);
-		tables.push_back(gstrCREATE_ATTRIBUTE_TABLE_v2);
-		tables.push_back(gstrCREATE_RASTER_ZONE_TABLE_v2);
-
-		return tables;
-	}
-
 	VectorOfString GetIndexes_v1()
 	{
 		VectorOfString queries;
 
 		queries.push_back(gstrCREATE_FILEID_ATTRIBUTE_SET_NAME_ID_INDEX);
-		queries.push_back(gstrCREATE_ATTRIBUTE_SET_FOR_FILEID_GUID_INDEX);
-
 		return queries;
 	}
 
-	VectorOfString GetIndexes_v2()
-	{
-		VectorOfString queries;
 
-		queries.push_back(gstrCREATE_FILEID_ATTRIBUTE_SET_NAME_ID_INDEX);
-
-		return queries;
-	}
 
 	VectorOfString GetForeignKeys_v1()
 	{
 		VectorOfString fKeys;
 
-		fKeys.push_back(gstrADD_ATTRIBUTE_SET_FOR_FILEID_FK);
+		fKeys.push_back(gstrADD_ATTRIBUTE_SET_FOR_FILE_FILETASKSESSIONID_FK);
+		fKeys.push_back(gstrADD_ATTRIBUTE_SET_FOR_FILE_ATTRIBUTESETNAMEID_FK);
 		fKeys.push_back(gstrADD_ATTRIBUTE_INSTANCE_TYPE_ATTRIBUTEID);
 		fKeys.push_back(gstrADD_ATTRIBUTE_INSTANCE_TYPE_ATTRIBUTETYPEID);
 		fKeys.push_back(gstrADD_ATTRIBUTE_ATTRIBUTE_SET_FILE_FILEID_FK);
@@ -124,21 +97,6 @@ namespace
 		return fKeys;
 	}
 
-	VectorOfString GetForeignKeys_v2()
-	{
-		VectorOfString fKeys;
-
-		fKeys.push_back(gstrADD_ATTRIBUTE_SET_FOR_FILEID_FK);
-		fKeys.push_back(gstrADD_ATTRIBUTE_SET_FOR_FILE_ATTRIBUTESETNAMEID_FK);	// added for v2, missed in v1
-		fKeys.push_back(gstrADD_ATTRIBUTE_INSTANCE_TYPE_ATTRIBUTEID);
-		fKeys.push_back(gstrADD_ATTRIBUTE_INSTANCE_TYPE_ATTRIBUTETYPEID);
-		fKeys.push_back(gstrADD_ATTRIBUTE_ATTRIBUTE_SET_FILE_FILEID_FK);
-		fKeys.push_back(gstrADD_ATTRIBUTE_ATTRIBUTE_NAMEID_FK);
-		fKeys.push_back(gstrADD_ATTRIBUTE_PARENT_ATTRIBUTEID_FK);
-		fKeys.push_back(gstrADD_RASTER_ZONE_ATTRIBUTEID_FK);
-
-		return fKeys;
-	}
 
 	std::string GetVersionInsertStatement( long schemaVersion )
 	{
@@ -174,18 +132,9 @@ namespace
 		return queries;
 	}
 
-	VectorOfString GetSchema_v2( bool bAddUserTables )
-	{
-		VectorOfString queries = GetTables_v2( bAddUserTables );
-		AppendToVector( queries, GetIndexes_v2() );
-		AppendToVector( queries, GetForeignKeys_v2() );
-
-		return queries;
-	}
-
 	VectorOfString GetCurrentSchema( bool bAddUserTables = true )
 	{
-		return GetSchema_v2( bAddUserTables );
+		return GetSchema_v1( bAddUserTables );
 	}
 
 	
@@ -206,7 +155,6 @@ namespace
 	
 			vector<string> queries = GetSchema_v1( true );
 			queries.emplace_back( GetVersionInsertStatement( nNewSchemaVersion ) );
-	
 			executeVectorOfSQL(ipConnection, queries);
 	
 			return nNewSchemaVersion;
@@ -214,31 +162,6 @@ namespace
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38511");
 	}
 
-	// NOTE: version 1 and 2 are identical except that many of the key columns are bigint instead of int.
-	int UpdateToSchemaVersion2( _ConnectionPtr ipConnection, long* pnNumSteps ) 
-	{
-		try
-		{
-			const int nNewSchemaVersion = 2;
-
-			if ( pnNumSteps != nullptr )
-			{
-				*pnNumSteps += 3;
-				return nNewSchemaVersion;
-			}
-
-			VectorOfString commands;
-			commands.push_back( gstrDROP_CONSTRAINTS );
-			commands.push_back( gstrREDEFINE_COLUMN_TYPES );
-			commands.push_back( gstrDEFINE_PKS_AND_FKS );
-			commands.emplace_back( GetVersionUpdateStatement( nNewSchemaVersion ) );
-	
-			executeVectorOfSQL( ipConnection, commands );
-	
-			return nNewSchemaVersion;
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION( "ELI38556" );
-	}
 }		// end of anonymous namespace
 //-------------------------------------------------------------------------------------------------
 
@@ -462,7 +385,7 @@ STDMETHODIMP CAttributeDBMgr::raw_ValidateSchema( IFileProcessingDB* pDB )
 			m_ipDBConnection = nullptr;
 		}
 
-		validateSchemaVersion(false);
+		validateSchemaVersion();
 
 		return S_OK;
 	}
@@ -569,13 +492,6 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				break;
 
 			case 1:
-				if (nFAMDBSchemaVersion == 128)
-				{
-					*pnProdSchemaVersion = UpdateToSchemaVersion2(ipConnection, pnNumSteps);
-				}
-				break;
-
-			case 2:
 				break;
 
 			default:
@@ -617,7 +533,7 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 }
 
 STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileID,
-														    long attributeSetNameID,
+														    long attributeSetNameID,	// TODO - should be AttributeSetName, not ID, right?
 														    IIUnknownVector* pAttributes )
 {
 	try
@@ -630,35 +546,24 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileID,
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38557");
 
-	/*
-	Where do I get:
-	AttributeSetForFile.AttributeSetNameID - attribute set name
-
-	Is the AttributeType a reference table? NO!
-
-	Ditto for AttributeName, NO!
-
-
-	*/
-
 }
 STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** /*pAttributes*/, 
 													 long /*fileID*/, 
-													 long /*attributeSetForFileID*/)
+													 long /*attributeSetForFileID*/)	// TODO- not ID?
 {
 	return Error("Not implemented");
 
 }
 
 STDMETHODIMP CAttributeDBMgr::GetNewestAttributeSetForFile(IIUnknownVector** /*pAttributes*/, 
-														   long /*fileID*/)
+														   long /*fileID*/)						// TODO- should add AttributeSetName
 {
 	return Error("Not implemented");
 }
 
 
 STDMETHODIMP CAttributeDBMgr::GetOldestAttributeSetForFile(IIUnknownVector** /*pAttributes*/, 
-														   long /*fileID*/)
+														   long /*fileID*/)						// TODO - add AttributeSetName
 {
 	return Error("Not implemented");
 }
@@ -744,24 +649,21 @@ void CAttributeDBMgr::validateLicense()
 }
 
 //-------------------------------------------------------------------------------------------------
-void CAttributeDBMgr::validateSchemaVersion(bool bThrowIfMissing)
+void CAttributeDBMgr::validateSchemaVersion()
 {
 
 	ASSERT_RESOURCE_ALLOCATION("ELI38545", m_ipFAMDB != nullptr);
 
 	// Get the Version from the FAMDB DBInfo table
 	auto value = asString( m_ipFAMDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(), 
-													    asVariantBool(bThrowIfMissing) ) );
-	if ( bThrowIfMissing || !value.empty() )
+													    asVariantBool(true) ) );
+	// Check against expected version
+	if (asLong(value) != glSCHEMA_VERSION)
 	{
-		// Check against expected version
-		if (asLong(value) != glSCHEMA_VERSION)
-		{
-			UCLIDException ue("ELI38546", "Attribute collection database schema is not current version!");
-			ue.addDebugInfo("Expected", glSCHEMA_VERSION);
-			ue.addDebugInfo("Database Version", value);
-			throw ue;
-		}
+		UCLIDException ue("ELI38546", "Attribute collection database schema is not current version!");
+		ue.addDebugInfo("Expected", glSCHEMA_VERSION);
+		ue.addDebugInfo("Database Version", value);
+		throw ue;
 	}
 }
 
