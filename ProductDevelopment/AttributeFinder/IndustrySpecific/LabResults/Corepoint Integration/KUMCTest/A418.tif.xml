@@ -41,6 +41,9 @@
 			<FullText>00000001</FullText>
 		</MR_Number>
 	</PatientInfo>
+	<CSN>
+		<FullText>0123456789</FullText>
+	</CSN>
 	<PhysicianInfo>
 		<FullText/>
 		<OrderingPhysicianName>
