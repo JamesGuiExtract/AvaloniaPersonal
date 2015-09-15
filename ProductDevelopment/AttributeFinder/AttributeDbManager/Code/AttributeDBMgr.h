@@ -77,18 +77,30 @@ public:
 											   IProgressStatus* pProgressStatus);
 // IAttributeDBMgr Methods
 	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
+
 	STDMETHOD(CreateNewAttributeSetForFile)(long fileID,
-											long attributeSetNameID,
-											IIUnknownVector* pAttributes);
-	STDMETHOD(GetAttributeSetForFile)(IIUnknownVector** pAttributes, long fileID, long attributeSetForFileID);
-	STDMETHOD(GetNewestAttributeSetForFile)(IIUnknownVector** pAttributes, long fileID);
-	STDMETHOD(GetOldestAttributeSetForFile)(IIUnknownVector** pAttributes, long fileID);
-	STDMETHOD(GetAttributeSetForFileID)(long* pSetID, long fileID, long attributeSetNameID);
-	STDMETHOD(DeleteAttributeSetForFileID)(long fileID, long AttributeSetForFileID);
-	STDMETHOD(DeleteHistoricalAttributeSetsForFile)(long fileID);
-	STDMETHOD(CreateNewAttributeSetName)(BSTR name, long* pAttributeSetNameID);
-	STDMETHOD(RenameAttributeSetName)(long attributeNameSetID, BSTR newName);
-	STDMETHOD(DeleteAttributeSetName)(long attributeNameSetID);
+											BSTR attributeSetName,
+											IIUnknownVector* pAttributes,
+											VARIANT_BOOL storeRasterZone);
+
+	// relativeIndex: -1 for most recent, 1 for oldest
+	// decrement most recent value to get next most recent (-2)
+	// increment oldest value to get next oldest (2)
+	// Zero is an illegal relativeIndex value.
+	STDMETHOD(GetAttributeSetForFile)(IIUnknownVector** pAttributes, 
+									  long fileID, 
+									  BSTR attributeSetName,
+									  long relativeIndex);		
+
+	STDMETHOD(CreateNewAttributeSetName)(BSTR name, 
+										 long long* pAttributeSetNameID);
+
+	STDMETHOD(RenameAttributeSetName)(BSTR attributeSetName, 
+									  BSTR newName);
+
+	STDMETHOD(DeleteAttributeSetName)(BSTR attributeSetName);
+
+	STDMETHOD(GetAllAttributeSetNames)(IStrToStrMap** ppNames);
 	
 private:
 

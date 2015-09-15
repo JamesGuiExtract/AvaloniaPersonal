@@ -533,75 +533,147 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 }
 
 STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileID,
-														    long attributeSetNameID,	// TODO - should be AttributeSetName, not ID, right?
-														    IIUnknownVector* pAttributes )
+														    BSTR /*bstrAttributeSetName*/,
+														    IIUnknownVector* ipAttributes,
+															VARIANT_BOOL /*storeRasterZone*/ )
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI38553", pAttributes != nullptr);
+		ASSERT_ARGUMENT("ELI38553", ipAttributes != nullptr);
 		ASSERT_ARGUMENT("ELI38554", fileID > 0 );
-		ASSERT_ARGUMENT("ELI38555", attributeSetNameID);
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38557");
 
 }
-STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** /*pAttributes*/, 
+
+// relativeIndex: -1 for most recent, 1 for oldest
+// decrement most recent value to get next most recent (-2)
+// increment oldest value to get next oldest (2)
+// Zero is an illegal relativeIndex value.
+STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** /*ippAttributes*/, 
 													 long /*fileID*/, 
-													 long /*attributeSetForFileID*/)	// TODO- not ID?
+													 BSTR /*attributeSetName*/,
+													 long relativeIndex)
 {
-	return Error("Not implemented");
+	try
+	{
+		ASSERT_ARGUMENT("ELI38618", relativeIndex != 0);
+		return Error("Not implemented");
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38619");
+}
+
+STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name, 
+														long long* pAttributeSetNameID)
+{
+	try
+	{
+		ASSERT_ARGUMENT( "ELI38630", name != nullptr );
+
+		std::string newName( asString(name) );
+		std::string cmd( Util::Format( "INSERT INTO [dbo].[AttributeSetName] (Description) VALUES ('%s');",
+									   newName.c_str() ) );
+
+		m_ipFAMDB->ExecuteCommandQuery( cmd.c_str() );
+
+		if ( nullptr != pAttributeSetNameID )
+		{
+			*pAttributeSetNameID = 0;
+
+			std::string query( Util::Format( "SELECT ID FROM [dbo].[AttributeSetName] WHERE Description='%s';",
+											 newName.c_str() ) );
+
+			ADODB::_RecordsetPtr pRecords = m_ipFAMDB->GetResultsForQuery( query.c_str() );
+			if ( VARIANT_FALSE == pRecords->adoEOF )
+			{
+				FieldsPtr pFields = pRecords->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI38631", pFields != nullptr);
+
+				long long Id = getLongLongField( pFields, "ID" );
+				*pAttributeSetNameID = Id;
+			}
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38629");
+}
+
+STDMETHODIMP CAttributeDBMgr::RenameAttributeSetName(BSTR attributeSetName, 
+													 BSTR newName)
+{
+	try
+	{
+		ASSERT_ARGUMENT( "ELI38627", attributeSetName != nullptr );
+		ASSERT_ARGUMENT( "ELI38628", newName != nullptr );
+
+		std::string currentName( asString(attributeSetName) );
+		std::string changeNameTo( asString(newName) );
+
+		std::string cmd( Util::Format( "UPDATE [dbo].[AttributeSetName] SET Description='%s' WHERE Description='%s';",
+									   changeNameTo.c_str(),
+									   currentName.c_str() ) );
+
+		m_ipFAMDB->ExecuteCommandQuery( cmd.c_str() );
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38626");
 
 }
 
-STDMETHODIMP CAttributeDBMgr::GetNewestAttributeSetForFile(IIUnknownVector** /*pAttributes*/, 
-														   long /*fileID*/)						// TODO- should add AttributeSetName
+STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetName(BSTR attributeSetName)
 {
-	return Error("Not implemented");
+	try
+	{
+		ASSERT_ARGUMENT( "ELI38624", attributeSetName != nullptr );
+
+		std::string name( asString(attributeSetName) );
+		ASSERT_ARGUMENT( "ELI38625", !name.empty() );
+
+		std::string cmd( Util::Format( "DELETE FROM  [dbo].[AttributeSetName] WHERE Description='%s';", 
+									   name.c_str() ) );
+
+		m_ipFAMDB->ExecuteCommandQuery( cmd.c_str() );
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38623");
 }
 
-
-STDMETHODIMP CAttributeDBMgr::GetOldestAttributeSetForFile(IIUnknownVector** /*pAttributes*/, 
-														   long /*fileID*/)						// TODO - add AttributeSetName
+STDMETHODIMP CAttributeDBMgr::GetAllAttributeSetNames(IStrToStrMap** ippNames)
 {
-	return Error("Not implemented");
-}
+	try
+	{
+		ASSERT_ARGUMENT("ELI38617", nullptr != ippNames);
 
-STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFileID(long* /*pSetID*/, 
-													   long /*fileID*/, 
-													   long /*attributeSetNameID*/)
-{
-	return Error("Not implemented");
-}
+		std::string query( "SELECT [ID], [Description] FROM [dbo].[AttributeSetName];" );
 
+		ADODB::_RecordsetPtr pRecords = m_ipFAMDB->GetResultsForQuery( query.c_str() );
 
-STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetForFileID(long /*fileID*/, 
-														  long /*AttributeSetForFileID*/)
-{
-	return Error("Not implemented");
-}
+		IStrToStrMapPtr pAttributeSetNames(CLSID_StrToStrMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI38621", pAttributeSetNames != nullptr);
 
-STDMETHODIMP CAttributeDBMgr::DeleteHistoricalAttributeSetsForFile(long /*fileID*/)
-{
-	return Error("Not implemented");
-}
+		while ( VARIANT_FALSE == pRecords->adoEOF )
+		{
+			FieldsPtr pFields = pRecords->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI38622", pFields != nullptr);
 
-STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR /*name*/, 
-														long* /*pAttributeSetNameID*/)
-{
-	return Error("Not implemented");
-}
+			std::string description = getStringField( pFields, "Description" );
+			long long Id = getLongLongField( pFields, "ID" );
+			std::string ID = Util::Format( "%lld", Id );
 
-STDMETHODIMP CAttributeDBMgr::RenameAttributeSetName(long /*attributeNameSetID*/, 
-													 BSTR /*newName*/)
-{
-	return Error("Not implemented");
-}
+			pAttributeSetNames->Set( ID.c_str(), description.c_str() );
+			
+			pRecords->MoveNext();
+		}
 
-STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetName(long /*attributeNameSetID*/)
-{
-	return Error("Not implemented");
+		*ippNames = pAttributeSetNames.Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38620");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -651,7 +723,6 @@ void CAttributeDBMgr::validateLicense()
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::validateSchemaVersion()
 {
-
 	ASSERT_RESOURCE_ALLOCATION("ELI38545", m_ipFAMDB != nullptr);
 
 	// Get the Version from the FAMDB DBInfo table

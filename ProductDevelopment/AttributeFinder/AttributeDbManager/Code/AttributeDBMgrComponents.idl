@@ -35,24 +35,34 @@ library UCLID_AttributeDbMgrComponentsLib
 	{
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To set the FAMDB
-		[propput, id(1), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
+		[propput, id(1), helpstring("property FAMDB")] 
+		HRESULT FAMDB([in] IFileProcessingDB* newVal);
 
-		[id(2), helpstring("method CreateNewAttributeSetForFile")] HRESULT CreateNewAttributeSetForFile([in] long fileID,
-			[in] long attributeSetNameID, [in] IIUnknownVector* pAttributes);
-		[id(3), helpstring("method GetAttributeSetForFile")] HRESULT GetAttributeSetForFile([out]IIUnknownVector** pAttributes, 
-			[in] long fileID, [in] long attributeSetNameID);
-		[id(4), helpstring("method GetNewestAttributeSetForFile")] HRESULT GetNewestAttributeSetForFile([out]IIUnknownVector** pAttributes,
-			[in] long fileID);
-		[id(5), helpstring("method GetOldestAttributeSetForFile")] HRESULT GetOldestAttributeSetForFile([out]IIUnknownVector** pAttributes,
-			[in] long fileID);
-		[id(6), helpstring("method GetAttributeSetForFileID")] HRESULT GetAttributeSetForFileID([out]long* pSetID, [in] long fileID,
-			[in] long attributeSetNameID);
-		[id(7), helpstring("method DeleteAttributeSetForFileID")] HRESULT DeleteAttributeSetForFileID([in] long fileID,
-			[in] long attributeSetNameID);
-		[id(8), helpstring("method DeleteHistoricalAttributeSetsForFile")] HRESULT DeleteHistoricalAttributeSetsForFile([in] long fileID);
-		[id(9), helpstring("method CreateNewAttributeSetName")] HRESULT CreateNewAttributeSetName([in] BSTR name, [out] long* pAttributeSetName);
-		[id(10), helpstring("method RenameAttributeSetName")] HRESULT RenameAttributeSetName([in] long attributeSetNameID, [in] BSTR newName);
-		[id(11), helpstring("method DeleteAttributeSetName")] HRESULT DeleteAttributeSetName([in] long attributeSetNameID);
+		[id(2), helpstring("method CreateNewAttributeSetForFile")] 
+		HRESULT CreateNewAttributeSetForFile([in] long fileID, 
+											 [in] BSTR attributeSetName, 
+											 [in] IIUnknownVector* pAttributes, 
+											 [in] VARIANT_BOOL storeRasterZone);
+
+		[id(3), helpstring("method GetAttributeSetForFile")] 
+		HRESULT GetAttributeSetForFile([out]IIUnknownVector** pAttributes, 
+									   [in] long fileID, 
+									   [in] BSTR attributeSetName,
+									   [in] long relativeIndex);
+
+		[id(4), helpstring("method CreateNewAttributeSetName")] 
+		HRESULT CreateNewAttributeSetName([in] BSTR name, 
+										  [out] long long* pAttributeSetName);
+
+		[id(5), helpstring("method RenameAttributeSetName")] 
+		HRESULT RenameAttributeSetName([in] BSTR attributeSetName, 
+									   [in] BSTR newName);
+
+		[id(6), helpstring("method DeleteAttributeSetName")] 
+		HRESULT DeleteAttributeSetName([in] BSTR attributeSetName);
+
+		[id(7), helpstring("method GetAllAttributeSetNames")]
+		HRESULT GetAllAttributeSetNames([out, retval] IStrToStrMap** ppNames);
 	};
 
 	[

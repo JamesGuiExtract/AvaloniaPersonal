@@ -26,11 +26,25 @@ extern CComModule _Module;
 #include "..\..\..\..\ReusableComponents\APIs\Microsoft Visual Studio\VC98\ATL\Include\atlcontrols.h"
 #include <afxmt.h>
 
+
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
 using namespace UCLID_COMLMLib;
 
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
+
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" named_guids \
+	rename("LoadImage", "LoadRasterImage")
+using namespace UCLID_RASTERANDOCRMGMTLib;
+
+#import "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
+using namespace UCLID_INPUTFUNNELLib;
+
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.tlb" named_guids
+using namespace UCLID_IMAGEUTILSLib;
+
+#import "..\..\AFCore\Code\AFCore.tlb" named_guids
+using namespace UCLID_AFCORELib;
 
 #import "Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")
@@ -41,6 +55,7 @@ using namespace Extract_Interfaces;
 
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb" named_guids 
 using namespace UCLID_FILEPROCESSINGLib;
+
 
 #import "AttributeDBMgrComponents.tlb"
 

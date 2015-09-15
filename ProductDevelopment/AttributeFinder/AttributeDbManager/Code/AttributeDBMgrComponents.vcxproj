@@ -238,9 +238,18 @@
       <Project>{5a74ecb3-8b17-42b5-b77f-44c35d489a64}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcxproj">
+      <Project>{cc01ae64-6b4c-4fee-8a87-b13941098a6a}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj">
       <Project>{6e3eeaf2-30a3-42be-be62-9cf2ba3702d2}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.vcxproj">
+      <Project>{037f8051-5f5f-48c4-9bf3-34aa990aa5de}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AFCore\Code\AFCore.vcxproj">
+      <Project>{83c2c49f-e325-4abf-b4eb-8125ee2dd4fa}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
