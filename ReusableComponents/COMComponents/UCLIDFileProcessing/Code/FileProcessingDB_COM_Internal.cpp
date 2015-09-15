@@ -1175,7 +1175,7 @@ bool CFileProcessingDB::DeleteAction_Internal(bool bDBLocked, BSTR strAction)
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 				// Delete the action
-				string strDeleteActionQuery = "DELETE FROM Action WHERE ASCName = '" + asString(strAction) + "'";
+				string strDeleteActionQuery = "DELETE FROM [Action] WHERE [ASCName] = '" + asString(strAction) + "'";
 				executeCmdQuery(ipConnection, strDeleteActionQuery);
 
 				// Commit this transaction

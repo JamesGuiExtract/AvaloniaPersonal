@@ -4788,7 +4788,9 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	ASSERT_RESOURCE_ALLOCATION("ELI31589", ipProcessingSet != __nullptr);
 
 	// Open recordset with ActiveFAM records that show processing on the action
-	string strSQL = "SELECT UPI FROM ActiveFAM WHERE ActionID = " + strActionID;
+	string strSQL = "SELECT [UPI] FROM [FAMSession] "
+		"INNER JOIN [ActiveFAM] ON [FAMSessionID] = [FAMSession].[ID] "
+		"WHERE [ActionID] = " + strActionID;
 	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 		adLockReadOnly, adCmdText);
 
