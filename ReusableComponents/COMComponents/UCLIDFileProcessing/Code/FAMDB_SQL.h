@@ -1384,3 +1384,14 @@ const string gstrGET_WORK_ITEM_GROUP_ID =
 	"SELECT ID "
 	"FROM workItemTotals "
 	"WHERE CountOfWorkItems = NumberOfWorkItems ";
+
+static const string gstrINSERT_FILETASKSESSION_DATA = 
+	"INSERT INTO [dbo].[FileTaskSession] "
+	" ([FAMSessionID]"
+	"  ,[TaskClassID]"
+	"  ,[FileID]"
+    "  ,[DateTimeStamp]"
+    "  ,[Duration]"
+	"  ,[OverheadTime])"
+	"  OUTPUT INSERTED.ID"
+	"  VALUES (<FAMSessionID>, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = '<TaskClassGuid>'), <FileID>, GETDATE(), <Duration>, <OverheadTime>)";

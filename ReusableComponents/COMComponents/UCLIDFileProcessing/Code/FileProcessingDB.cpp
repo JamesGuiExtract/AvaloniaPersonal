@@ -3446,6 +3446,32 @@ STDMETHODIMP CFileProcessingDB::get_FAMSessionID(long *pnFAMSessionID)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38551");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RecordFileTaskSession(BSTR bstrTaskClassGuid, long nFileID,
+								double dDuration, double dOverheadTime, long *pnFileTaskSessionID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI38638", pnFileTaskSessionID != nullptr);
+
+		if (!RecordFileTaskSession_Internal(false, bstrTaskClassGuid, nFileID, dDuration,
+				dOverheadTime, pnFileTaskSessionID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			RecordFileTaskSession_Internal(true, bstrTaskClassGuid, nFileID, dDuration,
+				dOverheadTime, pnFileTaskSessionID);
+		}
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38639");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

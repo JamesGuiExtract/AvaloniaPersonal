@@ -68,6 +68,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         const string _NEXT_DOCUMENT = "Next document";
 
+        /// <summary>
+        /// A string representation of the GUID of the data entry verification task.
+        /// </summary>
+        static readonly string _VERIFICATION_TASK_GUID = typeof(ComClass).GUID.ToString("B");
+
         #endregion Constants
 
         #region DataEntryConfiguration
@@ -1000,7 +1005,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     Type mgrType = Type.GetTypeFromProgID(famDBUtils.GetDataEntryDBProgId());
 
                     _dataEntryDatabaseManager = (DataEntryProductDBMgr)Activator.CreateInstance(mgrType);
-                    _dataEntryDatabaseManager.Initialize(fileProcessingDB, typeof(ComClass).GUID);
+                    _dataEntryDatabaseManager.Initialize(fileProcessingDB);
                 }
 
                 _imageViewer.OpenImage(fileName, false);
@@ -4536,8 +4541,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
                     _fileProcessingStopwatch.Restart();
 
-                    int instanceId = _dataEntryDatabaseManager.AddDataEntryData(
-                        _fileId, _actionId, elapsedSeconds, _overheadElapsedTime.Value);
+                    int instanceId = _fileProcessingDb.RecordFileTaskSession(
+                        _VERIFICATION_TASK_GUID, _fileId, elapsedSeconds,
+                        _overheadElapsedTime.Value);
 
                     if (_countersEnabled)
                     {

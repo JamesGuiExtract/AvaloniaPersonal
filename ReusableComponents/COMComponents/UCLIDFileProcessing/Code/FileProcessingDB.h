@@ -284,6 +284,8 @@ public:
 	STDMETHOD(GetLastConnectionStringConfiguredThisProcess)(BSTR *pbstrConnectionString);
 	STDMETHOD(get_ActiveFAMID)(long *pnActiveFAMID);
 	STDMETHOD(get_FAMSessionID)(long *pnFAMSessionID);
+	STDMETHOD(RecordFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, double dDuration,
+		double dOverheadTime, long *pnFileTaskSessionID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1139,6 +1141,8 @@ private:
 	bool AddMetadataField_Internal(bool bDBLocked, const string& strMetadataFieldName);
 	bool DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMetadataFieldName);
 	bool RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
+	bool RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, double dDuration,
+		double dOverheadTime, long *pnFileTaskSessionID);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

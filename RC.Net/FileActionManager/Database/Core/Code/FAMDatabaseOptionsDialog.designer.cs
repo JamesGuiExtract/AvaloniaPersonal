@@ -39,9 +39,6 @@
             this._tabControlSettings = new System.Windows.Forms.TabControl();
             this._tabGeneral = new System.Windows.Forms.TabPage();
             this._alternateComponentDataDirectoryTextBox = new System.Windows.Forms.TextBox();
-            this._numberMaxTimeBetweenChecks = new Extract.Utilities.Forms.NumericEntryTextBox();
-            this._numberMinTimeBetweenChecks = new Extract.Utilities.Forms.NumericEntryTextBox();
-            this._upDownRevertMinutes = new Extract.Utilities.Forms.BetterNumericUpDown();
             this._buttonRemoveEmail = new System.Windows.Forms.Button();
             this._buttonModifyEmail = new System.Windows.Forms.Button();
             this._buttonAddEmail = new System.Windows.Forms.Button();
@@ -53,7 +50,6 @@
             this._checkStoreFTPEventHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreDBSettingsChangeHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreDocTagHistory = new System.Windows.Forms.CheckBox();
-            this._upDownInputEventHistory = new Extract.Utilities.Forms.BetterNumericUpDown();
             this._checkStoreInputEventTracking = new System.Windows.Forms.CheckBox();
             this._checkStoreQueueEventHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreFASTHistory = new System.Windows.Forms.CheckBox();
@@ -67,17 +63,18 @@
             this._checkRequirePasswordForSkipped = new System.Windows.Forms.CheckBox();
             this._tabProductSpecific = new System.Windows.Forms.TabPage();
             this._productSpecificLayout = new System.Windows.Forms.FlowLayoutPanel();
-            this._groupIDShield = new System.Windows.Forms.GroupBox();
-            this._checkIdShieldHistory = new System.Windows.Forms.CheckBox();
             this._groupDataEntry = new System.Windows.Forms.GroupBox();
             this._checkDataEntryEnableCounters = new System.Windows.Forms.CheckBox();
-            this._checkDataEntryHistory = new System.Windows.Forms.CheckBox();
             this._tabEmail = new System.Windows.Forms.TabPage();
-            this._emailSettingsControl = new Extract.Utilities.Email.EmailSettingsControl();
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
             this._emailTestButton = new System.Windows.Forms.Button();
+            this._numberMaxTimeBetweenChecks = new Extract.Utilities.Forms.NumericEntryTextBox();
+            this._numberMinTimeBetweenChecks = new Extract.Utilities.Forms.NumericEntryTextBox();
+            this._upDownRevertMinutes = new Extract.Utilities.Forms.BetterNumericUpDown();
+            this._upDownInputEventHistory = new Extract.Utilities.Forms.BetterNumericUpDown();
+            this._emailSettingsControl = new Extract.Utilities.Email.EmailSettingsControl();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -88,15 +85,14 @@
             label8 = new System.Windows.Forms.Label();
             this._tabControlSettings.SuspendLayout();
             this._tabGeneral.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._upDownRevertMinutes)).BeginInit();
             this._tabHistory.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._upDownInputEventHistory)).BeginInit();
             this._tabSecurity.SuspendLayout();
             this._tabProductSpecific.SuspendLayout();
             this._productSpecificLayout.SuspendLayout();
-            this._groupIDShield.SuspendLayout();
             this._groupDataEntry.SuspendLayout();
             this._tabEmail.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._upDownRevertMinutes)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._upDownInputEventHistory)).BeginInit();
             this.SuspendLayout();
             // 
             // label2
@@ -225,48 +221,6 @@
             this._alternateComponentDataDirectoryTextBox.Size = new System.Drawing.Size(446, 20);
             this._alternateComponentDataDirectoryTextBox.TabIndex = 25;
             // 
-            // _numberMaxTimeBetweenChecks
-            // 
-            this._numberMaxTimeBetweenChecks.Location = new System.Drawing.Point(297, 242);
-            this._numberMaxTimeBetweenChecks.MaximumValue = 1.7976931348623157E+308D;
-            this._numberMaxTimeBetweenChecks.MinimumValue = -1.7976931348623157E+308D;
-            this._numberMaxTimeBetweenChecks.Name = "_numberMaxTimeBetweenChecks";
-            this._numberMaxTimeBetweenChecks.Size = new System.Drawing.Size(55, 20);
-            this._numberMaxTimeBetweenChecks.TabIndex = 11;
-            // 
-            // _numberMinTimeBetweenChecks
-            // 
-            this._numberMinTimeBetweenChecks.AllowNegative = false;
-            this._numberMinTimeBetweenChecks.Location = new System.Drawing.Point(297, 216);
-            this._numberMinTimeBetweenChecks.MaximumValue = 1.7976931348623157E+308D;
-            this._numberMinTimeBetweenChecks.MinimumValue = -1.7976931348623157E+308D;
-            this._numberMinTimeBetweenChecks.Name = "_numberMinTimeBetweenChecks";
-            this._numberMinTimeBetweenChecks.Size = new System.Drawing.Size(55, 20);
-            this._numberMinTimeBetweenChecks.TabIndex = 10;
-            // 
-            // _upDownRevertMinutes
-            // 
-            this._upDownRevertMinutes.Location = new System.Drawing.Point(205, 73);
-            this._upDownRevertMinutes.Maximum = new decimal(new int[] {
-            1440,
-            0,
-            0,
-            0});
-            this._upDownRevertMinutes.Minimum = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this._upDownRevertMinutes.Name = "_upDownRevertMinutes";
-            this._upDownRevertMinutes.Size = new System.Drawing.Size(49, 20);
-            this._upDownRevertMinutes.TabIndex = 5;
-            this._upDownRevertMinutes.Value = new decimal(new int[] {
-            1440,
-            0,
-            0,
-            0});
-            this._upDownRevertMinutes.UserTextCorrected += new System.EventHandler<System.EventArgs>(this.HandleAutoRevertValueCorrectedEvent);
-            // 
             // _buttonRemoveEmail
             // 
             this._buttonRemoveEmail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -347,12 +301,12 @@
             this._tabHistory.Controls.Add(this._checkStoreFTPEventHistory);
             this._tabHistory.Controls.Add(this._checkStoreDBSettingsChangeHistory);
             this._tabHistory.Controls.Add(this._checkStoreDocTagHistory);
-            this._tabHistory.Controls.Add(this._upDownInputEventHistory);
             this._tabHistory.Controls.Add(label1);
             this._tabHistory.Controls.Add(this._checkStoreInputEventTracking);
             this._tabHistory.Controls.Add(this._checkStoreQueueEventHistory);
             this._tabHistory.Controls.Add(this._checkStoreFASTHistory);
             this._tabHistory.Controls.Add(this._checkStoreSourceDocChangeHistory);
+            this._tabHistory.Controls.Add(this._upDownInputEventHistory);
             this._tabHistory.Location = new System.Drawing.Point(4, 22);
             this._tabHistory.Name = "_tabHistory";
             this._tabHistory.Padding = new System.Windows.Forms.Padding(3);
@@ -391,29 +345,6 @@
             this._checkStoreDocTagHistory.TabIndex = 3;
             this._checkStoreDocTagHistory.Text = "Store document tag history";
             this._checkStoreDocTagHistory.UseVisualStyleBackColor = true;
-            // 
-            // _upDownInputEventHistory
-            // 
-            this._upDownInputEventHistory.Location = new System.Drawing.Point(208, 97);
-            this._upDownInputEventHistory.Maximum = new decimal(new int[] {
-            365,
-            0,
-            0,
-            0});
-            this._upDownInputEventHistory.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this._upDownInputEventHistory.Name = "_upDownInputEventHistory";
-            this._upDownInputEventHistory.Size = new System.Drawing.Size(40, 20);
-            this._upDownInputEventHistory.TabIndex = 6;
-            this._upDownInputEventHistory.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this._upDownInputEventHistory.UserTextCorrected += new System.EventHandler<System.EventArgs>(this.HandleInputEventHistoryValueCorrectedEvent);
             // 
             // _checkStoreInputEventTracking
             // 
@@ -552,7 +483,6 @@
             // 
             // _productSpecificLayout
             // 
-            this._productSpecificLayout.Controls.Add(this._groupIDShield);
             this._productSpecificLayout.Controls.Add(this._groupDataEntry);
             this._productSpecificLayout.Dock = System.Windows.Forms.DockStyle.Fill;
             this._productSpecificLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
@@ -561,33 +491,12 @@
             this._productSpecificLayout.Size = new System.Drawing.Size(458, 311);
             this._productSpecificLayout.TabIndex = 1;
             // 
-            // _groupIDShield
-            // 
-            this._groupIDShield.Controls.Add(this._checkIdShieldHistory);
-            this._groupIDShield.Location = new System.Drawing.Point(3, 3);
-            this._groupIDShield.Name = "_groupIDShield";
-            this._groupIDShield.Size = new System.Drawing.Size(452, 65);
-            this._groupIDShield.TabIndex = 0;
-            this._groupIDShield.TabStop = false;
-            this._groupIDShield.Text = "ID Shield";
-            // 
-            // _checkIdShieldHistory
-            // 
-            this._checkIdShieldHistory.AutoSize = true;
-            this._checkIdShieldHistory.Location = new System.Drawing.Point(6, 19);
-            this._checkIdShieldHistory.Name = "_checkIdShieldHistory";
-            this._checkIdShieldHistory.Size = new System.Drawing.Size(184, 17);
-            this._checkIdShieldHistory.TabIndex = 0;
-            this._checkIdShieldHistory.Text = "Store ID Shield processing history";
-            this._checkIdShieldHistory.UseVisualStyleBackColor = true;
-            // 
             // _groupDataEntry
             // 
             this._groupDataEntry.Controls.Add(this._checkDataEntryEnableCounters);
-            this._groupDataEntry.Controls.Add(this._checkDataEntryHistory);
-            this._groupDataEntry.Location = new System.Drawing.Point(3, 74);
+            this._groupDataEntry.Location = new System.Drawing.Point(3, 3);
             this._groupDataEntry.Name = "_groupDataEntry";
-            this._groupDataEntry.Size = new System.Drawing.Size(451, 65);
+            this._groupDataEntry.Size = new System.Drawing.Size(451, 47);
             this._groupDataEntry.TabIndex = 1;
             this._groupDataEntry.TabStop = false;
             this._groupDataEntry.Text = "Data Entry";
@@ -595,22 +504,12 @@
             // _checkDataEntryEnableCounters
             // 
             this._checkDataEntryEnableCounters.AutoSize = true;
-            this._checkDataEntryEnableCounters.Location = new System.Drawing.Point(6, 42);
+            this._checkDataEntryEnableCounters.Location = new System.Drawing.Point(6, 19);
             this._checkDataEntryEnableCounters.Name = "_checkDataEntryEnableCounters";
             this._checkDataEntryEnableCounters.Size = new System.Drawing.Size(153, 17);
             this._checkDataEntryEnableCounters.TabIndex = 1;
             this._checkDataEntryEnableCounters.Text = "Enable data entry counters";
             this._checkDataEntryEnableCounters.UseVisualStyleBackColor = true;
-            // 
-            // _checkDataEntryHistory
-            // 
-            this._checkDataEntryHistory.AutoSize = true;
-            this._checkDataEntryHistory.Location = new System.Drawing.Point(6, 19);
-            this._checkDataEntryHistory.Name = "_checkDataEntryHistory";
-            this._checkDataEntryHistory.Size = new System.Drawing.Size(188, 17);
-            this._checkDataEntryHistory.TabIndex = 0;
-            this._checkDataEntryHistory.Text = "Store data entry processing history";
-            this._checkDataEntryHistory.UseVisualStyleBackColor = true;
             // 
             // _tabEmail
             // 
@@ -622,14 +521,6 @@
             this._tabEmail.TabIndex = 6;
             this._tabEmail.Text = "Email";
             this._tabEmail.UseVisualStyleBackColor = true;
-            // 
-            // _emailSettingsControl
-            // 
-            this._emailSettingsControl.Location = new System.Drawing.Point(3, 3);
-            this._emailSettingsControl.Name = "_emailSettingsControl";
-            this._emailSettingsControl.Size = new System.Drawing.Size(452, 319);
-            this._emailSettingsControl.TabIndex = 0;
-            this._emailSettingsControl.SettingsChanged += new System.EventHandler<System.EventArgs>(this.HandleEmailSettingsControl_SettingsChanged);
             // 
             // _buttonCancel
             // 
@@ -676,6 +567,79 @@
             this._emailTestButton.Visible = false;
             this._emailTestButton.Click += new System.EventHandler(this.HandleEmailTestButton_Click);
             // 
+            // _numberMaxTimeBetweenChecks
+            // 
+            this._numberMaxTimeBetweenChecks.Location = new System.Drawing.Point(297, 242);
+            this._numberMaxTimeBetweenChecks.MaximumValue = 1.7976931348623157E+308D;
+            this._numberMaxTimeBetweenChecks.MinimumValue = -1.7976931348623157E+308D;
+            this._numberMaxTimeBetweenChecks.Name = "_numberMaxTimeBetweenChecks";
+            this._numberMaxTimeBetweenChecks.Size = new System.Drawing.Size(55, 20);
+            this._numberMaxTimeBetweenChecks.TabIndex = 11;
+            // 
+            // _numberMinTimeBetweenChecks
+            // 
+            this._numberMinTimeBetweenChecks.AllowNegative = false;
+            this._numberMinTimeBetweenChecks.Location = new System.Drawing.Point(297, 216);
+            this._numberMinTimeBetweenChecks.MaximumValue = 1.7976931348623157E+308D;
+            this._numberMinTimeBetweenChecks.MinimumValue = -1.7976931348623157E+308D;
+            this._numberMinTimeBetweenChecks.Name = "_numberMinTimeBetweenChecks";
+            this._numberMinTimeBetweenChecks.Size = new System.Drawing.Size(55, 20);
+            this._numberMinTimeBetweenChecks.TabIndex = 10;
+            // 
+            // _upDownRevertMinutes
+            // 
+            this._upDownRevertMinutes.Location = new System.Drawing.Point(205, 73);
+            this._upDownRevertMinutes.Maximum = new decimal(new int[] {
+            1440,
+            0,
+            0,
+            0});
+            this._upDownRevertMinutes.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this._upDownRevertMinutes.Name = "_upDownRevertMinutes";
+            this._upDownRevertMinutes.Size = new System.Drawing.Size(49, 20);
+            this._upDownRevertMinutes.TabIndex = 5;
+            this._upDownRevertMinutes.Value = new decimal(new int[] {
+            1440,
+            0,
+            0,
+            0});
+            this._upDownRevertMinutes.UserTextCorrected += new System.EventHandler<System.EventArgs>(this.HandleAutoRevertValueCorrectedEvent);
+            // 
+            // _upDownInputEventHistory
+            // 
+            this._upDownInputEventHistory.Location = new System.Drawing.Point(208, 97);
+            this._upDownInputEventHistory.Maximum = new decimal(new int[] {
+            365,
+            0,
+            0,
+            0});
+            this._upDownInputEventHistory.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._upDownInputEventHistory.Name = "_upDownInputEventHistory";
+            this._upDownInputEventHistory.Size = new System.Drawing.Size(40, 20);
+            this._upDownInputEventHistory.TabIndex = 6;
+            this._upDownInputEventHistory.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._upDownInputEventHistory.UserTextCorrected += new System.EventHandler<System.EventArgs>(this.HandleInputEventHistoryValueCorrectedEvent);
+            // 
+            // _emailSettingsControl
+            // 
+            this._emailSettingsControl.Location = new System.Drawing.Point(3, 3);
+            this._emailSettingsControl.Name = "_emailSettingsControl";
+            this._emailSettingsControl.Size = new System.Drawing.Size(452, 319);
+            this._emailSettingsControl.TabIndex = 0;
+            this._emailSettingsControl.SettingsChanged += new System.EventHandler<System.EventArgs>(this.HandleEmailSettingsControl_SettingsChanged);
+            // 
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -697,19 +661,17 @@
             this._tabControlSettings.ResumeLayout(false);
             this._tabGeneral.ResumeLayout(false);
             this._tabGeneral.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._upDownRevertMinutes)).EndInit();
             this._tabHistory.ResumeLayout(false);
             this._tabHistory.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._upDownInputEventHistory)).EndInit();
             this._tabSecurity.ResumeLayout(false);
             this._tabSecurity.PerformLayout();
             this._tabProductSpecific.ResumeLayout(false);
             this._productSpecificLayout.ResumeLayout(false);
-            this._groupIDShield.ResumeLayout(false);
-            this._groupIDShield.PerformLayout();
             this._groupDataEntry.ResumeLayout(false);
             this._groupDataEntry.PerformLayout();
             this._tabEmail.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this._upDownRevertMinutes)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._upDownInputEventHistory)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -743,9 +705,6 @@
         private System.Windows.Forms.TabPage _tabProductSpecific;
         private System.Windows.Forms.GroupBox _groupDataEntry;
         private System.Windows.Forms.CheckBox _checkDataEntryEnableCounters;
-        private System.Windows.Forms.CheckBox _checkDataEntryHistory;
-        private System.Windows.Forms.GroupBox _groupIDShield;
-        private System.Windows.Forms.CheckBox _checkIdShieldHistory;
         private System.Windows.Forms.FlowLayoutPanel _productSpecificLayout;
         private Utilities.Forms.BetterNumericUpDown _upDownRevertMinutes;
         private Utilities.Forms.BetterNumericUpDown _upDownInputEventHistory;

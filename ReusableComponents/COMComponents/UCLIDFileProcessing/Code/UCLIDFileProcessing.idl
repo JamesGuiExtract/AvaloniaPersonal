@@ -1630,6 +1630,13 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// Gets the FAMSessionID for the current FAM session; 0 if there is no current FAMSession.
 		[propget, id(144), helpstring("property FAMSessionID")] HRESULT FAMSessionID([out, retval] long* pnFAMSessionID);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Adds a row to the FileTaskSession table. It is assumed that the specified bstrTaskClassGuid
+		//			already exists in the TaskClass table.
+		// RETURNS: The ID of the added FileTaskSession row.
+		[id(145), helpstring("methods RecordFileTaskSession")] HRESULT RecordFileTaskSession([in] BSTR bstrTaskClassGuid,
+			[in] long nFileID, [in] double dDuration, [in] double dOverheadTime,
+			[out, retval] long *pnFileTaskSessionID);
 	};
 
 	[

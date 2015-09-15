@@ -78,8 +78,10 @@ public:
 	void updateMenuAndToolbar();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: This method will update UI
-	//---------------------------------------------------------------------------------------------
 	void updateUI();
+	//---------------------------------------------------------------------------------------------	
+	// Updates the database tab based on the current database status and updates the UI
+	void updateUIForCurrentDBStatus();
 	//---------------------------------------------------------------------------------------------
 	void updateStatusBarStats(UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats);
 	//---------------------------------------------------------------------------------------------
@@ -264,6 +266,12 @@ private:
 	// Is Database connection ready
 	bool m_bDBConnectionReady;
 
+	// The ID of the currently configured action
+	long m_nCurrActionID;
+
+	// A textual description of the current database connection status.
+	string m_strCurrDBStatus;
+
 	// Statistics Thread Related Events
 	Win32Event m_eventStatsThreadStarted;
 	Win32Event m_eventStatsThreadStop;
@@ -338,6 +346,8 @@ private:
 	// appropriately
 	void setCurrFPSFile(const string& strFileName);
 	//---------------------------------------------------------------------------------------------
+	void updateDBConnectionStatus();
+	//---------------------------------------------------------------------------------------------
 	void saveWindowSettings();
 	//---------------------------------------------------------------------------------------------
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr getDBPointer();
@@ -375,9 +385,6 @@ private:
 
 	// Thread function pParam must be a StatisticsMgr * (this pointer)
 	static UINT __cdecl StatisticsMgrThreadFunct( LPVOID pParam );
-
-	// Updates the database tab based on the current database status and updates the UI
-	void updateUIForCurrentDBStatus();
 
 	// Returns a pointer to the property page that is specified by ePage, this should always return a valid pointer
 	CPropertyPage *getPropertyPage(EDlgTabPage ePage);

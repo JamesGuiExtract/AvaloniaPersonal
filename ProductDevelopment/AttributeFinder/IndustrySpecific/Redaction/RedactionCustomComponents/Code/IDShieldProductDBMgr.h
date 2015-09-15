@@ -72,13 +72,13 @@ public:
 		long* pnNumSteps, IProgressStatus* pProgressStatus);
 
 // IIDShieldProductDBMgr Methods
-	STDMETHOD(AddIDShieldData)(long lFileID, double dDuration, double dOverheadTime,
-		long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound,
+	STDMETHOD(AddIDShieldData)(BSTR bstrTaskClassGuid, long lFileID, double dDuration,
+		double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound,
 		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
 		long lNumPagesAutoAdvanced);
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* plFileID);
-	STDMETHOD(Initialize)(IFileProcessingDB* pFAMDB, GUID guidTaskClass);
+	STDMETHOD(Initialize)(IFileProcessingDB* pFAMDB);
 
 private:
 	// Variables
@@ -89,19 +89,12 @@ private:
 	// This it the pointer to the database connection
 	ADODB::_ConnectionPtr m_ipDBConnection; 
 
-	// Flag to indicate if non recent IDShieldData records should be saved
-	bool m_bStoreIDShieldProcessingHistory;
-
 	// Contains the number of times an attempt to reconnect. Each time the reconnect attempt times
 	// out an exception will be logged.
 	long m_nNumberOfRetries;
 
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
-
-	// The GUID for the class implementing the IFileProcessingTask instance for which data is to be
-	// logged.
-	string m_strTaskClassID;
 
 	// Methods
 	
@@ -120,16 +113,13 @@ private:
 	void validateLicense();
 
 	// Internal versions of external methods that may require database locking
-	bool AddIDShieldData_Internal(bool bDBLocked, long lFileID, double dDuration,
-		double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
-		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
+	bool AddIDShieldData_Internal(bool bDBLocked, long nFileTaskSessionID,  long lNumHCDataFound,
+		long lNumMCDataFound, long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
 		long lTotalManualRedactions, long lNumPagesAutoAdvanced);
 
 	bool GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery, _Recordset** ppVal);
 
 	bool GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, long* plFileID);
-
-	bool Initialize_Internal(bool bDBLocked, GUID guidTaskClass);
 
 	// Retrieves the set of SQL queries used to create the IDShield specific database tables.
 	const vector<string> getTableCreationQueries();

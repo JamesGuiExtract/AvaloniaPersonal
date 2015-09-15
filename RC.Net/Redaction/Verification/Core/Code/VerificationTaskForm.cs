@@ -103,6 +103,17 @@ namespace Extract.Redaction.Verification
         /// </summary>
         static readonly int _SC_MONITORPOWER = 0xF170;
 
+        /// <summary>
+        /// A string representation of the GUID for <see cref="AttributeStorageManagerClass"/> 
+        /// </summary>
+        static readonly string _ATTRIBUTE_STORAGE_MANAGER_GUID =
+            typeof(AttributeStorageManagerClass).GUID.ToString("B");
+
+        /// <summary>
+        /// A string representation of theGUID for <see cref="VerificationTask"/> 
+        /// </summary>
+        static readonly string _VERIFY_TASK_GUID = typeof(VerificationTask).GUID.ToString("B");
+
         #endregion Constants
 
         #region Enums
@@ -1010,7 +1021,7 @@ namespace Extract.Redaction.Verification
         void AddDatabaseData(int fileId, RedactionCounts counts, double screenTime,
             double overheadTime)
         {
-            _idShieldDatabase.AddIDShieldData(fileId, screenTime, overheadTime,
+            _idShieldDatabase.AddIDShieldData(_VERIFY_TASK_GUID, fileId, screenTime, overheadTime,
                 counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence,
                 counts.Clues, counts.Total, counts.Manual, _setSlideshowAdvancedPages.Count);
         }
@@ -1201,7 +1212,7 @@ namespace Extract.Redaction.Verification
                         // save verified data as found data at a later point in time.
                         IUnknownVector emptyVector = new IUnknownVector();
                         emptyVector.SaveTo(memento.FoundAttributesFileName, false,
-                            typeof(AttributeStorageManagerClass).GUID.ToString("B"));
+                            _ATTRIBUTE_STORAGE_MANAGER_GUID);
                     }
                 }
             }
@@ -2620,7 +2631,7 @@ namespace Extract.Redaction.Verification
                 Type mgrType = Type.GetTypeFromProgID(dbUtils.GetIDShieldDBProgId());
                 _idShieldDatabase = (IDShieldProductDBMgr)Activator.CreateInstance(mgrType);
 
-                _idShieldDatabase.Initialize(_fileDatabase, typeof(VerificationTask).GUID);
+                _idShieldDatabase.Initialize(_fileDatabase);
             }
         }
 

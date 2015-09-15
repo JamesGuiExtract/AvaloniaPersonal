@@ -262,6 +262,12 @@ namespace Extract.DataEntry
         /// </summary>
         const double _AUTO_ZOOM_MAX_CONTEXT = 0.75;
 
+        /// <summary>
+        /// A string representation of the GUID for <see cref="AttributeStorageManagerClass"/> 
+        /// </summary>
+        static readonly string _ATTRIBUTE_STORAGE_MANAGER_GUID =
+            typeof(AttributeStorageManagerClass).GUID.ToString("B");
+
         #endregion Constants
 
         #region Fields
@@ -1836,7 +1842,7 @@ namespace Extract.DataEntry
 
                             // If all attributes passed validation, save the data.
                             _mostRecentlySaveAttributes.SaveTo(_imageViewer.ImageFile + ".voa",
-                                true, typeof(AttributeStorageManagerClass).GUID.ToString("B"));
+                                true, _ATTRIBUTE_STORAGE_MANAGER_GUID);
 
                             OnDataSaved();
 

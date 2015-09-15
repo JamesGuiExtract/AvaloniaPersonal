@@ -28,8 +28,11 @@ using namespace std;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-static const long glDATAENTRY_DB_SCHEMA_VERSION = 4;
+static const long glDATAENTRY_DB_SCHEMA_VERSION = 5;
 static const string gstrDATA_ENTRY_SCHEMA_VERSION_NAME = "DataEntrySchemaVersion";
+// https://extract.atlassian.net/browse/ISSUE-13239
+// StoreDataEntryProcessingHistory has been removed (const exists only for
+// findUnrecognizedSchemaElements)
 static const string gstrSTORE_DATAENTRY_PROCESSING_HISTORY = "StoreDataEntryProcessingHistory";
 static const string gstrSTORE_HISTORY_DEFAULT_SETTING = "1"; // TRUE
 static const string gstrENABLE_DATA_ENTRY_COUNTERS = "EnableDataEntryCounters";
@@ -102,6 +105,34 @@ int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38600");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion5(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 5;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("DELETE FROM [DBInfo] WHERE [Name] = '" +
+			gstrSTORE_DATAENTRY_PROCESSING_HISTORY + "'");
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '5' WHERE [Name] = '" + 
+			gstrDATA_ENTRY_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38665");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CDataEntryProductDBMgr
@@ -109,12 +140,10 @@ int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps,
 CDataEntryProductDBMgr::CDataEntryProductDBMgr()
 : m_ipFAMDB(NULL)
 , m_ipDBConnection(NULL)
-, m_bStoreDataEntryProcessingHistory(true)
 , m_ipAFUtility(NULL)
 , m_lNextInstanceToken(0)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
-, m_strTaskClassID()
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -426,6 +455,10 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_GetDBInfoRows(IVariantVector** ppDBInfo
 			ipDBInfoRows->PushBack(iterDBInfoValues->first.c_str());
 		}
 
+		// https://extract.atlassian.net/browse/ISSUE-13239
+		// Ability to turn off record session history for data entry has been removed.
+		ipDBInfoRows->PushBack(gstrSTORE_DATAENTRY_PROCESSING_HISTORY.c_str());
+
 		*ppDBInfoRows = ipDBInfoRows.Detach();
 
 		return S_OK;
@@ -507,9 +540,16 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion4(ipConnection, pnNumSteps, NULL);
 					}
+					// Break is intentionally missing as schema updates 4 and 5 both correspond with
+					// nFAMDBSchemaVersion 129
+
+			case 4:	if (nFAMDBSchemaVersion == 129)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion5(ipConnection, pnNumSteps, NULL);
+					}
 					break;
 
-			case 4: break;
+			case 5: break;
 
 			default:
 				{
@@ -528,29 +568,6 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 
 //-------------------------------------------------------------------------------------------------
 // IDataEntryProductDBMgr Methods
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nActionID,
-										double dDuration, double dOverheadTime, long* plInstanceID)
-{
-	try
-	{
-		AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-		if (!AddDataEntryData_Internal(false, lFileID, nActionID, dDuration, dOverheadTime,
-				plInstanceID))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB,
-				gstrMAIN_DB_LOCK);
-
-			AddDataEntryData_Internal(true, lFileID, nActionID, dDuration, dOverheadTime,
-				plInstanceID);
-		}
-	
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29008");
-}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 									long lDataEntryDataInstanceID, IIUnknownVector* pAttributes)
@@ -571,7 +588,7 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29056");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDataEntryProductDBMgr::Initialize(IFileProcessingDB* pFAMDB, GUID guidTaskClass)
+STDMETHODIMP CDataEntryProductDBMgr::Initialize(IFileProcessingDB* pFAMDB)
 {
 	try
 	{
@@ -579,20 +596,10 @@ STDMETHODIMP CDataEntryProductDBMgr::Initialize(IFileProcessingDB* pFAMDB, GUID 
 
 		ASSERT_ARGUMENT("ELI38615", pFAMDB != nullptr);
 
-		// m_ipFAMDB needs to be set before Initialize_Internal can properly attempt optimistic
-		// locking.
 		m_ipFAMDB = pFAMDB;
 		ASSERT_RESOURCE_ALLOCATION("ELI38616", m_ipFAMDB != nullptr);
 
 		m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
-
-		if (!Initialize_Internal(false, guidTaskClass))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
-
-			Initialize_Internal(true, guidTaskClass);
-		}
 		
 		return S_OK;
 	}
@@ -640,13 +647,6 @@ ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection()
 
 			// Set the command timeout
 			m_ipDBConnection->CommandTimeout = asLong(strValue);
-
-			// Get the setting for storing Data Entry processing history
-			strValue = asString(m_ipFAMDB->GetDBInfoSetting(
-				gstrSTORE_DATAENTRY_PROCESSING_HISTORY.c_str(), VARIANT_TRUE));
-
-			// Set the local setting for storing history
-			m_bStoreDataEntryProcessingHistory = strValue == asString(TRUE);
 		}
 	}
 	
@@ -711,81 +711,6 @@ IAFUtilityPtr CDataEntryProductDBMgr::getAFUtility()
 }
 //-------------------------------------------------------------------------------------------------
 // Internal versions of Interface methods
-//-------------------------------------------------------------------------------------------------
-bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFileID, long nActionID,
-										double dDuration, double dOverheadTime, long* plInstanceID)
-{
-	try
-	{
-		try
-		{
-			ASSERT_ARGUMENT("ELI29051", plInstanceID != __nullptr);
-
-			if (m_strTaskClassID.empty())
-			{
-				throw UCLIDException("ELI38610", "TaskClass ID has not been set.");
-			}
-
-			// Validate data entry schema
-			validateDataEntrySchemaVersion(true);
-
-			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-			_ConnectionPtr ipConnection = __nullptr;
-
-			BEGIN_ADO_CONNECTION_RETRY();
-
-			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
-
-			// Get the file ID as a string
-			string strFileId = asString(lFileID);
-
-			long nUserID = getKeyID(ipConnection, "FAMUser", "UserName", getCurrentUserName());
-			long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
-
-			// Build insert SQL query 
-			string strInsertSQL = gstrINSERT_FILETASKSESSION_DATA_RCD;
-			replaceVariable(strInsertSQL, "<FAMSessionID>", asString(m_ipFAMDB->FAMSessionID));
-			replaceVariable(strInsertSQL, "<TaskClassID>", m_strTaskClassID);
-			replaceVariable(strInsertSQL, "<FileID>", strFileId);
-			replaceVariable(strInsertSQL, "<Duration>", asString(dDuration));
-			replaceVariable(strInsertSQL, "<OverheadTime>", asString(dOverheadTime));
-
-			// Create a transaction guard
-			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
-
-			// If not storing previous history need to delete it
-			if (!m_bStoreDataEntryProcessingHistory)
-			{
-				string strDeleteQuery = gstrDELETE_PREVIOUS_STATUS_FOR_FILEID;
-				replaceVariable(strDeleteQuery, "<TaskClassID>", m_strTaskClassID);
-				replaceVariable(strDeleteQuery, "<FileID>", strFileId);
-
-				// Delete previous records with the fileID
-				executeCmdQuery(ipConnection, strDeleteQuery);
-			}
-
-			// Insert the record
-			executeCmdQuery(ipConnection, strInsertSQL, false, plInstanceID);
-
-			// Commit the transactions
-			tg.CommitTrans();
-
-			END_ADO_CONNECTION_RETRY(
-				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29837");
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30714");
-	}
-	catch(UCLIDException ue)
-	{
-		if (!bDBLocked)
-		{
-			return false;
-		}
-		throw ue;
-	}
-	return true;
-}
 //-------------------------------------------------------------------------------------------------
 bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* plInstanceToken,
 									long lDataEntryDataInstanceID, IIUnknownVector* pAttributes)
@@ -921,55 +846,6 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CDataEntryProductDBMgr::Initialize_Internal(bool bDBLocked, GUID guidTaskClass)
-{
-	try
-	{
-		try
-		{
-			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-			_ConnectionPtr ipConnection = __nullptr;
-			string strTaskClassID;
-
-			BEGIN_ADO_CONNECTION_RETRY();
-
-			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
-
-			long nTaskClassID = 0;
-			executeCmdQuery(ipConnection,
-				"SELECT [ID] FROM [TaskClass] WHERE [GUID] = '" + asString(guidTaskClass) + "'",
-				false, &nTaskClassID);
-
-			ASSERT_RESOURCE_ALLOCATION("ELI38611", nTaskClassID != 0);
-
-			strTaskClassID = asString(nTaskClassID);
-
-			END_ADO_CONNECTION_RETRY(
-				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI38612");
-
-			if (!m_strTaskClassID.empty() && strTaskClassID != m_strTaskClassID)
-			{
-				UCLIDException ue("ELI38613", "A different task class ID has already been assigned.");
-				ue.addDebugInfo("GUID", asString(guidTaskClass));
-				throw ue;
-			}
-
-			m_strTaskClassID = strTaskClassID;
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38614");
-	}
-	catch(UCLIDException ue)
-	{
-		if (!bDBLocked)
-		{
-			return false;
-		}
-		throw ue;
-	}
-	return true;
-}
-//-------------------------------------------------------------------------------------------------
 const vector<string> CDataEntryProductDBMgr::getTableCreationQueries(bool bAddUserTables)
 {
 	vector<string> vecQueries;
@@ -995,7 +871,6 @@ map<string, string> CDataEntryProductDBMgr::getDBInfoDefaultValues()
 	// findUnrecognizedSchemaElements does not treat the element on old schema versions as
 	// unrecognized.
 	mapDefaultValues[gstrDATA_ENTRY_SCHEMA_VERSION_NAME] = asString(glDATAENTRY_DB_SCHEMA_VERSION);
-	mapDefaultValues[gstrSTORE_DATAENTRY_PROCESSING_HISTORY] = gstrSTORE_HISTORY_DEFAULT_SETTING;
 	mapDefaultValues[gstrENABLE_DATA_ENTRY_COUNTERS] = gstrENABLE_DATA_ENTRY_COUNTERS_DEFAULT_SETTING;
 
 	return mapDefaultValues;

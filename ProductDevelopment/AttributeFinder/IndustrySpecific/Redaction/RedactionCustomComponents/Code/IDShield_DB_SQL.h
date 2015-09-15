@@ -34,17 +34,6 @@ static const string gstrCREATE_IDSHIELDDATA_FILETASKSESSION_INDEX =
 	"CREATE NONCLUSTERED INDEX [IX_FileID_FileTaskSession] ON [dbo].[IDShieldData] "
 	"([FileTaskSessionID] ASC)";
 
-static const string gstrINSERT_FILETASKSESSION_DATA_RCD =
-	"INSERT INTO [dbo].[FileTaskSession] "
-	" ([FAMSessionID]"
-	"  ,[TaskClassID]"
-	"  ,[FileID]"
-    "  ,[DateTimeStamp]"
-    "  ,[Duration]"
-	"  ,[OverheadTime]) "
-	"  OUTPUT INSERTED.ID "
-	"  VALUES (<FAMSessionID>, <TaskClassID>, <FileID>, GETDATE(), <Duration>, <OverheadTime>)";
-
 static const string gstrINSERT_IDSHIELD_DATA_RCD = 
 	"INSERT INTO [dbo].[IDShieldData] "
 	" ([FileTaskSessionID]"
@@ -57,14 +46,6 @@ static const string gstrINSERT_IDSHIELD_DATA_RCD =
 	"  ,[NumPagesAutoAdvanced]) "
 	"  VALUES (<FileTaskSessionID>, <NumHCDataFound>, <NumMCDataFound>, <NumLCDataFound>, "
 	"	<NumCluesFound>, <TotalRedactions>, <TotalManualRedactions>, <NumPagesAutoAdvanced>)";
-
-// Deletes all records in the FileTaskSession table that have the given TaskClassID and FileID. This
-// should be run before adding a new record if history is not being kept.
-// Requires <TaskClassID> and <FileID> be replaced with the appropriate values.
-// (Cascade deletes will delete the corresponding row in IDShieldData)
-static const string gstrDELETE_PREVIOUS_STATUS_FOR_FILEID = 
-	"DELETE FROM [FileTaskSession]"
-	"WHERE [TaskClassID] = <TaskClassID> AND [FileID] = <FileID>";
 
 // https://extract.atlassian.net/browse/ISSUE-13226
 // Moves all data in IDShieldData to FileTaskSession and updates all foreign keys as necessary.

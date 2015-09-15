@@ -79,6 +79,16 @@ namespace Extract.Utilities.Forms
         PathTagsButtonDisplayStyle _displayStyle = PathTagsButtonDisplayStyle.ImageOnly;
 
         /// <summary>
+        /// A text control associated with this button.
+        /// </summary>
+        TextBoxBase _textControl;
+        
+        /// <summary>
+        /// A combo box associated with this button.
+        /// </summary>
+        ComboBox _comboBox;
+
+        /// <summary>
         /// Whether or not path tags should be displayed in the drop down.
         /// </summary>
         bool _displayPathTags = true;
@@ -151,13 +161,54 @@ namespace Extract.Utilities.Forms
         #region Properties
 
         /// <summary>
-        /// Gets/sets the text control associated with this <see cref="PathTagsButton"/>.
+        /// Gets/sets a text control associated with this <see cref="PathTagsButton"/>.
+        /// <para><b>Note</b></para>
+        /// Only one of <see cref="TextControl"/> and <see cref="ComboBox"/> should be set (not both).
         /// </summary>
-        /// <returns>The text control associated with this <see cref="PathTagsButton"/>.</returns>
-        /// <value>The text control associated with this <see cref="PathTagsButton"/>.</value>
+        /// <returns>A text control associated with this <see cref="PathTagsButton"/>.</returns>
+        /// <value>A text control associated with this <see cref="PathTagsButton"/>.</value>
         [DefaultValue(null)]
-        [Description("The text control to automatically update when a tag is selected.")]
-        public TextBoxBase TextControl { get; set; }
+        [Description("A text control to automatically update when a tag is selected.")]
+        public TextBoxBase TextControl
+        {
+            get
+            {
+                return _textControl;
+            }
+
+            set
+            {
+                ExtractException.Assert("ELI38662", "A ComboBox cannot be set if a TextControl is.",
+                    value == null || _comboBox == null);
+
+                _textControl = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets a <see cref="ComboBox"/> associated with this <see cref="PathTagsButton"/>.
+        /// <para><b>Note</b></para>
+        /// Only one of <see cref="TextControl"/> and <see cref="ComboBox"/> should be set (not both).
+        /// </summary>
+        /// <returns>The <see cref="ComboBox"/> associated with this <see cref="PathTagsButton"/>.</returns>
+        /// <value>The <see cref="ComboBox"/> associated with this <see cref="PathTagsButton"/>.</value>
+        [DefaultValue(null)]
+        [Description("A combo box to automatically update when a tag is selected.")]
+        public ComboBox ComboBox
+        {
+            get
+            {
+                return _comboBox;
+            }
+
+            set
+            {
+                ExtractException.Assert("ELI38663", "A TextControl cannot be set if a ComboBox is.",
+                    value == null || _textControl == null);
+
+                _comboBox = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the path tags that are available for selection.
@@ -499,6 +550,36 @@ namespace Extract.Utilities.Forms
                         }
 
                         TextControl.Focus();
+                    }
+                    else if (ComboBox != null)
+                    {
+                        // Same logic as above must be repeated since ComboBox and TextBoxBase don't
+                        // share a common base class or interface.
+                        int originalSelectionStart = ComboBox.SelectionStart;
+                        string originalSelectedText = ComboBox.SelectedText;
+
+                        // If a tag function has been selected, automatically position the cursor
+                        // between the parentheses
+                        if (tagName.StartsWith("$", StringComparison.OrdinalIgnoreCase) &&
+                            tagName.EndsWith(")", StringComparison.OrdinalIgnoreCase))
+                        {
+                            int parameterInsertIndex = tagName.IndexOf('(') + 1;
+                            tagName = tagName.Substring(0, parameterInsertIndex);
+
+                            tagName += originalSelectedText + ")";
+                            ComboBox.SelectionLength = ComboBox.SelectedText.Length;
+
+                            ComboBox.SelectedText = tagName;
+                            ComboBox.SelectionStart = originalSelectionStart + parameterInsertIndex;
+                            ComboBox.SelectionLength = originalSelectedText.Length;
+                        }
+                        else
+                        {
+                            ComboBox.SelectedText = tagName;
+                            ComboBox.SelectionLength = 0;
+                        }
+
+                        ComboBox.Focus();
                     }
 
                     // Raise the TagSelected event

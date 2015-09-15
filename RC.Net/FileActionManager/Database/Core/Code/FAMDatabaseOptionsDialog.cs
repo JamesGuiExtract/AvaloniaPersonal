@@ -47,9 +47,7 @@ namespace Extract.FileActionManager.Database
 
         // Constants for Product Specific tab
         const string _ID_SHIELD_SCHEMA_VERSION_NAME = "IDShieldSchemaVersion";
-        const string _STORE_IDSHIELD_PROCESSING_HISTORY = "StoreIDShieldProcessingHistory";
         const string _DATA_ENTRY_SCHEMA_VERSION_NAME = "DataEntrySchemaVersion";
-        const string _STORE_DATAENTRY_PROCESSING_HISTORY = "StoreDataEntryProcessingHistory";
         const string _ENABLE_DATA_ENTRY_COUNTERS = "EnableDataEntryCounters";
 
         // Constant for retrieving the last DB info change
@@ -230,7 +228,8 @@ namespace Extract.FileActionManager.Database
                 _upDownInputEventHistory.Value = dayCount;
 
                 // Check for product specific entries
-                bool enableIdShield = settings.Contains(_ID_SHIELD_SCHEMA_VERSION_NAME);
+                // There are no longer any settings associated with IDShield.
+                bool enableIdShield = false; //settings.Contains(_ID_SHIELD_SCHEMA_VERSION_NAME);
                 bool enableDataEntry = settings.Contains(_DATA_ENTRY_SCHEMA_VERSION_NAME);
 
                 // No product specific entries, remove the tab
@@ -245,18 +244,10 @@ namespace Extract.FileActionManager.Database
                         _tabControlSettings.TabPages.Add(_tabProductSpecific);
                     }
 
-                    _groupIDShield.Visible = enableIdShield;
                     _groupDataEntry.Visible = enableDataEntry;
 
-                    if (enableIdShield)
-                    {
-                        SetCheckControl(settings, _STORE_IDSHIELD_PROCESSING_HISTORY,
-                            _checkIdShieldHistory);
-                    }
                     if (enableDataEntry)
                     {
-                        SetCheckControl(settings, _STORE_DATAENTRY_PROCESSING_HISTORY,
-                            _checkDataEntryHistory);
                         SetCheckControl(settings, _ENABLE_DATA_ENTRY_COUNTERS,
                             _checkDataEntryEnableCounters);
                     }
@@ -597,15 +588,9 @@ namespace Extract.FileActionManager.Database
                 map.Set(_SKIP_AUTHENTICATION_ON_MACHINES, machines);
 
                 // Add product specific data if the group boxes are visible
-                if (_groupIDShield.Visible)
-                {
-                    map.Set(_STORE_IDSHIELD_PROCESSING_HISTORY,
-                        _checkIdShieldHistory.Checked ? "1" : "0");
-                }
+
                 if (_groupDataEntry.Visible)
                 {
-                    map.Set(_STORE_DATAENTRY_PROCESSING_HISTORY,
-                        _checkDataEntryHistory.Checked ? "1" : "0");
                     map.Set(_ENABLE_DATA_ENTRY_COUNTERS,
                         _checkDataEntryEnableCounters.Checked ? "1" : "0");
                 }

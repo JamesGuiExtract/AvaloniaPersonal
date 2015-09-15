@@ -8193,3 +8193,48 @@ bool CFileProcessingDB::RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOl
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, 
+					long nFileID, double dDuration, double dOverheadTime, long *pnFileTaskSessionID)
+{
+	try
+	{
+		try
+		{
+			*pnFileTaskSessionID = 0;
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			validateDBSchemaVersion();
+
+			string strInsertSQL = gstrINSERT_FILETASKSESSION_DATA;
+			replaceVariable(strInsertSQL, "<FAMSessionID>", asString(m_nFAMSessionID));
+			replaceVariable(strInsertSQL, "<TaskClassGuid>", asString(bstrTaskClassGuid));
+			replaceVariable(strInsertSQL, "<FileID>", asString(nFileID));
+			replaceVariable(strInsertSQL, "<Duration>", asString(dDuration));
+			replaceVariable(strInsertSQL, "<OverheadTime>", asString(dOverheadTime));
+
+			long nFileTaskSessionID = 0;
+			executeCmdQuery(ipConnection, strInsertSQL, false, pnFileTaskSessionID);
+			
+			END_CONNECTION_RETRY(ipConnection, "ELI38640");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38641");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------

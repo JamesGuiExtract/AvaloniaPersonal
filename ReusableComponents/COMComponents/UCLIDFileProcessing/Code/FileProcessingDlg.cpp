@@ -104,6 +104,7 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
  m_bForceCloseOnComplete(false),
  m_bExceededExecCount(false),
  m_bDBConnectionReady(true),
+ m_nCurrActionID(-1),
  m_apDatabaseStatusIconUpdater(__nullptr),
  m_bStatsOnlyRunning(false),
  m_bProcessingSkippedFiles(false),
@@ -2258,12 +2259,6 @@ void FileProcessingDlg::updateUI()
 			bEnableRun = true;
 		}
 
-		// Get the database status
-		string strDBStatus = asString(getDBPointer()->GetCurrentConnectionStatus());
-
-		// Set the DBConnectionReady flag by checking if the status string is the Connection Established string
-		m_bDBConnectionReady = strDBStatus == gstrCONNECTION_ESTABLISHED;
-
 		// Disable/enable run save and save as button and menu items
 		m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, asMFCBool(bEnableRun) );
 		m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_OPEN, asMFCBool(!m_bRunning));
@@ -2272,11 +2267,10 @@ void FileProcessingDlg::updateUI()
 		pMenu->EnableMenuItem(ID_FILE_OPEN, MF_BYCOMMAND | MF_ENABLED );
 	}
 
-	string strCurrDBStatus = asString(getDBPointer()->GetCurrentConnectionStatus());
-	// Display comma-separated numbers in status bar
-	// only if an Action has been selected (P13 #4355)
-	string strAction = getFPM()->ActionName;
-	if (strCurrDBStatus == gstrCONNECTION_ESTABLISHED && strAction != "")
+	updateDBConnectionStatus();
+
+	// Display comma-separated numbers in status bar only if an Action has been selected (P13 #4355)
+	if (m_bDBConnectionReady && m_nCurrActionID != -1)
 	{
 		zCompletedProcessing.Format( "%s %s", gstrCOMPLETED_STATUS_PANE_LABEL.c_str(), 
 			commaFormatNumber( (LONGLONG)m_nNumCompletedProcessing ).c_str() );
@@ -2314,7 +2308,7 @@ void FileProcessingDlg::updateUI()
 	// Set the title bar text
 	CString szTitle = "File Action Manager";
 	
-	if (m_strCurrFPSFilename != "")
+	if (m_strCurrFPSFilename != "" && m_bDBConnectionReady)
 	{
 		// Get the Context path	
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
@@ -2593,6 +2587,26 @@ void FileProcessingDlg::setCurrFPSFile(const string& strFileName)
 	m_strCurrFPSFilename = strFileName;
 
 	updateUI();
+}
+//---------------------------------------------------------------------------------------------
+void FileProcessingDlg::updateDBConnectionStatus()
+{
+	m_nCurrActionID = -1;
+	m_bDBConnectionReady = false;
+	m_strCurrDBStatus = gstrNOT_CONNECTED;
+
+	m_strCurrDBStatus = asString(getDBPointer()->GetCurrentConnectionStatus());
+	m_bDBConnectionReady = (m_strCurrDBStatus == gstrCONNECTION_ESTABLISHED);
+
+	if (m_bDBConnectionReady)
+	{
+		try
+		{
+			m_nCurrActionID = getDBPointer()->GetActionID(getFPM()->GetExpandedActionName());
+		}
+		catch (_com_error& e) {} 
+		catch (UCLIDException &ue) {}
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::loadSettingsFromManager()
@@ -2903,11 +2917,10 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::updateUIForCurrentDBStatus()
 {
-	// Get the current database status
-	string strCurrDBStatus = asString(getDBPointer()->GetCurrentConnectionStatus());
+	updateDBConnectionStatus();
 
 	// Set the database status on the database page
-	m_propDatabasePage.setDBConnectionStatus ( strCurrDBStatus );
+	m_propDatabasePage.setDBConnectionStatus(m_strCurrDBStatus);
 
 	// Initialize page set
 	set<EDlgTabPage> setPages;
@@ -2916,7 +2929,7 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 	setPages.insert(kDatabasePage);
 
 	// If the new database file connects to the database successfully the action tab should be displayed
-	if ( strCurrDBStatus == gstrCONNECTION_ESTABLISHED )
+	if (m_bDBConnectionReady)
 	{
 		if (isPageDisplayed(kActionPage))
 		{
@@ -2932,13 +2945,27 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 			updateTabs(setPages);
 		}
 
-		long nActionID = getDBPointer()->GetActionID(getFPM()->GetExpandedActionName());
-
-		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats = 
-			getDBPointer()->GetStats(nActionID, VARIANT_FALSE);
-		ASSERT_RESOURCE_ALLOCATION("ELI38476", ipActionStats != __nullptr);
+		// If there is an action set, show the stats for the current action.
+		try
+		{
+			if (m_nCurrActionID != -1)
+			{
+				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats = 
+					getDBPointer()->GetStats(m_nCurrActionID, VARIANT_FALSE);
+				ASSERT_RESOURCE_ALLOCATION("ELI38476", ipActionStats != __nullptr);
 	
-		updateStatusBarStats(ipActionStats);
+				updateStatusBarStats(ipActionStats);
+			}
+		}
+		// If the action name doesn't exist don't show an error; simply don't update the counts
+		catch (_com_error& e)
+		{
+			updateStatusBarStats(nullptr);
+		}
+		catch (UCLIDException &ue)
+		{
+			updateStatusBarStats(nullptr);
+		}
 	}
 	else
 	{

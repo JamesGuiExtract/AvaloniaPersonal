@@ -105,6 +105,13 @@
     </Compile>
     <Compile Include="ApplyBatesNumberTask.cs" />
     <Compile Include="BatesNumberGeneratorWithDatabase.cs" />
+    <Compile Include="StoreAttributesInDBTask.cs" />
+    <Compile Include="StoreAttributesInDBTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StoreAttributesInDBTaskSettingsDialog.Designer.cs">
+      <DependentUpon>StoreAttributesInDBTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ValidateXmlTaskSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -312,6 +319,15 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+    <COMReference Include="UCLID_AttributeDbMgrComponentsLib">
+      <Guid>{0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="UCLID_COMLMLib">
       <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -368,6 +384,9 @@
     <EmbeddedResource Include="ApplyBatesNumberSettingsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StoreAttributesInDBTaskSettingsDialog.resx">
+      <DependentUpon>StoreAttributesInDBTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ValidateXMLTaskSettingsDialog.resx">
       <DependentUpon>ValidateXmlTaskSettingsDialog.cs</DependentUpon>

@@ -59,25 +59,6 @@ static const string gstrCREATE_FILEID_DATETIMESTAMP_INDEX_V1 =
 	"CREATE NONCLUSTERED INDEX [IX_FileID_DateTimeStamp] ON [dbo].[DataEntryData] "
 	"( [FileID] ASC, [DateTimeStamp] ASC )";
 
-// Query for inserting record into FileTaskSession table.
-static const string gstrINSERT_FILETASKSESSION_DATA_RCD = 
-	"INSERT INTO [dbo].[FileTaskSession] "
-	" ([FAMSessionID]"
-	"  ,[TaskClassID]"
-	"  ,[FileID]"
-    "  ,[DateTimeStamp]"
-    "  ,[Duration]"
-	"  ,[OverheadTime]) "
-	"  OUTPUT INSERTED.ID"
-	"  VALUES (<FAMSessionID>, <TaskClassID>, <FileID>, GETDATE(), <Duration>, <OverheadTime>)";
-
-// Deletes all records in the FileTaskSession table that have the given TaskClassID and FileID. This
-// should be run before adding a new record if history is not being kept.
-// Requires <TaskClassID> and <FileID> be replaced with the appropriate values.
-static const string gstrDELETE_PREVIOUS_STATUS_FOR_FILEID = 
-	"DELETE FROM [FileTaskSession] "
-	"WHERE [TaskClassID] = <TaskClassID> AND [FileID] = <FileID>";
-
 //--------------------------------------------------------------------------------------------------
 // DataEntryCounterDefinition
 //--------------------------------------------------------------------------------------------------

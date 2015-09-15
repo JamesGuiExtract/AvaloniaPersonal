@@ -568,17 +568,16 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 		//-----------------------------------------------------------------------------------------
         // PROMISE: To add a record in the IDShieldData table in the database for the file with the
         //          given values.
-        [id(5), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData([in] long lFileID, 
+        [id(5), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData(
+			[in] BSTR bstrTaskClassGuid, [in] long lFileID, 
             [in] double dDuration, [in] double dOverheadTime, [in] long lNumHCDataFound,
 			[in] long lNumMCDataFound, [in] long lNumLCDataFound, [in] long lNumCluesDataFound,
 			[in] long lTotalRedactions, [in] long lTotalManualRedactions,
 			[in] long lNumPagesAutoAdvanced);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Initializes the class instance to record IDShield data against the specified
-		//			pFAMDB for the FAM task represented by guidTaskClass (The GUID of the
-		//			IFileProcessingTask's implementing class).
-		[id(6), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB* pFAMDB,
-			[in] GUID guidTaskClass);
+		//			pFAMDB.
+		[id(6), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB* pFAMDB);
     };
 
     [

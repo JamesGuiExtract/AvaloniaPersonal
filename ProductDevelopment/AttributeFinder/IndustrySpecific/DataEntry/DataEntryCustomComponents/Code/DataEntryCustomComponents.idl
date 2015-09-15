@@ -48,17 +48,9 @@ library UCLID_DATAENTRYCUSTOMCOMPONENTSLib
 			[in, out] long* plInstanceToken, [in] long lDataEntryDataInstanceID,
 			[in] IIUnknownVector* pAttributes);
 		//-----------------------------------------------------------------------------------------
-		// PROMISE: To add a record in the DataEntryData table in the database for the file with the
-		//          given values.
-		[id(4), helpstring("method AddDataEntryData")] HRESULT AddDataEntryData([in] long lFileID, 
-			[in] long nActionID, [in] double dDuration, [in] double dOverheadTime,
-			[out, retval] long* plInstanceID);
-		//-----------------------------------------------------------------------------------------
 		// PROMISE: Initializes the class instance to record DataEntry data against the specified
-		//			pFAMDB for the FAM task represented by guidTaskClass (The GUID of the
-		//			IFileProcessingTask's implementing class).
-		[id(5), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB* pFAMDB,
-			[in] GUID guidTaskClass);
+		//			pFAMDB.
+		[id(5), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB* pFAMDB);
 	};
 
 	[

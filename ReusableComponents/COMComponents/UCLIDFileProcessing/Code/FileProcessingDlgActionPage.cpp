@@ -172,7 +172,7 @@ void FileProcessingDlgActionPage::OnBnClickedBtnSelAction()
 		// Reset the DB Connection
 		getDBPointer()->ResetDBConnection(VARIANT_FALSE);
 
-		// Check if there is no action inside the datebase;
+		// Check if there is no action inside the database;
 		IStrToStrMapPtr ipMapActions = getDBPointer()->GetActions();
 		ASSERT_RESOURCE_ALLOCATION("ELI15021", ipMapActions != __nullptr );
 
@@ -202,7 +202,7 @@ void FileProcessingDlgActionPage::OnBnClickedBtnSelAction()
 
 			// Update the UI
 			refresh();
-			updateUI();
+			updateUI(true);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14033");
@@ -232,7 +232,7 @@ void FileProcessingDlgActionPage::OnBnClickedChkQueue()
 		getSupplyingActionMgmtRole()->Enabled = asVariantBool(m_btnQueue.GetCheck() == BST_CHECKED);
 
 		// Update the UI, menu and toolbar items
-		updateUI();
+		updateUI(false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14034");
 }
@@ -261,7 +261,7 @@ void FileProcessingDlgActionPage::OnBnClickedChkProc()
 		getProcessingActionMgmtRole()->Enabled = asVariantBool(m_btnProcess.GetCheck() == BST_CHECKED);
 
 		// Update the UI, menu and toolbar items
-		updateUI();
+		updateUI(false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14035");
 }
@@ -280,7 +280,7 @@ void FileProcessingDlgActionPage::OnBnClickedChkDisplay()
 		getFPM()->DisplayOfStatisticsEnabled = asVariantBool(m_btnDisplay.GetCheck() == BST_CHECKED);
 
 		// Update the UI, menu and toolbar items
-		updateUI();
+		updateUI(false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14036");
 }
@@ -323,7 +323,8 @@ void FileProcessingDlgActionPage::refresh(bool bWarnIfActionNotFound)
 		else if (strActionName != "")
 		{
 			// Check for this action in the DB if it doesn't contain a function tag
-			if (strActionName.find('$') == string::npos)
+			if (strActionName.find('$') == string::npos && 
+				strActionName.find('<') == string::npos)
 			{
 				try
 				{
@@ -379,7 +380,7 @@ void FileProcessingDlgActionPage::refresh(bool bWarnIfActionNotFound)
 
 		// Update the check boxes, tabs and UI
 		updateChecksAndTabs();
-		updateUI();
+		updateUI(false);
 
 		UpdateData( FALSE );
 	}
@@ -540,14 +541,21 @@ void FileProcessingDlgActionPage::updateChecksAndTabs()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14139");
 }
 //--------------------------------------------------------------------------------------------------
-void FileProcessingDlgActionPage::updateUI()
+void FileProcessingDlgActionPage::updateUI(bool bRefreshStats)
 {
 	// Get the pointer to the Property sheet object
 	ResizablePropertySheet* pFPDPropSheet = (ResizablePropertySheet*)GetParent();
 	// Get the pointer to the current FileProcessingDlg object
 	FileProcessingDlg* pFPDlg = (FileProcessingDlg*)pFPDPropSheet->GetParent();
 
-	pFPDlg->updateUI();
+	if (bRefreshStats)
+	{
+		pFPDlg->updateUIForCurrentDBStatus();
+	}
+	else
+	{
+		pFPDlg->updateUI();
+	}
 }
 //--------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileSupplyingMgmtRolePtr FileProcessingDlgActionPage::getFSMgmtRole()

@@ -25,8 +25,11 @@ using namespace std;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long glIDShieldDBSchemaVersion = 5;
+const long glIDShieldDBSchemaVersion = 6;
 const string gstrID_SHIELD_SCHEMA_VERSION_NAME = "IDShieldSchemaVersion";
+// https://extract.atlassian.net/browse/ISSUE-13239
+// StoreIDShieldProcessingHistory has been removed (const exists only for
+// findUnrecognizedSchemaElements)
 static const string gstrSTORE_IDSHIELD_PROCESSING_HISTORY = "StoreIDShieldProcessingHistory";
 static const string gstrSTORE_HISTORY_DEFAULT_SETTING = "1"; // TRUE
 
@@ -134,13 +137,40 @@ int UpdateToSchemaVersion5(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38601");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 6;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("DELETE FROM [DBInfo] WHERE [Name] = '" +
+			gstrSTORE_IDSHIELD_PROCESSING_HISTORY + "'");
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '6' WHERE [Name] = '" + 
+			gstrID_SHIELD_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38665");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CIDShieldProductDBMgr
 //-------------------------------------------------------------------------------------------------
 CIDShieldProductDBMgr::CIDShieldProductDBMgr()
-: m_bStoreIDShieldProcessingHistory(true)
-, m_nNumberOfRetries(0)
+: m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
 {
 }
@@ -425,6 +455,10 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_GetDBInfoRows(IVariantVector** ppDBInfoR
 			ipDBInfoRows->PushBack(iterDBInfoValues->first.c_str());
 		}
 
+		// https://extract.atlassian.net/browse/ISSUE-13239
+		// Ability to turn off record session history for ID Shield has been removed.
+		ipDBInfoRows->PushBack(gstrSTORE_IDSHIELD_PROCESSING_HISTORY.c_str());
+
 		*ppDBInfoRows = ipDBInfoRows.Detach();
 
 		return S_OK;
@@ -511,8 +545,15 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcess
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion5(ipConnection, pnNumSteps, NULL);
 					}
+					// Break is intentionally missing as schema updates 5 and 6 both correspond with
+					// nFAMDBSchemaVersion 129
 
-			case 5: break;
+			case 5: if (nFAMDBSchemaVersion == 129)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion6(ipConnection, pnNumSteps, NULL);
+					}
+
+			case 6: break;
 
 			default:
 				{
@@ -529,8 +570,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcess
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31413");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, double dDuration,
-		double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
+STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(BSTR bstrTaskClassGuid, long lFileID,
+		double dDuration, double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
 		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
 		long lTotalManualRedactions, long lNumPagesAutoAdvanced)
 {
@@ -538,16 +579,21 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, double dDurati
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		if (!AddIDShieldData_Internal(false, lFileID, dDuration, dOverheadTime,
-			lNumHCDataFound, lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
-			lTotalManualRedactions, lNumPagesAutoAdvanced))
+		// Use the FAMDB's RecordFileTaskSession to add the FileTaskSesson. Since it has it's own
+		// optimistic locking, no need to do so here.
+		long nFileTaskSessionID = m_ipFAMDB->RecordFileTaskSession(
+			bstrTaskClassGuid, lFileID, dDuration, dOverheadTime);
+
+		if (!AddIDShieldData_Internal(false, nFileTaskSessionID, lNumHCDataFound, lNumMCDataFound,
+			lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, lTotalManualRedactions,
+			lNumPagesAutoAdvanced))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
 			
-			AddIDShieldData_Internal(true, lFileID, dDuration, dOverheadTime,
-				lNumHCDataFound, lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound,
-				lTotalRedactions, lTotalManualRedactions, lNumPagesAutoAdvanced);
+			AddIDShieldData_Internal(true, nFileTaskSessionID, lNumHCDataFound, lNumMCDataFound,
+				lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, lTotalManualRedactions,
+				lNumPagesAutoAdvanced);
 		}
 		return S_OK;
 	}
@@ -602,7 +648,7 @@ STDMETHODIMP CIDShieldProductDBMgr::GetFileID(BSTR bstrFileName, long* plFileID)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI20179");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIDShieldProductDBMgr::Initialize(IFileProcessingDB* pFAMDB, GUID guidTaskClass)
+STDMETHODIMP CIDShieldProductDBMgr::Initialize(IFileProcessingDB* pFAMDB)
 {
 	try
 	{
@@ -613,20 +659,10 @@ STDMETHODIMP CIDShieldProductDBMgr::Initialize(IFileProcessingDB* pFAMDB, GUID g
 		
 		ASSERT_ARGUMENT("ELI38615", pFAMDB != nullptr);
 
-		// m_ipFAMDB needs to be set before Initialize_Internal can properly attempt optimistic
-		// locking.
 		m_ipFAMDB = pFAMDB;
 		ASSERT_RESOURCE_ALLOCATION("ELI38616", m_ipFAMDB != nullptr);
 
 		m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
-
-		if (!Initialize_Internal(false, guidTaskClass))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
-
-			Initialize_Internal(true, guidTaskClass);
-		}
 		
 		return S_OK;
 	}
@@ -673,13 +709,6 @@ ADODB::_ConnectionPtr CIDShieldProductDBMgr::getDBConnection()
 
 			// Set the command timeout
 			m_ipDBConnection->CommandTimeout = asLong(strValue);
-
-			// Get the setting for storing IDShield processing history
-			strValue = asString(m_ipFAMDB->GetDBInfoSetting(
-				gstrSTORE_IDSHIELD_PROCESSING_HISTORY.c_str(), VARIANT_TRUE));
-
-			// Set the local setting for storing history
-			m_bStoreIDShieldProcessingHistory = strValue == asString(TRUE);
 		}
 	}
 	
@@ -718,10 +747,9 @@ void CIDShieldProductDBMgr::validateIDShieldSchemaVersion(bool bThrowIfMissing)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileID,
-		double dDuration, double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
-		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
-		long lTotalManualRedactions, long lNumPagesAutoAdvanced)
+bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long nFileTaskSessionID,
+		long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound, long lNumCluesDataFound,
+		long lTotalRedactions, long lTotalManualRedactions, long lNumPagesAutoAdvanced)
 {
 	try
 	{
@@ -732,11 +760,6 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileI
 			// Validate IDShield Schema
 			validateIDShieldSchemaVersion(true);
 
-			if (m_strTaskClassID.empty())
-			{
-				throw UCLIDException("ELI38604", "TaskClass ID has not been set.");
-			}
-
 			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
 			_ConnectionPtr ipConnection = __nullptr;
 
@@ -745,26 +768,13 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileI
 			// Get the connection for the thread and save it locally.
 			ipConnection = getDBConnection();
 
-			long nUserID = getKeyID(ipConnection, "FAMUser", "UserName", getCurrentUserName());
-			long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
-
-			// Get the file ID as a string
-			string strFileId = asString(lFileID);
-
 			// Create a pointer to a recordset
 			_RecordsetPtr ipSet( __uuidof( Recordset ));
 			ASSERT_RESOURCE_ALLOCATION("ELI28069", ipSet != __nullptr );
 
-			// Query to add the FileTaskSession record.
-			string strInsertFTS_SQL = gstrINSERT_FILETASKSESSION_DATA_RCD;
-			replaceVariable(strInsertFTS_SQL, "<FAMSessionID>", asString(m_ipFAMDB->FAMSessionID));
-			replaceVariable(strInsertFTS_SQL, "<TaskClassID>", m_strTaskClassID);
-			replaceVariable(strInsertFTS_SQL, "<FileID>", strFileId);
-			replaceVariable(strInsertFTS_SQL, "<Duration>", asString(dDuration));
-			replaceVariable(strInsertFTS_SQL, "<OverheadTime>", asString(dOverheadTime));
-
 			// Query to add the corresponding IDShieldData record.
 			string strInsertIDSD_SQL = gstrINSERT_IDSHIELD_DATA_RCD;
+			replaceVariable(strInsertIDSD_SQL, "<FileTaskSessionID>", asString(nFileTaskSessionID));
 			replaceVariable(strInsertIDSD_SQL, "<NumHCDataFound>", asString(lNumHCDataFound));
 			replaceVariable(strInsertIDSD_SQL, "<NumMCDataFound>", asString(lNumMCDataFound));
 			replaceVariable(strInsertIDSD_SQL, "<NumLCDataFound>", asString(lNumLCDataFound));
@@ -775,23 +785,6 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileI
 
 			// Create a transaction guard
 			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
-
-			// If not storing previous history need to delete it
-			if (!m_bStoreIDShieldProcessingHistory)
-			{
-				string strDeleteQuery = gstrDELETE_PREVIOUS_STATUS_FOR_FILEID;
-				replaceVariable(strDeleteQuery, "<TaskClassID>", m_strTaskClassID);
-				replaceVariable(strDeleteQuery, "<FileID>", strFileId);
-
-				// Delete previous records with the fileID
-				executeCmdQuery(ipConnection, strDeleteQuery);
-			}
-
-			// Created the FileTaskSession record.
-			long nFileTaskSessionID = 0;
-			executeCmdQuery(ipConnection, strInsertFTS_SQL, false, &nFileTaskSessionID);
-
-			replaceVariable(strInsertIDSD_SQL, "<FileTaskSessionID>", asString(nFileTaskSessionID));
 
 			// Create the corresponding IDShieldData record.
 			executeCmdQuery(ipConnection, strInsertIDSD_SQL);
@@ -896,55 +889,6 @@ bool CIDShieldProductDBMgr::GetFileID_Internal(bool bDBLocked, BSTR bstrFileName
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CIDShieldProductDBMgr::Initialize_Internal(bool bDBLocked, GUID guidTaskClass)
-{
-	try
-	{
-		try
-		{
-			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-			_ConnectionPtr ipConnection = __nullptr;
-			string strTaskClassID;
-
-			BEGIN_ADO_CONNECTION_RETRY();
-
-			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
-
-			long nTaskClassID = 0;
-			executeCmdQuery(ipConnection,
-				"SELECT [ID] FROM [TaskClass] WHERE [GUID] = '" + asString(guidTaskClass) + "'",
-				false, &nTaskClassID);
-
-			ASSERT_RESOURCE_ALLOCATION("ELI38605", nTaskClassID != 0);
-
-			strTaskClassID = asString(nTaskClassID);
-
-			END_ADO_CONNECTION_RETRY(
-				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI38606");
-
-			if (!m_strTaskClassID.empty() && strTaskClassID != m_strTaskClassID)
-			{
-				UCLIDException ue("ELI38607", "A different task class ID has already been assigned.");
-				ue.addDebugInfo("GUID", asString(guidTaskClass));
-				throw ue;
-			}
-
-			m_strTaskClassID = strTaskClassID;
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38608");
-	}
-	catch(UCLIDException ue)
-	{
-		if (!bDBLocked)
-		{
-			return false;
-		}
-		throw ue;
-	}
-	return true;
-}
-//-------------------------------------------------------------------------------------------------
 const vector<string> CIDShieldProductDBMgr::getTableCreationQueries()
 {
 	vector<string> vecQueries;
@@ -965,7 +909,6 @@ map<string, string> CIDShieldProductDBMgr::getDBInfoDefaultValues()
 	// findUnrecognizedSchemaElements does not treat the element on old schema versions as
 	// unrecognized.
 	mapDefaultValues[gstrID_SHIELD_SCHEMA_VERSION_NAME] = asString(glIDShieldDBSchemaVersion);
-	mapDefaultValues[gstrSTORE_IDSHIELD_PROCESSING_HISTORY] = gstrSTORE_HISTORY_DEFAULT_SETTING;
 
 	return mapDefaultValues;
 }

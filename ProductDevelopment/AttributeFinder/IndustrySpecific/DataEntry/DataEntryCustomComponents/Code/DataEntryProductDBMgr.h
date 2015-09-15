@@ -71,11 +71,9 @@ public:
 		IProgressStatus* pProgressStatus);
 
 // IDataEntryProductDBMgr Methods
-	STDMETHOD(AddDataEntryData)(long lFileID, long nActionID, double dDuration,
-		double dOverheadTime, long* plInstanceID);
 	STDMETHOD(RecordCounterValues)(long* plInstanceToken, long lDataEntryDataInstanceID,
 		IIUnknownVector* pAttributes);
-	STDMETHOD(Initialize)(IFileProcessingDB* pFAMDB, GUID guidTaskClass);
+	STDMETHOD(Initialize)(IFileProcessingDB* pFAMDB);
 
 private:
 
@@ -88,9 +86,6 @@ private:
 
 	// This it the pointer to the database connection
 	ADODB::_ConnectionPtr m_ipDBConnection; 
-
-	// Flag to indicate if non recent DataEntryData records should be saved
-	bool m_bStoreDataEntryProcessingHistory;
 
 	// An IAFUtility instance to be used to execute attribute queries.
 	IAFUtilityPtr m_ipAFUtility;
@@ -108,10 +103,6 @@ private:
 
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
-
-	// The GUID for the class implementing the IFileProcessingTask instance for which data is to be
-	// logged.
-	string m_strTaskClassID;
 
 	//////////////
 	// Methods
@@ -138,11 +129,8 @@ private:
 	void validateLicense();
 
 	// Internal versions of external methods that may require database locking
-	bool AddDataEntryData_Internal(bool bDBLocked, long lFileID, long nActionID,
-		double dDuration, double dOverheadTime, long* plInstanceID);
 	bool RecordCounterValues_Internal(bool bDBLocked, long* plInstanceToken,
 		long lDataEntryDataInstanceID, IIUnknownVector* pAttributes);
-	bool Initialize_Internal(bool bDBLocked, GUID guidTaskClass);
 
 	// Retrieves the set of SQL queries used to create the DataEntry specific database tables.
 	const vector<string> getTableCreationQueries(bool bAddUserTables);

@@ -109,6 +109,7 @@ private:
 	// Update the check boxes and tabs when load the action tab
 	void updateChecksAndTabs();
 
-	// Update UI, menu and toolbar items
-	void updateUI();
+	// Update UI, menu and toolbar items. If bRefreshStats is true, the status bar status will also
+	// be updated.
+	void updateUI(bool bRefreshStats);
 };

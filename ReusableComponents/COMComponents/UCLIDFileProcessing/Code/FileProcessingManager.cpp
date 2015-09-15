@@ -757,7 +757,9 @@ STDMETHODIMP CFileProcessingManager::ValidateStatus(void)
 		}
 
 		// Validate the action name unless it contains a function to expand
-		if (m_strAction.find('$') == string::npos && !isActionNameInDatabase(m_strAction))
+		if (m_strAction.find('$') == string::npos && 
+			m_strAction.find('<') == string::npos && 
+			!isActionNameInDatabase(m_strAction))
 		{
 			string strDebugInfo = "The action '" + m_strAction + "' does not exist in database.";
 			UCLIDException ue("ELI15658", strDebugInfo.c_str());

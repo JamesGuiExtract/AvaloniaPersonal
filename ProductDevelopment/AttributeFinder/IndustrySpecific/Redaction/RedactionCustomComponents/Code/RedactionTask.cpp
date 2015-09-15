@@ -35,6 +35,8 @@ using namespace std;
 //		flag set to true can be set back to false
 const unsigned long gnCurrentVersion = 5;
 
+const char* gszREDACTION_TASK_GUID = asString(CLSID_RedactionTask).c_str();
+
 //-------------------------------------------------------------------------------------------------
 // CRedactionTask
 //-------------------------------------------------------------------------------------------------
@@ -663,7 +665,8 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 				getIDShieldDBPtr(ipFAMDB);
 
             // Add the IDShieldData record to the database
-            ipIDSDB->AddIDShieldData(nFileID, swProcessingTime.getElapsedTime(), 0, 
+            ipIDSDB->AddIDShieldData(gszREDACTION_TASK_GUID, nFileID,
+				swProcessingTime.getElapsedTime(), 0, 
                 idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
                 idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions,
                 idsData.m_lNumPagesAutoAdvanced);
@@ -2589,7 +2592,7 @@ UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr CRedactionTask::get
         m_ipIDShieldDB.CreateInstance((LPCSTR)ipFAMDBUtils->GetIDShieldDBProgId());
         ASSERT_RESOURCE_ALLOCATION("ELI19794", m_ipIDShieldDB != __nullptr);		
 
-		m_ipIDShieldDB->Initialize(ipFAMDB, CLSID_RedactionTask);
+		m_ipIDShieldDB->Initialize(ipFAMDB);
     }
 
     return m_ipIDShieldDB;
