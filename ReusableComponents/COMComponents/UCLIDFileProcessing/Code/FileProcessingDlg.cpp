@@ -2604,8 +2604,8 @@ void FileProcessingDlg::updateDBConnectionStatus()
 		{
 			m_nCurrActionID = getDBPointer()->GetActionID(getFPM()->GetExpandedActionName());
 		}
-		catch (_com_error& e) {} 
-		catch (UCLIDException &ue) {}
+		catch (_com_error&) {} 
+		catch (UCLIDException&) {}
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -2958,11 +2958,11 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 			}
 		}
 		// If the action name doesn't exist don't show an error; simply don't update the counts
-		catch (_com_error& e)
+		catch (_com_error&)
 		{
 			updateStatusBarStats(nullptr);
 		}
-		catch (UCLIDException &ue)
+		catch (UCLIDException&)
 		{
 			updateStatusBarStats(nullptr);
 		}
