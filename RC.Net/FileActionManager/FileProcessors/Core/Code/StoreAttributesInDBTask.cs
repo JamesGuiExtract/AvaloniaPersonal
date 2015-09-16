@@ -438,7 +438,7 @@ namespace Extract.FileActionManager.FileProcessors
                 voaData.ReportMemoryUsage();
 
                 _attributeDBManager.CreateNewAttributeSetForFile(
-                    pFileRecord.FileID, 0/*_attributeSetName*/, voaData /*, StoreRasterZones*/);
+                    pFileRecord.FileID, _attributeSetName, voaData, StoreRasterZones);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
