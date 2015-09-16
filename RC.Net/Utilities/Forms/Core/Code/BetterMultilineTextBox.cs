@@ -20,6 +20,15 @@ namespace Extract.Utilities.Forms
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// Indicates whether an update of the scrollbar visibility has been queued.
+        /// </summary>
+        bool _scrollbarUpdateQueued;
+
+        #endregion Fields
+
         #region Constructors
 
         /// <summary>
@@ -156,25 +165,43 @@ namespace Extract.Utilities.Forms
         /// </summary>
         void UpdateScrollbarVisibility()
         {
-            using(new LockControlUpdates(this))
+            // If the form hasn't been created or a scroll bar update has already been scheduled,
+            // there is nothing to do.
+            if (Handle == IntPtr.Zero || _scrollbarUpdateQueued)
             {
-                var selection = SelectionStart;
-                var size = TextRenderer.MeasureText(Text, Font);
-                var clientSize = ClientSize;
-                var sb = ScrollBars.None;
-                if (clientSize.Height < size.Height + (int)Font.Size)
-                {
-                    sb |= ScrollBars.Vertical;
-                }
-                if (clientSize.Width < size.Width)
-                {
-                    sb |= ScrollBars.Horizontal;
-                }
-
-                ScrollBars = sb;
-                SelectionStart = selection;
-                ScrollToCaret();
+                return;
             }
+
+            _scrollbarUpdateQueued = true;
+
+            // https://extract.atlassian.net/browse/ISSUE-12956
+            // It appears updating the scroll bar status as part of other windows message handlers
+            // is what was leading to exceptions. Update the scrollbars via a separate windows
+            // message.
+            this.SafeBeginInvoke("ELI38667", () =>
+            {
+                _scrollbarUpdateQueued = false;
+
+                using (new LockControlUpdates(this))
+                {
+                    var selection = SelectionStart;
+                    var size = TextRenderer.MeasureText(Text, Font);
+                    var clientSize = ClientSize;
+                    var sb = ScrollBars.None;
+                    if (clientSize.Height < size.Height + (int)Font.Size)
+                    {
+                        sb |= ScrollBars.Vertical;
+                    }
+                    if (clientSize.Width < size.Width)
+                    {
+                        sb |= ScrollBars.Horizontal;
+                    }
+
+                    ScrollBars = sb;
+                    SelectionStart = selection;
+                    ScrollToCaret();
+                }
+            });
         }
 
         #endregion Methods
