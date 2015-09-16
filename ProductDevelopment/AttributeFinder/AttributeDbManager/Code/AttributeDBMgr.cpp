@@ -727,9 +727,10 @@ void CAttributeDBMgr::validateSchemaVersion()
 
 	// Get the Version from the FAMDB DBInfo table
 	auto value = asString( m_ipFAMDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(), 
-													    asVariantBool(true) ) );
+													    asVariantBool(false) ) );
 	// Check against expected version
-	if (asLong(value) != glSCHEMA_VERSION)
+	long versionNumber = value.empty() ? 0L : asLong(value);
+	if (versionNumber != glSCHEMA_VERSION)
 	{
 		UCLIDException ue("ELI38546", "Attribute collection database schema is not current version!");
 		ue.addDebugInfo("Expected", glSCHEMA_VERSION);

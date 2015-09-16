@@ -2886,8 +2886,10 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
+				// Make sure the DB Schema is the expected version - actually DO NOT do this here,
+				// as we are setting the DB Info NOW, so attempting to validate the schema can cause
+				// an error here before the update is finished.
+				//validateDBSchemaVersion();
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
