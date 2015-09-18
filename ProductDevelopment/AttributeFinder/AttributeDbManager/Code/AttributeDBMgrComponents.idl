@@ -13,7 +13,7 @@ import "ocidl.idl";
 	version(1.0),
 	helpstring("AttributeDbMgrComponents 1.0 Type Library")
 ]
-library UCLID_AttributeDbMgrComponentsLib
+library AttributeDbMgrComponentsLib
 {
 	importlib("stdole2.tlb");
 	importlib("stdole32.tlb");

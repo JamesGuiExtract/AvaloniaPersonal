@@ -20,7 +20,7 @@ class ATL_NO_VTABLE CAttributeDBMgr :
 	public CComObjectRootEx<CComMultiThreadModel>,
 	public CComCoClass<CAttributeDBMgr, &CLSID_AttributeDBMgr>,
 	public ISupportErrorInfo,
-	public IDispatchImpl<IAttributeDBMgr, &IID_IAttributeDBMgr, &LIBID_UCLID_AttributeDbMgrComponentsLib, /*wMajor =*/ 1, /*wMinor =*/ 0>,
+	public IDispatchImpl<IAttributeDBMgr, &IID_IAttributeDBMgr, &LIBID_AttributeDbMgrComponentsLib, /*wMajor =*/ 1, /*wMinor =*/ 0>,
 	public IDispatchImpl<ICategorizedComponent, &__uuidof(ICategorizedComponent), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
 	public IDispatchImpl<ILicensedComponent, &__uuidof(ILicensedComponent), &LIBID_UCLID_COMLMLib, /* wMajor = */ 1>,
 	public IDispatchImpl<IProductSpecificDBMgr, &__uuidof(IProductSpecificDBMgr), &LIBID_UCLID_FILEPROCESSINGLib, /* wMajor = */ 1>

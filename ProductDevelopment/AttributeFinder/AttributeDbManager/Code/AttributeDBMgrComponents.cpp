@@ -42,7 +42,7 @@ CAttributeDBMgrComponentsApp theApp;
 
 BOOL CAttributeDBMgrComponentsApp::InitInstance()
 {
-    _Module.Init(ObjectMap, m_hInstance, &LIBID_UCLID_AttributeDbMgrComponentsLib);
+    _Module.Init(ObjectMap, m_hInstance, &LIBID_AttributeDbMgrComponentsLib);
     return CWinApp::InitInstance();
 }
 
