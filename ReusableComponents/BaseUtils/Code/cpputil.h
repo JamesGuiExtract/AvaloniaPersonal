@@ -1218,4 +1218,61 @@ namespace Util
 	  _snprintf_s( &buffer[0], Internal::Size, _TRUNCATE, formatString, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 );
 	  return std::string( &buffer[0] );
   }
+
+  template <typename ArgT1, 
+			typename ArgT2, 
+			typename ArgT3, 
+			typename ArgT4, 
+			typename ArgT5, 
+			typename ArgT6, 
+			typename ArgT7,
+			typename ArgT8,
+			typename ArgT9,
+			typename ArgT10>
+  std::string Format( const char* formatString, 
+					  const ArgT1 arg1, 
+					  const ArgT2 arg2, 
+					  const ArgT3 arg3,
+					  const ArgT4 arg4,
+					  const ArgT5 arg5,
+					  const ArgT6 arg6,
+					  const ArgT7 arg7,
+					  const ArgT8 arg8,
+					  const ArgT9 arg9,
+					  const ArgT10 arg10)
+  {
+	  std::vector<char> buffer( Internal::Size, '\0' );
+	  _snprintf_s( &buffer[0], Internal::Size, _TRUNCATE, formatString, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10 );
+	  return std::string( &buffer[0] );
+  }
+
+  template <typename ArgT1, 
+			typename ArgT2, 
+			typename ArgT3, 
+			typename ArgT4, 
+			typename ArgT5, 
+			typename ArgT6, 
+			typename ArgT7,
+			typename ArgT8,
+			typename ArgT9,
+			typename ArgT10,
+			typename ArgT11>
+  std::string Format( const char* formatString, 
+					  const ArgT1 arg1, 
+					  const ArgT2 arg2, 
+					  const ArgT3 arg3,
+					  const ArgT4 arg4,
+					  const ArgT5 arg5,
+					  const ArgT6 arg6,
+					  const ArgT7 arg7,
+					  const ArgT8 arg8,
+					  const ArgT9 arg9,
+					  const ArgT10 arg10,
+					  const ArgT11 arg11)
+  {
+	  std::vector<char> buffer( Internal::Size, '\0' );
+	  _snprintf_s( &buffer[0], Internal::Size, _TRUNCATE, formatString, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 );
+	  return std::string( &buffer[0] );
+  }
+
 }

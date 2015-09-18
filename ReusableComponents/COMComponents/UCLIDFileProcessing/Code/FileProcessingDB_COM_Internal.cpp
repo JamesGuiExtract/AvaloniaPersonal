@@ -4504,6 +4504,70 @@ bool CFileProcessingDB::ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQu
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool 
+CFileProcessingDB::
+ExecuteCommandReturnLongLongResult_Internal( bool bDBLocked, 
+											 BSTR bstrQuery, 
+											 long* pnRecordsAffected,
+											 BSTR bstrResultColumnName,
+											 long long* pResult )
+{
+	try
+	{
+		try
+		{
+			// Get the query string and ensure it is not empty
+			string strQuery = asString(bstrQuery);
+			ASSERT_ARGUMENT("ELI38678", !strQuery.empty());
+
+			std::string resultColumnName = 
+				nullptr != bstrResultColumnName ? asString(bstrResultColumnName) : "";
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Set the transaction guard
+				TransactionGuard tg(ipConnection, adXactChaos, nullptr);
+
+				// Execute the query
+				const bool displayExceptions = false;
+				long nRecordsAffected = executeCmdQuery( ipConnection, 
+														 strQuery,
+														 resultColumnName,
+														 displayExceptions,
+														 pResult );
+
+				// If user wants a count of affected records, return it
+				if (pnRecordsAffected != nullptr)
+				{
+					*pnRecordsAffected = nRecordsAffected;
+				}
+
+				// Commit the transaction
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI38679");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38680");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 {
 	try

@@ -777,6 +777,59 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 	return vtRecordsAffected.lVal;
 }
 //-------------------------------------------------------------------------------------------------
+long executeCmdQuery( const _ConnectionPtr& ipDBConnection, 
+					  const std::string& strSQLQuery,
+					  const std::string& resultColumnName,
+					  bool bDisplayExceptions, 
+					  long long *pnOutputID )
+{
+	ASSERT_ARGUMENT( "ELI38681", ipDBConnection != nullptr );
+
+	variant_t vtRecordsAffected = 0L;
+	try
+	{
+		try
+		{
+			if ( pnOutputID == nullptr )
+			{
+				ipDBConnection->Execute( strSQLQuery.c_str(),
+										 &vtRecordsAffected, 
+										 adCmdText | adExecuteNoRecords );
+			}
+			else
+			{
+				ASSERT_ARGUMENT( "ELI38682", !resultColumnName.empty() );
+				_RecordsetPtr ipResult = ipDBConnection->Execute( strSQLQuery.c_str(), 
+																  nullptr, 
+																  adCmdUnknown );
+				ASSERT_RESOURCE_ALLOCATION( "ELI38683", ipResult != nullptr );
+
+				// If pnOutputID is provided, it is assumed the query will return a 
+				// single record, with a field name contained in resultColumName.
+				ipResult->MoveFirst();
+				*pnOutputID = getLongLongField( ipResult->Fields, resultColumnName );
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION( "ELI38684" );
+	}
+	catch( UCLIDException& ue )
+	{
+		ue.addDebugInfo( "SQL", strSQLQuery, true );
+
+		if ( !bDisplayExceptions )
+		{
+			// Rethrow the exception
+			throw ue;
+		}
+
+		// Display exception
+		ue.display();
+		return 0;
+	} 
+
+	return vtRecordsAffected.lVal;
+}
+//-------------------------------------------------------------------------------------------------
 long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, const string& strKeyCol, string& rstrKey, bool bAddKey)
 {
 	ASSERT_ARGUMENT("ELI18775", ipDBConnection != __nullptr);

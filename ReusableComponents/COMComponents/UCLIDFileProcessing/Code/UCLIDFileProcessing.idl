@@ -1637,6 +1637,13 @@ library UCLID_FILEPROCESSINGLib
 		[id(145), helpstring("methods RecordFileTaskSession")] HRESULT RecordFileTaskSession([in] BSTR bstrTaskClassGuid,
 			[in] long nFileID, [in] double dDuration, [in] double dOverheadTime,
 			[out, retval] long *pnFileTaskSessionID);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To execute the specified command query and return the number of affected rows
+		// AND a long long value of a named column.
+		//			(NOTE: This query should not return any results i.e. a SELECT query, meant for insert
+		//			 where a single value is returned typically using OUTPUT INSERTED.ID)
+		[id(146), helpstring("method ExecuteInsertReturnLongLongResult")] HRESULT ExecuteInsertReturnLongLongResult(
+			[in] BSTR bstrQuery, [in] BSTR bstrResultColumnName, [out] long long* pResult, [out, retval] long* pnRecordsAffected);
 	};
 
 	[

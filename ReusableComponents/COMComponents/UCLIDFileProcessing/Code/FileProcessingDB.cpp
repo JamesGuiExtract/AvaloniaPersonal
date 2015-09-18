@@ -1834,6 +1834,38 @@ STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnReco
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27686");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP 
+CFileProcessingDB::ExecuteInsertReturnLongLongResult( BSTR bstrQuery, 
+													  BSTR bstrResultColumnName,
+													  long long* pResult,
+													  long* pnRecordsAffected )
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!ExecuteCommandReturnLongLongResult_Internal( false, 
+														  bstrQuery, 
+														  pnRecordsAffected, 
+														  bstrResultColumnName, 
+														  pResult ))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+			ExecuteCommandReturnLongLongResult_Internal( true, 
+														 bstrQuery, 
+														 pnRecordsAffected, 
+														 bstrResultColumnName, 
+														 pResult );
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27686");
+}
+
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::RegisterActiveFAM()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())

@@ -200,6 +200,8 @@ public:
 	STDMETHOD(AsPriorityString)(EFilePriority ePriority, BSTR* pbstrPriority);
 	STDMETHOD(AsEFilePriority)(BSTR bstrPriority, EFilePriority* pePriority);
 	STDMETHOD(ExecuteCommandQuery)(BSTR bstrQuery, long* pnRecordsAffected);
+	STDMETHOD(ExecuteInsertReturnLongLongResult)( BSTR bstrQuery, 
+		BSTR bstrResultColumnName, long long* pResult, long* pnRecordsAffected );
 	STDMETHOD(SetPriorityForFiles)(BSTR bstrSelectQuery, EFilePriority eNewPriority,
 		IRandomMathCondition* pRandomCondition, long* pnNumRecordsModified);
 	STDMETHOD(AddUserCounter)(BSTR bstrCounterName, LONGLONG llInitialValue);
@@ -1076,6 +1078,8 @@ private:
 	bool SetStatusForFilesWithTags_Internal(bool bDBLocked, IVariantVector *pvecTagNames,
 		VARIANT_BOOL vbAndOperation, long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
 	bool ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQuery, long* pnRecordsAffected);
+	bool ExecuteCommandReturnLongLongResult_Internal( bool bDBLocked, BSTR bstrQuery, 
+		long* pnRecordsAffected, BSTR bstrResultColumnName, long long* pResult );
 	bool UnregisterActiveFAM_Internal(bool bDBLocked);
 	bool SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSelectQuery, EFilePriority eNewPriority,
 		IRandomMathCondition *pRandomCondition, long *pnNumRecordsModified);
