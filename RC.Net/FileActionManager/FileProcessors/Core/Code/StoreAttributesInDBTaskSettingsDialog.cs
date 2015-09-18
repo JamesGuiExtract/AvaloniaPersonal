@@ -4,7 +4,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
-using UCLID_AttributeDbMgrComponentsLib;
+using AttributeDbMgrComponentsLib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.FileProcessors

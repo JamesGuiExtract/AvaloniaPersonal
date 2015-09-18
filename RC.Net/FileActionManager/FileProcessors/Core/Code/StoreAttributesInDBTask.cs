@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using UCLID_AttributeDbMgrComponentsLib;
+using AttributeDbMgrComponentsLib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
