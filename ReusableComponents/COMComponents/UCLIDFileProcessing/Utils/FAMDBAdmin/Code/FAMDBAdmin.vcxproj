@@ -159,6 +159,7 @@
     <ClCompile Include="FAMDBAdminUtils.cpp" />
     <ClCompile Include="FileProcessingAddActionDlg.cpp" />
     <ClCompile Include="ManageActionsDlg.cpp" />
+    <ClCompile Include="ManageAttributeSets.cpp" />
     <ClCompile Include="ManageMetadataFieldsDlg.cpp" />
     <ClCompile Include="ManageTagsDlg.cpp" />
     <ClCompile Include="ManageUserCountersDlg.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="FAMDBAdminUtils.h" />
     <ClInclude Include="FileProcessingAddActionDlg.h" />
     <ClInclude Include="ManageActionsDlg.h" />
+    <ClInclude Include="ManageAttributeSets.h" />
     <ClInclude Include="ManageMetadataFieldsDlg.h" />
     <ClInclude Include="ManageTagsDlg.h" />
     <ClInclude Include="ManageUserCountersDlg.h" />

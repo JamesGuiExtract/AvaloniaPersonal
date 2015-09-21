@@ -51,6 +51,9 @@ using namespace EXTRACT_FAMCONDITIONSLib;
 #import "..\..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMFileInspector\ComLibrary\Core\Code\Extract.FileActionManager.FAMFileInspector.tlb" named_guids
 using namespace Extract_FileActionManager_FAMFileInspector;
 
+#import "..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AttributeDbManager\Code\AttributeDBMgrComponents.tlb" named_guids
+using namespace AttributeDbMgrComponentsLib;
+
 #ifdef _UNICODE
 #if defined _M_IX86
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")

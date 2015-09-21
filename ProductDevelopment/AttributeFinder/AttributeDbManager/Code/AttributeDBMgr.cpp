@@ -202,6 +202,7 @@ void CAttributeDBMgr::FinalRelease()
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38517");
 }
+
 //-------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
 //-------------------------------------------------------------------------------------------------
@@ -531,6 +532,7 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38540");
 }
+//-------------------------------------------------------------------------------------------------
 
 namespace Test		// TODO - temporary test framework
 {
@@ -774,6 +776,7 @@ namespace Test
 
 }
 
+//-------------------------------------------------------------------------------------------------
 // TODO - add DB locking to all inserters and getters...
 STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileID,
 														    BSTR bstrAttributeSetName,
@@ -846,8 +849,7 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileID,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38557");
 
 }
-
-
+//-------------------------------------------------------------------------------------------------
 // relativeIndex: -1 for most recent, 1 for oldest
 // decrement most recent value to get next most recent (-2)
 // increment oldest value to get next oldest (2)
@@ -895,7 +897,7 @@ STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** ppAttribu
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38619");
 }
-
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name, 
 														long long* pAttributeSetNameID)
 {
@@ -916,7 +918,7 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name,
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38629");
 }
-
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeDBMgr::RenameAttributeSetName(BSTR attributeSetName, 
 													 BSTR newName)
 {
@@ -939,7 +941,7 @@ STDMETHODIMP CAttributeDBMgr::RenameAttributeSetName(BSTR attributeSetName,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38626");
 
 }
-
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetName(BSTR attributeSetName)
 {
 	try
@@ -959,7 +961,7 @@ STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetName(BSTR attributeSetName)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38623");
 }
-
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeDBMgr::GetAllAttributeSetNames(IStrToStrMap** ippNames)
 {
 	try
@@ -1035,7 +1037,6 @@ void CAttributeDBMgr::validateLicense()
 {
 	VALIDATE_LICENSE( gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI38544", gstrDESCRIPTION);
 }
-
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::validateSchemaVersion()
 {
@@ -1072,7 +1073,6 @@ void CAttributeDBMgr::validateSchemaVersion()
 		throw ue;
 	}
 }
-
 //-------------------------------------------------------------------------------------------------
 map<string, string> CAttributeDBMgr::getDBInfoDefaultValues()
 {
@@ -1085,3 +1085,4 @@ map<string, string> CAttributeDBMgr::getDBInfoDefaultValues()
 
 	return mapDefaultValues;
 }
+//-------------------------------------------------------------------------------------------------

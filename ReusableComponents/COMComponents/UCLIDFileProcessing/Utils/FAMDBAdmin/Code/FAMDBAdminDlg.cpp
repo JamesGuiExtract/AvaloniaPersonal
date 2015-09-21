@@ -16,6 +16,7 @@
 #include "ManageUsersDlg.h"
 #include "ManageActionsDlg.h"
 #include "ManageMetadataFieldsDlg.h"
+#include "ManageAttributeSets.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -124,6 +125,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_REPORTS, &CFAMDBAdminDlg::OnToolsReports)
 	ON_COMMAND(ID_TOOLS_RECALCULATE_STATS, &CFAMDBAdminDlg::OnRecalculateStats)
 	ON_COMMAND(ID_MANAGE_METADATA, &CFAMDBAdminDlg::OnManageMetadataFields)
+	ON_COMMAND(ID_MANAGE_ATTRIBUTESETS, &CFAMDBAdminDlg::OnManageAttributeSets)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -903,6 +905,21 @@ void CFAMDBAdminDlg::UpdateSummaryTab(long nActionID /*= -1*/)
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27696");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnManageAttributeSets()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{	
+		// Create a new Metadata fields manager dialog
+		CManageAttributeSets dlg(m_ipFAMDB);
+
+		// Display the dialog
+		dlg.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38633");
 }
 
 //-------------------------------------------------------------------------------------------------

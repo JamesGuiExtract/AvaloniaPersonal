@@ -52,7 +52,7 @@ library AttributeDbMgrComponentsLib
 
 		[id(4), helpstring("method CreateNewAttributeSetName")] 
 		HRESULT CreateNewAttributeSetName([in] BSTR name, 
-										  [out] long long* pAttributeSetName);
+										  [out, retval] long long* pAttributeSetName);
 
 		[id(5), helpstring("method RenameAttributeSetName")] 
 		HRESULT RenameAttributeSetName([in] BSTR attributeSetName, 
@@ -61,6 +61,8 @@ library AttributeDbMgrComponentsLib
 		[id(6), helpstring("method DeleteAttributeSetName")] 
 		HRESULT DeleteAttributeSetName([in] BSTR attributeSetName);
 
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Returns a IStrToStrMap with the Attribute name as the key and the ID as a value
 		[id(7), helpstring("method GetAllAttributeSetNames")]
 		HRESULT GetAllAttributeSetNames([out, retval] IStrToStrMap** ppNames);
 	};
