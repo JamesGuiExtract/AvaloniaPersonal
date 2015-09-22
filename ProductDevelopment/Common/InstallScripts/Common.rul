@@ -427,19 +427,25 @@ begin
    	szProgram = SUPPORTDIR ^ "\\CBSetup.exe";
 	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 
-	// Call uninstall for ClearImage on 32 bit
-	clearImagePath = "C:\\Program Files\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
-	LongPathToShortPath(clearImagePath);
-	LaunchAppAndWait("\"C:\\Program Files\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, 
-		LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+	// Don't uninstall in silent mode - the uninstallextract.bat file will take care of the uninstall.
+	// if ran here if the INSTALL.LOG file doen't exist a dialog will displayed which is not good if
+	// uninstalling silently
+	if (MODE != SILENTMODE) then
+		// Call uninstall for ClearImage on 32 bit
+		if ( !SYSINFO.bIsWow64 ) then
+			clearImagePath = "C:\\Program Files\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
+			LongPathToShortPath(clearImagePath);
+			LaunchAppAndWait("\"C:\\Program Files\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, 
+				LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+		else
+			// Call uninstall for ClearImage on 64 bit
+			clearImagePath = "C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
+			LongPathToShortPath(clearImagePath);
+			LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, 
+				LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+		endif;
 
-	// Call uninstall for ClearImage on 64 bit
-	clearImagePath = "C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
-	LongPathToShortPath(clearImagePath);
-	LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, 
-		LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
-
-	UninstallApplication("ClearImage 7 PDK" , "/S /A /U", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS );
+	endif;
 	
  	SdShowMsg("Setup is Uninstalling Inlite drivers.", FALSE);
 end;

@@ -68,6 +68,18 @@ SET LM=%InstallShieldFolder%\%LM_GUID%\setup
 SET IDShieldSPClient=%InstallShieldFolder%\%IDShieldSPClient_GUID%\setup
 SET RDT=%InstallShieldFolder%\%RDT_GUID%\setup
 
+:: Make sure Clear image INSTALL.LOG file exists before running any of the
+:: uninstalls since this will cause a dialog to pop up.
+SET CLEARIMAGE_DIR=%PROGRAM_ROOT%\Inlite\ClearImage 7 PDK
+
+:: Check if UNWISE.exe exists
+IF EXIST "%CLEARIMAGE_DIR%\UNWISE.EXE" (
+:: if the INSTALL.LOG file does not exist delete the unwise.exe file
+	IF  NOT EXIST "%CLEARIMAGE_DIR%\INSTALL.LOG" (
+		del "%CLEARIMAGE_DIR%\UNWISE.EXE"
+	)
+)
+
 :UninstRDT
 :: UnInstall RDT
 IF NOT EXIST "%RDT%.ini" GOTO UninstLabDE
