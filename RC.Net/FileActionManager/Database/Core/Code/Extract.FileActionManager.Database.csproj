@@ -29,7 +29,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>..\..\..\..\..\binaries\Debug\Extract.FileActionManager.Database.XML</DocumentationFile>
-    <RegisterForComInterop>true</RegisterForComInterop>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -76,6 +76,7 @@
       <DependentUpon>FAMDatabaseOptionsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="FAMDatabaseSettings.cs" />
+    <Compile Include="FAMDBRuleExecutionCounter.cs" />
     <Compile Include="FAMServiceDatabaseManager.cs" />
     <Compile Include="FAMServiceDatabaseMapping.cs" />
     <Compile Include="FpsFileTableData.cs" />
@@ -89,6 +90,10 @@
     <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.Database.csproj">
       <Project>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</Project>
       <Name>Extract.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
+      <Name>Extract.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
@@ -156,7 +161,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>RegAsm "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"
+CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

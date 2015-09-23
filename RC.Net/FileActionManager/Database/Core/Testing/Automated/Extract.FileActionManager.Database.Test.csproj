@@ -73,6 +73,10 @@
       <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
       <Name>Extract.Testing.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
+      <Name>Extract.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>

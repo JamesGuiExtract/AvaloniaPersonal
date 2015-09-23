@@ -95,6 +95,8 @@ public:
 	STDMETHOD(put_IgnoreOutputHandlerErrors)(VARIANT_BOOL newVal);
 	STDMETHOD(get_Comments)(BSTR *pVal);
 	STDMETHOD(put_Comments)(BSTR newVal);
+	STDMETHOD(get_RuleExecutionCounters)(IIUnknownVector **pVal);
+	STDMETHOD(put_RuleExecutionCounters)(IIUnknownVector *pNewVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -147,14 +149,25 @@ private:
 	// this mutex is used in the constructor and destructor to protect the m_apSafeNetMgr member
 	static CMutex ms_mutexLM;
 
+	// Used to synchronize construction/destruction of rulesets (for threadsafe checks against
+	// ms_referenceCount)
+	static CMutex ms_mutexConstruction;
+
 	// The should be only one SafeNetLicenseMgr object
 	// protected by ms_mutexLM
 	static unique_ptr<SafeNetLicenseMgr> m_apSafeNetMgr;
 	
-	// This is need to to keep track of the number of RuleSet intances that are active so it will
+	// This is need to keep track of the number of RuleSet instances that are active so it will
 	// be possible to know when the m_apSafeNetMgr object can safely be deleted 
 	// protected by ms_mutexLM
 	static int m_iSNMRefCount;
+
+	// A vector of RuleExecutionCounters to be decremented when rules are run. If specified, when
+	// running a ruleset each counter shall be tried in order until one with the proper counterID
+	// is found with enough counts available. If there is no available counter with enough counts
+	// (or no RuleExecutionCounters are provided in the first place), a USB key shall be decremented
+	// if one is available.
+	IIUnknownVectorPtr m_ipRuleExecutionCounters;
 
 	// This mutex is used to protect the same instance between threads
 	CMutex m_mutex;
@@ -241,6 +254,14 @@ private:
 
 	// Decrements from the USB key any accumulated counts right away.
 	void flushCounter(DataCell cell, CounterData& counterData);
+
+	// Attempts to decrement using m_ipRuleExecutionCounters. Note that DataCell is used only to
+	// indicate the proper CounterID to decrement while disturbing the existing code as little as
+	// possible. In the future, the should be factored out and a counter ID should be used in its
+	// place.
+	// Returns the number of counts remaining. If there is not a counter available or not enough
+	// counts on an available counter, -1 will be returned;
+	int decrementRuleExecutionCounter(DataCell cell, int nNumToDecrement);
 
 	// returns a reference of the member variable m_vecSerialNumbers
 	// this function separates the serial numbers in the string m_strKeySerialNumbers

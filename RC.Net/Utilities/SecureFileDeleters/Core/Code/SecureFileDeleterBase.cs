@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace Extract.Utilities.SecureFileDeleters
 {
     /// <summary>
-    /// A base class for secure file delete implmentations that provides most of the code that
+    /// A base class for secure file delete implementations that provides most of the code that
     /// should be required by any implementation.
     /// </summary>
+    // This class is intentionally missing a default constructor so that it cannot be directly
+    // instantiated via COM. Only derived classes such as DoD5220E should be used.
+    [SuppressMessage("Microsoft.Interoperability", "CA1409:ComVisibleTypesShouldBeCreatable")]
+    [ComVisible(true)]
     public class SecureFileDeleterBase
     {
         #region Constants
@@ -62,7 +65,7 @@ namespace Extract.Utilities.SecureFileDeleters
         static Random _randomGenerator = new Random();
 
         /// <summary>
-        /// The registry settings from which the the secure file delete options are to be retrieved.
+        /// The registry settings from which the secure file delete options are to be retrieved.
         /// </summary>
         // Intentionally not dynamic since the values will not be read dynamically on the c++ side.
         readonly RegistrySettings<Properties.Settings> _registry;
@@ -148,23 +151,6 @@ namespace Extract.Utilities.SecureFileDeleters
         #region Methods
 
         /// <summary>
-        /// Authenticates this <see cref="SecureFileDeleterBase"/> instance.
-        /// </summary>
-        /// <param name="key">The authentication key.</param>
-        /// <returns>The authentication value.</returns>
-        public string Authenticate(string key)
-        {
-            try
-            {
-                return ObfuscatedAuthenticate(key);
-            }
-            catch (Exception ex)
-            {
-                throw ex.CreateComVisible("ELI33381", "Secure file deletion authentication failed.");
-            }
-        }
-
-        /// <summary>
         /// Securely deletes the specified <see paramref="fileName"/>.
         /// </summary>
         /// <param name="fileName">Name of the file to securely delete.</param>
@@ -175,6 +161,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// <see langword="true"/>, otherwise they will be ignored.</param>
         /// <param name="doRetries"><see langword="true"/> if retries should be attempted when
         /// sharing violations occur; <see langword="false"/> otherwise.</param>
+        [ComVisible(false)]
         public virtual void SecureDeleteFile(string fileName, bool throwIfUnableToDeleteSecurely,
             bool doRetries)
         {
@@ -201,12 +188,12 @@ namespace Extract.Utilities.SecureFileDeleters
                     SecureDeleteFileHelper(fileName, throwIfUnableToDeleteSecurely, exceptions);
                 }
 
-                // If the file was deleted, there were no proplems overwriting the file or
-                // throwIfUnableToDeleteSecurely is false. Log any the excpetions if specified.
+                // If the file was deleted, there were no problems overwriting the file or
+                // throwIfUnableToDeleteSecurely is false. Log any the exceptions if specified.
                 if (exceptions.Count > 0 && _registry.Settings.LogSecureDeleteErrors)
                 {
                     ExtractException aggregateException = new ExtractException("ELI32855",
-                        "An error occured while securely deleting a file; the file may be recoverable.",
+                        "An error occurred while securely deleting a file; the file may be recoverable.",
                         exceptions.AsAggregateException());
                     aggregateException.AddDebugData("Filename", fileName, false);
                     aggregateException.Log();
@@ -218,7 +205,7 @@ namespace Extract.Utilities.SecureFileDeleters
                 // the file was not properly overwritten, or the delete failed outright. Throw an
                 // exception.
                 ExtractException ee = new ExtractException("ELI32867",
-                    "An error occured while securely deleting a file; the file could not be deleted.",
+                    "An error occurred while securely deleting a file; the file could not be deleted.",
                     ex);
                 ee.AddDebugData("Filename", fileName, false);
                 throw ee;
@@ -396,7 +383,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// <param name="bytesToVerify">The number of bytes to verify.</param>
         /// <requires><see paramref="readBuffer"/> and <see paramref="readBuffer"/> must be at least
         /// as large as <see paramref="bytesToVerify"/>.</requires>
-        /// <throws><see cref="ExtractException"/> if the verificaton fails.</throws>
+        /// <throws><see cref="ExtractException"/> if the verification fails.</throws>
         internal protected static void VerifyData(Stream stream, byte[] writeBuffer, byte[] readBuffer,
             int bytesToVerify)
         {
@@ -435,7 +422,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// </summary>
         /// <param name="fileName">The name of the file to rename.</param>
         /// <param name="count">The number of times to rename the file.</param>
-        /// <param name="exceptions">Any excpetions encountered will be added to this
+        /// <param name="exceptions">Any exceptions encountered will be added to this
         /// <see paramref="Collection{T}"/>.</param>
         /// <returns>The final name of the file after the renaming.</returns>
         internal protected virtual string RenameFile(string fileName, int count,
@@ -572,41 +559,5 @@ namespace Extract.Utilities.SecureFileDeleters
         }
 
         #endregion Protected Members
-
-        #region Private Member
-
-        /// <summary>
-        /// Authenticates this <see cref="SecureFileDeleterBase"/> instance. (Obfuscated since this
-        /// is private).
-        /// </summary>
-        /// <param name="key">The authentication key.</param>
-        /// <returns>The authentication value.</returns>
-        static string ObfuscatedAuthenticate(string key)
-        {
-            ExtractException.Assert("ELI33483", "Invalid authentication key", key.Length == 32);
-
-            // So that the caller can verify that this is an Extract Systems implementation, it will
-            // expect a result calculated by:
-            // 1) Encrypting the key.
-            // 2) Interpreting the result as 5 64 bit numbers.
-            // 3) XOR'ing them where each is rotated left by its index (0-4)
-            // 4) Converting this result to a 16 char hex string.
-            // Do this quick and dirty checksum rather than direct encryption so one can't call
-            // Authenticate repeatedly to crack our standard encryption scheme).
-            string encryptedString = NativeMethods.EncryptString(key);
-            byte[] encryptedBytes = StringMethods.ConvertHexStringToBytes(encryptedString);
-
-            ulong result = 0;
-            for (int i = 0; i < 5; i++)
-            {
-                ulong value = BitConverter.ToUInt64(encryptedBytes, i * sizeof(ulong));
-                result ^= (value << i) | (value >> (64 - i));
-            }
-            string resultString = result.ToString("X16", CultureInfo.InvariantCulture);
-
-            return resultString;
-        }
-
-        #endregion Private Member
     }
 }

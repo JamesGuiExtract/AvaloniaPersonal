@@ -13,7 +13,7 @@ namespace Extract.Utilities.SecureFileDeleters
     /// <summary>
     /// An <see cref="ISecureFileDeleter"/> implementation that fulfills the data cleansing
     /// specifications US Department of Defense manual 5220.22M (Versions prior to Nov 2007).
-    /// Specifically, in the matrix from section 8-306, this implments option E (3 pass: zeros,
+    /// Specifically, in the matrix from section 8-306, this implements option E (3 pass: zeros,
     /// ones, random).
     /// </summary>
     [ComVisible(true)]
@@ -62,7 +62,7 @@ namespace Extract.Utilities.SecureFileDeleters
         #region ISecureFileDeleter
 
         /// <summary>
-        /// A descriptive name of this implmentation.
+        /// A descriptive name of this implementation.
         /// </summary>
         public string Name
         {

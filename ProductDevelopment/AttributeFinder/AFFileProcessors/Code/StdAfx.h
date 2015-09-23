@@ -63,6 +63,9 @@ using namespace UCLID_FILEPROCESSINGLib;
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.tlb" named_guids
 using namespace UCLID_IMAGEUTILSLib;
 
+#import "..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.tlb" named_guids
+using namespace Extract_FileActionManager_Database;
+
 #import "AFFileProcessors.tlb"
 
 //{{AFX_INSERT_LOCATION}}

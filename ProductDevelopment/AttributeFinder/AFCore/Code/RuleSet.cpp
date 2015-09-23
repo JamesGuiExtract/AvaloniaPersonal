@@ -43,9 +43,12 @@ const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Defin
 // License Manager is only created once or destroyed once
 CMutex CRuleSet::ms_mutexLM;
 
+// Used to synchronize construction/destruction of rulesets (for threadsafe checks against
+// ms_referenceCount)
+CMutex CRuleSet::ms_mutexConstruction;
+
 // License manager instance
 unique_ptr<SafeNetLicenseMgr> CRuleSet::m_apSafeNetMgr(__nullptr);
-int CRuleSet::m_iSNMRefCount = 0;
 
 // Max accumulation = 10 (use char index 4 followed by char index 2 as a long);
 #define _MAX_COUNTER_ACCUMULATION "D804155D-471C-4C81-A07D-9392AD45661C"
@@ -78,18 +81,9 @@ m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current v
 {
 	try
 	{
-		// Lock the mutex for USB License manager
-		CSingleLock lg( &ms_mutexLM, TRUE );
+		CSingleLock lg(&ms_mutexConstruction, TRUE);
 
 		ms_referenceCount++;
-
-		// if this is the first instance of RuleSet will need to allocate the pointer
-		if ( m_apSafeNetMgr.get() == __nullptr )
-		{
-			m_apSafeNetMgr = unique_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
-		}
-		// Increment the Reference count
-		m_iSNMRefCount++;
 
 		// If full RDT is not licensed, we may be able to preset a USB counter
 		if (!isRdtLicensed())
@@ -120,10 +114,17 @@ CRuleSet::~CRuleSet()
 
 	try
 	{
-		// Lock the mutex for USB License manager
-		CSingleLock lg( &ms_mutexLM, TRUE);
+		CSingleLock lg(&ms_mutexConstruction, TRUE);
 
-		ms_referenceCount--;
+		if (ms_referenceCount <= 0)
+		{
+			UCLIDException("ELI38721", "Failed RuleSet consistency check.").log();
+			ms_referenceCount = 0;
+		}
+		else
+		{
+			ms_referenceCount--;
+		}
 
 		// Before releasing the connection to m_apSafeNetMgr, flush any accumulated values that have
 		// not yet been decremented.
@@ -131,20 +132,16 @@ CRuleSet::~CRuleSet()
 		{
 			try
 			{
+				CSingleLock lg(&ms_mutexLM, TRUE);
+
 				flushCounter(gdcellFlexIndexingCounter, ms_indexingCounterData);
 				flushCounter(gdcellFlexPaginationCounter, ms_paginationCounterData);
 				flushCounter(gdcellIDShieldRedactionCounter, ms_redactionCounterData);
+
+				// If no more instances of RuleSet exist release the SafeNetMgr ( license )
+				m_apSafeNetMgr.reset(__nullptr);
 			}
 			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33414")
-		}
-
-		// Decrement the reference Count
-		m_iSNMRefCount--;
-
-		// If no more instances of RuleSet exist release the SafeNetMgr ( license )
-		if ( m_iSNMRefCount <= 0 )
-		{
-			m_apSafeNetMgr.reset(__nullptr);
 		}
 
 		// clean up the dialog resource in this scope so that the
@@ -426,7 +423,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				{
 					try
 					{
-						// Preprocess the doc if there's any preprocessor
+						// Pre-process the doc if there's any preprocessor
 						if (bEnabledDocumentPreprocessorExists)
 						{
 							// Update the progress status
@@ -787,7 +784,7 @@ STDMETHODIMP CRuleSet::put_FileName(BSTR newVal)
 		m_strFileName = asString(newVal);
 
 		// NOTE: we don't need to set the dirty flag because the filename
-		// property is a "dynamic" and "non-persitent" property, and therefore
+		// property is a "dynamic" and "non-persistent" property, and therefore
 		// doesn't affect the dirty flag of this object
 	
 		return S_OK;
@@ -1009,7 +1006,7 @@ STDMETHODIMP CRuleSet::put_KeySerialList(BSTR newVal)
 
 	try
 	{
-		// NOTE: Unlike other methods/properties, calling this method requries
+		// NOTE: Unlike other methods/properties, calling this method requires
 		// RuleSet Editor license.
 		void validateUILicense();
 
@@ -1210,7 +1207,7 @@ STDMETHODIMP CRuleSet::put_Comments(BSTR newVal)
 
 	try
 	{
-		// NOTE: Unlike other methods/properties, calling this method requries
+		// NOTE: Unlike other methods/properties, calling this method requires
 		// RuleSet Editor license.
 		void validateUILicense();
 
@@ -1219,6 +1216,40 @@ STDMETHODIMP CRuleSet::put_Comments(BSTR newVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34020")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_RuleExecutionCounters(IIUnknownVector **pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI38718", pVal != __nullptr);
+
+		validateLicense();
+
+		IIUnknownVectorPtr ipShallowCopy = m_ipRuleExecutionCounters;
+		*pVal = ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38719")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_RuleExecutionCounters(IIUnknownVector *pNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		void validateUILicense();
+
+		m_ipRuleExecutionCounters = pNewVal;
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38720")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1858,14 +1889,6 @@ void CRuleSet::decrementCounters( ISpatialStringPtr ipText )
 	// Only check counters if at least one counter is checked
 	if (isUsingCounter())
 	{
-		// Check to see if USB Key serial numbers should be ignored
-		bool bDisableUSBSNs = usbSerialNumbersDisabled();
-		if ( !bDisableUSBSNs && !m_strKeySerialNumbers.empty() )
-		{
-			// Serial numbers found and must be considered
-			validateKeySerialNumber();
-		}
-
 		// Update counters as needed
 		if ( m_bUseIndexingCounter )
 		{
@@ -1912,9 +1935,6 @@ void CRuleSet::decrementCounter(DataCell cell, int nNumToDecrement, CounterData&
 		// E = number of counts on the USB key at the time of the last successful decrement of the
 		// USB key from the current process.
 
-		// Lock the mutex for USB License manager to ensure thread safety of counterData.
-		CSingleLock lg( &ms_mutexLM, TRUE);
-
 		string strMaxAccumulation(_MAX_COUNTER_ACCUMULATION);
 		int allowedAccumulation = asLong(strMaxAccumulation.substr(4, 1) + strMaxAccumulation[2]);
 		allowedAccumulation = min(allowedAccumulation, counterData.m_nCountsDecrementedInProcess / 10);
@@ -1927,8 +1947,34 @@ void CRuleSet::decrementCounter(DataCell cell, int nNumToDecrement, CounterData&
 		}
 		else
 		{
-			counterData.m_nLastCountValue =
-				m_apSafeNetMgr->decreaseCellValue(cell, nCurrentAccumulation);
+			// First try to decrement using m_ipRuleExecutionCounters.
+			int nLastCount = decrementRuleExecutionCounter(cell, nCurrentAccumulation);
+
+			// For legacy purposes, allow a USB key as a fallback if there is no proper counter
+			// available in m_ipRuleExecutionCounters.
+			if (nLastCount < 0)
+			{
+				// Lock the mutex for USB License manager to ensure thread safety of counterData.
+				CSingleLock lg( &ms_mutexLM, TRUE);
+
+				// if this is the first instance of RuleSet will need to allocate the pointer
+				if ( m_apSafeNetMgr.get() == __nullptr )
+				{
+					m_apSafeNetMgr = unique_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
+				}
+
+				// Check to see if USB Key serial numbers should be ignored
+				bool bDisableUSBSNs = usbSerialNumbersDisabled();
+				if ( !bDisableUSBSNs && !m_strKeySerialNumbers.empty())
+				{
+					// Serial numbers found and must be considered
+					validateKeySerialNumber();
+				}
+
+				nLastCount = m_apSafeNetMgr->decreaseCellValue(cell, nCurrentAccumulation);
+			}
+
+			counterData.m_nLastCountValue = nLastCount;
 			counterData.m_nCountsDecrementedInProcess += nCurrentAccumulation;
 			counterData.m_nCountDecrementAccumulation = 0;
 		}
@@ -1950,9 +1996,64 @@ void CRuleSet::flushCounter(DataCell cell, CounterData& counterData)
 
 	if (counterData.m_nCountDecrementAccumulation > 0)
 	{
-		m_apSafeNetMgr->decreaseCellValue(cell, counterData.m_nCountDecrementAccumulation);
-		counterData.m_nCountDecrementAccumulation = 0;
+		if (m_apSafeNetMgr.get() == nullptr)
+		{
+			UCLIDException ue("ELI38722", "Unexpected counter state.");
+			ue.addDebugInfo("Cell", cell.getCellName());
+			ue.log();
+		}
+		else
+		{
+			m_apSafeNetMgr->decreaseCellValue(cell, counterData.m_nCountDecrementAccumulation);
+			counterData.m_nCountDecrementAccumulation = 0;
+		}
 	}
+}
+//-------------------------------------------------------------------------------------------------
+int CRuleSet::decrementRuleExecutionCounter(DataCell cell, int nNumToDecrement)
+{
+	if (m_ipRuleExecutionCounters == nullptr)
+	{
+		return -1;
+	}
+
+	int nResult = -1;
+
+	// Iterate each counter for the counter with the correct ID to decrement.
+	long nCount = m_ipRuleExecutionCounters->Size();
+	for (long i = 0; nResult < 0 && i < nCount; i++)
+	{
+		IRuleExecutionCounterPtr ipCounter = m_ipRuleExecutionCounters->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI38759", ipCounter != nullptr);
+
+		long nCounterID = ipCounter->CounterID;
+		switch (nCounterID)
+		{
+			case 1: 
+				if (cell.getCellName() == "Indexing")
+				{
+					nResult = ipCounter->DecrementCounter(nNumToDecrement);
+				}
+				break;
+
+			case 2:
+				if (cell.getCellName() == "Pagination")
+				{
+					nResult = ipCounter->DecrementCounter(nNumToDecrement);
+				}
+				break;
+
+			case 3:
+			case 4:
+				if (cell.getCellName() == "Redaction")
+				{
+					nResult = ipCounter->DecrementCounter(nNumToDecrement);
+				}
+				break;
+		}
+	}
+
+	return nResult;
 }
 //-------------------------------------------------------------------------------------------------
 std::vector<DWORD>& CRuleSet::getSerialListAsDWORDS()

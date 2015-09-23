@@ -1,4 +1,5 @@
 using Extract.Interfaces;
+using Extract.Licensing;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -101,13 +102,7 @@ namespace Extract.Utilities
         static object _secureFileDeleterLock = new object();
 
         /// <summary>
-        /// Keeps track of whether authentication of the secure file deleter has failed so that
-        /// repeated attempts to authenticate are not made.
-        /// </summary>
-        static bool _secureFileDeleterAuthenticationFailed;
-
-        /// <summary>
-        /// The registry settings from which the the secure file delete options are to be retrieved.
+        /// The registry settings from which the secure file delete options are to be retrieved.
         /// </summary>
         // Intentionally not dynamic since the values will not be read dynamically on the c++ side.
         static readonly RegistrySettings<Properties.Settings> _registry;
@@ -766,7 +761,7 @@ namespace Extract.Utilities
         /// <param name="convertLocalPath">If <see langword="true"/> paths referencing a file on
         /// the local system will be converted to a UNC path (if possible), <see langword="false"/>
         /// if local paths should not be converted.</param>
-        /// <returns><see langword="true"/> if the the path was successfully converted to a UNC
+        /// <returns><see langword="true"/> if the path was successfully converted to a UNC
         /// path, <see langword="false"/> if the path was not converted in which case the path
         /// remains the same as it was passed in.</returns>
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "0#")]
@@ -1009,11 +1004,6 @@ namespace Extract.Utilities
         {
             lock (_secureFileDeleterLock)
             {
-                // If we have already failed to authenticate, don't try again.
-                ExtractException.Assert("ELI33484",
-                    "Secure file deletion authentication failed.",
-                    !_secureFileDeleterAuthenticationFailed);
-
                 if (_secureFileDeleter == null)
                 {
                     try
@@ -1030,38 +1020,11 @@ namespace Extract.Utilities
                             throw ee;
                         }
 
+                        ExtractException.Assert("ELI38732", "Unable to verify assembly.",
+                            LicenseUtilities.VerifyAssemblyData(deleterType.Assembly));
+
                         _secureFileDeleter =
                             (ISecureFileDeleter)Activator.CreateInstance(deleterType);
-
-                        // Generate a random 32 char key, use it to call authenticate.
-                        string key = UtilityMethods.GetRandomString(32, true, true, true);
-                        string response = _secureFileDeleter.Authenticate(key);
-
-                        // Test that the same result is achieved by:
-                        // 1) Encrypting the key.
-                        // 2) Interpreting the result as 5 64 bit numbers.
-                        // 3) XOR'ing them where each is rotated left by its index (0-4)
-                        // 4) Converting this result to a 16 char hex string.
-                        // Do this quick and dirty checksum rather than direct encryption so one can't call
-                        // Authenticate repeatedly to crack our standard encryption scheme).
-                        string encryptedString = NativeMethods.EncryptString(key);
-                        byte[] encryptedBytes = StringMethods.ConvertHexStringToBytes(encryptedString);
-
-                        ulong result = 0;
-                        for (int i = 0; i < 5; i++)
-                        {
-                            ulong value = BitConverter.ToUInt64(encryptedBytes, i * sizeof(ulong));
-                            result ^= (value << i) | (value >> (64 - i));
-                        }
-                        string resultString = result.ToString("X16", CultureInfo.InvariantCulture);
-
-                        // If authentication failed, don't attempt to authenticate again.
-                        _secureFileDeleterAuthenticationFailed =
-                            !response.Equals(resultString, StringComparison.OrdinalIgnoreCase);
-
-                        ExtractException.Assert("ELI33380",
-                            "Secure file deletion authentication failed.",
-                            !_secureFileDeleterAuthenticationFailed);
                     }
                     catch (Exception ex)
                     {

@@ -18,19 +18,12 @@ namespace Extract.Interfaces
     public interface ISecureFileDeleter
     {
         /// <summary>
-        /// A descriptive name of the implmentation.
+        /// A descriptive name of the implementation.
         /// </summary>
         string Name
         {
             get;
         }
-
-        /// <summary>
-        /// Authenticates the <see cref="ISecureFileDeleter"/> instance.
-        /// </summary>
-        /// <param name="key">The authentication key.</param>
-        /// <returns>The authentication value.</returns>
-        string Authenticate(string key);
 
         /// <summary>
         /// Securely deletes the specified <see paramref="fileName"/>.

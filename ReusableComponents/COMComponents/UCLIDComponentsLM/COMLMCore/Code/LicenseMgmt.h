@@ -219,6 +219,24 @@ public:
     // PURPOSE: Unlicenses the specified component.
     static void unlicenseId(unsigned long ulComponentID);
 
+	//=======================================================================
+    // PURPOSE: A special purpose function that should be called only via
+	// Extract.Interop.SecureObjectCreator -> Extract.Licensing.LicenseUtilities.InitRegisteredObjects
+	// in order to validate that the SecureObjectCreator implementation being used is ours.
+	// In particular, this initializes an encrypted day code (LICENSE_MGMT_PASSWORD) to be able to
+	// validate SecureObjectCreator have registered themselves via Extract.Licenseing as expected.
+	static void initRegisteredObjects();
+
+	//=======================================================================
+    // PURPOSE: A special purpose function that should be called only via
+	// Extract.Interop.SecureObjectCreator -> Extract.Licensing.LicenseUtilities.RegisterObject
+	// in order to validate that the SecureObjectCreator implementation being used is ours.
+	// In particular, this registers a SecureObjectCreator's InstanceID using the previously
+	// initialized encrypted day code (LICENSE_MGMT_PASSWORD). This prevents 3rd party code from
+	// being able to use registerObjectBase to do the registration that is expected of our
+	// SecureObjectCreator implementation.
+	static void registerObject(long objectCode);
+
 protected:
     //=======================================================================
     // PURPOSE: Updates the m_LicenseData object with later expiration dates
@@ -305,6 +323,11 @@ private:
 	// Indicates whether in this process we have already checked on whether to activate high
 	// memory test mode.
 	static volatile bool m_initializedHighMemoryMode;
+
+	// Keeps track of the number of calls to registerObject. This will be expected to always match
+	// a the count of calls to registerObjectBase. If it does not, someone has been trying to
+	// register objects outside of SecureObjectCreator and should trigger license validation failure.
+	static long m_nRegisteredObjectCount;
 };
 //============================================================================
 // PURPOSE: Use the following macro as a general way to check if a particular

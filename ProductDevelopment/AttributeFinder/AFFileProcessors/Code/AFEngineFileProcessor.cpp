@@ -338,6 +338,9 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		// and so that it need not be loaded each time this method is called.
 		IRuleSetPtr ipRules = getRuleSet(strRulesFile);
 
+		// Assign any counters provided for the ruleset to decrement from.
+		ipRules->RuleExecutionCounters = m_ipFAMDBCounters;
+
 		_lastCodePos = "190";
 
 		IUnknownPtr ipUnknown = ipRules;

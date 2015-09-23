@@ -430,6 +430,14 @@ library UCLID_AFCORELib
 		// Ruleset comments visible to customer (to be used in lieu of readme).
 		[propget, id(23), helpstring("property Comments")] HRESULT Comments([out, retval] BSTR *pVal);
 		[propput, id(23), helpstring("property Comments")] HRESULT Comments([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// A vector of RuleExecutionCounters to be decremented when rules are run. If specified,
+		// when running a ruleset each counter shall be tried in order until one with the proper
+		// counterID is found with enough counts available. If there is no available counter with
+		// enough counts (or no RuleExecutionCounters are provided in the first place), a USB key
+		// shall be decremented if one is available.
+		[propget, id(24), helpstring("property RuleExecutionCounters")] HRESULT RuleExecutionCounters([out, retval] IIUnknownVector **pVal);
+		[propput, id(24), helpstring("property RuleExecutionCounters")] HRESULT RuleExecutionCounters([in] IIUnknownVector *pNewVal);
 	};
 
 	[

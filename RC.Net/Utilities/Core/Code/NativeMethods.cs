@@ -68,7 +68,7 @@ namespace Extract.Utilities
             SHCNE_ATTRIBUTES = 0x00000800,
 
             /// <summary>
-            /// A nonfolder item has been created.
+            /// A non-folder item has been created.
             /// <see cref="HChangeNotifyFlags.SHCNF_IDLIST"/> or
             /// HChangeNotifyFlags.SHCNF_PATH(A/W) must be specified in <i>uFlags</i>.
             /// <i>dwItem1</i> contains the item that was created.
@@ -77,7 +77,7 @@ namespace Extract.Utilities
             SHCNE_CREATE = 0x00000002,
 
             /// <summary>
-            /// A nonfolder item has been deleted.
+            /// A non-folder item has been deleted.
             /// <see cref="HChangeNotifyFlags.SHCNF_IDLIST"/> or
             /// HChangeNotifyFlags.SHCNF_PATH(A/W) must be specified in <i>uFlags</i>.
             /// <i>dwItem1</i> contains the item that was deleted.
@@ -179,7 +179,7 @@ namespace Extract.Utilities
             SHCNE_RENAMEFOLDER = 0x00020000,
 
             /// <summary>
-            /// The name of a nonfolder item has changed.
+            /// The name of a non-folder item has changed.
             /// <see cref="HChangeNotifyFlags.SHCNF_IDLIST"/> or
             /// HChangeNotifyFlags.SHCNF_PATH(A/W) must be specified in <i>uFlags</i>.
             /// <i>dwItem1</i> contains the previous PIDL or name of the item.
@@ -612,21 +612,6 @@ namespace Extract.Utilities
             out uint lpcbMaxValueLen, out uint lpcbSecurityDescriptor,
             ref FILETIME lpftLastWriteTime);
 
-        // P/Invoke the encryption method from BaseUtils.
-        // NOTE:    The mangled name appearing below should stay the same unless we switch
-        //          to a new version of the compiler.  If there is a problem where the entry
-        //          point cannot be found, run DUMPBIN /Exports on BaseUtils.dll and
-        //          search the output for externManipulator.  When you find it, copy
-        //          the full name from the output (the output is organized by columns,
-        //          there should be three columns of numbers (1 decimal, 2 HEX) and then
-        //          the mangled name of the function followed by a space and '='.
-        [DllImport("BaseUtils.dll",
-            EntryPoint = "?externManipulator@@YAPAEPBDPAK@Z", CharSet = CharSet.Ansi,
-            BestFitMapping = false, ThrowOnUnmappableChar = true,
-            CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr EncryptBytes([MarshalAs(UnmanagedType.LPStr)] string text,
-            ref uint length);
-
         /// <summary>
         /// Gets the number of milliseconds that have elapsed since the system was started.
         /// </summary>
@@ -845,68 +830,6 @@ namespace Extract.Utilities
         #endregion NativeMethods P/Invokes
 
         #region NativeMethods Methods
-
-        /// <summary>
-        /// Encrypts a given string using the internal Extract Systems passwords for encrypting
-        /// Exception debug strings.
-        /// </summary>
-        /// <param name="plainText">The string to be encrypted.</param>
-        /// <returns>A string containing the encrypted data</returns>
-        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-        internal static string EncryptString(string plainText)
-        {
-            string plainHexText = StringMethods.ConvertBytesToHexString(
-                StringMethods.ConvertStringToBytes(plainText));
-
-            string encryptedText = "";
-
-            // Create a pointer to a buffer to hold the encrypted data
-            IntPtr buffer = IntPtr.Zero;
-
-            // Wrap this in a try/catch block so we guarantee even if an exception is thrown that:
-            // 1) The exception will be eaten.
-            // 2) The empty string will be returned.
-            // 3) Memory allocated for the buffer will be released.
-            try
-            {
-                uint dataLength = 0;
-                buffer = EncryptBytes(plainHexText, ref dataLength);
-
-                // Create a byte array to hold the encrypted text
-                byte[] cipherText = new byte[dataLength];
-
-                // Copy the data from the buffer to the byte array
-                Marshal.Copy(buffer, cipherText, 0, (int)dataLength);
-
-                // Create a new string builder and add the encrypted bytes to
-                // the string one byte at a time
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < cipherText.Length; i++)
-                {
-                    // Format each byte as a 2 character HEX string
-                    sb.Append(cipherText[i].ToString("X2",
-                        System.Globalization.CultureInfo.InvariantCulture));
-                }
-
-                // Copy the string builder into the encrypted string
-                encryptedText = sb.ToString();
-            }
-            catch
-            {
-                // Ignore exceptions
-            }
-            finally
-            {
-                // Free the memory that was allocated in the encrypt method
-                if (buffer != IntPtr.Zero)
-                {
-                    Marshal.FreeCoTaskMem(buffer);
-                }
-            }
-
-            // Return the encrypted text
-            return encryptedText;
-        }
 
         /// <summary>
         /// Retrieves a string from the specified section in an initialization file.
@@ -1209,8 +1132,8 @@ namespace Extract.Utilities
         /// <param name="passwordBufferSize">The size of the <see paramref="passwordBuffer"/> in
         /// characters.</param>
         /// <param name="identity">The <see cref="WindowsIdentity"/> indicated by the credentials
-        /// entered if validation was successfull; otherwise, <see langword="null"/></param>
-        /// <returns>A <see cref="CredUIReturnCode"/> that indicates the result of diplaying the
+        /// entered if validation was successful; otherwise, <see langword="null"/></param>
+        /// <returns>A <see cref="CredUIReturnCode"/> that indicates the result of displaying the
         /// prompt. <see cref="CredUIReturnCode.NO_ERROR"/> indicates credentials were successfully
         /// but does not necessarily mean they were valid; the validity of the credentials is
         /// indicated by whether an <see paramref="identity"/> was returned.</returns>

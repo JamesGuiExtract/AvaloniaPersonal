@@ -116,60 +116,10 @@ ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 		{
 			try
 			{
-				sipSecureFileDeleter.CreateInstance(strSecureFileDeleterProgID.c_str());
-				ASSERT_RESOURCE_ALLOCATION("ELI32863", sipSecureFileDeleter != __nullptr);
-
-				// Generate a random 32 char key, use it to call authenticate.
-				string strKey = Random().getRandomString(32, true, true, true);
-				string strResponse = asString(sipSecureFileDeleter->Authenticate(strKey.c_str()));
-
-				// Test that the same result is achieved by:
-                // 1) Encrypting the key.
-                // 2) Interpreting the result as 5 64 bit numbers.
-                // 3) XOR'ing them where each is rotated left by its index (0-4)
-                // 4) Converting this result to a 16 char hex string.
-                // Do this quick and dirty checksum rather than direct encryption so one can't call
-				// Authenticate repeatedly to crack our standard encryption scheme).
-
-				// Convert key to a hex string so it can be encrypted with externManipulator.
-				char szTemp[64 + 1] = {0};
-				for (unsigned int i = 0; i < 32; i++)
-				{
-					sprintf_s(&szTemp[i * 2], 3, "%02X", strKey[i]);
-				}
-
-				// Get the encrypted bytes.
-				unsigned long length;
-				unsigned char *szEncrypted(externManipulator(szTemp, &length));
-				ByteStream bsEncrypted(szEncrypted, length);
-				unsigned char* pszData = bsEncrypted.getData();
-
-				// XOR each 64 bit number where the number is shifted to the left by its index in
-				// the data.
-				unsigned long long *pnKeys = (unsigned long long*)pszData;
-				unsigned long long nResult = 0;
-				for (int i = 0; i < 5; i++)
-				{
-					unsigned long long value = *(unsigned long long*)&pszData[sizeof(long long) * i];
-					nResult ^= (value << i) | (value >> (64 - i));
-				}
-				unsigned char* pnResult = (unsigned char *)&nResult;
-				
-				// Write out the result as a hex string.
-				ZeroMemory(szTemp, sizeof(szTemp));
-				for (unsigned int i = 0; i < 8; i++)
-				{
-					sprintf_s(&szTemp[i * 2], 3, "%02X", pnResult[7 - i]);
-				}
-
-				// Ensure we got the same result.
-				if (_strcmpi(strResponse.c_str(), szTemp) != 0)
-				{
-					// If authentication failed, don't attempt to authenticate again.
-					sbSecureFileDeleterAuthenticationFailed = true;
-					UCLIDException ue("ELI33377", "Secure file deletion authentication failed.");
-					throw ue;
-				}
+				// https://extract.atlassian.net/browse/ISSUE-11852
+				// Ensures the COM implementation is provided by an ExtractSystems strong-named .Net assembly.
+				SECURE_CREATE_OBJECT("ELI32863",
+					sipSecureFileDeleter, strSecureFileDeleterProgID.c_str());
 			}
 			catch (...)
 			{

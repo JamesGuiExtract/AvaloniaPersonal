@@ -90,7 +90,21 @@ namespace Extract
             //--------------------------------------------------------------------------------------
             // PURPOSE: To verify that the assembly is an extract assembly.
             static bool VerifyAssemblyData(Assembly^ assembly);
+			//--------------------------------------------------------------------------------------
+			// PURPOSE: A special purpose function that should be called only via
+			// Extract.Interop.SecureObjectCreator in order to validate that the SecureObjectCreator
+			// implementation being used is ours.
+			// In particular, this triggers the LicenseManagement class to initialize an encrypted
+			// day code (LICENSE_MGMT_PASSWORD) to use when validating SecureObjectCreator instances
+			// have properly registered themselves.
+			static void InitRegisteredObjects(MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
+			// PURPOSE: A special purpose function that should be called only via
+			// Extract.Interop.SecureObjectCreator in order to validate that the SecureObjectCreator
+			// implementation being used is ours.
+			// In particular, this encodes the specified objectID using an encrypted day code
+			// (LICENSE_MGMT_PASSWORD).
+			static void RegisterObject(int objectId, MapLabel^ mapLabel);
 
 		private:
             //--------------------------------------------------------------------------------------

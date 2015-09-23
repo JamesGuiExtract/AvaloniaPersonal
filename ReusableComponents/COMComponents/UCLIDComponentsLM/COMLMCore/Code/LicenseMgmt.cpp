@@ -59,6 +59,7 @@ Win32Event LicenseManagement::m_licenseStateIsInvalidEvent;
 unique_ptr<CMutex> LicenseManagement::m_upTrpRunning(__nullptr);
 unique_ptr<CMutex> LicenseManagement::m_upValidState(getGlobalNamedMutex(gpszGoodStateMutex));
 volatile bool LicenseManagement::m_initializedHighMemoryMode = false;
+long LicenseManagement::m_nRegisteredObjectCount = 0;
 
 const string gstrHIGH_MEM_TEST_MODE_KEY = "HighMemoryTestMode";
 const string gstrDEFAULT_HIGH_MEM_TEST_MODE = "";
@@ -648,6 +649,30 @@ void LicenseManagement::unlicenseId(unsigned long ulComponentID)
 
 	m_LicenseData.unlicenseId(ulComponentID);
 }
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::initRegisteredObjects()
+{
+	if (m_nRegisteredObjectCount != getRegisteredObjectCount())
+	{
+		throw UCLIDException("ELI38725", "Registration corrupted");
+	}
+
+	// Initialize initRegisteredObjectsBase with the long long representation of
+	// LICENSE_MGMT_PASSWORD where the low and high longs are XOR'd.
+	ULONGLONG ullPassword = asUnsignedLongLong(LICENSE_MGMT_PASSWORD);
+
+	long lkey = (long)(ullPassword / ULONG_MAX) ^ (long)ullPassword;
+	initRegisteredObjectsBase(lkey);
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::registerObject(long objectCode)
+{
+	// Used to ensure registerObjectBase is always called via this method.
+	m_nRegisteredObjectCount++;
+	
+	// The objectCode will have been disguised with LICENSE_MGMT_PASSWORD LicenseUtilities.
+	registerObjectBase(objectCode);
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
@@ -793,6 +818,11 @@ void LicenseManagement::validateState()
 					throw UCLIDException("ELI35323", "Extract Systems license state has been corrupted!");
 				}
 			}
+		}
+
+		if (m_nRegisteredObjectCount != getRegisteredObjectCount())
+		{
+			throw UCLIDException("ELI38726", "Registration corrupted");
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35324");

@@ -53,6 +53,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -65,6 +66,8 @@
     <Compile Include="IErrorEmailTask.cs" />
     <Compile Include="IFileBrowser.cs" />
     <Compile Include="IMemoryManager.cs" />
+    <Compile Include="ISecureObjectCreator.cs" />
+    <Compile Include="IRuleExecutionCounter.cs" />
     <Compile Include="ISecureFileDeleter.cs" />
     <Compile Include="IWcfFileReceiverManager.cs" />
     <Compile Include="MenuDefinition.cs" />

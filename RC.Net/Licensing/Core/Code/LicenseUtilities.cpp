@@ -11,6 +11,7 @@
 
 using namespace Extract;
 using namespace Extract::Licensing;
+using namespace System::Globalization;
 
 #pragma unmanaged
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -307,6 +308,52 @@ bool LicenseUtilities::VerifyAssemblyData(Assembly^ assembly)
     catch(Exception^ ex)
     {
         throw gcnew ExtractException("ELI31148", "Unable to verify assembly data.", ex);
+    }
+}
+//--------------------------------------------------------------------------------------------------
+void LicenseUtilities::InitRegisteredObjects(MapLabel^ mapLabel)
+{
+	try
+	{
+		// Ensure a map label has been specified
+        ASSERT_ARGUMENT("ELI38738", mapLabel != nullptr);
+
+		LicenseManagement::initRegisteredObjects();
+	}
+	catch(UCLIDException& uex)
+    {
+        throw gcnew ExtractException("ELI38739", "Failed to initialize object registration.",
+            StringHelpers::AsSystemString(uex.asStringizedByteStream()));
+    }
+    catch(Exception^ ex)
+    {
+        throw gcnew ExtractException("ELI38740", "Failed to initialize object registration.", ex);
+    }
+}
+//--------------------------------------------------------------------------------------------------
+void LicenseUtilities::RegisterObject(int objectId, MapLabel^ mapLabel)
+{
+    try
+    {
+		// Ensure a map label has been specified
+        ASSERT_ARGUMENT("ELI38741", mapLabel != nullptr);
+
+		// So that 3rd party code can't simply call registerObjectBase to impersonate a trusted
+		// SecureObjectCreator, the code will be XOR'd with the low and high longs from an encrypted
+		// day code (LICENSE_MGMT_PASSWORD).
+		Int64 password = UInt64::Parse(GetMapLabelValue(mapLabel), CultureInfo::InvariantCulture);
+		int key = (int)(password >> 32) ^ (int)password;
+
+        LicenseManagement::registerObject(objectId ^ key);
+    }
+    catch(UCLIDException& uex)
+    {
+        throw gcnew ExtractException("ELI38742", "Failed to register object.",
+            StringHelpers::AsSystemString(uex.asStringizedByteStream()));
+    }
+    catch(Exception^ ex)
+    {
+        throw gcnew ExtractException("ELI38743", "Failed to register object.", ex);
     }
 }
 

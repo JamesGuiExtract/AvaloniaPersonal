@@ -161,7 +161,7 @@ vector<string> getComponentProgIDsInCategory(const string& strCategoryName)
 			}
 			
 			// we can assume that there is only one category with the given
-			// description.  This is infact a requirement for calling this
+			// description.  This is, in fact, a requirement for calling this
 			// method.  Since we have found the one category, we can break out
 			// of the while loop.
 			break;
@@ -437,7 +437,7 @@ _bstr_t EXPORT_BaseUtils writeObjectToBSTR(IPersistStreamPtr& ipObj, BOOL bClear
 	// represents whether or not the bytestream had an odd number of bytes
 	// 1 = odd
 	// 0 = even
-	// All BSTR's contain an even nuber of bytes because each "character" is unicode i.e. 2 bytes long.
+	// All BSTR's contain an even number of bytes because each "character" is unicode i.e. 2 bytes long.
 	// since we are passing a stream of bytes as a BSTR the number of bytes passed will always be even,
 	// even in the case where the original stream had an odd number of bytes
 	// When decoding the stream we will need to know whether there is an extra byte on the end
@@ -802,8 +802,8 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 				ipStream = __nullptr;
 				ipStorage = __nullptr;
 
-				// If we wrote to a temporary file, now the the write succeeded, overwrite the
-				// original file with the temp copy.
+				// If we wrote to a temporary file, now the write succeeded, overwrite the original
+				// file with the temp copy.
 				if (pTempOutFile != __nullptr)
 				{
 					try
@@ -972,8 +972,8 @@ IPersistStreamPtr EXPORT_BaseUtils readObjFromSAFEARRAY(SAFEARRAY *psaData)
 	}
 	if (psaData->cDims != 1)
 	{
-		UCLIDException ue("ELI37202", "SAFEARRAY must have only 1 diminsion.");
-		ue.addDebugInfo("Diminisions", psaData->cDims);
+		UCLIDException ue("ELI37202", "SAFEARRAY must have only 1 dimension.");
+		ue.addDebugInfo("Dimensions", psaData->cDims);
 		throw ue;
 	}
 
@@ -1053,3 +1053,76 @@ LPSAFEARRAY EXPORT_BaseUtils writeObjToSAFEARRAY(IPersistStreamPtr ipObj)
 	throw ueRead;
 }
 //-------------------------------------------------------------------------------------------------
+void initRegisteredObjectsBase(long objectCode)
+{
+	if (m_sapnRegisteredObjectKey)
+	{
+		// If init is called when already initialized, it is an indication that registerObjectBase
+		// has been called from somewhere other than LicenseManagement::registerObject. Corrupt the
+		// license state of the software.
+		m_snRegisteredObjectCount = -1;
+		THROW_LOGIC_ERROR_EXCEPTION("ELI38727");
+	}
+
+	m_sapnRegisteredObjectKey.reset(new long(objectCode));
+	m_sapnRegisteredObject.reset(nullptr);
+}
+//-------------------------------------------------------------------------------------------------
+void registerObjectBase(long objectCode)
+{
+	m_snRegisteredObjectCount++;
+
+	if (!m_sapnRegisteredObjectKey)
+	{
+		// If registerObjectBase is called when not initialized, it is an indication that it has
+		// been called from somewhere other than LicenseManagement::registerObject. Corrupt the
+		// license state of the software.
+		m_snRegisteredObjectCount = -1;
+		THROW_LOGIC_ERROR_EXCEPTION("ELI38728");
+	}
+
+	// The objectCode will have been disguised with m_sapnRegisteredObjectKey.
+	m_sapnRegisteredObject.reset(new long(objectCode));
+}
+//-------------------------------------------------------------------------------------------------
+void validateObjectRegistration(long objectCode)
+{
+	try
+	{
+		try
+		{
+			if (!m_sapnRegisteredObjectKey)
+			{
+				// If validateObjectRegistration is called when not initialized, it is an indication
+				// that it has been called from somewhere other than
+				// LicenseManagement::registerObject. Corrupt the license state of the software.
+				m_snRegisteredObjectCount = -1;
+				THROW_LOGIC_ERROR_EXCEPTION("ELI38729");
+			}
+
+			// So that 3rd party code can't simply call registerObjectBase to impersonate a trusted
+			// SecureObjectCreator, m_sapnRegisteredObject will have been XOR'd with the low and
+			// high longs from an encrypted day code (LICENSE_MGMT_PASSWORD).
+			long key = *m_sapnRegisteredObjectKey ^ objectCode;
+			bool valid = (m_sapnRegisteredObject && *m_sapnRegisteredObject == key);
+			if (!valid)
+			{
+				throw UCLIDException("ELI38730", "Object validation failed.");
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38731");
+	}
+	catch (UCLIDException &ue)
+	{
+		// It is expected that in response to an error, SecureObjectCreator (via 
+		// CREATE_VERIFIED_OBJECT) will trigger initRegisteredObjectsBase.
+		m_sapnRegisteredObjectKey = nullptr;
+		
+		// Prevent brute-force attempts at cracking m_sapnRegisteredObjectKey.
+		Sleep(1000);
+
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+
