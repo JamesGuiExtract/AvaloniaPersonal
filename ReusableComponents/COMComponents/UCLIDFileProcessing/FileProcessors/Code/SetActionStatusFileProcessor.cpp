@@ -317,34 +317,56 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 
         bstr_t comFileName = get_bstr_t(fileName);
 
-        if (m_reportErrorWhenFileNotQueued)
-        {
-            // Called for side-effect only - throw if the file hasn't been previously
-            // added to the DB.
-            ipDB->GetFileID(comFileName);
-        }
+		long nFileID = -1;
+		try
+		{
+			try
+			{
+				// GetFileID will throw if the file hasn't been previously added to the DB.
+				nFileID = ipDB->GetFileID(comFileName);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+		}
+		catch (UCLIDException &ue)
+		{
+			if (m_reportErrorWhenFileNotQueued)
+			{
+				throw ue;
+			}
+		}
 
-        try
-        {
-            try
-            {
-                // This will throw if the tag-expanded-filename points to a path
-                // that doesn't exist, or if the file doesn't exist. Using the 
-                // double-catch-pattern to identify the actual target filename
-                // in the error report - see the addDebugInfo() below.
-                VARIANT_BOOL bAlreadyExists = VARIANT_FALSE;
-                ipDB->AddFile(comFileName, strActionName.c_str(), kPriorityDefault,
-                    VARIANT_TRUE, VARIANT_FALSE, m_eActionStatus, VARIANT_FALSE, &bAlreadyExists,
-                    &ePrevStatus);
-            }
-            CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38453");
-        }
-        catch (UCLIDException ue)
-        {
-            ue.addDebugInfo("Target Filename", fileName);
-            throw ue;
-        }
-
+		// If nFileID == -1 then the file does not exist so add it to the database
+		if (nFileID == -1)
+		{
+			try
+			{
+				try
+				{
+					// This will throw if the tag-expanded-filename points to a path
+					// that doesn't exist, or if the file doesn't exist. Using the 
+					// double-catch-pattern to identify the actual target filename
+					// in the error report - see the addDebugInfo() below.
+					VARIANT_BOOL bAlreadyExists = VARIANT_FALSE;
+					ipDB->AddFile(comFileName, strActionName.c_str(), kPriorityDefault,
+						VARIANT_TRUE, VARIANT_FALSE, m_eActionStatus, VARIANT_FALSE, &bAlreadyExists,
+						&ePrevStatus);
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38453");
+			}
+			catch (UCLIDException ue)
+			{
+				ue.addDebugInfo("Target Filename", fileName);
+				throw ue;
+			}
+		}
+		else
+		{
+			// Pass VARIANT_TRUE for vbQueueChangeIfProcessing so that if the file is currently
+			// processing, an action status change is queued up so that once processing is
+			// finished, m_eActionStatus will be applied at that time. 
+			ipDB->SetStatusForFile(nFileID, strActionName.c_str(), m_eActionStatus, VARIANT_TRUE,
+				VARIANT_FALSE, &ePrevStatus);
+		}
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15116")
 
