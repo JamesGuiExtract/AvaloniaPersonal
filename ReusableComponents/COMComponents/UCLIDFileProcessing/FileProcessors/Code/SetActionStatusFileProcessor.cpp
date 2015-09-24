@@ -325,7 +325,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 				// GetFileID will throw if the file hasn't been previously added to the DB.
 				nFileID = ipDB->GetFileID(comFileName);
 			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38760");
 		}
 		catch (UCLIDException &ue)
 		{
