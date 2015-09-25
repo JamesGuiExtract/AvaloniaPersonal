@@ -2333,6 +2333,24 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrFileSet);
 	};
 
+	[
+		object,
+		uuid(04A14B5A-C96D-44F2-B393-7A6CAA2AECC2),
+		dual,
+		helpstring("ISecureCounterCreator Interface"),
+		pointer_default(unique)
+	]
+	interface ISecureCounterCreator : IDispatch
+	{
+		// PURPOSE: Initializes the counter of the specified counter ID maintained in the specified pFAMDB.
+		[id(1), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB *pFAMDB, [in] long nID);
+
+		// PURPOSE: Applies an update code for this secure counter in order to increment or set its current
+        //			value.
+		// ARGS:	bstrCode- The update code.
+		[id(2), helpstring("method ApplyUpdateCode")] HRESULT ApplyUpdateCode([in] BSTR bstrCode);
+	}
+
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------

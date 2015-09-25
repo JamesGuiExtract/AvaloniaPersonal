@@ -1,29 +1,11 @@
 ﻿using Extract.Interfaces;
+using Extract.Licensing;
 using System;
 using System.Runtime.InteropServices;
 using UCLID_FILEPROCESSINGLib;
-using Extract.Licensing;
 
 namespace Extract.FileActionManager.Database
 {
-    /// <summary>
-    /// The interface for <see cref="FAMDBRuleExecutionCounter"/>
-    /// </summary>
-    [ComVisible(true)]
-    [Guid("FF01AAAD-2CC7-40D0-A3D2-FB4932BBB3E1")]
-    [CLSCompliant(false)]
-    public interface IFAMDBRuleExecutionCounter
-    {
-        /// <summary>
-        /// Initializes the counter of the specified <see paramref="counterID"/> against the
-        /// specified <see paramref="fileProcessingDB"/>.
-        /// </summary>
-        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> where the counts will
-        /// be tracked.</param>
-        /// <param name="counterID">The ID of the counter.</param>
-        void Initialize(FileProcessingDB fileProcessingDB, int counterID);
-    }
-
     /// <summary>
     /// A class used for tracking counts decremented by rule execution in the
     /// <see cref="FileProcessingDB"/>.
@@ -32,23 +14,23 @@ namespace Extract.FileActionManager.Database
     [Guid("8CDB95DB-D580-4E26-B4FE-2EF777E3E712")]
     [ProgId("Extract.FileActionManager.Database.FAMDBRuleExecutionCounter")]
     [CLSCompliant(false)]
-    public class FAMDBRuleExecutionCounter: IFAMDBRuleExecutionCounter, IRuleExecutionCounter
+    public class FAMDBSecureCounter : ISecureCounterCreator, ISecureCounter
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static readonly string _OBJECT_NAME = typeof(FAMDBRuleExecutionCounter).ToString();
+        static readonly string _OBJECT_NAME = typeof(FAMDBSecureCounter).ToString();
 
         #endregion Constants
 
         #region Fields
 
-        /// <summary>
-        /// For testing only.
-        /// </summary>
-        static int _countsRemaining = 10;
+//        /// <summary>
+//        /// The <see cref="FileProcessingDB"/> that is the source of this counter.
+//        /// </summary>
+//        FileProcessingDB _fileProcessingDB;
 
         /// <summary>
         /// The ID of the counter.
@@ -65,43 +47,64 @@ namespace Extract.FileActionManager.Database
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FAMDBRuleExecutionCounter"/> class.
+        /// Initializes a new instance of the <see cref="FAMDBSecureCounter"/> class.
         /// </summary>
-        public FAMDBRuleExecutionCounter()
+        public FAMDBSecureCounter()
         {
         }
 
         #endregion Constructors
 
-        #region IFAMDBRuleExecutionCounter
+        #region ISecureCounterCreator
 
         /// <summary>
         /// Initializes the counter of the specified <see paramref="counterID"/> against the
         /// specified <see paramref="fileProcessingDB"/>.
         /// </summary>
-        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> where the counts will
-        /// be tracked.</param>
-        /// <param name="counterID">The ID of the counter.</param>
-        public void Initialize(FileProcessingDB fileProcessingDB, int counterID)
+        /// <param name="pFAMDB">The <see cref="FileProcessingDB"/> that is the source of
+        /// this counter.</param>
+        /// <param name="nID">The ID of the counter.</param>
+        public void Initialize(FileProcessingDB pFAMDB, int nID)
         {
             try
             {
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.ExtractCoreObjects, "ELI38744", _OBJECT_NAME);
 
-                _counterID = counterID;
-                _counterName = "ID Shield - Redaction (By Page)";
+                ExtractException.Assert("ELI38766", "Null argument exception.",
+                    pFAMDB != null);
+
+                //_fileProcessingDB = pFAMDB;
+                _counterID = nID;
+                //_counterName = fileProcessingDB.GetSecureCounterName(_counterID);
+                _counterName = "TODO";
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI38746",
-                    "Failed to initialize '" + CounterName + "' counter");
+                throw ex.CreateComVisible("ELI38746", "Failed to initialize secure counter.");
             }
         }
 
-        #endregion IFAMDBRuleExecutionCounter
+        /// <summary>
+        /// Applies an update code for this secure counter in order to increment or set its current
+        /// value.
+        /// </summary>
+        /// <param name="bstrCode">The update code.</param>
+        public void ApplyUpdateCode(string bstrCode)
+        {
+            try
+            {
+                // _fileProcessingDB.ApplySecureCounterUpdateCode(bstrCode);
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI38768", "Failed to apply secure counter update code");
+            }
+        }
 
-        #region IRuleExecutionCounter
+        #endregion ISecureCounterCreator
+
+        #region ISecureCounter
 
         /// <summary>
         /// Gets the ID of the counter.
@@ -126,6 +129,26 @@ namespace Extract.FileActionManager.Database
         }
 
         /// <summary>
+        /// Gets the value of the counter.
+        /// </summary>
+        public int Value
+        {
+            get
+            {
+                try
+                {
+                    //return _fileProcessingDB.GetSecureCounterValue(_counterID);
+                    return -1;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI38769",
+                        "Failed to retrieve value of '" + CounterName + "' counter");
+                }
+            }
+        }
+
+        /// <summary>
         /// Decrements the counter by the specified <see paramref="count"/> assuming enough counts
         /// are available.
         /// </summary>
@@ -136,15 +159,8 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                if (count > _countsRemaining)
-                {
-                    return -1;
-                }
-                else
-                {
-                    _countsRemaining -= count;
-                    return _countsRemaining;
-                }
+                //return _fileProcessingDB.DecrementSecureCounter(_counterID, count);
+                return -1;
             }
             catch (Exception ex)
             {
@@ -153,6 +169,6 @@ namespace Extract.FileActionManager.Database
             }
         }
 
-        #endregion IRuleExecutionCounter
+        #endregion ISecureCounter
     }
 }

@@ -11,7 +11,7 @@ namespace Extract.Interfaces
     /// </summary>
     [ComVisible(true)]
     [Guid("CBDB5B5D-2097-4644-9516-D952CECD6066")]
-    public interface IRuleExecutionCounter
+    public interface ISecureCounter
     {
         /// <summary>
         /// Gets the ID of the counter.
@@ -25,6 +25,14 @@ namespace Extract.Interfaces
         /// Gets the name of the counter.
         /// </summary>
         string CounterName
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the current counter value.
+        /// </summary>
+        int Value
         {
             get;
         }

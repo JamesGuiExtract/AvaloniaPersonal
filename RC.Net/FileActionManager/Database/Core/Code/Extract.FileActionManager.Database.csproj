@@ -76,7 +76,7 @@
       <DependentUpon>FAMDatabaseOptionsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="FAMDatabaseSettings.cs" />
-    <Compile Include="FAMDBRuleExecutionCounter.cs" />
+    <Compile Include="FAMDBSecureCounter.cs" />
     <Compile Include="FAMServiceDatabaseManager.cs" />
     <Compile Include="FAMServiceDatabaseMapping.cs" />
     <Compile Include="FpsFileTableData.cs" />
