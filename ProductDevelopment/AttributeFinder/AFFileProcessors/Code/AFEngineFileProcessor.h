@@ -140,9 +140,6 @@ private:
 
 	bool m_bUseCleanedImage;
 
-	// The FAMDBRuleExceutionCounters provided by the FAMDB for decrementing.
-	IIUnknownVectorPtr m_ipFAMDBCounters;
-
 	bool m_bDirty;
 
 	/////////////

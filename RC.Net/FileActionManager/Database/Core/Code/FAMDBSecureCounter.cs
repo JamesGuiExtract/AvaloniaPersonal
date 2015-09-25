@@ -35,12 +35,12 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// The ID of the counter.
         /// </summary>
-        int _counterID;
+        int _id;
 
         /// <summary>
         /// The name of the counter.
         /// </summary>
-        string _counterName;
+        string _name;
 
         #endregion Fields
 
@@ -75,9 +75,9 @@ namespace Extract.FileActionManager.Database
                     pFAMDB != null);
 
                 //_fileProcessingDB = pFAMDB;
-                _counterID = nID;
-                //_counterName = fileProcessingDB.GetSecureCounterName(_counterID);
-                _counterName = "TODO";
+                _id = nID;
+                //_name = fileProcessingDB.GetSecureCounterName(_counterID);
+                _name = "TODO";
             }
             catch (Exception ex)
             {
@@ -109,22 +109,22 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// Gets the ID of the counter.
         /// </summary>
-        public int CounterID
+        public int ID
         {
             get
             {
-                return _counterID;
+                return _id;
             }
         }
 
         /// <summary>
         /// Gets the name of the counter.
         /// </summary>
-        public string CounterName
+        public string Name
         {
             get
             {
-                return _counterName;
+                return _name;
             }
         }
 
@@ -143,7 +143,7 @@ namespace Extract.FileActionManager.Database
                 catch (Exception ex)
                 {
                     throw ex.CreateComVisible("ELI38769",
-                        "Failed to retrieve value of '" + CounterName + "' counter");
+                        "Failed to retrieve value of '" + Name + "' counter");
                 }
             }
         }
@@ -165,7 +165,7 @@ namespace Extract.FileActionManager.Database
             catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI38747",
-                    "Failed to decrement '" + CounterName + "' counter");
+                    "Failed to decrement '" + Name + "' counter");
             }
         }
 
