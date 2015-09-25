@@ -2026,7 +2026,7 @@ int CRuleSet::decrementRuleExecutionCounter(DataCell cell, int nNumToDecrement)
 		ISecureCounterPtr ipCounter = m_ipRuleExecutionCounters->At(i);
 		ASSERT_RESOURCE_ALLOCATION("ELI38759", ipCounter != nullptr);
 
-		long nCounterID = ipCounter->CounterID;
+		long nCounterID = ipCounter->ID;
 		switch (nCounterID)
 		{
 			case 1: 
