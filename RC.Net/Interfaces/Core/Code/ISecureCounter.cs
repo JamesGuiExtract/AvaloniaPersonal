@@ -16,7 +16,7 @@ namespace Extract.Interfaces
         /// <summary>
         /// Gets the ID of the counter.
         /// </summary>
-        int CounterID
+        int ID
         {
             get;
         }
@@ -24,7 +24,7 @@ namespace Extract.Interfaces
         /// <summary>
         /// Gets the name of the counter.
         /// </summary>
-        string CounterName
+        string Name
         {
             get;
         }
