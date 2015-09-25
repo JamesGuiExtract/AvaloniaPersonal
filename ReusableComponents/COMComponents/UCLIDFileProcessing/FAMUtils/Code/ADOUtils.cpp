@@ -909,16 +909,17 @@ void dropFKContraintsOnTables(const _ConnectionPtr& ipDBConnection, const vector
 	while (!asCppBool(ipConstraints->adoEOF))
 	{
 		// Get the Name of the Foreign key table
-		string strTableName = getStringField(ipConstraints->Fields, "FK_TABLE_NAME");
+		string strFKTableName = getStringField(ipConstraints->Fields, "FK_TABLE_NAME");
+		string strPKTableName = getStringField(ipConstraints->Fields, "PK_TABLE_NAME");
 		
 		// Check if it is our table
-		if (vectorContainsElement(vecTables, strTableName))
+		if (vectorContainsElement(vecTables, strFKTableName) || vectorContainsElement(vecTables, strPKTableName ))
 		{
 			// Get the name of the Foreign key
 			string strConstraintName = getStringField(ipConstraints->Fields, "FK_NAME");
 
 			// Drop the Foreign key
-			dropConstraint(ipDBConnection, strTableName, strConstraintName);
+			dropConstraint(ipDBConnection, strFKTableName, strConstraintName);
 		}
 
 		// Move to next constraint
@@ -1135,3 +1136,56 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20156");
 }
 //-------------------------------------------------------------------------------------------------
+FAMUTILS_API void getDatabaseCreationDateAndRestoreDate(const _ConnectionPtr& ipDBConnection, string strDBName,
+	string &strServerName, string &strCreateDate, string &strLastRestoreDate)
+{
+	try
+	{
+		string strQuery = "select db.name, @@ServerName as ServerName, convert(nvarchar(30), db.create_date,121) as create_date, "
+			" convert(nvarchar(30), coalesce( max(rh.restore_date), db.create_date), 121) as restore_date "
+			"from master.sys.databases db "
+			"LEFT JOIN msdb.dbo.restorehistory rh on db.name = rh.destination_database_name "
+			"group by db.name, db.create_date "
+			"having name = '"+ strDBName + "'";
+
+		_RecordsetPtr result = ipDBConnection->Execute(strQuery.c_str(), NULL, adCmdText);
+		if (!result->adoEOF)
+		{
+			// Get the fields pointer
+			FieldsPtr ipFields = result->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI15701", ipFields != __nullptr );
+
+			strCreateDate = getStringField(ipFields, "create_date");
+			strLastRestoreDate = getStringField(ipFields, "restore_date");
+			strServerName = getStringField(ipFields, "ServerName");
+		}
+		else
+		{
+			UCLIDException ue ("ELI38758", "Unable to get Database creation date.");
+			ue.addDebugInfo("Database name", strDBName);
+			throw ue;
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38757");
+}
+//-------------------------------------------------------------------------------------------------
+FAMUTILS_API string createDatabaseIDString(const _ConnectionPtr& ipConnection, string strDatabaseName)
+{
+	try
+	{
+		string strDBCreatedDate;
+		string strDBRestoreDate;
+		string strServer;
+
+		getDatabaseCreationDateAndRestoreDate(ipConnection, asString(ipConnection->DefaultDatabase), 
+			strServer, strDBCreatedDate, strDBRestoreDate);
+
+		GUID guidDatabaseID;
+		CoCreateGuid(&guidDatabaseID);
+
+			// Create combined string to return		
+		return asString(guidDatabaseID) + "," + strServer + "," + strDatabaseName + "," + 
+			strDBCreatedDate + "," + strDBRestoreDate;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38765"); 
+}

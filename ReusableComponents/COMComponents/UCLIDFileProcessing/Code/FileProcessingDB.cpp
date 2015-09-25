@@ -72,7 +72,8 @@ m_nActiveActionID(-1),
 m_bLoggedInAsAdmin(false),
 m_bCheckedFeatures(false),
 m_bAllowRestartableProcessing(false),
-m_bWorkItemRevertInProgress(false)
+m_bWorkItemRevertInProgress(false),
+m_strEncryptedDatabaseID("")
 {
 	try
 	{

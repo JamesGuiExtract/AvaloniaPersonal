@@ -47,6 +47,7 @@ static const string gstrEMAIL_PASSWORD = "EmailPassword";
 static const string gstrEMAIL_TIMEOUT = "EmailTimeout";
 static const string gstrEMAIL_USE_SSL = "EmailUseSSL";
 static const string gstrALLOW_RESTARTABLE_PROCESSING = "AllowRestartableProcessing";
+static const string gstrDATABASEID = "DatabaseID";
 
 // Feature names
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";

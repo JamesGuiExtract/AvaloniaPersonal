@@ -354,6 +354,23 @@ static const string gstrCREATE_FILE_TASK_SESSION =
 	" [Duration] [float] NULL, "
 	" [OverheadTime] [float] NULL)";
 
+static const string gstrCREATE_SECURE_COUNTER =
+	"CREATE TABLE dbo.SecureCounter ( "
+	"   ID int NOT NULL CONSTRAINT PK_SecureCounter PRIMARY KEY CLUSTERED, "
+	"   CounterName nvarchar(100) NOT NULL, "
+	"   SecureCounterValue nvarchar(max) NOT NULL)";
+
+static const string gstrCREATE_SECURE_COUNTER_VALUE_CHANGE = 
+	"CREATE TABLE dbo.SecureCounterValueChange ( "
+	"  ID int IDENTITY(1,1)  CONSTRAINT PK_SecureCounterValueChange PRIMARY KEY CLUSTERED, "
+	"  CounterID int NOT NULL, "
+	"  FromValue int NOT NULL, "
+	"  ToValue int NOT NULL, "
+	"  LastUpdatedTime datetime NOT NULL, "
+	"  LastUpdatedByFAMSesstionID int NULL, "
+	"  MinFAMFileCount bigint NOT NULL, "
+	"  HashValue bigint NOT NULL) ";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -884,6 +901,16 @@ static const string gstrADD_FILE_TASK_SESSION_FAMFILE_FK =
 	"ALTER TABLE [dbo].[FileTaskSession]  "
 	"WITH CHECK ADD  CONSTRAINT [FK_FileTaskSession_FAMFile] FOREIGN KEY([FileID])"
 	"REFERENCES [dbo].[FAMFile] ([ID])";
+
+static const string gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK =
+	"ALTER TABLE [dbo].SecureCounterValueChange "
+	"WITH CHECK ADD CONSTRAINT FK_SecureCounterValueChange_SecureCounter FOREIGN KEY([CounterID]) "
+	"REFERENCES dbo.[SecureCounter] ([ID])";
+
+static const string gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK =
+	"ALTER TABLE [dbo].SecureCounterValueChange "
+	"WITH CHECK ADD CONSTRAINT FK_SecureCounterValueChange_FAMSession FOREIGN KEY (LastUpdatedByFAMSesstionID) "
+	"REFERENCES dbo.[FAMSession] (ID)";
 
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_NAME_VAL = "<LockName>";

@@ -74,6 +74,8 @@ static const string gstrMETADATA_FIELD="MetadataField";
 static const string gstrFILE_METADATA_FIELD_VALUE="FileMetadataFieldValue";
 static const string gstrTASK_CLASS="TaskClass";
 static const string gstrFILE_TASK_SESSION="FileTaskSession";
+static const string gstrSECURE_COUNTER="SecureCounter";
+static const string gstrSECURE_COUNTER_VALUE_CHANGE="SecureCounterValueChange";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -506,6 +508,9 @@ private:
 
 	// The file IDs for each defined file set (file set name not case-sensitive)
 	csis_map<vector<int>>::type m_mapFileSets;
+
+	// The encrypted DatabaseID loaded from the DBInfo table
+	string m_strEncryptedDatabaseID;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods

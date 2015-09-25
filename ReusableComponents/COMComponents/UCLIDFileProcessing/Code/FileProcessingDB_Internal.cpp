@@ -1175,6 +1175,10 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrMETADATA_FIELD);
 		}
 
+		// Never drop these tables
+		eraseFromVector(vecTables, gstrSECURE_COUNTER);
+		eraseFromVector(vecTables, gstrSECURE_COUNTER_VALUE_CHANGE);
+
 		// Drop the tables in the vector
 		dropTablesInVector(getDBConnection(), vecTables);
 	}
@@ -1192,6 +1196,28 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		if (doesTableExist(getDBConnection(), "Login"))
 		{
 			eraseFromVector(vecQueries, gstrCREATE_LOGIN_TABLE);
+		}
+
+		// if both the Secure counter tables exist the FK between them will exist 
+		// and so we don't want to create it again
+		bool bAddSecureCounterTablesFK = false;
+		// Only create the SecureCounter table if it does not already exist
+		if (doesTableExist(getDBConnection(), gstrSECURE_COUNTER))
+		{
+			eraseFromVector(vecQueries, gstrCREATE_SECURE_COUNTER);
+		}
+		else
+		{
+			bAddSecureCounterTablesFK = true;
+		}
+		// Only create the SecureCounterValueChange table if it does not already exist
+		if (doesTableExist(getDBConnection(), gstrSECURE_COUNTER_VALUE_CHANGE))
+		{
+			eraseFromVector(vecQueries, gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
+		}
+		else
+		{
+			bAddSecureCounterTablesFK = true;
 		}
 
 		// Add indexes
@@ -1292,6 +1318,14 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_TASK_CLASS_FK);
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK);
+
+		// Don't create the FK between the Secure counter tables unless at least one
+		// of the SercureCounter tables had to be created
+		if (bAddSecureCounterTablesFK)
+		{
+			vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK);
+		}
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1391,6 +1425,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_FILE_HANDLER_TABLE);
 		vecQueries.push_back(gstrCREATE_FEATURE_TABLE);
 		vecQueries.push_back(gstrCREATE_METADATA_FIELD_TABLE);
+		vecQueries.push_back(gstrCREATE_SECURE_COUNTER);
+		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
 	}
 
 	// Add queries to create tables to the vector
@@ -1471,6 +1507,22 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
 			"VALUES('R', 'File was renamed')");
 
+		// Add the Database ID if needed
+		// The m_strEncryptedDatabaseID value is initialized with the value in the dbinfo table
+		// when a connection is made to the database. So if the value is empty either there was no
+		// value in the dbinfo table or the value has been deleted
+		if (bInitializeUserTables || m_strEncryptedDatabaseID.empty())
+		{
+			// if the DatabaseID is empty create a new id - this 
+			if (m_strEncryptedDatabaseID.empty())
+			{
+				m_strEncryptedDatabaseID = getEncryptedString(createDatabaseIDString(getDBConnection(), m_strDatabaseName));
+			}
+		
+			// When this is executed if there is already a DatabaseID value it will throw an exception
+			vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+					+ gstrDATABASEID + "', '" + m_strEncryptedDatabaseID + "')");
+		}
 		// Initialize the DB Info settings if necessary
 		if (bInitializeUserTables)
 		{
@@ -2754,6 +2806,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFILE_METADATA_FIELD_VALUE);
 	vecTables.push_back(gstrTASK_CLASS);
 	vecTables.push_back(gstrFILE_TASK_SESSION);
+	vecTables.push_back(gstrSECURE_COUNTER);
+	vecTables.push_back(gstrSECURE_COUNTER_VALUE_CHANGE);
 
 }
 //--------------------------------------------------------------------------------------------------
@@ -3012,6 +3066,11 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						{
 							_lastCodePos = "300";
 							m_bAllowRestartableProcessing = getStringField(ipFields, "Value") == "1";
+						}
+						else if (strValue == gstrDATABASEID)
+						{
+							_lastCodePos = "310";
+							m_strEncryptedDatabaseID = getStringField(ipFields, "Value");
 						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))

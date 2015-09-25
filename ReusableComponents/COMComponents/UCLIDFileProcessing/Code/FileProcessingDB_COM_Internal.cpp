@@ -20,6 +20,7 @@
 #include <ADOUtils.h>
 #include <StopWatch.h>
 #include <stringCSIS.h>
+#include <EncryptionEngine.h>
 
 #include <string>
 #include <stack>
@@ -32,8 +33,17 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 129;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 130;
 //-------------------------------------------------------------------------------------------------
+// Define four UCLID passwords used for encrypting the password
+// NOTE: These passwords were not exposed at the header file level because
+//		 no user of this class needs to know that these passwords exist
+// These passwords are also uses in the FileProcessingDB.cpp
+const unsigned long	gulFAMKey1 = 0x78932517;
+const unsigned long	gulFAMKey2 = 0x193E2224;
+const unsigned long	gulFAMKey3 = 0x20134253;
+const unsigned long	gulFAMKey4 = 0x15990323;
+
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
 	string strQuery = "UPDATE [DBInfo] SET [Value] = '" + asString(nSchemaVersion)
@@ -41,6 +51,39 @@ string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 
 	return strQuery;
 }
+
+inline string getEncryptedString(string strInput)
+{
+	// Put the input string into the byte manipulator
+	ByteStream bytes;
+	ByteStreamManipulator bytesManipulator(ByteStreamManipulator::kWrite, bytes);
+
+	bytesManipulator << strInput;
+
+	// Convert information to a stream of bytes
+	// with length divisible by 8 (in variable called 'bytes')
+	bytesManipulator.flushToByteStream(8);
+
+	// Get the password 'key' based on the 4 hex global variables
+	ByteStream pwBS;
+	ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, pwBS);
+
+	bsm << gulFAMKey1;
+	bsm << gulFAMKey2;
+	bsm << gulFAMKey3;
+	bsm << gulFAMKey4;
+	bsm.flushToByteStream(8);
+	
+
+	// Do the encryption
+	ByteStream encryptedBS;
+	MapLabel encryptionEngine;
+	encryptionEngine.setMapLabel(encryptedBS, bytes, pwBS);
+
+	// Return the encrypted value
+	return encryptedBS.asString();
+}
+
 //-------------------------------------------------------------------------------------------------
 // Schema update functions
 // 
@@ -1096,6 +1139,41 @@ int UpdateToSchemaVersion129(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38602");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion130(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 130;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Create a new DatabaseID and encrypt it
+		string strDBValue = getEncryptedString(createDatabaseIDString(ipConnection, asString(ipConnection->DefaultDatabase)));
+
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrDATABASEID + "', '" + strDBValue + "')");
+
+		vecQueries.push_back(gstrCREATE_SECURE_COUNTER);
+		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
+		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK);
+		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38716");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6161,7 +6239,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 126:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion127);
 				case 127:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion128);
 				case 128:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion129);
-				case 129:	break;
+				case 129:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion130);
+				case 130:	break;
 
 				default:
 					{
