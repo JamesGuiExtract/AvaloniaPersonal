@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BetterLock.cs" />
+    <Compile Include="ByteArrayManipulator.cs" />
     <Compile Include="DataCache.cs" />
     <Compile Include="DateTimeMethods.cs" />
     <Compile Include="IdentifiableObject.cs" />

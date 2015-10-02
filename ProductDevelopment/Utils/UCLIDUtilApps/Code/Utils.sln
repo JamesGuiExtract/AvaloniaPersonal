@@ -205,12 +205,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Ftp", "..\..\..\..\RC.Net\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj", "{D2DD8D8F-E632-429E-8646-B9489D21295F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FAMDBCounterManager", "..\..\..\..\RC.Net\UtilityApplications\Internal\FAMDBCounterManager\Core\Code\FAMDBCounterManager.csproj", "{7952C20B-782E-49AD-93CC-474987954FC4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808} = {8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InternalLicenseUtils", "..\..\InternalLicenseUtils\Code\LicenseUtils.vcxproj", "{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://EngSvr.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 92
+		ProjectCount = 94
 		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj
 		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcxproj
@@ -303,6 +310,8 @@ Global
 		ProjectRelativeDiskPath90 = ..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj
 		ProjectRelativeDiskPath91 = ..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj
 		ProjectRelativeDiskPath92 = ..\..\..\..\RC.Net\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj
+		ProjectRelativeDiskPath93 = ..\..\..\..\RC.Net\UtilityApplications\Internal\FAMDBCounterManager\Core\Code\FAMDBCounterManager.csproj
+		ProjectRelativeDiskPath94 = ..\..\InternalLicenseUtils\Code\LicenseUtils.vcxproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1407,6 +1416,30 @@ Global
 		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|Win32.ActiveCfg = Release|Any CPU
 		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|x86.ActiveCfg = Release|Any CPU
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Debug|Win32.ActiveCfg = Debug|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Debug|x86.ActiveCfg = Debug|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Debug|x86.Build.0 = Debug|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Release|Any CPU.ActiveCfg = Release|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Release|Mixed Platforms.Build.0 = Release|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Release|Win32.ActiveCfg = Release|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Release|x86.ActiveCfg = Release|x86
+		{7952C20B-782E-49AD-93CC-474987954FC4}.Release|x86.Build.0 = Release|x86
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Debug|Win32.Build.0 = Debug|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Debug|x86.ActiveCfg = Debug|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Release|Any CPU.ActiveCfg = Release|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Release|Win32.ActiveCfg = Release|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Release|Win32.Build.0 = Release|Win32
+		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Release|x86.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
