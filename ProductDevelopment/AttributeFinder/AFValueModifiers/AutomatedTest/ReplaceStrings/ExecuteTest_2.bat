@@ -1,5 +1,5 @@
 REM Clean Source folder
-call Clean.bat Test_1 > NUL
+call Clean.bat Test_2 > NUL
 
 REM Supply Numbered Files for 4 hours
 START "" "C:\Program Files (x86)\Extract Systems\CommonComponents\CopyNumberedFiles.exe" "..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss" ".\Source" 250ms -h4
