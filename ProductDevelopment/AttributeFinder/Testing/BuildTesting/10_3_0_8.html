@@ -1,0 +1,306 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.3.0.8 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.3.0.8 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed after <b>10.2.0.30</b> and up through <b>10.3.0.8</b>.
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-1593]</b> Confirm that the <b>Regular Expression VF</b> automated 
+		tests all pass.
+<p>
+  	   	<LI><b>[ISSUE-7381]</b> Confirm that the <b>Entity Splitter</b> NRS tests all pass.
+<p>
+  	   	<LI><b>[ISSUE-7505, ISSUE-13244]</b> Confirm that the <b>Auto Shrink Redaction 
+		Zones</b> automated tests all pass as part of <b>RDT - Run All Tests</b>.
+<p>
+  	   	<LI><b>[ISSUE-7651]</b> Confirm that <b>Remove Attributes</b> automated tests all 
+		pass.
+<p>
+  	   	<LI><b>[ISSUE-11305]</b> FAM Internal Logic Error
+        	<ul>
+			<li>Start FAM processing.
+			<li>Stop the SQL service on the machine hosting the database.
+			<li>Wait until all processing threads exit.
+			<li>Confirm that the UEX log includes an application trace about 
+			the FAM has stopped processing.
+			<li>Press the <b>stop processing</b> button in the FAM.
+			<li>Confirm that an internal logic error exception is not displayed and 
+			that the FAM can be closed gracefully.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-11381]</b> Confirm that the FAM status bar reflects the number of files 
+		processing in the database rather than the number of files processing in the current FAM.
+<p>
+  	   	<LI><b>[ISSUE-11852]</b> Confirm that <b>secure file deletion</b> works on Server 2012.
+<p>
+  	   	<LI><b>[ISSUE-12694]</b> Processing Hung After Database Connection Lost and Recovered
+        	<ul>
+			<li>Run a FAM against a remote database.
+			<li>Stop the database server while processing is underway.
+			<li>Restart the database server.
+			<li>Confirm that processing restarts.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12733]</b> Data Query Rule Objects
+        	<ul>
+			<li>Confirm that the <b>Data Query</b> output handler supports opening a 
+			SQL Compact DB in read-only mode.
+			<li>Confirm that the same database can be edited in a separate process while 
+			the rule object is being run.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12789]</b> Confirm that a UPI column is only provided in the following 
+		tables.
+        	<ul>
+			<li>FAMSession
+			<li>LockTable
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12825]</b> Core: Set File Action Status In Database
+        	<ul>
+			<li>Confirm that the property page contains an edit box to specify the 
+			file for which status should be set.
+			<li>Confirm that the property page includes an associated tag selector.
+			<li>Confirm that the property page includes an associated browse button.
+			<li>Confirm that the default setting is <b>&lt;SourceDocName&gt;</b>.
+			<li>Confirm that an option exists to <b>report an error</b> if the file 
+			does not exist in the database.
+			<li>Confirm that an option exists to <b>queue the file</b> if the file 
+			does not exist in the database.
+			<li>Confirm that the default setting is to <b>report an error</b>.
+			<li>Confirm proper behavior for a non-default file.
+			<li>Confirm that an error can be reported if the file does not exist in 
+			the database.
+			<li>Confirm that the file can be queued if the file does not exist in 
+			the database.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-12956]</b> Core: Create File.
+		<ul>
+			<li>Configure the task such that the file text creates a horizontal 
+			scroll bar.
+			<li>Confirm that the property page remains responsive and that settings 
+			are persistent.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUS-13034, ISSUE-13035]</b> Confirm that the following EXEs have 
+		copyright strings.
+		<ul>
+			<li>CopyNumberedFiles
+			<li>CreateMultiPageImage
+			<li>DComPerm
+			<li>DetectAndReportFailure
+			<li>DocumentSorterConsoleApp
+			<li>EncryptFile
+			<li>ESOCR
+			<li>ImageViewer
+			<li>IndexConverter
+			<li>RDTConfig
+			<li>RuleTester
+			<li>TestHarness
+			<li>UEXViewer
+			<li>UserLicense
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13114]</b> Confirm that the Pagination utility supports printing.
+<p>
+  	   	<LI><b>[ISSUE-13127]</b> Confirm that <b>AF Data Scorers</b> portion of the 
+		automated tests all pass.
+<p>
+  	   	<LI><b>[ISSUE-13151]</b> Rule Tester
+        	<ul>
+			<li>Exercise the rules and images found in 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-13151</b>.
+			<li>Confirm that each image processes in reasonable time.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13165]</b> Confirm that the first Memory Leak test for 
+		<b>Replace Strings VM</b> references unencrypted RSD files.
+<p>
+  	   	<LI><b>[ISSUE-13181]</b> Confirm that each Help file references the correct 
+		version under Getting Started - Installation - Before You Install.
+        	<ul>
+			<li>FLEX Index
+			<Li>ID Shield
+			<li>LabDE
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13184, ISSUE-13185]</b> Demo_LabDE
+        	<ul>
+			<li>Confirm that the DEP uses 
+			<b>LabDEUtils.ValidateFlagAgainstValueAndRange</b>.
+			<li>Confirm that the DEP uses a utility method to update metadata.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13194]</b> Confirm that the Meory Leak test for <b>Duplicate and 
+		Separate Trees OH</b> references all three test RSD files.
+<p>
+  	   	<LI><b>[ISSUE-13210]</b> Rule Objects Dependent On Spatial Lines
+        	<ul>
+			<li>Exercise <b>test.rsd</b> and images from 
+			<b>M:\PVCS_JIRA\JIRA\ISSUE-13210</b> using FAM.
+			<li>Confirm that none of the images require more than 2 minutes for 
+			rule execution.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13214]</b> Core: OCR Document
+		<ul>
+			<li>Confirm that the task works correctly with RunFPSFile and /ignoreDB when 
+			parallelization is turned off.
+			<li>Confirm that the task works correctly with RunFPSFile and <b>NOT</b> 
+			/ignoreDB when parallelization is turned on.
+			<li>Confirm that the task logs a meaningful exception when used with RunFPSFile 
+			and /ignoreDB when parallelization is turned on.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13215]</b> Confirm that the FAM status bar statistics are updated 
+		immediately after connecting to a database.
+<p>
+  	   	<LI><b>[ISSUE-13220]</b> Run Object On Attributes OH
+		<ul>
+			<li>Configure and save a ruleset using this object.
+			<li>Double-click the output handler to open the configuration dialog.
+			<li>Click the Cancel button.
+			<li>Close the RuleSet Editor and confirm that the user is not prompted to 
+			save changes.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13222]</b> Confirm that <b>Set Document Tags</b> exists as a Document 
+		preprocessor and as an Output Handler.
+<p>
+  	   	<LI><b>[ISSUE-13224]</b> Confirm that a Memory Leak test has been defined for 
+		<b>Core: Set file-action status in database</b> that uses a non-default filename.
+<p>
+  	   	<LI><b>[ISSUE-13227]</b> Confirm that databases from the following versions successfully 
+		upgrade their schemas.
+		<ul>
+			<li>10.2
+			<li>10.1
+			<li>10.0
+			<li>9.8
+			<li>9.1
+			<li>8.0
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13228]</b> Mathematical Contents Condition
+        	<ul>
+			<li>Confirm that using a random <b>1%</b> on a large sample set yields the 
+			expected result.
+			<li>Confirm that using a random <b>99%</b> on a large sample set yields the 
+			expected result.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13237]</b> Confirm that an action can be deleted without error from 
+		DB Admin.
+<p>
+  	   	<LI><b>[ISSUE-13238]</b> Unhelpful FAM Exception
+        	<ul>
+			<li>Open a previously saved FPS file.
+			<li>Open DB Admin and delete the action used by the FPS file.
+			<li>Close and re-open the FPS file.
+			<li>Confirm that a meaningful exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13239]</b> Confirm that the following product-specific 
+		<b>Store Processing History</b> options have been removed.
+        	<ul>
+			<li>Demo_FLEXIndex
+			<ul>
+				<li>DataEntryData table
+				<li>DBInfo table - StoreDataEntryProcessingHistory field
+				<li>DB Admin - DB options - Product Specific - Store data entry 
+				processing history
+			</ul>
+			<li>Demo_IDShield
+			<ul>
+				<li>IDShieldData table
+				<li>DBInfo table - StoreIDShieldProcessingHistory field
+				<li>DB Admin - DB options - Product Specific - Store ID Shield 
+				processing history
+			</ul>
+			<li>Demo_LabDE
+			<ul>
+				<li>DataEntryData table
+				<li>DBInfo table - StoreDataEntryProcessingHistory field
+				<li>DB Admin - DB options - Product Specific - Store data entry 
+				processing history
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13240]</b> LabDE Silent Install
+        	<ul>
+			<li>Install an older version of LabDE without FLEX Index or ID Shield.
+			<li>Exercise the silent install batch file for LabDE.
+			<li>Confirm that a dialog to uninstall Crystal Reports is not presented.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13246]</b> Confirm that the DBInfo table contains an encrypted 
+		string for <b>DatabaseID</b>.
+<p>
+  	   	<LI><b>[ISSUE-13247]</b> Database Counters
+        	<ul>
+			<li>Confirm that a <b>SecureCounter</b> table is defined.
+			<li>Confirm that a <b>SecureCounterValueChange</b> table is defined.
+			<li>Confirm that the tables are not deleted when the database is cleared.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13254]</b> Confirm that <b>F003.tif</b> is the first Demo_LabDE document 
+		presented for verification.
+    	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+   	<ul>
+  	   	<LI><b>[ISSUE-13201, ISSUE-13202]</b> Store Attributes In Database
+        	<ul>
+			<li>Confirm that the <b>Attribute</b> class persists identifier GUIDs.
+			<li>Confirm that the FAM schema supports Attribute storage with the 
+			following tables.
+			<ul>
+				<li>Attribute
+				<li>AttributeName
+				<li>AttributeSetForFile
+				<li>AttributeSetName
+				<li>AttributeType
+				<li>RasterZone
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13163, ISSUE-13196]</b> NUnit Testing
+        	<ul>
+			<li>Confirm that all NUnit tests pass.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+	    		<li>All Tests
+			<li>Raster Zone Test
+			<li>Spatial String Searcher Test
+			<li>Spatial String Test
+	    	</ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
