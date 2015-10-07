@@ -149,6 +149,9 @@ namespace ResolutionNormalizer
         {
             try
             {
+                ExtractException.Assert("ELI38898", "Filename does not exist.",
+                    File.Exists(arguments.FileName), "Filename", arguments.FileName);
+
                 using (RasterCodecs codecs = GetCodecs())
                 {
                     int pageCount;
@@ -212,8 +215,10 @@ namespace ResolutionNormalizer
                         image.YResolution = maxResolution;
 
                         // Replace the original image page with the normalized page.
-                        codecs.Save(image, fileName, info.Format, info.BitsPerPixel, 1, 1, page,
-                            CodecsSavePageMode.Replace);
+                        PerformFileOperationWithRetry(() =>
+                            codecs.Save(image, fileName, info.Format, info.BitsPerPixel, 1, 1, page,
+                                CodecsSavePageMode.Replace),
+                                false);
                     }
                 }
             }
@@ -261,12 +266,6 @@ namespace ResolutionNormalizer
                 {
                     // Get the fully qualified path to the file
                     arguments.FileName = Path.GetFullPath(arg);
-
-                    if (!File.Exists(arguments.FileName))
-                    {
-                        ShowUsage("Filename does not exist: \"{0}\".", arg);
-                        return null;
-                    }
                 }
                 else if (i == 1)
                 {
@@ -376,7 +375,9 @@ namespace ResolutionNormalizer
                         fileOperation();
                         break;
                     }
-                    catch (IOException ex)
+                    // Changed from IOException because LeadTools will produce exceptions that are
+                    // not IOExceptions despite a problem relating to accessing a file.
+                    catch (Exception ex)
                     {
                         // https://extract.atlassian.net/browse/ISSUE-11972
                         // Allow for retries for errors other than a sharing violation if
