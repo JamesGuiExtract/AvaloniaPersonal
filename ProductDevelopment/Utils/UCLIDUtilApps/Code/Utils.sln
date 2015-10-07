@@ -212,12 +212,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FAMDBCounterManager", "..\.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InternalLicenseUtils", "..\..\InternalLicenseUtils\Code\LicenseUtils.vcxproj", "{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResolutionNormalizer", "..\..\..\..\RC.Net\UtilityApplications\ResolutionNormalizer\Core\Code\ResolutionNormalizer.csproj", "{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://EngSvr.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 94
+		ProjectCount = 95
 		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj
 		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcxproj
@@ -312,6 +314,7 @@ Global
 		ProjectRelativeDiskPath92 = ..\..\..\..\RC.Net\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj
 		ProjectRelativeDiskPath93 = ..\..\..\..\RC.Net\UtilityApplications\Internal\FAMDBCounterManager\Core\Code\FAMDBCounterManager.csproj
 		ProjectRelativeDiskPath94 = ..\..\InternalLicenseUtils\Code\LicenseUtils.vcxproj
+		ProjectRelativeDiskPath95 = ..\..\..\..\RC.Net\UtilityApplications\ResolutionNormalizer\Core\Code\ResolutionNormalizer.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1440,6 +1443,18 @@ Global
 		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Release|Win32.ActiveCfg = Release|Win32
 		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Release|Win32.Build.0 = Release|Win32
 		{8457DC6C-B1C0-49D6-9AA8-58E1DEA94808}.Release|x86.ActiveCfg = Release|Win32
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Debug|Win32.ActiveCfg = Debug|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Debug|x86.ActiveCfg = Debug|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Debug|x86.Build.0 = Debug|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Release|Any CPU.ActiveCfg = Release|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Release|Mixed Platforms.Build.0 = Release|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Release|Win32.ActiveCfg = Release|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Release|x86.ActiveCfg = Release|x86
+		{BEA9E5F1-549A-4CFE-8288-C16A2536FE6E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
