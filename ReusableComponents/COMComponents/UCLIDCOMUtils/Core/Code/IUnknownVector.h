@@ -79,6 +79,8 @@ END_COM_MAP()
 	STDMETHOD(PushBackIfNotContained)(/*[in]*/ IUnknown *pObj);
 	STDMETHOD(FindByReference)(/*[in]*/ IUnknown *pObj, /*[in]*/ long nStartPos, /*[out, retval]*/ long *pRetVal);
 	STDMETHOD(Sort)(/*[in]*/ ISortCompare* pSortCompare);
+	STDMETHOD(PrepareForStorage)(/*[in]*/ BSTR bstrStorageManager, 
+		/*[out, retval]*/ IIUnknownVector** ppClonedVector);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

@@ -12,10 +12,90 @@
 #include <ADOUtils.h>
 #include <FAMDBHelperFunctions.h>
 #include <cpputil.h>
+#include <zlib.h>
+
+#include <atlsafe.h>
 #include "DefinedTypes.h"
 
 using namespace ADODB;
 using namespace std;
+
+namespace Logging
+{
+	std::string CurrentDateTimeAsString()
+	{
+		SYSTEMTIME st;
+		GetLocalTime( &st );
+
+		return Util::Format( "%04d-%02d-%02d_%02d-%02d", 
+							 st.wYear,
+							 st.wMonth,
+							 st.wDay,
+							 st.wHour, 
+							 st.wMinute );
+	}
+
+	std::string MakeFilename()
+	{
+		return Util::Format( "c:\\temp\\Log_%s.txt", CurrentDateTimeAsString().c_str() );
+	}
+
+	struct Log
+	{
+		static Log& Instance()
+		{
+			static Log instance;
+			return instance;
+		}
+
+		void Write( const std::string& msg )
+		{
+			_file.write( msg.c_str(), msg.size() );
+			_file.flush();
+		}
+
+		~Log()
+		{
+			_file.flush();
+			_file.close();
+		}
+
+	private:
+		std::ofstream _file;
+
+		Log():
+		_file( MakeFilename().c_str() )
+		{
+			ASSERT_RUNTIME_CONDITION( "ELI38787", _file.is_open(), "Log open failed" );
+		}
+	};
+
+//#define LOGGING_ENABLED
+	void WriteToLog( const char* 
+#ifdef LOGGING_ENABLED
+						formatSpec
+#endif
+						, ... )
+	{
+#ifdef LOGGING_ENABLED
+#pragma message("Logging is enabled...")
+		size_t size = 8 * 1024;
+		std::vector<char> buffer( size, '\0' );
+
+		std::string format = Util::Format( "%s\n", formatSpec );
+
+		va_list args;
+		va_start( args, formatSpec );
+		::vsnprintf_s( &buffer[0], size, size, format.c_str(), args );
+
+		std::string msg( buffer.data() );
+		Log::Instance().Write( msg );
+#endif
+	}
+
+}	// end of namespace Logging
+
+
 
 namespace
 {
@@ -29,7 +109,7 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 1;
+	const long glSCHEMA_VERSION = 2;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
@@ -132,9 +212,17 @@ namespace
 		return queries;
 	}
 
+	VectorOfString GetSchema_v2( bool bAddUserTables )
+	{
+		VectorOfString queries = GetSchema_v1( bAddUserTables );
+		queries.push_back( gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN );
+
+		return queries;
+	}
+
 	VectorOfString GetCurrentSchema( bool bAddUserTables = true )
 	{
-		return GetSchema_v1( bAddUserTables );
+		return GetSchema_v2( bAddUserTables );
 	}
 
 	
@@ -160,6 +248,28 @@ namespace
 			return nNewSchemaVersion;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38511");
+	}
+
+	int UpdateToSchemaVersion2( _ConnectionPtr ipConnection, long* pnNumSteps )
+	{
+		try
+		{
+			const int nNewSchemaVersion = 2;
+
+			if (pnNumSteps != nullptr)
+			{
+				*pnNumSteps += 3;
+				return nNewSchemaVersion;
+			}
+	
+			vector<string> queries;
+			queries.push_back( gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN );
+			queries.emplace_back( GetVersionUpdateStatement( nNewSchemaVersion ) );
+			executeVectorOfSQL(ipConnection, queries);
+	
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38888");
 	}
 
 }		// end of anonymous namespace
@@ -490,9 +600,13 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				{
 					*pnProdSchemaVersion = UpdateToSchemaVersion1(ipConnection, pnNumSteps);
 				}
-				break;
+				// fall into the next case and update that version as well...
 
 			case 1:
+				*pnProdSchemaVersion = UpdateToSchemaVersion2(ipConnection, pnNumSteps);
+				break;
+
+			case 2:
 				break;
 
 			default:
@@ -534,35 +648,18 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 }
 //-------------------------------------------------------------------------------------------------
 
-namespace Test		// TODO - temporary test framework
+namespace
 {
-	void TestCreateNewAttributeSetForFile( CAttributeDBMgr* thisPtr )
-	{
-		IAttributePtr ipAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI38664", nullptr != ipAttribute);
-	
-		long baseID = 18;
-		ipAttribute->Name = Util::Format("attributeName%d", baseID).c_str();
-		ipAttribute->Type = Util::Format("attributeType%d", baseID).c_str();
-		ISpatialStringPtr ipText(CLSID_SpatialString);
-		ipText->ReplaceAndDowngradeToNonSpatial( Util::Format("attribute value (spatial string) #%d", baseID).c_str() );
-		ipAttribute->Value = ipText;
-		BSTR attributeSetName = L"AttributeSetName18";
-		const long file_id = baseID;
-	
-		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI38664", nullptr != ipAttributes);
-		ipAttributes->PushBack(ipAttribute);
-	
-		thisPtr->CreateNewAttributeSetForFile( file_id, attributeSetName, ipAttributes, asVariantBool(false) );
-	}
-
-
-	void SaveStatement( const std::string& saveFileName, const std::string& statement )
+	void SaveStatement( const std::string& saveFileName, 
+						const std::string& 
+#ifdef LOGGING_ENABLED
+						statement 
+#endif
+					  )
 	{
 		if ( saveFileName.empty() )
 			return;
-#if 0
+#ifdef LOGGING_ENABLED
 		std::ofstream ofile( saveFileName.c_str() );
 		if ( ofile.is_open() )
 		{
@@ -572,121 +669,55 @@ namespace Test		// TODO - temporary test framework
 		}
 #endif
 	}
-}
-
-
-namespace
-{
-
-	std::string GetInsertAttributeSetForFileStatement( IAttributePtr ipAttribute,
-													   BSTR bstrAttributeSetName,
-													   const std::string& parentAttributeID,
-													   long fileID )
+	// This function escapes any single quotes in the input.
+	std::string SqlSanitizeInput( const std::string& input )
 	{
-		ISpatialStringPtr ipValue = ipAttribute->GetValue();
-		std::string value = asString(ipValue->String);
-		std::string attributeName = asString(ipAttribute->GetName());
-		std::string attributeType = asString(ipAttribute->GetType());
-		std::string attributeSetName = asString(bstrAttributeSetName);
+		std::string sanitized( input );
+		replaceVariable( sanitized, "'", "''" );	// replace single quote (') with ''
+		return sanitized;
+	}
 
-		IIdentifiableObjectPtr ipIdentifiable(ipAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI38642", nullptr != ipIdentifiable);			
-		std::string guid = asString(ipIdentifiable->InstanceGUID);
+
+	std::string GetInsertRootASFFStatement( BSTR bstrAttributeSetName, long fileID )
+	{
+		std::string attributeSetName = SqlSanitizeInput(asString(bstrAttributeSetName));
 
 		std::string insert = 
-			"SET NOCOUNT ON\n"
-			"DECLARE  @AttributeName_Name AS NVARCHAR(255);\n"
-			"DECLARE  @AttributeType_Type AS NVARCHAR(255);\n"
-			"DECLARE  @AttributeSetName_Description AS NVARCHAR(255);\n"
-			"DECLARE  @Attribute_Value AS NVARCHAR(MAX);\n"
-			"DECLARE  @Attribute_GUID AS UNIQUEIDENTIFIER;\n"
-			"DECLARE  @Attribute_ParentAttributeID AS BIGINT;\n"
-			"DECLARE  @FileID AS INT;\n"
-			"\n"
+			"SET NOCOUNT ON \n"
+			"DECLARE @AttributeSetName_Description AS NVARCHAR(255);\n"
+			"DECLARE @FileID AS INT;\n"
 			"DECLARE @AttributeSetName_ID AS BIGINT;\n"
 			"DECLARE @AttributeSetForFile_ID AS BIGINT;\n"
-			"DECLARE @AttributeName_ID AS BIGINT;\n"
-			"DECLARE @AttributeType_ID AS BIGINT;\n"
-			"DECLARE @Attribute_ID AS BIGINT;\n"
+			"DECLARE @FileTaskSessionID AS BIGINT;\n"
 			"\n";
-			
-		insert += Util::Format( "SELECT @AttributeName_Name='%s';\n"
-								"SELECT @AttributeType_Type='%s';\n"
-								"SELECT @AttributeSetName_Description='%s';\n"
-								"SELECT @Attribute_Value='%s';\n"
-								"SELECT @Attribute_GUID='%s';\n"
-								"SELECT @Attribute_ParentAttributeID=%s;\n"
+
+		insert += Util::Format( "SELECT @AttributeSetName_Description='%s';\n"
 								"SELECT @FileID=%d;\n",
-								attributeName.c_str(),
-								attributeType.c_str(),
 								attributeSetName.c_str(),
-								value.c_str(),
-								guid.c_str(),
-								parentAttributeID.c_str(),
 								fileID );
-			
 		insert += 
 			"\n"
-			"SELECT @AttributeSetName_ID=null;\n"
-			"SELECT @AttributeSetForFile_ID=null;\n"
-			"SELECT @AttributeName_ID=null;\n"
-			"SELECT @AttributeType_ID=null;\n"
-			"SELECT @Attribute_ID=null;\n"
-			"\n"
 			"BEGIN TRY\n"
-			"	SELECT @AttributeSetName_ID=(SELECT [ID] FROM [dbo].[AttributeSetName] "
-			"WHERE Description=@AttributeSetName_Description)\n"
+			"	SELECT @AttributeSetName_ID=(SELECT TOP 1 [ID] FROM [dbo].[AttributeSetName] "
+			"		WHERE [Description]=@AttributeSetName_Description)\n"
 			"	if @AttributeSetName_ID IS NULL\n"
 			"	begin\n"
 			"		INSERT INTO [dbo].[AttributeSetName] ([Description]) VALUES (@AttributeSetName_Description);\n"
 			"		SELECT @AttributeSetName_ID = SCOPE_IDENTITY()\n"
 			"	end\n"
-			"\n"	
-			"	SELECT @AttributeSetForFile_ID=(SELECT ID FROM [dbo].[AttributeSetForFile] "
-			"WHERE FileTaskSessionID=@FileID AND AttributeSetNameID=@AttributeSetName_ID)\n"
-			"	if @AttributeSetForFile_ID IS NULL\n"
-			"	begin\n"
-			"		INSERT INTO AttributeSetForFile ([FileTaskSessionID], [AttributeSetNameID])\n"
-			"			VALUES (@FileID, @AttributeSetName_ID);\n"
-			"		SELECT @AttributeSetForFile_ID = SCOPE_IDENTITY();\n"
-			"\n"		
-			"	end\n"
-			"	\n"
-			"	SELECT @AttributeName_ID = (SELECT ID FROM [dbo].[AttributeName] WHERE [Name]=@AttributeName_Name)\n"
-			"	if @AttributeName_ID IS NULL\n"
-			"	begin\n"
-			"		INSERT INTO [dbo].[AttributeName] ([Name]) VALUES (@AttributeName_Name);\n"
-			"		SELECT @AttributeName_ID = SCOPE_IDENTITY()\n"
-			"	end\n"
-			"	\n"
-			"	SELECT @AttributeType_ID = (SELECT [ID] from [dbo].[AttributeType] WHERE [Type]=@AttributeType_Type)\n"
-			"	if @AttributeType_ID IS NULL\n"
-			"	begin\n"
-			"		INSERT INTO [dbo].[AttributeType] ([Type]) VALUES (@AttributeType_Type);\n"
-			"		SELECT @AttributeType_ID = SCOPE_IDENTITY()\n"
-			"	end\n"
-			"\n"	
-			"	SELECT @Attribute_ID = (SELECT ID FROM [dbo].[Attribute] WHERE [Value]=@Attribute_Value AND [GUID]=@Attribute_GUID)\n"
-			"	if @Attribute_ID IS NULL\n"
-			"	begin\n"
-			"		INSERT INTO [dbo].[Attribute] ([AttributeSetForFileID], [AttributeNameID], [Value], [ParentAttributeID], [GUID]) \n"
-			"			VALUES (@AttributeSetForFile_ID, @AttributeName_ID, @Attribute_Value, @Attribute_ParentAttributeID, @Attribute_GUID);\n"
-			"		SELECT @Attribute_ID = SCOPE_IDENTITY()\n"
-			"	end\n"
 			"\n"
-			"	if not exists (SELECT * FROM [dbo].[AttributeInstanceType] WHERE [AttributeID]=@Attribute_ID AND [AttributeTypeID]=@AttributeType_ID)\n"
-			"	BEGIN\n"
-			"		INSERT INTO [dbo].[AttributeInstanceType] ([AttributeID], [AttributeTypeID]) VALUES (@Attribute_ID, @AttributeType_ID)\n"
-			"	END\n"
-			"\n"	
-			"	SELECT ID=@AttributeSetForFile_ID, AttributeID=@Attribute_ID\n"
+			"	SELECT @FileTaskSessionID=(SELECT TOP 1 [ID] from [dbo].[FileTaskSession] \n"
+			"		WHERE [FileID]=@FileID ORDER BY [ID] DESC) \n"
+			"	INSERT INTO [AttributeSetForFile] ([FileTaskSessionID], [AttributeSetNameID])\n"
+			"	OUTPUT INSERTED.ID \n"
+			"	VALUES (@FileTaskSessionID, @AttributeSetName_ID);\n"
 			"	SET NOCOUNT OFF\n"
 			"END TRY\n"
 			"BEGIN CATCH\n"
 			"	SET NOCOUNT OFF\n"
 			"	DECLARE @ErrorMessage NVARCHAR(4000);\n"
-			"    DECLARE @ErrorSeverity INT;\n"
-			"    DECLARE @ErrorState INT;\n"
+			"   DECLARE @ErrorSeverity INT;\n"
+			"   DECLARE @ErrorState INT;\n"
 			"\n"
 			"    SELECT\n"
 			"        @ErrorMessage = ERROR_MESSAGE(),\n"
@@ -696,8 +727,128 @@ namespace
 			"    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState)\n"
 			"END CATCH";
 
-			Test::SaveStatement( "c:\\temp\\insertASFF.txt", insert );
+			static int counter = 0;
+			SaveStatement( Util::Format("c:\\temp\\insertRootASFF%04d.txt", counter).c_str(), insert );
+			++counter;
+
 			return insert;
+	}
+
+	std::string GetInsertAttribute( IAttributePtr ipAttribute,
+									BSTR bstrAttributeSetName,
+									longlong parentAttributeID,
+									longlong owningAttributeSetForFileID )
+	{
+		ISpatialStringPtr ipValue = ipAttribute->GetValue();
+		std::string value = SqlSanitizeInput(asString(ipValue->String));
+		std::string attributeName = SqlSanitizeInput(asString(ipAttribute->GetName()));
+		std::string attributeType = SqlSanitizeInput(asString(ipAttribute->GetType()));
+		std::string attributeSetName = SqlSanitizeInput(asString(bstrAttributeSetName));
+
+		IIdentifiableObjectPtr ipIdentifiable(ipAttribute);
+		ASSERT_RESOURCE_ALLOCATION("ELI38642", nullptr != ipIdentifiable);			
+		std::string guid = asString(ipIdentifiable->InstanceGUID);
+
+		Logging::WriteToLog( "%s- Value: %s, attributeName: %s, attributeType: %s, "
+							 "attributeSetName: %s, parentAttributeID: %lld, GUID: %s, ASFF ID: %lld",
+							 __FUNCTION__,
+							 value.c_str(), 
+							 attributeName.c_str(),
+							 attributeType.c_str(),
+							 attributeSetName.c_str(),
+							 parentAttributeID,
+							 guid.c_str(),
+							 owningAttributeSetForFileID );
+
+		std::string insert = 
+						  "SET NOCOUNT ON \n"
+						  "DECLARE  @AttributeName_Name AS NVARCHAR(255); \n"
+						  "DECLARE  @AttributeType_Type AS NVARCHAR(255); \n"
+						  "DECLARE  @AttributeSetName_Description AS NVARCHAR(255); \n"
+						  "DECLARE  @Attribute_Value AS NVARCHAR(MAX); \n"
+						  "DECLARE  @Attribute_GUID AS UNIQUEIDENTIFIER; \n"
+						  "DECLARE  @Attribute_ParentAttributeID AS BIGINT; \n"
+						  
+						  "DECLARE @AttributeSetName_ID AS BIGINT; \n"
+						  "DECLARE @AttributeSetForFile_ID AS BIGINT; \n"
+						  "DECLARE @AttributeName_ID AS BIGINT; \n"
+						  "DECLARE @AttributeType_ID AS BIGINT; \n"
+						  "DECLARE @Attribute_ID AS BIGINT; \n";
+
+		std::string parentID = parentAttributeID == 0 ? "null" : Util::Format("%lld", parentAttributeID );
+		std::string args = 
+			Util::Format( "SELECT @AttributeName_Name='%s'; \n"
+						  "SELECT @AttributeType_Type='%s'; \n"
+						  "SELECT @AttributeSetName_Description='%s'; \n"
+						  "SELECT @Attribute_Value='%s'; \n"
+						  "SELECT @Attribute_GUID='%s'; \n"
+						  "SELECT @Attribute_ParentAttributeID=%s; \n"
+						  "SELECT @AttributeSetForFile_ID=%ld",
+						  attributeName.c_str(),
+						  attributeType.c_str(),
+						  attributeSetName.c_str(),
+						  value.c_str(),
+						  guid.c_str(),
+						  parentID.c_str(),
+						  owningAttributeSetForFileID );
+
+		insert += args;
+		insert += 		  "SELECT @AttributeSetName_ID=null; \n"
+						  "SELECT @AttributeName_ID=null; \n"
+						  "SELECT @AttributeType_ID=null; \n"
+
+						  "BEGIN TRY \n"
+						  "SELECT @AttributeSetName_ID=(SELECT TOP 1 [ID] FROM [dbo].[AttributeSetName] \n"
+						  "WHERE Description=@AttributeSetName_Description)\n"
+						  "if @AttributeSetName_ID IS NULL\n"
+						  "begin\n"
+						  "    INSERT INTO [dbo].[AttributeSetName] ([Description]) VALUES (@AttributeSetName_Description);\n"
+						  "    SELECT @AttributeSetName_ID = SCOPE_IDENTITY()\n"
+						  "end\n"
+						  "\n"	
+						  "SELECT @AttributeName_ID = (SELECT TOP 1 [ID] FROM [dbo].[AttributeName] WHERE [Name]=@AttributeName_Name)\n"
+						  "if @AttributeName_ID IS NULL\n"
+						  "begin\n"
+						  "    INSERT INTO [dbo].[AttributeName] ([Name]) VALUES (@AttributeName_Name);\n"
+						  "    SELECT @AttributeName_ID = SCOPE_IDENTITY()\n"
+						  "end\n"
+						  "\n"
+						  "SELECT @AttributeType_ID = (SELECT TOP 1 [ID] from [dbo].[AttributeType] WHERE [Type]=@AttributeType_Type)\n"
+						  "if @AttributeType_ID IS NULL\n"
+						  "begin\n"
+						  "    INSERT INTO [dbo].[AttributeType] ([Type]) VALUES (@AttributeType_Type);\n"
+						  "    SELECT @AttributeType_ID = SCOPE_IDENTITY()\n"
+						  "end\n"
+						  "\n"	
+						  "INSERT INTO [dbo].[Attribute] ([AttributeSetForFileID], [AttributeNameID], [Value], [ParentAttributeID], [GUID]) \n"
+						  "VALUES (@AttributeSetForFile_ID, @AttributeName_ID, @Attribute_Value, @Attribute_ParentAttributeID, @Attribute_GUID);\n"
+						  "SELECT @Attribute_ID = SCOPE_IDENTITY()\n"
+						  "\n"
+						  "if not exists (SELECT * FROM [dbo].[AttributeInstanceType] WHERE [AttributeID]=@Attribute_ID AND [AttributeTypeID]=@AttributeType_ID)\n"
+						  "BEGIN\n"
+						  "    INSERT INTO [dbo].[AttributeInstanceType] ([AttributeID], [AttributeTypeID]) VALUES (@Attribute_ID, @AttributeType_ID)\n"
+						  "END\n"
+						  "\n"	
+						  "SELECT AttributeID=@Attribute_ID\n"
+						  "SET NOCOUNT OFF\n"
+						"END TRY \n"
+						"BEGIN CATCH \n"
+							"SET NOCOUNT OFF \n"
+							"DECLARE @ErrorMessage NVARCHAR(4000); \n"
+							"DECLARE @ErrorSeverity INT; \n"
+							"DECLARE @ErrorState INT; \n"
+							"SELECT \n"
+								"@ErrorMessage = ERROR_MESSAGE(), \n"
+								"@ErrorSeverity = ERROR_SEVERITY(), \n"
+								"@ErrorState = ERROR_STATE(); \n"
+							"RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState) \n"
+						"END CATCH \n";
+
+		static int counter = 0;
+		SaveStatement( Util::Format("c:\\temp\\insertSubAttribute%04d.txt", counter).c_str(), insert );
+		++counter;
+
+		return insert;
 	}
 
 
@@ -731,115 +882,274 @@ namespace
 										   endY,
 										   pageNumber,
 										   height );
-		Test::SaveStatement( "c:\\temp\\insertRZ.txt", insert );
+
+		static int counter = 0;
+		SaveStatement( Util::Format("c:\\temp\\insertRZ%04d.txt", counter).c_str(), insert );
+		++counter;
 		return insert;
 	}
 
-	std::string GetQueryForAttributeSetForFile( long fileID, BSTR attributeSetName )
+	// This query gets one top-level attribute.
+	std::string GetQueryForAttributeSetForFile( long fileID, 
+												BSTR attributeSetName, 
+												long relativeIndex )
 	{
 		std::string query = 
-			Util::Format( "SELECT attr.[Value], attr.[ParentAttributeID], attr.[GUID], \n"
-			"attrT.[Type], attrN.[Name], asn.[Description], \n"
-			"rz.[Top], rz.[Left], rz.[Bottom], rz.[Right], rz.[StartX], rz.[StartY], \n"
-			"rz.[EndX], rz.[EndY], rz.[PageNumber], rz.[Height] \n"
-			"FROM AttributeSetForFile asff \n"
-			"LEFT JOIN AttributeSetName asn ON asff.AttributeSetNameID=asn.ID\n"
-			"JOIN Attribute attr ON asff.ID=attr.AttributeSetForFileID\n"
-			"JOIN AttributeName attrN ON attr.AttributeNameID=attrN.ID\n"
-			"JOIN AttributeInstanceType ait ON ait.AttributeID=attr.ID\n"
-			"JOIN AttributeType attrT ON ait.AttributeTypeID=attrT.ID\n"
-			"LEFT JOIN RasterZone rz ON rz.AttributeID=attr.ID\n"
-			"WHERE asff.FileTaskSessionID=%ld AND\n"
-			"asn.Description='%s' ORDER BY attr.ID DESC;",
-			fileID,
-			asString(attributeSetName).c_str() );
+			Util::Format( "WITH attrSets AS ( \n"
+						  "SELECT [asff].[VOA], "
+						  "ROW_NUMBER() OVER (ORDER BY [asff].[ID] %s) AS \"RowNumber\" "
+						  "FROM [AttributeSetForFile] asff \n"
+						  "INNER JOIN [AttributeSetName] asn ON [asff].[AttributeSetNameID]=[asn].[ID] \n"
+						  "INNER JOIN [FileTaskSession] fts ON [asff].[FileTaskSessionID]=[fts].[ID] \n"
+						  "WHERE [fts].[FileID]=%d AND [asn].[Description]='%s' \n"
+						  ") SELECT * FROM attrSets WHERE \"RowNumber\" = %d;",
+						  relativeIndex < 0 ? "DESC" : "ASC",					// DESC is most recent, ASC is oldest
+						  fileID,
+						  asString(attributeSetName).c_str(),
+						  abs( relativeIndex ) );								// offset (index) into result set, get Nth
 
-		Test::SaveStatement( "c:\\temp\\queryASFF.txt", query );
+		static int counter = 0;
+		SaveStatement( Util::Format("c:\\temp\\queryASFF%04d.txt", counter).c_str(), query );
+		++counter;
 		return query;
 	}
-}
 
-
-namespace Test
-{
-	void TestRasterZoneInsert()
+	struct FieldFetcher
 	{
-		ILongRectanglePtr ipRect(CLSID_LongRectangle);
-		ipRect->SetBounds(0, 0, 100, 50);
+		explicit FieldFetcher( FieldsPtr ipFields ):
+		m_ipFields( ipFields )
+		{
+		}
 
-		// Create a raster zone based on this rectangle.
-		IRasterZonePtr ipRasterZone(CLSID_RasterZone);
-		ipRasterZone->CreateFromLongRectangle(ipRect, 1);
+		std::string GetString( const std::string& fieldName ) const
+		{
+			return getStringField( m_ipFields, fieldName );
+		}
 
-		std::string insert = GetInsertRasterZoneStatement( "1", ipRasterZone );
+		long GetLong( const std::string& fieldName ) const
+		{
+			return getLongField( m_ipFields, fieldName );
+		}
+
+		long long GetLongLong(const std::string& fieldName ) const
+		{
+			return getLongLongField( m_ipFields, fieldName );
+		}
+
+	private:
+		FieldsPtr	m_ipFields;
+	};
+
+	template <typename TPtr>
+	TPtr AssignComPtr( TPtr ipInstance, const std::string& eliCode )
+	{
+		TPtr instance = ipInstance;
+		ASSERT_RESOURCE_ALLOCATION( eliCode, nullptr != instance );
+		return instance;
 	}
 
-}
+	template <typename TPtr>
+	TPtr AssignComPtr( TPtr ipInstance, bool bCondition, const std::string& eliCode )
+	{
+		TPtr instance = ipInstance;
+		ASSERT_RESOURCE_ALLOCATION( eliCode, bCondition );
+		return instance;
+	}
 
-//-------------------------------------------------------------------------------------------------
-// TODO - add DB locking to all inserters and getters...
+	template <typename TPtr>
+	TPtr MakeIPtr( const GUID& clsId, const std::string& eliCode )
+	{
+		TPtr pT(clsId);
+		ASSERT_RESOURCE_ALLOCATION( eliCode, nullptr != pT );
+		
+		return pT;
+	}
+
+	void SetAttributeGuid( IAttributePtr ipAttribute, const std::string& guid )
+	{
+		UUID uuid;
+		UuidFromString( (unsigned char*)guid.c_str(), &uuid );
+		ipAttribute->SetGUID( &uuid );
+	}
+
+	bool RecordsInSet( const ADODB::_RecordsetPtr ipRecords )
+	{
+		return VARIANT_FALSE == ipRecords->adoEOF;
+	}
+
+	ADODB::_RecordsetPtr ExecuteCmd( const std::string& cmd, ADODB::_ConnectionPtr ipConnection )
+	{
+		Logging::WriteToLog( "%s- executing command...", __FUNCTION__ );
+		return ipConnection->Execute( cmd.c_str(), nullptr, adCmdText );
+	}
+
+	FieldsPtr GetFieldsForQuery( const std::string& query, ADODB::_ConnectionPtr ipConnection )
+	{
+		ADODB::_RecordsetPtr ipASFF = ExecuteCmd( query, ipConnection );
+		ASSERT_RUNTIME_CONDITION( "ELI38763", 
+								  RecordsInSet(ipASFF), 
+								  Util::Format( "Insert failed: %s", query.c_str() ) );
+
+		FieldsPtr ipFields = AssignComPtr( ipASFF->Fields, "ELI38764" );
+		return ipFields;
+	}
+
+	longlong ExecuteRootInsertASFF( const std::string& insert, ADODB::_ConnectionPtr ipConnection )
+	{
+		Logging::WriteToLog( "\n%s- insert statement: %s", __FUNCTION__, insert.c_str() );
+
+		ADODB::_RecordsetPtr ipRS = ExecuteCmd( insert.c_str(), ipConnection );
+		ASSERT_RESOURCE_ALLOCATION(	"ELI38886", VARIANT_FALSE == ipRS->adoEOF );
+
+		FieldsPtr ipFields = AssignComPtr( ipRS->Fields, "ELI38887" );
+		longlong ID = getLongLongField( ipFields, "ID" );
+		Logging::WriteToLog( "%s- Returned Root ASFF ID: %lld", __FUNCTION__, ID );
+
+		ipRS->Close();
+
+		return ID;
+	}
+
+}		// end of anonymous namespace
+
+// ------------------------------------------------------------------------------------------------
+void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong rootASFF_ID )
+{
+//	if ( 0 == pAttributes->Size() )
+//		return;
+
+	try
+	{
+		std::string query = Util::Format( "SELECT * FROM [dbo].[AttributeSetForFile] "
+										  "WHERE [ID] = %lld",
+										  rootASFF_ID );
+		Logging::WriteToLog( "%s- set up to write VOA, query is: %s", __FUNCTION__, query.c_str() );
+
+		ADODB::_RecordsetPtr ipASFF( __uuidof(Recordset) );
+		ASSERT_RESOURCE_ALLOCATION( "ELI38804", nullptr != ipASFF );
+
+		auto connectParam = _variant_t( (IDispatch*)getDBConnection(), true );
+		ipASFF->Open( query.c_str(), 
+					  connectParam, 
+					  adOpenDynamic, 
+					  adLockOptimistic, 
+					  adCmdText );
+		ASSERT_RUNTIME_CONDITION( "ELI38805", 
+								  RecordsInSet(ipASFF), 
+								  Util::Format( "Insert failed: %s", query.c_str() ) );
+
+		FieldsPtr ipFields = AssignComPtr( ipASFF->Fields, "ELI38764" );
+
+		// Now prepare the VOA for save
+		string storageManagerIID = asString(CLSID_AttributeStorageManager);
+		IIUnknownVectorPtr pAttributesClone = pAttributes->PrepareForStorage( storageManagerIID.c_str() );
+
+		IPersistStreamPtr ipPersistObj = pAttributesClone;
+		// TODO - compress the spatial string!
+		setIPersistObjToField( ipFields, "VOA", ipPersistObj );
+		ipASFF->Update();
+	}
+	catch (...)
+	{
+		UCLIDException ue;
+		std::string message( 
+			Util::Format("ADO exception while saving VOA to AttributeSetForFile, "
+						 "ID: %lld", rootASFF_ID ) );
+		Logging::WriteToLog( message.c_str() );
+		ue.asString( message );
+		throw ue;
+	}
+}
+// ------------------------------------------------------------------------------------------------
+long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute, 
+										  VARIANT_BOOL storeRasterZone,
+										  const std::string& insert )
+{
+	Logging::WriteToLog( "\n%s-", __FUNCTION__ );
+
+	ADODB::_RecordsetPtr ipRS = ExecuteCmd( insert.c_str(), getDBConnection() );
+	ASSERT_RESOURCE_ALLOCATION(	"ELI38670", VARIANT_FALSE == ipRS->adoEOF );
+
+	FieldsPtr ipFields = AssignComPtr( ipRS->Fields, "ELI38631" );
+	long long parentID = getLongLongField( ipFields, "AttributeID" );
+	Logging::WriteToLog( "%s- Returned Parent ID: %lld", __FUNCTION__, parentID );
+
+	ipRS->Close();
+
+	ISpatialStringPtr ipValue = AssignComPtr( ipAttribute->GetValue(), "ELI38714" );
+	bool hasSpatialInfo = asCppBool( ipValue->HasSpatialInfo() );
+	bool storeInfo = asCppBool(storeRasterZone);
+	if ( hasSpatialInfo && true == storeInfo )
+	{
+		IIUnknownVectorPtr ipZones = ipValue->GetOriginalImageRasterZones();	// NOTE: can't return nullptr, throws
+		Logging::WriteToLog( "%s- Number of Raster Zones: %d", __FUNCTION__, ipZones->Size() );
+		for ( long index = 0; index < ipZones->Size(); ++index )
+		{
+			IRasterZonePtr ipZone = AssignComPtr( ipZones->At(index), "ELI38669" );
+
+			const std::string parentAttrID( Util::Format( "%lld", parentID ) );
+			std::string zoneInsert = GetInsertRasterZoneStatement( parentAttrID, ipZone );
+
+			Logging::WriteToLog( "%s- ^^^^^^^^^ Saving raster zone[%d]: %s", __FUNCTION__, index, zoneInsert.c_str() );
+			ExecuteCmd( zoneInsert.c_str(), getDBConnection() );
+		}
+	}
+
+	return parentID;
+}
+// ------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileID,
 														    BSTR bstrAttributeSetName,
 														    IIUnknownVector* pAttributes,
 															VARIANT_BOOL storeRasterZone )
 {
+	longlong rootASFF_ID = 0;
+
 	try
 	{
 		ASSERT_ARGUMENT("ELI38553", pAttributes != nullptr);
 		ASSERT_ARGUMENT("ELI38554", fileID > 0 );
 
-		_ConnectionPtr ipConnection = getDBConnection();
-		TransactionGuard tg(ipConnection, adXactRepeatableRead, nullptr);
+		Logging::WriteToLog( "%s- starting, fileID: %d, attribute set name: %s, Size: %d",
+							 __FUNCTION__,
+							 fileID,
+							 asString(bstrAttributeSetName).c_str(),
+							 pAttributes->Size() );
+
+		TransactionGuard tg( getDBConnection(), adXactRepeatableRead, nullptr );
+
+		auto insertRootASFF = GetInsertRootASFFStatement( bstrAttributeSetName, fileID );
+		rootASFF_ID = ExecuteRootInsertASFF( insertRootASFF, getDBConnection() );
+		SaveVoaDataInASFF( pAttributes, rootASFF_ID );
 
 		for ( long i = 0; i < pAttributes->Size(); ++i )
 		{
-			IAttributePtr ipAttribute = pAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION( "ELI38693", ipAttribute != nullptr );
-			ISpatialStringPtr ipValue = ipAttribute->GetValue();
+			Logging::WriteToLog( "\n%s- __________ Saving parent attribute[%d]", __FUNCTION__, i );
+			IAttributePtr ipAttribute = AssignComPtr( pAttributes->At(i), "ELI38693" );
 
-			const std::string topLevelParentAttributeID( "null" );
-			std::string insert = GetInsertAttributeSetForFileStatement( ipAttribute,
-																		bstrAttributeSetName,
-																		topLevelParentAttributeID,
-																		fileID );
+			const longlong topLevelParentAttributeID = 0;
+			std::string insert = GetInsertAttribute( ipAttribute, 
+													 bstrAttributeSetName, 
+													 topLevelParentAttributeID,
+													 rootASFF_ID );
+			long long parentID = SaveAttribute( ipAttribute, 
+												storeRasterZone,
+												insert );
 
-			ADODB::_RecordsetPtr ipRS = m_ipFAMDB->GetResultsForQuery( insert.c_str() );
-			ASSERT_RESOURCE_ALLOCATION(	"ELI38670", VARIANT_FALSE == ipRS->adoEOF );
-
-			FieldsPtr ipFields = ipRS->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI38631", ipFields != nullptr);
-
-			long long parentID = getLongLongField( ipFields, "AttributeID" );
-			ipRS->Close();
-
-			if ( true == asCppBool(storeRasterZone) )
-			{
-				// Determine if there are 0..N associated raster zones to store
-				IIUnknownVectorPtr ipZones = ipValue->GetOriginalImageRasterZones();
-				for ( long index = 0; index < ipZones->Size(); ++index )
-				{
-					IRasterZonePtr ipZone = ipZones->At(index);
-					ASSERT_RESOURCE_ALLOCATION("ELI38669", ipZone != nullptr);
-	
-					const std::string parentAttrID( Util::Format( "%ld", parentID ) );
-					std::string zoneInsert = GetInsertRasterZoneStatement( parentAttrID, ipZone );
-					m_ipFAMDB->GetResultsForQuery( zoneInsert.c_str() );
-				}
-			}
-
-			// Now determine if there are 0..N associated sub attributes.
 			IIUnknownVectorPtr ipSubAttrs = ipAttribute->GetSubAttributes();
+			Logging::WriteToLog( "%s- ----- Saving subattributes, Size: %d", __FUNCTION__, ipSubAttrs->Size() );
 			for ( long index = 0; index < ipSubAttrs->Size(); ++index )
 			{
-				IAttributePtr ipSubAttribute = ipSubAttrs->At( index );
-				ASSERT_RESOURCE_ALLOCATION( "ELI38694", ipAttribute != nullptr );
+				Logging::WriteToLog( "%s- **** Saving sub-attribute[%d]", __FUNCTION__, index );
 
-				const std::string subAttributeParentID( Util::Format("%ld", parentID) );
-				std::string subInsert = GetInsertAttributeSetForFileStatement( ipSubAttribute,
-																			   bstrAttributeSetName,
-																			   subAttributeParentID,
-																			   fileID );
-				m_ipFAMDB->GetResultsForQuery( subInsert.c_str() );
+				IAttributePtr ipSubAttribute = AssignComPtr( ipSubAttrs->At( index ), "ELI38717" );
+				std::string cmd = GetInsertAttribute( ipSubAttribute, 
+													  bstrAttributeSetName, 
+													  parentID, 
+													  rootASFF_ID );
+				SaveAttribute( ipAttribute, 
+							   storeRasterZone,
+							   cmd );
 			}
 		}
 
@@ -847,16 +1157,12 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileID,
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38557");
-
 }
 //-------------------------------------------------------------------------------------------------
 // relativeIndex: -1 for most recent, 1 for oldest
 // decrement most recent value to get next most recent (-2)
 // increment oldest value to get next oldest (2)
 // Zero is an illegal relativeIndex value.
-// TODO - support relativeIndex
-// TODO - get associated RasterZone info
-// TODO - get associated Subattribute info
 STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** ppAttributes, 
 													 long fileID, 
 													 BSTR attributeSetName,
@@ -867,33 +1173,12 @@ STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** ppAttribu
 		ASSERT_ARGUMENT("ELI38618", relativeIndex != 0);
 		ASSERT_ARGUMENT("ELI38668", ppAttributes != nullptr);
 
-		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI38664", nullptr != ipAttributes);
-		
-		std::string query( GetQueryForAttributeSetForFile( fileID, attributeSetName ) );
-		
-		ADODB::_RecordsetPtr ipRecords = m_ipFAMDB->GetResultsForQuery( query.c_str() );
-		while ( VARIANT_FALSE == ipRecords->adoEOF )
-		{
-			FieldsPtr ipFields = ipRecords->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI38622", ipFields != nullptr);
+		auto query( GetQueryForAttributeSetForFile( fileID, attributeSetName, relativeIndex ) );
 
-			IAttributePtr ipAttribute(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI38664", nullptr != ipAttribute);
-		
-			ipAttribute->Name = getStringField( ipFields, "Name" ).c_str();
-			ipAttribute->Type = getStringField( ipFields, "Type" ).c_str();
+		FieldsPtr ipFields = GetFieldsForQuery( query, getDBConnection() );
+		IPersistStreamPtr ipStream = getIPersistObjFromField( ipFields, "VOA" );
 
-			ISpatialStringPtr ipText(CLSID_SpatialString);
-			ipText->ReplaceAndDowngradeToNonSpatial( getStringField( ipFields, "Value" ).c_str() );
-			ipAttribute->Value = ipText;
-		
-			ipAttributes->PushBack(ipAttribute);
-			ipRecords->MoveNext();
-		}
-
-		*ppAttributes = ipAttributes.Detach();
-		return S_OK;
+		*ppAttributes = (IIUnknownVectorPtr)ipStream.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38619");
 }
@@ -911,9 +1196,9 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name,
 									   "(Description) OUTPUT INSERTED.ID VALUES ('%s');",
 									   newName.c_str() ) );
 
-		m_ipFAMDB->ExecuteInsertReturnLongLongResult( cmd.c_str(), 
-													  "ID",
-													  pAttributeSetNameID );
+		m_ipFAMDB->ExecuteCommandReturnLongLongResult( cmd.c_str(), 
+		 											   "ID",
+													   pAttributeSetNameID );
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38629");
@@ -967,21 +1252,17 @@ STDMETHODIMP CAttributeDBMgr::GetAllAttributeSetNames(IStrToStrMap** ippNames)
 	try
 	{
 		ASSERT_ARGUMENT("ELI38617", nullptr != ippNames);
+		auto ipAttributeSetNames = MakeIPtr<IStrToStrMapPtr>(CLSID_StrToStrMap, "ELI38621");
 
 		std::string query( "SELECT [ID], [Description] FROM [dbo].[AttributeSetName];" );
-
 		ADODB::_RecordsetPtr pRecords = m_ipFAMDB->GetResultsForQuery( query.c_str() );
-
-		IStrToStrMapPtr ipAttributeSetNames(CLSID_StrToStrMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI38621", ipAttributeSetNames != nullptr);
-
-		while ( VARIANT_FALSE == pRecords->adoEOF )
+		while ( RecordsInSet(pRecords) )
 		{
-			FieldsPtr pFields = pRecords->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI38622", pFields != nullptr);
+			FieldsPtr pFields = AssignComPtr( pRecords->Fields, "ELI38622" );
 
 			std::string description = getStringField( pFields, "Description" );
 			long long Id = getLongLongField( pFields, "ID" );
+
 			std::string ID = Util::Format( "%lld", Id );
 			ipAttributeSetNames->Set( description.c_str(), ID.c_str() );
 			
@@ -1041,24 +1322,6 @@ void CAttributeDBMgr::validateLicense()
 void CAttributeDBMgr::validateSchemaVersion()
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI38545", m_ipFAMDB != nullptr);
-
-	//DeleteAttributeSetName( ::SysAllocString(L"as4") );
-	//RenameAttributeSetName( ::SysAllocString(L"as2"), ::SysAllocString(L"asn2") );
-	//CreateNewAttributeSetName( ::SysAllocString(L"asn4"), nullptr );
-	/*
-	long long ID = 0;
-	CreateNewAttributeSetName( ::SysAllocString(L"asnTestInf4"), &ID );
-	*/
-
-	//Test::TestCreateNewAttributeSetForFile();
-	
-/*	
-	IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI38664", nullptr != ipAttributes);
-
-	GetAttributeSetForFile( &ipAttributes, 1, get_bstr_t("AttributeSetName1"), 1 );
-*/
-	Test::TestRasterZoneInsert();
 
 	// Get the Version from the FAMDB DBInfo table
 	auto value = asString( m_ipFAMDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(), 

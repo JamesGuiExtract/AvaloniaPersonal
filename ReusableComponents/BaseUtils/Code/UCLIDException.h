@@ -654,6 +654,24 @@ private:
 		ue.addDebugInfo("Failed condition", #bCondition); \
 		throw ue; \
 	}
+
+//--------------------------------------------------------------------------------------------------
+// PURPOSE: To provide an easy mechanism to validate a runtime requierment and throw an UCLIDException
+//			when that requirement is not met.
+// REQUIRE: strELI must be a unique string among all ELI's of exceptions that are thrown by software
+//			components developed at UCLID or for UCLID.
+//			strELI != ""
+//			bCondition must be evaluate to a boolean value.
+// PROMISE: if bCondition evaluates to false, a UCLIDException will be thrown with the specified
+//			ELI, and with the stringized condition as the associated debug information.
+#define ASSERT_RUNTIME_CONDITION(strELI, bCondition, description) \
+	if (!(bCondition)) \
+	{ \
+		UCLIDException ue(strELI, "Runtime error: " #description); \
+		ue.addDebugInfo("Failed condition", #bCondition); \
+		throw ue; \
+	}
+
 //--------------------------------------------------------------------------------------------------
 // PURPOSE: To provide an easy mechanism to validate resource allocation and throw an UCLIDException
 //			when the resource allocation requirements are not met.

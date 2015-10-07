@@ -328,6 +328,34 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Converts IStrToStrMap into a Dictionary
+        /// </summary>
+        /// <param name="instance">The IStrToStr instance to convert.</param>
+        /// <returns>A dictionary of type Dictionary</returns>
+        [CLSCompliant(false)]
+        public static Dictionary<string, string> ToDictionary(this IStrToStrMap instance)
+        {
+            try
+            {
+                Dictionary<string, string> temp = new Dictionary<string, string>();
+
+                for (int i = 0; i < instance.Size; ++i)
+                {
+                    string key;
+                    string value;
+                    instance.GetKeyValue(i, out key, out value);
+                    temp.Add(key, value);
+                }
+
+                return temp;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI38760");
+            }
+        }
+
+        /// <summary>
         /// Tries to add the key value pair to the <see cref="Dictionary{K,V}"/> if the key is
         /// not already present in the dictionary.
         /// </summary>

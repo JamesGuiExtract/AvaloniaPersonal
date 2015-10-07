@@ -217,6 +217,11 @@ library UCLID_COMUTILSLib
 		//			if a<b and b<c then a<c
 		//			if a==b and b==c
 		[id(23), helpstring("method Sort")] HRESULT Sort([in] ISortCompare* pSortCompare);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: bstrStorageManager must not be empty
+		// PROMISE: To return a prepared-for-storage clone of the original.
+		[id(24), helpstring("method PrepareForStorage")] HRESULT PrepareForStorage([in] BSTR bstrStorageManager, 
+			[out, retval] IIUnknownVector** ppClonedVector);
 	};
 	[
 		object,

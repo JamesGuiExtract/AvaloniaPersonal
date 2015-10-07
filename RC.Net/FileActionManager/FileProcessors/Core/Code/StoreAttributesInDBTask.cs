@@ -5,8 +5,10 @@ using Extract.Licensing;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using AttributeDbMgrComponentsLib;
+using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -19,9 +21,14 @@ namespace Extract.FileActionManager.FileProcessors
     [ComVisible(true)]
     [Guid("31FE0077-EF9C-4F69-8BBD-D7344A3855B7")]
     [CLSCompliant(false)]
-    public interface IStoreAttributesInDBTask : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask,
-        ILicensedComponent, IPersistStream
+    public interface IStoreAttributesInDBTask : 
+        ICategorizedComponent, 
+        IConfigurableObject,
+        IMustBeConfiguredObject, 
+        ICopyableObject, 
+        IFileProcessingTask,
+        ILicensedComponent, 
+        IPersistStream
     {
         /// <summary>
         /// Gets or sets the name of the VOA file to store in the DB
@@ -45,6 +52,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// <value><see langword="true"/> if raster zone data should be stored; otherwise,
         /// <see langword="false"/>.</value>
         bool StoreRasterZones { get; set; }
+
+        /// <summary>
+        /// Gets or set flag that determines mode - either Save or Retrieve
+        /// </summary>
+        bool StoreModeIsSet { get; set; }
     }
 
     /// <summary>
@@ -60,17 +72,23 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Store attributes in DB";
+        const string _COMPONENT_DESCRIPTION = "Core: Store/Retrieve attributes in DB";
 
         /// <summary>
         /// Current task version.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
+
+        /// <summary>
+        /// A string representation of the GUID for <see cref="AttributeStorageManagerClass"/> 
+        /// </summary>
+        static readonly string _ATTRIBUTE_STORAGE_MANAGER_GUID =
+            typeof(AttributeStorageManagerClass).GUID.ToString("B");
 
         #endregion Constants
 
@@ -100,6 +118,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// Indicates that settings have been changed, but not saved.
         /// </summary>
         bool _dirty;
+
+        /// <summary>
+        /// Determines the mode of the class - either storage or retrieval.
+        /// </summary>
+        bool _storeModeIsSet = true;
 
         #endregion Fields
 
@@ -200,6 +223,24 @@ namespace Extract.FileActionManager.FileProcessors
                 }
             }
         }
+
+        /// <summary>
+        /// Gets/set flag that represents whether the mode is Save or retrieve
+        /// </summary>
+        public bool StoreModeIsSet 
+        { 
+            get
+            {
+                return _storeModeIsSet;
+            }
+
+            set
+            {
+                _storeModeIsSet = value;
+                _dirty = true;
+            }
+        }
+
 
         #endregion IStoreAttributesInDBTask Members
 
@@ -415,9 +456,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// <returns>An <see cref="EFileProcessingResult"/> indicating the result of the
         /// processing.</returns>
         [CLSCompliant(false)]
-        public EFileProcessingResult ProcessFile(FileRecord pFileRecord,
-            int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
-            ProgressStatus pProgressStatus, bool bCancelRequested)
+        public EFileProcessingResult ProcessFile( FileRecord pFileRecord,
+                                                  int nActionID, 
+                                                  FAMTagManager pFAMTM, 
+                                                  FileProcessingDB pDB,
+                                                  ProgressStatus pProgressStatus, 
+                                                  bool bCancelRequested )
         {
             try
             {
@@ -425,26 +469,52 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI38650", _COMPONENT_DESCRIPTION);
 
-                FileActionManagerPathTags pathTags = new FileActionManagerPathTags(
-                    pFAMTM, pFileRecord.Name);
+                FileActionManagerPathTags pathTags = 
+                    new FileActionManagerPathTags( pFAMTM, pFileRecord.Name );
 
-                string voaFileName = pathTags.Expand(VOAFileName);
-                ExtractException.Assert("ELI38651", "VOA file not found.", File.Exists(voaFileName),
-                    "VOA filename", voaFileName);
+                string voaFileName = pathTags.Expand( VOAFileName );
 
-                IUnknownVector voaData = new IUnknownVector();
-                voaData.LoadFrom(voaFileName, false);
+                string expandedAttrSetName = pathTags.Expand(_attributeSetName);
 
-                voaData.ReportMemoryUsage();
+                if ( true == StoreModeIsSet )
+                {
+                    ExtractException.Assert("ELI38651",
+                                            "VOA file not found.",
+                                            File.Exists(voaFileName),
+                                            "VOA filename",
+                                            voaFileName);
 
-                _attributeDBManager.CreateNewAttributeSetForFile(
-                    pFileRecord.FileID, _attributeSetName, voaData, StoreRasterZones);
+                    IUnknownVector voaData = new IUnknownVector();
+                    voaData.LoadFrom(voaFileName, false);
+                    voaData.ReportMemoryUsage();
+
+                    _attributeDBManager.CreateNewAttributeSetForFile( pFileRecord.FileID,
+                                                                      expandedAttrSetName,
+                                                                      voaData,
+                                                                      StoreRasterZones );
+                }
+                else
+                {
+                    const int MOST_RECENT_ATTRIBUTE = -1;
+                    IUnknownVector vAttributes = new IUnknownVector();
+                    _attributeDBManager.GetAttributeSetForFile( out vAttributes,
+                                                                pFileRecord.FileID,
+                                                                expandedAttrSetName,
+                                                                MOST_RECENT_ATTRIBUTE );
+
+                    vAttributes.SaveTo( voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID );
+                }
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI38652", "Unable to process the file.");
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("Unable to {0} attributes for file: {1}, attribute set name: {2}",
+                                 StoreModeIsSet ? "store" : "retrieve",
+                                 pFileRecord.Name,
+                                 _attributeSetName);        // NOTE: can't easily expand this name...
+                throw ex.CreateComVisible( "ELI38652", sb.ToString() );
             }
         }
 
@@ -522,6 +592,12 @@ namespace Extract.FileActionManager.FileProcessors
                     _voaFileName = reader.ReadString();
                     _attributeSetName = reader.ReadString();
                     _storeRasterZones = reader.ReadBoolean();
+
+                    if (reader.Version > 1)
+                    {
+                        //int version = reader.ReadInt32();
+                        _storeModeIsSet = reader.ReadBoolean();
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -552,6 +628,7 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(_voaFileName);
                     writer.Write(_attributeSetName);
                     writer.Write(_storeRasterZones);
+                    writer.Write(_storeModeIsSet);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -616,6 +693,7 @@ namespace Extract.FileActionManager.FileProcessors
             _voaFileName = task.VOAFileName;
             _attributeSetName = task.AttributeSetName;
             _storeRasterZones = task.StoreRasterZones;
+            _storeModeIsSet = task._storeModeIsSet;
 
             _dirty = true;
         }

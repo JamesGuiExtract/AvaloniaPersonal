@@ -1,6 +1,7 @@
 ﻿using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -22,12 +23,6 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         static readonly string _OBJECT_NAME =
             typeof(StoreAttributesInDBTaskSettingsDialog).ToString();
-
-        /// <summary>
-        /// Special value in the attribute set name drop down to allow a new attribute set name to
-        /// be added.
-        /// </summary>
-        static readonly string _ADD_NEW = "<Add new...>";
 
         #endregion Constants
 
@@ -51,6 +46,8 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 InitializeComponent();
+                this._attributeSetNamePathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
+                this._voaFileNamePathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             }
             catch (Exception ex)
             {
@@ -115,32 +112,41 @@ namespace Extract.FileActionManager.FileProcessors
                 _attributeDBManager = new AttributeDBMgr();
                 _attributeDBManager.FAMDB = fileProcessingDB;
 
-// TODO
-//                _attributeSetNameComboBox.Items.AddRange(
-//                    _attributeDBManager.GetAttributeSetNames().ToIEnumerable());
-                _attributeSetNameComboBox.Items.Add(_ADD_NEW);
+                var attributeNames = _attributeDBManager.GetAllAttributeSetNames();
 
-                if (!string.IsNullOrWhiteSpace(Settings.AttributeSetName))
+                _attributeSetNameComboBox.Items.AddRange(attributeNames.ToDictionary().Keys.ToArray());
+                _attributeSetNameComboBox.Text = Settings.AttributeSetName;
+
+               // If Retrieve mode, then the string in the AttributeSetName combo-box must match an 
+               // existing name already in the database. However it can't be fully verified because
+               // the attributeSetName might need to be expanded before being compared to existing 
+               // names in DB, so check to see if the name has one or more tags in it.
+               if (!string.IsNullOrWhiteSpace(Settings.AttributeSetName) && Settings.StoreModeIsSet)
                 {
-                    var selectedItem = _attributeSetNameComboBox.Items.OfType<object>()
-                        .Where(item => Settings.AttributeSetName.Equals(item.ToString(),
-                                StringComparison.OrdinalIgnoreCase))
-                        .SingleOrDefault();
+                    if (!Settings.AttributeSetName.Contains('$') &&
+                        !Settings.AttributeSetName.Contains('<'))
+                    {
+                        var selectedItem = _attributeSetNameComboBox.Items.OfType<object>()
+                            .Where(item => Settings.AttributeSetName.Equals(item.ToString(),
+                            StringComparison.OrdinalIgnoreCase))
+                            .SingleOrDefault();
 
-                    if (selectedItem != null)
-                    {
-                        _attributeSetNameComboBox.SelectedItem = selectedItem;
-                    }
-                    else
-                    {
-                        UtilityMethods.ShowMessageBox(
-                            string.Format(CultureInfo.CurrentCulture,
-                            "The attribute set name \"{0}\" no longer exists in the database.",
-                            Settings.AttributeSetName), "Invalid attribute set name", true);
+                        if (selectedItem == null)
+                        {
+                            UtilityMethods.ShowMessageBox(
+                                string.Format(CultureInfo.CurrentCulture,
+                                "The attribute set name \"{0}\" no longer exists in the database.",
+                                Settings.AttributeSetName), "Invalid attribute set name", true);
+                        }
                     }
                 }
 
+                _StoreRadioButton.Checked = Settings.StoreModeIsSet;
+                _RetrieveRadioButton.Checked = !Settings.StoreModeIsSet;
+
                 _storeRasterZonesCheckBox.Checked = Settings.StoreRasterZones;
+                _storeRasterZonesCheckBox.Enabled = Settings.StoreModeIsSet;
+                _storeRasterZonesCheckBox.Visible = Settings.StoreModeIsSet;
             }
             catch (Exception ex)
             {
@@ -162,10 +168,13 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                // TODO - fix this!
+                /*
                 if (_attributeSetNameComboBox.Text == _ADD_NEW)
                 {
                     UtilityMethods.ShowMessageBox("TODO: UI to add attribute set name", "TODO", true);
                 }
+                */
             }
             catch (Exception ex)
             {
@@ -191,6 +200,8 @@ namespace Extract.FileActionManager.FileProcessors
                 Settings.VOAFileName = _voaFileNameTextBox.Text;
                 Settings.AttributeSetName = _attributeSetNameComboBox.Text;
                 Settings.StoreRasterZones = _storeRasterZonesCheckBox.Checked;
+
+                Settings.StoreModeIsSet = _StoreRadioButton.Checked;
 
                 DialogResult = DialogResult.OK;
             }
@@ -233,5 +244,17 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion Private Members
+
+        private void HandleStoreRadioButtonClicked(object sender, EventArgs e)
+        {
+            _storeRasterZonesCheckBox.Visible = true;
+            _storeRasterZonesCheckBox.Enabled = true;
+        }
+
+        private void HandleRetrieveRadioButtonClicked(object sender, EventArgs e)
+        {
+            _storeRasterZonesCheckBox.Enabled = false;
+            _storeRasterZonesCheckBox.Visible = false;
+        }
     }
 }

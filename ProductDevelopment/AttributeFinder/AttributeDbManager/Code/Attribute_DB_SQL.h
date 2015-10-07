@@ -129,22 +129,7 @@ static const std::string gstrCREATE_FILEID_ATTRIBUTE_SET_NAME_ID_INDEX =
 
 
 // ****************************************************************************
-// SQL statements to Write and Read AttributeSetForFile items.
-static const std::string gstrREAD_ATTRIBUTE_SET_FOR_FILE = 
-	"DECLARE @fileID AS INT; "
-	"SELECT @fileID=1; "
-	"SELECT "
-		"attr.Value, attr.ParentAttributeID, attr.GUID, "
-		"attrT.Type, "
-		"attrN.Name, "
-		"asn.Description, "
-		"rz.[Top], rz.[Left], rz.Bottom, rz.[Right], rz.StartX, rz.StartY, rz.EndX, rz.EndY, rz.PageNumber, rz.Height "
-	"FROM AttributeSetForFile asff "
-	"LEFT JOIN AttributeSetName asn ON asff.AttributeSetNameID=asn.ID "
-	"JOIN Attribute attr ON asff.ID=attr.AttributeSetForFileID "
-	"JOIN AttributeName attrN ON attr.AttributeNameID=attrN.ID "
-	"JOIN AttributeInstanceType ait ON ait.AttributeID=attr.ID "
-	"JOIN AttributeType attrT ON ait.AttributeTypeID=attrT.ID "
-	"LEFT JOIN RasterZone rz ON rz.AttributeID=attr.ID "
-	"WHERE asff.FileID=@fileID ORDER BY attr.ID DESC; ";
+// version 2 update- add a binary column to AttributeSetForFile, to store the complete spatial string for the document.
+static const std::string gstrADD_ATTRIBUTE_SET_FOR_FILE_VOA_COLUMN = 
+	"ALTER TABLE [dbo].[AttributeSetForFile] ADD [VOA] [varbinary](max) NULL";
 	

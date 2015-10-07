@@ -121,7 +121,6 @@ private:
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
 
-
 	//////////////
 	// Methods
 	//////////////
@@ -140,6 +139,15 @@ private:
 
 	// Retrieves a map of each DBInfo value the component uses and its default value.
 	std::map<std::string, std::string> getDBInfoDefaultValues();
+
+	// This method sets the VOA field in the AttributeSetForFile table.
+	void SaveVoaDataInASFF( IIUnknownVector* pAttributes, long long rootASFF_ID );
+
+	// This method performs the insert of Attribute rows, handling
+	// both parent (top-level, or root) and child attributes.
+	long long SaveAttribute( IAttributePtr ipAttribute, 
+							 VARIANT_BOOL storeRasterZone,
+							 const std::string& insert );
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(AttributeDBMgr), CAttributeDBMgr)

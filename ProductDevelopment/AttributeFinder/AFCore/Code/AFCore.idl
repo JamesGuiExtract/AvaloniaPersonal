@@ -90,6 +90,7 @@ library UCLID_AFCORELib
 		// Gets the size of this attribute (1 + sum of size of each subattribute)
 		[id(11), helpstring("method GetAttributeSize")]
 			HRESULT GetAttributeSize([out, retval] long* plAttributeSize);
+		[id(12), helpstring("method SetGUID")] HRESULT SetGUID( const GUID* pGuid );
 	};
 	[
 		object,

@@ -71,7 +71,8 @@ public:
 	STDMETHOD(get_DataObject)(/*[out, retval]*/ IUnknown **pVal);
 	STDMETHOD(put_DataObject)(/*[in]*/ IUnknown* newVal);
 	STDMETHOD(GetAttributeSize)(long* plAttributeSize);
-
+	STDMETHOD(SetGUID)(const GUID* pGuid);
+	
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown ** pObject);
 	STDMETHOD(raw_CopyFrom)(IUnknown * pObject);

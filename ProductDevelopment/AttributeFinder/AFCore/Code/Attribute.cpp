@@ -1370,6 +1370,22 @@ STDMETHODIMP CAttribute::get_InstanceGUID(GUID *pVal)
 }
 
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttribute::SetGUID(const GUID* pGuid)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		setGUID( *pGuid );
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38460")
+}
+
+//-------------------------------------------------------------------------------------------------
 // ICloneIdentifiableObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttribute::raw_CloneIdentifiableObject(IUnknown ** pObject)

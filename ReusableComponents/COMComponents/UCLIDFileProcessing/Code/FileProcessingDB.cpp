@@ -1836,7 +1836,7 @@ STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnReco
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP 
-CFileProcessingDB::ExecuteInsertReturnLongLongResult( BSTR bstrQuery, 
+CFileProcessingDB::ExecuteCommandReturnLongLongResult( BSTR bstrQuery, 
 													  BSTR bstrResultColumnName,
 													  long long* pResult,
 													  long* pnRecordsAffected )
@@ -3505,7 +3505,37 @@ STDMETHODIMP CFileProcessingDB::RecordFileTaskSession(BSTR bstrTaskClassGuid, lo
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38639");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileNameFromFileID( long fileID, BSTR* pbstrFileName )
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
+	try
+	{
+		std::string query = Util::Format( "SELECT [FileName] FROM [dbo].[FAMFile] "
+										  "WHERE [ID]=%d;", 
+										  fileID );
+
+		ADODB::_RecordsetPtr ipRecords = getThisAsCOMPtr()->GetResultsForQuery( query.c_str() );
+		ASSERT_RUNTIME_CONDITION( "ELI38704", 
+								  VARIANT_FALSE == ipRecords->adoEOF, 
+								  Util::Format("No filename found for fileID: %d", 
+											   fileID).c_str() );
+
+		FieldsPtr ipFields = ipRecords->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI38622", ipFields != nullptr);
+
+		std::string filename = getStringField( ipFields, "FileName" );
+		ASSERT_RUNTIME_CONDITION( "ELI38705", 
+								  !filename.empty(), 
+								  Util::Format("Empty filename found for FileID: %d", 
+											   fileID).c_str() );
+
+		*pbstrFileName = get_bstr_t(filename.c_str()).Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38703");	
+}
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
 //-------------------------------------------------------------------------------------------------

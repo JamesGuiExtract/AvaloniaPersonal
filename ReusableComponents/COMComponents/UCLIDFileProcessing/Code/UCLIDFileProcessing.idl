@@ -1642,8 +1642,11 @@ library UCLID_FILEPROCESSINGLib
 		// AND a long long value of a named column.
 		//			(NOTE: This query should not return any results i.e. a SELECT query, meant for insert
 		//			 where a single value is returned typically using OUTPUT INSERTED.ID)
-		[id(146), helpstring("method ExecuteInsertReturnLongLongResult")] HRESULT ExecuteInsertReturnLongLongResult(
+		[id(146), helpstring("method ExecuteCommandReturnLongLongResult")] HRESULT ExecuteCommandReturnLongLongResult(
 			[in] BSTR bstrQuery, [in] BSTR bstrResultColumnName, [out] long long* pResult, [out, retval] long* pnRecordsAffected);
+
+		[id(147), helpstring("method GetFileNameFromFileID")]
+		HRESULT GetFileNameFromFileID( [in] long fileID, [out, retval] BSTR* pbstrFileName );
 	};
 
 	[

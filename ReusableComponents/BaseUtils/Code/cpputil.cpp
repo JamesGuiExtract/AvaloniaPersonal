@@ -1384,4 +1384,25 @@ void shellOpenDocument(const string& strFilename)
 	WaitForSingleObject(pThread->m_hThread, INFINITE);
 }
 //-------------------------------------------------------------------------------------------------
+namespace Util
+{
+	namespace Internal
+	{
+		const size_t Size = 1024 * 8;
+	}
 
+	// Utility function that provides string formatting. This function takes a format specifier
+	// string constant (exactly like printf or sprintf does), and a set of 1..N arguments for
+	// the specifier string. Standard printf-style format specifiers are used in the format string.
+	std::string Format( const char* formatString, ... )
+	{
+		std::vector<char> buffer( Internal::Size, '\0' );
+		va_list args;
+		va_start( args, formatString );
+
+		int ret = ::vsnprintf_s( &buffer[0], Internal::Size, Internal::Size, formatString, args );
+		ASSERT_RUNTIME_CONDITION( "ELI38885", ret > 0, "Format caused string truncation" );
+
+		return std::string( &buffer[0] );
+	}
+}

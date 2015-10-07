@@ -84,7 +84,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\APIs\ZLib\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -116,6 +116,7 @@
       <ImportLibrary>.\..\Release/$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <RegisterOutput>true</RegisterOutput>
+      <AdditionalDependencies>Rpcrt4.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -138,7 +139,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\APIs\ZLib\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -169,6 +170,7 @@
       <ImportLibrary>.\..\Debug/$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <RegisterOutput>true</RegisterOutput>
+      <AdditionalDependencies>Rpcrt4.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -251,6 +253,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.vcxproj">
       <Project>{037f8051-5f5f-48c4-9bf3-34aa990aa5de}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcxproj">
+      <Project>{a1474e20-9b5f-4df9-a400-490270bc7999}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\AFCore\Code\AFCore.vcxproj">
       <Project>{83c2c49f-e325-4abf-b4eb-8125ee2dd4fa}</Project>

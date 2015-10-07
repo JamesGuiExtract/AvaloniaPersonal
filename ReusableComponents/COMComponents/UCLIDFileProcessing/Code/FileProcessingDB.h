@@ -202,7 +202,7 @@ public:
 	STDMETHOD(AsPriorityString)(EFilePriority ePriority, BSTR* pbstrPriority);
 	STDMETHOD(AsEFilePriority)(BSTR bstrPriority, EFilePriority* pePriority);
 	STDMETHOD(ExecuteCommandQuery)(BSTR bstrQuery, long* pnRecordsAffected);
-	STDMETHOD(ExecuteInsertReturnLongLongResult)( BSTR bstrQuery, 
+	STDMETHOD(ExecuteCommandReturnLongLongResult)( BSTR bstrQuery, 
 		BSTR bstrResultColumnName, long long* pResult, long* pnRecordsAffected );
 	STDMETHOD(SetPriorityForFiles)(BSTR bstrSelectQuery, EFilePriority eNewPriority,
 		IRandomMathCondition* pRandomCondition, long* pnNumRecordsModified);
@@ -290,6 +290,7 @@ public:
 	STDMETHOD(get_FAMSessionID)(long *pnFAMSessionID);
 	STDMETHOD(RecordFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, double dDuration,
 		double dOverheadTime, long *pnFileTaskSessionID);
+	STDMETHOD(GetFileNameFromFileID)( /*[in]*/ long fileID, /*[out, retval]*/ BSTR* pbstrFileName );
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
