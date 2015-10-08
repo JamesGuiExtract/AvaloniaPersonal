@@ -1422,3 +1422,7 @@ static const string gstrINSERT_FILETASKSESSION_DATA =
 	"  ,[OverheadTime])"
 	"  OUTPUT INSERTED.ID"
 	"  VALUES (<FAMSessionID>, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = '<TaskClassGuid>'), <FileID>, GETDATE(), <Duration>, <OverheadTime>)";
+
+static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES = 
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006', 'Core: Store/Retrieve attributes in DB') \r\n";

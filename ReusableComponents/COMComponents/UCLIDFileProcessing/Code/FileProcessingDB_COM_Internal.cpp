@@ -33,7 +33,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 130;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 131;
 //-------------------------------------------------------------------------------------------------
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -1175,6 +1175,33 @@ int UpdateToSchemaVersion130(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38716");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion131(_ConnectionPtr ipConnection, 
+							 long* pnNumSteps, 
+							 IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 131;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES);
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38716");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -6240,7 +6267,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 127:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion128);
 				case 128:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion129);
 				case 129:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion130);
-				case 130:	break;
+				case 130:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion131);
+				case 131:	break;
 
 				default:
 					{

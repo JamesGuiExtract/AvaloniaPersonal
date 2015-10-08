@@ -678,23 +678,22 @@ namespace
 	}
 
 
-	std::string GetInsertRootASFFStatement( BSTR bstrAttributeSetName, long fileID )
+	std::string GetInsertRootASFFStatement( BSTR bstrAttributeSetName, long fileTaskSessionID )
 	{
 		std::string attributeSetName = SqlSanitizeInput(asString(bstrAttributeSetName));
 
 		std::string insert = 
 			"SET NOCOUNT ON \n"
 			"DECLARE @AttributeSetName_Description AS NVARCHAR(255);\n"
-			"DECLARE @FileID AS INT;\n"
 			"DECLARE @AttributeSetName_ID AS BIGINT;\n"
 			"DECLARE @AttributeSetForFile_ID AS BIGINT;\n"
 			"DECLARE @FileTaskSessionID AS BIGINT;\n"
 			"\n";
 
 		insert += Util::Format( "SELECT @AttributeSetName_Description='%s';\n"
-								"SELECT @FileID=%d;\n",
+								"SELECT @FileTaskSessionID=%d;\n",
 								attributeSetName.c_str(),
-								fileID );
+								fileTaskSessionID );
 		insert += 
 			"\n"
 			"BEGIN TRY\n"
@@ -706,8 +705,6 @@ namespace
 			"		SELECT @AttributeSetName_ID = SCOPE_IDENTITY()\n"
 			"	end\n"
 			"\n"
-			"	SELECT @FileTaskSessionID=(SELECT TOP 1 [ID] from [dbo].[FileTaskSession] \n"
-			"		WHERE [FileID]=@FileID ORDER BY [ID] DESC) \n"
 			"	INSERT INTO [AttributeSetForFile] ([FileTaskSessionID], [AttributeSetNameID])\n"
 			"	OUTPUT INSERTED.ID \n"
 			"	VALUES (@FileTaskSessionID, @AttributeSetName_ID);\n"
@@ -1098,7 +1095,7 @@ long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute,
 	return parentID;
 }
 // ------------------------------------------------------------------------------------------------
-STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileID,
+STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileTaskSessionID,
 														    BSTR bstrAttributeSetName,
 														    IIUnknownVector* pAttributes,
 															VARIANT_BOOL storeRasterZone )
@@ -1108,17 +1105,17 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileID,
 	try
 	{
 		ASSERT_ARGUMENT("ELI38553", pAttributes != nullptr);
-		ASSERT_ARGUMENT("ELI38554", fileID > 0 );
+		ASSERT_ARGUMENT("ELI38554", fileTaskSessionID > 0 );
 
-		Logging::WriteToLog( "%s- starting, fileID: %d, attribute set name: %s, Size: %d",
+		Logging::WriteToLog( "%s- starting, fileTaskSessionID: %d, attribute set name: %s, Size: %d",
 							 __FUNCTION__,
-							 fileID,
+							 fileTaskSessionID,
 							 asString(bstrAttributeSetName).c_str(),
 							 pAttributes->Size() );
 
 		TransactionGuard tg( getDBConnection(), adXactRepeatableRead, nullptr );
 
-		auto insertRootASFF = GetInsertRootASFFStatement( bstrAttributeSetName, fileID );
+		auto insertRootASFF = GetInsertRootASFFStatement( bstrAttributeSetName, fileTaskSessionID );
 		rootASFF_ID = ExecuteRootInsertASFF( insertRootASFF, getDBConnection() );
 		SaveVoaDataInASFF( pAttributes, rootASFF_ID );
 

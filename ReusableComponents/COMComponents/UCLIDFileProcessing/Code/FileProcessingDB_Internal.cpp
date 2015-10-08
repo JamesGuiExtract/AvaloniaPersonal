@@ -1507,6 +1507,8 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
 			"VALUES('R', 'File was renamed')");
 
+		vecQueries.push_back(gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES);
+
 		// Add the Database ID if needed
 		// The m_strEncryptedDatabaseID value is initialized with the value in the dbinfo table
 		// when a connection is made to the database. So if the value is empty either there was no

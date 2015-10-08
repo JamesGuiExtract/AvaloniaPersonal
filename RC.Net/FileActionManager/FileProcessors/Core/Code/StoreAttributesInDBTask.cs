@@ -75,6 +75,11 @@ namespace Extract.FileActionManager.FileProcessors
         const string _COMPONENT_DESCRIPTION = "Core: Store/Retrieve attributes in DB";
 
         /// <summary>
+        /// The GUID identifying this class
+        /// </summary>
+        static readonly string _CLASS_GUID = typeof(StoreAttributesInDBTask).GUID.ToString();
+
+        /// <summary>
         /// Current task version.
         /// </summary>
         const int _CURRENT_VERSION = 2;
@@ -484,11 +489,17 @@ namespace Extract.FileActionManager.FileProcessors
                                             "VOA filename",
                                             voaFileName);
 
+                    const double unusedDuration = 0.0;
+                    const double unusedOverheadTime = 0.0;
+                    int fileTaskSessionID = pDB.RecordFileTaskSession( _CLASS_GUID,
+                                                                       pFileRecord.FileID,
+                                                                       unusedDuration,
+                                                                       unusedOverheadTime );
                     IUnknownVector voaData = new IUnknownVector();
                     voaData.LoadFrom(voaFileName, false);
                     voaData.ReportMemoryUsage();
 
-                    _attributeDBManager.CreateNewAttributeSetForFile( pFileRecord.FileID,
+                    _attributeDBManager.CreateNewAttributeSetForFile( fileTaskSessionID, 
                                                                       expandedAttrSetName,
                                                                       voaData,
                                                                       StoreRasterZones );
