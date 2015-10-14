@@ -194,7 +194,7 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the <see cref="_ok"/> button.
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="ok"/> button.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
