@@ -39,8 +39,9 @@
             System.Windows.Forms.Label label9;
             System.Windows.Forms.Label label10;
             System.Windows.Forms.Label label11;
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FAMDBCounterManagerForm));
             this._licenseStringTextBox = new System.Windows.Forms.TextBox();
             this._databaseIdTextBox = new System.Windows.Forms.TextBox();
             this._databaseServerTextBox = new System.Windows.Forms.TextBox();
@@ -253,8 +254,8 @@
             // _counterIdColumn
             // 
             this._counterIdColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle5.NullValue = null;
-            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.NullValue = null;
+            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle1;
             this._counterIdColumn.FillWeight = 20F;
             this._counterIdColumn.HeaderText = "ID";
             this._counterIdColumn.Name = "_counterIdColumn";
@@ -290,8 +291,8 @@
             // _counterApplyValueColumn
             // 
             this._counterApplyValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle6.NullValue = null;
-            this._counterApplyValueColumn.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle2.NullValue = null;
+            this._counterApplyValueColumn.DefaultCellStyle = dataGridViewCellStyle2;
             this._counterApplyValueColumn.FillWeight = 55F;
             this._counterApplyValueColumn.HeaderText = "Apply Value";
             this._counterApplyValueColumn.Name = "_counterApplyValueColumn";
@@ -331,6 +332,7 @@
             // _generateCodeButton
             // 
             this._generateCodeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._generateCodeButton.Enabled = false;
             this._generateCodeButton.Location = new System.Drawing.Point(440, 577);
             this._generateCodeButton.Name = "_generateCodeButton";
             this._generateCodeButton.Size = new System.Drawing.Size(125, 23);
@@ -409,6 +411,7 @@
             this.Controls.Add(label2);
             this.Controls.Add(this._licenseStringTextBox);
             this.Controls.Add(label1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(594, 650);
             this.Name = "FAMDBCounterManagerForm";
             this.Text = "FAM DB Counter Manager";

@@ -165,19 +165,47 @@
   <metadata name="_counterApplyValueColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="_counterIdColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="_counterNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="_counterPreviousValueColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="_counterOperationColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="_counterApplyValueColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAEAICAAAAAACACoCAAAFgAAACgAAAAgAAAAQAAAAAEACAAAAAAAAAQAAAAAAAAAAAAAAAEAAAAB
+        AAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAwMDAAMDcwADwyqYABAQEAAgICAAMDAwAERERABYW
+        FgAcHBwAIiIiACkpKQBVVVUATU1NAEJCQgA5OTkAgHz/AFBQ/wCTANYA/+zMAMbW7wDW5+cAkKmtAAAA
+        MwAAAGYAAACZAAAAzAAAMwAAADMzAAAzZgAAM5kAADPMAAAz/wAAZgAAAGYzAABmZgAAZpkAAGbMAABm
+        /wAAmQAAAJkzAACZZgAAmZkAAJnMAACZ/wAAzAAAAMwzAADMZgAAzJkAAMzMAADM/wAA/2YAAP+ZAAD/
+        zAAzAAAAMwAzADMAZgAzAJkAMwDMADMA/wAzMwAAMzMzADMzZgAzM5kAMzPMADMz/wAzZgAAM2YzADNm
+        ZgAzZpkAM2bMADNm/wAzmQAAM5kzADOZZgAzmZkAM5nMADOZ/wAzzAAAM8wzADPMZgAzzJkAM8zMADPM
+        /wAz/zMAM/9mADP/mQAz/8wAM///AGYAAABmADMAZgBmAGYAmQBmAMwAZgD/AGYzAABmMzMAZjNmAGYz
+        mQBmM8wAZjP/AGZmAABmZjMAZmZmAGZmmQBmZswAZpkAAGaZMwBmmWYAZpmZAGaZzABmmf8AZswAAGbM
+        MwBmzJkAZszMAGbM/wBm/wAAZv8zAGb/mQBm/8wAzAD/AP8AzACZmQAAmTOZAJkAmQCZAMwAmQAAAJkz
+        MwCZAGYAmTPMAJkA/wCZZgAAmWYzAJkzZgCZZpkAmWbMAJkz/wCZmTMAmZlmAJmZmQCZmcwAmZn/AJnM
+        AACZzDMAZsxmAJnMmQCZzMwAmcz/AJn/AACZ/zMAmcxmAJn/mQCZ/8wAmf//AMwAAACZADMAzABmAMwA
+        mQDMAMwAmTMAAMwzMwDMM2YAzDOZAMwzzADMM/8AzGYAAMxmMwCZZmYAzGaZAMxmzACZZv8AzJkAAMyZ
+        MwDMmWYAzJmZAMyZzADMmf8AzMwAAMzMMwDMzGYAzMyZAMzMzADMzP8AzP8AAMz/MwCZ/2YAzP+ZAMz/
+        zADM//8AzAAzAP8AZgD/AJkAzDMAAP8zMwD/M2YA/zOZAP8zzAD/M/8A/2YAAP9mMwDMZmYA/2aZAP9m
+        zADMZv8A/5kAAP+ZMwD/mWYA/5mZAP+ZzAD/mf8A/8wAAP/MMwD/zGYA/8yZAP/MzAD/zP8A//8zAMz/
+        ZgD//5kA///MAGZm/wBm/2YAZv//AP9mZgD/Zv8A//9mACEApQBfX18Ad3d3AIaGhgCWlpYAy8vLALKy
+        sgDX19cA3d3dAOPj4wDq6uoA8fHxAPj4+ADw+/8ApKCgAICAgAAAAP8AAP8AAAD//wD/AAAA/wD/AP//
+        AAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoKCnNzS0tLS0tLS3NzCgoK
+        CgoKCgoKCgoKCgoKCgoKCm5ubnSZmXp6WFJSS0tLS0sKCgoKCgoKCgoKCgoKCnNuUll6mqCgmnpZWTIx
+        MTFSS0oKCgoKCgoKCgoKCgoKc1JZWXqaoKCaellZMjExCgoKIgoKCgoKCgoKCgoKCgpzMllZepqgoJp6
+        WVkyMQoKMCoKIgoKCgoKCgoKCgoKCnMyWVl6mqCgmnpZWTIxCjcioCoKIgoKCgoKCgoKCgoKczJZWXqa
+        oKCaellZMjEK+zcioCoKIgoKCgoKCgoKCgpzMllZepqgoJp6WVkyMgoK+zcioCoKIgoKCgoKCgoKCnMy
+        WVl6mqCgmnpZWTIxMQoiCjcioCoKIiIjIiMpCgoKczJZWXqaoKCaellZMjExMQoi+zcioCoKCgoKCgop
+        CgpzMllZepqgoJp6WVkyMjExCgMqCvsi5Sr7Kvv7UQopCnMyWVl6mqCgmnpZWTIxMTExCgoKCvsqoCL7
+        WFjlUQopczJZWXqaoKCaellZMjIxMTExSgoKKqAj+1gjWFjlCilzMllZepqgoJp6WVkyMjExMTFKCgr7
+        IvtYIuXl+/sKKXMyWVl6mqCgmnpZWTIxMTExMUoKCiqgWCIqCgoq+wopczJZWXqaoKCaellZMjExMTEx
+        Sgoi5Vgj5QoD/wrlCilzMllZepqgoJp6WVkyMjExMTFKCiKgWPv7CgMKWPsiKnMyWVl6mqCgmnpZWTIx
+        MTExMUsKKlGg5eUDClj7IioKczJZWXqaoKCaellZMjIxMTExSwoKKlGgoKCgoCIqCgpzMllZepqgoJp6
+        WVkyMTExMTFLCgoKKikqKSopKgoKCnMyWVl6mqCgmnpZWTIyMTExMUsKCgoKCgoKCgoKCgoKczJZeqDD
+        w8PDw8OgmnpZMTExSwoKCgoKCgoKCgoKCgpzeprDw8PDw8PDw8PDw8PDejFLCgoKCgoKCgoKCgoKChwa
+        w8PDw8PDw8PDw8PDw8PDmXMKCgoKCgoKCgoKCgoKCnMcmZkaw8PDw8PDwxqZHEtLCgoKCgoKCgoKCgoK
+        CgoKCgpzc3Nzc3Nzc25ubm5uCgoKCgoKCgoKCgoKCgoKCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAP////////////////AB///AAD//AAAf/wAAH/8AAA//AAAH/wAAA/8AAAH/AAAABwAA
+        AAMAAAABAAAAAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAQAAGAMAABwHAAAf/wAAH/8AAB//AAAf/4AA
+        P//gAP//////////////////
+</value>
+  </data>
 </root>

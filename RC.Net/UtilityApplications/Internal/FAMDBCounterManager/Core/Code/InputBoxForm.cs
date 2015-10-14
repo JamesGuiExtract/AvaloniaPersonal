@@ -1,15 +1,17 @@
 // InputBox - Based on implementation by: Andrew Ma
 // URL: http://www.devhood.com/Tools/tool_details.aspx?tool_id=295
 
-using Extract.Licensing;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Extract.Utilities.Forms
+namespace Extract.FAMDBCounterManager
 {
     /// <summary>
     /// Summary description for InputBoxForm.
+    /// <para><b>Note</b></para>
+    /// This class is a modified copy of Extract.Utilities.Forms.InputBoxForm. This project is not
+    /// linked to Extract.Utilities.Forms to avoid COM dependencies.
     /// </summary>
     internal class InputBoxForm : Form
     {
@@ -60,16 +62,9 @@ namespace Extract.Utilities.Forms
         /// </summary>
         internal InputBoxForm()
         {
-            try
-            {
-                // Required for Windows Form Designer support
-                InitializeComponent();
-                returnValue = "";
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI23146", ex);
-            }
+            // Required for Windows Form Designer support
+            InitializeComponent();
+            returnValue = "";
         }
 
         #endregion Constructors
@@ -165,9 +160,9 @@ namespace Extract.Utilities.Forms
             PerformLayout();
         }
 
-        #endregion
+        #endregion Windows Form Designer generated code
 
-        #region event handlers
+        #region Event Handlers
 
         /// <summary>
         /// Called during <see cref="Form.Load"/> to set the startup position
@@ -189,7 +184,7 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38948");
+                ex.ShowMessageBox();
             }
         }
 
@@ -197,7 +192,7 @@ namespace Extract.Utilities.Forms
         /// Handles the <see cref="Control.Click"/> event of the <see cref="_ok"/> button.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         void ok_Click(object sender, EventArgs e)
         {
             try
@@ -210,11 +205,11 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38949");
+                ex.ShowMessageBox();
             }
         }
 
-        #endregion event handlers
+        #endregion Event Handlers
 
         /// <summary>
         /// Sets the title for the input box.

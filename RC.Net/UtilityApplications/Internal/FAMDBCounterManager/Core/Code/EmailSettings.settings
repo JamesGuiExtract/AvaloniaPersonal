@@ -1,0 +1,53 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Extract.FAMDBCounterManager" GeneratedClassName="EmailSettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Server" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Port" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">25</Value>
+    </Setting>
+    <Setting Name="UserName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Password" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SenderName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Extract Licensing</Value>
+    </Setting>
+    <Setting Name="SenderAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">flex-license@extractsystems.com</Value>
+    </Setting>
+    <Setting Name="Timeout" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="UseSsl" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ReadonlyBodyTemplate" Type="System.String" Scope="User">
+      <Value Profile="(Default)">The counter update code below is for the database:
+&lt;DatabaseServer&gt;/&lt;DatabaseName&gt;
+ID = &lt;DatabaseID&gt;
+
+This code will apply the following changes to the database's counters:
+&lt;Description&gt;
+
+To apply update:
+1) Open the FAMDBAdmin utility
+2) Select menu options Tools | Counters | Apply code...
+3) Copy the code below and paste it into the Apply code dialog.
+
+&lt;Code&gt;</Value>
+    </Setting>
+    <Setting Name="SubjectTemplate" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Extract Systems counter update code for &lt;Customer&gt;</Value>
+    </Setting>
+    <Setting Name="EditableBodyTemplate" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Dear &lt;Customer&gt;,
+
+&lt;Comment&gt;</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

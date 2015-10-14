@@ -1,8 +1,4 @@
-﻿using Extract.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 
 namespace Extract.FAMDBCounterManager
 {
@@ -21,8 +17,8 @@ namespace Extract.FAMDBCounterManager
     }
 
     /// <summary>
-    /// Represents a FAM DB secure counter, (existing or to be created), and information about any
-    /// operation to execute on the counter.
+    /// Represents a FAM DB secure counter (either existing or to be created), and information about
+    /// any operation to execute on the counter.
     /// </summary>
     internal class CounterData
     {
@@ -53,7 +49,7 @@ namespace Extract.FAMDBCounterManager
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38875");
+                ex.ShowMessageBox();
             }
         }
 
@@ -63,16 +59,10 @@ namespace Extract.FAMDBCounterManager
         /// </summary>
         public CounterData()
         {
-            try
-            {
-                UserAdded = true;
-                Operation = CounterOperation.Create;
-                ApplyValue = 0;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38877");
-            }
+            // If this instance is not being initialized with an ID, it must be a new counter.
+            UserAdded = true;
+            Operation = CounterOperation.Create;
+            ApplyValue = 0;
         }
 
         /// <summary>
@@ -83,16 +73,10 @@ namespace Extract.FAMDBCounterManager
         /// <param name="id">The ID of the counter.</param>
         public CounterData(int id)
         {
-            try
-            {
-                UserAdded = false;
-                ID = id;
-                Operation = CounterOperation.None;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38878");
-            }
+            // If this instance is not being initialized with an ID, it is not a new counter.
+            UserAdded = false;
+            ID = id;
+            Operation = CounterOperation.None;
         }
 
         #endregion Constructors
@@ -127,12 +111,10 @@ namespace Extract.FAMDBCounterManager
 
             set
             {
-                if (value.HasValue && value > 4 && value < 100)
-                {
-                    throw new ExtractException("ELI38876",
-                        "Counter values < 100 are reserved for standard counters.");
-                }
-                else if (value.HasValue)
+                UtilityMethods.Assert(!value.HasValue || value <= 4 || value >= 100,
+                    "Counter values < 100 are reserved for standard counters");
+
+                if (value.HasValue)
                 {
                     string standardName;
                     if (FAMDBCounterManagerForm._standardCounterNames.TryGetValue(value.Value, out standardName))

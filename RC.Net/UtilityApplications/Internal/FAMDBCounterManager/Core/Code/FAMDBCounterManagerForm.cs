@@ -1,19 +1,60 @@
-﻿using Extract.Licensing;
-using Extract.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Text;
 
 namespace Extract.FAMDBCounterManager
 {
     /// <summary>
+    /// Provides information about operations to be performed on FAM DB secure counters.
+    /// </summary>
+    internal struct CounterOperationInfo
+    {
+        public string Customer;
+        public string Comment;
+        public string Description;
+        public string Code;
+    }
+
+    /// <summary>
+    /// Represents FAM database info pertaining to secure counters.
+    /// </summary>
+    internal struct DatabaseInfo
+    {
+        public Guid DatabaseID;
+        public string DatabaseServer;
+        public string DatabaseName;
+        public DateTime CreationTime;
+        public DateTime RestoreTime;
+        public DateTime LastCounterUpdateTime;
+        public DateTime DateTimeStamp;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseInfo"/> struct from the
+        /// provided data.
+        /// </summary>
+        /// <param name="licenseData">The <see cref="ByteArrayManipulator"/> containing the data
+        /// encoding in a license string.</param>
+        public DatabaseInfo(ByteArrayManipulator licenseData)
+        {
+            DatabaseID = licenseData.ReadGuid();
+            DatabaseServer = licenseData.ReadString();
+            DatabaseName = licenseData.ReadString();
+            CreationTime = licenseData.ReadCTimeAsDateTime();
+            RestoreTime = licenseData.ReadCTimeAsDateTime();
+            LastCounterUpdateTime = licenseData.ReadCTimeAsDateTime();
+            DateTimeStamp = licenseData.ReadCTimeAsDateTime();
+        }
+    }
+
+    /// <summary>
     /// Allows for generation of FAM DB counter update codes.
     /// </summary>
-    internal partial class FAMDBCounterManagerForm : Form
+    internal partial class FAMDBCounterManagerForm : Form, IMessageFilter
     {
         #region Constants
 
@@ -42,48 +83,6 @@ namespace Extract.FAMDBCounterManager
 
         #endregion Constants
 
-        #region DatabaseInfo
-
-        /// <summary>
-        /// Represent counter related info for FAM DB secure counters.
-        /// </summary>
-        internal struct DatabaseInfo
-        {
-            public Guid DatabaseID;
-            public string DatabaseServer;
-            public string DatabaseName;
-            public DateTime CreationTime;
-            public DateTime RestoreTime;
-            public DateTime LastCounterUpdateTime;
-            public DateTime DateTimeStamp;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DatabaseInfo"/> struct from the
-            /// provided data.
-            /// </summary>
-            /// <param name="licenseData">The <see cref="ByteArrayManipulator"/> containing the data
-            /// encoding in a license string.</param>
-            public DatabaseInfo(ByteArrayManipulator licenseData)
-            {
-                try
-                {
-                    DatabaseID = licenseData.ReadGuid();
-                    DatabaseServer = licenseData.ReadString();
-                    DatabaseName = licenseData.ReadString();
-                    CreationTime = licenseData.ReadCTimeAsDateTime();
-                    RestoreTime = licenseData.ReadCTimeAsDateTime();
-                    LastCounterUpdateTime = licenseData.ReadCTimeAsDateTime();
-                    DateTimeStamp = licenseData.ReadCTimeAsDateTime();
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI38880");
-                }
-            }
-        }
-
-        #endregion DatabaseInfo
-
         #region Fields
 
         /// <summary>
@@ -106,19 +105,7 @@ namespace Extract.FAMDBCounterManager
         /// </summary>
         public FAMDBCounterManagerForm()
         {
-            try
-            {
-                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI38856", "FAM DB Counter Manger");
-
-                InitializeComponent();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38857");
-            }
+            InitializeComponent();
         }
 
         #endregion Constructors
@@ -126,53 +113,66 @@ namespace Extract.FAMDBCounterManager
         #region Overrides
 
         /// <summary>
-        /// THE METHOD GENERATES CODES FOR TESTING PURPOSES ONLY AND SHOULD BE REMOVED BEFORE RELEASE.
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Load"/> event.
         /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
-        /// </param>
-        protected override void OnDoubleClick(EventArgs e)
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        protected override void OnLoad(EventArgs e)
         {
             try
             {
-                base.OnDoubleClick(e);
+                base.OnLoad(e);
 
-                var liceneData = new ByteArrayManipulator();
-                liceneData.Write(Guid.Parse("9DCEEBE6-8F10-4823-8440-83DB223A3FE5"));
-                liceneData.Write("HAWKEYE");
-                liceneData.Write("Demo_LabDE");
-                liceneData.WriteAsCTime(DateTime.Now - new TimeSpan(365, 0, 0, 0));
-                liceneData.WriteAsCTime(DateTime.Now - new TimeSpan(30, 0, 0, 0));
-                liceneData.WriteAsCTime(new DateTime(0));
-                liceneData.WriteAsCTime(DateTime.Now);
-                liceneData.Write((int)1);
-                liceneData.Write((int)1);
-                liceneData.Write((int)123000);
-//                liceneData.Write((int)101);
-//                liceneData.Write("Custom ID Shield Counter 1");
-//                liceneData.Write((int)0);
-//                liceneData.Write((int)102);
-//                liceneData.Write("Custom ID Shield Counter 2");
-//                liceneData.Write((int)9234000);
-//                liceneData.Write((int)103);
-//                liceneData.Write("Custom ID Shield Counter 3");
-//                liceneData.Write((int)1000);
-//                liceneData.Write((int)104);
-//                liceneData.Write("Custom ID Shield Counter 4");
-//                liceneData.Write((int)2000);
-
-                var encryptedData = NativeMethods.EncryptDecryptBytes(liceneData.GetBytes(8), true);
-                string code = encryptedData.ToHexString();
-
-                Clipboard.SetText(code);
-                UtilityMethods.ShowMessageBox(code, "Code", false);
+                Application.AddMessageFilter(this);
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38858");
+                ex.ShowMessageBox();
             }
         }
 
         #endregion Overrides
+
+        #region IMessageFilter Members
+
+        /// <summary>
+        /// Filters out a message before it is dispatched.
+        /// </summary>
+        /// <param name="m">The message to be dispatched. You cannot modify this message.</param>
+        /// <returns>
+        /// true to filter the message and stop it from being dispatched; false to allow the message
+        /// to continue to the next filter or control.
+        /// </returns>
+        public bool PreFilterMessage(ref Message m)
+        {
+            try
+            {
+                // Override DataGridView shortcut to select whole row when shift-space is entered so
+                // that a literal space is added to the active cell. Avoids annoyance where having
+                // the shift key down in anticipation of a capital letter causing selection change
+                // rather than adding a space.
+                if (m.Msg == 0x100 && m.WParam == (IntPtr)Keys.Space &&
+                        Control.ModifierKeys.HasFlag(Keys.Shift))
+                {
+                    var textBox = _counterDataGridView.EditingControl as TextBoxBase;
+                    if (textBox != null)
+                    {
+                        int pos = textBox.SelectionStart;
+                        textBox.Text = textBox.Text.Insert(pos, " ");
+                        textBox.SelectionStart = pos + 1;
+                        textBox.SelectionLength = 0;
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ShowMessageBox();
+            }
+
+            return false;
+        }
+
+        #endregion IMessageFilter Members
 
         #region Event Handlers
 
@@ -196,7 +196,7 @@ namespace Extract.FAMDBCounterManager
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38859");
+                ex.ShowMessageBox();
             }
         }
 
@@ -245,14 +245,13 @@ namespace Extract.FAMDBCounterManager
                             break;
 
                         default:
-                            ExtractException.ThrowLogicException("ELI38881");
-                            break;
+                            throw new Exception("Internal logic error");
                     }
                 }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38861");
+                ex.ShowMessageBox();
             }
         }
 
@@ -266,7 +265,7 @@ namespace Extract.FAMDBCounterManager
         void HandleCounterDataGridView_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
         {
             try 
-	        {	        
+	        {
                 // Apply the value entered into the specified cell into _counterData.
 		        var row = _counterDataGridView.Rows[e.RowIndex];
                 CounterData counter = null;
@@ -277,13 +276,12 @@ namespace Extract.FAMDBCounterManager
                     switch ((CounterGridColumn)e.ColumnIndex)
                     {
                         case CounterGridColumn.ID:
-                            int? counterID = ParseInteger(stringValue, false);
+                            int? counterID = stringValue.ParseInteger(false);
                             if (counterID.HasValue && _counterData.Values
                                 .Except(new[] { counter })
                                 .Any(other => counterID.Value == other.ID))
                             {
-                                throw new ExtractException("ELI38862",
-                                    "Cannot use the same ID as an existing counter.");
+                                throw new Exception("Cannot use the same ID as an existing counter.");
                             }
                             counter.ID = counterID;
                             break;
@@ -292,24 +290,21 @@ namespace Extract.FAMDBCounterManager
                             if (!stringValue.EndsWith("(By Document)", StringComparison.OrdinalIgnoreCase) &&
                                 !stringValue.EndsWith("(By Page)", StringComparison.OrdinalIgnoreCase))
                             {
-                                throw new ExtractException("ELI38863",
-                                    "Counter name must end with \"(By Document)\" or \"(By Page)\"");
+                                throw new Exception("Counter name must end with \"(By Document)\" or \"(By Page)\".");
                             }
                             if (_counterData.Values
                                 .Except(new[] { counter })
                                 .Any(other => 
                                     stringValue.Equals(other.Name, StringComparison.OrdinalIgnoreCase)))
                             {
-                                throw new ExtractException("ELI38864",
-                                    "Cannot use the same name as an existing counter.");
+                                throw new Exception("Cannot use the same name as an existing counter.");
                             }
                             if (_standardCounterNames
                                     .Values
                                     .Any(standardName =>
                                         standardName.Equals(stringValue, StringComparison.OrdinalIgnoreCase)))
                             {
-                                throw new ExtractException("ELI38865",
-                                    "Cannot use a standard counter name for a custom counter.");
+                                throw new Exception("Cannot use a standard counter name for a custom counter.");
                             }
 
                             counter.Name = stringValue;
@@ -334,7 +329,7 @@ namespace Extract.FAMDBCounterManager
                             break;
 
                         case CounterGridColumn.ApplyValue:
-                            counter.ApplyValue = ParseInteger(stringValue, true);
+                            counter.ApplyValue = stringValue.ParseInteger(true);
                             if (counter.ApplyValue == null &&
                                 counter.Operation != CounterOperation.Delete)
                             {
@@ -343,14 +338,13 @@ namespace Extract.FAMDBCounterManager
                             break;
 
                         default:
-                            ExtractException.ThrowLogicException("ELI38882");
-                            break;
+                            throw new Exception("Internal logic error.");
                     }
                 }
 	        }
 	        catch (Exception ex)
 	        {
-		        ex.ExtractDisplay("ELI38866");
+                ex.ShowMessageBox();
 	        }
         }
 
@@ -375,7 +369,7 @@ namespace Extract.FAMDBCounterManager
 	        }
 	        catch (Exception ex)
 	        {
-		        ex.ExtractDisplay("ELI38867");
+                ex.ShowMessageBox();
 	        }
         }
 
@@ -407,13 +401,13 @@ namespace Extract.FAMDBCounterManager
                     {
                         // User should not have been allowed to edit the operation for a new
                         // counter. (The operation must be "Create").
-                        ExtractException.ThrowLogicException("ELI38868");
+                        throw new Exception("Internal logic error");
                     }
                 }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38869");
+                ex.ShowMessageBox();
             }
         }
 
@@ -453,7 +447,7 @@ namespace Extract.FAMDBCounterManager
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38870");
+                ex.ShowMessageBox();
             }
         }
 
@@ -483,7 +477,7 @@ namespace Extract.FAMDBCounterManager
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38871");
+                ex.ShowMessageBox();
             }
         }
 
@@ -514,8 +508,13 @@ namespace Extract.FAMDBCounterManager
 
                     // Write the data for the counters to update.
                     licenseData.Write(counterUpdates.Count());
+
+                    var description = new StringBuilder();
                     foreach (var counter in counterUpdates)
                     {
+                        description.Append(string.Format(CultureInfo.CurrentCulture,
+                            "- {0} counter \"{1}\"", counter.Operation.ToReadableValue(), counter.Name));
+
                         licenseData.Write(counter.ID.Value);
                         // Counter name does not need to be included for standard counters.
                         if (counter.ID >= 100)
@@ -527,20 +526,38 @@ namespace Extract.FAMDBCounterManager
                         if (counter.Operation != CounterOperation.Delete)
                         {
                             licenseData.Write(counter.ApplyValue.Value);
+
+                            description.Append(string.Format(CultureInfo.CurrentCulture,
+                                " {0} {1:n0} counts", 
+                                (counter.Operation == CounterOperation.Create)
+                                    ? "with"
+                                    : (counter.Operation == CounterOperation.Set)
+                                        ? "to"
+                                        : "by",
+                                counter.ApplyValue.Value));
                         }
+
+                        description.AppendLine(".");
                     }
 
                     var encryptedData = NativeMethods.EncryptDecryptBytes(licenseData.GetBytes(8), true);
                     string code = encryptedData.ToHexString();
 
-                    // TODO: Create a license email using this code.
-                    Clipboard.SetText(code);
-                    UtilityMethods.ShowMessageBox(code, "Code", false);
+                    using (var emailForm = new EmailForm(_dbInfo, new CounterOperationInfo
+                        {
+                            Customer = _customerNameTextBox.Text,
+                            Comment = _commentsTextBox.Text.Trim(),
+                            Description = description.ToString().Trim(),
+                            Code = code
+                        }))
+                    {
+                        emailForm.ShowDialog(this);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI38872");
+                ex.ShowMessageBox();
             }
         }
 
@@ -559,7 +576,7 @@ namespace Extract.FAMDBCounterManager
         {
             try
             {
-                var licenseBytes = StringMethods.ConvertHexStringToBytes(licenseString);
+                byte[] licenseBytes = licenseString.HexStringToBytes();
                 var decryptedBytes = NativeMethods.EncryptDecryptBytes(licenseBytes, false);
 
                 // Retrieve the general information about the FAM DB.
@@ -568,13 +585,21 @@ namespace Extract.FAMDBCounterManager
                 _databaseIdTextBox.Text = _dbInfo.DatabaseID.ToString().ToUpperInvariant();
                 _databaseServerTextBox.Text = _dbInfo.DatabaseServer;
                 _databaseNameTextBox.Text = _dbInfo.DatabaseName;
-                _databaseCreationTextBox.Text = ToString(_dbInfo.CreationTime);
-                _databaseRestoreTextBox.Text = ToString(_dbInfo.RestoreTime);
-                _lastCounterUpdateTextBox.Text = ToString(_dbInfo.LastCounterUpdateTime);
-                _dateTimeStampTextBox.Text = ToString(_dbInfo.DateTimeStamp);
+                _databaseCreationTextBox.Text = _dbInfo.CreationTime.DateTimeToString();
+                _databaseRestoreTextBox.Text = _dbInfo.RestoreTime.DateTimeToString();
+                _lastCounterUpdateTextBox.Text = _dbInfo.LastCounterUpdateTime.DateTimeToString();
+                _dateTimeStampTextBox.Text = _dbInfo.DateTimeStamp.DateTimeToString();
 
                 // Retrieve info about the database's existing secure counters.
                 _counterDataGridView.Rows.Clear();
+                // Remove all _counterData entries no longer in the table. Note that the entry for
+                // the new row may remain despite the clear.
+                var removedRows = _counterData.Keys.Where(row => row.DataGridView == null).ToArray();
+                foreach (DataGridViewRow row in removedRows)
+                {
+                    _counterData.Remove(row);
+                }
+
                 int counterCount = licenseData.ReadInt32();
                 for (int i = 0; i < counterCount; i++)
                 {
@@ -611,6 +636,13 @@ namespace Extract.FAMDBCounterManager
                 _databaseRestoreTextBox.Text = "";
                 _dateTimeStampTextBox.Text = "";
                 _counterDataGridView.Rows.Clear();
+                // Remove all _counterData entries no longer in the table. Note that the entry for
+                // the new row may remain despite the clear.
+                var removedRows = _counterData.Keys.Where(row => row.DataGridView == null).ToArray();
+                foreach (DataGridViewRow row in removedRows)
+                {
+                    _counterData.Remove(row);
+                }
 
                 _customerNameTextBox.Enabled = false;
                 _counterDataGridView.Enabled = false;
@@ -637,36 +669,32 @@ namespace Extract.FAMDBCounterManager
             if (string.IsNullOrWhiteSpace(_customerNameTextBox.Text))
             {
                 _customerNameTextBox.Focus();
-                MessageBox.Show("Please specify the customer.",
-                    "Missing customer", MessageBoxButtons.OK, MessageBoxIcon.None,
-                    MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("Please specify the customer.",
+                    "Missing customer", true);
                 return false;
             }
 
             if (!configuredCounters.Any(counter => counter.Operation != CounterOperation.None))
             {
                 _counterDataGridView.Focus();
-                MessageBox.Show("You have not specified any operations.",
-                    "No operations defined", MessageBoxButtons.OK, MessageBoxIcon.None,
-                    MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("You have not specified any operations.",
+                    "No operations defined", true);
                 return false;
             }
 
             if (configuredCounters.Any(counter => !counter.ID.HasValue))
             {
                 _counterDataGridView.Focus();
-                MessageBox.Show("Please specify an ID for all counters.",
-                    "Missing ID", MessageBoxButtons.OK, MessageBoxIcon.None,
-                    MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("Please specify an ID for all counters.",
+                    "Missing ID", true);
                 return false;
             }
 
             if (configuredCounters.Any(counter => string.IsNullOrWhiteSpace(counter.Name)))
             {
                 _counterDataGridView.Focus();
-                MessageBox.Show("Please specify a name for all counters.",
-                    "Missing name", MessageBoxButtons.OK, MessageBoxIcon.None,
-                    MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("Please specify a name for all counters.",
+                    "Missing name", false);
                 return false;
             }
 
@@ -680,8 +708,7 @@ namespace Extract.FAMDBCounterManager
                     string message = string.Format(CultureInfo.CurrentCulture,
                         "Need a non-zero value to {0} counter \"{1}\".",
                         counter.Operation.ToReadableValue().ToLowerInvariant(), counter.Name);
-                    MessageBox.Show(message, "Apply value missing", MessageBoxButtons.OK,
-                        MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    UtilityMethods.ShowMessageBox(message, "Apply value missing", true);
                     return false;
                 }
 
@@ -692,58 +719,12 @@ namespace Extract.FAMDBCounterManager
                     string message = string.Format(CultureInfo.CurrentCulture,
                         "Cannot decrement more counts from \"{0}\" than it currently has.",
                         counter.Name);
-                    MessageBox.Show(message, "Invalid decrement count.", MessageBoxButtons.OK,
-                        MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    UtilityMethods.ShowMessageBox(message, "Invalid decrement count.", true);
                     return false;
                 }
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Returns a <see cref="System.String"/> that represents the <see paramref="dateTime"/>.
-        /// </summary>
-        /// <param name="dateTime">The date time.</param>
-        /// <returns>
-        /// A <see cref="System.String"/> that represents this instance or "N/A" if the datetime is
-        /// zero/empty.
-        /// </returns>
-        static string ToString(DateTime dateTime)
-        {
-            return (dateTime.Ticks == 0)
-                ? "N/A"
-                : dateTime.ToString();
-        }
-
-        /// <summary>
-        /// Parses and validates a positive integer from the specified <see paramref="stringValue"/>.
-        /// </summary>
-        /// <param name="stringValue">The string value to parse</param>
-        /// <param name="requireValue"><see langword="true"/> if it is required that
-        /// <see paramref="stringValue"/> is not empty; <see langword="false"/> if
-        /// <see paramref="stringValue"/> may be empty.</param>
-        /// <returns>An <see langword="int?"/> with the parsed value or <see langword="null"/> if
-        /// <paramref="stringValue"> was empty.</returns>
-        static int? ParseInteger(string stringValue, bool requireValue)
-        {
-            if (!requireValue && string.IsNullOrWhiteSpace(stringValue))
-            {
-                return null;
-            }
-
-            uint value = 0;
-            if (!UInt32.TryParse(stringValue,
-                NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | NumberStyles.AllowThousands,
-                CultureInfo.CurrentCulture, out value))
-            {
-                ExtractException ee = new ExtractException("ELI38879",
-                    "Value to apply must be a positive integer");
-                ee.AddDebugData("Value", stringValue, false);
-                throw ee;
-            }
-
-            return (int)value;
         }
 
         #endregion Private Members

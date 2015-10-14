@@ -48,6 +48,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -59,18 +60,64 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteArrayManipulator.cs" />
+    <Compile Include="ConfigSettings.cs" />
     <Compile Include="CounterData.cs" />
+    <Compile Include="EmailMessage.cs" />
+    <Compile Include="EmailSettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EmailSettingsControl.designer.cs">
+      <DependentUpon>EmailSettingsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExtractSettingsBase.cs" />
+    <Compile Include="EmailSettings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>EmailSettings.settings</DependentUpon>
+    </Compile>
     <Compile Include="FAMDBCounterManagerForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FAMDBCounterManagerForm.Designer.cs">
       <DependentUpon>FAMDBCounterManagerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="InputBox.cs" />
+    <Compile Include="InputBoxForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="NumericEntryTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NumericEntryTextBox.designer.cs">
+      <DependentUpon>NumericEntryTextBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EmailForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailForm.designer.cs">
+      <DependentUpon>EmailForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReadableEnum.cs" />
+    <Compile Include="EmailSettingsManager.cs" />
+    <Compile Include="EmailSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailSettingsDialog.designer.cs">
+      <DependentUpon>EmailSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UtilityMethods.cs" />
+    <EmbeddedResource Include="EmailSettingsControl.resx">
+      <DependentUpon>EmailSettingsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FAMDBCounterManagerForm.resx">
       <DependentUpon>FAMDBCounterManagerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InputBoxForm.resx">
+      <DependentUpon>InputBoxForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -82,7 +129,17 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="EmailForm.resx">
+      <DependentUpon>EmailForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailSettingsDialog.resx">
+      <DependentUpon>EmailSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="EmailSettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>EmailSettings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -94,18 +151,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Core\Code\Extract.csproj">
-      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
-      <Name>Extract.Licensing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
-      <Name>Extract.Utilities</Name>
-    </ProjectReference>
+    <None Include="Resources\EmailSettings.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FAMDBAdmin.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -93,7 +93,7 @@ namespace Extract.Utilities
                 try
                 {
                     ExtractException.Assert("ELI38829", "Invalid read position.",
-                        value > 0 && value < Length, "Position", value, "Length", Length);
+                        value >= 0 && value < Length, "Position", value, "Length", Length);
 
                     _readPosition = value;
                 }
