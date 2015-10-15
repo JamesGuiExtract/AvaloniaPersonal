@@ -18,84 +18,12 @@
 #include "DefinedTypes.h"
 
 using namespace ADODB;
-using namespace std;
 
-namespace Logging
+namespace ZipUtil
 {
-	std::string CurrentDateTimeAsString()
-	{
-		SYSTEMTIME st;
-		GetLocalTime( &st );
-
-		return Util::Format( "%04d-%02d-%02d_%02d-%02d", 
-							 st.wYear,
-							 st.wMonth,
-							 st.wDay,
-							 st.wHour, 
-							 st.wMinute );
-	}
-
-	std::string MakeFilename()
-	{
-		return Util::Format( "c:\\temp\\Log_%s.txt", CurrentDateTimeAsString().c_str() );
-	}
-
-	struct Log
-	{
-		static Log& Instance()
-		{
-			static Log instance;
-			return instance;
-		}
-
-		void Write( const std::string& msg )
-		{
-			_file.write( msg.c_str(), msg.size() );
-			_file.flush();
-		}
-
-		~Log()
-		{
-			_file.flush();
-			_file.close();
-		}
-
-	private:
-		std::ofstream _file;
-
-		Log():
-		_file( MakeFilename().c_str() )
-		{
-			ASSERT_RUNTIME_CONDITION( "ELI38787", _file.is_open(), "Log open failed" );
-		}
-	};
-
-//#define LOGGING_ENABLED
-	void WriteToLog( const char* 
-#ifdef LOGGING_ENABLED
-						formatSpec
-#endif
-						, ... )
-	{
-#ifdef LOGGING_ENABLED
-#pragma message("Logging is enabled...")
-		size_t size = 8 * 1024;
-		std::vector<char> buffer( size, '\0' );
-
-		std::string format = Util::Format( "%s\n", formatSpec );
-
-		va_list args;
-		va_start( args, formatSpec );
-		::vsnprintf_s( &buffer[0], size, size, format.c_str(), args );
-
-		std::string msg( buffer.data() );
-		Log::Instance().Write( msg );
-#endif
-	}
-
-}	// end of namespace Logging
-
-
+	SAFEARRAY* DecompressAttributes( SAFEARRAY* pSA );
+	SAFEARRAY* CompressAttributes( IPersistStreamPtr ipStream );
+}
 
 namespace
 {
@@ -650,25 +578,6 @@ STDMETHODIMP CAttributeDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 
 namespace
 {
-	void SaveStatement( const std::string& saveFileName, 
-						const std::string& 
-#ifdef LOGGING_ENABLED
-						statement 
-#endif
-					  )
-	{
-		if ( saveFileName.empty() )
-			return;
-#ifdef LOGGING_ENABLED
-		std::ofstream ofile( saveFileName.c_str() );
-		if ( ofile.is_open() )
-		{
-			ofile << statement;
-			ofile.flush();
-			ofile.close();
-		}
-#endif
-	}
 	// This function escapes any single quotes in the input.
 	std::string SqlSanitizeInput( const std::string& input )
 	{
@@ -724,10 +633,6 @@ namespace
 			"    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState)\n"
 			"END CATCH";
 
-			static int counter = 0;
-			SaveStatement( Util::Format("c:\\temp\\insertRootASFF%04d.txt", counter).c_str(), insert );
-			++counter;
-
 			return insert;
 	}
 
@@ -745,17 +650,6 @@ namespace
 		IIdentifiableObjectPtr ipIdentifiable(ipAttribute);
 		ASSERT_RESOURCE_ALLOCATION("ELI38642", nullptr != ipIdentifiable);			
 		std::string guid = asString(ipIdentifiable->InstanceGUID);
-
-		Logging::WriteToLog( "%s- Value: %s, attributeName: %s, attributeType: %s, "
-							 "attributeSetName: %s, parentAttributeID: %lld, GUID: %s, ASFF ID: %lld",
-							 __FUNCTION__,
-							 value.c_str(), 
-							 attributeName.c_str(),
-							 attributeType.c_str(),
-							 attributeSetName.c_str(),
-							 parentAttributeID,
-							 guid.c_str(),
-							 owningAttributeSetForFileID );
 
 		std::string insert = 
 						  "SET NOCOUNT ON \n"
@@ -841,10 +735,6 @@ namespace
 							"RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState) \n"
 						"END CATCH \n";
 
-		static int counter = 0;
-		SaveStatement( Util::Format("c:\\temp\\insertSubAttribute%04d.txt", counter).c_str(), insert );
-		++counter;
-
 		return insert;
 	}
 
@@ -880,9 +770,6 @@ namespace
 										   pageNumber,
 										   height );
 
-		static int counter = 0;
-		SaveStatement( Util::Format("c:\\temp\\insertRZ%04d.txt", counter).c_str(), insert );
-		++counter;
 		return insert;
 	}
 
@@ -905,9 +792,6 @@ namespace
 						  asString(attributeSetName).c_str(),
 						  abs( relativeIndex ) );								// offset (index) into result set, get Nth
 
-		static int counter = 0;
-		SaveStatement( Util::Format("c:\\temp\\queryASFF%04d.txt", counter).c_str(), query );
-		++counter;
 		return query;
 	}
 
@@ -976,7 +860,6 @@ namespace
 
 	ADODB::_RecordsetPtr ExecuteCmd( const std::string& cmd, ADODB::_ConnectionPtr ipConnection )
 	{
-		Logging::WriteToLog( "%s- executing command...", __FUNCTION__ );
 		return ipConnection->Execute( cmd.c_str(), nullptr, adCmdText );
 	}
 
@@ -993,34 +876,39 @@ namespace
 
 	longlong ExecuteRootInsertASFF( const std::string& insert, ADODB::_ConnectionPtr ipConnection )
 	{
-		Logging::WriteToLog( "\n%s- insert statement: %s", __FUNCTION__, insert.c_str() );
-
 		ADODB::_RecordsetPtr ipRS = ExecuteCmd( insert.c_str(), ipConnection );
 		ASSERT_RESOURCE_ALLOCATION(	"ELI38886", VARIANT_FALSE == ipRS->adoEOF );
 
 		FieldsPtr ipFields = AssignComPtr( ipRS->Fields, "ELI38887" );
 		longlong ID = getLongLongField( ipFields, "ID" );
-		Logging::WriteToLog( "%s- Returned Root ASFF ID: %lld", __FUNCTION__, ID );
-
 		ipRS->Close();
 
 		return ID;
 	}
 
+	// Used to delete a safe array - called by unique_ptr<SAFEARRAY> DTOR
+	struct SafeArrayDeleter
+	{
+		void operator() ( SAFEARRAY* pSA ) const
+		{
+			SafeArrayDestroy( pSA );
+		}
+	};
+
 }		// end of anonymous namespace
+
+
+#define COMPRESSED_STREAM
+
 
 // ------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong rootASFF_ID )
 {
-//	if ( 0 == pAttributes->Size() )
-//		return;
-
 	try
 	{
 		std::string query = Util::Format( "SELECT * FROM [dbo].[AttributeSetForFile] "
 										  "WHERE [ID] = %lld",
 										  rootASFF_ID );
-		Logging::WriteToLog( "%s- set up to write VOA, query is: %s", __FUNCTION__, query.c_str() );
 
 		ADODB::_RecordsetPtr ipASFF( __uuidof(Recordset) );
 		ASSERT_RESOURCE_ALLOCATION( "ELI38804", nullptr != ipASFF );
@@ -1042,9 +930,22 @@ void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong 
 		IIUnknownVectorPtr pAttributesClone = pAttributes->PrepareForStorage( storageManagerIID.c_str() );
 
 		IPersistStreamPtr ipPersistObj = pAttributesClone;
-		// TODO - compress the spatial string!
+
+#ifdef UNCOMPRESSED_STREAM
 		setIPersistObjToField( ipFields, "VOA", ipPersistObj );
 		ipASFF->Update();
+#endif
+
+#ifdef COMPRESSED_STREAM
+		unique_ptr<SAFEARRAY, SafeArrayDeleter> psaData( ZipUtil::CompressAttributes( ipPersistObj ) );
+		std::unique_ptr<_variant_t>variantData( new _variant_t() );
+		variantData->vt = VT_ARRAY|VT_UI1;
+		variantData->parray = psaData.get();
+		ipASFF->Fields->GetItem( "VOA" )->PutValue( variantData.get() );
+		ipASFF->Update();
+
+		variantData->parray = nullptr;		// don't double-delete, unique_ptr will take care of this
+#endif
 	}
 	catch (...)
 	{
@@ -1052,7 +953,6 @@ void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong 
 		std::string message( 
 			Util::Format("ADO exception while saving VOA to AttributeSetForFile, "
 						 "ID: %lld", rootASFF_ID ) );
-		Logging::WriteToLog( message.c_str() );
 		ue.asString( message );
 		throw ue;
 	}
@@ -1062,14 +962,11 @@ long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute,
 										  VARIANT_BOOL storeRasterZone,
 										  const std::string& insert )
 {
-	Logging::WriteToLog( "\n%s-", __FUNCTION__ );
-
 	ADODB::_RecordsetPtr ipRS = ExecuteCmd( insert.c_str(), getDBConnection() );
 	ASSERT_RESOURCE_ALLOCATION(	"ELI38670", VARIANT_FALSE == ipRS->adoEOF );
 
 	FieldsPtr ipFields = AssignComPtr( ipRS->Fields, "ELI38631" );
 	long long parentID = getLongLongField( ipFields, "AttributeID" );
-	Logging::WriteToLog( "%s- Returned Parent ID: %lld", __FUNCTION__, parentID );
 
 	ipRS->Close();
 
@@ -1079,7 +976,6 @@ long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute,
 	if ( hasSpatialInfo && true == storeInfo )
 	{
 		IIUnknownVectorPtr ipZones = ipValue->GetOriginalImageRasterZones();	// NOTE: can't return nullptr, throws
-		Logging::WriteToLog( "%s- Number of Raster Zones: %d", __FUNCTION__, ipZones->Size() );
 		for ( long index = 0; index < ipZones->Size(); ++index )
 		{
 			IRasterZonePtr ipZone = AssignComPtr( ipZones->At(index), "ELI38669" );
@@ -1087,7 +983,6 @@ long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute,
 			const std::string parentAttrID( Util::Format( "%lld", parentID ) );
 			std::string zoneInsert = GetInsertRasterZoneStatement( parentAttrID, ipZone );
 
-			Logging::WriteToLog( "%s- ^^^^^^^^^ Saving raster zone[%d]: %s", __FUNCTION__, index, zoneInsert.c_str() );
 			ExecuteCmd( zoneInsert.c_str(), getDBConnection() );
 		}
 	}
@@ -1107,12 +1002,6 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileTaskSession
 		ASSERT_ARGUMENT("ELI38553", pAttributes != nullptr);
 		ASSERT_ARGUMENT("ELI38554", fileTaskSessionID > 0 );
 
-		Logging::WriteToLog( "%s- starting, fileTaskSessionID: %d, attribute set name: %s, Size: %d",
-							 __FUNCTION__,
-							 fileTaskSessionID,
-							 asString(bstrAttributeSetName).c_str(),
-							 pAttributes->Size() );
-
 		TransactionGuard tg( getDBConnection(), adXactRepeatableRead, nullptr );
 
 		auto insertRootASFF = GetInsertRootASFFStatement( bstrAttributeSetName, fileTaskSessionID );
@@ -1121,7 +1010,6 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileTaskSession
 
 		for ( long i = 0; i < pAttributes->Size(); ++i )
 		{
-			Logging::WriteToLog( "\n%s- __________ Saving parent attribute[%d]", __FUNCTION__, i );
 			IAttributePtr ipAttribute = AssignComPtr( pAttributes->At(i), "ELI38693" );
 
 			const longlong topLevelParentAttributeID = 0;
@@ -1134,11 +1022,8 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long fileTaskSession
 												insert );
 
 			IIUnknownVectorPtr ipSubAttrs = ipAttribute->GetSubAttributes();
-			Logging::WriteToLog( "%s- ----- Saving subattributes, Size: %d", __FUNCTION__, ipSubAttrs->Size() );
 			for ( long index = 0; index < ipSubAttrs->Size(); ++index )
 			{
-				Logging::WriteToLog( "%s- **** Saving sub-attribute[%d]", __FUNCTION__, index );
-
 				IAttributePtr ipSubAttribute = AssignComPtr( ipSubAttrs->At( index ), "ELI38717" );
 				std::string cmd = GetInsertAttribute( ipSubAttribute, 
 													  bstrAttributeSetName, 
@@ -1172,10 +1057,25 @@ STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** ppAttribu
 
 		auto query( GetQueryForAttributeSetForFile( fileID, attributeSetName, relativeIndex ) );
 
+#ifdef UNCOMPRESSED_STREAM	
 		FieldsPtr ipFields = GetFieldsForQuery( query, getDBConnection() );
 		IPersistStreamPtr ipStream = getIPersistObjFromField( ipFields, "VOA" );
 
 		*ppAttributes = (IIUnknownVectorPtr)ipStream.Detach();
+#endif		
+
+#ifdef COMPRESSED_STREAM
+		FieldsPtr ipFields = GetFieldsForQuery( query, getDBConnection() );
+		_variant_t vData = ipFields->GetItem("VOA")->GetValue();
+		SafeArrayDeleter sad;
+		unique_ptr<SAFEARRAY, SafeArrayDeleter> pData( vData.Detach().parray, sad );
+		
+		unique_ptr<SAFEARRAY, SafeArrayDeleter> pDataSA( ZipUtil::DecompressAttributes( pData.get() ), sad );
+		IPersistStreamPtr ipStream = readObjFromSAFEARRAY( pDataSA.get() );
+ 
+		*ppAttributes = (IIUnknownVectorPtr)ipStream.Detach();
+#endif
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38619");
 }

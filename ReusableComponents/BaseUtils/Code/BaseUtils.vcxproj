@@ -85,6 +85,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -131,6 +132,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -229,6 +231,7 @@
     <ClCompile Include="LineSegment.cpp" />
     <ClCompile Include="ListControlSelectionRestorer.cpp" />
     <ClCompile Include="LoadFileDlgThread.cpp" />
+    <ClCompile Include="Logging.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="LoopCurve.cpp" />
     <ClCompile Include="LoopTrace.cpp" />
@@ -384,7 +387,9 @@
     <ClInclude Include="CsisUtils.h" />
     <ClInclude Include="CursorToolTipCtrl.h" />
     <ClInclude Include="DateUtil.h" />
+    <ClInclude Include="DefinedTypes.h" />
     <ClInclude Include="DocTagUtils.h" />
+    <ClInclude Include="Logging.h" />
     <ClInclude Include="QuickMenuChooser.h" />
     <ClInclude Include="SafeArrayAccessGuard.h" />
     <ClInclude Include="VectorOperations.h" />
