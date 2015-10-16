@@ -78,27 +78,27 @@ public:
 // IAttributeDBMgr Methods
 	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
 
-	STDMETHOD(CreateNewAttributeSetForFile)(long fileID,
-											BSTR attributeSetName,
+	STDMETHOD(CreateNewAttributeSetForFile)(long nFileID,
+											BSTR bstrAttributeSetName,
 											IIUnknownVector* pAttributes,
-											VARIANT_BOOL storeRasterZone);
+											VARIANT_BOOL vbStoreRasterZone);
 
 	// relativeIndex: -1 for most recent, 1 for oldest
 	// decrement most recent value to get next most recent (-2)
 	// increment oldest value to get next oldest (2)
 	// Zero is an illegal relativeIndex value.
 	STDMETHOD(GetAttributeSetForFile)(IIUnknownVector** pAttributes, 
-									  long fileID, 
-									  BSTR attributeSetName,
-									  long relativeIndex);		
+									  long nFileID, 
+									  BSTR bstrAttributeSetName,
+									  long nRelativeIndex);		
 
 	STDMETHOD(CreateNewAttributeSetName)(BSTR name, 
-										 long long* pAttributeSetNameID);
+										 long long* pllAttributeSetNameID);
 
-	STDMETHOD(RenameAttributeSetName)(BSTR attributeSetName, 
-									  BSTR newName);
+	STDMETHOD(RenameAttributeSetName)(BSTR bstrAttributeSetName, 
+									  BSTR bstrNewName);
 
-	STDMETHOD(DeleteAttributeSetName)(BSTR attributeSetName);
+	STDMETHOD(DeleteAttributeSetName)(BSTR bstrAttributeSetName);
 
 	STDMETHOD(GetAllAttributeSetNames)(IStrToStrMap** ppNames);
 	
@@ -141,13 +141,18 @@ private:
 	std::map<std::string, std::string> getDBInfoDefaultValues();
 
 	// This method sets the VOA field in the AttributeSetForFile table.
-	void SaveVoaDataInASFF( IIUnknownVector* pAttributes, long long rootASFF_ID );
+	void SaveVoaDataInASFF( IIUnknownVector* pAttributes, long long llRootASFF_ID );
 
 	// This method performs the insert of Attribute rows, handling
 	// both parent (top-level, or root) and child attributes.
 	long long SaveAttribute( IAttributePtr ipAttribute, 
 							 VARIANT_BOOL storeRasterZone,
 							 const std::string& insert );
+
+	// Stores the discrete data for the specified vector of attributes (including all descendants).
+	// llParentAttrID == 0 for root attributes.
+	void storeAttributeData(IIUnknownVectorPtr ipAttributes, bool bStoreRasterZone,
+		long long llRootASFF_ID, long long llParentAttrID = 0);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(AttributeDBMgr), CAttributeDBMgr)
