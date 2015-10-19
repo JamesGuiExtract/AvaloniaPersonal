@@ -114,6 +114,12 @@
 			<OriginalName>
 				<FullText>WBC</FullText>
 			</OriginalName>
+			<ValueError>
+				<FullText>False</FullText>
+			</ValueError>
+			<RangeError>
+				<FullText>False</FullText>
+			</RangeError>
 			<Comment>
 				<FullText/>
 			</Comment>
@@ -171,6 +177,12 @@
 			<OriginalName>
 				<FullText>WBC COUNT</FullText>
 			</OriginalName>
+			<ValueError>
+				<FullText>False</FullText>
+			</ValueError>
+			<RangeError>
+				<FullText>False</FullText>
+			</RangeError>
 			<Comment>
 				<FullText/>
 			</Comment>
@@ -198,6 +210,12 @@
 			<OriginalName>
 				<FullText>HEMOGLOBIN</FullText>
 			</OriginalName>
+			<ValueError>
+				<FullText>False</FullText>
+			</ValueError>
+			<RangeError>
+				<FullText>False</FullText>
+			</RangeError>
 			<Comment>
 				<FullText/>
 			</Comment>
@@ -208,7 +226,7 @@
 				<FullText>HCT</FullText>
 			</TestCode>
 			<Value>
-				<FullText>40.5</FullText>
+				<FullText>40-50</FullText>
 			</Value>
 			<Units>
 				<FullText>%</FullText>
@@ -225,6 +243,12 @@
 			<OriginalName>
 				<FullText>HEMATOCRIT</FullText>
 			</OriginalName>
+			<ValueError>
+				<FullText>False</FullText>
+			</ValueError>
+			<RangeError>
+				<FullText>False</FullText>
+			</RangeError>
 			<Comment>
 				<FullText/>
 			</Comment>
@@ -235,7 +259,7 @@
 				<FullText>PLT</FullText>
 			</TestCode>
 			<Value>
-				<FullText>210</FullText>
+				<FullText>&gt;210</FullText>
 			</Value>
 			<Units>
 				<FullText>K/UL</FullText>
@@ -252,6 +276,12 @@
 			<OriginalName>
 				<FullText>PLATELET COUNT</FullText>
 			</OriginalName>
+			<ValueError>
+				<FullText>False</FullText>
+			</ValueError>
+			<RangeError>
+				<FullText>False</FullText>
+			</RangeError>
 			<Comment>
 				<FullText/>
 			</Comment>
