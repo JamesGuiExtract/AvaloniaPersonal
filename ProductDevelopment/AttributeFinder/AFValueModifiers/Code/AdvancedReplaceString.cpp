@@ -288,61 +288,6 @@ STDMETHODIMP CAdvancedReplaceString::put_SpecifiedOccurrence(long newVal)
 
 	return S_OK;
 }
-
-//-------------------------------------------------------------------------------------------------
-// IAttributeModifyingRule
-//-------------------------------------------------------------------------------------------------
-// Given strInput and strReplacement, find out what is the actual
-// replacement for defined pattern in pRegExpr
-// Example: pattern = (the)\B, 
-//			input = other
-//			replacment = $1_abc
-//			actual replacment = the_abc
-//
-string getActualReplacment(IRegularExprParser *pRegExpr,
-						   const string& strInput,
-						   const string& strReplacement)
-{
-	IRegularExprParserPtr ipRegExpr(pRegExpr);
-	// find the pattern to be replaced
-	IIUnknownVectorPtr ipMatches = ipRegExpr->Find(_bstr_t(strInput.c_str()), VARIANT_TRUE, 
-		VARIANT_FALSE);
-	if (ipMatches == __nullptr || ipMatches->Size() <= 0)
-	{
-		return "";
-	}
-
-	IObjectPairPtr ipMatchInfo = ipMatches->At(0);
-	ASSERT_RESOURCE_ALLOCATION("ELI07313", ipMatchInfo != __nullptr);
-	ITokenPtr ipMatch = ipMatchInfo->Object1;
-	ASSERT_RESOURCE_ALLOCATION("ELI07314", ipMatch != __nullptr);
-	// get the start and end positions for the match
-	long nStartPos = ipMatch->StartPosition;
-	long nEndPos = ipMatch->EndPosition;
-	
-	// get the input after replacement
-	string strReplacedInput = ipRegExpr->ReplaceMatches(
-		_bstr_t(strInput.c_str()), _bstr_t(strReplacement.c_str()), VARIANT_TRUE);
-	
-	// get the string after the match
-	string strRemainingString = strInput.substr(nEndPos+1);
-	string strActualReplacement("");
-	if (!strRemainingString.empty())
-	{
-		// find the start position of remaining string in the replaced string
-		int nFound = strReplacedInput.rfind(strRemainingString);
-		if (nFound != string::npos)
-		{
-			strActualReplacement = strReplacedInput.substr(nStartPos, nFound-nStartPos);
-		}
-	}
-	else
-	{
-		strActualReplacement = strReplacedInput.substr(nStartPos);
-	}
-
-	return strActualReplacement;
-}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAdvancedReplaceString::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOriginInput, 
 													 IProgressStatus *pProgressStatus)

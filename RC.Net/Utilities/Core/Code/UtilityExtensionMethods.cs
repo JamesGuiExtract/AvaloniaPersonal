@@ -1,9 +1,10 @@
-﻿using Extract.Licensing;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using Extract.Licensing;
 
 namespace Extract.Utilities
 {
@@ -83,6 +84,50 @@ namespace Extract.Utilities
                 throw ee;
             }
         }
+
+        /// <summary>
+        /// Creates a memoized version of a unary function
+        /// </summary>
+        /// <typeparam name="A">The type of the function parameter</typeparam>
+        /// <typeparam name="R">The return type of the function</typeparam>
+        /// <param name="f">The non-memoized unary function</param>
+        /// <returns>A memoized version of the function</returns>
+        public static Func<A, R> Memoize<A, R>(this Func<A, R> f)
+        {
+            try
+            {
+                var map = new Dictionary<A, R>();
+                return a => map.GetOrAdd(a, () => f(a));
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI38961");
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Creates a memoized version of a binary function
+        /// </summary>
+        /// <typeparam name="A">The type of the first function parameter</typeparam>
+        /// <typeparam name="B">The type of the second function parameter</typeparam>
+        /// <typeparam name="R">The return type of the function</typeparam>
+        /// <param name="f">The non-memoized binary function</param>
+        /// <returns>A memoized version of the function</returns>
+        public static Func<A, B, R> Memoize<A, B, R>(this Func<A, B, R> f)
+        {
+            try
+            {
+                var map = new Dictionary<Tuple<A, B>, R>();
+                return (a, b) => map.GetOrAdd(Tuple.Create(a, b), () => f(a, b));
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI38962");
+                throw ee;
+            }
+        }
+
 
         #endregion Methods
 

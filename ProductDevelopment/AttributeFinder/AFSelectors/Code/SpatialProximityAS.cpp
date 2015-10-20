@@ -329,7 +329,7 @@ STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn,
 		IIUnknownVectorPtr ipAttributes(pAttrIn);
 		ASSERT_ARGUMENT("ELI22562", ipAttributes != __nullptr);
 		IIUnknownVectorPtr ipContextAttributes(pAttrContext);
-		ASSERT_ARGUMENT("ELI38510", ipAttributes != __nullptr);
+		ASSERT_ARGUMENT("ELI38510", ipContextAttributes != __nullptr);
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 		ASSERT_ARGUMENT("ELI22563", ipAFDoc != __nullptr);
 		ASSERT_ARGUMENT("ELI22564", pAttrOut != __nullptr);
@@ -753,7 +753,7 @@ vector< pair<CRect, long> > CSpatialProximityAS::getAttributeRects(IAttributePtr
 {
 	ASSERT_ARGUMENT("ELI22668", ipAttribute != __nullptr);
 
-	// Retrive the attribute's spatial string
+	// Retrieve the attribute's spatial string
 	ISpatialStringPtr ipValue = ipAttribute->Value;
 	ASSERT_RESOURCE_ALLOCATION("ELI22669", ipValue != __nullptr);
 
@@ -989,10 +989,17 @@ IIUnknownVectorPtr CSpatialProximityAS::findContainedAttributes(
 	IIUnknownVectorPtr ipSelectedAttributes(CLSID_IUnknownVector);
 	ASSERT_RESOURCE_ALLOCATION("ELI38355", ipSelectedAttributes != __nullptr);
 
+	long nContainerAttributesCount = ipContainerAttributes->Size();
+	long nContainedAttributesCount = ipContainedAttributes->Size();
+
+	if (nContainerAttributesCount == 0 || nContainedAttributesCount == 0)
+	{
+		return ipSelectedAttributes;
+	}
+
 	// Collect vectors of rects for all contained attribute candidates to avoid repeating work
 	vector< vector< pair<CRect, long> > > vecContainerAttributesRectsCache;
-	long nContainerAttributeCount = ipContainerAttributes->Size();
-	for (int i = 0; i < nContainerAttributeCount; i++)
+	for (long i = 0; i < nContainerAttributesCount; i++)
 	{
 		IAttributePtr ipContainerAttribute = ipContainerAttributes->At(i);
 		ASSERT_RESOURCE_ALLOCATION("ELI38361", ipContainerAttribute != __nullptr);
@@ -1010,7 +1017,6 @@ IIUnknownVectorPtr CSpatialProximityAS::findContainedAttributes(
 
 	// Cycle through each possible contained attribute to find out whether it is contained by a
 	// container attribute
-	long nContainedAttributesCount = ipContainedAttributes->Size();
 	for (long i = 0; i < nContainedAttributesCount; i++)
 	{
 		IAttributePtr ipContainedAttribute = ipContainedAttributes->At(i);
@@ -1025,7 +1031,7 @@ IIUnknownVectorPtr CSpatialProximityAS::findContainedAttributes(
 				getAttributeRects(ipContainedAttribute, m_bCompareLinesSeparately,
 					m_bTargetsMustContainReferences);
 
-		for (int j = 0; j < nContainerAttributeCount; j++)
+		for (long j = 0; j < nContainerAttributesCount; j++)
 		{
 			IAttributePtr ipContainerAttribute = ipContainerAttributes->At(j);
 			ASSERT_RESOURCE_ALLOCATION("ELI22704", ipContainerAttribute != __nullptr);
@@ -1060,10 +1066,17 @@ IIUnknownVectorPtr CSpatialProximityAS::findContainerAttributes(
 	IIUnknownVectorPtr ipSelectedAttributes(CLSID_IUnknownVector);
 	ASSERT_RESOURCE_ALLOCATION("ELI38358", ipSelectedAttributes != __nullptr);
 
-	// Collect vectors of rects for all container attribute candidates to avoid repeating work
+	long nContainerAttributesCount = ipContainerAttributes->Size();
 	long nContainedAttributesCount = ipContainedAttributes->Size();
+
+	if (nContainerAttributesCount == 0 || nContainedAttributesCount == 0)
+	{
+		return ipSelectedAttributes;
+	}
+
+	// Collect vectors of rects for all container attribute candidates to avoid repeating work
 	vector< vector <pair<CRect, long> > > vecContainedAttributesRectsCache;
-	for (int i = 0; i < nContainedAttributesCount; i++)
+	for (long i = 0; i < nContainedAttributesCount; i++)
 	{
 		IAttributePtr ipContainedAttribute = ipContainedAttributes->At(i);
 		ASSERT_RESOURCE_ALLOCATION("ELI38362", ipContainedAttribute != __nullptr);
@@ -1080,7 +1093,6 @@ IIUnknownVectorPtr CSpatialProximityAS::findContainerAttributes(
 	}
 
 	// Cycle through each container attribute to find out whether it contains a contained attribute
-	long nContainerAttributesCount = ipContainerAttributes->Size();
 	for (long i = 0; i < nContainerAttributesCount; i++)
 	{
 		IAttributePtr ipContainerAttribute = ipContainerAttributes->At(i);
@@ -1095,7 +1107,7 @@ IIUnknownVectorPtr CSpatialProximityAS::findContainerAttributes(
 			getAttributeRects(ipContainerAttribute, m_bCompareLinesSeparately,
 				!m_bTargetsMustContainReferences);
 
-		for (int j = 0; j < nContainedAttributesCount; j++)
+		for (long j = 0; j < nContainedAttributesCount; j++)
 		{
 			IAttributePtr ipContainedAttribute = ipContainedAttributes->At(j);
 			ASSERT_RESOURCE_ALLOCATION("ELI38360", ipContainedAttribute != __nullptr);

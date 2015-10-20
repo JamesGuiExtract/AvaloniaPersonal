@@ -3,6 +3,7 @@ using Extract.DataEntry;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
+using Spring.Core.TypeResolution;
 using System;
 using System.Data.Common;
 using System.Data.OleDb;
@@ -200,6 +201,8 @@ namespace Extract.AttributeFinder.Rules
             {
                 _databaseConnectionInfo.PathTags = _pathTags;
                 _localDatabaseCopyManager = new TemporaryFileCopyManager();
+                TypeRegistry.RegisterType("Regex", typeof(System.Text.RegularExpressions.Regex));
+                TypeRegistry.RegisterType("StringUtils", typeof(Spring.Util.StringUtils));
             }
             catch (Exception ex)
             {

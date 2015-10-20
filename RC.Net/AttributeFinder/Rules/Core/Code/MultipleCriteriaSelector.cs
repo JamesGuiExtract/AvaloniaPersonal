@@ -302,11 +302,7 @@ namespace Extract.AttributeFinder.Rules
 
             // If selecting exclusively, the remaining candidateAttributes will be the result;
             // if selecting inclusively, build the result by moving selected candidates into a new set.
-            HashSet<ComAttribute> resultingAttributes = null;
-            if (!SelectExclusively)
-            {
-                resultingAttributes = new HashSet<ComAttribute>();
-            }
+            HashSet<ComAttribute> resultingAttributes = new HashSet<ComAttribute>();
 
             // Iterate through each selector.
             for (int i = 0; i < NegatedSelectors.Length; i++)
