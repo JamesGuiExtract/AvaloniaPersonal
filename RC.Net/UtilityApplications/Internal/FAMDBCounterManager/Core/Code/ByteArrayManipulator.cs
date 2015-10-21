@@ -70,6 +70,13 @@ namespace Extract.FAMDBCounterManager
             {
                 return _readPosition;
             }
+
+            set
+            {
+                UtilityMethods.Assert(value >= 0 && value < Length, "Invalid read position.");
+
+                _readPosition = value;
+            }
         }
 
         /// <summary>

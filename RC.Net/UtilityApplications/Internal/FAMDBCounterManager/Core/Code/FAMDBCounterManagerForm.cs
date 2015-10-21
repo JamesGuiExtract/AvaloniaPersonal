@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Text;
 
 namespace Extract.FAMDBCounterManager
 {
@@ -86,6 +87,22 @@ namespace Extract.FAMDBCounterManager
         #region Fields
 
         /// <summary>
+        /// The license data parsed from a pasted license string.
+        /// </summary>
+        ByteArrayManipulator _licenseData;
+
+        /// <summary>
+        /// The index of the counter data within <see cref="_licenseData"/>.
+        /// </summary>
+        int _counterDataPos;
+
+        /// <summary>
+        /// Indicates whether the secure counter associated with the current license string are in
+        /// a good state.
+        /// </summary>
+        bool _counterDataIsValid;
+
+        /// <summary>
         /// Information about the FAM DB associated with the currently pasted license code.
         /// </summary>
         DatabaseInfo _dbInfo;
@@ -95,6 +112,16 @@ namespace Extract.FAMDBCounterManager
         /// </summary>
         Dictionary<DataGridViewRow, CounterData> _counterData =
             new Dictionary<DataGridViewRow, CounterData>();
+
+        /// <summary>
+        /// The default style to use for cells.
+        /// </summary>
+        DataGridViewCellStyle _defaultCellStyle;
+
+        /// <summary>
+        /// The style to use for table cells when the table is disabled.
+        /// </summary>
+        DataGridViewCellStyle _disabledCellStyle;
 
         #endregion Fields
 
@@ -106,6 +133,8 @@ namespace Extract.FAMDBCounterManager
         public FAMDBCounterManagerForm()
         {
             InitializeComponent();
+
+            InitializeCellStyles();
         }
 
         #endregion Constructors
@@ -123,6 +152,8 @@ namespace Extract.FAMDBCounterManager
                 base.OnLoad(e);
 
                 Application.AddMessageFilter(this);
+
+                UpdateControls(false);
             }
             catch (Exception ex)
             {
@@ -151,7 +182,7 @@ namespace Extract.FAMDBCounterManager
                 // the shift key down in anticipation of a capital letter causing selection change
                 // rather than adding a space.
                 if (m.Msg == 0x100 && m.WParam == (IntPtr)Keys.Space &&
-                        Control.ModifierKeys.HasFlag(Keys.Shift))
+                    Control.ModifierKeys.HasFlag(Keys.Shift))
                 {
                     var textBox = _counterDataGridView.EditingControl as TextBoxBase;
                     if (textBox != null)
@@ -162,6 +193,12 @@ namespace Extract.FAMDBCounterManager
                         textBox.SelectionLength = 0;
                         return true;
                     }
+                }
+                else if (m.Msg == 0x100 && m.WParam == (IntPtr)Keys.V &&
+                    Control.ModifierKeys.HasFlag(Keys.Control) &&
+                    ActiveControl == _licenseStringTextBox)
+                {
+                    ParseLicenseString(Clipboard.GetText());
                 }
             }
             catch (Exception ex)
@@ -187,12 +224,7 @@ namespace Extract.FAMDBCounterManager
         {
             try
             {
-                string licenseString = Clipboard.GetText();
-                licenseString = Regex.Replace(licenseString, @"\s+", "");
-
-                _licenseStringTextBox.Text = ParseLicenseString(licenseString)
-                    ? licenseString
-                    : "Invalid license string!";
+                ParseLicenseString(Clipboard.GetText());
             }
             catch (Exception ex)
             {
@@ -284,6 +316,9 @@ namespace Extract.FAMDBCounterManager
                                 throw new Exception("Cannot use the same ID as an existing counter.");
                             }
                             counter.ID = counterID;
+                            // Because the ID may trigger a standard counter name to be applied,
+                            // invalidated the row to force it to be refreshed.
+                            _counterDataGridView.InvalidateRow(e.RowIndex);
                             break;
 
                         case CounterGridColumn.Name:
@@ -496,24 +531,40 @@ namespace Extract.FAMDBCounterManager
                     // Initialize the license data with general info about the creator and target DB.
                     var licenseData = new ByteArrayManipulator();
                     licenseData.Write(_dbInfo.DatabaseID);
+                    licenseData.Write(_dbInfo.DatabaseServer);
+                    licenseData.Write(_dbInfo.DatabaseName);
+                    licenseData.WriteAsCTime(_dbInfo.CreationTime);
+                    licenseData.WriteAsCTime(_dbInfo.RestoreTime);
                     licenseData.WriteAsCTime(_dbInfo.LastCounterUpdateTime);
                     licenseData.WriteAsCTime(DateTime.Now);
                     licenseData.Write(Environment.UserName);
                     licenseData.Write(Environment.MachineName);
 
+                    bool unlock = _generateUnlockCodeRadioButton.Checked;
+
                     // Get the set of counters for which operations are being applied.
                     var counterUpdates = _counterData
-                        .Where(entry => !entry.Key.IsNewRow && entry.Value.Operation != CounterOperation.None)
+                        .Where(entry => !entry.Key.IsNewRow && (unlock || entry.Value.Operation != CounterOperation.None))
                         .Select(entry => entry.Value);
 
-                    // Write the data for the counters to update.
-                    licenseData.Write(counterUpdates.Count());
+                    // Write the number of counters for which data is being sent; use a negative
+                    // number to signify the counters are being unlocked as opposed to updated.
+                    licenseData.Write(unlock
+                        ? -counterUpdates.Count()
+                        : counterUpdates.Count());
 
-                    var description = new StringBuilder();
+                    // Write data pertaining to the specific counters to update/unlock.
+                    var description = new StringBuilder(unlock
+                        ? "Restore all counters to a working state."
+                        :  "");
+
                     foreach (var counter in counterUpdates)
                     {
-                        description.Append(string.Format(CultureInfo.CurrentCulture,
-                            "- {0} counter \"{1}\"", counter.Operation.ToReadableValue(), counter.Name));
+                        if (!unlock)
+                        {
+                            description.Append(string.Format(CultureInfo.CurrentCulture,
+                                "- {0} counter \"{1}\"", counter.Operation.ToReadableValue(), counter.Name));
+                        }
 
                         licenseData.Write(counter.ID.Value);
                         // Counter name does not need to be included for standard counters.
@@ -521,23 +572,34 @@ namespace Extract.FAMDBCounterManager
                         {
                             licenseData.Write(counter.Name);
                         }
-                        licenseData.Write((int)counter.Operation);
-                        // Apply value does not need to be included for deletions
-                        if (counter.Operation != CounterOperation.Delete)
+
+                        if (unlock)
                         {
-                            licenseData.Write(counter.ApplyValue.Value);
-
-                            description.Append(string.Format(CultureInfo.CurrentCulture,
-                                " {0} {1:n0} counts", 
-                                (counter.Operation == CounterOperation.Create)
-                                    ? "with"
-                                    : (counter.Operation == CounterOperation.Set)
-                                        ? "to"
-                                        : "by",
-                                counter.ApplyValue.Value));
+                            // When unlocking counters, ensure the counter value hasn't changed
+                            // prior to unlocking.
+                            licenseData.Write((int)counter.Operation);
+                            licenseData.Write((int)counter.PreviousValue.Value);
                         }
+                        else
+                        {
+                            licenseData.Write((int)counter.Operation);
+                            // Apply value does not need to be included for deletions
+                            if (counter.Operation != CounterOperation.Delete)
+                            {
+                                licenseData.Write(counter.ApplyValue.Value);
 
-                        description.AppendLine(".");
+                                description.Append(string.Format(CultureInfo.CurrentCulture,
+                                    " {0} {1:n0} counts",
+                                    (counter.Operation == CounterOperation.Create)
+                                        ? "with"
+                                        : (counter.Operation == CounterOperation.Set)
+                                            ? "to"
+                                            : "by",
+                                    counter.ApplyValue.Value));
+                            }
+
+                            description.AppendLine(".");
+                        }
                     }
 
                     var encryptedData = NativeMethods.EncryptDecryptBytes(licenseData.GetBytes(8), true);
@@ -561,9 +623,80 @@ namespace Extract.FAMDBCounterManager
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="RadioButtonCheckedChanged"/> event of the
+        /// <see cref="_generateUpdateCodeRadioButton"/> or <see cref="_generateUnlockCodeRadioButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // When unlock option is selected, ensure grid directly reflects data in the
+                // received license code and not any edits the user has made.
+                if (_generateUnlockCodeRadioButton.Checked)
+                {
+                    UpdateCounteGridFromLicenseData();
+                }
+
+                UpdateControls(true);
+            }
+            catch (Exception ex)
+            {
+                ex.ShowMessageBox();
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the secure counter associated with the current
+        /// license string are in a good state.
+        /// </summary>
+        /// <value><see langword="true"/> if the counters are in a good state; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool CounterDataIsValid
+        {
+            get
+            {
+                return _counterDataIsValid;
+            }
+
+            set
+            {
+                // Disable the HandleRadioButton_CheckedChanged handler while we programmatically
+                // change the check state (to prevent recursion in UpdateCounteGridFromLicenseData)
+                _generateUnlockCodeRadioButton.CheckedChanged -= HandleRadioButton_CheckedChanged;
+                _generateUpdateCodeRadioButton.CheckedChanged -= HandleRadioButton_CheckedChanged;
+
+                try
+                {
+                    if (value)
+                    {
+                        _counterStateTextBox.Text = "Valid";
+                        _generateUpdateCodeRadioButton.Checked = true;
+                    }
+                    else
+                    {
+                        _counterStateTextBox.Text = "Invalid";
+                        _generateUnlockCodeRadioButton.Checked = true;
+                    }
+
+                    _counterDataIsValid = value;
+
+                    UpdateControls(true);
+                }
+                finally
+                {
+                    _generateUnlockCodeRadioButton.CheckedChanged += HandleRadioButton_CheckedChanged;
+                    _generateUpdateCodeRadioButton.CheckedChanged += HandleRadioButton_CheckedChanged;
+                }
+            }
+        }
 
         /// <summary>
         /// Decrypts and parses the <see paramref="licenseString"/> and uses the data to initialize
@@ -576,12 +709,15 @@ namespace Extract.FAMDBCounterManager
         {
             try
             {
+                licenseString = Regex.Replace(licenseString, @"\s+", "");
+                _licenseStringTextBox.Text = licenseString;
+
                 byte[] licenseBytes = licenseString.HexStringToBytes();
                 var decryptedBytes = NativeMethods.EncryptDecryptBytes(licenseBytes, false);
 
                 // Retrieve the general information about the FAM DB.
-                ByteArrayManipulator licenseData = new ByteArrayManipulator(decryptedBytes);
-                _dbInfo = new DatabaseInfo(licenseData);
+                _licenseData = new ByteArrayManipulator(decryptedBytes);
+                _dbInfo = new DatabaseInfo(_licenseData);
                 _databaseIdTextBox.Text = _dbInfo.DatabaseID.ToString().ToUpperInvariant();
                 _databaseServerTextBox.Text = _dbInfo.DatabaseServer;
                 _databaseNameTextBox.Text = _dbInfo.DatabaseName;
@@ -589,40 +725,14 @@ namespace Extract.FAMDBCounterManager
                 _databaseRestoreTextBox.Text = _dbInfo.RestoreTime.DateTimeToString();
                 _lastCounterUpdateTextBox.Text = _dbInfo.LastCounterUpdateTime.DateTimeToString();
                 _dateTimeStampTextBox.Text = _dbInfo.DateTimeStamp.DateTimeToString();
-
-                // Retrieve info about the database's existing secure counters.
-                _counterDataGridView.Rows.Clear();
-                // Remove all _counterData entries no longer in the table. Note that the entry for
-                // the new row may remain despite the clear.
-                var removedRows = _counterData.Keys.Where(row => row.DataGridView == null).ToArray();
-                foreach (DataGridViewRow row in removedRows)
-                {
-                    _counterData.Remove(row);
-                }
-
-                int counterCount = licenseData.ReadInt32();
-                for (int i = 0; i < counterCount; i++)
-                {
-                    CounterData counter = new CounterData(licenseData.ReadInt32());
-
-                    // The license data will not contain the counter name for standard counters.
-                    if (counter.ID >= 100)
-                    {
-                        counter.Name = licenseData.ReadString();
-                    }
-
-                    counter.PreviousValue = licenseData.ReadInt32();
-
-                    var index = _counterDataGridView.Rows.Add();
-                    DataGridViewRow row = _counterDataGridView.Rows[index];
-                    _counterData[row] = counter;
-                }
+                _customerNameTextBox.Text = "";
+                _commentsTextBox.Text = "";
+                
+                _counterDataPos = _licenseData.ReadPosition;
+                UpdateCounteGridFromLicenseData();
                 
                 // The license string was successfully parsed; enable the controls.
-                _customerNameTextBox.Enabled = true;
-                _counterDataGridView.Enabled = true;
-                _commentsTextBox.Enabled = true;
-                _generateCodeButton.Enabled = true;
+                UpdateControls(true);
 
                 return true;
             }
@@ -634,7 +744,12 @@ namespace Extract.FAMDBCounterManager
                 _databaseIdTextBox.Text = "";
                 _databaseCreationTextBox.Text = "";
                 _databaseRestoreTextBox.Text = "";
+                _lastCounterUpdateTextBox.Text = "";
+                _counterStateTextBox.Text = "Invalid license string";
                 _dateTimeStampTextBox.Text = "";
+                _customerNameTextBox.Text = "";
+                _commentsTextBox.Text = "";
+
                 _counterDataGridView.Rows.Clear();
                 // Remove all _counterData entries no longer in the table. Note that the entry for
                 // the new row may remain despite the clear.
@@ -644,12 +759,96 @@ namespace Extract.FAMDBCounterManager
                     _counterData.Remove(row);
                 }
 
-                _customerNameTextBox.Enabled = false;
-                _counterDataGridView.Enabled = false;
-                _commentsTextBox.Enabled = false;
-                _generateCodeButton.Enabled = false;
+                UpdateControls(false);
 
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates the counter grid from <see cref="_licenseData"/>.
+        /// </summary>
+        void UpdateCounteGridFromLicenseData()
+        {
+            _licenseData.ReadPosition = _counterDataPos;
+            
+            // Retrieve info about the database's existing secure counters.
+            _counterDataGridView.Rows.Clear();
+            // Remove all _counterData entries no longer in the table. Note that the entry for
+            // the new row may remain despite the clear.
+            var removedRows = _counterData.Keys.Where(row => row.DataGridView == null).ToArray();
+            foreach (DataGridViewRow row in removedRows)
+            {
+                _counterData.Remove(row);
+            }
+
+            int counterCount = _licenseData.ReadInt32();
+
+            // A negative counter count indicates the counters are in an invalid or non-functioning
+            // state.
+            CounterDataIsValid = counterCount >= 0;
+            if (counterCount < 0)
+            {
+                counterCount = -counterCount;
+            }
+
+            for (int i = 0; i < counterCount; i++)
+            {
+                CounterData counter = new CounterData(_licenseData.ReadInt32());
+
+                // The license data will not contain the counter name for standard counters.
+                if (counter.ID >= 100)
+                {
+                    counter.Name = _licenseData.ReadString();
+                }
+
+                counter.PreviousValue = _licenseData.ReadInt32();
+
+                var index = _counterDataGridView.Rows.Add();
+                DataGridViewRow row = _counterDataGridView.Rows[index];
+                _counterData[row] = counter;
+            }
+        }
+
+        /// <summary>
+        /// Initializes the cell styles used by <see cref="_counterDataGridView"/>.
+        /// </summary>
+        void InitializeCellStyles()
+        {
+            _defaultCellStyle = _counterDataGridView.DefaultCellStyle;
+
+            // Use the control color rather than white for the cell backgrounds when disabled.
+            _disabledCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
+            _disabledCellStyle.SelectionBackColor = SystemColors.Control;
+            _disabledCellStyle.BackColor = SystemColors.Control;
+            _disabledCellStyle.SelectionForeColor = _defaultCellStyle.ForeColor;
+        }
+
+        /// <summary>
+        /// Updates the enabled state of UI controls.
+        /// </summary>
+        /// <param name="enable">Whether the UI controls should be enabled.</param>
+        void UpdateControls(bool enable)
+        {
+            _generateUnlockCodeRadioButton.Enabled = enable && !CounterDataIsValid;
+            _generateUpdateCodeRadioButton.Enabled = enable && CounterDataIsValid;
+            _customerNameTextBox.Enabled = enable;
+            _counterDataGridView.Enabled = enable && _generateUpdateCodeRadioButton.Checked;
+            _commentsTextBox.Enabled = enable;
+            _generateCodeButton.Enabled = enable;
+
+            var cellStyle = _counterDataGridView.Enabled ? _defaultCellStyle : _disabledCellStyle;
+
+            // Change the table's default cell style base on the enabled status
+            _counterDataGridView.DefaultCellStyle = cellStyle;
+
+            // Update the style of all cells currently displayed.
+            foreach (DataGridViewRow row in _counterDataGridView.Rows)
+            {
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    cell.Style = cellStyle;
+                }
             }
         }
 
@@ -674,7 +873,14 @@ namespace Extract.FAMDBCounterManager
                 return false;
             }
 
-            if (!configuredCounters.Any(counter => counter.Operation != CounterOperation.None))
+            if (_generateUnlockCodeRadioButton.Checked)
+            {
+                // No need to validate counter grid for unlock operations.
+                return true;
+            }
+
+            if (!_generateUpdateCodeRadioButton.Checked ||
+                !configuredCounters.Any(counter => counter.Operation != CounterOperation.None))
             {
                 _counterDataGridView.Focus();
                 UtilityMethods.ShowMessageBox("You have not specified any operations.",

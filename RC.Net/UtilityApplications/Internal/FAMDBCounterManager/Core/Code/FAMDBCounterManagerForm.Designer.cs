@@ -32,13 +32,13 @@
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label4;
-            System.Windows.Forms.Label label5;
             System.Windows.Forms.Label label6;
             System.Windows.Forms.Label label7;
             System.Windows.Forms.Label label8;
             System.Windows.Forms.Label label9;
             System.Windows.Forms.Label label10;
             System.Windows.Forms.Label label11;
+            System.Windows.Forms.Label label5;
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FAMDBCounterManagerForm));
@@ -60,17 +60,20 @@
             this._databaseRestoreTextBox = new System.Windows.Forms.TextBox();
             this._pasteLicenseStringButton = new System.Windows.Forms.Button();
             this._lastCounterUpdateTextBox = new System.Windows.Forms.TextBox();
+            this._generateUnlockCodeRadioButton = new System.Windows.Forms.RadioButton();
+            this._generateUpdateCodeRadioButton = new System.Windows.Forms.RadioButton();
+            this._counterStateTextBox = new System.Windows.Forms.TextBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
-            label5 = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
             label7 = new System.Windows.Forms.Label();
             label8 = new System.Windows.Forms.Label();
             label9 = new System.Windows.Forms.Label();
             label10 = new System.Windows.Forms.Label();
             label11 = new System.Windows.Forms.Label();
+            label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this._counterDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -110,15 +113,6 @@
             label4.TabIndex = 5;
             label4.Text = "Database name";
             // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(12, 342);
-            label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(96, 13);
-            label5.TabIndex = 19;
-            label5.Text = "Counter operations";
-            // 
             // label6
             // 
             label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -126,7 +120,7 @@
             label6.Location = new System.Drawing.Point(294, 265);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(94, 13);
-            label6.TabIndex = 15;
+            label6.TabIndex = 17;
             label6.Text = "Counter data as of";
             // 
             // label7
@@ -135,17 +129,17 @@
             label7.Location = new System.Drawing.Point(11, 305);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(80, 13);
-            label7.TabIndex = 17;
+            label7.TabIndex = 19;
             label7.Text = "Customer name";
             // 
             // label8
             // 
             label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             label8.AutoSize = true;
-            label8.Location = new System.Drawing.Point(11, 500);
+            label8.Location = new System.Drawing.Point(11, 489);
             label8.Name = "label8";
             label8.Size = new System.Drawing.Size(56, 13);
-            label8.TabIndex = 21;
+            label8.TabIndex = 24;
             label8.Text = "Comments";
             // 
             // label9
@@ -155,7 +149,7 @@
             label9.Location = new System.Drawing.Point(294, 145);
             label9.Name = "label9";
             label9.Size = new System.Drawing.Size(107, 13);
-            label9.TabIndex = 9;
+            label9.TabIndex = 11;
             label9.Text = "Database created on";
             // 
             // label10
@@ -165,18 +159,27 @@
             label10.Location = new System.Drawing.Point(294, 185);
             label10.Name = "label10";
             label10.Size = new System.Drawing.Size(109, 13);
-            label10.TabIndex = 11;
+            label10.TabIndex = 13;
             label10.Text = "Last database restore";
             // 
             // label11
             // 
             label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             label11.AutoSize = true;
-            label11.Location = new System.Drawing.Point(297, 225);
+            label11.Location = new System.Drawing.Point(294, 225);
             label11.Name = "label11";
             label11.Size = new System.Drawing.Size(102, 13);
-            label11.TabIndex = 13;
+            label11.TabIndex = 15;
             label11.Text = "Last counter update";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new System.Drawing.Point(12, 264);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(103, 13);
+            label5.TabIndex = 9;
+            label5.Text = "Counter data validity";
             // 
             // _licenseStringTextBox
             // 
@@ -238,11 +241,11 @@
             this._counterOperationColumn,
             this._counterApplyValueColumn});
             this._counterDataGridView.Enabled = false;
-            this._counterDataGridView.Location = new System.Drawing.Point(15, 360);
+            this._counterDataGridView.Location = new System.Drawing.Point(15, 370);
             this._counterDataGridView.Name = "_counterDataGridView";
             this._counterDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this._counterDataGridView.Size = new System.Drawing.Size(551, 137);
-            this._counterDataGridView.TabIndex = 20;
+            this._counterDataGridView.Size = new System.Drawing.Size(551, 116);
+            this._counterDataGridView.TabIndex = 23;
             this._counterDataGridView.VirtualMode = true;
             this._counterDataGridView.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.HandleCounterDataGridView_CellBeginEdit);
             this._counterDataGridView.CellValueNeeded += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.HandleCounterDataGridView_CellValueNeeded);
@@ -305,7 +308,7 @@
             this._dateTimeStampTextBox.Name = "_dateTimeStampTextBox";
             this._dateTimeStampTextBox.ReadOnly = true;
             this._dateTimeStampTextBox.Size = new System.Drawing.Size(268, 20);
-            this._dateTimeStampTextBox.TabIndex = 16;
+            this._dateTimeStampTextBox.TabIndex = 18;
             this._dateTimeStampTextBox.TabStop = false;
             // 
             // _customerNameTextBox
@@ -316,27 +319,27 @@
             this._customerNameTextBox.Location = new System.Drawing.Point(15, 321);
             this._customerNameTextBox.Name = "_customerNameTextBox";
             this._customerNameTextBox.Size = new System.Drawing.Size(551, 20);
-            this._customerNameTextBox.TabIndex = 18;
+            this._customerNameTextBox.TabIndex = 20;
             // 
             // _commentsTextBox
             // 
             this._commentsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._commentsTextBox.Enabled = false;
-            this._commentsTextBox.Location = new System.Drawing.Point(15, 516);
+            this._commentsTextBox.Location = new System.Drawing.Point(15, 505);
             this._commentsTextBox.Multiline = true;
             this._commentsTextBox.Name = "_commentsTextBox";
             this._commentsTextBox.Size = new System.Drawing.Size(550, 55);
-            this._commentsTextBox.TabIndex = 22;
+            this._commentsTextBox.TabIndex = 25;
             // 
             // _generateCodeButton
             // 
             this._generateCodeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._generateCodeButton.Enabled = false;
-            this._generateCodeButton.Location = new System.Drawing.Point(440, 577);
+            this._generateCodeButton.Location = new System.Drawing.Point(440, 566);
             this._generateCodeButton.Name = "_generateCodeButton";
             this._generateCodeButton.Size = new System.Drawing.Size(125, 23);
-            this._generateCodeButton.TabIndex = 23;
+            this._generateCodeButton.TabIndex = 26;
             this._generateCodeButton.Text = "Generate Code";
             this._generateCodeButton.UseVisualStyleBackColor = true;
             this._generateCodeButton.Click += new System.EventHandler(this.HandleGenerateCodeButton_Click);
@@ -348,7 +351,7 @@
             this._databaseCreationTextBox.Name = "_databaseCreationTextBox";
             this._databaseCreationTextBox.ReadOnly = true;
             this._databaseCreationTextBox.Size = new System.Drawing.Size(268, 20);
-            this._databaseCreationTextBox.TabIndex = 10;
+            this._databaseCreationTextBox.TabIndex = 12;
             this._databaseCreationTextBox.TabStop = false;
             // 
             // _databaseRestoreTextBox
@@ -358,7 +361,7 @@
             this._databaseRestoreTextBox.Name = "_databaseRestoreTextBox";
             this._databaseRestoreTextBox.ReadOnly = true;
             this._databaseRestoreTextBox.Size = new System.Drawing.Size(268, 20);
-            this._databaseRestoreTextBox.TabIndex = 12;
+            this._databaseRestoreTextBox.TabIndex = 14;
             this._databaseRestoreTextBox.TabStop = false;
             // 
             // _pasteLicenseStringButton
@@ -379,14 +382,53 @@
             this._lastCounterUpdateTextBox.Name = "_lastCounterUpdateTextBox";
             this._lastCounterUpdateTextBox.ReadOnly = true;
             this._lastCounterUpdateTextBox.Size = new System.Drawing.Size(268, 20);
-            this._lastCounterUpdateTextBox.TabIndex = 14;
+            this._lastCounterUpdateTextBox.TabIndex = 16;
             this._lastCounterUpdateTextBox.TabStop = false;
+            // 
+            // _generateUnlockCodeRadioButton
+            // 
+            this._generateUnlockCodeRadioButton.AutoSize = true;
+            this._generateUnlockCodeRadioButton.Enabled = false;
+            this._generateUnlockCodeRadioButton.Location = new System.Drawing.Point(297, 347);
+            this._generateUnlockCodeRadioButton.Name = "_generateUnlockCodeRadioButton";
+            this._generateUnlockCodeRadioButton.Size = new System.Drawing.Size(131, 17);
+            this._generateUnlockCodeRadioButton.TabIndex = 22;
+            this._generateUnlockCodeRadioButton.TabStop = true;
+            this._generateUnlockCodeRadioButton.Text = "Generate unlock code";
+            this._generateUnlockCodeRadioButton.UseVisualStyleBackColor = true;
+            this._generateUnlockCodeRadioButton.CheckedChanged += new System.EventHandler(this.HandleRadioButton_CheckedChanged);
+            // 
+            // _generateUpdateCodeRadioButton
+            // 
+            this._generateUpdateCodeRadioButton.AutoSize = true;
+            this._generateUpdateCodeRadioButton.Enabled = false;
+            this._generateUpdateCodeRadioButton.Location = new System.Drawing.Point(15, 347);
+            this._generateUpdateCodeRadioButton.Name = "_generateUpdateCodeRadioButton";
+            this._generateUpdateCodeRadioButton.Size = new System.Drawing.Size(171, 17);
+            this._generateUpdateCodeRadioButton.TabIndex = 21;
+            this._generateUpdateCodeRadioButton.TabStop = true;
+            this._generateUpdateCodeRadioButton.Text = "Generate counter update code";
+            this._generateUpdateCodeRadioButton.UseVisualStyleBackColor = true;
+            this._generateUpdateCodeRadioButton.CheckedChanged += new System.EventHandler(this.HandleRadioButton_CheckedChanged);
+            // 
+            // _counterStateTextBox
+            // 
+            this._counterStateTextBox.Location = new System.Drawing.Point(15, 281);
+            this._counterStateTextBox.Name = "_counterStateTextBox";
+            this._counterStateTextBox.ReadOnly = true;
+            this._counterStateTextBox.Size = new System.Drawing.Size(276, 20);
+            this._counterStateTextBox.TabIndex = 10;
+            this._counterStateTextBox.TabStop = false;
             // 
             // FAMDBCounterManagerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(578, 612);
+            this.ClientSize = new System.Drawing.Size(578, 601);
+            this.Controls.Add(label5);
+            this.Controls.Add(this._counterStateTextBox);
+            this.Controls.Add(this._generateUpdateCodeRadioButton);
+            this.Controls.Add(this._generateUnlockCodeRadioButton);
             this.Controls.Add(this._lastCounterUpdateTextBox);
             this.Controls.Add(label11);
             this.Controls.Add(this._pasteLicenseStringButton);
@@ -401,7 +443,6 @@
             this.Controls.Add(label7);
             this.Controls.Add(this._dateTimeStampTextBox);
             this.Controls.Add(label6);
-            this.Controls.Add(label5);
             this.Controls.Add(this._counterDataGridView);
             this.Controls.Add(this._databaseNameTextBox);
             this.Controls.Add(label4);
@@ -412,7 +453,7 @@
             this.Controls.Add(this._licenseStringTextBox);
             this.Controls.Add(label1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(594, 650);
+            this.MinimumSize = new System.Drawing.Size(594, 600);
             this.Name = "FAMDBCounterManagerForm";
             this.Text = "FAM DB Counter Manager";
             ((System.ComponentModel.ISupportInitialize)(this._counterDataGridView)).EndInit();
@@ -441,6 +482,9 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterPreviousValueColumn;
         private System.Windows.Forms.DataGridViewComboBoxColumn _counterOperationColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterApplyValueColumn;
+        private System.Windows.Forms.RadioButton _generateUnlockCodeRadioButton;
+        private System.Windows.Forms.RadioButton _generateUpdateCodeRadioButton;
+        private System.Windows.Forms.TextBox _counterStateTextBox;
     }
 }
 

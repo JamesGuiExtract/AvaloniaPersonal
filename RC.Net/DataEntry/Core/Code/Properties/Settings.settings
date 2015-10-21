@@ -41,8 +41,5 @@
     <Setting Name="TooltipFontSize" Type="System.Single" Scope="Application">
       <Value Profile="(Default)">13</Value>
     </Setting>
-    <Setting Name="EnableTrace" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
   </Settings>
 </SettingsFile>
