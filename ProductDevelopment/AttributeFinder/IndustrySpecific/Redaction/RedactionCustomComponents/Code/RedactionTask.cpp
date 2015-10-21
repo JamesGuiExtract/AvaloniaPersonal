@@ -28,14 +28,14 @@ using namespace std;
 // Version 3 - Added TextToReplace, ReplacementText, and AutoAdjustCase settings for
 //		redaction appearance
 // Version 4 - Changed replace text from single replacement to group of replacement settings,
-//		moved advanced text settings to seperate dialog, added settings for prefix and suffix
+//		moved advanced text settings to separate dialog, added settings for prefix and suffix
 //		text for the first instance of a type
 // Version 5 - After upgrade to LT 17, the bug that forced setting both owner and user passwords
 //		when applying PDF security has been fixed. Any settings object that had the enforce
 //		flag set to true can be set back to false
 const unsigned long gnCurrentVersion = 5;
 
-const char* gszREDACTION_TASK_GUID = asString(CLSID_RedactionTask).c_str();
+const string gstrREDACTION_TASK_GUID = asString(CLSID_RedactionTask);
 
 //-------------------------------------------------------------------------------------------------
 // CRedactionTask
@@ -665,7 +665,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 				getIDShieldDBPtr(ipFAMDB);
 
             // Add the IDShieldData record to the database
-            ipIDSDB->AddIDShieldData(gszREDACTION_TASK_GUID, nFileID,
+            ipIDSDB->AddIDShieldData(gstrREDACTION_TASK_GUID.c_str(), nFileID,
 				swProcessingTime.getElapsedTime(), 0, 
                 idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
                 idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions,
