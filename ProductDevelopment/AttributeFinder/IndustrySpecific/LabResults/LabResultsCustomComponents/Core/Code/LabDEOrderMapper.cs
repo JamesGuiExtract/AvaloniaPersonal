@@ -14,20 +14,55 @@ using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
-
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.LabResultsCustomComponents
 {
     /// <summary>
+    /// An interface for the <see cref="LabDEOrderMapper"/> class.
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("BAAB1CA3-A57D-4EEB-82B4-ECC17F41B7E5")]
+    [CLSCompliant(false)]
+    public interface ILabDEOrderMapper : IOutputHandler, ICategorizedComponent, IConfigurableObject,
+        ICopyableObject, ILicensedComponent, IPersistStream, IMustBeConfiguredObject, IIdentifiableObject
+    {
+        /// <summary>
+        /// Gets the database file name.
+        /// </summary>
+        /// <returns>The database file name.</returns>
+        string DatabaseFileName { get; set; }
+
+        /// <summary>
+        /// Gets whether to remove any duplicate Test subattributes after the mapping is finished.
+        /// </summary>
+        bool EliminateDuplicateTestSubAttributes { get; set; }
+
+        /// <summary>
+        /// Gets/sets whether mandatory tests are required during the second pass of the order
+        /// mapping algorithm.
+        /// </summary>
+        bool RequireMandatoryTests { get; set; }
+
+        /// <summary>
+        /// Gets whether to require that orders meet their filled requirement
+        /// </summary>
+        bool UseFilledRequirement { get; set; }
+
+        /// <summary>
+        /// Gets whether to prefer orders with codes matching known, outstanding order codes
+        /// </summary>
+        bool UseOutstandingOrders { get; set; }
+    }
+
+    /// <summary>
     /// Handles mapping orders from the rules output into Lab orders and their
-    /// associated EPIC codes based on a database file.
+    /// associated order codes based on a database file.
     /// </summary>
     [Guid("ABC13C14-B6C6-4679-A69B-5083D3B4B60C")]
     [ProgId("Extract.DataEntry.LabDE.LabDEOrderMapper")]
     [ComVisible(true)]
-    public class LabDEOrderMapper : IOutputHandler, ICopyableObject, ICategorizedComponent,
-        IPersistStream, IConfigurableObject, IMustBeConfiguredObject, ILicensedComponent, IDisposable
+    public class LabDEOrderMapper : IdentifiableObject, ILabDEOrderMapper, IDisposable
     {
         #region Constants
 
@@ -68,16 +103,6 @@ namespace Extract.LabResultsCustomComponents
         class OrderGroupingPermutation
         {
             /// <summary>
-            /// The database connection to use for mapping orders.
-            /// </summary>
-            OrderMappingDBCache _dbCache;
-
-            /// <summary>
-            /// The sourcedoc name to use in the grouping.
-            /// </summary>
-            string _sourceDocName;
-
-            /// <summary>
             /// The combined order grouping that this permutation contains.
             /// </summary>
             public OrderGrouping CombinedGroup;
@@ -92,8 +117,7 @@ namespace Extract.LabResultsCustomComponents
             /// The collection of <see cref="LabTest"/> objects contained by this order
             /// mapping.
             /// </summary>
-            public Dictionary<string, LabTest> ContainedTests =
-                new Dictionary<string, LabTest>(StringComparer.OrdinalIgnoreCase);
+            public List<LabTest> ContainedTests = new List<LabTest>();
 
             /// <summary>
             /// The set of all known outstanding order codes. Only orders in this set will be
@@ -107,26 +131,13 @@ namespace Extract.LabResultsCustomComponents
             /// </summary>
             /// <param name="originalGroup">The original order group for this permutation (before
             /// any merging with other orders has taken place).</param>
-            /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use when performing the
-            /// order mapping.</param>
-            /// <param name="sourceDocName">The sourcedoc name to use in the grouping.</param>
-            public OrderGroupingPermutation(OrderGrouping originalGroup,
-                OrderMappingDBCache dbCache, string sourceDocName)
+            public OrderGroupingPermutation(OrderGrouping originalGroup)
             {
                 // The initial combined group contains only the original group
                 CombinedGroup = originalGroup;
                 ContainedGroups.Add(originalGroup);
                 OutstandingOrderCodes = originalGroup.OutstandingOrderCodes;
-
-                // Initialize the dictionary of contained tests
-                foreach (LabTest test in originalGroup.LabTests)
-                {
-                    ContainedTests[test.Name] = test;
-                }
-
-                // Store the other data needed to perform mapping/merging
-                _dbCache = dbCache;
-                _sourceDocName = sourceDocName;
+                ContainedTests = new List<LabTest>(originalGroup.LabTests);
             }
 
             /// <summary>
@@ -137,19 +148,26 @@ namespace Extract.LabResultsCustomComponents
             /// merge with the current grouping.</param>
             /// <param name="labOrders">The collection of lab order codes to
             /// <see cref="LabOrder"/> objects.</param>
-            /// <returns>A new merged <see cref="OrderGroupingPermutation"/>
-            /// or <see langword="null"/> if no merging can take place.</returns>
+            /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> used for mapping</param>
             /// <param name="limitToOutstandingOrders">Whether to limit orders to be considered to
             /// the set of outstanding order codes as specified in either of the
             /// <see cref="OrderGrouping"/> objects.</param>
+            /// <param name="compatibleDates">Whether the collection and result dates/times
+            /// of this instance were compatible with <paramref name="newGroup"/></param>
+            /// <returns>A new merged <see cref="OrderGroupingPermutation"/>
+            /// or <see langword="null"/> if no merging can take place.</returns>
             public OrderGroupingPermutation AttemptMerge(OrderGrouping newGroup,
-                Dictionary<string, LabOrder> labOrders, bool limitToOutstandingOrders)
+                Dictionary<string, LabOrder> labOrders, OrderMappingDBCache dbCache,
+                bool limitToOutstandingOrders, out bool compatibleDates)
             {
-                if (!OrderGrouping.CollectionDatesEqual(CombinedGroup, newGroup))
+                if (   !OrderGrouping.CollectionDatesEqual(CombinedGroup, newGroup)
+                    || !OrderGrouping.ResultDatesEqual(CombinedGroup, newGroup))
                 {
                     // Collection dates don't match, cannot group these orders
+                    compatibleDates = false;
                     return null;
                 }
+                compatibleDates = true;
 
                 // Check if this group is already contained by the current group
                 if (ContainedGroups.Contains(newGroup))
@@ -158,32 +176,18 @@ namespace Extract.LabResultsCustomComponents
                     return null;
                 }
 
-                // Build a new set of tests by adding newGroup's tests.
-                Dictionary<string, LabTest> combinedTests =
-                    new Dictionary<string, LabTest>(ContainedTests, StringComparer.OrdinalIgnoreCase);
-                foreach (LabTest test in newGroup.LabTests)
-                {
-                    string name = test.Name;
-                    if (combinedTests.ContainsKey(name))
-                    {
-                        // The test was already contained in the permutation, these two groups
-                        // cannot be combined.
-                        return null;
-                    }
-
-                    combinedTests[name] = test;
-                }
-
                 // Combine outstanding orders from both groups.
                 if (limitToOutstandingOrders)
                 {
                     OutstandingOrderCodes.UnionWith(newGroup.OutstandingOrderCodes);
                 }
 
+                List<LabTest> combinedTests = ContainedTests.Concat(newGroup.LabTests).ToList();
+
                 // Groups could potentially be merged, find the best order
                 KeyValuePair<string, List<LabTest>> bestOrder =
-                    FindBestOrder(new List<LabTest>(combinedTests.Values),
-                        labOrders, _dbCache, false, false, OutstandingOrderCodes);
+                    FindBestOrder(combinedTests,
+                        labOrders, dbCache, false, false, OutstandingOrderCodes, true, true);
 
                 // In order to group into a new combined order, the resulting order must contain
                 // all of the tests from the list.
@@ -192,19 +196,11 @@ namespace Extract.LabResultsCustomComponents
                     return null;
                 }
 
-                // Clone the current CombinedGroup
-                OrderGrouping combinedGroup = new OrderGrouping(CombinedGroup);
-
-                // Add the attribute map from the newGroup into the combined group
-                combinedGroup.InsertNameAttributeMap(newGroup);
-
-                // Create a new combined group using the current combined group
-                combinedGroup =
-                    CreateNewOrderGrouping(bestOrder.Key, labOrders, _sourceDocName, combinedGroup);
+                OrderGrouping combinedGroup = new OrderGrouping(labOrders[bestOrder.Key],
+                    bestOrder.Value, CombinedGroup, newGroup);
 
                 // Create the new grouping permutation
-                OrderGroupingPermutation newGroupingPermutation =
-                    new OrderGroupingPermutation(combinedGroup, _dbCache, _sourceDocName);
+                var newGroupingPermutation = new OrderGroupingPermutation(combinedGroup);
                 newGroupingPermutation.ContainedTests = combinedTests;
                 newGroupingPermutation.ContainedGroups = new List<OrderGrouping>(ContainedGroups);
                 newGroupingPermutation.ContainedGroups.Add(newGroup);
@@ -898,12 +894,9 @@ namespace Extract.LabResultsCustomComponents
             Dictionary<string, LabOrder> orders =
                 new Dictionary<string, LabOrder>(StringComparer.OrdinalIgnoreCase);
 
-            string query = hasFilledRequirement
-                ? "SELECT [Code], [Name], [EpicCode], [TieBreaker], "
-                    + "[FilledRequirement] FROM [LabOrder] WHERE [EpicCode] IS NOT NULL"
-
-                : "SELECT [Code], [Name], [EpicCode], [TieBreaker] "
-                    + "FROM [LabOrder] WHERE [EpicCode] IS NOT NULL";
+            string query = "SELECT [Code], [Name], [TieBreaker]"
+                    + (hasFilledRequirement ? ", [FilledRequirement]" : "")
+                    + " FROM [LabOrder] WHERE [Code] IS NOT NULL";
 
             using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
             using (SqlCeDataReader reader = command.ExecuteReader())
@@ -912,12 +905,11 @@ namespace Extract.LabResultsCustomComponents
                 {
                     string code = reader.GetString(0);
                     string name = reader.GetString(1);
-                    string epicCode = reader.GetString(2);
-                    string tieBreaker = reader.GetString(3);
+                    string tieBreaker = reader[2] as string;
                     int filledRequirement = hasFilledRequirement
-                        ? (reader.IsDBNull(4) ? 0 : reader.GetInt32(4)) : 0;
+                        ? (reader[3] as int? ?? 0) : 0;
                     orders.Add(code,
-                        new LabOrder(code, name, epicCode, tieBreaker, dbCache, filledRequirement));
+                        new LabOrder(code, name, tieBreaker, dbCache, filledRequirement));
                 }
             }
             return orders;
@@ -956,7 +948,7 @@ namespace Extract.LabResultsCustomComponents
 
             // Perform the second pass
             var secondPassResult = GetFinalGrouping(firstPassResult, dbCache, labOrders,
-                sourceDocName, requireMandatory, useFilledRequirement, useOutstandingOrders);
+               requireMandatory, useFilledRequirement, useOutstandingOrders);
 
             // If first attempt was trying to limit to outstanding orders,
             // try unknown orders again without limiting
@@ -979,7 +971,7 @@ namespace Extract.LabResultsCustomComponents
                         unknown, dbCache, labOrders, sourceDocName, useFilledRequirement, false);
 
                 secondPassResult = GetFinalGrouping(firstPassResult, dbCache, labOrders,
-                        sourceDocName, requireMandatory, useFilledRequirement, false);
+                        requireMandatory, useFilledRequirement, false);
 
                 // Return the final groupings
                 return known.Concat(secondPassResult.Item1.Concat(secondPassResult.Item2));
@@ -1004,7 +996,7 @@ namespace Extract.LabResultsCustomComponents
         /// A tuple representing the first order mapping pass as a list of mapped groups and a list
         /// of unmapped groups.
         /// </returns>
-        static List<IAttribute> FirstPassGrouping(
+        static List<OrderGrouping> FirstPassGrouping(
             IEnumerable<IAttribute> tests,
             OrderMappingDBCache dbCache,
             Dictionary<string, LabOrder> labOrders,
@@ -1012,7 +1004,7 @@ namespace Extract.LabResultsCustomComponents
             bool useFilledRequirement,
             bool limitToOutstandingOrders)
         {
-            var firstPassMapping = new List<IAttribute>();
+            var firstPassMapping = new List<OrderGrouping>();
 
             foreach (IAttribute attribute in tests)
             {
@@ -1056,92 +1048,33 @@ namespace Extract.LabResultsCustomComponents
                     }
                 }
 
-                List<IAttribute> mappedList = new List<IAttribute>();
                 if (components != null && components.Count > 0)
                 {
                     // All attributes are unmatched at this point
                     List<LabTest> unmatchedTests = BuildTestList(components);
                     while (unmatchedTests.Count > 0)
                     {
-                        // Create a new IUnknown vectors for the matched tests
-                        IUnknownVector vecMatched = new IUnknownVector();
-
-                        // Add all the non-component attributes to the sub attributes
-                        foreach (IAttribute attr in nonComponents)
-                        {
-                            vecMatched.PushBack(attr);
-                        }
-
-                        // Create the new order grouping attribute (default to UnknownOrder)
-                        // and add it to the vector
-                        AttributeClass orderGrouping = new AttributeClass();
-                        orderGrouping.Name = "Name";
-                        orderGrouping.Value.CreateNonSpatialString("UnknownOrder", sourceDocName);
-                        vecMatched.PushBack(orderGrouping);
-
-
                         // Get the best match order for the remaining unmatched tests (require
                         // mandatory tests)
-                        KeyValuePair<string, List<LabTest>> matchedTests = FindBestOrder(unmatchedTests,
-                            labOrders, dbCache, true, useFilledRequirement, outstandingOrderCodes);
+                        KeyValuePair<string, List<LabTest>> matchedOrder = FindBestOrder(unmatchedTests,
+                            labOrders, dbCache, true, useFilledRequirement, outstandingOrderCodes, false, false);
+
+                        LabOrder labOrder;
+                        if (!labOrders.TryGetValue(matchedOrder.Key, out labOrder))
+                        {
+                            labOrder = null;
+                        }
+
+                        var orderGroup = new OrderGrouping(labOrder, matchedOrder.Value,
+                            limitToOutstandingOrders, sourceDocName, nonComponents);
+
+                        firstPassMapping.Add(orderGroup);
 
                         // Update the unmatched test list by removing the now matched tests
-                        foreach (LabTest matches in matchedTests.Value)
-                        {
-                            unmatchedTests.Remove(matches);
-                        }
-
-                        string orderCode = matchedTests.Key;
-                        if (!orderCode.Equals("UnknownOrder", StringComparison.OrdinalIgnoreCase))
-                        {
-                            foreach (LabTest matches in matchedTests.Value)
-                            {
-                                // Add the test to the vector
-                                vecMatched.PushBack(matches.Attribute);
-                            }
-
-                            LabOrder labOrder;
-                            if (!labOrders.TryGetValue(orderCode, out labOrder))
-                            {
-                                ExtractException ee = new ExtractException("ELI29072",
-                                    "Order code could not be found in collection.");
-                                ee.AddDebugData("OrderCode", orderCode, false);
-                                throw ee;
-                            }
-
-
-                            // Set the order group name
-                            orderGrouping.Value.ReplaceAndDowngradeToNonSpatial(
-                                labOrder.OrderName);
-
-                            // Add the epic code
-                            AttributeClass epicCode = new AttributeClass();
-                            epicCode.Name = "EpicCode";
-                            epicCode.Value.CreateNonSpatialString(labOrder.EpicCode,
-                                sourceDocName);
-                            vecMatched.PushBack(epicCode);
-                        }
-                        else
-                        {
-                            // Add all of the "UnknownOrder" tests since there is no group for them
-                            // NOTE: With the current algorithm, this should only be 1 test
-                            foreach (LabTest matches in matchedTests.Value)
-                            {
-                                vecMatched.PushBack(matches.Attribute);
-                            }
-                        }
-
-                        AttributeClass newAttribute = new AttributeClass();
-                        newAttribute.Name = "Test";
-                        newAttribute.Value.CreateNonSpatialString("N/A", sourceDocName);
-                        newAttribute.SubAttributes = vecMatched;
-
-                        // Add the attribute to the return list
-                        mappedList.Add(newAttribute);
+                        var matchedAttributes = new HashSet<IAttribute>(matchedOrder.Value.Select(test => test.Attribute));
+                        unmatchedTests = unmatchedTests.Where(test => !matchedAttributes.Contains(test.Attribute)).ToList();
                     }
                 }
-
-                firstPassMapping.AddRange(mappedList);
             }
 
             return firstPassMapping;
@@ -1158,8 +1091,6 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for querying data.</param>
         /// <param name="labOrders">The collection of lab order codes to <see cref="LabOrder"/>
         /// objects.</param>
-        /// <param name="sourceDocName">The source document name to be used when creating new
-        /// spatial strings.</param>
         /// <param name="requireMandatory">Whether mandatory tests are required when creating
         /// the final groupings.</param>
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
@@ -1170,80 +1101,31 @@ namespace Extract.LabResultsCustomComponents
         /// of unmapped groups.
         /// </returns>
         static Tuple<List<IAttribute>, List<IAttribute>> GetFinalGrouping(
-            List<IAttribute> firstPassGrouping,
+            IEnumerable<OrderGrouping> firstPassGrouping,
             OrderMappingDBCache dbCache,
             Dictionary<string, LabOrder> labOrders,
-            string sourceDocName,
             bool requireMandatory,
             bool useFilledRequirement,
             bool limitToOutstandingOrders)
         {
-            var bestGroups = new List<OrderGrouping>();
-            var finalGrouping = Tuple.Create(new List<IAttribute>(), new List<IAttribute>());
-            var firstPass = new List<OrderGrouping>();
-
-            foreach (IAttribute attribute in firstPassGrouping)
-            {
-                firstPass.Add(new OrderGrouping(attribute, labOrders, limitToOutstandingOrders));
-            }
-
-            while (firstPass.Count > 0)
-            {
-                OrderGroupingPermutation first = new OrderGroupingPermutation(firstPass[0],
-                    dbCache, sourceDocName);
-                List<OrderGroupingPermutation> possibleGroupings = new List<OrderGroupingPermutation>();
-                possibleGroupings.Add(first);
-
-                for (int i = 0; i < possibleGroupings.Count; i++)
-                {
-                    OrderGroupingPermutation temp = possibleGroupings[i];
-                    OrderGrouping lastOrder = temp.ContainedGroups[temp.ContainedGroups.Count - 1];
-
-                    // Now compare each item in the first pass grouping to see if it can be grouped
-                    // with another item in the grouping
-                    for (int j = firstPass.IndexOf(lastOrder) + 1; j < firstPass.Count; j++)
-                    {
-                        OrderGroupingPermutation newPossibility =
-                            temp.AttemptMerge(firstPass[j], labOrders, limitToOutstandingOrders);
-
-                        if (newPossibility != null)
-                        {
-                            // [DataEntry:965]
-                            // If too many possible combinations have been found, begin allowing
-                            // further combinations only with the next test that can be grouped.
-                            // This will prevent the total number of stored combinations from being
-                            // greater than _COMBINATION_ALGORITHM_SAFETY_CUTOFF and prevent the
-                            // possibility of out-of-memory issues.
-                            if (possibleGroupings.Count == _COMBINATION_ALGORITHM_SAFETY_CUTOFF)
-                            {
-                                possibleGroupings[i] = newPossibility;
-                                temp = newPossibility;
-                            }
-                            else
-                            {
-                                possibleGroupings.Add(newPossibility);
-                            }
-                        }
-                    }
-                }
-
-                // Get the best grouping and remove all matched groupings from the first
-                // pass grouping collection
-                OrderGroupingPermutation bestGrouping =
-                    GetBestGrouping(possibleGroupings, requireMandatory, dbCache) ?? first;
-                bestGroups.Add(bestGrouping.CombinedGroup);
-                foreach (OrderGrouping group in bestGrouping.ContainedGroups)
-                {
-                    firstPass.Remove(group);
-                }
-            }
+            IEnumerable<OrderGrouping> bestGroups = MergeGroups(firstPassGrouping, labOrders,
+                dbCache, requireMandatory, useFilledRequirement, limitToOutstandingOrders, false);
 
             // Check for any order groupings that are "UnknownOrder"
             // and attempt to map them to an order [DE #833]
-            MapSingleUnknownOrders(bestGroups, labOrders, dbCache, sourceDocName, requireMandatory,
+            bestGroups = MapSingleUnknownOrders(bestGroups, labOrders, dbCache, requireMandatory,
                 useFilledRequirement);
 
-            // bestGroups should now contain all groupings that could be combined
+            // If filled requirements have been enforced thus far, attempt to combine unknown
+            // order groups with other groups, ignoring filled requirements
+            if (useFilledRequirement)
+            {
+                bestGroups = MergeGroups(bestGroups, labOrders, dbCache, requireMandatory,
+                    false, limitToOutstandingOrders, true);
+            }
+
+            // BestGroups should now contain all groupings that could be combined
+            var finalGrouping = Tuple.Create(new List<IAttribute>(), new List<IAttribute>());
             foreach (OrderGrouping orderGroup in bestGroups)
             {
                 // Add the mapped group to the final grouping
@@ -1264,6 +1146,85 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
+        /// Attempts to merge <see cref="OrderGrouping"/>s together to create larger groups
+        /// </summary>
+        /// <param name="orderGroups">The <see cref="OrderGrouping"/>s to merge</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for querying data.</param>
+        /// <param name="labOrders">The collection of lab order codes to <see cref="LabOrder"/>
+        /// objects.</param>
+        /// <param name="requireMandatory">Whether mandatory tests are required</param>
+        /// <param name="useFilledRequirement">Whether to require that orders meet their filled
+        /// requirement</param>
+        /// <param name="limitToOutstandingOrders">Whether to limit orders to be considered based
+        /// on known, outstanding order codes.</param>
+        /// <param name="mergeUnknownOrders">Whether only mergers containing at least one unknown
+        /// order will be performed</param>
+        /// <returns>List of merged <see cref="OrderGrouping"/>s</returns>
+        private static LinkedList<OrderGrouping> MergeGroups(
+            IEnumerable<OrderGrouping> orderGroups,
+            Dictionary<string, LabOrder> labOrders,
+            OrderMappingDBCache dbCache,
+            bool requireMandatory,
+            bool useFilledRequirement,
+            bool limitToOutstandingOrders,
+            bool mergeUnknownOrders)
+        {
+            LinkedList<OrderGrouping> preMergeGroups, postMergeGroups;
+            postMergeGroups = new LinkedList<OrderGrouping>(orderGroups);
+
+            // Attempt merges until result is the same length as the input
+            do
+            {
+                preMergeGroups = postMergeGroups;
+                postMergeGroups = new LinkedList<OrderGrouping>();
+
+                // Iterate through the pending groups and try to merge with as many subsequent groups
+                // as possible. After merging at least once, stop at the first group with compatible
+                // dates that cannot be merged (to promote merging between nearby groups).
+                while (preMergeGroups.Count > 0)
+                {
+                    var currentGroup = new OrderGroupingPermutation(preMergeGroups.First.Value);
+                    var possibleGroupings = new List<OrderGroupingPermutation> { currentGroup };
+                    // Attempt to add each subsequent pending group
+                    foreach (var nextGroup in preMergeGroups)
+                    {
+                        bool compatibleDates;
+                        bool mergedAtLeastOnce = false;
+                        OrderGroupingPermutation newPossibility =
+                            currentGroup.AttemptMerge(nextGroup, labOrders, dbCache, limitToOutstandingOrders,
+                            out compatibleDates);
+
+                        if (newPossibility != null)
+                        {
+                            possibleGroupings.Add(newPossibility);
+                            currentGroup = newPossibility;
+                            mergedAtLeastOnce = true;
+                        }
+                        else if (compatibleDates && mergedAtLeastOnce)
+                        {
+                            break;
+                        }
+                    }
+
+                    // Get the best groups and remove all matched groups from the pending collection
+                    OrderGroupingPermutation bestGrouping = GetBestGrouping
+                        (possibleGroupings, requireMandatory, useFilledRequirement, mergeUnknownOrders)
+                        ?? possibleGroupings[0];
+
+                    postMergeGroups.AddLast(bestGrouping.CombinedGroup);
+
+                    foreach (OrderGrouping group in bestGrouping.ContainedGroups)
+                    {
+                        preMergeGroups.Remove(group);
+                    }
+                }
+            }
+            while (preMergeGroups.Count > postMergeGroups.Count);
+
+            return postMergeGroups;
+        }
+
+        /// <summary>
         /// Gets the best order grouping from a collection of potential order groupings.
         /// <para>Note:</para>
         /// Best is defined as the order grouping with the most tests.
@@ -1272,26 +1233,37 @@ namespace Extract.LabResultsCustomComponents
         /// </param>
         /// <param name="requireMandatory">Whether mandatory tests are required when creating
         /// the final groupings.</param>
-        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
+        /// <param name="useFilledRequirement">Whether the filled requirement of an order must be met</param>
+        /// <param name="requireContainedUnknownOrder">Whether a group not yet mapped to an order
+        /// must be contained in the result</param>
         /// <returns>The "Best" (see note in summary) order grouping from the list of possible
         /// groupings.</returns>
         static OrderGroupingPermutation GetBestGrouping(
             List<OrderGroupingPermutation> possibleGroupings, bool requireMandatory,
-            OrderMappingDBCache dbCache)
+            bool useFilledRequirement, bool requireContainedUnknownOrder)
         {
             int bestGroupCount = 0;
             string bestTieBreakerString = "";
             OrderGroupingPermutation bestGroup = null;
             foreach (OrderGroupingPermutation group in possibleGroupings)
             {
+                // Check mandatory requirement
                 if (requireMandatory && group.CombinedGroup.LabOrder != null &&
-                    !group.CombinedGroup.ContainsAllMandatoryTests(dbCache))
+                    !group.CombinedGroup.ContainsAllMandatoryTests())
                 {
                     continue;
                 }
 
-                if (group.CombinedGroup.LabOrder != null &&
+                // Check filled requirement
+                if (useFilledRequirement && group.CombinedGroup.LabOrder != null &&
                     group.CombinedGroup.LabTests.Count < group.CombinedGroup.LabOrder.FilledRequirement)
+                {
+                    continue;
+                }
+
+                // Check if an unknown order was merged if that is required
+                if (requireContainedUnknownOrder
+                    && !group.ContainedGroups.Where(g => g.LabOrder == null).Any())
                 {
                     continue;
                 }
@@ -1323,61 +1295,6 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Creates a new <see cref="OrderGrouping"/> from the sub attributes contained in the
-        /// <paramref name="sourceGroup"/> <see cref="OrderGrouping"/>.
-        /// </summary>
-        /// <param name="orderCode">The order code to create the group for.
-        /// <para><b>Note:</b></para>
-        /// This must be a valid order code, do not call this method with "UnknownOrder".</param>
-        /// <param name="labOrders">The map of order codes to <see cref="LabOrder"/>s.</param>
-        /// <param name="sourceDocName">The source doc name for the new attributes.</param>
-        /// <param name="sourceGroup">The <see cref="OrderGrouping"/> that contains the
-        /// sub attributes that should be added to the new <see cref="OrderGrouping"/>.</param>
-        /// <returns>A new <see cref="OrderGrouping"/> based on <paramref name="sourceGroup"/>
-        /// and the new <paramref name="orderCode"/>.</returns>
-        static OrderGrouping CreateNewOrderGrouping(string orderCode,
-            Dictionary<string, LabOrder> labOrders, string sourceDocName,
-            OrderGrouping sourceGroup)
-        {
-            LabOrder labOrder;
-            if (!labOrders.TryGetValue(orderCode, out labOrder))
-            {
-                ExtractException ee = new ExtractException("ELI29074",
-                    "Order code could not be found in collection.");
-                ee.AddDebugData("OrderCode", orderCode, false);
-                throw ee;
-            }
-
-            // Update the order name of the group1 mapping
-            List<IAttribute> tempList = new List<IAttribute>();
-            IAttribute temp = new AttributeClass();
-            temp.Name = "Name";
-            temp.Value.CreateNonSpatialString(labOrder.OrderName, sourceDocName);
-            tempList.Add(temp);
-            sourceGroup.NameToAttributes["NAME"] = tempList;
-
-            // Update the epic code of the group mapping
-            tempList = new List<IAttribute>();
-            temp = new AttributeClass();
-            temp.Name = "EpicCode";
-            temp.Value.CreateNonSpatialString(labOrder.EpicCode, sourceDocName);
-            tempList.Add(temp);
-            sourceGroup.NameToAttributes["EPICCODE"] = tempList;
-
-            // Build a new order for this group
-            IAttribute attribute = new AttributeClass();
-            attribute.Name = "Test";
-            attribute.Value.CreateNonSpatialString("N/A", sourceDocName);
-            attribute.SubAttributes = sourceGroup.GetAllAttributesAsIUnknownVector();
-
-            // Create a new group with this object
-            OrderGrouping newGroup = new OrderGrouping(attribute, null,
-                sourceGroup.NameToAttributes, false, sourceGroup.OutstandingOrderCodes);
-            newGroup.LabOrder = labOrder;
-            return newGroup;
-        }
-
-        /// <summary>
         /// Attempts to map any single unknown orders into an actual order grouping.
         /// If a mapping is possible, the unknown order <see cref="OrderGrouping"/>
         /// will be replaced in <paramref name="orderGroups"/> with the a new
@@ -1387,36 +1304,32 @@ namespace Extract.LabResultsCustomComponents
         /// to check.</param>
         /// <param name="labOrders">The map of order codes to <see cref="LabOrder"/>s.</param>
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for querying data.</param>
-        /// <param name="sourceDocName">The source doc name for the new attributes.</param>
         /// <param name="requireMandatory">If <see langword="true"/> then will only map to an
         /// order if all mandatory tests are present.</param>
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
-        static void MapSingleUnknownOrders(List<OrderGrouping> orderGroups,
+        static IEnumerable<OrderGrouping> MapSingleUnknownOrders(IEnumerable<OrderGrouping> orderGroups,
             Dictionary<string, LabOrder> labOrders, OrderMappingDBCache dbCache,
-            string sourceDocName, bool requireMandatory, bool useFilledRequirement)
+            bool requireMandatory, bool useFilledRequirement)
         {
-            for (int i = 0; i < orderGroups.Count; i++)
+            return orderGroups.Select(group =>
             {
-                OrderGrouping group = orderGroups[i];
+                var newGroup = group;
                 if (group.LabOrder == null && group.LabTests.Count == 1)
                 {
                     // Try to map this unknown order
                     KeyValuePair<string, List<LabTest>> bestMatch = FindBestOrder(
                         new List<LabTest>(group.LabTests), labOrders, dbCache, requireMandatory,
-                        useFilledRequirement, group.OutstandingOrderCodes);
+                        useFilledRequirement, group.OutstandingOrderCodes, true, false);
 
                     // Check for a new mapping
                     if (!bestMatch.Key.Equals("UnknownOrder", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Create the new order grouping
-                        OrderGrouping newGroup = CreateNewOrderGrouping(bestMatch.Key,
-                            labOrders, sourceDocName, group);
-
-                        // Update the list entry with the new order grouping
-                        orderGroups[i] = newGroup;
+                        newGroup = new OrderGrouping(labOrders[bestMatch.Key], bestMatch.Value, group);
                     }
                 }
-            }
+
+                return newGroup;
+            });
         }
 
         /// <summary>
@@ -1469,10 +1382,13 @@ namespace Extract.LabResultsCustomComponents
         /// the order with the most tests, even if all mandatory are not present.</param>
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
         /// <param name="outstandingOrderCodes">Set of order codes to limit the orders to be considered.</param>
+        /// <param name="finalPass">Whether this is the second, merge-groups, pass of the algorithm</param>
+        /// <param name="mustUseAllTests">Whether all tests must be mapped to a single order</param>
         /// <returns>A pair containing the order code and a list of matched tests.</returns>
         static KeyValuePair<string, List<LabTest>> FindBestOrder(List<LabTest> unmatchedTests,
             Dictionary<string, LabOrder> labOrders, OrderMappingDBCache dbCache,
-            bool requireMandatory, bool useFilledRequirement, HashSet<string> outstandingOrderCodes)
+            bool requireMandatory, bool useFilledRequirement, HashSet<string> outstandingOrderCodes,
+            bool finalPass, bool mustUseAllTests)
         {
             // Variables to hold the best match seen thus far (will be modified as the
             // best matching algorithm does its work
@@ -1504,31 +1420,34 @@ namespace Extract.LabResultsCustomComponents
                     throw ee;
                 }
 
-                // Check if either mandatory not required or all the mandatory tests are present
-                if (!requireMandatory || labOrder.ContainsAllMandatoryTests(unmatchedTests, dbCache))
+                // Check if all tests could possibly fit in the order
+                if (mustUseAllTests && labOrder.MaxSize < unmatchedTests.Count)
                 {
-                    List<LabTest> matchedTests = labOrder.GetMatchingTests(unmatchedTests, dbCache);
+                    continue;
+                }
 
-                    if (!useFilledRequirement || matchedTests.Count >= labOrder.FilledRequirement)
+                List<LabTest> matchedTests = labOrder.GetMatchingTests(unmatchedTests, dbCache,
+                    finalPass, requireMandatory);
+
+                if (matchedTests != null && (!useFilledRequirement || matchedTests.Count >= labOrder.FilledRequirement))
+                {
+                    // Best match if more tests matched OR
+                    if (matchedTests.Count > bestMatchCount)
                     {
-                        // Best match if more tests matched OR
-                        if (matchedTests.Count > bestMatchCount)
-                        {
-                            bestMatchCount = matchedTests.Count;
-                            bestMatchedTests = matchedTests;
-                            bestOrderId = labOrder.OrderCode;
-                            bestTieBreakerString = labOrder.TieBreakerString;
-                        }
-                        // ...equal test count AND a lesser TieBreakerString.
-                        else if (matchedTests.Count == bestMatchCount &&
-                                 string.Compare(labOrder.TieBreakerString, bestTieBreakerString,
-                                                StringComparison.Ordinal) < 0)
-                        {
-                            bestMatchCount = matchedTests.Count;
-                            bestMatchedTests = matchedTests;
-                            bestOrderId = labOrder.OrderCode;
-                            bestTieBreakerString = labOrder.TieBreakerString;
-                        }
+                        bestMatchCount = matchedTests.Count;
+                        bestMatchedTests = matchedTests;
+                        bestOrderId = labOrder.OrderCode;
+                        bestTieBreakerString = labOrder.TieBreakerString;
+                    }
+                    // ...equal test count AND a lesser TieBreakerString.
+                    else if (matchedTests.Count == bestMatchCount &&
+                             string.Compare(labOrder.TieBreakerString, bestTieBreakerString,
+                                            StringComparison.Ordinal) < 0)
+                    {
+                        bestMatchCount = matchedTests.Count;
+                        bestMatchedTests = matchedTests;
+                        bestOrderId = labOrder.OrderCode;
+                        bestTieBreakerString = labOrder.TieBreakerString;
                     }
                 }
             }
@@ -1537,26 +1456,6 @@ namespace Extract.LabResultsCustomComponents
             if (bestMatchCount == 0)
             {
                 bestMatchedTests.Add(unmatchedTests[0]);
-            }
-            else
-            {
-                // bestMatchedTests contains copies of the original source tests. Now that this set
-                // is finalized, find the corresponding tests from the source parameter and use them
-                // after assign the mapped test codes.
-                // This is so the caller can compare the resulting tests to the source tests by
-                // reference.
-                for (int i = 0; i < bestMatchedTests.Count; i++)
-                {
-                    LabTest bestMatchedTest = bestMatchedTests[i];
-
-                    LabTest sourceTest = unmatchedTests
-                        .Where(test => test.Attribute == bestMatchedTest.Attribute)
-                        .First();
-
-                    sourceTest.TestCode = bestMatchedTest.TestCode;
-
-                    bestMatchedTests[i] = sourceTest;
-                }
             }
 
             return new KeyValuePair<string, List<LabTest>>(bestOrderId, bestMatchedTests);
@@ -1596,6 +1495,27 @@ namespace Extract.LabResultsCustomComponents
                 }
 
                 nameToAttributes.Add(name.ToUpperInvariant(), listAttributes);
+            }
+
+            return nameToAttributes;
+        }
+
+        /// <summary>
+        /// Builds a map of names to <see cref="List{T}"/> of attributes.
+        /// </summary>
+        /// <param name="attributes">The list of attributes to group.</param>
+        /// <returns>The map of names to attributes.</returns>
+        internal static Dictionary<string, List<IAttribute>> GetMapOfNamesToAttributes(
+            List<IAttribute> attributes)
+        {
+            // Create a dictionary to hold the values
+            Dictionary<string, List<IAttribute>> nameToAttributes =
+                new Dictionary<string, List<IAttribute>>();
+
+            foreach (var attribute in attributes)
+            {
+                nameToAttributes.GetOrAdd(attribute.Name, name =>
+                    new List<IAttribute>()).Add(attribute);
             }
 
             return nameToAttributes;

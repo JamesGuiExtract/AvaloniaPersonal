@@ -1,7 +1,9 @@
+using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -11,7 +13,7 @@ namespace Extract.Utilities.Parsers
     /// A utility class to used to expand Extract Systems fuzzy regex search syntax into an
     /// equivalent regular expression.
     /// </summary>
-    static class FuzzySearchRegexBuilder
+    public static class FuzzySearchRegexBuilder
     {
         #region Private Classes
 
@@ -25,13 +27,13 @@ namespace Extract.Utilities.Parsers
             /// unmatched chars as possible.
             /// </summary>
             public enum Method
-            { 
+            {
                 /// <summary>
                 /// Specifies that the resulting expression should favor speed over finding the best
                 /// fit match.
                 /// </summary>
                 Fast,
-                
+
                 /// <summary>
                 /// Specifies that the resulting expression should favor finding a good fit over
                 /// speed.
@@ -54,6 +56,31 @@ namespace Extract.Utilities.Parsers
             /// allowed before a potential match is discarded.
             /// </summary>
             public uint ExtraWhitespaceAllowed;
+
+            /// <summary>
+            /// The pattern to use for substitute characters.
+            /// </summary>
+            public string SubstitutePattern = _DEFAULT_SUBSTITUTE_PATTERN;
+
+            /// <summary>
+            /// The pattern to use for extra whitespace.
+            /// </summary>
+            public string WhitespacePattern = _DEFAULT_WHITESPACE_PATTERN;
+
+            /// <summary>
+            /// Whether to omit numbers from balancing stack names.
+            /// </summary>
+            public bool UseGlobalNames;
+
+            /// <summary>
+            /// Whether to escape literal space characters in patterns.
+            /// </summary>
+            public bool EscapeSpaceChars;
+
+            /// <summary>
+            /// List of character replacements to run against the search string before expansion
+            /// </summary>
+            public List<KeyValuePair<string,string>> CharacterReplacements = new List<KeyValuePair<string,string>>();
         }
 
         /// <summary>
@@ -112,11 +139,12 @@ namespace Extract.Utilities.Parsers
             /// that correspond to the specified id.
             /// </summary>
             /// <param name="id">A <see langword="int"/> used to differentiate this set of stack
-            /// names from stack names used for other fuzzy searches in the same regex.</param>
+            /// names from stack names used for other fuzzy searches in the same regex. If -1 then
+            /// stack names will be 'global' (have no number suffix).</param>
             public BalancingRegexStackNames(int id)
             {
                 // Initialize the unique string to be added to each stack name.
-                string termIdentifier = id.ToString(CultureInfo.InvariantCulture);
+                string termIdentifier = id == -1 ? "" : id.ToString(CultureInfo.InvariantCulture);
 
                 // Initialize the stack names using termIdentifier.
                 _initialErrorStack = "_ie" + termIdentifier;
@@ -137,7 +165,6 @@ namespace Extract.Utilities.Parsers
             /// <see langword="false"/> if the final values should be used.</value>
             /// <returns><see langword="true"/> if the initial values are being used,
             /// <see langword="false"/> if the final values are being used.</returns>
-            [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
             public bool UseInitialStackSet
             {
                 get
@@ -160,7 +187,7 @@ namespace Extract.Utilities.Parsers
             {
                 get
                 {
-                    return _useInitialStackSet ? _initialErrorStack : _finalErrorStack;
+                    return UseInitialStackSet ? _initialErrorStack : _finalErrorStack;
                 }
             }
 
@@ -173,7 +200,7 @@ namespace Extract.Utilities.Parsers
             {
                 get
                 {
-                    return _useInitialStackSet ? _initialExtraSpaceStack : _finalExtraSpaceStack;
+                    return UseInitialStackSet ? _initialExtraSpaceStack : _finalExtraSpaceStack;
                 }
             }
 
@@ -186,7 +213,7 @@ namespace Extract.Utilities.Parsers
             {
                 get
                 {
-                    return _useInitialStackSet ? _initialMissedStack : _finalMissedStack;
+                    return UseInitialStackSet ? _initialMissedStack : _finalMissedStack;
                 }
             }
 
@@ -239,90 +266,144 @@ namespace Extract.Utilities.Parsers
             }
         }
 
+        /// <summary>
+        /// Represents a single search token with no qualifier, an optional qualifier,
+        /// or a required qualifier
+        /// </summary>
+        struct SearchToken
+        {
+            /// <summary>
+            /// The token's value
+            /// </summary>
+            public string value;
+
+            /// <summary>
+            /// Whether this token can be missing without affecting the score of the match
+            /// </summary>
+            public bool optional;
+
+            /// <summary>
+            /// Whether this token is not allowed to be missing or substituted
+            /// </summary>
+            public bool required;
+        }
+
         #endregion Private Classes
 
-        #region Fields
+        #region Constants
 
         /// <summary>
-        /// A regular expression used to identify regex search expression(s) within a given regex
-        /// string.
+        /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static Regex _fuzzySearchExpressionParserRegex = new Regex(
-            @"[(][?][~][<]" +
-            @"(?'options'[^>]*?)" +
-            @"[>]" +
-            @"(?'search_string'" +
-                @"(" +
-                    // Treat all chars between unescaped open and closed square brackets
-                    // as part of a character class (disregard an enclosed closing paren)
-                    @"(?<=(^|[^\\])([\\]{2})*)\[" +
-                        @".+?" +
-                        @"(?<=[^\\]([\\]{2})*)\]" +
-                    // Treat any escaped closing paren as part of the search string.
-                    @"|(?<=[^\\]([\\]{2})*[\\])[)]" +
-                    // Treat any other non-paren as part of the search string.
-                    @"|[^)]" +
-                @")*?" +
-            @")" +
-            @"(?<=[^\\]([\\]{2})*)[)]");
+        static readonly string _OBJECT_NAME = typeof(FuzzySearchRegexBuilder).ToString();
 
         /// <summary>
-        /// A regular expression used to parse search tokens with a fuzzy search string.
+        /// The options to be used internally for regex pattern matching
         /// </summary>
-        static Regex _searchStringTokenizerRegex = new Regex(
-            // Search for token used to match next char
-            @"(?'search_token'" +
-            // Search for a character class enclosed in square brackets.
-                @"(?<=(^|[^\\])([\\]{2})*)\[" +
-                @"((?<![^\\]([\\]{2})*)\]|[^\]])*" +
-                @"(?<=[^\\]([\\]{2})*)\]" +
-            // Search for .NET regex defined escape chars
-                @"|\\\d{1,3}" +
-                @"|\\c\S" +
-                @"|\\x[0-9a-eA-E]{2}" +
-                @"|\\u[0-9a-eA-E]{4}" +
-                @"|\\[\s\S]" +
-                @"|[\s\S]" +
-            @")" +
-            // Look for specification of many times to repeat token.
-            @"(" +
-                @"(?<=[^\\]([\\]{2})*)" +
-                @"\{(?'repetitions'\d+?)\}" +
-            @")?");
+        const RegexOptions _REGEX_OPTIONS = RegexOptions.ExplicitCapture
+            | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace;
 
-        #endregion Fields
+        // The default pattern for what will be considered as whitespace for the fuzzy regex
+        // xtra_ws option.
+        const string _DEFAULT_WHITESPACE_PATTERN = @"\s";
 
-        #region Methods
+        // The default pattern allowed for token substitutions for the fuzzy regex
+        const string _DEFAULT_SUBSTITUTE_PATTERN = ".";
+
+        // Regex pattern that matches a fuzzy regex pattern
+        const string _FUZZY_SEARCH_EXPRESSION = _PREFIX + _OPTIONS + "(?'search_string'" + _VALID_SEQUENCE + @")\)";
+
+        // The prefix of a fuzzy pattern (non-escaped open parenthesis followed by '?~')
+        const string _PREFIX = @"(?<=(^|[^\\])(\\\\)*)\(\?~";
+
+        // The options for the fuzzy pattern
+        const string _OPTIONS = @"<(?>(?>((?<=<)|,)\s*" + _OPTION + @"\s*(?=,|>))*)>";
+
+        // A single option (name=value)
+        const string _OPTION = @"(?'option_name'\w+)\s*=\s*(?'option_value'" + _VALID_SEQUENCE + ")";
+
+        // A minimal sequence of characters and/or escape sequences that matches round and square
+        // bracket pairs, following the special character rules that the .NET regex parser uses.
+        // Capped at 1000 so that a malformed fuzzy regex syntax in a very large regex pattern will
+        // not cause parsing process to hang.
+        const string _VALID_SEQUENCE = @"(" + _ATOM + @"){1,1000}?" + _NO_OPEN_BRACKETS;
+
+        // Matches a single character or escape sequence and tracks open parentheses and square brackets.
+        const string _ATOM =
+            @"(?>
+                  \\( \d{1,3} | c\S | x[0-9a-eA-E]{2} | u[0-9a-eA-E]{4} | [\s\S] )
+                | \[\^] (?'Square') # in this position a closing bracket is effectively escaped
+                | \[ (?'Square')
+                | \] (?(Square)(?'-Square')) # Closing square is only special if there is an open square
+                | \( (?'Round')
+                | \) (?'-Round')
+                | [^])]
+              )";
+
+        // Fails the match if there is a bracket unclosed
+        const string _NO_OPEN_BRACKETS = @"(?(Square)(?!)|(?(Round)(?!)))";
+
+        // A valid fuzzy search token, consists of a search token, an optional, fixed-length
+        // quantifier and an optional qualifier (+ meaning the term is required and ? meaning
+        // that the term can be missing without affecting the error count)
+        const string _TOKEN =
+            @"\G(?'search_token'" + _VALID_SEQUENCE + @")({(?'repetitions'\d+)})?(?'qualifier'[+?])?";
+
+        // A sub-token of a fuzzy search token. This is used to break apart a token that is a
+        // parenthesized group token before performing any specified replacements on its pieces.
+        const string _SUB_TOKEN =
+            @"\G(?'search_token'" + _VALID_SEQUENCE + @")(?'quantifier'" + _QUANTIFIER + @")?";
+
+        // A .NET regex quantifier (can be variable length and non-greedy)
+        const string _QUANTIFIER = @"({\d+(,(\d+)?)?} | [?*+])\??";
+
+        #endregion Constants
+
+        #region Public Methods
 
         /// <summary>
         /// Expands all fuzzy search strings withing the specified regex to produce a resulting
         /// regular expression that will perform the search specified.
         /// <para><b>Syntax:</b></para>
-        /// SYNTAX: (given as a .NET regex):
-        /// [(] [?] [~] [&lt;]
-        /// (?'options'[^>]+?)
-        /// [>]
-        /// (?'search_string'
-		/// (
-        /// 	(?&lt;=(^|[^\\])([\\]{2})*)\[.+?
-		/// 		(?&lt;=[^\\]([\\]{2})*)\]
-        /// 	|(?&lt;=[^\\]([\\]{2})*[\\])[)]
-		/// 	|[^)]
-		/// )*?
-	    /// )
-        /// (?&lt;=[^\\]([\\]{2})*)[)]
-        /// where 'options' is a comma separated list of the following possible options:
+        /// SYNTAX: (?~&lt;options>search_string)
+        /// Where 'options' is a comma separated list of the following possible options:
         /// method=fast|better_fit (default=fast): 
         ///     fast will execute faster but match characters outside of the specified search string
         ///     depending upon how many of the errors allowed were found in a match.
         ///     better_fit will match only the specified search string but will take longer to
         ///     execute.
-        /// error=[number] (default = 1):
+        /// error=number (default = 1):
         ///     The number of errors (missing or wrong characters) that are allowed in a potential
         ///     match before the match is discarded.
-        /// xtra_ws=[number] (default = 0):
+        /// escape_space_chars|esc_s=true|false (default = false):
+        ///     Whether literal space characters (' ') will be escaped ('\ '). This only works in
+        ///     some contexts because often whitespace is trimmed from the source expression prior to
+        ///     fuzzy expansion.
+        /// extra_ws|xtra_ws=number (default = 0):
         ///     The number of extra whitespace chars that are allowed outside of the number of
         ///     errors that are allowed before disqualifying a potential match.
+        /// substitute_pattern|sub=pattern (default = .):
+        ///     The pattern that defines what a substitute (error) token can be. Any valid, non-empty
+        ///     regular expression will be accepted but if the pattern contains an unescaped '>' or ','
+        ///     character then it should be enclosed in parentheses to remove possible ambiguity.
+        /// use_global_names|global|g=true|false (default = false):
+        ///     If use_global_names=true then the group names used in the expanded pattern will not
+        ///     be unique to each pattern in the source regex. Only use this option if you understand
+        ///     the implications of this.
+        /// ws_pattern|ws=pattern (default = \s):
+        ///     The pattern that defines what is considered to be a whitespace character. Does not
+        ///     need to match only a single character; any valid, non-empty regular expression will
+        ///     be accepted but if the pattern contains an unescaped '>' or ',' character then it
+        ///     should be enclosed in parentheses to remove possible ambiguity.
+        /// replacements=(replace=>replacement)... (default = no replacements defined)
+        ///     Token replacements that will be made to the search string after it has been broken
+        ///     into tokens.
+        ///     The replace part is a .NET regular expression that must match an entire token or an
+        ///     entire sub-token for the replacement to occur. The replacement must be a valid .NET
+        ///     regular expression to avoid ambiguities in parsing the list of pairs
+        ///     (e.g., no unclosed parentheses). The replacements will not be made against tokens
+        ///     that have sub-tokens, against sub-sub-tokens nor against any quantifier portions of
+        ///     the regex, e.g., {1,2}.
         /// 'search_string' is the string to search for. The string will be treated a literal text
         /// except in that:
         /// 1) Regex escape sequences (ie. \d, \x20, \040, \cC, \u0020), and character
@@ -331,6 +412,10 @@ namespace Extract.Utilities.Parsers
         /// in the text to be searched.
         /// 2) A number enclosed in curly braces except at the beginning of the search string will
         /// repeat the previous token the specified number of times. (ie: \d{9} or [\da-eA-E]{3}).
+        /// 3) Top-level parenthesized groups will be treated as single tokens as far as errors and
+        /// extra whitespace are concerned but replacements will only occur on sub-tokens.
+        /// 4) A + or ? after a token will determine whether the token is required (substitution
+        /// or omission not allowed) or optional (in which case omission will not count as an error).
         /// </summary>
         /// <param name="sourceRegex">The regular expression in which fuzzy search syntax should be
         /// expanded out into the equivalent regex.</param>
@@ -340,19 +425,15 @@ namespace Extract.Utilities.Parsers
         {
             try
             {
+                ValidateLicense();
+
                 StringBuilder expandedSearchString = new StringBuilder();
                 int expansionPos = 0;
 
                 // Process each string within sourceRegex that matches the fuzzy search pattern.
-                MatchCollection matches = _fuzzySearchExpressionParserRegex.Matches(sourceRegex);
+                MatchCollection matches = Regex.Matches(sourceRegex, _FUZZY_SEARCH_EXPRESSION, _REGEX_OPTIONS);
                 foreach (Match match in matches)
                 {
-                    // Create a new set of stack names that will be unique to this particular
-                    // fuzzy search (so that the stack names are not repeated within the same
-                    // sourceRegex
-                    BalancingRegexStackNames stackNames =
-                        new BalancingRegexStackNames(match.Index);
-
                     // Add to the result the part of sourceRegex prior to the start of the fuzzy
                     // search pattern.
                     if (match.Index > expansionPos)
@@ -369,117 +450,159 @@ namespace Extract.Utilities.Parsers
                     FuzzySearchOptions options = GetFuzzySearchOptions(match);
 
                     // Parse the search string into a list of tokens.
-                    List<string> searchTokens = GetSearchTokens(match);
+                    List<SearchToken> searchTokens = GetSearchTokens(match, options);
 
-                    ExtractException.Assert("ELI28335", "Number of fuzzy search errors allowed " +
-                        "cannot be more than the length of the string to search for.",
-                        options.ErrorsAllowed <= searchTokens.Count);
-
-                    // Create expression prefix to initialize error and extra space stack counts.
-                    expandedSearchString.Append(@"(?nx:");
-                    expandedSearchString.Append(
-                        IncrementStack(stackNames.ErrorStack, (int)options.ErrorsAllowed));
-                    expandedSearchString.Append(IncrementStack(stackNames.ExtraSpaceStack,
-                            (int)options.ExtraWhitespaceAllowed));
-                    expandedSearchString.AppendLine();
-
-                    // For better fit method, create named group to store the matched string.
-                    if (options.SearchMethod == FuzzySearchOptions.Method.BetterFit)
+                    if (searchTokens.Count == 1)
                     {
-                        expandedSearchString.Append(@"(?'");
-                        expandedSearchString.Append(stackNames.ActualMatchedString);
-                        expandedSearchString.Append(@"'");
+                        expandedSearchString.Append(searchTokens[0]);
+                    }
+                    else
+                    {
+
+                        ExtractException.Assert("ELI28335", "Number of fuzzy search errors allowed " +
+                            "cannot be more than the length of the string to search for.",
+                            options.ErrorsAllowed <= searchTokens.Count);
+
+                        // Create a new set of stack names that will be unique (unless UseGlobalNames=true)
+                        // to this particular fuzzy search (so that the stack names are not repeated
+                        // within the same sourceRegex)
+                        BalancingRegexStackNames stackNames =
+                            new BalancingRegexStackNames(options.UseGlobalNames ? -1 : match.Index);
+
+                        // Create expression prefix to initialize error and extra space stack counts.
+                        expandedSearchString.Append(@"(?nx:");
+                        expandedSearchString.Append(
+                            IncrementStack(stackNames.ErrorStack, (int)options.ErrorsAllowed));
+                        expandedSearchString.Append(
+                            IncrementStack(stackNames.MissedStack, 0));
+                        if (options.ExtraWhitespaceAllowed != 0)
+                        {
+                            expandedSearchString.Append(IncrementStack(stackNames.ExtraSpaceStack,
+                                (int)options.ExtraWhitespaceAllowed));
+                        }
+                        else if (options.UseGlobalNames)
+                        {
+                            expandedSearchString.Append(IncrementStack(stackNames.ExtraSpaceStack, 0));
+                        }
                         expandedSearchString.AppendLine();
-                    }
 
-                    // Leading whitespace will be allowed for the first token of the fast method.
-                    bool allowLeadingSpace =
-                        options.SearchMethod != FuzzySearchOptions.Method.BetterFit
-                        && options.ExtraWhitespaceAllowed > 0;
-
-                    // Create a term that searches for each token in the search string and adjusts
-                    // stack counts accordingly for each miss.
-                    for (int i = 0; i < searchTokens.Count; i++)
-                    {
-                        string searchToken = searchTokens[i];
-
-                        AddTokenSearchTerm(expandedSearchString, searchToken, stackNames,
-                            options.SearchMethod == FuzzySearchOptions.Method.BetterFit,
-                            allowLeadingSpace);
-
-                        // Allow leading whitespace starting with the first token following a
-                        // non zero width assertion token.
-                        if (options.ExtraWhitespaceAllowed > 0)
+                        // For better fit method, create named group to store the matched string.
+                        if (options.SearchMethod == FuzzySearchOptions.Method.BetterFit)
                         {
-                            allowLeadingSpace |= !isZeroWidthAssertion(searchToken);
+                            expandedSearchString.Append(@"(?'");
+                            expandedSearchString.Append(stackNames.ActualMatchedString);
+                            expandedSearchString.Append(@"'");
+                            expandedSearchString.AppendLine();
                         }
-                    }
 
-                    // If using better fit method, create another set of token search terms that
-                    // lookahead to try to find a better match.
-                    if (options.SearchMethod == FuzzySearchOptions.Method.BetterFit)
-                    {
-                        // Close the ActualMatchedString search token group
-                        expandedSearchString.AppendLine(@")");
+                        // Leading whitespace not allowed for the first token of the better_fit method.
+                        // Don't allow leading space if ExtraWhitespaceAllowed == 0, unless using global
+                        // names (because if using global names then extra whitespace might be specified
+                        // outside the scope of this expression).
+                        bool allowLeadingSpace =
+                            options.SearchMethod != FuzzySearchOptions.Method.BetterFit
+                            && (options.UseGlobalNames
+                                 || options.ExtraWhitespaceAllowed != 0);
 
-                        // Open a new search token group that attempts to lookahead to avoid
-                        // matching any leading chars that are not part of the actual matched string.
-                        expandedSearchString.AppendLine(@"(?<=");
-
-                        expandedSearchString.Append(@"(?!");
-
-                        // Decrement the error or extra space stack
-                        if (allowLeadingSpace)
-                        {
-                            expandedSearchString.Append(@"(");
-                            expandedSearchString.Append(
-                                IncrementStack(stackNames.FinalExtraSpaceStack, -1));
-                            expandedSearchString.Append(@"|");
-                        }
-                        expandedSearchString.Append(
-                            IncrementStack(stackNames.FinalErrorStack, -1));
-                        if (allowLeadingSpace)
-                        {
-                            expandedSearchString.Append(@")");
-                        }
-                        expandedSearchString.Append(@"(");
-                        expandedSearchString.Append(
-                            IncrementStack(stackNames.AllowableLookAheadStack, -1));
-                        expandedSearchString.AppendLine(@"[\S\s])+?");
-
-                        // Switch to use the final stack name set for the following group of token
-                        // search terms.
-                        stackNames.UseInitialStackSet = false;
-
-                        // Leading whitespace not allowed for the first token of the better fit method.
-                        allowLeadingSpace = false;
-
-                        // Generate the second set of search token terms.
+                        // Create a term that searches for each token in the search string and adjusts
+                        // stack counts accordingly for each miss.
                         for (int i = 0; i < searchTokens.Count; i++)
                         {
-                            string searchToken = searchTokens[i];
-                            bool zeroWidthAssertion = isZeroWidthAssertion(searchToken);
+                            SearchToken searchToken = searchTokens[i];
 
                             AddTokenSearchTerm(expandedSearchString, searchToken, stackNames,
-                                false, allowLeadingSpace);
+                                options.SearchMethod == FuzzySearchOptions.Method.BetterFit,
+                                allowLeadingSpace, options.SubstitutePattern, options.WhitespacePattern);
 
                             // Allow leading whitespace starting with the first token following a
                             // non zero width assertion token.
-                            if (options.ExtraWhitespaceAllowed > 0)
+                            // Don't allow leading space if ExtraWhitespaceAllowed == 0 unless using global names
+                            if (options.UseGlobalNames || options.ExtraWhitespaceAllowed != 0)
                             {
-                                allowLeadingSpace |= !zeroWidthAssertion;
+                                allowLeadingSpace |= !isZeroWidthAssertion(searchToken.value);
                             }
                         }
 
-                        // End the lookahead term.
-                        expandedSearchString.AppendLine(@")");
-                        expandedSearchString.Append(@"\k'");
-                        expandedSearchString.Append(stackNames.ActualMatchedString);
-                        expandedSearchString.Append(@"')");
-                    }
+                        // If using better fit method, create another set of token search terms that
+                        // lookahead to try to find a better match.
+                        if (options.SearchMethod == FuzzySearchOptions.Method.BetterFit)
+                        {
+                            // Close the ActualMatchedString search token group
+                            expandedSearchString.AppendLine(@")");
 
-                    // End the fuzzy search regex expansion group
-                    expandedSearchString.Append(@")");
+                            // Open a new search token group that attempts to lookahead to avoid
+                            // matching any leading chars that are not part of the actual matched string.
+                            expandedSearchString.AppendLine(@"(?<=");
+
+                            expandedSearchString.Append(@"(?!");
+
+                            // Don't allow leading space if ExtraWhitespaceAllowed == 0, unless using global names
+                            allowLeadingSpace = options.UseGlobalNames || options.ExtraWhitespaceAllowed != 0;
+
+                            // Decrement the error or extra space stack
+                            if (allowLeadingSpace)
+                            {
+                                expandedSearchString.Append(@"(");
+                                expandedSearchString.Append(
+                                    IncrementStack(stackNames.FinalExtraSpaceStack, -1));
+                                expandedSearchString.Append(@"|");
+                            }
+                            expandedSearchString.Append(
+                                IncrementStack(stackNames.FinalErrorStack, -1));
+                            if (allowLeadingSpace)
+                            {
+                                expandedSearchString.Append(@")");
+                            }
+                            expandedSearchString.Append(@"(");
+                            expandedSearchString.Append(
+                                IncrementStack(stackNames.AllowableLookAheadStack, -1));
+
+                            // If using default whitespace and substitute patterns then it use a
+                            // simple character class instead of the union to make the expression faster.
+                            if (options.WhitespacePattern == _DEFAULT_WHITESPACE_PATTERN
+                                && options.SubstitutePattern == _DEFAULT_SUBSTITUTE_PATTERN)
+                            {
+                                expandedSearchString.AppendLine(@"[\S\s])+?");
+                            }
+                            else
+                            {
+                                expandedSearchString.AppendLine("("+options.WhitespacePattern + "|" + options.SubstitutePattern + "))+?");
+                            }
+
+                            // Switch to use the final stack name set for the following group of token
+                            // search terms.
+                            stackNames.UseInitialStackSet = false;
+
+                            // Leading whitespace not allowed for the first token of the better fit method.
+                            allowLeadingSpace = false;
+
+                            // Generate the second set of search token terms.
+                            for (int i = 0; i < searchTokens.Count; i++)
+                            {
+                                SearchToken searchToken = searchTokens[i];
+                                bool zeroWidthAssertion = isZeroWidthAssertion(searchToken.value);
+
+                                AddTokenSearchTerm(expandedSearchString, searchToken, stackNames, false,
+                                    allowLeadingSpace, options.SubstitutePattern, options.WhitespacePattern);
+
+                                // Allow leading whitespace starting with the first token following a
+                                // non zero width assertion token.
+                                if (options.ExtraWhitespaceAllowed != 0)
+                                {
+                                    allowLeadingSpace |= !zeroWidthAssertion;
+                                }
+                            }
+
+                            // End the lookahead term.
+                            expandedSearchString.AppendLine(@")");
+                            expandedSearchString.Append(@"\k'");
+                            expandedSearchString.Append(stackNames.ActualMatchedString);
+                            expandedSearchString.Append(@"')");
+                        }
+
+                        // End the fuzzy search regex expansion group
+                        expandedSearchString.Append(@")");
+                    }
                 }
 
                 // If there is any remaining part of sourceRegex that has not been parsed as part of
@@ -490,7 +613,12 @@ namespace Extract.Utilities.Parsers
                         sourceRegex.Substring(expansionPos, sourceRegex.Length - expansionPos));
                 }
 
-                return expandedSearchString.ToString();
+                string result = expandedSearchString.ToString();
+
+                ExtractException.Assert("ELI38826", "Unable to expand one or more fuzzy search patterns.",
+                    !Regex.IsMatch(result, _PREFIX, _REGEX_OPTIONS));
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -510,6 +638,7 @@ namespace Extract.Utilities.Parsers
                 token.Equals(@"$", StringComparison.Ordinal) ||
                 token.Equals(@"\b", StringComparison.OrdinalIgnoreCase) ||
                 token.Equals(@"\z", StringComparison.OrdinalIgnoreCase) ||
+                token.Equals(@"\G", StringComparison.Ordinal) ||
                 token.Equals(@"\A", StringComparison.Ordinal))
             {
                 return true;
@@ -534,21 +663,31 @@ namespace Extract.Utilities.Parsers
         /// <param name="allowLeadingSpace"><see langword="true"/> to allow for a space prior to
         /// matching the search token, <see langword="false"/> to require the next char to match
         /// the search token.</param>
-        static void AddTokenSearchTerm(StringBuilder regEx, string searchToken,
-            BalancingRegexStackNames stackNames, bool initialBetterFitTerm, bool allowLeadingSpace)
+        /// <param name="substitutePattern">The pattern to use for substituted characters.</param>
+        /// <param name="whitespacePattern">The pattern to use for whitespace.</param>
+        static void AddTokenSearchTerm(StringBuilder regEx, SearchToken searchToken,
+            BalancingRegexStackNames stackNames, bool initialBetterFitTerm, bool allowLeadingSpace,
+            string substitutePattern, string whitespacePattern)
         {
             // Open a group by attempting to match the search token.
             regEx.Append(@"  (");
 
             // Add a term to reflect a char that does not correspond to the search token.
-            AddIgnoreTokenTerm(regEx, stackNames, initialBetterFitTerm, allowLeadingSpace);
+            AddIgnoreTokenTerm(regEx, stackNames, initialBetterFitTerm, allowLeadingSpace,
+                substitutePattern, whitespacePattern);
 
-            AddMatchTokenTerm(regEx, stackNames, searchToken);
+            AddMatchTokenTerm(regEx, stackNames, searchToken.value);
 
-            regEx.Append(@"|");
+            if (!searchToken.required)
+            {
+                regEx.Append(@"|");
 
-            // Add a token for allow for a missing token.
-            AddMissingTokenTerm(regEx, stackNames, initialBetterFitTerm);
+                if (!searchToken.optional)
+                {
+                    // Add a token to allow for a missing token.
+                    AddMissingTokenTerm(regEx, stackNames, initialBetterFitTerm);
+                }
+            }
 
             regEx.AppendLine(@")");
         }
@@ -590,12 +729,17 @@ namespace Extract.Utilities.Parsers
         /// <param name="allowLeadingSpace"><see langword="true"/> to allow for a space prior to
         /// matching the search token, <see langword="false"/> to require the next char to match
         /// the search token.</param>
+        /// <param name="substitutePattern">The pattern to use for substituted characters.</param>
+        /// <param name="whitespacePattern">The pattern to use for whitespace.</param>
         static void AddIgnoreTokenTerm(StringBuilder term, BalancingRegexStackNames stackNames,
-            bool initialBetterFitTerm, bool allowLeadingSpace)
+            bool initialBetterFitTerm, bool allowLeadingSpace, string substitutePattern,
+            string whitespacePattern)
         {
             // Decrement the error stack or the last miss that had been added to the missed
             // chars stack.
-            term.Append(@"(.(?>");
+            term.Append(@"(");
+            term.Append(substitutePattern);
+            term.Append(@"(?>");
             term.Append(IncrementStack(stackNames.MissedStack, -1));
             term.Append(@"|");
             term.Append(IncrementStack(stackNames.ErrorStack, -1));
@@ -617,7 +761,7 @@ namespace Extract.Utilities.Parsers
             if (allowLeadingSpace)
             {
                 term.Append(@"|");
-                AddExtraSpaceTerm(term, stackNames, initialBetterFitTerm);
+                AddExtraSpaceTerm(term, stackNames, initialBetterFitTerm, whitespacePattern);
             }
 
 
@@ -655,8 +799,9 @@ namespace Extract.Utilities.Parsers
         /// <param name="stackNames">The set of stack names to be modified.</param>
         /// <param name="initialBetterFitTerm"><see langword="true"/> to build a term for the first
         /// part of a better fit expression.</param>
+        /// <param name="whitespacePattern">The pattern to use for whitespace.</param>
         static void AddExtraSpaceTerm(StringBuilder term, BalancingRegexStackNames stackNames,
-            bool initialBetterFitTerm)
+            bool initialBetterFitTerm, string whitespacePattern)
         {
             // Decrement the extra space stack
             term.Append(IncrementStack(stackNames.ExtraSpaceStack, -1));
@@ -668,7 +813,7 @@ namespace Extract.Utilities.Parsers
                 term.Append(IncrementStack(stackNames.FinalExtraSpaceStack, 1));
             }
 
-            term.Append(@"\s");
+            term.Append(whitespacePattern);
         }
 
         /// <summary>
@@ -701,7 +846,8 @@ namespace Extract.Utilities.Parsers
         /// _fuzzySearchExpressionParserRegex).</param>
         /// <returns>A list of tokens, each of which is to be used to match a single char in the
         /// searched text.</returns>
-        static List<string> GetSearchTokens(Match match)
+        /// <param name="options">The <see cref="FuzzySearchOptions"/> for this match.</param>
+        static List<SearchToken> GetSearchTokens(Match match, FuzzySearchOptions options)
         {
             string searchString = "[not found]";
 
@@ -711,13 +857,33 @@ namespace Extract.Utilities.Parsers
                 Group searchStringGroup = match.Groups["search_string"];
                 searchString = searchStringGroup.Value;
 
-                // Use SearchStringTokenizerRegex to split the search string into tokens.
-                MatchCollection matches = _searchStringTokenizerRegex.Matches(searchString);
-                List<string> searchTokens = new List<string>(matches.Count);
+                // Use the _TOKEN regex to split the search string into tokens.
+                MatchCollection matches = Regex.Matches(searchString, _TOKEN, _REGEX_OPTIONS);
+                List<SearchToken> searchTokens = new List<SearchToken>(matches.Count);
+
+                // Generate a list of tokens that need to be escaped to avoid corrupting 
+                // the resulting regex.
+                char[] tokensToEscape = options.EscapeSpaceChars
+                    ? new char[] { '[', ']', '(', ')', '?', '*', '+', '|', ' ' }
+                    : new char[] { '[', ']', '(', ')', '?', '*', '+', '|' };
+
+                char[] tokensToIgnore = options.EscapeSpaceChars
+                    ? new char[] { '\t', '\r', '\n' }
+                    : new char[] { '\t', '\r', '\n', ' ' };
 
                 // Process each token.
                 for (int i = 0; i < matches.Count; i++)
                 {
+                    SearchToken token = new SearchToken();
+
+                    token.value = matches[i].Groups["search_token"].Value;
+
+                    // Check to see if token should be ignored
+                    if (token.value.Length == 1 && token.value.IndexOfAny(tokensToIgnore) == 0)
+                    {
+                        continue;
+                    }
+
                     // Check to see if the token should be repeated more than once.
                     Group repetitionGroup = matches[i].Groups["repetitions"];
                     uint repetitions = 1;
@@ -730,30 +896,41 @@ namespace Extract.Utilities.Parsers
                         ee.AddDebugData("Specified repetitions", repetitionGroup.Value, false);
                     }
 
-                    // Add the token to the search token list the specified number of times.
-                    for (uint j = 0; j < repetitions; j++)
+                    // Check to see if a qualifier was specified
+                    Group qualifierGroup = matches[i].Groups["qualifier"];
+                    if (qualifierGroup.Success)
                     {
-                        string token = matches[i].Groups["search_token"].Value;
-
-                        // Generate a list of tokens that need to be escaped to avoid corrupting 
-                        // the resulting regex.
-                        char[] tokensToEscape =
-                            new char[] { '[', ']', '(', ')', '?', '*', '+', '|' };
-
-                        // Escape the token if necessary.
-                        if (token.Length == 1 && token.IndexOfAny(tokensToEscape) == 0)
+                        if (qualifierGroup.Value == "?")
                         {
-                            searchTokens.Add("\\" + token);
+                            token.optional = true;
                         }
                         else
                         {
-                            searchTokens.Add(token);
+                            token.required = true;
                         }
+                    }
+
+                    // Perform any character replacements
+                    if (options.CharacterReplacements.Count > 0)
+                    {
+                        token.value = PerformCharacterReplacements(token.value, options.CharacterReplacements);
+                    }
+
+                    // Escape the token if necessary.
+                    if (token.value.Length == 1 && token.value.IndexOfAny(tokensToEscape) == 0)
+                    {
+                        token.value = "\\" + token.value;
+                    }
+
+                    // Add the token to the search token list the specified number of times.
+                    for (uint j = 0; j < repetitions; j++)
+                    {
+                        searchTokens.Add(token);
                     }
                 }
 
                 ExtractException.Assert("ELI28348",
-                    "Fuzzy search string valid only for two or more characters!", 
+                    "Fuzzy search string valid only for two or more characters!",
                     searchTokens.Count >= 2);
 
                 return searchTokens;
@@ -768,6 +945,60 @@ namespace Extract.Utilities.Parsers
         }
 
         /// <summary>
+        /// Performs any replacements specified, either against the search string component or, if
+        /// the token is a parenthesized group, against its sub-tokens.
+        /// </summary>
+        /// <param name="searchStringToken">The string to perform the replacements against.</param>
+        /// <param name="replacements">The list of replace regex and replacement pairs.</param>
+        /// <returns>The search string token after replacements have been performed.</returns>
+        static string PerformCharacterReplacements(string searchStringToken, List<KeyValuePair<string, string>> replacements)
+        {
+            StringBuilder tokenBuilder = new StringBuilder();
+
+            // If the search_string part of the token is a parenthesized group, perform
+            // replacements against its sub-tokens
+            if (searchStringToken.StartsWith("(", StringComparison.Ordinal))
+            {
+                // Skip if anything more than a simple parenthesized group
+                if (searchStringToken.StartsWith("(?", StringComparison.OrdinalIgnoreCase))
+                {
+                    return searchStringToken;
+                }
+
+                tokenBuilder.Append("(");
+                searchStringToken = searchStringToken.Substring(1, searchStringToken.Length - 2);
+
+                foreach (Match subTokenMatch in Regex.Matches(searchStringToken, _SUB_TOKEN, _REGEX_OPTIONS))
+                {
+                    string subToken = subTokenMatch.Groups["search_token"].Value;
+                    string quantifier = subTokenMatch.Groups["quantifier"].Value;
+                    foreach (var replacementPair in replacements)
+                    {
+                        subToken = Regex.Replace
+                            (subToken, replacementPair.Key, replacementPair.Value, _REGEX_OPTIONS);
+                    }
+
+                    tokenBuilder.Append(subToken);
+                    tokenBuilder.Append(quantifier);
+                }
+                tokenBuilder.Append(")");
+
+                searchStringToken = tokenBuilder.ToString();
+            }
+            // Else perform the replace against the whole token
+            else
+            {
+                foreach (var replacementPair in replacements)
+                {
+                    searchStringToken = Regex.Replace
+                        (searchStringToken, replacementPair.Key, replacementPair.Value, _REGEX_OPTIONS);
+                }
+            }
+
+            return searchStringToken;
+        }
+
+        /// <summary>
         /// Retrieves the fuzzy search options from the specified fuzzy search syntax match.
         /// </summary>
         /// <param name="match">A match containing fuzzy search syntax (obtained from
@@ -778,80 +1009,135 @@ namespace Extract.Utilities.Parsers
         {
             try
             {
+                const string REPLACEMENT_PAIR_EXPRESSION = @"\((?'replace'" + _VALID_SEQUENCE + @")=>(?'replacement'" + _VALID_SEQUENCE + @")\)";
+                const string REPLACEMENTS_EXPRESSION = REPLACEMENT_PAIR_EXPRESSION + @"(\s*" + REPLACEMENT_PAIR_EXPRESSION + @")*";
+
                 // Create a new options instance.
                 FuzzySearchOptions options = new FuzzySearchOptions();
 
-                // Retrieve the named group that contains the specified options.
-                Group optionsGroup = match.Groups["options"];
+                // Retrieve the named group that contains the specified option names.
+                CaptureCollection optionNames = match.Groups["option_name"].Captures;
+                CaptureCollection optionValues = match.Groups["option_value"].Captures;
 
-                string optionsString = optionsGroup.Value;
-                if (!string.IsNullOrEmpty(optionsString))
+                for (int i = 0; i < optionNames.Count; i++)
                 {
-                    // Iterate through each specified option.
-                    string[] optionsArray = optionsString.Split(',');
-                    foreach (string optionString in optionsArray)
+                    // Obtain both the name of the option and the corresponding value.
+                    string optionName = optionNames[i].Value.Trim();
+                    string optionValue = optionValues[i].Value.Trim();
+
+                    // The search method is being specified.
+                    if (optionName.Equals("method", StringComparison.OrdinalIgnoreCase))
                     {
-                        int equalPos = optionString.IndexOf('=');
-                        ExtractException.Assert("ELI28338", "Malformed fuzzy search string (option '" +
-                            optionsString + "'.", equalPos >= 0 &&
-                            equalPos < optionsString.Length - 1);
-
-                        // Obtain both the name of the option and the corresponding value.
-                        string optionName = optionString.Substring(0, equalPos).Trim();
-                        string optionValue = optionString.Substring(equalPos + 1).Trim();
-
-                        // The search method is being specified.
-                        if (optionName.Equals("method", StringComparison.OrdinalIgnoreCase))
+                        if (optionValue.Equals("fast", StringComparison.OrdinalIgnoreCase))
                         {
-                            if (optionValue.Equals("fast", StringComparison.OrdinalIgnoreCase))
-                            {
-                                options.SearchMethod = FuzzySearchOptions.Method.Fast;
-                            }
-                            else if (optionValue.Equals("better_fit",
-                                StringComparison.OrdinalIgnoreCase))
-                            {
-                                options.SearchMethod = FuzzySearchOptions.Method.BetterFit;
-                            }
-                            else
-                            {
-                                ExtractException ee = new ExtractException("ELI28339",
-                                    "Invalid fuzzy search method");
-                                ee.AddDebugData("Method", optionValue, true);
-                                throw ee;
-                            }
+                            options.SearchMethod = FuzzySearchOptions.Method.Fast;
                         }
-                        // The number of errors allowed is being specified.
-                        else if (optionName.Equals("error", StringComparison.OrdinalIgnoreCase))
+                        else if (optionValue.Equals("better_fit",
+                            StringComparison.OrdinalIgnoreCase))
                         {
-                            if (!UInt32.TryParse(optionValue, NumberStyles.Integer,
-                                    CultureInfo.InvariantCulture, out options.ErrorsAllowed))
-                            {
-                                ExtractException ee = new ExtractException("ELI28344",
-                                    "Unable to parse number of fuzzy search errors allowed!");
-                                ee.AddDebugData("error value", optionValue, false);
-                            }
+                            options.SearchMethod = FuzzySearchOptions.Method.BetterFit;
                         }
-                        // The number of extra whitespace chars allowed is being specified.
-                        else if (optionName.Equals("xtra_ws", StringComparison.OrdinalIgnoreCase) ||
-                                 optionName.Equals("extra_ws", StringComparison.OrdinalIgnoreCase))
-                        {
-                            if (!UInt32.TryParse(optionValue, NumberStyles.Integer,
-                                    CultureInfo.InvariantCulture, out options.ExtraWhitespaceAllowed))
-                            {
-                                ExtractException ee = new ExtractException("ELI28345",
-                                    "Unable to parse number of extra whitespace chars allowed!");
-                                ee.AddDebugData("xtra_ws value", optionValue, false);
-                            }
-                        }
-                        // An invalid option name was specified.
                         else
                         {
-                            ExtractException ee = new ExtractException("ELI28340",
-                                    "Invalid fuzzy search option.");
-                            ee.AddDebugData("Option Name", optionName, true);
-                            ee.AddDebugData("Option Value", optionValue, true);
+                            ExtractException ee = new ExtractException("ELI28339",
+                                "Invalid fuzzy search method");
+                            ee.AddDebugData("Method", optionValue, true);
                             throw ee;
                         }
+                    }
+                    // The number of errors allowed is being specified.
+                    else if (optionName.Equals("error", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!UInt32.TryParse(optionValue, NumberStyles.Integer,
+                                CultureInfo.InvariantCulture, out options.ErrorsAllowed))
+                        {
+                            ExtractException ee = new ExtractException("ELI28344",
+                                "Unable to parse number of fuzzy search errors allowed!");
+                            ee.AddDebugData("error value", optionValue, false);
+                        }
+                    }
+                    // The number of extra whitespace chars allowed is being specified.
+                    else if (optionName.Equals("xtra_ws", StringComparison.OrdinalIgnoreCase) ||
+                             optionName.Equals("extra_ws", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!UInt32.TryParse(optionValue, NumberStyles.Integer,
+                                CultureInfo.InvariantCulture, out options.ExtraWhitespaceAllowed))
+                        {
+                            ExtractException ee = new ExtractException("ELI28345",
+                                "Unable to parse number of extra whitespace chars allowed!");
+                            ee.AddDebugData("xtra_ws value", optionValue, false);
+                        }
+                    }
+                    // The substitute pattern is being specified.
+                    else if (optionName.Equals("sub", StringComparison.OrdinalIgnoreCase) ||
+                        optionName.Equals("substitute_pattern", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (optionValue == "." || optionValue.Equals(@"[\s\s]", StringComparison.OrdinalIgnoreCase))
+                        {
+                            options.SubstitutePattern = optionValue;
+                        }
+                        // Surround with parentheses to guard against patterns with '|' in them
+                        else
+                        {
+                            options.SubstitutePattern = "(" + optionValue + ")";
+                        }
+                    }
+                    // The whitespace pattern is being specified.
+                    else if (optionName.Equals("ws", StringComparison.OrdinalIgnoreCase) ||
+                        optionName.Equals("ws_pattern", StringComparison.OrdinalIgnoreCase))
+                    {
+                        options.WhitespacePattern = "("+optionValue+")";
+                    }
+                    // Whether to omit numbers from group names is being specified.
+                    else if (optionName.Equals("g", StringComparison.OrdinalIgnoreCase) ||
+                        optionName.Equals("global", StringComparison.OrdinalIgnoreCase) ||
+                        optionName.Equals("use_global_names", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!Boolean.TryParse(optionValue, out options.UseGlobalNames))
+                        {
+                            ExtractException ee = new ExtractException("ELI38849",
+                                "Unable to parse use simple names option!");
+                            ee.AddDebugData("use_global_names value", optionValue, false);
+                        }
+                    }
+                    // Whether to escape space characters is being specified.
+                    else if (optionName.Equals("esc_s", StringComparison.OrdinalIgnoreCase) ||
+                        optionName.Equals("escape_space_chars", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!Boolean.TryParse(optionValue, out options.EscapeSpaceChars))
+                        {
+                            ExtractException ee = new ExtractException("ELI38850",
+                                "Unable to parse escape space chars option!");
+                            ee.AddDebugData("escape_space_chars value", optionValue, false);
+                        }
+                    }
+                    // Replacement patterns are being specified.
+                    else if (optionName.Equals("replacements", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Match replacements = Regex.Match(optionValue, REPLACEMENTS_EXPRESSION, _REGEX_OPTIONS);
+                        if (!replacements.Success)
+                        {
+                            ExtractException ee = new ExtractException("ELI38853",
+                                "Unable to parse replacements option!");
+                            ee.AddDebugData("replacements value", optionValue, false);
+                        }
+
+                        CaptureCollection replaceValues = replacements.Groups["replace"].Captures;
+                        CaptureCollection replacementValues = replacements.Groups["replacement"].Captures;
+                        for (int j = 0; j < replaceValues.Count; j++)
+                        {
+                            options.CharacterReplacements.Add(new KeyValuePair<string,string>
+                                ("^"+replaceValues[j].Value+"$", replacementValues[j].Value));
+                        }
+                    }
+                    // An invalid option name was specified.
+                    else
+                    {
+                        ExtractException ee = new ExtractException("ELI28340",
+                                "Invalid fuzzy search option.");
+                        ee.AddDebugData("Option Name", optionName, false);
+                        ee.AddDebugData("Option Value", optionValue, false);
+                        throw ee;
                     }
                 }
 
@@ -865,6 +1151,20 @@ namespace Extract.Utilities.Parsers
             }
         }
 
-        #endregion Methods
+        #endregion Public Methods
+
+        #region Private Methods
+
+        /// <summary>
+        /// Throws exception if the object is not licensed.
+        /// </summary>
+        private static void ValidateLicense()
+        {
+            // Validate the license
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI38854", _OBJECT_NAME);
+        }
+
+        #endregion Private Methods
+
     }
 }

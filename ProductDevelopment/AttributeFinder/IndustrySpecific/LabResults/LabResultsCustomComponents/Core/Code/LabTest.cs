@@ -33,7 +33,7 @@ namespace Extract.LabResultsCustomComponents
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LabTest"/> struct.
+        /// Initializes a new instance of the <see cref="LabTest"/> class.
         /// </summary>
         /// <param name="attribute">The attribute associated with this object. Must
         /// not be <see langword="null"/>.</param>
@@ -85,9 +85,8 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Gets the test code for this <see cref="LabTest"/>.
+        /// Gets or sets the test code for this <see cref="LabTest"/>.
         /// </summary>
-        /// <returns>The test code for this <see cref="LabTest"/>.</returns>
         public string TestCode
         {
             get
@@ -96,10 +95,45 @@ namespace Extract.LabResultsCustomComponents
             }
             set
             {
-                _testCode = (value == null)
-                    ? null
-                    : value;
+                _testCode = value;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the sample type for this <see cref="LabTest"/>.
+        /// </summary>
+        public string SampleType
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the score of this mapping
+        /// </summary>
+        public int MatchScore
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether this test-code-to-attribute mapping was chosen during the
+        /// first pass of the mapping algorithm
+        /// </summary>
+        public bool FirstPassMapping
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether a fuzzy pattern was used to create this test-code-to-attribute mapping
+        /// </summary>
+        public bool FuzzyMatch
+        {
+            get;
+            set;
         }
 
         #endregion Properties

@@ -97,6 +97,9 @@
     <Compile Include="TestMapper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Spring.Core, Version=1.3.1.40711, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll</HintPath>
+    </Reference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
       <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
       <Name>Extract.AttributeFinder</Name>
@@ -108,6 +111,10 @@
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj">
       <Project>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</Project>
       <Name>Extract.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj">
+      <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
+      <Name>Extract.DataEntry</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
@@ -124,6 +131,10 @@
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
+      <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>
+      <Name>Extract.Utilities.Parsers</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

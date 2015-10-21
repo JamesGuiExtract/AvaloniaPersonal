@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UCLID_AFCORELib;
 
 namespace Extract.LabResultsCustomComponents
 {
@@ -29,17 +31,21 @@ namespace Extract.LabResultsCustomComponents
         HashSet<string> _mappedTestCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Keeps track of the test names that have already been mapped and, thus, should not be
-        /// considered for any additional tests.
+        /// Keeps track of attributes that have been iterated by PopNextNodeTests
         /// </summary>
-        HashSet<string> _mappedTestNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        HashSet<IAttribute> _visitedTestAttributes = new HashSet<IAttribute>();
 
         /// <summary>
-        /// Maps each test code for the target <see cref="LabOrder"/> to the available LabTests
-        /// that could be associated with that test code based on the test name.
+        /// Keeps track of the test attributes that have already been mapped and, thus, should not be
+        /// considered for any additional tests.
         /// </summary>
-        Dictionary<string, List<LabTest>> _mappingCandidates =
-            new Dictionary<string, List<LabTest>>(StringComparer.OrdinalIgnoreCase);
+        HashSet<IAttribute> _mappedTestAttributes = new HashSet<IAttribute>();
+
+        /// <summary>
+        /// A mapping of test attributes to possible tests
+        /// </summary>
+        Dictionary<IAttribute, List<LabTest>> _attributeToCandidateTests =
+            new Dictionary<IAttribute, List<LabTest>>();
 
         /// <summary>
         /// Keeps track of the total number of open <see cref="TestMapper"/> instances as part of
@@ -49,78 +55,53 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         int[] _totalOpenInstances = new int[] { 0 };
 
+        /// <summary>
+        /// The sample type (Blood/Urine) of this collection of mappings
+        /// </summary>
+        string _sampleType;
+
         #endregion Fields
 
         #region Static Methods
 
         /// <summary>
-        /// Finds the best mapping in terms of the number of <see paramref="tests"/> that can be
-        /// mapped into the tests defined by <see paramref="mandatoryTestCodes"/> and
-        /// <see paramref="otherTestCodes"/> based on the
-        /// available mappings in <see paramref="nameToTestMapping"/>. The best mapping is defined
-        /// as the mapping that maps the most tests; in the event of a tiebreaker, the tiebreaker is
-        /// the one that maps the most mandatory tests.
+        /// Searches <see paramref="possibleMappings"/> for the best mapping possible.
         /// </summary>
-        /// <param name="tests">The <see cref="LabTest"/>s that should be mapped</param>
-        /// <param name="mandatoryTestCodes">The mandatory test codes for the <see cref="LabOrder"/>
-        /// into which the <see paramref="tests"/> are being mapped.</param>
-        /// <param name="otherTestCodes">Other test codes for the <see cref="LabOrder"/>
-        /// into which the <see paramref="tests"/> are being mapped.</param>
-        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
-        /// <returns>
-        /// A list of <see cref="LabTest"/>s that have been mapped into the test codes.
-        /// <para><b>Note:</b></para>
-        /// The LabTest instances returned will not be the same instances from
-        /// <see paramref="tests"/>. Rather, they will be new instances where the appropriate
-        /// <see cref="LabTest.TestCode"/> value has been assigned.
-        /// </returns>
-        public static List<LabTest> FindBestMapping(IEnumerable<LabTest> tests,
-            HashSet<string> mandatoryTestCodes, HashSet<string> otherTestCodes,
-            OrderMappingDBCache dbCache)
+        /// <param name="possibleMappings">A <see cref="TestMapper"/> instance describing the set
+        /// of possible mappings of test names into test codes.</param>
+        /// <param name="requireMandatory"><see langword="true"/> if mandatory tests are required.</param>
+        /// <param name="finalPass">Whether this is the final mapping pass</param>
+        /// <Returns>A list of <see cref="LabTest"/>s that have been mapped into the test codes</Returns>
+        public static List<LabTest> FindMapping(TestMapper possibleMappings, bool requireMandatory,
+            bool finalPass)
         {
-            try
+            IEnumerable<string> possibleSampleTypes = null;
+
+            // If this is the final mapping pass or there are not multiple sample types in this order
+            // (e.g., this is not a single-bucket customer), then sample type is not important
+            if (finalPass || (possibleSampleTypes = possibleMappings.GetPossibleSampleTypes()).Count() < 2)
             {
-                TestMapper possibleMappings =
-                        new TestMapper(tests, mandatoryTestCodes, otherTestCodes, dbCache);
-
-                var matchingTests = FindMapping(possibleMappings, false);
-
-                return matchingTests;
+                return FindMapping(possibleMappings, requireMandatory);
             }
-            catch (Exception ex)
+            
+            // Else try limiting choices to each possible sample type and keep the best result
+            List<LabTest> bestResult = null;
+            foreach (string sampleType in possibleSampleTypes
+                .OrderBy(sampleType => sampleType == OrderMappingDBCache._BLOOD_SAMPLE_TYPE ? 0
+                             : sampleType == OrderMappingDBCache._URINE_SAMPLE_TYPE ? 1 : 2 ))
             {
-                throw ex.AsExtract("ELI35148");
-            }
-        }
+                var possibleMappingsForSampleType = new TestMapper(possibleMappings);
+                possibleMappingsForSampleType._sampleType = sampleType;
+                List<LabTest> result = FindMapping(possibleMappingsForSampleType, requireMandatory);
 
-        /// <summary>
-        /// Checks whether all test codes in <see paramref="mandatoryTestCodeDomain"/> can be mapped
-        /// from <see paramref="tests"/>.
-        /// </summary>
-        /// <param name="tests">The <see cref="LabTest"/>s that should be mapped</param>
-        /// <param name="mandatoryTestCodes">The mandatory test codes for the <see cref="LabOrder"/>
-        /// into which the <see paramref="tests"/> are being mapped.</param>
-        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
-        /// <returns><see langword="true"/> if <see paramref="tests"/> can be used to satisfy all
-        /// codes from <see paramref="mandatoryTestCodeDomain"/>; otherwise, <see langword="false"/>.
-        /// </returns>
-        public static bool AllMandatoryTestsExist(IEnumerable<LabTest> tests,
-            HashSet<string> mandatoryTestCodes,
-            OrderMappingDBCache dbCache)
-        {
-            try
-            {
-                TestMapper possibleMappings =
-                        new TestMapper(tests, mandatoryTestCodes, new HashSet<string>(), dbCache);
-
-                var matchingTests = FindMapping(possibleMappings, true);
-
-                return (matchingTests != null);
+                // Update the best result if this result has more mappings than the last.
+                if (result != null && (bestResult == null || result.Count > bestResult.Count))
+                {
+                    bestResult = result; 
+                }
             }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35149");
-            }
+
+            return bestResult;
         }
 
         /// <summary>
@@ -128,12 +109,9 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="possibleMappings">A <see cref="TestMapper"/> instance describing the set
         /// of possible mappings of test names into test codes.</param>
-        /// <param name="checkingMandatory"><see langword="true"/> if mappings should be found only
-        /// to determine whether all mandatory tests can be mapped; <see langword="false"/> to find
-        /// the best match.</param>
-        /// <Returns>A list of <see cref="LabTest"/>s that have been mapped into the test codes.
-        /// </Returns>
-        public static List<LabTest> FindMapping(TestMapper possibleMappings, bool checkingMandatory)
+        /// <param name="requireMandatory"><see langword="true"/> if mandatory tests are required.</param>
+        /// <Returns>A list of <see cref="LabTest"/>s that have been mapped into the test codes</Returns>
+        static List<LabTest> FindMapping(TestMapper possibleMappings, bool requireMandatory)
         {
             try
             {
@@ -142,92 +120,93 @@ namespace Extract.LabResultsCustomComponents
 
                 // Loop through each node in possibleMappings until one has at least two possible
                 // mappings.
-                bool isMandatory;
                 List<LabTest> candidateTests;
-                for (candidateTests = possibleMappings.PopNextNodeTests(out isMandatory);
+                for (candidateTests = possibleMappings.PopNextNodeTests();
                      candidateTests != null && candidateTests.Count < 2;
-                     candidateTests = possibleMappings.PopNextNodeTests(out isMandatory))
+                     candidateTests = possibleMappings.PopNextNodeTests())
                 {
-                    if (candidateTests.Count == 1)
+                    if (candidateTests.Count == 1
+                        && !possibleMappings.HasBetterMappingForAttribute(candidateTests[0]))
                     {
                         // For any node where there is only one possibility, add that into the
                         // result.
-                        LabTest candidateTest = candidateTests.First();
+                        LabTest candidateTest = candidateTests[0];
                         result.Add(candidateTest);
 
-                        // Don't allow this test name to be mapped for any subsequent node.
-                        // Mark this test code as mapped so that it is not returned in any future call.
-                        possibleMappings.MarkTestNameAsMapped(candidateTest.Name);
-                    }
-                    else if (checkingMandatory && isMandatory)
-                    {
-                        // If there are no possibilities for a mandatory test, return null to
-                        // indicate the mandatory check has failed.
-                        return null;
+                        // Don't allow this test attribute to be mapped for any subsequent node.
+                        possibleMappings._mappedTestAttributes.Add(candidateTest.Attribute);
+
+                        // Don't allow this test code to be mapped for any subsequent attribute.
+                        possibleMappings._mappedTestCodes.Add(candidateTest.TestCode);
                     }
                 }
 
-                // If there were no more candidate test nodes or we are past the mandatory nodes
-                // when checkingMandatory, return what result we have.
-                if (candidateTests == null ||
-                    (!isMandatory && checkingMandatory))
-                {
-                    return result;
-                }
-
-                // Iterate each possible mapping for the current node and find the one that allows
+                // Iterate each possible mapping for the current node/attribute and find the one that allows
                 // the most remaining nodes to be mapped.
-                foreach (LabTest candidateTest in candidateTests)
+                if (candidateTests != null)
                 {
-                    // Create a new copy of possibleMappings to pass into a recursive call on the
-                    // remaining nodes.
-                    var remainingMappings = new TestMapper(possibleMappings);
-
-                    // Don't allow this test name to be mapped for any subsequent node.
-                    remainingMappings.MarkTestNameAsMapped(candidateTest.Name);
-
-                    List<LabTest> subResult = FindMapping(remainingMappings, checkingMandatory);
-
-                    // If a mapping was found, combine it with candidateTest to form the complete
-                    // mapping.
-                    if (subResult != null)
+                    foreach (var candidateTest in candidateTests)
                     {
-                        // Combine the sub result with the result already compiled up to this point.
-                        subResult.Add(candidateTest);
-                        subResult.AddRange(result);
-
-                        // Update the best result if this result has more mappings than the last.
-                        if (bestResult == null || subResult.Count > bestResult.Count)
+                        if (possibleMappings.HasBetterMappingForAttribute(candidateTest))
                         {
-                            bestResult = subResult;
+                            continue;
+                        }
 
-                            // If checking for mandatory, we don't need the best mapping, we just
-                            // need one; we can return right away.
-                            if (checkingMandatory)
+                        // Create a new copy of possibleMappings to pass into a recursive call on the
+                        // remaining nodes.
+                        var remainingMappings = new TestMapper(possibleMappings);
+
+                        // Don't allow this test attribute to be mapped for any subsequent node.
+                        remainingMappings._mappedTestAttributes.Add(candidateTest.Attribute);
+
+                        // Don't allow this test code to be mapped for any subsequent attribute.
+                        remainingMappings._mappedTestCodes.Add(candidateTest.TestCode);
+
+                        List<LabTest> subResult = FindMapping(remainingMappings, requireMandatory);
+
+                        // If a mapping was found, combine it with candidateTest to form the complete
+                        // mapping.
+                        if (subResult != null)
+                        {
+                            // Combine the sub result with the result already compiled up to this point.
+                            subResult.Add(candidateTest);
+                            subResult.AddRange(result);
+
+                            // Update the best result if this result has more mappings than the last.
+                            if (bestResult == null || subResult.Count > bestResult.Count)
                             {
-                                return bestResult;
+                                bestResult = subResult;
                             }
                         }
-                    }
 
-                    // After trying at least one combination, ensure the permutations being searched
-                    // don't get out of control.
-                    if (possibleMappings.TotalOpenInstances >=
-                        LabDEOrderMapper._COMBINATION_ALGORITHM_SAFETY_CUTOFF)
-                    {
-                        break;
+                        // After trying at least one combination, ensure the permutations being searched
+                        // don't get out of control.
+                        if (possibleMappings.TotalOpenInstances >=
+                            LabDEOrderMapper._COMBINATION_ALGORITHM_SAFETY_CUTOFF)
+                        {
+                            break;
+                        }
                     }
                 }
 
-                // If we have gotten to this point when checkingMandatory, we have failed to map a
-                // mandatory test; return null to indicate the mapping failed.
-                if (checkingMandatory)
+                bestResult = bestResult ?? result;
+
+                // Mark all test codes selected as mapped
+                foreach (var test in bestResult)
+                {
+                    possibleMappings._mappedTestCodes.Add(test.TestCode);
+                }
+
+                // Ensure all mandatory tests have been mapped if required
+                if (requireMandatory && !possibleMappings._mandatoryTestCodes
+                    .IsSubsetOf(possibleMappings._mappedTestCodes))
                 {
                     return null;
                 }
-
-                // Otherwise we will have found the best mapping; return it.
-                return bestResult ?? result;
+                else
+                {
+                    return bestResult;
+                }
             }
             catch (Exception ex)
             {
@@ -248,9 +227,10 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="otherTestCodes">Other possible test codes for the <see cref="LabOrder"/>
         /// into which the <see paramref="tests"/> are being mapped.</param>
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
-        TestMapper(IEnumerable<LabTest> tests,
+        /// <param name="finalPass">Whether this is the final pass of the order mapping algorithm</param>
+        public TestMapper(IEnumerable<LabTest> tests,
             HashSet<string> mandatoryTestCodes, HashSet<string> otherTestCodes,
-            OrderMappingDBCache dbCache)
+            OrderMappingDBCache dbCache, bool finalPass)
         {
             try
             {
@@ -258,7 +238,7 @@ namespace Extract.LabResultsCustomComponents
                 _mandatoryTestCodes = mandatoryTestCodes;
                 _otherTestCodes = otherTestCodes;
                
-                InitializeMappingCandidates(tests, dbCache);
+                InitializeMappingCandidates(tests, dbCache, finalPass);
             }
             catch (Exception ex)
             {
@@ -278,13 +258,15 @@ namespace Extract.LabResultsCustomComponents
                 // The child instance will share the following values with its ancestors.
                 _mandatoryTestCodes = parentPermutations._mandatoryTestCodes;
                 _otherTestCodes = parentPermutations._otherTestCodes;
-                _mappingCandidates = parentPermutations._mappingCandidates;
+                _attributeToCandidateTests = parentPermutations._attributeToCandidateTests;
                 _totalOpenInstances = parentPermutations._totalOpenInstances;
+                _sampleType = parentPermutations._sampleType;
 
                 // The child instance will have separate sets of mapped test codes and names,
                 // however, so more can be mapped without affecting the parent instance.
                 _mappedTestCodes = new HashSet<string>(parentPermutations._mappedTestCodes, StringComparer.OrdinalIgnoreCase);
-                _mappedTestNames = new HashSet<string>(parentPermutations._mappedTestNames, StringComparer.OrdinalIgnoreCase);
+                _visitedTestAttributes = new HashSet<IAttribute>(parentPermutations._visitedTestAttributes);
+                _mappedTestAttributes = new HashSet<IAttribute>(parentPermutations._mappedTestAttributes);
 
                 TotalOpenInstances++;
             }
@@ -321,41 +303,53 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Initializes <see cref="_mappingCandidates"/> such that each test code key (or node) is
-        /// mapped to a list of possible names for the test.
+        /// Initializes <see cref="_attributeToCandidateTests"/> such that each result component attribute is
+        /// mapped to a list of possible tests.
         /// </summary>
         /// <param name="tests">The <see cref="LabTest"/>s that should be mapped.</param>
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to get potential
+        /// <param name="finalPass">Whether this is the final pass of the order mapping algorithm</param>
         /// test codes.</param>
-        void InitializeMappingCandidates(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache)
+        void InitializeMappingCandidates(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache,
+            bool finalPass)
         {
             try
             {
-                // Initialize _mappingCandidates with a key for every test code that could appear in
-                // the target order.
-                _mappingCandidates.Clear();
-
-                foreach (string testCode in _mandatoryTestCodes.Concat(_otherTestCodes))
-                {
-                    _mappingCandidates[testCode] = new List<LabTest>();
-                }
+                var candidateTestCodes = new HashSet<string>
+                    (_mandatoryTestCodes.Concat(_otherTestCodes), StringComparer.OrdinalIgnoreCase);
 
                 // Loop through all available tests and assign a copy of each to every test code
-                // key to which it could be mapped.
+                // key to which it could be mapped and add each test code to a map of attributes
+                // to possible mappings
                 foreach (LabTest test in tests)
                 {
-                    var possibleTestCodes = dbCache.GetPotentialTestCodes(test.Name).Where(
-                        s => _mappingCandidates.ContainsKey(s));
-
-                    foreach (string testCode in possibleTestCodes)
+                    bool fuzzyMatch;
+                    foreach (var testCode in dbCache.GetPotentialTestCodes(test.Name, out fuzzyMatch)
+                        .Where(s => candidateTestCodes.Contains(s)))
                     {
-                        List<LabTest> possibleTests = _mappingCandidates[testCode];
                         // Create a copy of the test and assign the test code.
                         LabTest mappedTest = new LabTest(test.Attribute);
                         mappedTest.TestCode = testCode;
+                        mappedTest.FuzzyMatch = fuzzyMatch;
+                        if (finalPass && !String.IsNullOrEmpty(mappedTest.TestCode))
+                        {
+                            mappedTest.FirstPassMapping = testCode == test.TestCode;
+                        }
+                        mappedTest.SampleType = dbCache.GetSampleType(testCode);
 
-                        // Add the test copy as a possible mapping for testCode.
-                        possibleTests.Add(mappedTest);
+                        // Add test to mapping of attributes to tests
+                        _attributeToCandidateTests.GetOrAdd(mappedTest.Attribute, a =>
+                            new List<LabTest>()).Add(mappedTest);
+                    }
+                }
+
+                // Set the MatchScore for any test that could be mapped to more than one test code.
+                foreach (var mappedTests in _attributeToCandidateTests.Values
+                    .Where(l => l.Count > 1))
+                {
+                    foreach (var mappedTest in mappedTests)
+                    {
+                        mappedTest.MatchScore = dbCache.GetMappingScore(mappedTest.TestCode, mappedTest.Attribute);
                     }
                 }
             }
@@ -366,38 +360,62 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Gets the candidate <see cref="LabTest"/>s for to map to the next test code (or node) in
+        /// Gets the candidate <see cref="LabTest"/>s to map to the next test code (or node) in
         /// the target order.
         /// </summary>
         /// <returns>The candidate <see cref="LabTest"/>s.</returns>
-        List<LabTest> PopNextNodeTests(out bool isMandatory)
+        List<LabTest> PopNextNodeTests()
         {
             try
             {
-                // Select the next test code key for which candidate tests should be grabbed.
-                // The mandatory test codes will come first so that they are mapped before
-                // non-mandatory tests.
-                string nextKey = _mandatoryTestCodes.Concat(_otherTestCodes)
-                    .Where(code => !_mappedTestCodes.Contains(code))
-                    .FirstOrDefault();
+                // Get candidates for the next test attribute
+                var nextCandidates = _attributeToCandidateTests.Keys
+                    // Where the attribute hasn't already been iterated or mapped
+                    .Where(attribute => !_visitedTestAttributes.Contains(attribute)
+                    && !_mappedTestAttributes.Contains(attribute))
+                    // Select all possible test codes for this attribute...
+                    .Select(attribute => _attributeToCandidateTests[attribute]
+                        // That haven't been mapped for this order already
+                        .Where(relatedTest => !_mappedTestCodes.Contains(relatedTest.TestCode)
+                        // Where the sample type is compatible with this order
+                        && IsSampleTypeCompatible(relatedTest))
+                        .Select(test => new
+                            {
+                                Test = test,
+                                Mandatory = _mandatoryTestCodes.Contains(test.TestCode),
+                                MatchScore = test.MatchScore,
+                                FuzzyMatch = test.FuzzyMatch
+                            })
+                        // Order the results to give preference to mandatory tests...
+                        .OrderBy(candidate => candidate.Mandatory ? 0 : 1)
+                        // and then to higher match scores
+                        .ThenByDescending(candidate => candidate.MatchScore)
+                        .ToList())
+                    .Where(candidates => candidates.Count > 0)
+                    // First try attributes that have only one possible match
+                    .OrderBy(candidates => candidates.Count())
+                    // ...giving preference to attributes that can be mapped to a mandatory test
+                    .ThenBy(candidates => candidates[0].Mandatory ? 0 : 1)
+                    // ...and those that did not require using a fuzzy pattern to match
+                    .ThenBy(candidates => candidates[0].FuzzyMatch ? 1 : 0)
+                    // and those with a higher match score
+                    .ThenByDescending(candidates => candidates[0].MatchScore);
 
                 // If there are no more nodes, return null;
-                if (nextKey == default(string))
+                if (!nextCandidates.Any())
                 {
-                    isMandatory = false;
                     return null;
                 }
 
-                isMandatory = _mandatoryTestCodes.Contains(nextKey);
+                // The candidate tests for the next attribute
+                var nextCandidatesForAttribute = nextCandidates.First()
+                    .Select(candidate => candidate.Test)
+                    .ToList();
 
-                // Mark this test code as mapped so that it is not returned in any future call.
-                _mappedTestCodes.Add(nextKey);
+                // Mark the attribute as visited
+                _visitedTestAttributes.Add(nextCandidatesForAttribute[0].Attribute);
 
-                // Return a the list of all candidate LabTests for this test code that haven't
-                // already been mapped.
-                return new List<LabTest>(
-                    _mappingCandidates[nextKey]
-                        .Where(test => !_mappedTestNames.Contains(test.Name)));
+                return nextCandidatesForAttribute;
             }
             catch (Exception ex)
             {
@@ -406,20 +424,55 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Specifies that <see paramref="testName"/> has been mapped for this order so that it
-        /// isn't considered as a candidate for any additional test codes.
+        /// Determines whether the sample type of a <see cref="LabTest"/> is compatible with this
+        /// set of mappings.
         /// </summary>
-        /// <param name="testName">The test name to mark as mapped.</param>
-        void MarkTestNameAsMapped(string testName)
+        /// <param name="test">The <see cref="LabTest"/> to check</param>
+        /// <returns>True if the sample type is compatible</returns>
+        bool IsSampleTypeCompatible(LabTest test)
         {
-            try
+            return String.IsNullOrEmpty(_sampleType)
+                || String.IsNullOrEmpty(test.SampleType)
+                || _sampleType == test.SampleType;
+        }
+
+        /// <summary>
+        /// Determines whether there is a better choice of attribute-to-test-code mapping for
+        /// the <see cref="IAttribute"/> of this <see cref="LabTest"/>
+        /// </summary>
+        /// <param name="currentChoice">The mapping being considered</param>
+        /// <returns>True if there is a better choice of mapping</returns>
+        bool HasBetterMappingForAttribute(LabTest currentChoice)
+        {
+            return _attributeToCandidateTests[currentChoice.Attribute]
+                .Where(test => test != currentChoice)
+                .Where(possibleBetterMapping =>
+                    possibleBetterMapping != currentChoice &&
+                    (   // Prefer previously mapped test if sample type is different from current candidate
+                       possibleBetterMapping.FirstPassMapping && !currentChoice.FirstPassMapping
+                       && possibleBetterMapping.SampleType != currentChoice.SampleType
+                       // Prefer other test if match score is greater and test code
+                       // is not already mapped to other attribute
+                    || possibleBetterMapping.MatchScore > currentChoice.MatchScore
+                       && (possibleBetterMapping.FirstPassMapping || !currentChoice.FirstPassMapping)
+                       && !_mappedTestCodes.Contains(possibleBetterMapping.TestCode
+                    ))).Any();
+        }
+
+        /// <summary>
+        /// Gets the possible sample types for this order
+        /// </summary>
+        /// <returns>A collection of possible sample types for this order</returns>
+        IEnumerable<string> GetPossibleSampleTypes()
+        {
+            var possibleSampleTypes = new HashSet<string>();
+            foreach (var test in _attributeToCandidateTests.Values
+                .SelectMany(tests => tests).Where(test => !String.IsNullOrEmpty(test.SampleType)))
             {
-                _mappedTestNames.Add(testName);
+                possibleSampleTypes.Add(test.SampleType);
             }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35155");
-            }
+
+            return possibleSampleTypes;
         }
 
         #endregion Private Members

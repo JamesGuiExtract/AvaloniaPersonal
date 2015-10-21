@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.LabResultsCustomComponents
 {
@@ -18,7 +19,7 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// The attribute that this order group is associated with (this is the top level attribute).
         /// </summary>
-        readonly IAttribute _attribute;
+        IAttribute _attribute;
 
         /// <summary>
         /// The collection date for this order group.
@@ -31,9 +32,19 @@ namespace Extract.LabResultsCustomComponents
         readonly DateTime _collectionTime = DateTime.MinValue;
 
         /// <summary>
+        /// The result date for this order group.
+        /// </summary>
+        readonly DateTime _resultDate = DateTime.MinValue;
+
+        /// <summary>
+        /// The result time for this order group.
+        /// </summary>
+        readonly DateTime _resultTime = DateTime.MinValue;
+
+        /// <summary>
         /// The collection of lab tests in this order group.
         /// </summary>
-        readonly List<LabTest> _labTests = new List<LabTest>();
+        List<LabTest> _labTests = new List<LabTest>();
 
         /// <summary>
         /// Set of all known outstanding order codes. Only orders in this set will be considered for
@@ -58,118 +69,151 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Initializes a new instance of the <see cref="OrderGrouping"/> class.
         /// </summary>
-        /// <param name="grouping">The <see cref="OrderGrouping"/> to initialize
-        /// the group from.</param>
-        public OrderGrouping(OrderGrouping grouping)
+        /// <param name="labOrder">The <see cref="LabOrder"/> of this instance</param>
+        /// <param name="tests">The collection of <see cref="LabTests"/> contained in this instance</param>
+        /// <param name="sourceGroups">The collection of <see cref="OrderGrouping"/>s that are a part of this instance</param>
+        public OrderGrouping(LabOrder labOrder, List<LabTest> tests, params OrderGrouping[] sourceGroups)
         {
-            _attribute = grouping._attribute;
-            _collectionDate = grouping._collectionDate;
-            _collectionTime = grouping._collectionTime;
-            _labTests.AddRange(grouping._labTests);
-            _nameToAttributes = new Dictionary<string,List<IAttribute>>();
-            foreach (KeyValuePair<string, List<IAttribute>> pair in grouping._nameToAttributes)
+            _labOrder = labOrder;
+            _labTests = tests;
+            _nameToAttributes = new Dictionary<string, List<IAttribute>>();
+            string sourceDocName = null;
+            foreach (var grouping in sourceGroups)
             {
-                _nameToAttributes.Add(pair.Key, new List<IAttribute>(pair.Value));
+                // Set collection date if not already set
+                if (_collectionDate == DateTime.MinValue)
+                {
+                    _collectionDate = grouping._collectionDate;
+                }
+
+                // Set collection time if not already set
+                if (_collectionTime == DateTime.MinValue)
+                {
+                    _collectionTime = grouping._collectionTime;
+                }
+
+                // Set result date if not already set
+                if (_resultDate == DateTime.MinValue)
+                {
+                    _resultDate = grouping._resultDate;
+                }
+
+                // Set result time if not already set
+                if (_resultTime == DateTime.MinValue)
+                {
+                    _resultTime = grouping._resultTime;
+                }
+
+                // Add other attributes
+                InsertNameToAttributeMap(grouping.NameToAttributes);
+
+                // Get the source doc to use to create new attributes
+                if (sourceDocName == null)
+                {
+                    sourceDocName = grouping._attribute.Value.SourceDocName;
+                }
             }
-            _labOrder = grouping._labOrder;
-            _outstandingOrderCodes = grouping._outstandingOrderCodes;
+
+            // Update the order name of the group mapping
+            var orderName = new SpatialStringClass();
+            orderName.CreateNonSpatialString(_labOrder == null ? "UnknownOrder"
+                : _labOrder.OrderName, sourceDocName);
+            NameToAttributes["NAME"] = new List<IAttribute>(1)
+                { new AttributeClass { Name = "Name", Value = orderName } };
+
+            // Update order code
+            if (_labOrder != null)
+            {
+                // Update the order code of the group mapping
+                var orderCode = new SpatialStringClass();
+                orderCode.CreateNonSpatialString(_labOrder.OrderCode, sourceDocName);
+                NameToAttributes["ORDERCODE"] = new List<IAttribute>(1)
+                    { new AttributeClass { Name = "OrderCode", Value = orderCode } };
+            }
+
+            // Create the root attribute
+            _attribute = new AttributeClass();
+            _attribute.Name = "Test";
+            _attribute.Value.CreateNonSpatialString("N/A", sourceDocName);
+
+            // Update the subattributes
+            _attribute.SubAttributes = GetAllAttributesAsIUnknownVector();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OrderGrouping"/> class.
         /// </summary>
-        /// <param name="attribute">The attribute to initialize the group from.</param>
-        /// <param name="labOrders">A map of lab order codes to
-        /// <see cref="LabOrder"/>s.  If not <see langword="null"/> then
-        /// the EpicCode attribute will be used to search the collection and
-        /// set the <see cref="LabOrder"/> value.</param>
-        /// <param name="limitToOutstandingOrders">Whether to limit potential orders to known
-        /// outstanding order codes.</param>
-        public OrderGrouping(IAttribute attribute, Dictionary<string, LabOrder> labOrders,
-            bool limitToOutstandingOrders)
-            : this(attribute, labOrders, null, limitToOutstandingOrders, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OrderGrouping"/> class.
-        /// </summary>
-        /// <param name="attribute">The attribute to initialize the group from.</param>
-        /// <param name="labOrders">A map of lab order codes to
-        /// <see cref="LabOrder"/>s.  If not <see langword="null"/> then
-        /// the EpicCode attribute will be used to search the collection and
-        /// set the <see cref="LabOrder"/> value.</param>
-        /// <param name="nameToAttributes">A map of names to attributes. If <see langword="null"/>
-        /// then a new map will be generated from the attribute parameter.</param>
-        /// <param name="generateOutstandingOrders">If true then the set of outstanding order codes
-        /// will be created from the <see paramref="nameToAttributes"/> map or from the sub-attribute
-        /// collection of the <see paramref="attribute"/></param>
-        /// <param name="outstandingOrderCodes">The set of outstanding order codes used to limit
-        /// potential orders.</param>
-        // The call to DateTime.TryParse has been analyzed and the result can be
-        // safely ignored since we are explicitly handling the setting of the out
-        // parameter to the default value of DateTime.MinValue
+        /// <param name="labOrder">The <see cref="LabOrder"/> of this instance</param>
+        /// <param name="tests">The collection of <see cref="LabTests"/> contained in this instance</param>
+        /// <param name="limitToOutstandingOrders">Whether to limit possible orders to outstanding order codes</param>
+        /// <param name="sourceDocName">The source image of the data</param>
+        /// <param name="nonTestAttributes">The subattributes of the Test hierarchy that are not tests
+        /// (not Component attributes)</param>
         [SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults",
-            MessageId="System.DateTime.TryParse(System.String,System.DateTime@)")]
-        public OrderGrouping(IAttribute attribute, Dictionary<string, LabOrder> labOrders,
-            Dictionary<string, List<IAttribute>> nameToAttributes, bool generateOutstandingOrders,
-            HashSet<string> outstandingOrderCodes)
+                    MessageId="System.DateTime.TryParse(System.String,System.DateTime@)")]
+        public OrderGrouping(LabOrder labOrder, List<LabTest> tests, bool limitToOutstandingOrders,
+            string sourceDocName, List<IAttribute> nonTestAttributes)
         {
             try
             {
-                _attribute = attribute;
-                _outstandingOrderCodes = outstandingOrderCodes;
-
-                // Get the sub attributes
-                IUnknownVector attributes = attribute.SubAttributes;
-
-                // If no name-to-attribute map was passed in, generate it from the attribute collection
-                if (nameToAttributes == null)
-                {
-                    _nameToAttributes = LabDEOrderMapper.GetMapOfNamesToAttributes(attributes);
-                }
-                else
-                {
-                    _nameToAttributes = nameToAttributes;
-                }
+                _labOrder = labOrder;
+                _labTests = tests;
+                _nameToAttributes = LabDEOrderMapper.GetMapOfNamesToAttributes(nonTestAttributes);
                 
                 // Get the date and time from the attributes
-                List<IAttribute> temp;
-                if (_nameToAttributes.TryGetValue("COLLECTIONDATE", out temp))
+                List<IAttribute> tempList;
+                if (_nameToAttributes.TryGetValue("COLLECTIONDATE", out tempList))
                 {
                     // List should have at least 1 item, pick the first
-                    ExtractException.Assert("ELI29076", "Attribute list should have at least 1"
-                        + " collection date.", temp.Count > 0);
+                    ExtractException.Assert("ELI38963", "Attribute list should have at least 1"
+                        + " collection date.", tempList.Count > 0);
 
-                    IAttribute dateAttribute = temp[0];
+                    IAttribute dateAttribute = tempList[0];
                     string date = dateAttribute.Value.String;
                     DateTime.TryParse(date, out _collectionDate);
                 }
-                temp = null;
-                if (_nameToAttributes.TryGetValue("COLLECTIONTIME", out temp))
+                tempList = null;
+                if (_nameToAttributes.TryGetValue("COLLECTIONTIME", out tempList))
                 {
                     // List should have at least 1 item, pick the first
-                    ExtractException.Assert("ELI29077", "Attribute list should have at least 1"
-                        + " collection time.", temp.Count > 0);
+                    ExtractException.Assert("ELI38964", "Attribute list should have at least 1"
+                        + " collection time.", tempList.Count > 0);
 
-                    IAttribute timeAttribute = temp[0];
+                    IAttribute timeAttribute = tempList[0];
                     string time = timeAttribute.Value.String;
                     DateTime.TryParse(time, out _collectionTime);
                 }
 
-                // Get the list of lab tests
-                if (_nameToAttributes.TryGetValue("COMPONENT", out temp))
+                tempList = null;
+                if (_nameToAttributes.TryGetValue("RESULTDATE", out tempList))
                 {
-                    _labTests.AddRange(LabDEOrderMapper.BuildTestList(temp));
+                    // List should have at least 1 item, pick the first
+                    ExtractException.Assert("ELI38965", "Attribute list should have at least 1"
+                        + " result date.", tempList.Count > 0);
+
+                    IAttribute dateAttribute = tempList[0];
+                    string date = dateAttribute.Value.String;
+                    DateTime.TryParse(date, out _resultDate);
+                }
+                tempList = null;
+                if (_nameToAttributes.TryGetValue("RESULTTIME", out tempList))
+                {
+                    // List should have at least 1 item, pick the first
+                    ExtractException.Assert("ELI38966", "Attribute list should have at least 1"
+                        + " result time.", tempList.Count > 0);
+
+                    IAttribute timeAttribute = tempList[0];
+                    string time = timeAttribute.Value.String;
+                    DateTime.TryParse(time, out _resultTime);
                 }
 
                 // Get set of outstanding orders
-                if (generateOutstandingOrders)
+                if (limitToOutstandingOrders)
                 {
-                    temp = null;
-                    if (_nameToAttributes.TryGetValue("OUTSTANDINGORDERCODE", out temp))
+                    tempList = null;
+                    if (_nameToAttributes.TryGetValue("OUTSTANDINGORDERCODE", out tempList))
                     {
-                        _outstandingOrderCodes = LabDEOrderMapper.BuildOutstandingOrdersSet(temp);
+                        _outstandingOrderCodes = LabDEOrderMapper.BuildOutstandingOrdersSet(tempList);
                     }
                     else
                     {
@@ -177,29 +221,33 @@ namespace Extract.LabResultsCustomComponents
                     }
                 }
 
-                // Get the epic code and set the _labOrder value
-                temp = null;
-                if (labOrders != null &&
-                    _nameToAttributes.TryGetValue("EPICCODE", out temp))
+                // Update the order name of the group mapping
+                var orderName = new SpatialStringClass();
+                orderName.CreateNonSpatialString(_labOrder == null ? "UnknownOrder"
+                    : _labOrder.OrderName, sourceDocName);
+                NameToAttributes["NAME"] = new List<IAttribute>(1)
+                    { new AttributeClass { Name = "Name", Value = orderName } };
+
+                if (_labOrder != null)
                 {
-                    string epicCode = temp[0].Value.String;
-
-                    // Find the lab order for this code
-                    foreach (LabOrder order in labOrders.Values)
-                    {
-                        if (order.EpicCode.Equals(epicCode))
-                        {
-                            _labOrder = order;
-                            break;
-                        }
-                    }
-
-                    temp = null;
+                    // Update the order code of the group mapping
+                    var orderCode = new SpatialStringClass();
+                    orderCode.CreateNonSpatialString(_labOrder.OrderCode, sourceDocName);
+                    NameToAttributes["ORDERCODE"] = new List<IAttribute>(1)
+                        { new AttributeClass { Name = "OrderCode", Value = orderCode } };
                 }
+
+                // Create the root attribute
+                _attribute = new AttributeClass();
+                _attribute.Name = "Test";
+                _attribute.Value.CreateNonSpatialString("N/A", sourceDocName);
+
+                // Update the subattributes
+                _attribute.SubAttributes = GetAllAttributesAsIUnknownVector();
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI29078", ex);
+                throw ExtractException.AsExtractException("ELI38967", ex);
             }
         }
 
@@ -208,13 +256,12 @@ namespace Extract.LabResultsCustomComponents
         #region Methods
 
         /// <summary>
-        /// Inserts the name attribute map from one <see cref="OrderGrouping"/> into this
-        /// group.
+        /// Inserts the values from a name to attribute map into this group.
         /// </summary>
-        /// <param name="group">The group to get the map from.</param>
-        internal void InsertNameAttributeMap(OrderGrouping group)
+        /// <param name="nameToAttributes">The map to add.</param>
+        internal void InsertNameToAttributeMap(Dictionary<string, List<IAttribute>> nameToAttributes)
         {
-            foreach (KeyValuePair<string, List<IAttribute>> pair in group.NameToAttributes)
+            foreach (KeyValuePair<string, List<IAttribute>> pair in nameToAttributes)
             {
                 string key = pair.Key;
 
@@ -225,8 +272,10 @@ namespace Extract.LabResultsCustomComponents
                 }
                 else if (key.Equals("COLLECTIONDATE", StringComparison.OrdinalIgnoreCase)
                     || key.Equals("COLLECTIONTIME", StringComparison.OrdinalIgnoreCase)
+                    || key.Equals("RESULTDATE", StringComparison.OrdinalIgnoreCase)
+                    || key.Equals("RESULTTIME", StringComparison.OrdinalIgnoreCase)
                     || key.Equals("NAME", StringComparison.OrdinalIgnoreCase)
-                    || key.Equals("EPICCODE", StringComparison.OrdinalIgnoreCase))
+                    || key.Equals("ORDERCODE", StringComparison.OrdinalIgnoreCase))
                 {
                     // Do nothing with these attributes, they will be obtained from this
                     // object or modified when this object is added to a new grouping
@@ -235,14 +284,6 @@ namespace Extract.LabResultsCustomComponents
                 {
                     attributes.AddRange(pair.Value);
                 }
-            }
-
-            // Update the labtests collection
-            List<IAttribute> temp;
-            if (_nameToAttributes.TryGetValue("COMPONENT", out temp))
-            {
-                _labTests.Clear();
-                _labTests.AddRange(LabDEOrderMapper.BuildTestList(temp));
             }
         }
 
@@ -254,17 +295,20 @@ namespace Extract.LabResultsCustomComponents
         /// <returns>
         /// An IUnknownVector containing all of the attributes of this group 
         /// (all of the attributes in the <see cref="OrderGrouping.NameToAttributes"/>
-        /// collection)
+        /// collection plus all lab tests)
         /// </returns>
         internal IUnknownVector GetAllAttributesAsIUnknownVector()
         {
             IUnknownVector subAttributes = new IUnknownVector();
-            foreach(List<IAttribute> list in _nameToAttributes.Values)
+            foreach(var attribute in _nameToAttributes.Keys
+                .Where(key => !key.Equals("COMPONENT", StringComparison.OrdinalIgnoreCase))
+                .SelectMany(key => _nameToAttributes[key]))
             {
-                foreach(IAttribute attribute in list)
-                {
-                    subAttributes.PushBack(attribute);
-                }
+                subAttributes.PushBack(attribute);
+            }
+            foreach(var test in _labTests)
+            {
+                subAttributes.PushBack(test.Attribute);
             }
 
             return subAttributes;
@@ -314,6 +358,49 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
+        /// Compares two <see cref="OrderGrouping"/> objects to see if their result dates
+        /// are equal.
+        /// </summary>
+        /// <param name="group1">The first group to compare.</param>
+        /// <param name="group2">The second group to compare.</param>
+        /// <returns><see langword="true"/> if the result dates are the same and
+        /// <see langword="false"/> if they are not.</returns>
+        internal static bool ResultDatesEqual(OrderGrouping group1, OrderGrouping group2)
+        {
+            bool equal = (group1.ResultDate == group1.ResultTime)
+                    && (group2.ResultDate == group2.ResultTime);
+
+            if (!equal)
+            {
+                // Check for valid result dates
+                if (group1.ResultDate != DateTime.MinValue
+                    && group2.ResultDate != DateTime.MinValue)
+                {
+                    // Check if the dates are equal
+                    TimeSpan difference = group1.ResultDate.Subtract(group2.ResultDate);
+                    equal = difference.Days == 0;
+                }
+                else
+                {
+                    // One date does not exist, set equal to true
+                    equal = true;
+                }
+
+                // If there are valid times, compare those
+                if (equal && group1.ResultTime != DateTime.MinValue
+                    && group2.ResultTime != DateTime.MinValue)
+                {
+                    TimeSpan difference = group1.ResultTime.Subtract(group2.ResultTime);
+                    equal = difference.Minutes == 0;
+                }
+            }
+
+
+            // Return the compared value
+            return equal;
+        }
+
+        /// <summary>
         /// Updates the lab tests in the attribute collection to their official name.
         /// <para><b>Note:</b></para>
         /// This should only be called as the last step before adding this list to the final
@@ -325,48 +412,16 @@ namespace Extract.LabResultsCustomComponents
             // an unknown order)
             if (_labOrder != null)
             {
-                // The get matching tests call should update the test code for each lab test
-                List<LabTest> temp = _labOrder.GetMatchingTests(_labTests, dbCache);
-
-                // Sanity check, the lists should be the same size
-                if (temp.Count != _labTests.Count)
+                //foreach (IAttribute attribute in tests)
+                foreach (LabTest test in _labTests)
                 {
-                    ExtractException.ThrowLogicException("ELI29080");
-                }
-
-                // Create a dictionary mapping the LabTest to its name
-                Dictionary<string, LabTest> labTests =
-                    new Dictionary<string, LabTest>(temp.Count, StringComparer.OrdinalIgnoreCase);
-                foreach (LabTest test in temp)
-                {
-                    labTests.Add(test.Name, test);
-                }
-
-                // Now iterate the collection of component attributes and update their value
-                List<IAttribute> tests;
-                if (!_nameToAttributes.TryGetValue("COMPONENT", out tests))
-                {
-                    // At this point there should always be at least 1 test
-                    ExtractException.ThrowLogicException("ELI29081");
-                }
-
-                foreach (IAttribute attribute in tests)
-                {
-                    // Get the name
-                    string name = attribute.Value.String;
-
-                    // Get the lab test for this name
-                    LabTest labTest;
-                    if (!labTests.TryGetValue(name, out labTest))
-                    {
-                        ExtractException.ThrowLogicException("ELI29082");
-                    }
+                    IAttribute attribute = test.Attribute;
 
                     // Create the official name subattribute
                     IAttribute officialName = new AttributeClass();
                     officialName.Name = "OfficialName";
                     officialName.Value.CreateNonSpatialString(
-                        LabDEOrderMapper.GetTestNameFromTestCode(labTest.TestCode, dbCache),
+                        LabDEOrderMapper.GetTestNameFromTestCode(test.TestCode, dbCache),
                         attribute.Value.SourceDocName);
 
                     // Add the official name subattribute
@@ -375,11 +430,24 @@ namespace Extract.LabResultsCustomComponents
                     // Create the test code subattribute
                     IAttribute testCode = new AttributeClass();
                     testCode.Name = "TestCode";
-                    testCode.Value.CreateNonSpatialString(labTest.TestCode,
+                    testCode.Value.CreateNonSpatialString(test.TestCode,
                         attribute.Value.SourceDocName);
 
                     // Add the test code subattribute
                     attribute.SubAttributes.PushBack(testCode);
+
+                    // Create the ESName subattribute
+                    HashSet<string> esNames;
+                    if (dbCache.TryGetESNames(test.TestCode, out esNames))
+                    {
+                        IAttribute esNamesAttribute = new AttributeClass();
+                        esNamesAttribute.Name = "ESNames";
+                        esNamesAttribute.Value.CreateNonSpatialString
+                            (String.Join("|", esNames), attribute.Value.SourceDocName);
+
+                        // Add the ESName subattribute
+                        attribute.SubAttributes.PushBack(esNamesAttribute);
+                    }
                 }
             }
         }
@@ -391,7 +459,7 @@ namespace Extract.LabResultsCustomComponents
         /// <see cref="OrderGrouping.LabOrder"/> does not equal <see langword="null"/>).
         /// </summary>
         /// <returns>Whether all mandatory tests are present or not.</returns>
-        internal bool ContainsAllMandatoryTests(OrderMappingDBCache dbCache)
+        internal bool ContainsAllMandatoryTests()
         {
             try
             {
@@ -399,7 +467,7 @@ namespace Extract.LabResultsCustomComponents
                     "Cannot check for mandatory tests when order has not been mapped.",
                     _labOrder != null);
 
-                return _labOrder.ContainsAllMandatoryTests(_labTests, dbCache);
+                return _labOrder.ContainsAllMandatoryTests(_labTests);
             }
             catch (Exception ex)
             {
@@ -445,6 +513,28 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
+        /// Gets the result date that this group is associated with.
+        /// </summary>
+        public DateTime ResultDate
+        {
+            get
+            {
+                return _resultDate;
+            }
+        }
+
+        /// <summary>
+        /// Gets the result time that this group is associated with.
+        /// </summary>
+        public DateTime ResultTime
+        {
+            get
+            {
+                return _resultTime;
+            }
+        }
+
+        /// <summary>
         /// Gets a <see cref="ReadOnlyCollection{T}"/> of <see cref="LabTest"/> that
         /// this group is associated with.
         /// </summary>
@@ -468,17 +558,13 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Gets/sets the <see cref="LabOrder"/> that this group is associated with.
+        /// Gets the <see cref="LabOrder"/> that this group is associated with.
         /// </summary>
         public LabOrder LabOrder
         {
             get
             {
                 return _labOrder;
-            }
-            set
-            {
-                _labOrder = value;
             }
         }
 

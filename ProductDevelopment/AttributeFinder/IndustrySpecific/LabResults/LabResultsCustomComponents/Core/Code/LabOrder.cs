@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.Linq;
-using System.Text;
 
 namespace Extract.LabResultsCustomComponents
 {
     /// <summary>
-    /// A class to hold the order code, name, and epic code information for a particular
+    /// A class to hold the order code, name, and order code information for a particular
     /// lab order.  This class will also maintain a collection of mandatory and
     /// non-mandatory tests along with helper methods for matching collections of
     /// <see cref="LabTest"/> to this order.
@@ -27,36 +26,10 @@ namespace Extract.LabResultsCustomComponents
         readonly string _orderName;
 
         /// <summary>
-        /// The epic code for this lab order
-        /// </summary>
-        readonly string _epicCode;
-
-        /// <summary>
         /// The tiebreaker string to use in deciding which order to map to in phase 2 when the
         /// number of combined groups for 2 different orders is the same.
         /// </summary>
         readonly string _tieBreakerString;
-
-        /// <summary>
-        /// A collection of mandatory tests mapping all possible test names
-        /// (the official and alternate names) to their possible associated test codes.
-        /// </summary>
-        readonly Dictionary<string, List<string>> _mandatoryTests
-            = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>
-        /// A collection of non-mandatory tests mapping all possible test names
-        /// (the official and alternate names) to their possible associated test codes.
-        /// </summary>
-        readonly Dictionary<string, List<string>> _otherTests
-            = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>
-        /// A collection of both mandatory and non-mandatory tests mapping all possible test names
-        /// (the official and alternate names) to their possible associated test codes.
-        /// </summary>
-        readonly Dictionary<string, List<string>> _allTests
-            = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// A set containing the test codes for all mandatory tests for this order
@@ -90,19 +63,17 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="orderCode">The order code.</param>
         /// <param name="orderName">The order name.</param>
-        /// <param name="epicCode">The epic code.</param>
         /// <param name="tieBreakerString">The tiebreaker string to use in deciding which order to
         /// map to in phase 2 when the number of combined groups for 2 different orders is the same.
         /// </param>
         /// <param name="filledRequirement">The number of tests required to consider this order filled.</param>
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to fill the collections
         /// of tests.</param>
-        public LabOrder(string orderCode, string orderName, string epicCode,
+        public LabOrder(string orderCode, string orderName,
             string tieBreakerString, OrderMappingDBCache dbCache, int filledRequirement)
         {
             _orderCode = orderCode;
             _orderName = orderName;
-            _epicCode = epicCode;
             _tieBreakerString = tieBreakerString;
             _filledRequirement = filledRequirement;
 
@@ -130,29 +101,6 @@ namespace Extract.LabResultsCustomComponents
 
                 // Add the test code to the all test code collection
                 _allTestCodes.Add(testCode);
-
-                // Get all names for this test code
-                var testNames = dbCache.GetTestNames(testCode);
-                foreach (string testName in testNames)
-                {
-                    // Add each name for this test code to the mandatory collection
-                    List<string> testCodes = null;
-                    if (!_mandatoryTests.TryGetValue(testName, out testCodes))
-                    {
-                        testCodes = new List<string>();
-                        _mandatoryTests[testName] = testCodes;
-                    }
-                    testCodes.Add(testCode);
-
-                    // Add each name for this test code to the all test collection
-                    testCodes = null;
-                    if (!_allTests.TryGetValue(testName, out testCodes))
-                    {
-                        testCodes = new List<string>();
-                        _allTests[testName] = testCodes;
-                    }
-                    testCodes.Add(testCode);
-                }
             }
         }
 
@@ -171,29 +119,6 @@ namespace Extract.LabResultsCustomComponents
 
                 // Add the test code to the all test code collection
                 _allTestCodes.Add(testCode);
-
-                // Get all names for this test code
-                var testNames = dbCache.GetTestNames(testCode);
-                foreach (string testName in testNames)
-                {
-                    // Add each name for this test code to the other collection
-                    List<string> testCodes = null;
-                    if (!_otherTests.TryGetValue(testName, out testCodes))
-                    {
-                        testCodes = new List<string>();
-                        _otherTests[testName] = testCodes;
-                    }
-                    testCodes.Add(testCode);
-
-                    // Add each name for this test code to the all test collection
-                    testCodes = null;
-                    if (!_allTests.TryGetValue(testName, out testCodes))
-                    {
-                        testCodes = new List<string>();
-                        _allTests[testName] = testCodes;
-                    }
-                    testCodes.Add(testCode);
-                }
             }
         }
 
@@ -233,16 +158,12 @@ namespace Extract.LabResultsCustomComponents
         /// tests for this lab order.
         /// </summary>
         /// <param name="tests">The collection of tests to check.</param>
-        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
         /// <returns><see langword="true"/> if <paramref name="tests"/> contained
         /// all of the mandatory tests for this order; <see langword="false"/> if
         /// <paramref name="tests"/> does not contain all mandatory tests.</returns>
-        public bool ContainsAllMandatoryTests(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache)
+        public bool ContainsAllMandatoryTests(IEnumerable<LabTest> tests)
         {
-            bool containsAllMandatory = 
-                TestMapper.AllMandatoryTestsExist(tests, _mandatoryTestCodes, dbCache);
-
-            return containsAllMandatory;
+            return _mandatoryTestCodes.IsSubsetOf(tests.Select(test => test.TestCode));
         }
 
         /// <summary>
@@ -256,13 +177,17 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="tests">The collection of <see cref="LabTest"/> to check for matching
         /// tests.</param>
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping.</param>
+        /// <param name="finalPass">Whether this is the final pass of the algorithm</param>
+        /// <param name="requireMandatory">Whether mandatory tests are required</param>
         /// <returns>A subset of <paramref name="tests"/> that match this order.</returns>
-        public List<LabTest> GetMatchingTests(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache)
+        public List<LabTest> GetMatchingTests(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache,
+            bool finalPass, bool requireMandatory)
         {
-            List<LabTest> matchingTests = TestMapper.FindBestMapping(
-                tests, _mandatoryTestCodes, _otherTestCodes, dbCache);
 
-            return matchingTests;
+            TestMapper possibleMappings =
+                    new TestMapper(tests, _mandatoryTestCodes, _otherTestCodes, dbCache, finalPass);
+
+            return TestMapper.FindMapping(possibleMappings, requireMandatory, finalPass);
         }
 
         #endregion Methods
@@ -292,17 +217,6 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Gets the epic code for this order.
-        /// </summary>
-        public string EpicCode
-        {
-            get
-            {
-                return _epicCode;
-            }
-        }
-
-        /// <summary>
         /// Gets the tiebreaker string to use in deciding which order to map to in phase 2 when the
         /// number of combined groups for 2 different orders is the same.
         /// </summary>
@@ -325,6 +239,16 @@ namespace Extract.LabResultsCustomComponents
             }
         }
 
+        /// <summary>
+        /// Gets the maximum number of tests this order could contain
+        /// </summary>
+        public int MaxSize
+        {
+            get
+            {
+                return _mandatoryTestCodes.Count + _otherTestCodes.Count;
+            }
+        }
         #endregion Properties
     }
 }
