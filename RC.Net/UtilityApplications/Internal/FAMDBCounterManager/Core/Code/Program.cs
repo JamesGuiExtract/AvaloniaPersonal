@@ -44,9 +44,10 @@ namespace Extract.FAMDBCounterManager
                 sb.AppendLine("NOTE:");
                 sb.AppendLine("This utility is for Extract Systems internal use only. It can");
                 sb.AppendLine("be run in place from any location regardless of any other");
-                sb.AppendLine("Extract software installed as long as the");
-                sb.AppendLine("InternalLicenseUtils.dll and BaseUtils.dll built with it are");
-                sb.AppendLine("alongside");
+                sb.AppendLine("Extract software installed as long as the following dlls are");
+                sb.AppendLine("alongside:");
+                sb.AppendLine("BaseUtils.dll, Extract.Interfaces.dll, InternalLicenseUtils.dll,");
+                sb.AppendLine("mfc100.dll, mfcm100.dll, msvcp100.dll and msvcr100.dll.");
 
                 UtilityMethods.ShowMessageBox(sb.ToString(), "FAMDBCounterManager Usage", false);
             }
