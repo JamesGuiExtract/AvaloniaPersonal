@@ -88,16 +88,16 @@ namespace Extract.Utilities
         /// <summary>
         /// Creates a memoized version of a unary function
         /// </summary>
-        /// <typeparam name="A">The type of the function parameter</typeparam>
-        /// <typeparam name="R">The return type of the function</typeparam>
-        /// <param name="f">The non-memoized unary function</param>
+        /// <typeparam name="T1">The type of the function parameter</typeparam>
+        /// <typeparam name="TResult">The return type of the function</typeparam>
+        /// <param name="fun">The non-memoized unary function</param>
         /// <returns>A memoized version of the function</returns>
-        public static Func<A, R> Memoize<A, R>(this Func<A, R> f)
+        public static Func<T1, TResult> Memoize<T1, TResult>(this Func<T1, TResult> fun)
         {
             try
             {
-                var map = new Dictionary<A, R>();
-                return a => map.GetOrAdd(a, () => f(a));
+                var map = new Dictionary<T1, TResult>();
+                return a => map.GetOrAdd(a, () => fun(a));
             }
             catch (Exception ex)
             {
@@ -109,17 +109,18 @@ namespace Extract.Utilities
         /// <summary>
         /// Creates a memoized version of a binary function
         /// </summary>
-        /// <typeparam name="A">The type of the first function parameter</typeparam>
-        /// <typeparam name="B">The type of the second function parameter</typeparam>
-        /// <typeparam name="R">The return type of the function</typeparam>
-        /// <param name="f">The non-memoized binary function</param>
+        /// <typeparam name="T1">The type of the first function parameter</typeparam>
+        /// <typeparam name="T2">The type of the second function parameter</typeparam>
+        /// <typeparam name="TResult">The return type of the function</typeparam>
+        /// <param name="fun">The non-memoized binary function</param>
         /// <returns>A memoized version of the function</returns>
-        public static Func<A, B, R> Memoize<A, B, R>(this Func<A, B, R> f)
+        public static Func<T1, T2, TResult> Memoize<T1, T2, TResult>
+            (this Func<T1, T2, TResult> fun)
         {
             try
             {
-                var map = new Dictionary<Tuple<A, B>, R>();
-                return (a, b) => map.GetOrAdd(Tuple.Create(a, b), () => f(a, b));
+                var map = new Dictionary<Tuple<T1, T2>, TResult>();
+                return (a, b) => map.GetOrAdd(Tuple.Create(a, b), () => fun(a, b));
             }
             catch (Exception ex)
             {
