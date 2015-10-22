@@ -365,57 +365,59 @@ namespace Extract.Utilities.Parsers
         /// Expands all fuzzy search strings withing the specified regex to produce a resulting
         /// regular expression that will perform the search specified.
         /// <para><b>Syntax:</b></para>
-        /// SYNTAX: (?~&lt;options>search_string)
-        /// Where 'options' is a comma separated list of the following possible options:
-        /// method=fast|better_fit (default=fast): 
+        /// <para>(?~&lt;options&gt;search_string)</para>
+        /// <para>Where 'options' is a comma separated list of the following possible options:</para>
+        /// <list type="bullet">
+        /// <item><term>method=fast|better_fit (default=fast)</term><description>
         ///     fast will execute faster but match characters outside of the specified search string
         ///     depending upon how many of the errors allowed were found in a match.
         ///     better_fit will match only the specified search string but will take longer to
-        ///     execute.
-        /// error=number (default = 1):
+        ///     execute.</description></item>
+        /// <item><term>error=number (default = 1)</term><description>
         ///     The number of errors (missing or wrong characters) that are allowed in a potential
-        ///     match before the match is discarded.
-        /// escape_space_chars|esc_s=true|false (default = false):
+        ///     match before the match is discarded.</description></item>
+        /// <item><term>escape_space_chars|esc_s=true|false (default = false)</term><description>
         ///     Whether literal space characters (' ') will be escaped ('\ '). This only works in
         ///     some contexts because often whitespace is trimmed from the source expression prior to
-        ///     fuzzy expansion.
-        /// extra_ws|xtra_ws=number (default = 0):
+        ///     fuzzy expansion.</description></item>
+        /// <item><term>extra_ws|xtra_ws=number (default = 0)</term><description>
         ///     The number of extra whitespace chars that are allowed outside of the number of
-        ///     errors that are allowed before disqualifying a potential match.
-        /// substitute_pattern|sub=pattern (default = .):
+        ///     errors that are allowed before disqualifying a potential match.</description></item>
+        /// <item><term>substitute_pattern|sub=pattern (default = .)</term><description>
         ///     The pattern that defines what a substitute (error) token can be. Any valid, non-empty
-        ///     regular expression will be accepted but if the pattern contains an unescaped '>' or ','
-        ///     character then it should be enclosed in parentheses to remove possible ambiguity.
-        /// use_global_names|global|g=true|false (default = false):
+        ///     regular expression will be accepted but if the pattern contains an unescaped '&gt;' or ','
+        ///     character then it should be enclosed in parentheses to remove possible ambiguity.</description></item>
+        /// <item><term>use_global_names|global|g=true|false (default = false)</term><description>
         ///     If use_global_names=true then the group names used in the expanded pattern will not
         ///     be unique to each pattern in the source regex. Only use this option if you understand
-        ///     the implications of this.
-        /// ws_pattern|ws=pattern (default = \s):
+        ///     the implications of this.</description></item>
+        /// <item><term>ws_pattern|ws=pattern (default = \s)</term><description>
         ///     The pattern that defines what is considered to be a whitespace character. Does not
         ///     need to match only a single character; any valid, non-empty regular expression will
-        ///     be accepted but if the pattern contains an unescaped '>' or ',' character then it
-        ///     should be enclosed in parentheses to remove possible ambiguity.
-        /// replacements=(replace=>replacement)... (default = no replacements defined)
+        ///     be accepted but if the pattern contains an unescaped '&gt;' or ',' character then it
+        ///     should be enclosed in parentheses to remove possible ambiguity.</description></item>
+        /// <item><term>replacements=(replace=&gt;replacement)... (default = no replacements defined)</term><description>
         ///     Token replacements that will be made to the search string after it has been broken
         ///     into tokens.
-        ///     The replace part is a .NET regular expression that must match an entire token or an
+        ///     <para>The replace part is a .NET regular expression that must match an entire token or an
         ///     entire sub-token for the replacement to occur. The replacement must be a valid .NET
         ///     regular expression to avoid ambiguities in parsing the list of pairs
         ///     (e.g., no unclosed parentheses). The replacements will not be made against tokens
         ///     that have sub-tokens, against sub-sub-tokens nor against any quantifier portions of
-        ///     the regex, e.g., {1,2}.
-        /// 'search_string' is the string to search for. The string will be treated a literal text
+        ///     the regex, e.g., {1,2}.</para></description></item>
+        /// <item><term>'search_string'</term><description>is the string to search for. The string will be treated a literal text
         /// except in that:
-        /// 1) Regex escape sequences (ie. \d, \x20, \040, \cC, \u0020), and character
+        /// <list type="number"><item>Regex escape sequences (ie. \d, \x20, \040, \cC, \u0020), and character
         /// classes whether specified with a backslash or that are enclosed in unescaped square 
         /// brackets (ie. [\da-eA-E]) will be taken together as a token representing a single char
-        /// in the text to be searched.
-        /// 2) A number enclosed in curly braces except at the beginning of the search string will
-        /// repeat the previous token the specified number of times. (ie: \d{9} or [\da-eA-E]{3}).
-        /// 3) Top-level parenthesized groups will be treated as single tokens as far as errors and
-        /// extra whitespace are concerned but replacements will only occur on sub-tokens.
-        /// 4) A + or ? after a token will determine whether the token is required (substitution
-        /// or omission not allowed) or optional (in which case omission will not count as an error).
+        /// in the text to be searched.</item>
+        /// <item>A number enclosed in curly braces except at the beginning of the search string will
+        /// repeat the previous token the specified number of times. (ie: \d{9} or [\da-eA-E]{3}).</item>
+        /// <item>Top-level parenthesized groups will be treated as single tokens as far as errors and
+        /// extra whitespace are concerned but replacements will only occur on sub-tokens.</item>
+        /// <item>A + or ? after a token will determine whether the token is required (substitution
+        /// or omission not allowed) or optional (in which case omission will not count as an error).</item>
+        /// </list></description></item></list>
         /// </summary>
         /// <param name="sourceRegex">The regular expression in which fuzzy search syntax should be
         /// expanded out into the equivalent regex.</param>

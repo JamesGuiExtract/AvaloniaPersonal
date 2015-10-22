@@ -168,8 +168,7 @@ namespace Extract.LabResultsCustomComponents
 
         /// <summary>
         /// Builds a collection of all <see cref="LabTest"/> that match this order
-        /// from the provided list of tests.  This method does not check if all mandatory
-        /// match.
+        /// from the provided list of tests.
         /// <para><b>Note:</b></para>
         /// This method will modify the <see cref="LabTest.TestCode"/> value to contain
         /// the proper test code for the matching test.
@@ -183,7 +182,6 @@ namespace Extract.LabResultsCustomComponents
         public List<LabTest> GetMatchingTests(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache,
             bool finalPass, bool requireMandatory)
         {
-
             TestMapper possibleMappings =
                     new TestMapper(tests, _mandatoryTestCodes, _otherTestCodes, dbCache, finalPass);
 

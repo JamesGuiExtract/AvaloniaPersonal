@@ -443,7 +443,7 @@ namespace Extract.LabResultsCustomComponents
                         IAttribute esNamesAttribute = new AttributeClass();
                         esNamesAttribute.Name = "ESNames";
                         esNamesAttribute.Value.CreateNonSpatialString
-                            (String.Join("|", esNames), attribute.Value.SourceDocName);
+                            (String.Join(";", esNames), attribute.Value.SourceDocName);
 
                         // Add the ESName subattribute
                         attribute.SubAttributes.PushBack(esNamesAttribute);

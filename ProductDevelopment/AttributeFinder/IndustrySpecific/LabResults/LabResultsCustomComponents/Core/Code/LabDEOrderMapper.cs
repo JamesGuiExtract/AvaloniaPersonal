@@ -120,12 +120,6 @@ namespace Extract.LabResultsCustomComponents
             public List<LabTest> ContainedTests = new List<LabTest>();
 
             /// <summary>
-            /// The set of all known outstanding order codes. Only orders in this set will be
-            /// considered for use. If null then all orders will be considered.
-            /// </summary>
-            public HashSet<string> OutstandingOrderCodes;
-
-            /// <summary>
             /// Initializes a new instance of the <see cref="OrderGroupingPermutation"/>
             /// class.
             /// </summary>
@@ -136,29 +130,23 @@ namespace Extract.LabResultsCustomComponents
                 // The initial combined group contains only the original group
                 CombinedGroup = originalGroup;
                 ContainedGroups.Add(originalGroup);
-                OutstandingOrderCodes = originalGroup.OutstandingOrderCodes;
                 ContainedTests = new List<LabTest>(originalGroup.LabTests);
             }
 
             /// <summary>
             /// Attempts to merge the specified <see cref="OrderGrouping"/> with the
-            /// currently contained order groupings to form a bigger order.
+            /// currently contained order groupings.
             /// </summary>
             /// <param name="newGroup">The <see cref="OrderGrouping"/> to
             /// merge with the current grouping.</param>
-            /// <param name="labOrders">The collection of lab order codes to
-            /// <see cref="LabOrder"/> objects.</param>
+            /// <param name="labOrder">The <see cref="LabOrder"/> to be mapped to</param>
             /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> used for mapping</param>
-            /// <param name="limitToOutstandingOrders">Whether to limit orders to be considered to
-            /// the set of outstanding order codes as specified in either of the
-            /// <see cref="OrderGrouping"/> objects.</param>
             /// <param name="compatibleDates">Whether the collection and result dates/times
             /// of this instance were compatible with <paramref name="newGroup"/></param>
             /// <returns>A new merged <see cref="OrderGroupingPermutation"/>
             /// or <see langword="null"/> if no merging can take place.</returns>
             public OrderGroupingPermutation AttemptMerge(OrderGrouping newGroup,
-                Dictionary<string, LabOrder> labOrders, OrderMappingDBCache dbCache,
-                bool limitToOutstandingOrders, out bool compatibleDates)
+                LabOrder labOrder, OrderMappingDBCache dbCache, out bool compatibleDates)
             {
                 if (   !OrderGrouping.CollectionDatesEqual(CombinedGroup, newGroup)
                     || !OrderGrouping.ResultDatesEqual(CombinedGroup, newGroup))
@@ -176,32 +164,23 @@ namespace Extract.LabResultsCustomComponents
                     return null;
                 }
 
-                // Combine outstanding orders from both groups.
-                if (limitToOutstandingOrders)
-                {
-                    OutstandingOrderCodes.UnionWith(newGroup.OutstandingOrderCodes);
-                }
-
+                // Map all the tests to this order. Don't require mandatory yet
                 List<LabTest> combinedTests = ContainedTests.Concat(newGroup.LabTests).ToList();
-
-                // Groups could potentially be merged, find the best order
-                KeyValuePair<string, List<LabTest>> bestOrder =
-                    FindBestOrder(combinedTests,
-                        labOrders, dbCache, false, false, OutstandingOrderCodes, true, true);
+                List<LabTest> matchedTests = labOrder.GetMatchingTests(combinedTests, dbCache,
+                    true, false);
 
                 // In order to group into a new combined order, the resulting order must contain
                 // all of the tests from the list.
-                if (combinedTests.Count != bestOrder.Value.Count)
+                if (combinedTests.Count != matchedTests.Count)
                 {
                     return null;
                 }
 
-                OrderGrouping combinedGroup = new OrderGrouping(labOrders[bestOrder.Key],
-                    bestOrder.Value, CombinedGroup, newGroup);
+                var combinedGroup = new OrderGrouping(labOrder, matchedTests, CombinedGroup, newGroup);
 
                 // Create the new grouping permutation
                 var newGroupingPermutation = new OrderGroupingPermutation(combinedGroup);
-                newGroupingPermutation.ContainedTests = combinedTests;
+                newGroupingPermutation.ContainedTests = matchedTests;
                 newGroupingPermutation.ContainedGroups = new List<OrderGrouping>(ContainedGroups);
                 newGroupingPermutation.ContainedGroups.Add(newGroup);
 
@@ -1108,8 +1087,24 @@ namespace Extract.LabResultsCustomComponents
             bool useFilledRequirement,
             bool limitToOutstandingOrders)
         {
+            // Combine all outstanding order codes
+            HashSet<string> outstandingOrderCodes = null;
+            if (limitToOutstandingOrders)
+            {
+                outstandingOrderCodes = new HashSet<string>();
+                foreach(var group in firstPassGrouping)
+                {
+                    outstandingOrderCodes.UnionWith(group.OutstandingOrderCodes);
+                }
+            }
+
+            // Try once allowing only one consecutive group to be skipped when matching an order
             IEnumerable<OrderGrouping> bestGroups = MergeGroups(firstPassGrouping, labOrders,
-                dbCache, requireMandatory, useFilledRequirement, limitToOutstandingOrders, false);
+                dbCache, requireMandatory, useFilledRequirement, outstandingOrderCodes, false, 1);
+
+            // Try again, allowing more groups to be skipped this time
+            bestGroups = MergeGroups(bestGroups, labOrders,
+                dbCache, requireMandatory, useFilledRequirement, outstandingOrderCodes, false, 50);
 
             // Check for any order groupings that are "UnknownOrder"
             // and attempt to map them to an order [DE #833]
@@ -1121,7 +1116,7 @@ namespace Extract.LabResultsCustomComponents
             if (useFilledRequirement)
             {
                 bestGroups = MergeGroups(bestGroups, labOrders, dbCache, requireMandatory,
-                    false, limitToOutstandingOrders, true);
+                    false, outstandingOrderCodes, true, 4);
             }
 
             // BestGroups should now contain all groupings that could be combined
@@ -1155,10 +1150,11 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="requireMandatory">Whether mandatory tests are required</param>
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled
         /// requirement</param>
-        /// <param name="limitToOutstandingOrders">Whether to limit orders to be considered based
-        /// on known, outstanding order codes.</param>
+        /// <param name="outstandingOrderCodes">Set of order codes to limit the orders to be considered.</param>
         /// <param name="mergeUnknownOrders">Whether only mergers containing at least one unknown
         /// order will be performed</param>
+        /// <param name="consecutiveGroupsAllowedToBeSkipped">The number of <see cref="OrderGrouping"/>s that
+        /// can be skipped in a row before no further attempts for a particular order will be tried.</param>
         /// <returns>List of merged <see cref="OrderGrouping"/>s</returns>
         private static LinkedList<OrderGrouping> MergeGroups(
             IEnumerable<OrderGrouping> orderGroups,
@@ -1166,117 +1162,138 @@ namespace Extract.LabResultsCustomComponents
             OrderMappingDBCache dbCache,
             bool requireMandatory,
             bool useFilledRequirement,
-            bool limitToOutstandingOrders,
-            bool mergeUnknownOrders)
+            HashSet<string> outstandingOrderCodes,
+            bool mergeUnknownOrders,
+            int consecutiveGroupsAllowedToBeSkipped)
         {
-            LinkedList<OrderGrouping> preMergeGroups, postMergeGroups;
-            postMergeGroups = new LinkedList<OrderGrouping>(orderGroups);
-
-            // Attempt merges until result is the same length as the input
-            do
+            var preMergeGroups = new LinkedList<OrderGrouping>(orderGroups);
+            var postMergeGroups = new LinkedList<OrderGrouping>();
+            while (preMergeGroups.Count > 0)
             {
-                preMergeGroups = postMergeGroups;
-                postMergeGroups = new LinkedList<OrderGrouping>();
+                // Get the best groups and remove all matched groups from the pending collection
+                OrderGroupingPermutation bestGrouping = GetBestGrouping(preMergeGroups, labOrders,
+                    dbCache, requireMandatory, useFilledRequirement, outstandingOrderCodes,
+                    consecutiveGroupsAllowedToBeSkipped);
 
-                // Iterate through the pending groups and try to merge with as many subsequent groups
-                // as possible. After merging at least once, stop at the first group with compatible
-                // dates that cannot be merged (to promote merging between nearby groups).
-                while (preMergeGroups.Count > 0)
+                // If no merge could take place or an unknown order is required to be, but wasn't,
+                // merged, then just move the first group from pre to post-merged collection.
+                if (bestGrouping == null || mergeUnknownOrders
+                    && !bestGrouping.ContainedGroups.Where(g => g.LabOrder == null).Any())
                 {
-                    var currentGroup = new OrderGroupingPermutation(preMergeGroups.First.Value);
-                    var possibleGroupings = new List<OrderGroupingPermutation> { currentGroup };
-                    // Attempt to add each subsequent pending group
-                    foreach (var nextGroup in preMergeGroups)
-                    {
-                        bool compatibleDates;
-                        bool mergedAtLeastOnce = false;
-                        OrderGroupingPermutation newPossibility =
-                            currentGroup.AttemptMerge(nextGroup, labOrders, dbCache, limitToOutstandingOrders,
-                            out compatibleDates);
-
-                        if (newPossibility != null)
-                        {
-                            possibleGroupings.Add(newPossibility);
-                            currentGroup = newPossibility;
-                            mergedAtLeastOnce = true;
-                        }
-                        else if (compatibleDates && mergedAtLeastOnce)
-                        {
-                            break;
-                        }
-                    }
-
-                    // Get the best groups and remove all matched groups from the pending collection
-                    OrderGroupingPermutation bestGrouping = GetBestGrouping
-                        (possibleGroupings, requireMandatory, useFilledRequirement, mergeUnknownOrders)
-                        ?? possibleGroupings[0];
-
+                    postMergeGroups.AddLast(preMergeGroups.First.Value);
+                    preMergeGroups.RemoveFirst();
+                }
+                else
+                {
                     postMergeGroups.AddLast(bestGrouping.CombinedGroup);
-
                     foreach (OrderGrouping group in bestGrouping.ContainedGroups)
                     {
                         preMergeGroups.Remove(group);
                     }
                 }
             }
-            while (preMergeGroups.Count > postMergeGroups.Count);
 
             return postMergeGroups;
         }
 
         /// <summary>
-        /// Gets the best order grouping from a collection of potential order groupings.
-        /// <para>Note:</para>
-        /// Best is defined as the order grouping with the most tests.
+        /// Find the best order match for the collection of <see cref="OrderGrouping"/>s
         /// </summary>
-        /// <param name="possibleGroupings">The collection of possible test groupings to compare.
-        /// </param>
-        /// <param name="requireMandatory">Whether mandatory tests are required when creating
-        /// the final groupings.</param>
-        /// <param name="useFilledRequirement">Whether the filled requirement of an order must be met</param>
-        /// <param name="requireContainedUnknownOrder">Whether a group not yet mapped to an order
-        /// must be contained in the result</param>
-        /// <returns>The "Best" (see note in summary) order grouping from the list of possible
-        /// groupings.</returns>
-        static OrderGroupingPermutation GetBestGrouping(
-            List<OrderGroupingPermutation> possibleGroupings, bool requireMandatory,
-            bool useFilledRequirement, bool requireContainedUnknownOrder)
+        /// <param name="unmatchedGroups">The list of <see cref="OrderGrouping"/>s to try to fit
+        /// into the best order possible</param>
+        /// <param name="labOrders">A collection mapping order codes to <see cref="LabOrder"/>s</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use for mapping</param>
+        /// <param name="requireMandatory">If <see langword="true"/> then will only map to an
+        /// order if all mandatory tests are present.  If <see langword="false"/> will map to
+        /// the order with the most tests, even if all mandatory are not present.</param>
+        /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
+        /// <param name="outstandingOrderCodes">Set of order codes to limit the orders to be considered.</param>
+        /// <param name="consecutiveGroupsAllowedToBeSkipped">The number of <see cref="OrderGrouping"/>s that
+        /// can be skipped in a row before no further attempts for a particular order will be tried.</param>
+        /// <returns>An <see cref="OrderGroupingPermutation"/> describing the merged groups</returns>
+        static OrderGroupingPermutation GetBestGrouping(IEnumerable<OrderGrouping> unmatchedGroups,
+            Dictionary<string, LabOrder> labOrders, OrderMappingDBCache dbCache,
+            bool requireMandatory, bool useFilledRequirement, HashSet<string> outstandingOrderCodes,
+            int consecutiveGroupsAllowedToBeSkipped)
         {
+            // Variables to hold the best match seen thus far (will be modified as the
+            // best matching algorithm does its work
             int bestGroupCount = 0;
             string bestTieBreakerString = "";
             OrderGroupingPermutation bestGroup = null;
-            foreach (OrderGroupingPermutation group in possibleGroupings)
+
+            // Get possible orders for the first group
+            var potentialOrderCodes = GetPotentialOrderCodes(unmatchedGroups.First().LabTests, dbCache);
+
+            // Loop through the potential orders attempting to match the order
+            foreach (string orderCode in potentialOrderCodes)
             {
+                // If outstandingOrderCodes is not null then limit to this set
+                if (outstandingOrderCodes != null && !outstandingOrderCodes.Contains(orderCode))
+                {
+                    continue;
+                }
+
+                // Get the lab order from the order code
+                LabOrder labOrder;
+                if (!labOrders.TryGetValue(orderCode, out labOrder))
+                {
+                    ExtractException ee = new ExtractException("ELI29075",
+                        "Order code was not found in the collection.");
+                    ee.AddDebugData("Order Code", orderCode, false);
+                    throw ee;
+                }
+
+                var currentPermutation = new OrderGroupingPermutation(unmatchedGroups.First());
+                var skipped = 0;
+                foreach (var nextGroup in unmatchedGroups.Skip(1))
+                {
+                    bool compatibleDates;
+                    var permutation = currentPermutation.AttemptMerge
+                        (nextGroup, labOrder, dbCache, out compatibleDates);
+
+                    // Skip group if no merge could happen
+                    if (permutation == null)
+                    {
+                        // Count as skipped only if the dates were compatible
+                        if (compatibleDates)
+                        {
+                            skipped++;
+                            if (skipped > consecutiveGroupsAllowedToBeSkipped)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        currentPermutation = permutation;
+                        skipped = 0;
+                    }
+                }
+ 
                 // Check mandatory requirement
-                if (requireMandatory && group.CombinedGroup.LabOrder != null &&
-                    !group.CombinedGroup.ContainsAllMandatoryTests())
+                var group = currentPermutation.CombinedGroup;
+                if (requireMandatory && group.LabOrder != null && !group.ContainsAllMandatoryTests())
                 {
                     continue;
                 }
 
                 // Check filled requirement
-                if (useFilledRequirement && group.CombinedGroup.LabOrder != null &&
-                    group.CombinedGroup.LabTests.Count < group.CombinedGroup.LabOrder.FilledRequirement)
+                if (useFilledRequirement && group.LabOrder != null &&
+                    group.LabTests.Count < group.LabOrder.FilledRequirement)
                 {
                     continue;
                 }
 
-                // Check if an unknown order was merged if that is required
-                if (requireContainedUnknownOrder
-                    && !group.ContainedGroups.Where(g => g.LabOrder == null).Any())
-                {
-                    continue;
-                }
-
-                int groupCount = group.ContainedGroups.Count;
-                string tieBreakerString = (group.CombinedGroup.LabOrder == null) ? "" :
-                    group.CombinedGroup.LabOrder.TieBreakerString;
+                int groupCount = currentPermutation.ContainedGroups.Count;
+                string tieBreakerString = (group.LabOrder == null) ? "" : group.LabOrder.TieBreakerString;
 
                 // Best match if:
                 // 1. Has more contained groups than other grouping OR
                 if (bestGroup == null || groupCount > bestGroupCount)
                 {
-                    bestGroup = group;
+                    bestGroup = currentPermutation;
                     bestGroupCount = groupCount;
                     bestTieBreakerString = tieBreakerString;
                 }
@@ -1285,7 +1302,7 @@ namespace Extract.LabResultsCustomComponents
                          string.Compare(
                             tieBreakerString, bestTieBreakerString, StringComparison.Ordinal) < 0)
                 {
-                    bestGroup = group;
+                    bestGroup = currentPermutation;
                     bestGroupCount = groupCount;
                     bestTieBreakerString = tieBreakerString;
                 }
@@ -1459,6 +1476,29 @@ namespace Extract.LabResultsCustomComponents
             }
 
             return new KeyValuePair<string, List<LabTest>>(bestOrderId, bestMatchedTests);
+        }
+
+        /// <summary>
+        /// Gets the intersection of potential order codes for a collection of <see cref="LabTest"/>s
+        /// </summary>
+        /// <param name="labTests">The collection of <see cref="LabTest"/>s</param>
+        /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to query</param>
+        /// <returns>The collection of potential order codes that all of the tests could be a part of</returns>
+        static IEnumerable<string> GetPotentialOrderCodes(IEnumerable<LabTest> labTests,
+            OrderMappingDBCache dbCache)
+        {
+            if (labTests.Count() == 0)
+            {
+                return Enumerable.Empty<string>();
+            }
+            var potentialOrderCodes = new HashSet<string>
+                (dbCache.GetPotentialOrderCodes(labTests.First().Name));
+            foreach(var test in labTests.Skip(1))
+            {
+                potentialOrderCodes.IntersectWith(dbCache.GetPotentialOrderCodes(test.Name));
+            }
+
+            return potentialOrderCodes;
         }
 
         /// <summary>
