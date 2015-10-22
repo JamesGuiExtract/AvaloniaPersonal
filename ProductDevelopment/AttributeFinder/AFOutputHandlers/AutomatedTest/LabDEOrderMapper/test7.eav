@@ -6,8 +6,9 @@ Test|N/A
 ..Units|K/UL
 ..Value|236
 ..TestCode|PLT
+..ESNames|Platelet
 .Name|PLATELET
-.EpicCode|85595
+.OrderCode|PLT
 Test|N/A
 .CollectionDate|12/04/2009
 .CollectionTime|07:20
@@ -15,13 +16,15 @@ Test|N/A
 ..Range|0.9-1.1
 ..Value|0.9
 ..TestCode|INR
+..ESNames|INR
 .Component|PROTIME
 ..Range|11.4-14.4
 ..Units|SEC
 ..Value|11.5
 ..TestCode|PROX
+..ESNames|Protime
 .Name|PROTIME
-.EpicCode|85610
+.OrderCode|PT
 Test|N/A
 .CollectionDate|12/04/2009
 .CollectionTime|07:20
@@ -30,5 +33,6 @@ Test|N/A
 ..Units|SEC
 ..Value|24
 ..TestCode|PTT
+..ESNames|PTT
 .Name|PTT
-.EpicCode|85730
+.OrderCode|PTT

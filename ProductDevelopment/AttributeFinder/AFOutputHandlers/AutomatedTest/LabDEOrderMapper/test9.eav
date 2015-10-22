@@ -4,10 +4,11 @@ Test|N/A
 ..Units|K/cumm
 ..Value|60
 ..TestCode|PLT
+..ESNames|Platelet
 .CollectionDate|12/11/2009
 .CollectionTime|13:50
 .Name|PLATELET
-.EpicCode|85595
+.OrderCode|PLT
 Test|N/A
 .Component|SEGS
 ..Flag|L
@@ -50,8 +51,8 @@ Test|N/A
 ..Flag|A
 ..Value|3+
 ..TestCode|RBCM
-.EpicCode|85097.01
 .Name|MANUAL DIFF
+.OrderCode|MAND
 Test|N/A
 .Component|Eosinophils
 ..Range|0-6
@@ -70,7 +71,7 @@ Test|N/A
 .CollectionDate|12/11/2009
 .CollectionTime|13:50
 .Name|ABSOLUTE NEUTROPHIL
-.EpicCode|85048.03
+.OrderCode|ABNEUT
 Test|N/A
 .Component|Absolute Lymph and Variant
 ..Range|1.0-3.0
@@ -97,4 +98,4 @@ Test|N/A
 .CollectionDate|12/11/2009
 .CollectionTime|13:50
 .Name|EOSINOPHIL COUNT, AB
-.EpicCode|85008
+.OrderCode|EOCT

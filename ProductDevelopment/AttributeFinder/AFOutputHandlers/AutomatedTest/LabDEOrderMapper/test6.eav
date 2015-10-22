@@ -6,32 +6,38 @@ Test|N/A
 ..Units|mg/dL
 ..Value|92
 ..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
 .Component|BUN
 ..Flag|H
 ..Range|5-20
 ..Units|mg/dL
 ..Value|31
 ..TestCode|BUN
+..ESNames|BUN
 .Component|CREATININE
 ..Range|0.50-1.06
 ..Units|mg/dL
 ..Value|0.75
 ..TestCode|CREAT
+..ESNames|Creatinine Blood
 .Component|CALCIUM
 ..Range|8.4-10.2
 ..Units|mg/dL
 ..Value|9.2
 ..TestCode|CA
+..ESNames|Calcium
 .Component|TOTAL PROTEIN
 ..Range|5.9-7.7
 ..Units|g/dL
 ..Value|7.0
 ..TestCode|TP
+..ESNames|Protein Total Blood
 .Component|ALBUMIN
 ..Range|3.8-5.4
 ..Units|g/dL
 ..Value|4.4
 ..TestCode|ALB
+..ESNames|Albumin
 .Component|A/G RATIO, SERUM
 ..Range|>0.9
 ..Value|1.7
@@ -42,16 +48,19 @@ Test|N/A
 ..Units|IU/L
 ..Value|38
 ..TestCode|AST
+..ESNames|AST
 .Component|ALT/SGPT
 ..Range|3-35
 ..Units|IU/L
 ..Value|16
 ..TestCode|ALT
+..ESNames|ALT
 .Component|ALK PHOSPHATASE
 ..Range|65-260
 ..Units|IU/L
 ..Value|87
 ..TestCode|ALKP
+..ESNames|Alkaline Phosphatase
 .Component|TOTAL BILIRUBIN
 ..Range|0.0-1.1
 ..Units|mg/dL
@@ -62,28 +71,33 @@ Test|N/A
 ..Units|mEq/L
 ..Value|139
 ..TestCode|NA
+..ESNames|Sodium
 .Component|POTASSIUM
 ..Range|3.5-5.0
 ..Units|mEq/L
 ..Value|4.5
 ..TestCode|K
+..ESNames|Potassium
 .Component|CHLORIDE
 ..Range|98-108
 ..Units|mEq/L
 ..Value|107
 ..TestCode|CL
+..ESNames|Chloride
 .Component|ECO2
 ..Range|20.0-28.0
 ..Units|mEq/L
 ..Value|27.7
 ..TestCode|CO2
+..ESNames|CO2
 .Component|ANION GAP
 ..Flag|L
 ..Range|10-20
 ..Value|9
 ..TestCode|ER6
-.EpicCode|80053
+..ESNames|Anion Gap
 .Name|COMPREHENSIVE PANEL
+.OrderCode|CMP1
 Test|N/A
 .CollectionDate|12/23/2009
 .CollectionTime|11:15
@@ -92,5 +106,6 @@ Test|N/A
 ..Units|mg/dL
 ..Value|3.5
 ..TestCode|PHOS
+..ESNames|Phosphorus
 .Name|PHOSPHORUS
-.EpicCode|84100
+.OrderCode|PHOS

@@ -6,11 +6,13 @@ Test|N/A
 ..Units|GM/DL
 ..Value|13.0
 ..TestCode|HGB
+..ESNames|Hemoglobin
 .Component|HCT
 ..Range|36.0-48.0
 ..Units|%
 ..Value|41.9
 ..TestCode|HCT
+..ESNames|Hematocrit
 .Component|RBC
 ..Range|4.00-5.30
 ..Units|M/UL
@@ -27,61 +29,72 @@ Test|N/A
 ..Units|K/UL
 ..Value|379
 ..TestCode|PLT
+..ESNames|Platelet
 .Component|MPV
 ..Range|9.0-13.0
 ..Units|FL
 ..Value|10.3
 ..TestCode|SKMPV
+..ESNames|MPV
 .Component|MCV
 ..Flag|H
 ..Range|79.0-99.0
 ..Units|FL
 ..Value|102.9
 ..TestCode|MCV
+..ESNames|MCV
 .Component|MCH
 ..Range|26.0-34.0
 ..Units|PG
 ..Value|31.9
 ..TestCode|MCH
+..ESNames|MCH
 .Component|MCHC
 ..Flag|L
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|31.0
 ..TestCode|MCHC
+..ESNames|MCHC
 .Component|RDW
 ..Flag|H
 ..Range|38.0-50.0
 ..Units|FL
 ..Value|71.3
 ..TestCode|RDW
+..ESNames|RDW-CV;RDW-SD
 .Component|SEG
 ..Flag|L
 ..Range|42-70
 ..Units|%
 ..Value|23
 ..TestCode|INEU
+..ESNames|Neutrophils %
 .Component|LYMPH
 ..Flag|H
 ..Range|15-45
 ..Units|%
 ..Value|71
 ..TestCode|JLYM
+..ESNames|Lymphocytes %
 .Component|MONO
 ..Range|4-12
 ..Units|%
 ..Value|6
 ..TestCode|KMONO
+..ESNames|Monocytes %
 .Component|EOSIN
 ..Range|0-6
 ..Units|%
 ..Value|0
 ..TestCode|MEO
+..ESNames|Eosinophils %
 .Component|BASO
 ..Range|0-2
 ..Units|%
 ..Value|0
 ..TestCode|NBASO
+..ESNames|Basophils %
 .Component|SEG,ABS (AUTO)
 ..Range|1.6-7.6
 ..Units|K/UL
@@ -109,21 +122,24 @@ Test|N/A
 ..Value|0.0
 ..TestCode|SKBASO
 .Name|CBC
-.EpicCode|85025
+.OrderCode|CBC
 Test|N/A
 .CollectionDate|10/10/2008
 .CollectionTime|13:00
 .Component|FASTING STATUS
 ..Value|NO
 ..TestCode|STAT2
+..ESNames|Fasting
 .Component|CALCIUM
 ..Range|8.4-10.2
 ..Units|MG/DL
 ..Value|8.5
 ..TestCode|CA
+..ESNames|Calcium
 .Component|GFR AFRICAN AMERICAN
 ..Value|34
 ..TestCode|ER8
+..ESNames|GFR African American
 .Component|GFR,ESTIMATE
 ..Value|28
 ..TestCode|GFR
@@ -132,42 +148,50 @@ Test|N/A
 ..Units|MG/DL
 ..Value|82
 ..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
 .Component|BUN
 ..Range|8-21
 ..Units|MG/DL
 ..Value|21
 ..TestCode|BUN
+..ESNames|BUN
 .Component|CREATININE
 ..Flag|H
 ..Range|0.7-1.3
 ..Units|MG/DL
 ..Value|1.8
 ..TestCode|CREAT
+..ESNames|Creatinine Blood
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
 ..Value|140
 ..TestCode|NA
+..ESNames|Sodium
 .Component|POTASSIUM
 ..Range|3.5-5.1
 ..Units|MMOL/L
 ..Value|4.8
 ..TestCode|K
+..ESNames|Potassium
 .Component|CHLORIDE
 ..Range|98-107
 ..Units|MMOL/L
 ..Value|105
 ..TestCode|CL
+..ESNames|Chloride
 .Component|ECO2
 ..Flag|L
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|22
 ..TestCode|CO2
+..ESNames|CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|13
 ..TestCode|ER6
+..ESNames|Anion Gap
 .Name|BASIC METABOLIC PANEL
-.EpicCode|80048
+.OrderCode|BMP1

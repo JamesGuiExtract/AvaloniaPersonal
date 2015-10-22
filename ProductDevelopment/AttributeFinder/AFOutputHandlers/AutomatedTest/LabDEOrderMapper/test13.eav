@@ -1,15 +1,19 @@
 Test|N/A
 .Name|TXP EXTERNAL LAB RESULTS
-.Component|WBC
-..OfficialName|WBC (OUTSIDE)
-..TestCode|50000
-.Component|WBC, URINE
-..OfficialName|URINE WBCS (OUTSIDE)
-..TestCode|50055
-.Component|GLUCOSE
-..OfficialName|URINE GLUCOSE (OUTSIDE)
-..TestCode|50048
+.OrderCode|TXPEXTLAB
 .Component|GLUCOSE BLOOD
 ..OfficialName|GLUCOSE (OUTSIDE)
 ..TestCode|50060
-.EpicCode|TXPEXTLAB
+..ESNames|Glucose Blood;Glucose Fasting
+.Component|WBC, URINE
+..OfficialName|URINE WBCS (OUTSIDE)
+..TestCode|50055
+..ESNames|WBC Urine
+.Component|WBC
+..OfficialName|WBC (OUTSIDE)
+..TestCode|50000
+..ESNames|WBC Blood
+.Component|GLUCOSE
+..OfficialName|URINE GLUCOSE (OUTSIDE)
+..TestCode|50048
+..ESNames|Glucose Urine

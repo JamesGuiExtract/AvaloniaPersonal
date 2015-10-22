@@ -1,9 +1,9 @@
 Test|N/A
+.Name|CBC
+.OrderCode|CBC
 .Component|Test %
 ..OfficialName|Test
 ..TestCode|TEST
 .Component|Test
 ..OfficialName|Test (abs)
 ..TestCode|TESTABS
-.Name|CBC
-.EpicCode|85025
