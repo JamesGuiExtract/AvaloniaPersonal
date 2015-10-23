@@ -60,6 +60,9 @@ std::vector<unsigned char> Deflater::GetCompressedData()
 		return std::move( result );
 	}
 	CATCH_UNEXPECTED_EXCEPTION( "ELI38952" );
+
+	std::vector<unsigned char> empty;
+	return empty;
 }
 
 
