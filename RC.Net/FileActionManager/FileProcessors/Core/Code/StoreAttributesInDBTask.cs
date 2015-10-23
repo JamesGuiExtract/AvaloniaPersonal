@@ -72,7 +72,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Store/Retrieve attributes in DB";
+        const string _COMPONENT_DESCRIPTION = "Core: Store or retrieve attributes in database";
 
         /// <summary>
         /// The GUID identifying this class
