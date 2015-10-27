@@ -42,6 +42,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._RetrieveRadioButton = new System.Windows.Forms.RadioButton();
             this._StoreRadioButton = new System.Windows.Forms.RadioButton();
+            this._doNotSaveEmptyCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
@@ -69,7 +70,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(361, 201);
+            this._cancelButton.Location = new System.Drawing.Point(361, 227);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 7;
@@ -79,7 +80,7 @@
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(280, 201);
+            this._okButton.Location = new System.Drawing.Point(280, 227);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 6;
@@ -185,13 +186,25 @@
             this._StoreRadioButton.UseVisualStyleBackColor = true;
             this._StoreRadioButton.Click += new System.EventHandler(this.HandleStoreRadioButtonClicked);
             // 
+            // _doNotSaveEmptyCheckBox
+            // 
+            this._doNotSaveEmptyCheckBox.AutoSize = true;
+            this._doNotSaveEmptyCheckBox.Checked = true;
+            this._doNotSaveEmptyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._doNotSaveEmptyCheckBox.Location = new System.Drawing.Point(12, 201);
+            this._doNotSaveEmptyCheckBox.Name = "_doNotSaveEmptyCheckBox";
+            this._doNotSaveEmptyCheckBox.Size = new System.Drawing.Size(161, 17);
+            this._doNotSaveEmptyCheckBox.TabIndex = 11;
+            this._doNotSaveEmptyCheckBox.Text = "Do not store empty attributes";
+            this._doNotSaveEmptyCheckBox.UseVisualStyleBackColor = true;
+            // 
             // StoreAttributesInDBTaskSettingsDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(448, 236);
+            this.ClientSize = new System.Drawing.Size(448, 262);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._attributeSetNameComboBox);
             this.Controls.Add(this._storeRasterZonesCheckBox);
@@ -203,6 +216,7 @@
             this.Controls.Add(label1);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this._okButton);
+            this.Controls.Add(this._doNotSaveEmptyCheckBox);
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(1000, 300);
             this.MinimizeBox = false;
@@ -211,7 +225,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Core: Store/Retrieve attributes in DB";
+            this.Text = "Core: Store or retrieve attributes in database";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -232,5 +246,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton _RetrieveRadioButton;
         private System.Windows.Forms.RadioButton _StoreRadioButton;
+        private System.Windows.Forms.CheckBox _doNotSaveEmptyCheckBox;
     }
 }

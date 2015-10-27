@@ -82,7 +82,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Current task version.
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -129,6 +129,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         bool _storeModeIsSet = true;
 
+        /// <summary>
+        /// Indicates whether user wants to store attributes even when empty - defaults to false
+        /// </summary>
+        bool _storeEmptyAttributes;
+
         #endregion Fields
 
          #region Constructors
@@ -138,6 +143,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public StoreAttributesInDBTask()
         {
+            StoreEmptyAttributes = false;
         }
 
         /// <summary>
@@ -242,6 +248,22 @@ namespace Extract.FileActionManager.FileProcessors
             set
             {
                 _storeModeIsSet = value;
+                _dirty = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets flag that determines whether to save empty attributes
+        /// </summary>
+        public bool StoreEmptyAttributes
+        {
+            get
+            {
+                return _storeEmptyAttributes;
+            }
+            set
+            {
+                _storeEmptyAttributes = value;
                 _dirty = true;
             }
         }
@@ -502,7 +524,8 @@ namespace Extract.FileActionManager.FileProcessors
                     _attributeDBManager.CreateNewAttributeSetForFile( fileTaskSessionID, 
                                                                       expandedAttrSetName,
                                                                       voaData,
-                                                                      StoreRasterZones );
+                                                                      StoreRasterZones,
+                                                                      StoreEmptyAttributes );
                 }
                 else
                 {
@@ -606,8 +629,12 @@ namespace Extract.FileActionManager.FileProcessors
 
                     if (reader.Version > 1)
                     {
-                        //int version = reader.ReadInt32();
                         _storeModeIsSet = reader.ReadBoolean();
+                    }
+
+                    if (reader.Version > 2)
+                    {
+                        _storeEmptyAttributes = reader.ReadBoolean();
                     }
                 }
 
@@ -640,6 +667,7 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(_attributeSetName);
                     writer.Write(_storeRasterZones);
                     writer.Write(_storeModeIsSet);
+                    writer.Write(_storeEmptyAttributes);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -705,6 +733,7 @@ namespace Extract.FileActionManager.FileProcessors
             _attributeSetName = task.AttributeSetName;
             _storeRasterZones = task.StoreRasterZones;
             _storeModeIsSet = task._storeModeIsSet;
+            _storeEmptyAttributes = task._storeEmptyAttributes;
 
             _dirty = true;
         }

@@ -690,7 +690,7 @@ namespace
 						  "end\n"
 						  "\n"
 						  "SELECT @AttributeType_ID = (SELECT TOP 1 [ID] from [dbo].[AttributeType] WHERE [Type]=@AttributeType_Type)\n"
-						  "if @AttributeType_ID IS NULL\n"
+						  "if @AttributeType_ID IS NULL AND @AttributeType_Type <> ''\n"
 						  "begin\n"
 						  "    INSERT INTO [dbo].[AttributeType] ([Type]) VALUES (@AttributeType_Type);\n"
 						  "    SELECT @AttributeType_ID = SCOPE_IDENTITY()\n"
@@ -700,25 +700,25 @@ namespace
 						  "VALUES (@AttributeSetForFile_ID, @AttributeName_ID, @Attribute_Value, @Attribute_ParentAttributeID, @Attribute_GUID);\n"
 						  "SELECT @Attribute_ID = SCOPE_IDENTITY()\n"
 						  "\n"
-						  "if not exists (SELECT * FROM [dbo].[AttributeInstanceType] WHERE [AttributeID]=@Attribute_ID AND [AttributeTypeID]=@AttributeType_ID)\n"
+						  "if @AttributeType_ID IS NOT NULL AND not exists (SELECT * FROM [dbo].[AttributeInstanceType] WHERE [AttributeID]=@Attribute_ID AND [AttributeTypeID]=@AttributeType_ID)\n"
 						  "BEGIN\n"
 						  "    INSERT INTO [dbo].[AttributeInstanceType] ([AttributeID], [AttributeTypeID]) VALUES (@Attribute_ID, @AttributeType_ID)\n"
 						  "END\n"
 						  "\n"	
 						  "SELECT AttributeID=@Attribute_ID\n"
 						  "SET NOCOUNT OFF\n"
-						"END TRY \n"
-						"BEGIN CATCH \n"
-							"SET NOCOUNT OFF \n"
-							"DECLARE @ErrorMessage NVARCHAR(4000); \n"
-							"DECLARE @ErrorSeverity INT; \n"
-							"DECLARE @ErrorState INT; \n"
-							"SELECT \n"
-								"@ErrorMessage = ERROR_MESSAGE(), \n"
-								"@ErrorSeverity = ERROR_SEVERITY(), \n"
-								"@ErrorState = ERROR_STATE(); \n"
-							"RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState) \n"
-						"END CATCH \n";
+						  "END TRY \n"
+						  "BEGIN CATCH \n"
+						  	"SET NOCOUNT OFF \n"
+						  	"DECLARE @ErrorMessage NVARCHAR(4000); \n"
+						  	"DECLARE @ErrorSeverity INT; \n"
+						  	"DECLARE @ErrorState INT; \n"
+						  	"SELECT \n"
+						  		"@ErrorMessage = ERROR_MESSAGE(), \n"
+						  		"@ErrorSeverity = ERROR_SEVERITY(), \n"
+						  		"@ErrorState = ERROR_STATE(); \n"
+						  	"RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState) \n"
+						  "END CATCH \n";
 
 		return insert;
 	}
@@ -880,6 +880,52 @@ namespace
 		}
 	};
 
+	// Definition of empty:
+	// the attribute Value is empty, the attribute Type is empty, 
+	// (iff true == storeRasterZones) RasterZones are NOT present, AND
+	// all subattributes are similarly empty.
+	bool AttributeIsEmpty( IAttributePtr ipAttribute, 
+						   bool bStoreRasterZones,
+   						   bool bStoreEmptyAttributes )
+	{
+		if ( true == bStoreEmptyAttributes )
+		{
+			return false;	// Tell caller attribute is not empty, because caller doesn't care
+		}
+
+		ISpatialStringPtr ipValue = ipAttribute->GetValue();
+		auto strValue = asString( ipValue->String );
+		if ( !strValue.empty() )
+		{
+			return false;
+		}
+
+		auto strType = asString( ipAttribute->Type );
+		if ( !strType.empty() )
+		{
+			return false;
+		}
+
+		if ( true == bStoreRasterZones )
+		{
+			if ( asCppBool( ipValue->HasSpatialInfo() ) )
+				return false;
+		}
+
+		IIUnknownVectorPtr ipSubAttrs = ipAttribute->GetSubAttributes();
+		for ( long i = 0; i < ipSubAttrs->Size(); ++i )
+		{
+			IAttributePtr ipSubAttribute = AssignComPtr( ipSubAttrs->At(i), "ELI38997" );
+			auto ret = AttributeIsEmpty( ipSubAttribute, bStoreRasterZones, bStoreEmptyAttributes );
+			if ( false == ret )
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 }		// end of anonymous namespace
 
 
@@ -944,7 +990,7 @@ void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong 
 }
 // ------------------------------------------------------------------------------------------------
 long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute, 
-										  VARIANT_BOOL vbStoreRasterZone,
+										  bool bStoreRasterZone,
 										  const std::string& strInsert )
 {
 	ADODB::_RecordsetPtr ipRS = ExecuteCmd( strInsert.c_str(), getDBConnection() );
@@ -957,8 +1003,7 @@ long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute,
 
 	ISpatialStringPtr ipValue = AssignComPtr( ipAttribute->GetValue(), "ELI38714" );
 	bool bHasSpatialInfo = asCppBool( ipValue->HasSpatialInfo() );
-	bool bStoreInfo = asCppBool(vbStoreRasterZone);
-	if ( bHasSpatialInfo && true == bStoreInfo )
+	if ( bHasSpatialInfo && true == bStoreRasterZone )
 	{
 		IIUnknownVectorPtr ipZones = ipValue->GetOriginalImageRasterZones();	// NOTE: can't return nullptr, throws
 		for ( long index = 0; index < ipZones->Size(); ++index )
@@ -974,11 +1019,39 @@ long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute,
 
 	return llParentID;
 }
+//-------------------------------------------------------------------------------------------------
+void CAttributeDBMgr::storeAttributeData( IIUnknownVectorPtr ipAttributes, 
+										  bool bStoreRasterZone,
+										  bool bStoreEmptyAttributes,
+										  long long llRootASFF_ID, 
+										  long long llParentAttrID/* = 0*/ )
+{
+	for ( long i = 0; i < ipAttributes->Size(); ++i )
+	{
+		IAttributePtr ipAttribute = AssignComPtr( ipAttributes->At(i), "ELI38693" );
+		if ( true == AttributeIsEmpty( ipAttribute, bStoreRasterZone, bStoreEmptyAttributes ) )
+		{
+			continue;
+		}
+
+		std::string strInsertQuery = GetInsertAttributeQuery( ipAttribute, 
+															  llParentAttrID,
+															  llRootASFF_ID);
+		long long llAttrID = SaveAttribute( ipAttribute, 
+											bStoreRasterZone,
+											strInsertQuery );
+
+		IIUnknownVectorPtr ipSubAttrs = ipAttribute->GetSubAttributes();
+		storeAttributeData(ipSubAttrs, bStoreRasterZone, bStoreEmptyAttributes, llRootASFF_ID, llAttrID);
+	}
+}
+
 // ------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessionID,
 														    BSTR bstrAttributeSetName,
 														    IIUnknownVector* pAttributes,
-															VARIANT_BOOL vbStoreRasterZone )
+															VARIANT_BOOL vbStoreRasterZone,
+															VARIANT_BOOL vbStoreEmptyAttributes )
 {
 	try
 	{
@@ -994,7 +1067,10 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessio
 		longlong llRootASFF_ID = ExecuteRootInsertASFF( strInsertRootASFF, getDBConnection() );
 		SaveVoaDataInASFF( ipAttributes, llRootASFF_ID );
 
-		storeAttributeData(ipAttributes, asCppBool(vbStoreRasterZone), llRootASFF_ID);
+		storeAttributeData( ipAttributes, 
+							asCppBool(vbStoreRasterZone), 
+							asCppBool(vbStoreEmptyAttributes), 
+							llRootASFF_ID );
 
 		tg.CommitTrans();
 		return S_OK;
@@ -1205,23 +1281,4 @@ map<string, string> CAttributeDBMgr::getDBInfoDefaultValues()
 	mapDefaultValues[gstrSCHEMA_VERSION_NAME] = asString(glSCHEMA_VERSION);
 
 	return mapDefaultValues;
-}
-//-------------------------------------------------------------------------------------------------
-void CAttributeDBMgr::storeAttributeData(IIUnknownVectorPtr ipAttributes, bool bStoreRasterZone,
-										 long long llRootASFF_ID, long long llParentAttrID/* = 0*/)
-{
-	for ( long i = 0; i < ipAttributes->Size(); ++i )
-	{
-		IAttributePtr ipAttribute = AssignComPtr( ipAttributes->At(i), "ELI38693" );
-
-		std::string strInsertQuery = GetInsertAttributeQuery( ipAttribute, 
-															  llParentAttrID,
-															  llRootASFF_ID);
-		long long llAttrID = SaveAttribute( ipAttribute, 
-											bStoreRasterZone,
-											strInsertQuery );
-
-		IIUnknownVectorPtr ipSubAttrs = ipAttribute->GetSubAttributes();
-		storeAttributeData(ipSubAttrs, bStoreRasterZone, llRootASFF_ID, llAttrID);
-	}
 }

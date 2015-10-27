@@ -81,7 +81,8 @@ public:
 	STDMETHOD(CreateNewAttributeSetForFile)(long nFileID,
 											BSTR bstrAttributeSetName,
 											IIUnknownVector* pAttributes,
-											VARIANT_BOOL vbStoreRasterZone);
+											VARIANT_BOOL vbStoreRasterZone,
+											VARIANT_BOOL vbStoreEmptyAttributes);
 
 	// relativeIndex: -1 for most recent, 1 for oldest
 	// decrement most recent value to get next most recent (-2)
@@ -146,13 +147,16 @@ private:
 	// This method performs the insert of Attribute rows, handling
 	// both parent (top-level, or root) and child attributes.
 	long long SaveAttribute( IAttributePtr ipAttribute, 
-							 VARIANT_BOOL storeRasterZone,
+							 bool bStoreRasterZone,
 							 const std::string& insert );
 
 	// Stores the discrete data for the specified vector of attributes (including all descendants).
 	// llParentAttrID == 0 for root attributes.
-	void storeAttributeData(IIUnknownVectorPtr ipAttributes, bool bStoreRasterZone,
-		long long llRootASFF_ID, long long llParentAttrID = 0);
+	void storeAttributeData(IIUnknownVectorPtr ipAttributes, 
+							bool bStoreRasterZone,
+							bool bStoreEmptyAttributes,
+							long long llRootASFF_ID, 
+							long long llParentAttrID = 0);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(AttributeDBMgr), CAttributeDBMgr)

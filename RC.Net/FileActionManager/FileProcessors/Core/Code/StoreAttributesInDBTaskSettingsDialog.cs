@@ -147,6 +147,10 @@ namespace Extract.FileActionManager.FileProcessors
                 _storeRasterZonesCheckBox.Checked = Settings.StoreRasterZones;
                 _storeRasterZonesCheckBox.Enabled = Settings.StoreModeIsSet;
                 _storeRasterZonesCheckBox.Visible = Settings.StoreModeIsSet;
+
+                _doNotSaveEmptyCheckBox.Checked = !Settings.StoreEmptyAttributes;
+                _doNotSaveEmptyCheckBox.Enabled = Settings.StoreModeIsSet;
+                _doNotSaveEmptyCheckBox.Visible = Settings.StoreModeIsSet;
             }
             catch (Exception ex)
             {
@@ -202,6 +206,7 @@ namespace Extract.FileActionManager.FileProcessors
                 Settings.StoreRasterZones = _storeRasterZonesCheckBox.Checked;
 
                 Settings.StoreModeIsSet = _StoreRadioButton.Checked;
+                Settings.StoreEmptyAttributes = !_doNotSaveEmptyCheckBox.Checked;
 
                 DialogResult = DialogResult.OK;
             }
@@ -249,12 +254,18 @@ namespace Extract.FileActionManager.FileProcessors
         {
             _storeRasterZonesCheckBox.Visible = true;
             _storeRasterZonesCheckBox.Enabled = true;
+
+            _doNotSaveEmptyCheckBox.Visible = true;
+            _doNotSaveEmptyCheckBox.Enabled = true;
         }
 
         private void HandleRetrieveRadioButtonClicked(object sender, EventArgs e)
         {
             _storeRasterZonesCheckBox.Enabled = false;
             _storeRasterZonesCheckBox.Visible = false;
+
+            _doNotSaveEmptyCheckBox.Enabled = false;
+            _doNotSaveEmptyCheckBox.Visible = false;
         }
     }
 }

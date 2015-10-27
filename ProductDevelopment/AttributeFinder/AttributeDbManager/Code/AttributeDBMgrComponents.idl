@@ -40,9 +40,10 @@ library AttributeDbMgrComponentsLib
 
 		[id(2), helpstring("method CreateNewAttributeSetForFile")] 
 		HRESULT CreateNewAttributeSetForFile([in] long fileID, 
-											 [in] BSTR attributeSetName, 
-											 [in] IIUnknownVector* pAttributes, 
-											 [in] VARIANT_BOOL storeRasterZone);
+											 [in] BSTR bstrAttributeSetName, 
+											 [in] IIUnknownVector* ipAttributes, 
+											 [in] VARIANT_BOOL vbStoreRasterZone,
+											 [in] VARIANT_BOOL vbStoreEmptyAttributes);
 
 		[id(3), helpstring("method GetAttributeSetForFile")] 
 		HRESULT GetAttributeSetForFile([out]IIUnknownVector** pAttributes, 
