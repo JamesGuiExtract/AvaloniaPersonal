@@ -19,7 +19,7 @@ namespace SpatialStringChecksum
     /// If /tree is not used, the VOA file will have single "Checksum" attribute which is a hash
     /// of all data in the uss file. If tree is used, the VOA file will also have attributes
     /// listing all fields in values in the uss file. This can then be converted to XML for
-    /// comparison purposes. The voa files produced when /tree is usec can be quite large.
+    /// comparison purposes. The voa files produced when /tree is used can be quite large.
     /// </summary>
     class Program
     {
@@ -118,7 +118,7 @@ namespace SpatialStringChecksum
 
             vector.SaveTo(Path.Combine(Path.GetDirectoryName(fileName),
                 Path.GetFileNameWithoutExtension(fileName) + ".voa"), false, 
-                Guid.Empty);
+                "");
         }
 
         static void CheckField(IUnknownVector vector, string name, object value)
