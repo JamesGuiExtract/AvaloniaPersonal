@@ -5604,7 +5604,7 @@ void CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpd
 
 	// Get the time since the request was generated
 	CTimeSpan tsDiff = newDatabaseIDValues.m_ctLastUpdated - counterUpdates.m_ctTimeCodeGenerated;
-	if (tsDiff.GetDays() >= 1 || tsDiff.GetDays() < 0)
+	if (tsDiff.GetDays() >= 4 || tsDiff.GetDays() < 0)
 	{
 		// Code has expired
 		UCLIDException ue("ELI38996", "Counter update code has expired.");
@@ -5828,7 +5828,7 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 
 	// Get the time since the request was generated
 	CTimeSpan tsDiff = newDatabaseID.m_ctLastUpdated - counterUpdates.m_ctTimeCodeGenerated;
-	if (tsDiff.GetDays() >= 1 || tsDiff.GetDays() < 0)
+	if (tsDiff.GetDays() >= 4 || tsDiff.GetDays() < 0)
 	{
 		// Code has expired
 		UCLIDException ue("ELI38988", "Unlock code has expired.");
