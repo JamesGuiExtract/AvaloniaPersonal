@@ -77,9 +77,15 @@ namespace Extract.FAMDBCounterManager
         /// </returns>
         public static string DateTimeToString(this DateTime dateTime)
         {
+            // There is no standard way to get the time zone abbreviation. Working off the
+            // assumption that Extract Systems will always operate out of the central time zone,
+            // hard-code the time zone abbreviation taking only daylight vs standard into account.
             return (dateTime.Ticks == 0)
                 ? "N/A"
-                : dateTime.ToString();
+                : dateTime.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)
+                    + (TimeZoneInfo.Local.IsDaylightSavingTime(DateTime.Now)
+                        ? " CDT"
+                        : " CST");
         }
 
         /// <summary>

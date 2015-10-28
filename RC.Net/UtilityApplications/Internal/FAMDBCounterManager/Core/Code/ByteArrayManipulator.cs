@@ -189,7 +189,7 @@ namespace Extract.FAMDBCounterManager
             }
             else
             {
-                return new DateTime(1970, 1, 1) +
+                return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc) +
                     TimeSpan.FromTicks(seconds * TimeSpan.TicksPerSecond);
             }
         }

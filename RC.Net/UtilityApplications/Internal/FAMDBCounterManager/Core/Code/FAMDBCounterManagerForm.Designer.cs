@@ -329,6 +329,7 @@
             this._commentsTextBox.Location = new System.Drawing.Point(15, 505);
             this._commentsTextBox.Multiline = true;
             this._commentsTextBox.Name = "_commentsTextBox";
+            this._commentsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._commentsTextBox.Size = new System.Drawing.Size(550, 55);
             this._commentsTextBox.TabIndex = 25;
             // 

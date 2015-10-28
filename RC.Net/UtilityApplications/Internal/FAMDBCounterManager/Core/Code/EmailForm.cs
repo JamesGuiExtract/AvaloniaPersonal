@@ -240,7 +240,7 @@ namespace Extract.FAMDBCounterManager
 
             if (string.IsNullOrEmpty(_settings.Server))
             {
-                UtilityMethods.ShowMessageBox("The outgoing email server settings have not" +
+                UtilityMethods.ShowMessageBox("The outgoing email server settings have not " +
                     "been specified in the corresponding config file.",
                     "Outgoing email server not configured", true);
             }   

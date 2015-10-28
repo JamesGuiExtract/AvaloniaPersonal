@@ -536,7 +536,7 @@ namespace Extract.FAMDBCounterManager
                     licenseData.WriteAsCTime(_dbInfo.CreationTime);
                     licenseData.WriteAsCTime(_dbInfo.RestoreTime);
                     licenseData.WriteAsCTime(_dbInfo.LastCounterUpdateTime);
-                    licenseData.WriteAsCTime(DateTime.Now);
+                    licenseData.WriteAsCTime(DateTime.UtcNow);
                     licenseData.Write(Environment.UserName);
                     licenseData.Write(Environment.MachineName);
 
