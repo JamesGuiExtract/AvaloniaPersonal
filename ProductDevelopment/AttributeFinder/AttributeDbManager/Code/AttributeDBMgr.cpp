@@ -587,6 +587,35 @@ namespace
 	}
 
 
+	// Split a string into a vector of string, using delimiter char.
+	// For an empty string, or a string that doesn't have the delimiter
+	// character in it, this routine will return a vector with only the 
+	// original source string in it.
+	// Note that this routine makes use of well-known std::string behavior:
+	// string::substr( start, len ) - if len > string::size(), the entire
+	// string from startPos to end is returned.
+	VectorOfString Split( const std::string& source, const char delimiter )
+	{
+		VectorOfString results;
+		size_t pos = 0;
+		size_t startPos = 0;
+		while ( true )
+		{
+			pos = source.find( delimiter, startPos );
+			const auto length = pos - startPos;
+			results.push_back( source.substr( startPos, length ) );
+			if ( pos == std::string::npos)
+			{
+				break;
+			}
+
+			startPos = pos + 1;
+		}
+
+		return std::move( results );
+	}
+
+
 	std::string GetInsertRootASFFStatement( BSTR bstrAttributeSetName, long fileTaskSessionID )
 	{
 		std::string attributeSetName = SqlSanitizeInput(asString(bstrAttributeSetName));
@@ -660,7 +689,18 @@ namespace
 						  "DECLARE @AttributeSetForFile_ID AS BIGINT; \n"
 						  "DECLARE @AttributeName_ID AS BIGINT; \n"
 						  "DECLARE @AttributeType_ID AS BIGINT; \n"
-						  "DECLARE @Attribute_ID AS BIGINT; \n";
+						  "DECLARE @Attribute_ID AS BIGINT; \n"
+						  "DECLARE @TypeTable table(idx int IDENTITY(1,1), TypeName NVARCHAR(255)) \n";
+
+		VectorOfString typeNames = Split( attributeType, '+' );
+		for ( size_t i = 0; i < typeNames.size(); ++i )
+		{
+			std::string insertToTable =
+						  Util::Format( "INSERT INTO @TypeTable (TypeName) VALUES ('%s') \n", 
+										typeNames[i].c_str() );
+
+			insert += insertToTable;
+		}
 
 		std::string parentID = parentAttributeID <= 0 ? "null" : Util::Format("%lld", parentAttributeID );
 		std::string args = 
@@ -669,7 +709,7 @@ namespace
 						  "SELECT @Attribute_Value='%s'; \n"
 						  "SELECT @Attribute_GUID='%s'; \n"
 						  "SELECT @Attribute_ParentAttributeID=%s; \n"
-						  "SELECT @AttributeSetForFile_ID=%ld",
+						  "SELECT @AttributeSetForFile_ID=%ld \n",
 						  attributeName.c_str(),
 						  attributeType.c_str(),
 						  value.c_str(),
@@ -682,28 +722,38 @@ namespace
 						  "SELECT @AttributeType_ID=null; \n"
 
 						  "BEGIN TRY \n"
+						  // AttributeName
 						  "SELECT @AttributeName_ID = (SELECT TOP 1 [ID] FROM [dbo].[AttributeName] WHERE [Name]=@AttributeName_Name)\n"
 						  "if @AttributeName_ID IS NULL\n"
-						  "begin\n"
+						  "BEGIN \n"
 						  "    INSERT INTO [dbo].[AttributeName] ([Name]) VALUES (@AttributeName_Name);\n"
 						  "    SELECT @AttributeName_ID = SCOPE_IDENTITY()\n"
-						  "end\n"
+						  "END \n"
 						  "\n"
-						  "SELECT @AttributeType_ID = (SELECT TOP 1 [ID] from [dbo].[AttributeType] WHERE [Type]=@AttributeType_Type)\n"
-						  "if @AttributeType_ID IS NULL AND @AttributeType_Type <> ''\n"
-						  "begin\n"
-						  "    INSERT INTO [dbo].[AttributeType] ([Type]) VALUES (@AttributeType_Type);\n"
-						  "    SELECT @AttributeType_ID = SCOPE_IDENTITY()\n"
-						  "end\n"
-						  "\n"	
-						  "INSERT INTO [dbo].[Attribute] ([AttributeSetForFileID], [AttributeNameID], [Value], [ParentAttributeID], [GUID]) \n"
+						  // Attribute
+  						  "INSERT INTO [dbo].[Attribute] ([AttributeSetForFileID], [AttributeNameID], [Value], [ParentAttributeID], [GUID]) \n"
 						  "VALUES (@AttributeSetForFile_ID, @AttributeName_ID, @Attribute_Value, @Attribute_ParentAttributeID, @Attribute_GUID);\n"
 						  "SELECT @Attribute_ID = SCOPE_IDENTITY()\n"
 						  "\n"
-						  "if @AttributeType_ID IS NOT NULL AND not exists (SELECT * FROM [dbo].[AttributeInstanceType] WHERE [AttributeID]=@Attribute_ID AND [AttributeTypeID]=@AttributeType_ID)\n"
-						  "BEGIN\n"
-						  "    INSERT INTO [dbo].[AttributeInstanceType] ([AttributeID], [AttributeTypeID]) VALUES (@Attribute_ID, @AttributeType_ID)\n"
-						  "END\n"
+						  "WHILE EXISTS (SELECT * FROM @TypeTable) \n"
+						  "BEGIN \n"
+						  "  SELECT @AttributeType_Type = MIN(TypeName) FROM @TypeTable \n"
+							// AttributeType
+							"SELECT @AttributeType_ID = (SELECT TOP 1 [ID] from [dbo].[AttributeType] WHERE [Type]=@AttributeType_Type) \n"
+							"if @AttributeType_ID IS NULL AND @AttributeType_Type <> '' \n"
+							"BEGIN \n"
+							"    INSERT INTO [dbo].[AttributeType] ([Type]) VALUES (@AttributeType_Type);\n"
+							"    SELECT @AttributeType_ID = SCOPE_IDENTITY()\n"
+							"END \n"
+							"\n"	
+							// AttributeInstanceType
+							"if @AttributeType_ID IS NOT NULL AND not exists (SELECT * FROM [dbo].[AttributeInstanceType] WHERE [AttributeID]=@Attribute_ID AND [AttributeTypeID]=@AttributeType_ID)\n"
+							"BEGIN \n"
+							"    INSERT INTO [dbo].[AttributeInstanceType] ([AttributeID], [AttributeTypeID]) VALUES (@Attribute_ID, @AttributeType_ID)\n"
+							"END \n"
+							"\n"
+							"DELETE FROM @TypeTable WHERE TypeName=@AttributeType_Type \n"
+						  "END \n"
 						  "\n"	
 						  "SELECT AttributeID=@Attribute_ID\n"
 						  "SET NOCOUNT OFF\n"
