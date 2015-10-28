@@ -367,9 +367,9 @@ library UCLID_AFCORELib
 			[out, retval] IObjectWithDescription **pVal);
 		[propput, id(9), helpstring("property GlobalOutputHandler")] HRESULT GlobalOutputHandler(
 			[in] IObjectWithDescription *newVal);
-		[propget, id(10), helpstring("property UseIndexingCounter")] HRESULT UseIndexingCounter(
+		[propget, id(10), helpstring("property UseDocsIndexingCounter")] HRESULT UseDocsIndexingCounter(
 			[out, retval] VARIANT_BOOL *pVal);
-		[propput, id(10), helpstring("property UseIndexingCounter")] HRESULT UseIndexingCounter(
+		[propput, id(10), helpstring("property UseDocsIndexingCounter")] HRESULT UseDocsIndexingCounter(
 			[in] VARIANT_BOOL newVal);
 		[propget, id(11), helpstring("property UsePagesRedactionCounter")] HRESULT 
 			UsePagesRedactionCounter([out, retval] VARIANT_BOOL *pVal);
@@ -439,6 +439,16 @@ library UCLID_AFCORELib
 		// shall be decremented if one is available.
 		[propget, id(24), helpstring("property RuleExecutionCounters")] HRESULT RuleExecutionCounters([out, retval] IIUnknownVector **pVal);
 		[propput, id(24), helpstring("property RuleExecutionCounters")] HRESULT RuleExecutionCounters([in] IIUnknownVector *pNewVal);
+		//-----------------------------------------------------------------------------------------		
+		[propget, id(25), helpstring("property UsePagesIndexingCounter")] HRESULT UsePagesIndexingCounter(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(25), helpstring("property UsePagesIndexingCounter")] HRESULT UsePagesIndexingCounter(
+			[in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------		
+		[propget, id(26), helpstring("property CustomCounters")] HRESULT CustomCounters(
+			[out, retval] IIUnknownVector **pVal);
+		[propput, id(26), helpstring("property CustomCounters")] HRESULT CustomCounters(
+			[in] IIUnknownVector *pNewVal);
 	};
 
 	[

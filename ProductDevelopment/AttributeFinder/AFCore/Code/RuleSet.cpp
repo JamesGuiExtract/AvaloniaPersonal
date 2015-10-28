@@ -19,7 +19,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 13;
+const unsigned long gnCurrentVersion = 14;
 // Version 3:
 //   Added Output Handler persistence
 // Version 7:
@@ -34,14 +34,13 @@ const unsigned long gnCurrentVersion = 13;
 // Version 11: Added CIdentifiableObject
 // Version 12: Added m_strPreviousFileName
 // Version 13: Added Comments
+// Version 14: Added m_bUsePagesIndexingCounter and m_ipCustomCounters
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
 
-// Mutex for thread safety for the License Manager
-// Only used in the constructor and destructor to make sure that the 
-// License Manager is only created once or destroyed once
-CMutex CRuleSet::ms_mutexLM;
+// Used to protect the data in CounterData instances.
+CMutex CRuleSet::ms_mutexCounterData;
 
 // Used to synchronize construction/destruction of rulesets (for threadsafe checks against
 // ms_referenceCount)
@@ -53,10 +52,6 @@ unique_ptr<SafeNetLicenseMgr> CRuleSet::m_apSafeNetMgr(__nullptr);
 // Max accumulation = 10 (use char index 4 followed by char index 2 as a long);
 #define _MAX_COUNTER_ACCUMULATION "D804155D-471C-4C81-A07D-9392AD45661C"
 
-CRuleSet::CounterData CRuleSet::ms_indexingCounterData = { 0 };
-CRuleSet::CounterData CRuleSet::ms_paginationCounterData = { 0 };
-CRuleSet::CounterData CRuleSet::ms_redactionCounterData = { 0 };
-
 int CRuleSet::ms_referenceCount = 0;
 
 //-------------------------------------------------------------------------------------------------
@@ -67,10 +62,11 @@ CRuleSet::CRuleSet()
 m_bstrStreamName("RuleSet"),
 m_bDirty(false),
 m_bIsEncrypted(false),
-m_bUseIndexingCounter(false),
+m_bUseDocsIndexingCounter(false),
 m_bUsePaginationCounter(false),
 m_bUsePagesRedactionCounter(false),
 m_bUseDocsRedactionCounter(false),
+m_bUsePagesIndexingCounter(false),
 m_bRuleSetOnlyForInternalUse(false),
 m_bSwipingRule(false),
 m_strKeySerialNumbers(""),
@@ -93,7 +89,7 @@ m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current v
 				!LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
 			{
 				// Can preset Indexing USB counter
-				m_bUseIndexingCounter = true;
+				m_bUseDocsIndexingCounter = true;
 			}
 
 			// If ID Shield rule writing is licensed and not FLEX Index rule writing
@@ -132,11 +128,9 @@ CRuleSet::~CRuleSet()
 		{
 			try
 			{
-				CSingleLock lg(&ms_mutexLM, TRUE);
+				CSingleLock lg(&ms_mutexCounterData, TRUE);
 
-				flushCounter(gdcellFlexIndexingCounter, ms_indexingCounterData);
-				flushCounter(gdcellFlexPaginationCounter, ms_paginationCounterData);
-				flushCounter(gdcellIDShieldRedactionCounter, ms_redactionCounterData);
+				flushCounters();
 
 				// If no more instances of RuleSet exist release the SafeNetMgr ( license )
 				m_apSafeNetMgr.reset(__nullptr);
@@ -602,9 +596,7 @@ STDMETHODIMP CRuleSet::Cleanup()
 	{
 		validateLicense();
 
-		flushCounter(gdcellFlexIndexingCounter, ms_indexingCounterData);
-		flushCounter(gdcellFlexPaginationCounter, ms_paginationCounterData);
-		flushCounter(gdcellIDShieldRedactionCounter, ms_redactionCounterData);
+		flushCounters();
 
 		CRuleSetProfiler::GenerateOuput();
 		CRuleSetProfiler::Reset();
@@ -807,7 +799,7 @@ STDMETHODIMP CRuleSet::get_IsEncrypted(VARIANT_BOOL *pVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15159")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRuleSet::get_UseIndexingCounter(VARIANT_BOOL *pVal)
+STDMETHODIMP CRuleSet::get_UseDocsIndexingCounter(VARIANT_BOOL *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -815,14 +807,14 @@ STDMETHODIMP CRuleSet::get_UseIndexingCounter(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		*pVal = m_bUseIndexingCounter ? VARIANT_TRUE : VARIANT_FALSE;
+		*pVal = m_bUseDocsIndexingCounter ? VARIANT_TRUE : VARIANT_FALSE;
 	
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11354")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRuleSet::put_UseIndexingCounter(VARIANT_BOOL newVal)
+STDMETHODIMP CRuleSet::put_UseDocsIndexingCounter(VARIANT_BOOL newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -832,7 +824,7 @@ STDMETHODIMP CRuleSet::put_UseIndexingCounter(VARIANT_BOOL newVal)
 		// RuleSet Editor license.
 		void validateUILicense();
 
-		m_bUseIndexingCounter = newVal == VARIANT_TRUE;
+		m_bUseDocsIndexingCounter = newVal == VARIANT_TRUE;
 		m_bDirty = true;
 		
 		return S_OK;
@@ -1245,11 +1237,87 @@ STDMETHODIMP CRuleSet::put_RuleExecutionCounters(IIUnknownVector *pNewVal)
 		void validateUILicense();
 
 		m_ipRuleExecutionCounters = pNewVal;
+		
+		// Force configured counter info to be re-initialized on next use to take into account the
+		// provided rule execution counters.
+		m_apmapCounters.reset(nullptr);
 		m_bDirty = true;
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38720")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_UsePagesIndexingCounter(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = m_bUsePagesIndexingCounter ? VARIANT_TRUE : VARIANT_FALSE;
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38999")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_UsePagesIndexingCounter(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// NOTE: Unlike other methods/properties, calling this method requires
+		// RuleSet Editor license.
+		void validateUILicense();
+
+		m_bUsePagesIndexingCounter = newVal == VARIANT_TRUE; 
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39000")
+}
+
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_CustomCounters(IIUnknownVector **pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI39001", pVal != __nullptr);
+
+		validateLicense();
+
+		IIUnknownVectorPtr ipShallowCopy = (m_ipCustomCounters == nullptr)
+			? IIUnknownVectorPtr(CLSID_IUnknownVector)
+			: m_ipCustomCounters;
+		*pVal = ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39002")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_CustomCounters(IIUnknownVector *pNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// NOTE: Unlike other methods/properties, calling this method requires
+		// RuleSet Editor license.
+		void validateUILicense();
+
+		m_ipCustomCounters = pNewVal;
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39003")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1341,10 +1409,12 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 		m_ipDocPreprocessor = __nullptr;
 
 		// Set all counters to default of false
-		m_bUseIndexingCounter = false;
+		m_bUseDocsIndexingCounter = false;
 		m_bUsePaginationCounter = false;
 		m_bUsePagesRedactionCounter = false;
 		m_bUseDocsRedactionCounter = false;
+		m_bUsePagesIndexingCounter = false;
+		bool bHasCustomCounters = false;
 
 		// by default rulesets can be used internally or externally
 		m_bRuleSetOnlyForInternalUse = false;
@@ -1407,7 +1477,7 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			if ( m_nVersionNumber >= 4 )
 			{
 				// Read counter settings
-				dataReader >> m_bUseIndexingCounter;
+				dataReader >> m_bUseDocsIndexingCounter;
 				dataReader >> m_bUsePaginationCounter;
 				dataReader >> m_bUsePagesRedactionCounter;
 
@@ -1456,6 +1526,12 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			{
 				dataReader >> m_strComments;
 			}
+
+			if (m_nVersionNumber >= 14)
+			{
+				dataReader >> m_bUsePagesIndexingCounter;
+				dataReader >> bHasCustomCounters;
+			}
 		}
 
 		// load the string-to-object map (attribute name to attribute find info map)
@@ -1490,6 +1566,19 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 					"Output Handler object could not be read from stream.");
 			}
 			m_ipOutputHandler = ipObj;
+		}
+
+		// Read custom counter data if present (version 14 or higher)
+		if (bHasCustomCounters)
+		{
+			ipObj = __nullptr;
+			readObjectFromStream(ipObj, pStream, "ELI39004");
+			if (ipObj == __nullptr)
+			{
+				throw UCLIDException("ELI39005", 
+					"Custom counter data could not be read from stream.");
+			}
+			m_ipCustomCounters = ipObj;
 		}
 
 		if (m_nVersionNumber >= 11)
@@ -1553,7 +1642,7 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_nVersionNumber;
 
 		// Write counter flags to stream ( added in version 4 of the file )
-		dataWriter << m_bUseIndexingCounter;
+		dataWriter << m_bUseDocsIndexingCounter;
 		dataWriter << m_bUsePaginationCounter;
 
 		// Write the redaction counter flags
@@ -1575,6 +1664,11 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_strFileName;
 
 		dataWriter << m_strComments;
+
+		dataWriter << m_bUsePagesIndexingCounter;
+		
+		bool bHasCustomCounters = (m_ipCustomCounters != nullptr && m_ipCustomCounters->Size() > 0);
+		dataWriter << bHasCustomCounters;
 
 		// flush bytes
 		dataWriter.flushToByteStream();
@@ -1609,6 +1703,17 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 				"Output Handler object does not support persistence." );
 		}
 		writeObjectToStream( ipObj, pStream, "ELI09912", fClearDirty );
+
+		// Separately any the custom counters to the stream
+		if (bHasCustomCounters)
+		{
+			ipObj = m_ipCustomCounters;
+			if (ipObj == __nullptr)
+			{
+				throw UCLIDException("ELI39006", "Unable to persist custom counters.");
+			}
+			writeObjectToStream( ipObj, pStream, "ELI39007", fClearDirty );
+		}
 
 		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
@@ -1728,10 +1833,11 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		m_ipOutputHandler = ipCopyableObject->Clone();
 
 		// Copy Counter flags
-		m_bUseIndexingCounter = ipSource->UseIndexingCounter == VARIANT_TRUE;
+		m_bUseDocsIndexingCounter = ipSource->UseDocsIndexingCounter == VARIANT_TRUE;
 		m_bUsePaginationCounter = ipSource->UsePaginationCounter == VARIANT_TRUE;
 		m_bUsePagesRedactionCounter = ipSource->UsePagesRedactionCounter == VARIANT_TRUE;
 		m_bUseDocsRedactionCounter = ipSource->UseDocsRedactionCounter == VARIANT_TRUE;
+		m_bUsePagesIndexingCounter = ipSource->UsePagesIndexingCounter == VARIANT_TRUE;
 
 		// copy internal-use-only flag
 		m_bRuleSetOnlyForInternalUse = (ipSource->ForInternalUseOnly == VARIANT_TRUE);
@@ -1877,6 +1983,37 @@ IMiscUtilsPtr CRuleSet::getMiscUtils()
 	return m_ipMiscUtils;
 }
 //-------------------------------------------------------------------------------------------------
+map<long, CounterInfo>& CRuleSet::getCounterInfo()
+{
+	if (!m_apmapCounters)
+	{
+		m_apmapCounters.reset(new map<long, CounterInfo>(
+			CounterInfo::GetCounterInfo(getThisAsCOMPtr())));
+
+		// If m_ipRuleExecutionCounters has been specified, assign these to the appropriate
+		// CounterInfo instances for use when decrementing.
+		if (m_ipRuleExecutionCounters != nullptr)
+		{
+			long nCount = m_ipRuleExecutionCounters->Size();
+			for (long i = 0; i < nCount; i++)
+			{
+				ISecureCounterPtr ipRuleExecutionCounter = m_ipRuleExecutionCounters->At(i);
+				long nCounterID = ipRuleExecutionCounter->ID;
+				if (m_apmapCounters->find(nCounterID) != m_apmapCounters->end())
+				{
+					CounterInfo& counterInfo = m_apmapCounters->at(nCounterID);
+					if (counterInfo.m_bEnabled)
+					{
+						counterInfo.SetSecureCounter(ipRuleExecutionCounter);
+					}
+				}
+			}
+		}
+	}
+
+	return *m_apmapCounters.get();
+}
+//-------------------------------------------------------------------------------------------------
 void CRuleSet::decrementCounters( ISpatialStringPtr ipText )
 {
 	// Check to see if USB Counters are to be ignored 
@@ -1886,44 +2023,40 @@ void CRuleSet::decrementCounters( ISpatialStringPtr ipText )
 		return;
 	}
 
-	// Only check counters if at least one counter is checked
-	if (isUsingCounter())
+	auto& mapCounters = getCounterInfo();
+	for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
 	{
-		// Update counters as needed
-		if ( m_bUseIndexingCounter )
-		{
-			decrementCounter(gdcellFlexIndexingCounter, 1, ms_indexingCounterData);
-		}
+		CounterInfo& counterInfo = entry->second;
 
-		if ( m_bUsePaginationCounter )
-		{
-			decrementCounter(gdcellFlexPaginationCounter, 1, ms_paginationCounterData);
-		}
-
-		if ( m_bUsePagesRedactionCounter )
+		if (counterInfo.m_bEnabled)
 		{
 			// Decrement counter once if non-spatial (P16 #1907)
-			long nNumberOfPages = 1;
-
-			// Decrement counter once for each page if spatial
-			if (ipText->HasSpatialInfo() == VARIANT_TRUE)
+			int nNumToDecrement = 1;
+			if (counterInfo.m_bByPage)
 			{
-				nNumberOfPages = ipText->GetLastPageNumber() - ipText->GetFirstPageNumber() + 1;
+				// Decrement counter once for each page if spatial
+				if (ipText->HasSpatialInfo() == VARIANT_TRUE)
+				{
+					nNumToDecrement =
+						ipText->GetLastPageNumber() - ipText->GetFirstPageNumber() + 1;
+				}
 			}
 
-			decrementCounter(gdcellIDShieldRedactionCounter, nNumberOfPages, ms_redactionCounterData);
-		}
-
-		if( m_bUseDocsRedactionCounter )
-		{
-			// Decrement counter once for the document.
-			decrementCounter(gdcellIDShieldRedactionCounter, 1, ms_redactionCounterData);
+			decrementCounter(counterInfo, nNumToDecrement, true);
 		}
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSet::decrementCounter(DataCell cell, int nNumToDecrement, CounterData& counterData)
+void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool bAllowAccumulation)
 {
+	ASSERT_RUNTIME_CONDITION("ELI38998", nNumToDecrement >= 0,
+		"Invalid counter decrement attempted.");
+
+	// Lock to ensure thread safety of counterData.
+	CSingleLock lg(&ms_mutexCounterData, TRUE);
+
+	CounterData& counterData = counter.GetCounterData();
+
 	try
 	{
 		// The max allowed accumulation for the counter value before decrementing the key is
@@ -1936,48 +2069,62 @@ void CRuleSet::decrementCounter(DataCell cell, int nNumToDecrement, CounterData&
 		// USB key from the current process.
 
 		string strMaxAccumulation(_MAX_COUNTER_ACCUMULATION);
-		int allowedAccumulation = asLong(strMaxAccumulation.substr(4, 1) + strMaxAccumulation[2]);
-		allowedAccumulation = min(allowedAccumulation, counterData.m_nCountsDecrementedInProcess / 10);
-		allowedAccumulation = min(allowedAccumulation, counterData.m_nLastCountValue / 100);
+		int nAllowedAccumulation = 0;
+		
+		if (bAllowAccumulation)
+		{
+			nAllowedAccumulation = asLong(strMaxAccumulation.substr(4, 1) + strMaxAccumulation[2]);
+			nAllowedAccumulation = min(nAllowedAccumulation, counterData.m_nCountsDecrementedInProcess / 10);
+			nAllowedAccumulation = min(nAllowedAccumulation, counterData.m_nLastCountValue / 100);
+		}
 
 		int nCurrentAccumulation = counterData.m_nCountDecrementAccumulation + nNumToDecrement;
-		if (nCurrentAccumulation < allowedAccumulation)
+		if (nCurrentAccumulation == 0 || nCurrentAccumulation < nAllowedAccumulation)
 		{
 			counterData.m_nCountDecrementAccumulation = nCurrentAccumulation;
+			return;
 		}
-		else
+
+		ISecureCounterPtr ipSecureCounter = counter.GetSecureCounter();
+
+		// First try to decrement using m_ipRuleExecutionCounters.
+		int nLastCount = (ipSecureCounter == nullptr)
+			? -1
+			: ipSecureCounter->DecrementCounter(nCurrentAccumulation);
+
+		// For legacy purposes, allow a USB key as a fallback if there is no proper counter
+		// available in m_ipRuleExecutionCounters.
+		if (ipSecureCounter == nullptr && counterData.m_pSafeNetDataCell != nullptr)
 		{
-			// First try to decrement using m_ipRuleExecutionCounters.
-			int nLastCount = decrementRuleExecutionCounter(cell, nCurrentAccumulation);
-
-			// For legacy purposes, allow a USB key as a fallback if there is no proper counter
-			// available in m_ipRuleExecutionCounters.
-			if (nLastCount < 0)
+			// if this is the first instance of RuleSet will need to allocate the pointer
+			if ( m_apSafeNetMgr.get() == __nullptr )
 			{
-				// Lock the mutex for USB License manager to ensure thread safety of counterData.
-				CSingleLock lg( &ms_mutexLM, TRUE);
-
-				// if this is the first instance of RuleSet will need to allocate the pointer
-				if ( m_apSafeNetMgr.get() == __nullptr )
-				{
-					m_apSafeNetMgr = unique_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
-				}
-
-				// Check to see if USB Key serial numbers should be ignored
-				bool bDisableUSBSNs = usbSerialNumbersDisabled();
-				if ( !bDisableUSBSNs && !m_strKeySerialNumbers.empty())
-				{
-					// Serial numbers found and must be considered
-					validateKeySerialNumber();
-				}
-
-				nLastCount = m_apSafeNetMgr->decreaseCellValue(cell, nCurrentAccumulation);
+				m_apSafeNetMgr = unique_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
 			}
 
-			counterData.m_nLastCountValue = nLastCount;
-			counterData.m_nCountsDecrementedInProcess += nCurrentAccumulation;
-			counterData.m_nCountDecrementAccumulation = 0;
+			// Check to see if USB Key serial numbers should be ignored
+			bool bDisableUSBSNs = usbSerialNumbersDisabled();
+			if ( !bDisableUSBSNs && !m_strKeySerialNumbers.empty())
+			{
+				// Serial numbers found and must be considered
+				validateKeySerialNumber();
+			}
+
+			nLastCount = m_apSafeNetMgr->decreaseCellValue(
+				*(counterData.m_pSafeNetDataCell), nCurrentAccumulation);
 		}
+
+		if (nLastCount < 0)
+		{
+			UCLIDException ue("ELI39008", "Rule execution counter not available.");
+			ue.addDebugInfo("ID", counter.m_nID);
+			ue.addDebugInfo("Name", counter.m_strName);
+			throw ue;
+		}
+
+		counterData.m_nLastCountValue = nLastCount;
+		counterData.m_nCountsDecrementedInProcess += nCurrentAccumulation;
+		counterData.m_nCountDecrementAccumulation = 0;
 	}
 	catch (...)
 	{
@@ -1989,71 +2136,22 @@ void CRuleSet::decrementCounter(DataCell cell, int nNumToDecrement, CounterData&
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSet::flushCounter(DataCell cell, CounterData& counterData)
+void CRuleSet::flushCounters()
 {
-	// Lock the mutex for USB License manager to ensure thread safety of counterData.
-	CSingleLock lg( &ms_mutexLM, TRUE);
-
-	if (counterData.m_nCountDecrementAccumulation > 0)
+	auto& mapCounters = getCounterInfo();
+	for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
 	{
-		if (m_apSafeNetMgr.get() == nullptr)
+		// Lock to ensure thread safety of counterData.
+		CSingleLock lg(&ms_mutexCounterData, TRUE);
+
+		CounterInfo& counterInfo = entry->second;
+		CounterData& counterData = counterInfo.GetCounterData();
+
+		if (counterData.m_nCountDecrementAccumulation > 0)
 		{
-			UCLIDException ue("ELI38722", "Unexpected counter state.");
-			ue.addDebugInfo("Cell", cell.getCellName());
-			ue.log();
-		}
-		else
-		{
-			m_apSafeNetMgr->decreaseCellValue(cell, counterData.m_nCountDecrementAccumulation);
-			counterData.m_nCountDecrementAccumulation = 0;
+			decrementCounter(counterInfo, 0, false);
 		}
 	}
-}
-//-------------------------------------------------------------------------------------------------
-int CRuleSet::decrementRuleExecutionCounter(DataCell cell, int nNumToDecrement)
-{
-	if (m_ipRuleExecutionCounters == nullptr)
-	{
-		return -1;
-	}
-
-	int nResult = -1;
-
-	// Iterate each counter for the counter with the correct ID to decrement.
-	long nCount = m_ipRuleExecutionCounters->Size();
-	for (long i = 0; nResult < 0 && i < nCount; i++)
-	{
-		ISecureCounterPtr ipCounter = m_ipRuleExecutionCounters->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI38759", ipCounter != nullptr);
-
-		long nCounterID = ipCounter->ID;
-		switch (nCounterID)
-		{
-			case 1: 
-				if (cell.getCellName() == "Indexing")
-				{
-					nResult = ipCounter->DecrementCounter(nNumToDecrement);
-				}
-				break;
-
-			case 2:
-				if (cell.getCellName() == "Pagination")
-				{
-					nResult = ipCounter->DecrementCounter(nNumToDecrement);
-				}
-				break;
-
-			case 3:
-			case 4:
-				if (cell.getCellName() == "Redaction")
-				{
-					nResult = ipCounter->DecrementCounter(nNumToDecrement);
-				}
-				break;
-		}
-	}
-
-	return nResult;
 }
 //-------------------------------------------------------------------------------------------------
 std::vector<DWORD>& CRuleSet::getSerialListAsDWORDS()
@@ -2124,8 +2222,17 @@ bool CRuleSet::isRdtLicensed()
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::isUsingCounter()
 {
-	return m_bUseIndexingCounter || m_bUsePaginationCounter || m_bUsePagesRedactionCounter || 
-		m_bUseDocsRedactionCounter;
+	auto& mapCounters = getCounterInfo();
+	for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
+	{
+		CounterInfo& counterInfo = entry->second;
+		if (counterInfo.m_bEnabled)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::isLicensedToSave()

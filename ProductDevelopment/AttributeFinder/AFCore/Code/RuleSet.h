@@ -6,6 +6,7 @@
 #include "RuleSetEditor.h"
 #include "SafeNetLicenseMgr.h"
 #include "IdentifiableObject.h"
+#include "CounterInfo.h"
 
 #include <afxmt.h>
 
@@ -77,8 +78,8 @@ public:
 	STDMETHOD(put_UsePagesRedactionCounter)(VARIANT_BOOL newVal);
 	STDMETHOD(get_UseDocsRedactionCounter)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_UseDocsRedactionCounter)(VARIANT_BOOL newVal);
-	STDMETHOD(get_UseIndexingCounter)(VARIANT_BOOL *pVal);
-	STDMETHOD(put_UseIndexingCounter)(VARIANT_BOOL newVal);
+	STDMETHOD(get_UseDocsIndexingCounter)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_UseDocsIndexingCounter)(VARIANT_BOOL newVal);
 	STDMETHOD(get_ForInternalUseOnly)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_ForInternalUseOnly)(VARIANT_BOOL newVal);
 	STDMETHOD(get_KeySerialList)(BSTR  *pVal);
@@ -97,6 +98,10 @@ public:
 	STDMETHOD(put_Comments)(BSTR newVal);
 	STDMETHOD(get_RuleExecutionCounters)(IIUnknownVector **pVal);
 	STDMETHOD(put_RuleExecutionCounters)(IIUnknownVector *pNewVal);
+	STDMETHOD(get_UsePagesIndexingCounter)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_UsePagesIndexingCounter)(VARIANT_BOOL newVal);
+	STDMETHOD(get_CustomCounters)(IIUnknownVector **pVal);
+	STDMETHOD(put_CustomCounters)(IIUnknownVector *pNewVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -146,8 +151,8 @@ private:
 	// need to be updated when saving.
 	string m_strPreviousFileName;
 
-	// this mutex is used in the constructor and destructor to protect the m_apSafeNetMgr member
-	static CMutex ms_mutexLM;
+	// Used to protect the data in CounterData instances.
+	static CMutex ms_mutexCounterData;
 
 	// Used to synchronize construction/destruction of rulesets (for threadsafe checks against
 	// ms_referenceCount)
@@ -173,10 +178,18 @@ private:
 	CMutex m_mutex;
 
 	// Counter Flags
-	bool m_bUseIndexingCounter;
+	bool m_bUseDocsIndexingCounter;
 	bool m_bUsePaginationCounter;
 	bool m_bUsePagesRedactionCounter;
 	bool m_bUseDocsRedactionCounter;
+	bool m_bUsePagesIndexingCounter;
+
+	// Keeps track of non-standard counters that have been specified in the counter grid.
+	IIUnknownVectorPtr m_ipCustomCounters;
+
+	// A working copy of all counter data (both standard and custom). Populated via the above
+	// counter flags in combination with m_ipCustomCounters.
+	unique_ptr<map<long, CounterInfo>> m_apmapCounters;
 
 	string m_strKeySerialNumbers;
 	vector<DWORD> m_vecSerialNumbers;
@@ -199,19 +212,6 @@ private:
 
 	// Comments for the ruleset.
 	string m_strComments;
-
-	// Used to track data for each counter in order to determine the number of counts that may be
-	// accumulated prior to deducting them from the USB key. [LegacyRCAndUtils:6170]
-	struct CounterData
-	{
-		int m_nCountsDecrementedInProcess;
-		int m_nLastCountValue;
-		int m_nCountDecrementAccumulation;
-	};
-
-	static CounterData ms_indexingCounterData;
-	static CounterData ms_paginationCounterData;
-	static CounterData ms_redactionCounterData;
 
 	// Keep track of the number of Rulesets in existence. Before the last closes, flush any
 	// accumulated USB counts.
@@ -244,24 +244,22 @@ private:
 	// create the MiscUtils object if necessary and return it
 	IMiscUtilsPtr getMiscUtils();
 
+	// Gets a map of counter IDs to CounterInfo instances describing the counters. If
+	// m_ipRuleExecutionCounters has been specified, these are assigned to the appropriate
+	// CounterInfo instances to be accessible for decrementing.
+	map<long, CounterInfo>& getCounterInfo();
+
 	// Method decrements counters if any are set 
 	void decrementCounters( ISpatialStringPtr ipText );
 
-	// Decrements the specified DataCell by the specified amount. This method includes code that
+	// Decrements the specified counter by the specified amount. This method includes code that
 	// can allow a small number of counts to accumulate before deducting them from the key to limit
-	// the extent to which a USB key can be a bottleneck.
-	void decrementCounter(DataCell cell, int nNumToDecrement, CounterData& counterData);
+	// the extent to which counter decrements can be a bottleneck. If bAllowAccumulation = false
+	// no such accumulation is allowed (and any counts already accumulated will be decremented).
+	void decrementCounter(CounterInfo& counter, int nNumToDecrement, bool bAllowAccumulation);
 
-	// Decrements from the USB key any accumulated counts right away.
-	void flushCounter(DataCell cell, CounterData& counterData);
-
-	// Attempts to decrement using m_ipRuleExecutionCounters. Note that DataCell is used only to
-	// indicate the proper CounterID to decrement while disturbing the existing code as little as
-	// possible. In the future, the should be factored out and a counter ID should be used in its
-	// place.
-	// Returns the number of counts remaining. If there is not a counter available or not enough
-	// counts on an available counter, -1 will be returned;
-	int decrementRuleExecutionCounter(DataCell cell, int nNumToDecrement);
+	// Decrements from the specified counter any accumulated counts right away.
+	void flushCounters();
 
 	// returns a reference of the member variable m_vecSerialNumbers
 	// this function separates the serial numbers in the string m_strKeySerialNumbers

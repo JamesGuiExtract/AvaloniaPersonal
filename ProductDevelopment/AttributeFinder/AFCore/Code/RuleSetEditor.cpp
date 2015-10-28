@@ -1207,9 +1207,9 @@ void CRuleSetEditor::setStatusBarText()
 	string strSelectedCounters = "";
 	bool bValidLicensing = true;
 
-	if ( m_ipRuleSet->UseIndexingCounter == VARIANT_TRUE )
+	if ( m_ipRuleSet->UseDocsIndexingCounter == VARIANT_TRUE )
 	{
-		strSelectedCounters = "Indexing";
+		strSelectedCounters = "Indexing (docs)";
 
 		// Requires special licensing - FLEX Index Rule Writing license
 		if (!LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ))
@@ -1261,6 +1261,22 @@ void CRuleSetEditor::setStatusBarText()
 
 		// Requires special licensing - full RDT license
 		if (!LicenseManagement::isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
+		{
+			bValidLicensing = false;
+		}
+	}
+
+	if ( m_ipRuleSet->UsePagesIndexingCounter == VARIANT_TRUE )
+	{
+		if ( strSelectedCounters != "" )
+		{
+			strSelectedCounters = strSelectedCounters + ", ";
+		}
+
+		strSelectedCounters = "Indexing (pages)";
+
+		// Requires special licensing - full RDT license
+		if (!LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS))
 		{
 			bValidLicensing = false;
 		}

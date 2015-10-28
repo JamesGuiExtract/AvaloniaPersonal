@@ -359,7 +359,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		_lastCodePos = "201";
 
 		// Assign any counters provided for the ruleset to decrement from.
-		//ipRules->RuleExecutionCounters = ipDB->SecureCounters;
+		ipRules->RuleExecutionCounters = ipDB->SecureCounters;
 
 		_lastCodePos = "205";
 
@@ -402,11 +402,12 @@ STDMETHODIMP CAFEngineFileProcessor::raw_Close()
 	
 	try
 	{
-		// Ensure all accumulated USB clicks are decremented.
-		UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
-		ASSERT_RESOURCE_ALLOCATION("ELI33403", ipRuleSet != __nullptr);
-
-		ipRuleSet->Cleanup();
+		// Ensure all accumulated counts are decremented using the most recently loaded ruleset
+		// (This ruleset will have any FAM DB SecureCounters used associated with it).
+		if (m_ipRuleSet.m_obj != nullptr)
+		{
+			m_ipRuleSet.m_obj->Cleanup();
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17790");
 

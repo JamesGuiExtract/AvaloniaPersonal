@@ -241,6 +241,8 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="CounterEditDlg.cpp" />
+    <ClCompile Include="CounterInfo.cpp" />
     <ClCompile Include="msword9.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -405,6 +407,8 @@
     <ClInclude Include="AttributeStorageManager.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="ConditionalRulePP.h" />
+    <ClInclude Include="CounterEditDlg.h" />
+    <ClInclude Include="CounterInfo.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="msword9.h" />
     <ClInclude Include="RequiredInterfaces.h" />

@@ -105,8 +105,22 @@ void CRuleSetPropertiesDlg::OnOK()
 	{
 		if (!m_bReadOnly)
 		{
-			m_ruleSetPropertiesPage.Apply();
-			m_ruleSetCommentsPage.Apply();
+			try
+			{
+				try
+				{
+					m_ruleSetPropertiesPage.Apply();
+					m_ruleSetCommentsPage.Apply();
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+			}
+			catch (UCLIDException &ue)
+			{
+				// If an exception was caught during the apply (such as a data validation issue)
+				// the dialog should not be closed.
+				ue.display();
+				return;
+			}
 		}
 
 		CDialog::OnOK();

@@ -185,6 +185,11 @@
 #define IDC_COUNTER_LIST                349
 #define IDC_STATIC_CHECK_PP             350
 #define IDC_STATIC_CHECK_IE             351
+#define IDD_EDIT_COUNTER                352
+#define IDC_BTN_ADD_COUNTER             367
+#define IDC_BTN_EDIT_COUNTER            368
+#define IDC_BTN_DELETE_COUNTER          369
+#define IDC_EDIT_ID                     370
 #define ID_FILE_SAVEAS                  32768
 #define ID_FILE_EXIT                    32769
 #define ID_TOOLS_TEST                   32770
@@ -228,9 +233,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        352
+#define _APS_NEXT_RESOURCE_VALUE        371
 #define _APS_NEXT_COMMAND_VALUE         32800
-#define _APS_NEXT_CONTROL_VALUE         352
+#define _APS_NEXT_CONTROL_VALUE         371
 #define _APS_NEXT_SYMED_VALUE           134
 #endif
 #endif

@@ -3,8 +3,10 @@
 // RuleSetPropertiesPage.h : header file
 //
 #include "resource.h"
+#include "CounterInfo.h"
 
 #include <string>
+#include <map>
 
 using namespace std;
 
@@ -30,9 +32,10 @@ public:
 // Overrides
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
 	virtual BOOL OnInitDialog();
-
+	afx_msg void OnClickedBtnAddCounter();
+	afx_msg void OnClickedBtnEditCounter();
+	afx_msg void OnClickedBtnDeleteCounter();
 	afx_msg void OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pResult);
 
 	DECLARE_MESSAGE_MAP()
@@ -43,29 +46,44 @@ private:
 	void hideCheckboxes();
 
 	void setupCounterList();
-	
-	// throws and exception if an invalid serial number is found ( non numeric )
-	void validateSerialList(const string &strSerialList);
 
-	// Checks whether the specified check box counter item is available, and if so sets
+	// Displays dialog to allow creation/editing of a custom counter.
+	// Pass -1 as the list index to add a new counter or the ID of an existing counter to edit.
+	void addEditCounter(int nListIndex);
+
+	// Checks whether the specified counter is available in m_CounterList, and if so sets
 	// rbIsCounterChecked accordingly.
-	bool isCounterAvailable(int nCounterItem, bool &rbIsCounterChecked);
+	bool isCounterAvailable(int nCounterId, bool &rbIsCounterChecked);
+
+	// Gets the CounterInfo instance associated with the specified row index in m_CounterList.
+	CounterInfo& getCounterFromList(long nIndex);
+
+	// Returns true if the specified name has not already been used; false if it has not.
+	bool isCounterNameUsed(const char* szName);
+
+	// Gets the index of the currently selected row in m_CounterList or -1 if no row is currently
+	// selected.
+	int getSelectedItem();
+	
+	// Updates the width of the counter name column to use the remaining space in the grid.
+	// (Ensures proper sizing after scroll bar as appeared/disappeared.)
+	void updateGridWidth();
 
 	// Returns true if the Rule Development Toolkit is licensed; false otherwise.
 	bool isRdtLicensed();
 
 	UCLID_AFCORELib::IRuleSetPtr m_ipRuleSet;
 
-	// Actual position in list of USB counter items
-	int m_iIndexingCounterItem;
-	int m_iPaginationCounterItem;
-	int m_iRedactPagesCounterItem;
-	int m_iRedactDocsCounterItem;
+	// A map counter ID to CounterInfo for all counters that appear in the grid (standard and
+	// custom).
+	map<long, CounterInfo> m_mapCounters;
 
+	CButton m_btnAddCounter;
+	CButton m_btnEditCounter;
+	CButton m_btnDeleteCounter;
 	CButton m_checkSwipingRule;
 	CListCtrl	m_CounterList;
 	CButton	m_checkboxForInternalUseOnly;
-	CEdit m_editKeySerialNumbers;
 	CEdit m_editFKBVersion;
 
 	bool m_bReadOnly;
@@ -73,4 +91,3 @@ private:
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-

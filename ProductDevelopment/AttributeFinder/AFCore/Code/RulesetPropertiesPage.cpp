@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "afcore.h"
 #include "RuleSetPropertiesPage.h"
+#include "CounterEditDlg.h"
 
 #include <LicenseMgmt.h>
 #include <StringTokenizer.h>
@@ -22,11 +23,8 @@ static char THIS_FILE[] = __FILE__;
 // Constants
 //-------------------------------------------------------------------------------------------------
 const int giENABLE_LIST_COLUMN = 0;
-const int giNAME_LIST_COLUMN = 1;
-const int giINDEXING_ITEM = 0;
-const int giPAGINATION_ITEM = 1;
-const int giREDACTION_PAGES_ITEM = 2;
-const int giREDACTION_DOCS_ITEM = 3;
+const int giID_LIST_COLUMN = 1;
+const int giNAME_LIST_COLUMN = 2;
 
 const int giTARGET_STATE_UNCHECKED = 2;
 
@@ -52,15 +50,20 @@ CRuleSetPropertiesPage::~CRuleSetPropertiesPage()
 void CRuleSetPropertiesPage::DoDataExchange(CDataExchange* pDX)
 {
 	CPropertyPage::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_BTN_ADD_COUNTER, m_btnAddCounter);
+	DDX_Control(pDX, IDC_BTN_EDIT_COUNTER, m_btnEditCounter);
+	DDX_Control(pDX, IDC_BTN_DELETE_COUNTER, m_btnDeleteCounter);
 	DDX_Control(pDX, IDC_COUNTER_LIST, m_CounterList);
 	DDX_Control(pDX, IDC_CHECK_INTERNAL_USE_ONLY, m_checkboxForInternalUseOnly);
-	DDX_Control(pDX, IDC_SERIAL_NUMBERS, m_editKeySerialNumbers);
 	DDX_Control(pDX, IDC_CHECK_SWIPING_RULE, m_checkSwipingRule);
 	DDX_Control(pDX, IDC_FKB_VERSION, m_editFKBVersion);
 }
 //-------------------------------------------------------------------------------------------------
 
 BEGIN_MESSAGE_MAP(CRuleSetPropertiesPage, CPropertyPage)
+	ON_BN_CLICKED(IDC_BTN_ADD_COUNTER, &CRuleSetPropertiesPage::OnClickedBtnAddCounter)
+	ON_BN_CLICKED(IDC_BTN_EDIT_COUNTER, &CRuleSetPropertiesPage::OnClickedBtnEditCounter)
+	ON_BN_CLICKED(IDC_BTN_DELETE_COUNTER, &CRuleSetPropertiesPage::OnClickedBtnDeleteCounter)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_COUNTER_LIST, &CRuleSetPropertiesPage::OnCounterListItemChanged)
 END_MESSAGE_MAP()
 
@@ -73,107 +76,7 @@ BOOL CRuleSetPropertiesPage::OnInitDialog()
 	{
 		CPropertyPage::OnInitDialog();
 		
-		// setup UI controls
 		setupCounterList();
-
-		// Next, initialize the UI with data from the RuleSet object's counters
-
-		// Update the Indexing counter [FlexIDSCore #3059]
-		if (asCppBool( m_ipRuleSet->UseIndexingCounter ))
-		{
-			// Rule set requires this counter, confirm license state.  If counter 
-			// is licensed, item value >= 0
-			if (m_iIndexingCounterItem != -1)
-			{
-				// Check the checkbox
-				m_CounterList.SetCheck( m_iIndexingCounterItem, TRUE );
-			}
-			else
-			{
-				// Error
-				UCLIDException ue( "ELI21445", "Unable to set required indexing counter!" );
-				throw ue;
-			}
-		}
-		else if (m_iIndexingCounterItem != -1)
-		{
-			// Uncheck the checkbox
-			m_CounterList.SetCheck( m_iIndexingCounterItem, FALSE );
-		}
-
-		// Update the Pagination counter
-		if (asCppBool( m_ipRuleSet->UsePaginationCounter ))
-		{
-			// Rule set requires this counter, confirm license state.  If counter 
-			// is licensed, item value >= 0
-			if (m_iPaginationCounterItem != -1)
-			{
-				// Check the checkbox
-				m_CounterList.SetCheck( m_iPaginationCounterItem, TRUE );
-			}
-			else
-			{
-				// Error
-				UCLIDException ue( "ELI21446", "Unable to set required pagination counter!" );
-				throw ue;
-			}
-		}
-		else if (m_iPaginationCounterItem != -1)
-		{
-			// Uncheck the checkbox
-			m_CounterList.SetCheck( m_iPaginationCounterItem, FALSE );
-		}
-
-		// Update the Redaction By Pages counter
-		if (asCppBool( m_ipRuleSet->UsePagesRedactionCounter ))
-		{
-			// Rule set requires this counter, confirm license state.  If counter 
-			// is licensed, item value >= 0
-			if (m_iRedactPagesCounterItem != -1)
-			{
-				// Check the checkbox
-				m_CounterList.SetCheck( m_iRedactPagesCounterItem, TRUE );
-			}
-			else
-			{
-				// Error
-				UCLIDException ue( "ELI21447", 
-					"Unable to set required redaction by pages counter!" );
-				throw ue;
-			}
-		}
-		else if (m_iRedactPagesCounterItem != -1)
-		{
-			// Uncheck the checkbox
-			m_CounterList.SetCheck( m_iRedactPagesCounterItem, FALSE );
-		}
-
-		// Update the Redaction By Documents counter
-		if (asCppBool( m_ipRuleSet->UseDocsRedactionCounter ))
-		{
-			// Rule set requires this counter, confirm license state.  If counter 
-			// is licensed, item value >= 0
-			if (m_iRedactDocsCounterItem != -1)
-			{
-				// Check the checkbox
-				m_CounterList.SetCheck( m_iRedactDocsCounterItem, TRUE );
-			}
-			else
-			{
-				// Error
-				UCLIDException ue( "ELI21448", 
-					"Unable to set required redaction by documents counter!" );
-				throw ue;
-			}
-		}
-		else if (m_iRedactDocsCounterItem != -1)
-		{
-			// Uncheck the checkbox
-			m_CounterList.SetCheck( m_iRedactDocsCounterItem, FALSE );
-		}
-
-		// Update the USB counter serial number edit box
-		m_editKeySerialNumbers.SetWindowText(m_ipRuleSet->KeySerialList);
 
 		// Update the FKB version.
 		m_editFKBVersion.SetWindowText(m_ipRuleSet->FKBVersion);
@@ -200,75 +103,86 @@ void CRuleSetPropertiesPage::Apply()
 	{
 		CString zFKBVersion;
 		m_editFKBVersion.GetWindowText(zFKBVersion);
-		m_ipRuleSet->FKBVersion = _bstr_t(zFKBVersion);
+		int nEnabledCount = 0;
 
-		bool bChecked;
+		// Update the enabled status of all counters in m_mapCounters based upon the check status.
+		int nCount = m_CounterList.GetItemCount();
+		for (int i = 0; i < nCount; i++)
+		{
+			long nCounterID = m_CounterList.GetItemData(i);
+			bool bEnabled = m_CounterList.GetCheck(i) == BST_CHECKED;
+			m_mapCounters[nCounterID].m_bEnabled = bEnabled;
+			if (bEnabled)
+			{
+				nEnabledCount++;
+			}
+		}
 
-		// Require the FKB verson to be set if 
-		if (asCppBool(zFKBVersion.IsEmpty()) &&
-				((isCounterAvailable(m_iIndexingCounterItem, bChecked) && bChecked) ||
-				 (isCounterAvailable(m_iPaginationCounterItem, bChecked) && bChecked) ||
-				 (isCounterAvailable(m_iRedactPagesCounterItem, bChecked) && bChecked) ||
-				 (isCounterAvailable(m_iRedactDocsCounterItem, bChecked) && bChecked) ||
-				 m_CounterList.GetCheck( m_iRedactDocsCounterItem ) == BST_CHECKED))
+		// Require the FKB version to be set if any counter has been selected to decrement.
+		if (nEnabledCount > 0 && asCppBool(zFKBVersion.IsEmpty()))
 		{
 			UCLIDException ue("ELI32485", "An FKB version must be specified for a swiping rule or "
 				"a ruleset that decrements counters.");
-			ue.display();
-			return;
+			throw ue;
 		}
 
-		// update the state of the Indexing and Pagination counters
-		if (isCounterAvailable(m_iIndexingCounterItem, bChecked))
-		{
-			m_ipRuleSet->UseIndexingCounter = asVariantBool(bChecked);
-		}
+		// Apply m_mapCounters to m_ipRuleSet
+		CounterInfo::ApplyCounterInfo(m_mapCounters, m_ipRuleSet);
 
-		if (isCounterAvailable(m_iPaginationCounterItem, bChecked))
-		{
-			m_ipRuleSet->UsePaginationCounter = asVariantBool(bChecked);
-		}
+		m_ipRuleSet->FKBVersion = _bstr_t(zFKBVersion);
 
-		// Validate one or the other of the redaction checkboxes (P16 #2198)
-		if ((isCounterAvailable(m_iRedactPagesCounterItem, bChecked) && bChecked) &&
-		    (isCounterAvailable(m_iRedactDocsCounterItem, bChecked) && bChecked))
-		{
-			UCLIDException ue("ELI14499", "Cannot select redaction by pages and documents!");
-			ue.display();
-			return;
-		}
-
-		// Update state of the appropriate Redaction counter
-		if (isCounterAvailable(m_iRedactPagesCounterItem, bChecked))
-		{
-			m_ipRuleSet->UsePagesRedactionCounter = asVariantBool(bChecked);
-		}
-
-		if (isCounterAvailable(m_iRedactDocsCounterItem, bChecked))
-		{
-			m_ipRuleSet->UseDocsRedactionCounter = asVariantBool(bChecked);
-		}
-
-		// Get the serial number list
-		CString zSerialText;
-		m_editKeySerialNumbers.GetWindowText(zSerialText);
-
-		// Set focus to serial number list so if list not valid it will have the focus
-		m_editKeySerialNumbers.SetFocus();
-		validateSerialList(LPCTSTR(zSerialText));
-
-		// Serial number list is valid so save in the ruleset
-		m_ipRuleSet->KeySerialList = _bstr_t(zSerialText);
-		
 		// update the value related to the checkbox for internal use
-		bChecked = m_checkboxForInternalUseOnly.GetCheck() == BST_CHECKED;
+		bool bChecked = m_checkboxForInternalUseOnly.GetCheck() == BST_CHECKED;
 		m_ipRuleSet->ForInternalUseOnly = asVariantBool(bChecked);
 
 		// Store whether this is a swiping rule
 		bChecked = m_checkSwipingRule.GetCheck() == BST_CHECKED;
 		m_ipRuleSet->IsSwipingRule = asVariantBool(bChecked);
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11553")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI11553")
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesPage::OnClickedBtnAddCounter()
+{
+	try
+	{
+		addEditCounter(-1);
+
+		// Added counter may require m_CounterList column sizes to account for scroll bar.
+		updateGridWidth();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38989")
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesPage::OnClickedBtnEditCounter()
+{
+	try
+	{
+		int nItem = getSelectedItem();
+
+		ASSERT_RUNTIME_CONDITION("ELI38992", nItem != -1, "No counter is selected.");
+
+		addEditCounter(nItem);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38990")
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesPage::OnClickedBtnDeleteCounter()
+{
+	try
+	{
+		int nItem = getSelectedItem();
+
+		ASSERT_RUNTIME_CONDITION("ELI38992", nItem != -1, "No counter is selected.");
+
+		long nID = m_CounterList.GetItemData(nItem);
+		m_mapCounters.erase(nID);
+		m_CounterList.DeleteItem(nItem);
+
+		// Deleted counter may require m_CounterList column sizes to account for removed scroll bar.
+		updateGridWidth();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38991")
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetPropertiesPage::OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pResult)
@@ -278,32 +192,69 @@ void CRuleSetPropertiesPage::OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pR
 		// Get the list view item structure from the message
 		LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 
+		// Get the index of the item and the ID for the associated counter.
+		int iIndex = pNMLV->iItem;
+		int iItemData = m_CounterList.GetItemData(iIndex);
+
 		// Check if the item state has changed and it is changing to checked
 		// AND it is one of the redaction check boxes
 		if (pNMLV->uChanged & LVIF_STATE
 			&& (pNMLV->uNewState & LVIS_STATEIMAGEMASK) == INDEXTOSTATEIMAGEMASK(giTARGET_STATE_UNCHECKED))
 		{
-			// Get the index of the checked/unchecked item and the item data for the item
-			int iIndex = pNMLV->iItem;
-			int iItemData = m_CounterList.GetItemData(iIndex);
-
-			// Check if this is one of the redaction check boxes
-			if (iItemData == giREDACTION_PAGES_ITEM)
+			// Check dis-sallow either both of the indexing or both of the redaction counters from
+			// being simultaneously checked.
+			if (iItemData == giREDACTION_PAGES_COUNTERID)
 			{
 				// Need to uncheck the redaction count by doc item
-				if (m_iRedactDocsCounterItem != -1)
+				if (m_mapCounters[giREDACTION_DOCS_COUNTERID].m_nIndex != -1)
 				{
-					m_CounterList.SetCheck(m_iRedactDocsCounterItem, FALSE);
+					m_CounterList.SetCheck(m_mapCounters[giREDACTION_DOCS_COUNTERID].m_nIndex, FALSE);
 				}
 			}
-			else if (iItemData == giREDACTION_DOCS_ITEM)
+			else if (iItemData == giREDACTION_DOCS_COUNTERID)
 			{
 				// Need to uncheck the redaction count by page item
-				if (m_iRedactPagesCounterItem != -1)
+				if (m_mapCounters[giREDACTION_PAGES_COUNTERID].m_nIndex != -1)
 				{
-					m_CounterList.SetCheck(m_iRedactPagesCounterItem, FALSE);
+					m_CounterList.SetCheck(m_mapCounters[giREDACTION_PAGES_COUNTERID].m_nIndex, FALSE);
 				}
 			}
+			else if (iItemData == giINDEXING_PAGES_COUNTERID)
+			{
+				// Need to uncheck the redaction count by doc item
+				if (m_mapCounters[giINDEXING_DOCS_COUNTERID].m_nIndex != -1)
+				{
+					m_CounterList.SetCheck(m_mapCounters[giINDEXING_DOCS_COUNTERID].m_nIndex, FALSE);
+				}
+			}
+			else if (iItemData == giINDEXING_DOCS_COUNTERID)
+			{
+				// Need to uncheck the redaction count by page item
+				if (m_mapCounters[giINDEXING_PAGES_COUNTERID].m_nIndex != -1)
+				{
+					m_CounterList.SetCheck(m_mapCounters[giINDEXING_PAGES_COUNTERID].m_nIndex, FALSE);
+				}
+			}
+		}
+		else if (m_CounterList.GetFirstSelectedItemPosition() != NULL)
+		{
+			if (iItemData < 100)
+			{
+				// Standard counters may not be edited.
+				m_btnEditCounter.EnableWindow(FALSE);
+				m_btnDeleteCounter.EnableWindow(FALSE);
+			}
+			else
+			{
+				m_btnEditCounter.EnableWindow(TRUE);
+				m_btnDeleteCounter.EnableWindow(TRUE);
+			}
+		}
+		else
+		{
+			// If nothing's selected, nothing to be edited/deleted.
+			m_btnEditCounter.EnableWindow(FALSE);
+			m_btnDeleteCounter.EnableWindow(FALSE);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14496")
@@ -320,13 +271,13 @@ void CRuleSetPropertiesPage::hideCheckboxes()
 	m_checkboxForInternalUseOnly.ShowWindow(FALSE);
 	m_checkSwipingRule.ShowWindow(FALSE);
 
-	// Get the dimensions of the swiping rule checkbox (ie. the last checkbox)
+	// Get the dimensions of the swiping rule checkbox (i.e. the last checkbox)
 	RECT checkRect = {0};
 	m_checkSwipingRule.GetWindowRect(&checkRect);
 	ScreenToClient(&checkRect);
 
-	// Get the dimensions of the key serial numbers edit box 
-	// (ie. the control immediately above the check boxes)
+	// Get the dimensions of the key FKB edit box 
+	// (i.e. the control immediately above the check boxes)
 	RECT editRect = {0};
 	m_editFKBVersion.GetWindowRect(&editRect);
 	ScreenToClient(&editRect);
@@ -351,108 +302,225 @@ void CRuleSetPropertiesPage::setupCounterList()
 	m_CounterList.GetClientRect( &rect );
 
 	// Define width of columns
-	long lEnabledWidth = 60;
-	long lNameWidth = rect.Width() - lEnabledWidth;
+	long lEnabledWidth = 55;
+	long lIdWidth = 35;
+	long lNameWidth = rect.Width() - lEnabledWidth - lIdWidth;
 
 	// Add column headers
 	m_CounterList.InsertColumn( giENABLE_LIST_COLUMN, "Enabled", 
 		LVCFMT_CENTER, lEnabledWidth, giENABLE_LIST_COLUMN );
 
+	m_CounterList.InsertColumn( giID_LIST_COLUMN, "ID", 
+		LVCFMT_LEFT, lIdWidth, giID_LIST_COLUMN );
+
 	m_CounterList.InsertColumn( giNAME_LIST_COLUMN, "Name", 
 		LVCFMT_LEFT, lNameWidth, giNAME_LIST_COLUMN );
 
-	// Default each counter item to unused
-	m_iIndexingCounterItem = -1;
-	m_iPaginationCounterItem = -1;
-	m_iRedactPagesCounterItem = -1;
-	m_iRedactDocsCounterItem = -1;
+	// Retrieve the counter configuration from m_ipRuleSet into m_mapCounters.
+	m_mapCounters = CounterInfo::GetCounterInfo(m_ipRuleSet);
 
-	// Determine if FLEX Index rules are licensed - requires FLEX Index Rule Writing license
-	// (But if in read-only mode, always show)
-	// [FlexIDSCore #3059]
-	int nCounterItemPosition = giINDEXING_ITEM;
-	if (m_bReadOnly || LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ))
+	// Iterate the counter configuration to initialize m_CounterList.
+	for (auto entry = m_mapCounters.begin(); entry != m_mapCounters.end(); entry++)
 	{
-		// Add this item at the top of the list
-		nCounterItemPosition = m_CounterList.InsertItem( giINDEXING_ITEM, "" );
-		m_CounterList.SetItemText( nCounterItemPosition, giNAME_LIST_COLUMN, 
-			"FLEX Index - Indexing" );
-		m_CounterList.SetItemData( nCounterItemPosition, giINDEXING_ITEM );
+		long nID = entry->first;
+		CounterInfo& counterInfo = entry->second;
 
-		// Save position of this item
-		m_iIndexingCounterItem = nCounterItemPosition;
+		// Because the counter grid will be disabled when read-only, its scroll bar won't work. To
+		// Ensure all enabled counters can be seen, display only the enabled ones.
+		if (m_bReadOnly && !counterInfo.m_bEnabled)
+		{
+			continue;
+		}
+		
+		// Populate counter if:
+		// - RDT is licensed
+		// - The counter is a custom counter
+		// - We have a gnFLEXINDEX_RULE_WRITING_OBJECTS license and the counter is indexing by doc.
+		// - We have a gnIDSHIELD_RULE_WRITING_OBJECTS license and the counter is redaction by page.
+		if (isRdtLicensed() || nID >= 100
+			|| (nID == giINDEXING_DOCS_COUNTERID &&
+				LicenseManagement::isLicensed(gnFLEXINDEX_RULE_WRITING_OBJECTS))
+			|| (nID == giREDACTION_PAGES_COUNTERID &&
+				LicenseManagement::isLicensed(gnIDSHIELD_RULE_WRITING_OBJECTS)))
+		{
+			counterInfo.m_nIndex = m_CounterList.InsertItem(counterInfo.m_nID, "");
+			m_CounterList.SetItemText(counterInfo.m_nIndex, giID_LIST_COLUMN, asString(counterInfo.m_nID).c_str());
+			m_CounterList.SetItemText(counterInfo.m_nIndex, giNAME_LIST_COLUMN, counterInfo.m_strName.c_str());
+			m_CounterList.SetItemData(counterInfo.m_nIndex, counterInfo.m_nID);
+			m_CounterList.SetCheck(counterInfo.m_nIndex, asMFCBool(counterInfo.m_bEnabled));
+		}
+		// If a counter that couldn't be displayed is enabled, we have a problem.
+		else if (counterInfo.m_bEnabled)
+		{
+			UCLIDException ue("ELI38993", "Unable to set required counter!");
+			ue.addDebugInfo("CounterID", nID);
+			throw ue;
+		}
 	}
 
-	// Determine if Pagination rules are licensed - requires full RDT license
-	// (But if in read-only mode, always show)
-	if (m_bReadOnly || isRdtLicensed())
+	if (m_bReadOnly)
 	{
-		// Add this item next
-		nCounterItemPosition = m_CounterList.InsertItem( nCounterItemPosition + 1, "" );
-		m_CounterList.SetItemText( nCounterItemPosition, giNAME_LIST_COLUMN, 
-			"FLEX Index - Pagination" );
-		m_CounterList.SetItemData( nCounterItemPosition, giPAGINATION_ITEM );
+		m_btnAddCounter.ShowWindow(SW_HIDE);
+		m_btnEditCounter.ShowWindow(SW_HIDE);
+		m_btnDeleteCounter.ShowWindow(SW_HIDE);
 
-		// Save position of this item
-		m_iPaginationCounterItem = nCounterItemPosition;
+		CRect rectCountersList;
+		m_CounterList.GetWindowRect(&rectCountersList);
+		ScreenToClient(&rectCountersList);
+
+		CRect rectAddButton;
+		m_btnAddCounter.GetWindowRect(&rectAddButton);
+		ScreenToClient(&rectAddButton);
+
+		rectCountersList.right = rectAddButton.right;
+		m_CounterList.MoveWindow(&rectCountersList);
 	}
 
-	// Determine if Redaction By Pages rules are licensed - requires ID Shield Rule Writing license
-	// (But if in read-only mode, always show)
-	if (m_bReadOnly || LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
+	updateGridWidth();
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesPage::addEditCounter(int nListIndex)
+{
+	CounterInfo* pCounterInfo = nullptr;
+	CCounterEditDlg counterEditor(this);
+	counterEditor.m_zCaption = (nListIndex == -1)
+		? "Add Custom Counter"
+		: "Edit Custom Counter";
+	if (nListIndex != -1)
 	{
-		// Add this item next
-		nCounterItemPosition = m_CounterList.InsertItem( nCounterItemPosition + 1, "" );
-		m_CounterList.SetItemText( nCounterItemPosition, giNAME_LIST_COLUMN, 
-			"ID Shield - Redaction (By Page)" );
-		m_CounterList.SetItemData( nCounterItemPosition, giREDACTION_PAGES_ITEM );
-
-		// Save position of this item
-		m_iRedactPagesCounterItem = nCounterItemPosition;
+		// If editing, load the existing counter ID and name into the counterEditor.
+		counterEditor.m_zCounterID = m_CounterList.GetItemText(nListIndex, giID_LIST_COLUMN);
+		counterEditor.m_zCounterName = m_CounterList.GetItemText(nListIndex, giNAME_LIST_COLUMN);
+		pCounterInfo = &getCounterFromList(nListIndex);
+		ASSERT_RUNTIME_CONDITION("ELI38994", pCounterInfo->m_nID >= 100,
+			"Internal logic error");
 	}
 
-	// Determine if Redaction By Documents rules are licensed - requires full RDT license
-	// (But if in read-only mode, always show)
-	if (m_bReadOnly || isRdtLicensed())
+	// Display counterEditor in a loop until they either cancel or enter valid data.
+	long nNewID = -1;
+	while (counterEditor.DoModal() == IDOK)
 	{
-		// Add this item next
-		nCounterItemPosition = m_CounterList.InsertItem( nCounterItemPosition + 1, "" );
-		m_CounterList.SetItemText( nCounterItemPosition, giNAME_LIST_COLUMN, 
-			"ID Shield - Redaction (By Document)" );
-		m_CounterList.SetItemData( nCounterItemPosition, giREDACTION_DOCS_ITEM );
+		long nNewID = asLong((LPCTSTR)counterEditor.m_zCounterID);
 
-		// Save position of this item
-		m_iRedactDocsCounterItem = nCounterItemPosition;
+		// If adding a new counter or the counter ID has been changed, check to ensure the ID isn't
+		// already being used for another counter.
+		if ((pCounterInfo == nullptr || pCounterInfo->m_nID != nNewID) &&
+			m_mapCounters.find(nNewID) != m_mapCounters.end())
+		{
+			MessageBox("Counter ID is already in use.", "Duplicate counter ID", MB_OK);
+			continue;
+		}	
+
+		// If the ID is being changed, remove we will replace the old CounterInfo instance with a
+		// completely new one.
+		if (pCounterInfo != nullptr && pCounterInfo->m_nID != nNewID)
+		{
+			m_mapCounters.erase(pCounterInfo->m_nID);
+			pCounterInfo = nullptr;
+		}
+
+		if (isCounterNameUsed((LPCTSTR)counterEditor.m_zCounterName))
+		{
+			MessageBox("Counter name is already in use.", "Duplicate counter name", MB_OK);
+			continue;
+		}
+
+		if (pCounterInfo == nullptr)
+		{
+			// New counter or ID has been changed
+			m_mapCounters.emplace(make_pair(nNewID, CounterInfo(nNewID, string(counterEditor.m_zCounterName))));
+		}
+		else
+		{
+			// Existing counter whose ID remains the same.
+			m_mapCounters[nNewID].m_strName = counterEditor.m_zCounterName.Trim();
+		}
+
+		if (nListIndex == -1)
+		{
+			// A new counter is being added.
+			nListIndex = m_CounterList.GetItemCount();
+			m_CounterList.InsertItem(nListIndex, "");
+			m_CounterList.SetCheck(nListIndex, TRUE); // Default any added counter to enabled.
+			m_CounterList.SetItemState(nListIndex, LVIS_SELECTED, LVIS_SELECTED);
+			m_CounterList.EnsureVisible(nListIndex, FALSE);
+		}
+		
+		// Ensure the CounterInfo instance is linked with the correct row in m_CounterList
+		m_mapCounters[nNewID].m_nIndex = nListIndex;
+
+		// Set the specified data for the m_CounterList row.
+		m_CounterList.SetItemText(nListIndex, giID_LIST_COLUMN, counterEditor.m_zCounterID);
+		m_CounterList.SetItemText(nListIndex, giNAME_LIST_COLUMN, counterEditor.m_zCounterName.Trim());
+		m_CounterList.SetItemData(nListIndex, nNewID);
+
+		// Ensure grid has focus to show current selection.
+		m_CounterList.SetFocus();
+
+		break;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetPropertiesPage::validateSerialList( const string &strSerialList )
+bool CRuleSetPropertiesPage::isCounterAvailable(int nCounterID, bool &rbIsCounterChecked)
 {
-	try	
+	long nIndex = m_mapCounters[nCounterID].m_nIndex;
+
+	if (nIndex != -1)
 	{
-		// Attempt to convert strSerialList to a range on numbers in the same way CRuleSet will to
-		// ensure a valid list.
-		vector<DWORD> vecSerialNumbers;
-		addRangeToVector(vecSerialNumbers, strSerialList);
-	}
-	catch (UCLIDException &ue)
-	{
-		UCLIDException uex2("ELI12020", "Invalid Serial Number list.", ue);
-		throw uex2;
-		// if any exceptions are thrown it is because a serial number list is not valid.
-	}
-	// no exceptions means serial numbers are valid
-}
-//-------------------------------------------------------------------------------------------------
-bool CRuleSetPropertiesPage::isCounterAvailable(int nCounterItem, bool &rbIsCounterChecked)
-{
-	if (nCounterItem != -1)
-	{
-		rbIsCounterChecked = (m_CounterList.GetCheck(nCounterItem) == BST_CHECKED);
+		rbIsCounterChecked = (m_CounterList.GetCheck(nIndex) == BST_CHECKED);
 		return true;
 	}
 	
 	return false;
+}
+//-------------------------------------------------------------------------------------------------
+CounterInfo& CRuleSetPropertiesPage::getCounterFromList(long nIndex)
+{
+	long nID = m_CounterList.GetItemData(nIndex);
+	return m_mapCounters[nID];
+}
+//-------------------------------------------------------------------------------------------------
+bool CRuleSetPropertiesPage::isCounterNameUsed(const char* szName)
+{
+	string strName = trim(szName, " ", " ");
+
+	for (auto entry = m_mapCounters.begin(); entry != m_mapCounters.end(); entry++)
+	{
+		CounterInfo& counterInfo = entry->second;
+		if (_strcmpi(strName.c_str(), counterInfo.m_strName.c_str()) == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+int CRuleSetPropertiesPage::getSelectedItem()
+{
+	POSITION pos = m_CounterList.GetFirstSelectedItemPosition();
+	if (pos != NULL)
+	{
+		return m_CounterList.GetNextSelectedItem(pos);
+	}
+
+	return -1;
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesPage::updateGridWidth()
+{
+	try
+	{
+		// giNAME_LIST_COLUMN should fill all client width not used by giENABLE_LIST_COLUMN or
+		// giID_LIST_COLUMN.
+		int nUsedWidth = m_CounterList.GetColumnWidth(giENABLE_LIST_COLUMN);
+		nUsedWidth += m_CounterList.GetColumnWidth(giID_LIST_COLUMN);
+
+		CRect rect;
+		m_CounterList.GetClientRect(&rect);
+		m_CounterList.SetColumnWidth(giNAME_LIST_COLUMN, rect.Width() - nUsedWidth);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38995");
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSetPropertiesPage::isRdtLicensed()
