@@ -390,6 +390,7 @@
     <ClInclude Include="DefinedTypes.h" />
     <ClInclude Include="DocTagUtils.h" />
     <ClInclude Include="Logging.h" />
+    <ClInclude Include="MapInitializationTemplate.h" />
     <ClInclude Include="QuickMenuChooser.h" />
     <ClInclude Include="SafeArrayAccessGuard.h" />
     <ClInclude Include="VectorOperations.h" />

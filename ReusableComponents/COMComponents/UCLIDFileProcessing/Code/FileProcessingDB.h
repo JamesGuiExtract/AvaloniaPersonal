@@ -8,6 +8,10 @@
 #include "FilePriorityHelper.h"
 #include "FP_UI_Notifications.h"
 #include "TransactionGuard.h"
+#include "DatabaseIDValues.h"
+#include "DBCounter.h"
+#include "DBCounterUpdate.h"
+#include "DBCounterChangeValue.h"
 
 #include <RegistryPersistenceMgr.h>
 #include <FileProcessingConfigMgr.h>
@@ -291,6 +295,13 @@ public:
 	STDMETHOD(RecordFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, double dDuration,
 		double dOverheadTime, long *pnFileTaskSessionID);
 	STDMETHOD(GetFileNameFromFileID)( /*[in]*/ long fileID, /*[out, retval]*/ BSTR* pbstrFileName );
+	STDMETHOD(get_SecureCounters)(IIUnknownVector** ppSecureCounters);
+	STDMETHOD(GetSecureCounterName)(long nCounterID, BSTR *pstrCounterName);
+	STDMETHOD(ApplySecureCounterUpdateCode)(BSTR strUpdateCode);
+	STDMETHOD(GetSecureCounterValue)(long nCounterID, long* pnCounterValue);
+	STDMETHOD(DecrementSecureCounter)(long nCounterID, long decrementAmount, long* pnCounterValue);
+	STDMETHOD(SecureCounterConsistencyCheck)(VARIANT_BOOL* pvbValid);
+	STDMETHOD(GetCounterUpdateRequestCode)(BSTR* pstrUpdateRequestCode);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -512,6 +523,19 @@ private:
 
 	// The encrypted DatabaseID loaded from the DBInfo table
 	string m_strEncryptedDatabaseID;
+
+	DatabaseIDValues m_DatabaseIDValues;
+
+	// This is used to only create the counters vector once
+	IIUnknownVectorPtr m_ipSecureCounters;
+
+	// True if the values in m_DatabaseIDValues have been validated 
+	// this is used to trigger a recheck databaseID when checkDatabaseIDValid is called
+	bool m_bDatabaseIDValuesValidated;
+
+	// This is set when the SecureCounters is called using IDENT_CURRENT on the FAMFile table
+	// which returns the last ID that was used.
+	long m_nLastFAMFileID;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods
@@ -1012,6 +1036,34 @@ private:
 	// Checks for new Product Specific DB managers
 	void checkForNewDBManagers();
 
+	// If m_bDatabaseIDValuesValidated is true this returns true - if false 
+	// the m_strEncryptedDatabaseID will be checked for validity - if it is empty it will be loaded 
+	// from DBInfo table and then checked for validity
+	// m_bDatabaseIDValuesValidated will be set to result of this function an if an exception is thrown
+	// m_bDatabaseIDValuesValidated will be set to false.
+	// if bThowIfInvalid is true, an exception will be throw instead of returning a value
+	bool checkDatabaseIDValid(_ConnectionPtr ipConnection, bool bThowIfInvalid);
+
+	// Method applies the changes that are in the counterUpdates argument as well as update the 
+	// existing counters that are not being modified to use the new databaseID caused by the update
+	// Should be executed within a transaction
+	void updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates);
+
+	// Method unlocks the counters if they are in a bad state
+	void unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates);
+
+	// Returns a map with all the existing counters as CounterOperation records. All of the records
+	// returned will have the m_eOperation set to kNone. As the changes are processed they will be 
+	// changes to reflect the operations specified with the upgrade code.
+	// if bCheckCounterHash is true the Hash portion of the encrypted value SecureCounterValue will
+	// be checked that the DatabaseID hash portion is what is expected if bCheckCounterHash is false
+	// only the CounterID portion will be checked against the record's ID
+	void getCounterInfo(map<long, CounterOperation> &mapOfCounterOps, bool bCheckCounterHash = true);
+
+
+	void createCounterUpdateQueries(const DatabaseIDValues &databaseIDValues, vector<string> &vecCounterUpdates, 
+		map<long, CounterOperation> &mapCounters );
+
 	void validateLicense();
 
 	// Internal implementation methods
@@ -1153,6 +1205,12 @@ private:
 	bool RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
 	bool RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, double dDuration,
 		double dOverheadTime, long *pnFileTaskSessionID);
+	bool GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName);
+	bool ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode);
+	bool GetSecureCounterValue_Internal(bool bDBLocked, long nCounterID, long* pnCounterValue);
+	bool DecrementSecureCounter_Internal(bool bDBLocked, long nCounterID, long decrementAmount, long* pnCounterValue);
+	bool SecureCounterConsistencyCheck_Internal(bool bDBLocked, VARIANT_BOOL* pvbValid);
+	bool GetCounterUpdateRequestCode_Internal(bool bDBLocked, BSTR* pstrUpdateRequestCode);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)
@@ -1215,3 +1273,4 @@ OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)
 			} \
 		} \
 		while (!bRetrySuccess);
+

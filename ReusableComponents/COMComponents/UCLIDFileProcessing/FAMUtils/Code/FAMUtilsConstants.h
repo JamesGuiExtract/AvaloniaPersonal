@@ -85,8 +85,12 @@ static const string gstrQUERY_FILES_WITH_TAGS = "SELECT <SelectFileValues> FROM 
 static const string gstrMAIN_DB_LOCK = "Main";
 static const string gstrUSER_COUNTER_DB_LOCK = "UserCounter";
 static const string gstrWORKITEM_DB_LOCK = "WorkItem";
+static const string gstr_SECURE_COUNTER_DB_LOCK = "SecureCounter";
 
 // Special-purpose FAM tag names
 const string gstrDATABASE_SERVER_TAG = "<DatabaseServer>";
 const string gstrDATABASE_NAME_TAG = "<DatabaseName>";
 const string gstrDATABASE_ACTION_TAG = "<ActionName>";
+
+// Date Format - used for inserting dates into database
+static const string& gstrDATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S";

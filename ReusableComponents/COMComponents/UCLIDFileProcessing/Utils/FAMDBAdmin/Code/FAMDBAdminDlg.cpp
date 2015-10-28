@@ -24,6 +24,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <FAMUtilsConstants.h>
 #include <RegConstants.h>
+#include <ClipboardManager.h>
 
 #include <set>
 
@@ -126,6 +127,8 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_RECALCULATE_STATS, &CFAMDBAdminDlg::OnRecalculateStats)
 	ON_COMMAND(ID_MANAGE_METADATA, &CFAMDBAdminDlg::OnManageMetadataFields)
 	ON_COMMAND(ID_MANAGE_ATTRIBUTESETS, &CFAMDBAdminDlg::OnManageAttributeSets)
+	ON_COMMAND(ID_COUNTERS_GENERATEREQUESTCODE, &CFAMDBAdminDlg::OnCountersGeneraterequestcode)
+	ON_COMMAND(ID_COUNTERS_APPLYUPDATECODE, &CFAMDBAdminDlg::OnCountersApplyupdatecode)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -920,6 +923,41 @@ void CFAMDBAdminDlg::OnManageAttributeSets()
 		dlg.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38633");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnCountersGeneraterequestcode()
+{
+	try
+	{
+		string strCounterRequestCode = m_ipFAMDB->GetCounterUpdateRequestCode();
+
+		ClipboardManager clipboard(this);
+		clipboard.writeText(strCounterRequestCode);
+		MessageBox("Request code has been copied to the clipboard.", "Counter update request", MB_OK);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38945")
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnCountersApplyupdatecode()
+{
+	try
+	{
+		// TODO: Add UI that displays what counters are being updated and if the code is valid? 
+		ClipboardManager clipboard(this);
+		string strUpdateCode;
+		if (clipboard.readText(strUpdateCode))
+		{
+			m_ipFAMDB->ApplySecureCounterUpdateCode(strUpdateCode.c_str());
+			MessageBox("Update code has been applied", "Counter update", MB_OK);
+		}
+		else
+		{
+			MessageBox("No update code on clipboard.", "Counter update", MB_OK);
+		}
+
+		
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38946");
 }
 
 //-------------------------------------------------------------------------------------------------

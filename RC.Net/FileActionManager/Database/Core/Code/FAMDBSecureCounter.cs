@@ -27,10 +27,10 @@ namespace Extract.FileActionManager.Database
 
         #region Fields
 
-//        /// <summary>
-//        /// The <see cref="FileProcessingDB"/> that is the source of this counter.
-//        /// </summary>
-//        FileProcessingDB _fileProcessingDB;
+        /// <summary>
+        /// The <see cref="FileProcessingDB"/> that is the source of this counter.
+        /// </summary>
+        FileProcessingDB _fileProcessingDB;
 
         /// <summary>
         /// The ID of the counter.
@@ -74,10 +74,10 @@ namespace Extract.FileActionManager.Database
                 ExtractException.Assert("ELI38766", "Null argument exception.",
                     pFAMDB != null);
 
-                //_fileProcessingDB = pFAMDB;
+                _fileProcessingDB = pFAMDB;
                 _id = nID;
-                //_name = fileProcessingDB.GetSecureCounterName(_counterID);
-                _name = "TODO";
+                _name = _fileProcessingDB.GetSecureCounterName(_id);
+                
             }
             catch (Exception ex)
             {
@@ -94,7 +94,7 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                // _fileProcessingDB.ApplySecureCounterUpdateCode(bstrCode);
+                 _fileProcessingDB.ApplySecureCounterUpdateCode(bstrCode);
             }
             catch (Exception ex)
             {
@@ -137,8 +137,7 @@ namespace Extract.FileActionManager.Database
             {
                 try
                 {
-                    //return _fileProcessingDB.GetSecureCounterValue(_counterID);
-                    return -1;
+                    return _fileProcessingDB.GetSecureCounterValue(_id);
                 }
                 catch (Exception ex)
                 {
@@ -159,8 +158,7 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                //return _fileProcessingDB.DecrementSecureCounter(_counterID, count);
-                return -1;
+                return _fileProcessingDB.DecrementSecureCounter(_id, count);
             }
             catch (Exception ex)
             {

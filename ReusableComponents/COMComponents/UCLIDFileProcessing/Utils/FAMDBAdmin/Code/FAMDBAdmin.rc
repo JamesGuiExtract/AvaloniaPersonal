@@ -576,6 +576,13 @@ BEGIN
     BEGIN
         MENUITEM "Check for new components",    ID_TOOLS_CHECKFORNEWCOMPONENTS
         MENUITEM SEPARATOR
+        POPUP "Counters..."
+        BEGIN
+            MENUITEM "Generate request code...",    ID_COUNTERS_GENERATEREQUESTCODE
+            MENUITEM "Apply update code...",        ID_COUNTERS_APPLYUPDATECODE
+            MENUITEM "Perform integrity check...",  ID_COUNTERS_PERFORMINTEGRITYCHECK
+        END
+        MENUITEM SEPARATOR
         MENUITEM "&Manually set action status...\tCtrl+M", ID_TOOLS_MANUALLYSETACTIONSTATUS
         MENUITEM "Manually set file processing &priority...", ID_TOOLS_SETPRIORITY
         MENUITEM SEPARATOR

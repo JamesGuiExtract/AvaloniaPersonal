@@ -1509,22 +1509,6 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 
 		vecQueries.push_back(gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES);
 
-		// Add the Database ID if needed
-		// The m_strEncryptedDatabaseID value is initialized with the value in the dbinfo table
-		// when a connection is made to the database. So if the value is empty either there was no
-		// value in the dbinfo table or the value has been deleted
-		if (bInitializeUserTables || m_strEncryptedDatabaseID.empty())
-		{
-			// if the DatabaseID is empty create a new id - this 
-			if (m_strEncryptedDatabaseID.empty())
-			{
-				m_strEncryptedDatabaseID = getEncryptedString(createDatabaseIDString(getDBConnection(), m_strDatabaseName));
-			}
-		
-			// When this is executed if there is already a DatabaseID value it will throw an exception
-			vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-					+ gstrDATABASEID + "', '" + m_strEncryptedDatabaseID + "')");
-		}
 		// Initialize the DB Info settings if necessary
 		if (bInitializeUserTables)
 		{
@@ -1732,6 +1716,28 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrEMAIL_TIMEOUT] = "0";
 	mapDefaultValues[gstrEMAIL_USE_SSL] = "0";
 	mapDefaultValues[gstrALLOW_RESTARTABLE_PROCESSING] = "0";
+
+	// Create a new database ID  or use existing if it has been set
+	ByteStream bsDatabaseID;
+
+	if (!m_bDatabaseIDValuesValidated)
+	{
+		createDatabaseID(getDBConnection(), bsDatabaseID);
+	}
+	else
+	{
+		// Puts the current DatabaseID into the bsDatabaseID bytestream
+		ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bsDatabaseID);
+		bsm << m_DatabaseIDValues;
+		bsm.flushToByteStream(8);
+	}
+
+	// Encrypt the DatabaseID
+	// The actual value will change in the DBInfo table but it will be the same DatabaseID
+	ByteStream bsPW;
+	getFAMPassword(bsPW);
+	mapDefaultValues[gstrDATABASEID] = MapLabel::setMapLabelWithS(bsDatabaseID,bsPW);
+	
 	try
 	{
 		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = getSQLServerDateTime(getDBConnection());
@@ -3073,6 +3079,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						{
 							_lastCodePos = "310";
 							m_strEncryptedDatabaseID = getStringField(ipFields, "Value");
+							m_bDatabaseIDValuesValidated = false;
 						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
@@ -3543,6 +3550,17 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				}
 			}
 		
+			// Need to make sure the databaseID is loaded from the DBInfo table if it is there
+			if (doesTableExist(ipConnection, gstrDB_INFO))
+			{
+				m_strEncryptedDatabaseID = "";
+				m_bDatabaseIDValuesValidated = false;
+
+				// this will load from db info and validate the string if not valid it will
+				// leave it blank
+				checkDatabaseIDValid(ipConnection, false);
+			}
+
 			CSingleLock lock(&m_mutex, TRUE);
 
 			// Begin a transaction
@@ -5524,3 +5542,382 @@ void CFileProcessingDB::checkForNewDBManagers()
 	ipCategoryManager->CheckForNewComponents(ipCategoryNames);
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid)
+{
+	if (m_bDatabaseIDValuesValidated)
+	{
+		return true;
+	}
+
+	// If the database id is empty load from DBInfo - and if still empty it is invalid
+	if (m_strEncryptedDatabaseID.empty())
+	{
+		// Load from the database
+		m_strEncryptedDatabaseID = getDBInfoSetting(ipConnection, gstrDATABASEID, bThrowIfInvalid);
+		if (m_strEncryptedDatabaseID.empty())
+		{
+			if (bThrowIfInvalid)
+			{
+				UCLIDException ueEmpty("ELI38795", "DatabaseID was empty.");
+				throw ueEmpty;
+			}
+			return false;
+		}
+	};
+
+	try
+	{
+		DatabaseIDValues storedDatabaseIDValues(m_strEncryptedDatabaseID);
+		m_DatabaseIDValues = storedDatabaseIDValues;
+
+		if (storedDatabaseIDValues.CheckIfValid(ipConnection, bThrowIfInvalid))
+		{
+			m_bDatabaseIDValuesValidated = true;
+			return true;
+		}
+	}
+	catch(...)
+	{
+		// if the not valid set the saved encrypted database ID string to an empty string
+		m_strEncryptedDatabaseID = "";
+
+		if (bThrowIfInvalid)
+		{
+			throw;
+		}
+	}
+	
+	// if the not valid set the saved encrypted database ID string to an empty string
+	m_strEncryptedDatabaseID = "";
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates)
+{
+	// get the update operations
+	vector<CounterOperation> &vecOperations = counterUpdates.m_vecOperations;
+
+	// Get the new DatabaseID - will be the same as old except for the LastUpdated
+	DatabaseIDValues newDatabaseIDValues = m_DatabaseIDValues;
+	newDatabaseIDValues.m_ctLastUpdated =  getSQLServerDateTimeAsCTime(getDBConnection());
+
+	// Get the time since the request was generated
+	CTimeSpan tsDiff = newDatabaseIDValues.m_ctLastUpdated - counterUpdates.m_ctTimeCodeGenerated;
+	if (tsDiff.GetDays() >= 1 || tsDiff.GetDays() < 0)
+	{
+		// Code has expired
+		UCLIDException ue("ELI38996", "Counter update code has expired.");
+		throw ue;
+	}
+
+	newDatabaseIDValues.CalculateHashValue(newDatabaseIDValues.m_nHashValue);
+
+	// get a map of the standard counter names
+	map<long, string> &mapCounterNames = DBCounter::ms_mapOfStandardNames;
+
+	// Get the last issued FAMFile id
+	executeCmdQuery(ipConnection,"SELECT cast(IDENT_CURRENT('FAMFile') as int) AS ID",
+		false, &m_nLastFAMFileID);
+
+	// Get map with the key as CounterId and the counter as a CounterOperation with operation set to kNone
+	map<long, CounterOperation> mapCounters;
+	getCounterInfo(mapCounters);
+	vector<DBCounterChangeValue> vecCounterChanges;
+
+	// Go thru all of the operations that are requested
+	for (size_t i=0; i < vecOperations.size(); i++)
+	{
+		CounterOperation &counterOp = vecOperations[i];
+		
+		// Find the counter in the map of existing counters
+		auto counter = mapCounters.find(counterOp.m_nCounterID);
+
+		// Set the name of the non custom counters
+		if (counterOp.m_nCounterID < 100)
+		{
+			counterOp.m_strCounterName = mapCounterNames[counterOp.m_nCounterID];
+		}
+
+		// check if the counter exists
+		if (counterOp.m_eOperation == kCreate && counter != mapCounters.end())
+		{
+			UCLIDException ueCreate("ELI38911", "Counter already exists.");
+			ueCreate.addDebugInfo("CounterID", counterOp.m_nCounterID);
+			ueCreate.addDebugInfo("CounterName", counterOp.m_strCounterName);
+			throw ueCreate;
+		}
+		else if (counterOp.m_eOperation != kCreate && counter == mapCounters.end())
+		{
+			UCLIDException ueMissingCounter("ELI38912", "Counter doesn't exist.");
+			ueMissingCounter.addDebugInfo("CounterID", counterOp.m_nCounterID);
+			ueMissingCounter.addDebugInfo("CounterName", counterOp.m_strCounterName);
+			throw ueMissingCounter;
+		}
+
+		// Create the counter change records
+		DBCounterChangeValue counterChange;
+		counterChange.m_nCounterID = counterOp.m_nCounterID;
+		counterChange.m_ctUpdatedTime = newDatabaseIDValues.m_ctLastUpdated;
+		counterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
+		counterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
+		counterChange.m_strComment = "Update";
+
+		// Set the counterChange data for the operation and convert the 
+		// Increase and Decrease operations to Sets ( for generating the SQL statements to 
+		// update the value
+		switch (counterOp.m_eOperation)
+		{
+		case kCreate:
+			counterChange.m_nToValue = counterOp.m_nValue;
+			counterChange.m_nFromValue = 0;
+			counterChange.CalculateHashValue(counterChange.m_llHashValue);
+			vecCounterChanges.push_back(counterChange);
+
+			// Add a create record to the map
+			mapCounters[counterOp.m_nCounterID] = counterOp;
+			break;
+		case kSet:
+			counterChange.m_nToValue = counterOp.m_nValue;
+			counterChange.m_nFromValue = counter->second.m_nValue;
+			counterChange.CalculateHashValue(counterChange.m_llHashValue);
+			vecCounterChanges.push_back(counterChange);
+
+			// Update the counterOp record in map to the counterOp being performed
+			mapCounters[counterOp.m_nCounterID] = counterOp;
+			break;
+		case kIncrement:
+			counterChange.m_nToValue = counter->second.m_nValue + counterOp.m_nValue;
+			counterChange.m_nFromValue = counter->second.m_nValue;
+			counterChange.CalculateHashValue(counterChange.m_llHashValue);
+			vecCounterChanges.push_back(counterChange);
+
+			// Modify the existing counterOp record in map to change to a set with the new counter value
+			mapCounters[counterOp.m_nCounterID].m_eOperation = kSet;
+			mapCounters[counterOp.m_nCounterID].m_nValue = counterChange.m_nToValue;
+			break;
+		case kDecrement:
+			// An operation to decrement should set counter value to 0 if the decrement value
+			// is larger than the value of the counter
+			counterChange.m_nToValue = max(0, counter->second.m_nValue - counterOp.m_nValue);
+			counterChange.m_nFromValue = counter->second.m_nValue;
+			counterChange.CalculateHashValue(counterChange.m_llHashValue);
+			vecCounterChanges.push_back(counterChange);
+
+			// Modify the existing counterOp record in map to change to a set with the new counter value
+			mapCounters[counterOp.m_nCounterID].m_eOperation = kSet;
+			mapCounters[counterOp.m_nCounterID].m_nValue = counterChange.m_nToValue;
+			break;
+		case kDelete:
+			// Modify existing counterOp record to the delete op
+			mapCounters[counterOp.m_nCounterID] = counterOp;
+			break;
+		default:
+			THROW_LOGIC_ERROR_EXCEPTION("ELI38913");
+		}
+	}
+
+	// the mapCounters has the changes that need to be made to the SecureCounter table
+	// and the vecCounterChanges has the changes that need to be added to the SecureCounterChange table
+
+	// Need to updated the DatabaseID record
+	ByteStream bsNewDBID;
+	ByteStreamManipulator bsmNewDBID(ByteStreamManipulator::kWrite, bsNewDBID);
+	bsmNewDBID << newDatabaseIDValues;
+	bsmNewDBID.flushToByteStream(8);
+	
+	ByteStream bsFAMPassword;
+	getFAMPassword(bsFAMPassword);
+
+	string strNewEncryptedDBID = MapLabel::setMapLabelWithS(bsNewDBID,bsFAMPassword);
+
+	// list of queries to run
+	vector<string> vecUpdateQueries;
+
+	string strUpdateDBInfoQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
+	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_NAME, gstrDATABASEID);
+	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_VALUE, strNewEncryptedDBID);
+	
+	// Add Query to update to new DatabaseId
+	vecUpdateQueries.push_back(strUpdateDBInfoQuery);
+	
+	// Add the queries to update the counter records
+	createCounterUpdateQueries(newDatabaseIDValues, vecUpdateQueries, mapCounters);
+
+	// add counter change value records
+	for (auto scvc = vecCounterChanges.begin(); scvc != vecCounterChanges.end(); ++scvc)
+	{
+		vecUpdateQueries.push_back((*scvc).GetInsertQuery());
+	}
+
+	// Apply the changes with the new counter change records
+	executeVectorOfSQL(ipConnection, vecUpdateQueries);
+	
+	// Clear the member encrypted value and validated flag so that the next time checkDatabaseIDValid is called
+	// it will trigger a load from the DBInfo
+	m_strEncryptedDatabaseID = "";
+	m_bDatabaseIDValuesValidated = false;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::getCounterInfo(map<long, CounterOperation> &mapOfCounterOps, bool bCheckCounterHash)
+{
+	// Load counters from the database and check that they the SecureCounterValueChange table last
+	// counter value matches the encrypted counter value.
+	ADODB::_ConnectionPtr ipConnection = getDBConnection();
+	
+	// Create a pointer to a recordset
+	_RecordsetPtr ipResultSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI38915", ipResultSet != __nullptr);
+	
+	// Open the Action table
+	ipResultSet->Open(gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+		adLockReadOnly, adCmdText);
+	while (!asCppBool(ipResultSet->adoEOF))
+	{
+		DBCounter dbCounter;
+		DBCounterChangeValue counterChange;
+
+		FieldsPtr fields = ipResultSet->Fields;
+		if (bCheckCounterHash)
+		{
+			// Check the counter hash and validate counter value against the last ChangeValue for the
+			// counter
+			dbCounter.LoadFromFields(ipResultSet->Fields, m_DatabaseIDValues.m_nHashValue, true);
+		}
+		else
+		{
+			// Don't check the databaseID hash - does check the counter ID against the record's id
+			dbCounter.LoadFromFields(ipResultSet->Fields);
+		}
+
+		CounterOperation counterOp(dbCounter);
+	
+		mapOfCounterOps[dbCounter.m_nID] = counterOp;
+
+		ipResultSet->MoveNext();
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::createCounterUpdateQueries(const DatabaseIDValues &databaseIDValues, 
+	vector<string> &vecCounterUpdates, map<long, CounterOperation> &mapCounters)
+{
+	// Go thru all counterOp records in map and create the update queries
+	// All existing counter records have to be updated to be encrypted with the new database id
+	for (auto c = mapCounters.begin(); c != mapCounters.end(); ++c)
+	{
+		vecCounterUpdates.push_back(c->second.GetSQLQuery(databaseIDValues));
+	}
+}
+
+void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates)
+{
+	// Check the unlock code databaseID, it should be valid since the request code contained the 
+	// fixed up version
+	bool bValid = counterUpdates.m_DatabaseID.CheckIfValid(ipConnection, false);
+	if (!bValid)
+	{
+		// Unlock code is not valid
+		UCLIDException ue("ELI38977", "Unlock code is invalid.");
+		throw ue;
+	}
+
+	DatabaseIDValues &newDatabaseID = counterUpdates.m_DatabaseID;
+	
+	// Update the counterUpdates DatabaseID to have a new last updated time
+	newDatabaseID.m_ctLastUpdated =  getSQLServerDateTimeAsCTime(getDBConnection());
+
+	// Get the time since the request was generated
+	CTimeSpan tsDiff = newDatabaseID.m_ctLastUpdated - counterUpdates.m_ctTimeCodeGenerated;
+	if (tsDiff.GetDays() >= 1 || tsDiff.GetDays() < 0)
+	{
+		// Code has expired
+		UCLIDException ue("ELI38988", "Unlock code has expired.");
+		throw ue;
+	}
+
+	// Update the hash
+	newDatabaseID.CalculateHashValue(newDatabaseID.m_nHashValue);
+
+	// Get the last issued FAMFile id
+	executeCmdQuery(ipConnection,"SELECT cast(IDENT_CURRENT('FAMFile') as int) AS ID",
+		false, &m_nLastFAMFileID);
+
+	// Get map with the key as CounterId and the counter as a CounterOperation with operation set to kNone
+	map<long, CounterOperation> mapCounters;
+	// Get the counters from SecureCounter table but don't check the hash (the counterID portion of the hash
+	// will still be checked
+	getCounterInfo(mapCounters, false);
+	vector<DBCounterChangeValue> vecCounterChanges;
+
+	// The number of records in mapCounters should be the same as the number of operations in counterUpdates.m_vecOperations
+	if (mapCounters.size() != counterUpdates.m_vecOperations.size())
+	{
+		UCLIDException ue("ELI38978", "Number of counters in unlock code does not match the number of counters.");
+		ue.addDebugInfo("NumberInUnlockCode", counterUpdates.m_vecOperations.size());
+		ue.addDebugInfo("NumberInDatabase", mapCounters.size());
+		throw ue;
+	}
+
+	vector<string> vecUpdateQueries;
+
+	// Put the operations from the unlock code in a map
+	map<long, CounterOperation> mapUnlockCounters;
+	for (size_t i = 0; i < counterUpdates.m_vecOperations.size(); i++)
+	{
+		CounterOperation &operation = counterUpdates.m_vecOperations[i];
+		auto foundCounter = mapCounters.find(operation.m_nCounterID);
+		if (foundCounter == mapCounters.end())
+		{
+			UCLIDException ue("ELI38980", "Counter in unlock code does not exist.");
+			ue.addDebugInfo("CounterID", operation.m_nCounterID);
+			throw ue;
+		}
+		CounterOperation &existingCounter = foundCounter->second;
+
+		if (operation.m_eOperation != kNone && existingCounter.m_eOperation != kNone
+			&& operation.m_nValue < existingCounter.m_nValue)
+		{
+			UCLIDException ue("ELI38979", "Unlock code counter information invalid.");
+			throw ue;
+		}
+
+		vecUpdateQueries.push_back(existingCounter.GetSQLQuery(newDatabaseID));
+
+		// Create the counter change records
+		DBCounterChangeValue counterChange;
+		counterChange.m_nCounterID = existingCounter.m_nCounterID;
+		counterChange.m_ctUpdatedTime = newDatabaseID.m_ctLastUpdated;
+		counterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
+		counterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
+		counterChange.m_strComment = "Unlock";
+		counterChange.m_nFromValue = existingCounter.m_nValue;
+		counterChange.m_nToValue = existingCounter.m_nValue;
+		counterChange.CalculateHashValue(counterChange.m_llHashValue);
+
+		vecUpdateQueries.push_back(counterChange.GetInsertQuery());
+	}
+
+	// Need to updated the DatabaseID record
+	ByteStream bsNewDBID;
+	ByteStreamManipulator bsmNewDBID(ByteStreamManipulator::kWrite, bsNewDBID);
+	bsmNewDBID << newDatabaseID;
+	bsmNewDBID.flushToByteStream(8);
+	
+	ByteStream bsFAMPassword;
+	getFAMPassword(bsFAMPassword);
+
+	string strNewEncryptedDBID = MapLabel::setMapLabelWithS(bsNewDBID,bsFAMPassword);
+
+	string strUpdateDBInfoQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
+	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_NAME, gstrDATABASEID);
+	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_VALUE, strNewEncryptedDBID);
+	
+	// Add Query to update to new DatabaseId
+	vecUpdateQueries.push_back(strUpdateDBInfoQuery);
+
+	executeVectorOfSQL(ipConnection, vecUpdateQueries);
+	
+	m_strEncryptedDatabaseID = "";
+	m_bDatabaseIDValuesValidated = false;
+
+}

@@ -185,7 +185,11 @@
     <ClCompile Include="ActionStatusCondition.cpp" />
     <ClCompile Include="ActionStatusConditionDlg.cpp" />
     <ClCompile Include="AdvancedTaskSettingsDlg.cpp" />
+    <ClCompile Include="DatabaseIDValues.cpp" />
     <ClCompile Include="DatabaseStatusIconUpdater.cpp" />
+    <ClCompile Include="DBCounter.cpp" />
+    <ClCompile Include="DBCounterChangeValue.cpp" />
+    <ClCompile Include="DBCounterUpdate.cpp" />
     <ClCompile Include="FAMDBHelperFunctions.cpp" />
     <ClCompile Include="FAMDBUtils.cpp" />
     <ClCompile Include="FAMFileSelector.cpp" />
@@ -363,7 +367,11 @@
     <ClInclude Include="ActionStatusConditionDlg.h" />
     <ClInclude Include="AdvancedTaskSettingsDlg.h" />
     <ClInclude Include="CommonConstants.h" />
+    <ClInclude Include="DatabaseIDValues.h" />
     <ClInclude Include="DatabaseStatusIconUpdater.h" />
+    <ClInclude Include="DBCounter.h" />
+    <ClInclude Include="DBCounterChangeValue.h" />
+    <ClInclude Include="DBCounterUpdate.h" />
     <ClInclude Include="FAMDBHelperFunctions.h" />
     <ClInclude Include="FAMDB_SQL.h" />
     <ClInclude Include="FAMDBUtils.h" />

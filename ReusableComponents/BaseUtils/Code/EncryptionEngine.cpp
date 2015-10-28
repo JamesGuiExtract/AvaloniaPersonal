@@ -2,7 +2,9 @@
 #include "EncryptionEngine.h"
 #include "IceKey.h"
 #include "ByteStream.h"
+#include "ByteStreamManipulator.h"
 #include "UCLIDException.h"
+#include "Random.h"
 
 #include <string>
 
@@ -45,7 +47,7 @@ void MapLabel::setMapLabel(ByteStream& cipherByteStream,
 	for (unsigned int i=0; i < ulNumIterations; i++)
 		ik.encrypt(pszPlainText+i*8, pszCipherText+i*8);
 }
-
+//-------------------------------------------------------------------------------------------------
 void MapLabel::getMapLabel(ByteStream& plainByteStream, 
 						   const ByteStream& cipherByteStream, 
 						   const ByteStream& passwordByteStream)
@@ -76,8 +78,73 @@ void MapLabel::getMapLabel(ByteStream& plainByteStream,
 	const unsigned char* pszCipherText = cipherByteStream.getData();
 	unsigned char *pszPlainText = plainByteStream.getData();
 
-	// decrpypt the stream, 8 bytes at a time
+	// decrypt the stream, 8 bytes at a time
 	unsigned long ulNumIterations = plainByteStream.getLength() / 8;
 	for (unsigned int i=0; i < ulNumIterations; i++)
 		ik.decrypt(pszCipherText+i*8, pszPlainText+i*8);
+}
+//-------------------------------------------------------------------------------------------------
+void MapLabel::scrambleData(unsigned char* pszData, unsigned long nLength, unsigned long nScrambleKey,
+				  bool bScramble)
+{
+	// For every other byte in the array, swap it with a byte that is half the array
+	// size ahead +- 8 bytes. This position to swap with should roll over to the
+	// beginning of the array once it gets past the end of it.
+	// When unscrambling, swap the same bytes, but in the opposite order (start with the last even
+	// numbered index in the array and work backwards).
+	long nStart = bScramble ? 0 : (nLength - 1) - ((nLength - 1) % 2);
+	long nIncrement = bScramble ? 2 : -2;
+	for (long i = nStart; (unsigned long)i < nLength; i += nIncrement)
+	{
+		// Random offset will be a number between 0 and 15 based on i and nScrambleKey.
+		unsigned long nRandomOffset = (nScrambleKey >> (i % 32)) & 0xF;
+		// Use the random offset to pick the byte to swap with.
+		unsigned long nSwapPos = (i + (nLength / 2) - 8 + nRandomOffset);
+		// Roll over once past the end of the array.
+		nSwapPos = nSwapPos % nLength;
+
+		swap(pszData[i], pszData[nSwapPos]);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+ByteStream MapLabel::getMapLabelWithS(string strInput, ByteStream& bsKey)
+{
+	// Get the scramble key which will be the first 8 bytes  (strInput is stringized bytestream
+	string strScrambleKey = strInput.substr(0,8);
+	
+	ByteStream bsScramble(strScrambleKey);
+	unsigned long ulScrambleKey = *(unsigned long*) bsScramble.getData();
+	
+	ByteStream bytes(strInput.substr(8, string::npos));
+	
+	ByteStream decryptedBytes;
+
+	// Decrypt the stored, encrypted PW
+	MapLabel encryptionEngine;
+	encryptionEngine.getMapLabel(decryptedBytes, bytes, bsKey);
+	ByteStreamManipulator bsm(ByteStreamManipulator::kRead, decryptedBytes);
+	
+	encryptionEngine.scrambleData(decryptedBytes.getData(), decryptedBytes.getLength(), ulScrambleKey, false);
+
+	return decryptedBytes;
+}
+//-------------------------------------------------------------------------------------------------
+string MapLabel::setMapLabelWithS(ByteStream &bsInput, ByteStream &bsKey)
+{
+	unsigned long ulScrambleKey;
+	static Random rand;
+	ulScrambleKey = rand.uniform(0, ULONG_MAX);
+
+	ByteStream bsScramble((unsigned char*)&ulScrambleKey, sizeof(ulScrambleKey));
+	string strScramble = bsScramble.asString();
+
+	MapLabel::scrambleData(bsInput.getData(), bsInput.getLength() ,ulScrambleKey, true);
+
+	// Do the encryption
+	ByteStream encryptedBS;
+	MapLabel encryptionEngine;
+	encryptionEngine.setMapLabel(encryptedBS, bsInput, bsKey);
+
+	// Return the encrypted value
+	return encryptedBS.asString().insert(0, strScramble);	
 }

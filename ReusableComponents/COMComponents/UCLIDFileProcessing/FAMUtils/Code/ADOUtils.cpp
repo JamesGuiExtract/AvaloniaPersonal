@@ -2,12 +2,15 @@
 #include "stdafx.h"
 #include "FAMUtils.h"
 #include "ADOUtils.h"
+#include "FAMUtilsConstants.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <VectorOperations.h>
 #include <StringTokenizer.h>
+#include <ByteStream.h>
+#include <ByteStreamManipulator.h>
 
 using namespace ADODB;
 using namespace std;
@@ -17,8 +20,6 @@ static const string& gstrPROVIDER = "Provider=SQLNCLI10";
 static const string& gstrINTEGRATED_SECURITY = "Integrated Security=SSPI";
 static const string& gstrDATA_TYPE_COMPATIBILITY = "DataTypeCompatibility=80";
 static const string& gstrMARS_CONNECTION = "MARS Connection=True";
-
-static const string& gstrDATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
 
 // Misc queries
 static const string gstrGET_SQL_SERVER_TIME = "SELECT GETDATE() as CurrDateTime";
@@ -175,7 +176,7 @@ string getStringField( const FieldsPtr& ipFields, const string& strFieldName )
 				throw ue;
 			}
 
-			// convert the bstr to astring and return
+			// convert the bstr to a string and return
 			return asString(vtItem.bstrVal);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15290");
@@ -662,7 +663,7 @@ bool findConnectionStringProperty(const string& strConnectionString, const strin
 //-------------------------------------------------------------------------------------------------
 void updateConnectionStringProperties(string& rstrConnectionString, const string& strNewProperties)
 {
-	// Retrieve the properties of both the existing connecton string and the new properties.
+	// Retrieve the properties of both the existing connection string and the new properties.
 	csis_map<string>::type mapSourceProperties = getConnectionStringProperties(rstrConnectionString);
 	csis_map<string>::type mapNewProperties = getConnectionStringProperties(strNewProperties);
 
@@ -704,7 +705,7 @@ void updateConnectionStringProperties(string& rstrConnectionString, const string
 
 	// If no property has been modified, don't re-generate the connection string. The properties
 	// will likely end up in a different order and make it hard for callers to determine if there
-	// has been a meaninful change to the connection string.
+	// has been a meaningful change to the connection string.
 	if (!bModifiedProperty)
 	{
 		return;
@@ -1169,23 +1170,100 @@ FAMUTILS_API void getDatabaseCreationDateAndRestoreDate(const _ConnectionPtr& ip
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38757");
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API string createDatabaseIDString(const _ConnectionPtr& ipConnection, string strDatabaseName)
+FAMUTILS_API void getDatabaseCreationDateAndRestoreDate(const _ConnectionPtr& ipDBConnection, string strDBName,
+	string &strServerName, CTime &ctCreateDate, CTime &ctLastRestoreDate)
 {
 	try
 	{
-		string strDBCreatedDate;
-		string strDBRestoreDate;
+		string strQuery = "select db.name, @@ServerName as ServerName, create_date, "
+			" coalesce( max(rh.restore_date), db.create_date) as restore_date "
+			"from master.sys.databases db "
+			"LEFT JOIN msdb.dbo.restorehistory rh on db.name = rh.destination_database_name "
+			"group by db.name, db.create_date "
+			"having name = '"+ strDBName + "'";
+
+		_RecordsetPtr result = ipDBConnection->Execute(strQuery.c_str(), NULL, adCmdText);
+
+		if (!result->adoEOF)
+		{
+			// Get the fields pointer
+			FieldsPtr ipFields = result->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI38806", ipFields != __nullptr );
+
+			ctCreateDate = getTimeDateField(ipFields, "create_date");
+			ctLastRestoreDate = getTimeDateField(ipFields, "restore_date");
+			strServerName = getStringField(ipFields, "ServerName");
+		}
+		else
+		{
+			UCLIDException ue ("ELI38807", "Unable to get Database creation date.");
+			ue.addDebugInfo("Database name", strDBName);
+			throw ue;
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38808");
+}
+//-------------------------------------------------------------------------------------------------
+FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStream &bsDatabaseID)
+{
+	try
+	{
+		CTime ctDBCreatedDate;
+		CTime ctDBRestoreDate;
 		string strServer;
 
-		getDatabaseCreationDateAndRestoreDate(ipConnection, asString(ipConnection->DefaultDatabase), 
-			strServer, strDBCreatedDate, strDBRestoreDate);
+		string strDBName = ipConnection->DefaultDatabase;
 
+		// Make sure the bytestream is empty
+		bsDatabaseID.setSize(0);
+
+		ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bsDatabaseID);
+
+		getDatabaseCreationDateAndRestoreDate(ipConnection, strDBName, strServer,ctDBCreatedDate,
+			ctDBRestoreDate);
+		
 		GUID guidDatabaseID;
 		CoCreateGuid(&guidDatabaseID);
+		CTime ctLastUpdateTime(0);
 
-			// Create combined string to return		
-		return asString(guidDatabaseID) + "," + strServer + "," + strDatabaseName + "," + 
-			strDBCreatedDate + "," + strDBRestoreDate;
+		// Put the values in the ByteStream;
+		bsm << guidDatabaseID;
+		bsm << strServer;
+		bsm << strDBName;
+		bsm << ctDBCreatedDate;
+		bsm << ctDBRestoreDate;
+		bsm << ctLastUpdateTime;
+		// Flush in multiple of 8 bytes because it will need to be encrypted
+		bsm.flushToByteStream(8);
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38765"); 
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38900");
+}
+//-------------------------------------------------------------------------------------------------
+FAMUTILS_API bool isNULL(const FieldsPtr& ipFields, const string& strFieldName)
+{
+	// Use double try catch so that the field name can be added to the debug info
+	try
+	{
+		// Make user ipFields is not NULL
+		ASSERT_ARGUMENT("ELI38932", ipFields != __nullptr );
+
+		try
+		{
+			// Get the Field from the fields list
+			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
+			ASSERT_RESOURCE_ALLOCATION("ELI38933", ipItem != __nullptr );
+
+			// get the value
+			variant_t vtItem = ipItem->Value;
+			
+			return vtItem.vt == VT_NULL;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38935");
+	}
+	catch(UCLIDException& ue)
+	{
+		// Add FieldName to the debug info
+		ue.addDebugInfo("FieldName", strFieldName);
+		throw ue;
+	}
 }

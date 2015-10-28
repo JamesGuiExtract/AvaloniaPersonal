@@ -10,10 +10,12 @@
 DWORD FAMDBSemaphore::ms_dwMainLockThread = 0;
 DWORD FAMDBSemaphore::ms_dwCounterLockThread = 0;
 DWORD FAMDBSemaphore::ms_dwWorkItemLockThread = 0;
+DWORD FAMDBSemaphore::ms_dwSecureCounterLockThread = 0;
 
 CSemaphore FAMDBSemaphore::ms_semaphoreMainLock(1);
 CSemaphore FAMDBSemaphore::ms_semaphoreCounterLock(1);
 CSemaphore FAMDBSemaphore::ms_semaphoreWorkItemLock(1);
+CSemaphore FAMDBSemaphore::ms_semaphoreSecureCounterLock(1);
 
 //--------------------------------------------------------------------------------------------------
 // FAMDBSemaphore
@@ -90,7 +92,12 @@ void FAMDBSemaphore::getSyncObjects(const string &strLockName, CSemaphore *&pSem
 		pSemaphore = &ms_semaphoreWorkItemLock;
 		pdwLockThreadId = &ms_dwWorkItemLockThread;
 	}
-	else
+	else if (strLockName == gstr_SECURE_COUNTER_DB_LOCK)
+	{
+		pSemaphore = &ms_semaphoreSecureCounterLock;
+		pdwLockThreadId = &ms_dwSecureCounterLockThread;
+	}
+	else 
 	{
 		THROW_LOGIC_ERROR_EXCEPTION("ELI37216");
 	}

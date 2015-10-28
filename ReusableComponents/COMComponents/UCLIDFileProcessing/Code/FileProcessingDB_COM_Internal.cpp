@@ -21,6 +21,7 @@
 #include <StopWatch.h>
 #include <stringCSIS.h>
 #include <EncryptionEngine.h>
+#include <StringTokenizer.h>
 
 #include <string>
 #include <stack>
@@ -33,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 131;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 132;
 //-------------------------------------------------------------------------------------------------
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -43,6 +44,10 @@ const unsigned long	gulFAMKey1 = 0x78932517;
 const unsigned long	gulFAMKey2 = 0x193E2224;
 const unsigned long	gulFAMKey3 = 0x20134253;
 const unsigned long	gulFAMKey4 = 0x15990323;
+
+// Method defined in FileProcessingDB_Internal
+//void addFAMPasswords(ByteStreamManipulator &bsmPassword);
+void getFAMPassword(ByteStream& rPasswordBytes);
 
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -1155,12 +1160,10 @@ int UpdateToSchemaVersion130(_ConnectionPtr ipConnection, long* pnNumSteps,
 		}
 
 		vector<string> vecQueries;
-
-		// Create a new DatabaseID and encrypt it
-		string strDBValue = getEncryptedString(createDatabaseIDString(ipConnection, asString(ipConnection->DefaultDatabase)));
+	
 
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrDATABASEID + "', '" + strDBValue + "')");
+			+ gstrDATABASEID + "', '')");
 
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER);
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
@@ -1175,6 +1178,7 @@ int UpdateToSchemaVersion130(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38716");
 }
+
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion131(_ConnectionPtr ipConnection, 
 							 long* pnNumSteps, 
@@ -1201,7 +1205,51 @@ int UpdateToSchemaVersion131(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38716");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion132(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 132;
 
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Drop the SecureCounterValueChange table an SecureCounter table because of issues
+		vecQueries.push_back("DELETE FROM DBInfo WHERE [NAME] = '" + gstrDATABASEID + "'");
+		vecQueries.push_back("DROP TABLE [dbo].[SecureCounterValueChange]");
+		vecQueries.push_back("DROP TABLE [dbo].[SecureCounter]");
+
+		// Create a new DatabaseID and encrypt it
+		ByteStream bsDatabaseID;
+		createDatabaseID(ipConnection, bsDatabaseID);
+
+		ByteStream bsPW;
+		getFAMPassword(bsPW);
+		string strDBValue = MapLabel::setMapLabelWithS(bsDatabaseID,bsPW);
+		
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrDATABASEID + "', '" + strDBValue + "')");
+
+		vecQueries.push_back(gstrCREATE_SECURE_COUNTER);
+		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
+		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK);
+		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38716");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -6268,7 +6316,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 128:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion129);
 				case 129:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion130);
 				case 130:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion131);
-				case 131:	break;
+				case 131:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion132);
+				case 132:	break;
 
 				default:
 					{
@@ -8411,3 +8460,446 @@ bool CFileProcessingDB::RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstr
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+			
+				ipConnection = getDBConnection();
+
+				string strQuery = "SELECT CounterName FROM SecureCounter WHERE ID = " + asString(nCounterID);
+				
+				// Create a pointer to a recordset
+				_RecordsetPtr ipResultSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI38901", ipResultSet != __nullptr);
+
+				// Open the Action table
+				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
+				string strCounterName = "";
+				if (!asCppBool(ipResultSet->adoEOF))
+				{
+					strCounterName = getStringField(ipResultSet->Fields, "CounterName");
+				}
+				*pstrCounterName = _bstr_t(strCounterName.c_str()).Detach();
+			
+			END_CONNECTION_RETRY(ipConnection, "ELI38800");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38782");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}	
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode)
+{
+
+	try
+	{
+		try
+		{
+			_ConnectionPtr ipConnection;
+			BEGIN_CONNECTION_RETRY();
+
+				ipConnection = getDBConnection();
+				bool bValid = checkDatabaseIDValid(ipConnection, false);
+
+				ByteStream bsPW;
+				getFAMPassword(bsPW);
+
+				// Get the bytestream from the update code
+				ByteStream bsUpgradeCode = MapLabel::getMapLabelWithS(asString(strUpdateCode), bsPW);
+				ByteStreamManipulator bsmUpgradeCode(ByteStreamManipulator::kRead, bsUpgradeCode);
+
+				DBCounterUpdate counterUpdates;
+
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+				try
+				{
+					try
+					{
+						bsmUpgradeCode >> counterUpdates;
+
+						ASSERT_RUNTIME_CONDITION("ELI38903", counterUpdates.m_nNumberOfUpdates != 0,
+							"No counter updates in code.");
+
+						if (counterUpdates.m_nNumberOfUpdates < 0 )
+						{
+							// this is an unlock code
+							unlockCounters(ipConnection, counterUpdates);
+						}
+						else
+						{
+							ASSERT_RUNTIME_CONDITION("ELI38976", bValid, "DatabaseID is corrupt.")
+
+							// Validate the guid and the LastUpdated time
+							ASSERT_RUNTIME_CONDITION("ELI38902", m_DatabaseIDValues == counterUpdates.m_DatabaseID, 
+								"Code is not valid.");
+
+							updateCounters(ipConnection, counterUpdates);
+						}
+						tg.CommitTrans();
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38904");
+				}
+				catch (UCLIDException &ue)
+				{
+					UCLIDException ueBad("ELI38905", "Unable to process counter upgrade code.", ue);
+					throw ueBad;
+				}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI38906");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38783");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetSecureCounterValue_Internal(bool bDBLocked, long nCounterID, long* pnCounterValue)
+{
+	try
+	{
+		try
+		{
+			_ConnectionPtr ipConnection;
+			BEGIN_CONNECTION_RETRY();
+
+				ipConnection = getDBConnection();
+
+				string strQuery = "SELECT * FROM [dbo].[SecureCounter] WHERE ID = " +
+					 asString(nCounterID);
+
+				if (!m_bDatabaseIDValuesValidated)
+				{
+					checkDatabaseIDValid(ipConnection, true);
+				}
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipResultSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI38924", ipResultSet != __nullptr);
+				
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Open the Action table
+				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
+				if (!asCppBool(ipResultSet->adoEOF))
+				{
+					FieldsPtr fields = ipResultSet->Fields;
+					DBCounter dbCounter;
+					
+					dbCounter.LoadFromFields(ipResultSet->Fields, m_DatabaseIDValues.m_nHashValue, false);
+
+					*pnCounterValue = dbCounter.m_nValue;
+					return true;
+				}
+				UCLIDException ue("ELI38931", "Counter value could not be determined.");
+				ue.addDebugInfo("CounterID", nCounterID);
+				throw ue;
+
+			END_CONNECTION_RETRY(ipConnection, "ELI38923");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38784");
+	}
+	catch(UCLIDException &ue)
+	{
+		m_bDatabaseIDValuesValidated = false;
+		m_strEncryptedDatabaseID = "";
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCounterID, long decrementAmount, long* pnCounterValue)
+{
+	try
+	{
+		try
+		{
+			ASSERT_RUNTIME_CONDITION("ELI39026", decrementAmount >= 0, "Decrement must be positive.");
+
+			bool bCounterDecremented = false;
+			long nDecrementRetries = 0;
+			long nMillisecondsToWait = 30000;
+			do 
+			{
+				_ConnectionPtr ipConnection;
+				BEGIN_CONNECTION_RETRY();
+
+					ipConnection = getDBConnection();
+
+					string strQuery = "SELECT * FROM [dbo].[SecureCounter] WHERE ID = " +
+						 asString(nCounterID);
+
+					if (!m_bDatabaseIDValuesValidated)
+					{
+						checkDatabaseIDValid(ipConnection, true);
+					}
+				
+					// Create a pointer to a recordset
+					_RecordsetPtr ipResultSet(__uuidof(Recordset));
+					ASSERT_RESOURCE_ALLOCATION("ELI38937", ipResultSet != __nullptr);
+				
+					// Make sure the DB Schema is the expected version
+					validateDBSchemaVersion();
+
+					// Begin a transaction
+					TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+					// Open the Action table
+					ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+						adLockReadOnly, adCmdText);
+
+					if (!asCppBool(ipResultSet->adoEOF))
+					{
+						FieldsPtr fields = ipResultSet->Fields;
+						DBCounter dbCounter;
+						dbCounter.LoadFromFields(ipResultSet->Fields, 
+							m_DatabaseIDValues.m_nHashValue, false);
+
+						DBCounterChangeValue dbCounterChange;
+						dbCounterChange.m_nCounterID = dbCounter.m_nID;
+						dbCounterChange.m_nFromValue = dbCounter.m_nValue;
+						if (decrementAmount > dbCounter.m_nValue)
+						{
+							if (nDecrementRetries % 100 == 0)
+							{
+								UCLIDException ue("ELI38938", "Counter has insufficient counts.");
+								ue.addDebugInfo("CounterName", dbCounter.m_strName);
+								ue.addDebugInfo("CounterID", dbCounter.m_nID);
+								ue.addDebugInfo("RequiredCounts", decrementAmount);
+								ue.addDebugInfo("RemainingCountes", dbCounter.m_nValue);
+								ue.addDebugInfo("nNumberOfRetries", nDecrementRetries);
+								ue.log();
+							}
+							if (nDecrementRetries < 1000)
+							{
+								Sleep(nMillisecondsToWait);
+								nMillisecondsToWait += 500;
+								nDecrementRetries++;
+							}
+						}
+						else
+						{
+							dbCounter.m_nValue -= decrementAmount;
+							nDecrementRetries = 0;
+							bCounterDecremented = true;
+
+							dbCounterChange.m_nToValue = dbCounter.m_nValue;
+							dbCounterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
+
+							dbCounterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
+										
+							dbCounterChange.m_ctUpdatedTime = getSQLServerDateTimeAsCTime(getDBConnection());
+
+							dbCounterChange.CalculateHashValue(dbCounterChange.m_llHashValue);
+
+							// list of queries to run
+							vector<string> vecUpdateQueries;
+							vecUpdateQueries.push_back("UPDATE [dbo].[SecureCounter] SET SecureCounterValue = '" + 
+								dbCounter.getEncrypted(m_DatabaseIDValues.m_nHashValue) + 
+								"' WHERE ID = " + asString(dbCounter.m_nID));
+
+							vecUpdateQueries.push_back(dbCounterChange.GetInsertQuery());
+
+							executeVectorOfSQL(ipConnection, vecUpdateQueries);
+							tg.CommitTrans();
+						}
+					}
+
+				END_CONNECTION_RETRY(ipConnection, "ELI38936");
+			} while (!bCounterDecremented  && nDecrementRetries < 1000);
+			
+			if (nDecrementRetries >= 1000)
+			{
+				UCLIDException ue("ELI38985", "Could not decrement counter.");
+				ue.addDebugInfo("NumberOfRetires", nDecrementRetries);
+				throw ue;
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38785");
+	}
+	catch(UCLIDException &ue)
+	{
+		m_bDatabaseIDValuesValidated = false;
+		m_strEncryptedDatabaseID = "";
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SecureCounterConsistencyCheck_Internal(bool bDBLocked, VARIANT_BOOL* pvbValid)
+{
+	try
+	{
+		try
+		{
+			// TODO: do the check
+			*pvbValid = VARIANT_TRUE;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38786");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+
+bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BSTR* pstrUpdateRequestCode)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				ipConnection = getDBConnection();
+				bool bValid = checkDatabaseIDValid(ipConnection, false);
+
+				DatabaseIDValues DBIDValue = m_DatabaseIDValues;
+
+				if (!bValid)
+				{
+					// Modify the DBIdValue to have corrected values (m_GUID and m_ctLastUpdated will be the same)
+					getDatabaseCreationDateAndRestoreDate(ipConnection, m_strDatabaseName, 
+						DBIDValue.m_strServer, DBIDValue.m_ctCreated, DBIDValue.m_ctRestored);
+					DBIDValue.m_strName = m_strDatabaseName;
+				}
+
+				ByteStream bsRequestCode;
+				ByteStreamManipulator bsmRequest(ByteStreamManipulator::kWrite, bsRequestCode);
+				
+				bsmRequest << DBIDValue;
+
+				// Add the current time
+				bsmRequest << getSQLServerDateTimeAsCTime(getDBConnection());
+
+				// Add code to get counters info
+				// 
+				string strQuery = "SELECT * FROM [dbo].[SecureCounter]";
+  
+				// Create a pointer to a recordset
+				_RecordsetPtr ipResultSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI38907", ipResultSet != __nullptr);
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Open the Action table
+				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+				
+				vector<DBCounter> vecDBCounters;
+				while (!asCppBool(ipResultSet->adoEOF))
+				{
+					DBCounter dbCounter;
+					dbCounter.LoadFromFields(ipResultSet->Fields);
+
+					bValid = bValid && dbCounter.isValid(m_DatabaseIDValues.m_nHashValue);
+
+					vecDBCounters.push_back(dbCounter);
+
+					ipResultSet->MoveNext();
+				}
+				long nNumCounters = vecDBCounters.size();
+				// if the number of counters is 0 and the DatabaseID is invalid
+				// create a completely new DatabaseID value and save it in DBInfo
+				// then bValid will be set to true and this becomes a request code instead
+				if (!bValid && nNumCounters == 0)
+				{
+					// Create a new DatabaseID and encrypt it
+					ByteStream bsDatabaseID;
+					createDatabaseID(ipConnection, bsDatabaseID);
+
+					ByteStream bsPW;
+					getFAMPassword(bsPW);
+					m_strEncryptedDatabaseID = MapLabel::setMapLabelWithS(bsDatabaseID,bsPW);
+					string strUpdateQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
+					replaceVariable(strUpdateQuery, gstrSETTING_NAME, gstrDATABASEID);
+					replaceVariable(strUpdateQuery, gstrSETTING_VALUE, m_strEncryptedDatabaseID);
+					executeCmdQuery(ipConnection,gstrDBINFO_UPDATE_SETTINGS_QUERY);
+					bValid = true;
+				}
+
+
+				bsmRequest << (((nNumCounters == 0) || bValid) ? nNumCounters : -nNumCounters);
+
+				for (auto c = vecDBCounters.begin(); c != vecDBCounters.end(); c++)
+				{
+					bsmRequest << c->m_nID;
+					if (c->m_nID >= 100)
+					{
+						bsmRequest << c->m_strName;
+					}						
+
+					bsmRequest << c->m_nValue;
+				}
+
+				bsmRequest.flushToByteStream(8);
+
+				// Get the password 'key' based on the 4 hex global variables
+				ByteStream pwBS;
+				getFAMPassword(pwBS);
+				
+				// Create the | separated list
+				string strCode = MapLabel::setMapLabelWithS(bsRequestCode, pwBS);
+				
+				*pstrUpdateRequestCode = _bstr_t(strCode.c_str()).Detach();
+				
+			END_CONNECTION_RETRY(ipConnection, "ELI38798");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38790");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}

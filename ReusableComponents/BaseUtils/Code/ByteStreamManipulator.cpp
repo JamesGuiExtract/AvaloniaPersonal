@@ -443,6 +443,25 @@ ByteStreamManipulator& operator << (ByteStreamManipulator& rManipulator, bool bD
 	return rManipulator;
 }
 //--------------------------------------------------------------------------------------------------
+ByteStreamManipulator& operator << (ByteStreamManipulator& rManipulator, 
+									const GUID & guidData)
+{
+	// this operator should only work in the kWrite mode
+	if (rManipulator.eMode != ByteStreamManipulator::kWrite)
+	{
+		throw UCLIDException("ELI38812", 
+			"ByteStreamManipulator: cannot call << operator on a read-only object!");
+	}
+
+	DWORD *pdwGUIDData = (DWORD *) &guidData;
+	for (int i = 0; i < 4; i++)
+	{
+		rManipulator << pdwGUIDData[i];
+	}
+	
+	return rManipulator;
+}
+//--------------------------------------------------------------------------------------------------
 ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator, long& rlData)
 {
 	// this operator should only work in the kRead mode
@@ -727,6 +746,33 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator, bool& r
 	memcpy( &rbData, rManipulator.pszByteStreamCursor, sizeof(rbData) );
 	rManipulator.pszByteStreamCursor += sizeof(rbData);
 	
+	return rManipulator;
+}
+//--------------------------------------------------------------------------------------------------
+ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator, 
+									GUID& rguidData)
+{
+	// this operator should only work in the kRead mode
+	if (rManipulator.eMode != ByteStreamManipulator::kRead)
+	{
+		throw UCLIDException("ELI38810", 
+			"ByteStreamManipulator: cannot call >> operator on a write-only object!");
+	}
+
+	// ensure that the cursor is not null
+	if (rManipulator.pszByteStreamCursor == NULL)
+	{
+		throw UCLIDException("ELI38811", 
+			"Internal error in ByteStreamManipulator >> operator - rTime!");
+	}
+
+	// Read the data
+	DWORD *pdwGUIDData = (DWORD *) &rguidData;
+	for (int i = 0; i < 4; i++)
+	{
+		rManipulator >> pdwGUIDData[i];
+	}
+
 	return rManipulator;
 }
 //--------------------------------------------------------------------------------------------------

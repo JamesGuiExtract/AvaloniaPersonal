@@ -1644,9 +1644,75 @@ library UCLID_FILEPROCESSINGLib
 		//			 where a single value is returned typically using OUTPUT INSERTED.ID)
 		[id(146), helpstring("method ExecuteCommandReturnLongLongResult")] HRESULT ExecuteCommandReturnLongLongResult(
 			[in] BSTR bstrQuery, [in] BSTR bstrResultColumnName, [out] long long* pResult, [out, retval] long* pnRecordsAffected);
-
+		// -----------------------------------------------------------------------------------------------
 		[id(147), helpstring("method GetFileNameFromFileID")]
 		HRESULT GetFileNameFromFileID( [in] long fileID, [out, retval] BSTR* pbstrFileName );
+		// PURPOSE: To return an IUnknownVector that contains objects of type 
+		//			Extract.FileActionManager.Database.FAMDBRuleExecutionCounter for each counter that
+		//			is in the SecureCounter table
+		// -----------------------------------------------------------------------------------------------
+		[propget, id(148), helpstring("property SecureCounters")] HRESULT SecureCounters(
+			[out, retval] IIUnknownVector** ppSecureCounters);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To return the name for the counter with an ID of nCounterID
+		[id(149), helpstring("method GetSecureCounterName")] HRESULT GetSecureCounterName(
+			[in] long nCounterID, [out, retval] BSTR *pstrCounterName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To apply an upgrade code that is a hex string that contains a ByteStream 
+		//			encrypted with the FAM Password that contains the following:
+		//			DatabaseGUID - DatabaseGUID that is stored in the DatabaseID
+		//			ServerName - Name of the server the code is from 
+		//			DatabaseName - Name of the database the code is from
+		//			DatabaserCeatedDate - creation date of the database
+		//			DatabaseRestoredDate - restore date of the database - if database has not been restored
+		//								this will equal the DatabaseCreatedDate
+		//			LastUpdatedDate - Last time an update code was applied
+		//			TimeCodeGenerated - For informational purposes - could be used to expire a code
+		//			UserName - For informational purposes - User that generated the code
+		//			MachineName - For informational purposes - Machine that generated the code
+		//			NumberOfOperations - number of updates included in the code if this is negative the code
+		//				is an unlock code and the list of counters will only be CounterID and Value for
+		//				each counter that was in the request code that was used to generate the unlock code
+		//			List of Counters:
+		//				CounterID - Id of counter to update
+		//				CounterName - Name of counter if counter ID < 100 the counter it is not included
+		//				Operation - 0 - None, 1 - Create, 2 - Set, 3 - Increment, 4 - Decrement, 5 - Delete, 6 - Rename
+		//				Value - Amount used to set or update the counter.
+		[id(150), helpstring("method ApplySecureCounterUpdateCode")] HRESULT ApplySecureCounterUpdateCode(
+			[in] BSTR strUpdateCode);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To return the current value of the counter with counter id nCounterID
+		[id(151), helpstring("method GetSecureCounterValue")] HRESULT GetSecureCounterValue(
+			[in] long nCounterID, [out, retval] long* pnCounterValue);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To decrement the value of the counter given by nCounterID by the decrementAmount
+		//			and return the new value of the counter. If there are not enough counts an exception 
+		//			is thrown.
+		[id(152), helpstring("method DecrementSecureCounter")] HRESULT DecrementSecureCounter(
+			[in] long nCounterID, [in] long decrementAmount, [out, retval] long* pnCounterValue);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To check the consistency of the Secure counter tables 
+		[id(153), helpstring("method SecureCounterConsistencyCheck")] HRESULT SecureCounterConsistencyCheck(
+			[out, retval] VARIANT_BOOL* pvbValid);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To return a update request code that is an encrypted ByteStream that contains 
+		//			the following:
+		//			DatabaseGUID - DatabaseGUID that is stored in the DatabaseID
+		//			ServerName - Name of the server the code is from 
+		//			DatabaseName - Name of the database the code is from
+		//			DatabaseCreatedDate - creation date of the database
+		//			DatabaseRestoredDate - restore date of the database - if database has not been restored
+		//								this will equal the DatabaseCreatedDate
+		//			LastUpdatedDate - Last time an update code was applied
+		//			NumberOfCounters - number of counters defined in SecureCounters if the counters are locked
+		//				when this code is generated the value will be -(number of counters) - this will be negative 
+		//				if the counters are in a corrupt state
+		//			List of counters
+		//				CounterID
+		//				CounterName - Name of counter only included if counter id > 100
+		//				CounterValue - Value of counter when Request code generated.
+		[id(154), helpstring("method GetCounterUpdateRequestCode")] HRESULT GetCounterUpdateRequestCode(
+			[out, retval] BSTR* pstrUpdateRequestCode);
 	};
 
 	[

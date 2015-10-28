@@ -59,6 +59,7 @@ public:
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const string& strData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const CTime& Time);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, bool bData);
+	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const GUID &guidData);
 
 	// the following methods only work in kRead mode
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, long& rlData);
@@ -70,6 +71,7 @@ public:
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, string& rstrData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, CTime& rTime);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, bool& bData);
+	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, GUID& guidData);
 
 	// public methods to read/write ByteStreams from/to ByteStreams
 	void write(const ByteStream& bs);

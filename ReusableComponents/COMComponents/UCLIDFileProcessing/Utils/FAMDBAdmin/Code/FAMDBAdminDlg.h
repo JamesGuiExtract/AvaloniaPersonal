@@ -63,6 +63,8 @@ protected:
 	afx_msg void OnRecalculateStats();
 	afx_msg void OnManageMetadataFields();
 	afx_msg void OnManageAttributeSets();
+	afx_msg void OnCountersGeneraterequestcode();
+	afx_msg void OnCountersApplyupdatecode();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged

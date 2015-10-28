@@ -367,9 +367,10 @@ static const string gstrCREATE_SECURE_COUNTER_VALUE_CHANGE =
 	"  FromValue int NOT NULL, "
 	"  ToValue int NOT NULL, "
 	"  LastUpdatedTime datetime NOT NULL, "
-	"  LastUpdatedByFAMSesstionID int NULL, "
+	"  LastUpdatedByFAMSessionID int NULL, "
 	"  MinFAMFileCount bigint NOT NULL, "
-	"  HashValue bigint NOT NULL) ";
+	"  HashValue bigint NOT NULL, "
+	"  Comment nvarchar(max)) ";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
@@ -905,11 +906,13 @@ static const string gstrADD_FILE_TASK_SESSION_FAMFILE_FK =
 static const string gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK =
 	"ALTER TABLE [dbo].SecureCounterValueChange "
 	"WITH CHECK ADD CONSTRAINT FK_SecureCounterValueChange_SecureCounter FOREIGN KEY([CounterID]) "
-	"REFERENCES dbo.[SecureCounter] ([ID])";
+	"REFERENCES dbo.[SecureCounter] ([ID])"
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
 
 static const string gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK =
 	"ALTER TABLE [dbo].SecureCounterValueChange "
-	"WITH CHECK ADD CONSTRAINT FK_SecureCounterValueChange_FAMSession FOREIGN KEY (LastUpdatedByFAMSesstionID) "
+	"WITH NOCHECK ADD CONSTRAINT FK_SecureCounterValueChange_FAMSession FOREIGN KEY (LastUpdatedByFAMSessionID) "
 	"REFERENCES dbo.[FAMSession] (ID)";
 
 // Query for obtaining the current db lock record with the time it has been locked
@@ -1426,3 +1429,26 @@ static const string gstrINSERT_FILETASKSESSION_DATA =
 static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES = 
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006', 'Core: Store/Retrieve attributes in DB') \r\n";
+
+static const string gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE = 
+	"	SELECT sc.ID "
+	"		,sc.CounterName "
+	"		,sc.SecureCounterValue "
+	"		,scvc.ID AS ValueChangedID "
+	"		,scvc.FromValue "
+	"		,scvc.ToValue "
+	"		,scvc.LastUpdatedTime "
+	"		,scvc.LastUpdatedByFAMSessionID "
+	"		,scvc.MinFAMFileCount "
+	"		,scvc.HashValue "
+	"		,scvc.Comment "
+	"	FROM dbo.SecureCounter sc "
+	"	LEFT JOIN dbo.SecureCounterValueChange scvc ON sc.ID = scvc.CounterID "
+	"	WHERE (scvc.id = ( "
+	"			SELECT Max(SecureCounterValueChange.ID) "
+	"			FROM SecureCounterValueChange "
+	"			WHERE SecureCounterValueChange.CounterID = SC.ID "
+	"			) "
+	"		OR scvc.id IS NULL) ";
+
+ 

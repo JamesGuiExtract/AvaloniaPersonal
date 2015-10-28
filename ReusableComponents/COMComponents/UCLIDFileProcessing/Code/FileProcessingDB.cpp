@@ -73,7 +73,10 @@ m_bLoggedInAsAdmin(false),
 m_bCheckedFeatures(false),
 m_bAllowRestartableProcessing(false),
 m_bWorkItemRevertInProgress(false),
-m_strEncryptedDatabaseID("")
+m_strEncryptedDatabaseID(""),
+m_bDatabaseIDValuesValidated(false),
+m_ipSecureCounters(__nullptr),
+m_nLastFAMFileID(0)
 {
 	try
 	{
@@ -3536,6 +3539,220 @@ STDMETHODIMP CFileProcessingDB::GetFileNameFromFileID( long fileID, BSTR* pbstrF
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38703");	
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_SecureCounters (IIUnknownVector** ppSecureCounters)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI38771", ppSecureCounters != nullptr);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+		BEGIN_CONNECTION_RETRY();
+
+			// check if the m_ipSecureCounters is already defined;
+			if (m_ipSecureCounters != __nullptr)
+			{
+				// Need to increment the reference count since passing to a non smart pointer
+				m_ipSecureCounters.AddRef();
+				*ppSecureCounters = m_ipSecureCounters;
+				return S_OK;
+			}
+
+			// Get a list of all of the counters from the database
+
+			string strQuery = gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE;
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			if (!m_bDatabaseIDValuesValidated)
+			{
+				checkDatabaseIDValid(ipConnection, true);
+			}
+
+			// Get the last issued FAMFile id
+			executeCmdQuery(ipConnection,"SELECT cast(IDENT_CURRENT('FAMFile') as int) AS ID",
+				false, &m_nLastFAMFileID);
+
+			// Create a pointer to a recordset
+			_RecordsetPtr ipResultSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI38940", ipResultSet != __nullptr);
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			// Open the Action table
+			ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+				adLockReadOnly, adCmdText);
+
+			IIUnknownVectorPtr ipSecureCounters(CLSID_IUnknownVector);
+
+			while (!asCppBool(ipResultSet->adoEOF))
+			{
+				DBCounter dbCounter;
+				dbCounter.LoadFromFields(ipResultSet->Fields, m_DatabaseIDValues.m_nHashValue, true);
+
+				UCLID_FILEPROCESSINGLib::ISecureCounterCreatorPtr ipSecureCounter(nullptr);
+				SECURE_CREATE_OBJECT("ELI38941", ipSecureCounter,
+					"Extract.FileActionManager.Database.FAMDBRuleExecutionCounter");
+				ipSecureCounter->Initialize(getThisAsCOMPtr(), dbCounter.m_nID);
+				ipSecureCounters->PushBack(ipSecureCounter);
+
+				ipResultSet->MoveNext();
+			}
+			m_ipSecureCounters = ipSecureCounters;
+			
+			// Need to increment the reference count since passing to a non smart pointer
+			m_ipSecureCounters.AddRef();
+			*ppSecureCounters = ipSecureCounters;
+
+		END_CONNECTION_RETRY(ipConnection, "ELI38942");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38770");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetSecureCounterName (long nCounterID, BSTR *pstrCounterName)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI38772", pstrCounterName != nullptr);
+
+		if (!GetSecureCounterName_Internal(false, nCounterID, pstrCounterName))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
+				gstr_SECURE_COUNTER_DB_LOCK);
+
+			GetSecureCounterName_Internal(true, nCounterID, pstrCounterName);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38773");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ApplySecureCounterUpdateCode (BSTR strUpdateCode)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!ApplySecureCounterUpdateCode_Internal(false, strUpdateCode))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
+				gstr_SECURE_COUNTER_DB_LOCK);
+
+			ApplySecureCounterUpdateCode_Internal(true, strUpdateCode);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38775");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetSecureCounterValue (long nCounterID, long* pnCounterValue)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI38776", pnCounterValue != nullptr);
+
+		if (!GetSecureCounterValue_Internal(false, nCounterID, pnCounterValue))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
+				gstr_SECURE_COUNTER_DB_LOCK);
+
+			GetSecureCounterValue_Internal(true, nCounterID, pnCounterValue);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38777");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::DecrementSecureCounter (long nCounterID, long decrementAmount, long* pnCounterValue)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI38778", pnCounterValue != nullptr);
+
+		if (!DecrementSecureCounter_Internal(false, nCounterID, decrementAmount, pnCounterValue))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
+				gstr_SECURE_COUNTER_DB_LOCK);
+
+			DecrementSecureCounter_Internal(true, nCounterID, decrementAmount, pnCounterValue);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38779");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SecureCounterConsistencyCheck (VARIANT_BOOL* pvbValid)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI38780", pvbValid != nullptr);
+		
+		if (!SecureCounterConsistencyCheck_Internal(false, pvbValid))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
+				gstr_SECURE_COUNTER_DB_LOCK);
+
+			SecureCounterConsistencyCheck_Internal(true,  pvbValid);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38781");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetCounterUpdateRequestCode (BSTR* pstrUpdateRequestCode)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI38788", pstrUpdateRequestCode != nullptr);
+		
+		if (!GetCounterUpdateRequestCode_Internal(false, pstrUpdateRequestCode))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
+				gstr_SECURE_COUNTER_DB_LOCK);
+
+			GetCounterUpdateRequestCode_Internal(true,  pstrUpdateRequestCode);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38789");
+}
+
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
 //-------------------------------------------------------------------------------------------------
