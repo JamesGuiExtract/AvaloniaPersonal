@@ -83,10 +83,11 @@ namespace Extract.Utilities.Forms
         /// </summary>
         TextBoxBase _textControl;
         
-        /// <summary>
-        /// A combo box associated with this button.
-        /// </summary>
-        ComboBox _comboBox;
+        ///// <summary>
+        ///// A combo box associated with this button.
+        ///// </summary>
+        //ComboBox _comboBox;
+        // see: https://extract.atlassian.net/browse/ISSUE-13280
 
         /// <summary>
         /// Whether or not path tags should be displayed in the drop down.
@@ -178,37 +179,40 @@ namespace Extract.Utilities.Forms
 
             set
             {
-                ExtractException.Assert("ELI38662", "A ComboBox cannot be set if a TextControl is.",
-                    value == null || _comboBox == null);
+                //ExtractException.Assert("ELI38662", "A ComboBox cannot be set if a TextControl is.",
+                //    value == null);
+                // || _comboBox == null);
 
                 _textControl = value;
             }
         }
 
-        /// <summary>
-        /// Gets/sets a <see cref="ComboBox"/> associated with this <see cref="PathTagsButton"/>.
-        /// <para><b>Note</b></para>
-        /// Only one of <see cref="TextControl"/> and <see cref="ComboBox"/> should be set (not both).
-        /// </summary>
-        /// <returns>The <see cref="ComboBox"/> associated with this <see cref="PathTagsButton"/>.</returns>
-        /// <value>The <see cref="ComboBox"/> associated with this <see cref="PathTagsButton"/>.</value>
-        [DefaultValue(null)]
-        [Description("A combo box to automatically update when a tag is selected.")]
-        public ComboBox ComboBox
-        {
-            get
-            {
-                return _comboBox;
-            }
+        ///// <summary>
+        ///// Gets/sets a <see cref="ComboBox"/> associated with this <see cref="PathTagsButton"/>.
+        ///// <para><b>Note</b></para>
+        ///// Only one of <see cref="TextControl"/> and <see cref="ComboBox"/> should be set (not both).
+        ///// </summary>
+        ///// <returns>The <see cref="ComboBox"/> associated with this <see cref="PathTagsButton"/>.</returns>
+        ///// <value>The <see cref="ComboBox"/> associated with this <see cref="PathTagsButton"/>.</value>
+        //[DefaultValue(null)]
+        //[Description("A combo box to automatically update when a tag is selected.")]
+        //public ComboBox ComboBox
+        //{
+        //    get
+        //    {
+        //        return _comboBox;
+        //    }
 
-            set
-            {
-                ExtractException.Assert("ELI38663", "A TextControl cannot be set if a ComboBox is.",
-                    value == null || _textControl == null);
+        //    set
+        //    {
+        //        ExtractException.Assert("ELI38663", "A TextControl cannot be set if a ComboBox is.",
+        //            value == null || _textControl == null);
 
-                _comboBox = value;
-            }
-        }
+        //        _comboBox = value;
+        //    }
+        //}
+        // see: https://extract.atlassian.net/browse/ISSUE-13280
+        //
 
         /// <summary>
         /// Gets or sets the path tags that are available for selection.
@@ -551,36 +555,36 @@ namespace Extract.Utilities.Forms
 
                         TextControl.Focus();
                     }
-                    else if (ComboBox != null)
-                    {
-                        // Same logic as above must be repeated since ComboBox and TextBoxBase don't
-                        // share a common base class or interface.
-                        int originalSelectionStart = ComboBox.SelectionStart;
-                        string originalSelectedText = ComboBox.SelectedText;
+                    //else if (ComboBox != null)
+                    //{
+                    //    // Same logic as above must be repeated since ComboBox and TextBoxBase don't
+                    //    // share a common base class or interface.
+                    //    int originalSelectionStart = ComboBox.SelectionStart;
+                    //    string originalSelectedText = ComboBox.SelectedText;
 
-                        // If a tag function has been selected, automatically position the cursor
-                        // between the parentheses
-                        if (tagName.StartsWith("$", StringComparison.OrdinalIgnoreCase) &&
-                            tagName.EndsWith(")", StringComparison.OrdinalIgnoreCase))
-                        {
-                            int parameterInsertIndex = tagName.IndexOf('(') + 1;
-                            tagName = tagName.Substring(0, parameterInsertIndex);
+                    //    // If a tag function has been selected, automatically position the cursor
+                    //    // between the parentheses
+                    //    if (tagName.StartsWith("$", StringComparison.OrdinalIgnoreCase) &&
+                    //        tagName.EndsWith(")", StringComparison.OrdinalIgnoreCase))
+                    //    {
+                    //        int parameterInsertIndex = tagName.IndexOf('(') + 1;
+                    //        tagName = tagName.Substring(0, parameterInsertIndex);
 
-                            tagName += originalSelectedText + ")";
-                            ComboBox.SelectionLength = ComboBox.SelectedText.Length;
+                    //        tagName += originalSelectedText + ")";
+                    //        ComboBox.SelectionLength = ComboBox.SelectedText.Length;
 
-                            ComboBox.SelectedText = tagName;
-                            ComboBox.SelectionStart = originalSelectionStart + parameterInsertIndex;
-                            ComboBox.SelectionLength = originalSelectedText.Length;
-                        }
-                        else
-                        {
-                            ComboBox.SelectedText = tagName;
-                            ComboBox.SelectionLength = 0;
-                        }
+                    //        ComboBox.SelectedText = tagName;
+                    //        ComboBox.SelectionStart = originalSelectionStart + parameterInsertIndex;
+                    //        ComboBox.SelectionLength = originalSelectedText.Length;
+                    //    }
+                    //    else
+                    //    {
+                    //        ComboBox.SelectedText = tagName;
+                    //        ComboBox.SelectionLength = 0;
+                    //    }
 
-                        ComboBox.Focus();
-                    }
+                    //    ComboBox.Focus();
+                    //}
 
                     // Raise the TagSelected event
                     OnTagSelected(new TagSelectedEventArgs(tagName));

@@ -37,12 +37,12 @@
             this._attributeSetNameComboBox = new System.Windows.Forms.ComboBox();
             this._voaFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._storeRasterZonesCheckBox = new System.Windows.Forms.CheckBox();
-            this._attributeSetNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
-            this._voaFileNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._RetrieveRadioButton = new System.Windows.Forms.RadioButton();
             this._StoreRadioButton = new System.Windows.Forms.RadioButton();
             this._doNotSaveEmptyCheckBox = new System.Windows.Forms.CheckBox();
+            this._attributeSetNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._voaFileNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
@@ -129,28 +129,6 @@
             this._storeRasterZonesCheckBox.Text = "Store spatial information (raster zones)";
             this._storeRasterZonesCheckBox.UseVisualStyleBackColor = true;
             // 
-            // _attributeSetNamePathTagButton
-            // 
-            this._attributeSetNamePathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._attributeSetNamePathTagButton.ComboBox = this._attributeSetNameComboBox;
-            this._attributeSetNamePathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_attributeSetNamePathTagButton.Image")));
-            this._attributeSetNamePathTagButton.Location = new System.Drawing.Point(386, 64);
-            this._attributeSetNamePathTagButton.Name = "_attributeSetNamePathTagButton";
-            this._attributeSetNamePathTagButton.Size = new System.Drawing.Size(18, 21);
-            this._attributeSetNamePathTagButton.TabIndex = 4;
-            this._attributeSetNamePathTagButton.UseVisualStyleBackColor = true;
-            // 
-            // _voaFileNamePathTagButton
-            // 
-            this._voaFileNamePathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._voaFileNamePathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_voaFileNamePathTagButton.Image")));
-            this._voaFileNamePathTagButton.Location = new System.Drawing.Point(386, 25);
-            this._voaFileNamePathTagButton.Name = "_voaFileNamePathTagButton";
-            this._voaFileNamePathTagButton.Size = new System.Drawing.Size(18, 21);
-            this._voaFileNamePathTagButton.TabIndex = 1;
-            this._voaFileNamePathTagButton.TextControl = this._voaFileNameTextBox;
-            this._voaFileNamePathTagButton.UseVisualStyleBackColor = true;
-            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this._RetrieveRadioButton);
@@ -197,6 +175,29 @@
             this._doNotSaveEmptyCheckBox.TabIndex = 11;
             this._doNotSaveEmptyCheckBox.Text = "Do not store empty attributes";
             this._doNotSaveEmptyCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _attributeSetNamePathTagButton
+            // 
+            this._attributeSetNamePathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._attributeSetNamePathTagButton.Enabled = false;
+            this._attributeSetNamePathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_attributeSetNamePathTagButton.Image")));
+            this._attributeSetNamePathTagButton.Location = new System.Drawing.Point(386, 64);
+            this._attributeSetNamePathTagButton.Name = "_attributeSetNamePathTagButton";
+            this._attributeSetNamePathTagButton.Size = new System.Drawing.Size(18, 21);
+            this._attributeSetNamePathTagButton.TabIndex = 4;
+            this._attributeSetNamePathTagButton.UseVisualStyleBackColor = true;
+            this._attributeSetNamePathTagButton.Visible = false;
+            // 
+            // _voaFileNamePathTagButton
+            // 
+            this._voaFileNamePathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._voaFileNamePathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_voaFileNamePathTagButton.Image")));
+            this._voaFileNamePathTagButton.Location = new System.Drawing.Point(386, 25);
+            this._voaFileNamePathTagButton.Name = "_voaFileNamePathTagButton";
+            this._voaFileNamePathTagButton.Size = new System.Drawing.Size(18, 21);
+            this._voaFileNamePathTagButton.TabIndex = 1;
+            this._voaFileNamePathTagButton.TextControl = this._voaFileNameTextBox;
+            this._voaFileNamePathTagButton.UseVisualStyleBackColor = true;
             // 
             // StoreAttributesInDBTaskSettingsDialog
             // 

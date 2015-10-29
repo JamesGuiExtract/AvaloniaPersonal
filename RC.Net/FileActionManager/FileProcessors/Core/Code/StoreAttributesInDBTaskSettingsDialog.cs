@@ -46,7 +46,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 InitializeComponent();
-                this._attributeSetNamePathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
+                //this._attributeSetNamePathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
                 this._voaFileNamePathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             }
             catch (Exception ex)
