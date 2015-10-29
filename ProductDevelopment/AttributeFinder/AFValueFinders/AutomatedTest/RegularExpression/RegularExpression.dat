@@ -126,6 +126,24 @@
 //[FlexIDSCore:4072]
 <TESTCASE>;Test40.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test40.eav
 
+//Fuzzy search; sub=... option
+<TESTCASE>;Fuzzy22.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Fuzzy22.eav
+
+//Fuzzy search; global=true option
+<TESTCASE>;Fuzzy23.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Fuzzy23.eav
+
+//Fuzzy search; ws=... option
+<TESTCASE>;Fuzzy24.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Fuzzy24.eav
+
+//Fuzzy search; replacements=... option
+<TESTCASE>;Fuzzy25.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Fuzzy25.eav
+
+//Fuzzy search; required qualifier (+)
+<TESTCASE>;Fuzzy26.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;Fuzzy26.eav
+
+//Fuzzy search; optional qualifier (?) and parenthetical groups
+<TESTCASE>;Fuzzy27.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Fuzzy27.eav
+
 // https://extract.atlassian.net/browse/ISSUE-1593
 <TESTCASE>;FuzzyApple.rsd;FuzzyApple.txt;;FuzzyApple.eav
 
