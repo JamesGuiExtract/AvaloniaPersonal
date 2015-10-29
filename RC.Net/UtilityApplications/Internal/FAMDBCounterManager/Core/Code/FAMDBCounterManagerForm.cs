@@ -65,9 +65,10 @@ namespace Extract.FAMDBCounterManager
         internal static Dictionary<int, string> _standardCounterNames = new Dictionary<int, string>()
         {
             { 1, "FLEX Index - Indexing (By Document)" },
-            { 2, "FLEX Index - Pagination (By Page)" },
+            { 2, "FLEX Index - Pagination (By Document)" },
             { 3, "ID Shield - Redaction (By Page)" },
-            { 4, "ID Shield - Redaction (By Document)" }
+            { 4, "ID Shield - Redaction (By Document)" },
+            { 5, "FLEX Index - Indexing (By Page)" }
         };
 
         /// <summary>
@@ -79,7 +80,8 @@ namespace Extract.FAMDBCounterManager
             Name = 1,
             PreviousValue = 2,
             Operation = 3,
-            ApplyValue = 4
+            ApplyValue = 4,
+            ValidityComment = 5
         }
 
         #endregion Constants
@@ -276,6 +278,10 @@ namespace Extract.FAMDBCounterManager
                                 : string.Format(CultureInfo.CurrentCulture, "{0:n0}", counter.ApplyValue.Value);
                             break;
 
+                        case CounterGridColumn.ValidityComment:
+                            e.Value = counter.ValidityComment;
+                            break;
+
                         default:
                             throw new Exception("Internal logic error");
                     }
@@ -370,6 +376,10 @@ namespace Extract.FAMDBCounterManager
                             {
 
                             }
+                            break;
+
+                        case CounterGridColumn.ValidityComment:
+                            // User should never be able to manipulate the ValidityComment
                             break;
 
                         default:
@@ -679,11 +689,21 @@ namespace Extract.FAMDBCounterManager
                     {
                         _counterStateTextBox.Text = "Valid";
                         _generateUpdateCodeRadioButton.Checked = true;
+
+                        _counterPreviousValueColumn.HeaderText = "Previous Value";
+                        _counterOperationColumn.Visible = true;
+                        _counterApplyValueColumn.Visible = true;
+                        _counterValidityColumn.Visible = false;
                     }
                     else
                     {
                         _counterStateTextBox.Text = "Invalid";
                         _generateUnlockCodeRadioButton.Checked = true;
+
+                        _counterPreviousValueColumn.HeaderText = "Value";
+                        _counterOperationColumn.Visible = false;
+                        _counterApplyValueColumn.Visible = false;
+                        _counterValidityColumn.Visible = true;
                     }
 
                     _counterDataIsValid = value;
@@ -804,9 +824,23 @@ namespace Extract.FAMDBCounterManager
 
                 counter.PreviousValue = _licenseData.ReadInt32();
 
+                if (!CounterDataIsValid)
+                {
+                    counter.ValidityComment = _licenseData.ReadString();
+                }
+
                 var index = _counterDataGridView.Rows.Add();
                 DataGridViewRow row = _counterDataGridView.Rows[index];
                 _counterData[row] = counter;
+            }
+
+            if (!CounterDataIsValid)
+            {
+                string validityComment = _licenseData.ReadString();
+                if (!string.IsNullOrWhiteSpace(validityComment))
+                {
+                    _counterStateTextBox.Text += "; " + validityComment;
+                }
             }
         }
 

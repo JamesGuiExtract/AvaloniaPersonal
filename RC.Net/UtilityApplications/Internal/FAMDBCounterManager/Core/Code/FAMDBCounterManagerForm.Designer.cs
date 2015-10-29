@@ -52,6 +52,7 @@
             this._counterPreviousValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._counterOperationColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this._counterApplyValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterValidityColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._dateTimeStampTextBox = new System.Windows.Forms.TextBox();
             this._customerNameTextBox = new System.Windows.Forms.TextBox();
             this._commentsTextBox = new System.Windows.Forms.TextBox();
@@ -117,7 +118,7 @@
             // 
             label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(294, 265);
+            label6.Location = new System.Drawing.Point(316, 265);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(94, 13);
             label6.TabIndex = 17;
@@ -146,7 +147,7 @@
             // 
             label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             label9.AutoSize = true;
-            label9.Location = new System.Drawing.Point(294, 145);
+            label9.Location = new System.Drawing.Point(315, 145);
             label9.Name = "label9";
             label9.Size = new System.Drawing.Size(107, 13);
             label9.TabIndex = 11;
@@ -156,7 +157,7 @@
             // 
             label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             label10.AutoSize = true;
-            label10.Location = new System.Drawing.Point(294, 185);
+            label10.Location = new System.Drawing.Point(316, 185);
             label10.Name = "label10";
             label10.Size = new System.Drawing.Size(109, 13);
             label10.TabIndex = 13;
@@ -166,7 +167,7 @@
             // 
             label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             label11.AutoSize = true;
-            label11.Location = new System.Drawing.Point(294, 225);
+            label11.Location = new System.Drawing.Point(316, 225);
             label11.Name = "label11";
             label11.Size = new System.Drawing.Size(102, 13);
             label11.TabIndex = 15;
@@ -190,7 +191,7 @@
             this._licenseStringTextBox.Name = "_licenseStringTextBox";
             this._licenseStringTextBox.ReadOnly = true;
             this._licenseStringTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._licenseStringTextBox.Size = new System.Drawing.Size(551, 89);
+            this._licenseStringTextBox.Size = new System.Drawing.Size(601, 89);
             this._licenseStringTextBox.TabIndex = 1;
             // 
             // _databaseIdTextBox
@@ -200,7 +201,7 @@
             this._databaseIdTextBox.Location = new System.Drawing.Point(15, 241);
             this._databaseIdTextBox.Name = "_databaseIdTextBox";
             this._databaseIdTextBox.ReadOnly = true;
-            this._databaseIdTextBox.Size = new System.Drawing.Size(276, 20);
+            this._databaseIdTextBox.Size = new System.Drawing.Size(297, 20);
             this._databaseIdTextBox.TabIndex = 8;
             this._databaseIdTextBox.TabStop = false;
             // 
@@ -211,7 +212,7 @@
             this._databaseServerTextBox.Location = new System.Drawing.Point(15, 161);
             this._databaseServerTextBox.Name = "_databaseServerTextBox";
             this._databaseServerTextBox.ReadOnly = true;
-            this._databaseServerTextBox.Size = new System.Drawing.Size(276, 20);
+            this._databaseServerTextBox.Size = new System.Drawing.Size(297, 20);
             this._databaseServerTextBox.TabIndex = 4;
             this._databaseServerTextBox.TabStop = false;
             // 
@@ -222,7 +223,7 @@
             this._databaseNameTextBox.Location = new System.Drawing.Point(15, 201);
             this._databaseNameTextBox.Name = "_databaseNameTextBox";
             this._databaseNameTextBox.ReadOnly = true;
-            this._databaseNameTextBox.Size = new System.Drawing.Size(276, 20);
+            this._databaseNameTextBox.Size = new System.Drawing.Size(297, 20);
             this._databaseNameTextBox.TabIndex = 6;
             this._databaseNameTextBox.TabStop = false;
             // 
@@ -239,12 +240,13 @@
             this._counterNameColumn,
             this._counterPreviousValueColumn,
             this._counterOperationColumn,
-            this._counterApplyValueColumn});
+            this._counterApplyValueColumn,
+            this._counterValidityColumn});
             this._counterDataGridView.Enabled = false;
             this._counterDataGridView.Location = new System.Drawing.Point(15, 370);
             this._counterDataGridView.Name = "_counterDataGridView";
             this._counterDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this._counterDataGridView.Size = new System.Drawing.Size(551, 116);
+            this._counterDataGridView.Size = new System.Drawing.Size(601, 116);
             this._counterDataGridView.TabIndex = 23;
             this._counterDataGridView.VirtualMode = true;
             this._counterDataGridView.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.HandleCounterDataGridView_CellBeginEdit);
@@ -301,13 +303,19 @@
             this._counterApplyValueColumn.Name = "_counterApplyValueColumn";
             this._counterApplyValueColumn.Width = 102;
             // 
+            // _counterValidityColumn
+            // 
+            this._counterValidityColumn.HeaderText = "Validity";
+            this._counterValidityColumn.Name = "_counterValidityColumn";
+            this._counterValidityColumn.Visible = false;
+            // 
             // _dateTimeStampTextBox
             // 
             this._dateTimeStampTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._dateTimeStampTextBox.Location = new System.Drawing.Point(297, 281);
+            this._dateTimeStampTextBox.Location = new System.Drawing.Point(319, 281);
             this._dateTimeStampTextBox.Name = "_dateTimeStampTextBox";
             this._dateTimeStampTextBox.ReadOnly = true;
-            this._dateTimeStampTextBox.Size = new System.Drawing.Size(268, 20);
+            this._dateTimeStampTextBox.Size = new System.Drawing.Size(297, 20);
             this._dateTimeStampTextBox.TabIndex = 18;
             this._dateTimeStampTextBox.TabStop = false;
             // 
@@ -318,7 +326,7 @@
             this._customerNameTextBox.Enabled = false;
             this._customerNameTextBox.Location = new System.Drawing.Point(15, 321);
             this._customerNameTextBox.Name = "_customerNameTextBox";
-            this._customerNameTextBox.Size = new System.Drawing.Size(551, 20);
+            this._customerNameTextBox.Size = new System.Drawing.Size(601, 20);
             this._customerNameTextBox.TabIndex = 20;
             // 
             // _commentsTextBox
@@ -330,14 +338,14 @@
             this._commentsTextBox.Multiline = true;
             this._commentsTextBox.Name = "_commentsTextBox";
             this._commentsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._commentsTextBox.Size = new System.Drawing.Size(550, 55);
+            this._commentsTextBox.Size = new System.Drawing.Size(600, 55);
             this._commentsTextBox.TabIndex = 25;
             // 
             // _generateCodeButton
             // 
             this._generateCodeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._generateCodeButton.Enabled = false;
-            this._generateCodeButton.Location = new System.Drawing.Point(440, 566);
+            this._generateCodeButton.Location = new System.Drawing.Point(490, 566);
             this._generateCodeButton.Name = "_generateCodeButton";
             this._generateCodeButton.Size = new System.Drawing.Size(125, 23);
             this._generateCodeButton.TabIndex = 26;
@@ -348,27 +356,27 @@
             // _databaseCreationTextBox
             // 
             this._databaseCreationTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._databaseCreationTextBox.Location = new System.Drawing.Point(297, 161);
+            this._databaseCreationTextBox.Location = new System.Drawing.Point(318, 161);
             this._databaseCreationTextBox.Name = "_databaseCreationTextBox";
             this._databaseCreationTextBox.ReadOnly = true;
-            this._databaseCreationTextBox.Size = new System.Drawing.Size(268, 20);
+            this._databaseCreationTextBox.Size = new System.Drawing.Size(297, 20);
             this._databaseCreationTextBox.TabIndex = 12;
             this._databaseCreationTextBox.TabStop = false;
             // 
             // _databaseRestoreTextBox
             // 
             this._databaseRestoreTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._databaseRestoreTextBox.Location = new System.Drawing.Point(297, 201);
+            this._databaseRestoreTextBox.Location = new System.Drawing.Point(319, 201);
             this._databaseRestoreTextBox.Name = "_databaseRestoreTextBox";
             this._databaseRestoreTextBox.ReadOnly = true;
-            this._databaseRestoreTextBox.Size = new System.Drawing.Size(268, 20);
+            this._databaseRestoreTextBox.Size = new System.Drawing.Size(297, 20);
             this._databaseRestoreTextBox.TabIndex = 14;
             this._databaseRestoreTextBox.TabStop = false;
             // 
             // _pasteLicenseStringButton
             // 
             this._pasteLicenseStringButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._pasteLicenseStringButton.Location = new System.Drawing.Point(440, 121);
+            this._pasteLicenseStringButton.Location = new System.Drawing.Point(490, 121);
             this._pasteLicenseStringButton.Name = "_pasteLicenseStringButton";
             this._pasteLicenseStringButton.Size = new System.Drawing.Size(125, 23);
             this._pasteLicenseStringButton.TabIndex = 2;
@@ -379,10 +387,10 @@
             // _lastCounterUpdateTextBox
             // 
             this._lastCounterUpdateTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._lastCounterUpdateTextBox.Location = new System.Drawing.Point(297, 241);
+            this._lastCounterUpdateTextBox.Location = new System.Drawing.Point(319, 241);
             this._lastCounterUpdateTextBox.Name = "_lastCounterUpdateTextBox";
             this._lastCounterUpdateTextBox.ReadOnly = true;
-            this._lastCounterUpdateTextBox.Size = new System.Drawing.Size(268, 20);
+            this._lastCounterUpdateTextBox.Size = new System.Drawing.Size(297, 20);
             this._lastCounterUpdateTextBox.TabIndex = 16;
             this._lastCounterUpdateTextBox.TabStop = false;
             // 
@@ -414,10 +422,12 @@
             // 
             // _counterStateTextBox
             // 
+            this._counterStateTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._counterStateTextBox.Location = new System.Drawing.Point(15, 281);
             this._counterStateTextBox.Name = "_counterStateTextBox";
             this._counterStateTextBox.ReadOnly = true;
-            this._counterStateTextBox.Size = new System.Drawing.Size(276, 20);
+            this._counterStateTextBox.Size = new System.Drawing.Size(297, 20);
             this._counterStateTextBox.TabIndex = 10;
             this._counterStateTextBox.TabStop = false;
             // 
@@ -425,7 +435,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(578, 601);
+            this.ClientSize = new System.Drawing.Size(628, 601);
             this.Controls.Add(label5);
             this.Controls.Add(this._counterStateTextBox);
             this.Controls.Add(this._generateUpdateCodeRadioButton);
@@ -478,14 +488,15 @@
         private System.Windows.Forms.TextBox _databaseRestoreTextBox;
         private System.Windows.Forms.Button _pasteLicenseStringButton;
         private System.Windows.Forms.TextBox _lastCounterUpdateTextBox;
+        private System.Windows.Forms.RadioButton _generateUnlockCodeRadioButton;
+        private System.Windows.Forms.RadioButton _generateUpdateCodeRadioButton;
+        private System.Windows.Forms.TextBox _counterStateTextBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterIdColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterNameColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterPreviousValueColumn;
         private System.Windows.Forms.DataGridViewComboBoxColumn _counterOperationColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterApplyValueColumn;
-        private System.Windows.Forms.RadioButton _generateUnlockCodeRadioButton;
-        private System.Windows.Forms.RadioButton _generateUpdateCodeRadioButton;
-        private System.Windows.Forms.TextBox _counterStateTextBox;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _counterValidityColumn;
     }
 }
 

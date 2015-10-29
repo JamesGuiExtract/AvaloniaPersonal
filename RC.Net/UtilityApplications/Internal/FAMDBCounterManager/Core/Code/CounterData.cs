@@ -111,7 +111,7 @@ namespace Extract.FAMDBCounterManager
 
             set
             {
-                UtilityMethods.Assert(!value.HasValue || value <= 4 || value >= 100,
+                UtilityMethods.Assert(!value.HasValue || value <= 5 || value >= 100,
                     "Counter values < 100 are reserved for standard counters");
 
                 if (value.HasValue)
@@ -175,6 +175,19 @@ namespace Extract.FAMDBCounterManager
         /// <see cref="Operation"/>. Will be <see langword="null"/> for operation "None" or "Delete".
         /// </value>
         public int? ApplyValue
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a textual description of any counter-specific reason(s) the counter is
+        /// invalid.
+        /// </summary>
+        /// <value>
+        /// A textual counter-specific reason the counter is invalid
+        /// </value>
+        public string ValidityComment
         {
             get;
             set;
