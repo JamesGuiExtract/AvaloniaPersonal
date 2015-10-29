@@ -577,8 +577,8 @@ namespace Extract.FAMDBCounterManager
                         }
 
                         licenseData.Write(counter.ID.Value);
-                        // Counter name does not need to be included for standard counters.
-                        if (counter.ID >= 100)
+                        // Counter name does not need to be included for unlocks or standard counters.
+                        if (!unlock && counter.ID >= 100)
                         {
                             licenseData.Write(counter.Name);
                         }
@@ -587,7 +587,6 @@ namespace Extract.FAMDBCounterManager
                         {
                             // When unlocking counters, ensure the counter value hasn't changed
                             // prior to unlocking.
-                            licenseData.Write((int)counter.Operation);
                             licenseData.Write((int)counter.PreviousValue.Value);
                         }
                         else
