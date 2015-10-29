@@ -17,13 +17,22 @@ public:
 	CTime m_ctRestored;
 	CTime m_ctLastUpdated;
 
+	// This will only be filled in when CheckIfValid is called with bGenerateInvalidReason = true
+	string m_strInvalidReason;
+
 	// This is not saved but will be calculated when read from a stream
 	long m_nHashValue;
 
 	// Checks the contained values against the values returned for the current connection
 	// returns true if valid if not valid will return false or throw exception if bThrowIfInvalid
 	// is true
-	bool CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid = false);
+	// Fills in the m_strInvalidReason if bGenerateInvalidReason is true otherwise m_strInvalidReason will 
+	// be set to ""
+	bool CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid = false, bool bGenerateInvalidReason = false);
+
+	// This will return a string that identifies what parts of the Database id are invalid
+	// if the database id is valid the return string will be ""
+	string ReasonInvalid(_ConnectionPtr ipConnection);
 	
 	// Calculates the hash value for this class (does not include m_nHashValue)
 	void CalculateHashValue(long &nHashValue);

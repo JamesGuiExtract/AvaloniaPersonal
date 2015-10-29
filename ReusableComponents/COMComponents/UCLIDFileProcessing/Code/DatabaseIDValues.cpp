@@ -19,7 +19,8 @@ void getFAMPassword(ByteStream &bsPW);
 // DatabaseIDValues Constructors
 //-------------------------------------------------------------------------------------------------
 DatabaseIDValues::DatabaseIDValues()
-	:m_strServer(""), m_strName(""), m_ctCreated(0), m_ctRestored(0), m_ctLastUpdated(0), m_nHashValue(0)
+	:m_strServer(""), m_strName(""), m_ctCreated(0), m_ctRestored(0), m_ctLastUpdated(0), m_nHashValue(0),
+	m_strInvalidReason("")
 {
 	m_GUID.Data1 = 0;
 	m_GUID.Data2 = 0;
@@ -65,8 +66,11 @@ ByteStreamManipulator& operator << (ByteStreamManipulator & bsm, const DatabaseI
 	return bsm;
 }
 //-------------------------------------------------------------------------------------------------
-bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid)
+bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid, bool bGenerateInvalidReason)
 {
+	// Reset the invalid reason
+	m_strInvalidReason = "";
+
 	// Get the expected values
 	string strServer;
 	CTime ctCreationDate, ctRestoreDate;
@@ -86,6 +90,32 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 		&& m_ctCreated == ctCreationDate && m_ctRestored == ctRestoreDate)
 	{
 		return true;
+	}
+
+	if (bGenerateInvalidReason)
+	{
+		// Determine the reasons the code is invalid
+		vector<string> vecReasons;
+		if (tmp.m_strServer != strServer)
+		{
+			vecReasons.push_back("Server has changed");
+		}
+		if (tmp.m_strName != strDatabaseName)
+		{
+			vecReasons.push_back("Database has changed");
+		}
+		if (tmp.m_ctCreated != ctCreationDate)
+		{
+			vecReasons.push_back("Creation date has changed");
+		}
+		if (tmp.m_ctRestored != ctRestoreDate)
+		{
+			vecReasons.push_back("Restored date has changed");
+		}
+		if (vecReasons.size() > 0)
+		{
+			m_strInvalidReason = asString(vecReasons, false, ", ");
+		}
 	}
 
 	if (bThrowIfInvalid)

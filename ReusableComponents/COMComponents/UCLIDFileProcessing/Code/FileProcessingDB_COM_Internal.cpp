@@ -8864,7 +8864,6 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 					bValid = true;
 				}
 
-
 				bsmRequest << (((nNumCounters == 0) || bValid) ? nNumCounters : -nNumCounters);
 
 				for (auto c = vecDBCounters.begin(); c != vecDBCounters.end(); c++)
@@ -8876,6 +8875,21 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 					}						
 
 					bsmRequest << c->m_nValue;
+					string strUnlockComment = "";
+					if (!bValid && !c->isValid(m_DatabaseIDValues.m_nHashValue))
+					{
+						strUnlockComment = "Counter hash is invalid.";
+					}
+					if (!bValid)
+					{
+						bsmRequest << strUnlockComment;
+					}
+				}
+
+				if (!bValid)
+				{
+					m_DatabaseIDValues.CheckIfValid(ipConnection, false, true);
+					bsmRequest << m_DatabaseIDValues.m_strInvalidReason;
 				}
 
 				bsmRequest.flushToByteStream(8);
