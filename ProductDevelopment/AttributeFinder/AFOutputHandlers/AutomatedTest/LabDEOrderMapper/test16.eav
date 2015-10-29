@@ -1,0 +1,12 @@
+Test|N/A
+.Name|TXP EXTERNAL LAB RESULTS
+.OrderCode|TXPEXTLAB
+.Component|NEUTROPHILS
+..Units|Blah
+..OfficialName|NEUTROPHILS (OUTSIDE)
+..TestCode|50015
+.Component|NEUTROPHILS
+..Units|%
+..OfficialName|% NEUTROPHILS  (OUTSIDE)
+..TestCode|50008
+..ESNames|Neutrophils %

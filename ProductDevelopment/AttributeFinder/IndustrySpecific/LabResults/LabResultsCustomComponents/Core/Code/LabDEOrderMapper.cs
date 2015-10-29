@@ -1528,13 +1528,12 @@ namespace Extract.LabResultsCustomComponents
 
                 IUnknownVector vectorOfAttributes = vecAttributes as IUnknownVector;
                 int vectorSize = vectorOfAttributes.Size();
-                List<IAttribute> listAttributes = new List<IAttribute>(vectorSize);
+                List<IAttribute> listAttributes = nameToAttributes.GetOrAdd(name.ToUpperInvariant(),
+                    () => new List<IAttribute>(vectorSize));
                 for (int j = 0; j < vectorSize; j++)
                 {
                     listAttributes.Add((IAttribute)vectorOfAttributes.At(j));
                 }
-
-                nameToAttributes.Add(name.ToUpperInvariant(), listAttributes);
             }
 
             return nameToAttributes;
@@ -1554,7 +1553,7 @@ namespace Extract.LabResultsCustomComponents
 
             foreach (var attribute in attributes)
             {
-                nameToAttributes.GetOrAdd(attribute.Name, name =>
+                nameToAttributes.GetOrAdd(attribute.Name.ToUpperInvariant(), name =>
                     new List<IAttribute>()).Add(attribute);
             }
 

@@ -42,6 +42,7 @@ Test|N/A
 ..Range|>0.9
 ..Value|1.7
 ..TestCode|ER2
+..ESNames|Albumin/Globulin Ratio
 .Component|AST/SGOT
 ..Flag|H
 ..Range|5-35

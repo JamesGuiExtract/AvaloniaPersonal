@@ -37,3 +37,12 @@
 
 // Maintain input ordering for spatially equivalent test hierarchies
 <TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;test14.eav
+
+// Test that two identically named tests get mapped to the same order (as different tests)
+<TESTCASE>;test15.rsd;test15.txt;;test15.eav
+
+// Test that units are taken into account for two identically named tests
+<TESTCASE>;test16.rsd;test16.txt;;test16.eav
+
+// Ensure that only test groups with matching dates are combined
+<TESTCASE>;Test.rsd;test17.txt;;test17.eav
