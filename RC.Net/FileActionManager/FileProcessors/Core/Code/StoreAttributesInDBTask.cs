@@ -537,6 +537,7 @@ namespace Extract.FileActionManager.FileProcessors
                                                                 MOST_RECENT_ATTRIBUTE );
 
                     vAttributes.SaveTo( voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID );
+                    vAttributes.ReportMemoryUsage();
                 }
 
                 return EFileProcessingResult.kProcessingSuccessful;

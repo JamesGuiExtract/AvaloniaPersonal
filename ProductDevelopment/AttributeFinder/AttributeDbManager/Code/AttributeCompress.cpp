@@ -41,8 +41,8 @@ namespace Internal
 
 	VectorOfByte PersistStreamToByteVector( const IPersistStreamPtr& ipPersistObj )
 	{
-		CComSafeArray<BYTE> saData;
-		saData.CopyFrom( writeObjToSAFEARRAY( ipPersistObj ) );
+		CComSafeArray<BYTE> saData;		
+		saData.Attach( writeObjToSAFEARRAY( ipPersistObj ) );
 		ASSERT_RUNTIME_CONDITION( "ELI38825", 
 								  1 == saData.GetDimensions(),  
 								  Util::Format("In: %s, SAFEARRAY assumed to have 1 dimension, has: %d dimensions",
@@ -88,7 +88,7 @@ namespace Internal
 
 namespace ZipUtil
 {
-	SAFEARRAY* CompressAttributes( IPersistStreamPtr ipStream )
+	SAFEARRAY* CompressAttributes( const IPersistStreamPtr& ipStream )
 	{
 		VectorOfByte buffer = Internal::PersistStreamToByteVector( ipStream );
 		VectorOfByte compressed = Internal::Compress( buffer );

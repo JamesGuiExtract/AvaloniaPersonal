@@ -22,7 +22,7 @@ using namespace ADODB;
 namespace ZipUtil
 {
 	SAFEARRAY* DecompressAttributes( SAFEARRAY* pSA );
-	SAFEARRAY* CompressAttributes( IPersistStreamPtr ipStream );
+	SAFEARRAY* CompressAttributes( const IPersistStreamPtr& ipStream );
 }
 
 namespace
@@ -1018,14 +1018,14 @@ void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong 
 #endif
 
 #ifdef COMPRESSED_STREAM
-		unique_ptr<SAFEARRAY, SafeArrayDeleter> psaData( ZipUtil::CompressAttributes( ipPersistObj ) );
-		std::unique_ptr<_variant_t>variantData( new _variant_t() );
-		variantData->vt = VT_ARRAY|VT_UI1;
-		variantData->parray = psaData.get();
-		ipASFF->Fields->GetItem( "VOA" )->PutValue( variantData.get() );
+		std::unique_ptr<SAFEARRAY, SafeArrayDeleter> psaData( ZipUtil::CompressAttributes( ipPersistObj ) );
+		_variant_t variantData;
+		variantData.vt = VT_ARRAY|VT_UI1;
+		variantData.parray = psaData.get();
+		ipASFF->Fields->GetItem( "VOA" )->PutValue( variantData );
 		ipASFF->Update();
 
-		variantData->parray = nullptr;		// don't double-delete, unique_ptr will take care of this
+		variantData.parray = nullptr;		// don't double-delete, unique_ptr will take care of this
 #endif
 	}
 	catch (...)
@@ -1145,7 +1145,7 @@ STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** ppAttribu
 		auto strQuery( GetQueryForAttributeSetForFile( fileID, attributeSetName, relativeIndex ) );
 
 #ifdef UNCOMPRESSED_STREAM	
-		FieldsPtr ipFields = GetFieldsForQuery( query, getDBConnection() );
+		FieldsPtr ipFields = GetFieldsForQuery( strQuery, getDBConnection() );
 		IPersistStreamPtr ipStream = getIPersistObjFromField( ipFields, "VOA" );
 
 		*ppAttributes = (IIUnknownVectorPtr)ipStream.Detach();
