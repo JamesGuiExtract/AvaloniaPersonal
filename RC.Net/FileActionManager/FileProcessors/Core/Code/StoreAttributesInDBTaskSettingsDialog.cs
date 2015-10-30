@@ -69,7 +69,6 @@ namespace Extract.FileActionManager.FileProcessors
                 Settings = settings;
 
                 InitializeComponent();
-
             }
             catch (Exception ex)
             {

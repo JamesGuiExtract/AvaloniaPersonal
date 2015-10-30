@@ -183,6 +183,7 @@
             this._attributeSetNamePathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_attributeSetNamePathTagButton.Image")));
             this._attributeSetNamePathTagButton.Location = new System.Drawing.Point(386, 64);
             this._attributeSetNamePathTagButton.Name = "_attributeSetNamePathTagButton";
+            this._attributeSetNamePathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._attributeSetNamePathTagButton.Size = new System.Drawing.Size(18, 21);
             this._attributeSetNamePathTagButton.TabIndex = 4;
             this._attributeSetNamePathTagButton.UseVisualStyleBackColor = true;
@@ -194,6 +195,7 @@
             this._voaFileNamePathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_voaFileNamePathTagButton.Image")));
             this._voaFileNamePathTagButton.Location = new System.Drawing.Point(386, 25);
             this._voaFileNamePathTagButton.Name = "_voaFileNamePathTagButton";
+            this._voaFileNamePathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._voaFileNamePathTagButton.Size = new System.Drawing.Size(18, 21);
             this._voaFileNamePathTagButton.TabIndex = 1;
             this._voaFileNamePathTagButton.TextControl = this._voaFileNameTextBox;
@@ -221,7 +223,7 @@
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(1000, 300);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(463, 191);
+            this.MinimumSize = new System.Drawing.Size(463, 300);
             this.Name = "StoreAttributesInDBTaskSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
