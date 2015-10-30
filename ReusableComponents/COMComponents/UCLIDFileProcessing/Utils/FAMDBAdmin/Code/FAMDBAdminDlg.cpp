@@ -1052,6 +1052,7 @@ void CFAMDBAdminDlg::enableMenus()
 	pMenu->EnableMenuItem(ID_MANAGE_ACTIONS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_USERS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_METADATA, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_ATTRIBUTESETS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_MANUALLYSETACTIONSTATUS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_SETPRIORITY, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_EXPORTFILELISTS, m_bIsDBGood ? nEnable : nDisable);
