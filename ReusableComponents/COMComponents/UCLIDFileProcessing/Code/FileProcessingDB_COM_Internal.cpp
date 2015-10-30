@@ -1009,6 +1009,12 @@ int UpdateToSchemaVersion127(_ConnectionPtr ipConnection, long *pnNumSteps,
 	vecQueries.push_back("ALTER TABLE dbo.FileMetadataFieldValue ALTER COLUMN Value nvarchar(400) NULL"); 
 	vecQueries.push_back(gstrMETADATA_FIELD_VALUE_VALUE_INDEX);
 
+	// Before adding the FK if it doesn't exist should make sure there are no orphaned records
+	// https://extract.atlassian.net/browse/ISSUE-13301
+	string strDeleteOrphanActionStatistics = 
+		"DELETE FROM [dbo].[ActionStatistics] WHERE ActionID NOT IN (SELECT ID FROM [dbo].[Action])";
+	vecQueries.push_back(strDeleteOrphanActionStatistics);
+
 	// https://extract.atlassian.net/browse/ISSUE-12916
 	// This was added so that an upgrade to 10.1 will fix existing problems if a database was previously
 	// upgraded and the FK_Statistics_Action was not added
