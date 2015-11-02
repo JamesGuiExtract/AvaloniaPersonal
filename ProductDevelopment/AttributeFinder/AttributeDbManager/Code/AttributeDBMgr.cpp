@@ -1096,6 +1096,49 @@ void CAttributeDBMgr::storeAttributeData( IIUnknownVectorPtr ipAttributes,
 	}
 }
 
+
+bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
+															 long nFileTaskSessionID,
+  														     BSTR bstrAttributeSetName,
+  														     IIUnknownVector* pAttributes,
+  															 VARIANT_BOOL vbStoreRasterZone,
+  															 VARIANT_BOOL vbStoreEmptyAttributes )
+{
+	try
+	{
+		try
+		{
+			IIUnknownVectorPtr ipAttributes(pAttributes);
+			ASSERT_RESOURCE_ALLOCATION("ELI38959", ipAttributes != nullptr);
+			ASSERT_ARGUMENT("ELI38553", pAttributes != nullptr);
+			ASSERT_ARGUMENT("ELI38554", nFileTaskSessionID > 0 );
+
+			TransactionGuard tg( getDBConnection(), adXactRepeatableRead, nullptr );
+
+			auto strInsertRootASFF = GetInsertRootASFFStatement( bstrAttributeSetName, nFileTaskSessionID );
+			longlong llRootASFF_ID = ExecuteRootInsertASFF( strInsertRootASFF, getDBConnection() );
+			SaveVoaDataInASFF( ipAttributes, llRootASFF_ID );
+
+			storeAttributeData( ipAttributes, 
+								asCppBool(vbStoreRasterZone), 
+								asCppBool(vbStoreEmptyAttributes), 
+								llRootASFF_ID );
+
+			tg.CommitTrans();
+			return true;
+		}
+		CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38557");
+	}
+	catch (const UCLIDException& ue)
+	{
+		if (!bDbLocked)
+		{
+			return false;
+		}
+
+		throw;
+	}
+}
 // ------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessionID,
 														    BSTR bstrAttributeSetName,
@@ -1105,28 +1148,80 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetForFile( long nFileTaskSessio
 {
 	try
 	{
-		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI38959", ipAttributes != nullptr);
-		ASSERT_ARGUMENT("ELI38553", pAttributes != nullptr);
-		ASSERT_ARGUMENT("ELI38554", nFileTaskSessionID > 0 );
+		const bool bDbNotLocked = false;
+		auto bRet = CreateNewAttributeSetForFile_Internal( bDbNotLocked, 
+														   nFileTaskSessionID,
+														   bstrAttributeSetName,
+														   pAttributes,
+														   vbStoreRasterZone,
+														   vbStoreEmptyAttributes );
+		if ( !bRet )
+		{
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dbLock( m_ipFAMDB, 
+																			 gstrMAIN_DB_LOCK );
+			const bool bDbIsLocked = true;
+			CreateNewAttributeSetForFile_Internal( bDbIsLocked, 
+												   nFileTaskSessionID,
+												   bstrAttributeSetName,
+												   pAttributes,
+												   vbStoreRasterZone,
+												   vbStoreEmptyAttributes );
+		}
 
-
-		TransactionGuard tg( getDBConnection(), adXactRepeatableRead, nullptr );
-
-		auto strInsertRootASFF = GetInsertRootASFFStatement( bstrAttributeSetName, nFileTaskSessionID );
-		longlong llRootASFF_ID = ExecuteRootInsertASFF( strInsertRootASFF, getDBConnection() );
-		SaveVoaDataInASFF( ipAttributes, llRootASFF_ID );
-
-		storeAttributeData( ipAttributes, 
-							asCppBool(vbStoreRasterZone), 
-							asCppBool(vbStoreEmptyAttributes), 
-							llRootASFF_ID );
-
-		tg.CommitTrans();
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38557");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39028");
 }
+
+bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
+													   IIUnknownVector** ppAttributes, 
+													   long fileID, 
+													   BSTR attributeSetName,
+													   long relativeIndex )
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI38618", relativeIndex != 0);
+			ASSERT_ARGUMENT("ELI38668", ppAttributes != nullptr);
+
+			auto strQuery( GetQueryForAttributeSetForFile( fileID, attributeSetName, relativeIndex ) );
+
+#ifdef UNCOMPRESSED_STREAM	
+			FieldsPtr ipFields = GetFieldsForQuery( strQuery, getDBConnection() );
+			IPersistStreamPtr ipStream = getIPersistObjFromField( ipFields, "VOA" );
+
+			*ppAttributes = (IIUnknownVectorPtr)ipStream.Detach();
+#endif		
+
+#ifdef COMPRESSED_STREAM
+			FieldsPtr ipFields = GetFieldsForQuery( strQuery, getDBConnection() );
+			_variant_t vData = ipFields->GetItem("VOA")->GetValue();
+			SafeArrayDeleter sad;
+			unique_ptr<SAFEARRAY, SafeArrayDeleter> pData( vData.Detach().parray, sad );
+		
+			unique_ptr<SAFEARRAY, SafeArrayDeleter> pDataSA( ZipUtil::DecompressAttributes( pData.get() ), sad );
+			IPersistStreamPtr ipStream = readObjFromSAFEARRAY( pDataSA.get() );
+ 
+			*ppAttributes = (IIUnknownVectorPtr)ipStream.Detach();
+#endif
+			return S_OK;
+		}
+		CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39029");
+	}
+	catch ( const UCLIDException& ue )
+	{
+		if ( !bDbLocked )
+		{
+			return false;
+		}
+
+		throw;
+	}
+}
+
+
 //-------------------------------------------------------------------------------------------------
 // relativeIndex: -1 for most recent, 1 for oldest
 // decrement most recent value to get next most recent (-2)
@@ -1139,29 +1234,24 @@ STDMETHODIMP CAttributeDBMgr::GetAttributeSetForFile(IIUnknownVector** ppAttribu
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI38618", relativeIndex != 0);
-		ASSERT_ARGUMENT("ELI38668", ppAttributes != nullptr);
+		const bool bDbNotLocked = false;
+		auto bRet = GetAttributeSetForFile_Internal( bDbNotLocked, 
+													 ppAttributes, 
+													 fileID, 
+													 attributeSetName, 
+													 relativeIndex );
+		if ( !bRet )
+		{
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dbLock( m_ipFAMDB, 
+																			 gstrMAIN_DB_LOCK );
+			const bool bDbIsLocked = true;
+			GetAttributeSetForFile_Internal( bDbIsLocked, 
+											 ppAttributes, 
+											 fileID, 
+											 attributeSetName, 
+											 relativeIndex );
+		}
 
-		auto strQuery( GetQueryForAttributeSetForFile( fileID, attributeSetName, relativeIndex ) );
-
-#ifdef UNCOMPRESSED_STREAM	
-		FieldsPtr ipFields = GetFieldsForQuery( strQuery, getDBConnection() );
-		IPersistStreamPtr ipStream = getIPersistObjFromField( ipFields, "VOA" );
-
-		*ppAttributes = (IIUnknownVectorPtr)ipStream.Detach();
-#endif		
-
-#ifdef COMPRESSED_STREAM
-		FieldsPtr ipFields = GetFieldsForQuery( strQuery, getDBConnection() );
-		_variant_t vData = ipFields->GetItem("VOA")->GetValue();
-		SafeArrayDeleter sad;
-		unique_ptr<SAFEARRAY, SafeArrayDeleter> pData( vData.Detach().parray, sad );
-		
-		unique_ptr<SAFEARRAY, SafeArrayDeleter> pDataSA( ZipUtil::DecompressAttributes( pData.get() ), sad );
-		IPersistStreamPtr ipStream = readObjFromSAFEARRAY( pDataSA.get() );
- 
-		*ppAttributes = (IIUnknownVectorPtr)ipStream.Detach();
-#endif
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38619");

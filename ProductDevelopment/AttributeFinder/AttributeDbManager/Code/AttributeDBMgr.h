@@ -157,6 +157,19 @@ private:
 							bool bStoreEmptyAttributes,
 							long long llRootASFF_ID, 
 							long long llParentAttrID = 0);
+
+	bool CreateNewAttributeSetForFile_Internal( bool bDbLocked,
+												long nFileTaskSessionID,
+  												BSTR bstrAttributeSetName,
+  												IIUnknownVector* pAttributes,
+  												VARIANT_BOOL vbStoreRasterZone,
+  												VARIANT_BOOL vbStoreEmptyAttributes );
+
+	bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
+													       IIUnknownVector** ppAttributes, 
+													       long fileID, 
+													       BSTR attributeSetName,
+													       long relativeIndex );
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(AttributeDBMgr), CAttributeDBMgr)
