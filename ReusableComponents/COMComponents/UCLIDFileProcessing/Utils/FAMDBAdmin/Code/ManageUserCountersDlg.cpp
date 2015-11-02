@@ -639,7 +639,7 @@ void CManageUserCountersDlg::refreshCounterList(const string& strNameToSelect)
 
 		// Select either the last selected item position or select the first item
 		m_listCounters.SetItemState(nSelectedItem < lSize ? nSelectedItem : 0,
-			LVIS_SELECTED, LVIS_SELECTED);
+			LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 
 		updateControls();
 	}

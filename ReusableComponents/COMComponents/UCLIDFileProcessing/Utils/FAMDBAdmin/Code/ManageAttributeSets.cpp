@@ -310,7 +310,7 @@ void CManageAttributeSets::refreshAttributeSetsList()
 
 		// Select either the last selected item position or select the first item
 		m_listAttributeSets.SetItemState(nSelectedItem < lSize ? nSelectedItem : 0,
-			LVIS_SELECTED, LVIS_SELECTED);
+			LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 
 		updateControls();
 	}
