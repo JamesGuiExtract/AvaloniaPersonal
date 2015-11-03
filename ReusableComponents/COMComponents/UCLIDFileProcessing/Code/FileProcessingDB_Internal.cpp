@@ -5593,8 +5593,10 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates)
+string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates)
 {
+	string strReturnValue = "";
+
 	// get the update operations
 	vector<CounterOperation> &vecOperations = counterUpdates.m_vecOperations;
 
@@ -5663,6 +5665,8 @@ void CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpd
 		counterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
 		counterChange.m_strComment = "Update";
 
+		string strOperationPerformed;
+
 		// Set the counterChange data for the operation and convert the 
 		// Increase and Decrease operations to Sets ( for generating the SQL statements to 
 		// update the value
@@ -5676,6 +5680,8 @@ void CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpd
 
 			// Add a create record to the map
 			mapCounters[counterOp.m_nCounterID] = counterOp;
+			strOperationPerformed = "Created counter " + counterOp.m_strCounterName + " with " 
+				+ asString(counterOp.m_nValue) + " counts.";
 			break;
 		case kSet:
 			counterChange.m_nToValue = counterOp.m_nValue;
@@ -5685,6 +5691,8 @@ void CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpd
 
 			// Update the counterOp record in map to the counterOp being performed
 			mapCounters[counterOp.m_nCounterID] = counterOp;
+			strOperationPerformed = "Set counter " + counterOp.m_strCounterName + " to "
+				+ asString(counterOp.m_nValue) + " counts.";
 			break;
 		case kIncrement:
 			counterChange.m_nToValue = counter->second.m_nValue + counterOp.m_nValue;
@@ -5695,6 +5703,8 @@ void CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpd
 			// Modify the existing counterOp record in map to change to a set with the new counter value
 			mapCounters[counterOp.m_nCounterID].m_eOperation = kSet;
 			mapCounters[counterOp.m_nCounterID].m_nValue = counterChange.m_nToValue;
+			strOperationPerformed = "Incremented counter " + counterOp.m_strCounterName + " by "
+				+ asString(counterOp.m_nValue) + " counts.";
 			break;
 		case kDecrement:
 			// An operation to decrement should set counter value to 0 if the decrement value
@@ -5707,14 +5717,20 @@ void CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpd
 			// Modify the existing counterOp record in map to change to a set with the new counter value
 			mapCounters[counterOp.m_nCounterID].m_eOperation = kSet;
 			mapCounters[counterOp.m_nCounterID].m_nValue = counterChange.m_nToValue;
+
+			strOperationPerformed = "Decremented counter " + counterOp.m_strCounterName + " by "
+				+ asString(counterOp.m_nValue) + " counts.";
 			break;
 		case kDelete:
 			// Modify existing counterOp record to the delete op
 			mapCounters[counterOp.m_nCounterID] = counterOp;
+
+			strOperationPerformed = "Deleted counter " + counterOp.m_strCounterName;
 			break;
 		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI38913");
 		}
+		strReturnValue += strOperationPerformed + "\r\n";
 	}
 
 	// the mapCounters has the changes that need to be made to the SecureCounter table
@@ -5757,6 +5773,7 @@ void CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpd
 	// it will trigger a load from the DBInfo
 	m_strEncryptedDatabaseID = "";
 	m_bDatabaseIDValuesValidated = false;
+	return strReturnValue;
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::getCounterInfo(map<long, CounterOperation> &mapOfCounterOps, bool bCheckCounterHash)
@@ -5808,7 +5825,7 @@ void CFileProcessingDB::createCounterUpdateQueries(const DatabaseIDValues &datab
 		vecCounterUpdates.push_back(c->second.GetSQLQuery(databaseIDValues));
 	}
 }
-
+//-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates)
 {
 	// Check the unlock code databaseID, it should be valid since the request code contained the 

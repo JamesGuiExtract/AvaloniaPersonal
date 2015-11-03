@@ -297,7 +297,7 @@ public:
 	STDMETHOD(GetFileNameFromFileID)( /*[in]*/ long fileID, /*[out, retval]*/ BSTR* pbstrFileName );
 	STDMETHOD(get_SecureCounters)(IIUnknownVector** ppSecureCounters);
 	STDMETHOD(GetSecureCounterName)(long nCounterID, BSTR *pstrCounterName);
-	STDMETHOD(ApplySecureCounterUpdateCode)(BSTR strUpdateCode);
+	STDMETHOD(ApplySecureCounterUpdateCode)(BSTR strUpdateCode, BSTR *pbstrResult);
 	STDMETHOD(GetSecureCounterValue)(long nCounterID, long* pnCounterValue);
 	STDMETHOD(DecrementSecureCounter)(long nCounterID, long decrementAmount, long* pnCounterValue);
 	STDMETHOD(SecureCounterConsistencyCheck)(VARIANT_BOOL* pvbValid);
@@ -1047,7 +1047,8 @@ private:
 	// Method applies the changes that are in the counterUpdates argument as well as update the 
 	// existing counters that are not being modified to use the new databaseID caused by the update
 	// Should be executed within a transaction
-	void updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates);
+	// returns a string that has one line for each update performed
+	string updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates);
 
 	// Method unlocks the counters if they are in a bad state
 	void unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates);
@@ -1206,7 +1207,7 @@ private:
 	bool RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, double dDuration,
 		double dOverheadTime, long *pnFileTaskSessionID);
 	bool GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName);
-	bool ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode);
+	bool ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode, BSTR *pbstrResult);
 	bool GetSecureCounterValue_Internal(bool bDBLocked, long nCounterID, long* pnCounterValue);
 	bool DecrementSecureCounter_Internal(bool bDBLocked, long nCounterID, long decrementAmount, long* pnCounterValue);
 	bool SecureCounterConsistencyCheck_Internal(bool bDBLocked, VARIANT_BOOL* pvbValid);

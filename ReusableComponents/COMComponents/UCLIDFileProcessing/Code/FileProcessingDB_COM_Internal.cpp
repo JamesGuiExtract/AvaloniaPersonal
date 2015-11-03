@@ -8512,13 +8512,15 @@ bool CFileProcessingDB::GetSecureCounterName_Internal(bool bDBLocked, long nCoun
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode)
+bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode, BSTR *pbstrResult)
 {
 
 	try
 	{
 		try
 		{
+			ASSERT_ARGUMENT("ELI39030", pbstrResult != __nullptr);
+
 			_ConnectionPtr ipConnection;
 			BEGIN_CONNECTION_RETRY();
 
@@ -8536,6 +8538,7 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+				string strApplyResult;
 
 				try
 				{
@@ -8550,6 +8553,7 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 						{
 							// this is an unlock code
 							unlockCounters(ipConnection, counterUpdates);
+							strApplyResult = "Counters restored to working state.\r\n";
 						}
 						else
 						{
@@ -8559,9 +8563,11 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 							ASSERT_RUNTIME_CONDITION("ELI38902", m_DatabaseIDValues == counterUpdates.m_DatabaseID, 
 								"Code is not valid.");
 
-							updateCounters(ipConnection, counterUpdates);
+							strApplyResult = updateCounters(ipConnection, counterUpdates);
 						}
 						tg.CommitTrans();
+
+						*pbstrResult = _bstr_t(strApplyResult.c_str()).Detach();
 					}
 					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38904");
 				}

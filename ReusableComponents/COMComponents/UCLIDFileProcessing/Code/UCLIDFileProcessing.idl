@@ -1678,8 +1678,9 @@ library UCLID_FILEPROCESSINGLib
 		//				CounterName - Name of counter if counter ID < 100 the counter it is not included
 		//				Operation - 0 - None, 1 - Create, 2 - Set, 3 - Increment, 4 - Decrement, 5 - Delete, 6 - Rename
 		//				Value - Amount used to set or update the counter.
+		//			Return value pbstrResult will have a line for each update that was performed and what was done
 		[id(150), helpstring("method ApplySecureCounterUpdateCode")] HRESULT ApplySecureCounterUpdateCode(
-			[in] BSTR strUpdateCode);
+			[in] BSTR strUpdateCode, [out, retval] BSTR *pbstrResult);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To return the current value of the counter with counter id nCounterID
 		[id(151), helpstring("method GetSecureCounterValue")] HRESULT GetSecureCounterValue(

@@ -3641,7 +3641,7 @@ STDMETHODIMP CFileProcessingDB::GetSecureCounterName (long nCounterID, BSTR *pst
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38773");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::ApplySecureCounterUpdateCode (BSTR strUpdateCode)
+STDMETHODIMP CFileProcessingDB::ApplySecureCounterUpdateCode (BSTR strUpdateCode, BSTR *pbstrResult)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -3649,13 +3649,13 @@ STDMETHODIMP CFileProcessingDB::ApplySecureCounterUpdateCode (BSTR strUpdateCode
 	{
 		validateLicense();
 		
-		if (!ApplySecureCounterUpdateCode_Internal(false, strUpdateCode))
+		if (!ApplySecureCounterUpdateCode_Internal(false, strUpdateCode, pbstrResult))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
 				gstr_SECURE_COUNTER_DB_LOCK);
 
-			ApplySecureCounterUpdateCode_Internal(true, strUpdateCode);
+			ApplySecureCounterUpdateCode_Internal(true, strUpdateCode, pbstrResult);
 		}
 
 		return S_OK;
