@@ -3103,7 +3103,7 @@
 		<row><td>ID_STRING1</td><td>1033</td><td>Extract Systems, LLC</td><td>0</td><td/><td>194625038</td></row>
 		<row><td>ID_STRING10</td><td>1033</td><td>TESTHA~1|Test Harness</td><td>0</td><td/><td>-1575463955</td></row>
 		<row><td>ID_STRING11</td><td>1033</td><td>FLEXIN~1|FLEX Index UI Help</td><td>0</td><td/><td>-1550244656</td></row>
-		<row><td>ID_STRING12</td><td>1033</td><td>Extract Systems FLEX Index Rule Development Toolkit</td><td>0</td><td/><td>194580014</td></row>
+		<row><td>ID_STRING12</td><td>1033</td><td>Extract Systems Rule Development Toolkit</td><td>0</td><td/><td>-450657040</td></row>
 		<row><td>ID_STRING13</td><td>1033</td><td>COMMAN~1|Command Prompt Bin</td><td>0</td><td/><td>-1575476405</td></row>
 		<row><td>ID_STRING14</td><td>1033</td><td>COMMAN~1|Command Prompt Bin</td><td>0</td><td/><td>-1575480501</td></row>
 		<row><td>ID_STRING15</td><td>1033</td><td>EAVGEN~1|EAV Generator</td><td>0</td><td/><td>-1575472179</td></row>
@@ -3131,7 +3131,7 @@
 		<row><td>ID_STRING4</td><td>1033</td><td>ENCRYP~1|Encrypt File</td><td>0</td><td/><td>-1331814998</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>RDT Components</td><td>0</td><td/><td>1914202479</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>FLEXIN~1|Extract Systems FLEX Index SDK</td><td>0</td><td/><td>194598446</td></row>
-		<row><td>ID_STRING7</td><td>1033</td><td>EXTRAC~1|Extract Systems FLEX Index RDT</td><td>0</td><td/><td>-1600449462</td></row>
+		<row><td>ID_STRING7</td><td>1033</td><td>EXTRAC~1|Extract Systems RDT</td><td>0</td><td/><td>-450663376</td></row>
 		<row><td>ID_STRING8</td><td>1033</td><td>RUNDIA~1|Run Diagnositic Test</td><td>0</td><td/><td>-2112339766</td></row>
 		<row><td>ID_STRING9</td><td>1033</td><td>TESTHA~1|TestHarness</td><td>0</td><td/><td>-1709677267</td></row>
 		<row><td>IIDS_UITEXT_FeatureUninstalled</td><td>1033</td><td>This feature will remain uninstalled.</td><td>0</td><td/><td>479668549</td></row>
@@ -3709,8 +3709,8 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>ProductCode</td><td>{735E1622-3990-445F-9E5D-B0D7FDE292A3}</td><td/></row>
-		<row><td>ProductName</td><td>Extract Systems FLEX Index Rule Development Toolkit</td><td/></row>
-		<row><td>ProductVersion</td><td>1.00.0000</td><td/></row>
+		<row><td>ProductName</td><td>Extract Systems Rule Development Toolkit</td><td/></row>
+		<row><td>ProductVersion</td><td>1.0.0.0</td><td/></row>
 		<row><td>REBOOT</td><td>Suppress</td><td/></row>
 		<row><td>STANDARD_USE_SETUPEXE</td><td>##IDS_STANDARD_USE_SETUPEXE##</td><td/></row>
 		<row><td>SecureCustomProperties</td><td>ARPNOMODIFY;ARPNOREMOVE;ARPSYSTEMCOMPONENT;INSTALLDIR;ISALWAYSINSTALLELEVATED;ISSETUPDRIVEN;IS_NET_API_GROUP_LIST;IS_NET_API_LOGON_DOMAIN_TOKEN;IS_NET_API_LOGON_PASSWORD;IS_NET_API_LOGON_USERNAME;IS_NET_API_LOGON_USERNAME_TOKEN;IS_NET_API_NEW_USER_CONFIRM;IS_NET_API_NEW_USER_GROUP;IS_NET_API_NEW_USER_NAME;IS_NET_API_NEW_USER_PASSWORD;IS_NET_API_NEW_USER_SERVER;IS_NET_API_SERVER_LIST;IS_NET_API_SERVER_NEW_USER_LIST;IS_NET_API_USER_LIST;IS_NEW_USER_CONFIRM_TEXT;IS_NEW_USER_GROUP_TEXT;IS_NEW_USER_NAME_TEXT;IS_NEW_USER_PASSWORD_TEXT;IS_NEW_USER_SERVER_TEXT;IS_SQLSERVER_AUTHENTICATION;IS_SQLSERVER_DATABASE;IS_SQLSERVER_LIST;IS_SQLSERVER_PASSWORD;IS_SQLSERVER_SERVER;IS_SQLSERVER_USERNAME;SUPPORTDIR</td><td/></row>

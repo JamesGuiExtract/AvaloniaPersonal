@@ -3029,7 +3029,7 @@
 		<row><td>IDS__TargetReq_DESC_PROCESSOR</td><td>1033</td><td>The processor is not adequate for running [ProductName].</td><td>0</td><td/><td>-1264741984</td></row>
 		<row><td>IDS__TargetReq_DESC_RAM</td><td>1033</td><td>The amount of RAM is not adequate for running [ProductName].</td><td>0</td><td/><td>-1264741984</td></row>
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>-1264741984</td></row>
-		<row><td>ID_STRING1</td><td>1033</td><td>FLEX Index Customer Rule Writing Toolkit</td><td>0</td><td/><td>1377918058</td></row>
+		<row><td>ID_STRING1</td><td>1033</td><td>FLEX Index Rule Writing Toolkit</td><td>0</td><td/><td>631476523</td></row>
 		<row><td>ID_STRING10</td><td>1033</td><td>INDEXC~1|Index Converter</td><td>0</td><td/><td>1377939117</td></row>
 		<row><td>ID_STRING2</td><td>1033</td><td/><td>0</td><td/><td>1377903754</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>www.extractsystems.com</td><td>0</td><td/><td>1377946762</td></row>
@@ -3037,7 +3037,7 @@
 		<row><td>ID_STRING5</td><td>1033</td><td>Description</td><td>0</td><td/><td>1377920682</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>RDT Components</td><td>0</td><td/><td>1377939146</td></row>
 		<row><td>ID_STRING7</td><td>1033</td><td>TESTHA~1|Test Harness</td><td>0</td><td/><td>1377912269</td></row>
-		<row><td>ID_STRING8</td><td>1033</td><td>EXTRAC~1|Extract Systems FLEX Index Customer RDT</td><td>0</td><td/><td>1377936845</td></row>
+		<row><td>ID_STRING8</td><td>1033</td><td>EXTRAC~2|Extract Systems FLEX Index RDT</td><td>0</td><td/><td>631441643</td></row>
 		<row><td>ID_STRING9</td><td>1033</td><td>RULESE~1|Rule Set Editor</td><td>0</td><td/><td>1377906157</td></row>
 		<row><td>IIDS_UITEXT_FeatureUninstalled</td><td>1033</td><td>This feature will remain uninstalled.</td><td>0</td><td/><td>-1264741984</td></row>
 	</table>
@@ -3621,7 +3621,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>ProductCode</td><td>{0096DE46-974F-48D5-956C-695B2E4A30F6}</td><td/></row>
-		<row><td>ProductName</td><td>FLEX Index Customer Rule Writing Toolkit</td><td/></row>
+		<row><td>ProductName</td><td>Extract Systems FLEX Index Customer Rule Writing Toolkit</td><td/></row>
 		<row><td>ProductVersion</td><td>1.00.0000</td><td/></row>
 		<row><td>REBOOT</td><td>Suppress</td><td/></row>
 		<row><td>STANDARD_USE_SETUPEXE</td><td>##IDS_STANDARD_USE_SETUPEXE##</td><td/></row>
