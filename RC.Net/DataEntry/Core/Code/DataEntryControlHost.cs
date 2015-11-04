@@ -902,7 +902,11 @@ namespace Extract.DataEntry
         {
             get
             {
+#if PERFORMANCE_TESTING
+                return UnviewedDataSaveMode.Allow;
+#else
                 return _unviewedDataSaveMode;
+#endif
             }
 
             set
@@ -932,7 +936,11 @@ namespace Extract.DataEntry
         {
             get
             {
+#if PERFORMANCE_TESTING
+                return InvalidDataSaveMode.Allow;
+#else
                 return _invalidDataSaveMode;
+#endif
             }
 
             set
@@ -7424,15 +7432,15 @@ namespace Extract.DataEntry
             // Don't prompt or display exception about validation warnings if we are allowing them
             // or if prompting for each warning but there are truly invalid attributes.
             bool ignoreWarnings =
-                   _invalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings
-                || _invalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && hasError;
+                   InvalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings
+                || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && hasError;
 
             // If saving could be prevented by invalid data, iterate through the invalid attributes
             // in order to display the appropriate exception or prompt user for confirmation.
-            if (   _invalidDataSaveMode == InvalidDataSaveMode.Disallow
-                || _invalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings && hasError
-                || _invalidDataSaveMode == InvalidDataSaveMode.PromptForEach
-                || _invalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning
+            if (   InvalidDataSaveMode == InvalidDataSaveMode.Disallow
+                || InvalidDataSaveMode == InvalidDataSaveMode.AllowWithWarnings && hasError
+                || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEach
+                || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning
                )
 
             {
@@ -7486,8 +7494,8 @@ namespace Extract.DataEntry
                     {
                         // If saving is allowed after prompting, prompt for each attribute that
                         // currently does not meet validation requirements.
-                        if (   _invalidDataSaveMode == InvalidDataSaveMode.PromptForEach
-                            || _invalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && !hasError
+                        if (   InvalidDataSaveMode == InvalidDataSaveMode.PromptForEach
+                            || InvalidDataSaveMode == InvalidDataSaveMode.PromptForEachWarning && !hasError
                            )
                         {
                             string message = validationException.Message + Environment.NewLine +
@@ -7532,7 +7540,7 @@ namespace Extract.DataEntry
             }
 
             // If saving should be or can be prevented by unviewed data, check for unviewed data.
-            if (_unviewedDataSaveMode != UnviewedDataSaveMode.Allow)
+            if (UnviewedDataSaveMode != UnviewedDataSaveMode.Allow)
             {
                 if (GetNextUnviewedAttribute() != null)
                 {
@@ -7540,7 +7548,7 @@ namespace Extract.DataEntry
                     changedSelection = true;
 
                     // If saving should be allowed after a prompting, prompt.
-                    if (_unviewedDataSaveMode == UnviewedDataSaveMode.PromptOnceForAll)
+                    if (UnviewedDataSaveMode == UnviewedDataSaveMode.PromptOnceForAll)
                     {
                         if (MessageBox.Show(this, "Not all fields have been viewed, do you wish " +
                             "to save the data anyway?", "Unviewed data", MessageBoxButtons.YesNo, 
