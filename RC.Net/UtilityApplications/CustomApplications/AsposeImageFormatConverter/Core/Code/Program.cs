@@ -2,6 +2,7 @@
 using Aspose.Pdf.Devices;
 using Aspose.Pdf.Facades;
 using Extract;
+using Extract.Licensing;
 using System;
 using System.IO;
 using System.Reflection;
@@ -19,6 +20,13 @@ namespace AsposeImageFormatConverter
 
             try
             {
+               // Load the licenses
+                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+
+                // Validate that this is licensed
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI39034", "Special Image Format Converter Application");  
+              
                 int argumentCount = args.Length;
 
                 if (argumentCount == 1
