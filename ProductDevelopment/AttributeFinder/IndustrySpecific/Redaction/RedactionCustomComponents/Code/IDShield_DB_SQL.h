@@ -162,3 +162,11 @@ static const string gstrPORT_IDSHEIELDDATA_TO_FILETASKSESSION =
 " \r\n"
 "    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState) \r\n"
 "END CATCH";
+
+static const string gstrINSERT_REDACTION_VERIFY_TASK_CLASS =
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('AD7F3F3F-20EC-4830-B014-EC118F6D4567', 'Redaction: Verify sensitive data') \r\n";
+
+static const string gstrINSERT_CREATE_REDACTED_IMAGE_TASK_CLASS = 
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('36D14C41-CE3D-4950-AC47-2664563340B1', 'Redaction: Create redacted image') \r\n";

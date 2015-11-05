@@ -127,6 +127,12 @@ int UpdateToSchemaVersion5(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '5' WHERE [Name] = '" + 
 			gstrDATA_ENTRY_SCHEMA_VERSION_NAME + "'");
 
+		// This is to fix a problem were the TaskClass values may not be in the database
+		// https://extract.atlassian.net/browse/ISSUE-13341
+		string strInsertTaskClassIfNeeded = 
+			"IF NOT EXISTS (SELECT ID FROM TaskClass WHERE GUID = '59496DF7-3951-49b7-B063-8C28F4CD843F') " +
+			gstrINSERT_DATA_ENTRY_VERIFY_TASK_CLASS;
+		vecQueries.push_back(strInsertTaskClassIfNeeded);
 		executeVectorOfSQL(ipConnection, vecQueries);
 
 		return nNewSchemaVersion;
@@ -277,6 +283,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_INSTANCE_V4);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_ID);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_TYPE);
+		vecCreateQueries.push_back(gstrINSERT_DATA_ENTRY_VERIFY_TASK_CLASS);
 
 		// Execute the queries to create the data entry table
 		executeVectorOfSQL(ipDBConnection, vecCreateQueries);

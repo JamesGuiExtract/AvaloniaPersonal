@@ -159,6 +159,17 @@ int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '6' WHERE [Name] = '" + 
 			gstrID_SHIELD_SCHEMA_VERSION_NAME + "'");
 
+		// This corrects a problem where the TaskClass values may not be in the database
+		// https://extract.atlassian.net/browse/ISSUE-13341
+		string strInsertVerifyTaskClassIfNeeded = 
+			"IF NOT EXISTS (SELECT ID FROM TaskClass WHERE GUID = 'AD7F3F3F-20EC-4830-B014-EC118F6D4567')" +
+			gstrINSERT_REDACTION_VERIFY_TASK_CLASS;
+		string strInsertCreateRedactedTaskClassIfNeeded = 
+			"IF NOT EXISTS (SELECT ID FROM TaskClass WHERE GUID = '36D14C41-CE3D-4950-AC47-2664563340B1'" +
+			gstrINSERT_CREATE_REDACTED_IMAGE_TASK_CLASS;
+		vecQueries.push_back(strInsertVerifyTaskClassIfNeeded);
+		vecQueries.push_back(strInsertCreateRedactedTaskClassIfNeeded);
+
 		executeVectorOfSQL(ipConnection, vecQueries);
 
 		return nNewSchemaVersion;
@@ -294,6 +305,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(IFileProcessing
 		// Add queries for creating indexes & constraints
 		vecCreateQueries.push_back(gstrADD_IDSHIELDDATA_FILETASKSESSION_FK);
 		vecCreateQueries.push_back(gstrCREATE_IDSHIELDDATA_FILETASKSESSION_INDEX);
+		vecCreateQueries.push_back(gstrINSERT_REDACTION_VERIFY_TASK_CLASS);
+		vecCreateQueries.push_back(gstrINSERT_CREATE_REDACTED_IMAGE_TASK_CLASS);
 
 		// Execute the queries to create the id shield table
 		executeVectorOfSQL(ipDBConnection, vecCreateQueries);

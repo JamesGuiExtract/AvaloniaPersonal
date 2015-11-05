@@ -286,3 +286,7 @@ static const string gstrPORT_DATAENTRYDATA_TO_FILETASKSESSION =
 " \r\n"
 "    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState) \r\n"
 "END CATCH \r\n";
+
+static const string gstrINSERT_DATA_ENTRY_VERIFY_TASK_CLASS =
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('59496DF7-3951-49b7-B063-8C28F4CD843F', 'Data Entry: Verify extracted data') \r\n";
