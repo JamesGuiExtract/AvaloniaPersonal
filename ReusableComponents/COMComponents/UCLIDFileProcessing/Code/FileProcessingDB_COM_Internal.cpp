@@ -35,6 +35,11 @@ using namespace ADODB;
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
 const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 133;
+
+//-------------------------------------------------------------------------------------------------
+// Defined constant for the Request code version
+const long glSECURE_COUNTER_REQUEST_VERSION = 1;
+
 //-------------------------------------------------------------------------------------------------
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -8966,6 +8971,9 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				ByteStream bsRequestCode;
 				ByteStreamManipulator bsmRequest(ByteStreamManipulator::kWrite, bsRequestCode);
 				
+				// Add the version to the request
+				bsmRequest << glSECURE_COUNTER_REQUEST_VERSION;
+
 				bsmRequest << DBIDValue;
 
 				// Add the current time

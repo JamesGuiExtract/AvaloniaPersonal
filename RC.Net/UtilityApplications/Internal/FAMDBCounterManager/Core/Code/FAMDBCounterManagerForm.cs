@@ -94,6 +94,11 @@ namespace Extract.FAMDBCounterManager
         ByteArrayManipulator _licenseData;
 
         /// <summary>
+        /// The version of the license string
+        /// </summary>
+        int _licenseCodeVersion;
+
+        /// <summary>
         /// The index of the counter data within <see cref="_licenseData"/>.
         /// </summary>
         int _counterDataPos;
@@ -737,6 +742,18 @@ namespace Extract.FAMDBCounterManager
 
                 // Retrieve the general information about the FAM DB.
                 _licenseData = new ByteArrayManipulator(decryptedBytes);
+                _licenseCodeVersion = _licenseData.ReadInt32();
+
+                // Make sure the version is one that can be interpreted
+				// Future version will need code to read the different versions if needed
+                if (_licenseCodeVersion > 1)
+                {
+                    Exception ex = new Exception("License code version is not recognized.");
+                    ex.Data.Add("LicenseCodeVersion", _licenseCodeVersion.ToString());
+                    ex.ShowMessageBox();
+                    throw ex;
+                }
+
                 _dbInfo = new DatabaseInfo(_licenseData);
                 _databaseIdTextBox.Text = _dbInfo.DatabaseID.ToString().ToUpperInvariant();
                 _databaseServerTextBox.Text = _dbInfo.DatabaseServer;
