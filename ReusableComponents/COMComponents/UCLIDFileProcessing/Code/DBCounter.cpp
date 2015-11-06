@@ -32,34 +32,8 @@ DBCounter::DBCounter(long nID, string strName, long nValue)
 	: m_nID(nID), m_strName(strName), m_nValue(nValue)
 {
 }
-
 //-------------------------------------------------------------------------------------------------
 // DBCounter operators
-//-------------------------------------------------------------------------------------------------
-void DBCounter::LoadFromFields(FieldsPtr ipFields, const long nDatabaseIDHash, bool bValidate)
-{
-	LoadFromFields(ipFields);
-
-	// Check that the hash is what it should be	
-	if (m_nDatabaseIDCounterIDHash != ((nDatabaseIDHash << 10) + m_nID))
-	{
-		UCLIDException ueInvalid("ELI38927", "Counter has been corrupted.");
-		throw ueInvalid;
-	}
-
-	if (bValidate)
-	{
-		DBCounterChangeValue counterChange;
-		counterChange.LoadFromFields(ipFields, true);
-		if (m_nValue != counterChange.m_nToValue)
-		{
-			UCLIDException ue("ELI38930", "Counter has been corrupted.");
-			ue.addDebugInfo("CounterID", m_nID);
-			ue.addDebugInfo("CounterName", m_strName);
-			throw ue;
-		}
-	}
-}
 //-------------------------------------------------------------------------------------------------
 void DBCounter::LoadFromFields(FieldsPtr ipFields)
 {
@@ -104,11 +78,51 @@ string DBCounter::getEncrypted(const long nDatabaseIDHash)
 	bsm.flushToByteStream(8);
 
 	return MapLabel::setMapLabelWithS(bsCounter, bsPW);
-
 }
 //-------------------------------------------------------------------------------------------------
-bool DBCounter::isValid(const long nDatabaseIDHash)
+void DBCounter::validate(const long nDatabaseIDHash, FieldsPtr ipFields/* = nullptr */)
 {
-	return 	m_nDatabaseIDCounterIDHash == ((nDatabaseIDHash << 10) + m_nID);
-}
+	long nHashedID = m_nDatabaseIDCounterIDHash & 0x3FF;
 
+	if (m_nDatabaseIDCounterIDHash != ((nDatabaseIDHash << 10) + m_nID))
+	{
+		m_strValidationError = "Counter hash is invalid";
+		throw UCLIDException("ELI38927", "Counter has been corrupted.");
+	}
+
+	if (ipFields != nullptr)
+	{
+		DBCounterChangeValue counterChange;
+		try
+		{
+			counterChange.LoadFromFields(ipFields, true);
+		}
+		catch (...)
+		{
+			m_strValidationError = "Counter history corrupted";
+			throw;
+		}
+
+		if (m_nValue != counterChange.m_nToValue)
+		{
+			m_strValidationError = "Counter history discrepancy.";
+			UCLIDException ue("ELI38930", "Counter has been corrupted.");
+			ue.addDebugInfo("CounterID", m_nID);
+			ue.addDebugInfo("CounterName", m_strName);
+			throw ue;
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+bool DBCounter::isValid(const long nDatabaseIDHash, FieldsPtr ipFields/* = nullptr */)
+{
+	try
+	{
+		validate(nDatabaseIDHash, ipFields);
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
+}

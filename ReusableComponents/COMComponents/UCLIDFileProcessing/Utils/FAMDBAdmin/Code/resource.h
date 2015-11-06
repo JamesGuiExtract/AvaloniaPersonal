@@ -29,7 +29,6 @@
 #define IDR_MENU_SUMMARY_TOTAL_COLUMN   145
 #define IDD_DIALOG_MANAGE_ATTRIBUTE_SETS 146
 
-
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
 // These ID's are defined in FAMUtils
@@ -164,7 +163,7 @@
 #define ID_TOOLS_CHECKFORNEWCOMPONENTS  32789
 #define ID_MANAGE_TAGS                  32790
 #define ID_TOOLS_SETPRIORITY            32791
-#define ID_MANAGE_COUNTERS              32792
+#define ID_MANAGE_BATES_COUNTERS        32792
 #define ID_MANAGE_ACTIONS               32793
 #define ID_MANAGE_USERS                 32794
 #define ID_SUMMARY_MENU_CANCEL          32795
@@ -183,16 +182,14 @@
 #define ID_MANAGE_METADATA              32808
 #define ID_MANAGE_ATTRIBUTESETS         32809
 #define ID_TOOLS_COUNTERS               32810
-#define ID_COUNTERS_GENERATEREQUESTCODE 32811
-#define ID_COUNTERS_APPLYUPDATECODE     32812
-#define ID_COUNTERS_PERFORMINTEGRITYCHECK 32813
+#define ID_MANAGE_RULE_COUNTERS         32811
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        147
-#define _APS_NEXT_COMMAND_VALUE         32814
+#define _APS_NEXT_COMMAND_VALUE         32812
 #define _APS_NEXT_CONTROL_VALUE         2122
 #define _APS_NEXT_SYMED_VALUE           2122
 #endif

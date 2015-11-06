@@ -3540,82 +3540,28 @@ STDMETHODIMP CFileProcessingDB::GetFileNameFromFileID( long fileID, BSTR* pbstrF
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38703");	
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::get_SecureCounters (IIUnknownVector** ppSecureCounters)
+STDMETHODIMP CFileProcessingDB::GetSecureCounters(VARIANT_BOOL vbRefresh,
+	IIUnknownVector** ppSecureCounters)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
 	try
 	{
 		validateLicense();
-		ASSERT_ARGUMENT("ELI38771", ppSecureCounters != nullptr);
+		ASSERT_ARGUMENT("ELI39076", ppSecureCounters != nullptr);
 
-		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-		ADODB::_ConnectionPtr ipConnection = __nullptr;
+		if (!GetSecureCounters_Internal(false, vbRefresh, ppSecureCounters))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(
+				getThisAsCOMPtr(), gstrSECURE_COUNTER_DB_LOCK);
 
-		BEGIN_CONNECTION_RETRY();
-
-			// check if the m_ipSecureCounters is already defined;
-			if (m_ipSecureCounters != __nullptr)
-			{
-				// Need to increment the reference count since passing to a non smart pointer
-				m_ipSecureCounters.AddRef();
-				*ppSecureCounters = m_ipSecureCounters;
-				return S_OK;
-			}
-
-			// Get a list of all of the counters from the database
-
-			string strQuery = gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE;
-
-			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
-
-			if (!m_bDatabaseIDValuesValidated)
-			{
-				checkDatabaseIDValid(ipConnection, true);
-			}
-
-			// Get the last issued FAMFile id
-			executeCmdQuery(ipConnection,"SELECT cast(IDENT_CURRENT('FAMFile') as int) AS ID",
-				false, &m_nLastFAMFileID);
-
-			// Create a pointer to a recordset
-			_RecordsetPtr ipResultSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI38940", ipResultSet != __nullptr);
-
-			// Make sure the DB Schema is the expected version
-			validateDBSchemaVersion();
-
-			// Open the Action table
-			ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-				adLockReadOnly, adCmdText);
-
-			IIUnknownVectorPtr ipSecureCounters(CLSID_IUnknownVector);
-
-			while (!asCppBool(ipResultSet->adoEOF))
-			{
-				DBCounter dbCounter;
-				dbCounter.LoadFromFields(ipResultSet->Fields, m_DatabaseIDValues.m_nHashValue, true);
-
-				UCLID_FILEPROCESSINGLib::ISecureCounterCreatorPtr ipSecureCounter(nullptr);
-				SECURE_CREATE_OBJECT("ELI38941", ipSecureCounter,
-					"Extract.FileActionManager.Database.FAMDBRuleExecutionCounter");
-				ipSecureCounter->Initialize(getThisAsCOMPtr(), dbCounter.m_nID);
-				ipSecureCounters->PushBack(ipSecureCounter);
-
-				ipResultSet->MoveNext();
-			}
-			m_ipSecureCounters = ipSecureCounters;
-			
-			// Need to increment the reference count since passing to a non smart pointer
-			m_ipSecureCounters.AddRef();
-			*ppSecureCounters = ipSecureCounters;
-
-		END_CONNECTION_RETRY(ipConnection, "ELI38942");
+			GetSecureCounters_Internal(true, vbRefresh, ppSecureCounters);
+		}
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38770");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39077");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetSecureCounterName (long nCounterID, BSTR *pstrCounterName)
@@ -3631,7 +3577,7 @@ STDMETHODIMP CFileProcessingDB::GetSecureCounterName (long nCounterID, BSTR *pst
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
-				gstr_SECURE_COUNTER_DB_LOCK);
+				gstrSECURE_COUNTER_DB_LOCK);
 
 			GetSecureCounterName_Internal(true, nCounterID, pstrCounterName);
 		}
@@ -3653,7 +3599,7 @@ STDMETHODIMP CFileProcessingDB::ApplySecureCounterUpdateCode (BSTR strUpdateCode
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
-				gstr_SECURE_COUNTER_DB_LOCK);
+				gstrSECURE_COUNTER_DB_LOCK);
 
 			ApplySecureCounterUpdateCode_Internal(true, strUpdateCode, pbstrResult);
 		}
@@ -3676,7 +3622,7 @@ STDMETHODIMP CFileProcessingDB::GetSecureCounterValue (long nCounterID, long* pn
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
-				gstr_SECURE_COUNTER_DB_LOCK);
+				gstrSECURE_COUNTER_DB_LOCK);
 
 			GetSecureCounterValue_Internal(true, nCounterID, pnCounterValue);
 		}
@@ -3699,7 +3645,7 @@ STDMETHODIMP CFileProcessingDB::DecrementSecureCounter (long nCounterID, long de
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
-				gstr_SECURE_COUNTER_DB_LOCK);
+				gstrSECURE_COUNTER_DB_LOCK);
 
 			DecrementSecureCounter_Internal(true, nCounterID, decrementAmount, pnCounterValue);
 		}
@@ -3722,7 +3668,7 @@ STDMETHODIMP CFileProcessingDB::SecureCounterConsistencyCheck (VARIANT_BOOL* pvb
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
-				gstr_SECURE_COUNTER_DB_LOCK);
+				gstrSECURE_COUNTER_DB_LOCK);
 
 			SecureCounterConsistencyCheck_Internal(true,  pvbValid);
 		}
@@ -3744,13 +3690,70 @@ STDMETHODIMP CFileProcessingDB::GetCounterUpdateRequestCode (BSTR* pstrUpdateReq
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
-				gstr_SECURE_COUNTER_DB_LOCK);
+				gstrSECURE_COUNTER_DB_LOCK);
 
 			GetCounterUpdateRequestCode_Internal(true,  pstrUpdateRequestCode);
 		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38789");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_DatabaseID(BSTR* pbstrDatabaseID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI39078", pbstrDatabaseID != nullptr);
+
+		checkDatabaseIDValid(getDBConnection(), false);
+		string strDatabaseID = asString(m_DatabaseIDValues.m_GUID);
+		replaceVariable(strDatabaseID, "{", "");
+		replaceVariable(strDatabaseID, "}", "");
+		
+		*pbstrDatabaseID = get_bstr_t(strDatabaseID.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39079");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_ConnectedDatabaseServer(BSTR* pbstrDatabaseServer)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI39080", pbstrDatabaseServer != nullptr);
+
+		checkDatabaseIDValid(getDBConnection(), false);
+		
+		*pbstrDatabaseServer = get_bstr_t(m_DatabaseIDValues.m_strServer.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39081");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_ConnectedDatabaseName(BSTR* pbstrDatabaseName)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI39082", pbstrDatabaseName != nullptr);
+
+		checkDatabaseIDValid(getDBConnection(), false);
+		
+		*pbstrDatabaseName = get_bstr_t(m_DatabaseIDValues.m_strName.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39083");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -76,7 +76,7 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 	CTime ctCreationDate, ctRestoreDate;
 	string strDatabaseName = ipConnection->DefaultDatabase;
 	
-	getDatabaseCreationDateAndRestoreDate(ipConnection, strDatabaseName, strServer, ctCreationDate, ctRestoreDate);
+	getDatabaseInfo(ipConnection, strDatabaseName, strServer, ctCreationDate, ctRestoreDate);
 
 	makeLowerCase(strDatabaseName);
 	makeLowerCase(strServer);

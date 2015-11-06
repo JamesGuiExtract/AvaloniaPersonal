@@ -68,6 +68,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplyCounterUpdateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ApplyCounterUpdateForm.Designer.cs">
+      <DependentUpon>ApplyCounterUpdateForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfigureDBInfoSettings.cs" />
     <Compile Include="FAMDatabaseOptionsDialog.cs">
       <SubType>Form</SubType>
@@ -80,7 +86,32 @@
     <Compile Include="FAMServiceDatabaseManager.cs" />
     <Compile Include="FAMServiceDatabaseMapping.cs" />
     <Compile Include="FpsFileTableData.cs" />
+    <Compile Include="GenerateCounterRequestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GenerateCounterRequestForm.Designer.cs">
+      <DependentUpon>GenerateCounterRequestForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LicenseContact.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>LicenseContact.settings</DependentUpon>
+    </Compile>
+    <Compile Include="ManageSecureCountersForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ManageSecureCountersForm.Designer.cs">
+      <DependentUpon>ManageSecureCountersForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SecureCounterManagement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SecureCounterTextManipulator.cs" />
+    <Compile Include="SendCounterConfirmationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SendCounterConfirmationForm.Designer.cs">
+      <DependentUpon>SendCounterConfirmationForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
@@ -155,9 +186,28 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ApplyCounterUpdateForm.resx">
+      <DependentUpon>ApplyCounterUpdateForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FAMDatabaseOptionsDialog.resx">
       <DependentUpon>FAMDatabaseOptionsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GenerateCounterRequestForm.resx">
+      <DependentUpon>GenerateCounterRequestForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManageSecureCountersForm.resx">
+      <DependentUpon>ManageSecureCountersForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SendCounterConfirmationForm.resx">
+      <DependentUpon>SendCounterConfirmationForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="LicenseContact.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>LicenseContact.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

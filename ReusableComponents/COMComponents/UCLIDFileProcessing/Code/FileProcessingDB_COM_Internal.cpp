@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 132;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 133;
 //-------------------------------------------------------------------------------------------------
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -1255,6 +1255,44 @@ int UpdateToSchemaVersion132(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38716");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion133(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 133;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Add license contact settings (for secure counter management screens)
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrSEND_ALERTS_TO_EXTRACT + "', '0')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrSEND_ALERTS_TO_SPECIFIED + "', '0')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrSPECIFIED_ALERT_RECIPIENTS + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrLICENSE_CONTACT_ORGANIZATION + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrLICENSE_CONTACT_EMAIL + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrLICENSE_CONTACT_PHONE + "', '')");
+		
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39084");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -5542,6 +5580,10 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 				executeCmdQuery(ipConnection, strFAMSessionQuery, false, (long*)&m_nFAMSessionID);
 				m_nActiveActionID = lActionID;
 
+				// Whenever processing is started, re-get the secure counters as a way to force
+				// validation that the secure counters are in a good state.
+				m_ipSecureCounters = nullptr;
+
 				// Commit the transaction
 				tg.CommitTrans();
 
@@ -6323,7 +6365,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 129:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion130);
 				case 130:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion131);
 				case 131:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion132);
-				case 132:	break;
+				case 132:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion133);
+				case 133:	break;
 
 				default:
 					{
@@ -8466,6 +8509,100 @@ bool CFileProcessingDB::RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstr
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL vbRefresh,
+												   IIUnknownVector** ppSecureCounters)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+			
+			ipConnection = getDBConnection();
+
+			// Use any already existing m_ipSecureCounters unless refreshing.
+			if (!asCppBool(vbRefresh) && m_ipSecureCounters != __nullptr)
+			{
+				// Need to increment the reference count since passing to a non smart pointer
+				m_ipSecureCounters.AddRef();
+				*ppSecureCounters = m_ipSecureCounters;
+				return S_OK;
+			}
+
+			// Get a list of all of the counters from the database
+			string strQuery = gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE;
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			bool bIsDatabaseIDValid = checkDatabaseIDValid(ipConnection, false);
+
+			// Get the last issued FAMFile id
+			executeCmdQuery(ipConnection,"SELECT cast(IDENT_CURRENT('FAMFile') as int) AS ID",
+				false, &m_nLastFAMFileID);
+
+			// Create a pointer to a recordset
+			_RecordsetPtr ipResultSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI38940", ipResultSet != __nullptr);
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			// Open the Action table
+			ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+				adLockReadOnly, adCmdText);
+
+			IIUnknownVectorPtr ipSecureCounters(CLSID_IUnknownVector);
+
+			while (!asCppBool(ipResultSet->adoEOF))
+			{
+				DBCounter dbCounter;
+				UCLID_FILEPROCESSINGLib::ISecureCounterCreatorPtr ipSecureCounter(nullptr);
+				SECURE_CREATE_OBJECT("ELI38941", ipSecureCounter,
+					"Extract.FileActionManager.Database.FAMDBRuleExecutionCounter");
+
+				try
+				{
+					dbCounter.LoadFromFields(ipResultSet->Fields);
+					bool bValid = bIsDatabaseIDValid && 
+						dbCounter.isValid(m_DatabaseIDValues.m_nHashValue, ipResultSet->Fields);
+
+					ipSecureCounter->Initialize(getThisAsCOMPtr(), dbCounter.m_nID, asVariantBool(bValid));
+				}
+				catch (...)
+				{
+					ipSecureCounter->Initialize(getThisAsCOMPtr(), 0, false);
+				}
+				
+				ipSecureCounters->PushBack(ipSecureCounter);
+
+				ipResultSet->MoveNext();
+			}
+			m_ipSecureCounters = ipSecureCounters;
+			
+			// Need to increment the reference count since passing to a non smart pointer
+			m_ipSecureCounters.AddRef();
+			*ppSecureCounters = ipSecureCounters;
+
+			END_CONNECTION_RETRY(ipConnection, "ELI39085");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39086");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName)
 {
 	try
@@ -8566,6 +8703,10 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 							strApplyResult = updateCounters(ipConnection, counterUpdates);
 						}
 						tg.CommitTrans();
+						
+						// Whenever counter updates/unlocks are applied, re-get the secure counters 
+						// to ensure their new states are properly reported.
+						m_ipSecureCounters = nullptr;
 
 						*pbstrResult = _bstr_t(strApplyResult.c_str()).Detach();
 					}
@@ -8627,7 +8768,8 @@ bool CFileProcessingDB::GetSecureCounterValue_Internal(bool bDBLocked, long nCou
 					FieldsPtr fields = ipResultSet->Fields;
 					DBCounter dbCounter;
 					
-					dbCounter.LoadFromFields(ipResultSet->Fields, m_DatabaseIDValues.m_nHashValue, false);
+					dbCounter.LoadFromFields(ipResultSet->Fields);
+					dbCounter.validate(m_DatabaseIDValues.m_nHashValue);
 
 					*pnCounterValue = dbCounter.m_nValue;
 					return true;
@@ -8697,8 +8839,8 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 					{
 						FieldsPtr fields = ipResultSet->Fields;
 						DBCounter dbCounter;
-						dbCounter.LoadFromFields(ipResultSet->Fields, 
-							m_DatabaseIDValues.m_nHashValue, false);
+						dbCounter.LoadFromFields(ipResultSet->Fields);
+						dbCounter.validate(m_DatabaseIDValues.m_nHashValue);
 
 						DBCounterChangeValue dbCounterChange;
 						dbCounterChange.m_nCounterID = dbCounter.m_nID;
@@ -8796,7 +8938,7 @@ bool CFileProcessingDB::SecureCounterConsistencyCheck_Internal(bool bDBLocked, V
 	}
 	return true;
 }
-
+//-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BSTR* pstrUpdateRequestCode)
 {
 	try
@@ -8816,8 +8958,8 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				if (!bValid)
 				{
 					// Modify the DBIdValue to have corrected values (m_GUID and m_ctLastUpdated will be the same)
-					getDatabaseCreationDateAndRestoreDate(ipConnection, m_strDatabaseName, 
-						DBIDValue.m_strServer, DBIDValue.m_ctCreated, DBIDValue.m_ctRestored);
+					getDatabaseInfo(ipConnection, m_strDatabaseName, DBIDValue.m_strServer,
+						DBIDValue.m_ctCreated, DBIDValue.m_ctRestored);
 					DBIDValue.m_strName = m_strDatabaseName;
 				}
 
@@ -8829,10 +8971,6 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				// Add the current time
 				bsmRequest << getSQLServerDateTimeAsCTime(getDBConnection());
 
-				// Add code to get counters info
-				// 
-				string strQuery = "SELECT * FROM [dbo].[SecureCounter]";
-  
 				// Create a pointer to a recordset
 				_RecordsetPtr ipResultSet(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI38907", ipResultSet != __nullptr);
@@ -8841,16 +8979,18 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				validateDBSchemaVersion();
 
 				// Open the Action table
-				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockReadOnly, adCmdText);
-				
+				ipResultSet->Open(gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.c_str(), 
+					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
+					adCmdText);
+
 				vector<DBCounter> vecDBCounters;
 				while (!asCppBool(ipResultSet->adoEOF))
 				{
 					DBCounter dbCounter;
 					dbCounter.LoadFromFields(ipResultSet->Fields);
 
-					bValid = bValid && dbCounter.isValid(m_DatabaseIDValues.m_nHashValue);
+					bValid = bValid && dbCounter.isValid(
+						m_DatabaseIDValues.m_nHashValue, ipResultSet->Fields);
 
 					vecDBCounters.push_back(dbCounter);
 
@@ -8887,14 +9027,10 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 					}						
 
 					bsmRequest << c->m_nValue;
-					string strUnlockComment = "";
-					if (!bValid && !c->isValid(m_DatabaseIDValues.m_nHashValue))
-					{
-						strUnlockComment = "Counter hash is invalid.";
-					}
+
 					if (!bValid)
 					{
-						bsmRequest << strUnlockComment;
+						bsmRequest << c->m_strValidationError;
 					}
 				}
 

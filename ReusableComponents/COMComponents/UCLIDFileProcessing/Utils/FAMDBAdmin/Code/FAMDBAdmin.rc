@@ -553,7 +553,7 @@ BEGIN
     POPUP "&Database"
     BEGIN
         MENUITEM "&Clear...",                   ID_DATABASE_CLEAR
-        MENUITEM "&Reset lock\tCtrl+R",         ID_DATABASE_RESETLOCK
+        MENUITEM "&Reset lock",					ID_DATABASE_RESETLOCK
         MENUITEM "&Update database schema...",  ID_DATABASE_UPDATE_SCHEMA
         MENUITEM SEPARATOR
         MENUITEM "&Database options...",        ID_DATABASE_SET_OPTIONS
@@ -567,21 +567,16 @@ BEGIN
     BEGIN
         MENUITEM "&Actions...\tCtrl+A",         ID_MANAGE_ACTIONS
         MENUITEM "Attribute &sets...\tCtrl+S",  ID_MANAGE_ATTRIBUTESETS
-        MENUITEM "&Counters...\tCtrl+C",        ID_MANAGE_COUNTERS
+        MENUITEM "Bates number &counters...\tCtrl+B", ID_MANAGE_BATES_COUNTERS
         MENUITEM "&Tags...\tCtrl+T",            ID_MANAGE_TAGS
         MENUITEM "&Users...\tCtrl+U",           ID_MANAGE_USERS
         MENUITEM "&Metadata fields...",         ID_MANAGE_METADATA
+        MENUITEM SEPARATOR
+        MENUITEM "&Rule execution counters...\tCtrl+R", ID_MANAGE_RULE_COUNTERS
     END
     POPUP "&Tools"
     BEGIN
         MENUITEM "Check for new components",    ID_TOOLS_CHECKFORNEWCOMPONENTS
-        MENUITEM SEPARATOR
-        POPUP "Counters..."
-        BEGIN
-            MENUITEM "Generate request code...",    ID_COUNTERS_GENERATEREQUESTCODE
-            MENUITEM "Apply update code...",        ID_COUNTERS_APPLYUPDATECODE
-            MENUITEM "Perform integrity check...",  ID_COUNTERS_PERFORMINTEGRITYCHECK
-        END
         MENUITEM SEPARATOR
         MENUITEM "&Manually set action status...\tCtrl+M", ID_TOOLS_MANUALLYSETACTIONSTATUS
         MENUITEM "Manually set file processing &priority...", ID_TOOLS_SETPRIORITY
@@ -648,11 +643,11 @@ IDR_ACCELERATORS ACCELERATORS
 BEGIN
     "H",            ID_DATABASE_CHANGEPASSWORD, VIRTKEY, CONTROL, NOINVERT
     "L",            ID_DATABASE_LOGIN,      VIRTKEY, CONTROL, NOINVERT
-    "R",            ID_DATABASE_RESETLOCK,  VIRTKEY, CONTROL, NOINVERT
     "A",            ID_MANAGE_ACTIONS,      VIRTKEY, CONTROL, NOINVERT
-    "C",            ID_MANAGE_COUNTERS,     VIRTKEY, CONTROL, NOINVERT
+    "B",            ID_MANAGE_BATES_COUNTERS, VIRTKEY, CONTROL, NOINVERT
     "T",            ID_MANAGE_TAGS,         VIRTKEY, CONTROL, NOINVERT
     "U",            ID_MANAGE_USERS,        VIRTKEY, CONTROL, NOINVERT
+	"R",            ID_MANAGE_RULE_COUNTERS, VIRTKEY, CONTROL, NOINVERT
     "F",            ID_TOOLS_FILEACTIONMANAGER, VIRTKEY, CONTROL, NOINVERT
     "I",            ID_TOOLS_INSPECT_FILES, VIRTKEY, CONTROL, NOINVERT
     "M",            ID_TOOLS_MANUALLYSETACTIONSTATUS, VIRTKEY, CONTROL, NOINVERT

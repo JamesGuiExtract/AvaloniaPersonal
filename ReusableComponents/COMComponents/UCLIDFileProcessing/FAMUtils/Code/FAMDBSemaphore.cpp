@@ -92,7 +92,7 @@ void FAMDBSemaphore::getSyncObjects(const string &strLockName, CSemaphore *&pSem
 		pSemaphore = &ms_semaphoreWorkItemLock;
 		pdwLockThreadId = &ms_dwWorkItemLockThread;
 	}
-	else if (strLockName == gstr_SECURE_COUNTER_DB_LOCK)
+	else if (strLockName == gstrSECURE_COUNTER_DB_LOCK)
 	{
 		pSemaphore = &ms_semaphoreSecureCounterLock;
 		pdwLockThreadId = &ms_dwSecureCounterLockThread;

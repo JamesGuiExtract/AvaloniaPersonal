@@ -44,6 +44,7 @@ const string gstrFAMDB_REG_KEY = gstrCOM_COMPONENTS_REG_PATH + "\\UCLIDFileProce
 
 // Guid for the COM class that displays the DB info configuration dialog
 const string gstrDB_OPTIONS_GUID = "{F86BB12C-EB1C-44EA-B5EA-9A428A601608}";
+const string gstrDB_SECURE_COUNTER_MANAGER_GUID = "{D22193BD-EC71-4494-B185-F673EEA548D2}";
 
 //-------------------------------------------------------------------------------------------------
 // CFAMDBAdminDlg dialog
@@ -119,7 +120,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_WM_GETMINMAXINFO()
 	ON_COMMAND(ID_TOOLS_CHECKFORNEWCOMPONENTS, &CFAMDBAdminDlg::OnToolsCheckForNewComponents)
 	ON_COMMAND(ID_MANAGE_TAGS, &CFAMDBAdminDlg::OnManageTags)
-	ON_COMMAND(ID_MANAGE_COUNTERS, &CFAMDBAdminDlg::OnManageCounters)
+	ON_COMMAND(ID_MANAGE_BATES_COUNTERS, &CFAMDBAdminDlg::OnManageBatesCounters)
 	ON_COMMAND(ID_MANAGE_USERS, &CFAMDBAdminDlg::OnManageLoginUsers)
 	ON_COMMAND(ID_MANAGE_ACTIONS, &CFAMDBAdminDlg::OnManageActions)
 	ON_COMMAND(ID_TOOLS_SETPRIORITY, &CFAMDBAdminDlg::OnToolsSetPriority)
@@ -127,8 +128,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_RECALCULATE_STATS, &CFAMDBAdminDlg::OnRecalculateStats)
 	ON_COMMAND(ID_MANAGE_METADATA, &CFAMDBAdminDlg::OnManageMetadataFields)
 	ON_COMMAND(ID_MANAGE_ATTRIBUTESETS, &CFAMDBAdminDlg::OnManageAttributeSets)
-	ON_COMMAND(ID_COUNTERS_GENERATEREQUESTCODE, &CFAMDBAdminDlg::OnCountersGeneraterequestcode)
-	ON_COMMAND(ID_COUNTERS_APPLYUPDATECODE, &CFAMDBAdminDlg::OnCountersApplyupdatecode)
+	ON_COMMAND(ID_MANAGE_RULE_COUNTERS, &CFAMDBAdminDlg::OnManageRuleCounters)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -800,7 +800,7 @@ void CFAMDBAdminDlg::OnManageTags()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27416");
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnManageCounters()
+void CFAMDBAdminDlg::OnManageBatesCounters()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 
@@ -924,40 +924,17 @@ void CFAMDBAdminDlg::OnManageAttributeSets()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38633");
 }
-//-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnCountersGeneraterequestcode()
-{
-	try
-	{
-		string strCounterRequestCode = m_ipFAMDB->GetCounterUpdateRequestCode();
-
-		ClipboardManager clipboard(this);
-		clipboard.writeText(strCounterRequestCode);
-		MessageBox("Request code has been copied to the clipboard.", "Counter update request", MB_OK);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38945")
-}
 //--------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnCountersApplyupdatecode()
+void CFAMDBAdminDlg::OnManageRuleCounters()
 {
 	try
 	{
-		// TODO: Add UI that displays what counters are being updated and if the code is valid? 
-		ClipboardManager clipboard(this);
-		string strUpdateCode;
-		if (clipboard.readText(strUpdateCode))
-		{
-			m_ipFAMDB->ApplySecureCounterUpdateCode(strUpdateCode.c_str());
-			MessageBox("Update code has been applied", "Counter update", MB_OK);
-		}
-		else
-		{
-			MessageBox("No update code on clipboard.", "Counter update", MB_OK);
-		}
+		ISecureCounterManagementPtr ipCounterManager(gstrDB_SECURE_COUNTER_MANAGER_GUID.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI39087", ipCounterManager != __nullptr);
 
-		
+		ipCounterManager->ShowUI(m_ipFAMDB, m_hWnd);
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38946");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39088");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1048,11 +1025,12 @@ void CFAMDBAdminDlg::enableMenus()
 	pMenu->EnableMenuItem(ID_DATABASE_CHANGEPASSWORD, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_DATABASE_SET_OPTIONS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_TAGS, m_bIsDBGood ? nEnable : nDisable);
-	pMenu->EnableMenuItem(ID_MANAGE_COUNTERS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_BATES_COUNTERS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_ACTIONS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_USERS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_METADATA, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_ATTRIBUTESETS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_RULE_COUNTERS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_MANUALLYSETACTIONSTATUS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_SETPRIORITY, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_EXPORTFILELISTS, m_bIsDBGood ? nEnable : nDisable);

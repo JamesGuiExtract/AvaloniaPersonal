@@ -48,6 +48,13 @@ static const string gstrEMAIL_TIMEOUT = "EmailTimeout";
 static const string gstrEMAIL_USE_SSL = "EmailUseSSL";
 static const string gstrALLOW_RESTARTABLE_PROCESSING = "AllowRestartableProcessing";
 static const string gstrDATABASEID = "DatabaseID";
+static const string gstrSEND_ALERTS_TO_EXTRACT = "SendAlertsToExtract";
+static const string gstrSEND_ALERTS_TO_SPECIFIED = "SendAlertsToSpecified";
+static const string gstrSPECIFIED_ALERT_RECIPIENTS = "SpecifiedAlertRecipients";
+static const string gstrLICENSE_CONTACT_ORGANIZATION = "LicenseContactOrganization";
+static const string gstrLICENSE_CONTACT_EMAIL = "LicenseContactEmail";
+static const string gstrLICENSE_CONTACT_PHONE = "LicenseContactPhone";
+
 
 // Feature names
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";
@@ -85,7 +92,7 @@ static const string gstrQUERY_FILES_WITH_TAGS = "SELECT <SelectFileValues> FROM 
 static const string gstrMAIN_DB_LOCK = "Main";
 static const string gstrUSER_COUNTER_DB_LOCK = "UserCounter";
 static const string gstrWORKITEM_DB_LOCK = "WorkItem";
-static const string gstr_SECURE_COUNTER_DB_LOCK = "SecureCounter";
+static const string gstrSECURE_COUNTER_DB_LOCK = "SecureCounter";
 
 // Special-purpose FAM tag names
 const string gstrDATABASE_SERVER_TAG = "<DatabaseServer>";

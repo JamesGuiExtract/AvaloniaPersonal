@@ -295,13 +295,16 @@ public:
 	STDMETHOD(RecordFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, double dDuration,
 		double dOverheadTime, long *pnFileTaskSessionID);
 	STDMETHOD(GetFileNameFromFileID)( /*[in]*/ long fileID, /*[out, retval]*/ BSTR* pbstrFileName );
-	STDMETHOD(get_SecureCounters)(IIUnknownVector** ppSecureCounters);
+	STDMETHOD(GetSecureCounters)(VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	STDMETHOD(GetSecureCounterName)(long nCounterID, BSTR *pstrCounterName);
 	STDMETHOD(ApplySecureCounterUpdateCode)(BSTR strUpdateCode, BSTR *pbstrResult);
 	STDMETHOD(GetSecureCounterValue)(long nCounterID, long* pnCounterValue);
 	STDMETHOD(DecrementSecureCounter)(long nCounterID, long decrementAmount, long* pnCounterValue);
 	STDMETHOD(SecureCounterConsistencyCheck)(VARIANT_BOOL* pvbValid);
 	STDMETHOD(GetCounterUpdateRequestCode)(BSTR* pstrUpdateRequestCode);
+	STDMETHOD(get_DatabaseID)(BSTR* pbstrDatabaseID);
+	STDMETHOD(get_ConnectedDatabaseServer)(BSTR* pbstrDatabaseServer);
+	STDMETHOD(get_ConnectedDatabaseName)(BSTR* pbstrDatabaseName);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1206,6 +1209,7 @@ private:
 	bool RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
 	bool RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, double dDuration,
 		double dOverheadTime, long *pnFileTaskSessionID);
+	bool GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	bool GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName);
 	bool ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode, BSTR *pbstrResult);
 	bool GetSecureCounterValue_Internal(bool bDBLocked, long nCounterID, long* pnCounterValue);

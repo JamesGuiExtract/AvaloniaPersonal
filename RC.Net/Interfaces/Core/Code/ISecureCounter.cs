@@ -38,6 +38,16 @@ namespace Extract.Interfaces
         }
 
         /// <summary>
+        /// Gets a value indicating whether this counter is valid and can be used.
+        /// </summary>
+        /// <value><see langword="true"/> if this counter is valid; otherwise, <see langword="false"/>.
+        /// </value>
+        bool IsValid
+        {
+            get;
+        }
+
+        /// <summary>
         /// Decrements the counter by the specified <see paramref="count"/> assuming enough counts
         /// are available.
         /// </summary>

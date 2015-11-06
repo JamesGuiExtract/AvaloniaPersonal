@@ -1651,8 +1651,11 @@ library UCLID_FILEPROCESSINGLib
 		//			Extract.FileActionManager.Database.FAMDBRuleExecutionCounter for each counter that
 		//			is in the SecureCounter table
 		// -----------------------------------------------------------------------------------------------
-		[propget, id(148), helpstring("property SecureCounters")] HRESULT SecureCounters(
-			[out, retval] IIUnknownVector** ppSecureCounters);
+		// Get a vector of the secure counters currently defined in the database. If vbRefresh ==
+		// VARIANT_TRUE, the counter status will be re-validated and re-queried; otherwise the any
+		// previously retrieved counter list will be used.
+		[id(148), helpstring("method GetSecureCounters")] HRESULT GetSecureCounters(
+			[in] VARIANT_BOOL vbRefresh, [out, retval] IIUnknownVector** ppSecureCounters);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To return the name for the counter with an ID of nCounterID
 		[id(149), helpstring("method GetSecureCounterName")] HRESULT GetSecureCounterName(
@@ -1714,6 +1717,20 @@ library UCLID_FILEPROCESSINGLib
 		//				CounterValue - Value of counter when Request code generated.
 		[id(154), helpstring("method GetCounterUpdateRequestCode")] HRESULT GetCounterUpdateRequestCode(
 			[out, retval] BSTR* pstrUpdateRequestCode);
+		// -----------------------------------------------------------------------------------------------
+		// The string representation of the GUID ID for the FAM DB.
+		[propget, id(155), helpstring("method DatabaseID")] HRESULT DatabaseID(
+			[out, retval] BSTR* pbstrDatabaseID);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Gets the name of the database server this instance last connected to. This is the
+        //			same server name used by the encrypted database ID, not the user-entered server
+        //			(i.e., will never be "(local)").
+		[propget, id(156), helpstring("method ConnectedDatabaseServer")] HRESULT ConnectedDatabaseServer(
+			[out, retval] BSTR* pbstrServerName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Gets the name of the database name this instance last connected to. 
+		[propget, id(157), helpstring("method ConnectedDatabaseName")] HRESULT ConnectedDatabaseName(
+			[out, retval] BSTR* pbstrDatabaseName);
 	};
 
 	[
@@ -2329,6 +2346,19 @@ library UCLID_FILEPROCESSINGLib
 
 	[
 		object,
+		uuid(B0CF1FC4-4E1A-46C5-BED1-1D6D9D730187),
+		dual,
+		helpstring("ISecureCounterManagement Interface"),
+		pointer_default(unique)
+	]
+	interface ISecureCounterManagement : IDispatch
+	{
+		// PURPOSE: Displays UI for managing the secure counters in the specified pDB.
+		[id(1), helpstring("method ShowUI")] HRESULT ShowUI([in] IFileProcessingDB* pDB, [in] HANDLE owner);
+	};
+
+	[
+		object,
 		uuid(3C96B8AE-BA83-4FEB-8EC9-D060CC33F1AA),
 		dual,
 		nonextensible,
@@ -2413,12 +2443,8 @@ library UCLID_FILEPROCESSINGLib
 	interface ISecureCounterCreator : IDispatch
 	{
 		// PURPOSE: Initializes the counter of the specified counter ID maintained in the specified pFAMDB.
-		[id(1), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB *pFAMDB, [in] long nID);
-
-		// PURPOSE: Applies an update code for this secure counter in order to increment or set its current
-        //			value.
-		// ARGS:	bstrCode- The update code.
-		[id(2), helpstring("method ApplyUpdateCode")] HRESULT ApplyUpdateCode([in] BSTR bstrCode);
+		[id(1), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB *pFAMDB,
+			[in] long nID, [in] VARIANT_BOOL bIsValid);
 	}
 
 	//----------------------------------------------------------------------------------------------

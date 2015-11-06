@@ -56,15 +56,14 @@ protected:
 	afx_msg void OnToolsReports();
 	afx_msg void OnToolsCheckForNewComponents();
 	afx_msg void OnManageTags();
-	afx_msg void OnManageCounters();
+	afx_msg void OnManageBatesCounters();
 	afx_msg void OnManageLoginUsers();
 	afx_msg void OnManageActions();
 	afx_msg void OnToolsSetPriority();
 	afx_msg void OnRecalculateStats();
 	afx_msg void OnManageMetadataFields();
 	afx_msg void OnManageAttributeSets();
-	afx_msg void OnCountersGeneraterequestcode();
-	afx_msg void OnCountersApplyupdatecode();
+	afx_msg void OnManageRuleCounters();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged

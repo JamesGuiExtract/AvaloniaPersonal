@@ -2004,6 +2004,10 @@ map<long, CounterInfo>& CRuleSet::getCounterInfo()
 					CounterInfo& counterInfo = m_apmapCounters->at(nCounterID);
 					if (counterInfo.m_bEnabled)
 					{
+						ASSERT_RUNTIME_CONDITION("ELI39043",
+							asCppBool(ipRuleExecutionCounter->IsValid),
+							"Specified counter is corrupted.");
+
 						counterInfo.SetSecureCounter(ipRuleExecutionCounter);
 					}
 				}

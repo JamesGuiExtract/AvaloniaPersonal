@@ -305,9 +305,9 @@ FAMUTILS_API void setIPersistObjToField(const FieldsPtr& ipFields, const string&
 
 // PROMISE: To return the Server name, creation date and last restore date of the database as strings
 // NOTE:	If the database has never been restored the last restore date will equal the creation date
-FAMUTILS_API void getDatabaseCreationDateAndRestoreDate(const _ConnectionPtr& ipDBConnection, string strDBName,
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string strDBName,
 	string &strServerName, string &strCreateDate, string &strLastRestoreDate);
-FAMUTILS_API void getDatabaseCreationDateAndRestoreDate(const _ConnectionPtr& ipDBConnection, string strDBName,
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string strDBName,
 	string &strServerName, CTime &ctCreateDate, CTime &ctLastRestoreDate);
 
 // PROMISE: To return the bsDatabaseID ByteStream that contains the following:

@@ -359,7 +359,9 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		_lastCodePos = "201";
 
 		// Assign any counters provided for the ruleset to decrement from.
-		ipRules->RuleExecutionCounters = ipDB->SecureCounters;
+		// For performance reasons, don't refresh the list here; it will be refreshed by
+		// FileProcessingDB every time processing is started.
+		ipRules->RuleExecutionCounters = ipDB->GetSecureCounters(VARIANT_FALSE);
 
 		_lastCodePos = "205";
 

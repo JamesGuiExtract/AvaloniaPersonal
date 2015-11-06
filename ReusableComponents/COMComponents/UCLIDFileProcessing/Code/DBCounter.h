@@ -20,14 +20,10 @@ public:
 	long m_nID;
 	string m_strName;
 	long m_nValue;
+	string m_strValidationError;
 
 	// This is expected to be (<DatabaseID Hash> << 10) + m_nID
 	long m_nDatabaseIDCounterIDHash;
-
-	// Assumes results in ipFields using gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE
-	// Which has SecureCounter.ID as ID and SecureCounterValueChange.ID as ValueChangedID
-	// if bValidate is false the only requires SecureCounter fields
-	void LoadFromFields(FieldsPtr ipFields, const long nDatabaseIDHash, bool bValidate);
 
 	// This will only validate that the counterID portion of the m_nDatabaseIDCounterIDHash = m_nID
 	// It does not validate the databaseID hash
@@ -36,8 +32,14 @@ public:
 	// Returns a string of the encrypted m_nValue & CounterIDHash
 	string getEncrypted(const long nDatabaseIDHash);
 
-	// Returns true if the m_nDatabaseIDCounterIDHash is the expected value given nDatabaseIDHash
-	bool isValid(const long nDatabaseIDHash);
+	// Throws an exception if checks of the counter validity fail. If ipFields is specified, the
+	// counter's value with be cross checked with the SecureCounterValueChange table. Use of
+	// ipFields assumes ipFields was generated with gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.
+	void validate(const long nDatabaseIDHash, FieldsPtr ipFields = nullptr);
+
+	// Returns true if checks of the counter validity succeed.
+	// Assumes ipFields generated with gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.
+	bool isValid(const long nDatabaseIDHash, FieldsPtr ipFields = nullptr);
 
 	// Map that maps the CounterID to Name for the standard counters
 	static map<long, string> ms_mapOfStandardNames;

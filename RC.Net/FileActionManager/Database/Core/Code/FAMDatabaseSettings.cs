@@ -51,6 +51,22 @@ namespace Extract.FileActionManager.Database
         /// soon as they are modified and re-freshed from disk as necessary every time the Settings 
         /// property is accessed. If <see langword="false"/> the properties will only be loaded and
         /// saved to disk when explicitly requested.</param>
+        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "FAM")]
+        public FAMDatabaseSettings(IFileProcessingDB FAMDatabase, bool dynamic)
+            : this(FAMDatabase, dynamic, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FAMDatabaseSettings&lt;T&gt;"/> class.
+        /// </summary>
+        /// <param name="FAMDatabase">The <see cref="IFileProcessingDB"/> to which the settings
+        /// should be persisted.</param>
+        /// <param name="dynamic">If <see langword="true"/>, properties will be saved to disk as 
+        /// soon as they are modified and re-freshed from disk as necessary every time the Settings 
+        /// property is accessed. If <see langword="false"/> the properties will only be loaded and
+        /// saved to disk when explicitly requested.</param>
         /// <param name="propertyLookup">Maps all property names in <see typeparam="T"/> to the name
         /// of setting in the DBInfo table.</param>
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -90,7 +106,7 @@ namespace Extract.FileActionManager.Database
                 foreach (SettingsProperty property in Settings.Properties)
                 {
                     string value = _FAMDatabase.GetDBInfoSetting(
-                        _propertyLookup[property.Name].Single(), false);
+                        GetDbPropertyName(property.Name), false);
 
                     if (value != null)
                     {
@@ -159,7 +175,7 @@ namespace Extract.FileActionManager.Database
             try
             {
                 _FAMDatabase.SetDBInfoSetting(
-                    _propertyLookup[propertyName].Single(), value, true);
+                    GetDbPropertyName(propertyName), value, true);
             }
             catch (Exception ex)
             {
@@ -188,5 +204,23 @@ namespace Extract.FileActionManager.Database
         }
 
         #endregion Overrides
+
+        #region Private Members
+
+        /// <summary>
+        /// Gets <see paramref="propertyName"/> as it exists the database's DBInfo table.
+        /// </summary>
+        /// <param name="propertyName">The property name as it exists in this instance's Settings.
+        /// </param>
+        /// <returns>The <see paramref="propertyName"/> as it exists the database's DBInfo table.
+        /// </returns>
+        string GetDbPropertyName(string propertyName)
+        {
+            return (_propertyLookup == null)
+                ? propertyName
+                : _propertyLookup[propertyName].Single();
+        }
+
+        #endregion Private Members
     }
 }

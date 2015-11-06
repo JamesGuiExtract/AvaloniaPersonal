@@ -5704,7 +5704,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 			mapCounters[counterOp.m_nCounterID].m_eOperation = kSet;
 			mapCounters[counterOp.m_nCounterID].m_nValue = counterChange.m_nToValue;
 			strOperationPerformed = "Incremented counter " + counterOp.m_strCounterName + " by "
-				+ asString(counterOp.m_nValue) + " counts.";
+				+ asString(counterOp.m_nValue) + ".";
 			break;
 		case kDecrement:
 			// An operation to decrement should set counter value to 0 if the decrement value
@@ -5719,7 +5719,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 			mapCounters[counterOp.m_nCounterID].m_nValue = counterChange.m_nToValue;
 
 			strOperationPerformed = "Decremented counter " + counterOp.m_strCounterName + " by "
-				+ asString(counterOp.m_nValue) + " counts.";
+				+ asString(counterOp.m_nValue) + ".";
 			break;
 		case kDelete:
 			// Modify existing counterOp record to the delete op
@@ -5786,7 +5786,6 @@ void CFileProcessingDB::getCounterInfo(map<long, CounterOperation> &mapOfCounter
 	_RecordsetPtr ipResultSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI38915", ipResultSet != __nullptr);
 	
-	// Open the Action table
 	ipResultSet->Open(gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 		adLockReadOnly, adCmdText);
 	while (!asCppBool(ipResultSet->adoEOF))
@@ -5795,16 +5794,13 @@ void CFileProcessingDB::getCounterInfo(map<long, CounterOperation> &mapOfCounter
 		DBCounterChangeValue counterChange;
 
 		FieldsPtr fields = ipResultSet->Fields;
+		dbCounter.LoadFromFields(ipResultSet->Fields);
+
 		if (bCheckCounterHash)
 		{
 			// Check the counter hash and validate counter value against the last ChangeValue for the
 			// counter
-			dbCounter.LoadFromFields(ipResultSet->Fields, m_DatabaseIDValues.m_nHashValue, true);
-		}
-		else
-		{
-			// Don't check the databaseID hash - does check the counter ID against the record's id
-			dbCounter.LoadFromFields(ipResultSet->Fields);
+			dbCounter.validate(m_DatabaseIDValues.m_nHashValue);
 		}
 
 		CounterOperation counterOp(dbCounter);

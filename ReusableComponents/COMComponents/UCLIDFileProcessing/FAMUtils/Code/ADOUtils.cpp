@@ -1137,7 +1137,7 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20156");
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void getDatabaseCreationDateAndRestoreDate(const _ConnectionPtr& ipDBConnection, string strDBName,
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string strDBName,
 	string &strServerName, string &strCreateDate, string &strLastRestoreDate)
 {
 	try
@@ -1170,7 +1170,7 @@ FAMUTILS_API void getDatabaseCreationDateAndRestoreDate(const _ConnectionPtr& ip
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38757");
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void getDatabaseCreationDateAndRestoreDate(const _ConnectionPtr& ipDBConnection, string strDBName,
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, string strDBName,
 	string &strServerName, CTime &ctCreateDate, CTime &ctLastRestoreDate)
 {
 	try
@@ -1219,7 +1219,7 @@ FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStrea
 
 		ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bsDatabaseID);
 
-		getDatabaseCreationDateAndRestoreDate(ipConnection, strDBName, strServer,ctDBCreatedDate,
+		getDatabaseInfo(ipConnection, strDBName, strServer,ctDBCreatedDate,
 			ctDBRestoreDate);
 		
 		GUID guidDatabaseID;

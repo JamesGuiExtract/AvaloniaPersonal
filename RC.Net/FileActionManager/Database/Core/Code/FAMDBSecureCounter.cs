@@ -42,6 +42,11 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         string _name;
 
+        /// <summary>
+        /// <see langword="true"/> if this counter is valid; otherwise, <see langword="false"/>.
+        /// </summary>
+        bool _isValid;
+
         #endregion Fields
 
         #region Constructors
@@ -64,7 +69,9 @@ namespace Extract.FileActionManager.Database
         /// <param name="pFAMDB">The <see cref="FileProcessingDB"/> that is the source of
         /// this counter.</param>
         /// <param name="nID">The ID of the counter.</param>
-        public void Initialize(FileProcessingDB pFAMDB, int nID)
+        /// <param name="bIsValid"><see langword="true"/> if this counter is valid; otherwise,
+        /// <see langword="false"/>.</param>
+        public void Initialize(FileProcessingDB pFAMDB, int nID, bool bIsValid)
         {
             try
             {
@@ -77,28 +84,11 @@ namespace Extract.FileActionManager.Database
                 _fileProcessingDB = pFAMDB;
                 _id = nID;
                 _name = _fileProcessingDB.GetSecureCounterName(_id);
-                
+                _isValid = bIsValid;
             }
             catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI38746", "Failed to initialize secure counter.");
-            }
-        }
-
-        /// <summary>
-        /// Applies an update code for this secure counter in order to increment or set its current
-        /// value.
-        /// </summary>
-        /// <param name="bstrCode">The update code.</param>
-        public void ApplyUpdateCode(string bstrCode)
-        {
-            try
-            {
-                 _fileProcessingDB.ApplySecureCounterUpdateCode(bstrCode);
-            }
-            catch (Exception ex)
-            {
-                throw ex.CreateComVisible("ELI38768", "Failed to apply secure counter update code");
             }
         }
 
@@ -144,6 +134,19 @@ namespace Extract.FileActionManager.Database
                     throw ex.CreateComVisible("ELI38769",
                         "Failed to retrieve value of '" + Name + "' counter");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this counter is valid and can be used.
+        /// </summary>
+        /// <value><see langword="true"/> if this counter is valid; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool IsValid
+        {
+            get
+            {
+                return _isValid;
             }
         }
 
