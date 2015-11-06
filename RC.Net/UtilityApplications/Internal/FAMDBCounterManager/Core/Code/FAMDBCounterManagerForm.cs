@@ -201,6 +201,7 @@ namespace Extract.FAMDBCounterManager
                     ActiveControl == _licenseStringTextBox)
                 {
                     ParseLicenseString(Clipboard.GetText());
+                    return true;
                 }
             }
             catch (Exception ex)
