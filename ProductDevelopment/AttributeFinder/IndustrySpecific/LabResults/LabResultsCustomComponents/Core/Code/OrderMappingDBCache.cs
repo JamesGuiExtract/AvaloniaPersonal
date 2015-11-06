@@ -577,7 +577,7 @@ namespace Extract.LabResultsCustomComponents
         private void InitializeMappings()
         {
             // Build the common words pattern
-            string query = "SELECT Word FROM CommonWords";
+            string query = "SELECT [Word] FROM [ESCommonWords]";
             using (SqlCeCommand command = new SqlCeCommand(query, _componentDataDBConnection))
             using (SqlCeDataReader reader = command.ExecuteReader())
             {
@@ -586,9 +586,10 @@ namespace Extract.LabResultsCustomComponents
             }
 
             // Populate mapping of names to test codes using customer-specific DB
-            query = "SELECT DISTINCT * FROM "
+            query = "SELECT DISTINCT [TestCode], [TestName], [ESComponentCode] FROM "
                 + "(SELECT [TestCode], [OfficialName] AS [TestName] FROM [LabTest] "
-                + "UNION SELECT [TestCode], [Name] AS [TestName] FROM [AlternateTestName]) [Tests]";
+                + "UNION SELECT [TestCode], [Name] AS [TestName] FROM [AlternateTestName]) [Tests] "
+                + "LEFT JOIN [ComponentToESComponentMap] ON [TestCode] = [ComponentCode]";
 
             using (SqlCeCommand command = new SqlCeCommand(query, _customerDBConnection))
             using (SqlCeDataReader reader = command.ExecuteReader())
@@ -596,22 +597,31 @@ namespace Extract.LabResultsCustomComponents
             {
                 string code = r.GetString(0);
                 string name = r.GetString(1);
-
+                // Use 'as string' to handle null values
+                string esComponentCode = r[2] as string;
 
                 string normalizedName = _getNormalizedName(name);
                 HashSet<string> codes = _normalizedNameToCustomerTestCodes.GetOrAdd(normalizedName,
                     _ => new HashSet<string>());
                 codes.Add(code);
+
+                if (esComponentCode != null)
+                {
+                    // Add this customer code to the map of ES codes to customer codes
+                    HashSet<string> customerCodes = _esCodeToCustomerCodes.GetOrAdd(esComponentCode,
+                        _ => new HashSet<string>());
+                    customerCodes.Add(code);
+                }
             }
 
             // Add additional mappings using the component data (URS) database
-            query = "SELECT LabTest.TestCode, OfficialName, Name, SampleType"
+            query = "SELECT ESComponent.Code, ESComponent.Name, ESComponentAKA.Name, SampleType"
                     + ", MatchScoringQuery, Frequency"
-                    + " FROM LabTest JOIN AlternateTestName"
-                    + " ON LabTest.TestCode = AlternateTestName.TestCode"
+                    + " FROM ESComponent JOIN ESComponentAKA"
+                    + " ON ESComponent.Code = ESComponentCode"
                     + " LEFT JOIN AKAFrequency"
-                        + " ON LabTest.TestCode = AKAFrequency.TestCode"
-                        + " AND AlternateTestName.Name = AKAFrequency.AKA";
+                        + " ON ESComponent.Code = AKAFrequency.ESComponentCode"
+                        + " AND ESComponentAKA.Name = AKAFrequency.Name";
             using (SqlCeCommand command = new SqlCeCommand(query, _componentDataDBConnection))
             using (SqlCeDataReader reader = command.ExecuteReader())
             foreach (var record in reader.Cast<IDataRecord>())
@@ -630,9 +640,8 @@ namespace Extract.LabResultsCustomComponents
                 codesForAKA.Add(Tuple.Create(testCode, frequency));
 
                 // For all customer codes that are mapped to this ES code, add the ES info to the customer dictionaries
-                string normalizedName = _getNormalizedName(officialName);
                 HashSet<string> customerCodesForTest = null;
-                if (_normalizedNameToCustomerTestCodes.TryGetValue(normalizedName, out customerCodesForTest))
+                if (_esCodeToCustomerCodes.TryGetValue(testCode, out customerCodesForTest))
                 {
                     foreach (var customerCode in customerCodesForTest)
                     {
@@ -640,11 +649,6 @@ namespace Extract.LabResultsCustomComponents
                         HashSet<string> esNames = _customerCodeToESNames.GetOrAdd(customerCode,
                             _ => new HashSet<string>());
                         esNames.Add(officialName);
-
-                        // Add this customer code to the map of ES codes to customer codes
-                        HashSet<string> customerCodes = _esCodeToCustomerCodes.GetOrAdd(testCode,
-                            _ => new HashSet<string>());
-                        customerCodes.Add(customerCode);
 
                         // Add the sample type if there is one
                         // If there is already a sample type associated with this customer test,
