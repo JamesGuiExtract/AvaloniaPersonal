@@ -39,6 +39,7 @@ void DBCounter::LoadFromFields(FieldsPtr ipFields)
 {
 	m_nID = getLongField(ipFields, "ID");
 	m_strName = getStringField(ipFields, "CounterName");
+	m_strValidationError = "";
 	
 	string encryptedCounter = getStringField(ipFields, "SecureCounterValue");
 	ByteStream bsCounterPW;
@@ -95,23 +96,30 @@ void DBCounter::validate(const long nDatabaseIDHash, FieldsPtr ipFields/* = null
 		DBCounterChangeValue counterChange;
 		try
 		{
-			counterChange.LoadFromFields(ipFields, true);
+			try
+			{
+				counterChange.LoadFromFields(ipFields, true);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39102");
 		}
-		catch (...)
+		catch (UCLIDException &ue)
 		{
 			m_strValidationError = "Counter history corrupted";
-			throw;
+			throw ue;
 		}
 
 		if (m_nValue != counterChange.m_nToValue)
 		{
-			m_strValidationError = "Counter history discrepancy.";
+			m_strValidationError = "Counter history discrepancy";
 			UCLIDException ue("ELI38930", "Counter has been corrupted.");
 			ue.addDebugInfo("CounterID", m_nID);
 			ue.addDebugInfo("CounterName", m_strName);
 			throw ue;
 		}
 	}
+
+	// Clear any validation errors from previous attempts.
+	m_strValidationError = "";
 }
 //-------------------------------------------------------------------------------------------------
 bool DBCounter::isValid(const long nDatabaseIDHash, FieldsPtr ipFields/* = nullptr */)

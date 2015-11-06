@@ -177,7 +177,7 @@
             this._generateRequestButton.Name = "_generateRequestButton";
             this._generateRequestButton.Size = new System.Drawing.Size(164, 23);
             this._generateRequestButton.TabIndex = 4;
-            this._generateRequestButton.Text = "Generate request code";
+            this._generateRequestButton.Text = "Generate update request";
             this._generateRequestButton.UseVisualStyleBackColor = true;
             this._generateRequestButton.Click += new System.EventHandler(this.HandleGenerateRequestButton_Click);
             // 

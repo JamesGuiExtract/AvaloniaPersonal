@@ -338,7 +338,7 @@ namespace Extract.FileActionManager.Database
 
             if (!_countersAreValid)
             {
-                _generateRequestButton.Text = "Generate unlock code";
+                _generateRequestButton.Text = "Generate unlock request";
                 _applyUpdateCodeButton.Text = "Apply unlock code";
             }
         }

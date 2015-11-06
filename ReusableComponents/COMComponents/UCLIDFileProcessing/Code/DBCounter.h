@@ -20,6 +20,10 @@ public:
 	long m_nID;
 	string m_strName;
 	long m_nValue;
+
+	// Whenever either validate or isValid are called and find the counter to be invalid, the reason
+	// for the validation error is maintained here. This reason is intended for Extract support
+	// purposes (via unlock codes) and not for display to the customer.
 	string m_strValidationError;
 
 	// This is expected to be (<DatabaseID Hash> << 10) + m_nID
