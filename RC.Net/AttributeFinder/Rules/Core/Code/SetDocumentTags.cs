@@ -875,9 +875,9 @@ namespace Extract.AttributeFinder.Rules
                     // Check for missing values
                     if (// Empty tag name
                            string.IsNullOrWhiteSpace(StringTagName)
-                        // Empty specified value
+                        // Null specified value
                         || UseSpecifiedValueForStringTag
-                           && string.IsNullOrWhiteSpace(SpecifiedValueForStringTag)
+                           && SpecifiedValueForStringTag == null
                         // Empty tag to use for value name
                         || UseTagValueForStringTag
                            && string.IsNullOrWhiteSpace(TagNameForStringTagValue)
@@ -902,9 +902,9 @@ namespace Extract.AttributeFinder.Rules
                     // Check for missing values
                     if (// Empty tag name
                            string.IsNullOrWhiteSpace(ObjectTagName)
-                        // Empty specified value
+                        // Null specified value
                         || UseSpecifiedValueForObjectTag
-                           && string.IsNullOrWhiteSpace(SpecifiedValueForObjectTag)
+                           && SpecifiedValueForObjectTag == null
                         // Missing or not configured attribute selector
                         || UseSelectedAttributesForObjectTagValue
                               && (ObjectTagAttributeSelector == null

@@ -1305,7 +1305,7 @@ namespace Extract.DataEntry
                 // attribute.
                 // [DataEntry:876]
                 // On attribute initialized needs to be called before LoadDataQueries so that
-                // and undo memento for adding the attribute is added to the undo stack before an
+                // an undo memento for adding the attribute is added to the undo stack before an
                 // undo memento for modifying the value (as LoadDataQueries may do).
                 if (!statusInfo._initialized)
                 {
@@ -3250,10 +3250,12 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Releases all <see cref="IAttribute"/> COM objects in the supplied vector by calling
-        /// FinalReleaseComObject on each. This needs to be done due to the assignment of
-        /// <see cref="AttributeStatusInfo"/> objects as the DataObject member of an attribute.
-        /// (If this is not done, handles are leaked).
+        /// Allows all <see cref="IAttribute"/> COM objects in the supplied vector to be garbage
+        /// collected by setting the DataObject property to null and thereby removing an untracked
+        /// (I think) circular reference. (If this is not done, handles are leaked.)
+        /// Setting the DataObject to null rather than calling Marshal.FinalReleaseComObject prevents
+        /// "COM object that has been separated from its underlying RCW cannot be used" exceptions.
+        /// https://extract.atlassian.net/browse/ISSUE-13345
         /// <b><para>Important:</para></b>
         /// Call DeleteAttribute rather than ReleaseAttributes for any attributes removed while the
         /// DEP is current loaded or in the process of being loaded. DeleteAttribute will raise
@@ -3274,11 +3276,7 @@ namespace Extract.DataEntry
                 {
                     ReleaseAttributes(attribute.SubAttributes);
 
-                    if (attribute.Value != null)
-                    {
-                        Marshal.FinalReleaseComObject(attribute.Value);
-                    }
-                    Marshal.FinalReleaseComObject(attribute);
+                    attribute.DataObject = null;
                 }
             }
             catch (Exception ex)

@@ -239,15 +239,7 @@ namespace Extract.AttributeFinder.Rules
                     return true;
                 }
 
-                if (_useSpecifiedValueForStringTag.Checked
-                    && string.IsNullOrWhiteSpace(_specifiedValueForStringTag.Text))
-                {
-                    _specifiedValueForStringTag.Focus();
-                    UtilityMethods.ShowMessageBox("Please specify a tag value.",
-                        "Specify a tag value", false);
-                    return true;
-                }
-                else if (_useTagValueForStringTag.Checked
+                if (_useTagValueForStringTag.Checked
                          && string.IsNullOrWhiteSpace(_tagNameForStringTagValue.Text))
                 {
                     _tagNameForStringTagValue.Focus();
@@ -290,15 +282,7 @@ namespace Extract.AttributeFinder.Rules
                     return true;
                 }
 
-                if (_useSpecifiedValueForObjectTag.Checked
-                    && string.IsNullOrWhiteSpace(_specifiedValueForObjectTag.Text))
-                {
-                    _specifiedValueForObjectTag.Focus();
-                    UtilityMethods.ShowMessageBox("Please specify a tag value.",
-                        "Specify a tag value", false);
-                    return true;
-                }
-                else if (_useSelectedAttributesForObjectTag.Checked)
+                if (_useSelectedAttributesForObjectTag.Checked)
                 {
                     if (_objectTagAttributeSelector.ConfigurableObject == null)
                     {
