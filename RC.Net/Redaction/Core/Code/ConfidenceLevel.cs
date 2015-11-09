@@ -7,33 +7,24 @@ namespace Extract.Redaction
     /// </summary>
     public class ConfidenceLevel
     {
-        #region Fields
-
-        readonly string _shortName;
-        readonly string _query;
-        readonly Color _color;
-        readonly bool _output;
-        readonly bool _warnIfRedact;
-        readonly bool _warnIfNonRedact;
-        readonly bool _readOnly;
-
-        #endregion Fields
-
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfidenceLevel"/> class.
         /// </summary>
         public ConfidenceLevel(string shortName, string query, Color color, bool output,
-            bool warnIfRedact, bool warnIfNonRedact, bool readOnly)
+            bool warnIfRedact, bool warnIfNonRedact, bool readOnly, bool highlight,
+            Color? fillColor)
         {
-            _shortName = shortName;
-            _query = query;
-            _color = color;
-            _output = output;
-            _warnIfRedact = warnIfRedact;
-            _warnIfNonRedact = warnIfNonRedact;
-            _readOnly = readOnly;
+            ShortName = shortName;
+            Query = query;
+            Color = color;
+            Output = output;
+            WarnIfRedacted = warnIfRedact;
+            WarnIfNotRedacted = warnIfNonRedact;
+            ReadOnly = readOnly;
+            Highlight = highlight;
+            FillColor = fillColor;
         }
 
         #endregion Constructors
@@ -46,10 +37,8 @@ namespace Extract.Redaction
         /// <value>The abbreviated name of the confidence level.</value>
         public string ShortName
         {
-            get
-            {
-                return _shortName;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -58,10 +47,8 @@ namespace Extract.Redaction
         /// <value>The attribute query for data in this confidence level.</value>
         public string Query
         {
-            get
-            {
-                return _query;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -70,10 +57,8 @@ namespace Extract.Redaction
         /// <value>The color to display attributes of this confidence level.</value>
         public Color Color
         {
-            get
-            {
-                return _color;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -84,10 +69,8 @@ namespace Extract.Redaction
         /// <see langword="false"/> if attributes should not be rendered in physical output.</value>
         public bool Output
         {
-            get
-            {
-                return _output;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -98,10 +81,8 @@ namespace Extract.Redaction
         /// attribute is redacted.</value>
         public bool WarnIfRedacted
         {
-            get
-            {
-                return _warnIfRedact;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -112,10 +93,8 @@ namespace Extract.Redaction
         /// attribute is not redacted.</value>
         public bool WarnIfNotRedacted
         {
-            get
-            {
-                return _warnIfNonRedact;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -126,10 +105,33 @@ namespace Extract.Redaction
         /// </value>
         public bool ReadOnly
         {
-            get
-            {
-                return _readOnly;
-            }
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ConfidenceLevel"/> represents a
+        /// highlight rather than a redaction.
+        /// </summary>
+        /// <value><see langword="true"/> if a highlight; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Highlight
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the fill <see cref="Color"/> to use for attributes in this category or
+        /// <see langword="null"/> to use the default fill color.
+        /// </summary>
+        /// <value>
+        /// The fill <see cref="Color"/> to use for attributes in this category.
+        /// </value>
+        public Color? FillColor
+        {
+            get;
+            private set;
         }
 
         #endregion Properties

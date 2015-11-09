@@ -1,6 +1,6 @@
+using Extract.AttributeFinder;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
-using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -65,7 +65,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The confidence level of the attribute in this row.
         /// </summary>
-        readonly ConfidenceLevel _confidenceLevel;
+        ConfidenceLevel _confidenceLevel;
 
         /// <summary>
         /// <see langword="true"/> if this row has been visited; <see langword="false"/> if it has 
@@ -145,6 +145,15 @@ namespace Extract.Redaction.Verification
 
         #endregion Constructors
 
+        #region Events
+
+        /// <summary>
+        /// Raised when the <see cref="RedactionType"/> property changes.
+        /// </summary>
+        internal event EventHandler<EventArgs> TypeChanged;
+
+        #endregion Events
+
         #region Properties
 
         /// <summary>
@@ -194,7 +203,7 @@ namespace Extract.Redaction.Verification
                         _redacted = value;
 
                         Color color = _redacted ? 
-                            RedactionGridView.ToggledRedactionColor : Color.Transparent;
+                            RedactionGridView.DefaultRedactionFillColor : Color.Transparent;
                         foreach (RedactionLayerObject redaction in _layerObjects)
                         {
                             redaction.Color = color;
@@ -255,6 +264,8 @@ namespace Extract.Redaction.Verification
                         _type = value;
 
                         _typeDirty = true;
+
+                        OnTypeChanged();
                     }
                 }
                 catch (Exception ex)
@@ -305,6 +316,47 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Gets or sets the <see cref="ConfidenceLevel"/> associated with this row.
+        /// </summary>
+        /// <value>The <see cref="ConfidenceLevel"/> associated with this row.</value>
+        public ConfidenceLevel ConfidenceLevel
+        {
+            get
+            {
+                return _confidenceLevel;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value.ShortName != _confidenceLevel.ShortName)
+                    {
+                        _confidenceLevel = value;
+
+                        foreach (RedactionLayerObject redaction in _layerObjects)
+                        {
+                            // https://extract.atlassian.net/browse/ISSUE-13365
+                            // Note: The new confidence level's ReadOnly or Highlight properties
+                            // will not be honored this session; Only after re-loading from disk
+                            // would either of those properties be honored.
+                            redaction.BorderColor = _confidenceLevel.Color;
+                            redaction.Color = _redacted
+                                ? _confidenceLevel.FillColor.HasValue
+                                    ? _confidenceLevel.FillColor.Value
+                                    : RedactionGridView.DefaultRedactionFillColor
+                                : Color.Transparent;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39107");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets whether a warning should be displayed if this row is redacted.
         /// </summary>
         /// <value><see langword="true"/> if a warning should be displayed if this row is redacted;
@@ -313,7 +365,7 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _confidenceLevel.WarnIfRedacted;
+                return ConfidenceLevel.WarnIfRedacted;
             }
         }
 
@@ -326,7 +378,7 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _confidenceLevel.WarnIfNotRedacted;
+                return ConfidenceLevel.WarnIfNotRedacted;
             }
         }
 
@@ -407,7 +459,7 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _confidenceLevel.ReadOnly;
+                return ConfidenceLevel.ReadOnly;
             }
         }
 
@@ -564,6 +616,10 @@ namespace Extract.Redaction.Verification
                     "Unable to create attribute from redaction grid row.", ex);
             }
         }
+
+        #endregion Methods
+
+        #region Private Members
 
         /// <summary>
         /// Creates a <see cref="Extract.Redaction.RedactionItem"/> that corresponds to the row.
@@ -748,8 +804,11 @@ namespace Extract.Redaction.Verification
                 RedactionLayerObject redaction = new RedactionLayerObject(imageViewer,
                     pair.Key, new string[] { "Redaction" }, pair.Value);
                 redaction.BorderColor = item.Level.Color;
-                redaction.Color = item.Attribute.Redacted ? 
-                    RedactionGridView.ToggledRedactionColor : Color.Transparent;
+                redaction.Color = item.Attribute.Redacted ?
+                    item.Level.FillColor.HasValue
+                        ? item.Level.FillColor.Value
+                        : RedactionGridView.DefaultRedactionFillColor
+                    : Color.Transparent;
                 redaction.CanRender = item.Attribute.Redacted;
 
                 layerObjects.Add(redaction);
@@ -795,6 +854,18 @@ namespace Extract.Redaction.Verification
             return page;
         }
 
-        #endregion Methods
+        /// <summary>
+        /// Raises the <see cref="TypeChanged"/> event.
+        /// </summary>
+        void OnTypeChanged()
+        {
+            var eventHandler = TypeChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        #endregion Private Methods
     }
 }

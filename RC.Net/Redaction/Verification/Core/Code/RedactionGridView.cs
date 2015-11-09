@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using System;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
+using ComAttribute = UCLID_AFCORELib.Attribute;
 using EOrientation = UCLID_RASTERANDOCRMGMTLib.EOrientation;
 using RedactionLayerObject = Extract.Imaging.Forms.Redaction;
 using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
@@ -74,7 +76,12 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The color that toggled on redactions are drawn on the image viewer.
         /// </summary>
-        public static readonly Color ToggledRedactionColor = Color.CornflowerBlue;
+        public static readonly Color DefaultRedactionFillColor = Color.CornflowerBlue;
+
+        /// <summary>
+        /// The color that toggled on highlights are drawn on the image viewer.
+        /// </summary>
+        public static readonly Color DefaultHighlightFillColor = Color.Yellow;
 
         /// <summary>
         /// The <see cref="ImageViewer"/> with which the <see cref="RedactionGridView"/> is 
@@ -685,7 +692,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Gets or sets a value indicating whether the next KeyUp event should be suppressed.
         /// </summary>
-        /// <value><see langword="true"/> to suppress the next next key up event; otherwise,
+        /// <value><see langword="true"/> to suppress the next key up event; otherwise,
         /// <see langword="false"/>.
         /// </value>
         [Browsable(false)]
@@ -715,7 +722,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                return Add( new RedactionGridViewRow(layerObject, text, category, type, confidenceLevel) );
+                var row = new RedactionGridViewRow(layerObject, text, category, type, confidenceLevel);
+                row.TypeChanged += HandleRowTypeChanged;
+
+                return Add(row);
             }
             catch (Exception ex)
             {
@@ -791,6 +801,8 @@ namespace Extract.Redaction.Verification
                     RedactionGridViewRow row = _redactions[i];
                     if (row.TryRemoveLayerObject(layerObject))
                     {
+                        row.TypeChanged -= HandleRowTypeChanged;
+
                         // Store the currently selected rows so selection of any non-deleted rows
                         // can be restored after the deletion.
                         List<DataGridViewRow> originallySelectedRows =
@@ -1098,7 +1110,7 @@ namespace Extract.Redaction.Verification
             }
 
             // Prevent this method from calling itself
-            // It may be better to de-activate here if active, but it's late in the 9.0 release
+            // It may be better to deactivate here if active, but it's late in the 9.0 release
             // cycle, so I'm opting to keep code as close a possible to its previous state.
             bool wasActive = Active;
             if (wasActive)
@@ -1388,17 +1400,31 @@ namespace Extract.Redaction.Verification
             // Iterate over the attributes
             foreach (SensitiveItem item in file.Items)
             {
-                // Add each attribute
-                RedactionGridViewRow row = 
-                    RedactionGridViewRow.FromSensitiveItem(item, _imageViewer, MasterCodes);
-                row.IsNew = false;
-
-                Add(row);
-
-                foreach (LayerObject layerObject in row.LayerObjects)
+                if (item.Level.Highlight)
                 {
-                    layerObject.Movable = !row.ReadOnly;
-                    _imageViewer.LayerObjects.Add(layerObject);
+                    var highlights = _imageViewer.CreateHighlights(item.Attribute.SpatialString, Color.Yellow);
+
+                    foreach (var highlight in highlights)
+                    {
+                        highlight.Selectable = false;
+                        _imageViewer.LayerObjects.Add(highlight);
+                    }
+                }
+                else
+                {
+                    // Add each attribute
+                    RedactionGridViewRow row =
+                        RedactionGridViewRow.FromSensitiveItem(item, _imageViewer, MasterCodes);
+                    row.IsNew = false;
+                    row.TypeChanged += HandleRowTypeChanged;
+
+                    Add(row);
+
+                    foreach (LayerObject layerObject in row.LayerObjects)
+                    {
+                        layerObject.Movable = !row.ReadOnly;
+                        _imageViewer.LayerObjects.Add(layerObject);
+                    }
                 }
             }
         }
@@ -1829,7 +1855,7 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets the currently selected row indicies.
+        /// Gets the currently selected row indices.
         /// </summary>
         public IEnumerable<int> SelectedRowIndexes
         {
@@ -1877,11 +1903,11 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Selects the specified indicies.
+        /// Selects the specified indices.
         /// </summary>
-        /// <param name="indexes">The indicies.</param>
+        /// <param name="indexes">The indices.</param>
         /// <param name="updateZoom"><see langword="true"/> to zoom to the new selection per
-        /// auto-zoom settings; <see langword="false"/> to not disturbe the current view in the
+        /// auto-zoom settings; <see langword="false"/> to not disturb the current view in the
         /// image viewer.</param>
         public void Select(IEnumerable<int> indexes, bool updateZoom)
         {
@@ -2220,11 +2246,17 @@ namespace Extract.Redaction.Verification
                         strText = "[No text]";
                     }
 
-                    int addedRowIndex =
-                        Add(e.LayerObject, strText, "Manual", _lastType, _confidenceLevels.Manual);
+                    // https://extract.atlassian.net/browse/ISSUE-13365
+                    // Find the appropriate confidence level to use for the new attribute.
+                    var confidenceLevel = GetConfidenceLevel("Manual", _lastType, _confidenceLevels.Manual);
+                    int addedRowIndex = Add(e.LayerObject, strText, "Manual", _lastType, confidenceLevel);
 
-                    redaction.BorderColor = _confidenceLevels.Manual.Color;
-                    redaction.Color = ToggledRedactionColor;
+                    // Note: The new row will not honor ReadOnly or Highlight properties in this session;
+                    // Only after re-loading from disk would either of those properties be honored.
+                    redaction.BorderColor = confidenceLevel.Color;
+                    redaction.Color = confidenceLevel.FillColor.HasValue
+                        ? confidenceLevel.FillColor.Value
+                        : RedactionGridView.DefaultRedactionFillColor;
 
                     if (_autoTool != AutoTool.None)
                     {
@@ -2287,7 +2319,7 @@ namespace Extract.Redaction.Verification
                     }
                 }
 
-                // Intentionlly removed assertion that the layer object was found. A sub-layer
+                // Intentionally removed assertion that the layer object was found. A sub-layer
                 // object of a CompositeLayerObject may have been modified. In that case the ID will
                 // not be a direct member of any of the rows. However, the parent
                 // CompositeLayerObject will still get flagged as dirty allowing
@@ -2310,13 +2342,16 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Select the row containing the layer object
-                SelectRowContainingLayerObject(e.LayerObject, true);
-
-                // Ensure the top row in the selection is visible
-                if (_dataGridView.SelectedRows.Count > 0)
+                if (e.LayerObject is RedactionLayerObject)
                 {
-                    _dataGridView.FirstDisplayedScrollingRowIndex = GetFirstSelectedRowIndex();
+                    // Select the row containing the layer object
+                    SelectRowContainingLayerObject(e.LayerObject, true);
+
+                    // Ensure the top row in the selection is visible
+                    if (_dataGridView.SelectedRows.Count > 0)
+                    {
+                        _dataGridView.FirstDisplayedScrollingRowIndex = GetFirstSelectedRowIndex();
+                    }
                 }
             }
             catch (Exception ex)
@@ -2336,8 +2371,11 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Deselect the row containing the layer object
-                SelectRowContainingLayerObject(e.LayerObject, false);
+                if (e.LayerObject is RedactionLayerObject)
+                {
+                    // Deselect the row containing the layer object
+                    SelectRowContainingLayerObject(e.LayerObject, false);
+                }
             }
             catch (Exception ex)
             {
@@ -2507,6 +2545,34 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="RedactionGridViewRow.TypeChanged"/> event for any row in the grid.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleRowTypeChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                var row = (RedactionGridViewRow)sender;
+
+                // https://extract.atlassian.net/browse/ISSUE-13365
+                // Check to see if the new type means the row should be associated with a new confidence
+                // level.
+                var newConfidenceLevel = GetConfidenceLevel(
+                    row.Category, row.RedactionType, _confidenceLevels.Manual);
+                if (newConfidenceLevel.ShortName != row.ConfidenceLevel.ShortName)
+                {
+                    row.ConfidenceLevel = newConfidenceLevel;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39109");
+            }
+        }
+
         #endregion Event Handlers
 
         #region IImageViewerControl Members
@@ -2609,6 +2675,29 @@ namespace Extract.Redaction.Verification
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ConfidenceLevel"/> that should be associated with the specified
+        /// <see paramref="category"/> and <see paramref="type"/>. If there are multiple matching
+        /// confidence levels, the first defined level will be used.
+        /// </summary>
+        /// <param name="category">The category (or attribute name)</param>
+        /// <param name="type">The redaction type (attribute type)</param>
+        /// <param name="defaultLevel">The default <see cref="ConfidenceLevel"/> to use if no
+        /// matching confidence level is found.</param>
+        /// <returns>The <see cref="ConfidenceLevel"/> that should be associated with the specified
+        /// <see paramref="category"/> and <see paramref="type"/>.</returns>
+        ConfidenceLevel GetConfidenceLevel(string category, string type, ConfidenceLevel defaultLevel)
+        {
+            // Create a dummy attribute based on the specified category and type for testing against
+            // the available confidence levels.
+            ComAttribute attribute = new ComAttribute();
+            attribute.Value.ReplaceAndDowngradeToNonSpatial(category);
+            attribute.Type = type;
+            attribute.ReportMemoryUsage();
+
+            return _confidenceLevels.GetConfidenceLevel(attribute, defaultLevel);
         }
 
         #endregion Private Members

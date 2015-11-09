@@ -33,6 +33,8 @@ namespace Extract.Redaction
 
         const string _COLOR_KEY = "Color";
 
+        const string _FILL_COLOR_KEY = "FillColor";
+
         const string _OUTPUT_KEY = "Output";
 
         const string _WARN_IF_REDACT = "WarnIfRedact";
@@ -40,6 +42,8 @@ namespace Extract.Redaction
         const string _WARN_IF_NON_REDACT = "WarnIfNonRedact";
 
         const string _READ_ONLY = "ReadOnly";
+
+        const string _HIGHLIGHT = "Highlight";
 
         const string _REDACTION_TYPES_SECTION = "RedactionDataTypes";
 
@@ -250,35 +254,43 @@ namespace Extract.Redaction
                 // Get the data associated with this section
                 string shortName = iniFile.ReadString(section, _SHORT_NAME_KEY);
                 string query = iniFile.ReadString(section, _QUERY_KEY);
-                Color color = GetColor(iniFile, section, _COLOR_KEY);
+                Color color = GetColor(iniFile, section, _COLOR_KEY).Value;
                 bool output = iniFile.ReadInt32(section, _OUTPUT_KEY) != 0;
                 bool warnIfRedact = iniFile.ReadInt32(section, _WARN_IF_REDACT) != 0;
                 bool warnIfNonRedact = iniFile.ReadInt32(section, _WARN_IF_NON_REDACT) != 0;
                 bool readOnly = iniFile.ReadInt32(section, _READ_ONLY) != 0;
+                bool highlight = iniFile.ReadInt32(section, _HIGHLIGHT) != 0;
+                Color? fillColor = GetColor(iniFile, section, _FILL_COLOR_KEY);
 
                 // Store the confidence level
                 levels[i - 1] = new ConfidenceLevel(shortName, query, color, output, 
-                    warnIfRedact, warnIfNonRedact, readOnly);
+                    warnIfRedact, warnIfNonRedact, readOnly, highlight, fillColor);
             }
 
             return new ConfidenceLevelsCollection(levels);
         }
 
         /// <summary>
-        /// Gets the color from the specified section and key of an initialization file.
+        /// Gets the <see cref="Color"/> from the specified section and key of an initialization
+        /// file or <see langword="null"/> if there is no color specified for the given key.
         /// </summary>
         /// <param name="iniFile">The initialization file containing color information.</param>
         /// <param name="section">The section of the initialization file to read.</param>
         /// <param name="key">The key containing the color information.</param>
         /// <returns>The color specified by the <paramref name="key"/> of the 
-        /// <paramref name="section"/> in the specified <paramref name="iniFile"/>.</returns>
-        static Color GetColor(InitializationFile iniFile, string section, string key)
+        /// <paramref name="section"/> in the specified <paramref name="iniFile"/> or 
+        /// or <see langword="null"/> if there is no color specified for the given key.</returns>
+        static Color? GetColor(InitializationFile iniFile, string section, string key)
         {
             string value = null;
             try
             {
                 // Get the value of the section as a string
                 value = iniFile.ReadString(section, key);
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return null;
+                }
 
                 // Split into red, green, blue
                 string[] rgb = value.Split('.');

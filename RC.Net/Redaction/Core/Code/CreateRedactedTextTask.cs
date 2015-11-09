@@ -140,7 +140,7 @@ namespace Extract.Redaction
         /// Gets the minimum stack size needed for the thread in which this task is to be run.
         /// </summary>
         /// <value>
-        /// The the minimum stack size needed for the thread in which this task is to be run.
+        /// The minimum stack size needed for the thread in which this task is to be run.
         /// </value>
         [CLSCompliant(false)]
         public uint MinStackSize
@@ -199,7 +199,7 @@ namespace Extract.Redaction
         /// This call will be made on a different thread than the other calls, so the Standby call
         /// must be thread-safe. This allows the file processor to block on the Standby call, but
         /// it also means that call to <see cref="ProcessFile"/> or <see cref="Close"/> may come
-        /// while the Standby call is still ocurring. If this happens, the return value of Standby
+        /// while the Standby call is still occurring. If this happens, the return value of Standby
         /// will be ignored; however, Standby should promptly return in this case to avoid
         /// needlessly keeping a thread alive.
         /// </summary>
@@ -235,7 +235,8 @@ namespace Extract.Redaction
                 {
                     // Create a ConfidenceLevel that queries for all attributes.
                     confidenceLevels.Add(
-                        new ConfidenceLevel("*", "*", Color.Black, true, false, false, false));
+                        new ConfidenceLevel(
+                            "*", "*", Color.Black, true, false, false, false, false, null));
                 }
                 else
                 {
@@ -245,7 +246,8 @@ namespace Extract.Redaction
                         // Create a ConfidenceLevel that query for each specified data type that is to
                         // be redacted.
                         confidenceLevels.Add(
-                            new ConfidenceLevel(dataType, dataType, Color.Black, true, false, false, false));
+                            new ConfidenceLevel(
+                                dataType, dataType, Color.Black, true, false, false, false, false, null));
                     }
                 }
 
