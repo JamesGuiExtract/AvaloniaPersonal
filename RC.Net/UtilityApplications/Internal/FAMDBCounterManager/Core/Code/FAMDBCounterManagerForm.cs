@@ -18,6 +18,7 @@ namespace Extract.FAMDBCounterManager
         public string Customer;
         public string Comment;
         public string Description;
+        public string CodeType;
         public string Code;
     }
 
@@ -83,6 +84,19 @@ namespace Extract.FAMDBCounterManager
             ApplyValue = 4,
             ValidityComment = 5
         }
+
+        /// <summary>
+        /// Expect a code to consist of at least 8 blocks of 8 chars that are either digits or A-F
+        /// broken only by whitespace. Each instance of whitespace must contain at most one newline
+        /// and at most two consecutive non-newline whitespace chars. The code shall also be bounded
+        /// on both sides by a newline. (No other text expected to share the first or last line of a
+        /// code.)
+        /// </summary>
+        static Regex _codeParserRegex = new Regex(
+            @"(?<=\A|[\x0A\x0D]\s*)" +
+            @"(([\x20\t]{0,2}((\x0D?\x0A|\x0A?\x0D)[\x20\t]{0,2})?[0-9,A-F]){8}){8,}" +
+            @"(?=\z|\s*[\x0A\x0D])",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         #endregion Constants
 
@@ -625,6 +639,7 @@ namespace Extract.FAMDBCounterManager
                             Customer = _customerNameTextBox.Text,
                             Comment = _commentsTextBox.Text.Trim(),
                             Description = description.ToString().Trim(),
+                            CodeType = unlock ? "unlock" : "update",
                             Code = code
                         }))
                     {
@@ -656,6 +671,49 @@ namespace Extract.FAMDBCounterManager
                 }
 
                 UpdateControls(true);
+            }
+            catch (Exception ex)
+            {
+                ex.ShowMessageBox();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.DragEnter"/> event of the <see cref="_licenseStringTextBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.DragEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleLicenseStringTextBox_DragEnter(object sender, DragEventArgs e)
+        {
+            try
+            {
+                if (e.Data.GetDataPresent(DataFormats.Text))
+                {
+                    e.Effect = DragDropEffects.Copy;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ShowMessageBox();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.DragDrop"/> event of the <see cref="_licenseStringTextBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.DragEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleLicenseStringTextBox_DragDrop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                if (e.Data.GetDataPresent(DataFormats.Text))
+                {
+                    string droppedText = (string)e.Data.GetData(DataFormats.Text);
+                    ParseLicenseString(droppedText);
+                }
             }
             catch (Exception ex)
             {
@@ -734,6 +792,18 @@ namespace Extract.FAMDBCounterManager
         {
             try
             {
+                var matches = _codeParserRegex.Matches(licenseString);
+                if (matches.Count == 1)
+                {
+                    // While _codeParserRegex will find codes with embedded whitespace, remove this
+                    // whitespace from the returned code.
+                    licenseString = Regex.Replace(matches[0].Value, @"\s", "");
+                }
+                else
+                {
+                    throw new Exception("Failed to parse code from text.");
+                }
+
                 licenseString = Regex.Replace(licenseString, @"\s+", "");
                 _licenseStringTextBox.Text = licenseString;
 

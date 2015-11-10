@@ -121,7 +121,7 @@ namespace Extract.FAMDBCounterManager {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"The counter update code below is for the database:
+        [global::System.Configuration.DefaultSettingValueAttribute(@"The counter <CodeType> code below is for the database:
 <DatabaseServer>/<DatabaseName>
 ID = <DatabaseID>
 
@@ -130,8 +130,9 @@ This code will apply the following changes to the database's counters:
 
 To apply update:
 1) Open the FAMDBAdmin utility
-2) Select menu options Tools | Counters | Apply code...
-3) Copy the code below and paste it into the Apply code dialog.
+2) Select menu option Manage | Rule execution counters...
+3) Press the ""Apply <CodeType> code"" button
+4) Follow the dialog's instructions to apply the code and send confirmation of the operation to Extract Systems.
 
 <Code>")]
         public string ReadonlyBodyTemplate {
@@ -145,7 +146,7 @@ To apply update:
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Extract Systems counter update code for <Customer>")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Extract Systems counter <CodeType> code for <Customer>")]
         public string SubjectTemplate {
             get {
                 return ((string)(this["SubjectTemplate"]));

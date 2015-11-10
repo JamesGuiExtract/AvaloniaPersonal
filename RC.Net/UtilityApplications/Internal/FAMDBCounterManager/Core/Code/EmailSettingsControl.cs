@@ -196,6 +196,7 @@ namespace Extract.FAMDBCounterManager
                     Customer = "[Customer goes here]",
                     Comment = "[Comment goes here]",
                     Description = "[Description goes here]",
+                    CodeType = "[update/unlock]",
                     Code = "[Code goes here]"
                 };
 

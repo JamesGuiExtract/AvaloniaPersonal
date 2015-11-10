@@ -27,7 +27,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ReadonlyBodyTemplate" Type="System.String" Scope="User">
-      <Value Profile="(Default)">The counter update code below is for the database:
+      <Value Profile="(Default)">The counter &lt;CodeType&gt; code below is for the database:
 &lt;DatabaseServer&gt;/&lt;DatabaseName&gt;
 ID = &lt;DatabaseID&gt;
 
@@ -36,13 +36,14 @@ This code will apply the following changes to the database's counters:
 
 To apply update:
 1) Open the FAMDBAdmin utility
-2) Select menu options Tools | Counters | Apply code...
-3) Copy the code below and paste it into the Apply code dialog.
+2) Select menu option Manage | Rule execution counters...
+3) Press the "Apply &lt;CodeType&gt; code" button
+4) Follow the dialog's instructions to apply the code and send confirmation of the operation to Extract Systems.
 
 &lt;Code&gt;</Value>
     </Setting>
     <Setting Name="SubjectTemplate" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Extract Systems counter update code for &lt;Customer&gt;</Value>
+      <Value Profile="(Default)">Extract Systems counter &lt;CodeType&gt; code for &lt;Customer&gt;</Value>
     </Setting>
     <Setting Name="EditableBodyTemplate" Type="System.String" Scope="User">
       <Value Profile="(Default)">Dear &lt;Customer&gt;,

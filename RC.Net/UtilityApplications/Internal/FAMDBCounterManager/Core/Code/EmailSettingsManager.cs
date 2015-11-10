@@ -420,6 +420,7 @@ namespace Extract.FAMDBCounterManager
             value = Replace(value, "<Customer>", CounterOperationInfo.Customer);
             value = Replace(value, "<Comment>", CounterOperationInfo.Comment);
             value = Replace(value, "<Description>", CounterOperationInfo.Description);
+            value = Replace(value, "<CodeType>", CounterOperationInfo.CodeType);
             value = Replace(value, "<Code>", CounterOperationInfo.Code);
 
             return value;

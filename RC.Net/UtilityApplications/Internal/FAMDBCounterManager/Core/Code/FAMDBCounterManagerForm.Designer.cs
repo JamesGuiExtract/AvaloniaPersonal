@@ -149,9 +149,9 @@
             label9.AutoSize = true;
             label9.Location = new System.Drawing.Point(315, 145);
             label9.Name = "label9";
-            label9.Size = new System.Drawing.Size(107, 13);
+            label9.Size = new System.Drawing.Size(92, 13);
             label9.TabIndex = 11;
-            label9.Text = "Database created on";
+            label9.Text = "Database created";
             // 
             // label10
             // 
@@ -184,6 +184,7 @@
             // 
             // _licenseStringTextBox
             // 
+            this._licenseStringTextBox.AllowDrop = true;
             this._licenseStringTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._licenseStringTextBox.Location = new System.Drawing.Point(15, 26);
@@ -193,6 +194,8 @@
             this._licenseStringTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._licenseStringTextBox.Size = new System.Drawing.Size(601, 89);
             this._licenseStringTextBox.TabIndex = 1;
+            this._licenseStringTextBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleLicenseStringTextBox_DragDrop);
+            this._licenseStringTextBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleLicenseStringTextBox_DragEnter);
             // 
             // _databaseIdTextBox
             // 
@@ -433,6 +436,7 @@
             // 
             // FAMDBCounterManagerForm
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(628, 601);
