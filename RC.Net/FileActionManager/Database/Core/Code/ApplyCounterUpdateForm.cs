@@ -48,7 +48,7 @@ namespace Extract.FileActionManager.Database
                 _unlockCode = unlockCode;
                 if (unlockCode)
                 {
-                    Text = "Generate Unlock Code";
+                    Text = "Apply Counter Unlock Code";
                     _updateCodeLabel.Text = "Counter unlock code:";
                 }
             }
