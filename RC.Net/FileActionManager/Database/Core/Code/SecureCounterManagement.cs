@@ -30,9 +30,17 @@ namespace Extract.FileActionManager.Database
 	        {
                 Thread uiThread = new Thread(() =>
                 {
-                    using (var form = new ManageSecureCountersForm(pDB))
+                    try
                     {
-                        form.ShowDialog(new WindowWrapper(owner));
+                        using (var form = new ManageSecureCountersForm(pDB))
+                        {
+                            form.ShowDialog(new WindowWrapper(owner));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException ee = new ExtractException("ELI39118", "Unable to display Manage Counter Dialog.", ex);
+                        ee.Display();
                     }
                 });
                 // Single-threaded apartment state is needed for copy/paste or drag/drop to work.

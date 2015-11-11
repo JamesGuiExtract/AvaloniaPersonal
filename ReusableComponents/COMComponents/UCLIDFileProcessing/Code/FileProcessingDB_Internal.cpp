@@ -3442,6 +3442,10 @@ void CFileProcessingDB::resetDBConnection()
 		// If there is a non empty server and database name get a connection and validate
 		if (bDBSpecified)
 		{
+			// Reset the validation flags so all versions are checked
+			m_bProductSpecificDBSchemasAreValid = false;
+			m_bValidatingOrUpdatingSchema = false;
+
 			// This will create a new connection for this thread and initialize the schema
 			getDBConnection();
 
