@@ -1716,6 +1716,12 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrEMAIL_TIMEOUT] = "0";
 	mapDefaultValues[gstrEMAIL_USE_SSL] = "0";
 	mapDefaultValues[gstrALLOW_RESTARTABLE_PROCESSING] = "0";
+	mapDefaultValues[gstrSEND_ALERTS_TO_EXTRACT] = "0";
+	mapDefaultValues[gstrSEND_ALERTS_TO_SPECIFIED] = "0";
+	mapDefaultValues[gstrSPECIFIED_ALERT_RECIPIENTS] = "";
+	mapDefaultValues[gstrLICENSE_CONTACT_ORGANIZATION] = "";
+	mapDefaultValues[gstrLICENSE_CONTACT_EMAIL] = "";
+	mapDefaultValues[gstrLICENSE_CONTACT_PHONE] = "";
 
 	// Create a new database ID  or use existing if it has been set
 	ByteStream bsDatabaseID;

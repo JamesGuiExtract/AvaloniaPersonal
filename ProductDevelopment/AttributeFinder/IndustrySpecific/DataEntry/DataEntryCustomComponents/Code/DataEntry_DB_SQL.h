@@ -290,3 +290,7 @@ static const string gstrPORT_DATAENTRYDATA_TO_FILETASKSESSION =
 static const string gstrINSERT_DATA_ENTRY_VERIFY_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('59496DF7-3951-49b7-B063-8C28F4CD843F', 'Data Entry: Verify extracted data') \r\n";
+
+static const string gstrCREATE_DATA_ENTRY_COUNTER_VALUE_INSTANCEID_TYPE_INDEX = 
+	"CREATE NONCLUSTERED INDEX [IX_DataEntryCounterValue_InstanceID_Type] ON [dbo].[DataEntryCounterValue] "
+	"( [InstanceID] ASC, [Type] ASC	)";

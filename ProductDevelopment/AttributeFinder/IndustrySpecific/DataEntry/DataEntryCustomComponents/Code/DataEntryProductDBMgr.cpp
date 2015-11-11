@@ -28,7 +28,7 @@ using namespace std;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-static const long glDATAENTRY_DB_SCHEMA_VERSION = 5;
+static const long glDATAENTRY_DB_SCHEMA_VERSION = 6;
 static const string gstrDATA_ENTRY_SCHEMA_VERSION_NAME = "DataEntrySchemaVersion";
 // https://extract.atlassian.net/browse/ISSUE-13239
 // StoreDataEntryProcessingHistory has been removed (const exists only for
@@ -138,6 +138,33 @@ int UpdateToSchemaVersion5(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38665");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 6;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_DATA_ENTRY_COUNTER_VALUE_INSTANCEID_TYPE_INDEX);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '6' WHERE [Name] = '" + 
+			gstrDATA_ENTRY_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39113");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -284,6 +311,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_ID);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_TYPE);
 		vecCreateQueries.push_back(gstrINSERT_DATA_ENTRY_VERIFY_TASK_CLASS);
+		vecCreateQueries.push_back(gstrCREATE_DATA_ENTRY_COUNTER_VALUE_INSTANCEID_TYPE_INDEX);
 
 		// Execute the queries to create the data entry table
 		executeVectorOfSQL(ipDBConnection, vecCreateQueries);
@@ -555,8 +583,14 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 						*pnProdSchemaVersion = UpdateToSchemaVersion5(ipConnection, pnNumSteps, NULL);
 					}
 					break;
+					
+			case 5: if (nFAMDBSchemaVersion == 133)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion6(ipConnection, pnNumSteps, NULL);
+					}
+					break;
 
-			case 5: break;
+			case 6: break;
 
 			default:
 				{
