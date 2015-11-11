@@ -101,8 +101,14 @@ namespace Extract.DataEntry
                             type = TypeResolutionUtils.ResolveType(typeName);
                         }
 
+                        // For now, this is checking to see if a DbConnection is being passed via a
+                        // DbConnectionQueryNode.
+                        if (childQueryResult.IsObject)
+                        {
+                            value = childQueryResult.Object;
+                        }
                         // If not specified, treat as a string.
-                        if (type == null)
+                        else if (type == null)
                         {
                             value = stringValue;
                         }

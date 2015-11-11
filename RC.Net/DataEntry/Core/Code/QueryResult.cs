@@ -105,6 +105,11 @@ namespace Extract.DataEntry
         List<IAttribute> _attributeResults;
 
         /// <summary>
+        /// A <see langword="object"/> that represents this result.
+        /// </summary>
+        object _objectResult;
+
+        /// <summary>
         /// <see langword="true"/> if multiple values are present; <see langword="false"/>
         /// otherwise.
         /// </summary>
@@ -126,9 +131,18 @@ namespace Extract.DataEntry
        
         #region Constructors
 
-        /// <overloads>
-        /// Initializes a new <see cref="QueryResult"/> instance.
-        /// </overloads>
+        /// <summary>
+        /// Initializes a new, empty <see cref="QueryResult"/> instance.
+        /// </summary>
+        /// <param name="queryNode">The <see cref="QueryNode"/> this result is to be associated
+        /// with.</param>
+        /// <param name="result">A <see langword="object"/> that represents this result.</param>
+        public QueryResult(QueryNode queryNode, object result)
+        {
+            _queryNode = queryNode;
+            _objectResult = result;
+        }
+
         /// <summary>
         /// Initializes a new, empty <see cref="QueryResult"/> instance.
         /// </summary>
@@ -171,6 +185,11 @@ namespace Extract.DataEntry
                     _spatialResults = new List<SpatialString>(queryResult._spatialResults);
                     Initialize<SpatialString>(queryNode, _spatialResults);
                 }
+                else if (queryResult.IsObject)
+                {
+                    _queryNode = queryNode;
+                    _objectResult = queryResult._objectResult;
+                }
                 else
                 {
                     _stringResults = new List<string>(queryResult._stringResults);
@@ -194,14 +213,13 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="queryNode">The <see cref="QueryNode"/> this result is to be associated
         /// with.</param>
-        /// <param name="stringResults">One or more <see langword="string"/> values representing the
+        /// <param name="results">One or more <see langword="string"/> values representing the
         /// result of a <see cref="DataEntryQuery"/>.</param>
-        [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "string")]
-        public QueryResult(QueryNode queryNode, params string[] stringResults)
+        public QueryResult(QueryNode queryNode, params string[] results)
         {
             try
             {
-                _stringResults = new List<string>(stringResults);
+                _stringResults = new List<string>(results);
                 Initialize<string>(queryNode, _stringResults);
             }
             catch (Exception ex)
@@ -215,13 +233,13 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="queryNode">The <see cref="QueryNode"/> this result is to be associated
         /// with.</param>
-        /// <param name="spatialResults">One or more <see cref="SpatialString"/> values representing
+        /// <param name="results">One or more <see cref="SpatialString"/> values representing
         /// the result of a <see cref="DataEntryQuery"/>.</param>
-        public QueryResult(QueryNode queryNode, params SpatialString[] spatialResults)
+        public QueryResult(QueryNode queryNode, params SpatialString[] results)
         {
             try
             {
-                _spatialResults = new List<SpatialString>(spatialResults);
+                _spatialResults = new List<SpatialString>(results);
                 Initialize<SpatialString>(queryNode, _spatialResults);
             }
             catch (Exception ex)
@@ -311,7 +329,7 @@ namespace Extract.DataEntry
         /// <see cref="IsAttribute"/> must be <see langword="true"/>.
         /// </summary>
         /// <returns>The first <see cref="IAttribute"/> value.</returns>
-        public IAttribute FirstAttributeValue
+        public IAttribute FirstAttribute
         {
             get
             {
@@ -335,7 +353,7 @@ namespace Extract.DataEntry
         /// <see cref="IsSpatial"/> must be <see langword="true"/>.
         /// </summary>
         /// <returns>The first <see langword="SpatialString"/> value.</returns>
-        public SpatialString FirstSpatialStringValue
+        public SpatialString FirstSpatialString
         {
             get
             {
@@ -365,7 +383,7 @@ namespace Extract.DataEntry
         /// Gets or sets the result of the query as a <see langword="string"/>.
         /// </summary>
         /// <value>The result of the query as a <see langword="string"/>.</value>
-        public string FirstStringValue
+        public string FirstString
         {
             get
             {
@@ -398,7 +416,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    if (FirstStringValue != value)
+                    if (FirstString != value)
                     {
                         if (IsSpatial)
                         {
@@ -406,13 +424,13 @@ namespace Extract.DataEntry
                             // Because the SpatialString class will remove spatial info for blank
                             // strings, allow for the case that the spatial mode of
                             // FirstSpatialStringValue does not match IsSpatial.
-                            if (FirstSpatialStringValue.HasSpatialInfo())
+                            if (FirstSpatialString.HasSpatialInfo())
                             {
-                                FirstSpatialStringValue.ReplaceAndDowngradeToHybrid(value);
+                                FirstSpatialString.ReplaceAndDowngradeToHybrid(value);
                             }
                             else
                             {
-                                FirstSpatialStringValue.ReplaceAndDowngradeToNonSpatial(value);
+                                FirstSpatialString.ReplaceAndDowngradeToNonSpatial(value);
                             }
                         }
                         else if (_stringResults != null && _stringResults.Count > 0)
@@ -440,6 +458,31 @@ namespace Extract.DataEntry
                 {
                     throw ExtractException.AsExtractException("ELI28913", ex);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this result is represented by <see cref="Object"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance is represented by
+        /// <see cref="Object"/>; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool IsObject
+        {
+            get
+            {
+                return _objectResult != null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see paramref="object"/> that represents this result.
+        /// </summary>
+        public object Object
+        {
+            get
+            {
+                return _objectResult;
             }
         }
 
@@ -502,7 +545,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    if (IsAttribute || IsSpatial || !string.IsNullOrEmpty(FirstStringValue))
+                    if (IsAttribute || IsSpatial || IsObject || !string.IsNullOrEmpty(FirstString))
                     {
                         return false;
                     }
@@ -614,11 +657,11 @@ namespace Extract.DataEntry
                     // Ensure FirstStringValue is in _stringResults.
                     if (_stringResults.Count == 0)
                     {
-                        _stringResults.Add(FirstStringValue);
+                        _stringResults.Add(FirstString);
                     }
                     else
                     {
-                        _stringResults[0] = FirstStringValue;
+                        _stringResults[0] = FirstString;
                     }
 
                     // Do the same for all remaining values.
@@ -648,7 +691,7 @@ namespace Extract.DataEntry
             {
                 if (!IsEmpty)
                 {
-                    FirstStringValue = "";
+                    FirstString = "";
 
                     // Do the same for all remaining values.
                     if (NextValue != null)
@@ -678,7 +721,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                FirstStringValue = string.Join(delimiter, ToStringArray());
+                FirstString = string.Join(delimiter, ToStringArray());
 
                 // We no longer have multiple results, so break off any linked values it
                 // previously had.
@@ -734,7 +777,7 @@ namespace Extract.DataEntry
                     combinedResult.AppendStringValue(resultCopy);
                 }
 
-                return combinedResult.FirstSpatialStringValue;
+                return combinedResult.FirstSpatialString;
             }
             catch (Exception ex)
             {
@@ -777,7 +820,7 @@ namespace Extract.DataEntry
                 }
                 else if (!IsEmpty)
                 {
-                    stringList.Add(FirstStringValue);
+                    stringList.Add(FirstString);
 
                     if (NextValue != null)
                     {
@@ -971,24 +1014,24 @@ namespace Extract.DataEntry
                         // If both results have spatial info, but neither has a string value, 
                         // temporarily assign a string value, otherwise the SpatialString.Append
                         // call will downgrade the value to non-spatial.
-                        if (string.IsNullOrEmpty(FirstStringValue) && 
-                            string.IsNullOrEmpty(otherResult.FirstStringValue))
+                        if (string.IsNullOrEmpty(FirstString) && 
+                            string.IsNullOrEmpty(otherResult.FirstString))
                         {
-                            FirstSpatialStringValue.ReplaceAndDowngradeToHybrid("Temporary");
-                            FirstSpatialStringValue.Append(otherResult.FirstSpatialStringValue);
-                            FirstSpatialStringValue.ReplaceAndDowngradeToHybrid("");
+                            FirstSpatialString.ReplaceAndDowngradeToHybrid("Temporary");
+                            FirstSpatialString.Append(otherResult.FirstSpatialString);
+                            FirstSpatialString.ReplaceAndDowngradeToHybrid("");
                         }
                         // Otherwise, append the other result normally.
                         else
                         {
-                            FirstSpatialStringValue.Append(otherResult.FirstSpatialStringValue);
+                            FirstSpatialString.Append(otherResult.FirstSpatialString);
                         }
                     }
                     // If the other result doesn't have any spatial info to persist, append its
                     // string value.
                     else
                     {
-                        FirstSpatialStringValue.AppendString(otherResult.FirstStringValue);
+                        FirstSpatialString.AppendString(otherResult.FirstString);
                     }
                 }
                 // If the other result has spatial info to persist.
@@ -996,39 +1039,39 @@ namespace Extract.DataEntry
                 {
                     // Make sure _stringResult contains the current string value in case
                     // _spatialString exists but is non-spatial.
-                    string stringValue = FirstStringValue;
+                    string stringValue = FirstString;
 
                     // To ensure other result's spatial info is preserved, assign a temporary string
                     // value if it does not have one... otherwise, the "Clone" call will remove the
                     // spatial info.
                     bool assignedTemporaryString = false;
-                    if (string.IsNullOrEmpty(otherResult.FirstStringValue))
+                    if (string.IsNullOrEmpty(otherResult.FirstString))
                     {
                         assignedTemporaryString = true;
-                        otherResult.FirstStringValue = "Temporary";
+                        otherResult.FirstString = "Temporary";
                     }
 
                     // Initialize this result's _spatialResult as a clone of the other result.
                     _spatialResults = new List<SpatialString>();
-                    _spatialResults.Add(otherResult.FirstSpatialStringValue.Clone());
+                    _spatialResults.Add(otherResult.FirstSpatialString.Clone());
 
                     // Remove any temporary string from both the original and clone.
                     if (assignedTemporaryString)
                     {
-                        otherResult.FirstStringValue = "";
+                        otherResult.FirstString = "";
                         _spatialResults[0].ReplaceAndDowngradeToHybrid("");
                     }
 
                     // Insert the text of this result before any text from the other result.
                     if (!string.IsNullOrEmpty(stringValue))
                     {
-                        FirstSpatialStringValue.InsertString(0, stringValue);
+                        FirstSpatialString.InsertString(0, stringValue);
                     }
                 }
                 // There is no spatial info to persist; simply append the other result's text.
                 else
                 {
-                    FirstStringValue += otherResult.FirstStringValue;
+                    FirstString += otherResult.FirstString;
 
                     // In case a spatial result existed but did not have spatial info to persist,
                     // null, it out now-- it is no longer needed.
@@ -1129,15 +1172,19 @@ namespace Extract.DataEntry
 
                 if (IsAttribute)
                 {
-                    resultCopy = new QueryResult(_queryNode, FirstAttributeValue);
+                    resultCopy = new QueryResult(_queryNode, FirstAttribute);
                 }
                 else if (IsSpatial)
                 {
-                    resultCopy = new QueryResult(_queryNode, FirstSpatialStringValue);
+                    resultCopy = new QueryResult(_queryNode, FirstSpatialString);
+                }
+                else if (IsObject)
+                {
+                    resultCopy = new QueryResult(_queryNode, _objectResult);
                 }
                 else
                 {
-                    resultCopy = new QueryResult(_queryNode, FirstStringValue);
+                    resultCopy = new QueryResult(_queryNode, FirstString);
                 }
 
                 return resultCopy;

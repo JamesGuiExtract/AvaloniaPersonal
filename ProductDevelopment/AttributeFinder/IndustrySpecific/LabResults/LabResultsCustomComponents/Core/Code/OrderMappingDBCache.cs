@@ -399,7 +399,7 @@ namespace Extract.LabResultsCustomComponents
                     QueryResult result = query.Evaluate();
 
                     int retVal = 0;
-                    return Int32.TryParse(result.FirstStringValue, out retVal) ? retVal : 0;
+                    return Int32.TryParse(result.FirstString, out retVal) ? retVal : 0;
                 }
                 catch (Exception ex)
                 {

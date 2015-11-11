@@ -503,11 +503,11 @@ namespace Extract.AttributeFinder.Rules
                         // The query system will have already cloned any spatial values that came
                         // from other attributes, so the spatial string result can be used directly
                         // without any side-effects on other attributes.
-                        attribute.Value = result.FirstSpatialStringValue;
+                        attribute.Value = result.FirstSpatialString;
                     }
                     else
                     {
-                        attribute.Value.ReplaceAndDowngradeToNonSpatial(result.FirstStringValue);
+                        attribute.Value.ReplaceAndDowngradeToNonSpatial(result.FirstString);
                     }
 
                     returnValue.PushBack(attribute);

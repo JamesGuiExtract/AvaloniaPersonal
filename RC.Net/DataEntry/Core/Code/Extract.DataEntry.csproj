@@ -237,6 +237,10 @@
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
     <Compile Include="DataEntryUndoMementos.cs" />
+    <Compile Include="DbConnectionQueryNode.cs">
+	  <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+	</Compile>
     <Compile Include="ExpressionQueryNode.cs">
       <SubType>Code</SubType>
       <DependentUpon>DataEntryQuery.cs</DependentUpon>

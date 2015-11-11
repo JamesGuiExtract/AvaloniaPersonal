@@ -535,6 +535,11 @@ namespace Extract.DataEntry
                             childQueryNode =
                                 new ExpressionQueryNode(RootAttribute, DatabaseConnections);
                         }
+                        else if (childElement.Name.Equals("DbConnection",
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            childQueryNode = new DbConnectionQueryNode(RootAttribute, DatabaseConnections);
+                        }
                         else
                         {
                             // If the node name matches the name of one of the name QueryNodes,
@@ -675,13 +680,13 @@ namespace Extract.DataEntry
                         foreach (QueryResult subResult in result)
                         {
                             SpatialString spatialString = forcedSpatialResult.Clone();
-                            spatialString.ReplaceAndDowngradeToHybrid(subResult.FirstStringValue);
+                            spatialString.ReplaceAndDowngradeToHybrid(subResult.FirstString);
                             spatialResults.Add(spatialString);
                         }
                     }
                     else
                     {
-                        forcedSpatialResult.ReplaceAndDowngradeToHybrid(result.FirstStringValue);
+                        forcedSpatialResult.ReplaceAndDowngradeToHybrid(result.FirstString);
                         spatialResults.Add(forcedSpatialResult);
                     }
 
@@ -845,7 +850,7 @@ namespace Extract.DataEntry
                             {
                                 vecRasterZones.Append(forcedSpatialResult.GetOCRImageRasterZones());
                                 forcedSpatialResult.DataEntryMergeAsHybridString(
-                                    distinctResult.FirstSpatialStringValue);
+                                    distinctResult.FirstSpatialString);
                             }
 
                             // Because the SpatialString class will remove spatial info for
@@ -966,8 +971,8 @@ namespace Extract.DataEntry
                 IEnumerable<SpatialString> spatialResults = result.Select(value =>
                     value.IsSpatial
                         ? (value.IsAttribute
-                            ? value.FirstAttributeValue.Value
-                            : value.FirstSpatialStringValue)
+                            ? value.FirstAttribute.Value
+                            : value.FirstSpatialString)
                         : null);
 
                 // Convert each spatial result into a string value corresponding to the SpatialField
@@ -1086,7 +1091,7 @@ namespace Extract.DataEntry
                 // Compile an enumeration of all attribute results.
                 IEnumerable<IAttribute> attributeResults = result
                     .Where(value => value.IsAttribute)
-                    .Select(value => value.FirstAttributeValue);
+                    .Select(value => value.FirstAttribute);
 
                 // Convert each attribute result into a string value corresponding to the
                 // AttributeField property.

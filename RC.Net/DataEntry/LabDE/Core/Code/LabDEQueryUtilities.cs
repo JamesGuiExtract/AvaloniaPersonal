@@ -1,6 +1,9 @@
-﻿using Extract.Licensing;
+﻿using Extract.Database;
+using Extract.Licensing;
 using Spring.Core.TypeResolution;
 using System;
+using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -215,6 +218,55 @@ namespace Extract.DataEntry.LabDE
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38425");
+            }
+        }
+
+        /// <summary>
+        /// Gets any result component codes from <see paramref="orderMappingDbConnection"/> that the
+        /// specified <see paramref="componentAKA"/> may refer to using the AKAs defined in
+        /// <see paramref="componentDataDb"/>.
+        /// </summary>
+        /// <param name="customerDB">A <see cref="DbConnection"/> to the
+        /// customer-specific OrderMappingDB.</param>
+        /// <param name="componentDataDB">>A <see cref="DbConnection"/> to the URS OrderMappingDB.
+        /// </param>
+        /// <param name="componentAKA">A value that is to be treated as a potential AKA in the URS
+        /// database.</param>
+        /// <param name="orderCode">If not empty, the returned result codes will be restricted to
+        /// components mapped to the specified order.</param>
+        /// <returns>An array of any result component codes <see paramref="componentAKA"/> may refer
+        /// to.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ESAKA")]
+        public static string[] GetComponentCodesFromESAKA(DbConnection customerDB,
+            DbConnection componentDataDB, string componentAKA, string orderCode)
+        {
+            try
+            {
+                // Find all component codes componentAKA may refer to in the URS DB>
+                var ESComponentCodes = DBMethods.GetQueryResultsAsStringArray(componentDataDB,
+                        "SELECT [ESComponentAKA].[ESComponentCode] FROM [ESComponentAKA] " +
+                        "WHERE [Name] LIKE @0",
+                        new Dictionary<string, string>() { { "@0", componentAKA } }, "");
+
+                // Translate this to the component codes in the customer DB and ignore any AKAs in
+                // the DisabledESComponentAKA table.
+                var customerComponentCodes = DBMethods.GetQueryResultsAsStringArray(
+                    customerDB,
+                    "SELECT [LabTest].[OfficialName] FROM [LabTest] " +
+                    "INNER JOIN [LabOrderTest] ON [LabTest].[TestCode] = [LabOrderTest].[TestCode] " +
+                    "INNER JOIN [ComponentToESComponentMap] ON [LabTest].[TestCode] = [ComponentToESComponentMap].[ComponentCode] " +
+                    "LEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode] " +
+                    "   AND [DisabledESComponentAKA].[ESComponentAKA] LIKE @0 " +
+                    "WHERE (LEN(@1) = 0 OR [OrderCode] LIKE @1) " +
+                    "AND [DisabledESComponentAKA].[ESComponentCode] IS NULL " +
+                    "AND [ComponentToESComponentMap].[ESComponentCode] IN ('" + string.Join("','", ESComponentCodes) + "')",
+                    new Dictionary<string, string>() { { "@0", componentAKA }, { "@1", orderCode } }, "");
+
+                return customerComponentCodes;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39114");
             }
         }
 
