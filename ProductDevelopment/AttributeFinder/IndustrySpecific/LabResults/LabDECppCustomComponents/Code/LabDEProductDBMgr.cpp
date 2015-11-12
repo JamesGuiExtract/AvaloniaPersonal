@@ -153,6 +153,9 @@ int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("ALTER TABLE [Order] ADD [ReferenceDateTime] DATETIME");
 		vecQueries.push_back("ALTER TABLE [Order] ADD [ORMMessage] XML");
 		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_V3);
+		
+		// The default was added to the Order table that was created with version 3
+		vecQueries.push_back("ALTER TABLE [dbo].[Order] ADD DEFAULT 'A' FOR OrderStatus");
 
 		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
 			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
@@ -179,13 +182,12 @@ int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vector<string> vecQueries;
 		
-		vecQueries.push_back("ALTER TABLE [dbo].[Order] ADD DEFAULT 'A' FOR OrderStatus");
 		vecQueries.push_back("exec sp_rename 'Order', 'LabDEOrder'");
 		vecQueries.push_back("exec sp_rename 'OrderFile', 'LabDEOrderFile'");
 		vecQueries.push_back("exec sp_rename 'OrderStatus', 'LabDEOrderStatus'");
 		vecQueries.push_back("exec sp_rename 'Patient', 'LabDEPatient'");
 		vecQueries.push_back("ALTER TABLE LabDEOrderFile ADD [CollectionDate] DATETIME");
-		vecQueries.push_back("DROP PROCEDURE [AddOrUpdateLabDEOrder]");
+		vecQueries.push_back(gstrDROP_PROCEDURE_ADD_OR_UPDATE_ORDER);
 		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
 
 		// Change Default value for ReceivedDateTime field on LabDEOrder
@@ -256,7 +258,7 @@ int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vector<string> vecQueries;
 		
 		// Update AddOrUpdateLabDEOrder stored procedure to make it dbo
-		vecQueries.push_back("DROP PROCEDURE [AddOrUpdateLabDEOrder]");
+		vecQueries.push_back(gstrDROP_PROCEDURE_ADD_OR_UPDATE_ORDER);
 		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
 
 		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +

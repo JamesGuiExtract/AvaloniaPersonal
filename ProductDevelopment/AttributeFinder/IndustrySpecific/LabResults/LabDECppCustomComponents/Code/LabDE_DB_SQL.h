@@ -163,3 +163,7 @@ static const string gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER =
 	"				@ReferenceDateTime, @OrderStatus, @ORMMessage) "
 	"		END "
 	"END";
+
+static const string gstrDROP_PROCEDURE_ADD_OR_UPDATE_ORDER =
+	"IF  EXISTS (SELECT * FROM sysobjects WHERE name='AddOrUpdateLabDEOrder') "	
+	"	DROP PROCEDURE [AddOrUpdateLabDEOrder]";
