@@ -4323,8 +4323,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                                 // https://extract.atlassian.net/browse/ISSUE-13385
                                 // If this is the default connection, use the FKB version (if
-                                // specified) to be able to expand the <ComponentDataDir> _tagUtility
-                                // (including for any subsequent connection definitions).
+                                // specified) to be able to expand the <ComponentDataDir> using
+                                // _tagUtility from this point forward (including for any subsequent
+                                // connection definitions).
                                 if (isDefaultConnection && _tagUtility != null)
                                 {
                                     AddComponentDataDirTag(connectionInfo);
@@ -4503,33 +4504,41 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <see cref="_tagUtility"/>.
         /// </summary>
         /// <param name="connectionInfo">A <see cref="DatabaseConnectionInfo"/> that is expected to
-        /// represent the default customer OrderMappingDB database. This database is required to
-        /// have a Settings table.</param>
+        /// represent the default customer OrderMappingDB database. The tag will only be added if
+        /// this database has a Settings table and that table has a populated FKBVersion setting.
+        /// </param>
         void AddComponentDataDirTag(DatabaseConnectionInfo connectionInfo)
         {
-            string FKBVersion = DBMethods.GetQueryResultsAsStringArray(
-                connectionInfo.ManagedDbConnection,
-                "SELECT [Value] FROM [Settings] WHERE [Name] = 'FKBVersion'")
-                .SingleOrDefault();
-            if (!string.IsNullOrWhiteSpace(FKBVersion))
+            if (_tagUtility != null &&
+                DBMethods.GetQueryResultsAsStringArray(connectionInfo.ManagedDbConnection,
+                "SELECT COUNT(*) FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = 'Settings'")
+                .Single() == "1")
             {
-                var ruleExecutionEnv = new RuleExecutionEnv();
-                ruleExecutionEnv.PushRSDFileName("");
-                try
-                {
-                    ruleExecutionEnv.FKBVersion = FKBVersion;
-                    if (FileProcessingDB != null)
-                    {
-                        ruleExecutionEnv.AlternateComponentDataDir =
-                            FileProcessingDB.GetDBInfoSetting("AlternateComponentDataDir", false);
-                    }
+                string FKBVersion = DBMethods.GetQueryResultsAsStringArray(
+                    connectionInfo.ManagedDbConnection,
+                    "SELECT [Value] FROM [Settings] WHERE [Name] = 'FKBVersion'")
+                    .SingleOrDefault();
 
-                    var afUtility = new AFUtility();
-                    _tagUtility.AddTag("<ComponentDataDir>", afUtility.GetComponentDataFolder());
-                }
-                finally
+                if (!string.IsNullOrWhiteSpace(FKBVersion))
                 {
-                    ruleExecutionEnv.PopRSDFileName();
+                    var ruleExecutionEnv = new RuleExecutionEnv();
+                    ruleExecutionEnv.PushRSDFileName("");
+                    try
+                    {
+                        ruleExecutionEnv.FKBVersion = FKBVersion;
+                        if (FileProcessingDB != null)
+                        {
+                            ruleExecutionEnv.AlternateComponentDataDir =
+                                FileProcessingDB.GetDBInfoSetting("AlternateComponentDataDir", false);
+                        }
+
+                        var afUtility = new AFUtility();
+                        _tagUtility.AddTag("<ComponentDataDir>", afUtility.GetComponentDataFolder());
+                    }
+                    finally
+                    {
+                        ruleExecutionEnv.PopRSDFileName();
+                    }
                 }
             }
         }
