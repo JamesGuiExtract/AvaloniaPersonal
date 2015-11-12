@@ -21,6 +21,7 @@ using System.Xml;
 using System.Xml.XPath;
 using TD.SandDock;
 using UCLID_AFCORELib;
+using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_DATAENTRYCUSTOMCOMPONENTSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -4311,13 +4312,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             do
                             {
                                 bool isDefaultConnection = false;
-                                LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
+                                var connectionInfo =
+                                    LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
 
                                 ExtractException.Assert("ELI37781",
                                     "Multiple default connections are defined.",
                                     !isDefaultConnection || !loadedDefaultConnection);
 
                                 loadedDefaultConnection |= isDefaultConnection;
+
+                                // https://extract.atlassian.net/browse/ISSUE-13385
+                                // If this is the default connection, use the FKB version (if
+                                // specified) to be able to expand the <ComponentDataDir> _tagUtility
+                                // (including for any subsequent connection definitions).
+                                if (isDefaultConnection && _tagUtility != null)
+                                {
+                                    AddComponentDataDirTag(connectionInfo);
+                                }
                             }
                             while (databaseConnectionsNode.MoveToNext());
                         }
@@ -4354,7 +4365,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// data entry config file defining the connection.</param>
         /// <param name="isDefaultConnection"><see langword="true"/> if the connection is defined as
         /// the default database connection; otherwise, <see langword="false"/>.</param>
-        void LoadDatabaseConnection(XPathNavigator databaseConnectionsNode,
+        /// <returns>A <see cref="DatabaseConnectionInfo"/> representing the
+        /// <see cref="DbConnection"/>.</returns>
+        DatabaseConnectionInfo LoadDatabaseConnection(XPathNavigator databaseConnectionsNode,
             out bool isDefaultConnection)
         {
             isDefaultConnection = false;
@@ -4425,7 +4438,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     _dbConnections[""] = _dbConnections[connectionName];
                 }
+
+                return _dbConnections[connectionName];
             }
+
+            return null;
         }
 
         /// <summary>
@@ -4477,6 +4494,43 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 dbConnInfo = new DatabaseConnectionInfo(databaseType, connectionString);
                 dbConnInfo.UseLocalSqlCeCopy = true;
                 _dbConnections[name] = dbConnInfo;
+            }
+        }
+
+        /// <summary>
+        /// If an FKBVersion value is available in the Settings table of the specified
+        /// <see paramref="connectionInfo"/>, adds the &lt;ComponentDataDir&gt; tag to
+        /// <see cref="_tagUtility"/>.
+        /// </summary>
+        /// <param name="connectionInfo">A <see cref="DatabaseConnectionInfo"/> that is expected to
+        /// represent the default customer OrderMappingDB database. This database is required to
+        /// have a Settings table.</param>
+        void AddComponentDataDirTag(DatabaseConnectionInfo connectionInfo)
+        {
+            string FKBVersion = DBMethods.GetQueryResultsAsStringArray(
+                connectionInfo.ManagedDbConnection,
+                "SELECT [Value] FROM [Settings] WHERE [Name] = 'FKBVersion'")
+                .SingleOrDefault();
+            if (!string.IsNullOrWhiteSpace(FKBVersion))
+            {
+                var ruleExecutionEnv = new RuleExecutionEnv();
+                ruleExecutionEnv.PushRSDFileName("");
+                try
+                {
+                    ruleExecutionEnv.FKBVersion = FKBVersion;
+                    if (FileProcessingDB != null)
+                    {
+                        ruleExecutionEnv.AlternateComponentDataDir =
+                            FileProcessingDB.GetDBInfoSetting("AlternateComponentDataDir", false);
+                    }
+
+                    var afUtility = new AFUtility();
+                    _tagUtility.AddTag("<ComponentDataDir>", afUtility.GetComponentDataFolder());
+                }
+                finally
+                {
+                    ruleExecutionEnv.PopRSDFileName();
+                }
             }
         }
 
