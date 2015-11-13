@@ -133,3 +133,10 @@ static const std::string gstrCREATE_FILE_ACTION_STATUS_LEGACY =
 	"	[ActionID] ASC, "
 	"	[FileID] ASC "
 	")) ";
+
+// Used for schema versions 130 - 132
+static const string gstrCREATE_SECURE_COUNTER_V130 =
+	"CREATE TABLE dbo.SecureCounter ( "
+	"   ID int NOT NULL CONSTRAINT PK_SecureCounter PRIMARY KEY CLUSTERED, "
+	"   CounterName nvarchar(100) NOT NULL, "
+	"   SecureCounterValue nvarchar(max) NOT NULL)";

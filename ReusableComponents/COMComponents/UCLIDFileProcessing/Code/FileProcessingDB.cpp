@@ -3755,6 +3755,31 @@ STDMETHODIMP CFileProcessingDB::get_ConnectedDatabaseName(BSTR* pbstrDatabaseNam
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39083");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetSecureCounterAlertLevel(long nCounterID, long nAlertLevel,
+														   long nAlertMultiple)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI39128", nCounterID > 0 && nCounterID < 1000);
+		ASSERT_ARGUMENT("ELI39129", nAlertLevel >= 0);
+		ASSERT_ARGUMENT("ELI39130", nAlertMultiple >= 0);
+		
+		if (!SetSecureCounterAlertLevel_Internal(false, nCounterID, nAlertLevel, nAlertMultiple))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
+				gstrSECURE_COUNTER_DB_LOCK);
+
+			SetSecureCounterAlertLevel_Internal(true, nCounterID, nAlertLevel, nAlertMultiple);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39131");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

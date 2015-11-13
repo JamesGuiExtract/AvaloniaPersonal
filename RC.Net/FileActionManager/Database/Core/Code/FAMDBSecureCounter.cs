@@ -1,6 +1,12 @@
 ﻿using Extract.Interfaces;
 using Extract.Licensing;
+using Extract.Utilities;
+using Extract.Utilities.Email;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
 using UCLID_FILEPROCESSINGLib;
 
@@ -14,7 +20,7 @@ namespace Extract.FileActionManager.Database
     [Guid("8CDB95DB-D580-4E26-B4FE-2EF777E3E712")]
     [ProgId("Extract.FileActionManager.Database.FAMDBRuleExecutionCounter")]
     [CLSCompliant(false)]
-    public class FAMDBSecureCounter : ISecureCounterCreator, ISecureCounter
+    public class FAMDBSecureCounter : IFAMDBSecureCounter, ISecureCounter
     {
         #region Constants
 
@@ -43,6 +49,16 @@ namespace Extract.FileActionManager.Database
         string _name;
 
         /// <summary>
+        /// The number of counts remaining at which the software should start sending alerts.
+        /// </summary>
+        int _alertLevel;
+
+        /// <summary>
+        /// How frequently alerts should be repeated after reaching _alertLevel.
+        /// </summary>
+        int _alertMultiple;
+
+        /// <summary>
         /// <see langword="true"/> if this counter is valid; otherwise, <see langword="false"/>.
         /// </summary>
         bool _isValid;
@@ -60,18 +76,29 @@ namespace Extract.FileActionManager.Database
 
         #endregion Constructors
 
-        #region ISecureCounterCreator
+        #region IFAMDBSecureCounter
 
         /// <summary>
         /// Initializes the counter of the specified <see paramref="counterID"/> against the
         /// specified <see paramref="fileProcessingDB"/>.
         /// </summary>
-        /// <param name="pFAMDB">The <see cref="FileProcessingDB"/> that is the source of
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> that is the source of
         /// this counter.</param>
-        /// <param name="nID">The ID of the counter.</param>
-        /// <param name="bIsValid"><see langword="true"/> if this counter is valid; otherwise,
+        /// <param name="ID">The ID of the counter.</param>
+        /// <param name="name"></param>
+        /// <param name="alertLevel"></param>
+        /// <param name="alertMultiple"></param>
+        /// <param name="isValid"><see langword="true"/> if this counter is valid; otherwise,
         /// <see langword="false"/>.</param>
-        public void Initialize(FileProcessingDB pFAMDB, int nID, bool bIsValid)
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#")]
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "1#")]
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "2#")]
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "3#")]
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "4#")]
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "5#")]
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "6#")]
+        public void Initialize(FileProcessingDB fileProcessingDB, int ID, string name,
+            int alertLevel, int alertMultiple, bool isValid)
         {
             try
             {
@@ -79,12 +106,18 @@ namespace Extract.FileActionManager.Database
                     LicenseIdName.ExtractCoreObjects, "ELI38744", _OBJECT_NAME);
 
                 ExtractException.Assert("ELI38766", "Null argument exception.",
-                    pFAMDB != null);
+                    fileProcessingDB != null);
 
-                _fileProcessingDB = pFAMDB;
-                _id = nID;
-                _name = _fileProcessingDB.GetSecureCounterName(_id);
-                _isValid = bIsValid;
+                _fileProcessingDB = fileProcessingDB;
+                _id = ID;
+                _name = name;
+                _alertLevel = alertLevel;
+                _alertMultiple = alertMultiple;
+                if (_alertLevel > 0 && _alertMultiple <= 0)
+                {
+                    _alertMultiple = _alertLevel;
+                }
+                _isValid = isValid;
             }
             catch (Exception ex)
             {
@@ -92,7 +125,29 @@ namespace Extract.FileActionManager.Database
             }
         }
 
-        #endregion ISecureCounterCreator
+        /// <summary>
+        /// Gets the number of counts remaining at which the software should start sending alerts.
+        /// </summary>
+        public int AlertLevel
+        {
+            get
+            {
+                return _alertLevel;
+            }
+        }
+
+        /// <summary>
+        /// Gets how frequently alerts should be repeated after reaching <see cref="AlertLevel"/>.
+        /// </summary>
+        public int AlertMultiple
+        {
+            get
+            {
+                return _alertMultiple;
+            }
+        }
+
+        #endregion IFAMDBSecureCounter
 
         #region ISecureCounter
 
@@ -161,7 +216,20 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                return _fileProcessingDB.DecrementSecureCounter(_id, count);
+                int newValue = _fileProcessingDB.DecrementSecureCounter(_id, count);
+
+                if (AlertLevel > 0 && newValue <= AlertLevel)
+                {
+                    int lastValue = newValue + count;
+                    if (lastValue > AlertLevel ||
+                        ((AlertLevel - newValue) / AlertMultiple !=
+                         (AlertLevel - lastValue) / AlertMultiple))
+                    {
+                        SendEmailAlert(newValue);
+                    }
+                }
+
+                return newValue;
             }
             catch (Exception ex)
             {
@@ -171,5 +239,87 @@ namespace Extract.FileActionManager.Database
         }
 
         #endregion ISecureCounter
+
+        #region Private Methods
+
+        /// <summary>
+        /// Sends an email to alert the recipients that the counter is running low.
+        /// </summary>
+        /// <param name="counterValue">The number of counts currently remaining in this counter.
+        /// </param>
+        void SendEmailAlert(int counterValue)
+        {
+            try
+            {
+                var emailSettings = new SmtpEmailSettings();
+                emailSettings.LoadSettings(
+                        new FAMDatabaseSettings<ExtractSmtp>(
+                            _fileProcessingDB, false, SmtpEmailSettings.PropertyNameLookup));
+
+                if (string.IsNullOrWhiteSpace(emailSettings.Server))
+                {
+                    throw new ExtractException("ELI39124",
+                        "FAM DB email settings are not configured.");
+                }
+                else
+                {
+                    var requestTextGenerator = new SecureCounterTextManipulator(_fileProcessingDB);
+                    requestTextGenerator.Reason = string.Format(CultureInfo.CurrentCulture,
+                        "The counter \"{0}\" is running low.", _name);
+
+                    var contactSettings = new FAMDatabaseSettings<LicenseContact>(
+                        _fileProcessingDB, false);
+                    requestTextGenerator.Organization
+                        = contactSettings.Settings.LicenseContactOrganization;
+                    requestTextGenerator.EmailAddress
+                        = contactSettings.Settings.LicenseContactEmail;
+                    requestTextGenerator.Phone
+                        = contactSettings.Settings.LicenseContactPhone;
+
+                    var emailMessage = new ExtractEmailMessage();
+                    emailMessage.EmailSettings = emailSettings;
+
+                    List<string> recipients = contactSettings.Settings.SendAlertsToExtract
+                        ? new List<string>(new[] { "support@extractsystems.com" })
+                        : new List<string>();
+
+                    if (contactSettings.Settings.SendAlertsToSpecified)
+                    {
+                        recipients.AddRange(contactSettings.Settings.SpecifiedAlertRecipients
+                            .Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(s => s.Trim())
+                            .Where(s => !string.IsNullOrEmpty(s)));
+                    }
+
+                    if (!recipients.Any())
+                    {
+                        return;
+                    }
+
+                    emailMessage.Recipients = recipients.ToVariantVector();
+
+                    if (!string.IsNullOrWhiteSpace(contactSettings.Settings.LicenseContactEmail))
+                    {
+                        emailMessage.CarbonCopyRecipients = new[] { contactSettings.Settings.LicenseContactEmail }.ToVariantVector();
+                    }
+
+                    emailMessage.Subject = string.Format(CultureInfo.CurrentCulture,
+                        "FAM DB counter \"{0}\" is running low", _name);
+                    emailMessage.Body = requestTextGenerator.GetRequestText();
+
+                    emailMessage.Send();
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI39125",
+                    "Failed to send low counter value alert email.", ex);
+                ee.AddDebugData("Counter name", _name, false);
+                ee.AddDebugData("Counter value", counterValue, false);
+                throw ee;
+            }
+        }
+
+        #endregion Private Methods
     }
 }

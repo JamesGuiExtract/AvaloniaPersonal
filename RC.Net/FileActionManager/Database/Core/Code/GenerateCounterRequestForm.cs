@@ -94,11 +94,6 @@ namespace Extract.FileActionManager.Database
                 _phoneTextBox.Text = _licenseContactSettings.Settings.LicenseContactPhone;
 
                 UpdateRequestText();
-
-                if (string.IsNullOrWhiteSpace(_emailSettings.Server))
-                {
-                    _sendEmailButton.Enabled = false;
-                }
             }
             catch (Exception ex)
             {
@@ -165,6 +160,17 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(_emailSettings.Server))
+                {
+                    UtilityMethods.ShowMessageBox("The email is sent using email server settings " +
+                        "in the database, but these settings have not been configured.\r\n\r\n" +
+                        "From the main screen, select the \"Database | Database options...\" " +
+                        "menu option, then use the \"Email\" tab to configure the outgoing email server.",
+                        "Outgoing email server not configured", true);
+
+                    return;
+                }
+
                 // Whenever the request is sent to Extract, store the licensing contact info to
                 // the DBInfo table as it is currently entered.
                 SaveLicenseContactInfo();
@@ -173,8 +179,8 @@ namespace Extract.FileActionManager.Database
                 emailMessage.EmailSettings = _emailSettings;
                 emailMessage.Recipients = new[] { "flex-license@extractsystems.com" }.ToVariantVector();
                 emailMessage.Subject = _unlockCode
-                    ? "FAM DB secure counter unlock request"
-                    : "FAM DB secure counter update request";
+                    ? "FAM DB counter unlock request"
+                    : "FAM DB counter update request";
                 if (!string.IsNullOrWhiteSpace(_requestTextGenerator.EmailAddress))
                 {
                     emailMessage.CarbonCopyRecipients =

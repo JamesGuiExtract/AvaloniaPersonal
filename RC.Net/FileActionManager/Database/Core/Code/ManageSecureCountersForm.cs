@@ -2,6 +2,7 @@
 using Extract.Utilities;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 using System.Globalization;
@@ -37,6 +38,11 @@ namespace Extract.FileActionManager.Database
         /// in <see cref="_counterDataGridView"/>
         /// </summary>
         DataGridViewTextBoxEditingControl _editingControl;
+
+        /// <summary>
+        /// Indicates whether any of the alert level or multiple values have been touched.
+        /// </summary>
+        bool _alertLevelChanged;
 
         #endregion Fields
 
@@ -88,7 +94,7 @@ namespace Extract.FileActionManager.Database
                 _emailAlertRecipients.Text =
                     _licenseContactSettings.Settings.SpecifiedAlertRecipients;
 
-                RefreshCounterGrid();
+                RefreshCounterData();
 	        }
 	        catch (Exception ex)
 	        {
@@ -138,7 +144,7 @@ namespace Extract.FileActionManager.Database
                 {
                     applyUpdateCodeForm.ShowDialog(this);
 
-                    RefreshCounterGrid();
+                    RefreshCounterData();
                 }
             }
             catch (Exception ex)
@@ -231,7 +237,7 @@ namespace Extract.FileActionManager.Database
             try 
 	        {
                 // Ensure that valid numbers have been entered for the alert level settings.
-                if (e.ColumnIndex >= 2)
+                if (e.ColumnIndex >= 3)
                 {
                     string value = e.FormattedValue.ToString();
                     if (!string.IsNullOrWhiteSpace(value))
@@ -255,6 +261,8 @@ namespace Extract.FileActionManager.Database
                             e.Cancel = true;
                         }
                     }
+
+                    _alertLevelChanged = true;
                 }
             }
 	        catch (Exception ex)
@@ -280,6 +288,20 @@ namespace Extract.FileActionManager.Database
                     _emailSpecifiedRecipientsCheckBox.Checked;
                 _licenseContactSettings.Settings.SpecifiedAlertRecipients =
                     _emailAlertRecipients.Text;
+
+                if (_alertLevelChanged)
+                {
+                    foreach (var row in _counterDataGridView.Rows
+                        .OfType<DataGridViewRow>())
+                    {
+                        int counterID = ParseIntValue(row.Cells[0]);
+                        int alertLevel = ParseIntValue(row.Cells[3]);
+                        int alertMultiple = ParseIntValue(row.Cells[4]);
+
+                        _fileProcessingDB.SetSecureCounterAlertLevel(
+                            counterID, alertLevel, alertMultiple);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -292,10 +314,9 @@ namespace Extract.FileActionManager.Database
         #region Private Members
 
         /// <summary>
-        /// Refreshes the counter grid with the current counter data from
-        /// <see cref="_fileProcessingDB"/>.
+        /// Reloads secure counter data from <see cref="_fileProcessingDB"/> into the dialog.
         /// </summary>
-        void RefreshCounterGrid()
+        void RefreshCounterData()
         {
             try
             {
@@ -318,8 +339,12 @@ namespace Extract.FileActionManager.Database
                     }
                     else
                     {
+                        var FAMDBCounter = (IFAMDBSecureCounter)secureCounter;
+
                         _counterDataGridView.Rows.Add(secureCounter.ID, secureCounter.Name,
-                            secureCounter.Value);
+                            FormatForDisplay(secureCounter.Value, false),
+                            FormatForDisplay(FAMDBCounter.AlertLevel, true),
+                            FormatForDisplay(FAMDBCounter.AlertMultiple, true));
                     }
                 }
             }
@@ -336,10 +361,54 @@ namespace Extract.FileActionManager.Database
                 _countersAreValid = false;
             }
 
-            if (!_countersAreValid)
+            if (_countersAreValid)
+            {
+                _generateRequestButton.Text = "Generate update request";
+                _applyUpdateCodeButton.Text = "Apply update code";
+                _counterDataGridView.Enabled = true;
+            }
+            else
             {
                 _generateRequestButton.Text = "Generate unlock request";
                 _applyUpdateCodeButton.Text = "Apply unlock code";
+                _counterDataGridView.Enabled = false;
+            }
+        }
+
+        /// <summary>
+        /// Parses the <see paramref="cell"/>'s value as an integer.
+        /// </summary>
+        /// <param name="cell">The <see cref="DataGridViewCell"/> to parse.</param>
+        /// <returns>The cell's value as an <see langword="int"/>.</returns>
+        static int ParseIntValue(DataGridViewCell cell)
+        {
+            string value = cell.Value.ToString();
+            return string.IsNullOrWhiteSpace(value)
+                ? 0
+                : Int32.Parse(value,
+                    NumberStyles.AllowThousands |
+                    NumberStyles.AllowLeadingWhite |
+                    NumberStyles.AllowTrailingWhite,
+                    CultureInfo.CurrentCulture);
+        }
+
+        /// <summary>
+        /// Formats the specified <see paramref="number"/> as a string with thousands separator
+        /// commas.
+        /// </summary>
+        /// <param name="number">The number to format.</param>
+        /// <param name="makeZeroBlank"><see langword="true"/> if the number zero should result in a
+        /// blank value; <see langword="false"/> to return "0".</param>
+        /// <returns>The formatted number</returns>
+        static string FormatForDisplay(int number, bool makeZeroBlank)
+        {
+            if (number == 0 && makeZeroBlank)
+            {
+                return "";
+            }
+            else
+            {
+                return string.Format(CultureInfo.CurrentCulture, "{0:n0}", number);
             }
         }
 

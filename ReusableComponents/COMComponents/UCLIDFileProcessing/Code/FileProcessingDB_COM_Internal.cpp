@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 133;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 134;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1176,7 +1176,7 @@ int UpdateToSchemaVersion130(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 			+ gstrDATABASEID + "', '')");
 
-		vecQueries.push_back(gstrCREATE_SECURE_COUNTER);
+		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_V130);
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
 		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK);
 		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK);
@@ -1248,7 +1248,7 @@ int UpdateToSchemaVersion132(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 			+ gstrDATABASEID + "', '" + strDBValue + "')");
 
-		vecQueries.push_back(gstrCREATE_SECURE_COUNTER);
+		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_V130);
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
 		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK);
 		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK);
@@ -1298,6 +1298,35 @@ int UpdateToSchemaVersion133(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39084");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion134(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 134;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE [SecureCounter] ADD "
+			"[AlertLevel] int NOT NULL CONSTRAINT [DF_SecureCounter_AlertLevel] DEFAULT(0)");
+		vecQueries.push_back("ALTER TABLE [SecureCounter] ADD "
+			"[AlertMultiple] int NOT NULL CONSTRAINT [DF_SecureCounter_AlertMultiple] DEFAULT(0)");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39123");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6371,7 +6400,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 130:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion131);
 				case 131:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion132);
 				case 132:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion133);
-				case 133:	break;
+				case 133:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion134);
+				case 134:	break;
 
 				default:
 					{
@@ -8565,7 +8595,7 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 			while (!asCppBool(ipResultSet->adoEOF))
 			{
 				DBCounter dbCounter;
-				UCLID_FILEPROCESSINGLib::ISecureCounterCreatorPtr ipSecureCounter(nullptr);
+				UCLID_FILEPROCESSINGLib::IFAMDBSecureCounterPtr ipSecureCounter(nullptr);
 				SECURE_CREATE_OBJECT("ELI38941", ipSecureCounter,
 					"Extract.FileActionManager.Database.FAMDBRuleExecutionCounter");
 
@@ -8575,11 +8605,13 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 					bool bValid = bIsDatabaseIDValid && 
 						dbCounter.isValid(m_DatabaseIDValues.m_nHashValue, ipResultSet->Fields);
 
-					ipSecureCounter->Initialize(getThisAsCOMPtr(), dbCounter.m_nID, asVariantBool(bValid));
+					ipSecureCounter->Initialize(getThisAsCOMPtr(), dbCounter.m_nID,
+						_bstr_t(dbCounter.m_strName.c_str()), dbCounter.m_nAlertLevel,
+						dbCounter.m_nAlertMultiple, asVariantBool(bValid));
 				}
 				catch (...)
 				{
-					ipSecureCounter->Initialize(getThisAsCOMPtr(), 0, false);
+					ipSecureCounter->Initialize(getThisAsCOMPtr(), 0, "", 0, 0, false);
 				}
 				
 				ipSecureCounters->PushBack(ipSecureCounter);
@@ -8806,6 +8838,7 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 	{
 		try
 		{
+			ASSERT_ARGUMENT("ELI39122", pnCounterValue != nullptr);
 			ASSERT_RUNTIME_CONDITION("ELI39026", decrementAmount >= 0, "Decrement must be positive.");
 
 			bool bCounterDecremented = false;
@@ -8894,6 +8927,8 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 
 							executeVectorOfSQL(ipConnection, vecUpdateQueries);
 							tg.CommitTrans();
+
+							*pnCounterValue = dbCounterChange.m_nToValue;
 						}
 					}
 
@@ -9056,12 +9091,48 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				
 				// Create the | separated list
 				string strCode = MapLabel::setMapLabelWithS(bsRequestCode, pwBS);
+				makeUpperCase(strCode);
 				
 				*pstrUpdateRequestCode = _bstr_t(strCode.c_str()).Detach();
 				
 			END_CONNECTION_RETRY(ipConnection, "ELI38798");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38790");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SetSecureCounterAlertLevel_Internal(bool bDBLocked, long nCounterID,
+															long nAlertLevel, long nAlertMultiple)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				ipConnection = getDBConnection();
+
+				string strQuery = Util::Format(
+					"UPDATE [SecureCounter] SET [AlertLevel] = %d, [AlertMultiple] = %d  "
+					"	WHERE [ID] = %d", nAlertLevel, nAlertMultiple, nCounterID);
+				
+				executeCmdQuery(ipConnection, strQuery);
+				
+			END_CONNECTION_RETRY(ipConnection, "ELI39126");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39127");
 	}
 	catch(UCLIDException &ue)
 	{

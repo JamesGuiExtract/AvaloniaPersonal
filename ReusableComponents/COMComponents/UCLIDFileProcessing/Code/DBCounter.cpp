@@ -29,7 +29,7 @@ DBCounter::DBCounter()
 }
 //-------------------------------------------------------------------------------------------------
 DBCounter::DBCounter(long nID, string strName, long nValue)
-	: m_nID(nID), m_strName(strName), m_nValue(nValue)
+	: m_nID(nID), m_strName(strName), m_nValue(nValue), m_nAlertLevel(0), m_nAlertMultiple(0)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -39,6 +39,8 @@ void DBCounter::LoadFromFields(FieldsPtr ipFields)
 {
 	m_nID = getLongField(ipFields, "ID");
 	m_strName = getStringField(ipFields, "CounterName");
+	m_nAlertLevel = getLongField(ipFields, "AlertLevel");
+	m_nAlertMultiple = getLongField(ipFields, "AlertMultiple");
 	m_strValidationError = "";
 	
 	string encryptedCounter = getStringField(ipFields, "SecureCounterValue");

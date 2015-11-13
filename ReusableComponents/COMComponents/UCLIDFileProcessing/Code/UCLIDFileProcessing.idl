@@ -1731,6 +1731,10 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Gets the name of the database name this instance last connected to. 
 		[propget, id(157), helpstring("method ConnectedDatabaseName")] HRESULT ConnectedDatabaseName(
 			[out, retval] BSTR* pbstrDatabaseName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Sets the alert level and alert multiple for the specified secure counter.
+		[id(158), helpstring("method SetSecureCounterAlertLevel")] HRESULT SetSecureCounterAlertLevel(
+			[in] long nCounterID, [in] long nAlertLevel, [in] long nAlertMultiple);
 	};
 
 	[
@@ -2437,14 +2441,22 @@ library UCLID_FILEPROCESSINGLib
 		object,
 		uuid(04A14B5A-C96D-44F2-B393-7A6CAA2AECC2),
 		dual,
-		helpstring("ISecureCounterCreator Interface"),
+		helpstring("IFAMDBSecureCounter Interface"),
 		pointer_default(unique)
 	]
-	interface ISecureCounterCreator : IDispatch
+	interface IFAMDBSecureCounter : IDispatch
 	{
+		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Initializes the counter of the specified counter ID maintained in the specified pFAMDB.
 		[id(1), helpstring("method Initialize")] HRESULT Initialize([in] IFileProcessingDB *pFAMDB,
-			[in] long nID, [in] VARIANT_BOOL bIsValid);
+			[in] long nID, [in] BSTR bstrName, [in] long nAlertLevel, [in] long nAlertMultiple,
+			[in] VARIANT_BOOL bIsValid);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets the alert level for this counter.
+		[propget, id(2), helpstring("property AlertLevel")] HRESULT AlertLevel([out, retval] long* pnAlertLevel);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets the alert multiple for this counter.
+		[propget, id(3), helpstring("property AlertMultiple")] HRESULT AlertMultiple([out, retval] long* pnAlertMultiple);
 	}
 
 	//----------------------------------------------------------------------------------------------

@@ -355,10 +355,12 @@ static const string gstrCREATE_FILE_TASK_SESSION =
 	" [OverheadTime] [float] NULL)";
 
 static const string gstrCREATE_SECURE_COUNTER =
-	"CREATE TABLE dbo.SecureCounter ( "
-	"   ID int NOT NULL CONSTRAINT PK_SecureCounter PRIMARY KEY CLUSTERED, "
-	"   CounterName nvarchar(100) NOT NULL, "
-	"   SecureCounterValue nvarchar(max) NOT NULL)";
+	"CREATE TABLE dbo.[SecureCounter] ( "
+	"   [ID] int NOT NULL CONSTRAINT [PK_SecureCounter] PRIMARY KEY CLUSTERED, "
+	"   [CounterName] nvarchar(100) NOT NULL, "
+	"   [SecureCounterValue] nvarchar(max) NOT NULL, "
+	"	[AlertLevel] int NOT NULL CONSTRAINT [DF_SecureCounter_AlertLevel] DEFAULT(0), "
+	"	[AlertMultiple] int NOT NULL CONSTRAINT [DF_SecureCounter_AlertMultiple] DEFAULT(0))";
 
 static const string gstrCREATE_SECURE_COUNTER_VALUE_CHANGE = 
 	"CREATE TABLE dbo.SecureCounterValueChange ( "
@@ -1431,24 +1433,26 @@ static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES =
 	"	('B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006', 'Core: Store/Retrieve attributes in DB') \r\n";
 
 static const string gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE = 
-	"	SELECT sc.ID "
-	"		,sc.CounterName "
-	"		,sc.SecureCounterValue "
-	"		,scvc.ID AS ValueChangedID "
-	"		,scvc.FromValue "
-	"		,scvc.ToValue "
-	"		,scvc.LastUpdatedTime "
-	"		,scvc.LastUpdatedByFAMSessionID "
-	"		,scvc.MinFAMFileCount "
-	"		,scvc.HashValue "
-	"		,scvc.Comment "
-	"	FROM dbo.SecureCounter sc "
-	"	LEFT JOIN dbo.SecureCounterValueChange scvc ON sc.ID = scvc.CounterID "
-	"	WHERE (scvc.id = ( "
-	"			SELECT Max(SecureCounterValueChange.ID) "
-	"			FROM SecureCounterValueChange "
-	"			WHERE SecureCounterValueChange.CounterID = SC.ID "
+	"	SELECT [sc].[ID] "
+	"		,[sc].[CounterName] "
+	"		,[sc].[SecureCounterValue] "
+	"		,[sc].[AlertLevel] "
+	"		,[sc].[AlertMultiple] "
+	"		,[scvc].[ID] AS [ValueChangedID] "
+	"		,[scvc].[FromValue] "
+	"		,[scvc].[ToValue] "
+	"		,[scvc].[LastUpdatedTime] "
+	"		,[scvc].[LastUpdatedByFAMSessionID] "
+	"		,[scvc].[MinFAMFileCount] "
+	"		,[scvc].[HashValue] "
+	"		,[scvc].[Comment] "
+	"	FROM dbo.[SecureCounter] [sc] "
+	"	LEFT JOIN dbo.[SecureCounterValueChange] [scvc] ON [sc].[ID] = [scvc].[CounterID] "
+	"	WHERE ([scvc].[ID] = ( "
+	"			SELECT Max([SecureCounterValueChange].[ID]) "
+	"			FROM [SecureCounterValueChange] "
+	"			WHERE [SecureCounterValueChange].[CounterID] = [SC].[ID] "
 	"			) "
-	"		OR scvc.id IS NULL) ";
+	"		OR [scvc].[ID] IS NULL) ";
 
  

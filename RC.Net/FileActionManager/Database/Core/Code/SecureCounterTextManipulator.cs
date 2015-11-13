@@ -212,7 +212,11 @@ namespace Extract.FileActionManager.Database
                 requestText.Append(GetFormattedLine("Organization", Organization));
                 requestText.Append(GetFormattedLine("Email", EmailAddress));
                 requestText.Append(GetFormattedLine("Phone", Phone));
-                requestText.Append(GetFormattedLine("Reason", Reason));
+                if (!string.IsNullOrWhiteSpace(Reason))
+                {
+                    requestText.AppendLine();
+                    requestText.AppendLine(Reason);
+                }
                 requestText.AppendLine();
 
                 requestText.AppendLine("Current counter values:");

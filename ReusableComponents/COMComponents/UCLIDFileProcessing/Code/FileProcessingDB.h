@@ -305,6 +305,7 @@ public:
 	STDMETHOD(get_DatabaseID)(BSTR* pbstrDatabaseID);
 	STDMETHOD(get_ConnectedDatabaseServer)(BSTR* pbstrDatabaseServer);
 	STDMETHOD(get_ConnectedDatabaseName)(BSTR* pbstrDatabaseName);
+	STDMETHOD(SetSecureCounterAlertLevel)(long nCounterID, long nAlertLevel, long nAlertMultiple);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1216,6 +1217,7 @@ private:
 	bool DecrementSecureCounter_Internal(bool bDBLocked, long nCounterID, long decrementAmount, long* pnCounterValue);
 	bool SecureCounterConsistencyCheck_Internal(bool bDBLocked, VARIANT_BOOL* pvbValid);
 	bool GetCounterUpdateRequestCode_Internal(bool bDBLocked, BSTR* pstrUpdateRequestCode);
+	bool SetSecureCounterAlertLevel_Internal(bool bDBLocked, long nCounterID, long nAlertLevel, long nAlertMultiple);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

@@ -173,9 +173,9 @@
             // _generateRequestButton
             // 
             this._generateRequestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._generateRequestButton.Location = new System.Drawing.Point(118, 179);
+            this._generateRequestButton.Location = new System.Drawing.Point(148, 179);
             this._generateRequestButton.Name = "_generateRequestButton";
-            this._generateRequestButton.Size = new System.Drawing.Size(164, 23);
+            this._generateRequestButton.Size = new System.Drawing.Size(149, 23);
             this._generateRequestButton.TabIndex = 4;
             this._generateRequestButton.Text = "Generate update request";
             this._generateRequestButton.UseVisualStyleBackColor = true;
@@ -184,11 +184,11 @@
             // _applyUpdateCodeButton
             // 
             this._applyUpdateCodeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._applyUpdateCodeButton.Location = new System.Drawing.Point(288, 179);
+            this._applyUpdateCodeButton.Location = new System.Drawing.Point(303, 179);
             this._applyUpdateCodeButton.Name = "_applyUpdateCodeButton";
-            this._applyUpdateCodeButton.Size = new System.Drawing.Size(164, 23);
+            this._applyUpdateCodeButton.Size = new System.Drawing.Size(149, 23);
             this._applyUpdateCodeButton.TabIndex = 5;
-            this._applyUpdateCodeButton.Text = "Apply counter update code";
+            this._applyUpdateCodeButton.Text = "Apply update code";
             this._applyUpdateCodeButton.UseVisualStyleBackColor = true;
             this._applyUpdateCodeButton.Click += new System.EventHandler(this.HandleApplyUpdateCodeButton_Click);
             // 
