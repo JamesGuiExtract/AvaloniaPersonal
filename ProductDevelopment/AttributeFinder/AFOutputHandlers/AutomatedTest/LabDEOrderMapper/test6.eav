@@ -90,7 +90,7 @@ Test|N/A
 ..Units|mEq/L
 ..Value|27.7
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Flag|L
 ..Range|10-20

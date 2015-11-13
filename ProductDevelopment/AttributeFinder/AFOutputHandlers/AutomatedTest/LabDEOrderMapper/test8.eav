@@ -71,7 +71,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|26
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ALT/SGPT
 ..Range|21-47
 ..Units|U/L
@@ -154,7 +154,7 @@ Test|N/A
 ..Units|K
 ..Value|12.70
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|MPV
 ..Flag|L
 ..Range|9.0-13.0

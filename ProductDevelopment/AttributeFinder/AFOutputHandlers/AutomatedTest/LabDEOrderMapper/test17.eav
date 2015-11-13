@@ -45,7 +45,7 @@ Test|N/A
 ..Units|%
 ..Value|17.9
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|PLT
 ..Range|150-400
 ..Units|Thou/uL
@@ -162,7 +162,7 @@ Test|N/A
 ..Units|%
 ..Value|18.3
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|PLT
 ..Range|150-400
 ..Units|Thou/uL
@@ -255,7 +255,7 @@ Test|N/A
 ..Units|mmol/L
 ..Value|23.9
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|GLUCOSE
 ..Flag| H
 ..Range|74-99
@@ -337,7 +337,7 @@ Test|N/A
 ..Units|mmol/L
 ..Value|27.3
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|GLUCOSE
 ..Flag| H
 ..Range|74-99

@@ -62,7 +62,7 @@ Test|N/A
 ..Units|FL
 ..Value|71.3
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|SEG
 ..Flag|L
 ..Range|42-70
@@ -186,7 +186,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|22
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L

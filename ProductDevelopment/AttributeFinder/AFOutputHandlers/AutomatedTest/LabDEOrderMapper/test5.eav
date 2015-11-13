@@ -61,7 +61,7 @@ Test|N/A
 ..Units|FL
 ..Value|49.3
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -227,7 +227,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|27
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
@@ -244,7 +244,7 @@ Test|N/A
 ..Units|MG/DL
 ..Value|2.0
 ..TestCode|MG
-..ESNames|Magnesium;Magnesium Urine
+..ESNames|Magnesium Urine
 .Name|MAGNESIUM
 .OrderCode|MG
 Test|N/A
@@ -324,7 +324,7 @@ Test|N/A
 ..Units|FL
 ..Value|49.3
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -443,7 +443,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|32
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
@@ -528,7 +528,7 @@ Test|N/A
 ..Units|FL
 ..Value|48.3
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -647,7 +647,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|27
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
@@ -732,7 +732,7 @@ Test|N/A
 ..Units|FL
 ..Value|47.7
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|SEG
 ..Flag|H
 ..Range|42.0-76.0
@@ -891,7 +891,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|27
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
@@ -908,7 +908,7 @@ Test|N/A
 ..Units|MG/DL
 ..Value|2.0
 ..TestCode|MG
-..ESNames|Magnesium;Magnesium Urine
+..ESNames|Magnesium Urine
 .Name|MAGNESIUM
 .OrderCode|MG
 Test|N/A
@@ -959,7 +959,6 @@ Test|N/A
 ..Units|MG/DL
 ..Value|99
 ..TestCode|LDLC
-..ESNames|LDL Calculated
 .Component|CHOL/HDL
 ..Range|< 6.0
 ..Value|2.8
@@ -1032,7 +1031,7 @@ Test|N/A
 ..Units|FL
 ..Value|48.2
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -1151,7 +1150,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|29
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
@@ -1236,7 +1235,7 @@ Test|N/A
 ..Units|FL
 ..Value|48.7
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -1356,7 +1355,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|27
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
@@ -1441,7 +1440,7 @@ Test|N/A
 ..Units|FL
 ..Value|49.4
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -1570,7 +1569,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|29
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
@@ -1631,7 +1630,7 @@ Test|N/A
 ..Units|MG/DL
 ..Value|2.6
 ..TestCode|MG
-..ESNames|Magnesium;Magnesium Urine
+..ESNames|Magnesium Urine
 .Name|MAGNESIUM
 .OrderCode|MG
 Test|N/A
@@ -1728,7 +1727,7 @@ Test|N/A
 ..Units|FL
 ..Value|47.3
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|BAND
 ..Range|%
 ..Value|4
@@ -1851,7 +1850,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|26
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
@@ -1868,7 +1867,7 @@ Test|N/A
 ..Units|MG/DL
 ..Value|2.1
 ..TestCode|MG
-..ESNames|Magnesium;Magnesium Urine
+..ESNames|Magnesium Urine
 .Name|MAGNESIUM
 .OrderCode|MG
 Test|N/A
@@ -1985,7 +1984,7 @@ Test|N/A
 ..Units|FL
 ..Value|51.0
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|BAND
 ..Flag|H
 ..Range|0-6
@@ -2113,7 +2112,7 @@ Test|N/A
 ..Units|FL
 ..Value|49.4
 ..TestCode|RDW
-..ESNames|RDW-CV;RDW-SD
+..ESNames|RDW-SD;RDW-CV
 .Component|SEGS
 ..Flag|H
 ..Range|42-70
@@ -2236,7 +2235,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|28
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
@@ -2609,7 +2608,7 @@ Test|N/A
 ..Units|MMOL/L
 ..Value|18
 ..TestCode|CO2
-..ESNames|CO2
+..ESNames|Bicarbonate;CO2
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
