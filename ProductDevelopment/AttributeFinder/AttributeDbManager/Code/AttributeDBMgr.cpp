@@ -1127,9 +1127,9 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 			tg.CommitTrans();
 			return true;
 		}
-		CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38557");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38557");
 	}
-	catch (const UCLIDException& ue)
+	catch (const UCLIDException&)
 	{
 		if (!bDbLocked)
 		{
@@ -1208,9 +1208,9 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 #endif
 			return S_OK;
 		}
-		CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39029");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39029");
 	}
-	catch ( const UCLIDException& ue )
+	catch ( const UCLIDException&)
 	{
 		if ( !bDbLocked )
 		{
