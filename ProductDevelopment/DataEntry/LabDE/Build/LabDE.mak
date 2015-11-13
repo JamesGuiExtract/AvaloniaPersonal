@@ -134,7 +134,7 @@ CreateDemo_LabDE: BuildDemoLabDE_DEP
 	@IF NOT EXIST "$(LabDEDemo)\Solution\Database Files" MKDIR "$(LabDEDemo)\Solution\Database Files"
 	@IF NOT EXIST "$(LabDEDemo)\Solution\Bin\" MKDIR "$(LabDEDemo)\Solution\Bin\"
 	@ECHO Updating LabDE demo rules for FKB Version...
-	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" -silent "$(RulesDir)\LabDE\Demo_LabDE\Solution\Rules" "$(FKBVersion)"
+	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" -silent "$(RulesDir)\LabDE\Demo_LabDE\Solution" "$(FKBVersion)"
 	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEDemo)\" /v /s /e /y
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEDemo)\Input" /v /s /e /y
 	@XCOPY "$(RulesDir)\LabDE\Demo_LabDE\Solution\*.*" "$(LabDEDemo)\Solution" /v /s /e /y	
