@@ -18,5 +18,6 @@ PUSHD %~dp0
 
 for /f "delims=\" %%a in ("%~dp0") do set name=%%~nxa.js
 copy "main.js" + "%~dp0..\Common\ScriptWrapper.js" "..\%name%" /B /Y
+copy "main.js" + "%~dp0..\Common\ScriptWrapper.js" "..\..\..\..\ProductDevelopment\Utils\Scripts\%name%" /B /Y
 
 POPD
