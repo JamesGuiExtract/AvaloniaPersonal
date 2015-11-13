@@ -588,7 +588,8 @@ namespace Extract.LabResultsCustomComponents
             // Populate mapping of names to test codes using customer-specific DB
             query = "SELECT DISTINCT [TestCode], [TestName], [ESComponentCode] FROM "
                 + "(SELECT [TestCode], [OfficialName] AS [TestName] FROM [LabTest] "
-                + "UNION SELECT [TestCode], [Name] AS [TestName] FROM [AlternateTestName]) [Tests] "
+                + "UNION SELECT [TestCode], [Name] AS [TestName] FROM [AlternateTestName] "
+                + "WHERE [StatusCode] = 'A') [Tests] "
                 + "LEFT JOIN [ComponentToESComponentMap] ON [TestCode] = [ComponentCode]";
 
             using (SqlCeCommand command = new SqlCeCommand(query, _customerDBConnection))
@@ -614,14 +615,26 @@ namespace Extract.LabResultsCustomComponents
                 }
             }
 
+            // Get set of disabled ESComponentAKAs
+            var disabledESComponentAKAs = new HashSet<Tuple<string, string>>();
+            query = "SELECT [ESComponentCode], [ESComponentAKA] FROM [DisabledESComponentAKA]";
+            using (SqlCeCommand command = new SqlCeCommand(query, _customerDBConnection))
+            using (SqlCeDataReader reader = command.ExecuteReader())
+            foreach(var r in reader.Cast<IDataRecord>())
+            {
+                string code = r.GetString(0).ToUpperInvariant();
+                string aka = r.GetString(1).ToUpperInvariant();
+
+                disabledESComponentAKAs.Add(Tuple.Create(code, aka));
+            }
+
             // Add additional mappings using the component data (URS) database
-            query = "SELECT ESComponent.Code, ESComponent.Name, ESComponentAKA.Name, SampleType"
-                    + ", MatchScoringQuery, Frequency"
-                    + " FROM ESComponent JOIN ESComponentAKA"
-                    + " ON ESComponent.Code = ESComponentCode"
-                    + " LEFT JOIN AKAFrequency"
-                        + " ON ESComponent.Code = AKAFrequency.ESComponentCode"
-                        + " AND ESComponentAKA.Name = AKAFrequency.Name";
+            query = "SELECT [ESComponent].[Code], [ESComponent].[Name], [ESComponentAKA].[Name], [SampleType]"
+                    + ", [MatchScoringQuery], [Frequency]"
+                    + " FROM [ESComponent] JOIN [ESComponentAKA] ON [ESComponent].[Code] = [ESComponentCode]"
+                    + " LEFT JOIN [AKAFrequency]"
+                    + " ON [ESComponent].[Code] = [AKAFrequency].[ESComponentCode]"
+                    + " AND [ESComponentAKA].[Name] = [AKAFrequency].[Name]";
             using (SqlCeCommand command = new SqlCeCommand(query, _componentDataDBConnection))
             using (SqlCeDataReader reader = command.ExecuteReader())
             foreach (var record in reader.Cast<IDataRecord>())
@@ -632,6 +645,12 @@ namespace Extract.LabResultsCustomComponents
                 string sampleType = record[3] as string;
                 string matchScoringQuery = record[4] as string;
                 int frequency = record[5] as int? ?? 0;
+
+                // Skip if this AKA has been disabled by the customer order mapping DB
+                if (disabledESComponentAKAs.Contains(Tuple.Create(testCode.ToUpperInvariant(), aka.ToUpperInvariant())))
+                {
+                    continue;
+                }
 
                 // Add this AKA to the map of names to ES codes
                 string normalizedAKA = _getNormalizedName(aka);
