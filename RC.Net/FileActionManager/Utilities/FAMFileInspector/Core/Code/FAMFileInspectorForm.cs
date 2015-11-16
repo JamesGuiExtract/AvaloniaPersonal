@@ -135,7 +135,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The default value for <see cref="MaxFilesToDisplay"/>.
         /// </summary>
-        public static readonly int DefaultMaxFilesToDisplay = 1000;
+        public static readonly int DefaultMaxFilesToDisplay = 5000;
 
         /// <summary>
         /// The method a limited subset should be selected from the overall set of files.
@@ -963,7 +963,7 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Resets all changes to file selection back to the default (no conditions, top 1000 files).
+        /// Resets all changes to file selection back to the default (no conditions, top 5000 files).
         /// </summary>
         public void ResetFileSelectionSettings()
         {

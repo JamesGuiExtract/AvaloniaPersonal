@@ -1402,7 +1402,10 @@ namespace Extract.Redaction.Verification
             {
                 if (item.Level.Highlight)
                 {
-                    var highlights = _imageViewer.CreateHighlights(item.Attribute.SpatialString, Color.Yellow);
+                    var highlights = _imageViewer.CreateHighlights(item.Attribute.SpatialString,
+                        item.Level.FillColor.HasValue
+                            ? item.Level.FillColor.Value
+                            : DefaultHighlightFillColor);
 
                     foreach (var highlight in highlights)
                     {
