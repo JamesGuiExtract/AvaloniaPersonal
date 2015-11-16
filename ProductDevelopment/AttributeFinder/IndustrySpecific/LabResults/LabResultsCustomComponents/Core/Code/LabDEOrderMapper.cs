@@ -45,6 +45,12 @@ namespace Extract.LabResultsCustomComponents
         bool RequireMandatoryTests { get; set; }
 
         /// <summary>
+        /// Gets whether filled/mandatory requirements can be disregarded in order to increase the
+        /// number of mapped result components
+        /// </summary>
+        bool RequirementsAreOptional { get; set; }
+
+        /// <summary>
         /// Gets whether to require that orders meet their filled requirement
         /// </summary>
         bool UseFilledRequirement { get; set; }
@@ -80,8 +86,10 @@ namespace Extract.LabResultsCustomComponents
         /// Added support for configuring whether provided OutstandingOrderCode
         /// attribute values are preferred when mapping.
         /// Added support for eliminating duplicate subattributes after mapping.
+        /// Version 4: Added requirements are optional setting.
+        /// Changed default values of RequireMandatoryTests and EliminateDuplicateTestSubattributes to true
         /// </summary>
-        static readonly int _CURRENT_VERSION = 3;
+        static readonly int _CURRENT_VERSION = 4;
 
         /// <summary>
         /// A couple algorithms used in the order mapper to find the best combinations of objects
@@ -215,17 +223,22 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Whether to require that orders meet their filled requirement
         /// </summary>
-        bool _useFilledRequirement = true;
+        bool _useFilledRequirement;
 
         /// <summary>
         /// Whether to prefer orders that match known, outstanding order code attributes.
         /// </summary>
-        bool _useOutstandingOrders = false;
+        bool _useOutstandingOrders;
+
+        /// <summary>
+        /// Whether filled/mandatory requirements can be disregarded in order to increase the number of mapped result components.
+        /// </summary>
+        bool _requirementsAreOptional;
 
         /// <summary>
         /// Whether to remove any duplicate Test subattributes after the mapping is finished.
         /// </summary>
-        bool _eliminateDuplicateTestSubAttributes = false;
+        bool _eliminateDuplicateTestSubAttributes = true;
 
         #endregion Fields
 
@@ -238,7 +251,7 @@ namespace Extract.LabResultsCustomComponents
         /// Initializes a new instance of the <see cref="LabDEOrderMapper"/> class.
         /// </summary>
         public LabDEOrderMapper()
-            : this(null, false, true, false, false)
+            : this(null, true, true, false, true, true)
         {
         }
 
@@ -251,6 +264,8 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
         /// <param name="useOutstandingOrders">Whether to prefer orders that match known,
         /// outstanding order code attributes.</param>
+        /// <param name="requirementsAreOptional">Whether filled/mandatory requirements can be disregarded
+        /// in order to increase the number of mapped result components</param>
         /// <param name="eliminateDuplicateTestSubAttributes">Whether to remove any duplicate Test
         /// subattributes after the mapping is finished. (Prevents lots of extra ResultDate attributes, e.g.)</param>
         public LabDEOrderMapper(
@@ -258,6 +273,7 @@ namespace Extract.LabResultsCustomComponents
             bool requireMandatory,
             bool useFilledRequirement,
             bool useOutstandingOrders,
+            bool requirementsAreOptional,
             bool eliminateDuplicateTestSubAttributes)
         {
             try
@@ -267,6 +283,7 @@ namespace Extract.LabResultsCustomComponents
                 _requireMandatory = requireMandatory;
                 _useFilledRequirement = useFilledRequirement;
                 _useOutstandingOrders = useOutstandingOrders;
+                _requirementsAreOptional = requirementsAreOptional;
                 _eliminateDuplicateTestSubAttributes = eliminateDuplicateTestSubAttributes;
                 _dirty = true;
             }
@@ -379,6 +396,31 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
+        /// Gets whether filled/mandatory requirements can be disregarded in order to increase the
+        /// number of mapped result components
+        /// </summary>
+        public bool RequirementsAreOptional
+        {
+            get
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.LabDECoreObjects, "ELI39141", _DEFAULT_OUTPUT_HANDLER_NAME);
+
+                return _requirementsAreOptional;
+            }
+            set
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.LabDECoreObjects, "ELI39142", _DEFAULT_OUTPUT_HANDLER_NAME);
+
+                _requirementsAreOptional = value;
+                _dirty = true;
+            }
+        }
+
+        /// <summary>
         /// Gets whether to remove any duplicate Test subattributes after the mapping is finished.
         /// </summary>
         public bool EliminateDuplicateTestSubAttributes
@@ -453,9 +495,12 @@ namespace Extract.LabResultsCustomComponents
                 // Only need to perform mapping if there are test attributes
                 if (testAttributes.Count > 0)
                 {
+                    bool requireMandatory = _requireMandatory ? dbCache.AreMandatoryRequirementsDefined() : false;
+                    bool useFilledRequirement = _useFilledRequirement ? dbCache.AreFilledRequirementsDefined() : false;
+
                     // Perform order mapping on the list of test attributes
                     IEnumerable<IAttribute> mappedAttributes = MapOrders(testAttributes, dbCache,
-                        _requireMandatory, _useFilledRequirement, _useOutstandingOrders);
+                        requireMandatory, useFilledRequirement, _useOutstandingOrders, _requirementsAreOptional);
 
                     // Create an attribute sorter for sorting sub attributes
                     ISortCompare attributeSorter =
@@ -523,7 +568,8 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 LabDEOrderMapper newMapper = new LabDEOrderMapper(_databaseFile, _requireMandatory,
-                    _useFilledRequirement, _useOutstandingOrders, _eliminateDuplicateTestSubAttributes);
+                    _useFilledRequirement, _useOutstandingOrders, _requirementsAreOptional,
+                    _eliminateDuplicateTestSubAttributes);
 
                 return newMapper;
             }
@@ -572,6 +618,7 @@ namespace Extract.LabResultsCustomComponents
                 _requireMandatory = orderMapper.RequireMandatoryTests;
                 _useFilledRequirement = orderMapper.UseFilledRequirement;
                 _useOutstandingOrders = orderMapper.UseOutstandingOrders;
+                _requirementsAreOptional = orderMapper._requirementsAreOptional;
                 _eliminateDuplicateTestSubAttributes = orderMapper.EliminateDuplicateTestSubAttributes;
             }
             catch (Exception ex)
@@ -655,6 +702,11 @@ namespace Extract.LabResultsCustomComponents
                         // Read the require mandatory setting
                         _requireMandatory = reader.ReadBoolean();
                     }
+                    else
+                    {
+                        // Use old defaults for the options that have new defaults in version 4
+                        _requireMandatory = false;
+                    }
 
                     if (reader.Version >= 3)
                     {
@@ -666,6 +718,16 @@ namespace Extract.LabResultsCustomComponents
 
                         // Read the eliminate duplicate Test subattributes setting
                         _eliminateDuplicateTestSubAttributes = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        // Use old defaults for the options that have new defaults in version 4
+                        _eliminateDuplicateTestSubAttributes = false;
+                    }
+                    if (reader.Version >= 4)
+                    {
+                        // Read the requirements-are-optional setting
+                        _requirementsAreOptional = reader.ReadBoolean();
                     }
                 }
 
@@ -695,6 +757,7 @@ namespace Extract.LabResultsCustomComponents
                     writer.Write(_useFilledRequirement);
                     writer.Write(_useOutstandingOrders);
                     writer.Write(_eliminateDuplicateTestSubAttributes);
+                    writer.Write(_requirementsAreOptional);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -749,7 +812,8 @@ namespace Extract.LabResultsCustomComponents
                 // Display the configuration form
                 using (LabDEOrderMapperConfigurationForm configureForm =
                     new LabDEOrderMapperConfigurationForm(_databaseFile, _requireMandatory,
-                        _useFilledRequirement, _useOutstandingOrders, _eliminateDuplicateTestSubAttributes))
+                        _useFilledRequirement, _useOutstandingOrders,
+                        _requirementsAreOptional, _eliminateDuplicateTestSubAttributes))
                 {
                     // If the user clicked OK then set fields
                     if (configureForm.ShowDialog() == DialogResult.OK)
@@ -758,6 +822,7 @@ namespace Extract.LabResultsCustomComponents
                         _requireMandatory = configureForm.RequireMandatoryTests;
                         _useFilledRequirement = configureForm.UseFilledRequirement;
                         _useOutstandingOrders = configureForm.UseOutstandingOrders;
+                        _requirementsAreOptional = configureForm.RequirementsAreOptional;
                         _eliminateDuplicateTestSubAttributes = configureForm.EliminateDuplicateTestSubAttributes;
 
                         _dirty = true;
@@ -858,23 +923,10 @@ namespace Extract.LabResultsCustomComponents
         static Dictionary<string, LabOrder> FillLabOrderCollection(OrderMappingDBCache dbCache,
             bool useFilledRequirement)
         {
-            bool hasFilledRequirement = false;
-            if (useFilledRequirement)
-            {
-                string infoQuery = "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS "
-                    + "WHERE TABLE_NAME = 'LabOrder' AND COLUMN_NAME = 'FilledRequirement'";
-
-                using (SqlCeCommand command = new SqlCeCommand(infoQuery, dbCache.DBConnection))
-                {
-                    hasFilledRequirement = command.ExecuteScalar() != null;
-                }
-            }
-
             Dictionary<string, LabOrder> orders =
                 new Dictionary<string, LabOrder>(StringComparer.OrdinalIgnoreCase);
 
-            string query = "SELECT [Code], [Name], [TieBreaker]"
-                    + (hasFilledRequirement ? ", [FilledRequirement]" : "")
+            string query = "SELECT [Code], [Name], [TieBreaker], [FilledRequirement]"
                     + " FROM [LabOrder] WHERE [Code] IS NOT NULL";
 
             using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
@@ -885,8 +937,7 @@ namespace Extract.LabResultsCustomComponents
                     string code = reader.GetString(0);
                     string name = reader.GetString(1);
                     string tieBreaker = reader[2] as string;
-                    int filledRequirement = hasFilledRequirement
-                        ? (reader[3] as int? ?? 0) : 0;
+                    int filledRequirement = reader[3] as int? ?? 0;
                     orders.Add(code,
                         new LabOrder(code, name, tieBreaker, dbCache, filledRequirement));
                 }
@@ -905,8 +956,10 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
         /// <param name="useOutstandingOrders">Whether to prefer orders that match known,
         /// outstanding order code attributes.</param>
+        /// <param name="requirementsAreOptional">Whether filled/mandatory requirements can be
+        /// disregarded in order to increase the number of mapped tests.</param>
         static IEnumerable<IAttribute> MapOrders(List<IAttribute> tests, OrderMappingDBCache dbCache,
-            bool requireMandatory, bool useFilledRequirement, bool useOutstandingOrders)
+            bool requireMandatory, bool useFilledRequirement, bool useOutstandingOrders, bool requirementsAreOptional)
         {
             // If there are no tests then just return the input
             if (tests.Count == 0)
@@ -925,13 +978,17 @@ namespace Extract.LabResultsCustomComponents
             var firstPassResult = FirstPassGrouping(
                 tests, dbCache, labOrders, sourceDocName, useFilledRequirement, useOutstandingOrders);
 
+            // Limit to outstanding orders if useOutstandingOrders and there actually are any outstanding orders
+            bool limitToOutstandingOrders = useOutstandingOrders ?
+                firstPassResult.Any(g => g.OutstandingOrderCodes.Any()) : false;
+
             // Perform the second pass
             var secondPassResult = GetFinalGrouping(firstPassResult, dbCache, labOrders,
-               requireMandatory, useFilledRequirement, useOutstandingOrders);
+               requireMandatory, useFilledRequirement, requirementsAreOptional, limitToOutstandingOrders);
 
             // If first attempt was trying to limit to outstanding orders,
             // try unknown orders again without limiting
-            if (useOutstandingOrders)
+            if (limitToOutstandingOrders)
             {
                 var known = secondPassResult.Item1;
                 List<IAttribute> unknown;
@@ -946,14 +1003,17 @@ namespace Extract.LabResultsCustomComponents
                     unknown = tests;
                 }
 
-                firstPassResult = FirstPassGrouping(
-                        unknown, dbCache, labOrders, sourceDocName, useFilledRequirement, false);
+                if (unknown.Count > 0)
+                {
+                    firstPassResult = FirstPassGrouping(
+                            unknown, dbCache, labOrders, sourceDocName, useFilledRequirement, false);
 
-                secondPassResult = GetFinalGrouping(firstPassResult, dbCache, labOrders,
-                        requireMandatory, useFilledRequirement, false);
+                    secondPassResult = GetFinalGrouping(firstPassResult, dbCache, labOrders,
+                            requireMandatory, useFilledRequirement, requirementsAreOptional, false);
 
-                // Return the final groupings
-                return known.Concat(secondPassResult.Item1.Concat(secondPassResult.Item2));
+                    // Return the final groupings
+                    return known.Concat(secondPassResult.Item1.Concat(secondPassResult.Item2));
+                }
             }
 
             // Return the final groupings
@@ -1073,6 +1133,8 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="requireMandatory">Whether mandatory tests are required when creating
         /// the final groupings.</param>
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
+        /// <param name="requirementsAreOptional">Whether filled/mandatory requirements can be disregarded
+        /// in order to increase the number of mapped tests.</param>
         /// <param name="limitToOutstandingOrders">Whether to limit orders to be considered based
         /// on known, outstanding order codes.</param>
         /// <returns>
@@ -1085,6 +1147,7 @@ namespace Extract.LabResultsCustomComponents
             Dictionary<string, LabOrder> labOrders,
             bool requireMandatory,
             bool useFilledRequirement,
+            bool requirementsAreOptional,
             bool limitToOutstandingOrders)
         {
             // Combine all outstanding order codes
@@ -1111,12 +1174,31 @@ namespace Extract.LabResultsCustomComponents
             bestGroups = MapSingleUnknownOrders(bestGroups, labOrders, dbCache, requireMandatory,
                 useFilledRequirement);
 
-            // If filled requirements have been enforced thus far, attempt to combine unknown
-            // order groups with other groups, ignoring filled requirements
-            if (useFilledRequirement)
+            if (requirementsAreOptional)
             {
-                bestGroups = MergeGroups(bestGroups, labOrders, dbCache, requireMandatory,
-                    false, outstandingOrderCodes, true, 4);
+                // If mandatory requirements have been enforced thus far, attempt to combine unknown
+                // order groups with other groups, ignoring mandatory requirements
+                if (requireMandatory)
+                {
+                    bestGroups = MergeGroups(bestGroups, labOrders, dbCache, false,
+                        useFilledRequirement, outstandingOrderCodes, true, 4);
+                }
+
+                // If filled requirements have been enforced thus far, attempt to combine unknown
+                // order groups with other groups, ignoring filled requirements
+                if (useFilledRequirement)
+                {
+                    bestGroups = MergeGroups(bestGroups, labOrders, dbCache, requireMandatory,
+                        false, outstandingOrderCodes, true, 4);
+                }
+
+                // If mandatory AND filled requirements have been enforced thus far, attempt to combine unknown
+                // order groups with other groups, ignoring both requirements
+                if (requireMandatory && useFilledRequirement)
+                {
+                    bestGroups = MergeGroups(bestGroups, labOrders, dbCache, false,
+                        false, outstandingOrderCodes, true, 4);
+                }
             }
 
             // BestGroups should now contain all groupings that could be combined
@@ -1156,7 +1238,7 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="consecutiveGroupsAllowedToBeSkipped">The number of <see cref="OrderGrouping"/>s that
         /// can be skipped in a row before no further attempts for a particular order will be tried.</param>
         /// <returns>List of merged <see cref="OrderGrouping"/>s</returns>
-        private static LinkedList<OrderGrouping> MergeGroups(
+        private static IEnumerable<OrderGrouping> MergeGroups(
             IEnumerable<OrderGrouping> orderGroups,
             Dictionary<string, LabOrder> labOrders,
             OrderMappingDBCache dbCache,
@@ -1166,6 +1248,13 @@ namespace Extract.LabResultsCustomComponents
             bool mergeUnknownOrders,
             int consecutiveGroupsAllowedToBeSkipped)
         {
+
+            // If merging unknown orders but there are no unknown orders, just return the input
+            if (mergeUnknownOrders && !orderGroups.Where(g => g.LabOrder == null).Any())
+            {
+                return orderGroups;
+            }
+
             var preMergeGroups = new LinkedList<OrderGrouping>(orderGroups);
             var postMergeGroups = new LinkedList<OrderGrouping>();
             while (preMergeGroups.Count > 0)
@@ -1229,7 +1318,8 @@ namespace Extract.LabResultsCustomComponents
             foreach (string orderCode in potentialOrderCodes)
             {
                 // If outstandingOrderCodes is not null then limit to this set
-                if (outstandingOrderCodes != null && !outstandingOrderCodes.Contains(orderCode))
+                if (outstandingOrderCodes != null && outstandingOrderCodes.Count > 0
+                    && !outstandingOrderCodes.Contains(orderCode))
                 {
                     continue;
                 }
@@ -1422,7 +1512,8 @@ namespace Extract.LabResultsCustomComponents
             foreach (string orderCode in potentialOrderCodes)
             {
                 // If outstandingOrderCodes is not null then limit to this set
-                if (outstandingOrderCodes != null && !outstandingOrderCodes.Contains(orderCode))
+                if (outstandingOrderCodes != null && outstandingOrderCodes.Count > 0
+                    && !outstandingOrderCodes.Contains(orderCode))
                 {
                     continue;
                 }

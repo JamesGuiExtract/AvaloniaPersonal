@@ -24,7 +24,7 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Initializes a new instance of the <see cref="LabDEOrderMapperConfigurationForm"/> class.
         /// </summary>
-        public LabDEOrderMapperConfigurationForm() : this(null, false, true, false, false)
+        public LabDEOrderMapperConfigurationForm() : this(null, false, true, false, true, true)
         {
         }
 
@@ -40,27 +40,25 @@ namespace Extract.LabResultsCustomComponents
         /// provided OutstandingOrderCode attributes should be used. If <see langword="false"/> then
         /// the outstanding order codes will be used if possible but other codes will be considered
         /// if necessary.</param>
+        /// <param name="requirementsAreOptional">Whether filled/mandatory requirements can be disregarded if necessary</param>
         /// <param name="eliminateDuplicateTestSubAttributes">Whether to eliminate duplicate Test
         /// subattributes after mapping is finished.</param>
         public LabDEOrderMapperConfigurationForm(string databaseFile, bool requireMandatoryTests,
             bool useFilledRequirement, bool useOutstandingOrders,
-            bool eliminateDuplicateTestSubAttributes)
+            bool requirementsAreOptional, bool eliminateDuplicateTestSubAttributes)
         {
             try
             {
                 InitializeComponent();
 
                 _databaseFile = databaseFile;
-
                 _textDatabaseFile.Text = _databaseFile ?? "";
-
                 _checkRequireMandatoryTests.Checked = requireMandatoryTests;
-
                 _checkUseFilledRequirement.Checked = useFilledRequirement;
-
                 _checkUseOutstandingOrders.Checked = useOutstandingOrders;
-
+                _checkRequirementsAreOptional.Checked = requirementsAreOptional;
                 _checkEliminateDuplicateTestSubAttributes.Checked = eliminateDuplicateTestSubAttributes;
+                SetEnabledStates();
             }
             catch (Exception ex)
             {
@@ -115,6 +113,17 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
+        /// Whether filled/mandatory requirements can be disregarded if doing so would increase the number of mapped components
+        /// </summary>
+        public bool RequirementsAreOptional
+        {
+            get
+            {
+                return _checkRequirementsAreOptional.Checked;
+            }
+        }
+
+        /// <summary>
         /// Whether to remove any duplicate Test sub-attributes after the mapping is finished.
         /// </summary>
         public bool EliminateDuplicateTestSubAttributes
@@ -128,6 +137,25 @@ namespace Extract.LabResultsCustomComponents
         #endregion Properties
 
         #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="T:CheckBox.CheckChanged"/> event for
+        /// various <see cref="System.Windows.Forms.CheckBox"/>s.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleCheckChanged(object sender, System.EventArgs e)
+        {
+            try
+            {
+                SetEnabledStates();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39144");
+            }
+        }
 
         /// <summary>
         /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
@@ -189,5 +217,17 @@ namespace Extract.LabResultsCustomComponents
         }
 
         #endregion Event Handlers
+
+        #region Private Members
+
+        /// <summary>
+        /// Sets the enabled states of all controls
+        /// </summary>
+        void SetEnabledStates()
+        {
+            _checkRequirementsAreOptional.Enabled = _checkUseFilledRequirement.Checked || _checkRequireMandatoryTests.Checked;
+        }
+
+        #endregion Private Members
     }
 }

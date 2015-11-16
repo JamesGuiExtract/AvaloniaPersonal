@@ -294,6 +294,50 @@ namespace Extract.LabResultsCustomComponents
             }
         }
 
+        /// <summary>
+        /// Gets whether filled requirements are defined for any orders
+        /// </summary>
+        /// <returns>True if any orders have filled requirements, else false</returns>
+        public bool AreFilledRequirementsDefined()
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM [LabOrder] WHERE [FilledRequirement] > 0";
+                using (SqlCeCommand command = new SqlCeCommand(query, DBConnection))
+                {
+                    return (int)command.ExecuteScalar() > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI39139",
+                    "Failed to query FilledRequirement!", ex);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether mandatory test requirements are defined for any orders
+        /// </summary>
+        /// <returns>True if any orders have mandatory tests, else false</returns>
+        public bool AreMandatoryRequirementsDefined()
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM [LabOrderTest] WHERE [Mandatory] = 1";
+                using (SqlCeCommand command = new SqlCeCommand(query, DBConnection))
+                {
+                    return (int)command.ExecuteScalar() > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI39140",
+                    "Failed to query for Mandatory requirements!", ex);
+                throw ee;
+            }
+        }
+
         #endregion Public Methods
 
         #region Private Methods

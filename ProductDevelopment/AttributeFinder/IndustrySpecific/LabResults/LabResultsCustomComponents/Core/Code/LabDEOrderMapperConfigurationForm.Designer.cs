@@ -39,6 +39,7 @@ namespace Extract.LabResultsCustomComponents
             this._checkUseFilledRequirement = new System.Windows.Forms.CheckBox();
             this._checkUseOutstandingOrders = new System.Windows.Forms.CheckBox();
             this._checkEliminateDuplicateTestSubAttributes = new System.Windows.Forms.CheckBox();
+            this._checkRequirementsAreOptional = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -80,7 +81,7 @@ namespace Extract.LabResultsCustomComponents
             // 
             // _buttonOk
             // 
-            this._buttonOk.Location = new System.Drawing.Point(328, 173);
+            this._buttonOk.Location = new System.Drawing.Point(328, 193);
             this._buttonOk.Name = "_buttonOk";
             this._buttonOk.Size = new System.Drawing.Size(75, 23);
             this._buttonOk.TabIndex = 8;
@@ -91,7 +92,7 @@ namespace Extract.LabResultsCustomComponents
             // _buttonCancel
             // 
             this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._buttonCancel.Location = new System.Drawing.Point(409, 173);
+            this._buttonCancel.Location = new System.Drawing.Point(409, 193);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
             this._buttonCancel.TabIndex = 9;
@@ -108,6 +109,7 @@ namespace Extract.LabResultsCustomComponents
             this._checkRequireMandatoryTests.TabIndex = 4;
             this._checkRequireMandatoryTests.Text = "Require mandatory tests during second pass of order mapping";
             this._checkRequireMandatoryTests.UseVisualStyleBackColor = true;
+            this._checkRequireMandatoryTests.CheckedChanged += HandleCheckChanged;
             // 
             // _checkUseFilledRequirement
             // 
@@ -117,11 +119,12 @@ namespace Extract.LabResultsCustomComponents
             this._checkUseFilledRequirement.Size = new System.Drawing.Size(253, 17);
             this._checkUseFilledRequirement.TabIndex = 5;
             this._checkUseFilledRequirement.Text = "Use FilledRequirement column to validate orders";
+            this._checkUseFilledRequirement.CheckedChanged += HandleCheckChanged;
             // 
             // _checkUseOutstandingOrders
             // 
             this._checkUseOutstandingOrders.AutoSize = true;
-            this._checkUseOutstandingOrders.Location = new System.Drawing.Point(15, 114);
+            this._checkUseOutstandingOrders.Location = new System.Drawing.Point(15, 137);
             this._checkUseOutstandingOrders.Name = "_checkUseOutstandingOrders";
             this._checkUseOutstandingOrders.Size = new System.Drawing.Size(433, 17);
             this._checkUseOutstandingOrders.TabIndex = 6;
@@ -132,12 +135,23 @@ namespace Extract.LabResultsCustomComponents
             // _checkEliminateDuplicateTestSubAttributes
             // 
             this._checkEliminateDuplicateTestSubAttributes.AutoSize = true;
-            this._checkEliminateDuplicateTestSubAttributes.Location = new System.Drawing.Point(15, 137);
+            this._checkEliminateDuplicateTestSubAttributes.Location = new System.Drawing.Point(15, 160);
             this._checkEliminateDuplicateTestSubAttributes.Name = "_checkEliminateDuplicateTestSubAttributes";
             this._checkEliminateDuplicateTestSubAttributes.Size = new System.Drawing.Size(247, 17);
             this._checkEliminateDuplicateTestSubAttributes.TabIndex = 7;
             this._checkEliminateDuplicateTestSubAttributes.Text = "Eliminate duplicate sub-attributes after mapping";
             this._checkEliminateDuplicateTestSubAttributes.UseVisualStyleBackColor = true;
+            // 
+            // _checkRequirementsAreOptional
+            // 
+            this._checkRequirementsAreOptional.AutoSize = true;
+            this._checkRequirementsAreOptional.Location = new System.Drawing.Point(15, 114);
+            this._checkRequirementsAreOptional.Name = "_checkRequirementsAreOptional";
+            this._checkRequirementsAreOptional.Size = new System.Drawing.Size(450, 17);
+            this._checkRequirementsAreOptional.TabIndex = 10;
+            this._checkRequirementsAreOptional.Text = "Filled/mandatory requirements can be disregarded to increase the number of mapped" +
+    " tests";
+            this._checkRequirementsAreOptional.UseVisualStyleBackColor = true;
             // 
             // LabDEOrderMapperConfigurationForm
             // 
@@ -145,7 +159,8 @@ namespace Extract.LabResultsCustomComponents
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._buttonCancel;
-            this.ClientSize = new System.Drawing.Size(496, 209);
+            this.ClientSize = new System.Drawing.Size(496, 229);
+            this.Controls.Add(this._checkRequirementsAreOptional);
             this.Controls.Add(this._checkEliminateDuplicateTestSubAttributes);
             this.Controls.Add(this._checkUseFilledRequirement);
             this.Controls.Add(this._checkUseOutstandingOrders);
@@ -180,5 +195,6 @@ namespace Extract.LabResultsCustomComponents
         private System.Windows.Forms.CheckBox _checkUseFilledRequirement;
         private System.Windows.Forms.CheckBox _checkUseOutstandingOrders;
         private System.Windows.Forms.CheckBox _checkEliminateDuplicateTestSubAttributes;
+        private System.Windows.Forms.CheckBox _checkRequirementsAreOptional;
     }
 }
