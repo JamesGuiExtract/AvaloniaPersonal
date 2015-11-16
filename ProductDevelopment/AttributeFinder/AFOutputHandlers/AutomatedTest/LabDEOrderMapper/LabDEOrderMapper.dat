@@ -46,3 +46,18 @@
 
 // Ensure that only test groups with matching dates are combined
 <TESTCASE>;Test.rsd;test17.txt;;test17.eav
+
+// Test filled requirement
+<TESTCASE>;Test18.rsd;test18.txt;;test18.eav
+
+// Test using filled requirement but allowing requirements to be disregarded
+<TESTCASE>;Test19.rsd;test18.txt;;test19.eav
+
+// Test using mandatory requirement but allowing requirements to be disregarded
+<TESTCASE>;Test20.rsd;test18.txt;;test20.eav
+
+// Test preferring orders matching OutstandingOrderCode values
+<TESTCASE>;Test21.rsd;test21.txt;;test21.eav
+
+// Test preferring orders matching OutstandingOrderCode values (with no outstanding order codes provided)
+<TESTCASE>;Test21.rsd;test22.txt;;test22.eav
