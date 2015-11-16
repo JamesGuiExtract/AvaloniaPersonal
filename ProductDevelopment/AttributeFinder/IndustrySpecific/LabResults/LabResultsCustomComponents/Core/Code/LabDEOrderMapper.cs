@@ -970,7 +970,7 @@ namespace Extract.LabResultsCustomComponents
             sourceDocName = tests[0].Value.SourceDocName;
 
             // Build the list of all lab orders with their associated test collections.
-            Dictionary<string, LabOrder> labOrders = FillLabOrderCollection(dbCache, useFilledRequirement);
+            Dictionary<string, LabOrder> labOrders = FillLabOrderCollection(dbCache);
 
             // Perform the first pass
             var firstPassResult = FirstPassGrouping(
