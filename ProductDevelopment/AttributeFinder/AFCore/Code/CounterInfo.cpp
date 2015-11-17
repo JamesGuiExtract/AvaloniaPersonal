@@ -113,9 +113,13 @@ IVariantVectorPtr CounterInfo::GetProperties()
 //--------------------------------------------------------------------------------------------------
 void CounterInfo::SetSecureCounter(ISecureCounterPtr ipSecureCounter)
 {
-	ASSERT_RUNTIME_CONDITION("ELI39012",
-		_strcmpi(asString(ipSecureCounter->Name).c_str(), m_strName.c_str()) == 0,
-		"Counter discrepancy encountered.");
+	if (_strcmpi(asString(ipSecureCounter->Name).c_str(), m_strName.c_str()) != 0)
+	{
+		UCLIDException ue("ELI39012", "Counter discrepancy encountered.");
+		ue.addDebugInfo("Expected counter name", m_strName);
+		ue.addDebugInfo("Counter Name", asString(ipSecureCounter->Name));
+		throw ue;
+	}
 
 	CSingleLock lg(&ms_mutex, TRUE);
 
@@ -126,9 +130,13 @@ void CounterInfo::SetSecureCounter(ISecureCounterPtr ipSecureCounter)
 	else
 	{
 		// The same name should be used for any given counter ID across any thread.
-		ASSERT_RUNTIME_CONDITION("ELI39013",
-			_strcmpi(ms_mapCounterNames[m_nID].c_str(), m_strName.c_str()) == 0,
-			"Counter discrepancy encountered.");
+		if (_strcmpi(ms_mapCounterNames[m_nID].c_str(), m_strName.c_str()) != 0)
+		{
+			UCLIDException ue("ELI39012", "Counter discrepancy encountered.");
+			ue.addDebugInfo("Expected counter name", m_strName);
+			ue.addDebugInfo("Counter Name", ms_mapCounterNames[m_nID]);
+			throw ue;
+		}
 	}
 
 	m_ipSecureCounter = ipSecureCounter;

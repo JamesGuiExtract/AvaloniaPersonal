@@ -40,6 +40,9 @@ const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 134;
 // Defined constant for the Request code version
 const long glSECURE_COUNTER_REQUEST_VERSION = 1;
 
+// Add item to exception log at this counter decrement frequency
+const long gnLOG_FREQUENCY = 1000;
+
 //-------------------------------------------------------------------------------------------------
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -8723,23 +8726,38 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 						ASSERT_RUNTIME_CONDITION("ELI38903", counterUpdates.m_nNumberOfUpdates != 0,
 							"No counter updates in code.");
 
+						UCLIDException ueLog("ELI39143", "Counter code applied.");
+
 						if (counterUpdates.m_nNumberOfUpdates < 0 )
 						{
 							// this is an unlock code
-							unlockCounters(ipConnection, counterUpdates);
+							unlockCounters(ipConnection, counterUpdates, ueLog);
 							strApplyResult = "Counters restored to working state.\r\n";
 						}
 						else
 						{
-							ASSERT_RUNTIME_CONDITION("ELI38976", bValid, "DatabaseID is corrupt.")
+							if (!bValid)
+							{
+								UCLIDException ueInvalid("ELI39147", "DatabaseID is corrupt.");
+								m_DatabaseIDValues.addAsDebugInfo(ueInvalid, "DatabaseID_");
+								throw ueInvalid;
+							}
 
 							// Validate the guid and the LastUpdated time
-							ASSERT_RUNTIME_CONDITION("ELI38902", m_DatabaseIDValues == counterUpdates.m_DatabaseID, 
-								"Code is not valid.");
+							if (m_DatabaseIDValues != counterUpdates.m_DatabaseID)
+							{
+								UCLIDException ueInvalid("ELI38902", "Code is not valid.");
+								counterUpdates.m_DatabaseID.addAsDebugInfo(ueInvalid, "UpdateCode_");
+								m_DatabaseIDValues.addAsDebugInfo(ueInvalid, "DatabaseID_");
+								throw ueInvalid;
+							}
 
-							strApplyResult = updateCounters(ipConnection, counterUpdates);
+							strApplyResult = updateCounters(ipConnection, counterUpdates, ueLog);
 						}
 						tg.CommitTrans();
+
+						// The update was successful so log the ueLog exception
+						ueLog.log();
 						
 						// Whenever counter updates/unlocks are applied, re-get the secure counters 
 						// to ensure their new states are properly reported.
@@ -8751,7 +8769,7 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 				}
 				catch (UCLIDException &ue)
 				{
-					UCLIDException ueBad("ELI38905", "Unable to process counter upgrade code.", ue);
+					UCLIDException ueBad("ELI38905", "Unable to process counter update code.", ue);
 					throw ueBad;
 				}
 
@@ -8904,6 +8922,7 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 						}
 						else
 						{
+							long lOldValue = dbCounter.m_nValue;
 							dbCounter.m_nValue -= decrementAmount;
 							nDecrementRetries = 0;
 							bCounterDecremented = true;
@@ -8928,6 +8947,15 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 							executeVectorOfSQL(ipConnection, vecUpdateQueries);
 							tg.CommitTrans();
 
+							// Check new counter value and possibly add item to exception log
+							if (((lOldValue - 1) / gnLOG_FREQUENCY) != ((dbCounter.m_nValue - 1)/ gnLOG_FREQUENCY))
+							{
+								UCLIDException ue("ELI15935", "Application trace: debug information");
+								ue.addDebugInfo("Item 1", dbCounter.m_nID, true );
+								ue.addDebugInfo("Item 2", dbCounter.m_strName, true);
+								ue.addDebugInfo("Item 3", dbCounter.m_nValue, true );
+								ue.log();
+							}							
 							*pnCounterValue = dbCounterChange.m_nToValue;
 						}
 					}
@@ -9003,17 +9031,6 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 					DBIDValue.m_strName = m_strDatabaseName;
 				}
 
-				ByteStream bsRequestCode;
-				ByteStreamManipulator bsmRequest(ByteStreamManipulator::kWrite, bsRequestCode);
-				
-				// Add the version to the request
-				bsmRequest << glSECURE_COUNTER_REQUEST_VERSION;
-
-				bsmRequest << DBIDValue;
-
-				// Add the current time
-				bsmRequest << getSQLServerDateTimeAsCTime(getDBConnection());
-
 				// Create a pointer to a recordset
 				_RecordsetPtr ipResultSet(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI38907", ipResultSet != __nullptr);
@@ -9040,6 +9057,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 					ipResultSet->MoveNext();
 				}
 				long nNumCounters = vecDBCounters.size();
+				
 				// if the number of counters is 0 and the DatabaseID is invalid
 				// create a completely new DatabaseID value and save it in DBInfo
 				// then bValid will be set to true and this becomes a request code instead
@@ -9055,9 +9073,27 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 					string strUpdateQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
 					replaceVariable(strUpdateQuery, gstrSETTING_NAME, gstrDATABASEID);
 					replaceVariable(strUpdateQuery, gstrSETTING_VALUE, m_strEncryptedDatabaseID);
-					executeCmdQuery(ipConnection,gstrDBINFO_UPDATE_SETTINGS_QUERY);
+					executeCmdQuery(ipConnection, strUpdateQuery);
+					m_bDatabaseIDValuesValidated = false;
+					
+					// The DatabaseID should be valid now so check it and throw exception if it isn't
+					checkDatabaseIDValid(ipConnection, true);
+					
+					// Set the DatabaseID that will be in the request to the new DatabaseID Value
+					DBIDValue = m_DatabaseIDValues;
 					bValid = true;
 				}
+
+				ByteStream bsRequestCode;
+				ByteStreamManipulator bsmRequest(ByteStreamManipulator::kWrite, bsRequestCode);
+				
+				// Add the version to the request
+				bsmRequest << glSECURE_COUNTER_REQUEST_VERSION;
+
+				bsmRequest << DBIDValue;
+
+				// Add the current time
+				bsmRequest << getSQLServerDateTimeAsCTime(getDBConnection());
 
 				bsmRequest << (((nNumCounters == 0) || bValid) ? nNumCounters : -nNumCounters);
 

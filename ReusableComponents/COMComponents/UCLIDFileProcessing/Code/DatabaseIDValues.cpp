@@ -156,6 +156,16 @@ void DatabaseIDValues::CalculateHashValue(long &nHashValue)
 	nHashValue ^= hashLongLong((long long)m_ctLastUpdated.GetTime());
 }
 //-------------------------------------------------------------------------------------------------
+void DatabaseIDValues::addAsDebugInfo(UCLIDException &ue, string strPrefix)
+{
+	ue.addDebugInfo(strPrefix + "Server", m_strServer);
+	ue.addDebugInfo(strPrefix + "DBName", m_strName);
+	ue.addDebugInfo(strPrefix + "DBGUID", asString(m_GUID), true);
+	ue.addDebugInfo(strPrefix + "Created",(LPCSTR) m_ctCreated.Format(gstrDATE_TIME_FORMAT.c_str()), true);
+	ue.addDebugInfo(strPrefix + "Restored",(LPCSTR) m_ctRestored.Format(gstrDATE_TIME_FORMAT.c_str()), true);
+	ue.addDebugInfo(strPrefix + "LastUpdated",(LPCSTR) m_ctLastUpdated.Format(gstrDATE_TIME_FORMAT.c_str()), true);
+}
+//-------------------------------------------------------------------------------------------------
 bool DatabaseIDValues::operator !=(const DatabaseIDValues &other)
 {
 	return m_GUID != other.m_GUID ||

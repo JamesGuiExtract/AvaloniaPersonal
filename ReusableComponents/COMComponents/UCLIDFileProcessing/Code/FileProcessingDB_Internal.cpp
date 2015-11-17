@@ -5603,9 +5603,11 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates)
+string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates,
+	UCLIDException &ueLog)
 {
 	string strReturnValue = "";
+	ueLog.addDebugInfo("CodeType", "Update");
 
 	// get the update operations
 	vector<CounterOperation> &vecOperations = counterUpdates.m_vecOperations;
@@ -5620,6 +5622,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 	{
 		// Code has expired
 		UCLIDException ue("ELI38996", "Counter update code has expired.");
+		ue.addDebugInfo("UpdateCodeDate", (LPCSTR) counterUpdates.m_ctTimeCodeGenerated.Format(gstrDATE_TIME_FORMAT.c_str()));
 		throw ue;
 	}
 
@@ -5692,6 +5695,9 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 			mapCounters[counterOp.m_nCounterID] = counterOp;
 			strOperationPerformed = "Created counter " + counterOp.m_strCounterName + " with " 
 				+ asString(counterOp.m_nValue) + " counts.";
+			ueLog.addDebugInfo("Create counter", counterChange.m_nCounterID);
+			ueLog.addDebugInfo("CounterName", mapCounters[counterOp.m_nCounterID].m_strCounterName);
+			ueLog.addDebugInfo("CounterValue", mapCounters[counterOp.m_nCounterID].m_nValue);
 			break;
 		case kSet:
 			counterChange.m_nToValue = counterOp.m_nValue;
@@ -5703,6 +5709,9 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 			mapCounters[counterOp.m_nCounterID] = counterOp;
 			strOperationPerformed = "Set counter " + counterOp.m_strCounterName + " to "
 				+ asString(counterOp.m_nValue) + " counts.";
+			ueLog.addDebugInfo("Set counter", counterChange.m_nCounterID);
+			ueLog.addDebugInfo("CounterName", mapCounters[counterOp.m_nCounterID].m_strCounterName);
+			ueLog.addDebugInfo("CounterValue", mapCounters[counterOp.m_nCounterID].m_nValue);
 			break;
 		case kIncrement:
 			counterChange.m_nToValue = counter->second.m_nValue + counterOp.m_nValue;
@@ -5715,6 +5724,9 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 			mapCounters[counterOp.m_nCounterID].m_nValue = counterChange.m_nToValue;
 			strOperationPerformed = "Incremented counter " + counterOp.m_strCounterName + " by "
 				+ asString(counterOp.m_nValue) + ".";
+			ueLog.addDebugInfo("Increment counter", counterChange.m_nCounterID);
+			ueLog.addDebugInfo("CounterName", mapCounters[counterOp.m_nCounterID].m_strCounterName);
+			ueLog.addDebugInfo("CounterValue", mapCounters[counterOp.m_nCounterID].m_nValue);
 			break;
 		case kDecrement:
 			// An operation to decrement should set counter value to 0 if the decrement value
@@ -5730,8 +5742,15 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 
 			strOperationPerformed = "Decremented counter " + counterOp.m_strCounterName + " by "
 				+ asString(counterOp.m_nValue) + ".";
+			ueLog.addDebugInfo("Decrement counter", counterChange.m_nCounterID);
+			ueLog.addDebugInfo("CounterName", mapCounters[counterOp.m_nCounterID].m_strCounterName);
+			ueLog.addDebugInfo("CounterValue", mapCounters[counterOp.m_nCounterID].m_nValue);
 			break;
 		case kDelete:
+			ueLog.addDebugInfo("Delete counter", counterChange.m_nCounterID);
+			ueLog.addDebugInfo("CounterName", mapCounters[counterOp.m_nCounterID].m_strCounterName);
+			ueLog.addDebugInfo("CounterValue", mapCounters[counterOp.m_nCounterID].m_nValue);
+
 			// Modify existing counterOp record to the delete op
 			mapCounters[counterOp.m_nCounterID] = counterOp;
 
@@ -5832,7 +5851,8 @@ void CFileProcessingDB::createCounterUpdateQueries(const DatabaseIDValues &datab
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates)
+void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates,
+	UCLIDException &ueLog)
 {
 	// Check the unlock code databaseID, it should be valid since the request code contained the 
 	// fixed up version
@@ -5841,8 +5861,10 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 	{
 		// Unlock code is not valid
 		UCLIDException ue("ELI38977", "Unlock code is invalid.");
+		counterUpdates.m_DatabaseID.addAsDebugInfo(ue, "UnlockCode");
 		throw ue;
 	}
+	ueLog.addDebugInfo("CodeType", "Unlock");
 
 	DatabaseIDValues &newDatabaseID = counterUpdates.m_DatabaseID;
 	
@@ -5855,6 +5877,7 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 	{
 		// Code has expired
 		UCLIDException ue("ELI38988", "Unlock code has expired.");
+		ue.addDebugInfo("UnlockCodeDate", (LPCSTR) counterUpdates.m_ctTimeCodeGenerated.Format(gstrDATE_TIME_FORMAT.c_str()));
 		throw ue;
 	}
 
@@ -5918,6 +5941,10 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 		counterChange.CalculateHashValue(counterChange.m_llHashValue);
 
 		vecUpdateQueries.push_back(counterChange.GetInsertQuery());
+
+		ueLog.addDebugInfo("CounterID", existingCounter.m_nCounterID);
+		ueLog.addDebugInfo("CounterName", existingCounter.m_strCounterName);
+		ueLog.addDebugInfo("CounterValue", existingCounter.m_nValue);
 	}
 
 	// Need to updated the DatabaseID record

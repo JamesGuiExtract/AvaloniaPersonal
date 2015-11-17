@@ -1052,10 +1052,10 @@ private:
 	// existing counters that are not being modified to use the new databaseID caused by the update
 	// Should be executed within a transaction
 	// returns a string that has one line for each update performed
-	string updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates);
+	string updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates, UCLIDException &ueLog);
 
 	// Method unlocks the counters if they are in a bad state
-	void unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates);
+	void unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates, UCLIDException &ueLog);
 
 	// Returns a map with all the existing counters as CounterOperation records. All of the records
 	// returned will have the m_eOperation set to kNone. As the changes are processed they will be 

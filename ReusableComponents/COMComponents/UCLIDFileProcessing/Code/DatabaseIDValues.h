@@ -3,6 +3,7 @@
 #include <ADOUtils.h>
 
 #include <ByteStreamManipulator.h>
+#include <UCLIDException.h>
 
 // Class that represents the decrypted Database ID
 class DatabaseIDValues
@@ -36,6 +37,10 @@ public:
 	
 	// Calculates the hash value for this class (does not include m_nHashValue)
 	void CalculateHashValue(long &nHashValue);
+
+	// Adds the values to the debug data of the exception using strPrefix in front of the member values names
+	// the Server and Database Names are the only items add not encrypted
+	void addAsDebugInfo(UCLIDException &ue, string strPrefix);
 
 	// Comparison operators
 	bool operator !=(const DatabaseIDValues &other);
