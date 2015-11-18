@@ -744,7 +744,10 @@ namespace Extract.Utilities
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI23513", ex);
+                var ee = ex.AsExtract("ELI23513");
+                ee.AddDebugData("Filename", fileName, false);
+                ee.AddDebugData("Root", pathRoot, false);
+                throw ee;
             }
         }
 

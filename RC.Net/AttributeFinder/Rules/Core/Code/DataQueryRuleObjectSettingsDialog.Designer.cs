@@ -141,14 +141,15 @@
             // 
             // _openSqlCompactReadOnlyCheckBox
             // 
+            this._openSqlCompactReadOnlyCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._openSqlCompactReadOnlyCheckBox.AutoSize = true;
+            this._openSqlCompactReadOnlyCheckBox.Enabled = false;
             this._openSqlCompactReadOnlyCheckBox.Location = new System.Drawing.Point(244, 208);
             this._openSqlCompactReadOnlyCheckBox.Name = "_openSqlCompactReadOnlyCheckBox";
             this._openSqlCompactReadOnlyCheckBox.Size = new System.Drawing.Size(200, 17);
             this._openSqlCompactReadOnlyCheckBox.TabIndex = 20;
             this._openSqlCompactReadOnlyCheckBox.Text = "Open SQL Compact DB for read only";
             this._openSqlCompactReadOnlyCheckBox.UseVisualStyleBackColor = true;
-            this._openSqlCompactReadOnlyCheckBox.Enabled = false;
             // 
             // DataQueryRuleObjectSettingsDialog
             // 

@@ -167,15 +167,12 @@ namespace Extract.SQLCDBEditor.Plugins
             get
             {
                 return "SELECT [LabTest].[TestCode], [OfficialName] AS [Official Name], " +
-                                "[CandidateAlternateTestName].[Name] AS [Candidate AKA], COUNT(*) AS Count " +
-                            "FROM [CandidateAlternateTestName] " +
-                            "INNER JOIN [LabTest] ON [CandidateAlternateTestName].[TestCode] = [LabTest].[TestCode] " +
-                            "LEFT JOIN [AlternateTestName] ON " +
-		                    "   ([CandidateAlternateTestName].[TestCode] = [AlternateTestName].[TestCode] AND " +
-		                    "    [CandidateAlternateTestName].[Name] = [AlternateTestName].[Name]) " +
-                            "WHERE [AlternateTestName].[Name] IS NULL " +
-                            "GROUP BY [LabTest].[TestCode], [OfficialName], [CandidateAlternateTestName].[Name] " +
-                            "HAVING MAX(CAST([Ignore] AS INT)) = 0";
+                                "[AlternateTestName].[Name] AS [Candidate AKA], COUNT(*) AS Count " +
+                            "FROM [AlternateTestName] " +
+                            "INNER JOIN [LabTest] ON [AlternateTestName].[TestCode] = [LabTest].[TestCode] " +
+                            "LEFT JOIN [AlternateTestNameSource] ON [AlternateTestName].[ID] = [AlternateTestNameID] " +
+                            "WHERE [StatusCode] = 'P' " +
+                            "GROUP BY [LabTest].[TestCode], [OfficialName], [AlternateTestName].[Name] ";
             }
         }
 
@@ -277,9 +274,8 @@ namespace Extract.SQLCDBEditor.Plugins
         {
             try
             {
-                // As long as there is a single candidate AKA row selected, add the AKA into the
-                // AlternateTestName table, and remove all instances from the
-                // CandidateAlternateTestName table.
+                // As long as there is a single candidate AKA row selected, change status in the
+                // AlternateTestName table to "A" (Accepted).
                 if (_selectedRow != null)
                 {
                     string testCode = (string)_selectedRow.ItemArray[0];
@@ -295,12 +291,8 @@ namespace Extract.SQLCDBEditor.Plugins
                         parameters.Add("@Name", name);
 
                         DBMethods.ExecuteDBQuery(_connection,
-                            "INSERT INTO [AlternateTestName] ([TestCode], [Name]) VALUES " +
-                                "(@TestCode, @Name)", parameters);
-
-                        DBMethods.ExecuteDBQuery(_connection,
-                            "DELETE FROM [CandidateAlternateTestName] " +
-                            "WHERE [TestCode] = @TestCode AND [Name] = @Name", parameters);
+                            "UPDATE [AlternateTestName] SET [StatusCode] = 'A' " +
+                            "   WHERE [TestCode] = @TestCode AND [Name] = @Name", parameters);
 
                         _pluginManager.RefreshQueryResults();
 
@@ -324,11 +316,8 @@ namespace Extract.SQLCDBEditor.Plugins
         {
             try
             {
-                // As long as there is a single candidate AKA row selected, mark all instances in
-                // the CandidateAlternateTestName table with the ignore flag to prevent it from
-                // being displayed again. (Note: even if additional examples of this AKA are later
-                // added to the CandidateAlternateTestName table, they will not be displayed on the
-                // basis that at least one instance has the ignore flag set.)
+                // As long as there is a single candidate AKA row selected, mark the StatusCode in
+                // the AlternateTestName table "I" (Ignored).
                 if (_selectedRow != null)
                 {
                     string testCode = (string)_selectedRow.ItemArray[0];
@@ -346,8 +335,8 @@ namespace Extract.SQLCDBEditor.Plugins
                         parameters.Add("@Name", name);
 
                         DBMethods.ExecuteDBQuery(_connection,
-                            "UPDATE [CandidateAlternateTestName] " +
-                            "SET [Ignore] = 1 " +
+                            "UPDATE [AlternateTestName] " +
+                            "SET [StatusCode] = 'I' " +
                             "WHERE [TestCode] = @TestCode AND [Name] = @Name",
                             parameters);
 
@@ -378,9 +367,9 @@ namespace Extract.SQLCDBEditor.Plugins
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question,
                     MessageBoxDefaultButton.Button1, 0) == DialogResult.Yes)
                 {
-                    // Clear all ignore flags in the CandidateAlternateTestName table.
+                    // Resets to 'P' all instances where StatusCode = 'I' in the AlternateTestName table.
                     DBMethods.ExecuteDBQuery(_connection,
-                            "UPDATE [CandidateAlternateTestName] SET [Ignore] = 0 ");
+                        "UPDATE [AlternateTestName] SET [StatusCode] = 'P' WHERE [StatusCode] = 'I'");
 
                     _pluginManager.RefreshQueryResults();
 
@@ -413,7 +402,7 @@ namespace Extract.SQLCDBEditor.Plugins
 
                 if (_selectedRow != null)
                 {
-                    // Query for allow rows in CandidateAlternateTestName for this candidate AKA.
+                    // Query for allow rows in AlternateTestNameSource for this candidate AKA.
                     string testCode = (string)_selectedRow.ItemArray[0];
                     string name = (string)_selectedRow.ItemArray[2];
 
@@ -422,8 +411,9 @@ namespace Extract.SQLCDBEditor.Plugins
                     parameters.Add("@Name", name);
 
                     string[] examples = DBMethods.GetQueryResultsAsStringArray(_connection,
-                        "SELECT [Filename], [Page], [StartX], [StartY], [EndX], [EndY], [Height] " +
-                            "FROM [CandidateAlternateTestName] " +
+                        "SELECT [FileName], [Page], [StartX], [StartY], [EndX], [EndY], [Height] " +
+                            "FROM [AlternateTestName] " +
+                            "LEFT JOIN [AlternateTestNameSource] ON [AlternateTestName].[ID] = [AlternateTestNameID] " +
                             "WHERE [TestCode] = @TestCode and [Name] = @Name", parameters, "|");
 
                     _examples.Clear();
