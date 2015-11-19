@@ -1967,9 +1967,12 @@ void CEnhanceOCR::generateFilteredImage(string strFilter, set<ILongRectanglePtr>
 	// It does seem on some testing that it is more accurate to output in grayscale in some cases
 	// such as for aliased of diffuse text, so this may be worth revisiting if trying to fine-tune
 	// performance.
+	// Specify the file format to ensure it is valid for bitonal images
+	// https://extract.atlassian.net/browse/ISSUE-13411
+	const long nFORMAT = FILE_CCITT_GROUP4;
 	L_INT nCompression = getCompressionFactor(m_apPageBitmap->m_FileInfo.Format);
 	saveImagePage(hBitmapCopy, m_apFilteredBitmapFileName->getName().c_str(),
-		m_apPageBitmap->m_FileInfo.Format, nCompression, 1, sfOptions);
+		nFORMAT, nCompression, 1, sfOptions);
 }
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongRectanglePtr ipRect)
