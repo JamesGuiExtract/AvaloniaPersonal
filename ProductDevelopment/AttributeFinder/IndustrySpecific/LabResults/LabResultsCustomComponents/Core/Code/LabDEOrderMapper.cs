@@ -724,10 +724,15 @@ namespace Extract.LabResultsCustomComponents
                         // Use old defaults for the options that have new defaults in version 4
                         _eliminateDuplicateTestSubAttributes = false;
                     }
+
                     if (reader.Version >= 4)
                     {
                         // Read the requirements-are-optional setting
                         _requirementsAreOptional = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        _requirementsAreOptional = false;
                     }
                 }
 
@@ -1159,9 +1164,9 @@ namespace Extract.LabResultsCustomComponents
                 }
             }
 
-            // Try once allowing only one consecutive group to be skipped when matching an order
+            // Try once allowing only four consecutive groups to be skipped when matching an order
             IEnumerable<OrderGrouping> bestGroups = MergeGroups(firstPassGrouping, labOrders,
-                dbCache, requireMandatory, useFilledRequirement, outstandingOrderCodes, false, 1);
+                dbCache, requireMandatory, useFilledRequirement, outstandingOrderCodes, false, 4);
 
             // Try again, allowing more groups to be skipped this time
             bestGroups = MergeGroups(bestGroups, labOrders,
@@ -1315,7 +1320,7 @@ namespace Extract.LabResultsCustomComponents
             // Loop through the potential orders attempting to match the order
             foreach (string orderCode in potentialOrderCodes)
             {
-                // If outstandingOrderCodes is not null then limit to this set
+                // If outstandingOrderCodes is not null or empty then limit to this set
                 if (outstandingOrderCodes != null && outstandingOrderCodes.Count > 0
                     && !outstandingOrderCodes.Contains(orderCode))
                 {
@@ -1359,9 +1364,33 @@ namespace Extract.LabResultsCustomComponents
                         skipped = 0;
                     }
                 }
- 
-                // Check mandatory requirement
+
+                // The group so far
                 var group = currentPermutation.CombinedGroup;
+
+                // If no merging has happened, attempt to map the group to the order being considered
+                if (group.LabOrder != null && group.LabOrder.OrderCode != labOrder.OrderCode)
+                {
+                    List<LabTest> matchedTests = labOrder.GetMatchingTests(group.LabTests, dbCache,
+                        true, requireMandatory);
+
+                    // In order to accept this mapping the order must contain all of the tests from
+                    // the original group.
+                    if (matchedTests == null || matchedTests.Count != group.LabTests.Count)
+                    {
+                        continue;
+                    }
+
+                    // Make a new group with this order
+                    var newGroup = new OrderGrouping(labOrder, matchedTests, group);
+
+                    // Create a new grouping permutation
+                    var newPermutation = new OrderGroupingPermutation(newGroup);
+                    newPermutation.ContainedGroups = new List<OrderGrouping>(currentPermutation.ContainedGroups);
+                    currentPermutation = newPermutation;
+                }
+
+                // Check mandatory requirement
                 if (requireMandatory && group.LabOrder != null && !group.ContainsAllMandatoryTests())
                 {
                     continue;

@@ -49,7 +49,7 @@
             panel1.Controls.Add(this._queryScintillaBox);
             panel1.Location = new System.Drawing.Point(13, 28);
             panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(543, 151);
+            panel1.Size = new System.Drawing.Size(825, 481);
             panel1.TabIndex = 19;
             // 
             // _queryScintillaBox
@@ -69,13 +69,13 @@
             this._queryScintillaBox.Location = new System.Drawing.Point(0, 0);
             this._queryScintillaBox.Margins.Margin1.Width = 0;
             this._queryScintillaBox.Name = "_queryScintillaBox";
-            this._queryScintillaBox.Size = new System.Drawing.Size(539, 149);
+            this._queryScintillaBox.Size = new System.Drawing.Size(828, 479);
             this._queryScintillaBox.TabIndex = 0;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(400, 332);
+            this._okButton.Location = new System.Drawing.Point(682, 662);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 5;
@@ -87,7 +87,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(481, 332);
+            this._cancelButton.Location = new System.Drawing.Point(763, 662);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 6;
@@ -97,7 +97,7 @@
             // _testQueryButton
             // 
             this._testQueryButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._testQueryButton.Location = new System.Drawing.Point(319, 332);
+            this._testQueryButton.Location = new System.Drawing.Point(601, 662);
             this._testQueryButton.Name = "_testQueryButton";
             this._testQueryButton.Size = new System.Drawing.Size(75, 23);
             this._testQueryButton.TabIndex = 4;
@@ -110,18 +110,18 @@
             this._databaseConnectionControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._databaseConnectionControl.Enabled = false;
-            this._databaseConnectionControl.Location = new System.Drawing.Point(13, 231);
+            this._databaseConnectionControl.Location = new System.Drawing.Point(13, 561);
             this._databaseConnectionControl.Name = "_databaseConnectionControl";
             this._databaseConnectionControl.PathTags = null;
             this._databaseConnectionControl.ShowCopyConnectionTypeMenuOption = true;
-            this._databaseConnectionControl.Size = new System.Drawing.Size(543, 92);
+            this._databaseConnectionControl.Size = new System.Drawing.Size(825, 92);
             this._databaseConnectionControl.TabIndex = 3;
             // 
             // _useFAMDBCheckBox
             // 
             this._useFAMDBCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._useFAMDBCheckBox.AutoSize = true;
-            this._useFAMDBCheckBox.Location = new System.Drawing.Point(12, 185);
+            this._useFAMDBCheckBox.Location = new System.Drawing.Point(12, 515);
             this._useFAMDBCheckBox.Name = "_useFAMDBCheckBox";
             this._useFAMDBCheckBox.Size = new System.Drawing.Size(180, 17);
             this._useFAMDBCheckBox.TabIndex = 1;
@@ -132,7 +132,7 @@
             // 
             this._useSpecifiedDBCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._useSpecifiedDBCheckBox.AutoSize = true;
-            this._useSpecifiedDBCheckBox.Location = new System.Drawing.Point(12, 208);
+            this._useSpecifiedDBCheckBox.Location = new System.Drawing.Point(12, 538);
             this._useSpecifiedDBCheckBox.Name = "_useSpecifiedDBCheckBox";
             this._useSpecifiedDBCheckBox.Size = new System.Drawing.Size(167, 17);
             this._useSpecifiedDBCheckBox.TabIndex = 2;
@@ -144,7 +144,7 @@
             this._openSqlCompactReadOnlyCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._openSqlCompactReadOnlyCheckBox.AutoSize = true;
             this._openSqlCompactReadOnlyCheckBox.Enabled = false;
-            this._openSqlCompactReadOnlyCheckBox.Location = new System.Drawing.Point(244, 208);
+            this._openSqlCompactReadOnlyCheckBox.Location = new System.Drawing.Point(244, 538);
             this._openSqlCompactReadOnlyCheckBox.Name = "_openSqlCompactReadOnlyCheckBox";
             this._openSqlCompactReadOnlyCheckBox.Size = new System.Drawing.Size(200, 17);
             this._openSqlCompactReadOnlyCheckBox.TabIndex = 20;
@@ -156,7 +156,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(568, 364);
+            this.ClientSize = new System.Drawing.Size(850, 694);
             this.Controls.Add(this._openSqlCompactReadOnlyCheckBox);
             this.Controls.Add(this._useSpecifiedDBCheckBox);
             this.Controls.Add(this._useFAMDBCheckBox);
@@ -166,9 +166,8 @@
             this.Controls.Add(label1);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(450, 350);
+            this.MinimumSize = new System.Drawing.Size(470, 350);
             this.Name = "DataQueryRuleObjectSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

@@ -308,8 +308,8 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="tests">The <see cref="LabTest"/>s that should be mapped.</param>
         /// <param name="dbCache">The <see cref="OrderMappingDBCache"/> to use to get potential
-        /// <param name="finalPass">Whether this is the final pass of the order mapping algorithm</param>
         /// test codes.</param>
+        /// <param name="finalPass">Whether this is the final pass of the order mapping algorithm</param>
         void InitializeMappingCandidates(IEnumerable<LabTest> tests, OrderMappingDBCache dbCache,
             bool finalPass)
         {
