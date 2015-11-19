@@ -37,13 +37,14 @@ void DBCounterChangeValue::CalculateHashValue(long long &llHashValue)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void DBCounterChangeValue::LoadFromFields(FieldsPtr ipFields, bool bValidateHash)
+void DBCounterChangeValue::LoadFromFields(FieldsPtr ipFields, bool bValidateHash, long& rnToValue)
 {
 	try
 	{
 		m_nID = getLongField(ipFields, "ValueChangedID");
 		m_nCounterID = getLongField(ipFields, "ID");
 		m_nToValue = getLongField(ipFields, "ToValue");
+		rnToValue = m_nToValue; 
 		m_nFromValue = getLongField(ipFields, "FromValue");
 		m_ctUpdatedTime = getTimeDateField(ipFields, "LastUpdatedTime");
 

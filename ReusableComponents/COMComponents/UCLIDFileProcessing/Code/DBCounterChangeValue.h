@@ -24,7 +24,8 @@ public:
 
 	// Assumes results in ipFields using gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE
 	// Which has SecureCounter.ID as ID and SecureCounterValueChange.ID as ValueChangedID
-	void LoadFromFields(FieldsPtr ipFields, bool bValidateHash);
+	// rnToValue returns the "ToValue" for the counter from the SecureCounterValueChange table.
+	void LoadFromFields(FieldsPtr ipFields, bool bValidateHash, long& rnToValue);
 
 	// Returns the query to insert the record into the SecureCounterValueChange table
 	string GetInsertQuery();

@@ -22,6 +22,8 @@ public:
 	long m_nValue;
 	long m_nAlertLevel;
 	long m_nAlertMultiple;
+	bool m_bUnrecoverable;
+	long m_nChangeLogValue;
 
 	// Whenever either validate or isValid are called and find the counter to be invalid, the reason
 	// for the validation error is maintained here. This reason is intended for Extract support

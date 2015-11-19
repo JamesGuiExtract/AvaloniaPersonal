@@ -8698,20 +8698,36 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 		{
 			ASSERT_ARGUMENT("ELI39030", pbstrResult != __nullptr);
 
+			DBCounterUpdate counterUpdates;
+
+			try
+			{
+				try
+				{
+					ByteStream bsPW;
+					getFAMPassword(bsPW);
+
+					// Get the bytestream from the update code
+					ByteStream bsUpgradeCode = MapLabel::getMapLabelWithS(asString(strUpdateCode), bsPW);
+					ByteStreamManipulator bsmUpgradeCode(ByteStreamManipulator::kRead, bsUpgradeCode);
+
+					bsmUpgradeCode >> counterUpdates;
+
+					ASSERT_RUNTIME_CONDITION("ELI38903", counterUpdates.m_nNumberOfUpdates != 0,
+						"No counter updates in code.");
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39159");
+			}
+			catch (UCLIDException &ue)
+			{
+				throw UCLIDException("ELI39160", "Failed to parse counter update or unlock code.", ue);
+			}
+
 			_ConnectionPtr ipConnection;
 			BEGIN_CONNECTION_RETRY();
 
 				ipConnection = getDBConnection();
 				bool bValid = checkDatabaseIDValid(ipConnection, false);
-
-				ByteStream bsPW;
-				getFAMPassword(bsPW);
-
-				// Get the bytestream from the update code
-				ByteStream bsUpgradeCode = MapLabel::getMapLabelWithS(asString(strUpdateCode), bsPW);
-				ByteStreamManipulator bsmUpgradeCode(ByteStreamManipulator::kRead, bsUpgradeCode);
-
-				DBCounterUpdate counterUpdates;
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
@@ -8721,11 +8737,6 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 				{
 					try
 					{
-						bsmUpgradeCode >> counterUpdates;
-
-						ASSERT_RUNTIME_CONDITION("ELI38903", counterUpdates.m_nNumberOfUpdates != 0,
-							"No counter updates in code.");
-
 						UCLIDException ueLog("ELI39143", "Counter code applied.");
 
 						if (counterUpdates.m_nNumberOfUpdates < 0 )
@@ -9105,10 +9116,19 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 						bsmRequest << c->m_strName;
 					}						
 
-					bsmRequest << c->m_nValue;
+					if (c->m_bUnrecoverable)
+					{
+						// Indicate unrecoverable counters with a -1 value.
+						bsmRequest << (long)-1;
+					}
+					else
+					{
+						bsmRequest << c->m_nValue;
+					}
 
 					if (!bValid)
 					{
+						bsmRequest << c->m_nChangeLogValue;
 						bsmRequest << c->m_strValidationError;
 					}
 				}

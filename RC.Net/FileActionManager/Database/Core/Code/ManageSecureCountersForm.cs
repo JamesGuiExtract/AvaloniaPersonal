@@ -107,6 +107,24 @@ namespace Extract.FileActionManager.Database
         #region Event Handlers
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_refreshButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleRefreshButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                RefreshCounterData();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39155");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the <see cref="_generateRequestButton"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
