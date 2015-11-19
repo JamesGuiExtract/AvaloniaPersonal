@@ -148,7 +148,21 @@ namespace Extract.FAMDBCounterManager
         /// generation. This value will be <see langword="null"/> for new counters defined in this
         /// utility for creation.
         /// </value>
-        public int? PreviousValue
+        public int? Value
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the value of the counter as reported in the SecureCounterValueChange table.
+        /// </summary>
+        /// <value>
+        /// The value of the counter in the SecureCounterValueChange table. This value will be
+        /// <see langword="null"/> if there is no corresponding value in the
+        /// SecureCounterValueChange table.
+        /// </value>
+        public int? ChangeLogValue
         {
             get;
             set;

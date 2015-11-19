@@ -47,12 +47,6 @@
             this._databaseServerTextBox = new System.Windows.Forms.TextBox();
             this._databaseNameTextBox = new System.Windows.Forms.TextBox();
             this._counterDataGridView = new System.Windows.Forms.DataGridView();
-            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterPreviousValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterOperationColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this._counterApplyValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterValidityColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._dateTimeStampTextBox = new System.Windows.Forms.TextBox();
             this._customerNameTextBox = new System.Windows.Forms.TextBox();
             this._commentsTextBox = new System.Windows.Forms.TextBox();
@@ -64,6 +58,13 @@
             this._generateUnlockCodeRadioButton = new System.Windows.Forms.RadioButton();
             this._generateUpdateCodeRadioButton = new System.Windows.Forms.RadioButton();
             this._counterStateTextBox = new System.Windows.Forms.TextBox();
+            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterPreviousValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterOperationColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this._counterApplyValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterChangeLogValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterValidityColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -118,7 +119,7 @@
             // 
             label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(316, 265);
+            label6.Location = new System.Drawing.Point(342, 265);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(94, 13);
             label6.TabIndex = 17;
@@ -147,7 +148,7 @@
             // 
             label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             label9.AutoSize = true;
-            label9.Location = new System.Drawing.Point(315, 145);
+            label9.Location = new System.Drawing.Point(341, 145);
             label9.Name = "label9";
             label9.Size = new System.Drawing.Size(92, 13);
             label9.TabIndex = 11;
@@ -157,7 +158,7 @@
             // 
             label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             label10.AutoSize = true;
-            label10.Location = new System.Drawing.Point(316, 185);
+            label10.Location = new System.Drawing.Point(342, 185);
             label10.Name = "label10";
             label10.Size = new System.Drawing.Size(109, 13);
             label10.TabIndex = 13;
@@ -167,7 +168,7 @@
             // 
             label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             label11.AutoSize = true;
-            label11.Location = new System.Drawing.Point(316, 225);
+            label11.Location = new System.Drawing.Point(342, 225);
             label11.Name = "label11";
             label11.Size = new System.Drawing.Size(102, 13);
             label11.TabIndex = 15;
@@ -192,7 +193,7 @@
             this._licenseStringTextBox.Name = "_licenseStringTextBox";
             this._licenseStringTextBox.ReadOnly = true;
             this._licenseStringTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._licenseStringTextBox.Size = new System.Drawing.Size(601, 89);
+            this._licenseStringTextBox.Size = new System.Drawing.Size(655, 89);
             this._licenseStringTextBox.TabIndex = 1;
             this._licenseStringTextBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleLicenseStringTextBox_DragDrop);
             this._licenseStringTextBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleLicenseStringTextBox_DragEnter);
@@ -204,7 +205,7 @@
             this._databaseIdTextBox.Location = new System.Drawing.Point(15, 241);
             this._databaseIdTextBox.Name = "_databaseIdTextBox";
             this._databaseIdTextBox.ReadOnly = true;
-            this._databaseIdTextBox.Size = new System.Drawing.Size(297, 20);
+            this._databaseIdTextBox.Size = new System.Drawing.Size(324, 20);
             this._databaseIdTextBox.TabIndex = 8;
             this._databaseIdTextBox.TabStop = false;
             // 
@@ -215,7 +216,7 @@
             this._databaseServerTextBox.Location = new System.Drawing.Point(15, 161);
             this._databaseServerTextBox.Name = "_databaseServerTextBox";
             this._databaseServerTextBox.ReadOnly = true;
-            this._databaseServerTextBox.Size = new System.Drawing.Size(297, 20);
+            this._databaseServerTextBox.Size = new System.Drawing.Size(324, 20);
             this._databaseServerTextBox.TabIndex = 4;
             this._databaseServerTextBox.TabStop = false;
             // 
@@ -226,7 +227,7 @@
             this._databaseNameTextBox.Location = new System.Drawing.Point(15, 201);
             this._databaseNameTextBox.Name = "_databaseNameTextBox";
             this._databaseNameTextBox.ReadOnly = true;
-            this._databaseNameTextBox.Size = new System.Drawing.Size(297, 20);
+            this._databaseNameTextBox.Size = new System.Drawing.Size(324, 20);
             this._databaseNameTextBox.TabIndex = 6;
             this._databaseNameTextBox.TabStop = false;
             // 
@@ -244,12 +245,13 @@
             this._counterPreviousValueColumn,
             this._counterOperationColumn,
             this._counterApplyValueColumn,
+            this._counterChangeLogValueColumn,
             this._counterValidityColumn});
             this._counterDataGridView.Enabled = false;
             this._counterDataGridView.Location = new System.Drawing.Point(15, 370);
             this._counterDataGridView.Name = "_counterDataGridView";
             this._counterDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this._counterDataGridView.Size = new System.Drawing.Size(601, 116);
+            this._counterDataGridView.Size = new System.Drawing.Size(655, 116);
             this._counterDataGridView.TabIndex = 23;
             this._counterDataGridView.VirtualMode = true;
             this._counterDataGridView.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.HandleCounterDataGridView_CellBeginEdit);
@@ -259,66 +261,13 @@
             this._counterDataGridView.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.HandleCounterDataGridView_RowsAdded);
             this._counterDataGridView.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.HandleCounterDataGridView_UserDeletingRow);
             // 
-            // _counterIdColumn
-            // 
-            this._counterIdColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle1.NullValue = null;
-            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle1;
-            this._counterIdColumn.FillWeight = 20F;
-            this._counterIdColumn.HeaderText = "ID";
-            this._counterIdColumn.Name = "_counterIdColumn";
-            this._counterIdColumn.Width = 37;
-            // 
-            // _counterNameColumn
-            // 
-            this._counterNameColumn.HeaderText = "Name";
-            this._counterNameColumn.Name = "_counterNameColumn";
-            // 
-            // _counterPreviousValueColumn
-            // 
-            this._counterPreviousValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterPreviousValueColumn.FillWeight = 55F;
-            this._counterPreviousValueColumn.HeaderText = "Previous Value";
-            this._counterPreviousValueColumn.Name = "_counterPreviousValueColumn";
-            this._counterPreviousValueColumn.Width = 102;
-            // 
-            // _counterOperationColumn
-            // 
-            this._counterOperationColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterOperationColumn.FillWeight = 44F;
-            this._counterOperationColumn.HeaderText = "Operation";
-            this._counterOperationColumn.Items.AddRange(new object[] {
-            "Create",
-            "Delete",
-            "Set",
-            "Increment",
-            "Decrement"});
-            this._counterOperationColumn.Name = "_counterOperationColumn";
-            this._counterOperationColumn.Width = 82;
-            // 
-            // _counterApplyValueColumn
-            // 
-            this._counterApplyValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle2.NullValue = null;
-            this._counterApplyValueColumn.DefaultCellStyle = dataGridViewCellStyle2;
-            this._counterApplyValueColumn.FillWeight = 55F;
-            this._counterApplyValueColumn.HeaderText = "Apply Value";
-            this._counterApplyValueColumn.Name = "_counterApplyValueColumn";
-            this._counterApplyValueColumn.Width = 102;
-            // 
-            // _counterValidityColumn
-            // 
-            this._counterValidityColumn.HeaderText = "Validity";
-            this._counterValidityColumn.Name = "_counterValidityColumn";
-            this._counterValidityColumn.Visible = false;
-            // 
             // _dateTimeStampTextBox
             // 
             this._dateTimeStampTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._dateTimeStampTextBox.Location = new System.Drawing.Point(319, 281);
+            this._dateTimeStampTextBox.Location = new System.Drawing.Point(345, 281);
             this._dateTimeStampTextBox.Name = "_dateTimeStampTextBox";
             this._dateTimeStampTextBox.ReadOnly = true;
-            this._dateTimeStampTextBox.Size = new System.Drawing.Size(297, 20);
+            this._dateTimeStampTextBox.Size = new System.Drawing.Size(324, 20);
             this._dateTimeStampTextBox.TabIndex = 18;
             this._dateTimeStampTextBox.TabStop = false;
             // 
@@ -329,7 +278,7 @@
             this._customerNameTextBox.Enabled = false;
             this._customerNameTextBox.Location = new System.Drawing.Point(15, 321);
             this._customerNameTextBox.Name = "_customerNameTextBox";
-            this._customerNameTextBox.Size = new System.Drawing.Size(601, 20);
+            this._customerNameTextBox.Size = new System.Drawing.Size(655, 20);
             this._customerNameTextBox.TabIndex = 20;
             // 
             // _commentsTextBox
@@ -341,14 +290,14 @@
             this._commentsTextBox.Multiline = true;
             this._commentsTextBox.Name = "_commentsTextBox";
             this._commentsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._commentsTextBox.Size = new System.Drawing.Size(600, 55);
+            this._commentsTextBox.Size = new System.Drawing.Size(654, 55);
             this._commentsTextBox.TabIndex = 25;
             // 
             // _generateCodeButton
             // 
             this._generateCodeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._generateCodeButton.Enabled = false;
-            this._generateCodeButton.Location = new System.Drawing.Point(490, 566);
+            this._generateCodeButton.Location = new System.Drawing.Point(544, 566);
             this._generateCodeButton.Name = "_generateCodeButton";
             this._generateCodeButton.Size = new System.Drawing.Size(125, 23);
             this._generateCodeButton.TabIndex = 26;
@@ -359,27 +308,27 @@
             // _databaseCreationTextBox
             // 
             this._databaseCreationTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._databaseCreationTextBox.Location = new System.Drawing.Point(318, 161);
+            this._databaseCreationTextBox.Location = new System.Drawing.Point(345, 161);
             this._databaseCreationTextBox.Name = "_databaseCreationTextBox";
             this._databaseCreationTextBox.ReadOnly = true;
-            this._databaseCreationTextBox.Size = new System.Drawing.Size(297, 20);
+            this._databaseCreationTextBox.Size = new System.Drawing.Size(324, 20);
             this._databaseCreationTextBox.TabIndex = 12;
             this._databaseCreationTextBox.TabStop = false;
             // 
             // _databaseRestoreTextBox
             // 
             this._databaseRestoreTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._databaseRestoreTextBox.Location = new System.Drawing.Point(319, 201);
+            this._databaseRestoreTextBox.Location = new System.Drawing.Point(345, 201);
             this._databaseRestoreTextBox.Name = "_databaseRestoreTextBox";
             this._databaseRestoreTextBox.ReadOnly = true;
-            this._databaseRestoreTextBox.Size = new System.Drawing.Size(297, 20);
+            this._databaseRestoreTextBox.Size = new System.Drawing.Size(324, 20);
             this._databaseRestoreTextBox.TabIndex = 14;
             this._databaseRestoreTextBox.TabStop = false;
             // 
             // _pasteLicenseStringButton
             // 
             this._pasteLicenseStringButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._pasteLicenseStringButton.Location = new System.Drawing.Point(490, 121);
+            this._pasteLicenseStringButton.Location = new System.Drawing.Point(544, 121);
             this._pasteLicenseStringButton.Name = "_pasteLicenseStringButton";
             this._pasteLicenseStringButton.Size = new System.Drawing.Size(125, 23);
             this._pasteLicenseStringButton.TabIndex = 2;
@@ -390,10 +339,10 @@
             // _lastCounterUpdateTextBox
             // 
             this._lastCounterUpdateTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._lastCounterUpdateTextBox.Location = new System.Drawing.Point(319, 241);
+            this._lastCounterUpdateTextBox.Location = new System.Drawing.Point(345, 241);
             this._lastCounterUpdateTextBox.Name = "_lastCounterUpdateTextBox";
             this._lastCounterUpdateTextBox.ReadOnly = true;
-            this._lastCounterUpdateTextBox.Size = new System.Drawing.Size(297, 20);
+            this._lastCounterUpdateTextBox.Size = new System.Drawing.Size(324, 20);
             this._lastCounterUpdateTextBox.TabIndex = 16;
             this._lastCounterUpdateTextBox.TabStop = false;
             // 
@@ -401,7 +350,7 @@
             // 
             this._generateUnlockCodeRadioButton.AutoSize = true;
             this._generateUnlockCodeRadioButton.Enabled = false;
-            this._generateUnlockCodeRadioButton.Location = new System.Drawing.Point(297, 347);
+            this._generateUnlockCodeRadioButton.Location = new System.Drawing.Point(192, 347);
             this._generateUnlockCodeRadioButton.Name = "_generateUnlockCodeRadioButton";
             this._generateUnlockCodeRadioButton.Size = new System.Drawing.Size(131, 17);
             this._generateUnlockCodeRadioButton.TabIndex = 22;
@@ -430,16 +379,88 @@
             this._counterStateTextBox.Location = new System.Drawing.Point(15, 281);
             this._counterStateTextBox.Name = "_counterStateTextBox";
             this._counterStateTextBox.ReadOnly = true;
-            this._counterStateTextBox.Size = new System.Drawing.Size(297, 20);
+            this._counterStateTextBox.Size = new System.Drawing.Size(324, 20);
             this._counterStateTextBox.TabIndex = 10;
             this._counterStateTextBox.TabStop = false;
+            // 
+            // _counterIdColumn
+            // 
+            this._counterIdColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle1.NullValue = null;
+            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle1;
+            this._counterIdColumn.FillWeight = 20F;
+            this._counterIdColumn.HeaderText = "ID";
+            this._counterIdColumn.MinimumWidth = 40;
+            this._counterIdColumn.Name = "_counterIdColumn";
+            this._counterIdColumn.Width = 40;
+            // 
+            // _counterNameColumn
+            // 
+            this._counterNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this._counterNameColumn.FillWeight = 125F;
+            this._counterNameColumn.HeaderText = "Name";
+            this._counterNameColumn.Name = "_counterNameColumn";
+            // 
+            // _counterPreviousValueColumn
+            // 
+            this._counterPreviousValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterPreviousValueColumn.FillWeight = 45F;
+            this._counterPreviousValueColumn.HeaderText = "Value";
+            this._counterPreviousValueColumn.MinimumWidth = 90;
+            this._counterPreviousValueColumn.Name = "_counterPreviousValueColumn";
+            // 
+            // _counterOperationColumn
+            // 
+            this._counterOperationColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterOperationColumn.FillWeight = 44F;
+            this._counterOperationColumn.HeaderText = "Operation";
+            this._counterOperationColumn.Items.AddRange(new object[] {
+            "Create",
+            "Delete",
+            "Set",
+            "Increment",
+            "Decrement"});
+            this._counterOperationColumn.MinimumWidth = 90;
+            this._counterOperationColumn.Name = "_counterOperationColumn";
+            this._counterOperationColumn.Width = 98;
+            // 
+            // _counterApplyValueColumn
+            // 
+            this._counterApplyValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle2.NullValue = null;
+            this._counterApplyValueColumn.DefaultCellStyle = dataGridViewCellStyle2;
+            this._counterApplyValueColumn.FillWeight = 45F;
+            this._counterApplyValueColumn.HeaderText = "Apply Value";
+            this._counterApplyValueColumn.MinimumWidth = 90;
+            this._counterApplyValueColumn.Name = "_counterApplyValueColumn";
+            this._counterApplyValueColumn.Width = 95;
+            // 
+            // _counterChangeLogValueColumn
+            // 
+            this._counterChangeLogValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterChangeLogValueColumn.FillWeight = 45F;
+            this._counterChangeLogValueColumn.HeaderText = "Value Log";
+            this._counterChangeLogValueColumn.MinimumWidth = 90;
+            this._counterChangeLogValueColumn.Name = "_counterChangeLogValueColumn";
+            this._counterChangeLogValueColumn.Visible = false;
+            this._counterChangeLogValueColumn.Width = 90;
+            // 
+            // _counterValidityColumn
+            // 
+            this._counterValidityColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this._counterValidityColumn.FillWeight = 125F;
+            this._counterValidityColumn.HeaderText = "Validity";
+            this._counterValidityColumn.MinimumWidth = 150;
+            this._counterValidityColumn.Name = "_counterValidityColumn";
+            this._counterValidityColumn.Visible = false;
+            this._counterValidityColumn.Width = 150;
             // 
             // FAMDBCounterManagerForm
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(628, 601);
+            this.ClientSize = new System.Drawing.Size(682, 601);
             this.Controls.Add(label5);
             this.Controls.Add(this._counterStateTextBox);
             this.Controls.Add(this._generateUpdateCodeRadioButton);
@@ -500,6 +521,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterPreviousValueColumn;
         private System.Windows.Forms.DataGridViewComboBoxColumn _counterOperationColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterApplyValueColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _counterChangeLogValueColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterValidityColumn;
     }
 }
