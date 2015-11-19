@@ -121,10 +121,6 @@ Test|N/A
 ..Units|K/UL
 ..Value|0.0
 ..TestCode|SKBASO
-.Component|RBC MORPHOLOGY
-..Flag|*
-..Value|FEW
-..TestCode|RBCM
 .Name|CBC
 .OrderCode|CBC
 Test|N/A
@@ -152,6 +148,13 @@ Test|N/A
 .CollectionDate|10/10/2008
 .CollectionTime|13:00
 .Component|TEAR DROPS
+..Flag|*
+..Value|FEW
+.Name|UnknownOrder
+Test|N/A
+.CollectionDate|10/10/2008
+.CollectionTime|13:00
+.Component|POLYCHROMASIA
 ..Flag|*
 ..Value|FEW
 .Name|UnknownOrder

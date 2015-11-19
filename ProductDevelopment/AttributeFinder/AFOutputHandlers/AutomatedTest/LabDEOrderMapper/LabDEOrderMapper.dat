@@ -61,3 +61,9 @@
 
 // Test preferring orders matching OutstandingOrderCode values (with no outstanding order codes provided)
 <TESTCASE>;Test21.rsd;test22.txt;;test22.eav
+
+// Test that more than one test group can be skipped over during second pass so that CMP and DBIL is found instead of BMP and HEPATIC PNL
+<TESTCASE>;Test23.rsd;test23.txt;;test23.eav
+
+// Test that the don't require mandatory tests + tiebreaker work even when most orders are only a single test
+<TESTCASE>;Test24.rsd;test24.txt;;test24.eav

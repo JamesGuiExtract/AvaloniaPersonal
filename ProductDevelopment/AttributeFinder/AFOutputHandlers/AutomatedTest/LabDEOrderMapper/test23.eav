@@ -1,0 +1,220 @@
+Test|N/A
+.Component|GLUCOSE
+..Flag|H
+..Range|60-100
+..Units|mg/dl
+..Value|184
+..TestCode|1510655
+..ESNames|Glucose Blood;Glucose Average;Glucose Fasting
+.Component|BUN
+..Range|8-24
+..Units|mg/dL
+..Value|11
+..TestCode|1526068
+..ESNames|BUN
+.CollectionDate|07/17/2014
+.CollectionTime|10:09
+.Component|CREATININE
+..Flag|L
+..Range|0.44-1.30
+..Units|mg/dL
+..Value|0.43
+..TestCode|1526296
+..ESNames|Creatinine Blood
+.Component|CALC GFR (ML/MIN/1.73M2)
+..Value|>60
+..TestCode|1810555
+..ESNames|GFR Non-African American
+.Component|GFR FOR AFRICAN AMERICANS
+..Value|>60
+..TestCode|3040003207
+..ESNames|GFR African American
+.Component|TOTAL BILIRUBIN
+..Range|0.0-1.3
+..Units|mg/dL
+..Value|0.4
+..TestCode|1534076
+..ESNames|Bilirubin Total Blood
+.Component|ALK PHOS
+..Flag|H
+..Range|37-112
+..Units|IU/L
+..Value|176
+..TestCode|1525848
+..ESNames|Alkaline Phosphatase
+.Component|AST
+..Range|13-36
+..Units|IU/L
+..Value|13
+..TestCode|1526000
+..ESNames|AST
+.Component|ALT
+..Range|12-78
+..Units|IU/L
+..Value|57
+..TestCode|1525870
+..ESNames|ALT
+.Component|TOTAL PROTEIN
+..Range|6.4-8.3
+..Units|g/dL
+..Value|6.9
+..TestCode|1577414
+..ESNames|Protein Total Blood
+.Component|ALBUMIN
+..Flag|L
+..Range|3.2-5.5
+..Units|g/dL
+..Value|2.7
+..TestCode|3040000737
+..ESNames|Albumin
+.Component|ALBUMIN GLOBULIN RATIO
+..Flag|L
+..Range|0.8-2.0
+..Value|0.6
+..TestCode|3040003434
+..ESNames|Albumin/Globulin Ratio
+.Component|CALCIUM
+..Range|8.4-10.7
+..Units|mg/dL
+..Value|9.6
+..TestCode|1558170
+..ESNames|Calcium
+.Component|SODIUM
+..Range|136-145
+..Units|mmol/L
+..Value|136
+..TestCode|1534098
+..ESNames|Sodium
+.Component|POTASSIUM
+..Range|3.4-5.0
+..Units|mmol/L
+..Value|3.8
+..TestCode|1534081
+..ESNames|Potassium
+.Component|CHLORIDE
+..Range|101-111
+..Units|mmol/L
+..Value|102
+..TestCode|1534101
+..ESNames|Chloride
+.Component|CO2
+..Range|21-31
+..Units|mmol/L
+..Value|28
+..TestCode|1526212
+..ESNames|Bicarbonate;CO2
+.Component|ANION GAP
+..Range|6-16
+..Value|10
+..TestCode|1525828
+..ESNames|Anion Gap
+.Name|COMPREHENSIVE METABOLIC PANEL
+.OrderCode|682
+Test|N/A
+.Component|URIC ACID
+..Range|2.6-6.0
+..Units|mg/dL
+..Value|5.2
+..TestCode|1577798
+..ESNames|Uric Acid
+.CollectionDate|07/17/2014
+.CollectionTime|10:09
+.Name|URIC ACID
+.OrderCode|930
+Test|N/A
+.Component|BILI CONJUGATED
+..Range|0.0-0.2
+..Units|mg/dL
+..Value|< 0.1
+..TestCode|1558221
+..ESNames|Bilirubin Direct Blood;Bilirubin Conjugated
+.CollectionDate|07/17/2014
+.CollectionTime|10:09
+.Name|BILIRUBIN, CONJUGATED
+.OrderCode|752
+Test|N/A
+.Component|PHOSPHORUS
+..Range|2.5-4.7
+..Units|mg/dL
+..Value|3.5
+..TestCode|1555028
+..ESNames|Phosphorus
+.CollectionDate|07/17/2014
+.CollectionTime|10:09
+.Name|PHOSPHORUS
+.OrderCode|874
+Test|N/A
+.Component|MAGNESIUM
+..Range|1.5-2.3
+..Units|mg/dL
+..Value|1.6
+..TestCode|1557749
+..ESNames|Magnesium Blood
+.CollectionDate|07/17/2014
+.CollectionTime|10:09
+.Name|MAGNESIUM
+.OrderCode|854
+Test|N/A
+.Component|WBC
+..Range|3.5-11.0
+..Units|THO/MM3
+..Value|8.2
+..TestCode|1577876
+..ESNames|WBC Blood
+.Component|RBC
+..Range|3.7-5.0
+..Units|MIL/MM3
+..Value|4.06
+..TestCode|1577212
+..ESNames|RBC Blood
+.Component|HEMOGLOBIN
+..Range|11.0-16.0
+..Units|g/dL
+..Value|12.9
+..TestCode|1534435
+..ESNames|Hemoglobin
+.Component|HEMATOCRIT
+..Range|33-45
+..Units|%
+..Value|38.2
+..TestCode|1534436
+..ESNames|Hematocrit
+.Component|MCV
+..Range|80-97
+..Units|fL
+..Value|94.0
+..TestCode|1576934
+..ESNames|MCV
+.Component|MCH
+..Range|27-34
+..Units|uug
+..Value|31.9
+..TestCode|1576930
+..ESNames|MCH
+.Component|MCHC
+..Range|32-36
+..Units|g/dL
+..Value|33.9
+..TestCode|1576932
+..ESNames|MCHC
+.Component|RDW
+..Range|11.2-15.2
+..Units|%
+..Value|14.2
+..TestCode|1534437
+..ESNames|RDW-CV
+.Component|PLATELETS
+..Range|140-400
+..Units|THOUS
+..Value|318
+..TestCode|1577116
+..ESNames|Platelet
+.Component|MPV
+..Range|7.3-10.1
+..Value|7.6
+..TestCode|1576980
+..ESNames|MPV
+.CollectionDate|07/17/2014
+.CollectionTime|10:09
+.Name|CBC AND PLT
+.OrderCode|1698
