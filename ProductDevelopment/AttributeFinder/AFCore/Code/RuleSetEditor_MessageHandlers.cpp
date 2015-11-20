@@ -653,7 +653,18 @@ void CRuleSetEditor::OnRclickComboAttributes(NMHDR* pNMHDR, LRESULT* pResult)
 		pContextMenu->EnableMenuItem(ID_EDIT_COPY, bEnable ? nEnable : nDisable);
 		pContextMenu->EnableMenuItem(ID_EDIT_DELETE, bEnable ? nEnable : nDisable);
 
-		bEnable = clipboardObjectIsAttribute();
+		// Only interested in enabling or disabling the paste menu and don't want an exception displayed
+		// so added the try catch block to remove the display of the exception when displaying the
+		// context menu
+		// https://extract.atlassian.net/browse/ISSUE-13155
+		try
+		{
+			bEnable = clipboardObjectIsAttribute();
+		}
+		catch(...)
+		{
+			bEnable = false;
+		}
 		pContextMenu->EnableMenuItem(ID_EDIT_PASTE, bEnable ? nEnable : nDisable);
 
 		// Map the point to the correct position
@@ -1221,8 +1232,15 @@ LRESULT CRuleSetEditor::OnRclickListRules(WPARAM wParam, LPARAM lParam)
 		pContextMenu->EnableMenuItem(ID_EDIT_COPY, bEnable ? nEnable : nDisable);
 		pContextMenu->EnableMenuItem(ID_EDIT_DELETE, bEnable ? nEnable : nDisable);
 			
-		bEnable = 
-			m_ipClipboardMgr->ObjectIsIUnknownVectorOfType(IID_IAttributeRule) == VARIANT_TRUE;
+		try
+		{
+			bEnable = 
+				m_ipClipboardMgr->ObjectIsIUnknownVectorOfType(IID_IAttributeRule) == VARIANT_TRUE;
+		}
+		catch (...)
+		{
+			bEnable = false;
+		}
 		pContextMenu->EnableMenuItem(ID_EDIT_PASTE, bEnable ? nEnable : nDisable);
 			
 		// Map the point to the correct position
@@ -1283,8 +1301,15 @@ void CRuleSetEditor::OnRclickValidatorText(NMHDR* pNMHDR, LRESULT* pResult)
 		pContextMenu->EnableMenuItem(ID_EDIT_COPY, bEnable ? nEnable : nDisable);
 		pContextMenu->EnableMenuItem(ID_EDIT_DELETE, bEnable ? nEnable : nDisable);
 
-		bEnable = 
-			m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IInputValidator) == VARIANT_TRUE;
+		try
+		{
+			bEnable = 
+				m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IInputValidator) == VARIANT_TRUE;
+		}
+		catch(...)
+		{
+			bEnable = false;
+		}
 		pContextMenu->EnableMenuItem(ID_EDIT_PASTE, bEnable ? nEnable : nDisable);
 
 		// Map the point to the correct position
@@ -1385,8 +1410,15 @@ void CRuleSetEditor::OnRclickSplitterText(NMHDR* pNMHDR, LRESULT* pResult)
 		pContextMenu->EnableMenuItem(ID_EDIT_DELETE, nEnableValue);
 
 		// only enable Paste menu item if the object from clipboard is of type AttributeSplitter
-		bEnable = 
-			m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IAttributeSplitter) == VARIANT_TRUE;
+		try
+		{
+			bEnable = 
+				m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IAttributeSplitter) == VARIANT_TRUE;
+		}
+		catch(...)
+		{
+			bEnable = false;
+		}
 		nEnableValue = bEnable ? (MF_BYCOMMAND | MF_ENABLED) : (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 		pContextMenu->EnableMenuItem( ID_EDIT_PASTE, nEnableValue);
 
@@ -1431,8 +1463,15 @@ void CRuleSetEditor::OnRclickPreprocessorText(NMHDR* pNMHDR, LRESULT* pResult)
 		pContextMenu->EnableMenuItem(ID_EDIT_DELETE, bEnable ? nEnable : nDisable);
 
 		// Check Clipboard object type to enable/disable Paste menu item
-		bEnable = 
-			m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IDocumentPreprocessor) == VARIANT_TRUE;
+		try
+		{
+			bEnable = 
+				m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IDocumentPreprocessor) == VARIANT_TRUE;
+		}
+		catch(...)
+		{
+			bEnable = false;
+		}
 		pContextMenu->EnableMenuItem(ID_EDIT_PASTE, bEnable ? nEnable : nDisable);
 
 		// Map the point to the correct position
@@ -1475,8 +1514,19 @@ void CRuleSetEditor::OnRclickHandlerText(NMHDR* pNMHDR, LRESULT* pResult)
 		pContextMenu->EnableMenuItem( ID_EDIT_DELETE, bEnable ? nEnable : nDisable );
 
 		// Check Clipboard object type to enable/disable Paste menu item
-		bEnable = 
-			m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IOutputHandler) == VARIANT_TRUE;
+		// Only interested in enabling or disabling the paste menu and don't want an exception displayed
+		// so added the try catch block to remove the display of the exception when displaying the
+		// context menu
+		// https://extract.atlassian.net/browse/ISSUE-13155
+		try
+		{
+			bEnable = 
+				m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IOutputHandler) == VARIANT_TRUE;
+		}
+		catch(...)
+		{
+			bEnable = false;
+		}
 		pContextMenu->EnableMenuItem( ID_EDIT_PASTE, bEnable ? nEnable : nDisable );
 
 		// Map the point to the correct position

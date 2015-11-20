@@ -1026,24 +1026,36 @@ LRESULT FileProcessingDlgTaskPage::OnGridRightClick(WPARAM wParam, LPARAM lParam
 		pContextMenu->EnableMenuItem(ID_CONTEXT_CUT, iIndex == -1 ? nDisable : nEnable);
 		pContextMenu->EnableMenuItem(ID_CONTEXT_COPY, iIndex == -1 ? nDisable : nEnable );
 		pContextMenu->EnableMenuItem(ID_CONTEXT_DELETE, iIndex == -1 ? nDisable : nEnable );
-			
+
+		// Paste will be disabled if clipboard manager is null or the data on the clipboard is not 
+		// readable - not a known object or compatible version
+		UINT nPasteSetting = nDisable;
+
 		// Check Clipboard object type
-		if(m_ipClipboardMgr != __nullptr &&
-			(asCppBool(m_ipClipboardMgr->IUnknownVectorIsOWDOfType(IID_IFileProcessingTask)) ||
-			asCppBool(m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IFileProcessingTask))))
+		if (m_ipClipboardMgr != __nullptr)
 		{
-			// Object is a vector of IFileProcessingTasks OR Object is a
-			// single IFileProcessingTask
-			pContextMenu->EnableMenuItem( ID_CONTEXT_PASTE, nEnable);
-		}
-		else
-		{
-			// The clipboard manager is either NULL OR Object is
-			// neither a vector of IFileProcessingTask items
-			// nor a single IFileProcessingTask item
-			pContextMenu->EnableMenuItem( ID_CONTEXT_PASTE, nDisable );
+			// Only interested in enabling or disabling the paste menu and don't want an exception displayed
+			// so added the try catch block to remove the display of the exception when displaying the
+			// context menu
+			// https://extract.atlassian.net/browse/ISSUE-13155
+			try 
+			{
+				if (asCppBool(m_ipClipboardMgr->IUnknownVectorIsOWDOfType(IID_IFileProcessingTask)) ||
+					asCppBool(m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IFileProcessingTask)))
+				{
+					// Object is a vector of IFileProcessingTasks OR Object is a
+					// single IFileProcessingTask
+					nPasteSetting = nEnable;
+				}
+			}
+			catch (...)
+			{
+				// Just eat the exception 
+			}
 		}
 			
+		pContextMenu->EnableMenuItem( ID_CONTEXT_PASTE, nPasteSetting );
+
 		// Map the point to the correct position
 		CPoint	point;
 		GetCursorPos( &point );

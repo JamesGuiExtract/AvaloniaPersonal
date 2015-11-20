@@ -939,8 +939,19 @@ void FileProcessingDlgScopePage::displayContextMenu()
 		pContextMenu->EnableMenuItem( ID_CONTEXT_DELETE, bEnable ? nEnable : nDisable );
 
 		// Check Clipboard object type to enable/disable Paste menu item
-		bEnable = asCppBool(
-			getClipboardManager()->ObjectIsTypeWithDescription(IID_IFAMCondition) == VARIANT_TRUE);
+		// Only interested in enabling or disabling the paste menu and don't want an exception displayed
+		// so added the try catch block to remove the display of the exception when displaying the
+		// context menu
+		// https://extract.atlassian.net/browse/ISSUE-13155
+		try
+		{
+			bEnable = asCppBool(
+				getClipboardManager()->ObjectIsTypeWithDescription(IID_IFAMCondition) == VARIANT_TRUE);
+		}
+		catch(...)
+		{
+			bEnable = false;
+		}
 		pContextMenu->EnableMenuItem( ID_CONTEXT_PASTE, bEnable ? nEnable : nDisable );
 
 		// Map the point to the correct position

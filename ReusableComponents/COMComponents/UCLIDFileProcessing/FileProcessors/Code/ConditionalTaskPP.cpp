@@ -529,16 +529,26 @@ LRESULT CConditionalTaskPP::OnRClickList(int idCtrl, LPNMHDR pnmh, BOOL &bHandle
 		pContextMenu->EnableMenuItem(IDC_EDIT_COPY, bEnable ? nEnable : nDisable);
 		pContextMenu->EnableMenuItem(IDC_EDIT_DELETE, bEnable ? nEnable : nDisable);
 
-		if (m_ipClipboardMgr->IUnknownVectorIsOWDOfType( 
-			IID_IFileProcessingTask)
-			|| m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IFileProcessingTask))
+		// Only interested in enabling or disabling the paste menu and don't want an exception displayed
+		// so added the try catch block to remove the display of the exception when displaying the
+		// context menu
+		// https://extract.atlassian.net/browse/ISSUE-13155
+		bEnable = false;
+		try
 		{
-			bEnable = true;
+			// Only enable Paste if pastable objects are on the clipboard
+			if (m_ipClipboardMgr->IUnknownVectorIsOWDOfType( 
+				IID_IFileProcessingTask)
+				|| m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IFileProcessingTask))
+			{
+				bEnable = true;
+			}
 		}
-		else
+		catch(...)
 		{
-			bEnable = false;
+			// Eat the exception because we don't care about it
 		}
+			
 		pContextMenu->EnableMenuItem(IDC_EDIT_PASTE, bEnable ? nEnable : nDisable);
 
 		// Map the point to the correct position

@@ -1612,8 +1612,19 @@ void CImageCleanupSettingsEditorDlg::OnRightClickTasks(NMHDR *pNMHDR, LRESULT *p
 			pContextMenu->EnableMenuItem(ID_EDIT_COPY, bEnable ? nEnable : nDisable);
 			pContextMenu->EnableMenuItem(ID_EDIT_DELETE, bEnable ? nEnable : nDisable);
 			
-			bEnable = 
-				m_ipClipboardMgr->IUnknownVectorIsOWDOfType(IID_IImageCleanupOperation) == VARIANT_TRUE;
+			// Only interested in enabling or disabling the paste menu and don't want an exception displayed
+			// so added the try catch block to remove the display of the exception when displaying the
+			// context menu
+			// https://extract.atlassian.net/browse/ISSUE-13155			
+			try
+			{
+				bEnable = 
+					m_ipClipboardMgr->IUnknownVectorIsOWDOfType(IID_IImageCleanupOperation) == VARIANT_TRUE;
+			}
+			catch(...)
+			{
+				bEnable = false;
+			}
 			
 			// enable paste if there is a vector of ObjectsWithDescription in the clipboard
 			pContextMenu->EnableMenuItem(ID_EDIT_PASTE, bEnable ? nEnable : nDisable);

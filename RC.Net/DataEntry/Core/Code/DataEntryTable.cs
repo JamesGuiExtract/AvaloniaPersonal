@@ -2294,10 +2294,24 @@ namespace Extract.DataEntry
                 // the current table cell.
                 bool enableRowOptions = AllowRowTasks(hit.RowIndex, hit.ColumnIndex);
                 bool enablePasteOptions = false;
-                if (enableRowOptions &&
-                    GetDataFormatName(DataEntryMethods.GetClipboardData()) != null)
+
+                // If getting the data from the clipboard throws an exception don't enable 
+                // the paste button
+		        // Only interested in enabling or disabling the paste menu and don't want an exception displayed
+		        // so added the try catch block to remove the display of the exception when displaying the
+		        // context menu
+		        // https://extract.atlassian.net/browse/ISSUE-13155
+                try
                 {
-                    enablePasteOptions = true;
+                    if (enableRowOptions &&
+                        GetDataFormatName(DataEntryMethods.GetClipboardData()) != null)
+                    {
+                        enablePasteOptions = true;
+                    }
+                }
+                catch (Exception)
+                {
+                    enablePasteOptions = false;
                 }
 
                 // Enable/disable the context menu options as appropriate.

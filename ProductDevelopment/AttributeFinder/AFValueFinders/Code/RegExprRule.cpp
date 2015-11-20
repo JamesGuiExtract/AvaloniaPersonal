@@ -390,6 +390,17 @@ STDMETHODIMP CRegExprRule::Load(IStream *pStream)
 		// Read the individual data items from the bytestream
 		unsigned long nDataVersion = 0;
 		dataReader >> nDataVersion;
+		
+		// Check for newer version
+		if (nDataVersion > gnCurrentVersion)
+		{
+			// Throw exception
+			UCLIDException ue( "ELI39154", "Unable to load newer Regular expression rule." );
+			ue.addDebugInfo( "Current Version", gnCurrentVersion );
+			ue.addDebugInfo( "Version to Load", nDataVersion );
+			throw ue;
+		}
+
 		if (nDataVersion >= 1)
 		{
 			dataReader >> m_bCaseSensitive;

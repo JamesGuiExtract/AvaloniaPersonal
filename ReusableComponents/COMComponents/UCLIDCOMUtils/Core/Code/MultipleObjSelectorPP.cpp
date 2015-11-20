@@ -496,8 +496,20 @@ LRESULT CMultipleObjSelectorPP::OnRClickListObjects(int idCtrl, LPNMHDR pnmh, BO
 
 		// Enable paste if clipboard contains either a Vector of objects
 		// of type m_iid or a single object of type m_iid 
-		bEnable = asCppBool(m_ipClipboardMgr->IUnknownVectorIsOWDOfType(m_iid))
-			|| asCppBool(m_ipClipboardMgr->ObjectIsTypeWithDescription(m_iid));
+		// Only interested in enabling or disabling the paste menu and don't want an exception displayed
+		// so added the try catch block to remove the display of the exception when displaying the
+		// context menu
+		// https://extract.atlassian.net/browse/ISSUE-13155
+		try
+		{
+			bEnable = asCppBool(m_ipClipboardMgr->IUnknownVectorIsOWDOfType(m_iid))
+				|| asCppBool(m_ipClipboardMgr->ObjectIsTypeWithDescription(m_iid));
+		}
+		catch(...)
+		{
+			bEnable = false;
+			// eat the exception
+		}
 		pContextMenu->EnableMenuItem(ID_EDIT_PASTE, bEnable ? nEnable : nDisable);
 
 		// Map the point to the correct position

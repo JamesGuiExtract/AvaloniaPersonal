@@ -928,23 +928,31 @@ void CAddRuleDlg::OnRclickListRules(NMHDR* pNMHDR, LRESULT* pResult)
 			// changed as per P16 #2551 JDS - Only allow pasting of AttributeModifyingRules
 			// check not only if is it a vector of ObjectsWithDescription, but also
 			// each of those objects are AttributeModifyingRules
-			if (m_ipClipboardMgr->IUnknownVectorIsOWDOfType(IID_IAttributeModifyingRule))
-			{
-				pContextMenu->EnableMenuItem( ID_EDIT_PASTE, nEnable );
+			// Only interested in enabling or disabling the paste menu and don't want an exception displayed
+			// so added the try catch block to remove the display of the exception when displaying the
+			// context menu
+			// https://extract.atlassian.net/browse/ISSUE-13155
+			UINT nEnablePaste = nDisable;
+			try
+			{	
+				if (m_ipClipboardMgr->IUnknownVectorIsOWDOfType(IID_IAttributeModifyingRule))
+				{
+					nEnablePaste = nEnable;
+				}
+				else if (m_ipClipboardMgr->ObjectIsTypeWithDescription( 
+					IID_IAttributeModifyingRule ))
+				{
+					// Object is a single ObjectWithDescription item
+					// We expect the embedded object to be an AM Rule
+					nEnablePaste = nEnable;
+				}
 			}
-			else if (m_ipClipboardMgr->ObjectIsTypeWithDescription( 
-				IID_IAttributeModifyingRule ))
+			catch(...)
 			{
-				// Object is a single ObjectWithDescription item
-				// We expect the embedded object to be an AM Rule
-				pContextMenu->EnableMenuItem( ID_EDIT_PASTE, nEnable );
+				// Eat the exception
 			}
-			else
-			{
-				// Object is neither a vector of ObjectWithDescription items
-				// nor a single AM Rule item
-				pContextMenu->EnableMenuItem( ID_EDIT_PASTE, nDisable );
-			}
+
+			pContextMenu->EnableMenuItem( ID_EDIT_PASTE, nEnablePaste );
 			
 			// Map the point to the correct position
 			CPoint	point;
