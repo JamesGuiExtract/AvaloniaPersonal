@@ -101,9 +101,6 @@ namespace Extract.FileActionManager.Database
             try
             {
                 Clipboard.SetText(_confirmationTextBox.Text);
-
-                UtilityMethods.ShowMessageBox("The confirmation message has been copied to the clipboard.",
-                    "Copied to clipboard", false);
             }
             catch (Exception ex)
             {

@@ -149,11 +149,11 @@ CounterData& CounterInfo::GetCounterData()
 	{
 		switch (m_nID)
 		{
-			case giINDEXING_DOCS_COUNTERID:		return ms_indexingCounterData;
+			case giINDEXING_DOCS_COUNTERID:		return ms_indexingByDocCounterData;
 			case giPAGINATION_DOCS_COUNTERID:	return ms_paginationCounterData;
-			case giREDACTION_PAGES_COUNTERID:	return ms_redactionCounterData;
-			case giREDACTION_DOCS_COUNTERID:	return ms_redactionCounterData;
-			case giINDEXING_PAGES_COUNTERID:	return ms_indexingCounterData;
+			case giREDACTION_PAGES_COUNTERID:	return ms_redactionByPageCounterData;
+			case giREDACTION_DOCS_COUNTERID:	return ms_redactionByDocCounterData;
+			case giINDEXING_PAGES_COUNTERID:	return ms_indexingByPageCounterData;
 
 			default:	THROW_LOGIC_ERROR_EXCEPTION("ELI39014");
 		}

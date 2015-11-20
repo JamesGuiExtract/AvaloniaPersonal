@@ -102,6 +102,36 @@ namespace Extract.FileActionManager.Database
 	        }
         }
 
+        /// <summary>
+        /// Sets the control to the specified visible state.
+        /// </summary>
+        /// <param name="value"><see langword="true"/> to make the control visible; otherwise,
+        /// <see langword="false"/>.</param>
+        protected override void SetVisibleCore(bool value)
+        {
+            var autoSizeMode = _counterDataGridView.ColumnHeadersHeightSizeMode;
+
+            try
+            {
+                // https://extract.atlassian.net/browse/ISSUE-12964
+                // The sequence of events when this form sometimes results in an
+                // InvalidOperationException related to column sizing during layout. The call stack
+                // at the time of the exception is completely outside of Extract code. However,
+                // since the situation seems to be related to enforcing ColumnHeadersHeightSizeMode,
+                // temporarily disable any column header resizing while changing visibility.
+                _counterDataGridView.ColumnHeadersHeightSizeMode =
+                    DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+
+                base.SetVisibleCore(value);
+
+                _counterDataGridView.ColumnHeadersHeightSizeMode = autoSizeMode;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39167");
+            }
+        }
+
         #endregion Overrides
 
         #region Event Handlers

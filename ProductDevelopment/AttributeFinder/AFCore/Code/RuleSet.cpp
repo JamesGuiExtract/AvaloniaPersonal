@@ -15,6 +15,7 @@
 #include <StringTokenizer.h>
 #include <ComponentLicenseIDs.h>
 #include <VectorOperations.h>
+#include <MiscLeadUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -410,7 +411,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				}
 
 				// If any counters are set decrement them here
-				decrementCounters(ipAFDoc->Text);
+				decrementCounters(ipAFDoc);
 
 				// Try/catch for preprocessors
 				try
@@ -2018,7 +2019,7 @@ map<long, CounterInfo>& CRuleSet::getCounterInfo()
 	return *m_apmapCounters.get();
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSet::decrementCounters( ISpatialStringPtr ipText )
+void CRuleSet::decrementCounters(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 {
 	// Check to see if USB Counters are to be ignored 
 	// This is machine-level locking P16 #1905 - WEL 10/17/06
@@ -2034,16 +2035,11 @@ void CRuleSet::decrementCounters( ISpatialStringPtr ipText )
 
 		if (counterInfo.m_bEnabled)
 		{
-			// Decrement counter once if non-spatial (P16 #1907)
 			int nNumToDecrement = 1;
 			if (counterInfo.m_bByPage)
 			{
-				// Decrement counter once for each page if spatial
-				if (ipText->HasSpatialInfo() == VARIANT_TRUE)
-				{
-					nNumToDecrement =
-						ipText->GetLastPageNumber() - ipText->GetFirstPageNumber() + 1;
-				}
+				nNumToDecrement = getNumberOfPagesInImage(
+					asString(ipAFDoc->Text->SourceDocName));
 			}
 
 			decrementCounter(counterInfo, nNumToDecrement, true);

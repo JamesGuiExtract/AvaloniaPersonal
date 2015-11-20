@@ -198,7 +198,7 @@
             this._saveFileButton.Name = "_saveFileButton";
             this._saveFileButton.Size = new System.Drawing.Size(129, 23);
             this._saveFileButton.TabIndex = 4;
-            this._saveFileButton.Text = "Save request to a file";
+            this._saveFileButton.Text = "Save to a file...";
             this._saveFileButton.UseVisualStyleBackColor = true;
             this._saveFileButton.Click += new System.EventHandler(this.HandleSaveToFile_Click);
             // 

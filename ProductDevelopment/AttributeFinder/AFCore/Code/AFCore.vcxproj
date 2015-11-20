@@ -78,7 +78,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\UltimateGrid\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\UltimateGrid\Include;..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;EXPORT_AFCORE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -131,7 +131,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\UltimateGrid\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\UltimateGrid\Include;..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;EXPORT_AFCORE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -475,6 +475,9 @@
     <ProjectReference Include="..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.vcxproj">
       <Project>{c9beb739-8c91-4201-9e94-2d5f650fb5ae}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj">
+      <Project>{08cc1afb-7b9d-42e5-b823-dc72cdc06631}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code\SafeNetUtils.vcxproj">
       <Project>{3edfa52f-f37c-4417-a818-ef4d254796fe}</Project>

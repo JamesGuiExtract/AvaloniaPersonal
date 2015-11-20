@@ -27,9 +27,11 @@ struct CounterData
 
 // Static CounterData instances to be used to track counts for the standard Extract counters. These
 // instances include the SafeNet cells to be used if it is necessary to decrement from a USB key.
-static CounterData ms_indexingCounterData(&gdcellFlexIndexingCounter);
+static CounterData ms_indexingByDocCounterData(&gdcellFlexIndexingCounter);
+static CounterData ms_indexingByPageCounterData(&gdcellFlexIndexingCounter);
 static CounterData ms_paginationCounterData(&gdcellFlexPaginationCounter);
-static CounterData ms_redactionCounterData(&gdcellIDShieldRedactionCounter);
+static CounterData ms_redactionByDocCounterData(&gdcellIDShieldRedactionCounter);
+static CounterData ms_redactionByPageCounterData(&gdcellIDShieldRedactionCounter);
 
 // Information about a rule execution counter.
 class CounterInfo

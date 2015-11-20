@@ -250,7 +250,7 @@ private:
 	map<long, CounterInfo>& getCounterInfo();
 
 	// Method decrements counters if any are set 
-	void decrementCounters( ISpatialStringPtr ipText );
+	void decrementCounters(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc);
 
 	// Decrements the specified counter by the specified amount. This method includes code that
 	// can allow a small number of counts to accumulate before deducting them from the key to limit

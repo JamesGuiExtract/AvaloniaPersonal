@@ -140,9 +140,6 @@ namespace Extract.FileActionManager.Database
                 SaveLicenseContactInfo();
 
                 Clipboard.SetText(_requestTextBox.Text);
-
-                UtilityMethods.ShowMessageBox("The request message has been copied to the clipboard.",
-                    "Copied to clipboard", false);
             }
             catch (Exception ex)
             {
