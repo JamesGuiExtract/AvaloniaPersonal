@@ -443,7 +443,7 @@ namespace Extract.LabResultsCustomComponents
                     QueryResult result = query.Evaluate();
 
                     int retVal = 0;
-                    return Int32.TryParse(result.FirstString, out retVal) ? retVal : 0;
+                    return result.Max(r => Int32.TryParse(result.FirstString, out retVal) ? retVal : 0);
                 }
                 catch (Exception ex)
                 {
@@ -728,12 +728,13 @@ namespace Extract.LabResultsCustomComponents
                         }
 
                         // Add the match scoring query unless it is empty
-                        // if there already is a query, clear it.
+                        // if there already is a query and it is not the same as the new one, then
+                        // append the new one.
                         string existingMatchScoringQuery;
                         if (_testCodeToMatchScoringQuery.TryGetValue(customerCode, out existingMatchScoringQuery)
                             && existingMatchScoringQuery != matchScoringQuery)
                         {
-                            _testCodeToMatchScoringQuery[customerCode] = null;
+                            _testCodeToMatchScoringQuery[customerCode] += matchScoringQuery;
                         }
                         else if (!String.IsNullOrEmpty(matchScoringQuery))
                         {

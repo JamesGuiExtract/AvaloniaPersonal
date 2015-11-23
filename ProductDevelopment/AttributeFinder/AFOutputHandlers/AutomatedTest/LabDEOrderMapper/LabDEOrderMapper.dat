@@ -67,3 +67,6 @@
 
 // Test that the don't require mandatory tests + tiebreaker work even when most orders are only a single test
 <TESTCASE>;Test24.rsd;test24.txt;;test24.eav
+
+// Test that match-scoring-queries are supported when a Component is mapped to multiple ESComponents
+<TESTCASE>;Test25.rsd;test25.txt;;test25.eav

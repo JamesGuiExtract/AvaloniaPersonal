@@ -1,0 +1,4 @@
+Test|N/A
+.Component|Protein, Urine Urine
+..Units|mg/dl
+..Value|50
