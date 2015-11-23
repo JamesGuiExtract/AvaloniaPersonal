@@ -86,9 +86,9 @@ RuleTesterDlg::~RuleTesterDlg()
 	try
 	{
 		// [FlexIDSCore:4266]
-		// Since a couple tester pages pages use ma_pCfgTesterMgr and message handlers triggered in
+		// Since a couple tester pages use ma_pCfgTesterMgr and message handlers triggered in
 		// the chain of events set off by this destructor could reference ma_pCfgTesterMgr after it
-		// has been destroyed, first destory this window ensure no message handlers are called after
+		// has been destroyed, first destroy this window ensure no message handlers are called after
 		// ma_pCfgTesterMgr's destruction.
 		if (::IsWindow(GetSafeHwnd()))
 		{
@@ -393,7 +393,16 @@ void RuleTesterDlg::OnButtonExecute()
 		// If gnFLEXINDEX_IDSHIELD_CORE_OBJECTS is not licensed, simple rules must be. For the
 		// duration of this test, use load licenses loaded with default (not simple rule writing)
 		// passwords.
-		if (!LicenseManagement::isLicensed(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS))
+		if (LicenseManagement::isLicensed(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS))
+		{
+			if (!LicenseManagement::isLicensed(gnFLEXINDEX_RULE_WRITING_OBJECTS) ||
+				!LicenseManagement::isLicensed(gnIGNORE_USB_DECREMENT_FEATURE))
+			{
+				throw UCLIDException("ELI39170",
+					"RuleTester is not licensed to execute rules.");
+			}
+		}
+		else
 		{
 			bUsingTemporaryLicensing = true;
 			LicenseManagement::unlicenseAll();
@@ -490,7 +499,7 @@ void RuleTesterDlg::OnButtonExecute()
 		{
 			ipTmpAttrs.CreateInstance(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI09754" , ipTmpAttrs != __nullptr );
-			// Temporarly hold the attributes for the last run;
+			// Temporarily hold the attributes for the last run;
 			ipTmpAttrs->Append( m_ipAttributes );
 		}
 
@@ -1125,7 +1134,7 @@ void RuleTesterDlg::updateList(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 		IVariantVectorPtr ipVector(ipValue);
 		if (ipVector)
 		{
-			// If successful, extact each value from the vector
+			// If successful, extract each value from the vector
 			long lVecSize = ipVector->Size;
 			for (long j = 0; j < lVecSize; j++)
 			{

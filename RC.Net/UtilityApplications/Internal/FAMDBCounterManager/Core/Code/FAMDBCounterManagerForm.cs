@@ -812,6 +812,7 @@ namespace Extract.FAMDBCounterManager
             catch
             {
                 // The license string could not be parsed; clear and disable the controls.
+                _licenseStringTextBox.Text = "";
                 _databaseServerTextBox.Text = "";
                 _databaseNameTextBox.Text = "";
                 _databaseIdTextBox.Text = "";

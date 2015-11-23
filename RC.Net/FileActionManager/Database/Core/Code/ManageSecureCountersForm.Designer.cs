@@ -28,16 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this._counterDataGridView = new System.Windows.Forms.DataGridView();
-            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterAlertLevelColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterAlertMultipleColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._emailSupportCheckBox = new System.Windows.Forms.CheckBox();
             this._emailSpecifiedRecipientsCheckBox = new System.Windows.Forms.CheckBox();
             this._emailAlertRecipients = new System.Windows.Forms.TextBox();
@@ -46,6 +41,11 @@
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this._refreshButton = new System.Windows.Forms.Button();
+            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterAlertLevelColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterAlertMultipleColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this._counterDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -58,14 +58,14 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._counterDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._counterDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._counterDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this._counterDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._counterDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._counterIdColumn,
@@ -73,71 +73,29 @@
             this._counterValueColumn,
             this._counterAlertLevelColumn,
             this._counterAlertMultipleColumn});
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._counterDataGridView.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._counterDataGridView.DefaultCellStyle = dataGridViewCellStyle3;
             this._counterDataGridView.Location = new System.Drawing.Point(12, 12);
             this._counterDataGridView.Name = "_counterDataGridView";
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._counterDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._counterDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this._counterDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this._counterDataGridView.Size = new System.Drawing.Size(602, 114);
             this._counterDataGridView.TabIndex = 0;
             this._counterDataGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.HandleCounterDataGridView_CellValidating);
             this._counterDataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.HandleCounterDataGridView_EditingControlShowing);
-            // 
-            // _counterIdColumn
-            // 
-            this._counterIdColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle6.NullValue = null;
-            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle6;
-            this._counterIdColumn.FillWeight = 20F;
-            this._counterIdColumn.HeaderText = "ID";
-            this._counterIdColumn.Name = "_counterIdColumn";
-            this._counterIdColumn.ReadOnly = true;
-            this._counterIdColumn.Width = 37;
-            // 
-            // _counterNameColumn
-            // 
-            this._counterNameColumn.HeaderText = "Name";
-            this._counterNameColumn.Name = "_counterNameColumn";
-            this._counterNameColumn.ReadOnly = true;
-            // 
-            // _counterValueColumn
-            // 
-            this._counterValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterValueColumn.FillWeight = 1F;
-            this._counterValueColumn.HeaderText = "Value";
-            this._counterValueColumn.Name = "_counterValueColumn";
-            this._counterValueColumn.ReadOnly = true;
-            this._counterValueColumn.Width = 90;
-            // 
-            // _counterAlertLevelColumn
-            // 
-            this._counterAlertLevelColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterAlertLevelColumn.FillWeight = 1F;
-            this._counterAlertLevelColumn.HeaderText = "Alert Level";
-            this._counterAlertLevelColumn.Name = "_counterAlertLevelColumn";
-            this._counterAlertLevelColumn.Width = 90;
-            // 
-            // _counterAlertMultipleColumn
-            // 
-            this._counterAlertMultipleColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterAlertMultipleColumn.FillWeight = 1F;
-            this._counterAlertMultipleColumn.HeaderText = "Alert Multiple";
-            this._counterAlertMultipleColumn.Name = "_counterAlertMultipleColumn";
-            this._counterAlertMultipleColumn.Width = 90;
             // 
             // _emailSupportCheckBox
             // 
@@ -227,6 +185,48 @@
             this._refreshButton.UseVisualStyleBackColor = true;
             this._refreshButton.Click += new System.EventHandler(this.HandleRefreshButton_Click);
             // 
+            // _counterIdColumn
+            // 
+            this._counterIdColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle2.NullValue = null;
+            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle2;
+            this._counterIdColumn.FillWeight = 20F;
+            this._counterIdColumn.HeaderText = "ID";
+            this._counterIdColumn.Name = "_counterIdColumn";
+            this._counterIdColumn.ReadOnly = true;
+            this._counterIdColumn.Width = 37;
+            // 
+            // _counterNameColumn
+            // 
+            this._counterNameColumn.HeaderText = "Name";
+            this._counterNameColumn.Name = "_counterNameColumn";
+            this._counterNameColumn.ReadOnly = true;
+            // 
+            // _counterValueColumn
+            // 
+            this._counterValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterValueColumn.FillWeight = 1F;
+            this._counterValueColumn.HeaderText = "Value";
+            this._counterValueColumn.Name = "_counterValueColumn";
+            this._counterValueColumn.ReadOnly = true;
+            this._counterValueColumn.Width = 90;
+            // 
+            // _counterAlertLevelColumn
+            // 
+            this._counterAlertLevelColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterAlertLevelColumn.FillWeight = 1F;
+            this._counterAlertLevelColumn.HeaderText = "Alert Level";
+            this._counterAlertLevelColumn.Name = "_counterAlertLevelColumn";
+            this._counterAlertLevelColumn.Width = 90;
+            // 
+            // _counterAlertMultipleColumn
+            // 
+            this._counterAlertMultipleColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterAlertMultipleColumn.FillWeight = 1F;
+            this._counterAlertMultipleColumn.HeaderText = "Alert Frequency";
+            this._counterAlertMultipleColumn.Name = "_counterAlertMultipleColumn";
+            this._counterAlertMultipleColumn.Width = 105;
+            // 
             // ManageSecureCountersForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -265,12 +265,12 @@
         private System.Windows.Forms.Button _generateRequestButton;
         private System.Windows.Forms.Button _applyUpdateCodeButton;
         private System.Windows.Forms.Button _okButton;
+        private System.Windows.Forms.Button _cancelButton;
+        private System.Windows.Forms.Button _refreshButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterIdColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterNameColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterValueColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterAlertLevelColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterAlertMultipleColumn;
-        private System.Windows.Forms.Button _cancelButton;
-        private System.Windows.Forms.Button _refreshButton;
     }
 }

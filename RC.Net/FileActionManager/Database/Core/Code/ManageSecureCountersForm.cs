@@ -216,7 +216,7 @@ namespace Extract.FileActionManager.Database
                 _editingControl = (DataGridViewTextBoxEditingControl)e.Control;
 
                 // Register to receive key press events in order to limit input on the alert level
-                // and alert multiple values to numbers.
+                // and alert frequency values to numbers.
                 _editingControl.KeyPress += HandleTextBox_KeyPress;
                 _editingControl.VisibleChanged += HandleEditingControlVisibleChanged;
             }
@@ -263,7 +263,7 @@ namespace Extract.FileActionManager.Database
                 if (!char.IsControl(e.KeyChar) && e.KeyChar != ',' && !char.IsDigit(e.KeyChar))
                 {
                     // Don't allow any non-numeric characters to be entered for alert level or alert
-                    // multiple.
+                    // frequency.
                     e.Handled = true;
                 }
             }
@@ -298,19 +298,45 @@ namespace Extract.FileActionManager.Database
                             CultureInfo.CurrentCulture,
                             out intValue))
                         {
-                            UtilityMethods.ShowMessageBox("Please enter a valid number.",
+                            UtilityMethods.ShowMessageBox("Please enter a valid number (or leave blank).",
                                 "Invalid number", true);
                             e.Cancel = true;
                         }
                         else if (intValue == 0)
                         {
-                            UtilityMethods.ShowMessageBox("Please enter a positive number.",
+                            UtilityMethods.ShowMessageBox("Please enter a positive number (or leave blank).",
                                 "Invalid number", true);
+                            e.Cancel = true;
+                        }
+
+                        var row = _counterDataGridView.Rows[e.RowIndex];
+                        int alertLevel;
+                        int alertFrequency;
+                        if (e.ColumnIndex == 3)
+                        {
+                            alertLevel = intValue;
+                            alertFrequency = ParseIntValue(row.Cells[4]);
+                        }
+                        else
+                        {
+                            alertLevel = ParseIntValue(row.Cells[3]);
+                            alertFrequency = intValue;
+                        }
+
+                        if (alertLevel > 0 && alertFrequency > alertLevel)
+                        {
+                            UtilityMethods.ShowMessageBox(
+                                "Alert frequency should be less than or equal to alert level " +
+                                "(blank if alert should never be repeated).",
+                                "Invalid alert frequency", true);
                             e.Cancel = true;
                         }
                     }
 
-                    _alertLevelChanged = true;
+                    if (!e.Cancel)
+                    {
+                        _alertLevelChanged = true;
+                    }
                 }
             }
 	        catch (Exception ex)
@@ -344,10 +370,10 @@ namespace Extract.FileActionManager.Database
                     {
                         int counterID = ParseIntValue(row.Cells[0]);
                         int alertLevel = ParseIntValue(row.Cells[3]);
-                        int alertMultiple = ParseIntValue(row.Cells[4]);
+                        int alertFrequency = ParseIntValue(row.Cells[4]);
 
                         _fileProcessingDB.SetSecureCounterAlertLevel(
-                            counterID, alertLevel, alertMultiple);
+                            counterID, alertLevel, alertFrequency);
                     }
                 }
             }
@@ -430,6 +456,11 @@ namespace Extract.FileActionManager.Database
         /// <returns>The cell's value as an <see langword="int"/>.</returns>
         static int ParseIntValue(DataGridViewCell cell)
         {
+            if (cell.Value == null)
+            {
+                return 0;
+            }
+
             string value = cell.Value.ToString();
             return string.IsNullOrWhiteSpace(value)
                 ? 0
