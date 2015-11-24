@@ -83,6 +83,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SqlCeColumnInfo.cs" />
     <Compile Include="DatabaseConnectionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -93,8 +94,10 @@
     <Compile Include="DatabaseHelperMethods.cs" />
     <Compile Include="DataConnectionConfiguration.cs" />
     <Compile Include="DbMethods.cs" />
+    <Compile Include="ExportTable.cs" />
     <Compile Include="IDatabaseSchemaManager.cs" />
     <Compile Include="IDataConnectionConfiguration.cs" />
+    <Compile Include="ImportTable.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

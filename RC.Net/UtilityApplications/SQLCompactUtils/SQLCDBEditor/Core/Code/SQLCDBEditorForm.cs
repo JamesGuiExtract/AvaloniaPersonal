@@ -1346,6 +1346,61 @@ namespace Extract.SQLCDBEditor
             }
         }
 
+        /// <summary>
+        /// Handler for Import menu item.
+        /// </summary>
+        void HandleImportClick(object sender, EventArgs e)
+        {
+            try
+            {
+                using (ImportTableForm importForm = new ImportTableForm(_databaseWorkingCopyFileName,
+                                                              _tableNames.ToArray<string>(),
+                                                              _connection))
+                {
+                    importForm.ShowDialog();
+                    var modifiedTableName = importForm.ModifiedTableName;
+                    if (!String.IsNullOrWhiteSpace(modifiedTableName))
+                    {
+                        var tableNames = _tableNames.ToList();
+                        int index = tableNames.BinarySearch(modifiedTableName);
+                        if (index >= 0)
+                        {
+                            _tablesListBox.SelectedIndex = index;
+                            var item = _tablesListBox.SelectedItem as QueryAndResultsControl;
+                            item.RefreshQueryResults();
+                        }
+
+                        _dirty = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI39031", ex);
+            }
+
+        }
+
+        /// <summary>
+        /// Handler for export menu item.
+        /// </summary>
+        void HandleExportClick(object sender, EventArgs e)
+        {
+            try
+            {
+                using (ExportTablesForm exportTables = new ExportTablesForm(_databaseWorkingCopyFileName,
+                                                             _tableNames.ToArray<string>(),
+                                                             _connection))
+                {
+                    exportTables.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI39033", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -2178,6 +2233,9 @@ namespace Extract.SQLCDBEditor
             _updateToCurrentSchemaToolStripMenuItem.Enabled =
                 _schemaManager != null
                 && _schemaManager.IsUpdateRequired;
+
+            _importToolStripMenuItem.Enabled = databaseOpen;
+            _exportToolStripMenuItem.Enabled = databaseOpen;
         }
 
         /// <summary>
@@ -2544,5 +2602,6 @@ namespace Extract.SQLCDBEditor
         }
 
         #endregion Properties
+
     }
 }

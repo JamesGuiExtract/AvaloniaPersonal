@@ -1,4 +1,5 @@
 using Extract;
+using Extract.Database;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
@@ -15,129 +16,10 @@ namespace Extract.SqlCompactExporter
     class Program
     {
         /// <summary>
-        /// The settings that dictate how to output the data from a database.
-        /// </summary>
-        class Settings
-        {
-            /// <summary>
-            /// The SQL Compact database to export from.
-            /// </summary>
-            public string DatabaseFile;
-
-            /// <summary>
-            /// The query used to retrieve the data.
-            /// </summary>
-            public string Query;
-
-            /// <summary>
-            /// The file to output the results to.
-            /// </summary>
-            public string OutputFile;
-
-            /// <summary>
-            /// The string that should be used to delimit each row of the results (the delimiter
-            /// will not appear before the first row or after the last row)
-            /// </summary>
-            public string RowDelimiter = Environment.NewLine;
-
-            /// <summary>
-            /// The string that should be used to delimit each column within a row of the results
-            /// (the delimiter will not appear before the first column or after the last column).
-            /// </summary>
-            public string ColumnDelimiter = "\t";
-
-            /// <summary>
-            /// The string that should appear at the start of the output file (if any)
-            /// </summary>
-            public string FilePrefix;
-
-            /// <summary>
-            /// The string that should appear at the end of the output file (if any)
-            /// </summary>
-            public string FileSuffix;
-
-            /// <summary>
-            /// Specifies whether output fields should be escaped for use in a regular
-            /// expression.
-            /// </summary>
-            public bool EscapeForRegEx;
-
-            /// <summary>
-            /// Specifies the encoding use to use for the output text.
-            /// </summary>
-            public Encoding Encoding = Encoding.Default;
-
-            /// <summary>
-            /// Initializes a new <see cref="Settings"/> instance.
-            /// </summary>
-            /// <param name="args">The command-line arguments the application was launched with.</param>
-            public Settings(string[] args)
-            {
-                ExtractException.Assert("ELI27125", "Missing required argument.", args.Length >= 3);
-
-                // Read the mandatory settings
-                DatabaseFile = args[0];
-                Query = args[1];
-                OutputFile = args[2];
-
-                // Scan for optional settings.
-                for (int i = 3; i < args.Length; i++)
-                {
-                    if (args[i].Equals("/rd", StringComparison.OrdinalIgnoreCase))
-                    {
-                        i++;
-                        ExtractException.Assert("ELI27122", "Missing row delimeter value.", i < args.Length);
-
-                        RowDelimiter = ParamUnescape(args[i]);
-                    }
-                    else if (args[i].Equals("/cd", StringComparison.OrdinalIgnoreCase))
-                    {
-                        i++;
-                        ExtractException.Assert("ELI27123", "Missing column delimeter value.", i < args.Length);
-
-                        ColumnDelimiter = ParamUnescape(args[i]);
-                    }
-                    else if (args[i].Equals("/fp", StringComparison.OrdinalIgnoreCase))
-                    {
-                        i++;
-                        ExtractException.Assert("ELI27128", "Missing file prefix value.", i < args.Length);
-
-                        FilePrefix = ParamUnescape(args[i]);
-                    }
-                    else if (args[i].Equals("/fs", StringComparison.OrdinalIgnoreCase))
-                    {
-                        i++;
-                        ExtractException.Assert("ELI27129", "Missing file suffix value.", i < args.Length);
-
-                        FileSuffix = ParamUnescape(args[i]);
-                    }
-                    else if (args[i].Equals("/enc", StringComparison.OrdinalIgnoreCase))
-                    {
-                        i++;
-                        ExtractException.Assert("ELI27729", "Missing code page name.", i < args.Length);
-
-                        Encoding = Encoding.GetEncoding(args[i]);
-                    }
-                    else if (args[i].Equals("/esc", StringComparison.OrdinalIgnoreCase))
-                    {
-                        EscapeForRegEx = true;
-                    }
-                    else
-                    {
-                        ExtractException.Assert("ELI27124", "Unrecognized argument: " + args[i], false);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Exports a table in an SQL compact DB into a text file
         /// </summary>
         static void Main(string[] args)
         {
-
-            Settings settings = null;
-
             try
             {
                 Console.WriteLine();
@@ -152,10 +34,6 @@ namespace Extract.SqlCompactExporter
                     PrintUsage();
                     return;
                 }
-
-                // Attempt to load the settings from the command-line argument.  If unsuccessful, 
-                // log the problem, print usage, then return.
-                settings = new Settings(args);
             }
             catch (Exception ex)
             {
@@ -165,116 +43,19 @@ namespace Extract.SqlCompactExporter
                 return;
             }
 
+            ExportSettings settings = new ExportSettings(args);
+
             try
             {
-                // Attempt to connect to the database
-                string connectionString = "Data Source='" + settings.DatabaseFile + "';";
-                using (SqlCeConnection sqlConnection = new SqlCeConnection(connectionString))
-                {
-                    sqlConnection.Open();
+                string result = ExportTable.ExportToFile(settings);
 
-                    // Issue the query
-                    using (SqlCeCommand queryCommand = new SqlCeCommand(settings.Query, sqlConnection))
-                    {
-                        // Initialize a reader for the results.
-                        using (SqlCeDataReader reader = queryCommand.ExecuteReader())
-                        {
-                            int rowsExported = 0;
+                string[] results = result.Split(new string[] {settings.RowDelimiter}, 
+                                                StringSplitOptions.RemoveEmptyEntries);
 
-                            // Declare a writer to output the results.
-                            StringBuilder sb = new StringBuilder();
+                int rowsExported = results.Length;
 
-                            // Write the file prefix if specified
-                            if (!string.IsNullOrEmpty(settings.FilePrefix))
-                            {
-                                sb.Append(settings.FilePrefix);
-                            }
-
-                            // Has any data been read?
-                            bool readData = false;
-
-                            // Loop throw each row of the results.
-                            while (reader.Read())
-                            {
-                                // If previous rows have been read, append the row separator
-                                if (readData)
-                                {
-                                    sb.Append(settings.RowDelimiter);
-                                }
-                                readData = true;
-
-                                // Keep track of all column delimiters that are appended. They are
-                                // only added once it is confirmed that there is more data in the
-                                // row.
-                                StringBuilder pendingColumnDelimiters = new StringBuilder();
-
-                                // Loop through each column in the row.
-                                for (int i = 0; i < reader.FieldCount; i++)
-                                {
-                                    // If not the first column result, a column separator may be needed.
-                                    if (i > 0)
-                                    {
-                                        pendingColumnDelimiters.Append(settings.ColumnDelimiter);
-                                    }
-
-                                    // If the column value is NULL, there is nothing to write.
-                                    if (reader.IsDBNull(i))
-                                    {
-                                        continue;
-                                    }
-
-                                    // If the column value is empty, there is nothing to write.
-                                    string value = reader.GetValue(i).ToString();
-                                    if (string.IsNullOrEmpty(value))
-                                    {
-                                        continue;
-                                    }
-
-                                    // If there is data to write, go ahead and commit all pending
-                                    // column delimiters.
-                                    sb.Append(pendingColumnDelimiters.ToString());
-
-                                    // Reset the pending column delimiters
-                                    pendingColumnDelimiters = new StringBuilder();
-
-                                    // Escape for RegEx's if necessary
-                                    if (settings.EscapeForRegEx)
-                                    {
-                                        value = Regex.Escape(value);
-                                        
-                                        // Since our RegEx rule removes whitespace before processing
-                                        // the RegEx, escaped whitespace needs to be converted to
-                                        // hex escaped equivalents to ensure it is preserved.
-                                        value = value.Replace("\\ ", "\\x20");
-                                        value = value.Replace("\\t", "\\x09");
-                                        value = value.Replace("\\r", "\\x0D");
-                                        value = value.Replace("\\n", "\\x0A");
-                                    }
-
-                                    // Write the field value
-                                    sb.Append(value);
-                                }
-
-                                rowsExported++;
-                            }
-
-                            // Write the file suffix if specified
-                            if (!string.IsNullOrEmpty(settings.FileSuffix))
-                            {
-                                sb.Append(settings.FileSuffix);
-                            }
-
-                            if (readData && sb.Length > 0)
-                            {
-                                File.WriteAllText(settings.OutputFile, sb.ToString(),
-                                    settings.Encoding);
-                            }
-
-                            Console.WriteLine("Exported " +
-                                rowsExported.ToString(CultureInfo.CurrentCulture) + " rows.");
-                        }
-                    }
-                }
+                Console.WriteLine("Exported " +
+                                  rowsExported.ToString(CultureInfo.CurrentCulture) + " rows.");
             }
             catch (Exception ex)
             {
@@ -288,7 +69,7 @@ namespace Extract.SqlCompactExporter
                 Console.WriteLine("ColumnDelimter: " + ParamEscape(settings.ColumnDelimiter));
                 Console.WriteLine("FilePrefix: " + ParamEscape(settings.FilePrefix));
                 Console.WriteLine("FileSuffix: " + ParamEscape(settings.FileSuffix));
-                Console.WriteLine("EscapeForRegEx: " + (settings.EscapeForRegEx ? "Yes" : "No"));
+                Console.WriteLine("EscapeForRegEx: " + (settings.EscapeForRegex ? "Yes" : "No"));
             }
         }
 
@@ -338,29 +119,6 @@ namespace Extract.SqlCompactExporter
                 escapedParameter = escapedParameter.Replace("\t", "\\t");
                 
                 return escapedParameter;
-            }
-        }
-
-        /// <summary>
-        /// Replaces printable escape sequences for carriage returns, line feeds and tab characters
-        /// with the characters themselves.
-        /// </summary>
-        /// <param name="parameter">The parameter to unescape.</param>
-        /// <returns>The unescaped parameter.</returns>
-        static string ParamUnescape(string parameter)
-        {
-            if (parameter == null)
-            {
-                return null;
-            }
-            else
-            {
-                string unescapedParameter = parameter;
-                unescapedParameter = unescapedParameter.Replace("\\r", "\r");
-                unescapedParameter = unescapedParameter.Replace("\\n", "\n");
-                unescapedParameter = unescapedParameter.Replace("\\t", "\t");
-
-                return unescapedParameter;
             }
         }
     }

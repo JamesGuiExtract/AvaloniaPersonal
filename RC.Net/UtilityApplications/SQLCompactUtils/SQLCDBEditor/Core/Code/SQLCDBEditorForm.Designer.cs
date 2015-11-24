@@ -17,14 +17,11 @@ namespace Extract.SQLCDBEditor
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLCDBEditorForm));
             TD.SandDock.DockingRules dockingRules4 = new TD.SandDock.DockingRules();
             TD.SandDock.DockingRules dockingRules5 = new TD.SandDock.DockingRules();
             TD.SandDock.DockingRules dockingRules6 = new TD.SandDock.DockingRules();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLCDBEditorForm));
             this._toolStrip = new System.Windows.Forms.ToolStrip();
-            this._openToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this._newQueryToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -38,6 +35,7 @@ namespace Extract.SQLCDBEditor
             this._aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._statusStrip = new System.Windows.Forms.StatusStrip();
             this._databaseStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this._dataStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._tableDockWindow = new TD.SandDock.DockableWindow();
             this._tablesListBox = new System.Windows.Forms.ListBox();
@@ -51,7 +49,11 @@ namespace Extract.SQLCDBEditor
             this._queriesListBox = new System.Windows.Forms.ListBox();
             this._pluginDockableWindow = new TD.SandDock.DockableWindow();
             this._pluginsListBox = new System.Windows.Forms.ListBox();
-            this._dataStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this._importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._openToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._newQueryToolStripButton = new System.Windows.Forms.ToolStripButton();
             toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this._toolStrip.SuspendLayout();
             this._menuStrip.SuspendLayout();
@@ -80,37 +82,6 @@ namespace Extract.SQLCDBEditor
             this._toolStrip.Size = new System.Drawing.Size(847, 39);
             this._toolStrip.TabIndex = 0;
             this._toolStrip.Text = "toolStrip1";
-            // 
-            // _openToolStripButton
-            // 
-            this._openToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._openToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_openToolStripButton.Image")));
-            this._openToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._openToolStripButton.Name = "_openToolStripButton";
-            this._openToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._openToolStripButton.Text = "Open Database";
-            this._openToolStripButton.Click += new System.EventHandler(this.HandleOpenClick);
-            // 
-            // _saveToolStripButton
-            // 
-            this._saveToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._saveToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_saveToolStripButton.Image")));
-            this._saveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._saveToolStripButton.Name = "_saveToolStripButton";
-            this._saveToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._saveToolStripButton.Text = "Save Database";
-            this._saveToolStripButton.Click += new System.EventHandler(this.HandleSaveClick);
-            // 
-            // _newQueryToolStripButton
-            // 
-            this._newQueryToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._newQueryToolStripButton.Enabled = false;
-            this._newQueryToolStripButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbQueryLarge;
-            this._newQueryToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._newQueryToolStripButton.Name = "_newQueryToolStripButton";
-            this._newQueryToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._newQueryToolStripButton.Text = "Create New Query";
-            this._newQueryToolStripButton.Click += new System.EventHandler(this.HandleNewQueryClick);
             // 
             // _menuStrip
             // 
@@ -168,7 +139,9 @@ namespace Extract.SQLCDBEditor
             // 
             this._toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._updateToCurrentSchemaToolStripMenuItem,
-            this._newQueryToolStripMenuItem});
+            this._newQueryToolStripMenuItem,
+            this._importToolStripMenuItem,
+            this._exportToolStripMenuItem});
             this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
             this._toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this._toolsToolStripMenuItem.Text = "&Tools";
@@ -218,9 +191,16 @@ namespace Extract.SQLCDBEditor
             // _databaseStatusLabel
             // 
             this._databaseStatusLabel.Name = "_databaseStatusLabel";
-            this._databaseStatusLabel.Size = new System.Drawing.Size(400, 17);
+            this._databaseStatusLabel.Size = new System.Drawing.Size(416, 17);
             this._databaseStatusLabel.Spring = true;
             this._databaseStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // _dataStatusLabel
+            // 
+            this._dataStatusLabel.Name = "_dataStatusLabel";
+            this._dataStatusLabel.Size = new System.Drawing.Size(416, 17);
+            this._dataStatusLabel.Spring = true;
+            this._dataStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // _sandDockManager
             // 
@@ -398,12 +378,50 @@ namespace Extract.SQLCDBEditor
             this._pluginsListBox.SelectedIndexChanged += new System.EventHandler(this.HandleListSelectionChanged);
             this._pluginsListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleListMouseDown);
             // 
-            // _dataStatusLabel
+            // _importToolStripMenuItem
             // 
-            this._dataStatusLabel.Name = "_dataStatusLabel";
-            this._dataStatusLabel.Size = new System.Drawing.Size(400, 17);
-            this._dataStatusLabel.Spring = true;
-            this._dataStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this._importToolStripMenuItem.Name = "_importToolStripMenuItem";
+            this._importToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this._importToolStripMenuItem.Text = "Import...";
+            this._importToolStripMenuItem.Click += new System.EventHandler(this.HandleImportClick);
+            // 
+            // _exportToolStripMenuItem
+            // 
+            this._exportToolStripMenuItem.Name = "_exportToolStripMenuItem";
+            this._exportToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this._exportToolStripMenuItem.Text = "Export...";
+            this._exportToolStripMenuItem.Click += new System.EventHandler(this.HandleExportClick);
+            // 
+            // _openToolStripButton
+            // 
+            this._openToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._openToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_openToolStripButton.Image")));
+            this._openToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._openToolStripButton.Name = "_openToolStripButton";
+            this._openToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._openToolStripButton.Text = "Open Database";
+            this._openToolStripButton.Click += new System.EventHandler(this.HandleOpenClick);
+            // 
+            // _saveToolStripButton
+            // 
+            this._saveToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._saveToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_saveToolStripButton.Image")));
+            this._saveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._saveToolStripButton.Name = "_saveToolStripButton";
+            this._saveToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._saveToolStripButton.Text = "Save Database";
+            this._saveToolStripButton.Click += new System.EventHandler(this.HandleSaveClick);
+            // 
+            // _newQueryToolStripButton
+            // 
+            this._newQueryToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._newQueryToolStripButton.Enabled = false;
+            this._newQueryToolStripButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbQueryLarge;
+            this._newQueryToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._newQueryToolStripButton.Name = "_newQueryToolStripButton";
+            this._newQueryToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._newQueryToolStripButton.Text = "Create New Query";
+            this._newQueryToolStripButton.Click += new System.EventHandler(this.HandleNewQueryClick);
             // 
             // SQLCDBEditorForm
             // 
@@ -471,6 +489,8 @@ namespace Extract.SQLCDBEditor
         private TD.SandDock.DockableWindow _pluginDockableWindow;
         private System.Windows.Forms.ListBox _pluginsListBox;
         private System.Windows.Forms.ToolStripStatusLabel _dataStatusLabel;
+        private System.Windows.Forms.ToolStripMenuItem _importToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _exportToolStripMenuItem;
 
     }
 }

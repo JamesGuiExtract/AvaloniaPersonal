@@ -90,7 +90,31 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="DisplayImportErrors.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DisplayImportErrors.Designer.cs">
+      <DependentUpon>DisplayImportErrors.cs</DependentUpon>
+    </Compile>
     <Compile Include="EventArgs.cs" />
+    <Compile Include="ExportResultsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportResultsForm.Designer.cs">
+      <DependentUpon>ExportResultsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExportTablesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportTablesForm.Designer.cs">
+      <DependentUpon>ExportTablesForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportTableForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportTableForm.Designer.cs">
+      <DependentUpon>ImportTableForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SQLCDBEditorPlugin.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -112,6 +136,18 @@
     <EmbeddedResource Include="AboutBox.resx">
       <SubType>Designer</SubType>
       <DependentUpon>AboutBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DisplayImportErrors.resx">
+      <DependentUpon>DisplayImportErrors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportResultsForm.resx">
+      <DependentUpon>ExportResultsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportTablesForm.resx">
+      <DependentUpon>ExportTablesForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportTableForm.resx">
+      <DependentUpon>ImportTableForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="QueryAndResultsControl.resx">
