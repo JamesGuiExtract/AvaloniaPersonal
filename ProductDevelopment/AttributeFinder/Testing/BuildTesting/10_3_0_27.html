@@ -1,0 +1,659 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.3.0.27 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.3.0.27 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed after <b>10.3.0.8</b> and up through <b>10.3.0.27</b>.
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-1599, ISSUE-13209, ISSUE-13305]</b> Support Fuzzy Regex For LabDE Test Names
+		<ul>
+			<li>Confirm that LabDE NRS tests all pass.
+			<li>Confirm that the <b>LabDE Order Mapper</b> automated tests all pass.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13147]</b> Help File Updates
+		<ul>
+			<li>Confirm that the <b>Core: Clean up image</b> task notes that a hardware 
+			dongle is required.
+			<li>Confirm that the <b>Redaction: Extend redactions to surround context</b> 
+			task notes that the function operates on <b>&lt;SourceDocName&gt;.voa</b>.
+			<li>Confirm that the <b>Redaction: Verify sensitive data</b> task provides 
+			an explanation or a link for types and for exemption codes.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13165]</b> Confirm that the <b>Replace String VM</b> memory leak 
+		tests reference an unencrypted RSD file.
+<p>
+  	   	<LI><b>[ISSUE-13177]</b> RDT Installation
+		<ul>
+			<li>Confirm that the entry under <b>All Programs</b> is <b>Extract Systems 
+			RDT</b>.
+			<li>Confirm that the Control Panel label is <b>Extract Systems Rule 
+			Development Toolkit</b>.
+			<li>For FLEX Index Customer Rule Writing, confirm that the entry under 
+			<b>All Programs</b> is <b>Extract Systems Flex Index RDT</b>.
+			<li>For FLEX Index Customer Rule Writing, confirm that the Control Panel 
+			label is <b>Extract Systems Flex Index Customer RDT</b>.
+			<li>For ID Shield Customer Rule Writing, confirm that the entry under 
+			<b>All Programs</b> is <b>Extract Systems ID Shield RDT</b>.
+			<li>For ID Shield Customer Rule Writing, confirm that the Control Panel 
+			label is <b>Extract Systems ID Shield Customer RDT</b>.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13203, ISSUE-13205, ISSUE-13281, ISSUE-13286, ISSUE-13292, 
+		ISSUE-13319, ISSUE-13326, ISSUE-13330, ISSUE-13342]</b> 
+		Store Or Retrieve Attributes In Database
+		<ul>
+			<li><u>User Interface</u>
+			<ul>
+				<li>Confirm that the property page includes a <b>VOA file with 
+				attributes</b> edit box.
+				<li>Confirm that the default edit box text is 
+				<b>&lt;SourceDocName&gt;.voa</b>.
+				<li>Confirm presence of an associated <b>tag selector</b> button.
+				<li>Confirm presence of an associated <b>browse</b> button.
+				<li>Confirm that the property page includes an <b>Attribute set 
+				name</b> combo box. 
+				<li>Confirm that the combo box only allows selection of an 
+				existing attribute set name.
+				<li>Confirm that the property page includes a <b>Mode</b> group 
+				box with <b>Store</b> and <b>Retrieve</b> options.
+				<li>Confirm that <b>Store</b> is the default choice.
+				<li>Confirm that the property page includes a <b>Store spatial 
+				information (raster zones)</b> checkbox.
+				<li>Confirm that the checkbox is checked by default.
+				<li>Confirm that the property page includes a <b>Do not store empty 
+				attributes</b> checkbox.
+				<li>Confirm that the checkbox is checked by default.
+				<li>Confirm that the checkboxes are hidden when the <b>Retrieve</b> 
+				mode is selected.
+				<li>Confirm that settings are persistent.
+				<li>Confirm that the property page cannot be resized too small.
+			</ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Confirm that attributes can be stored to a FAM database.
+				<li>Confirm that attributes can be retrieved from a FAM database.
+				<li>Confirm that retrieved VOA files are identical to pre-storage 
+				VOA files regardless of settings for spatial information or empty 
+				attributes.
+				<li>Confirm that attribute sets without empty attributes do not 
+				include empty attributes in the <b>Attribute</b> or the 
+				<b>AttributeSetForFile</b> tables.
+				<li>Confirm that more than two levels of sub-attributes can be 
+				stored and retrieved.
+				<li>Confirm that attribute storage in the database supports multiple 
+				<b>Type</b> values for a single attribute.
+			</ul>
+			<li><u>Miscellaneous</u>
+			<ul>
+				<li>Confirm that <b>Memory Leak test 1</b> does not have a leak.
+				<li>Confirm that <b>Memory Leak test 2</b> does not have any failures.
+				<li>Confirm that exercising this task with Demo_IDShield images works 
+				without error.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13236, ISSUE-13396]</b> Product-Specific Reports
+		<ul>
+			<li>Confirm that the <b>ID Shield</b> reports each complete without error.
+			<li>Confirm that the <b>LabDE</b> reports each complete without error.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13248, ISSUE-13389]</b> FAM Counters
+		<ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Confirm that each <b>Standard</b> counter can be successfully 
+				decremented using a suitable ruleset.
+				<ul>
+					<li>ID = 1, Indexing By Document
+					<li>ID = 2, Pagination By Document
+					<li>ID = 3, Redaction By Page
+					<li>ID = 4, Redaction By Document
+					<li>ID = 5, Indexing By Page
+				</ul>
+				<li>Confirm that a <b>Custom By Document</b> counter can be 
+				successfully decremented using a suitable ruleset.
+				<li>Confirm that a <b>Custom By Page</b> counter can be 
+				successfully decremented using a suitable ruleset.
+				<li>Confirm that email alerts are correctly sent to Extract 
+				Systems when the alert threshold is crossed.
+				<li>Confirm that email alerts are correctly sent to Extract 
+				Systems when the alert multiple threshold is crossed.
+			</ul>
+			<li><u>Miscellaneous</u>
+			<ul>
+				<li>Confirm that the DB Admin UI displays counts with thousands 
+				separators.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13250, ISSUE-13283, ISSUE-13284, ISSUE-13298, ISSUE-13303, 
+		ISSUE-13320, ISSUE-13321, ISSUE-13325, ISSUE-13329, ISSUE-13343, ISSUE-13355, 
+		ISSUE-13363, ISSUE-13373]</b> 
+		FAM Counter Manager
+		<ul>
+			<li><u>User Interface</u>
+			<ul>
+				<li>Confirm that a multi-line edit box for <b>Database licensse 
+				string</b> is provided.
+				<li>Confirm that <b>Ctrl+V</b> pastes Clipboard contents into 
+				the edit box.
+				<li>Confirm that the associated <b>Paste License String</b> button 
+				pastes Clipboard contents into the edit box.
+				<ul>
+					<li>Confirm that this button is the only control enabled 
+					before a valid <b>Database license string</b> has been 
+					provided.
+				</ul>
+				<li>Confirm that a read-only <b>Database server</b> edit box is 
+				provided.
+				<li>Confirm that a read-only <b>Database created</b> edit box is 
+				provided.
+				<ul>
+					<li>Confirm that date, time and timezone information is 
+					displayed in the edit box.
+				</ul>
+				<li>Confirm that a read-only <b>Database name</b> edit box is 
+				provided.
+				<li>Confirm that a read-only <b>Last database restore</b> edit box 
+				is provided.
+				<ul>
+					<li>Confirm that date, time and timezone information is 
+					displayed in the edit box.
+				</ul>
+				<li>Confirm that a read-only <b>Database ID</b> edit box is 
+				provided.
+				<ul>
+					<li>Confirm that the displayed text is in GUID format 
+					with <b>8-4-4-4-12</b> characters.
+				</ul>
+				<li>Confirm that a read-only <b>Last counter update</b> edit box is 
+				provided.
+				<ul>
+					<li>Confirm that date, time and timezone information is 
+					displayed in the edit box.
+				</ul>
+				<li>Confirm that a read-only <b>Counter data validity</b> edit box 
+				is provided.
+				<ul>
+					<li>Confirm that edit box contents are either: <b>Valid</b> 
+					or <b>Invalid license string</b>.
+				</ul>
+				<li>Confirm that a read-only <b>Counter data as of</b> edit box is 
+				provided.
+				<ul>
+					<li>Confirm that date, time and timezone information is 
+					displayed in the edit box.
+				</ul>
+				<li>Confirm that a <b>Generate counter update code</b> radio button 
+				is provided.
+				<li>Confirm that a <b>Generate unlock code</b> radio button 
+				is provided.
+				<li>Confirm that the <b>Generate counter update code</b> radio button 
+				is enabled only if Counter data validity = <b>Valid</b>.
+				<li>Confirm that a <b>Generate unlock code</b> radio button 
+				is provided.
+				<li>Confirm that a table is provided for standard and custom counters 
+				with the following column headers when the <b>Generate counter update 
+				code</b> option is selected.
+				<ul>
+					<li>ID
+					<li>Name
+					<li>Value
+					<li>Operation
+					<li>Apply Value
+				</ul>
+				<li>Confirm that the column headers are as follows when the <b>Generate 
+				unlock code</b> option is selected.
+				<ul>
+					<li>ID
+					<li>Name
+					<li>Value
+					<li>Value Log
+					<li>Validity
+				</ul>
+				<li>Confirm that a multi-line edit box is provided for <b>Comments</b>.
+				<li>Confirm that the <b>Comments</b> edit box has a scrollbar.
+			</ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Confirm that Counter Manager can parse current and older input 
+				strings.
+				<li>Confirm that Counter Manager can provide version-specific updates 
+				and unlock codes.
+				<li><u>Generate code</u>
+				<ul>
+					<li>Confirm that clicking the button displays a <b>License 
+					email</b> window.
+					<li>Confirm that the window includes a <b>To</b> edit box.
+					<li>Confirm that the window includes a <b>Cc</b> edit box.
+					<li>Confirm that the <b>C</b> edit box includes a prefix 
+					read-only edit box pre-populated with <b>Extract Licensing</b>.
+					<li>Confirm that the window includes a <b>Subject</b> edit box.
+					<li>Confirm that the <b>Subject</b> edit box is pre-populated 
+					with appropriate text that includes the specified customer 
+					name.
+					<li>Confirm that the message body includes a read-only section 
+					with information about the counter update (or unlock code) 
+					and the steps to apply it to the database.
+					<li>Confirm that the window includes a <b>Send email</b> 
+					button.
+					<li>Confirm that sending an email requires an email address in 
+					the <b>To</b> edit box.
+					<li>Confirm that sending an email requires appropriate settings 
+					in the <b>EmailSettings.config</b> file in the network folder.
+					<li>Confirm that if the config file is not present, a meaningful 
+					error message is presented.
+				</ul>
+				<li>Confirm that the complete text provided by <b>Manage Rule Execution 
+				Counters</b> can be pasted into Counter Manager and parsed correctly.
+			</ul>
+			<li><u>Miscellaneous</u>
+			<ul>
+				<li>Confirm that Counter Manager running from the network location 
+				of <b>I:\Common\Engineering\Tools\SecureClients\DatabaseBasedCounterManager</b> 
+				is independent of the installed software version.
+				<li>Confirm that Counter Manager running from a local location 
+				will not run unless either or both of <b>\\fnp2\internal</b> or 
+				<b>\\es-it-dc-01\internal</b> is mapped.
+				<li>Confirm that Counter Manager has a non-default icon.
+				<li>Confirm that the <b>Counter data validity</b> edit box or the 
+				<b>Validity</b> column displays the reason for counter corruption.
+				<li>Confirm that the <b>usage message</b> lists all required DLLs.
+				<li><b>[ISSUE-13355]</b> Corrupt Counter
+				<ul>
+					<li>Start with clean <b>Demo_FlexIndex</b> database after 
+					possible schema update.
+					<li>Add counter ID = 1 with 1000 counts.
+					<li>Exercise FPS to run rules and decrement counts.
+					<li>Remove last entry from <b>SecureCounterValueChange</b> table.
+					<li>Confirm that FAM counters are now corrupt.
+					<li>Confirm that an unlock request can be generated.
+					<li>Confirm that an unlock code can be generated and applied.
+					<li>
+				</ul>
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13252, ISSUE-13311, ISSUE-13324, ISSUE-13331]</b> 
+		Manage Rule Execution Counters
+		<ul>
+			<li><u>User Interface</u>
+			<ul>
+				<li>Confirm that <b>Manage - Rule execution counters...</b> is 
+				available from DB Admin.
+				<li>Confirm that the menu item is disabled if the database 
+				schema is out-of-date.
+				<li>Confirm that a table of defined counters is provided with the 
+				following column headings.
+				<ul>
+					<li>ID
+					<li>Name
+					<li>Value
+					<li>Alert Level
+					<li>Alert Frequency
+				</ul>
+				<li>Confirm that a <b>Refresh</b> button is defined.
+				<li>Confirm that an <b>Enable email alerts to support@extractsystems.com</b> 
+				checkbox is defined.
+				<li>Confirm that an <b>Enable email alerts to:</b> checkbox is defined.
+				<li>Confirm that each checkbox is <b>unchecked</b> by default.
+				<li>Confirm that a <b>Generate update request</b> button is defined.
+				<li>Confirm that an <b>Apply update code</b> button is defined.
+				<li>Confirm that <b>OK</b> and <b>Cancel</b> buttons are defined.
+			</ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li><u>Generate counter request</u>
+				<ul>
+					<li>Confirm that clicking the button displays a <b>Generate 
+					Counter Update Request</b> dialog.
+					<li>Confirm that the dialog includes an <b>Organization</b> 
+					edit box.
+					<li>Confirm that the dialog includes an <b>Email (will be 
+					cc'd if email delivery option is used)</b> edit box.
+					<li>Confirm that the dialog includes an <b>Phone</b> 
+					edit box.
+					<li>Confirm that the dialog includes an <b>Reason for request</b> 
+					edit box.
+					<li>Confirm that the above edit boxes are editable and empty by 
+					default.
+					<li>Confirm that the dialog includes a read-only <b>Request</b> 
+					edit box containing the following data.
+					<ul>
+						<li>Database
+						<li>ID
+						<li>Current counter values: (one line for each)
+						<li>An encrypted string
+					</ul>
+					<li>Confirm that the dialog includes a <b>Copy to clipboard</b> 
+					button.
+					<li>Confirm that the dialog includes a <b>Send email to Extract</b> 
+					button.
+					<li>Confirm that the dialog includes a <b>Save request to a file</b> 
+					button.
+					<li>Confirm that the dialog includes a <b>Close</b> button.
+<p>
+					<li>Confirm that the <b>Copy to clipboard</b> button copies the 
+					dialog contents to the Clipboard.
+					<li>Confirm that the <b>Send email to Extract</b> button copies 
+					the dialog contents to an email message.
+					<li>Confirm that an <b>Outgoing email server not configured</b> 
+					error is displayed if email settings have not yet been configured 
+					in the associated FAM database.
+					<li>Confirm that the <b>Save request to a file</b> button opens a 
+					<b>Save As</b> dialog for saving dialog contents to a text file.
+					<li>Confirm that the <b>Close</b> button closes the dialog.
+				</ul>
+				<li><u>Apply update code</u>
+				<ul>
+					<li>Confirm that clicking the button displays a <b>Apply 
+					Counter Update Code</b> dialog.
+					<li>Confirm that the dialog includes a multi-line, read-only 
+					edit box for <b>Counter update code</b>.
+					<li>Confirm that the dialog includes a <b>Paste code from 
+					clipboard</b> button.
+					<li>Confirm that the dialog includes a <b>Load code from 
+					file</b> button.
+					<li>Confirm that the dialog includes an <b>Apply</b> button.
+					<li>Confirm that the dialog includes a <b>Cancel</b> button.
+<p>
+					<li>Confirm that the <b>Paste code from clipboard</b> button 
+					pastes clipboard contents into the multi-line edit box.
+					<li>Confirm that a <b>Counter Update Confirmation</b> dialog 
+					is presented.
+					<ul>
+						<li>Confirm that the dialog includes text about the 
+						update being successfully applied.
+						<li>Confirm that the dialog includes text about sending 
+						the following confirmation to Extract Systems.
+						<li>Confirm that the dialog includes a multi-line, 
+						read-only edit box with the following information.
+						<ul>
+							<li>Database
+							<li>ID
+							<li>A list of changes that were applied
+							<li>New counter values: (one line for each)
+							<li>An encrypted string
+						</ul>
+						<li>Confirm that the dialog includes a <b>Copy to 
+						clipboard</b> button.
+						<li>Confirm that the dialog includes a <b>Send email to 
+						Extract</b> button.
+						<li>Confirm that the dialog includes a <b>Save to a 
+						file</b> button.
+						<li>Confirm that the dialog includes a <b>Close</b> button.
+						<li>Confirm that each button works as expected.
+					</ul>
+				</ul>
+				<li>Confirm that the <b>Refresh</b> button updates the dialog to show 
+				current counter values.
+				<li>Confirm that <b>Cancel</b> closes the dialog without saving 
+				changes to checkbox selections, Alert Level, or Alert Frequencies.
+				<li>Confirm that <b>OK</b> closes the dialog and saves changes 
+				to checkbox selections, Alert Level, and Alert Frequencies.
+				<li>Confirm that an appropriate <b>Alert</b> email is sent if 
+				the counter value reaches the desired level.
+				<li>Confirm that an appropriate <b>Alert</b> email is sent if 
+				the counter value skips over the desired level.
+				<li>Confirm that an appropriate <b>Alert</b> email is sent if 
+				the counter value reaches or skips over an <b>Alert Frequency</b> 
+				level.
+			</ul>
+			<li><u>Miscellaneous</u>
+			<ul>
+				<li>
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13260]</b> Confirm that the <b>Email</b> tab on the Database options 
+		window is properly sized.		
+<p>
+  	   	<LI><b>[ISSUE-13265]</b> Confirm that <b>Auto-Redact.fps</b> works without error 
+		from the <b>Sanity Test - Server</b> checklist.
+<p>
+  	   	<LI><b>[ISSUE-13269]</b> Confirm that <b>SpecialImageFormatConverter.exe</b> requires 
+		a license file.
+<p>
+  	   	<LI><b>[ISSUE-13270, ISSUE-13274]</b> Resolution Normalizer Utility
+		<ul>
+			<li>Confirm that <b>ResolutionNormalizer.exe</b> is available after 
+			installation of <b>FLEX Index</b> or <b>ID Shield</b> or <b>LabDE</b>.
+			<li>Exercise the <b>Resolution Normalizer</b> checklist.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13276]</b> Confirm that the <b>Usage report during custom date range 
+		broken down by user</b> is sorted chronologically.
+<p>
+  	   	<LI><b>[ISSUE-13278]</b> RuleSet Editor Counters
+		<ul>
+			<li><u>User Interface</u>
+			<ul>
+				<li>Confirm that the <b>Ruleset Properties</b> dialog includes a 
+				<b>Properties</b> tab and a <b>Comments</b> tab.
+				<li>Confirm that the <b>Properties</b> tab is selected by default.
+				<li>Confirm that the Properties tab includes a table of <b>Counters 
+				to decrement</b> with the following column headers.
+				<ul>
+					<li>Enabled
+					<li>ID
+					<li>Name
+				</ul>
+				<li>Confirm that the following <b>Standard</b> counters are defined.
+				<ul>
+					<li>1 - FLEX Index - Indexing (By Document)
+					<li>2 - FLEX Index - Pagination (By Document)
+					<li>3 - ID Shield - Redaction (By Page)
+					<li>4 - ID Shield - Redaction (By Document)
+					<li>5 - FLEX Index - Indexing (By Page)
+				</ul>
+				<li>Confirm that each counter is unchecked by default.
+				<li>Confirm that the dialog contains <b>Add</b>, <b>Edit</b>, 
+				and <b>Delete</b> buttons.
+				<li>Confirm that the <b>Add</b> button is always enabled.
+				<li>Confirm that the <b>Edit</b> and <b>Delete</b> buttons are 
+				only enabled when a custom counter is selected.
+				<li>Confirm that an <b>FKB Version</b> edit box is available.
+				<li>Confirm that a <b>RuleSet can be executed only internally (i.e. 
+				it cannot be executed directly)</b> checkbox box is available.
+				<li>Confirm that a <b>This is a swiping rule</b> checkbox box is 
+				available.
+				<li>Confirm that the checkboxes are unchecked by default.
+				<li>Confirm that the <b>Comments</b> tab contains a multi-line 
+				edit box.
+				<li>Confirm that the <b>Comments</b> edit box is empty by default.
+			</ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Confirm that custom counters must have ID <b>&gt;= 100</b>.
+				<li>Confirm that custom counters must have ID <b>&lt;= 999</b>.
+				<li>Confirm that custom counters must end with either 
+				<b>(By Document)</b> or <b>(By Page)</b>.
+				<li>Confirm that the ending test requirement is not case sensitive.
+				<li>Confirm that counter names cannot be resued with different 
+				ID values.
+				<li>Confirm that multiple standard and/or custom counters can be 
+				selected.
+				<li>Confirm that settings are persistent with <b>OK</b>.
+				<li>Confirm that changes to settings are discarded with <b>Cancel</b>.
+			</ul>
+			<li><u>Miscellaneous</u>
+			<ul>
+				<li><b>[ISSUE-13430]</b> Confirm that custom counters are 
+				automatically sorted by ID.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13287, ISSUE-13288]</b> Manage Attribute Sets
+		<ul>
+	  	   	<LI>Confirm that the <b>Rename</b> button in the dialog includes ellipsis.
+			<li>Store some named sets in a FAM database.
+			<li>Confirm that the named sets are visible in the dialog.
+			<li>Select one set.
+			<li>Click the <b>Rename</b> button.
+			<li>Cancel from the Rename dialog.
+			<li>Confirm that arrow keys navigate selection from the previous selection 
+			point.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13301]</b> DB Admin - Update Database Schema
+		<ul>
+			<li>Restore the database from <b>M:\PVCS_JIRA\JIRA\ISSUE-13301</b>.
+			<li>Confirm that the database schema is successfully updated.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13308]</b> Confirm that the <b>Manage - Attribute sets</b> menu item 
+		is disabled in DB Admin if the database schema is not current.
+<p>
+  	   	<LI><b>[ISSUE-13309, ISSUE-13345]</b> Confirm that <b>Demo_LabDE</b> rules correctly 
+		use the new URS and Order Mapper.
+<p>
+  	   	<LI><b>[ISSUE-13328]</b> Confirm that the <b>Order Mapper</b> automated tests 
+		all pass.
+<p>
+  	   	<LI><b>[ISSUE-13340, ISSUE-13341]</b> Verify Extracted Data ML Test
+		<ul>
+			<li>Confirm that the CONFIG file referenced in the FPS file has a correct path 
+			that uses FPSFileDir.
+			<li>Confirm that the first memory leak test for <b>Data Entry: Verify 
+			Extracted Data</b> works without any FAM database errors.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13347]</b> Confirm that the <b>PERFORMANCE_TESTING</b> compilation 
+		symbol forces <b>InvalidDataSaveMode</b> = <b>Allow</b>.
+<p>
+  	   	<LI><b>[ISSUE-13348]</b> Confirm that the URS and associated OrderMappingDB.sdf 
+		are compatible with LABDE URS version 9.
+<p>
+  	   	<LI><b>[ISSUE-13350]</b> Confirm that <b>OrderMappingDB.sdf</b> for <b>Demo_LabDE</b> 
+		includes an appropriate <b>FKBVersion</b> field in the <b>Settings</b> table.
+<p>
+  	   	<LI><b>[ISSUE-13351]</b> Confirm that the <b>Demo_LabDE</b> DEP uses both customer 
+		and URS databases.
+<p>
+  	   	<LI><b>[ISSUE-13360]</b> Confirm that the LabDE NRS tests all pass.
+<p>
+  	   	<LI><b>[ISSUE-13365]</b> Exercise the <b>ID Shield Highlights</b> checklist associated 
+		with <b>ID Shield Patch 10.2.1</b>.
+<p>
+  	   	<LI><b>[ISSUE-13369]</b> Confirm that the <b>Demo_IDShield</b> database can successfully 
+		update its database schema.
+<p>
+  	   	<LI><b>[ISSUE-13375]</b> Confirm that the <b>LabDE High Effort Files By User</b> report 
+		returns quickly when run on a large database.
+<p>
+  	   	<LI><b>[ISSUE-13377, ISSUE-13381]</b> Missing DBInfo Fields
+		<ul>
+			<li>Confirm the presence of the following <b>DBInfo</b> fields in a new database.
+			<ul>
+				<li>LicenseContactOrganization
+				<li>LicenseContactEmail
+				<li>LicenseContactPhone
+				<li>SendAlertsToExtract
+				<li>SendAlertsToSpecified
+				<li>SpecifiedAlertRecipients
+			</ul>
+			<li>Confirm that the above fields are present in a database that has been cleared 
+			without saving old values.
+			<li>Confirm that <b>Manage - Rule Execution Counters</b> works for a new database.
+			<li>Confirm that <b>Manage - Rule Execution Counters</b> works for a database 
+			that has been cleared without saving old values.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13378]</b> DB Admin Status Message
+		<ul>
+			<li>Open DB Admin and log in to a database that has the current schema.
+			<li>Logout.
+			<li>Select another database that needs a schema update for just one of the 
+			product-specific pieces.
+			<li>Confirm that the connection status correctly indicates that an update 
+			is required.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13380]</b> DB Admin Failed To Update DB Schema
+		<ul>
+			<li>Open new instance of DB Admin.
+			<li>Log in to existing out-of-date database.
+			<li>Agree to update DB schema.
+			<li>Confirm that schema update is successful.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13382]</b> Confirm that a <b>LabDEUtilities</b> method is available to 
+		retrieve a component name from the collected AKAs in the URS.
+<p>
+  	   	<LI><b>[ISSUE-13383]</b> Confirm that <b>FAM File Inspector</b> defaults to 
+		display of <b>5000</b> rows.
+<p>
+  	   	<LI><b>[ISSUE-13385]</b> Confirm that Demo_LabDE includes use of 
+		<b>&lt;ComponentDataDir&gt;</b> in the config file and that the associated Order Mapper 
+		database includes an <b>FKBVersion</b> field in the <b>Settings</b> table.
+<p>
+  	   	<LI><b>[ISSUE-13388]</b> Manage Rule Execution Text Updates
+		<ul>
+			<li>Corrupt the FAM counters in a database.
+			<li>Create and send an <b>Unlock</b> request.
+			<li>Apply the received <b>Unlock</b> code.
+			<li>Confirm that FAM counters are no longer corrupt.
+			<li>Confirm that button text reflects the counters' usable state.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13390]</b> ID Shield Highlights Fill Color
+		<ul>
+			<li>Begin with <b>IDShield.ini</b> as amended for the BWH 
+			workflow.
+			<li>Add a <b>FillColor</b> item to the Level - Highlight section 
+			where FillColor is something other than yellow (0.128.0). Try 
+			FillColor = 128.128.0.
+			<li>Exercise verification on an image that already has some actual 
+			Highlight attributes.
+			<li>Confirm that the highlights are displayed with the specified 
+			fill color.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13392]</b> Confirm that the automated tests for <b>LabDE OrderMapper 
+		OH</b> all pass.
+    	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+   	<ul>
+  	   	<LI><b>TBD</b> 
+        	<ul>
+			<li>TBD
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+	    		<li>All Tests
+			<li>Raster Zone Test
+			<li>Spatial String Searcher Test
+			<li>Spatial String Test
+	    	</ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
