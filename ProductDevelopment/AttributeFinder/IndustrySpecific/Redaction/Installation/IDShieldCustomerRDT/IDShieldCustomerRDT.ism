@@ -3054,7 +3054,7 @@
 		<row><td>ID_STRING1</td><td>1033</td><td>Extract Systems, LLC</td><td>0</td><td/><td>194625038</td></row>
 		<row><td>ID_STRING10</td><td>1033</td><td>TESTHA~1|Test Harness</td><td>0</td><td/><td>-1575463955</td></row>
 		<row><td>ID_STRING11</td><td>1033</td><td>FLEXIN~1|FLEX Index UI Help</td><td>0</td><td/><td>-1550244656</td></row>
-		<row><td>ID_STRING12</td><td>1033</td><td>ID Shield Rule Writing Framework</td><td>0</td><td/><td>631462187</td></row>
+		<row><td>ID_STRING12</td><td>1033</td><td>ID Shield Rule Writing Toolkit</td><td>0</td><td/><td>631462187</td></row>
 		<row><td>ID_STRING13</td><td>1033</td><td>COMMAN~1|Command Prompt Bin</td><td>0</td><td/><td>-1575476405</td></row>
 		<row><td>ID_STRING14</td><td>1033</td><td>COMMAN~1|Command Prompt Bin</td><td>0</td><td/><td>-1575480501</td></row>
 		<row><td>ID_STRING15</td><td>1033</td><td>EAVGEN~1|EAV Generator</td><td>0</td><td/><td>-1575472179</td></row>
@@ -3653,7 +3653,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>ProductCode</td><td>{EAA7E74D-09C3-42EB-949F-C8F02D075B45}</td><td/></row>
-		<row><td>ProductName</td><td>Extract Systems ID Shield Customer Rule Writing Toolkit</td><td/></row>
+		<row><td>ProductName</td><td>Extract Systems ID Shield RDT</td><td/></row>
 		<row><td>ProductVersion</td><td>1.00.0000</td><td/></row>
 		<row><td>REBOOT</td><td>Suppress</td><td/></row>
 		<row><td>STANDARD_USE_SETUPEXE</td><td>##IDS_STANDARD_USE_SETUPEXE##</td><td/></row>
