@@ -1,0 +1,243 @@
+<HTML>
+
+<HEAD>
+<TITLE>Counter Manager - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" 
+href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Counter Manager - Testing Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+  	<li><h2>Command Line Options</h2></li>
+  	<ul>
+    		<li>TBD
+  	</ul>
+<p>
+  	<li><h2>General User Interface</h2></li>
+  	<ul>
+		<li>Confirm that a multi-line edit box for <b>Database licensse string</b> is 
+		provided.
+		<li>Confirm that <b>Ctrl+V</b> pastes Clipboard contents into the edit box.
+		<li>Confirm that the associated <b>Paste License String</b> button pastes 
+		Clipboard contents into the edit box.
+		<ul>
+			<li>Confirm that this button is the only control enabled before a valid 
+			<b>Database license string</b> has been provided.
+		</ul>
+		<li>Confirm that a read-only <b>Database server</b> edit box is provided.
+		<li>Confirm that a read-only <b>Database created</b> edit box is provided.
+		<ul>
+			<li>Confirm that date, time and timezone information is displayed in 
+			the edit box.
+		</ul>
+		<li>Confirm that a read-only <b>Database name</b> edit box is provided.
+		<li>Confirm that a read-only <b>Last database restore</b> edit box is provided.
+		<ul>
+			<li>Confirm that date, time and timezone information is displayed in 
+			the edit box.
+		</ul>
+		<li>Confirm that a read-only <b>Database ID</b> edit box is provided.
+		<ul>
+			<li>Confirm that the displayed text is in GUID format with <b>8-4-4-4-12</b> 
+			characters.
+		</ul>
+		<li>Confirm that a read-only <b>Last counter update</b> edit box is provided.
+		<ul>
+			<li>Confirm that date, time and timezone information is displayed in 
+			the edit box.
+		</ul>
+		<li>Confirm that a read-only <b>Counter data validity</b> edit box is provided.
+		<ul>
+			<li>Confirm that edit box contents are either: <b>Valid</b> or 
+			<b>Invalid license string</b>.
+		</ul>
+		<li>Confirm that a read-only <b>Counter data as of</b> edit box is provided.
+		<ul>
+			<li>Confirm that date, time and timezone information is displayed in 
+			the edit box.
+		</ul>
+		<li>Confirm that a <b>Generate counter update code</b> radio button is provided.
+		<li>Confirm that a <b>Generate unlock code</b> radio button is provided.
+		<li>Confirm that the <b>Generate counter update code</b> radio button is enabled 
+		only if Counter data validity = <b>Valid</b>.
+		<li>Confirm that a <b>Generate unlock code</b> radio button is provided.
+		<li>Confirm that a table is provided for standard and custom counters with the 
+		following column headers when the <b>Generate counter update code</b> option is 
+		selected.
+		<ul>
+			<li>ID
+			<li>Name
+			<li>Value
+			<li>Operation
+			<li>Apply Value
+		</ul>
+		<li>Confirm that the column headers are as follows when the <b>Generate unlock code</b> 
+		option is selected.
+		<ul>
+			<li>ID
+			<li>Name
+			<li>Value
+			<li>Value Log
+			<li>Validity
+		</ul>
+		<li>Confirm that a multi-line edit box is provided for <b>Comments</b>.
+		<li>Confirm that the <b>Comments</b> edit box has a scrollbar.
+<p>
+		<li>Confirm that the following <b>Operation</b> option is available for a new 
+		counter.
+		<ul>
+			<li>Create
+		</ul>
+		<li>Confirm that the following <b>Operation</b> options are available for a new 
+		counter.
+		<ul>
+			<li>Set
+			<li>Increment
+			<li>Decrement
+			<li>Delete
+		</ul>
+		<li>Confirm that the following fields cannot be modified for an existing counter.
+		<ul>
+			<li>ID
+			<li>Name
+			<li>Value
+		</ul>
+		<li>Confirm that existing counters cannot be deleted from the table.
+		<li>Confirm that a customer name must be specified.
+		<li>Confirm that a name must be specified for each custom counter.
+		<li>Confirm that an operation must be specified for each counter
+  	</ul>
+<p>
+  	<li><h2>Functionality</h2></li>
+  	<ul>
+		<li>Confirm that Counter Manager can parse current and older input strings.
+		<li>Confirm that Counter Manager can provide version-specific updates and unlock 
+		codes.
+		<li>Confirm that an ID cannot be used more than once in the list of counters.
+		<ul>
+			<li>Confirm that a <b>Cannot use the same ID as an existing counter</b> 
+			error message is presented.
+		</ul>
+		<li>Confirm that a custom counter must end with either <b>(By Document)</b> or 
+		<b>(By Page)</b>
+		<ul>
+			<li>Confirm that a <b>Counter name must end with "(By Document)" or 
+			"(By Page)"</b> error message is presented.
+			<li>Confirm that the required ending text is not case sensitive.
+		</ul>
+		<li>Confirm that a custom counter cannot have the same name as one of the 
+		<b>Standard</b> counters.
+		<ul>
+			<li>Confirm that a <b>Cannot use a standard counter name for a custom 
+			counter</b> error message is presented.
+		</ul>
+		<li>Confirm that a counter cannot be decremented by more than its current value.
+		<li>Confirm that if only existing counters are listed, at least one <b>Operation</b> 
+		must be defined.
+		<li>Confirm that an <b>Apply Value</b> must be defined for each counter with a 
+		selected <b>Operation</b>.
+<p>
+		<li><u>Generate code</u>
+		<ul>
+			<li>Confirm that clicking the button displays a <b>License email</b> window.
+			<li>Confirm that the window includes a <b>To</b> edit box.
+			<li>Confirm that the window includes a <b>Cc</b> edit box.
+			<li>Confirm that the <b>Cc</b> edit box includes a prefix read-only edit box 
+			pre-populated with <b>Extract Licensing</b>.
+			<li>Confirm that the window includes a <b>Subject</b> edit box.
+			<li>Confirm that the <b>Subject</b> edit box is pre-populated with appropriate 
+			text that includes the specified customer name.
+			<li>Confirm that the message body includes a read-only section with information 
+			about the counter update (or unlock code) and the steps to apply it to the 
+			database.
+			<li>Confirm that the window includes a <b>Send email</b> button.
+			<li>Confirm that sending an email requires an email address in the <b>To</b> 
+			edit box.
+			<li>Confirm that sending an email requires appropriate settings 
+			in the <b>EmailSettings.config</b> file in the network folder.
+			<li>Confirm that if the config file is not present, a meaningful 
+			error message is presented.
+		</ul>
+<p>
+		<li>Confirm that the complete text provided by <b>Manage Rule Execution Counters</b> 
+		can be pasted into Counter Manager and parsed correctly.
+		<li><b>[ISSUE-13420]</b> Confirm that pasting an invalid license string clears edit 
+		box contents.
+  	</ul>
+<p>
+  	<li><h2>Failure Testing</h2></li>
+  	<ul>
+		<li><b>[ISSUE-13355]</b> Modifying Change Table Will Corrupt Counter
+		<ul>
+			<li>Start with clean <b>Demo_FlexIndex</b> database after possible schema 
+			update.
+			<li>Add counter ID = 1 with 1000 counts.
+			<li>Exercise FPS to run rules and decrement counts.
+			<li>Remove last entry from <b>SecureCounterValueChange</b> table.
+			<li>Confirm that FAM counters are now corrupt.
+			<li>Confirm that an unlock request can be generated.
+			<li>Confirm that an unlock code can be generated and applied.
+			<li>Confirm that the counter is no longer corrupt.
+		</ul>
+		<li>Database Detach and Reattach Will Corrupt Counter
+		<ul>
+			<li>Start with clean <b>Demo_FlexIndex</b> database after possible schema 
+			update.
+			<li>Add counter ID = 1 with 1000 counts.
+			<li>Exercise FPS to run rules and decrement counts.
+			<li>Confirm that FAM counters are still valid.
+			<li>Use <b>SQL Management Studio</b> to <b>Detach</b> the database.
+			<li>Use <b>SQL Management Studio</b> to <b>Attach</b> the database.
+			<li>Confirm that FAM counters are now corrupt.
+			<li>Confirm that an unlock request can be generated.
+			<li>Confirm that an unlock code can be generated and applied.
+			<li>Confirm that the counter is no longer corrupt.
+		</ul>
+		<li>Database Backup and Restore Will Corrupt Counter
+		<ul>
+			<li>Start with clean <b>Demo_FlexIndex</b> database after possible schema 
+			update.
+			<li>Add counter ID = 1 with 1000 counts.
+			<li>Exercise FPS to run rules and decrement counts.
+			<li>Confirm that FAM counters are still valid.
+			<li>Use <b>SQL Management Studio</b> to <b>Backup</b> the database.
+			<li>Use <b>SQL Management Studio</b> to <b>Delete</b> the database.
+			<li>Use <b>SQL Management Studio</b> to <b>Restore</b> the database.
+			<li>Confirm that FAM counters are now corrupt.
+			<li>Confirm that an unlock request can be generated.
+			<li>Confirm that an unlock code can be generated and applied.
+			<li>Confirm that the counter is no longer corrupt.
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Tests Needed</h2></li>
+  	<ul>
+		<li>Change Log text turns red if values are different
+		<li>Corrupt: Detach and reattach DB
+		<li>Corrupt: Backup and restore DB
+		<li>Create unrecoverable counter, confirm that it must be deleted before any other 
+		action
+		<li>
+  	</ul>
+<p>
+  	<li><h2>Miscellaneous</h2></li>
+  	<ul>
+		<li>Confirm that Counter Manager running from the network location 
+		of <b>I:\Common\Engineering\Tools\SecureClients\DatabaseBasedCounterManager</b> 
+		is independent of the installed software version.
+		<li>Confirm that Counter Manager running from a local location will not run unless 
+		either or both of <b>\\fnp2\internal</b> or <b>\\es-it-dc-01\internal</b> is mapped.
+		<li>Confirm that Counter Manager has a non-default icon.
+		<li>Confirm that the <b>Counter data validity</b> edit box or the <b>Validity</b> 
+		column displays the reason for counter corruption.
+		<li>Confirm that the <b>usage message</b> lists all required DLLs.
+  	</ul>
+</ol>
+</body>
+</html>
