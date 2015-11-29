@@ -86,7 +86,7 @@ copy %BUILD_DRIVE%\BuildMachine_RDT*.lic %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT
 IF "%BUILD_STATUS%" NEQ "Started" (
 	SET BUILD_STATUS="Started"
 
-	PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%~1' 'Started'"
+	PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%~1' '%BUILD_STATUS%'"
 )
 IF EXIST "%TEMP%\nmakeErrors" del "%TEMP%\nmakeErrors"
 
