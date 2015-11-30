@@ -28,7 +28,7 @@ Sub Main
 	Dim nVerPos
 	nVerPos = InStr(1, objArgs(1), "Ver. ")
 	if ( nVerPos = 0 ) then
-		stdout.WriteLine "Version not fould " + objArgs(1)
+		stdout.WriteLine "Version not found " + objArgs(1)
 		exit sub
 	end if
 	sVersionNumber = Mid( objArgs(1), nVerPos + 5)
