@@ -203,6 +203,7 @@ namespace Extract.AttributeFinder.Rules
                 _localDatabaseCopyManager = new TemporaryFileCopyManager();
                 TypeRegistry.RegisterType("Regex", typeof(System.Text.RegularExpressions.Regex));
                 TypeRegistry.RegisterType("StringUtils", typeof(Spring.Util.StringUtils));
+                TypeRegistry.RegisterType("CultureInfo", typeof(System.Globalization.CultureInfo));
             }
             catch (Exception ex)
             {
