@@ -924,15 +924,6 @@ namespace
 		return ID;
 	}
 
-	// Used to delete a safe array - called by unique_ptr<SAFEARRAY> DTOR
-	struct SafeArrayDeleter
-	{
-		void operator() ( SAFEARRAY* pSA ) const
-		{
-			SafeArrayDestroy( pSA );
-		}
-	};
-
 	// Definition of empty:
 	// the attribute Value is empty, the attribute Type is empty, 
 	// (iff true == storeRasterZones) RasterZones are NOT present, AND
@@ -1025,14 +1016,14 @@ void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong 
 #endif
 
 #ifdef COMPRESSED_STREAM
-		std::unique_ptr<SAFEARRAY, SafeArrayDeleter> psaData( ZipUtil::CompressAttributes( ipPersistObj ) );
+		CComSafeArray<BYTE> saData;
+		saData.Attach(ZipUtil::CompressAttributes(ipPersistObj));
+
 		_variant_t variantData;
 		variantData.vt = VT_ARRAY|VT_UI1;
-		variantData.parray = psaData.get();
+		variantData.parray = saData;
 		ipASFF->Fields->GetItem( "VOA" )->PutValue( variantData );
 		ipASFF->Update();
-
-		variantData.parray = nullptr;		// don't double-delete, unique_ptr will take care of this
 #endif
 	}
 	catch (...)
@@ -1197,9 +1188,10 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 
 #ifdef UNCOMPRESSED_STREAM	
 			FieldsPtr ipFields = GetFieldsForQuery( strQuery, getDBConnection() );
-			IPersistStreamPtr ipStream = getIPersistObjFromField( ipFields, "VOA" );
+			IIUnknownVectorPtr ipAttributes = getIPersistObjFromField( ipFields, "VOA" );
+			ASSERT_RESOURCE_ALLOCATION("ELI39173", ipAttributes != nullptr);
 
-			*ppAttributes = (IIUnknownVectorPtr)ipStream.Detach();
+			*ppAttributes = ipAttributes.Detach();
 #endif		
 
 #ifdef COMPRESSED_STREAM
@@ -1216,7 +1208,7 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 
 			*ppAttributes = ipAttributes.Detach();
 #endif
-			return S_OK;
+			return true;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39029");
 	}

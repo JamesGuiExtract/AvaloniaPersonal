@@ -503,7 +503,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 string expandedAttrSetName = pathTags.Expand(_attributeSetName);
 
-                if ( true == StoreModeIsSet )
+                if (true == StoreModeIsSet)
                 {
                     ExtractException.Assert("ELI38651",
                                             "VOA file not found.",
@@ -513,19 +513,19 @@ namespace Extract.FileActionManager.FileProcessors
 
                     const double unusedDuration = 0.0;
                     const double unusedOverheadTime = 0.0;
-                    int fileTaskSessionID = pDB.RecordFileTaskSession( _CLASS_GUID,
+                    int fileTaskSessionID = pDB.RecordFileTaskSession(_CLASS_GUID,
                                                                        pFileRecord.FileID,
                                                                        unusedDuration,
-                                                                       unusedOverheadTime );
+                                                                       unusedOverheadTime);
                     IUnknownVector voaData = new IUnknownVector();
                     voaData.LoadFrom(voaFileName, false);
+                    voaData.ReportMemoryUsage();
 
-                    _attributeDBManager.CreateNewAttributeSetForFile( fileTaskSessionID, 
+                    _attributeDBManager.CreateNewAttributeSetForFile(fileTaskSessionID,
                                                                       expandedAttrSetName,
                                                                       voaData,
                                                                       StoreRasterZones,
-                                                                      StoreEmptyAttributes );
-                    Marshal.FinalReleaseComObject(voaData);
+                                                                      StoreEmptyAttributes);
                 }
                 else
                 {
@@ -534,8 +534,9 @@ namespace Extract.FileActionManager.FileProcessors
                                                                 pFileRecord.FileID,
                                                                 expandedAttrSetName,
                                                                 MOST_RECENT_ATTRIBUTE);
+
                     voaData.SaveTo(voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
-                    Marshal.FinalReleaseComObject(voaData);
+                    voaData.ReportMemoryUsage();
                 }
 
                 return EFileProcessingResult.kProcessingSuccessful;

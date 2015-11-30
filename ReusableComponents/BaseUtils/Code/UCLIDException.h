@@ -667,7 +667,7 @@ private:
 #define ASSERT_RUNTIME_CONDITION(strELI, bCondition, description) \
 	if (!(bCondition)) \
 	{ \
-		UCLIDException ue(strELI, "Runtime error: " #description); \
+		UCLIDException ue(strELI, string("Runtime error: ") + description); \
 		ue.addDebugInfo("Failed condition", #bCondition); \
 		throw ue; \
 	}
