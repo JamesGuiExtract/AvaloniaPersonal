@@ -88,10 +88,10 @@ public:
 	// decrement most recent value to get next most recent (-2)
 	// increment oldest value to get next oldest (2)
 	// Zero is an illegal relativeIndex value.
-	STDMETHOD(GetAttributeSetForFile)(IIUnknownVector** pAttributes, 
-									  long nFileID, 
+	STDMETHOD(GetAttributeSetForFile)(long nFileID, 
 									  BSTR bstrAttributeSetName,
-									  long nRelativeIndex);		
+									  long nRelativeIndex,
+									  IIUnknownVector** pAttributes);		
 
 	STDMETHOD(CreateNewAttributeSetName)(BSTR name, 
 										 long long* pllAttributeSetNameID);
@@ -165,11 +165,11 @@ private:
   												VARIANT_BOOL vbStoreRasterZone,
   												VARIANT_BOOL vbStoreEmptyAttributes );
 
-	bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
-													       IIUnknownVector** ppAttributes, 
+	bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked, 
 													       long fileID, 
 													       BSTR attributeSetName,
-													       long relativeIndex );
+													       long relativeIndex,
+														   IIUnknownVector** ppAttributes);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(AttributeDBMgr), CAttributeDBMgr)

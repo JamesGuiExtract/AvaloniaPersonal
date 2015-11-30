@@ -519,25 +519,23 @@ namespace Extract.FileActionManager.FileProcessors
                                                                        unusedOverheadTime );
                     IUnknownVector voaData = new IUnknownVector();
                     voaData.LoadFrom(voaFileName, false);
-                    voaData.ReportMemoryUsage();
 
                     _attributeDBManager.CreateNewAttributeSetForFile( fileTaskSessionID, 
                                                                       expandedAttrSetName,
                                                                       voaData,
                                                                       StoreRasterZones,
                                                                       StoreEmptyAttributes );
+                    Marshal.FinalReleaseComObject(voaData);
                 }
                 else
                 {
                     const int MOST_RECENT_ATTRIBUTE = -1;
-                    IUnknownVector vAttributes = new IUnknownVector();
-                    _attributeDBManager.GetAttributeSetForFile( out vAttributes,
+                    IUnknownVector voaData = _attributeDBManager.GetAttributeSetForFile(
                                                                 pFileRecord.FileID,
                                                                 expandedAttrSetName,
-                                                                MOST_RECENT_ATTRIBUTE );
-
-                    vAttributes.SaveTo( voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID );
-                    vAttributes.ReportMemoryUsage();
+                                                                MOST_RECENT_ATTRIBUTE);
+                    voaData.SaveTo(voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    Marshal.FinalReleaseComObject(voaData);
                 }
 
                 return EFileProcessingResult.kProcessingSuccessful;

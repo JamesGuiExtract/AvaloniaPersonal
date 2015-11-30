@@ -46,10 +46,10 @@ library AttributeDbMgrComponentsLib
 											 [in] VARIANT_BOOL vbStoreEmptyAttributes);
 
 		[id(3), helpstring("method GetAttributeSetForFile")] 
-		HRESULT GetAttributeSetForFile([out]IIUnknownVector** pAttributes, 
-									   [in] long fileID, 
+		HRESULT GetAttributeSetForFile([in] long fileID, 
 									   [in] BSTR attributeSetName,
-									   [in] long relativeIndex);
+									   [in] long relativeIndex,
+									   [out, retval]IIUnknownVector** pAttributes);
 
 		[id(4), helpstring("method CreateNewAttributeSetName")] 
 		HRESULT CreateNewAttributeSetName([in] BSTR name, 
