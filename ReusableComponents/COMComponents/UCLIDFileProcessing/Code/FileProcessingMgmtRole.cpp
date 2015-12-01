@@ -3277,11 +3277,14 @@ bool CFileProcessingMgmtRole::setupWorkItemThreadData(long nNumberOfThreads, lon
 		IObjectWithDescriptionPtr ipObject(m_ipFileProcessingTasks->At(i));
 		ASSERT_RESOURCE_ALLOCATION("ELI36864", ipObject != __nullptr );
 
-		UCLID_FILEPROCESSINGLib::IParallelizableTaskPtr ipParallelTask(ipObject->Object);
-		if (ipParallelTask != NULL && ipParallelTask->Parallelize == VARIANT_TRUE)
+		if (asCppBool(ipObject->Enabled))
 		{
-			bParallelize = true;
-			break;
+			UCLID_FILEPROCESSINGLib::IParallelizableTaskPtr ipParallelTask(ipObject->Object);
+			if (ipParallelTask != NULL && ipParallelTask->Parallelize == VARIANT_TRUE)
+			{
+				bParallelize = true;
+				break;
+			}
 		}
 	}
 	if(bParallelize)
