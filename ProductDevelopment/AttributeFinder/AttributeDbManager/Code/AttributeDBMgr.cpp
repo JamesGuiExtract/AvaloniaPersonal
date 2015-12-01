@@ -615,34 +615,46 @@ namespace
 		return std::move( results );
 	}
 
-
-	std::string GetInsertRootASFFStatement( BSTR bstrAttributeSetName, long fileTaskSessionID )
+	longlong GetAttributeSetID(string strAttributeSetName, _ConnectionPtr ipConnection)
 	{
-		std::string attributeSetName = SqlSanitizeInput(asString(bstrAttributeSetName));
+		longlong llSetNameID = 0;
+		try
+		{
+			try
+			{
+				executeCmdQuery(ipConnection, Util::Format(
+					"SELECT TOP 1 [ID] FROM [dbo].[AttributeSetName] WHERE [Description]='%s'"
+						, strAttributeSetName.c_str())
+					, "ID", false, &llSetNameID);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39174");
+		}
+		catch (UCLIDException &ue)
+		{
+			UCLIDException uexOuter("ELI39175", "Attribute set name not found.", ue);
+			uexOuter.addDebugInfo("Set name", strAttributeSetName);
+			throw uexOuter;
+		}
 
+		return llSetNameID;
+	}
+
+	std::string GetInsertRootASFFStatement( longlong llSetNameID, long fileTaskSessionID )
+	{
 		std::string insert = 
 			"SET NOCOUNT ON \n"
-			"DECLARE @AttributeSetName_Description AS NVARCHAR(255);\n"
 			"DECLARE @AttributeSetName_ID AS BIGINT;\n"
 			"DECLARE @AttributeSetForFile_ID AS BIGINT;\n"
-			"DECLARE @FileTaskSessionID AS BIGINT;\n"
+			"DECLARE @FileTaskSessionID AS INT;\n"
 			"\n";
 
-		insert += Util::Format( "SELECT @AttributeSetName_Description='%s';\n"
-								"SELECT @FileTaskSessionID=%d;\n",
-								attributeSetName.c_str(),
+		insert += Util::Format( "SELECT @AttributeSetName_ID=%lld;\n"
+								"SELECT @FileTaskSessionID=%ld;\n",
+								llSetNameID,
 								fileTaskSessionID );
 		insert += 
 			"\n"
 			"BEGIN TRY\n"
-			"	SELECT @AttributeSetName_ID=(SELECT TOP 1 [ID] FROM [dbo].[AttributeSetName] "
-			"		WHERE [Description]=@AttributeSetName_Description)\n"
-			"	if @AttributeSetName_ID IS NULL\n"
-			"	begin\n"
-			"		INSERT INTO [dbo].[AttributeSetName] ([Description]) VALUES (@AttributeSetName_Description);\n"
-			"		SELECT @AttributeSetName_ID = SCOPE_IDENTITY()\n"
-			"	end\n"
-			"\n"
 			"	INSERT INTO [AttributeSetForFile] ([FileTaskSessionID], [AttributeSetNameID])\n"
 			"	OUTPUT INSERTED.ID \n"
 			"	VALUES (@FileTaskSessionID, @AttributeSetName_ID);\n"
@@ -1111,9 +1123,12 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 			ASSERT_ARGUMENT("ELI38553", pAttributes != nullptr);
 			ASSERT_ARGUMENT("ELI38554", nFileTaskSessionID > 0 );
 
+			std::string strSetName = SqlSanitizeInput(asString(bstrAttributeSetName));
+
 			TransactionGuard tg( getDBConnection(), adXactRepeatableRead, nullptr );
 
-			auto strInsertRootASFF = GetInsertRootASFFStatement( bstrAttributeSetName, nFileTaskSessionID );
+			longlong llSetNameID = GetAttributeSetID( strSetName, getDBConnection() );
+			auto strInsertRootASFF = GetInsertRootASFFStatement( llSetNameID, nFileTaskSessionID );
 			longlong llRootASFF_ID = ExecuteRootInsertASFF( strInsertRootASFF, getDBConnection() );
 			SaveVoaDataInASFF( ipAttributes, llRootASFF_ID );
 
@@ -1123,6 +1138,7 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 								llRootASFF_ID );
 
 			tg.CommitTrans();
+
 			return true;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38557");

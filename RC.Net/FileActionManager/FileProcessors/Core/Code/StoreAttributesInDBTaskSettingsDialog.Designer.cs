@@ -101,10 +101,11 @@
             // 
             this._attributeSetNameComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this._attributeSetNameComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._attributeSetNameComboBox.FormattingEnabled = true;
             this._attributeSetNameComboBox.Location = new System.Drawing.Point(12, 64);
             this._attributeSetNameComboBox.Name = "_attributeSetNameComboBox";
-            this._attributeSetNameComboBox.Size = new System.Drawing.Size(365, 21);
+            this._attributeSetNameComboBox.Size = new System.Drawing.Size(367, 21);
             this._attributeSetNameComboBox.TabIndex = 3;
             this._attributeSetNameComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleAttributeSetNameComboBox_SelectedIndexChanged);
             // 
