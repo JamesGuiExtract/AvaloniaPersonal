@@ -116,6 +116,7 @@ namespace Extract.Database
             {
                 IsReadOnly = (bool)value;
             }
+
         }
 
         /// <summary>
@@ -194,7 +195,7 @@ namespace Extract.Database
             var query = String.Format(CultureInfo.InvariantCulture, "SELECT TOP (1) * FROM [{0}];", TableName);
             SqlCeCommand cmd = new SqlCeCommand(query.ToString(), connection);
 
-            SqlCeDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             DataTable dt = reader.GetSchemaTable();
             foreach (DataRow dr in dt.Rows)
             {

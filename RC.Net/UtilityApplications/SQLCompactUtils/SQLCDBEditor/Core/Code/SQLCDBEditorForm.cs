@@ -1371,6 +1371,7 @@ namespace Extract.SQLCDBEditor
                         }
 
                         _dirty = true;
+                        EnableCommands();
                     }
                 }
             }

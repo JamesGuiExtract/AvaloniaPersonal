@@ -90,14 +90,24 @@ namespace Extract.SQLCDBEditor
         {
             if (disposing)
             {
-                _resultsTable.Dispose();
-                _adapter.Dispose();
+                if (null != _resultsTable)
+                {
+                    _resultsTable.Dispose();
+                    _resultsTable = null;
+                }
+
+                if (null != _adapter)
+                {
+                    _adapter.Dispose();
+                    _adapter = null;
+                }
 
                 if (components != null)
                 {
                     components.Dispose();
                 }
             }
+
             base.Dispose(disposing);
         }
 
@@ -179,7 +189,7 @@ namespace Extract.SQLCDBEditor
                                                 rowsImported);
                     }
 
-                    MessageBox.Show(message);
+                    MessageBox.Show(text: message, caption: "Table update status");
                     ModifiedTableName = _tablename;
                     this.Close();
                     return;
@@ -197,7 +207,10 @@ namespace Extract.SQLCDBEditor
                     if (DialogResult.OK == ret)
                     {
                         importSettings.UseTransaction = false;
-                        ImportTable.ImportFromFile(importSettings);
+                        ImportTable.ImportFromFile(importSettings, _connection);
+
+                        ModifiedTableName = _tablename;
+                        this.Close();
                     }
                 }
             }
@@ -459,6 +472,12 @@ namespace Extract.SQLCDBEditor
             if (makeVisible)
             {
                 SqlCeTableColumnInfo tci = new SqlCeTableColumnInfo(_tablename, _connection);
+
+                int countOfAutoIncrementColumns = tci.Count(c => c.IsAutoIncrement);
+                if (countOfAutoIncrementColumns < 1)
+                {
+                    return;
+                }
 
                 var name = tci.Where(column => column.IsAutoIncrement == true)
                               .Select(column => column.ColumnName)
