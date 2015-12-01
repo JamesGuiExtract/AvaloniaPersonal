@@ -175,16 +175,10 @@ const unsigned int gnENHANCE_OCR						= gnBASE_OFFSET + 52;
 // This ID is included in FlexIndexIDShieldCore package in Packages.dat.
 const unsigned int gnANTI_ALIASING_FEATURE				= gnBASE_OFFSET + 70;
 
-// Special ID for ignoring the USB Key Serial Number.  This package is 
-// available for Developers and Rule Writers but NOT for external use.
-const unsigned int gnIGNORE_USB_IDCHECK_FEATURE			= gnBASE_OFFSET + 71;
-
-// Special ID for ignoring an RSD file requirement for a USB Key.  This 
-// package is useful ONLY for executing rules on a Virtual Machine where 
-// network access to a USB key is not available.  It is not needed for 
-// general use for anyone.  This package NOT available by default for 
-// Developers and Rule Writers and also NOT available for external use.
-const unsigned int gnIGNORE_USB_DECREMENT_FEATURE		= gnBASE_OFFSET + 72;
+// Special ID for ignoring an RSD file requirement for a rule execution counter. This license
+// is not for general use. This package NOT available for Rule Writers and also NOT available for
+// external use.
+const unsigned int gnIGNORE_RULE_EXECUTION_COUNTER_DECREMENTS	= gnBASE_OFFSET + 72;
 
 // Special ID for reading and writing PDF files within the Spot Recognition Window.
 const unsigned int gnPDF_READWRITE_FEATURE				= gnBASE_OFFSET + 73;

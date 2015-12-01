@@ -337,9 +337,7 @@ void CESConvertUSSToTXTApp::decrementCounter(ISpatialStringPtr ipText)
 //-------------------------------------------------------------------------------------------------
 bool CESConvertUSSToTXTApp::usbCountersDisabled()
 {
-	static const unsigned long DISABLE_USB_COUNTERS = gnIGNORE_USB_DECREMENT_FEATURE;
-
-	return LicenseManagement::isLicensed( DISABLE_USB_COUNTERS ); 
+	return LicenseManagement::isLicensed( gnIGNORE_RULE_EXECUTION_COUNTER_DECREMENTS ); 
 }
 //-------------------------------------------------------------------------------------------------
 void CESConvertUSSToTXTApp::validateLicense()

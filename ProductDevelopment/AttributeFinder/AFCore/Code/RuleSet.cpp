@@ -20,7 +20,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 14;
+const unsigned long gnCurrentVersion = 15;
 // Version 3:
 //   Added Output Handler persistence
 // Version 7:
@@ -36,6 +36,7 @@ const unsigned long gnCurrentVersion = 14;
 // Version 12: Added m_strPreviousFileName
 // Version 13: Added Comments
 // Version 14: Added m_bUsePagesIndexingCounter and m_ipCustomCounters
+// Version 15: Removed m_strKeySerialNumbers
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
@@ -70,7 +71,6 @@ m_bUseDocsRedactionCounter(false),
 m_bUsePagesIndexingCounter(false),
 m_bRuleSetOnlyForInternalUse(false),
 m_bSwipingRule(false),
-m_strKeySerialNumbers(""),
 m_strFKBVersion(""),
 m_bIgnorePreprocessorErrors(false),
 m_bIgnoreOutputHandlerErrors(false),
@@ -82,14 +82,14 @@ m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current v
 
 		ms_referenceCount++;
 
-		// If full RDT is not licensed, we may be able to preset a USB counter
+		// If full RDT is not licensed, we may be able to preset a counter
 		if (!isRdtLicensed())
 		{
 			// If FLEX Index rule writing is licensed and not ID Shield rule writing
 			if (LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ) && 
 				!LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
 			{
-				// Can preset Indexing USB counter
+				// Can preset Indexing counter
 				m_bUseDocsIndexingCounter = true;
 			}
 
@@ -97,7 +97,7 @@ m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current v
 			if (!LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ) && 
 				LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
 			{
-				// Can preset Redaction By Pages USB counter
+				// Can preset Redaction By Pages counter
 				m_bUsePagesRedactionCounter = true;
 			}
 		}
@@ -294,7 +294,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				if (!isRuleExecutionAllowed())
 				{
 					throw UCLIDException("ELI21520", 
-						"Rule execution is not allowed - make sure that a USB counter is selected.");
+						"Rule execution is not allowed - make sure that a counter is selected.");
 				}
 
 				if (m_strFKBVersion.empty() && (isUsingCounter() || m_bSwipingRule))
@@ -372,7 +372,6 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 				// If the ruleset is marked as an to-be-used-internally ruleset, then ensure 
 				// that stacksize > 1.
-				// Can directly execute internal-use rules if USB Key Serial Numbers are disabled (P13 #3474)
 				// Direct execution of internal-use rules now requires an RDT license [FlexIDSCore #3200]
 				if (m_bRuleSetOnlyForInternalUse && nStackSize == 1 && !isRdtLicensed())
 				{
@@ -978,38 +977,6 @@ STDMETHODIMP CRuleSet::put_ForInternalUseOnly(VARIANT_BOOL newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11548")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRuleSet::get_KeySerialList(BSTR *pVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		validateLicense();
-
-		*pVal = _bstr_t(m_strKeySerialNumbers.c_str()).copy();
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11631")
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRuleSet::put_KeySerialList(BSTR newVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		// NOTE: Unlike other methods/properties, calling this method requires
-		// RuleSet Editor license.
-		void validateUILicense();
-
-		m_strKeySerialNumbers = asString(newVal);
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11632")
-}
-//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_VersionNumber(long *nVersion)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -1501,10 +1468,12 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 				dataReader >> m_bSwipingRule;
 			}
 
-			if ( m_nVersionNumber >= 6 )
+			if ( m_nVersionNumber >= 6 && m_nVersionNumber < 15)
 			{
-				// Read USB serial numbers
-				dataReader >> m_strKeySerialNumbers;
+				// USB serial numbers were persisted here from version 6 to version 14, but are no
+				// longer used. Disregard.
+				string strTemp;
+				dataReader >> strTemp;
 			}
 
 			if (m_nVersionNumber >= 9)
@@ -1618,7 +1587,7 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		// Must be using a counter or have the RDT licensed to save external rules [FIDSC #3592]
 		if (!isLicensedToSave())
 		{
-			throw UCLIDException("ELI21505", "A USB counter must be selected.");
+			throw UCLIDException("ELI21505", "A counter must be selected.");
 		}
 
 		if (fClearDirty == TRUE && m_strFKBVersion.empty() && (isUsingCounter() || m_bSwipingRule))
@@ -1654,8 +1623,6 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bRuleSetOnlyForInternalUse;
 
 		dataWriter << m_bSwipingRule;
-
-		dataWriter << m_strKeySerialNumbers;
 
 		dataWriter << m_strFKBVersion;
 
@@ -1846,9 +1813,6 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		// Copy the swiping rule flag
 		m_bSwipingRule = asCppBool(ipSource->IsSwipingRule);
 
-		m_strKeySerialNumbers = asString(ipSource->KeySerialList);
-		m_vecSerialNumbers.clear();
-
 		m_strFKBVersion = asString(ipSource->FKBVersion);
 
 		// copy the version number
@@ -2021,9 +1985,9 @@ map<long, CounterInfo>& CRuleSet::getCounterInfo()
 //-------------------------------------------------------------------------------------------------
 void CRuleSet::decrementCounters(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 {
-	// Check to see if USB Counters are to be ignored 
+	// Check to see if counters are to be ignored 
 	// This is machine-level locking P16 #1905 - WEL 10/17/06
-	if (usbCountersDisabled())
+	if (countersDisabled())
 	{
 		return;
 	}
@@ -2059,14 +2023,14 @@ void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool 
 
 	try
 	{
-		// The max allowed accumulation for the counter value before decrementing the key is
+		// The max allowed accumulation for the counter value before decrementing the counter is
 		// defined as Min(A,B,C) where:
 		// A = 10 (_MAX_COUNTER_ACCUMULATION)
 		// B = D / 10
 		// C = E / 100
-		// D = number of counts successfully decremented off the USB key from in the current process
-		// E = number of counts on the USB key at the time of the last successful decrement of the
-		// USB key from the current process.
+		// D = number of counts successfully decremented off the counter from in the current process
+		// E = number of counts on the counter at the time of the last successful decrement of the
+		// counter from the current process.
 
 		string strMaxAccumulation(_MAX_COUNTER_ACCUMULATION);
 		int nAllowedAccumulation = 0;
@@ -2100,14 +2064,6 @@ void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool 
 			if ( m_apSafeNetMgr.get() == __nullptr )
 			{
 				m_apSafeNetMgr = unique_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
-			}
-
-			// Check to see if USB Key serial numbers should be ignored
-			bool bDisableUSBSNs = usbSerialNumbersDisabled();
-			if ( !bDisableUSBSNs && !m_strKeySerialNumbers.empty())
-			{
-				// Serial numbers found and must be considered
-				validateKeySerialNumber();
 			}
 
 			nLastCount = m_apSafeNetMgr->decreaseCellValue(
@@ -2154,49 +2110,15 @@ void CRuleSet::flushCounters()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-std::vector<DWORD>& CRuleSet::getSerialListAsDWORDS()
+bool CRuleSet::countersDisabled()
 {
-	m_vecSerialNumbers.clear();
-	addRangeToVector(m_vecSerialNumbers, m_strKeySerialNumbers);
-
-	return m_vecSerialNumbers;
-}
-//-------------------------------------------------------------------------------------------------
-void CRuleSet::validateKeySerialNumber()
-{
-	DWORD dwLicenseSN = m_apSafeNetMgr->getKeySN();
-	getSerialListAsDWORDS();
-	bool bValidSerial = false;
-	long nNumSerials = m_vecSerialNumbers.size();
-	for ( long i = 0; i < nNumSerials && !bValidSerial; i++ )
-	{
-		bValidSerial = m_vecSerialNumbers[i] == dwLicenseSN;
-	}
-
-	// Throw exception if rules require a different S/N 
-	if ( !bValidSerial )
-	{
-		UCLIDException ue("ELI11635", "Counter Key Serial # is not allowed with current rules." );
-		ue.addDebugInfo( "Serial #", dwLicenseSN);
-		ue.addDebugInfo( "Valid Serial Numbers", m_strKeySerialNumbers );
-		throw ue;
-	}
-}
-//-------------------------------------------------------------------------------------------------
-bool CRuleSet::usbCountersDisabled()
-{
-	return LicenseManagement::isLicensed(gnIGNORE_USB_DECREMENT_FEATURE); 
-}
-//-------------------------------------------------------------------------------------------------
-bool CRuleSet::usbSerialNumbersDisabled()
-{
-	return LicenseManagement::isLicensed(gnIGNORE_USB_IDCHECK_FEATURE); 
+	return LicenseManagement::isLicensed(gnIGNORE_RULE_EXECUTION_COUNTER_DECREMENTS); 
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::isRuleExecutionAllowed()
 {
 	// [FlexIDSCore #3061] Requires:
-	// - A USB counter OR
+	// - A counter OR
 	// - Internal-use flag OR
 	// - Is a swiping rule OR
 	// - Full RDT license

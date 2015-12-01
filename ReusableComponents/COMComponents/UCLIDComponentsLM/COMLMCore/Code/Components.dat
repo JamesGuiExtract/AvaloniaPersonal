@@ -56,8 +56,7 @@
 
 // IDs for individually licensed features
 6070,Anti_Aliasing_Feature
-6071,IgnoreUSB_IDCheck_Feature <DevOnly>
-6072,IgnoreUSB_Decrement_Feature
+6072,Ignore_RuleExecutionCounter_Decrements
 6073,PDF_ReadWrite_Feature
 6076,RotatedImages_And_Annotation_Feature
 6077,Image_Cleanup_Engine_Feature

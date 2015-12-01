@@ -395,8 +395,12 @@ void RuleTesterDlg::OnButtonExecute()
 		// passwords.
 		if (LicenseManagement::isLicensed(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS))
 		{
-			if (!LicenseManagement::isLicensed(gnFLEXINDEX_RULE_WRITING_OBJECTS) ||
-				!LicenseManagement::isLicensed(gnIGNORE_USB_DECREMENT_FEATURE))
+			// https://extract.atlassian.net/browse/ISSUE-13422
+			// Because we can't count on FAM DB secure counters being available to decrement and we
+			// can't yet control whether data is output, only allow execution if both an RDT and
+			// counter unlock license is present.
+			if (!LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS) ||
+				!LicenseManagement::isLicensed(gnIGNORE_RULE_EXECUTION_COUNTER_DECREMENTS))
 			{
 				throw UCLIDException("ELI39170",
 					"RuleTester is not licensed to execute rules.");

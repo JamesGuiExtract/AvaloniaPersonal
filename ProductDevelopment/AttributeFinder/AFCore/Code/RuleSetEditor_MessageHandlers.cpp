@@ -52,7 +52,7 @@ static const UINT indicators[] =
 {
 	//ID_SEPARATOR,           // status line indicator
 	ID_INDICATOR_COUNTERS,
-	ID_INDICATOR_SERIAL_NUMBERS,
+	ID_INDICATOR_SWIPING,
 	ID_INDICATOR_INTERNAL_USE_ONLY
 };
 //-------------------------------------------------------------------------------------------------

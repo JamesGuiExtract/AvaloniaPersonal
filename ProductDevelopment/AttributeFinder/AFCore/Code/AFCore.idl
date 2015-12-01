@@ -384,15 +384,6 @@ library UCLID_AFCORELib
 		[propput, id(13), helpstring("property ForInternalUseOnly")] HRESULT 
 			ForInternalUseOnly([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
-		// Returns a string with comma separated serial numbers for valid keys to use with this ruleset
-		[propget, id(14), helpstring("property KeySerialList")] HRESULT KeySerialList(
-			[out, retval] BSTR *pVal);
-		//-----------------------------------------------------------------------------------------
-		// Sets the serial number list
-		// newVal is a string with comma separated serial numbers for the valid keys to use with this ruleset
-		[propput, id(14), helpstring("property KeySerialList")] HRESULT KeySerialList(
-			[in] BSTR newVal);
-		//-----------------------------------------------------------------------------------------
 		// PROMISE:	To return the version number associated with the RuleSet object
 		[propget, id(15), helpstring("property VersionNumber")] HRESULT VersionNumber(
 			[out, retval] long *nVersion);

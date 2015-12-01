@@ -82,8 +82,6 @@ public:
 	STDMETHOD(put_UseDocsIndexingCounter)(VARIANT_BOOL newVal);
 	STDMETHOD(get_ForInternalUseOnly)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_ForInternalUseOnly)(VARIANT_BOOL newVal);
-	STDMETHOD(get_KeySerialList)(BSTR  *pVal);
-	STDMETHOD(put_KeySerialList)(BSTR newVal);
 	STDMETHOD(get_VersionNumber)(long *nVersion);
 	STDMETHOD(get_IsSwipingRule)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_IsSwipingRule)(VARIANT_BOOL newVal);
@@ -191,9 +189,6 @@ private:
 	// counter flags in combination with m_ipCustomCounters.
 	unique_ptr<map<long, CounterInfo>> m_apmapCounters;
 
-	string m_strKeySerialNumbers;
-	vector<DWORD> m_vecSerialNumbers;
-
 	// a flag to indicate whether this ruleset should only be used
 	// internally (i.e. from with other rule objects that UCLID delivers to customers)
 	bool m_bRuleSetOnlyForInternalUse;
@@ -214,7 +209,7 @@ private:
 	string m_strComments;
 
 	// Keep track of the number of Rulesets in existence. Before the last closes, flush any
-	// accumulated USB counts.
+	// accumulated counts.
 	static int ms_referenceCount;
 
 	/////////////////
@@ -261,25 +256,11 @@ private:
 	// Decrements from the specified counter any accumulated counts right away.
 	void flushCounters();
 
-	// returns a reference of the member variable m_vecSerialNumbers
-	// this function separates the serial numbers in the string m_strKeySerialNumbers
-	vector<DWORD>& getSerialListAsDWORDS(); 
+	// Returns true if counter decrements should be skipped. This implements machine-level locking
+	// and is managed via license file.
+	bool countersDisabled();
 
-	// Returns true if consideration of USB Key counters is to be ignored.
-	// This implements machine-level locking and is managed via license file.
-	bool usbCountersDisabled();
-
-	// Returns true if consideration of serial number of USB Key is to be ignored.
-	// This is managed via license file.
-	bool usbSerialNumbersDisabled();
-
-	// Checks the serial number against the list of serial numbers
-	// if no serial numbers in the list assume any will work
-	// if the serial number of the key is not in the list then an
-	// exception is thrown
-	void validateKeySerialNumber();
-
-	// Returns true if a USB counter is checked OR if internal-use flag is checked OR 
+	// Returns true if a counter is checked OR if internal-use flag is checked OR 
 	// if a full RDT license is available.  Otherwise returns false.
 	bool isRuleExecutionAllowed();
 
@@ -299,7 +280,7 @@ private:
 
 	// true if any of the following are true:
 	// 1) The Rule Development Toolkit is licensed
-	// 2) At least one usb counter is enabled
+	// 2) At least one counter is enabled
 	// 3) This is an internal ruleset
 	bool isLicensedToSave();
 };

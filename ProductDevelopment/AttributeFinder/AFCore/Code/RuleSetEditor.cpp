@@ -1314,12 +1314,12 @@ void CRuleSetEditor::setStatusBarText()
 	m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_COUNTERS),
 		strStatusBarText.c_str());
 	
-	// Set serial numbers text
-	string strSerials = m_ipRuleSet->KeySerialList;
-	strStatusBarText = "SNs: " +  strSerials;
-	m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_SERIAL_NUMBERS),
+	strStatusBarText = "Swiping = ";
+	strStatusBarText += (m_ipRuleSet->IsSwipingRule == VARIANT_TRUE) ?
+		"Yes" : "No";
+	m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_SWIPING),
 		strStatusBarText.c_str());
-	
+
 	// Update the internal-use-only flag in the status bar
 	strStatusBarText = "InternalUseOnly = ";
 	strStatusBarText += (m_ipRuleSet->ForInternalUseOnly == VARIANT_TRUE) ?
@@ -1467,24 +1467,19 @@ void CRuleSetEditor::doResize()
 	m_wMgr.moveAnchoredBottomRight(*GetDlgItem(IDC_BTN_SELECTOH), m_nDefaultW, m_nDefaultH, FALSE);
 
 	// Resize the status bar
-	int iWidth;
 	CRect clientRect;
 	GetClientRect(clientRect);
 
-	// Set width of counters status to 1/2 width of Client area
-	iWidth = clientRect.Width() / 2;
+	// Set width of counters status to take all available space not used by the swiping or internal
+	// use labels.
 	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_COUNTERS), 
-		ID_INDICATOR_COUNTERS, SBPS_NORMAL, iWidth );
+		ID_INDICATOR_COUNTERS, SBPS_NORMAL, clientRect.Width() - 245 );
+
+	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_SWIPING), 
+		ID_INDICATOR_SWIPING, SBPS_NORMAL, 85 );
 	
-	// Set the width of the serial numbers to 1/6 width of Client area
-	iWidth = iWidth / 3;
-	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_SERIAL_NUMBERS), 
-		ID_INDICATOR_SERIAL_NUMBERS, SBPS_NORMAL, iWidth );
-	
-	// Set the width of the ForInternalUseOnly to 1/3 width of Client area
-	iWidth = iWidth * 2;
 	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_INTERNAL_USE_ONLY), 
-		ID_INDICATOR_INTERNAL_USE_ONLY, SBPS_NORMAL, iWidth );
+		ID_INDICATOR_INTERNAL_USE_ONLY, SBPS_NORMAL, 160 );
 
 	// Update default values
 	CRect rectDlg;
