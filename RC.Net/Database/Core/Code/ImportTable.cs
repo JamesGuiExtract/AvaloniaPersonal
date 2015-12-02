@@ -234,8 +234,8 @@ namespace Extract.Database
                         new Dictionary<string, string>(columnSizes.Count);
 
                     // Split the input row into columns using the column delimiter.
-                    string[] columns = MakeColumns(rowText: rows[rowsProcessed], 
-                                                   delimiter: settings.ColumnDelimiter, 
+                    string[] columns = MakeColumns(rowText: rows[rowsProcessed],
+                                                   delimiter: settings.ColumnDelimiter,
                                                    useAdvancedSplitter: settings.ExtendedUse);
 
                     int columnCount = Math.Min(columns.Length, columnNames.Count);
@@ -327,8 +327,14 @@ namespace Extract.Database
                     tx.Rollback();
                 }
 
-                ExtractException.Log("ELI27127", ex);
-                messages.Add("*Exception: " + ex.Message);
+                throw new ExtractException("ELI27127", "Import operation failed.", ex);
+            }
+            finally
+            {
+                if (null != tx)
+                {
+                    tx.Dispose();
+                }
             }
 
             return Tuple.Create(rowsFailed, messages.ToArray());

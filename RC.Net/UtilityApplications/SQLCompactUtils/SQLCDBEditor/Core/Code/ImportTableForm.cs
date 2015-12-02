@@ -266,6 +266,23 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
+                if (sender == ReplaceRadioButton && ReplaceRadioButton.Checked)
+                {
+                    if (DialogResult.No == MessageBox.Show(
+                        "The replace option will clear all data from the selected table before " +
+                        "importing the new data.\r\n\r\n" +
+                        "Please review any foreign key relationships with this table to assess impacts. " +
+                        "Be aware that any foreign key relationships using cascade deletes may " +
+                        "may cause data in other tables to be deleted.\r\n\r\n" +
+                        "Are you sure you want to use replace instead of append?", "Warning", 
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button2, 0))
+                    {
+                        AppendRadioButton.Checked = true;
+                        return;
+                    }
+                }
+
                 UpdateDataIntoGrid();
             }
             catch (Exception ex)
