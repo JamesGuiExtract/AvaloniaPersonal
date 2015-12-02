@@ -140,6 +140,8 @@ private:
 
 	bool m_bUseCleanedImage;
 
+	bool m_bCounterDecrementFailed;
+
 	bool m_bDirty;
 
 	/////////////

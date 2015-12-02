@@ -30,7 +30,8 @@ const unsigned long gnCurrentVersion = 3;
 // CAFEngineFileProcessor
 //-------------------------------------------------------------------------------------------------
 CAFEngineFileProcessor::CAFEngineFileProcessor()
-:	m_bDirty(false)
+:	m_bCounterDecrementFailed(false)
+,	m_bDirty(false)
 {
 	clear();
 
@@ -87,7 +88,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_Init(long nActionID, IFAMTagManager* pF
 	
 	try
 	{
-		// nothing to do
+		m_bCounterDecrementFailed = false;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17792");
 
@@ -112,9 +113,17 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 		_lastCodePos = "20";
 
+		ASSERT_ARGUMENT("ELI17935", pResult != __nullptr);
+
+		if (m_bCounterDecrementFailed)
+		{
+			m_bCounterDecrementFailed = false;
+			*pResult = kProcessingCancelled;
+			return S_OK;
+		}
+
 		IFAMTagManagerPtr ipTagManager(pTagManager);
 		ASSERT_ARGUMENT("ELI26658", ipTagManager != __nullptr);
-		ASSERT_ARGUMENT("ELI17935", pResult != __nullptr);
 
 		_lastCodePos = "21";
 		
@@ -365,10 +374,30 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 		_lastCodePos = "205";
 
-		// Execute the rule set
-		getAFEngine()->FindAttributes(ipAFDoc, strInputFile.c_str(), 0, 
-			_varRuleSet, NULL, VARIANT_TRUE, bstrAlternateComponentDataDir,
-			ipProgressStatusToUseForSubTasks);
+		try
+		{
+			try
+			{
+				// Execute the rule set
+				getAFEngine()->FindAttributes(ipAFDoc, strInputFile.c_str(), 0, 
+					_varRuleSet, NULL, VARIANT_TRUE, bstrAlternateComponentDataDir,
+					ipProgressStatusToUseForSubTasks);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39179")
+		}
+		catch (UCLIDException &ue)
+		{
+			// https://extract.atlassian.net/browse/ISSUE-13451
+			// If rule execution failed because we could not decrement a FAM DB secure counter
+			// (most likely due to insufficient counts), stop when the next file comes in to
+			// be processed.
+			if (ue.getAllELIs().find("ELI38785") != string::npos)
+			{
+				m_bCounterDecrementFailed = true;
+			}
+
+			throw ue;
+		}
 
 		_lastCodePos = "210";
 
@@ -423,6 +452,13 @@ STDMETHODIMP CAFEngineFileProcessor::raw_Standby(VARIANT_BOOL* pVal)
 	try
 	{		
 		ASSERT_ARGUMENT("ELI33892", pVal != __nullptr);
+
+		// If the queue happens to be empty after running out of counts, allow the next queued file
+		// to be re-attempted to avoid processing stopping long after a failure to decrement.
+		if (m_bCounterDecrementFailed)
+		{
+			m_bCounterDecrementFailed = false;
+		}
 
 		*pVal = VARIANT_TRUE;
 

@@ -8870,117 +8870,94 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 			ASSERT_ARGUMENT("ELI39122", pnCounterValue != nullptr);
 			ASSERT_RUNTIME_CONDITION("ELI39026", decrementAmount >= 0, "Decrement must be positive.");
 
-			bool bCounterDecremented = false;
-			long nDecrementRetries = 0;
-			long nMillisecondsToWait = 30000;
-			do 
-			{
-				_ConnectionPtr ipConnection;
-				BEGIN_CONNECTION_RETRY();
+			_ConnectionPtr ipConnection;
+			BEGIN_CONNECTION_RETRY();
 
-					ipConnection = getDBConnection();
+				ipConnection = getDBConnection();
 
-					string strQuery = "SELECT * FROM [dbo].[SecureCounter] WHERE ID = " +
-						 asString(nCounterID);
+				string strQuery = "SELECT * FROM [dbo].[SecureCounter] WHERE ID = " +
+						asString(nCounterID);
 
-					if (!m_bDatabaseIDValuesValidated)
+				if (!m_bDatabaseIDValuesValidated)
+				{
+					checkDatabaseIDValid(ipConnection, true);
+				}
+				
+				// Create a pointer to a recordset
+				_RecordsetPtr ipResultSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI38937", ipResultSet != __nullptr);
+				
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+				// Open the Action table
+				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
+				if (!asCppBool(ipResultSet->adoEOF))
+				{
+					FieldsPtr fields = ipResultSet->Fields;
+					DBCounter dbCounter;
+					dbCounter.LoadFromFields(ipResultSet->Fields);
+					dbCounter.validate(m_DatabaseIDValues.m_nHashValue);
+
+					DBCounterChangeValue dbCounterChange;
+					dbCounterChange.m_nCounterID = dbCounter.m_nID;
+					dbCounterChange.m_nFromValue = dbCounter.m_nValue;
+					if (decrementAmount > dbCounter.m_nValue)
 					{
-						checkDatabaseIDValid(ipConnection, true);
+						UCLIDException ue("ELI38938", "Counter has insufficient counts.");
+						ue.addDebugInfo("CounterName", dbCounter.m_strName);
+						ue.addDebugInfo("CounterID", dbCounter.m_nID);
+						ue.addDebugInfo("RequiredCounts", decrementAmount);
+						ue.addDebugInfo("RemainingCounts", dbCounter.m_nValue);
+						throw ue;
 					}
-				
-					// Create a pointer to a recordset
-					_RecordsetPtr ipResultSet(__uuidof(Recordset));
-					ASSERT_RESOURCE_ALLOCATION("ELI38937", ipResultSet != __nullptr);
-				
-					// Make sure the DB Schema is the expected version
-					validateDBSchemaVersion();
-
-					// Begin a transaction
-					TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
-
-					// Open the Action table
-					ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-						adLockReadOnly, adCmdText);
-
-					if (!asCppBool(ipResultSet->adoEOF))
+					else
 					{
-						FieldsPtr fields = ipResultSet->Fields;
-						DBCounter dbCounter;
-						dbCounter.LoadFromFields(ipResultSet->Fields);
-						dbCounter.validate(m_DatabaseIDValues.m_nHashValue);
+						long lOldValue = dbCounter.m_nValue;
+						dbCounter.m_nValue -= decrementAmount;
 
-						DBCounterChangeValue dbCounterChange;
-						dbCounterChange.m_nCounterID = dbCounter.m_nID;
-						dbCounterChange.m_nFromValue = dbCounter.m_nValue;
-						if (decrementAmount > dbCounter.m_nValue)
-						{
-							if (nDecrementRetries % 100 == 0)
-							{
-								UCLIDException ue("ELI38938", "Counter has insufficient counts.");
-								ue.addDebugInfo("CounterName", dbCounter.m_strName);
-								ue.addDebugInfo("CounterID", dbCounter.m_nID);
-								ue.addDebugInfo("RequiredCounts", decrementAmount);
-								ue.addDebugInfo("RemainingCountes", dbCounter.m_nValue);
-								ue.addDebugInfo("nNumberOfRetries", nDecrementRetries);
-								ue.log();
-							}
-							if (nDecrementRetries < 1000)
-							{
-								Sleep(nMillisecondsToWait);
-								nMillisecondsToWait += 500;
-								nDecrementRetries++;
-							}
-						}
-						else
-						{
-							long lOldValue = dbCounter.m_nValue;
-							dbCounter.m_nValue -= decrementAmount;
-							nDecrementRetries = 0;
-							bCounterDecremented = true;
+						dbCounterChange.m_nToValue = dbCounter.m_nValue;
+						dbCounterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
 
-							dbCounterChange.m_nToValue = dbCounter.m_nValue;
-							dbCounterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
-
-							dbCounterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
+						dbCounterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
 										
-							dbCounterChange.m_ctUpdatedTime = getSQLServerDateTimeAsCTime(getDBConnection());
+						dbCounterChange.m_ctUpdatedTime = getSQLServerDateTimeAsCTime(getDBConnection());
 
-							dbCounterChange.CalculateHashValue(dbCounterChange.m_llHashValue);
+						dbCounterChange.CalculateHashValue(dbCounterChange.m_llHashValue);
 
-							// list of queries to run
-							vector<string> vecUpdateQueries;
-							vecUpdateQueries.push_back("UPDATE [dbo].[SecureCounter] SET SecureCounterValue = '" + 
-								dbCounter.getEncrypted(m_DatabaseIDValues.m_nHashValue) + 
-								"' WHERE ID = " + asString(dbCounter.m_nID));
+						// list of queries to run
+						vector<string> vecUpdateQueries;
+						vecUpdateQueries.push_back("UPDATE [dbo].[SecureCounter] SET SecureCounterValue = '" + 
+							dbCounter.getEncrypted(m_DatabaseIDValues.m_nHashValue) + 
+							"' WHERE ID = " + asString(dbCounter.m_nID));
 
-							vecUpdateQueries.push_back(dbCounterChange.GetInsertQuery());
+						vecUpdateQueries.push_back(dbCounterChange.GetInsertQuery());
 
-							executeVectorOfSQL(ipConnection, vecUpdateQueries);
-							tg.CommitTrans();
+						executeVectorOfSQL(ipConnection, vecUpdateQueries);
+						tg.CommitTrans();
 
-							// Check new counter value and possibly add item to exception log
-							if (((lOldValue - 1) / gnLOG_FREQUENCY) != ((dbCounter.m_nValue - 1)/ gnLOG_FREQUENCY))
-							{
-								UCLIDException ue("ELI15935", "Application trace: debug information");
-								ue.addDebugInfo("Item 1", dbCounter.m_nID, true );
-								ue.addDebugInfo("Item 2", dbCounter.m_strName, true);
-								ue.addDebugInfo("Item 3", dbCounter.m_nValue, true );
-								ue.log();
-							}							
-							*pnCounterValue = dbCounterChange.m_nToValue;
-						}
+						// Check new counter value and possibly add item to exception log
+						if (((lOldValue - 1) / gnLOG_FREQUENCY) != ((dbCounter.m_nValue - 1)/ gnLOG_FREQUENCY))
+						{
+							UCLIDException ue("ELI15935", "Application trace: debug information");
+							ue.addDebugInfo("Item 1", dbCounter.m_nID, true );
+							ue.addDebugInfo("Item 2", dbCounter.m_strName, true);
+							ue.addDebugInfo("Item 3", dbCounter.m_nValue, true );
+							ue.log();
+						}							
+						*pnCounterValue = dbCounterChange.m_nToValue;
 					}
-
-				END_CONNECTION_RETRY(ipConnection, "ELI38936");
-			} while (!bCounterDecremented  && nDecrementRetries < 1000);
-			
-			if (nDecrementRetries >= 1000)
-			{
-				UCLIDException ue("ELI38985", "Could not decrement counter.");
-				ue.addDebugInfo("NumberOfRetires", nDecrementRetries);
-				throw ue;
-			}
+				}
+			END_CONNECTION_RETRY(ipConnection, "ELI38936");
 		}
+		// https://extract.atlassian.net/browse/ISSUE-13451
+		// WARNING: DO NOT REMOVE OR CHANGE ELI38785 WITHOUT ALSO MODIFYING THE SPOT IT IS CHECKED
+		// IN CAFEngineFileProcessor::raw_ProcessFile.
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38785");
 	}
 	catch(UCLIDException &ue)
