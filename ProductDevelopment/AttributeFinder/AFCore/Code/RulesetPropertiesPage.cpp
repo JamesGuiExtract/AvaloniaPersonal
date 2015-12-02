@@ -333,11 +333,12 @@ void CRuleSetPropertiesPage::setupCounterList()
 		}
 		
 		// Populate counter if:
-		// - RDT is licensed
-		// - The counter is a custom counter
-		// - We have a gnFLEXINDEX_RULE_WRITING_OBJECTS license and the counter is indexing by doc.
-		// - We have a gnIDSHIELD_RULE_WRITING_OBJECTS license and the counter is redaction by page.
-		if (isRdtLicensed() || nID >= 100
+		// - The grid is read-only
+		// - or RDT is licensed
+		// - or The counter is a custom counter
+		// - or We have a gnFLEXINDEX_RULE_WRITING_OBJECTS license and the counter is indexing by doc.
+		// - or We have a gnIDSHIELD_RULE_WRITING_OBJECTS license and the counter is redaction by page.
+		if (m_bReadOnly || isRdtLicensed() || nID >= 100
 			|| (nID == giINDEXING_DOCS_COUNTERID &&
 				LicenseManagement::isLicensed(gnFLEXINDEX_RULE_WRITING_OBJECTS))
 			|| (nID == giREDACTION_PAGES_COUNTERID &&
