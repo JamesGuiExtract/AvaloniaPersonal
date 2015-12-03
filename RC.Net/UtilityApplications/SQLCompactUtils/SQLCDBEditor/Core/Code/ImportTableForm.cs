@@ -273,10 +273,10 @@ namespace Extract.SQLCDBEditor
                         "importing the new data.\r\n\r\n" +
                         "Please review any foreign key relationships with this table to assess impacts. " +
                         "Be aware that any foreign key relationships using cascade deletes may " +
-                        "may cause data in other tables to be deleted.\r\n\r\n" +
+                        "cause data in other tables to be deleted.\r\n\r\n" +
                         "Are you sure you want to use replace instead of append?", "Warning", 
                         MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
-                        MessageBoxDefaultButton.Button2, 0))
+                        MessageBoxDefaultButton.Button2, options: 0))
                     {
                         AppendRadioButton.Checked = true;
                         return;
