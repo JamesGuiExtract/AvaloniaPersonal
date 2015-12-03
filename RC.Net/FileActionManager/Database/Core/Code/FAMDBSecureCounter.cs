@@ -316,7 +316,7 @@ namespace Extract.FileActionManager.Database
                     "Failed to send low counter value alert email.", ex);
                 ee.AddDebugData("Counter name", _name, false);
                 ee.AddDebugData("Counter value", counterValue, false);
-                throw ee;
+                ee.Log();
             }
         }
 

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 using System.Globalization;
+using Extract.Utilities.Email;
 
 namespace Extract.FileActionManager.Database
 {
@@ -355,6 +356,26 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
+                // If email alerts are enabled make sure there are settings for the SMTP
+                if (_emailSpecifiedRecipientsCheckBox.Checked || _emailSupportCheckBox.Checked)
+                {
+                    // Verify that there are settings for SMTP
+                    SmtpEmailSettings _emailSettings = new SmtpEmailSettings();
+                    _emailSettings.LoadSettings(
+                                        new FAMDatabaseSettings<ExtractSmtp>(
+                                            _fileProcessingDB, false, SmtpEmailSettings.PropertyNameLookup));
+                    if (string.IsNullOrWhiteSpace(_emailSettings.Server))
+                    {
+                        UtilityMethods.ShowMessageBox("The alert email is sent using email server settings " +
+                            "in the database, but these settings have not been configured.\r\n\r\n" +
+                            "From the main screen, select the \"Database | Database options...\" " +
+                            "menu option, then use the \"Email\" tab to configure the outgoing email server.",
+                            "Outgoing email server not configured", true);
+                        DialogResult = DialogResult.None;
+                        return;
+                    }
+                }
+
                 // Store counter alert settings
                 _licenseContactSettings.Settings.SendAlertsToExtract =
                     _emailSupportCheckBox.Checked;
