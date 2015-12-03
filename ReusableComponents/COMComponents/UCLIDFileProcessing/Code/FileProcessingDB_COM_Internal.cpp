@@ -9013,6 +9013,11 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 
 				if (!bValid)
 				{
+					if (m_DatabaseIDValues.m_GUID == GUID_NULL)
+					{
+						UCLIDException ue("ELI39181", "Request code cannot be generated because DatabaseID is missing.");
+						throw ue;
+					}
 					// Modify the DBIdValue to have corrected values (m_GUID and m_ctLastUpdated will be the same)
 					getDatabaseInfo(ipConnection, m_strDatabaseName, DBIDValue.m_strServer,
 						DBIDValue.m_ctCreated, DBIDValue.m_ctRestored);
