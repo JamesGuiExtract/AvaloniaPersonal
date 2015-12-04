@@ -1,0 +1,316 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.3.0.39 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.3.0.39 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed after <b>10.3.0.27</b> and up through <b>10.3.0.39</b>.
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-12348]</b> Confirm that <b>Core: Store or retrieve attributes in 
+		database</b> functions correctly.
+<p>
+  	   	<LI><b>[ISSUE-13155]</b> Confirm that attempting to paste tasks (via context menu) 
+		with a newer task version brings up the context menu but with disabled options. 
+		See <b>M:\PVCS_JIRA\JIRA\ISSUE-13155</b>.
+<p>
+  	   	<LI><b>[ISSUE-13177]</b> Simple Rule Writing Installation
+		<ul>
+			<li>For FLEX Index Customer Rule Writing, confirm that the entry under 
+			<b>All Programs</b> is <b>Extract Systems Flex Index RDT</b>.
+			<li>For FLEX Index Customer Rule Writing, confirm that the Control Panel 
+			label is <b>Extract Systems Flex Index Customer RDT</b>.
+			<li>For ID Shield Customer Rule Writing, confirm that the entry under 
+			<b>All Programs</b> is <b>Extract Systems ID Shield RDT</b>.
+			<li>For ID Shield Customer Rule Writing, confirm that the Control Panel 
+			label is <b>Extract Systems ID Shield Customer RDT</b>.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13235]</b> FAM Counters
+		<ul>
+			<li>Confirm that each standard counter can successfully be created.
+			<li>Confirm that each standard counter can successfully support rule 
+			execution with correct decrements.
+			<li>Confirm that each standard counter can successfully be updated.
+			<ul>
+				<li>ID = 1, Indexing By Document
+				<li>ID = 2, Pagination By Document
+				<li>ID = 3, Redaction By Page
+				<li>ID = 4, Redaction By Document
+				<li>ID = 5, Indexing By Page
+			</ul>
+			<li>Confirm that the above tests also work with a <b>Custom By Page</b> 
+			counter.
+			<li>Confirm that the above tests also work with a <b>Custom By Document</b> 
+			counter.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13251]</b> Software Licensing
+		<ul>
+			<li>Confirm that a <b>FLEX Index / ID Shield Utilities</b> licensing item 
+			exists for <b>Disable Rule Execution Counters &lt;DevOnly&gt;</b> in the 
+			<b>Current</b> folder.
+			<li>Confirm that no licensing item exists for <b>Disable USB Key Serial 
+			Numbers</b>.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13266]</b> Confirm that the OrderMappingDB for <b>Demo_LabDE</b> 
+		does not contain a <b>Patient</b> table.
+<p>
+  	   	<LI><b>[ISSUE-13285]</b> Confirm that <b>FAMDBCounterManager.exe</b> is 
+		obfuscated.
+<p>
+  	   	<LI><b>[ISSUE-13317]</b> Confirm that <b>SpatialStringChecksum.exe</b> is 
+		installed into CommonComponents.
+<p>
+  	   	<LI><b>[ISSUE-13335]</b> DB Admin Debug Data
+        	<ul>
+			<li>Use DB Admin to request a counter update for a specific database.
+			<li>Use <b>Counter Manager</b> to create a new counter for the database.
+			<li>Use DB Admin to apply the update string to a <b>different</b> 
+			database.
+			<li>Confirm that the update fails.
+			<li>Confirm that the associated debug data includes the expected and 
+			actual database names.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13361]</b> FAM Counter Debug Data
+        	<ul>
+			<li>Create and apply a custom counter such as <b>Wayne (By Page)</b> with 
+			ID = 234.
+			<li>Create a simple RSD file that uses the same custom counter ID but with 
+			a slightly different name, such as <b>Wayne - (By Page)</b>.
+			<li>Confirm that an exception is thrown if trying to process images with 
+			this ruleset.
+			<li>Confirm that the associated debug data includes the expected and 
+			actual <b>counter names</b>.
+			<li>Confirm that the associated debug data includes the expected and 
+			actual <b>counter IDs</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13356]</b> Confirm that an entry is logged to UEX for each applied 
+		FAM Counter update or unlock.
+<p>
+  	   	<LI><b>[ISSUE-13357]</b> Confirm that an entry is logged to UEX for each FAM Counter 
+		transition of 1000 counts.
+<p>
+  	   	<LI><b>[ISSUE-13359]</b> Confirm that restarting a build of an already labelled build 
+		succeeds without sending a <b>Build Failed</b> message.
+<p>
+  	   	<LI><b>[ISSUE-13370]</b> Confirm that DB Admin window caption for managing Bates number 
+		counters is <b>Manage Bates Number Counters</b>.
+<p>
+  	   	<LI><b>[ISSUE-13395, ISSUE-13420]</b> FAM Counter Manager UI
+		<ul>
+			<li>Copy a valid update code to Clipboard.
+			<li>Paste into Counter Manager and confirm data validity.
+			<li>Copy other random text to Clipboard.
+			<li>Paste into Counter Manager and confirm data is not valid.
+			<li>Confirm that the <b>Database license string</b> edit box is cleared.
+			<li>Confirm that <b>Alert Frequency</b> values must be less than 
+			<b>Alert Level</b> values.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13397]</b> Confirm that Memory Leak test #2 for <b>Store Retrieve 
+		Attributes</b> processes smoothly without any hang.
+<p>
+  	   	<LI><b>[ISSUE-13399]</b> Confirm that the <b>Add AKAs</b> plugin works properly with 
+		the new Order Mapper DB schema.
+<p>
+  	   	<LI><b>[ISSUE-13400]</b> Confirm that <b>InsertAKAs.rsd</b> works properly with 
+		the new Order Mapper DB schema.
+<p>
+		<li><b>[ISSUE-13402]</b> Unlock Requests With Unrecoverable Counters
+		<ul>
+			<li>Start with clean <b>Test</b> database.
+			<li>Add each <b>standard</b> counter with 1000 counts.
+			<li>Exercise FPS to run rules and decrement from each counter.
+			<li>Confirm that FAM counters have each been decremented.
+			<li>Modify the <b>SecureCounterValue</b> entry for the Pagination counter 
+			from the <b>SecureCounter</b> table.
+			<li>Confirm that just one FAM counter is now corrupt.
+			<li>Confirm that an unlock request can be generated.
+			<li>Confirm that <b>Counter Manager</b> identifies the unrecoverable counter 
+			and the issue.
+			<li>Confirm that attempting to generate an unlock code displays an 
+			<b>Unrecoverable counter</b> error message with directions to delete it.
+			<li>Confirm that <b>SQL Management Studio</b> can delete the modified entry 
+			from the <b>SecureCounter</b> table.
+			<li>Confirm that the counter is no longer corrupt.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13404]</b> FAM Counters With Invalid Database ID
+        	<ul>
+			<li>Create a new database (current schema) without any counters.
+			<li>Backup or detach the database and restore it to a different machine.
+			<li>From DB Admin on the new machine, generate an update code to create a 
+			counter.
+			<li>Use <b>Counter Manager</b> to create an update code with a new counter.
+			<li>Confirm that the new counter is successfully applied to the database.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13405, ISSUE-13443]</b> SQLCDBEditor
+		<ul>
+			<li><u>Import</u>
+			<ul>
+				<li>Confirm that selecting <b>Tools - Import</b> brings up an 
+				<b>Import data into database table</b> dialog.
+				<li>Confirm that the dialog includes a <b>Select data file</b> 
+				edit box.
+				<li>Confirm that an associated browse button is included.
+				<li>Confirm that the dialog includes a <b>Select table to import 
+				data into</b> combo box.
+				<li>Confirm that the combo box is preloaded with each table contained 
+				in the open database.
+				<li>Confirm that the data file contents are listed in the dialog.
+				<li>Confirm that the dialog includes <b>Import configuration</b> 
+				radio buttons.
+				<ul>
+					<li>Append imported data to existing table contents
+					<li>Replace existing table contents with imported data
+				</ul>
+				<li>Confirm that the dialog includes <b>Import</b> and <b>Cancel</b> 
+				buttons.
+<p>
+				<li>Confirm that data can be successfully <b>appended</b>.
+				<li>Confirm that data can be successfully <b>replaced</b>.
+			</ul>
+			<li><u>Export</u>
+			<ul>
+			<ul>
+				<li>Confirm that selecting <b>Tools - Export</b> brings up an 
+				<b>Export Tables</b> dialog.
+				<li>Confirm that the dialog includes a <b>Selected output 
+				directory</b> edit box.
+				<li>Confirm that an associated browse button is included.
+				<li>Confirm that the dialog includes a list of all tables in the 
+				open database.
+				<li>Confirm that the following columns are included.
+				<ul>
+					<li>A checkbox column to indicate selection.
+					<li>Table name
+					<li>Output file name
+				</ul>
+				<li>Confirm that the header checkbox checks or unchecks each 
+				individual checkbox.
+				<li>Confirm that the default output file name is <b>&lt;table 
+				name&gt;.csv</b>
+				<li>Confirm that the dialog includes <b>Export</b> and <b>Done</b> 
+				buttons.
+<p>
+				<li>Confirm that data can be successfully <b>exported</b> from a 
+				single table.
+				<li>Confirm that data can be successfully <b>exported</b> from 
+				multiple tables.
+			</ul>
+<p>
+			<li>Open <b>Rutgers.sdf</b> and select <b>Tools - Import</b>.
+			<li>Confirm that the combo box available for table selection is height 
+			limited.
+			<li>Confirm that the confirmation message presented after <b>Import</b> 
+			includes a meaningful window caption.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13409]</b> FAM Counters
+        	<ul>
+			<li>Create a new database (current schema) and add one or more counters.
+			<li>Detach and reattach the database to the same machine.
+			<li>Confirm that the counters are in a corrupt state.
+			<li>Generate an <b>unlock code</b>.
+			<li>Use <b>Counter Manager</b> to create an unlock string.
+			<li>Confirm that <b>Counter Manager</b> displays the most recent counter 
+			value from the <b>SecureCounterValueHistory</b> table as extracted from 
+			the unlock request.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13410, ISSUE-13413]</b> FAM Counter Decrement By Page Without OCR
+		<ul>
+			<li>Prepare a testing database with <b>Indexing By Page</b> counter.
+			<li>Prepare a collection of multi-page images.
+			<li>Prepare simple RSD file with <b>Create Value</b> rule and <b>Indexing 
+			By Page</b> counter.
+			<li>Exercise <b>Core: Execute rules</b> with <b>Do not OCR</b> option.
+			<li>Confirm that the FAM counter correctly decrements per page count.
+			<li>Confirm that counting does not hang when a FAM process is stopped.
+			<li>Confirm that counting does not hang when a FAM Service process is 
+			stopped.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13411]</b> Confirm that exercising the URS for <b>MN - Fairview</b> 
+		does not have any processing failures.
+<p>
+  	   	<LI><b>[ISSUE-13412]</b> Confirm that a meaningful exception is generated when an 
+		older software version attempts to read a newer <b>Regular Expression Rule</b> 
+		object. See <b>M:\PVCS_JIRA\JIRA\ISSUE-13155</b>.
+<p>
+  	   	<LI><b>[ISSUE-13414]</b> Confirm that rapid and repeated open and close of <b>Manage - 
+		Rule execution counters</b> does not display an unhandled exception error.
+<p>
+  	   	<LI><b>[ISSUE-13422]</b> Rule Tester
+		<ul>
+			<li>Confirm that the <b>Run</b> button is disabled unless both of the 
+			following licenses are present.
+			<ul>
+				<li>RDT
+				<li>Disable Rule Execution Counters &lt;Dev Only&gt;
+			</ul>
+			<li>Confirm that the combination of <b>Disable Rule Execution Counters</b> 
+			and either license for simple rule writing <b>does not</b> enable the 
+			run button.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13423]</b> Storing Attribute Sets
+		<ul>
+			<li>Confirm that the <b>Core: Store or retrieve attributes in database</b> 
+			property page does not allow creation of new attribute set names.
+			<li>Confirm that a path tag or function can be entered by hand and will 
+			be evaluated correctly <b>if and only if</b> the resulting attribute set 
+			name already existed.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13439]</b> Core: Set File Action Status In Database UI
+		<ul>
+			<li>Confirm that the combo box is wide enough to display 
+			<b>Unattempted</b>.
+			<li>Confirm that tab navigation works correctly.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13445]</b> Confirm that each demo database has an up-to-date schema.
+		<ul>
+			<li>Demo_FlexIndex
+			<li>Demo_IDShield
+			<li>Demo_LabDE
+		</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+	    		<li>All Tests
+			<li>Raster Zone Test
+			<li>Spatial String Searcher Test
+			<li>Spatial String Test
+	    	</ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
