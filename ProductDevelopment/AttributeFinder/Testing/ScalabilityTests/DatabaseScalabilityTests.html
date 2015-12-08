@@ -113,6 +113,15 @@ to install FLEX Index.
 			<li>Action2.fps
 			<li>Action3.fps
 		</ul>
+		<li>Configure FAM DB counter decrements (optional)<br>
+		Action3 has a task (disabled by default) that will decrement a
+		"FLEX Index - Indexing (By Document)" counter;<br>
+		to include counter decrements as part of the test:
+		<ul>
+			<li> Enable this Execute Rules task in Action3.fps
+			<li> Create a "FLEX Index - Indexing (By Document)" rule execution
+			counter in the DB_Scalability database.
+		</ul>
 		<li>Configure the FAM service to execute each of the FPS files.
 	</ul>
 <p>
