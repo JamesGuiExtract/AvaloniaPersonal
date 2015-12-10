@@ -1,0 +1,213 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 10.3.0.x Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 10.3.0.x Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<h3>Goals</h3>
+    	<ul>
+  	   	<LI>Exercise SCRs fixed after <b>10.3.0.39</b> and up through <b>10.3 release</b>.
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[ISSUE-13304, ISSUE-13349, ISSUE-13460]</b> Demo_LabDE
+		<ul>
+			<li>Confirm that the <b>Demo_LabDE</b> rules work without failures.
+			<li>Confirm that the <b>StapledOutputDirectory</b> property on the 
+			<b>Duplicate Documents</b> button in Demo_LabDE points to 
+			<b>&lt;FPSFileDir&gt;\..\Input\Extended\Stapled_$Now().tif</b>.
+			<li>Confirm that while processing <b>Extended</b> documents, the 
+			<b>Staple</b> action succeeds.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13353]</b> URS Testing
+		<ul>
+			<li>Confirm that files (Solution folder and TestingFiles folder) are 
+			available to support URS testing for the following <b>LabDE</b> projects.
+			<li>Confirm that testing results support the goal of achieving <b>90+%</b> 
+			accuracy compared to pre-10.3 baseline results.
+			<ul>
+				<li>Advanced Health
+				<li>Fairview
+				<li>KUMC
+				<li>NMH
+				<li>ProHealth
+				<li>UITC
+				<li>UVA
+				<li>UW Clinics
+				<li>UW Transplant
+			</ul>
+			<li>Confirm that acceptable accuracy has been achieved for the following 
+			<b>URS-based LabDE</b> projects.
+			<ul>
+				<li>Duke
+				<li>Tampa General Hospital
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13453]</b> SQLCDBEditor Import
+        	<ul>
+			<li>Open SQLCDBEditor.exe
+			<li>Open <b>Demo_FlexIndex.sdf</b>.
+			<li>Export the <b>State</b> table
+			<li>Select <b>Tools - Import</b>.
+			<li>Confirm that <b>Append</b> is the default option.
+			<li>Select the <b>State</b> table and exported file from above.
+			<li>Select the <b>Replace</b> option.
+			<li>Confirm that a warning message is displayed about reviewing 
+			foreign key constraints.
+			<li>Choose <b>Yes</b> to Replace and click the <b>Import</b> button.
+			<li>Confirm that a meaningful exception is displayed and that the 
+			Import operation fails.
+			<li>Confirm that modifications made to an export of the <b>ZipCode</b> 
+			table can be successfully Replaced without a warning.
+			<li>Confirm that a menaingful confirmation message is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13458]</b> Confirm that <b>RuleTester.exe</b> can display ruleset 
+		properties including counter definitions without an RDT license.
+<p>
+  	   	<LI><b>[ISSUE-13459]</b> Database ID and FAM Counter Corruption
+		<ul>
+			<li><u>ID = 0, DB without Counters</u>
+			<ul>
+				<li>Create a new database.
+				<li>Use <b>SQL Mgmt Studio</b> to clear the 
+				<b>Database ID</b> field in the <b>DBInfo</b> table.
+				<li>Generate a <b>Counter Update Request</b>.
+				<li>Confirm that the request includes a Database ID 
+				containing all zeroes.
+				<li>Confirm that the request can be successfully 
+				pasted into <b>Counter Manager</b>.
+				<li>Confirm that <b>Counter Manager</b> displays a 
+				different, non-zero Database ID.
+				<li>Confirm that a counter can be created and applied.
+				<li>Confirm that a new update request includes the new 
+				Database ID.
+			</ul>
+<p>
+			<li><u>ID = 0, DB with Counters</u>
+			<ul>
+				<li>Operate on the database from the above test.
+				<li>Confirm that one or more counters are present and valid.
+				<li>Use <b>SQL Mgmt Studio</b> to clear the 
+				<b>Database ID</b> field in the <b>DBInfo</b> table.
+				<li>Confirm that the existing counter is <b>Corrupted</b>.
+				<li>Generate an <b>Unlock Request</b>.
+				<li>Confirm that an <b>ELI39181: Request code cannot be 
+				generated because Database ID is missing</b> exception is 
+				displayed.
+				<li>Use <b>SQL Mgmt Studio</b> to remove all entries from the 
+				<b>SecureCounter</b> table.
+				<li>Confirm that a <b>Counter Update Request</b> can be 
+				generated.
+				<li>Confirm that a new counter can be created and applied.
+			</ul>
+<p>
+			<li><u>ID missing, DB with Counters</u>
+			<ul>
+				<li>Operate on the database from the above test.
+				<li>Use <b>SQL Mgmt Studio</b> to remove the 
+				<b>Database ID</b> field in the <b>DBInfo</b> table.
+				<li>Generate a <b>Counter Update Request</b>.
+				<li>Confirm that the existing counter is <b>Corrupted</b>.
+				<li>Generate an <b>Unlock Request</b>.
+				<li>Confirm that an <b>ELI39181: Request code cannot be 
+				generated because Database ID is missing</b> exception is 
+				displayed.
+				<li>Use <b>SQL Mgmt Studio</b> to remove all entries from the 
+				<b>SecureCounter</b> table.
+				<li>Confirm that a <b>Counter Update Request</b> can be 
+				generated.
+				<li>Confirm that a new counter can be created.
+				<li>Confirm that applying the counter is successful but that 
+				the counter is <b>Corrupted</b>.
+				<li>Confirm that a subsequent <b>Unlock</b> request can be 
+				applied but that the counter remains <b>Corrupted</b>.
+				<li>Confirm that the <b>Database ID</b> field is still missing 
+				from the <b>DBInfo</b> table.
+			</ul>
+<p>
+			<li><b>[ISSUE-13482]</b> <u>ID missing, DB without Counters</u>
+			<ul>
+				<li>Create a new database.
+				<li>Use <b>SQL Mgmt Studio</b> to remove the 
+				<b>Database ID</b> field in the <b>DBInfo</b> table.
+				<li>Generate a <b>Counter Update Request</b>.
+				<li>Confirm that the request includes a Database ID 
+				containing all zeroes.
+				<li>Confirm that the request can be successfully 
+				pasted into <b>Counter Manager</b>.
+				<li>Confirm that <b>Counter Manager</b> displays a 
+				different, non-zero Database ID.
+				<li>Confirm that a counter can be created.
+				<li>Confirm that applying the counter is successful but that 
+				the counter is <b>Corrupted</b>.
+				<li>Confirm that a subsequent <b>Unlock</b> request can be 
+				applied but that the counter remains <b>Corrupted</b>.
+				<li>Confirm that the <b>Database ID</b> field is still missing 
+				from the <b>DBInfo</b> table.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13469, ISSUE-13470]</b> FAM Counters and Email Settings
+		<ul>
+			<li>Create a new database and add one or more <b>rule execution 
+			counters</b> with counts.
+			<li>Add an <b>Alert Level</b> and enable email alerts to <b>support</b>.
+			<li>Click <b>OK</b>.
+			<li>Confirm that an <b>Outgoing email server not configured</b> warning 
+			message is displayed.
+			<li>Confirm that Alert settings cannot be saved without email settings 
+			being previously saved.
+			<li>Configure <b>email settings</b> without specifying a <b>Sender 
+			address</b>.
+			<li>Process some files such that the <b>Alert Level</b> is crossed.
+			<li>Confirm that none of the processed files fail.
+			<li>Confirm that an exception is logged stating that the Alert 
+			message could not be sent.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13479]</b> Duplicate Documents With Multiple Users
+		<ul>
+			<li>Set up <b>Demo_LabDE</b> so that verification can be done by 
+			multiple users.
+			<li>From one machine, verify and advance to <b>R226.tif</b>.
+			<li>From another machine with a different user, advance to 
+			<b>Z226.tif</b>.
+			<li>From the first machine, click the <b>Duplicate Documents</b> 
+			button.
+			<li>Confirm that no exception is displayed.
+			<li>Confirm that documents are displayed in FFI with expected 
+			information.
+		</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+	    		<li>All Tests
+			<li>Raster Zone Test
+			<li>Spatial String Searcher Test
+			<li>Spatial String Test
+	    	</ul>
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+		<LI>National Ruleset : Indexing
+		<LI>National Ruleset : LabDE
+   	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
