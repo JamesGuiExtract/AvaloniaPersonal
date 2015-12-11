@@ -22,6 +22,7 @@
 //		<IncludePath>$(VCInstallDir)PlatformSDK\include;$(IncludePath);C:\Program Files (x86)\Visual Leak Detector\include</IncludePath>
 //		<LibraryPath>$(LibraryPath);C:\Program Files (x86)\Visual Leak Detector\lib\Win32</LibraryPath>
 // 3) The entire solution is properly built and registered before enabling VLD.
+
 //#include <vld.h> 
 
 #endif
