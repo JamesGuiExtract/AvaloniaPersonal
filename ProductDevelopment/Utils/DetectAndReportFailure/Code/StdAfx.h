@@ -19,6 +19,8 @@
 #endif // _AFX_NO_AFXCMN_SUPPORT
 #include <afxmt.h>          // MFC synchronization objects
 
+#include <MemLeakDetection.h>
+
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 

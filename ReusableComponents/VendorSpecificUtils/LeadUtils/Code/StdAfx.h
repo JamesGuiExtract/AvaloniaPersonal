@@ -15,3 +15,5 @@
 #include <windows.h>
 #include <comdef.h>
 #include <commdlg.h>
+
+#include <MemLeakDetection.h>

@@ -12,3 +12,5 @@
 #include <afxdisp.h>
 
 #include <windows.h>
+
+#include <MemLeakDetection.h>

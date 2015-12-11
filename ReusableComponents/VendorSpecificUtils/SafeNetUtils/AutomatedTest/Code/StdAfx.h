@@ -20,6 +20,8 @@ extern CComModule _Module;
 
 #include <afxmt.h>
 
+#include <MemLeakDetection.h>
+
 #import "..\..\..\..\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 

@@ -18,6 +18,8 @@
 extern CComModule _Module;
 #include <atlcom.h>
 
+#include <MemLeakDetection.h>
+
 #import "UCLIDExceptionMgmt.tlb"
 
 //{{AFX_INSERT_LOCATION}}

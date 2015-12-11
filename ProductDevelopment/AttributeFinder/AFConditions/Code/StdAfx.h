@@ -26,6 +26,8 @@ extern CComModule _Module;
 #include <atlctl.h>
 #include "..\..\..\..\ReusableComponents\APIs\Microsoft Visual Studio\VC98\ATL\Include\atlcontrols.h"
 
+#include <MemLeakDetection.h>
+
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 

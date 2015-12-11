@@ -693,6 +693,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Out
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AttributeDBMgrComponents", "..\..\..\AttributeDbManager\Code\AttributeDBMgrComponents.vcxproj", "{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Parsers.Test", "..\..\..\..\..\RC.Net\Utilities\Parsers\Testing\Automated\Extract.Utilities.Parsers.Test.csproj", "{15C50B49-911E-4E8C-8E22-DB15461D4FD6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3835,6 +3841,24 @@ Global
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Template|Win32.ActiveCfg = Template|Win32
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Template|Win32.Build.0 = Template|Win32
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}.Template|x86.ActiveCfg = Template|Win32
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Release|Win32.ActiveCfg = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Release|x86.ActiveCfg = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Template|Any CPU.ActiveCfg = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Template|Any CPU.Build.0 = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Template|Mixed Platforms.Build.0 = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Template|Win32.ActiveCfg = Release|Any CPU
+		{15C50B49-911E-4E8C-8E22-DB15461D4FD6}.Template|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -19,6 +19,8 @@ extern CComModule _Module;
 #include <atlcom.h>
 #include <afxmt.h>
 
+#include <MemLeakDetection.h>
+
 #import "..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids
 using namespace UCLID_COMLMLib;
 

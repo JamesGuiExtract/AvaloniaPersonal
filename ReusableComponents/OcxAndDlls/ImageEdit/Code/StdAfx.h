@@ -28,3 +28,5 @@ extern CComModule _Module;
 #include <atlcom.h>
 #include <atlctl.h>
 
+#include <MemLeakDetection.h>
+

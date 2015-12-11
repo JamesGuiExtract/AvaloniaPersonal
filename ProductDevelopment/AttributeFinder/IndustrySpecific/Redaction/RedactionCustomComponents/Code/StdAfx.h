@@ -28,6 +28,8 @@ extern CComModule _Module;
 
 #import <msxml.tlb> named_guids
 
+#include <MemLeakDetection.h>
+
 #import "..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
 using namespace UCLID_COMLMLib;
 

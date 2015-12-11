@@ -15,6 +15,8 @@
 
 #include <atlbase.h>
 
+#include <MemLeakDetection.h>
+
 // [Added 11/04/2009 - JDS] NOTE: This is an older way of working around
 // the issue related to including both afxwin.h and atlbase.h (including
 // both restricts access to some of the ATL template classes, in particular

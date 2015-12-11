@@ -20,6 +20,8 @@
 #include <afxdb.h>			// MFC database classes
 #include <afxdao.h>			// MFC DAO database classes
 
+#include <MemLeakDetection.h>
+
 // application specific includes
 
 //{{AFX_INSERT_LOCATION}}

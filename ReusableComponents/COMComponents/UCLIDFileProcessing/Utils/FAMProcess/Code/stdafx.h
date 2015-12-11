@@ -26,6 +26,8 @@
 #include <atlbase.h>
 #include <atlcom.h>
 
+#include <MemLeakDetection.h>
+
 using namespace ATL;
 
 #import "..\..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids

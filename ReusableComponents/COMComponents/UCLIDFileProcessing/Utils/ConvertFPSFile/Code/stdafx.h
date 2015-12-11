@@ -29,6 +29,8 @@
 #include <afxcmn.h>			// MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
+#include <MemLeakDetection.h>
+
 #import "Common Files\System\ADO\msado27.tlb" rename("EOF", "adoEOF")
 using namespace ADODB;
 

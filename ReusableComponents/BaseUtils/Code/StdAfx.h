@@ -34,5 +34,7 @@
 #include <afxsock.h>		// MFC socket extensions
 #include <atlsafe.h>
 
+#include "MemLeakDetection.h"
+
 #import "..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
 using namespace Extract_Interfaces;

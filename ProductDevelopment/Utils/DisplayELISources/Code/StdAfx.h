@@ -14,6 +14,8 @@
 
 #include <afxwin.h>
 
+#include <MemLeakDetection.h>
+
 #pragma warning (disable:4786)
 
 // TODO: reference additional headers your program requires here

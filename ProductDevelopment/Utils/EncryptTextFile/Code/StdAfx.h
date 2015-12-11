@@ -8,3 +8,5 @@
 #include <CommonToExtractProducts.h>
 
 #include <afxdisp.h>
+
+#include <MemLeakDetection.h>
