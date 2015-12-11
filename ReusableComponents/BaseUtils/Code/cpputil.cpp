@@ -1396,13 +1396,21 @@ namespace Util
 	// the specifier string. Standard printf-style format specifiers are used in the format string.
 	std::string Format( const char* formatString, ... )
 	{
-		std::vector<char> buffer( Internal::Size, '\0' );
-		va_list args;
-		va_start( args, formatString );
+		try
+		{
+			ASSERT_ARGUMENT("ELI39182", formatString != nullptr);
 
-		int ret = ::vsnprintf_s( &buffer[0], Internal::Size, Internal::Size, formatString, args );
-		ASSERT_RUNTIME_CONDITION( "ELI38885", ret > 0, "Format caused string truncation" );
+			va_list args;
+			va_start( args, formatString );
+		
+			int size = _vscprintf(formatString ,args) + 1;
+			std::vector<char> buffer( size, '\0' );
 
-		return std::string( &buffer[0] );
+			int ret = ::vsnprintf_s( &buffer[0], size, _TRUNCATE, formatString, args );
+			ASSERT_RUNTIME_CONDITION( "ELI38885", ret > 0, "Format caused string truncation" );
+
+			return std::string( &buffer[0] );
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39183")
 	}
 }
