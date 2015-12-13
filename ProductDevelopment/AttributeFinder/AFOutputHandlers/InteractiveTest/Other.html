@@ -64,6 +64,14 @@
 		<li>Confirm that the configuration dialog includes a <b>Test query</b> button.
        		<li>Confirm that settings are persistent.
 <p>
+  	   	<LI><b>[ISSUE-12733]</b> Data Query Rule Objects
+        	<ul>
+			<li>Confirm that the <b>Data Query</b> output handler supports opening a 
+			SQL Compact DB in read-only mode.
+			<li>Confirm that the same database can be edited in a separate process while 
+			the rule object is being run.
+        	</ul>
+<p>
   	   	<LI><b>[ISSUE-12785, ISSUE-12854]</b> Confirm proper resize behavior for 
 		the <b>Data Query</b> output handler rule object.
     	</ul>
@@ -695,6 +703,15 @@
             		<li>Ensure that the above output handlers are testing using all possible 
 			attribute selectors.
 	    	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13220]</b> Run Object On Attributes OH
+		<ul>
+			<li>Configure and save a ruleset using this object.
+			<li>Double-click the output handler to open the configuration dialog.
+			<li>Click the Cancel button.
+			<li>Close the RuleSet Editor and confirm that the user is not prompted to 
+			save changes.
+		</ul>
     	</ul>
 <p>
     <li><h2>Select Multiple Output Handlers</h2>
