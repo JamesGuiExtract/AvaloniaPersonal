@@ -460,11 +460,8 @@
         	<ul>
             		<li>Confirm that items on this tab are shown if and only if they were 
 			licensed when the database was created.</li>
-            		<li>Confirm that the <b>ID Shield</b> group box contains a <b>Store ID 
-			Shield processing history</b> checkbox.</li>
-            		<li>Confirm that the <b>Data Entry</b> group box contains two checkboxes:
+            		<li>Confirm that the <b>Data Entry</b> group box contains one checkbox:
             		<ul>
-                		<li>Store data entry processing history</li>
                 		<li>Enable data entry counters</li>
             		</ul></li>
             		<li>Confirm that all settings are correctly propagated back to the 
@@ -651,6 +648,17 @@
             		<li>Confirm that renaming an action and clicking <b>Cancel</b> in the confirmation
             		dialog does not rename an action.</li>
             		<li>Confirm that the <b>Summary</b> tab is refreshed after an action is renamed.</li>
+        	</ul></li>
+<p>
+        	<li><u><b>Miscellaneous</b></u>
+        	<ul>
+	  	   	<LI><b>[ISSUE-13238]</b> Unhelpful FAM Exception
+        		<ul>
+				<li>Open a previously saved FPS file.
+				<li>Open DB Admin and delete the action used by the FPS file.
+				<li>Close and re-open the FPS file.
+				<li>Confirm that a meaningful exception is displayed.
+        		</ul>
         	</ul></li>
     	</ul></li>
 <p>
