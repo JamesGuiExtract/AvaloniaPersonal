@@ -939,13 +939,13 @@
                 <li>Overwrite the file</li>
                 <li>Append to the file</lI>
             </ul></li>
-        <p>
+<p>
             <li>Confirm that files are created with the specified filenames.</li>
             <li>Confirm that relative paths can be used to specify filenames.</li>
             <li>Confirm that folder will be created if necessary.</li>
             <li>Confirm that files are created with the specified contents.</li>
             <li>Confirm that each of the radio button options works as expected.</lI>
-        <p>
+<p>
             <li><b>[DotNet #626]</b> Bug appending with multiple threads
             <ul>
                 <li>Use a multi-core test machine and an FPS file configured to use multiple
@@ -955,6 +955,14 @@
                 <li>Run the FPS file with a significant (&gt;100) number of files queued.</li>
                 <li>Confirm that the list is written correctly.</li>
             </ul></li>
+<p>
+  	   	<LI><b>[ISSUE-12956]</b> Core: Create File.
+		<ul>
+			<li>Configure the task such that the file text creates a horizontal 
+			scroll bar.
+			<li>Confirm that the property page remains responsive and that settings 
+			are persistent.
+		</ul>
         </ul></li>
     <p>
         <li><b>Core: Delete empty folder</b>
@@ -1751,23 +1759,39 @@ ORDER BY DateTimeStamp<br>
 <p>
         <li><b>Core: Set file action status in database</b>
         <ul> 
-            <li>Use the Add button to select <b>Core: Set file-action status in database</b> as
-            the task.
-            <li>Confirm that there is a combo box for <b>Status of the action</b> in the 
-            configuration dialog.
-            <li>Confirm that each action defined in the current database is included in the combo
-            box.
-            <li>Confirm that there is a combo box for the action status in the configuration 
-            dialog. 
-            <ul>
-                <li>Confirm that <b>Unattempted</b> is available in the combo box. 
-                <li>Confirm that <b>Pending</b> is available in the combo box. 
-                <li>Confirm that <b>Completed</b> is available in the combo box. 
-                <li>Confirm that <b>Skipped</b> is available in the combo box. 
-                <li>Confirm that <b>Failed</b> is available in the combo box. 
-                <li>Confirm that <b>Pending</b> is the default selection. 
-            </ul>
-            <li>Confirm that the settings are persistent.
+            	<li>Use the Add button to select <b>Core: Set file-action status in database</b> 
+		as the task.
+		<li>Confirm that the property page contains an edit box to specify the 
+		file for which status should be set.
+		<li>Confirm that the property page includes an associated tag selector.
+		<li>Confirm that the property page includes an associated browse button.
+		<li>Confirm that the default setting is <b>&lt;SourceDocName&gt;</b>.
+		<li>Confirm that an option exists to <b>report an error</b> if the file 
+		does not exist in the database.
+		<li>Confirm that an option exists to <b>queue the file</b> if the file 
+		does not exist in the database.
+		<li>Confirm that the default setting is to <b>report an error</b>.
+            	<li>Confirm that there is a combo box for <b>Status of the action</b> in the 
+            	configuration dialog.
+            	<li>Confirm that each action defined in the current database is included in the combo
+            	box.
+            	<li>Confirm that there is a combo box for the action status in the configuration 
+            	dialog. 
+            	<ul>
+                	<li>Confirm that <b>Unattempted</b> is available in the combo box. 
+                	<li>Confirm that <b>Pending</b> is available in the combo box. 
+                	<li>Confirm that <b>Completed</b> is available in the combo box. 
+                	<li>Confirm that <b>Skipped</b> is available in the combo box. 
+                	<li>Confirm that <b>Failed</b> is available in the combo box. 
+                	<li>Confirm that <b>Pending</b> is the default selection. 
+            	</ul>
+            	<li>Confirm that the settings are persistent.
+<p>
+		<li>Confirm proper behavior for a non-default file.
+		<li>Confirm that an error can be reported if the file does not exist in 
+		the database.
+		<li>Confirm that the file can be queued if the file does not exist in 
+		the database.
         </ul> 
 <p>
         <li><b>Core: Set file priority</b>
