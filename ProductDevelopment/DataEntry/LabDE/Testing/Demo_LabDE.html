@@ -224,7 +224,13 @@
 		</ul>
         	<LI><u>Physician</u>
 		<ul>
-			<li>
+			<li><b>[ISSUE-13176]</b> Validation Should Require A Name
+			<ul>
+				<li>Verify a document with a valid Physician Name.
+				<li>Delete the first and last name but retain the Code.
+				<li>Confirm that validation errors appear for the missing 
+				name fields.
+			</ul>
 		</ul>
         	<LI><u>Order</u>
 		<ul>
@@ -294,6 +300,20 @@
     	<UL>
   	   	<LI><b>[ISSUE-13135]</b> Confirm that a meaningful exception is displayed and 
 		that verification halts if logging is enabled but not licensed.
+  	   	<LI><b>[ISSUE-13149, ISSUE-13153]</b> Data Error Glyph
+		<ul>
+			<li>Verify <b>C413.tif</b>.
+			<li>Select a <b>BASIC METABOLIC PANEL</b> order and confirm that all 
+			mandatory tests are present.
+			<li>Delete one of the tests.
+			<li>Confirm that an error glyph appears in the order name cell.
+			<li>Confirm that the error text notes the missing mandatory test.
+			<li>Click <b>Undo</b>.
+			<li>Confirm that the error glyph disappears.
+			<li>Delete the order.
+			<li>Undo the deletion.
+			<li>Confirm that the component names are not flagged as invalid.
+		</ul>
     	</UL></li>
 </OL>
 </BODY>
