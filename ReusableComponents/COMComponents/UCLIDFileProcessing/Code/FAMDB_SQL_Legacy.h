@@ -140,3 +140,11 @@ static const string gstrCREATE_SECURE_COUNTER_V130 =
 	"   ID int NOT NULL CONSTRAINT PK_SecureCounter PRIMARY KEY CLUSTERED, "
 	"   CounterName nvarchar(100) NOT NULL, "
 	"   SecureCounterValue nvarchar(max) NOT NULL)";
+
+// Used before schema version 128 - 134
+static const string gstrADD_FAM_SESSION_ACTION_FK_V128 =
+	"ALTER TABLE [dbo].[FAMSession] "
+	"WITH CHECK ADD CONSTRAINT [FK_FAMSession_Action] FOREIGN KEY([ActionID])"
+	"REFERENCES [dbo].[Action] ([ID])"
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";

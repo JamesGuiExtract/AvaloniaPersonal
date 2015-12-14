@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 134;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 135;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1076,7 +1076,7 @@ int UpdateToSchemaVersion128(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("ALTER TABLE [FAMSession] ADD [ActionID] INT");
 		vecQueries.push_back("ALTER TABLE [FAMSession] ADD [Queuing] BIT");
 		vecQueries.push_back("ALTER TABLE [FAMSession] ADD [Processing] BIT");
-		vecQueries.push_back(gstrADD_FAM_SESSION_ACTION_FK);
+		vecQueries.push_back(gstrADD_FAM_SESSION_ACTION_FK_V128);
 		vecQueries.push_back("DROP INDEX [SkippedFile].[IX_Skipped_File_UPI]");
 
 		// Need to drop the unnamed default value constraint on SkippedFile.UPIID.
@@ -1331,6 +1331,34 @@ int UpdateToSchemaVersion134(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39123");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion135(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 135;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrDROP_FAM_SESSION_ACTION_FK);
+		vecQueries.push_back(gstrADD_FAM_SESSION_ACTION_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39184");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -6404,7 +6432,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 131:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion132);
 				case 132:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion133);
 				case 133:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion134);
-				case 134:	break;
+				case 134:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion135);
+				case 135:	break;
 
 				default:
 					{

@@ -624,12 +624,19 @@ static const string gstrADD_ACTIVEFAM_FAM_SESSION_FK =
 	"WITH CHECK ADD  CONSTRAINT [FK_ActiveFAM_FAMSession] FOREIGN KEY([FAMSessionID])"
 	"REFERENCES [dbo].[FAMSession] ([ID])";
 
+// For version 135, change the FK so that instead of a cascade delete, it
+// sets the ActionID to NULL. This allows deleting Actions, which were otherwise
+// prevented when a FileTaskSession referenced a FAMSession that in turn referred to
+// an Action.
+static const string gstrDROP_FAM_SESSION_ACTION_FK = 
+	"ALTER TABLE [dbo].[FAMSession]  DROP CONSTRAINT [FK_FAMSession_Action]";
+
 static const string gstrADD_FAM_SESSION_ACTION_FK =
 	"ALTER TABLE [dbo].[FAMSession] "
 	"WITH CHECK ADD CONSTRAINT [FK_FAMSession_Action] FOREIGN KEY([ActionID])"
 	"REFERENCES [dbo].[Action] ([ID])"
 	"ON UPDATE CASCADE "
-	"ON DELETE CASCADE";
+	"ON DELETE SET NULL";
 
 static const string gstrADD_FAM_SESSION_MACHINE_FK =
 	"ALTER TABLE [dbo].[FAMSession] "
