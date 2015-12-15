@@ -2714,9 +2714,7 @@ namespace Extract.DataEntry
             // If no attribute was supplied, create a new one.
             if (attribute == null)
             {
-                attribute = new AttributeClass();
-                attribute.Name = AttributeName;
-                AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this);
+                attribute = AttributeStatusInfo.Initialize(AttributeName, _sourceAttributes, this);
                 newAttributeCreated = true;
             }
 

@@ -282,10 +282,8 @@ namespace Extract.DataEntry
                         !string.IsNullOrEmpty(attributeName));
 
                     // If requested, create a new attribute using the specified attribute name.
-                    IAttribute attribute = (IAttribute) new AttributeClass();
-                    attribute.Name = attributeName;
-
-                    AttributeStatusInfo.Initialize(attribute, sourceAttributes, owningControl,
+                    IAttribute attribute =
+                        AttributeStatusInfo.Initialize(attributeName, sourceAttributes, owningControl,
                         displayOrder, considerPropagated, tabStopMode, validatorTemplate,
                         autoUpdateQuery, validationQuery);
 

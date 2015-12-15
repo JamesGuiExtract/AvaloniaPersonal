@@ -530,7 +530,18 @@ namespace Extract.DataEntry
                     if (statusInfo.LastAppliedStringValue != null &&
                         _targetAttribute.Value.String != statusInfo.LastAppliedStringValue)
                     {
-                        AttributeStatusInfo.SetValue(_targetAttribute, statusInfo.LastAppliedStringValue, false, true);
+                        string lastAppliedStringValue = statusInfo.LastAppliedStringValue;
+
+                        // https://extract.atlassian.net/browse/ISSUE-13506
+                        // To prevent the possibility of an infinite loop in the query system, set
+                        // LastAppliedStringValue to null before enforcing it within any postponed
+                        // query.
+                        if (_executingPendingTriggers)
+                        {
+                            statusInfo.LastAppliedStringValue = null;
+                        }
+
+                        AttributeStatusInfo.SetValue(_targetAttribute, lastAppliedStringValue, false, true);
                     }
 
                     // https://extract.atlassian.net/browse/ISSUE-12813
@@ -629,12 +640,6 @@ namespace Extract.DataEntry
                     stringResult = "";
                 }
 
-                // Keep track of programmatically applied values, in case the field control isn't
-                // yet prepared to accept the value. (i.e. combo box whose item list has not yet
-                // been updated/initialized)
-                var statusInfo = AttributeStatusInfo.GetStatusInfo(_targetAttribute);
-                statusInfo.LastAppliedStringValue = stringResult;
-
                 // Update the attribute's value.
                 if (queryResult.IsSpatial)
                 {
@@ -655,6 +660,18 @@ namespace Extract.DataEntry
                 // refresh the value.
                 AttributeStatusInfo.GetOwningControl(_targetAttribute).
                     RefreshAttributes(queryResult.IsSpatial, _targetAttribute);
+
+                // https://extract.atlassian.net/browse/ISSUE-13506
+                // Only set LastAppliedStringValue in the case where the owning control did not
+                // properly accept the new query result.
+                if (_targetAttribute.Value.String != stringResult)
+                {
+                    // Keep track of programmatically applied values, in case the field control isn't
+                    // yet prepared to accept the value. (i.e. combo box whose item list has not yet
+                    // been updated/initialized)
+                    var statusInfo = AttributeStatusInfo.GetStatusInfo(_targetAttribute);
+                    statusInfo.LastAppliedStringValue = stringResult;
+                }
 
                 return true;
             }

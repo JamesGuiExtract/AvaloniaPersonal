@@ -619,10 +619,10 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets or sets the last string value applied to this attribute programmatically (on load
-        /// or via an auto-update query). Used to help ensure the correct value gets applied to
-        /// fields that may not yet be ready to accept the value (i.e. combo boxes where the list of
-        /// possible values has not yet been set/updated).
+        /// Gets or sets a programmatically applied attribute value (on load or via an auto-update
+        /// query) that should be ensured after validation queries have all been applied. Used to
+        /// address fields that may not yet be ready to accept the value (i.e. combo boxes where
+        /// the list of possible values has not yet been set/updated).
         /// </summary>
         /// <value>
         /// The last string value applied to this attribute programmatically.
@@ -1125,6 +1125,83 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Initializes an <see cref="IAttribute"/> of the specified <see paramref="attributeName"/>
+        /// along with an associated <see cref="AttributeStatusInfo"/> instance.
+        /// </summary>
+        /// <param name="attributeName">The name for the <see cref="IAttribute"/> to be generated.
+        /// </param>
+        /// <param name="sourceAttributes">The vector of <see cref="IAttribute"/>s to which the
+        /// generated <see cref="IAttribute"/> should be added.</param>
+        /// <param name="owningControl">The <see cref="IDataEntryControl"/> in charge of displaying 
+        /// the generated <see cref="IAttribute"/>.</param>
+        public static IAttribute Initialize(string attributeName, IUnknownVector sourceAttributes,
+            IDataEntryControl owningControl)
+        {
+            try
+            {
+                IAttribute attribute = new AttributeClass();
+                attribute.Name = attributeName;
+                Initialize(attribute, sourceAttributes, owningControl,
+                    null, false, null, null, null, null, true);
+
+                return attribute;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39185");
+            }
+        }
+
+        /// <summary>
+        /// Initializes an <see cref="IAttribute"/> of the specified <see paramref="attributeName"/>
+        /// along with an associated <see cref="AttributeStatusInfo"/> instance.
+        /// </summary>
+        /// <param name="attributeName">The name for the <see cref="IAttribute"/> to be generated.
+        /// </param>
+        /// <param name="sourceAttributes">The vector of <see cref="IAttribute"/>s to which the
+        /// generated <see cref="IAttribute"/> should be added.</param>
+        /// <param name="owningControl">The <see cref="IDataEntryControl"/> in charge of displaying 
+        /// the generated <see cref="IAttribute"/>.</param>
+        /// <param name="displayOrder">A <see langword="string"/> that allows the 
+        /// <see cref="IAttribute"/> to be sorted by compared to other <see cref="IAttribute"/>'s 
+        /// <see cref="DisplayOrder"/>values. Specify <see langword="null"/> to allow the 
+        /// <see cref="IAttribute"/> to keep any display order it already has.</param>
+        /// <param name="considerPropagated"><see langword="true"/> to consider the 
+        /// <see cref="IAttribute"/> already propagated; <see langword="false"/> otherwise.</param>
+        /// <param name="validatorTemplate">A template to be used as the master for any per-attribute
+        /// <see cref="IDataEntryValidator"/> created to validate the attribute's data.
+        /// Can be <see langword="null"/> to keep the existing validator or if data validation is
+        /// not required.</param>
+        /// <param name="tabStopMode">A <see cref="TabStopMode"/> value indicating under what
+        /// circumstances the attribute should serve as a tab stop. Can be <see langword="null"/> to
+        /// keep the existing tabStopMode setting.</param>
+        /// <param name="autoUpdateQuery">A query which will cause the <see cref="IAttribute"/>'s
+        /// value to automatically be updated using values from other <see cref="IAttribute"/>s
+        /// and/or a database query.</param>
+        /// <param name="validationQuery">A query which will cause the validation list for the 
+        /// validator associated with the attribute to be updated using values from other
+        /// <see cref="IAttribute"/>'s and/or a database query.</param>
+        public static IAttribute Initialize(string attributeName, IUnknownVector sourceAttributes,
+            IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
+            TabStopMode? tabStopMode, IDataEntryValidator validatorTemplate, string autoUpdateQuery,
+            string validationQuery)
+        {
+            try
+            {
+                IAttribute attribute = new AttributeClass();
+                attribute.Name = attributeName;
+                Initialize(attribute, sourceAttributes, owningControl, displayOrder, considerPropagated,
+                    tabStopMode, validatorTemplate, autoUpdateQuery, validationQuery, true);
+
+                return attribute;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39186");
+            }
+        }
+
+        /// <summary>
         /// Initializes a <see cref="AttributeStatusInfo"/> instance for the specified
         /// <see cref="IAttribute"/> with the specified parameters.
         /// </summary>
@@ -1170,12 +1247,15 @@ namespace Extract.DataEntry
         /// <param name="validationQuery">A query which will cause the validation list for the 
         /// validator associated with the attribute to be updated using values from other
         /// <see cref="IAttribute"/>'s and/or a database query.</param>
+        /// <param name="newAttribute"><see langword="true"/> if <see paramref="attribute"/> is
+        /// newly generated (the blank value should not be considered a purposely applied blank
+        /// value).</param>
         [ComVisible(false)]
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes, 
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
             TabStopMode? tabStopMode, IDataEntryValidator validatorTemplate, string autoUpdateQuery,
-            string validationQuery)
+            string validationQuery, bool newAttribute = false)
         {
             try
             {
@@ -1194,17 +1274,17 @@ namespace Extract.DataEntry
                 // Create a new statusInfo instance (or retrieve an existing one).
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                // https://extract.atlassian.net/browse/ISSUE-12548
-                // The data entry framework does not support having the same attribute mapped to two
-                // different controls simultaneously.
-                if (statusInfo._owningControl != null)
-                {
-                    ExtractException.Assert("ELI37798", "Invalid configuration; an attribute has " +
-                        "been mapped to multiple controls.",
-                        statusInfo._owningControl == owningControl, "Attribute", attribute.Name,
-                        "Control 1", ((Control)statusInfo._owningControl).Name,
-                        "Control 2", ((Control)owningControl).Name);
-                }
+//                // https://extract.atlassian.net/browse/ISSUE-12548
+//                // The data entry framework does not support having the same attribute mapped to two
+//                // different controls simultaneously.
+//                if (statusInfo._owningControl != null)
+//                {
+//                    ExtractException.Assert("ELI37798", "Invalid configuration; an attribute has " +
+//                        "been mapped to multiple controls.",
+//                        statusInfo._owningControl == owningControl, "Attribute", attribute.Name,
+//                        "Control 1", ((Control)statusInfo._owningControl).Name,
+//                        "Control 2", ((Control)owningControl).Name);
+//                }
 
                 statusInfo._owningControl = owningControl;
 
@@ -1310,11 +1390,21 @@ namespace Extract.DataEntry
                 if (!statusInfo._initialized)
                 {
                     statusInfo._initialized = true;
-                    
-                    // Keep track of programmatically applied values, in case the field control isn't
-                    // yet prepared to accept the value. (i.e. combo box whose item list has not yet
-                    // been updated/initialized)
-                    statusInfo.LastAppliedStringValue = attribute.Value.String;
+
+                    // https://extract.atlassian.net/browse/ISSUE-13506
+                    // https://extract.atlassian.net/browse/ISSUE-12547
+                    // Attributes (even newly constructed ones) have a non-null value. We don't want
+                    // to treat the default blank value as a value that needs to be applied; this
+                    // can end up clearing the intended value for this new attribute. Set
+                    // LastAppliedStringValue only if we are dealing with a previously existing
+                    // attribute.
+                    if (!newAttribute)
+                    {
+                        // Keep track of previously applied values, in case the field control isn't
+                        // yet prepared to accept the value. (i.e. combo box whose item list has not
+                        // yet been updated/initialized)
+                        statusInfo.LastAppliedStringValue = attribute.Value.String;
+                    }
 
                     _undoManager.AddMemento(new DataEntryAddedAttributeMemento(attribute));
 
@@ -1446,12 +1536,6 @@ namespace Extract.DataEntry
                 attribute.Value = value;
 
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
-
-                // https://extract.atlassian.net/browse/ISSUE-12547
-                // Consider any assignment of a value via specification of a SpatialString
-                // programmatic. Specifically, without this assignment swipes into the new row of a
-                // table end up getting cleared.
-                statusInfo.LastAppliedStringValue = value.String;
 
                 // https://extract.atlassian.net/browse/ISSUE-12662
                 // Whether or not EndEditInProgress, track modified attributes for the purpose of
