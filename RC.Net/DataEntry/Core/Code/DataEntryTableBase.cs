@@ -2709,8 +2709,32 @@ namespace Extract.DataEntry
         /// If <see langword="false"/>, hints will only be recalculated if they are dirty.</param>
         protected void UpdateHints(bool forceRecalculation)
         {
+            List<IAttribute> autoPopulatedAttributes;
+            UpdateHints(forceRecalculation, null, out autoPopulatedAttributes);
+        }
+
+        /// <summary>
+        /// As long as spatial info associated with the table has changed since the last time hints
+        /// were generated, spatial hints will be generated according to the table properties for
+        /// all <see cref="IAttribute"/>s in the table that are lacking spatial information.
+        /// </summary>
+        /// <param name="forceRecalculation">If <see langword="true"/>, re-calculate all hints.
+        /// If <see langword="false"/>, hints will only be recalculated if they are dirty.</param>
+        /// <param name="allowAutoPopulateForRow">If not <see langword="null"/>, any OCR text found
+        /// within a smart hint region will be used to populate attributes in the specified row
+        /// number only.</param>
+        /// <param name="autoPopulatedAttributes">Returns whether or not any attribute values were auto-
+        /// populated in the row indicated by <see paramref="allowAutoPopulateForRow"/>.</param>
+        // Out parameter used instead of return value since it would otherwise not be obvious
+        // that the return value is associated only with whether data was auto-populated.
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
+        protected void UpdateHints(bool forceRecalculation, int? allowAutoPopulateForRow,
+            out List<IAttribute> autoPopulatedAttributes)
+        {
             try
             {
+                autoPopulatedAttributes = new List<IAttribute>();
+
                 if (forceRecalculation || _hintsAreDirty)
                 {
                     _spatialHintGenerator.ClearHintCache();
@@ -2752,7 +2776,15 @@ namespace Extract.DataEntry
                             (!attribute.Value.HasSpatialInfo() || 
                              string.IsNullOrEmpty(attribute.Value.String)))
                         {
-                            CreateSpatialHint(attribute, cell, smartHintRows, smartHintColumns);
+                            bool autoPopulatedData;
+                            CreateSpatialHint(attribute, cell, smartHintRows, smartHintColumns,
+                                allowAutoPopulateForRow.HasValue && allowAutoPopulateForRow.Value == cell.RowIndex,
+                                out autoPopulatedData);
+
+                            if (autoPopulatedData)
+                            {
+                                autoPopulatedAttributes.Add(attribute);
+                            }
                         }
                     }
 
@@ -3218,20 +3250,27 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Attempts to provide a hint as to where the data for the specified 
+        /// Attempts to provide a hint as to where the data for the specified
         /// <see cref="IAttribute"/> might appear.
         /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> for which a spatial hint is wanted.
-        /// </param>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which a spatial hint is wanted.</param>
         /// <param name="targetCell">The <see cref="DataGridViewCell"/> for which a spatial hint
         /// is wanted.</param>
         /// <param name="smartHintRows">The rows for which smart hints are enabled.</param>
         /// <param name="smartHintColumns">The columns for which smart hints are enabled.</param>
+        /// <param name="allowAutoPopulation">if set to <see langword="true"/> [allow auto population].</param>
+        /// <param name="autoPopulated"><see langword="true"/> if auto-population using OCR text
+        /// that exists within a smart-hint region should occur; <see langword="false"/> if
+        /// auto-population should not be allowed.</param>
         // Use lists to have access to the count.
         [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "5#")]
         protected void CreateSpatialHint(IAttribute attribute, DataGridViewCell targetCell,
-            List<DataGridViewRow> smartHintRows, List<DataGridViewColumn> smartHintColumns)
+            List<DataGridViewRow> smartHintRows, List<DataGridViewColumn> smartHintColumns,
+            bool allowAutoPopulation, out bool autoPopulated)
         {
+            autoPopulated = false;
+
             try
             {
                 ExtractException.Assert("ELI25232", "Null argument exception!", attribute != null);
@@ -3268,6 +3307,28 @@ namespace Extract.DataEntry
                     // If a smart hint was able to be generated, use it.
                     if (rasterZone != null)
                     {
+                        if (allowAutoPopulation && attribute.Value.IsEmpty())
+                        {
+                            // GetTextFromZone will include only words whose center points lie
+                            // within the specified rasterZone. In cases where there is some
+                            // document skew and the width of the zone is small to begin with (such
+                            // as for a LabDE flag value), this can end up missing text. Add a bit
+                            // of padding to the zone for which OCR text is to be retrieved.
+                            RasterZone paddedZone = new RasterZone(
+                                rasterZone.Start, rasterZone.End, rasterZone.Height, rasterZone.PageNumber);
+                            paddedZone.ExpandRasterZone(6, 6);
+
+                            var wordsFromZone =
+                                DataEntryControlHost.ImageViewer.GetOcrTextFromZone(paddedZone);
+
+                            if (wordsFromZone != null)
+                            {
+                                AttributeStatusInfo.SetValue(attribute, wordsFromZone, false, false);
+                                autoPopulated = true;
+                                return;
+                            }
+                        }
+
                         spatialHints = new List<RasterZone>();
                         spatialHints.Add(rasterZone);
 

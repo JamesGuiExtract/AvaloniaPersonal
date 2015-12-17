@@ -34,7 +34,7 @@ namespace Extract.Imaging.Forms
             const float _AUTO_FIT_MAX_HEIGHT = 5F;
 
             /// <summary>
-            /// Controls how lenient the algorighm to find auto-fit zones is when a hard edge of
+            /// Controls how lenient the algorithm to find auto-fit zones is when a hard edge of
             /// pixel content cannot be found.
             /// </summary>
             const float _AUTO_FIT_FUZZY_FACTOR = 0.25F;
@@ -87,7 +87,7 @@ namespace Extract.Imaging.Forms
 
             /// <summary>
             /// An event to signal the background worker that a new operation is available to
-            /// perform (or to stop waiting since the backgroung worker is being deactivated).
+            /// perform (or to stop waiting since the background worker is being deactivated).
             /// </summary>
             EventWaitHandle _operationAvailable = new ManualResetEvent(false);
 
@@ -102,7 +102,7 @@ namespace Extract.Imaging.Forms
             volatile CancellationTokenSource _ocrCanceler;
 
             /// <summary>
-            /// The <see cref="CancellationToken"/> assosicated with _canceler that operations
+            /// The <see cref="CancellationToken"/> associated with _canceler that operations
             /// should periodically check to see if they have been canceled.
             /// </summary>
             CancellationToken _cancelToken;
@@ -412,7 +412,7 @@ namespace Extract.Imaging.Forms
                     // Convert the points from client to image coordinates.
                     GeometryMethods.InvertPoints(_imageViewer._transform, startPoint);
 
-                    // Ensure the starting point is onpage before starting an auto-fit
+                    // Ensure the starting point is on-page before starting an auto-fit
                     // operation.
                     if (startPoint[0].X >= 0 && startPoint[0].X < _imageViewer.ImageWidth &&
                         startPoint[0].Y >= 0 && startPoint[0].Y < _imageViewer.ImageHeight)
@@ -495,7 +495,7 @@ namespace Extract.Imaging.Forms
 
                 try
                 {
-                    // Before accessing fields that may be modifed by the background worker, stop
+                    // Before accessing fields that may be modified by the background worker, stop
                     // any currently running operation on the background worker.
                     lock (_lock)
                     {
@@ -554,6 +554,39 @@ namespace Extract.Imaging.Forms
                 }
             }
 
+            /// <summary>
+            /// Gets any OCR text from where the center of each word is within the specified
+            /// <see paramref="rasterZone"/>.
+            /// </summary>
+            /// <param name="rasterZone">The <see cref="RasterZone"/> from which OCR text should be
+            /// returned.</param>
+            /// <returns>Any OCR text from where the center of each word is within the specified
+            /// <see paramref="rasterZone"/>.</returns>
+            public SpatialString GetOcrTextFromZone(RasterZone rasterZone)
+            {
+                try
+                {
+                    HashSet<LayerObject> wordHighlights;
+                    if (_wordHighlights.TryGetValue(rasterZone.PageNumber, out wordHighlights) &&
+                        wordHighlights.Any())
+                    {
+                        PointF[] zonePolygon = rasterZone.GetBoundaryPoints();
+
+                        SpatialString ocrText = GetOcrText(wordHighlights.Where(wordHighlight =>
+                            GeometryMethods.IsPointInPolygon(
+                                wordHighlight.GetCenterPoint(), zonePolygon)));
+
+                        return ocrText;
+                    }
+
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39189");
+                }
+            }
+
             #endregion Methods
 
             #region Event Handlers
@@ -573,7 +606,7 @@ namespace Extract.Imaging.Forms
                     {
                         // [FlexIDSCore:5007]
                         // Until the highlights for the new document are loaded, ensure any existing
-                        // hightlights are removed.
+                        // highlights are removed.
                         DisableWordHighlights();
                         Activate();
                     }
@@ -623,7 +656,7 @@ namespace Extract.Imaging.Forms
                 {
                     // [FlexIDSCore:5007]
                     // Until the highlights for the new document are loaded, ensure any existing
-                    // hightlights are removed.
+                    // highlights are removed.
                     DisableWordHighlights();
 
                     // After changing pages, call Activate. Even if a loader task is already
@@ -706,7 +739,7 @@ namespace Extract.Imaging.Forms
                     // Check to see if the specified layer object is a word highlight
                     if (IsWordHighlight(e.LayerObject))
                     {
-                        // Display the highlight (border) if the highlight is of the miniumum
+                        // Display the highlight (border) if the highlight is of the minimum
                         // height.
                         Highlight highlight = (Highlight)e.LayerObject;
                         if (highlight.Height >= _MIN_SPLIT_HEIGHT)
@@ -784,7 +817,7 @@ namespace Extract.Imaging.Forms
 
                 try
                 {
-                    // Before accessing fields that may be modifed by the background worker, stop
+                    // Before accessing fields that may be modified by the background worker, stop
                     // any currently running operation on the background worker.
                     lock (_lock)
                     {
@@ -1011,7 +1044,7 @@ namespace Extract.Imaging.Forms
                     catch { }
                 }
 
-                // Dispose of ummanaged resources
+                // Dispose of unmanaged resources
             }
 
             #endregion IDisposable Members
@@ -1172,7 +1205,7 @@ namespace Extract.Imaging.Forms
                 // If the background worker is not currently running, start it.
                 if (_backgroundWorker.IsBusy)
                 {
-                    // If the runnning working thread has been canceled, request a new worker to
+                    // If the running working thread has been canceled, request a new worker to
                     // start once the current one has completed.
                     if (_backgroundWorker.CancellationPending)
                     {
@@ -1257,7 +1290,7 @@ namespace Extract.Imaging.Forms
                 // If the background thread is currently waiting on the next operation, this
                 // will to end the wait and allow the background thread to exit.
                 // _backgroundWorkerIdle will be reset until any pending data cleanup has
-                // occured.
+                // occurred.
                 SignalOperationAvailable(null);
             }
 
@@ -1288,7 +1321,7 @@ namespace Extract.Imaging.Forms
 
                             // In case of a cancelled operation, give any pending UI operations every
                             // opportunity possible to cancel. (We cannot call DoEvents or wait
-                            // indefinetly since that could cause a deadlock).
+                            // indefinitely since that could cause a deadlock).
                             for (int i = 0; Interlocked.Read(ref _executeInUIReferenceCount) > 0; i++)
                             {
                                 Thread.Sleep(50);
@@ -1343,14 +1376,14 @@ namespace Extract.Imaging.Forms
                         {
                             // If the task threw an exception but a cancel has been requested, assume
                             // the exception resulted from attempting an operation that should not have
-                            // occured after cancelation (for example, accessing the current page number
+                            // occurred after cancellation (for example, accessing the current page number
                             if (!_cancelToken.IsCancellationRequested)
                             {
                                 string message = _imageViewer.RedactionMode
                                     ? "Error loading data for word highlight tool."
                                     : "Error loading data for word redaction tool.";
 
-                                // Display any non-cancelation exception so the user is notified right away
+                                // Display any non-cancellation exception so the user is notified right away
                                 // instead of when the page is changed or the document is closed.
                                 ExtractException ee = new ExtractException("ELI31365", message, ex);
 
@@ -1471,7 +1504,7 @@ namespace Extract.Imaging.Forms
                 try
                 {
                     // NOTE:
-                    // This method executes on a background thread. While it is guaranted that only
+                    // This method executes on a background thread. While it is guaranteed that only
                     // one instance of this method will run at any given time, any operations that
                     // occur in this method should be thread-safe with respect to the UI thread and
                     // should be tolerant to document/page changes that could occur in the UI thread.
@@ -1594,7 +1627,7 @@ namespace Extract.Imaging.Forms
             /// Encapsulates a task to load and add highlights for all words on a document from OCR
             /// data. While the tasks will load and create highlights for all words in the document,
             /// in order to reduce demand on the image viewer for documents with many pages,
-            /// it will only add the highlights to the current page. To add highights to other
+            /// it will only add the highlights to the current page. To add highlights to other
             /// pages, another tasks instance should be run when the image viewer page is changed
             /// (this task will also remove highlights from all pages except the current page).
             /// </summary>
@@ -1603,7 +1636,7 @@ namespace Extract.Imaging.Forms
                 try
                 {
                     // NOTE:
-                    // This method executes on a background thread. While it is guaranted that only
+                    // This method executes on a background thread. While it is guaranteed that only
                     // one instance of this method will run at any given time, any operations that
                     // occur in this method should be thread-safe with respect to the UI thread and
                     // should be tolerant to document/page changes that could occur in the UI thread.
@@ -1724,7 +1757,7 @@ namespace Extract.Imaging.Forms
             SpatialString LoadOcrDataForPage(int page)
             {
                 // NOTE:
-                // This method executes on a background thread. While it is guaranted that only
+                // This method executes on a background thread. While it is guaranteed that only
                 // one instance of this method will run at any given time, any operations that
                 // occur in this method should be thread-safe with respect to the UI thread and
                 // should be tolerant to document/page changes that could occur in the UI thread.
@@ -1826,7 +1859,7 @@ namespace Extract.Imaging.Forms
             SpatialString PerformBackgroundOcr(string imageFile, int page, OcrTradeoff ocrTradeoff)
             {
                 // NOTE:
-                // This method executes on a background thread. While it is guaranted that only
+                // This method executes on a background thread. While it is guaranteed that only
                 // one instance of this method will run at any given time, any operations that
                 // occur in this method should be thread-safe with respect to the UI thread and
                 // should be tolerant to document/page changes that could occur in the UI thread.
@@ -2062,7 +2095,7 @@ namespace Extract.Imaging.Forms
             HashSet<LayerObject> LoadWordHighlightsForPage(int page, SpatialString pageOcr)
             {
                 // NOTE:
-                // This method executes on a background thread. While it is guaranted that only
+                // This method executes on a background thread. While it is guaranteed that only
                 // one instance of this method will run at any given time, any operations that
                 // occur in this method should be thread-safe with respect to the UI thread and
                 // should be tolerant to document/page changes that could occur in the UI thread.
@@ -2213,8 +2246,8 @@ namespace Extract.Imaging.Forms
             /// blocks until the method has been executed or until the current background operation
             /// has been canceled.
             /// <para><b>Note</b></para>
-            /// This method cannot block indefinetly because the UI may be waiting on the background
-            /// thread (ie, it must adhere to _cancelToken).
+            /// This method cannot block indefinitely because the UI may be waiting on the background
+            /// thread (i.e., it must adhere to _cancelToken).
             /// </summary>
             /// <param name="method">The <see cref="Action"/> to execute in the UI thread.</param>
             void ExecuteInUIThread(Action method)
@@ -2224,7 +2257,7 @@ namespace Extract.Imaging.Forms
 
                 try
                 {
-                    // To avoid scheduling to the UI unnecessarilly, check cancelation token first.
+                    // To avoid scheduling to the UI unnecessarily, check cancellation token first.
                     _cancelToken.ThrowIfCancellationRequested();
 
                     // Keep track of the fact that the method was scheduled to execute.
@@ -2232,8 +2265,8 @@ namespace Extract.Imaging.Forms
 
                     // Assign a local copy of the _cancelToken to check inside the invoke call so that
                     // even if the worker thread is running a different operation by the time occurs
-                    // and, therefore, _cancelToken is now set to a different token, the Invoke can stil
-                    // know if the operation that launched it has been cancelled.
+                    // and, therefore, _cancelToken is now set to a different token, the Invoke can
+                    // still know if the operation that launched it has been cancelled.
                     CancellationToken cancelToken = _cancelToken;
 
                     // Invoke to avoid modifying the imageViewer from outside the UI thread. Use begin
@@ -2272,7 +2305,7 @@ namespace Extract.Imaging.Forms
                             }
                         });
 
-                    // If a null result was returned, the image viewer was destoryed; ignore the call.
+                    // If a null result was returned, the image viewer was destroyed; ignore the call.
                     if (result == null)
                     {
                         return;
@@ -2468,7 +2501,7 @@ namespace Extract.Imaging.Forms
                         {
                             // For an auto-fit zone, search a little ways left and right for the
                             // edge of content to correct for the start/end tracking event not
-                            // encapulating pixel content.
+                            // encapsulating pixel content.
                             horizontalExpandLimit = 10;
 
                             zonesToHighlight.Add(autoFitZone);
@@ -2483,7 +2516,7 @@ namespace Extract.Imaging.Forms
                     }
                     else
                     {
-                        // Rather than create spatial zones, report the OCR content itelf to be
+                        // Rather than create spatial zones, report the OCR content itself to be
                         // highlighted via the OcrTextHighlighted event.
                         HighlightActiveOCRText();
                         return;
@@ -2594,52 +2627,72 @@ namespace Extract.Imaging.Forms
                     return;
                 }
 
-                // Populate pageOcrWords with the OCR content on the page in order to sort the OCR
-                // content of the active highlights correctly in the output.
-                int pageNumber = _activeWordHighlights.First().PageNumber;
-                List<ThreadSafeSpatialString> pageOcrWords;
-                ExtractException.Assert("ELI34065", "Internal error.",
-                    _loadedOcrWords.TryGetValue(pageNumber, out pageOcrWords));
-                int? lastWordLineNumber = null;
-
                 // Generate a SpatialString by merging the OCR content of all active word highlights.
-                SpatialString outputSpatialString = _activeWordHighlights
-                    .Select(highlight => new Tuple<int, ThreadSafeSpatialString>(
-                        _wordLineMapping[highlight], _highlightOcr[highlight]))
-                    .OrderBy(tuple => pageOcrWords.IndexOf(tuple.Item2))
-                    .Aggregate(new SpatialString(), (spatialString, next) =>
-                    {
-                        // For each active word, we have the line number of the word and a
-                        // SpatialString representing its OCR content.
-                        int nextLineNumber = next.Item1;
-                        SpatialString nextSpatialString = next.Item2.SpatialString;
-
-                        // If this is not the first word in the output, separate it from the
-                        // previous word using either a space or a carriage return depending on
-                        // whether it is on the same line as the previous word.
-                        if (lastWordLineNumber.HasValue)
-                        {
-                            if (lastWordLineNumber.Value == nextLineNumber)
-                            {
-                                spatialString.AppendString(" ");
-                            }
-                            else
-                            {
-                                spatialString.AppendString("\r\n");
-                            }
-                        }
-
-                        lastWordLineNumber = nextLineNumber;
-                        spatialString.Append(nextSpatialString);
-
-                        return spatialString;
-                    });
+                SpatialString outputSpatialString = GetOcrText(_activeWordHighlights);
 
                 // Raise OcrTextHighlighted with the resulting SpatialString.
                 var eventArgs = new OcrTextEventArgs(
                     new ThreadSafeSpatialString(_imageViewer, outputSpatialString));
 
                 _imageViewer.OnOcrTextHighlighted(eventArgs);
+            }
+
+            /// <summary>
+            /// Gets any OCR text associated with the specified <see paramref="wordHighlights"/>.
+            /// </summary>
+            /// <param name="wordHighlights">The word highlights for which OCR text should be
+            /// retrieved.</param>
+            /// <returns>Any OCR text associated with the specified <see paramref="wordHighlights"/>.
+            /// </returns>
+            SpatialString GetOcrText(IEnumerable<LayerObject> wordHighlights)
+            {
+                SpatialString outputSpatialString = new SpatialString();
+
+                foreach (int pageNumber in wordHighlights
+                    .Select(wordHighlight => wordHighlight.PageNumber)
+                    .Distinct())
+                {
+                    // Populate pageOcrWords with the OCR content on the page in order to sort the OCR
+                    // content of the active highlights correctly in the output.
+                    List<ThreadSafeSpatialString> pageOcrWords;
+                    ExtractException.Assert("ELI34065", "Internal error.",
+                        _loadedOcrWords.TryGetValue(pageNumber, out pageOcrWords));
+
+                    int? lastWordLineNumber = null;
+
+                    outputSpatialString = wordHighlights
+                        .Select(highlight => new Tuple<int, ThreadSafeSpatialString>(
+                            _wordLineMapping[highlight], _highlightOcr[highlight]))
+                        .OrderBy(tuple => pageOcrWords.IndexOf(tuple.Item2))
+                        .Aggregate(outputSpatialString, (spatialString, next) =>
+                        {
+                            // For each active word, we have the line number of the word and a
+                            // SpatialString representing its OCR content.
+                            int nextLineNumber = next.Item1;
+                            SpatialString nextSpatialString = next.Item2.SpatialString;
+
+                            // If this is not the first word in the output, separate it from the
+                            // previous word using either a space or a carriage return depending on
+                            // whether it is on the same line as the previous word.
+                            if (lastWordLineNumber.HasValue)
+                            {
+                                if (lastWordLineNumber.Value == nextLineNumber)
+                                {
+                                    spatialString.AppendString(" ");
+                                }
+                                else
+                                {
+                                    spatialString.AppendString("\r\n");
+                                }
+                            }
+
+                            lastWordLineNumber = nextLineNumber;
+                            spatialString.Append(nextSpatialString);
+
+                            return spatialString;
+                        });
+                }
+                return outputSpatialString;
             }
 
             /// <summary>
@@ -2668,7 +2721,7 @@ namespace Extract.Imaging.Forms
                     // Convert the points from client to image coordinates.
                     GeometryMethods.InvertPoints(_imageViewer._transform, points);
 
-                    // Compute the distance betwen the points.
+                    // Compute the distance between the points.
                     int dX = points[0].X - points[1].X;
                     int dY = points[0].Y - points[1].Y;
                     double distance = Math.Sqrt(dX * dX + dY * dY);

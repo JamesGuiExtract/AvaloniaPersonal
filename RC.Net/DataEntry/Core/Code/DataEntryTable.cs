@@ -3064,12 +3064,27 @@ namespace Extract.DataEntry
 
             // Since the spatial information for this cell has changed, spatial hints need to be
             // updated.
-            UpdateHints(false);
+            // https://extract.atlassian.net/browse/ISSUE-12826
+            // Allow any OCR text existing within any smart hints generated for this row to be used
+            // to auto-populate the attribute values.
+            List<IAttribute> autoPopulatedAttributes;
+            UpdateHints(false, rowIndex, out autoPopulatedAttributes);
 
-            // Raise AttributesSelected to update the control's highlight.
-            OnAttributesSelected(
-                DataEntryMethods.AttributeAsVector(
-                    GetAttribute(CurrentCell)), false, true, null);
+            if (autoPopulatedAttributes.Count > 0)
+            {
+                RefreshAttributes(true, autoPopulatedAttributes.ToArray());
+                // If any data was auto-populated, select the whole row to make it clear data
+                // was added beyond just the cell where the swipe occurred.
+                ClearSelection();
+                Rows[rowIndex].Selected = true;
+            }
+            else
+            {
+                // Raise AttributesSelected to update the control's highlight.
+                OnAttributesSelected(
+                    DataEntryMethods.AttributeAsVector(
+                        GetAttribute(CurrentCell)), false, true, null);
+            }
 
             return true;
         }

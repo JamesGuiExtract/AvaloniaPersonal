@@ -757,6 +757,43 @@ namespace Extract.Drawing
             }
         }
 
+        /// <summary>
+        /// Determines whether the specified <see paramref="point"/> is inside a polygon defined by
+        /// <paramref name="polygon"/>.
+        /// <para><b>Note</b></para>
+        /// Code here is from:
+        /// http://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
+        /// http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+        /// </summary>
+        /// <param name="point">A <see cref="PointF"/> to check against <paramref name="polygon"/>.
+        /// </param>
+        /// <param name="polygon">A <see cref="PointF"/> array defining a polygon</param>
+        /// <returns><see langword="true"/> if <paramref name="point"/> is inside the specified
+        /// <paramref name="polygon"/>; otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool IsPointInPolygon(PointF point, PointF[] polygon)
+        {
+            try
+            {
+                bool inside = false;
+                for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
+                {
+                    if ((polygon[i].Y > point.Y) != (polygon[j].Y > point.Y) &&
+                             point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) /
+                             (polygon[j].Y - polygon[i].Y) + polygon[i].X)
+                    {
+                        inside = !inside;
+                    }
+                }
+
+                return inside;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39190");
+            }
+        }
+
         #endregion GeometryMethods Methods
     }
 }

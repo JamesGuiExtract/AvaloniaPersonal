@@ -19,6 +19,8 @@ using System.IO;
 using System.Linq;
 using System.Security.Permissions;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.Imaging.Forms
 {
@@ -72,14 +74,14 @@ namespace Extract.Imaging.Forms
 
         /// <summary>
         /// The scroll value multiplier applied to 
-        /// <see cref="RasterImageViewer.AutoScrollSmallChange"/> during a mousewheel scroll event.
+        /// <see cref="RasterImageViewer.AutoScrollSmallChange"/> during a mouse wheel scroll event.
         /// </summary>
         /// <seealso cref="OnMouseWheel"/>
         const int _MOUSEWHEEL_SCROLL_FACTOR = 2;
 
         /// <summary>
-        /// The amount the <see cref="DefaultHighlightHeight"/> is incremented or decremeneted 
-        /// during a mousewheel adjust highlight height event.
+        /// The amount the <see cref="DefaultHighlightHeight"/> is incremented or decremented 
+        /// during a mouse wheel adjust highlight height event.
         /// </summary>
         /// <seealso cref="OnMouseWheel"/>
         const int _MOUSEWHEEL_HEIGHT_INCREMENT = 4;
@@ -319,7 +321,7 @@ namespace Extract.Imaging.Forms
 
         /// <summary>
         /// A <see cref="TrackingData"/> object associated with the interactive cursor tool event 
-        /// currently in progess (e.g. drag and drop).
+        /// currently in progress (e.g. drag and drop).
         /// </summary>
         /// <remarks>Value is <see langword="null"/> if no interactive cursor tool event is being 
         /// tracked.</remarks>
@@ -481,7 +483,7 @@ namespace Extract.Imaging.Forms
 
         /// <summary>
         /// A <see cref="ProgressStatusDialogForm"/> to display the progress of automatic document
-        /// OCR occuring in the background.
+        /// OCR occurring in the background.
         /// </summary>
         ProgressStatusDialogForm _ocrProgressForm;
 
@@ -688,7 +690,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // LoadLicenseFilesFromFolder for design mode is now called in 
-                // LoadCursorsForCursorTools (ie, the static constructor)
+                // LoadCursorsForCursorTools (i.e., the static constructor)
                 InitializeComponent();
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23109",
@@ -730,7 +732,7 @@ namespace Extract.Imaging.Forms
                 // Store the original transformation matrix
                 _transform = base.Transform;
 
-                // Handle layer object object added/deleted/visibility changed events
+                // Handle layer object added/deleted/visibility changed events
                 _layerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
 
                 _wordHighlightManager = new WordHighlightManager(this);
@@ -1986,7 +1988,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // [DataEntry:837]
-                // The scoll position must be adjusted by the factor of change in the ScaleFactor. 
+                // The scroll position must be adjusted by the factor of change in the ScaleFactor. 
                 double factorOfScaleChange = ScaleFactor / initialScaleFactor;
                 scrollPosition = (int)(scrollPosition * factorOfScaleChange);
                 ScrollPosition = new Point(0, scrollPosition);
@@ -2920,7 +2922,7 @@ namespace Extract.Imaging.Forms
         /// and <see cref="CursorLeftLayerObject"/> events as appropriate.
         /// </summary>
         /// <param name="e">If not <see langword="null"/>, contains a <see cref="MouseEventArgs"/>
-        /// that contains infomation about the mouse event that triggered this call. If
+        /// that contains information about the mouse event that triggered this call. If
         /// <see langword="null"/>, <see cref="CursorLeftLayerObject"/> will be raised for
         /// all <see cref="LayerObject"/>s previously under the cursor.</param>
         void UpdateLayerObjectsUnderCursor(MouseEventArgs e)
@@ -2929,7 +2931,7 @@ namespace Extract.Imaging.Forms
             // tool. (If false, all current _layerObjectsUnderCursor members will be removed).
             bool lookForLayerObjectsUnderCursor = (e != null && IsImageAvailable);
 
-            // Don't bother looking for layerobjects under the cursor if no one is listening
+            // Don't bother looking for layer objects under the cursor if no one is listening
             // for the events.
             lookForLayerObjectsUnderCursor &=
                 (CursorEnteredLayerObject != null || CursorLeftLayerObject != null);
@@ -3322,6 +3324,32 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Retrieve any OCR text where the center of each word falls within
+        /// <see paramref="rasterZone"/>.
+        /// </summary>
+        /// <param name="rasterZone">The raster zone from which any OCR text should be returned.
+        /// </param>
+        /// <returns>A <see cref="SpatialString"/> representing the OCR text within
+        /// <see paramref="rasterZone"/></returns>
+        [CLSCompliant(false)]
+        public SpatialString GetOcrTextFromZone(RasterZone rasterZone)
+        {
+            try
+            {
+                if (_wordHighlightManager != null)
+                {
+                    return _wordHighlightManager.GetOcrTextFromZone(rasterZone);
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39188");
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="Control.MouseUp"/> event.
         /// </summary>
         /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
@@ -3336,7 +3364,7 @@ namespace Extract.Imaging.Forms
                 base.OnMouseUp(e);
 
                 // Allow the next MouseMove event to be fired-- otherwise the cursor won't get set
-                // correctly in the case that cusor is dependent on mouse position.
+                // correctly in the case that cursor is dependent on mouse position.
                 _lastMouseLocation = Point.Empty;
 
                 // Process this mouse event if an interactive region is being created
@@ -4235,7 +4263,7 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the case that a background process status update has occured.
+        /// Handles the case that a background process status update has occurred.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The

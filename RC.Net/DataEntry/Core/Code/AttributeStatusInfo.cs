@@ -1134,6 +1134,7 @@ namespace Extract.DataEntry
         /// generated <see cref="IAttribute"/> should be added.</param>
         /// <param name="owningControl">The <see cref="IDataEntryControl"/> in charge of displaying 
         /// the generated <see cref="IAttribute"/>.</param>
+        [SuppressMessage("Microsoft.Interoperability", "CA1407:AvoidStaticMembersInComVisibleTypes")]
         public static IAttribute Initialize(string attributeName, IUnknownVector sourceAttributes,
             IDataEntryControl owningControl)
         {
@@ -1181,6 +1182,7 @@ namespace Extract.DataEntry
         /// <param name="validationQuery">A query which will cause the validation list for the 
         /// validator associated with the attribute to be updated using values from other
         /// <see cref="IAttribute"/>'s and/or a database query.</param>
+        [SuppressMessage("Microsoft.Interoperability", "CA1407:AvoidStaticMembersInComVisibleTypes")]
         public static IAttribute Initialize(string attributeName, IUnknownVector sourceAttributes,
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
             TabStopMode? tabStopMode, IDataEntryValidator validatorTemplate, string autoUpdateQuery,
