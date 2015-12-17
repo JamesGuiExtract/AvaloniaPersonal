@@ -31,7 +31,7 @@
             this.ImportErrorsTextBox = new System.Windows.Forms.TextBox();
             this.ContinueButton = new System.Windows.Forms.Button();
             this._CancelButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.resultTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // ImportErrorsTextBox
@@ -70,22 +70,21 @@
             this._CancelButton.Text = "Cancel";
             this._CancelButton.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // resultTextBox
             // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 301);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(233, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Cancel will halt operation (no data will be saved)";
+            this.resultTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.resultTextBox.Location = new System.Drawing.Point(12, 299);
+            this.resultTextBox.Name = "resultTextBox";
+            this.resultTextBox.ReadOnly = true;
+            this.resultTextBox.Size = new System.Drawing.Size(478, 13);
+            this.resultTextBox.TabIndex = 3;
             // 
             // DisplayImportErrors
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(664, 331);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.resultTextBox);
             this.Controls.Add(this._CancelButton);
             this.Controls.Add(this.ContinueButton);
             this.Controls.Add(this.ImportErrorsTextBox);
@@ -104,6 +103,6 @@
         private System.Windows.Forms.TextBox ImportErrorsTextBox;
         private System.Windows.Forms.Button ContinueButton;
         private System.Windows.Forms.Button _CancelButton;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox resultTextBox;
     }
 }

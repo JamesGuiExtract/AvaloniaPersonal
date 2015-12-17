@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace Extract.SQLCDBEditor
@@ -21,8 +23,28 @@ namespace Extract.SQLCDBEditor
             InitializeComponent();
 
             List<string> ls = new List<string>();
-            ls.AddRange(messages);
+            int rowsSucceeded = 0;
+            foreach (var message in messages)
+            {
+                if (message.StartsWith("*", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    ls.Add(message);
+                }
+                else
+                {
+                    ++rowsSucceeded;
+                }
+            }
+
             ls.Add("\r\n");
+
+            int rowsFailed = messages.Length - rowsSucceeded;
+            var result = String.Format(CultureInfo.CurrentCulture,
+                                       "On Continue, {0} rows will succeed, and {1} rows will fail.",
+                                       rowsSucceeded,
+                                       rowsFailed);
+
+            resultTextBox.Text = result;
 
             ImportErrorsTextBox.Lines = ls.ToArray();
             ImportErrorsTextBox.SelectionLength = 0;

@@ -1,4 +1,5 @@
 ﻿using Extract.Database;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
@@ -134,15 +135,30 @@ namespace Extract.SQLCDBEditor
                                                     "The file: {0}, already exists. Are you sure you want to overwrite this file?",
                                                     outputFilename);
 
-                            var dr = MessageBox.Show(text: msg,
-                                                     caption: "File exists",
-                                                     buttons: MessageBoxButtons.YesNo,
-                                                     icon: MessageBoxIcon.Warning,
-                                                     defaultButton: MessageBoxDefaultButton.Button1,
-                                                     options: MessageBoxOptions.DefaultDesktopOnly);
-                            if (DialogResult.No == dr)
+                            using (CustomizableMessageBox cmb = new CustomizableMessageBox())
                             {
-                                continue;
+                                cmb.Caption = "File exists";
+                                cmb.Text = msg;
+
+                                CustomizableMessageBoxButton yesButton = new CustomizableMessageBoxButton();
+                                yesButton.Text = "Yes";
+                                yesButton.Value = "Yes";
+                                yesButton.IsCancelButton = false;
+                                cmb.AddButton(yesButton, defaultButton: false);
+
+                                CustomizableMessageBoxButton noButton = new CustomizableMessageBoxButton();
+                                noButton.Text = "No";
+                                noButton.Value = "No";
+                                noButton.IsCancelButton = true;
+                                cmb.AddButton(noButton, defaultButton: true);
+
+                                cmb.StandardIcon = MessageBoxIcon.Warning;
+
+                                var response = cmb.Show(this);
+                                if (response == "No")
+                                {
+                                    continue;
+                                }
                             }
                         }
 
@@ -161,8 +177,11 @@ namespace Extract.SQLCDBEditor
                     }
                 }
 
-                var resultsForm = new ExportResultsForm(results.ToArray());
-                resultsForm.ShowDialog();
+                if (results.Count > 0)
+                {
+                    var resultsForm = new ExportResultsForm(results.ToArray());
+                    resultsForm.ShowDialog();
+                }
             }
             catch (Exception ex)
             {

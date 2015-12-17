@@ -138,11 +138,9 @@ namespace Extract.SQLCDBEditor
             }
         }
 
-
         /// <summary>
         /// Event handler for the Import (data into the database) button
         /// </summary>
-        [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
         void HandleImportDataToDatabaseClick(object sender, EventArgs e)
         {
             try
@@ -174,23 +172,10 @@ namespace Extract.SQLCDBEditor
                 var countOfFailedInsertRows = result.Item1;
                 if (countOfFailedInsertRows == 0)
                 {
-                    int rowsImported = result.Item2.Count();
-                    string message;
-                    if (replaceData)
-                    {
-                        message = String.Format(CultureInfo.CurrentCulture,
-                                                "The table data has been replaced with {0} rows of imported data",
-                                                rowsImported);
-                    }
-                    else
-                    {
-                        message = String.Format(CultureInfo.CurrentCulture,
-                                                "{0} rows of data have been appended to the table",
-                                                rowsImported);
-                    }
+                    DisplayResultMessage(replaceData, rowMessages: result.Item2);
 
-                    MessageBox.Show(text: message, caption: "Table update status");
                     ModifiedTableName = _tablename;
+
                     this.Close();
                     return;
                 }
@@ -207,9 +192,16 @@ namespace Extract.SQLCDBEditor
                     if (DialogResult.OK == ret)
                     {
                         importSettings.UseTransaction = false;
-                        ImportTable.ImportFromFile(importSettings, _connection);
+                        using (new TemporaryWaitCursor())
+                        {
+                            result = ImportTable.ImportFromFile(importSettings, _connection);
+                        }
 
-                        ModifiedTableName = _tablename;
+                        var failedRows = result.Item1;
+                        var rowMessages = result.Item2;
+                        DisplayResultMessage(replaceData, rowMessages, failedRows);
+
+                        ModifiedTableName = failedRows != rowMessages.Count() ? _tablename : "";
                         this.Close();
                     }
                 }
@@ -233,6 +225,7 @@ namespace Extract.SQLCDBEditor
                 if (!File.Exists(_dataFilename))
                     return;
 
+                AutoSelectTableForMatchingFile();
                 UpdateDataIntoGrid();
             }
             catch (Exception ex)
@@ -268,18 +261,35 @@ namespace Extract.SQLCDBEditor
             {
                 if (sender == ReplaceRadioButton && ReplaceRadioButton.Checked)
                 {
-                    if (DialogResult.No == MessageBox.Show(
-                        "The replace option will clear all data from the selected table before " +
-                        "importing the new data.\r\n\r\n" +
-                        "Please review any foreign key relationships with this table to assess impacts. " +
-                        "Be aware that any foreign key relationships using cascade deletes may " +
-                        "cause data in other tables to be deleted.\r\n\r\n" +
-                        "Are you sure you want to use replace instead of append?", "Warning", 
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
-                        MessageBoxDefaultButton.Button2, options: 0))
+                    using (CustomizableMessageBox cmb = new CustomizableMessageBox())
                     {
-                        AppendRadioButton.Checked = true;
-                        return;
+                        cmb.Caption = "Warning";
+                        cmb.Text = "The replace option will clear all data from the selected table before " +
+                                   "importing the new data.\r\n\r\n" +
+                                   "Please review any foreign key relationships with this table to assess impacts.\r\n " +
+                                   "Be aware that any foreign key relationships using cascade deletes may " +
+                                   "cause data in other tables to be deleted.\r\n\r\n" +
+                                   "Are you sure you want to use replace instead of append?";
+                        cmb.StandardIcon = MessageBoxIcon.Warning;
+
+                        CustomizableMessageBoxButton yesButton = new CustomizableMessageBoxButton();
+                        yesButton.Text = "Yes";
+                        yesButton.Value = "Yes";
+                        yesButton.IsCancelButton = false;
+                        cmb.AddButton(yesButton, defaultButton: false);
+
+                        CustomizableMessageBoxButton noButton = new CustomizableMessageBoxButton();
+                        noButton.Text = "No";
+                        noButton.Value = "No";
+                        noButton.IsCancelButton = true;
+                        cmb.AddButton(noButton, defaultButton: true);
+
+                        var result = cmb.Show(this);
+                        if (result == "No")
+                        {
+                            AppendRadioButton.Checked = true;
+                            return;
+                        }
                     }
                 }
 
@@ -504,6 +514,78 @@ namespace Extract.SQLCDBEditor
                                                               "The column: {0}, will not be exported because it is an auto-increment column",
                                                               name);
                 ColumnNotImportedTextBox.ForeColor = Color.Red;
+            }
+        }
+
+        /// <summary>
+        /// automatically select a table based on the selected file name - convenience for user
+        /// </summary>
+        void AutoSelectTableForMatchingFile()
+        {
+            if (String.IsNullOrWhiteSpace(_dataFilename))
+            {
+                return;
+            }
+
+            var name = Path.GetFileNameWithoutExtension(_dataFilename);
+            if (String.IsNullOrWhiteSpace(name))
+            {
+                return;
+            }
+
+            int index = SelectTableToImportDataIntoComboBox.FindStringExact(name);
+            if (index < 0)
+            {
+                return;
+            }
+
+            SelectTableToImportDataIntoComboBox.SelectedIndex = index;
+            _tablename = (string)SelectTableToImportDataIntoComboBox.Text;
+        }
+
+        /// <summary>
+        /// display the result of the import append|replace operation
+        /// </summary>
+        /// <param name="replaceData">true to replace, false to append</param>
+        /// <param name="rowMessages">string[] of row insert operation outcomes</param>
+        /// <param name="countOfFailedRows">number of rows that failed to be imported</param>
+        void DisplayResultMessage(bool replaceData, string[] rowMessages, int countOfFailedRows = 0)
+        {
+            string message;
+            if (replaceData)
+            {
+                int rowsImported = rowMessages.Count();
+
+                message = String.Format(CultureInfo.CurrentCulture,
+                                        "The table data has been replaced with {0} rows of imported data",
+                                        rowsImported);
+            }
+            else
+            {
+                int rowsImported = 0;
+                foreach (string rowText in rowMessages)
+                {
+                    if (!rowText.StartsWith("*", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        ++rowsImported;
+                    }
+                }
+
+                message = String.Format(CultureInfo.CurrentCulture,
+                                        "{0} rows of data have been appended to the table\n" +
+                                        "{1} rows of data FAILED to be appended",
+                                        rowsImported,
+                                        countOfFailedRows);
+            }
+
+            using (CustomizableMessageBox cmb = new CustomizableMessageBox())
+            {
+                cmb.Caption = "Table update status";
+                cmb.Text = message;
+                cmb.AddStandardButtons(MessageBoxButtons.OK);
+                cmb.StandardIcon = MessageBoxIcon.Information;
+
+                cmb.Show(this);
             }
         }
 
