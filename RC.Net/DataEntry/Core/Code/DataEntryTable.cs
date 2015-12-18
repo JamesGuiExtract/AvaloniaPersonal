@@ -1858,11 +1858,11 @@ namespace Extract.DataEntry
                 // is to be propagated.
                 if (attribute == TabOrderPlaceholderAttribute)
                 {
-                    // If selectAttribute is specified, activate the first cell in the new row.
+                    // If selectAttribute is specified, activate the first visible cell in the new row.
                     if (selectAttribute)
                     {
                         ClearSelection();
-                        CurrentCell = Rows[NewRowIndex].Cells[0];
+                        CurrentCell = GetFirstVisibleCellInRow(Rows[NewRowIndex]);
                         CurrentCell.Selected = true;
 
                         OnAttributesSelected(
@@ -1882,7 +1882,7 @@ namespace Extract.DataEntry
                     _activeCachedRows.TryGetValue(attribute, out selectedRow))
                 {
                     ClearSelection(-1, selectedRow.Index, true);
-                    CurrentCell = Rows[selectedRow.Index].Cells[0];
+                    CurrentCell = GetFirstVisibleCellInRow(Rows[selectedRow.Index]);
                 }
                 // If TabOrderPlaceholderAttribute is not the attribute to propagate, allow the
                 // base class to handle the propagation.
@@ -2012,7 +2012,7 @@ namespace Extract.DataEntry
                     {
                         // Highlight the table's new row.
                         ClearSelection(-1, NewRowIndex, true);
-                        CurrentCell = Rows[NewRowIndex].Cells[0];
+                        CurrentCell = GetFirstVisibleCellInRow(Rows[NewRowIndex]);
 
                         // Paste the dropped data in.
                         PasteRowData(e.Data);
@@ -2025,7 +2025,7 @@ namespace Extract.DataEntry
                     {
                         // Highlight the table's one and only row.
                         ClearSelection(-1, 0, true);
-                        CurrentCell = Rows[0].Cells[0];
+                        CurrentCell = GetFirstVisibleCellInRow(Rows[0]);
 
                         // Paste the dropped data in.
                         PasteRowData(e.Data);
@@ -2555,7 +2555,7 @@ namespace Extract.DataEntry
                             // selection(s) may be undone.
                             if (lastSelectedRow != null)
                             {
-                                CurrentCell = lastSelectedRow.Cells[0];
+                                CurrentCell = GetFirstVisibleCellInRow(lastSelectedRow);
                             }
 
                             foreach (DataEntryTableRow row in _draggedRows)
@@ -2641,7 +2641,7 @@ namespace Extract.DataEntry
                             if (lastSelectedRow != null &&
                                 !_draggedRows.Contains(lastSelectedRow as DataEntryTableRow))
                             {
-                                CurrentCell = lastSelectedRow.Cells[0];
+                                CurrentCell = GetFirstVisibleCellInRow(lastSelectedRow);
                             }
 
                             foreach (DataGridViewRow row in initialSelectedRows)
@@ -3112,7 +3112,7 @@ namespace Extract.DataEntry
                 {
                     // Highlight the newly inserted row.
                     ClearSelection(-1, rowIndex, true);
-                    CurrentCell = Rows[rowIndex].Cells[0];
+                    CurrentCell = GetFirstVisibleCellInRow(Rows[rowIndex]);
                 }
                 else
                 {
@@ -3756,7 +3756,7 @@ namespace Extract.DataEntry
                     // Adjust the current selection to encapsulate all rows populated via swiped text
                     // with the current row being the last row populated.
                     ClearSelection(-1, destinationRows[destinationRows.Count - 1].Index, true);
-                    CurrentCell = destinationRows[destinationRows.Count - 1].Cells[0];
+                    CurrentCell = GetFirstVisibleCellInRow(destinationRows[destinationRows.Count - 1]);
                     foreach (DataGridViewRow row in destinationRows)
                     {
                         row.Selected = true;
@@ -3851,8 +3851,8 @@ namespace Extract.DataEntry
                     // flickering of tests while adjusting the selection.
                     using (new SelectionProcessingSuppressor(this))
                     {
-                        // Set the current cell to the first cell in the clicked row
-                        CurrentCell = clickedRow.Cells[0];
+                        // Set the current cell to the first visible cell in the clicked row
+                        CurrentCell = GetFirstVisibleCellInRow(clickedRow);
 
                         // Changing the current cell will have cleared the previously selected rows.
                         // Re-select them now.
@@ -3868,7 +3868,7 @@ namespace Extract.DataEntry
 
                     // If the clicked row is not the current row, make the click row current
                     // and selected.
-                    CurrentCell = clickedRow.Cells[0];
+                    CurrentCell = GetFirstVisibleCellInRow(clickedRow);
                 }
                 else if (!CurrentRow.Selected)
                 {
@@ -4037,6 +4037,16 @@ namespace Extract.DataEntry
 
                 return tabOrderPlaceholderAttribute;
             }
+        }
+
+        /// <summary>
+        /// Returns the first visible cell in the given row
+        /// </summary>
+        /// <param name="row">Row to find the first visible cell</param>
+        /// <returns>The first visible cell in the row</returns>
+        DataGridViewCell GetFirstVisibleCellInRow(DataGridViewRow row)
+        {
+            return row.Cells.Cast<DataGridViewCell>().First(c => c.Visible == true);
         }
 
         #endregion Private Members
