@@ -509,13 +509,63 @@
 <p>
         	<li><b><u>Functionality</u></b>
         	<ul>
-	        	<li>TBD</li>
+			<li>Confirm that the following command-line string properly updates 
+			<b>FKBVersion</b> in OrderMappingDB.sdf for Demo_LabDE.
+			<ul>
+				<li>SQLCompactExporter &quot;C:\Demo_LabDE\Solution\Database Files\
+				OrderMappingDB.sdf&quot; &quot;UPDATE [Settings] SET [Value] = 
+				'10.3.0.48' WHERE [Name] = 'FKBVersion'&quot; 
+				&quot;C:\Demo_LabDE\Solution\Database Files\OrderMappingDB.sdf&quot;
+			</ul>
         	</ul></li>
     	</ul></li>
 <p>
     	<LI><h2>SQLCompactImporter</h2>
     	<ul>
-        	<li>TBD</li>
+        	<li><b><u>Options</u></b>
+        	<ul>
+            		<li>Confirm that <b>DatabaseFile</b> is a required parameter.</li>
+            		<li>Confirm that <b>TableName</b> is a required parameter.</li>
+            		<li>Confirm that <b>InputFileName</b> is a required parameter.</li>
+            		<li>Confirm that <b>/rd &lt;RowDelimiter&gt;</b> is an optional parameter 
+            		for specifying a delimiter between rows in the result set.</li>
+            		<li>Confirm that the default is <b>\r\n</b>.</li>
+            		<li>Confirm that <b>/cd &lt;ColumnDelimiter&gt;</b> is an optional parameter 
+            		for specifying a delimiter between each field in the result set.</li>
+            		<li>Confirm that the default is <b>\t</b>.</li>
+        	</ul></li>
+<p>
+        	<li><b><u>Functionality</u></b>
+        	<ul>
+			<li>Create a text file containing the following rows
+			<ul>
+				<li>Name1 , Value1
+				<li>Name2 , Value2
+			</ul>
+			<li>Create a second text file with different <b>Name</b> items where 
+			the delimiter between name and value is a <b>tab</b> character.
+			<li>Create a third text file with different <b>Name</b> items where 
+			all text is on a single line using an asterisk as the delimiter.
+<p>
+			<li>Confirm that the second text file can be imported into the 
+			<b>Settings</b> table of the Demo_LabDE OrderMappingDB.sdf.
+			<ul>
+				<li>SQLCompactImporter "C:\Demo_LabDE\Solution\Database Files\
+				OrderMappingDB.sdf" Settings D:\Test\File2.txt
+			</ul>
+			<li>Confirm that the first text file can be imported into the 
+			<b>Settings</b> table of the Demo_LabDE OrderMappingDB.sdf.
+			<ul>
+				<li>SQLCompactImporter "C:\Demo_LabDE\Solution\Database Files\
+				OrderMappingDB.sdf" Settings D:\Test\File1.txt /cd ,
+			</ul>
+			<li>Confirm that the third text file can be imported into the 
+			<b>Settings</b> table of the Demo_LabDE OrderMappingDB.sdf.
+			<ul>
+				<li>SQLCompactImporter "C:\Demo_LabDE\Solution\Database Files\
+				OrderMappingDB.sdf" Settings D:\Test\File3.txt /cd , /rd *
+			</ul>
+        	</ul></li>
     	</ul></li>
 <p>
     	<LI><h2>Miscellaneous</h2>
