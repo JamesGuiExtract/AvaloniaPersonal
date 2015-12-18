@@ -3208,6 +3208,10 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 				UPI upi = UPI::getCurrentProcessUPI();
 				Win32Semaphore parallelSemaphore(upi.getProcessSemaphoreName());
 
+				// Need to signal that the processManager is active (for single file this is the 
+				// process manager
+				pMgmtRole->m_eventProcessManagerActive.signal();
+
 				pMgmtRole->m_pRecordMgr->pop(task, false, parallelSemaphore);
 				
 				// The semaphore has already been acquired
