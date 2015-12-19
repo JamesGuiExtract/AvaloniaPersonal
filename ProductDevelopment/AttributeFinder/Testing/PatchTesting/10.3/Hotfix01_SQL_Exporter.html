@@ -1,0 +1,94 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 10.3 Hotfix 01 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE 10.3<br> Hotfix 01 Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> N/A
+   	<LI><b>SCRs:</b> ISSUE-13520
+   	<LI><b>Issue:</b> OrderMappingDB.sdf in Demo_LabDE has <b>FKBVersion = Latest</b> instead of 
+	10.3.0.48. Also, the usual command string from <b>UpdateFKB.js</b> fails to update the field 
+	in the compact database.
+</ul>
+<p>
+<h3>Hotfix Tests</h3>
+<OL>
+	<LI><b>Test Setup</b>
+	<ul>
+		<LI>Prepare and license a test machine with <b>10.3.0.48</b>.
+		<li>Update the associated files with the new versions from 
+		<b>I:\users\David Brownstein\Public\Patch\SqlUtilsInstaller</b>.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Tests</b>
+	<ul>
+		<LI><b>Installation</b>
+		<ul>
+			<li>Confirm that <b>SQLCompactExporter.exe</b> and 
+			<b>SQLCompactImporter.exe</b> have updated timestamps.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Exporter Functionality</b>
+		<ul>
+			<li>Confirm that the following command-line string properly updates 
+			<b>FKBVersion</b> in OrderMappingDB.sdf for Demo_LabDE.
+			<ul>
+				<li>SQLCompactExporter &quot;C:\Demo_LabDE\Solution\Database Files\
+				OrderMappingDB.sdf&quot; &quot;UPDATE [Settings] SET [Value] = 
+				'10.3.0.48' WHERE [Name] = 'FKBVersion'&quot; 
+				&quot;C:\Demo_LabDE\Solution\Database Files\OrderMappingDB.sdf&quot;
+			</ul>
+			<li>Exercise the <b>SQLCompactExporter</b> portion of the 
+			<b>SQL Compact Utilities</b> checklist.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Importer Functionality</b>
+		<ul>
+			<li>Create a text file containing the following rows
+			<ul>
+				<li>Name1 , Value1
+				<li>Name2 , Value2
+			</ul>
+			<li>Create a second text file with different <b>Name</b> items where 
+			the delimiter between name and value is a <b>tab</b> character.
+			<li>Create a third text file with different <b>Name</b> items where 
+			all text is on a single line using an asterisk as the delimiter.
+<p>
+			<li>Confirm that the second text file can be imported into the 
+			<b>Settings</b> table of the Demo_LabDE OrderMappingDB.sdf.
+			<ul>
+				<li>SQLCompactImporter "C:\Demo_LabDE\Solution\Database Files\
+				OrderMappingDB.sdf" Settings D:\Test\File2.txt
+			</ul>
+			<li>Confirm that the first text file can be imported into the 
+			<b>Settings</b> table of the Demo_LabDE OrderMappingDB.sdf.
+			<ul>
+				<li>SQLCompactImporter "C:\Demo_LabDE\Solution\Database Files\
+				OrderMappingDB.sdf" Settings D:\Test\File1.txt /cd ,
+			</ul>
+			<li>Confirm that the third text file can be imported into the 
+			<b>Settings</b> table of the Demo_LabDE OrderMappingDB.sdf.
+			<ul>
+				<li>SQLCompactImporter "C:\Demo_LabDE\Solution\Database Files\
+				OrderMappingDB.sdf" Settings D:\Test\File3.txt /cd , /rd *
+			</ul>
+	       	</ul>
+   		</LI>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
