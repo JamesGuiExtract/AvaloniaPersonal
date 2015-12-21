@@ -956,10 +956,10 @@ LRESULT FileProcessingDlg::OnQueueEvent(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
+// wParam = ActionStatistics * with the new stats
+// lParam = 0
 LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 {
-	// wParam = ActionStatistics * with the new stats
-	// lParam = 0
 	try
 	{
 		// The statistics page sometimes needs one last update; such as when the processing is 
@@ -975,6 +975,15 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 		long nTotalDocs = 0;
 		long nTotalPages = 0;
 		unsigned long unTotalProcTime = 0;
+
+		// Get the total Processing time in order to update the time statistics
+		if (isPageDisplayed(kProcessingLogPage))
+		{
+			// If the processing log page doesn't exist, these will remain 0 and be used
+			// as a flag for the enabling or disabling the local page.
+			unTotalProcTime = m_propProcessingPage.getTotalProcTime();
+			m_propProcessingPage.getLocalStats( nTotalBytes, nTotalDocs, nTotalPages );
+		}
 
 		// Cast the wParam objects
 		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStatsNew;
@@ -1014,43 +1023,7 @@ LRESULT FileProcessingDlg::OnStatusChange(WPARAM wParam, LPARAM lParam)
 		if (isPageDisplayed(kProcessingLogPage))
 		{
 			m_propProcessingPage.onStatusChange(pTask, eOldStatus);
-		}
-
-		if(eOldStatus == eNewStatus)
-		{
-		}
-		else
-		{
-			switch(eNewStatus)
-			{
-			case kRecordComplete:
-				// this case is handled in the db
-				//m_nNumCompletedProcessing++;
-				break;
-			case kRecordFailed:
-				// this case is handled in the db
-				//m_nNumFailed++;
-				break;
-			case kRecordPending:
-				// this case is handled in the db
-				//m_nNumPending++;
-				break;
-			case kRecordCurrent:
-				m_nNumCurrentlyProcessing++;
-				break;
-			}
-
-			switch(eOldStatus)
-			{
-			case kRecordPending: 
-				// this case is handled in the db
-				//m_nNumPending--;
-				break;
-			case kRecordCurrent:
-				m_nNumCurrentlyProcessing--;
-				break;
-			}
-		}
+		}		
 
 		updateUI();
 	}
@@ -2228,17 +2201,26 @@ void FileProcessingDlg::updateUI()
 
 	CString zStatusText, zCompletedProcessing, zCurrentlyProcessing,
 			zFailed, zPending, zSkipped, zTotal;
-	if(m_bRunning)
+
+	if (m_bRunning)
 	{
 		if (m_strProcessingStateString.empty())
 		{
-			if(m_nNumCurrentlyProcessing <= 0)
+			if (isPageDisplayed(kProcessingLogPage))
 			{
-				zStatusText = "Waiting";
+				long nNumCurrentlyProcessing = m_propProcessingPage.getCurrentlyProcessingCount();
+				if (nNumCurrentlyProcessing <= 0)
+				{
+					zStatusText = "Waiting";
+				}
+				else
+				{
+					zStatusText = "Processing";
+				}
 			}
-			else
+			else if (isPageDisplayed(kQueueLogPage))
 			{
-				zStatusText = "Processing";
+				zStatusText = "Queueing";
 			}
 		}
 		else
