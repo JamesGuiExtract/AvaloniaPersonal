@@ -640,7 +640,7 @@ void SafeNetLicenseMgr::getLicense()
 					// Call releaseLicense to reset all values to defaults
 					releaseLicense("ELI29817");
 
-					// Set the saved exception everytime through the loop
+					// Set the saved exception every time through the loop
 					ueSave = UCLIDException ("ELI18243", "Get USB Key License timed out.", ue);
 
 					// Flag that an exception has been thrown
@@ -649,7 +649,7 @@ void SafeNetLicenseMgr::getLicense()
 				dElapsedTime = sw.getElapsedTime();
 
 				// Only sleep if we don't have a license and the timeout has not been met
-				if (!m_bLicenseRetry || !m_bHasLicense && dElapsedTime < dRetryWaitTimeout)
+				if (m_bLicenseRetry && !m_bHasLicense && dElapsedTime < dRetryWaitTimeout)
 				{
 					// Sleep for a while so this loop doesn't use lots of CPU time.
 					Sleep(gnSLEEP_TIME_BETWEEN_RETRIES);

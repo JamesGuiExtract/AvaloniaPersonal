@@ -1992,23 +1992,30 @@ void CRuleSet::decrementCounters(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 		return;
 	}
 
-	auto& mapCounters = getCounterInfo();
-	for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
+	try
 	{
-		CounterInfo& counterInfo = entry->second;
-
-		if (counterInfo.m_bEnabled)
+		auto& mapCounters = getCounterInfo();
+		for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
 		{
-			int nNumToDecrement = 1;
-			if (counterInfo.m_bByPage)
-			{
-				nNumToDecrement = getNumberOfPagesInImage(
-					asString(ipAFDoc->Text->SourceDocName));
-			}
+			CounterInfo& counterInfo = entry->second;
 
-			decrementCounter(counterInfo, nNumToDecrement, true);
+			if (counterInfo.m_bEnabled)
+			{
+				int nNumToDecrement = 1;
+				if (counterInfo.m_bByPage)
+				{
+					nNumToDecrement = getNumberOfPagesInImage(
+						asString(ipAFDoc->Text->SourceDocName));
+				}
+
+				decrementCounter(counterInfo, nNumToDecrement, true);
+			}
 		}
 	}
+	// https://extract.atlassian.net/browse/ISSUE-13451
+	// WARNING: DO NOT REMOVE OR CHANGE ELI39180 WITHOUT ALSO MODIFYING THE SPOT IT IS CHECKED
+	// IN CAFEngineFileProcessor::raw_ProcessFile.
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39180");
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool bAllowAccumulation)
@@ -2061,13 +2068,38 @@ void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool 
 		if (ipSecureCounter == nullptr && counterData.m_pSafeNetDataCell != nullptr)
 		{
 			// if this is the first instance of RuleSet will need to allocate the pointer
+			bool bFoundKey = false;
 			if ( m_apSafeNetMgr.get() == __nullptr )
 			{
-				m_apSafeNetMgr = unique_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
+				{
+					// https://extract.atlassian.net/browse/ISSUE-13451
+					// Use a temporary SafeNetLicenseMgr to see if a USB key can immediately be
+					// found. If a USB key is not immediately found, assume no USB key is being used
+					// rather than lock up processing while retrying.
+					SafeNetLicenseMgr testUSBMgr(gusblFlexIndex, true, false);
+					if (testUSBMgr.hasLicense())
+					{
+						bFoundKey = true;
+					}
+				}
+
+				if (bFoundKey)
+				{
+					// If a USB key was found in the above check, establish a permanent
+					// SafeNetLicenseMgr instance for decrementing counts.
+					m_apSafeNetMgr = unique_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
+				}
+			}
+			else
+			{
+				bFoundKey = true;
 			}
 
-			nLastCount = m_apSafeNetMgr->decreaseCellValue(
-				*(counterData.m_pSafeNetDataCell), nCurrentAccumulation);
+			if (bFoundKey)
+			{
+				nLastCount = m_apSafeNetMgr->decreaseCellValue(
+					*(counterData.m_pSafeNetDataCell), nCurrentAccumulation);
+			}
 		}
 
 		if (nLastCount < 0)

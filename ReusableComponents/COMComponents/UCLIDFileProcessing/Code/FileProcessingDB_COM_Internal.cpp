@@ -8984,9 +8984,6 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 				}
 			END_CONNECTION_RETRY(ipConnection, "ELI38936");
 		}
-		// https://extract.atlassian.net/browse/ISSUE-13451
-		// WARNING: DO NOT REMOVE OR CHANGE ELI38785 WITHOUT ALSO MODIFYING THE SPOT IT IS CHECKED
-		// IN CAFEngineFileProcessor::raw_ProcessFile.
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38785");
 	}
 	catch(UCLIDException &ue)

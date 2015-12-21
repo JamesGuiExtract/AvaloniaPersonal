@@ -388,10 +388,10 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		catch (UCLIDException &ue)
 		{
 			// https://extract.atlassian.net/browse/ISSUE-13451
-			// If rule execution failed because we could not decrement a FAM DB secure counter
-			// (most likely due to insufficient counts), stop when the next file comes in to
-			// be processed.
-			if (ue.getAllELIs().find("ELI38785") != string::npos)
+			// If rule execution failed because we could not decrement a rule execution counter
+			// (most likely a missing counter or insufficient counts), stop when the next file comes
+			// in to be processed.
+			if (ue.getAllELIs().find("ELI39180") != string::npos)
 			{
 				m_bCounterDecrementFailed = true;
 			}

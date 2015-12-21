@@ -101,7 +101,7 @@ public:
 	//				that has been obtained. Any exceptions are logged.
 	// NOTE:		This calls SFNTsntlCleanup().
 	void releaseLicense(const string& strELICode = "ELI18190", bool bLogReleaseException = true);
-	bool hasLicense();
+	bool hasLicense() { return m_bHasLicense; }
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Public variables;
