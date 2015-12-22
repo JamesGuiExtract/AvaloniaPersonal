@@ -957,6 +957,15 @@ static const string gstrDBINFO_UPDATE_SETTINGS_QUERY =
 	"UPDATE DBInfo SET [Value] = '" + gstrSETTING_VALUE + "' WHERE [Name] = '"
 	+ gstrSETTING_NAME + "' AND [Value] <> '" + gstrSETTING_VALUE + "'";
 
+// Query for inserting a DBInfo setting if it doesn't exist 
+static const string gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY =
+	"DECLARE @CurrentValue as NVARCHAR(MAX) "
+	"SELECT @CurrentValue = Value FROM DBInfo WHERE Name = '" + gstrSETTING_NAME + "' "
+	"IF (@CurrentValue IS NULL) BEGIN "
+	"	INSERT INTO DBINFO ([Name], [Value]) "
+	"	VALUES ('" + gstrSETTING_NAME + "', '" + gstrSETTING_VALUE + "') "
+	"END "; 
+
 // Query for updating the DB info settings and storing the change history
 static const string gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY =
 	"DECLARE @ChangeHistory TABLE (UserID INT, MachineID INT, DBInfoID INT, "

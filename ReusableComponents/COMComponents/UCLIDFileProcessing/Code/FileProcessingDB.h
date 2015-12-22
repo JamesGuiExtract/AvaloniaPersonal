@@ -1064,10 +1064,11 @@ private:
 	// be checked that the DatabaseID hash portion is what is expected if bCheckCounterHash is false
 	// only the CounterID portion will be checked against the record's ID
 	void getCounterInfo(map<long, CounterOperation> &mapOfCounterOps, bool bCheckCounterHash = true);
-
-
+	
 	void createCounterUpdateQueries(const DatabaseIDValues &databaseIDValues, vector<string> &vecCounterUpdates, 
 		map<long, CounterOperation> &mapCounters );
+
+	void createAndStoreNewDatabaseID(_ConnectionPtr ipConnection);
 
 	void validateLicense();
 

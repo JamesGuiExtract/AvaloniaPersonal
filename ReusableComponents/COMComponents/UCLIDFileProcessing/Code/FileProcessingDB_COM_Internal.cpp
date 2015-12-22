@@ -9071,36 +9071,28 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 					ipResultSet->MoveNext();
 				}
 				long nNumCounters = vecDBCounters.size();
+				bool bCreatedNewDatabaseID = false;
 				
 				// if the number of counters is 0 and the DatabaseID is invalid
 				// create a completely new DatabaseID value and save it in DBInfo
 				// then bValid will be set to true and this becomes a request code instead
 				if (!bValid && nNumCounters == 0)
 				{
-					// Create a new DatabaseID and encrypt it
-					ByteStream bsDatabaseID;
-					createDatabaseID(ipConnection, bsDatabaseID);
-
-					ByteStream bsPW;
-					getFAMPassword(bsPW);
-					m_strEncryptedDatabaseID = MapLabel::setMapLabelWithS(bsDatabaseID,bsPW);
-					string strUpdateQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
-					replaceVariable(strUpdateQuery, gstrSETTING_NAME, gstrDATABASEID);
-					replaceVariable(strUpdateQuery, gstrSETTING_VALUE, m_strEncryptedDatabaseID);
-					executeCmdQuery(ipConnection, strUpdateQuery);
-					m_bDatabaseIDValuesValidated = false;
-					
-					// The DatabaseID should be valid now so check it and throw exception if it isn't
-					checkDatabaseIDValid(ipConnection, true);
+					// Create a new DatabaseID
+					createAndStoreNewDatabaseID(ipConnection);
 					
 					// Set the DatabaseID that will be in the request to the new DatabaseID Value
 					DBIDValue = m_DatabaseIDValues;
+					
+					// Since no counters were defined the DatabaseID is now valid
 					bValid = true;
 				}
 				else if (!bValid && m_DatabaseIDValues.m_GUID == GUID_NULL)
 				{
-					UCLIDException ue("ELI39181", "Request code cannot be generated because DatabaseID is missing.");
-					throw ue;
+					// Create a new DatabaseID
+					createAndStoreNewDatabaseID(ipConnection);
+					bCreatedNewDatabaseID = true;
+					DBIDValue = m_DatabaseIDValues;
 				}
 
 
@@ -9144,8 +9136,16 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 
 				if (!bValid)
 				{
-					m_DatabaseIDValues.CheckIfValid(ipConnection, false, true);
-					bsmRequest << m_DatabaseIDValues.m_strInvalidReason;
+					if (!bCreatedNewDatabaseID)
+					{
+						m_DatabaseIDValues.CheckIfValid(ipConnection, false, true);
+						bsmRequest << m_DatabaseIDValues.m_strInvalidReason;
+					}
+					else
+					{
+						string strMessage = "DatabaseID was missing and new DatabaseID has been created.";
+						bsmRequest << strMessage;
+					}
 				}
 
 				bsmRequest.flushToByteStream(8);

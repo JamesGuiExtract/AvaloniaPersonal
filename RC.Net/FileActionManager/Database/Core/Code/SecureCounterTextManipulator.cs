@@ -99,10 +99,14 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
+                // Get the code before the DatabaseID because it is possible for the
+                // call to GetCounterUpdateRequestCode to create a new databaseID
+                // if it is missing
+                _licenseString = fileProcessingDB.GetCounterUpdateRequestCode();
+
                 _databaseName = fileProcessingDB.ConnectedDatabaseServer + "/" +
                         fileProcessingDB.ConnectedDatabaseName;
                 _databaseID = fileProcessingDB.DatabaseID;
-                _licenseString = fileProcessingDB.GetCounterUpdateRequestCode();
 
                 var countersDescription = new StringBuilder();
                 var secureCounters = fileProcessingDB.GetSecureCounters(false)

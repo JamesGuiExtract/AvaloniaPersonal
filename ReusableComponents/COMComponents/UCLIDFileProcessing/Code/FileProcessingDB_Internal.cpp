@@ -5971,3 +5971,33 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 	m_bDatabaseIDValuesValidated = false;
 
 }
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
+{
+	// Create a new DatabaseID and encrypt it
+	ByteStream bsDatabaseID;
+	createDatabaseID(ipConnection, bsDatabaseID);
+
+	ByteStream bsPW;
+	getFAMPassword(bsPW);
+	m_strEncryptedDatabaseID = MapLabel::setMapLabelWithS(bsDatabaseID,bsPW);
+
+	// Insert a blank entry if it is missing
+	string strUpdateQuery = gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY;
+	replaceVariable(strUpdateQuery, gstrSETTING_NAME, gstrDATABASEID);
+	replaceVariable(strUpdateQuery, gstrSETTING_VALUE, "");
+	executeCmdQuery(ipConnection, strUpdateQuery);
+	
+	// Update the value and store the old value in history
+	strUpdateQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY;
+	replaceVariable(strUpdateQuery, gstrUSER_ID_VAR, asString(getFAMUserID(ipConnection)));
+	replaceVariable(strUpdateQuery,	gstrMACHINE_ID_VAR, asString(getMachineID(ipConnection)));
+	replaceVariable(strUpdateQuery, gstrSETTING_NAME, gstrDATABASEID);
+	replaceVariable(strUpdateQuery, gstrSETTING_VALUE, m_strEncryptedDatabaseID);
+	executeCmdQuery(ipConnection, strUpdateQuery);
+	m_bDatabaseIDValuesValidated = false;
+					
+	// The DatabaseID should be valid now so check it and throw exception if it isn't
+	checkDatabaseIDValid(ipConnection, true);
+}
+
