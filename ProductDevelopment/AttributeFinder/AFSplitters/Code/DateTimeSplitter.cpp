@@ -894,7 +894,7 @@ void CDateTimeSplitter::trimColonWS(std::string & strText)
 	while (pos != string::npos)
 	{
 		//if we have hh :mm
-		if(strText[pos-1] == ' ')
+		if(pos > 0 && strText[pos-1] == ' ')
 		{
 			strText.replace(pos-1, 2, ":");
 			//since we're replacing 2 chars with 1, need to update pos in case
@@ -902,7 +902,7 @@ void CDateTimeSplitter::trimColonWS(std::string & strText)
 			pos--;
 		}
 		//if we have hh: mm
-		if(strText[pos + 1] == ' ')
+		if(pos + 1 < strText.length() && strText[pos + 1] == ' ')
 		{
 			strText.replace(pos, 2, ":");
 		}
