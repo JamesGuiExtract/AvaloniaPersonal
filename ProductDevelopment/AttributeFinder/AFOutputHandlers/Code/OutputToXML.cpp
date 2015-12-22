@@ -883,7 +883,7 @@ string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
 			_bstr_t bstrSourceDoc = ipString->SourceDocName;
 			
 			strFileName = asString(ipTagUtility->ExpandTagsAndFunctions(
-				m_strFileName.c_str(), bstrSourceDoc.Detach(), __nullptr));
+				m_strFileName.c_str(), bstrSourceDoc, __nullptr));
 		}
 		else
 		{
