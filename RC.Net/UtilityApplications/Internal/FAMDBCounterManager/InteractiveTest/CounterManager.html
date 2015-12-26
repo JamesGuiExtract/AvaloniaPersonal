@@ -214,6 +214,62 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			<li>Confirm that an unlock code can be generated and applied.
 			<li>Confirm that the counter is no longer corrupt.
 		</ul>
+  	   	<LI><b>[ISSUE-13388]</b> Manage Rule Execution Text Updates
+		<ul>
+			<li>Corrupt the FAM counters in a database.
+			<li>Create and send an <b>Unlock</b> request.
+			<li>Apply the received <b>Unlock</b> code.
+			<li>Confirm that FAM counters are no longer corrupt.
+			<li>Confirm that button text reflects the counters' usable state.
+		</ul>
+		<li><b>[ISSUE-13402]</b> Unlock Requests With Unrecoverable Counters
+		<ul>
+			<li>Start with clean <b>Test</b> database.
+			<li>Add each <b>standard</b> counter with 1000 counts.
+			<li>Exercise FPS to run rules and decrement from each counter.
+			<li>Confirm that FAM counters have each been decremented.
+			<li>Modify the <b>SecureCounterValue</b> entry for the Pagination counter 
+			from the <b>SecureCounter</b> table.
+			<li>Confirm that just one FAM counter is now corrupt.
+			<li>Confirm that an unlock request can be generated.
+			<li>Confirm that <b>Counter Manager</b> identifies the unrecoverable counter 
+			and the issue.
+			<li>Confirm that attempting to generate an unlock code displays an 
+			<b>Unrecoverable counter</b> error message with directions to delete it.
+			<li>Confirm that <b>SQL Management Studio</b> can delete the modified entry 
+			from the <b>SecureCounter</b> table.
+			<li>Confirm that the counter is no longer corrupt.
+		</ul>
+  	   	<LI><b>[ISSUE-13404]</b> FAM Counters With Invalid Database ID
+        	<ul>
+			<li>Create a new database (current schema) without any counters.
+			<li>Backup or detach the database and restore it to a different machine.
+			<li>From DB Admin on the new machine, generate an update code to create a 
+			counter.
+			<li>Use <b>Counter Manager</b> to create an update code with a new counter.
+			<li>Confirm that the new counter is successfully applied to the database.
+        	</ul>
+		<li><b>[ISSUE-13437]</b> Unlock Requests With Partial Corrupt Counters
+		<ul>
+			<li>Start with clean <b>Test</b> database.
+			<li>Add each <b>standard</b> counter with 1000 counts.
+			<li>Exercise FPS to run rules and decrement from each counter.
+			<li>Confirm that FAM counters have each been decremented.
+			<li>Remove last entry from <b>SecureCounterValueChange</b> table for the 
+			<b>Pagination</b> counter.
+			<li>Confirm that just one FAM counter is now corrupt.
+			<li>Confirm that an unlock request can be generated.
+			<li>Confirm that <b>Counter Manager</b> identifies the corrupt counter and 
+			the issue.
+			<ul>
+				<li>Confirm that counts are present in the <b>Value Log</b> column 
+				for counters 3 and 4.
+				<li>Confirm that the table can be scrolled to see status for counter 
+				5.
+			</ul>
+			<li>Confirm that an unlock code can be generated and applied.
+			<li>Confirm that the counter is no longer corrupt.
+		</ul>
   	</ul>
 <p>
   	<li><h2>Tests Needed</h2></li>
