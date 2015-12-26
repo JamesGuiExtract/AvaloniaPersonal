@@ -385,6 +385,98 @@
 		the number of records in the <b>IDShieldData</b> table.
 		<li>Confirm that the session time in the VOA file matches the time recorded in 
 		the <b>IDShieldData</b> table.
+    	</ul>
+<p>
+  	<LI><h2>ID Shield Highlights</h2>
+	<ul>
+		<LI><b>IDShield.ini</b>
+		<ul>
+			<li>The default INI file must be modified to support the following.
+			<li>Additional types must be counted and defined. <b>Highlight</b> must be 
+			included in the collection.
+			<li>Three new <b>Level</b> items must be added and counted. They should appear 
+			in the following order and at the top of the list of defined levels.
+			<ul>
+				<li>Level1 = Highlight
+				<li>Level2 = Highlight Clues
+				<li>Level3 = Manual Highlight
+			</ul>
+			<li>Specific values for Query, Color, Output, Display, Verify, ReadOnly, and 
+			Highlight settings can be found at <b>M:\PVCS_JIRA\JIRA\ISSUE-13365</b>.
+       		</ul>
+<p>
+		<LI><b>FPS File</b>
+		<ul>
+			<li>The following tasks should be done to exercise the BWH workflow. The can be 
+			saved into multiple FPS files if desired.
+			<li><u>Core: Rasterize PDF</u> - Modify SDN in database
+			<li><u>Core: OCR document</u>
+			<li><u>Core: Execute rules</u>
+			<ul>
+				<li>The actual customer workflow has two master rulesets, one for AFIB 
+				documents and one for PreD and SCD documents.
+				<li>A conditional task can be used to run the appropriate rules for the 
+				document, if desired.
+				<li>Just one of the rulesets can be run since the testing purpose may 
+				be to determine if the highlighting behavior works correctly.
+			</ul>
+			<li><u>Redaction: Verify sensitive data</u>
+			<ul>
+				<li>The sample documents are fairly long so the default settings may 
+				deserve to be changed to allow more rapid testing.
+			</ul>
+			<li><u>Core: Execute rules</u>
+			<ul>
+				<li>Use <b>renameHighlights.rsd.etf</b>. This ruleset is set as a swiping 
+				rule so that additional counters are not decremented.
+				<li>Note that <b>&lt;SourceDocName&gt;.voa</b> must be made available 
+				to the rule execution.
+				<li>The purpose of the ruleset is to rename any <b>Manual</b> items with 
+				type = <b>Highlight</b> to be Highlight items.
+			</ul>
+			<li><u>Redaction: Create redacted image</u>
+			<ul>
+				<li>The output file must be a PDF since the customer is expecting PDF 
+				documents as output.
+			</ul>
+			<li><u>Core: Modify PDF file</u>
+			<ul>
+				<li>Add highlights to the redacted output file for each attribute with 
+				name = <b>Highlight</b>.
+			</ul>
+	       	</ul>
+<p>
+		<LI><b>Customer Testing</b>
+		<ul>
+			<li>Exercise the master ruleset against the test images.
+			<li>Verify the test images.
+			<ul>
+				<li>Confirm that each image includes redactions with various types.
+				<li>Confirm that each image includes clues.
+				<li>Confirm that each image includes manual redactions.
+				<li>Confirm that each image includes highlights found via rule. Note 
+				that these highlights should not be listed in the data grid and should 
+				not be selectable.
+				<li>Confirm that image <b>highlights</b> default to <b>yellow</b>.
+				<li>Confirm that image <b>highlights</b> do not have a border rectangle.
+				<li>Confirm that each image includes manual items with type set to 
+				<b>Highlight</b>.
+			</ul>
+			<li>Confirm that other tasks work as intended.
+			<li>Confirm that output PDFs contain both redactions and highlights.
+			<li>Confirm that manual redactions and manual highlights appear correctly.
+			<li>Confirm that highlights appear in <b>yellow</b>.
+			<li>Confirm that redactions appear <b>black</b>.
+	       	</ul>
+<p>
+		<LI><b>Additional Testing</b>
+		<ul>
+			<li><b>[ISSUE-13390]</b> Confirm that specifying a <b>FillColor</b> for 
+			<b>Highlight</b> attributes overrides the yellow default.
+			<li>Confirm that <b>Demo_IDShield</b> behavior is unchanged if exercised using the 
+			modified INI file.
+			<li>Confirm that no memory leak is noted if exercising with the modified INI file.
+       		</ul>
 	</ul>
 </ul>
 </body> 
