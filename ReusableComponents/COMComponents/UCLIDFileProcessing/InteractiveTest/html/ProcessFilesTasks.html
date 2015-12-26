@@ -1881,6 +1881,66 @@ ORDER BY DateTimeStamp<br>
                 <li>Confirm that subsequent tasks <b>are not</b> executed.
                 <li>Confirm that progress status is updated as sleep proceeds.
             </ul>
+    	</ul>
+<p>
+        <li><b>Core: Store or retrieve attributes in database</b>
+        <ul> 
+		<li><u>User Interface</u>
+		<ul>
+			<li>Confirm that the property page includes a <b>VOA file with 
+			attributes</b> edit box.
+			<li>Confirm that the default edit box text is 
+			<b>&lt;SourceDocName&gt;.voa</b>.
+			<li>Confirm presence of an associated <b>tag selector</b> button.
+			<li>Confirm presence of an associated <b>browse</b> button.
+			<li>Confirm that the property page includes an <b>Attribute set 
+			name</b> combo box. 
+			<li>Confirm that the combo box only allows selection of an 
+			existing attribute set name.
+			<li>Confirm that the property page includes a <b>Mode</b> group 
+			box with <b>Store</b> and <b>Retrieve</b> options.
+			<li>Confirm that <b>Store</b> is the default choice.
+			<li>Confirm that the property page includes a <b>Store spatial 
+			information (raster zones)</b> checkbox.
+			<li>Confirm that the checkbox is checked by default.
+			<li>Confirm that the property page includes a <b>Do not store empty 
+			attributes</b> checkbox.
+			<li>Confirm that the checkbox is checked by default.
+			<li>Confirm that the checkboxes are hidden when the <b>Retrieve</b> 
+			mode is selected.
+			<li>Confirm that settings are persistent.
+			<li>Confirm that the property page cannot be resized too small.
+		</ul>
+		<li><u>Functionality</u>
+		<ul>
+			<li>Confirm that attributes can be stored to a FAM database.
+			<li>Confirm that attributes can be retrieved from a FAM database.
+			<li>Confirm that retrieved VOA files are identical to pre-storage 
+			VOA files regardless of settings for spatial information or empty 
+			attributes.
+			<li>Confirm that attribute sets without empty attributes do not 
+			include empty attributes in the <b>Attribute</b> or the 
+			<b>AttributeSetForFile</b> tables.
+			<li>Confirm that more than two levels of sub-attributes can be 
+			stored and retrieved.
+			<li>Confirm that attribute storage in the database supports multiple 
+			<b>Type</b> values for a single attribute.
+		</ul>
+		<li><u>Miscellaneous</u>
+		<ul>
+			<li>Confirm that exercising this task with Demo_IDShield images works 
+			without error.
+			<li><b>[ISSUE-13286]</b> Confirm that more than two levels of 
+			sub-attributes can be stored and retrieved.
+			<li><b>[ISSUE-13517]</b> Confirm that this task is able to store 
+			attributes from pre-processed images in the following folders.
+			<ul>
+				<li>K:\Common\Engineering\SecureSamples\American Family
+				<li>K:\Common\Engineering\SecureSamples\NJ-Rutgers
+				<li>Another folder under <b>SecureSamples</b>.
+				<li>A few folders under <b>Sample Files</b>.
+			</ul>
+		</ul>
         </ul> 
 <p>
         <li><b>Core: Transfer file via FTP/SFTP</b>
