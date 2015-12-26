@@ -341,6 +341,21 @@
 			tags, users and database settings.
 			<li>Confirm that the metadata field definitions are removed.
         	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13377]</b> Missing DBInfo Fields
+		<ul>
+			<li>Confirm the presence of the following <b>DBInfo</b> fields in a new database.
+			<ul>
+				<li>LicenseContactOrganization
+				<li>LicenseContactEmail
+				<li>LicenseContactPhone
+				<li>SendAlertsToExtract
+				<li>SendAlertsToSpecified
+				<li>SpecifiedAlertRecipients
+			</ul>
+			<li>Confirm that the above fields are present in a database that has been cleared 
+			without saving old values.
+		</ul>
     	</ul></li>
 <p>
     	<li><b>Reset Lock</b>
@@ -382,6 +397,20 @@
 			<li>Confirm that the <b>ReceivedDateTime</b> column in <b>LabDEOrder</b> 
 			table is not NULL when updated from an older schema.
         	</ul>
+<p>
+  	   	<LI><b>[ISSUE-13301]</b> DB Admin - Update Database Schema
+		<ul>
+			<li>Restore the database from <b>M:\PVCS_JIRA\JIRA\ISSUE-13301</b>.
+			<li>Confirm that the database schema is successfully updated.
+		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13380]</b> DB Admin Failed To Update DB Schema
+		<ul>
+			<li>Open new instance of DB Admin.
+			<li>Log in to existing out-of-date database.
+			<li>Agree to update DB schema.
+			<li>Confirm that schema update is successful.
+		</ul>
     	</ul></li>
 <p>
     	<li><b>Database options</b>
@@ -537,6 +566,9 @@
 				<li>Resize the settings dialog and confirm that button anchoring and 
 				dialog size remain acceptable.
 	        	</ul>
+<p>
+	  	   	<LI><b>[ISSUE-13260]</b> Confirm that the <b>Email</b> tab on the Database 
+			options window is properly sized.		
         	</ul></li>
         	<li>Confirm that changes made in the Database options dialog are logged in 
 		Application Traces.</li>
@@ -662,25 +694,46 @@
         	</ul></li>
     	</ul></li>
 <p>
-    	<li><b>Manage Counters...</b>
+    	<li><b>Manage Attribute sets...</b>
     	<ul>
-        	<li>Confirm that the <b>Manage Counters</b> dialog includes a list with columns for
-        	<b>Counter</b> and <b>Value</b>.</li>
-        	<li>Confirm that the <b>Manage Counters</b> dialog includes an <b>Add...</b> button.
+        	<li><u><b>Miscellaneous</b></u>
+        	<ul>
+	  	   	<LI>Confirm that the <b>Rename</b> button in the dialog includes ellipsis.
+			<li>Store some named sets in a FAM database.
+			<li>Confirm that the named sets are visible in the dialog.
+			<li>Select one set.
+			<li>Click the <b>Rename</b> button.
+			<li>Cancel from the Rename dialog.
+			<li>Confirm that arrow keys navigate selection from the previous selection 
+			point.
+<p>
+	  	   	<LI><b>[ISSUE-13308]</b> Confirm that the <b>Manage - Attribute sets</b> menu item 
+			is disabled in DB Admin if the database schema is not current.
+        	</ul></li>
+    	</ul></li>
+<p>
+    	<li><b>Manage Bates number counters...</b>
+    	<ul>
+        	<li>Confirm that the <b>Manage Bates Number Counters</b> dialog includes a list with 
+		columns for <b>Counter name</b> and <b>Value</b>.</li>
+        	<li>Confirm that the <b>Manage Bates Number Counters</b> dialog includes an 
+		<b>Add...</b> button.
         	<ul>
             		<li>Confirm that an <b>Add Counter</b> dialog is displayed.</li>
             		<li>Confirm that negative values can be used to initialize the counter.</li>
             		<li>Confirm that counter names must be unique in the database.</li>
         	</ul></li>
-        	<li>Confirm that the <b>Manage Counters</b> dialog includes a <b>Delete</b> button.</li>
+        	<li>Confirm that the <b>Manage Bates Number Counters</b> dialog includes a 
+		<b>Delete</b> button.</li>
         	<li>Confirm that a confirmation prompt is provided before deleting the counter.</li>
-        	<li>Confirm that the <b>Manage Counters</b> dialog includes a <b>Rename...</b> button.
+        	<li>Confirm that the <b>Manage Bates Number Counters</b> dialog includes a 
+		<b>Rename...</b> button.
         	<ul>
             		<li>Confirm that a <b>Rename Counter</b> dialog is displayed.</li>
             		<li>Confirm that counter names must be unique in the database.</li>
         	</ul></li>
-        	<li>Confirm that the <b>Manage Counters</b> dialog includes a <b>Set value...</b>
-        	button.
+        	<li>Confirm that the <b>Manage Bates Number Counters</b> dialog includes a 
+		<b>Set value...</b> button.
         	<ul>
             		<li>Confirm that a <b>Set Counter Value</b> dialog is displayed.</li>
             		<li>Confirm that the <b>Counter name</b> edit box is read-only.</li>
@@ -688,9 +741,11 @@
             		<li>Confirm that the default value in the <b>New value for counter</b> edit 
 			box is the current value.</li>
         	</ul></li>
-        	<li>Confirm that the <b>Manage Counters</b> dialog includes a <b>Refresh</b> button.</li>
+        	<li>Confirm that the <b>Manage Bates Number Counters</b> dialog includes a 
+		<b>Refresh</b> button.</li>
         	<li>Confirm that <b>Refresh</b> updates the list of counters and values.</li>
-        	<li>Confirm that the <b>Manage Counters</b> dialog includes a <b>Close</b> button.</li>
+        	<li>Confirm that the <b>Manage Bates Number Counters</b> dialog includes a 
+		<b>Close</b> button.</li>
         	<li>Confirm that <b>Close</b> closes the dialog.</li>
         	<li>Confirm that <b>ESC</b> will close the dialog.</li>
     	</ul></li>
@@ -868,6 +923,139 @@
             		<li>TBD
         	</ul></li>
     	</ul></li>
+<p>
+    	<li><b>Manage Rule Execution Counters...</b>
+    	<ul>
+		<li><u>User Interface</u>
+		<ul>
+			<li>Confirm that <b>Manage - Rule execution counters...</b> is 
+			available from DB Admin.
+			<li>Confirm that the menu item is disabled if the database 
+			schema is out-of-date.
+			<li>Confirm that a table of defined counters is provided with the 
+			following column headings.
+			<ul>
+				<li>ID
+				<li>Name
+				<li>Value
+				<li>Alert Level
+				<li>Alert Frequency
+			</ul>
+			<li>Confirm that a <b>Refresh</b> button is defined.
+			<li>Confirm that an <b>Enable email alerts to support@extractsystems.com</b> 
+			checkbox is defined.
+			<li>Confirm that an <b>Enable email alerts to:</b> checkbox is defined.
+			<li>Confirm that each checkbox is <b>unchecked</b> by default.
+			<li>Confirm that a <b>Generate update request</b> button is defined.
+			<li>Confirm that an <b>Apply update code</b> button is defined.
+			<li>Confirm that <b>OK</b> and <b>Cancel</b> buttons are defined.
+		</ul>
+		<li><u>Functionality</u>
+		<ul>
+			<li><u>Generate counter request</u>
+			<ul>
+				<li>Confirm that clicking the button displays a <b>Generate 
+				Counter Update Request</b> dialog.
+				<li>Confirm that the dialog includes an <b>Organization</b> 
+				edit box.
+				<li>Confirm that the dialog includes an <b>Email (will be 
+				cc'd if email delivery option is used)</b> edit box.
+				<li>Confirm that the dialog includes an <b>Phone</b> 
+				edit box.
+				<li>Confirm that the dialog includes an <b>Reason for request</b> 
+				edit box.
+				<li>Confirm that the above edit boxes are editable and empty by 
+				default.
+				<li>Confirm that the dialog includes a read-only <b>Request</b> 
+				edit box containing the following data.
+				<ul>
+					<li>Database
+					<li>ID
+					<li>Current counter values: (one line for each)
+					<li>An encrypted string
+				</ul>
+				<li>Confirm that the dialog includes a <b>Copy to clipboard</b> 
+				button.
+				<li>Confirm that the dialog includes a <b>Send email to Extract</b> 
+				button.
+				<li>Confirm that the dialog includes a <b>Save request to a file</b> 
+				button.
+				<li>Confirm that the dialog includes a <b>Close</b> button.
+<p>
+				<li>Confirm that the <b>Copy to clipboard</b> button copies the 
+				dialog contents to the Clipboard.
+				<li>Confirm that the <b>Send email to Extract</b> button copies 
+				the dialog contents to an email message.
+				<li>Confirm that an <b>Outgoing email server not configured</b> 
+				error is displayed if email settings have not yet been configured 
+				in the associated FAM database.
+				<li>Confirm that the <b>Save request to a file</b> button opens a 
+				<b>Save As</b> dialog for saving dialog contents to a text file.
+				<li>Confirm that the <b>Close</b> button closes the dialog.
+			</ul>
+			<li><u>Apply update code</u>
+			<ul>
+				<li>Confirm that clicking the button displays a <b>Apply 
+				Counter Update Code</b> dialog.
+				<li>Confirm that the dialog includes a multi-line, read-only 
+				edit box for <b>Counter update code</b>.
+				<li>Confirm that the dialog includes a <b>Paste code from 
+				clipboard</b> button.
+				<li>Confirm that the dialog includes a <b>Load code from 
+				file</b> button.
+				<li>Confirm that the dialog includes an <b>Apply</b> button.
+				<li>Confirm that the dialog includes a <b>Cancel</b> button.
+<p>
+				<li>Confirm that the <b>Paste code from clipboard</b> button 
+				pastes clipboard contents into the multi-line edit box.
+				<li>Confirm that a <b>Counter Update Confirmation</b> dialog 
+				is presented.
+				<ul>
+					<li>Confirm that the dialog includes text about the 
+					update being successfully applied.
+					<li>Confirm that the dialog includes text about sending 
+					the following confirmation to Extract Systems.
+					<li>Confirm that the dialog includes a multi-line, 
+					read-only edit box with the following information.
+					<ul>
+						<li>Database
+						<li>ID
+						<li>A list of changes that were applied
+						<li>New counter values: (one line for each)
+						<li>An encrypted string
+					</ul>
+					<li>Confirm that the dialog includes a <b>Copy to 
+					clipboard</b> button.
+					<li>Confirm that the dialog includes a <b>Send email to 
+					Extract</b> button.
+					<li>Confirm that the dialog includes a <b>Save to a 
+					file</b> button.
+					<li>Confirm that the dialog includes a <b>Close</b> button.
+					<li>Confirm that each button works as expected.
+				</ul>
+			</ul>
+			<li>Confirm that the <b>Refresh</b> button updates the dialog to show 
+			current counter values.
+			<li>Confirm that <b>Cancel</b> closes the dialog without saving 
+			changes to checkbox selections, Alert Level, or Alert Frequencies.
+			<li>Confirm that <b>OK</b> closes the dialog and saves changes 
+			to checkbox selections, Alert Level, and Alert Frequencies.
+			<li>Confirm that an appropriate <b>Alert</b> email is sent if 
+			the counter value reaches the desired level.
+			<li>Confirm that an appropriate <b>Alert</b> email is sent if 
+			the counter value skips over the desired level.
+			<li>Confirm that an appropriate <b>Alert</b> email is sent if 
+			the counter value reaches or skips over an <b>Alert Frequency</b> 
+			level.
+		</ul>
+		<li><u>Miscellaneous</u>
+		<ul>
+	  	   	<LI><b>[ISSUE-13381]</b> Confirm that <b>Manage - Rule Execution Counters</b> 
+			works for a database that has been cleared without saving old values.
+	  	   	<LI><b>[ISSUE-13389]</b> Confirm that the DB Admin UI displays counts with 
+			thousands separators.
+		</ul>
+	</ul>
 </ul>
 
 <h2>Tools Menu</h2>
