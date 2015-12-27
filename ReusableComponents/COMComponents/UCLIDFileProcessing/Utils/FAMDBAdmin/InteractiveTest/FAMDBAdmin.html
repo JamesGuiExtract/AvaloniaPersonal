@@ -1047,13 +1047,35 @@
 			<li>Confirm that an appropriate <b>Alert</b> email is sent if 
 			the counter value reaches or skips over an <b>Alert Frequency</b> 
 			level.
+			<li>Confirm that <b>Alert Frequency</b> values must be less than 
+			<b>Alert Level</b> values.
 		</ul>
 		<li><u>Miscellaneous</u>
 		<ul>
+	  	   	<LI><b>[ISSUE-13356]</b> Confirm that an entry is logged to UEX for each 
+			applied FAM Counter update or unlock.
+	  	   	<LI><b>[ISSUE-13357]</b> Confirm that an entry is logged to UEX for each FAM 
+			Counter transition of 1000 counts.
 	  	   	<LI><b>[ISSUE-13381]</b> Confirm that <b>Manage - Rule Execution Counters</b> 
 			works for a database that has been cleared without saving old values.
 	  	   	<LI><b>[ISSUE-13389]</b> Confirm that the DB Admin UI displays counts with 
 			thousands separators.
+	  	   	<LI><b>[ISSUE-13414]</b> Confirm that rapid and repeated open and close of 
+			<b>Manage - Rule execution counters</b> does not display an unhandled exception 
+			error.
+<p>
+	  	   	<LI><b>[ISSUE-13410, ISSUE-13413]</b> FAM Counter Decrement By Page Without OCR
+			<ul>
+				<li>Prepare a testing database with <b>Indexing By Page</b> counter.
+				<li>Prepare a collection of multi-page images.
+				<li>Prepare simple RSD file with <b>Create Value</b> rule and 
+				<b>Indexing By Page</b> counter.
+				<li>Exercise <b>Core: Execute rules</b> with <b>Do not OCR</b> option.
+				<li>Confirm that the FAM counter correctly decrements per page count.
+				<li>Confirm that counting does not hang when a FAM process is stopped.
+				<li>Confirm that counting does not hang when a FAM Service process is 
+				stopped.
+			</ul>
 		</ul>
 	</ul>
 </ul>
