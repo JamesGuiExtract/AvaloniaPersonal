@@ -61,6 +61,10 @@
             		<li>Confirm that <b>Update to current schema</b> works as expected.</lI>
             		<li>Confirm that <b>Tools - Create new query</b> creates a numbered 
 			<b>New Query</b> tab.</li>
+            		<li>Confirm that <b>Tools - Import</b> displays an <b>Import data into 
+			database table</b> window.</li>
+            		<li>Confirm that <b>Tools - Export</b> displays an <b>Export Tables</b> 
+			window.</li>
 <p>
             		<li>Confirm that <b>Help - About</b> displays the <b>About SQLCDBEditor</b> 
             		dialog.</li>
@@ -70,6 +74,59 @@
 <p>
         	<LI><b>Windows</b>
         	<ul>
+			<li><u>Import</u>
+			<ul>
+				<li>Confirm that the dialog includes a <b>Select data file</b> 
+				edit box.
+				<li>Confirm that an associated browse button is included.
+				<li>Confirm that the dialog includes a <b>Select table to import 
+				data into</b> combo box.
+				<li>Confirm that the combo box is preloaded with each table contained 
+				in the open database.
+				<li>Confirm that the data file contents are listed in the dialog.
+				<li>Confirm that the dialog includes <b>Import configuration</b> 
+				radio buttons.
+				<ul>
+					<li>Append imported data to existing table contents
+					<li>Replace existing table contents with imported data
+				</ul>
+				<li>Confirm that the dialog includes <b>Import</b> and <b>Cancel</b> 
+				buttons.
+<p>
+				<li>Confirm that data can be successfully <b>appended</b>.
+				<li>Confirm that data can be successfully <b>replaced</b>.
+<p>
+				<li>Open <b>Rutgers.sdf</b> and select <b>Tools - Import</b>.
+				<li>Confirm that the combo box available for table selection is height 
+				limited.
+				<li>Confirm that the confirmation message presented after <b>Import</b> 
+				includes a meaningful window caption.
+			</ul>
+			<li><u>Export</u>
+			<ul>
+				<li>Confirm that the dialog includes a <b>Selected output 
+				directory</b> edit box.
+				<li>Confirm that an associated browse button is included.
+				<li>Confirm that the dialog includes a list of all tables in the 
+				open database.
+				<li>Confirm that the following columns are included.
+				<ul>
+					<li>A checkbox column to indicate selection.
+					<li>Table name
+					<li>Output file name
+				</ul>
+				<li>Confirm that the header checkbox checks or unchecks each 
+				individual checkbox.
+				<li>Confirm that the default output file name is <b>&lt;table 
+				name&gt;.csv</b>
+				<li>Confirm that the dialog includes <b>Export</b> and <b>Done</b> 
+				buttons.
+<p>
+				<li>Confirm that data can be successfully <b>exported</b> from a 
+				single table.
+				<li>Confirm that data can be successfully <b>exported</b> from 
+				multiple tables.
+			</ul>
             		<li><u>Tables</u>
 			<ul>
             			<li>Open an existing SQL Compact Database file and confirm that 
