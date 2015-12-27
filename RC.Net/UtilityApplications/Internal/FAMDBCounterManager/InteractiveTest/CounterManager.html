@@ -214,6 +214,30 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			<li>Confirm that an unlock code can be generated and applied.
 			<li>Confirm that the counter is no longer corrupt.
 		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13335]</b> DB Admin Debug Data
+        	<ul>
+			<li>Use DB Admin to request a counter update for a specific database.
+			<li>Use <b>Counter Manager</b> to create a new counter for the database.
+			<li>Use DB Admin to apply the update string to a <b>different</b> 
+			database.
+			<li>Confirm that the update fails.
+			<li>Confirm that the associated debug data includes the expected and 
+			actual database names.
+        	</ul>
+  	   	<LI><b>[ISSUE-13361]</b> FAM Counter Debug Data
+        	<ul>
+			<li>Create and apply a custom counter such as <b>Wayne (By Page)</b> with 
+			ID = 234.
+			<li>Create a simple RSD file that uses the same custom counter ID but with 
+			a slightly different name, such as <b>Wayne - (By Page)</b>.
+			<li>Confirm that an exception is thrown if trying to process images with 
+			this ruleset.
+			<li>Confirm that the associated debug data includes the expected and 
+			actual <b>counter names</b>.
+			<li>Confirm that the associated debug data includes the expected and 
+			actual <b>counter IDs</b>.
+        	</ul>
   	   	<LI><b>[ISSUE-13388]</b> Manage Rule Execution Text Updates
 		<ul>
 			<li>Corrupt the FAM counters in a database.
@@ -248,6 +272,17 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			counter.
 			<li>Use <b>Counter Manager</b> to create an update code with a new counter.
 			<li>Confirm that the new counter is successfully applied to the database.
+        	</ul>
+  	   	<LI><b>[ISSUE-13409]</b> FAM Counters
+        	<ul>
+			<li>Create a new database (current schema) and add one or more counters.
+			<li>Detach and reattach the database to the same machine.
+			<li>Confirm that the counters are in a corrupt state.
+			<li>Generate an <b>unlock code</b>.
+			<li>Use <b>Counter Manager</b> to create an unlock string.
+			<li>Confirm that <b>Counter Manager</b> displays the most recent counter 
+			value from the <b>SecureCounterValueHistory</b> table as extracted from 
+			the unlock request.
         	</ul>
 		<li><b>[ISSUE-13437]</b> Unlock Requests With Partial Corrupt Counters
 		<ul>
@@ -293,6 +328,25 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 		<li>Confirm that the <b>Counter data validity</b> edit box or the <b>Validity</b> 
 		column displays the reason for counter corruption.
 		<li>Confirm that the <b>usage message</b> lists all required DLLs.
+<p>
+  	   	<LI><b>[ISSUE-13235]</b> FAM Counters
+		<ul>
+			<li>Confirm that each standard counter can successfully be created.
+			<li>Confirm that each standard counter can successfully support rule 
+			execution with correct decrements.
+			<li>Confirm that each standard counter can successfully be updated.
+			<ul>
+				<li>ID = 1, Indexing By Document
+				<li>ID = 2, Pagination By Document
+				<li>ID = 3, Redaction By Page
+				<li>ID = 4, Redaction By Document
+				<li>ID = 5, Indexing By Page
+			</ul>
+			<li>Confirm that the above tests also work with a <b>Custom By Page</b> 
+			counter.
+			<li>Confirm that the above tests also work with a <b>Custom By Document</b> 
+			counter.
+		</ul>
   	</ul>
 </ol>
 </body>
