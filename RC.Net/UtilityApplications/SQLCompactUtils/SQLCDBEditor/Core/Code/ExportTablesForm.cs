@@ -198,6 +198,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 FolderBrowserDialog fbd = new FolderBrowserDialog();
+                fbd.SelectedPath = Path.GetDirectoryName(_databaseFilename);
                 var ret = fbd.ShowDialog();
                 if (ret != DialogResult.OK)
                     return;

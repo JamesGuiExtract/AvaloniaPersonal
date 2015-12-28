@@ -125,6 +125,7 @@ namespace Extract.SQLCDBEditor
                 OpenFileDialog ofd = new OpenFileDialog();
                 ofd.Title = "Select data file";
                 ofd.Filter = "CSV Files (.csv)|*.csv|All files (*.*)|*.*";
+                ofd.InitialDirectory = Path.GetDirectoryName(_databaseFilename);
                 var result = ofd.ShowDialog();
                 if (result == DialogResult.OK)
                 {
@@ -361,15 +362,22 @@ namespace Extract.SQLCDBEditor
                             if (tci[index].IsAutoIncrement)
                             {
                                 ++index;
+                                if (index >= countOfColumns)
+                                {
+                                    break;
+                                }
+
                                 continue;
                             }
                         }
 
                         dr[index] = RemoveDoubleQuotes(item);
-                        ++index;
 
+                        ++index;
                         if (index >= countOfColumns)
+                        {
                             break;
+                        }
                     }
 
                     _resultsTable.Rows.Add(dr);
@@ -400,25 +408,28 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         void UpdateDataIntoGrid()
         {
-            if (String.IsNullOrWhiteSpace(_dataFilename))
-                return;
-            if (String.IsNullOrWhiteSpace(_tablename))
-                return;
+            using (new TemporaryWaitCursor())
+            {
+                if (String.IsNullOrWhiteSpace(_dataFilename))
+                    return;
+                if (String.IsNullOrWhiteSpace(_tablename))
+                    return;
 
-            // Now populate the data grid. First clear any existing data from the data table and grid view.
-            ResultsGridView.DataSource = null;
+                // Now populate the data grid. First clear any existing data from the data table and grid view.
+                ResultsGridView.DataSource = null;
 
-            _resultsTable = new DataTable();
-            _resultsTable.Locale = CultureInfo.CurrentCulture;
+                _resultsTable = new DataTable();
+                _resultsTable.Locale = CultureInfo.CurrentCulture;
 
-            // Load data from the DB table, so that the schema is set. Clearing retains columns, not data.
-            LoadOneRowIntoTable();
-            _resultsTable.Clear();
+                // Load data from the DB table, so that the schema is set. Clearing retains columns, not data.
+                LoadOneRowIntoTable();
+                _resultsTable.Clear();
 
-            LoadImportData(ReadFile());
+                LoadImportData(ReadFile());
 
-            ResultsGridView.DataSource = _resultsTable;
-            SetRowNumber();
+                ResultsGridView.DataSource = _resultsTable;
+                SetRowNumber();
+            }
         }
 
 
