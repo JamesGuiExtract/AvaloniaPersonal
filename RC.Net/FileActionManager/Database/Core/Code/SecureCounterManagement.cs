@@ -15,6 +15,13 @@ namespace Extract.FileActionManager.Database
     [CLSCompliant(false)]
     public class SecureCounterManagement : ISecureCounterManagement
     {
+        /// <summary>
+        /// Used to indicate that the UI is active or soon will be
+        /// If this has a value of 1 the UI is active
+        /// If this has a value of 0 the UI is not active
+        /// </summary>
+        static int _UICount;
+
         #region ISecureCounterManagement
 
         /// <summary>
@@ -28,6 +35,13 @@ namespace Extract.FileActionManager.Database
         {
             try 
 	        {
+                // Set the _UICount to 1 if it isn't already
+                if (1 == Interlocked.CompareExchange(ref _UICount, 1, 0))
+                {
+                    // UI is currently active since the previous value was 1
+                    return;
+                }
+
                 Thread uiThread = new Thread(() =>
                 {
                     try
@@ -41,6 +55,11 @@ namespace Extract.FileActionManager.Database
                     {
                         ExtractException ee = new ExtractException("ELI39118", "Unable to display Manage Counter Dialog.", ex);
                         ee.Display();
+                    }
+                    finally
+                    {
+                        // set the value of the _UICount to 0
+                        Interlocked.Exchange(ref _UICount, 0);
                     }
                 });
                 // Single-threaded apartment state is needed for copy/paste or drag/drop to work.
