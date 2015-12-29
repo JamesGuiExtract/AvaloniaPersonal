@@ -101,6 +101,27 @@
 				limited.
 				<li>Confirm that the confirmation message presented after <b>Import</b> 
 				includes a meaningful window caption.
+<p>
+		  	   	<LI><b>[ISSUE-13453]</b> SQLCDBEditor Import
+        			<ul>
+					<li>Open SQLCDBEditor.exe
+					<li>Open <b>Demo_FlexIndex.sdf</b>.
+					<li>Export the <b>State</b> table
+					<li>Select <b>Tools - Import</b>.
+					<li>Confirm that <b>Append</b> is the default option.
+					<li>Select the <b>State</b> table and exported file from above.
+					<li>Select the <b>Replace</b> option.
+					<li>Confirm that a warning message is displayed about reviewing 
+					foreign key constraints.
+					<li>Choose <b>Yes</b> to Replace and click the <b>Import</b> 
+					button.
+					<li>Confirm that a meaningful exception is displayed and that the 
+					Import operation fails.
+					<li>Confirm that modifications made to an export of the 
+					<b>ZipCode</b> table can be successfully Replaced without a 
+					warning.
+					<li>Confirm that a menaingful confirmation message is displayed.
+        			</ul>
 			</ul>
 			<li><u>Export</u>
 			<ul>
