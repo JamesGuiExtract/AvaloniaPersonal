@@ -305,6 +305,79 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			<li>Confirm that an unlock code can be generated and applied.
 			<li>Confirm that the counter is no longer corrupt.
 		</ul>
+<p>
+  	   	<LI><b>[ISSUE-13459]</b> Database ID and FAM Counter Corruption
+		<ul>
+			<li><u>ID = 0, DB without Counters</u>
+			<ul>
+				<li>Create a new database.
+				<li>Use <b>SQL Mgmt Studio</b> to clear the 
+				<b>Database ID</b> field in the <b>DBInfo</b> table.
+				<li>Generate a <b>Counter Update Request</b>.
+				<li>Confirm that the request includes a Database ID 
+				containing all zeroes.
+				<li>Confirm that the request can be successfully 
+				pasted into <b>Counter Manager</b>.
+				<li>Confirm that <b>Counter Manager</b> displays a 
+				different, non-zero Database ID.
+				<li>Confirm that a counter can be created and applied.
+				<li>Confirm that a new update request includes the new 
+				Database ID.
+			</ul>
+<p>
+			<li><u>ID = 0, DB with Counters</u>
+			<ul>
+				<li>Operate on the database from the above test.
+				<li>Confirm that one or more counters are present and valid.
+				<li>Use <b>SQL Mgmt Studio</b> to clear the 
+				<b>Database ID</b> field in the <b>DBInfo</b> table.
+				<li>Confirm that the existing counter is <b>Corrupted</b>.
+				<li>Generate an <b>Unlock Request</b>.
+				<li>Confirm that an <b>ELI39181: Request code cannot be 
+				generated because Database ID is missing</b> exception is 
+				displayed.
+				<li>Use <b>SQL Mgmt Studio</b> to remove all entries from the 
+				<b>SecureCounter</b> table.
+				<li>Confirm that a <b>Counter Update Request</b> can be 
+				generated.
+				<li>Confirm that a new counter can be created and applied.
+			</ul>
+<p>
+			<li><u>ID missing, DB with Counters</u>
+			<ul>
+				<li>Operate on the database from the above test.
+				<li>Use <b>SQL Mgmt Studio</b> to remove the 
+				<b>Database ID</b> field in the <b>DBInfo</b> table.
+				<li>Generate a <b>Counter Update Request</b>.
+				<li>Confirm that the existing counter is <b>Corrupted</b>.
+				<li>Generate an <b>Unlock Request</b>.
+				<li>Confirm that an <b>ELI39181: Request code cannot be 
+				generated because Database ID is missing</b> exception is 
+				displayed.
+				<li>Use <b>SQL Mgmt Studio</b> to remove all entries from the 
+				<b>SecureCounter</b> table.
+				<li>Confirm that a <b>Counter Update Request</b> can be 
+				generated.
+				<li>Confirm that a new counter can be created.
+				<li>Confirm that applying the counter is successful.
+			</ul>
+<p>
+			<li><b>[ISSUE-13482]</b> <u>ID missing, DB without Counters</u>
+			<ul>
+				<li>Create a new database.
+				<li>Use <b>SQL Mgmt Studio</b> to remove the 
+				<b>Database ID</b> field in the <b>DBInfo</b> table.
+				<li>Generate a <b>Counter Update Request</b>.
+				<li>Confirm that the request includes a Database ID 
+				containing all zeroes.
+				<li>Confirm that the request can be successfully 
+				pasted into <b>Counter Manager</b>.
+				<li>Confirm that <b>Counter Manager</b> displays a 
+				different, non-zero Database ID.
+				<li>Confirm that a counter can be created.
+				<li>Confirm that applying the counter is successful.
+			</ul>
+		</ul>
   	</ul>
 <p>
   	<li><h2>Tests Needed</h2></li>
