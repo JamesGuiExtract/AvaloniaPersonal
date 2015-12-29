@@ -3264,7 +3264,7 @@ namespace Extract.DataEntry
         /// auto-population should not be allowed.</param>
         // Use lists to have access to the count.
         [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "5#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "5#")]
         protected void CreateSpatialHint(IAttribute attribute, DataGridViewCell targetCell,
             List<DataGridViewRow> smartHintRows, List<DataGridViewColumn> smartHintColumns,
             bool allowAutoPopulation, out bool autoPopulated)

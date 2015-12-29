@@ -3,6 +3,7 @@ using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -73,15 +74,15 @@ namespace Extract.AttributeFinder.Rules
         #region Fields
 
         /// <summary>
-        /// Syncronizes access to the <see cref="ProcessOutput"/> method.
-        /// </summary>
-        static object _lock = new object();
-
-        /// <summary>
         /// The data entry configuration file defining the data entry configuration that should be
         /// used to pre-load the data.
         /// </summary>
         string _configFileName;
+
+        /// <summary>
+        /// <see cref="ConfigFileName"/> with any path tags expanded.
+        /// </summary>
+        string _expandedConfigFileName;
 
         /// <summary>
         /// An <see cref="AttributeFinderPathTags"/> to expand any tags in
@@ -102,50 +103,6 @@ namespace Extract.AttributeFinder.Rules
         MiscUtils _ruleExectutionThreadMiscUtils = new MiscUtils();
 
         /// <summary>
-        /// The <see cref="Thread"/> in which the <see cref="DataEntryApplicationForm"/> that will
-        /// load the data will be run.
-        /// </summary>
-        Thread _uiThread;
-
-        /// <summary>
-        /// Indicates whether the UI thread has successfully started.
-        /// </summary>
-        ManualResetEvent _uiThreadStartedEvent = new ManualResetEvent(false);
-
-        /// <summary>
-        /// Indicates whether the UI thread has been requested to stop.
-        /// </summary>
-        ManualResetEvent _stopUiThreadEvent = new ManualResetEvent(false);
-
-        /// <summary>
-        /// Indicates whether the UI thread has ended.
-        /// </summary>
-        ManualResetEvent _uiThreadEndedEvent = new ManualResetEvent(false);
-
-        /// <summary>
-        /// Signals to the UI thread that the rule execution thread has requested a new preload
-        /// operation.
-        /// </summary>
-        AutoResetEvent _preloadRequestedEvent = new AutoResetEvent(false);
-
-        /// <summary>
-        /// Signals to the rule execution thread that the UI thread has completed a preload
-        /// operation.
-        /// </summary>
-        AutoResetEvent _preloadCompleteEvent = new AutoResetEvent(false);
-
-        /// <summary>
-        /// Used to pass attribute data back and forth between the two threads.
-        /// </summary>
-        volatile string _stringizedAttributeData;
-
-        /// <summary>
-        /// Keeps track of any exceptions that occur on the UI thread so that the rule execution
-        /// thread can use them.
-        /// </summary>
-        volatile ExtractException _uiThreadException;
-
-        /// <summary>
         /// <see langword="true"/> if changes have been made to <see cref="DataEntryPreloader"/>
         /// since it was created; <see langword="false"/> if no changes have been made since it was
         /// created.
@@ -153,6 +110,82 @@ namespace Extract.AttributeFinder.Rules
         bool _dirty;
 
         #endregion Fields
+
+        #region Static Fields
+
+        // https://extract.atlassian.net/browse/ISSUE-13472
+        // It had once been allowed for each rule object instance to have it's own UI thread.
+        // However, since the rule objects are instantiated via COM, their finalization is,
+        // in the current code at least, not deterministic and the rule objects will often
+        // stick around long after they are no longer used (even after stopping and restarting
+        // the FAM). This meant many DEPs could get created and needlessly sit on memory. Since
+        // access to ProcessOutput was already synchronized, the speed hit of requiring each 
+        // instance to use the same UI thread should be negligible (at least if all instances are
+        // using the same DEP). That is why all members related to the UI thread are now static.
+
+        /// <summary>
+        /// Synchronizes access to the <see cref="ProcessOutput"/> method and the UI thread.
+        /// </summary>
+        static object _lock = new object();
+
+        /// <summary>
+        /// Keeps track of all pre-loader instances that have referenced the UI thread. Only after
+        /// all instances that have used the UI thread have been disposed should the UI thread be
+        /// stopped.
+        /// </summary>
+        static HashSet<DataEntryPreloader> _uiThreadReferences = new HashSet<DataEntryPreloader>();
+
+        /// <summary>
+        /// The <see cref="Thread"/> in which the <see cref="DataEntryApplicationForm"/> that will
+        /// load the data will be run.
+        /// </summary>
+        static Thread _uiThread;
+
+        /// <summary>
+        /// The config file used to define the DEP loaded in the UI thread; used to confirm the UI
+        /// thread can be used by the current instance.
+        /// </summary>
+        static string _uiThreadConfigFileName;
+
+        /// <summary>
+        /// Indicates whether the UI thread has successfully started.
+        /// </summary>
+        static ManualResetEvent _uiThreadStartedEvent = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Indicates whether the UI thread has been requested to stop.
+        /// </summary>
+        static ManualResetEvent _stopUiThreadEvent = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Indicates whether the UI thread has ended.
+        /// </summary>
+        static ManualResetEvent _uiThreadEndedEvent = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Signals to the UI thread that the rule execution thread has requested a new pre-load
+        /// operation.
+        /// </summary>
+        static AutoResetEvent _preloadRequestedEvent = new AutoResetEvent(false);
+
+        /// <summary>
+        /// Signals to the rule execution thread that the UI thread has completed a pre-load
+        /// operation.
+        /// </summary>
+        static AutoResetEvent _preloadCompleteEvent = new AutoResetEvent(false);
+
+        /// <summary>
+        /// Used to pass attribute data back and forth between the two threads.
+        /// </summary>
+        static string _stringizedAttributeData;
+
+        /// <summary>
+        /// Keeps track of any exceptions that occur on the UI thread so that the rule execution
+        /// thread can use them.
+        /// </summary>
+        static ExtractException _uiThreadException;
+
+        #endregion Static Fields
 
         #region Constructors
 
@@ -189,6 +222,19 @@ namespace Extract.AttributeFinder.Rules
         }
 
         #endregion Constructors
+
+        #region Finalizer
+
+        /// <summary>
+        /// Releases unmanaged resources and performs other cleanup operations before the
+        /// <see cref="DataEntryPreloader"/> is reclaimed by garbage collection.
+        /// </summary>
+        ~DataEntryPreloader()
+		{
+			Dispose(false);
+		}
+
+        #endregion Finalizer
 
         #region Properties
 
@@ -252,7 +298,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI35051", "Failed to preload data for data entry.");
+                throw ex.CreateComVisible("ELI35051", "Failed to pre-load data for data entry.");
             }
         }
 
@@ -512,43 +558,28 @@ namespace Extract.AttributeFinder.Rules
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>
         void Dispose(bool disposing)
         {
+            // https://extract.atlassian.net/browse/ISSUE-13542
+            // Currently there is no mechanism to trigger disposable rule objects to be disposed.
             if (disposing)
             {
-                if (UiThreadRunning)
-                {
-                    StopUiThread();
-                }
+            }
 
-                if (_uiThreadStartedEvent != null)
+            try
+            {
+                lock (_lock)
                 {
-                    _uiThreadStartedEvent.Dispose();
-                    _uiThreadStartedEvent = null;
-                }
+                    if (_uiThreadReferences.Contains(this))
+                    {
+                        _uiThreadReferences.Remove(this);
 
-                if (_stopUiThreadEvent != null)
-                {
-                    _stopUiThreadEvent.Dispose();
-                    _stopUiThreadEvent = null;
-                }
-
-                if (_uiThreadEndedEvent != null)
-                {
-                    _uiThreadEndedEvent.Dispose();
-                    _uiThreadEndedEvent = null;
-                }
-
-                if (_preloadRequestedEvent != null)
-                {
-                    _preloadRequestedEvent.Dispose();
-                    _preloadRequestedEvent = null;
-                }
-
-                if (_preloadCompleteEvent != null)
-                {
-                    _preloadCompleteEvent.Dispose();
-                    _preloadCompleteEvent = null;
+                        if (_uiThreadReferences.Count == 0 && UiThreadRunning)
+                        {
+                            StopUiThread();
+                        }
+                    }
                 }
             }
+            catch { }
         }
 
         #endregion IDisposable Members
@@ -596,7 +627,7 @@ namespace Extract.AttributeFinder.Rules
         /// <value><see langword="true"/> if the UI thread is currently running; otherwise,
         /// <see langword="false"/>.
         /// </value>
-        bool UiThreadRunning
+        static bool UiThreadRunning
         {
             get
             {
@@ -607,12 +638,12 @@ namespace Extract.AttributeFinder.Rules
         }
 
         /// <summary>
-        /// Gets a value indicating whether the UI thread is currently ready to preload data..
+        /// Gets a value indicating whether the UI thread is currently ready to pre-load data..
         /// </summary>
-        /// <value><see langword="true"/> if the UI thread is currently ready to preload data;
+        /// <value><see langword="true"/> if the UI thread is currently ready to pre-load data;
         /// otherwise, <see langword="false"/>.
         /// </value>
-        bool UiThreadReady
+        static bool UiThreadReady
         {
             get
             {
@@ -640,6 +671,19 @@ namespace Extract.AttributeFinder.Rules
                 {
                     _uiThreadException = null;
 
+                    attributes.ReportMemoryUsage();
+
+                    _expandedConfigFileName = _pathTags.Expand(ConfigFileName);
+
+                    // If the UI thread is currently running a different DEP, re-spawn the UI thread
+                    // with the DEP needed here.
+                    if (UiThreadReady && _expandedConfigFileName != _uiThreadConfigFileName)
+                    {
+                        StopUiThread();
+                    }
+
+                    _uiThreadReferences.Add(this);
+
                     // If the UI thread isn't already running and ready load data, start (or
                     // restart) it now.
                     if (!UiThreadReady)
@@ -661,7 +705,7 @@ namespace Extract.AttributeFinder.Rules
                     {
                         throw _uiThreadException;
                     }
-                    ExtractException.Assert("ELI35065", "Data entry preload thread not ready",
+                    ExtractException.Assert("ELI35065", "Data entry pre-load thread not ready",
                         UiThreadReady);
 
                     // Convert the attribute data to a stringized byte stream in order to pass the
@@ -680,7 +724,7 @@ namespace Extract.AttributeFinder.Rules
                     {
                         throw _uiThreadException;
                     }
-                    // Retrieve the attribute heirarchy from the UI thread.
+                    // Retrieve the attribute hierarchy from the UI thread.
                     IUnknownVector loadedAttributes = (IUnknownVector)
                         _ruleExectutionThreadMiscUtils.GetObjectFromStringizedByteStream(
                             _stringizedAttributeData);
@@ -726,18 +770,18 @@ namespace Extract.AttributeFinder.Rules
 
                     // Spawn a new STA thread with a 4MB stack (swiping rule execution may use more than
                     // the default 1MB stack size).
-                    string configFileName = _pathTags.Expand(ConfigFileName);
-                    var settings = new VerificationSettings(configFileName);
+                    _uiThreadConfigFileName = _expandedConfigFileName;
+                    var settings = new VerificationSettings(_expandedConfigFileName);
                     _uiThread = new Thread(new ThreadStart(() =>
                         RunUiThread(settings)), 0x400000);
                     _uiThread.SetApartmentState(ApartmentState.STA);
-                    _uiThread.Start(); 
+                    _uiThread.Start();
                 }
             }
             catch (Exception ex)
             {
                 throw new ExtractException("ELI35067",
-                    "Failed to start data entry preload thread.", ex);
+                    "Failed to start data entry pre-load thread.", ex);
             }
         }
 
@@ -746,12 +790,14 @@ namespace Extract.AttributeFinder.Rules
         /// <para><b>Note</b></para>
         /// Runs on the rule execution thread.
         /// </summary>
-        void StopUiThread()
+        static void StopUiThread()
         {
             try
             {
                 lock (_lock)
                 {
+                    _uiThreadConfigFileName = null;
+
                     // If the UI thread is not running, there is nothing to do.
                     if (!UiThreadRunning)
                     {
@@ -766,7 +812,7 @@ namespace Extract.AttributeFinder.Rules
                     if (!_uiThreadEndedEvent.WaitOne(10000))
                     {
                         ExtractException.Log("ELI35068",
-                            "DataEntry preloader thread failed to end cleanly.");
+                            "DataEntry pre-loader thread failed to end cleanly.");
                         if (_uiThread != null && _uiThread.ThreadState == ThreadState.Running)
                         {
                             _uiThread.Abort();
@@ -779,13 +825,13 @@ namespace Extract.AttributeFinder.Rules
             catch (Exception ex)
             {
                 throw new ExtractException("ELI35069",
-                    "Failed to stop data entry preload thread.", ex);
+                    "Failed to stop data entry pre-load thread.", ex);
             }
         }
 
         /// <summary>
         /// This is the main method for the UI thread. It will create a
-        /// <see cref="DataEntryApplicationForm"/> instance, then loop waiting for the next preload
+        /// <see cref="DataEntryApplicationForm"/> instance, then loop waiting for the next pre-load
         /// request or for the thread to be ended.
         /// <para><b>Note</b></para>
         /// Runs on the UI thread.
@@ -802,11 +848,11 @@ namespace Extract.AttributeFinder.Rules
 
                 using (var dataEntryApplicationForm = CreateDataEntryApplicationForm(settings))
                 {
-                    // Now the the DataEntryApplicationForm is created, let the rule execution
+                    // Now the DataEntryApplicationForm is created, let the rule execution
                     // thread know that this thread is ready.
                     _uiThreadStartedEvent.Set();
 
-                    // Wait until the next preload event is requested or the UI thread is ended.
+                    // Wait until the next pre-load event is requested or the UI thread is ended.
                     WaitHandle[] waitHandles = new WaitHandle[] 
                         {
                             _stopUiThreadEvent,
@@ -816,7 +862,7 @@ namespace Extract.AttributeFinder.Rules
                     {
                         try
                         {
-                            // A preload operation has been requested; do it.
+                            // A pre-load operation has been requested; do it.
                             PreloadData(dataEntryApplicationForm);
                         }
                         catch (Exception ex)
@@ -882,7 +928,7 @@ namespace Extract.AttributeFinder.Rules
             catch (Exception ex)
             {
                 throw new ExtractException("ELI35072",
-                    "Failed to create data entry form for preload.", ex);
+                    "Failed to create data entry form for pre-load.", ex);
             }
             finally
             {
@@ -930,12 +976,14 @@ namespace Extract.AttributeFinder.Rules
             {
                 IUnknownVector attributes = (IUnknownVector)
                     _uiThreadMiscUtils.GetObjectFromStringizedByteStream(_stringizedAttributeData);
+                attributes.ReportMemoryUsage();
                 // In case the there are multiple configurations for different document types,
                 // ensure the proper configuration is loaded for the supplied data.
                 dataEntryApplicationForm.LoadCorrectConfigForData(attributes);
                 dataEntryApplicationForm.ActiveDataEntryControlHost.LoadData(attributes);
                 IUnknownVector loadedAttributes =
                     dataEntryApplicationForm.ActiveDataEntryControlHost.GetData();
+                loadedAttributes.ReportMemoryUsage();
                 _stringizedAttributeData =
                     _uiThreadMiscUtils.GetObjectAsStringizedByteStream(loadedAttributes);
                 dataEntryApplicationForm.ActiveDataEntryControlHost.ClearData();

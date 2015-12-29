@@ -4044,7 +4044,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="row">Row to find the first visible cell</param>
         /// <returns>The first visible cell in the row</returns>
-        DataGridViewCell GetFirstVisibleCellInRow(DataGridViewRow row)
+        static DataGridViewCell GetFirstVisibleCellInRow(DataGridViewRow row)
         {
             return row.Cells.Cast<DataGridViewCell>().First(c => c.Visible == true);
         }
