@@ -1049,6 +1049,24 @@
 			level.
 			<li>Confirm that <b>Alert Frequency</b> values must be less than 
 			<b>Alert Level</b> values.
+<p>
+	  	   	<LI><b>[ISSUE-13469, ISSUE-13470]</b> FAM Counters and Email Settings
+			<ul>
+				<li>Create a new database and add one or more <b>rule execution 
+				counters</b> with counts.
+				<li>Add an <b>Alert Level</b> and enable email alerts to <b>support</b>.
+				<li>Click <b>OK</b>.
+				<li>Confirm that an <b>Outgoing email server not configured</b> warning 
+				message is displayed.
+				<li>Confirm that Alert settings cannot be saved without email settings 
+				being previously saved.
+				<li>Configure <b>email settings</b> without specifying a <b>Sender 
+				address</b>.
+				<li>Process some files such that the <b>Alert Level</b> is crossed.
+				<li>Confirm that none of the processed files fail.
+				<li>Confirm that an exception is logged stating that the Alert 
+				message could not be sent.
+			</ul>
 		</ul>
 		<li><u>Miscellaneous</u>
 		<ul>
