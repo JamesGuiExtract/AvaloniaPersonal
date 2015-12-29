@@ -1287,6 +1287,19 @@ STDMETHODIMP CRuleSet::put_CustomCounters(IIUnknownVector *pNewVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39003")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::FlushCounters()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		flushCounters();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39191")
+}
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream

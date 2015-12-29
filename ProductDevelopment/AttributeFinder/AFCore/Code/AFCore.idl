@@ -440,6 +440,9 @@ library UCLID_AFCORELib
 			[out, retval] IIUnknownVector **pVal);
 		[propput, id(26), helpstring("property CustomCounters")] HRESULT CustomCounters(
 			[in] IIUnknownVector *pNewVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To flush any accumulated counts to the counters
+		[id(27), helpstring("method FlushCounters")] HRESULT FlushCounters();
 	};
 
 	[

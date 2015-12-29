@@ -100,6 +100,7 @@ public:
 	STDMETHOD(put_UsePagesIndexingCounter)(VARIANT_BOOL newVal);
 	STDMETHOD(get_CustomCounters)(IIUnknownVector **pVal);
 	STDMETHOD(put_CustomCounters)(IIUnknownVector *pNewVal);
+	STDMETHOD(FlushCounters)();
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);

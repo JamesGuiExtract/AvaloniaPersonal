@@ -453,6 +453,12 @@ STDMETHODIMP CAFEngineFileProcessor::raw_Standby(VARIANT_BOOL* pVal)
 	{		
 		ASSERT_ARGUMENT("ELI33892", pVal != __nullptr);
 
+		// Flush counter accumulations
+		if (m_ipRuleSet.m_obj != nullptr)
+		{
+			m_ipRuleSet.m_obj->FlushCounters();
+		}
+
 		// If the queue happens to be empty after running out of counts, allow the next queued file
 		// to be re-attempted to avoid processing stopping long after a failure to decrement.
 		if (m_bCounterDecrementFailed)
