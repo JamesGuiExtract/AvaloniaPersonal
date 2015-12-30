@@ -1196,8 +1196,17 @@ namespace Extract.SQLCDBEditor
 
                     if (QueryAndResultsType == QueryAndResultsType.Table)
                     {
-                        DataRow row =
-                            ((DataRowView)_resultsGrid.CurrentCell.OwningRow.DataBoundItem).Row;
+                        // bug fix: ISSUE-13170
+                        // SQLCDBEditor - Null reference exception saving while new row in edit mode.
+                        // NOTE: if the current cell is empty (as when the user has clicked into a cell
+                        // in the new row), then there is no data-bound object (DataBoundItem).
+                        var dataItem = ((DataRowView)_resultsGrid.CurrentCell.OwningRow.DataBoundItem);
+                        if (null == dataItem)
+                        {
+                            return;
+                        }
+
+                        DataRow row = dataItem.Row;
                         if (row.RowState == DataRowState.Detached)
                         {
                             _resultsTable.Rows.Add(row);
