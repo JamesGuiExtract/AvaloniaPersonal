@@ -1283,7 +1283,7 @@ STDMETHODIMP CAttributeDBMgr::CreateNewAttributeSetName(BSTR name,
 		ASSERT_ARGUMENT( "ELI38630", name != nullptr );
 		ASSERT_ARGUMENT( "ELI38676", pAttributeSetNameID != nullptr );
 
-		std::string newName( asString(name) );
+		std::string newName( SqlSanitizeInput(asString(name)) );
 		std::string cmd( Util::Format( "INSERT INTO [dbo].[AttributeSetName] "
 									   "(Description) OUTPUT INSERTED.ID VALUES ('%s');",
 									   newName.c_str() ) );

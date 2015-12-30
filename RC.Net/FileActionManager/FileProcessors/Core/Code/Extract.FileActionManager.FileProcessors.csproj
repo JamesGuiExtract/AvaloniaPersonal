@@ -16,7 +16,7 @@
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-	<ReferencePath>$(BUILD_VSS_ROOT)\Engineering\Binaries\$(Configuration)</ReferencePath>
+    <ReferencePath>$(BUILD_VSS_ROOT)\Engineering\Binaries\$(Configuration)</ReferencePath>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileUpgradeFlags>
@@ -98,6 +98,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddAttributeSetDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddAttributeSetDialog.Designer.cs">
+      <DependentUpon>AddAttributeSetDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ApplyBatesNumberSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -382,6 +388,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AddAttributeSetDialog.resx">
+      <DependentUpon>AddAttributeSetDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ApplyBatesNumberSettingsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>

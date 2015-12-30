@@ -24,6 +24,12 @@ namespace Extract.FileActionManager.FileProcessors
         static readonly string _OBJECT_NAME =
             typeof(StoreAttributesInDBTaskSettingsDialog).ToString();
 
+        /// <summary>
+        /// This value is added to the elements in the Attribute Set Name combo box. When selected,
+        /// a new dialog (Add Attribute Set Name) will be invoked.
+        /// </summary>
+        static readonly string _ADD_NEW_ATTRIBUTE_LABEL = "<Add new...>";
+
         #endregion Constants
 
         #region Fields
@@ -111,10 +117,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _attributeDBManager = new AttributeDBMgr();
                 _attributeDBManager.FAMDB = fileProcessingDB;
 
-                var attributeNames = _attributeDBManager.GetAllAttributeSetNames();
-
-                _attributeSetNameComboBox.Items.AddRange(attributeNames.ToDictionary().Keys.ToArray());
-                _attributeSetNameComboBox.Text = Settings.AttributeSetName;
+               SetAttributeSetNameComboBox();
 
                // If Retrieve mode, then the string in the AttributeSetName combo-box must match an 
                // existing name already in the database. However it can't be fully verified because
@@ -157,6 +160,26 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Fetch and set the attribute set name elements into the combo box.
+        /// </summary>
+        private void SetAttributeSetNameComboBox()
+        {
+            _attributeSetNameComboBox.Items.Clear();
+
+            var attributeNames = _attributeDBManager.GetAllAttributeSetNames();
+            List<string> names = attributeNames.ToDictionary().Keys.ToList();
+            names.Sort((s1, s2) => String.Compare(s1, s2, StringComparison.OrdinalIgnoreCase));
+            _attributeSetNameComboBox.Items.AddRange(names.ToArray());
+
+            if (_StoreRadioButton.Checked)
+            {
+                _attributeSetNameComboBox.Items.Add(_ADD_NEW_ATTRIBUTE_LABEL);
+            }
+
+            _attributeSetNameComboBox.Text = Settings.AttributeSetName;
+        }
+
         #endregion Overrides
 
         #region Event Handlers
@@ -171,13 +194,20 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                // TODO - fix this!
-                /*
-                if (_attributeSetNameComboBox.Text == _ADD_NEW)
+                if (_attributeSetNameComboBox.Text == _ADD_NEW_ATTRIBUTE_LABEL)
                 {
-                    UtilityMethods.ShowMessageBox("TODO: UI to add attribute set name", "TODO", true);
+                    AddAttributeSetDialog aasd = new AddAttributeSetDialog();
+                    var result = aasd.ShowDialog();
+                    if (DialogResult.OK == result)
+                    {
+                        _attributeDBManager.CreateNewAttributeSetName(aasd.AttributeSetName);
+                    }
+
+                    // refresh the combobox list always, so that in the case where the user cancels the dialog,
+                    // the previously displayed attribute name is re-displayed. This prevents the <add new...>
+                    // from being displayed as an invalid selection.
+                    SetAttributeSetNameComboBox();
                 }
-                */
             }
             catch (Exception ex)
             {
@@ -215,6 +245,51 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Event handler for store radio button - click
+        /// </summary>
+        private void HandleStoreRadioButtonClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                _storeRasterZonesCheckBox.Visible = true;
+                _storeRasterZonesCheckBox.Enabled = true;
+
+                _doNotSaveEmptyCheckBox.Visible = true;
+                _doNotSaveEmptyCheckBox.Enabled = true;
+
+                // Add the "add new attribute set name..." label to the attribute set name combo box
+                SetAttributeSetNameComboBox();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI39192", ex);
+            }
+        }
+
+        /// <summary>
+        /// Event handler for Retrieve radio button - click
+        /// </summary>
+        private void HandleRetrieveRadioButtonClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                _storeRasterZonesCheckBox.Enabled = false;
+                _storeRasterZonesCheckBox.Visible = false;
+
+                _doNotSaveEmptyCheckBox.Enabled = false;
+                _doNotSaveEmptyCheckBox.Visible = false;
+
+                // Remove the "add new attribute set name..." label to the attribute set name combo box, as
+                // it doesn't make sense to allow that here.
+                SetAttributeSetNameComboBox();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI39193", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -235,7 +310,8 @@ namespace Extract.FileActionManager.FileProcessors
                 return true;
             }
 
-            if (string.IsNullOrWhiteSpace(_attributeSetNameComboBox.Text.ToString()))
+            var name = _attributeSetNameComboBox.Text.ToString();
+            if (string.IsNullOrWhiteSpace(name))
             {
                 _attributeSetNameComboBox.Focus();
                 MessageBox.Show("Please specify the attribute set name the attributes should be stored under.",
@@ -248,23 +324,5 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion Private Members
-
-        private void HandleStoreRadioButtonClicked(object sender, EventArgs e)
-        {
-            _storeRasterZonesCheckBox.Visible = true;
-            _storeRasterZonesCheckBox.Enabled = true;
-
-            _doNotSaveEmptyCheckBox.Visible = true;
-            _doNotSaveEmptyCheckBox.Enabled = true;
-        }
-
-        private void HandleRetrieveRadioButtonClicked(object sender, EventArgs e)
-        {
-            _storeRasterZonesCheckBox.Enabled = false;
-            _storeRasterZonesCheckBox.Visible = false;
-
-            _doNotSaveEmptyCheckBox.Enabled = false;
-            _doNotSaveEmptyCheckBox.Visible = false;
-        }
     }
 }
