@@ -211,6 +211,21 @@ namespace Extract.FAMDBCounterManager
             }
         }
 
+        /// <summary>
+        /// Handles the click event for the "Copy to clipboard" button
+        /// </summary>
+        private void CopyToClipboardButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Clipboard.SetText(_readOnlyBodyTextBox.Text);
+            }
+            catch (Exception ex)
+            {
+                ex.ShowMessageBox();
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members

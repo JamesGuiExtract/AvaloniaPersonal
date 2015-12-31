@@ -42,6 +42,7 @@
             this._bodyTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._readOnlyBodyTextBox = new System.Windows.Forms.TextBox();
             this._bodyPanel = new System.Windows.Forms.Panel();
+            this._copyToClipboardButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -216,6 +217,17 @@
             this._bodyPanel.TabIndex = 18;
             this._bodyPanel.SizeChanged += new System.EventHandler(this.HandleBodyPanel_SizeChanged);
             // 
+            // _copyToClipboardButton
+            // 
+            this._copyToClipboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._copyToClipboardButton.Location = new System.Drawing.Point(16, 404);
+            this._copyToClipboardButton.Name = "_copyToClipboardButton";
+            this._copyToClipboardButton.Size = new System.Drawing.Size(106, 23);
+            this._copyToClipboardButton.TabIndex = 19;
+            this._copyToClipboardButton.Text = "Copy to clipboard";
+            this._copyToClipboardButton.UseVisualStyleBackColor = true;
+            this._copyToClipboardButton.Click += new System.EventHandler(this.CopyToClipboardButton_Click);
+            // 
             // EmailForm
             // 
             this.AllowDrop = true;
@@ -223,6 +235,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(663, 439);
+            this.Controls.Add(this._copyToClipboardButton);
             this.Controls.Add(this._bodyPanel);
             this.Controls.Add(this._ccTableLayoutPanel);
             this.Controls.Add(this._recipientTextBox);
@@ -264,5 +277,6 @@
         private System.Windows.Forms.TableLayoutPanel _bodyTableLayoutPanel;
         private System.Windows.Forms.Panel _bodyPanel;
         private System.Windows.Forms.TextBox _readOnlyBodyTextBox;
+        private System.Windows.Forms.Button _copyToClipboardButton;
     }
 }
