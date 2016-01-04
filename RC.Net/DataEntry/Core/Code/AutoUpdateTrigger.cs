@@ -74,6 +74,14 @@ namespace Extract.DataEntry
         static List<Tuple<AutoUpdateTrigger, DataEntryQuery>> _queriesPendingUpdate;
 
         /// <summary>
+        /// Keeps track of all queries that have been triggered within an active call to
+        /// <see cref="ExecuteAllPendingTriggers"/> to prevent them from being re-queued for
+        /// execution within the same call thereby causing an infinite loop.
+        /// </summary>
+        [ThreadStatic]
+        static HashSet<DataEntryQuery> _pendingQueriesHandled;
+
+        /// <summary>
         /// Keeps track of whether the <see cref="_queriesPendingUpdate"/> are in the process of
         /// being evaluated. Do not allow for re-entry to <see cref="ExecuteAllPendingTriggers"/>.
         /// </summary>
@@ -341,13 +349,23 @@ namespace Extract.DataEntry
                 {
                     DataEntryQuery dataEntryQuery = (DataEntryQuery)sender;
 
+                    // https://extract.atlassian.net/browse/ISSUE-13506
+                    // https://extract.atlassian.net/browse/ISSUE-13538
+                    // If we are currently in an ExecuteAllPendingTriggers call, to prevent an
+                    // infinite do not re-queue a query that has already been triggered within the
+                    // active ExecuteAllPendingTriggers call.
+                    if (_pendingQueriesHandled != null &&
+                        _pendingQueriesHandled.Contains(dataEntryQuery))
+                    {
+                        // No nothing to prevent the possibility of an infinite loop.
+                    }
                     // [DataEntry:1283, 1284, 1289]
                     // If the query was modified during an EndEdit call, during an undo/redo
                     // operation or while processing the backlog of triggers that fired during
                     // either of those calls, postpone the update until all changes are registered.
                     // This prevents excessive recalculations as various parts of complex queries
                     // are updated.
-                    if (AttributeStatusInfo.EndEditInProgress ||
+                    else if (AttributeStatusInfo.EndEditInProgress ||
                         AttributeStatusInfo.UndoManager.InUndoOperation ||
                         AttributeStatusInfo.UndoManager.InRedoOperation ||
                         AttributeStatusInfo.PauseQueries ||
@@ -707,6 +725,7 @@ namespace Extract.DataEntry
             try
             {
                 _executingPendingTriggers = true;
+                _pendingQueriesHandled = new HashSet<DataEntryQuery>();
 
                 // [DataEntry:1292]
                 // https://extract.atlassian.net/browse/ISSUE-13149
@@ -718,7 +737,7 @@ namespace Extract.DataEntry
                 while (_queriesPendingUpdate.Count > 0)
                 {
                     var pendingTrigger = _queriesPendingUpdate.First();
-                    _queriesPendingUpdate.RemoveAt(0);
+                    _queriesPendingUpdate.RemoveAt(0);                    
                     
                     // Ensure that a field and/or it's autoupdate trigger(s) haven't been deleted or
                     // disposed of since the query modification occurred.
@@ -730,6 +749,7 @@ namespace Extract.DataEntry
                     }
 
                     DataEntryQuery dataEntryQuery = pendingTrigger.Item2;
+                    _pendingQueriesHandled.Add(dataEntryQuery);
 
                     // Always ensure a default query applies updates as part of a full
                     // auto-update trigger to ensure normal auto-update triggers can apply
@@ -752,6 +772,7 @@ namespace Extract.DataEntry
                 AttributeStatusInfo.ForgetLastAppliedStringValues();
 
                 _executingPendingTriggers = false;
+                _pendingQueriesHandled = null;
             }
         }
 
