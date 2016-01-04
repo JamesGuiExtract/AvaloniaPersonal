@@ -746,28 +746,6 @@ namespace Extract.DataEntry
             }
         }
 
-        /// <summary>
-        /// Clears any data this query node has cached.
-        /// </summary>
-        internal override void ClearCache()
-        {
-            try
-            {
-                base.ClearCache();
-
-                CachedResult = null;
-
-                foreach (QueryNode childNode in ChildNodes)
-                {
-                    childNode.ClearCache();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38249");
-            }
-        }
-
         #endregion Overrides
 
         #region Private Members

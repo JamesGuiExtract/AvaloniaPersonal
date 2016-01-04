@@ -222,29 +222,6 @@ namespace Extract.DataEntry
             }
         }
 
-        /// <summary>
-        /// Clears any data cached by the <see cref="DataEntryQuery"/>s this instance is using.
-        /// </summary>
-        public void ClearQueryCache()
-        {
-            try
-            {
-                foreach (DataEntryQuery query in _queries)
-                {
-                    query.ClearCache();
-                }
-
-                if (_defaultQuery != null)
-                {
-                    _defaultQuery.ClearCache();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38248");
-            }
-        }
-
         #endregion Methods
 
         #region IDisposable Members

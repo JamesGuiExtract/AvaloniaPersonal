@@ -6,6 +6,7 @@ using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using System.Windows.Forms;
 using System.Xml;
 using UCLID_AFCORELib;
 
@@ -59,6 +60,7 @@ namespace Extract.DataEntry
             public DbConnectionWrapper(DbConnection dbConnection)
             {
                 DbConnection = dbConnection;
+                AttributeStatusInfo.QueryCacheCleared += (o, e) => CachedResults.Clear();
             }
         }
 
@@ -84,6 +86,27 @@ namespace Extract.DataEntry
         #endregion Fields
 
         #region Constructors
+
+        /// <summary>
+        /// Static initializer for the <see cref="SqlQueryNode"/> class.
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
+        static SqlQueryNode()
+        {
+            Application.ThreadExit += (o, e) =>
+            {
+                // https://extract.atlassian.net/browse/ISSUE-12987
+                // dotMemory indicates leaks related to the _connectionInfo dictionary when
+                // processing is stopped and restarted (causing a new UI thread to be created). Even
+                // though the cached data for each DbConnectionWrapper is cleared when the UI thread
+                // exits, the dictionary still has space reserved for cached data. If the thread is
+                // exiting, remove references to all DbConnectionWrapper instances.
+                if (_connectionInfo != null)
+                {
+                    _connectionInfo.Clear();
+                }
+            };
+        }
 
         /// <summary>
         /// Initializes a new <see cref="SqlQueryNode"/> instance.
@@ -270,23 +293,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI26755");
-            }
-        }
-
-        /// <summary>
-        /// Clears any data this query node has cached.
-        /// </summary>
-        internal override void ClearCache()
-        {
-            try
-            {
-                base.ClearCache();
-
-                _currentConnection.CachedResults.Clear();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38246");
             }
         }
 

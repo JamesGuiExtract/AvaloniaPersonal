@@ -1610,6 +1610,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _documentTypeConfigurations = null;
                     }
 
+                    if (_defaultDataEntryConfig != null)
+                    {
+                        _defaultDataEntryConfig.Dispose();
+                        _defaultDataEntryConfig = null;
+                    }
+
                     if (_inputEventTracker != null)
                     {
                         _inputEventTracker.Dispose();

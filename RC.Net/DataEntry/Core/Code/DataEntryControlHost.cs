@@ -2814,6 +2814,12 @@ namespace Extract.DataEntry
                 AttributeStatusInfo.ViewedStateChanged -= HandleViewedStateChanged;
                 AttributeStatusInfo.ValidationStateChanged -= HandleValidationStateChanged;
 
+                // https://extract.atlassian.net/browse/ISSUE-12987
+                // If the DEP is being disposed, clear any cached data associated with this UI
+                // thread. This ensures cached data is not leaked if verification is stopped and
+                // restarted.
+                AttributeStatusInfo.ClearQueryCache();
+
                 // Dispose of managed objects
                 if (components != null)
                 {

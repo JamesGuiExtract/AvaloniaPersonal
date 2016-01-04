@@ -32,6 +32,21 @@ namespace Extract.DataEntry
 
         #region Constructors
 
+        /// <summary>
+        /// Static initializer for the <see cref="ExpressionQueryNode"/> class.
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
+        static ExpressionQueryNode()
+        {
+            AttributeStatusInfo.QueryCacheCleared += (o, e) => 
+            {
+                if (_cachedExpressions != null)
+                {
+                    _cachedExpressions.Clear();
+                }
+            };
+        }
+
         /// <overrides>
         /// Initializes a new <see cref="CompositeQueryNode"/> instance.
         /// </overrides>
@@ -227,23 +242,6 @@ namespace Extract.DataEntry
                     ee.AddDebugData(variable.Key, variable.Value.ToString(), true);
                 }
                 throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Clears any data this query node has cached.
-        /// </summary>
-        internal override void ClearCache()
-        {
-            try
-            {
-                base.ClearCache();
-
-                _cachedExpressions = null;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38250");
             }
         }
 

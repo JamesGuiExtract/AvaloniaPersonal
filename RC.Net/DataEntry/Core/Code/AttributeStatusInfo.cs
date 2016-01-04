@@ -268,6 +268,12 @@ namespace Extract.DataEntry
             new ThreadSpecificEventHandler<EventArgs>();
 
         /// <summary>
+        /// Registered event handlers for the <see cref="QueryCacheCleared"/> event.
+        /// </summary>
+        static ThreadSpecificEventHandler<EventArgs> _queryCacheClearHandler =
+            new ThreadSpecificEventHandler<EventArgs>();
+
+        /// <summary>
         /// Registered event handlers for the <see cref="AttributeInitialized"/> event.
         /// </summary>
         static ThreadSpecificEventHandler<AttributeInitializedEventArgs> _attributeInitializedHandler =
@@ -1488,11 +1494,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                foreach (AutoUpdateTrigger trigger in _autoUpdateTriggers.Values
-                    .Union(_validationTriggers.Values))
-                {
-                    trigger.ClearQueryCache();
-                }
+                OnQueryCacheCleared();
             }
             catch (Exception ex)
             {
@@ -3500,6 +3502,23 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Raised to notify listeners that a request to clear all cached query data has been
+        /// issued.
+        /// </summary>
+        public static event EventHandler<EventArgs> QueryCacheCleared
+        {
+            add
+            {
+                _queryCacheClearHandler.AddEventHandler(value);
+            }
+
+            remove
+            {
+                _queryCacheClearHandler.RemoveEventHander(value);
+            }
+        }
+
+        /// <summary>
         /// Raised to notify listeners that an Attribute's value was modified.
         /// </summary>
         public event EventHandler<AttributeValueModifiedEventArgs> AttributeValueModified;
@@ -3635,6 +3654,18 @@ namespace Extract.DataEntry
         static void OnQueryDelayEnded()
         {
             var eventHandler = _queryDelayEndedHandler.ThreadEventHandler;
+            if (eventHandler != null)
+            {
+                eventHandler(null, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="QueryCacheCleared"/> event.
+        /// </summary>
+        static void OnQueryCacheCleared()
+        {
+            var eventHandler = _queryCacheClearHandler.ThreadEventHandler;
             if (eventHandler != null)
             {
                 eventHandler(null, new EventArgs());

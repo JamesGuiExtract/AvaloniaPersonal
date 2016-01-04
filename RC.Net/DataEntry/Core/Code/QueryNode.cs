@@ -605,13 +605,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Clears any data this query node has cached.
-        /// </summary>
-        internal virtual void ClearCache()
-        {
-        }
-
-        /// <summary>
         /// The active distinct <see cref="QueryResult"/> for a node with the selection mode of 
         /// "Distinct" that is currently being evaluated.
         /// </summary>
