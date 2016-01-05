@@ -2984,6 +2984,8 @@ namespace Extract.DataEntry
             // apply depending on the selection type).
             int rowIndex = CurrentCell.RowIndex;
             int columnIndex = CurrentCell.ColumnIndex;
+            
+            bool allowAutoPop = true;
 
             // Cell selection mode. The swipe can be applied either via the results of a
             // column formatting rule or the swiped text value can be applied directly to
@@ -3019,6 +3021,17 @@ namespace Extract.DataEntry
 
                 // [DataEntry:288] Keep cell selection on the cell that was swiped.
                 CurrentCell = Rows[rowIndex].Cells[columnIndex];
+            }
+            else if (Rows[rowIndex].Cells
+                        .OfType<DataGridViewCell>()
+                        .Where(cell => cell.Visible)
+                        .OfType<IDataEntryTableCell>()
+                        .Any(cell => !string.IsNullOrWhiteSpace(cell.Attribute.Value.String)))
+            {
+                // https://extract.atlassian.net/browse/ISSUE-13549
+                // Do not allow auto-population of values via smart hints if there is any other data
+                // in the row.
+                allowAutoPop = false;
             }
 
             // If there is an active text box editing control, swipe into the current
@@ -3068,7 +3081,7 @@ namespace Extract.DataEntry
             // Allow any OCR text existing within any smart hints generated for this row to be used
             // to auto-populate the attribute values.
             List<IAttribute> autoPopulatedAttributes;
-            UpdateHints(false, rowIndex, out autoPopulatedAttributes);
+            UpdateHints(false, allowAutoPop ? (int?)rowIndex : null, out autoPopulatedAttributes);
 
             if (autoPopulatedAttributes.Count > 0)
             {
