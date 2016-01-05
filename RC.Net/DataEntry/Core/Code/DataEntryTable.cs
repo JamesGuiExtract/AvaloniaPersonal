@@ -42,6 +42,11 @@ namespace Extract.DataEntry
         bool _rowSwipingEnabled;
 
         /// <summary>
+        /// Indicates whether data for a row can be automatically populated via row hints.
+        /// </summary>
+        bool _rowAutoPopulationEnabled = true;
+
+        /// <summary>
         /// The filename of the rule file to be used to parse swiped data into rows.
         /// </summary>
         string _rowFormattingRuleFileName;
@@ -167,6 +172,18 @@ namespace Extract.DataEntry
         /// Indicates whether the control supports tabbing a row at a time.
         /// </summary>
         bool _allowTabbingByRow;
+
+        /// <summary>
+        /// Keeps track of the <see cref="DataGridViewRow"/> instances that have been initialized
+        /// into the table.
+        /// </summary>
+        HashSet<DataGridViewRow> _initializedRows = new HashSet<DataGridViewRow>();
+
+        /// <summary>
+        /// Keeps track of the <see cref="DataGridViewRow"/> instances that have been modified
+        /// since being initialized into the table.
+        /// </summary>
+        HashSet<DataGridViewRow> _modifiedRows = new HashSet<DataGridViewRow>();
 
         #endregion Fields
 
@@ -310,6 +327,26 @@ namespace Extract.DataEntry
             set
             {
                 base.RowHintsEnabled = value;
+            }
+        }
+
+        /// <summary>
+        /// Specifies whether data for a row can be automatically populated via row hints.
+        /// </summary>
+        /// <value><see langword="true"/> if data for a row can be automatically populated;
+        /// otherwise, <see langword="false"/>.</value>
+        [Category("Data Entry Table")]
+        [DefaultValue(true)]
+        public bool RowAutoPopulationEnabled
+        {
+            get
+            {
+                return _rowAutoPopulationEnabled;
+            }
+
+            set
+            {
+                _rowAutoPopulationEnabled = value;
             }
         }
 
@@ -1382,6 +1419,42 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Raises the <see cref="E:DataGridView.CellValueChanged"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:DataGridViewCellEventArgs"/> that contains the event
+        /// data.</param>
+        /// <exception cref="T:ArgumentOutOfRangeException">The value of the
+        /// <see cref="P:DataGridViewCellEventArgs.ColumnIndex"/> property of <paramref name="e"/>
+        /// is greater than the number of columns in the control minus one.
+        /// -or-
+        /// The value of the <see cref="P:DataGridViewCellEventArgs.RowIndex"/> property of
+        /// <paramref name="e"/> is greater than the number of rows in the control minus one.
+        /// </exception>
+        protected override void OnCellValueChanged(DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                base.OnCellValueChanged(e);
+
+                if (e.RowIndex >= 0 && e.RowIndex < Rows.Count)
+                {
+                    var row = Rows[e.RowIndex];
+
+                    // Consider a row modified if a cell value changes for any row that has already
+                    // been initialized into the table.
+                    if (_initializedRows.Contains(row))
+                    {
+                        _modifiedRows.Add(row);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39199");
+            }
+        }
+
+        /// <summary>
         /// Releases all unmanaged resources used by the <see cref="DataEntryTable"/>.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
@@ -1588,6 +1661,10 @@ namespace Extract.DataEntry
 
                         DeleteAttributeData(attributeToRemove);
                     }
+
+                    var row = (DataGridViewRow)e.Element;
+                    _initializedRows.Remove(row);
+                    _modifiedRows.Remove(row);
                 }
             }
             catch (Exception ex)
@@ -1686,6 +1763,9 @@ namespace Extract.DataEntry
                 Enabled = sourceAttributes != null && !Disabled;
 
                 _sourceAttributes = sourceAttributes;
+
+                _initializedRows.Clear();
+                _modifiedRows.Clear();
 
                 // Retrieve the cached rows that correspond to sourceAttributes (if available).
                 if (sourceAttributes == null)
@@ -2921,6 +3001,8 @@ namespace Extract.DataEntry
 
             // Any refreshes suppressed above can now occur.
             ExecutePendingRefresh();
+
+            _initializedRows.Add(Rows[rowIndex]);
         }
 
         /// <summary>
@@ -2984,8 +3066,8 @@ namespace Extract.DataEntry
             // apply depending on the selection type).
             int rowIndex = CurrentCell.RowIndex;
             int columnIndex = CurrentCell.ColumnIndex;
-            
-            bool allowAutoPop = true;
+
+            bool allowAutoPop = RowAutoPopulationEnabled;
 
             // Cell selection mode. The swipe can be applied either via the results of a
             // column formatting rule or the swiped text value can be applied directly to
@@ -3022,15 +3104,11 @@ namespace Extract.DataEntry
                 // [DataEntry:288] Keep cell selection on the cell that was swiped.
                 CurrentCell = Rows[rowIndex].Cells[columnIndex];
             }
-            else if (Rows[rowIndex].Cells
-                        .OfType<DataGridViewCell>()
-                        .Where(cell => cell.Visible)
-                        .OfType<IDataEntryTableCell>()
-                        .Any(cell => !string.IsNullOrWhiteSpace(cell.Attribute.Value.String)))
+            else if (_modifiedRows.Contains(Rows[rowIndex]))
             {
                 // https://extract.atlassian.net/browse/ISSUE-13549
-                // Do not allow auto-population of values via smart hints if there is any other data
-                // in the row.
+                // Do not allow auto-population of values via smart hints if any modification of the
+                // row has occurred.
                 allowAutoPop = false;
             }
 
