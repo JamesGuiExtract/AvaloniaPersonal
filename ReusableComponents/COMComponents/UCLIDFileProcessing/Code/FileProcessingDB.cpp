@@ -72,6 +72,7 @@ m_nActiveActionID(-1),
 m_bLoggedInAsAdmin(false),
 m_bCheckedFeatures(false),
 m_bAllowRestartableProcessing(false),
+m_bStoreDBInfoChangeHistory(false),
 m_bWorkItemRevertInProgress(false),
 m_strEncryptedDatabaseID(""),
 m_bDatabaseIDValuesValidated(false),
@@ -2472,17 +2473,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 		ASSERT_ARGUMENT("ELI31909", ipSettings != __nullptr);
 		ASSERT_ARGUMENT("ELI32173", pnNumRowsUpdated != __nullptr);
 
-		string strSettingVal;
-		if (!GetDBInfoSetting_Internal(false, gstrSTORE_DB_INFO_HISTORY, true, strSettingVal))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-			GetDBInfoSetting_Internal(true, gstrSTORE_DB_INFO_HISTORY, true, strSettingVal);
-		}
-
-		// Get the base update query
-		bool bUpdateHistory = strSettingVal == "1";
-		string strBaseQuery = bUpdateHistory ? gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY
+		string strBaseQuery = m_bStoreDBInfoChangeHistory ? gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY
 			: gstrDBINFO_UPDATE_SETTINGS_QUERY;
 
 		IIUnknownVectorPtr ipPairs = ipSettings->GetAllKeyValuePairs();
@@ -2508,11 +2499,11 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 		}
 
 		long nNumRowsUpdated = 0;
-		if (!SetDBInfoSettings_Internal(false, bUpdateHistory, vecQueries, nNumRowsUpdated))
+		if (!SetDBInfoSettings_Internal(false, vecQueries, nNumRowsUpdated))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-			SetDBInfoSettings_Internal(true, bUpdateHistory, vecQueries, nNumRowsUpdated);
+			SetDBInfoSettings_Internal(true, vecQueries, nNumRowsUpdated);
 		}
 
 		*pnNumRowsUpdated = nNumRowsUpdated;

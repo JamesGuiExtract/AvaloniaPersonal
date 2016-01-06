@@ -3170,12 +3170,20 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 				// Continue if the setting is new or we are changing an existing setting
 				if (!bExists || vbSetIfExists == VARIANT_TRUE)
 				{
+					string strOldValue;
+
 					if (!bExists)
 					{
 						// Setting does not exist so add it
 						ipDBInfoSet->AddNew();
 
 						setStringField(ipDBInfoSet->Fields, "Name", strSettingName, true);
+
+						strOldValue = "[N/A]";
+					}
+					else if (m_bStoreDBInfoChangeHistory)
+					{
+						strOldValue = getStringField(ipDBInfoSet->Fields, "Value");
 					}
 
 					// Set the value field to the new value
@@ -3185,6 +3193,25 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 					ipDBInfoSet->Update();
 
 					executeCmdQuery(ipConnection, gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
+
+					if (m_bStoreDBInfoChangeHistory)
+					{
+						ipDBInfoSet->Requery(adOptionUnspecified);
+
+						// If updating history, need to get user and machine id
+						long nUserId = getFAMUserID(ipConnection);
+						long nMachineId = getMachineID(ipConnection);
+						long nDBInfoId = getLongField(ipDBInfoSet->Fields, "ID");
+						replaceVariable(strOldValue, "'", "''");
+						replaceVariable(strSettingValue,  "'", "''");
+
+						string strQuery = Util::Format("INSERT INTO [DBInfoChangeHistory] "
+							"([FAMUserID], [MachineID], [DBInfoID], [OldValue], [NewValue]) "
+							"VALUES (%d, %d, %d, '%s', '%s')", nUserId, nMachineId, nDBInfoId,
+							strOldValue.c_str(), strSettingValue.c_str());
+
+						executeCmdQuery(ipConnection, strQuery);
+					}
 				}
 
 				// Commit transaction
@@ -6718,8 +6745,8 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateHistory,
-	vector<string> vecQueries, long& rnNumRowsUpdated)
+bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, vector<string> vecQueries,
+	long& rnNumRowsUpdated)
 {
 	try
 	{
@@ -6739,7 +6766,7 @@ bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateH
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
-				if (bUpdateHistory)
+				if (m_bStoreDBInfoChangeHistory)
 				{
 					// If updating history, need to get user and machine id
 					string strUserId = asString(getFAMUserID(ipConnection));

@@ -943,7 +943,7 @@ static const string gstrSETTING_NAME = "<SettingName>";
 // Query for looking for a specific setting
 // To use run replaceVariable to replace <SettingName>
 static const string gstrDBINFO_SETTING_QUERY = 
-	"SELECT [Name], [Value] FROM DBInfo WHERE [Name] = '" + gstrSETTING_NAME + "'";
+	"SELECT [ID], [Name], [Value] FROM DBInfo WHERE [Name] = '" + gstrSETTING_NAME + "'";
 
 // Query for getting all DB info settings
 static const string gstrDBINFO_GET_SETTINGS_QUERY =

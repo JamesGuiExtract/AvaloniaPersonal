@@ -3087,6 +3087,11 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							m_strEncryptedDatabaseID = getStringField(ipFields, "Value");
 							m_bDatabaseIDValuesValidated = false;
 						}
+						else if (strValue == gstrSTORE_DB_INFO_HISTORY)
+						{
+							_lastCodePos = "320";
+							m_bStoreDBInfoChangeHistory = getStringField(ipFields, "Value") == "1";
+						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
 					{

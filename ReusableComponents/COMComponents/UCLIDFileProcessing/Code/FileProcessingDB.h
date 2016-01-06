@@ -482,6 +482,8 @@ private:
 	// be reset to pending when files are reverted.
 	bool m_bAllowRestartableProcessing;
 
+	bool m_bStoreDBInfoChangeHistory;
+
 	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Events used for the ping and statistics maintenance threads.
@@ -1175,8 +1177,7 @@ private:
 	bool UpgradeToCurrentSchema_Internal(bool bDBLocked, IProgressStatusPtr ipProgressStatus);
 	bool RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRecord, BSTR bstrNewName);
 	bool get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap** ppSettings);
-	bool SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateHistory,
-		vector<string> vecQueries, long& nNumRowsUpdated);
+	bool SetDBInfoSettings_Internal(bool bDBLocked, vector<string> vecQueries, long& nNumRowsUpdated);
 	bool RecordFTPEvent_Internal(bool bDBLocked, long nFileId, long nActionID,
 		VARIANT_BOOL vbQueueing, EFTPAction eFTPAction, BSTR bstrServerAddress,
 		BSTR bstrUserName, BSTR bstrArg1, BSTR bstrArg2, long nRetries, BSTR bstrException);
