@@ -1,11 +1,3 @@
-// Add PERFORMANCE_TESTING to the "Conditional compilation symbols" in the build setting to
-// enable to performance testing. Use with a config file that sets PreventSave to True.
-// When enabled, the UI will automatically move to the next document after each is loaded.
-// When processing stops and the UI is closed, it will log an exception with total run time.
-// The top 25 most expensive queries will be output as debug values where the expensiveness
-// is the initial query execution time multiplied by the number of executions. This resulting
-// "score" will be shown just before the query itself in the debug value.
-
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
