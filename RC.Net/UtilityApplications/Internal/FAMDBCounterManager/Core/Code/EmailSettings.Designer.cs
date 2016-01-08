@@ -129,7 +129,7 @@ This code will apply the following changes to the database's counters:
 <Description>
 
 To apply update:
-1) Open the FAMDBAdmin utility
+1) Open the Extract Systems DB Administration utility
 2) Select menu option Manage | Rule execution counters...
 3) Press the ""Apply <CodeType> code"" button
 4) Follow the dialog's instructions to apply the code and send confirmation of the operation to Extract Systems.

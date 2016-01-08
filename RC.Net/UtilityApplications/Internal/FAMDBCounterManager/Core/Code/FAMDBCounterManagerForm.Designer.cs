@@ -47,6 +47,13 @@
             this._databaseServerTextBox = new System.Windows.Forms.TextBox();
             this._databaseNameTextBox = new System.Windows.Forms.TextBox();
             this._counterDataGridView = new System.Windows.Forms.DataGridView();
+            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterPreviousValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterOperationColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this._counterApplyValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterChangeLogValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterValidityColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._dateTimeStampTextBox = new System.Windows.Forms.TextBox();
             this._customerNameTextBox = new System.Windows.Forms.TextBox();
             this._commentsTextBox = new System.Windows.Forms.TextBox();
@@ -58,13 +65,6 @@
             this._generateUnlockCodeRadioButton = new System.Windows.Forms.RadioButton();
             this._generateUpdateCodeRadioButton = new System.Windows.Forms.RadioButton();
             this._counterStateTextBox = new System.Windows.Forms.TextBox();
-            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterPreviousValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterOperationColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this._counterApplyValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterChangeLogValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterValidityColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -261,6 +261,77 @@
             this._counterDataGridView.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.HandleCounterDataGridView_RowsAdded);
             this._counterDataGridView.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.HandleCounterDataGridView_UserDeletingRow);
             // 
+            // _counterIdColumn
+            // 
+            this._counterIdColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle1.NullValue = null;
+            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle1;
+            this._counterIdColumn.FillWeight = 20F;
+            this._counterIdColumn.HeaderText = "ID";
+            this._counterIdColumn.MinimumWidth = 40;
+            this._counterIdColumn.Name = "_counterIdColumn";
+            this._counterIdColumn.Width = 40;
+            // 
+            // _counterNameColumn
+            // 
+            this._counterNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this._counterNameColumn.FillWeight = 125F;
+            this._counterNameColumn.HeaderText = "Name";
+            this._counterNameColumn.Name = "_counterNameColumn";
+            // 
+            // _counterPreviousValueColumn
+            // 
+            this._counterPreviousValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterPreviousValueColumn.FillWeight = 45F;
+            this._counterPreviousValueColumn.HeaderText = "Value";
+            this._counterPreviousValueColumn.MinimumWidth = 90;
+            this._counterPreviousValueColumn.Name = "_counterPreviousValueColumn";
+            // 
+            // _counterOperationColumn
+            // 
+            this._counterOperationColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterOperationColumn.FillWeight = 44F;
+            this._counterOperationColumn.HeaderText = "Operation";
+            this._counterOperationColumn.Items.AddRange(new object[] {
+            "Create",
+            "Delete",
+            "Set",
+            "Increment",
+            "Decrement"});
+            this._counterOperationColumn.MinimumWidth = 90;
+            this._counterOperationColumn.Name = "_counterOperationColumn";
+            this._counterOperationColumn.Width = 98;
+            // 
+            // _counterApplyValueColumn
+            // 
+            this._counterApplyValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle2.NullValue = null;
+            this._counterApplyValueColumn.DefaultCellStyle = dataGridViewCellStyle2;
+            this._counterApplyValueColumn.FillWeight = 45F;
+            this._counterApplyValueColumn.HeaderText = "Apply Value";
+            this._counterApplyValueColumn.MinimumWidth = 90;
+            this._counterApplyValueColumn.Name = "_counterApplyValueColumn";
+            this._counterApplyValueColumn.Width = 95;
+            // 
+            // _counterChangeLogValueColumn
+            // 
+            this._counterChangeLogValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterChangeLogValueColumn.FillWeight = 45F;
+            this._counterChangeLogValueColumn.HeaderText = "Value Log";
+            this._counterChangeLogValueColumn.MinimumWidth = 90;
+            this._counterChangeLogValueColumn.Name = "_counterChangeLogValueColumn";
+            this._counterChangeLogValueColumn.Visible = false;
+            this._counterChangeLogValueColumn.Width = 90;
+            // 
+            // _counterValidityColumn
+            // 
+            this._counterValidityColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this._counterValidityColumn.FillWeight = 125F;
+            this._counterValidityColumn.HeaderText = "Validity";
+            this._counterValidityColumn.MinimumWidth = 150;
+            this._counterValidityColumn.Name = "_counterValidityColumn";
+            this._counterValidityColumn.Visible = false;
+            // 
             // _dateTimeStampTextBox
             // 
             this._dateTimeStampTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -382,78 +453,6 @@
             this._counterStateTextBox.Size = new System.Drawing.Size(324, 20);
             this._counterStateTextBox.TabIndex = 10;
             this._counterStateTextBox.TabStop = false;
-            // 
-            // _counterIdColumn
-            // 
-            this._counterIdColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle1.NullValue = null;
-            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle1;
-            this._counterIdColumn.FillWeight = 20F;
-            this._counterIdColumn.HeaderText = "ID";
-            this._counterIdColumn.MinimumWidth = 40;
-            this._counterIdColumn.Name = "_counterIdColumn";
-            this._counterIdColumn.Width = 40;
-            // 
-            // _counterNameColumn
-            // 
-            this._counterNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this._counterNameColumn.FillWeight = 125F;
-            this._counterNameColumn.HeaderText = "Name";
-            this._counterNameColumn.Name = "_counterNameColumn";
-            // 
-            // _counterPreviousValueColumn
-            // 
-            this._counterPreviousValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterPreviousValueColumn.FillWeight = 45F;
-            this._counterPreviousValueColumn.HeaderText = "Value";
-            this._counterPreviousValueColumn.MinimumWidth = 90;
-            this._counterPreviousValueColumn.Name = "_counterPreviousValueColumn";
-            // 
-            // _counterOperationColumn
-            // 
-            this._counterOperationColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterOperationColumn.FillWeight = 44F;
-            this._counterOperationColumn.HeaderText = "Operation";
-            this._counterOperationColumn.Items.AddRange(new object[] {
-            "Create",
-            "Delete",
-            "Set",
-            "Increment",
-            "Decrement"});
-            this._counterOperationColumn.MinimumWidth = 90;
-            this._counterOperationColumn.Name = "_counterOperationColumn";
-            this._counterOperationColumn.Width = 98;
-            // 
-            // _counterApplyValueColumn
-            // 
-            this._counterApplyValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle2.NullValue = null;
-            this._counterApplyValueColumn.DefaultCellStyle = dataGridViewCellStyle2;
-            this._counterApplyValueColumn.FillWeight = 45F;
-            this._counterApplyValueColumn.HeaderText = "Apply Value";
-            this._counterApplyValueColumn.MinimumWidth = 90;
-            this._counterApplyValueColumn.Name = "_counterApplyValueColumn";
-            this._counterApplyValueColumn.Width = 95;
-            // 
-            // _counterChangeLogValueColumn
-            // 
-            this._counterChangeLogValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterChangeLogValueColumn.FillWeight = 45F;
-            this._counterChangeLogValueColumn.HeaderText = "Value Log";
-            this._counterChangeLogValueColumn.MinimumWidth = 90;
-            this._counterChangeLogValueColumn.Name = "_counterChangeLogValueColumn";
-            this._counterChangeLogValueColumn.Visible = false;
-            this._counterChangeLogValueColumn.Width = 90;
-            // 
-            // _counterValidityColumn
-            // 
-            this._counterValidityColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this._counterValidityColumn.FillWeight = 125F;
-            this._counterValidityColumn.HeaderText = "Validity";
-            this._counterValidityColumn.MinimumWidth = 150;
-            this._counterValidityColumn.Name = "_counterValidityColumn";
-            this._counterValidityColumn.Visible = false;
-            this._counterValidityColumn.Width = 150;
             // 
             // FAMDBCounterManagerForm
             // 

@@ -47,7 +47,7 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\FAMDBAdmin.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\CounterManager.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -157,7 +157,7 @@
     <None Include="Resources\EmailSettings.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\FAMDBAdmin.ico" />
+    <Content Include="Resources\CounterManager.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
