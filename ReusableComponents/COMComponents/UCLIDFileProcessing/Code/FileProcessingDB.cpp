@@ -1205,7 +1205,7 @@ STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, VARIANT_B
 }
 
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::LockDB(BSTR bstrLockName)
+STDMETHODIMP CFileProcessingDB::LockDB_InternalOnly(BSTR bstrLockName)
 {
 	try
 	{
@@ -1225,7 +1225,7 @@ STDMETHODIMP CFileProcessingDB::LockDB(BSTR bstrLockName)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::UnlockDB(BSTR bstrLockName)
+STDMETHODIMP CFileProcessingDB::UnlockDB_InternalOnly(BSTR bstrLockName)
 {
 	try
 	{

@@ -1051,11 +1051,11 @@ library UCLID_FILEPROCESSINGLib
 		//			outside the FileProcessingDB class at all.
 		//			https://extract.atlassian.net/browse/ISSUE-12328
 		//			https://extract.atlassian.net/browse/ISSUE-11597
-		[id(39), helpstring("method LockDB")] HRESULT LockDB([in] BSTR bstrLockName);
+		[id(39), helpstring("method LockDB_InternalOnly")] HRESULT LockDB_InternalOnly([in] BSTR bstrLockName);
 
 		// PROMISE: To unlock the specified database lock
 		// NOTE:	See note for LockDB.
-		[id(40), helpstring("method UnlockDB")] HRESULT UnlockDB([in] BSTR bstrLockName);
+		[id(40), helpstring("method UnlockDB_InternalOnly")] HRESULT UnlockDB_InternalOnly([in] BSTR bstrLockName);
 		
 		// PROMISE: To return a recordset opened with the results of the query in bstrQuery
 		[id(41), helpstring("method GetResultsForQuery")] HRESULT GetResultsForQuery([in] BSTR bstrQuery, 

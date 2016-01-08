@@ -172,8 +172,8 @@ public:
 	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue, VARIANT_BOOL vbSetIfExists);
 	STDMETHOD(GetDBInfoSetting)(BSTR bstrSettingName, VARIANT_BOOL vbThrowIfMissing,
 		BSTR* pbstrSettingValue);
-	STDMETHOD(LockDB)(BSTR bstrLockName);
-	STDMETHOD(UnlockDB)(BSTR bstrLockName);
+	STDMETHOD(LockDB_InternalOnly)(BSTR bstrLockName);
+	STDMETHOD(UnlockDB_InternalOnly)(BSTR bstrLockName);
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
 	STDMETHOD(AsStatusString)(EActionStatus eaStatus, BSTR* pbstrStatusString);
 	STDMETHOD(AsEActionStatus)(BSTR bstrStatus, EActionStatus* peaStatus);

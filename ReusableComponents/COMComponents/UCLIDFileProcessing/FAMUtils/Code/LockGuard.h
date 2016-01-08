@@ -25,7 +25,7 @@ public:
 		if (!FAMDBSemaphore::ThisThreadHasLock(strLockName))
 		{
 			// lock the database
-			m_ipDB->LockDB(m_strLockName.c_str());
+			m_ipDB->LockDB_InternalOnly(m_strLockName.c_str());
 			m_bLockedByThisInstance = true;
 		}
 		else
@@ -45,7 +45,7 @@ public:
 			// Unlock the DB only if this instance locked it.
 			if (m_bLockedByThisInstance)
 			{
-				m_ipDB->UnlockDB(m_strLockName.c_str());
+				m_ipDB->UnlockDB_InternalOnly(m_strLockName.c_str());
 			}
 		}
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19754");
