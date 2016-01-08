@@ -1043,11 +1043,18 @@ library UCLID_FILEPROCESSINGLib
 
 		// PROMISE: To lock the specified database lock
 		// NOTE:	LockDB cannot be called twice on the same thread without first calling
-		//			UnlockDB; doing so will result in an exception.
+		//			UnlockDB; doing so will result in an exception. It is expected any subsequent
+		//			DB queries be made in this same thread to allow them to run under elevated
+		//			deadlock priority. Since calls from the .Net framework thread cannot be
+		//			guaranteed to come in on the same system thread, this should not be called
+		//			from .Net code. Unless absolutely necessary, it should not be called from
+		//			outside the FileProcessingDB class at all.
+		//			https://extract.atlassian.net/browse/ISSUE-12328
+		//			https://extract.atlassian.net/browse/ISSUE-11597
 		[id(39), helpstring("method LockDB")] HRESULT LockDB([in] BSTR bstrLockName);
 
 		// PROMISE: To unlock the specified database lock
-		// NOTE:	UnlockDB can be called on any thread, not just the one that locked the DB.
+		// NOTE:	See note for LockDB.
 		[id(40), helpstring("method UnlockDB")] HRESULT UnlockDB([in] BSTR bstrLockName);
 		
 		// PROMISE: To return a recordset opened with the results of the query in bstrQuery
