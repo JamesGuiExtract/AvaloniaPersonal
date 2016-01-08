@@ -1691,6 +1691,14 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					// Execute query to insert the new FileActionStatus record
 					executeCmdQuery(ipConnection, strStatusSQL);
 
+					_lastCodePos = "86";
+
+					// https://extract.atlassian.net/browse/ISSUE-13491
+					if (strNewStatus == "S")
+					{
+						addSkipFileRecord(ipConnection, nID, nActionID);
+					}
+
 					_lastCodePos = "87";
 
 					// update the statistics
