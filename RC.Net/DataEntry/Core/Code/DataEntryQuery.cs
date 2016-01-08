@@ -23,18 +23,17 @@ namespace Extract.DataEntry
     /// </summary>
     public class DataEntryQuery : CompositeQueryNode
     {
-        #region Constants
-
-
-        #endregion Constants
-
         #region Fields
 
-#if PERFORMANCE_TESTING
+        /// <summary>
+        /// When <see cref="QueryNode.PerformanceTesting"/> is <see langword="true"/> keeps track
+        /// of the top 25 most expensive queries will be output as debug values where the
+        /// expensiveness is the initial query execution time multiplied by the number of executions.
+        /// This resulting "score" will be shown just before the query itself in the exception debug.
+        /// </summary>
         static DataCache<string, CachedQueryData<string[]>> _performanceCache =
             new DataCache<string, CachedQueryData<string[]>>(
                 26, CachedQueryData<string[]>.GetScore);
-#endif
 
         /// <summary>
         /// Indicates whether this query is a default query.
@@ -208,7 +207,7 @@ namespace Extract.DataEntry
                 // A query containing named QueryNodes accessible by all defined DataEntryQueries.
                 DataEntryQuery queryNodeDeclarations = null;
 
-                // A collection named QueryNodes accessible to subquent DataEntryQueries that are
+                // A collection named QueryNodes accessible to subsequent DataEntryQueries that are
                 // loaded (includes name nodes both from the declarations node and the queries
                 // themselves).
                 Dictionary<string, NamedQueryReferences> namedReferences =
@@ -337,7 +336,7 @@ namespace Extract.DataEntry
         /// Gets whether this query should only indicate a warning when used for validation as
         /// opposed to data that is completely invalid.
         /// </summary>
-        /// <returns><see langword="true"/> if the data assosiated with this query may be wrong but
+        /// <returns><see langword="true"/> if the data associated with this query may be wrong but
         /// is not clearly invalid, <see langword="false"/> if the data is completely invalid.
         /// </returns>
         public bool IsValidationWarning
@@ -398,7 +397,6 @@ namespace Extract.DataEntry
             }
         }
 
-#if PERFORMANCE_TESTING
         /// <summary>
         /// Populates as debug info into <see paramref="ee"/> the most expensive queries that have
         /// been executed.
@@ -407,12 +405,18 @@ namespace Extract.DataEntry
         /// should be reported.</param>
         static public void ReportPerformanceData(ExtractException ee)
         {
-            foreach (string cachedQuery in _performanceCache.ReportCachedData())
+            try
             {
-                ee.AddDebugData("Query", cachedQuery, false);
+                foreach (string cachedQuery in _performanceCache.ReportCachedData())
+                {
+                    ee.AddDebugData("Query", cachedQuery, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39203");
             }
         }
-#endif
 
         #endregion Methods
 
@@ -470,7 +474,7 @@ namespace Extract.DataEntry
                     !string.Equals(xmlAttribute.Value, "Value", StringComparison.OrdinalIgnoreCase))
                 {
                     ExtractException.Assert("ELI37287", "The Default and TargetPorperty attributes " +
-                        "may not be used simultaneiously.", !_defaultQuery);
+                        "may not be used simultaneously.", !_defaultQuery);
                     _targetProperty = xmlAttribute.Value;
                 }
             }
@@ -488,23 +492,29 @@ namespace Extract.DataEntry
         /// </returns>
         public override QueryResult Evaluate()
         {
-#if PERFORMANCE_TESTING
-            DateTime startTime = DateTime.Now;
-#endif
-
-            QueryResult result = base.Evaluate();
-
-#if PERFORMANCE_TESTING
-            double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
-            CachedQueryData<string[]> cachedResults;
-            if (!_performanceCache.TryGetData(QueryText, out cachedResults))
+            try
             {
-                cachedResults = new CachedQueryData<string[]>(new string[0], executionTime);
-                _performanceCache.CacheData(QueryText, cachedResults);
-            }
-#endif
+                DateTime startTime = DateTime.Now;
 
-            return result;
+                QueryResult result = base.Evaluate();
+
+                if (QueryNode.PerformanceTesting)
+                {
+                    double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
+                    CachedQueryData<string[]> cachedResults;
+                    if (!_performanceCache.TryGetData(QueryText, out cachedResults))
+                    {
+                        cachedResults = new CachedQueryData<string[]>(new string[0], executionTime);
+                        _performanceCache.CacheData(QueryText, cachedResults);
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39201");
+            }
         }
 
         #endregion Overrides

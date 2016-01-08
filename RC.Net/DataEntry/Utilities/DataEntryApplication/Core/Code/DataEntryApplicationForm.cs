@@ -3916,6 +3916,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _saveMenuItem.Enabled = enableSave;
                 }
+                else
+                {
+                    QueryNode.PerformanceTesting = config.Config.Settings.PerformanceTesting;
+                }
 
                 _saveAndCommitFileCommand.Enabled = (config != null && _isLoaded);
             }

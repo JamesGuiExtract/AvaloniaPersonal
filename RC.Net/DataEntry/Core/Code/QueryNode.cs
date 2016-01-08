@@ -186,6 +186,12 @@ namespace Extract.DataEntry
         #endregion Constants
 
         /// <summary>
+        /// Indicates whether performance testing of data entry verification is currently enabled.
+        /// </summary>
+        [ThreadStatic]
+        internal static bool _performanceTesting;
+
+        /// <summary>
         /// The unparsed XML text that defines the query.
         /// </summary>
         string _queryText;
@@ -638,6 +644,23 @@ namespace Extract.DataEntry
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether performance testing of data entry verification is currently enabled.
+        /// This setting is thread static.
+        /// </summary>
+        internal static bool PerformanceTesting
+        {
+            get
+            {
+                return _performanceTesting;
+            }
+
+            set
+            {
+                _performanceTesting = value;
+            }
         }
 
         /// <summary>

@@ -140,5 +140,14 @@ namespace Extract.DataEntry.Properties {
                 return ((float)(this["TooltipFontSize"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool PerformanceTesting {
+            get {
+                return ((bool)(this["PerformanceTesting"]));
+            }
+        }
     }
 }

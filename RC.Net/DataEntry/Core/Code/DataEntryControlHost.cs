@@ -1,8 +1,3 @@
-// Add PERFORMANCE_TESTING to the "Conditional compilation symbols" in the build setting to
-// enable to performance testing. Use with a config file that sets PreventSave to True.
-// When enabled, the UI will automatically move to the next document after each is loaded.
-// When processing stops and the UI is closed, it will log an exception with total run time.
-
 using Extract.Database;
 using Extract.Drawing;
 using Extract.Imaging;
@@ -14,13 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
-using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
+using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -734,12 +727,12 @@ namespace Extract.DataEntry
         /// </summary>
         bool _isLoaded;
 
-#if PERFORMANCE_TESTING
         /// <summary>
-        /// Keeps track of the start time when measuring performance.
+        /// Keeps track of the start time when Config.Settings.PerformanceTesting is true.
+        /// When enabled, the UI will automatically move to the next document after each is loaded.
+        /// When processing stops and the UI is closed, it will log an exception with total run time.
         /// </summary>
         DateTime? _performanceTestingStartTime;
-#endif
 
         #endregion Fields
 
@@ -779,6 +772,8 @@ namespace Extract.DataEntry
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI23666", _OBJECT_NAME);
+
+                Config = new ConfigSettings<Properties.Settings>();
 
                 InitializeComponent();
 
@@ -902,11 +897,9 @@ namespace Extract.DataEntry
         {
             get
             {
-#if PERFORMANCE_TESTING
-                return UnviewedDataSaveMode.Allow;
-#else
-                return _unviewedDataSaveMode;
-#endif
+                return Config.Settings.PerformanceTesting
+                    ? UnviewedDataSaveMode.Allow
+                    : _unviewedDataSaveMode;
             }
 
             set
@@ -936,11 +929,9 @@ namespace Extract.DataEntry
         {
             get
             {
-#if PERFORMANCE_TESTING
-                return InvalidDataSaveMode.Allow;
-#else
-                return _invalidDataSaveMode;
-#endif
+                return Config.Settings.PerformanceTesting
+                    ? InvalidDataSaveMode.Allow
+                    : _invalidDataSaveMode;
             }
 
             set
@@ -1746,10 +1737,11 @@ namespace Extract.DataEntry
                     // FinalizeDocumentLoad at the end of the current message queue.
                     this.SafeBeginInvoke("ELI34448", () => FinalizeDocumentLoad());
 
-// If testing performance, send the shortcut key to save as soon as each document is loaded.
-#if PERFORMANCE_TESTING
-                    ExecuteOnIdle("ELI36156", () => SendKeys.Send("^s"));
-#endif
+                    // If testing performance, send the shortcut key to save as soon as each document is loaded.
+                    if (Config.Settings.PerformanceTesting)
+                    {
+                        ExecuteOnIdle("ELI36156", () => SendKeys.Send("^s"));
+                    }
                 }
             }
             catch (Exception ex)
@@ -2677,24 +2669,17 @@ namespace Extract.DataEntry
 
                 if (!_inDesignMode)
                 {
-// If testing performance, record the start time when the form is loaded.
-#if PERFORMANCE_TESTING
-                    if (!_performanceTestingStartTime.HasValue)
+                    // If testing performance, record the start time when the form is loaded.
+                    if (Config.Settings.PerformanceTesting && !_performanceTestingStartTime.HasValue)
                     {
                         _performanceTestingStartTime = DateTime.Now;
                     }
-#endif
 
                     ExtractException.Assert("ELI30678", "Application data not initialized.",
                         _dataEntryApp != null);
 
                     ExtractException.Assert("ELI25377", "Highlight colors not initialized!",
                         _highlightColors != null && _highlightColors.Length > 0);
-
-                    if (Config == null)
-                    {
-                        Config = new ConfigSettings<Properties.Settings>();
-                    }
 
                     // Initialize the font to use for tooltips
                     _toolTipFont = new Font(Config.Settings.FontFamily, Config.Settings.TooltipFontSize);
@@ -2771,26 +2756,32 @@ namespace Extract.DataEntry
             _regainingFocus = true;
         }
 
-// If testing performance, when the verification UI is hidden (closed), record the total run time.
-#if PERFORMANCE_TESTING
         /// <summary>
         /// Raises the <see cref="Control.VisibleChanged"/> event.
         /// </summary>
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnVisibleChanged(EventArgs e)
         {
-            base.OnVisibleChanged(e);
-
-            if (!Visible && _performanceTestingStartTime.HasValue)
+            try
             {
-                var ee = new ExtractException("ELI36157", "TotalTime: " +
-                    (DateTime.Now - _performanceTestingStartTime.Value).ToString("g"));
-                DataEntryQuery.ReportPerformanceData(ee);
-                ee.Log();
-                _performanceTestingStartTime = null;
+                base.OnVisibleChanged(e);
+
+                // If testing performance, when the verification UI is hidden (closed), record the total run time.
+                if (!Visible && _performanceTestingStartTime.HasValue)
+                {
+                    var ee = new ExtractException("ELI36157", "TotalTime: " +
+                        (DateTime.Now - _performanceTestingStartTime.Value).ToString(
+                            "g", CultureInfo.CurrentCulture));
+                    DataEntryQuery.ReportPerformanceData(ee);
+                    ee.Log();
+                    _performanceTestingStartTime = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39202");
             }
         }
-#endif
 
         /// <summary> 
         /// Clean up any resources being used.
