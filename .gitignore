@@ -1,12 +1,16 @@
 Media/
 *.suo
 Release/
+release/
 Debug/
+/debug
+debug/
+obj/
 _isuser_0x0409.dll
 *_i.c
 *.user
 *.aps
-Binaries/
+/Binaries/
 Thumbs.db
 *_p.c
 Analysis - */
@@ -146,3 +150,5 @@ String1033.txt
 /ProductDevelopment/AttributeFinder/IndustrySpecific/Redaction/RedactionTester/Code/RedactionTester.h
 
 ProductDevelopment/AttributeFinder/AFCore/AFCoreTest/Code/AFCoreTest.opensdf
+/.project
+/binaries64/
