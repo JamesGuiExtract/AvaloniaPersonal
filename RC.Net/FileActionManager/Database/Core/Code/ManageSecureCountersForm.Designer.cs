@@ -173,15 +173,16 @@
             this._cancelButton.TabIndex = 8;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
+            this._cancelButton.Click += new System.EventHandler(this.HandleCancelButton_Click);
             // 
             // _refreshButton
             // 
             this._refreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._refreshButton.Location = new System.Drawing.Point(539, 132);
+            this._refreshButton.Location = new System.Drawing.Point(458, 132);
             this._refreshButton.Name = "_refreshButton";
-            this._refreshButton.Size = new System.Drawing.Size(75, 23);
+            this._refreshButton.Size = new System.Drawing.Size(156, 23);
             this._refreshButton.TabIndex = 1;
-            this._refreshButton.Text = "Refresh";
+            this._refreshButton.Text = "Refresh counter values";
             this._refreshButton.UseVisualStyleBackColor = true;
             this._refreshButton.Click += new System.EventHandler(this.HandleRefreshButton_Click);
             // 
@@ -194,6 +195,7 @@
             this._counterIdColumn.HeaderText = "ID";
             this._counterIdColumn.Name = "_counterIdColumn";
             this._counterIdColumn.ReadOnly = true;
+            this._counterIdColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this._counterIdColumn.Width = 37;
             // 
             // _counterNameColumn
@@ -201,6 +203,7 @@
             this._counterNameColumn.HeaderText = "Name";
             this._counterNameColumn.Name = "_counterNameColumn";
             this._counterNameColumn.ReadOnly = true;
+            this._counterNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // _counterValueColumn
             // 
@@ -209,6 +212,7 @@
             this._counterValueColumn.HeaderText = "Value";
             this._counterValueColumn.Name = "_counterValueColumn";
             this._counterValueColumn.ReadOnly = true;
+            this._counterValueColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this._counterValueColumn.Width = 90;
             // 
             // _counterAlertLevelColumn
@@ -217,6 +221,7 @@
             this._counterAlertLevelColumn.FillWeight = 1F;
             this._counterAlertLevelColumn.HeaderText = "Alert Level";
             this._counterAlertLevelColumn.Name = "_counterAlertLevelColumn";
+            this._counterAlertLevelColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this._counterAlertLevelColumn.Width = 90;
             // 
             // _counterAlertMultipleColumn
@@ -225,6 +230,7 @@
             this._counterAlertMultipleColumn.FillWeight = 1F;
             this._counterAlertMultipleColumn.HeaderText = "Alert Frequency";
             this._counterAlertMultipleColumn.Name = "_counterAlertMultipleColumn";
+            this._counterAlertMultipleColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this._counterAlertMultipleColumn.Width = 105;
             // 
             // ManageSecureCountersForm

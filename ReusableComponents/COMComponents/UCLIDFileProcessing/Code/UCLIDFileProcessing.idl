@@ -1029,11 +1029,13 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To store a setting in the DBInfo table of the database. 
 		// PARAMS:  bstrSettingName - Name of the setting to add
 		//          bstrSettingValue - Value of the setting
-		//          vbSetIfExists - Whether to set the setting if it already exists. 
+		//          vbSetIfExists - Whether to set the setting if it already exists.
+		//			vbRecordHistory - Whether an entry should be stored in DBInfoChangeHistory.
 		// NOTE:	This is to be used by the product specific database managers to store there settings in the
 		//			DBInfo table.
 		[id(37), helpstring("method SetDBInfoSetting")] HRESULT SetDBInfoSetting(
-			[in] BSTR bstrSettingName, [in] BSTR bstrSettingValue, [in] VARIANT_BOOL vbSetIfExists);
+			[in] BSTR bstrSettingName, [in] BSTR bstrSettingValue, [in] VARIANT_BOOL vbSetIfExists,
+			[in] VARIANT_BOOL vbRecordHistory);
 
 		// PROMISE: To return the value for the setting name from the DBInfo table
 		// PARAMS:	vbThrowIfMissing- If VARIANT_TRUE, if the setting is missing an exception will be thrown.

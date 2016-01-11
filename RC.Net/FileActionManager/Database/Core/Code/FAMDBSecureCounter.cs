@@ -59,6 +59,12 @@ namespace Extract.FileActionManager.Database
         int _alertMultiple;
 
         /// <summary>
+        /// In the case that _alertMultiple has not been explicitly set, what value should be
+        /// assumed.
+        /// </summary>
+        int _effectiveAlertMultiple;
+
+        /// <summary>
         /// <see langword="true"/> if this counter is valid; otherwise, <see langword="false"/>.
         /// </summary>
         bool _isValid;
@@ -115,7 +121,11 @@ namespace Extract.FileActionManager.Database
                 _alertMultiple = alertMultiple;
                 if (_alertLevel > 0 && _alertMultiple <= 0)
                 {
-                    _alertMultiple = _alertLevel;
+                    _effectiveAlertMultiple = _alertLevel;
+                }
+                else
+                {
+                    _effectiveAlertMultiple = _alertMultiple;
                 }
                 _isValid = isValid;
             }
@@ -222,8 +232,8 @@ namespace Extract.FileActionManager.Database
                 {
                     int lastValue = newValue + count;
                     if (lastValue > AlertLevel ||
-                        ((AlertLevel - newValue) / AlertMultiple !=
-                         (AlertLevel - lastValue) / AlertMultiple))
+                        ((AlertLevel - newValue) / _effectiveAlertMultiple !=
+                         (AlertLevel - lastValue) / _effectiveAlertMultiple))
                     {
                         SendEmailAlert(newValue);
                     }
