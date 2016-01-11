@@ -348,8 +348,7 @@ STDMETHODIMP CAttributeDBMgr::raw_AddProductSpecificSchema( IFileProcessingDB* p
 			std::string schemaVersion = iterDBInfoValues->second;
 			ipDB->SetDBInfoSetting( schemaVersionName.c_str(),
 									schemaVersion.c_str(), 
-									setIfExists,
-									VARIANT_FALSE);
+									setIfExists);
 		}
 
 		return S_OK;

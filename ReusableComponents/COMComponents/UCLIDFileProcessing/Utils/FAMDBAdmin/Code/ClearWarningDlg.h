@@ -17,7 +17,7 @@ public:
 // Dialog Data
 	enum { IDD = IDD_DIALOG_CLEAR_WARNING };
 
-	// true if the retain database configuration/settings checkbox was checked by the user; false otherwise
+	// true if the retain actions checkbox was checked by the user; false otherwise
 	bool getRetainActions();
 
 	// Sets the caption and title text
@@ -35,7 +35,7 @@ public:
 
 	// Controls
 	CStatic m_labelCaption;
-	CButton m_checkRetainSettings;
+	CButton m_checkRetainActions;
 
 	// Data
 	string m_strTitle;

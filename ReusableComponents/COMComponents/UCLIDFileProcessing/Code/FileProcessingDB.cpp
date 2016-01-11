@@ -1153,7 +1153,7 @@ STDMETHODIMP CFileProcessingDB::ConnectLastUsedDBThisProcess()
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstrSettingValue, 
-										VARIANT_BOOL vbSetIfExists, VARIANT_BOOL vbRecordHistory)
+												 VARIANT_BOOL vbSetIfExists)
 {
 	try
 	{
@@ -1161,12 +1161,12 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 
 		validateLicense();
 
-		if (!SetDBInfoSetting_Internal(false, bstrSettingName, bstrSettingValue, vbSetIfExists, vbRecordHistory))
+		if (!SetDBInfoSetting_Internal(false, bstrSettingName, bstrSettingValue, vbSetIfExists))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			SetDBInfoSetting_Internal(true, bstrSettingName, bstrSettingValue, vbSetIfExists, vbRecordHistory);
+			SetDBInfoSetting_Internal(true, bstrSettingName, bstrSettingValue, vbSetIfExists);
 		}
 
 		return S_OK;

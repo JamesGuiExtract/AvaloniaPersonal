@@ -3134,7 +3134,7 @@ bool CFileProcessingDB::GetActionID_Internal(bool bDBLocked, BSTR bstrActionName
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, BSTR bstrSettingValue, 
-												 VARIANT_BOOL vbSetIfExists, VARIANT_BOOL vbRecordHistory)
+												 VARIANT_BOOL vbSetIfExists)
 {
 	try
 	{
@@ -3202,7 +3202,7 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 
 					executeCmdQuery(ipConnection, gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
-					if (m_bStoreDBInfoChangeHistory && asCppBool(vbRecordHistory))
+					if (m_bStoreDBInfoChangeHistory)
 					{
 						ipDBInfoSet->Requery(adOptionUnspecified);
 

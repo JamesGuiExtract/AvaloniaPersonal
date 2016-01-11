@@ -61,7 +61,7 @@ namespace Extract.FileActionManager.Database
                 _fileProcessingDB = fileProcessingDB;
 
                 _licenseContactSettings =
-                    new FAMDatabaseSettings<LicenseContact>(fileProcessingDB, false);
+                    new FAMDatabaseSettings<LicenseContact>(fileProcessingDB, true);
 
                 InitializeComponent();
             }
@@ -94,19 +94,6 @@ namespace Extract.FileActionManager.Database
                     _licenseContactSettings.Settings.SendAlertsToSpecified;
                 _emailAlertRecipients.Text =
                     _licenseContactSettings.Settings.SpecifiedAlertRecipients;
-
-                // Update _licenseContactSettings (but don't commit) as control values are changed.
-                _emailSupportCheckBox.CheckedChanged += (sender, args) =>
-                    _licenseContactSettings.Settings.SendAlertsToExtract =
-                        _emailSupportCheckBox.Checked;
-
-                _emailSpecifiedRecipientsCheckBox.CheckedChanged += (sender, args) =>
-                    _licenseContactSettings.Settings.SendAlertsToSpecified =
-                        _emailSpecifiedRecipientsCheckBox.Checked;
-
-                _emailAlertRecipients.TextChanged += (sender, args) =>
-                    _licenseContactSettings.Settings.SpecifiedAlertRecipients =
-                        _emailAlertRecipients.Text;
 
                 RefreshCounterData();
 	        }
@@ -143,31 +130,6 @@ namespace Extract.FileActionManager.Database
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39167");
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing"/> event.
-        /// </summary>
-        /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs"/> that contains
-        /// the event data.</param>
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            try
-            {
-                base.OnClosing(e);
-
-                if (DialogResult == DialogResult.Cancel)
-                {
-                    if (!PromptToApplyAlertChanges())
-                    {
-                        e.Cancel = true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39205");
             }
         }
 
@@ -394,9 +356,46 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                if (!ApplyAlertSettings())
+                // If email alerts are enabled make sure there are settings for the SMTP
+                if (_emailSpecifiedRecipientsCheckBox.Checked || _emailSupportCheckBox.Checked)
                 {
-                    DialogResult = DialogResult.None;
+                    // Verify that there are settings for SMTP
+                    SmtpEmailSettings _emailSettings = new SmtpEmailSettings();
+                    _emailSettings.LoadSettings(
+                                        new FAMDatabaseSettings<ExtractSmtp>(
+                                            _fileProcessingDB, false, SmtpEmailSettings.PropertyNameLookup));
+                    if (string.IsNullOrWhiteSpace(_emailSettings.Server))
+                    {
+                        UtilityMethods.ShowMessageBox("The alert email is sent using email server settings " +
+                            "in the database, but these settings have not been configured.\r\n\r\n" +
+                            "From the main screen, select the \"Database | Database options...\" " +
+                            "menu option, then use the \"Email\" tab to configure the outgoing email server.",
+                            "Outgoing email server not configured", true);
+                        DialogResult = DialogResult.None;
+                        return;
+                    }
+                }
+
+                // Store counter alert settings
+                _licenseContactSettings.Settings.SendAlertsToExtract =
+                    _emailSupportCheckBox.Checked;
+                _licenseContactSettings.Settings.SendAlertsToSpecified =
+                    _emailSpecifiedRecipientsCheckBox.Checked;
+                _licenseContactSettings.Settings.SpecifiedAlertRecipients =
+                    _emailAlertRecipients.Text;
+
+                if (_alertLevelChanged)
+                {
+                    foreach (var row in _counterDataGridView.Rows
+                        .OfType<DataGridViewRow>())
+                    {
+                        int counterID = ParseIntValue(row.Cells[0]);
+                        int alertLevel = ParseIntValue(row.Cells[3]);
+                        int alertFrequency = ParseIntValue(row.Cells[4]);
+
+                        _fileProcessingDB.SetSecureCounterAlertLevel(
+                            counterID, alertLevel, alertFrequency);
+                    }
                 }
             }
             catch (Exception ex)
@@ -410,114 +409,12 @@ namespace Extract.FileActionManager.Database
         #region Private Members
 
         /// <summary>
-        /// Prompts whether to apply changes to alert settings in the case that changes are about to
-        /// be otherwise lost.
-        /// </summary>
-        /// <returns><see langword="true"/> if the user chose either to save or discard the changes;
-        /// <see langword="false"/> if the user wants to cancel the operation that would have led to
-        /// the changed being lost.</returns>
-        bool PromptToApplyAlertChanges()
-        {
-            if (_alertLevelChanged || _licenseContactSettings.HasUnsavedChanges)
-            {
-                DialogResult answer = MessageBox.Show("Alert settings have been modified\r\n\r\n" +
-                    "Do you want to save your changes?", "Save changes?",
-                    MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1, 0);
-
-                if (answer == DialogResult.Yes)
-                {
-                    return ApplyAlertSettings();
-                }
-                else if (answer == DialogResult.No)
-                {
-                    // DialogResult.No is an explicit permission to discard; continue with operation.
-                    return true;
-                }
-                else if (answer == DialogResult.Cancel)
-                {
-                    return false;
-                }
-            }
-
-            // If there are no changes, operation can continue without saving.
-            return true;
-        }
-
-        /// <summary>
-        /// Applies any changes to alert settings.
-        /// </summary>
-        /// <returns><see langword="true"/> if the settings were able to be applied.
-        /// <see langword="false"/> if the settings could not be applied and the operation that
-        /// triggered the apply should be canceled.</returns>
-        bool ApplyAlertSettings()
-        {
-            // If email alerts are enabled make sure there are settings for the SMTP
-            if (_emailSpecifiedRecipientsCheckBox.Checked || _emailSupportCheckBox.Checked)
-            {
-                // Verify that there are settings for SMTP
-                SmtpEmailSettings _emailSettings = new SmtpEmailSettings();
-                _emailSettings.LoadSettings(
-                    new FAMDatabaseSettings<ExtractSmtp>(
-                        _fileProcessingDB, false, SmtpEmailSettings.PropertyNameLookup));
-                if (string.IsNullOrWhiteSpace(_emailSettings.Server))
-                {
-                    UtilityMethods.ShowMessageBox("The alert email is sent using email server settings " +
-                        "in the database, but these settings have not been configured.\r\n\r\n" +
-                        "From the main screen, select the \"Database | Database options...\" " +
-                        "menu option, then use the \"Email\" tab to configure the outgoing email server.",
-                        "Outgoing email server not configured", true);
-                    return false;
-                }
-            }
-
-            // Only save if the user made an explicit change to avoid overwriting changes another
-            // user may have made in another instance that was active at the same time as this one.
-            if (_licenseContactSettings.HasUnsavedChanges)
-            {
-                _licenseContactSettings.Save();
-            }
-
-            if (_alertLevelChanged)
-            {
-                foreach (var row in _counterDataGridView.Rows
-                    .OfType<DataGridViewRow>())
-                {
-                    int counterID = ParseIntValue(row.Cells[0]);
-                    int alertLevel = ParseIntValue(row.Cells[3]);
-                    int alertFrequency = ParseIntValue(row.Cells[4]);
-
-                    _fileProcessingDB.SetSecureCounterAlertLevel(
-                        counterID, alertLevel, alertFrequency);
-                }
-
-                _alertLevelChanged = false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// Reloads secure counter data from <see cref="_fileProcessingDB"/> into the dialog.
         /// </summary>
         void RefreshCounterData()
         {
             try
             {
-                // https://extract.atlassian.net/browse/ISSUE-13466
-                // Changes to alert level/frequency should not be applied until the OK button is
-                // pressed, but we don't want to lose changes the user has made to these settings
-                // either. Keep track of the currently displayed values and restore them after
-                // reloading the counter data from the DB.
-                var displayedAlertLevels =
-                    _counterDataGridView.Rows
-                        .OfType<DataGridViewRow>()
-                        .ToDictionary(
-                            row => ParseIntValue(row.Cells[0]), // Counter ID
-                            row => new Tuple<int, int>(
-                                ParseIntValue(row.Cells[3]), // Alert level
-                                ParseIntValue(row.Cells[4]))); // Alert multiple
-
                 _counterDataGridView.Rows.Clear();
                 _countersAreValid = true;
 
@@ -539,22 +436,10 @@ namespace Extract.FileActionManager.Database
                     {
                         var FAMDBCounter = (IFAMDBSecureCounter)secureCounter;
 
-                        int alertLevel = FAMDBCounter.AlertLevel;
-                        int alertMultiple = FAMDBCounter.AlertMultiple;
-
-                        // Restore alert level/frequency values that were displayed prior to the
-                        // refresh.
-                        Tuple<int, int> displayedAlertLevel;
-                        if (displayedAlertLevels.TryGetValue(secureCounter.ID, out displayedAlertLevel))
-                        {
-                            alertLevel = displayedAlertLevel.Item1;
-                            alertMultiple = displayedAlertLevel.Item2;
-                        }
-
                         _counterDataGridView.Rows.Add(secureCounter.ID, secureCounter.Name,
                             FormatForDisplay(secureCounter.Value, false),
-                            FormatForDisplay(alertLevel, true),
-                            FormatForDisplay(alertMultiple, true));
+                            FormatForDisplay(FAMDBCounter.AlertLevel, true),
+                            FormatForDisplay(FAMDBCounter.AlertMultiple, true));
                     }
                 }
             }

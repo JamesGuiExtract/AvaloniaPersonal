@@ -84,7 +84,7 @@
 #define IDC_STATIC_TOTAL_LABEL          2035
 #define IDC_LIST_REPORTS                2036
 #define ID_RUN_REPORT_OK                2037
-#define IDC_CHECK_RETAIN_SETTINGS       2038
+#define IDC_CHECK_RETAIN_ACTIONS        2038
 #define IDC_CAPTION                     2039
 #define IDC_STATIC_UPDATED              2040
 #define IDC_EDIT_FL_SLCT_SMRY_STATUS    2042

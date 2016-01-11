@@ -440,7 +440,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
 				asVariantBool(iterDBInfoValues->first == gstrLABDE_SCHEMA_VERSION_NAME);
 
 			ipDB->SetDBInfoSetting(iterDBInfoValues->first.c_str(),
-				iterDBInfoValues->second.c_str(), vbSetIfExists, VARIANT_FALSE);
+				iterDBInfoValues->second.c_str(), vbSetIfExists);
 		}
 
 		return S_OK;

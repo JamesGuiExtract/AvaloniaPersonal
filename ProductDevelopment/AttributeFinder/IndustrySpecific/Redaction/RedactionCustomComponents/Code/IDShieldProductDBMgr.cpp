@@ -321,7 +321,7 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(IFileProcessing
 				asVariantBool(iterDBInfoValues->first == gstrID_SHIELD_SCHEMA_VERSION_NAME);
 
 			ipDB->SetDBInfoSetting(iterDBInfoValues->first.c_str(),
-				iterDBInfoValues->second.c_str(), vbSetIfExists, VARIANT_FALSE);
+				iterDBInfoValues->second.c_str(), vbSetIfExists);
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18686");
