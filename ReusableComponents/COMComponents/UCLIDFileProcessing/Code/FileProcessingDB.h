@@ -169,7 +169,8 @@ public:
 	STDMETHOD(CreateNewDB)(BSTR bstrNewDBName);
 	STDMETHOD(CreateNew80DB)(BSTR bstrNewDBName);
 	STDMETHOD(ConnectLastUsedDBThisProcess)();
-	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue, VARIANT_BOOL vbSetIfExists);
+	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue,
+		VARIANT_BOOL vbSetIfExists, VARIANT_BOOL vbRecordHistory);
 	STDMETHOD(GetDBInfoSetting)(BSTR bstrSettingName, VARIANT_BOOL vbThrowIfMissing,
 		BSTR* pbstrSettingValue);
 	STDMETHOD(LockDB_InternalOnly)(BSTR bstrLockName);
@@ -1112,7 +1113,7 @@ private:
 		IRandomMathCondition* pRandomCondition, long *pnNumRecordsOutput);
 	bool GetActionID_Internal(bool bDBLocked, BSTR bstrActionName, long* pnActionID); 
 	bool SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, BSTR bstrSettingValue, 
-		VARIANT_BOOL vbSetIfExists);
+		VARIANT_BOOL vbSetIfExists, VARIANT_BOOL vbRecordHistory);
 	bool GetDBInfoSetting_Internal(bool bDBLocked, const string& strSettingName, bool bThrowIfMissing,
 		string& rstrSettingValue);
 	bool GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery, _Recordset** ppVal);

@@ -175,7 +175,7 @@ namespace Extract.FileActionManager.Database
             try
             {
                 _FAMDatabase.SetDBInfoSetting(
-                    GetDbPropertyName(propertyName), value, true);
+                    GetDbPropertyName(propertyName), value, true, true);
             }
             catch (Exception ex)
             {

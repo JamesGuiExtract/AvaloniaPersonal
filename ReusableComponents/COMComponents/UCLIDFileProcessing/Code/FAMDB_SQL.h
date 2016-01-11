@@ -1469,6 +1469,7 @@ static const string gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE =
 	"			FROM [SecureCounterValueChange] "
 	"			WHERE [SecureCounterValueChange].[CounterID] = [SC].[ID] "
 	"			) "
-	"		OR [scvc].[ID] IS NULL) ";
+	"		OR [scvc].[ID] IS NULL) "
+	"		ORDER BY [sc].[ID] ";
 
  

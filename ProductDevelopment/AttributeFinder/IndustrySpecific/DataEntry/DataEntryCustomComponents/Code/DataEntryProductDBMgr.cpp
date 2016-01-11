@@ -326,7 +326,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 				asVariantBool(iterDBInfoValues->first == gstrDATA_ENTRY_SCHEMA_VERSION_NAME);
 
 			ipDB->SetDBInfoSetting(iterDBInfoValues->first.c_str(),
-				iterDBInfoValues->second.c_str(), vbSetIfExists);
+				iterDBInfoValues->second.c_str(), vbSetIfExists, VARIANT_FALSE);
 		}
 
 		return S_OK;

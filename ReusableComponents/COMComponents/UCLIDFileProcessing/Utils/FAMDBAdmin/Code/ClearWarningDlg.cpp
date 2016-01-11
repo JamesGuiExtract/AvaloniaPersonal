@@ -44,7 +44,7 @@ void ClearWarningDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_CAPTION, m_labelCaption);
-	DDX_Control(pDX, IDC_CHECK_RETAIN_ACTIONS, m_checkRetainActions);
+	DDX_Control(pDX, IDC_CHECK_RETAIN_SETTINGS, m_checkRetainSettings);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(ClearWarningDlg, CDialog)
@@ -65,7 +65,7 @@ BOOL ClearWarningDlg::OnInitDialog()
 		m_labelCaption.SetWindowText(m_strCaption.c_str());
 
 		// Set the checkbox
-		m_checkRetainActions.SetCheck( asBSTChecked(m_bRetainActions) );
+		m_checkRetainSettings.SetCheck( asBSTChecked(m_bRetainActions) );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI25183")
 
@@ -74,14 +74,14 @@ BOOL ClearWarningDlg::OnInitDialog()
 //-------------------------------------------------------------------------------------------------
 void ClearWarningDlg::OnBnClickedYes()
 {
-	m_bRetainActions = (m_checkRetainActions.GetCheck() == BST_CHECKED);
+	m_bRetainActions = (m_checkRetainSettings.GetCheck() == BST_CHECKED);
 
 	EndDialog(IDYES);
 }
 //-------------------------------------------------------------------------------------------------
 void ClearWarningDlg::OnBnClickedNo()
 {
-	m_bRetainActions = (m_checkRetainActions.GetCheck() == BST_CHECKED);
+	m_bRetainActions = (m_checkRetainSettings.GetCheck() == BST_CHECKED);
 
 	EndDialog(IDNO);
 }
