@@ -146,6 +146,31 @@ namespace Extract.FileActionManager.Database
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs"/> that contains
+        /// the event data.</param>
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            try
+            {
+                base.OnClosing(e);
+
+                if (DialogResult == DialogResult.Cancel)
+                {
+                    if (!PromptToApplyAlertChanges())
+                    {
+                        e.Cancel = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39205");
+            }
+        }
+
         #endregion Overrides
 
         #region Event Handlers
@@ -377,27 +402,6 @@ namespace Extract.FileActionManager.Database
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39071");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the <see cref="_cancelButton"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleCancelButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (!PromptToApplyAlertChanges())
-                {
-                    DialogResult = DialogResult.None;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39204");
             }
         }
 
