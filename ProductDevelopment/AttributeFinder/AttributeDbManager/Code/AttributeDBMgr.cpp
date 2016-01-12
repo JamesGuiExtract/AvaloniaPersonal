@@ -616,6 +616,7 @@ namespace
 		return std::move( results );
 	}
 
+	// NOTE: strAttributeSetName must be escaped for XML (apostrophe's escaped).
 	longlong GetAttributeSetID(string strAttributeSetName, _ConnectionPtr ipConnection)
 	{
 		longlong llSetNameID = 0;
@@ -837,7 +838,7 @@ namespace
 						  ") SELECT * FROM attrSets WHERE \"RowNumber\" = %d;",
 						  relativeIndex < 0 ? "DESC" : "ASC",					// DESC is most recent, ASC is oldest
 						  fileID,
-						  asString(attributeSetName).c_str(),
+						  SqlSanitizeInput(asString(attributeSetName)).c_str(),
 						  abs( relativeIndex ) );								// offset (index) into result set, get Nth
 
 		return query;
@@ -1305,8 +1306,8 @@ STDMETHODIMP CAttributeDBMgr::RenameAttributeSetName(BSTR attributeSetName,
 		ASSERT_ARGUMENT( "ELI38627", attributeSetName != nullptr );
 		ASSERT_ARGUMENT( "ELI38628", newName != nullptr );
 
-		std::string currentName( asString(attributeSetName) );
-		std::string changeNameTo( asString(newName) );
+		std::string currentName( SqlSanitizeInput(asString(attributeSetName)) );
+		std::string changeNameTo( SqlSanitizeInput(asString(newName)) );
 
 		std::string cmd( Util::Format( "UPDATE [dbo].[AttributeSetName] SET Description='%s' WHERE Description='%s';",
 									   changeNameTo.c_str(),
@@ -1326,7 +1327,7 @@ STDMETHODIMP CAttributeDBMgr::DeleteAttributeSetName(BSTR attributeSetName)
 	{
 		ASSERT_ARGUMENT( "ELI38624", attributeSetName != nullptr );
 
-		std::string name( asString(attributeSetName) );
+		std::string name( SqlSanitizeInput(asString(attributeSetName)) );
 		ASSERT_ARGUMENT( "ELI38625", !name.empty() );
 
 		std::string cmd( Util::Format( "DELETE FROM  [dbo].[AttributeSetName] "

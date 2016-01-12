@@ -1,11 +1,11 @@
-﻿using Extract.Licensing;
+﻿using AttributeDbMgrComponentsLib;
+using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
-using AttributeDbMgrComponentsLib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.FileProcessors
@@ -38,6 +38,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// Provides the ability to retrieve and add additional attribute set names.
         /// </summary>
         AttributeDBMgr _attributeDBManager;
+
+        /// <summary>
+        /// The last selected attribute set name in the dialog.
+        /// </summary>
+        string _previousAttributeSetName;
 
         #endregion Fields
 
@@ -117,13 +122,26 @@ namespace Extract.FileActionManager.FileProcessors
                 _attributeDBManager = new AttributeDBMgr();
                 _attributeDBManager.FAMDB = fileProcessingDB;
 
-               SetAttributeSetNameComboBox();
+                _StoreRadioButton.Checked = Settings.StoreModeIsSet;
+                _RetrieveRadioButton.Checked = !Settings.StoreModeIsSet;
 
-               // If Retrieve mode, then the string in the AttributeSetName combo-box must match an 
-               // existing name already in the database. However it can't be fully verified because
-               // the attributeSetName might need to be expanded before being compared to existing 
-               // names in DB, so check to see if the name has one or more tags in it.
-               if (!string.IsNullOrWhiteSpace(Settings.AttributeSetName) && Settings.StoreModeIsSet)
+                _storeRasterZonesCheckBox.Checked = Settings.StoreRasterZones;
+                _storeRasterZonesCheckBox.Enabled = Settings.StoreModeIsSet;
+                _storeRasterZonesCheckBox.Visible = Settings.StoreModeIsSet;
+
+                _doNotSaveEmptyCheckBox.Checked = !Settings.StoreEmptyAttributes;
+                _doNotSaveEmptyCheckBox.Enabled = Settings.StoreModeIsSet;
+                _doNotSaveEmptyCheckBox.Visible = Settings.StoreModeIsSet;
+
+                // Don't initialize the combo box until the store/retrieve radio selection has been
+                // set since the combo's contents will be based on this selection.
+                SetAttributeSetNameComboBox(Settings.AttributeSetName);
+
+                // If Retrieve mode, then the string in the AttributeSetName combo-box must match an 
+                // existing name already in the database. However it can't be fully verified because
+                // the attributeSetName might need to be expanded before being compared to existing 
+                // names in DB, so check to see if the name has one or more tags in it.
+                if (!string.IsNullOrWhiteSpace(Settings.AttributeSetName) && Settings.StoreModeIsSet)
                 {
                     if (!Settings.AttributeSetName.Contains('$') &&
                         !Settings.AttributeSetName.Contains('<'))
@@ -142,17 +160,6 @@ namespace Extract.FileActionManager.FileProcessors
                         }
                     }
                 }
-
-                _StoreRadioButton.Checked = Settings.StoreModeIsSet;
-                _RetrieveRadioButton.Checked = !Settings.StoreModeIsSet;
-
-                _storeRasterZonesCheckBox.Checked = Settings.StoreRasterZones;
-                _storeRasterZonesCheckBox.Enabled = Settings.StoreModeIsSet;
-                _storeRasterZonesCheckBox.Visible = Settings.StoreModeIsSet;
-
-                _doNotSaveEmptyCheckBox.Checked = !Settings.StoreEmptyAttributes;
-                _doNotSaveEmptyCheckBox.Enabled = Settings.StoreModeIsSet;
-                _doNotSaveEmptyCheckBox.Visible = Settings.StoreModeIsSet;
             }
             catch (Exception ex)
             {
@@ -163,7 +170,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Fetch and set the attribute set name elements into the combo box.
         /// </summary>
-        private void SetAttributeSetNameComboBox()
+        /// <param name="nameToSelect">The name that should be selected from the values populated
+        /// into <see cref="_attributeSetNameComboBox"/>, or <see langword="null"/> to maintain
+        /// the previous selection.</param>
+        private void SetAttributeSetNameComboBox(string nameToSelect)
         {
             _attributeSetNameComboBox.Items.Clear();
 
@@ -177,7 +187,9 @@ namespace Extract.FileActionManager.FileProcessors
                 _attributeSetNameComboBox.Items.Add(_ADD_NEW_ATTRIBUTE_LABEL);
             }
 
-            _attributeSetNameComboBox.Text = Settings.AttributeSetName;
+            _attributeSetNameComboBox.Text = string.IsNullOrWhiteSpace(nameToSelect)
+                ? _previousAttributeSetName
+                : nameToSelect;
         }
 
         #endregion Overrides
@@ -196,17 +208,19 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 if (_attributeSetNameComboBox.Text == _ADD_NEW_ATTRIBUTE_LABEL)
                 {
-                    AddAttributeSetDialog aasd = new AddAttributeSetDialog();
-                    var result = aasd.ShowDialog();
-                    if (DialogResult.OK == result)
+                    using (var aasd = new AddAttributeSetDialog(_attributeDBManager))
                     {
-                        _attributeDBManager.CreateNewAttributeSetName(aasd.AttributeSetName);
-                    }
+                        var result = aasd.ShowDialog();
 
-                    // refresh the combobox list always, so that in the case where the user cancels the dialog,
-                    // the previously displayed attribute name is re-displayed. This prevents the <add new...>
-                    // from being displayed as an invalid selection.
-                    SetAttributeSetNameComboBox();
+                        // refresh the combobox list always, so that in the case where the user cancels the dialog,
+                        // the previously displayed attribute name is re-displayed. This prevents the <add new...>
+                        // from being displayed as an invalid selection.
+                        SetAttributeSetNameComboBox(aasd.AttributeSetName);
+                    }
+                }
+                else
+                {
+                    _previousAttributeSetName = _attributeSetNameComboBox.Text;
                 }
             }
             catch (Exception ex)
@@ -259,7 +273,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _doNotSaveEmptyCheckBox.Enabled = true;
 
                 // Add the "add new attribute set name..." label to the attribute set name combo box
-                SetAttributeSetNameComboBox();
+                SetAttributeSetNameComboBox(null);
             }
             catch (Exception ex)
             {
@@ -280,9 +294,9 @@ namespace Extract.FileActionManager.FileProcessors
                 _doNotSaveEmptyCheckBox.Enabled = false;
                 _doNotSaveEmptyCheckBox.Visible = false;
 
-                // Remove the "add new attribute set name..." label to the attribute set name combo box, as
-                // it doesn't make sense to allow that here.
-                SetAttributeSetNameComboBox();
+                // Remove the "add new attribute set name..." label to the attribute set name combo
+                // box, as it doesn't make sense to allow that here.
+                SetAttributeSetNameComboBox(null);
             }
             catch (Exception ex)
             {
@@ -311,7 +325,8 @@ namespace Extract.FileActionManager.FileProcessors
             }
 
             var name = _attributeSetNameComboBox.Text.ToString();
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(name) ||
+                name.Equals(_ADD_NEW_ATTRIBUTE_LABEL, StringComparison.OrdinalIgnoreCase))
             {
                 _attributeSetNameComboBox.Focus();
                 MessageBox.Show("Please specify the attribute set name the attributes should be stored under.",
