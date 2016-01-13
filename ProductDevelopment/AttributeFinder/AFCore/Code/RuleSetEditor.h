@@ -278,6 +278,9 @@ private:
 	//			the standard file-open dialog box.
 	void openFile(string strFileName);
 
+	// Closes any currently open ruleset.
+	void closeFile();
+
 	// Deletes Attribute rules that have been marked for deletion via SetItemData
 	void deleteSelectedRules();
 

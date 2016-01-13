@@ -18,6 +18,7 @@
 #include "RuleSetEditor.h"
 #include "Common.h"
 #include "RuleTesterDlg.h"
+#include "CounterInfo.h"
 
 #include <RegistryPersistenceMgr.h>
 #include <UCLIDException.h>
@@ -386,9 +387,37 @@ void CRuleSetEditor::openFile(string strFileName)
 	}
 	catch (...)
 	{
-		removeFileFromMRUList(strFileName);
+		try
+		{
+			removeFileFromMRUList(strFileName);
+
+			closeFile();
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI39211");
+
 		throw;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSetEditor::closeFile()
+{
+	// create a new ruleset object
+	UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
+	ASSERT_RESOURCE_ALLOCATION("ELI0", ipRuleSet != __nullptr);
+
+	// use the new/empty ruleset object as the object associated with
+	// this UI.
+	m_ipRuleSet = ipRuleSet;
+	refreshUIFromRuleSet();
+
+	// A new file doesn't have a name yet
+	m_strCurrentFileName = "";
+		
+	// update window caption
+	updateWindowCaption();
+
+	// Delete recovery file - user has started a new file
+	m_FRM.deleteRecoveryFile();
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSetEditor::checkModification()
@@ -1204,83 +1233,42 @@ void CRuleSetEditor::removeFileFromMRUList(const string& strFileToBeRemoved)
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::setStatusBarText()
 {
-	string strSelectedCounters = "";
 	bool bValidLicensing = true;
 
-	if ( m_ipRuleSet->UseDocsIndexingCounter == VARIANT_TRUE )
-	{
-		strSelectedCounters = "Indexing (docs)";
+	map<long, CounterInfo> mapCounters = CounterInfo::GetCounterInfo(m_ipRuleSet);
+	vector<string> vecSelectedCounters;
 
-		// Requires special licensing - FLEX Index Rule Writing license
-		if (!LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ))
+	for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
+	{
+		long nID = entry->first;
+		CounterInfo& counterInfo = entry->second;
+
+		if (counterInfo.m_bEnabled)
 		{
-			bValidLicensing = false;
+			vecSelectedCounters.push_back(counterInfo.m_strName);
+
+			// Check to see if we are properly licensed to save a ruleset with this counter.
+			if ((counterInfo.m_nID == giINDEXING_DOCS_COUNTERID &&
+				!LicenseManagement::isLicensed(gnFLEXINDEX_RULE_WRITING_OBJECTS))
+			||
+				(counterInfo.m_nID == giPAGINATION_DOCS_COUNTERID &&
+				 !LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS))
+			||
+				(counterInfo.m_nID == giREDACTION_PAGES_COUNTERID &&
+				 !LicenseManagement::isLicensed(gnIDSHIELD_RULE_WRITING_OBJECTS))
+			||
+				(counterInfo.m_nID == giREDACTION_DOCS_COUNTERID &&
+				 !LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS))
+			||
+				(counterInfo.m_nID == giINDEXING_PAGES_COUNTERID &&
+				 !LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS)))
+			{
+				bValidLicensing = false;
+			}
 		}
 	}
 
-	if ( m_ipRuleSet->UsePaginationCounter == VARIANT_TRUE )
-	{
-		if ( strSelectedCounters != "" )
-		{
-			strSelectedCounters = strSelectedCounters + ", ";
-		}
-
-		strSelectedCounters = strSelectedCounters + "Pagination";
-
-		// Requires special licensing - full RDT license
-		if (!LicenseManagement::isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
-		{
-			bValidLicensing = false;
-		}
-	}
-
-	if ( m_ipRuleSet->UsePagesRedactionCounter == VARIANT_TRUE )
-	{
-		if ( strSelectedCounters != "" )
-		{
-			strSelectedCounters = strSelectedCounters + ", ";
-		}
-
-		strSelectedCounters = strSelectedCounters + "Redaction (pages)";
-
-		// Requires special licensing - ID Shield Rule Writing license
-		if (!LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
-		{
-			bValidLicensing = false;
-		}
-	}
-
-	if ( m_ipRuleSet->UseDocsRedactionCounter == VARIANT_TRUE )
-	{
-		if ( strSelectedCounters != "" )
-		{
-			strSelectedCounters = strSelectedCounters + ", ";
-		}
-
-		strSelectedCounters = strSelectedCounters + "Redaction (docs)";
-
-		// Requires special licensing - full RDT license
-		if (!LicenseManagement::isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
-		{
-			bValidLicensing = false;
-		}
-	}
-
-	if ( m_ipRuleSet->UsePagesIndexingCounter == VARIANT_TRUE )
-	{
-		if ( strSelectedCounters != "" )
-		{
-			strSelectedCounters = strSelectedCounters + ", ";
-		}
-
-		strSelectedCounters = "Indexing (pages)";
-
-		// Requires special licensing - full RDT license
-		if (!LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS))
-		{
-			bValidLicensing = false;
-		}
-	}
+	string strSelectedCounters = asString(vecSelectedCounters, false, ", ");
 
 	// Make sure that counter requirements and licensing are valid
 	if (!bValidLicensing)
@@ -1294,7 +1282,8 @@ void CRuleSetEditor::setStatusBarText()
 		refreshUIFromRuleSet();
 
 		// Create and throw exception - invalid combination
-		UCLIDException ue( "ELI21502", "Invalid USB counter and licensing combination." );
+		UCLIDException ue( "ELI21502", 
+			"Invalid USB counter and licensing combination. Rule set cannot be loaded." );
 		ue.addDebugInfo( "Selected Counters", strSelectedCounters );
 		ue.addDebugInfo( "FLEX Index Rule Writing", LicenseManagement::isLicensed( 
 			gnFLEXINDEX_RULE_WRITING_OBJECTS ) ? "1" : "0" );
