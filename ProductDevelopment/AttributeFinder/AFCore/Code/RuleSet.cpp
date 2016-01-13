@@ -1819,7 +1819,6 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		m_bUsePagesRedactionCounter = ipSource->UsePagesRedactionCounter == VARIANT_TRUE;
 		m_bUseDocsRedactionCounter = ipSource->UseDocsRedactionCounter == VARIANT_TRUE;
 		m_bUsePagesIndexingCounter = ipSource->UsePagesIndexingCounter == VARIANT_TRUE;
-		m_ipCustomCounters = ipSource->CustomCounters->Clone();
 
 		// copy internal-use-only flag
 		m_bRuleSetOnlyForInternalUse = (ipSource->ForInternalUseOnly == VARIANT_TRUE);

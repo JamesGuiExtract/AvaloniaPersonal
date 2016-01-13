@@ -93,7 +93,23 @@ void CRuleSetEditor::OnFileNew()
 			return;
 		}
 
-		closeFile();
+		// create a new ruleset object
+		UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
+		ASSERT_RESOURCE_ALLOCATION("ELI04735", ipRuleSet != __nullptr);
+
+		// use the new/empty ruleset object as the object associated with
+		// this UI.
+		m_ipRuleSet = ipRuleSet;
+		refreshUIFromRuleSet();
+
+		// A new file doesn't have a name yet
+		m_strCurrentFileName = "";
+		
+		// update window caption
+		updateWindowCaption();
+
+		// Delete recovery file - user has started a new file
+		m_FRM.deleteRecoveryFile();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04416")
 }
@@ -671,91 +687,70 @@ BOOL CRuleSetEditor::OnInitDialog()
 
 	try
 	{	
-		try
+		CDialog::OnInitDialog();
+		
+		// initiate the timer event to do the auto-saving
+		SetTimer(giAUTO_SAVE_TIMERID, giAUTO_SAVE_FREQUENCY, NULL);
+
+		// Set the icon for this dialog.  The framework does this automatically
+		//  when the application's main window is not a dialog
+		SetIcon( m_hIcon, TRUE );			// Set big icon
+		SetIcon( m_hIcon, FALSE );			// Set small icon
+
+		// Associate the CRuleGrid class with the dialog resource.
+		m_listRules.AttachGrid(this, IDC_LIST_RULES);
+
+		// Set Up and Down bitmaps to buttons
+		m_btnRuleUp.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_UP)));
+		m_btnRuleDown.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_DOWN)));
+
+		// create status bar
+		m_statusBar.Create(this);
+		m_statusBar.GetStatusBarCtrl().SetMinHeight(g_nSTATUS_BAR_HEIGHT);
+		m_statusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
+		
+		// And position the control bars
+		RepositionBars( AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0 );
+
+		// update the window caption to be the default window
+		// caption when no file is loaded
+		updateWindowCaption();
+
+		// Update the Tools menu to include a Test Harness item
+		updateToolsMenu();
+
+		// Update the display for initial state
+		refreshUIFromRuleSet();
+
+		// center the static prompt which shows the "ruleset is encrypted" message
+		CWnd *pWnd = GetDlgItem( IDC_STATIC_PROMPT );
+		if (pWnd != __nullptr)
 		{
-			CDialog::OnInitDialog();
-		
-			// initiate the timer event to do the auto-saving
-			SetTimer(giAUTO_SAVE_TIMERID, giAUTO_SAVE_FREQUENCY, NULL);
-
-			// Set the icon for this dialog.  The framework does this automatically
-			//  when the application's main window is not a dialog
-			SetIcon( m_hIcon, TRUE );			// Set big icon
-			SetIcon( m_hIcon, FALSE );			// Set small icon
-
-			// Associate the CRuleGrid class with the dialog resource.
-			m_listRules.AttachGrid(this, IDC_LIST_RULES);
-
-			// Set Up and Down bitmaps to buttons
-			m_btnRuleUp.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_UP)));
-			m_btnRuleDown.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_DOWN)));
-
-			// create status bar
-			m_statusBar.Create(this);
-			m_statusBar.GetStatusBarCtrl().SetMinHeight(g_nSTATUS_BAR_HEIGHT);
-			m_statusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
-		
-			// And position the control bars
-			RepositionBars( AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0 );
-
-			// center the static prompt which shows the "ruleset is encrypted" message
-			CWnd *pWnd = GetDlgItem( IDC_STATIC_PROMPT );
-			if (pWnd != __nullptr)
-			{
-				pWnd->CenterWindow();
-			}
-
-			// create rule set tester
-			m_apRuleTesterDlg->Create(RuleTesterDlg::IDD, m_pParentWnd);
-
-			// Save original client width/height
-			CRect rectDlg;
-			GetClientRect(rectDlg);
-			m_nDefaultW = rectDlg.Width();
-			m_nDefaultH = rectDlg.Height();
-		
-			// Save minimum window width/height
-			GetWindowRect(rectDlg);
-			m_nMinWidth = rectDlg.Width();
-			m_nMinHeight = rectDlg.Height();
-
-			// Restore previous position if available
-			m_wMgr.RestoreWindowPosition();
-
-			// NOTE:
-			// Updates of the UI based upon the an rsd file passed on the command line should be saved
-			// for last so that any errors loading the file into the UI do not leave the UI in a bad
-			// state.
-
-			// update the window caption to be the default window
-			// caption when no file is loaded
-			updateWindowCaption();
-
-			// Update the Tools menu to include a Test Harness item
-			updateToolsMenu();
-
-			// Update the display for initial state
-			refreshUIFromRuleSet();
-
-			refreshFileMRU();
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39213");
-	}
-	catch (UCLIDException &ue)
-	{
-		// If an error occurred opening a file specified on the command line, ensure it is not left in
-		// a partially loaded state.
-		if (!m_strCurrentFileName.empty())
-		{
-			try
-			{
-				closeFile();
-			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI39212");
+			pWnd->CenterWindow();
 		}
 
-		ue.display();
+		// create rule set tester
+		m_apRuleTesterDlg->Create(RuleTesterDlg::IDD, m_pParentWnd);
+
+		// create the MRU list
+		refreshFileMRU();
+		setStatusBarText();
+
+		// Save original client width/height
+		CRect rectDlg;
+		GetClientRect(rectDlg);
+		m_nDefaultW = rectDlg.Width();
+		m_nDefaultH = rectDlg.Height();
+		
+		// Save minimum window width/height
+		GetWindowRect(rectDlg);
+		m_nMinWidth = rectDlg.Width();
+		m_nMinHeight = rectDlg.Height();
+
+		// Restore previous position if available
+		m_wMgr.RestoreWindowPosition();
 	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04426")
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
