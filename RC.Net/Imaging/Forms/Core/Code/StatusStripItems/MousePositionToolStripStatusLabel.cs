@@ -110,6 +110,9 @@ namespace Extract.Imaging.Forms
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23126",
 					_OBJECT_NAME);
 
+                // Set default property values.
+                ActivelyManageWidth = true;
+
                 InitializeComponent();
 
                 // If this is design-time, set the text of this label so it is visible.
@@ -162,6 +165,20 @@ namespace Extract.Imaging.Forms
 
                 _displayPercentages = ShouldDisplayPercentages();
             }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this status strip item should actively manage
+        /// its width (will override any AutoSize or Size settings).
+        /// </summary>
+        /// <value><see langword="true"/> if this status strip item should actively manage its
+        /// width; otherwise, <see langword="false"/>.
+        /// </value>
+        [DefaultValue(true)]
+        public bool ActivelyManageWidth
+        {
+            get;
+            set;
         }
 
         #endregion MousePositionToolStripStatusLabel Properties
@@ -223,6 +240,31 @@ namespace Extract.Imaging.Forms
             set
             {
                 // Do nothing
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.Layout"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.LayoutEventArgs"/> that contains the
+        /// event data.</param>
+        protected override void OnLayout(LayoutEventArgs e)
+        {
+            try
+            {
+                base.OnLayout(e);
+
+                // Because values automatically populated via the Visual Studio designer can override the
+                // originally calculated width, ensure the proper width on layout as long as
+                // ActivelyManageWidth is set.
+                if (ActivelyManageWidth)
+                {
+                    base.Width = _displayPercentages ? 175 : 100;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39219");
             }
         }
 
