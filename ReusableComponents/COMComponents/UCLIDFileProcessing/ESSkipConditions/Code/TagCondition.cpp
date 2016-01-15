@@ -7,6 +7,7 @@
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <CsisUtils.h>
 
 using namespace std;
 
@@ -192,13 +193,22 @@ STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecord
 		IVariantVectorPtr ipTagsOnFile = ipFPDB->GetTagsOnFile(ipFileRecord->FileID);
 		ASSERT_RESOURCE_ALLOCATION("ELI27534", ipTagsOnFile != __nullptr);
 
+		// Put the file's tags in a case-insensitive map to allow easy case-insensitive searching.
+		// This is being used as a set; the value for each map element is irrelevant.
+		csis_map<int>::type mapTagsOnFile;
+		long lSize = ipTagsOnFile->Size;
+		for (long i=0; i < lSize; i++)
+		{
+			mapTagsOnFile[asString(m_ipVecTags->Item[i].bstrVal)] = 0;
+		}
+
 		// Iterate through all of the tags
-		long lSize = m_ipVecTags->Size;
+		lSize = m_ipVecTags->Size;
 		bool bFound = false;
 		for (long i=0; i < lSize; i++)
 		{
-			// Check if the file contains the tag
-			bFound = asCppBool(ipTagsOnFile->Contains(m_ipVecTags->Item[i]));
+			string strTag = asString(m_ipVecTags->Item[i].bstrVal);
+			bFound = mapTagsOnFile.find(strTag) != mapTagsOnFile.end();
 
 			// Break from loop if bFound == m_bAnyTags
 			// 1. Found and Any Tags
