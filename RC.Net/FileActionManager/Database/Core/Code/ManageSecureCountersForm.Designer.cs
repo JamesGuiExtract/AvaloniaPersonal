@@ -33,11 +33,6 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this._counterDataGridView = new System.Windows.Forms.DataGridView();
-            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterAlertLevelColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterAlertMultipleColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._emailSupportCheckBox = new System.Windows.Forms.CheckBox();
             this._emailSpecifiedRecipientsCheckBox = new System.Windows.Forms.CheckBox();
             this._emailAlertRecipients = new System.Windows.Forms.TextBox();
@@ -46,6 +41,11 @@
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this._refreshButton = new System.Windows.Forms.Button();
+            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterAlertLevelColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterAlertMultipleColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this._counterDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -92,10 +92,98 @@
             dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._counterDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this._counterDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this._counterDataGridView.Size = new System.Drawing.Size(602, 114);
+            this._counterDataGridView.Size = new System.Drawing.Size(650, 114);
             this._counterDataGridView.TabIndex = 0;
             this._counterDataGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.HandleCounterDataGridView_CellValidating);
             this._counterDataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.HandleCounterDataGridView_EditingControlShowing);
+            // 
+            // _emailSupportCheckBox
+            // 
+            this._emailSupportCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._emailSupportCheckBox.AutoSize = true;
+            this._emailSupportCheckBox.Location = new System.Drawing.Point(13, 141);
+            this._emailSupportCheckBox.Name = "_emailSupportCheckBox";
+            this._emailSupportCheckBox.Size = new System.Drawing.Size(267, 17);
+            this._emailSupportCheckBox.TabIndex = 2;
+            this._emailSupportCheckBox.Text = "Enable email alerts to support@extractsystems.com";
+            this._emailSupportCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _emailSpecifiedRecipientsCheckBox
+            // 
+            this._emailSpecifiedRecipientsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._emailSpecifiedRecipientsCheckBox.AutoSize = true;
+            this._emailSpecifiedRecipientsCheckBox.Location = new System.Drawing.Point(13, 164);
+            this._emailSpecifiedRecipientsCheckBox.Name = "_emailSpecifiedRecipientsCheckBox";
+            this._emailSpecifiedRecipientsCheckBox.Size = new System.Drawing.Size(129, 17);
+            this._emailSpecifiedRecipientsCheckBox.TabIndex = 3;
+            this._emailSpecifiedRecipientsCheckBox.Text = "Enable email alerts to:";
+            this._emailSpecifiedRecipientsCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _emailAlertRecipients
+            // 
+            this._emailAlertRecipients.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._emailAlertRecipients.Enabled = false;
+            this._emailAlertRecipients.Location = new System.Drawing.Point(148, 161);
+            this._emailAlertRecipients.Name = "_emailAlertRecipients";
+            this._emailAlertRecipients.Size = new System.Drawing.Size(514, 20);
+            this._emailAlertRecipients.TabIndex = 4;
+            // 
+            // _generateRequestButton
+            // 
+            this._generateRequestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._generateRequestButton.Location = new System.Drawing.Point(196, 188);
+            this._generateRequestButton.Name = "_generateRequestButton";
+            this._generateRequestButton.Size = new System.Drawing.Size(149, 23);
+            this._generateRequestButton.TabIndex = 5;
+            this._generateRequestButton.Text = "Generate update request";
+            this._generateRequestButton.UseVisualStyleBackColor = true;
+            this._generateRequestButton.Click += new System.EventHandler(this.HandleGenerateRequestButton_Click);
+            // 
+            // _applyUpdateCodeButton
+            // 
+            this._applyUpdateCodeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._applyUpdateCodeButton.Location = new System.Drawing.Point(351, 188);
+            this._applyUpdateCodeButton.Name = "_applyUpdateCodeButton";
+            this._applyUpdateCodeButton.Size = new System.Drawing.Size(149, 23);
+            this._applyUpdateCodeButton.TabIndex = 6;
+            this._applyUpdateCodeButton.Text = "Apply update code";
+            this._applyUpdateCodeButton.UseVisualStyleBackColor = true;
+            this._applyUpdateCodeButton.Click += new System.EventHandler(this.HandleApplyUpdateCodeButton_Click);
+            // 
+            // _okButton
+            // 
+            this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this._okButton.Location = new System.Drawing.Point(506, 188);
+            this._okButton.Name = "_okButton";
+            this._okButton.Size = new System.Drawing.Size(75, 23);
+            this._okButton.TabIndex = 7;
+            this._okButton.Text = "OK";
+            this._okButton.UseVisualStyleBackColor = true;
+            this._okButton.Click += new System.EventHandler(this.HandleOkButton_Click);
+            // 
+            // _cancelButton
+            // 
+            this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this._cancelButton.Location = new System.Drawing.Point(587, 188);
+            this._cancelButton.Name = "_cancelButton";
+            this._cancelButton.Size = new System.Drawing.Size(75, 23);
+            this._cancelButton.TabIndex = 8;
+            this._cancelButton.Text = "Cancel";
+            this._cancelButton.UseVisualStyleBackColor = true;
+            // 
+            // _refreshButton
+            // 
+            this._refreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._refreshButton.Location = new System.Drawing.Point(506, 132);
+            this._refreshButton.Name = "_refreshButton";
+            this._refreshButton.Size = new System.Drawing.Size(156, 23);
+            this._refreshButton.TabIndex = 1;
+            this._refreshButton.Text = "Refresh counter values";
+            this._refreshButton.UseVisualStyleBackColor = true;
+            this._refreshButton.Click += new System.EventHandler(this.HandleRefreshButton_Click);
             // 
             // _counterIdColumn
             // 
@@ -142,102 +230,14 @@
             this._counterAlertMultipleColumn.HeaderText = "Alert Frequency";
             this._counterAlertMultipleColumn.Name = "_counterAlertMultipleColumn";
             this._counterAlertMultipleColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this._counterAlertMultipleColumn.Width = 105;
-            // 
-            // _emailSupportCheckBox
-            // 
-            this._emailSupportCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this._emailSupportCheckBox.AutoSize = true;
-            this._emailSupportCheckBox.Location = new System.Drawing.Point(13, 141);
-            this._emailSupportCheckBox.Name = "_emailSupportCheckBox";
-            this._emailSupportCheckBox.Size = new System.Drawing.Size(267, 17);
-            this._emailSupportCheckBox.TabIndex = 2;
-            this._emailSupportCheckBox.Text = "Enable email alerts to support@extractsystems.com";
-            this._emailSupportCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // _emailSpecifiedRecipientsCheckBox
-            // 
-            this._emailSpecifiedRecipientsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this._emailSpecifiedRecipientsCheckBox.AutoSize = true;
-            this._emailSpecifiedRecipientsCheckBox.Location = new System.Drawing.Point(13, 164);
-            this._emailSpecifiedRecipientsCheckBox.Name = "_emailSpecifiedRecipientsCheckBox";
-            this._emailSpecifiedRecipientsCheckBox.Size = new System.Drawing.Size(129, 17);
-            this._emailSpecifiedRecipientsCheckBox.TabIndex = 3;
-            this._emailSpecifiedRecipientsCheckBox.Text = "Enable email alerts to:";
-            this._emailSpecifiedRecipientsCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // _emailAlertRecipients
-            // 
-            this._emailAlertRecipients.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._emailAlertRecipients.Enabled = false;
-            this._emailAlertRecipients.Location = new System.Drawing.Point(148, 161);
-            this._emailAlertRecipients.Name = "_emailAlertRecipients";
-            this._emailAlertRecipients.Size = new System.Drawing.Size(466, 20);
-            this._emailAlertRecipients.TabIndex = 4;
-            // 
-            // _generateRequestButton
-            // 
-            this._generateRequestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._generateRequestButton.Location = new System.Drawing.Point(148, 188);
-            this._generateRequestButton.Name = "_generateRequestButton";
-            this._generateRequestButton.Size = new System.Drawing.Size(149, 23);
-            this._generateRequestButton.TabIndex = 5;
-            this._generateRequestButton.Text = "Generate update request";
-            this._generateRequestButton.UseVisualStyleBackColor = true;
-            this._generateRequestButton.Click += new System.EventHandler(this.HandleGenerateRequestButton_Click);
-            // 
-            // _applyUpdateCodeButton
-            // 
-            this._applyUpdateCodeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._applyUpdateCodeButton.Location = new System.Drawing.Point(303, 188);
-            this._applyUpdateCodeButton.Name = "_applyUpdateCodeButton";
-            this._applyUpdateCodeButton.Size = new System.Drawing.Size(149, 23);
-            this._applyUpdateCodeButton.TabIndex = 6;
-            this._applyUpdateCodeButton.Text = "Apply update code";
-            this._applyUpdateCodeButton.UseVisualStyleBackColor = true;
-            this._applyUpdateCodeButton.Click += new System.EventHandler(this.HandleApplyUpdateCodeButton_Click);
-            // 
-            // _okButton
-            // 
-            this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(458, 188);
-            this._okButton.Name = "_okButton";
-            this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 7;
-            this._okButton.Text = "OK";
-            this._okButton.UseVisualStyleBackColor = true;
-            this._okButton.Click += new System.EventHandler(this.HandleOkButton_Click);
-            // 
-            // _cancelButton
-            // 
-            this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(539, 188);
-            this._cancelButton.Name = "_cancelButton";
-            this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 8;
-            this._cancelButton.Text = "Cancel";
-            this._cancelButton.UseVisualStyleBackColor = true;
-            // 
-            // _refreshButton
-            // 
-            this._refreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._refreshButton.Location = new System.Drawing.Point(458, 132);
-            this._refreshButton.Name = "_refreshButton";
-            this._refreshButton.Size = new System.Drawing.Size(156, 23);
-            this._refreshButton.TabIndex = 1;
-            this._refreshButton.Text = "Refresh counter values";
-            this._refreshButton.UseVisualStyleBackColor = true;
-            this._refreshButton.Click += new System.EventHandler(this.HandleRefreshButton_Click);
+            this._counterAlertMultipleColumn.Width = 110;
             // 
             // ManageSecureCountersForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(626, 223);
+            this.ClientSize = new System.Drawing.Size(674, 223);
             this.Controls.Add(this._refreshButton);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this._okButton);

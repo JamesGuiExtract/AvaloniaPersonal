@@ -142,17 +142,20 @@ private:
 	std::map<std::string, std::string> getDBInfoDefaultValues();
 
 	// This method sets the VOA field in the AttributeSetForFile table.
-	void SaveVoaDataInASFF( IIUnknownVector* pAttributes, long long llRootASFF_ID );
+	void SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownVector* pAttributes,
+		long long llRootASFF_ID );
 
 	// This method performs the insert of Attribute rows, handling
 	// both parent (top-level, or root) and child attributes.
-	long long SaveAttribute( IAttributePtr ipAttribute, 
+	long long SaveAttribute( _ConnectionPtr ipConnection,
+							 IAttributePtr ipAttribute, 
 							 bool bStoreRasterZone,
 							 const std::string& insert );
 
 	// Stores the discrete data for the specified vector of attributes (including all descendants).
 	// llParentAttrID == 0 for root attributes.
-	void storeAttributeData(IIUnknownVectorPtr ipAttributes, 
+	void storeAttributeData(_ConnectionPtr ipConnection,
+							IIUnknownVectorPtr ipAttributes, 
 							bool bStoreRasterZone,
 							bool bStoreEmptyAttributes,
 							long long llRootASFF_ID, 

@@ -991,7 +991,8 @@ namespace
 
 
 // ------------------------------------------------------------------------------------------------
-void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong llRootASFF_ID )
+void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownVector* pAttributes,
+										 longlong llRootASFF_ID )
 {
 	try
 	{
@@ -1002,7 +1003,7 @@ void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong 
 		ADODB::_RecordsetPtr ipASFF( __uuidof(Recordset) );
 		ASSERT_RESOURCE_ALLOCATION( "ELI38804", nullptr != ipASFF );
 
-		auto connectParam = _variant_t( (IDispatch*)getDBConnection(), true );
+		auto connectParam = _variant_t( (IDispatch*)ipConnection, true );
 		ipASFF->Open( query.c_str(), 
 					  connectParam, 
 					  adOpenDynamic, 
@@ -1051,11 +1052,12 @@ void CAttributeDBMgr::SaveVoaDataInASFF( IIUnknownVector* pAttributes, longlong 
 	}
 }
 // ------------------------------------------------------------------------------------------------
-long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute, 
+long long CAttributeDBMgr::SaveAttribute( _ConnectionPtr ipConnection,
+										  IAttributePtr ipAttribute, 
 										  bool bStoreRasterZone,
 										  const std::string& strInsert )
 {
-	ADODB::_RecordsetPtr ipRS = ExecuteCmd( strInsert.c_str(), getDBConnection() );
+	ADODB::_RecordsetPtr ipRS = ExecuteCmd( strInsert.c_str(), ipConnection );
 	ASSERT_RESOURCE_ALLOCATION(	"ELI38670", VARIANT_FALSE == ipRS->adoEOF );
 
 	FieldsPtr ipFields = AssignComPtr( ipRS->Fields, "ELI38631" );
@@ -1075,14 +1077,15 @@ long long CAttributeDBMgr::SaveAttribute( IAttributePtr ipAttribute,
 			const std::string parentAttrID( Util::Format( "%lld", llParentID ) );
 			std::string zoneInsert = GetInsertRasterZoneStatement( parentAttrID, ipZone );
 
-			ExecuteCmd( zoneInsert.c_str(), getDBConnection() );
+			ExecuteCmd( zoneInsert.c_str(), ipConnection );
 		}
 	}
 
 	return llParentID;
 }
 //-------------------------------------------------------------------------------------------------
-void CAttributeDBMgr::storeAttributeData( IIUnknownVectorPtr ipAttributes, 
+void CAttributeDBMgr::storeAttributeData( _ConnectionPtr ipConnection,
+										  IIUnknownVectorPtr ipAttributes, 
 										  bool bStoreRasterZone,
 										  bool bStoreEmptyAttributes,
 										  long long llRootASFF_ID, 
@@ -1099,12 +1102,14 @@ void CAttributeDBMgr::storeAttributeData( IIUnknownVectorPtr ipAttributes,
 		std::string strInsertQuery = GetInsertAttributeQuery( ipAttribute, 
 															  llParentAttrID,
 															  llRootASFF_ID);
-		long long llAttrID = SaveAttribute( ipAttribute, 
+		long long llAttrID = SaveAttribute( ipConnection,
+											ipAttribute, 
 											bStoreRasterZone,
 											strInsertQuery );
 
 		IIUnknownVectorPtr ipSubAttrs = ipAttribute->GetSubAttributes();
-		storeAttributeData(ipSubAttrs, bStoreRasterZone, bStoreEmptyAttributes, llRootASFF_ID, llAttrID);
+		storeAttributeData(ipConnection, ipSubAttrs, bStoreRasterZone, bStoreEmptyAttributes,
+			llRootASFF_ID, llAttrID);
 	}
 }
 
@@ -1127,19 +1132,31 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 
 			std::string strSetName = SqlSanitizeInput(asString(bstrAttributeSetName));
 
-			TransactionGuard tg( getDBConnection(), adXactRepeatableRead, nullptr );
+			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+			_ConnectionPtr ipConnection = nullptr;
 
-			longlong llSetNameID = GetAttributeSetID( strSetName, getDBConnection() );
+			BEGIN_ADO_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			TransactionGuard tg( ipConnection, adXactRepeatableRead, nullptr );
+
+			longlong llSetNameID = GetAttributeSetID( strSetName, ipConnection );
 			auto strInsertRootASFF = GetInsertRootASFFStatement( llSetNameID, nFileTaskSessionID );
-			longlong llRootASFF_ID = ExecuteRootInsertASFF( strInsertRootASFF, getDBConnection() );
-			SaveVoaDataInASFF( ipAttributes, llRootASFF_ID );
+			longlong llRootASFF_ID = ExecuteRootInsertASFF( strInsertRootASFF, ipConnection );
+			SaveVoaDataInASFF( ipConnection, ipAttributes, llRootASFF_ID );
 
-			storeAttributeData( ipAttributes, 
+			storeAttributeData( ipConnection,
+								ipAttributes, 
 								asCppBool(vbStoreRasterZone), 
 								asCppBool(vbStoreEmptyAttributes), 
 								llRootASFF_ID );
 
 			tg.CommitTrans();
+
+			END_ADO_CONNECTION_RETRY(ipConnection, getDBConnection, m_nNumberOfRetries,
+				m_dRetryTimeout, "ELI39232");
 
 			return true;
 		}
@@ -1202,10 +1219,18 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 			ASSERT_ARGUMENT("ELI38618", relativeIndex != 0);
 			ASSERT_ARGUMENT("ELI38668", ppAttributes != nullptr);
 
+			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+			_ConnectionPtr ipConnection = nullptr;
+
+			BEGIN_ADO_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
 			auto strQuery( GetQueryForAttributeSetForFile( fileID, attributeSetName, relativeIndex ) );
 
 #ifdef UNCOMPRESSED_STREAM	
-			FieldsPtr ipFields = GetFieldsForQuery( strQuery, getDBConnection() );
+			FieldsPtr ipFields = GetFieldsForQuery( strQuery, ipConnection );
 			IIUnknownVectorPtr ipAttributes = getIPersistObjFromField( ipFields, "VOA" );
 			ASSERT_RESOURCE_ALLOCATION("ELI39173", ipAttributes != nullptr);
 
@@ -1213,7 +1238,7 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 #endif		
 
 #ifdef COMPRESSED_STREAM
-			FieldsPtr ipFields = GetFieldsForQuery( strQuery, getDBConnection() );
+			FieldsPtr ipFields = GetFieldsForQuery( strQuery, ipConnection );
 
 			CComSafeArray<BYTE> saData;
 			saData.Attach(ipFields->GetItem("VOA")->GetValue().parray);
@@ -1226,6 +1251,9 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 
 			*ppAttributes = ipAttributes.Detach();
 #endif
+			END_ADO_CONNECTION_RETRY(ipConnection, getDBConnection, m_nNumberOfRetries,
+				m_dRetryTimeout, "ELI39233");
+
 			return true;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39029");
