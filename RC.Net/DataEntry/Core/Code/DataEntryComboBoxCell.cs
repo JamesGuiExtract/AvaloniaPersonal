@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -136,7 +137,7 @@ namespace Extract.DataEntry
                             if (_activeValidator != null)
                             {
                                 // [DataEntry:975]
-                                // We are about set a new value for the cell; don't perserve the
+                                // We are about set a new value for the cell; don't preserve the
                                 // original value; this ensures there is no chance for the new value
                                 // to be overwritten with the original value as happened when the
                                 // _attribute was set prior to calling UpdateItemList.
@@ -551,11 +552,24 @@ namespace Extract.DataEntry
         /// </summary>
         void UpdateItemList()
         {
+            // https://extract.atlassian.net/browse/ISSUE-13572
+            // If in edit mode, apply the selected value before updating the item list to prevent
+            // clearing a value that had tentatively been selected. This is probably a good thing to
+            // do any time UpdateItemList is called whether or not the list actually needs to be
+            // updated as it means some external operation is occurring beyond the edit that is
+            // currently active.
+            if (IsInEditMode)
+            {
+                DataGridView.EndEdit();
+            }
+
             if (_activeValidator != null)
             {
                 string[] autoCompleteValues = _activeValidator.GetAutoCompleteValues();
 
-                if (autoCompleteValues != null)
+                if (autoCompleteValues != null &&
+                    (Items.Count != autoCompleteValues.Length ||
+                     !Items.Cast<string>().ToArray().SequenceEqual(autoCompleteValues)))
                 {
                     Items.Clear();
                     Items.AddRange(autoCompleteValues);

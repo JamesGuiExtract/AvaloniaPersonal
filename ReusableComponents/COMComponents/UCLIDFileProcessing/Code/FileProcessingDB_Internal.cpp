@@ -4983,6 +4983,23 @@ void CFileProcessingDB::assertNotActiveBeforeSchemaUpdate()
 				"of File Action Manager is active in the database");
 		}
 	}
+
+	// https://extract.atlassian.net/browse/ISSUE-13484
+	// Do not allow schema updates if there is pending parallelized work items.
+	if (doesTableExist(ipConnection, gstrWORK_ITEM))
+	{
+		_RecordsetPtr ipPendingWorkItems(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI39229", ipPendingWorkItems != __nullptr);
+
+		ipPendingWorkItems->Open("SELECT * FROM [dbo].[WorkItem]",
+			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
+
+		if (!asCppBool(ipPendingWorkItems->adoEOF))
+		{
+			throw UCLIDException("ELI39230", "Unable to update database since at least there is "
+				"pending work for a parallelized task that has not been completed.");
+		}
+	}
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isStatisticsUpdateFromDeltaNeeded(const _ConnectionPtr& ipConnection, const long nActionID)
