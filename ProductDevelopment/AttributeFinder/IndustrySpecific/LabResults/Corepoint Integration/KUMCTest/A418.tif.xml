@@ -65,7 +65,7 @@
 	<Test>
 		<FullText/>
 		<OrderNumber>
-			<FullText>UO</FullText>
+			<FullText/>
 		</OrderNumber>
 		<Name>
 			<FullText>HEMOGLOBIN A1c</FullText>
@@ -73,9 +73,6 @@
 		<OrderCode>
 			<FullText>HBA1C</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>HBA1C</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>09/09/2009</FullText>
 		</CollectionDate>
@@ -128,7 +125,7 @@
 	<Test>
 		<FullText/>
 		<OrderNumber>
-			<FullText>UO</FullText>
+			<FullText/>
 		</OrderNumber>
 		<Name>
 			<FullText>CBC</FullText>
@@ -136,9 +133,6 @@
 		<OrderCode>
 			<FullText>HP</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>HP</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>09/09/2009</FullText>
 		</CollectionDate>

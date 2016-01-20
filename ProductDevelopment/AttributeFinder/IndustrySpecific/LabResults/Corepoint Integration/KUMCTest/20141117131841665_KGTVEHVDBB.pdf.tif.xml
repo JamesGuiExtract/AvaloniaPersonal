@@ -19,13 +19,13 @@
 		<Name>
 			<FullText>BACA, YVONNE M</FullText>
 			<First>
-				<FullText>YVONNE</FullText>
+				<FullText>Yvonne</FullText>
 			</First>
 			<Middle>
 				<FullText>M</FullText>
 			</Middle>
 			<Last>
-				<FullText>BACA</FullText>
+				<FullText>Baca</FullText>
 			</Last>
 			<Suffix>
 				<FullText/>
@@ -73,9 +73,6 @@
 		<OrderCode>
 			<FullText>HP</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>HP</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>10/21/2014</FullText>
 		</CollectionDate>
@@ -235,9 +232,6 @@
 		<OrderCode>
 			<FullText>HPD</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>HPD</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>10/21/2014</FullText>
 		</CollectionDate>
@@ -320,9 +314,9 @@
 			</Comment>
 		</Component>
 		<Component>
-			<FullText>LYMPHOCYTES</FullText>
+			<FullText>LYMPHOCYTES %</FullText>
 			<TestCode>
-				<FullText>LYMA</FullText>
+				<FullText>LYMPH</FullText>
 			</TestCode>
 			<Value>
 				<FullText>16.9</FullText>
@@ -353,9 +347,9 @@
 			</Comment>
 		</Component>
 		<Component>
-			<FullText>MONOCYTES</FullText>
+			<FullText>Absolute Mono</FullText>
 			<TestCode>
-				<FullText>MONA</FullText>
+				<FullText>AMONO</FullText>
 			</TestCode>
 			<Value>
 				<FullText>6.7</FullText>
@@ -386,9 +380,9 @@
 			</Comment>
 		</Component>
 		<Component>
-			<FullText>BASOPHILS</FullText>
+			<FullText>BASOPHILS %</FullText>
 			<TestCode>
-				<FullText>BASA</FullText>
+				<FullText>BASO</FullText>
 			</TestCode>
 			<Value>
 				<FullText>0.6</FullText>
@@ -463,9 +457,6 @@
 		<OrderCode>
 			<FullText>EOSCT</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>EOSCT</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>10/21/2014</FullText>
 		</CollectionDate>
@@ -482,7 +473,7 @@
 			<FullText>Verified by Steve N. Kurth on 06/29/2015.</FullText>
 		</Comment>
 		<Component>
-			<FullText>EOSINOPHILS</FullText>
+			<FullText>Absolute Eos</FullText>
 			<TestCode>
 				<FullText>EOSA</FullText>
 			</TestCode>
