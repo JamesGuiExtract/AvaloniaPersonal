@@ -4095,10 +4095,15 @@ namespace Extract.DataEntry
                 if (!_tabOrderPlaceholderAttributes.TryGetValue(
                     _sourceAttributes, out tabOrderPlaceholderAttribute))
                 {
+                    // This was added to make sure that the place holder will be after the last attribute
+                    // in the set. 
+                    // https://extract.atlassian.net/browse/ISSUE-1163
+                    int displayOrder = _sourceAttributes.Size();
+
                     // If no placeholder attribute has been created for this set, create one now.
                     tabOrderPlaceholderAttribute = DataEntryMethods.InitializeAttribute(
                         "PlaceholderAttribute_" + Name, MultipleMatchSelectionMode.First,
-                        true, _sourceAttributes, null, this, 1, true, TabStopMode.Always,
+                        true, _sourceAttributes, null, this, displayOrder, true, TabStopMode.Always,
                         null, null, null);
 
                     AttributeStatusInfo placeholderStatusInfo =

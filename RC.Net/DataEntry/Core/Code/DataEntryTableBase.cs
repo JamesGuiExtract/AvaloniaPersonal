@@ -2042,12 +2042,27 @@ namespace Extract.DataEntry
                     if (selectAttribute)
                     {
                         // If not a row, the mapped element must be a cell.
-                        base.CurrentCell = (DataGridViewCell)_attributeMap[attribute];
+                        DataGridViewCell newCurrentCell = (DataGridViewCell)_attributeMap[attribute];
 
                         // Clear all selections first since sometimes trying to select an individual cell 
                         // in a selected row doesn't clear the row selection otherwise.
                         ClearSelection();
-                        ClearSelection(base.CurrentCell.ColumnIndex, base.CurrentCell.RowIndex, true);
+
+                        // Make sure the cell is visible before making it the current cell
+                        if (newCurrentCell.Visible)
+                        {
+                            base.CurrentCell = newCurrentCell;
+
+                            // Update the selection to just the current cell
+                            ClearSelection(base.CurrentCell.ColumnIndex, base.CurrentCell.RowIndex, true);
+                        }
+                        else
+                        {
+                            ClearSelection();
+
+                            // Update the selection to include the entire row.
+                            ClearSelection(-1, newCurrentCell.RowIndex, true);
+                        }
 
                         ProcessSelectionChange();
                     }

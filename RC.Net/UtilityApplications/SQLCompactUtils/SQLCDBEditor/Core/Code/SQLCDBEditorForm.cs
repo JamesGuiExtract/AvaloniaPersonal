@@ -1990,13 +1990,18 @@ namespace Extract.SQLCDBEditor
                     // Open the connection.
                     _connection.Open();
                 }
-                catch
+                catch (Exception ex)
                 {
                     // If we failed to open a new database connection, delete the working database
                     // file and set _databaseWorkingCopyFileName to null to ensure this instance
                     // doesn't end up trying to delete a working copy created by another instance.
-                    FileSystemMethods.DeleteFile(_databaseWorkingCopyFileName);
+                    // Verify the file exists before attempting to delete it
+                    if (File.Exists(_databaseWorkingCopyFileName))
+                    {
+                        FileSystemMethods.DeleteFile(_databaseWorkingCopyFileName);
+                    }
                     _databaseWorkingCopyFileName = null;
+                    throw ex.AsExtract("ELI39234");
                 }
 
                 CheckSchemaVersionAndPromptForUpdate();
