@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "AFDataScorers Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFDataScorers"
-            VALUE "LegalCopyright", "Copyright 2015"
+            VALUE "LegalCopyright", "Copyright 2016"
             VALUE "OriginalFilename", "AFDataScorers.DLL"
             VALUE "ProductName", "AFDataScorers Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

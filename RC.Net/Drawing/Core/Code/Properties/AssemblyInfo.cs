@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.Drawing")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2015")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

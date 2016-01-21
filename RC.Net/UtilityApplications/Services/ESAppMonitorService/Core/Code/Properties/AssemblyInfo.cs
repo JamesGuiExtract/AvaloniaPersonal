@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract System")]
 [assembly: AssemblyProduct("AppMonitorService")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2015")]
+[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

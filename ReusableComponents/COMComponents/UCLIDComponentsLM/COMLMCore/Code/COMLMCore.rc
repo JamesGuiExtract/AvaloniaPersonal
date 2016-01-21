@@ -85,7 +85,7 @@ BEGIN
 			VALUE "FileDescription", "COMLMCore DLL"
 			VALUE "FileVersion",     "1, 0, 0, 1"
 			VALUE "InternalName",    "COMLMCore"
-			VALUE "LegalCopyright",  "Copyright (C) 2015"
+			VALUE "LegalCopyright",  "Copyright (C) 2016"
 			VALUE "LegalTrademarks", ""
 			VALUE "OriginalFilename","COMLMCore.DLL"
 			VALUE "ProductName",     "COMLMCore Dynamic Link Library"

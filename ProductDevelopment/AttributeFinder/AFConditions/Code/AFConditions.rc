@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "AFConditions Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFConditions"
-            VALUE "LegalCopyright", "Copyright 2015"
+            VALUE "LegalCopyright", "Copyright 2016"
             VALUE "OriginalFilename", "AFConditions.DLL"
             VALUE "ProductName", "AFConditions Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

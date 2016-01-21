@@ -11,7 +11,7 @@ using System;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.FileActionManager.Database.Test")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2015")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

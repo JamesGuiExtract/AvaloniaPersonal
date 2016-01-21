@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("ID Shield for SP Client")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2015")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
