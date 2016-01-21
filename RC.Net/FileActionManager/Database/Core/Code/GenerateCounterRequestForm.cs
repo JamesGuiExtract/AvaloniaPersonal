@@ -157,15 +157,17 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(_emailSettings.Server))
+                if (!_emailSettings.EnableEmailSettings || string.IsNullOrWhiteSpace(_emailSettings.Server))
                 {
-                    UtilityMethods.ShowMessageBox("The email is sent using email server settings " +
-                        "in the database, but these settings have not been configured.\r\n\r\n" +
-                        "From the main screen, select the \"Database | Database options...\" " +
-                        "menu option, then use the \"Email\" tab to configure the outgoing email server.",
-                        "Outgoing email server not configured", true);
-
-                    return;
+                    // ISSUE-13475
+                    // DBAdmin: Manage rule execution UI should prompt to configure email sooner.
+                    // ISSUE-13435
+                    // DB Admin Email Settings - Sender Address Is Required For FAM Counters
+                    var emailConfigured = _emailSettings.RunConfiguration();
+                    if (!emailConfigured)
+                    {
+                        return;
+                    }
                 }
 
                 // Whenever the request is sent to Extract, store the licensing contact info to

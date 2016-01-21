@@ -983,6 +983,26 @@ static const string gstrUPDATE_DB_INFO_LAST_CHANGE_TIME =
 	"UPDATE [DBInfo] SET [Value] = CONVERT(NVARCHAR(MAX), GETDATE(), 21) WHERE [Name] = '"
 	+ gstrLAST_DB_INFO_CHANGE + "'";
 
+// Insert that adds Enable email Settings to DBInfo, and sets the value
+// to true iff email settings are already establised, false if not.
+static const string gstrINSERT_EMAIL_ENABLE_SETTINGS_WITH_VALUE = 
+"DECLARE @boolText nvarchar(50)\r\n"
+"DECLARE @ServerName nvarchar(max)\r\n"
+"Set @ServerName =\r\n"
+"(\r\n"
+"	select Value from DBInfo where Name=\'EmailServer\'\r\n"
+")\r\n"
+"IF @ServerName=\'\'\r\n"
+"BEGIN\r\n"
+"	SET @boolText=\'0\'\r\n"
+"END\r\n"
+"ELSE\r\n"
+"BEGIN\r\n"
+"	SET @boolText=\'1\'\r\n"
+"END\r\n"
+"INSERT INTO [DBInfo] (Name, Value) VALUES (\'EmailEnableSettings\', @boolText)";
+
+
 // Query to delete old input event records from the InputEvent table
 static const string gstrDELETE_OLD_INPUT_EVENT_RECORDS =
 	"DELETE FROM InputEvent WHERE DATEDIFF(d, GETDATE(), [TimeStamp]) > (SELECT COALESCE("

@@ -4,6 +4,7 @@ using Extract.Utilities.Email;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -540,12 +541,13 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions_RightAlign")]        
         private void HandleOkClicked(object sender, EventArgs e)
         {
             try
             {
-                // Validate email settings only if it appears the user has attempted to enter  valid settings have been entered.
-                if (_emailSettingsControl.HasSettings && !_emailSettingsControl.ValidateSettings())
+                // Validate email settings only if it appears the user has attempted to enter valid settings.
+                if (_emailSettingsControl.HasAnySettings && !_emailSettingsControl.ValidateSettings())
                 {
                     return;
                 }
@@ -1030,7 +1032,7 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                _emailTestButton.Enabled = _emailSettingsControl.HasSettings;
+                _emailTestButton.Enabled = _emailSettingsControl.ValidateSettings(doNotDisplayErrors: true);
             }
             catch (Exception ex)
             {

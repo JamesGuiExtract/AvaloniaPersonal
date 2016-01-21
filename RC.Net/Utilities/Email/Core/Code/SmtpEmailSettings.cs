@@ -120,6 +120,30 @@ namespace Extract.Utilities.Email
         /// </value>
         bool HasUnsavedChanges { get; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [enable email settings].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [enable email settings]; otherwise, <c>false</c>.
+        /// </value>
+        bool EnableEmailSettings { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [possible invalid server].
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if [possible invalid server]; otherwise, <c>false</c>.
+        /// </value>
+        bool PossibleInvalidServer { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [possible invalid sender address].
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if [possible invalid sender address]; otherwise, <c>false</c>.
+        /// </value>
+        bool PossibleInvalidSenderAddress { get; set; }
+
         #endregion Properties
     }
 
@@ -178,7 +202,10 @@ namespace Extract.Utilities.Email
                 { "SenderAddress", "EmailSenderAddress" },
                 { "EmailSignature", "EmailSignature" },
                 { "Timeout", "EmailTimeout" },
-                { "UseSsl", "EmailUseSsl" }
+                { "UseSsl", "EmailUseSsl" },
+                { "EnableEmailSettings", "EmailEnableSettings" },
+                { "PossibleInvalidServer", "EmailPossibleInvalidServer"},
+                { "PossibleInvalidSenderAddress", "EmailPossibleInvalidSenderAddress"}
             }).ToLookup(pair => pair.Key, pair => pair.Value);
 
         #endregion Constants
@@ -260,6 +287,8 @@ namespace Extract.Utilities.Email
             }
         }
 
+        #region Properties
+        
         /// <summary>
         /// Gets or sets the name of the SMTP server.
         /// </summary>
@@ -503,7 +532,63 @@ namespace Extract.Utilities.Email
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Gets or sets a value indicating whether [enable email settings].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [enable email settings]; otherwise, <c>false</c>.
+        /// </value>
+        public bool EnableEmailSettings
+        {
+            get
+            {
+                return Settings.EnableEmailSettings;
+            }
+            set
+            {
+                Settings.EnableEmailSettings = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [possible invalid server].
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if [possible invalid server]; otherwise, <c>false</c>.
+        /// </value>
+        public bool PossibleInvalidServer
+        {
+            get
+            {
+                return Settings.PossibleInvalidServer;
+            }
+            set
+            {
+                Settings.PossibleInvalidServer = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [possible invalid sender address].
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if [possible invalid sender address]; otherwise, <c>false</c>.
+        /// </value>
+        public bool PossibleInvalidSenderAddress 
+        {
+            get
+            {
+                return Settings.PossibleInvalidSenderAddress;
+            }
+            set
+            {
+                Settings.PossibleInvalidSenderAddress = value;
+            }
+        }
+
+        #endregion  Properties
+
+        #endregion Members
 
         #region IConfigurableObject Members
 
@@ -517,7 +602,7 @@ namespace Extract.Utilities.Email
             {
                 using (var dialog = new SmtpEmailSettingsDialog(this))
                 {
-                    return dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK;
+                    return dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK && Settings.EnableEmailSettings;
                 }
             }
             catch (Exception ex)

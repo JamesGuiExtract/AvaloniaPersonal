@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 135;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 136;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1357,6 +1357,42 @@ int UpdateToSchemaVersion135(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39184");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion136(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 136;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrINSERT_EMAIL_ENABLE_SETTINGS_WITH_VALUE);
+
+		string strEmailPossibleInvalidServer = gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY;
+		replaceVariable(strEmailPossibleInvalidServer, gstrSETTING_NAME, "EmailPossibleInvalidServer");	
+		replaceVariable(strEmailPossibleInvalidServer, gstrSETTING_VALUE, "0");
+		vecQueries.push_back(strEmailPossibleInvalidServer);
+
+		string strEmailPossibleInvalidSenderAddress = gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY;
+		replaceVariable(strEmailPossibleInvalidSenderAddress, gstrSETTING_NAME, "EmailPossibleInvalidSenderAddress");	
+		replaceVariable(strEmailPossibleInvalidSenderAddress, gstrSETTING_VALUE, "0");
+		vecQueries.push_back(strEmailPossibleInvalidSenderAddress);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39237");
 }
 
 
@@ -6468,7 +6504,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 132:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion133);
 				case 133:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion134);
 				case 134:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion135);
-				case 135:	break;
+				case 135:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion136);
+				case 136:	break;
 
 				default:
 					{

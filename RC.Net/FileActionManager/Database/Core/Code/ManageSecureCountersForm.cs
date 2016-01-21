@@ -1,12 +1,14 @@
 ﻿using Extract.Interfaces;
 using Extract.Utilities;
+using Extract.Utilities.Email;
+using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
-using System.Globalization;
-using Extract.Utilities.Email;
 
 namespace Extract.FileActionManager.Database
 {
@@ -85,9 +87,6 @@ namespace Extract.FileActionManager.Database
 	        {	        
 		        base.OnLoad(e);
 
-                _emailSpecifiedRecipientsCheckBox.CheckedChanged += (sender, args) =>
-                    _emailAlertRecipients.Enabled = _emailSpecifiedRecipientsCheckBox.Checked;
-
                 _emailSupportCheckBox.Checked =
                     _licenseContactSettings.Settings.SendAlertsToExtract;
                 _emailSpecifiedRecipientsCheckBox.Checked =
@@ -95,20 +94,10 @@ namespace Extract.FileActionManager.Database
                 _emailAlertRecipients.Text =
                     _licenseContactSettings.Settings.SpecifiedAlertRecipients;
 
-                // Update _licenseContactSettings (but don't commit) as control values are changed.
-                _emailSupportCheckBox.CheckedChanged += (sender, args) =>
-                    _licenseContactSettings.Settings.SendAlertsToExtract =
-                        _emailSupportCheckBox.Checked;
-
-                _emailSpecifiedRecipientsCheckBox.CheckedChanged += (sender, args) =>
-                    _licenseContactSettings.Settings.SendAlertsToSpecified =
-                        _emailSpecifiedRecipientsCheckBox.Checked;
-
-                _emailAlertRecipients.TextChanged += (sender, args) =>
-                    _licenseContactSettings.Settings.SpecifiedAlertRecipients =
-                        _emailAlertRecipients.Text;
-
                 RefreshCounterData();
+
+                _emailAlertRecipients.SetError(_manageCountersErrorProvider, String.Empty);
+                _emailAlertRecipients.SetErrorGlyphPosition(_manageCountersErrorProvider);
 	        }
 	        catch (Exception ex)
 	        {
@@ -143,31 +132,6 @@ namespace Extract.FileActionManager.Database
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39167");
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing"/> event.
-        /// </summary>
-        /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs"/> that contains
-        /// the event data.</param>
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            try
-            {
-                base.OnClosing(e);
-
-                if (DialogResult == DialogResult.Cancel)
-                {
-                    if (!PromptToApplyAlertChanges())
-                    {
-                        e.Cancel = true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39205");
             }
         }
 
@@ -383,6 +347,85 @@ namespace Extract.FileActionManager.Database
 		        ex.ExtractDisplay("ELI39069");
 	        }
         }
+        
+        /// <summary>
+        /// Handles the CheckChanged event of the HandleEnableEmailAlertsToSupport control. 
+        /// Set checked state to the outcome of making sure email settings are valid.
+        /// </summary>
+        private void HandleEnableEmailAlertsToSupport_CheckChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _licenseContactSettings.Settings.SendAlertsToExtract = _emailSupportCheckBox.Checked;
+
+                if (_emailSupportCheckBox.Checked)
+                {
+                    _emailSupportCheckBox.Checked = EmailSettingsAreValid();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39236");
+            }
+        }
+
+        /// <summary>
+        /// Handle event so that any existing displayed error state can be cleared if the user 
+        /// decides to fix the issue by unchecking the "Enable email alters to:" checkbox.
+        /// Also when checked, if the associated text field is blank (usual case), then add "Required"
+        /// </summary>
+        private void HandleEnableEmailAlertsTo_CheckStateChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _licenseContactSettings.Settings.SendAlertsToSpecified = 
+                    _emailSpecifiedRecipientsCheckBox.Checked;
+
+                _emailAlertRecipients.Enabled = _emailSpecifiedRecipientsCheckBox.Checked;
+
+                if (!_emailSpecifiedRecipientsCheckBox.Checked)
+                {
+                    _emailAlertRecipients.SetError(_manageCountersErrorProvider, String.Empty);
+                    _emailAlertRecipients.RemoveRequiredMarker();
+                }
+                else    // [x] Enable email alerts to: is checked
+                {
+                    if (EmailSettingsAreValid())
+                    {
+                        _emailAlertRecipients.SetRequiredMarker();
+                    }
+                    else
+                    {
+                        _emailSpecifiedRecipientsCheckBox.Checked = false;
+                        _emailAlertRecipients.Enabled = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39217");
+            }
+        }
+
+        /// <summary>
+        /// Handle event so that any existing displayed error state can be cleared if the user 
+        /// decides to fix the issue by entering text in the recipients text box.
+        /// </summary>
+        private void HandleEmailAlertRecipients_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _licenseContactSettings.Settings.SpecifiedAlertRecipients = _emailAlertRecipients.Text;
+                if (!_emailAlertRecipients.EmptyOrRequiredMarkerIsSet())
+                {
+                    _emailAlertRecipients.SetError(_manageCountersErrorProvider, String.Empty);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39218");
+            }
+        }
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the <see cref="_okButton"/>.
@@ -394,6 +437,14 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
+                if (!EnableEmailChecked_AreEmailSettingsCompleted() ||
+                    !EnableEmailAlertTo_TextBoxValidation())
+                {
+                    // In this case the dialog will not be dismissed.
+                    this.DialogResult = DialogResult.None;
+                    return;
+                }
+
                 if (!ApplyAlertSettings())
                 {
                     DialogResult = DialogResult.None;
@@ -410,41 +461,6 @@ namespace Extract.FileActionManager.Database
         #region Private Members
 
         /// <summary>
-        /// Prompts whether to apply changes to alert settings in the case that changes are about to
-        /// be otherwise lost.
-        /// </summary>
-        /// <returns><see langword="true"/> if the user chose either to save or discard the changes;
-        /// <see langword="false"/> if the user wants to cancel the operation that would have led to
-        /// the changed being lost.</returns>
-        bool PromptToApplyAlertChanges()
-        {
-            if (_alertLevelChanged || _licenseContactSettings.HasUnsavedChanges)
-            {
-                DialogResult answer = MessageBox.Show("Alert settings have been modified\r\n\r\n" +
-                    "Do you want to save your changes?", "Save changes?",
-                    MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1, 0);
-
-                if (answer == DialogResult.Yes)
-                {
-                    return ApplyAlertSettings();
-                }
-                else if (answer == DialogResult.No)
-                {
-                    // DialogResult.No is an explicit permission to discard; continue with operation.
-                    return true;
-                }
-                else if (answer == DialogResult.Cancel)
-                {
-                    return false;
-                }
-            }
-
-            // If there are no changes, operation can continue without saving.
-            return true;
-        }
-
-        /// <summary>
         /// Applies any changes to alert settings.
         /// </summary>
         /// <returns><see langword="true"/> if the settings were able to be applied.
@@ -452,23 +468,10 @@ namespace Extract.FileActionManager.Database
         /// triggered the apply should be canceled.</returns>
         bool ApplyAlertSettings()
         {
-            // If email alerts are enabled make sure there are settings for the SMTP
-            if (_emailSpecifiedRecipientsCheckBox.Checked || _emailSupportCheckBox.Checked)
+            if (_emailSpecifiedRecipientsCheckBox.Checked &&
+               _emailAlertRecipients.EmptyOrRequiredMarkerIsSet())
             {
-                // Verify that there are settings for SMTP
-                SmtpEmailSettings _emailSettings = new SmtpEmailSettings();
-                _emailSettings.LoadSettings(
-                    new FAMDatabaseSettings<ExtractSmtp>(
-                        _fileProcessingDB, false, SmtpEmailSettings.PropertyNameLookup));
-                if (string.IsNullOrWhiteSpace(_emailSettings.Server))
-                {
-                    UtilityMethods.ShowMessageBox("The alert email is sent using email server settings " +
-                        "in the database, but these settings have not been configured.\r\n\r\n" +
-                        "From the main screen, select the \"Database | Database options...\" " +
-                        "menu option, then use the \"Email\" tab to configure the outgoing email server.",
-                        "Outgoing email server not configured", true);
-                    return false;
-                }
+                _emailSpecifiedRecipientsCheckBox.Checked = false;
             }
 
             // Only save if the user made an explicit change to avoid overwriting changes another
@@ -625,6 +628,97 @@ namespace Extract.FileActionManager.Database
             {
                 return string.Format(CultureInfo.CurrentCulture, "{0:n0}", number);
             }
+        }
+
+        /// <summary>
+        /// If one or both enable email options are checked, make sure that email settings are valid.
+        /// </summary>
+        /// <returns>true if OK to continue processing in OK handler, false to halt processing 
+        /// (and not close the dialog)</returns>
+        bool EnableEmailChecked_AreEmailSettingsCompleted()
+        {
+            if (!_emailSupportCheckBox.Checked && !_emailSpecifiedRecipientsCheckBox.Checked)
+            {
+                return true;        // enable email... not checked
+            }
+
+            if (!EmailSettingsAreValid())
+            {
+                _emailSupportCheckBox.Checked = false;
+                _emailSpecifiedRecipientsCheckBox.Checked = false;
+                return false;
+            }
+
+            return true;
+        }
+        
+        /// <summary>
+        /// This method determines whether email settings are valid - invoking settings dialog if necessary.
+        /// </summary>
+        /// <returns></returns>
+        [SuppressMessage("Microsoft.Globalization", "CA1300:UseMessageBoxOptions")]
+        bool EmailSettingsAreValid()
+        {
+            SmtpEmailSettings emailSettings = new SmtpEmailSettings();
+            var dbSettings =
+                    new FAMDatabaseSettings<ExtractSmtp>(_fileProcessingDB,
+                                                         false,
+                                                         SmtpEmailSettings.PropertyNameLookup);
+            emailSettings.LoadSettings(dbSettings);
+
+            if (!dbSettings.Settings.EnableEmailSettings ||
+                String.IsNullOrWhiteSpace(dbSettings.Settings.Server))
+            {
+                var response =
+                    MessageBox.Show(owner: this,
+                                    text: "Email settings are not configured. Would you like to configure them now?\r\n" +
+                                    "If you choose Yes, the email settings window will be displayed " +
+                                    "and allow you to configure the email settings.\r\n" +
+                                    "If you choose No, the email alert(s) you just enabled will be disabled.",
+                                    caption: "Invalid email settings",
+                                    buttons: MessageBoxButtons.YesNo,
+                                    icon: MessageBoxIcon.Question,
+                                    defaultButton: MessageBoxDefaultButton.Button1);
+
+                if (DialogResult.Yes == response)
+                {
+                    return (emailSettings.RunConfiguration());
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;    // email settings configured
+        }
+
+
+        /// <summary>
+        /// There are two steps to validating that all is well with the Enable email alerts. 
+        /// The first is to check that email settings are configured.
+        /// The second is to make sure that iff "Enable email alerts to:" is check, then there is
+        /// a defined recipient. This method handles this second check.
+        /// It is possible that both checks will fail.
+        /// </summary>
+        /// <returns>true if OK to continue processing in OK handler, false to halt processing 
+        /// (and not close the dialog) </returns>
+        bool EnableEmailAlertTo_TextBoxValidation()
+        {
+            if (!_emailSpecifiedRecipientsCheckBox.Checked)
+                return true;
+
+            if (_emailAlertRecipients.EmptyOrRequiredMarkerIsSet())
+            {
+                _emailAlertRecipients.SetError(_manageCountersErrorProvider, "Add one or more email addresses to alert");
+
+                _emailAlertRecipients.RemoveRequiredMarker();
+                _emailAlertRecipients.Focus();
+
+                return false;
+            }
+
+            return true;
         }
 
         #endregion Private Members

@@ -64,6 +64,7 @@ namespace Extract.Utilities.Email
                 Icon = Resources.EmailSettings;
 
                 _emailSettingsControl.LoadSettings(_settings);
+                _emailSettingsControl.DoLoad();
             }
             catch (Exception ex)
             {
@@ -72,7 +73,7 @@ namespace Extract.Utilities.Email
         }
 
         /// <summary>
-        /// Handles the ok button clicked.
+        /// Handles the ok button clicked. User can only leave dialog with OK by completing settings.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
@@ -80,13 +81,19 @@ namespace Extract.Utilities.Email
         {
             try
             {
-                if (_emailSettingsControl.ValidateSettings())
-                {
-                    _emailSettingsControl.ApplySettings(_settings);
-                    _settings.SaveSettings();
+                // It is possible that the user elected to uncheck the Enable email settings checkbox, 
+                // and then clicked OK. We want to save the state of the checkbox so that next time
+                // the dialog is invoked, the dialog is consistent with the way the user left it.
+                _emailSettingsControl.ApplySettings(_settings);
+                _settings.SaveSettings();
 
-                    DialogResult = DialogResult.OK;
+                // Validate email settings only if it appears the user has attempted to enter valid settings.
+                if (_emailSettingsControl.HasAnySettings && !_emailSettingsControl.ValidateSettings())
+                {
+                    return;
                 }
+
+                DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {
@@ -122,8 +129,7 @@ namespace Extract.Utilities.Email
         {
             try
             {
-                _buttonTest.Enabled = _emailSettingsControl.HasSettings;
-                _buttonOk.Enabled = _emailSettingsControl.HasSettings;
+                _buttonTest.Enabled = _emailSettingsControl.ValidateSettings(doNotDisplayErrors: true);
             }
             catch (Exception ex)
             {

@@ -28,11 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this._counterDataGridView = new System.Windows.Forms.DataGridView();
+            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterAlertLevelColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._counterAlertMultipleColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._emailSupportCheckBox = new System.Windows.Forms.CheckBox();
             this._emailSpecifiedRecipientsCheckBox = new System.Windows.Forms.CheckBox();
             this._emailAlertRecipients = new System.Windows.Forms.TextBox();
@@ -41,12 +47,9 @@
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this._refreshButton = new System.Windows.Forms.Button();
-            this._counterIdColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterAlertLevelColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._counterAlertMultipleColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._manageCountersErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             ((System.ComponentModel.ISupportInitialize)(this._counterDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._manageCountersErrorProvider)).BeginInit();
             this.SuspendLayout();
             // 
             // _counterDataGridView
@@ -97,6 +100,53 @@
             this._counterDataGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.HandleCounterDataGridView_CellValidating);
             this._counterDataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.HandleCounterDataGridView_EditingControlShowing);
             // 
+            // _counterIdColumn
+            // 
+            this._counterIdColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle2.NullValue = null;
+            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle2;
+            this._counterIdColumn.FillWeight = 20F;
+            this._counterIdColumn.HeaderText = "ID";
+            this._counterIdColumn.Name = "_counterIdColumn";
+            this._counterIdColumn.ReadOnly = true;
+            this._counterIdColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this._counterIdColumn.Width = 37;
+            // 
+            // _counterNameColumn
+            // 
+            this._counterNameColumn.HeaderText = "Name";
+            this._counterNameColumn.Name = "_counterNameColumn";
+            this._counterNameColumn.ReadOnly = true;
+            this._counterNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // _counterValueColumn
+            // 
+            this._counterValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterValueColumn.FillWeight = 1F;
+            this._counterValueColumn.HeaderText = "Value";
+            this._counterValueColumn.Name = "_counterValueColumn";
+            this._counterValueColumn.ReadOnly = true;
+            this._counterValueColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this._counterValueColumn.Width = 90;
+            // 
+            // _counterAlertLevelColumn
+            // 
+            this._counterAlertLevelColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterAlertLevelColumn.FillWeight = 1F;
+            this._counterAlertLevelColumn.HeaderText = "Alert Level";
+            this._counterAlertLevelColumn.Name = "_counterAlertLevelColumn";
+            this._counterAlertLevelColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this._counterAlertLevelColumn.Width = 90;
+            // 
+            // _counterAlertMultipleColumn
+            // 
+            this._counterAlertMultipleColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._counterAlertMultipleColumn.FillWeight = 1F;
+            this._counterAlertMultipleColumn.HeaderText = "Alert Frequency";
+            this._counterAlertMultipleColumn.Name = "_counterAlertMultipleColumn";
+            this._counterAlertMultipleColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this._counterAlertMultipleColumn.Width = 105;
+            // 
             // _emailSupportCheckBox
             // 
             this._emailSupportCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -107,6 +157,7 @@
             this._emailSupportCheckBox.TabIndex = 2;
             this._emailSupportCheckBox.Text = "Enable email alerts to support@extractsystems.com";
             this._emailSupportCheckBox.UseVisualStyleBackColor = true;
+            this._emailSupportCheckBox.CheckStateChanged += new System.EventHandler(this.HandleEnableEmailAlertsToSupport_CheckChanged);
             // 
             // _emailSpecifiedRecipientsCheckBox
             // 
@@ -118,16 +169,19 @@
             this._emailSpecifiedRecipientsCheckBox.TabIndex = 3;
             this._emailSpecifiedRecipientsCheckBox.Text = "Enable email alerts to:";
             this._emailSpecifiedRecipientsCheckBox.UseVisualStyleBackColor = true;
+            this._emailSpecifiedRecipientsCheckBox.CheckStateChanged += new System.EventHandler(this.HandleEnableEmailAlertsTo_CheckStateChanged);
             // 
             // _emailAlertRecipients
             // 
             this._emailAlertRecipients.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._emailAlertRecipients.Enabled = false;
+            this._manageCountersErrorProvider.SetError(this._emailAlertRecipients, "\"Enable email alerts to\"");
             this._emailAlertRecipients.Location = new System.Drawing.Point(148, 161);
             this._emailAlertRecipients.Name = "_emailAlertRecipients";
             this._emailAlertRecipients.Size = new System.Drawing.Size(514, 20);
             this._emailAlertRecipients.TabIndex = 4;
+            this._emailAlertRecipients.TextChanged += new System.EventHandler(this.HandleEmailAlertRecipients_TextChanged);
             // 
             // _generateRequestButton
             // 
@@ -185,52 +239,10 @@
             this._refreshButton.UseVisualStyleBackColor = true;
             this._refreshButton.Click += new System.EventHandler(this.HandleRefreshButton_Click);
             // 
-            // _counterIdColumn
+            // _manageCountersErrorProvider
             // 
-            this._counterIdColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle2.NullValue = null;
-            this._counterIdColumn.DefaultCellStyle = dataGridViewCellStyle2;
-            this._counterIdColumn.FillWeight = 20F;
-            this._counterIdColumn.HeaderText = "ID";
-            this._counterIdColumn.Name = "_counterIdColumn";
-            this._counterIdColumn.ReadOnly = true;
-            this._counterIdColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this._counterIdColumn.Width = 37;
-            // 
-            // _counterNameColumn
-            // 
-            this._counterNameColumn.HeaderText = "Name";
-            this._counterNameColumn.Name = "_counterNameColumn";
-            this._counterNameColumn.ReadOnly = true;
-            this._counterNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // _counterValueColumn
-            // 
-            this._counterValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterValueColumn.FillWeight = 1F;
-            this._counterValueColumn.HeaderText = "Value";
-            this._counterValueColumn.Name = "_counterValueColumn";
-            this._counterValueColumn.ReadOnly = true;
-            this._counterValueColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this._counterValueColumn.Width = 90;
-            // 
-            // _counterAlertLevelColumn
-            // 
-            this._counterAlertLevelColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterAlertLevelColumn.FillWeight = 1F;
-            this._counterAlertLevelColumn.HeaderText = "Alert Level";
-            this._counterAlertLevelColumn.Name = "_counterAlertLevelColumn";
-            this._counterAlertLevelColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this._counterAlertLevelColumn.Width = 90;
-            // 
-            // _counterAlertMultipleColumn
-            // 
-            this._counterAlertMultipleColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this._counterAlertMultipleColumn.FillWeight = 1F;
-            this._counterAlertMultipleColumn.HeaderText = "Alert Frequency";
-            this._counterAlertMultipleColumn.Name = "_counterAlertMultipleColumn";
-            this._counterAlertMultipleColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this._counterAlertMultipleColumn.Width = 110;
+            this._manageCountersErrorProvider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this._manageCountersErrorProvider.ContainerControl = this;
             // 
             // ManageSecureCountersForm
             // 
@@ -256,6 +268,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Manage Rule Execution Counters";
             ((System.ComponentModel.ISupportInitialize)(this._counterDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._manageCountersErrorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -277,5 +290,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterValueColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterAlertLevelColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _counterAlertMultipleColumn;
+        private System.Windows.Forms.ErrorProvider _manageCountersErrorProvider;
     }
 }

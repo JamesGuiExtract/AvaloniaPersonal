@@ -1706,6 +1706,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrSTORE_FTP_EVENT_HISTORY] = "1";
 	mapDefaultValues[gstrALTERNATE_COMPONENT_DATA_DIR] = "";
 	// Email setting defaults should be kept in sync with Extract.Utilities.Email.ExtractSmtp
+	mapDefaultValues[gstrEMAIL_ENABLE_SETTINGS] = "0";
 	mapDefaultValues[gstrEMAIL_SERVER] = "";
 	mapDefaultValues[gstrEMAIL_PORT] = "25";
 	mapDefaultValues[gstrEMAIL_SENDER_NAME] = "";
@@ -1715,6 +1716,9 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrEMAIL_PASSWORD] = "";
 	mapDefaultValues[gstrEMAIL_TIMEOUT] = "0";
 	mapDefaultValues[gstrEMAIL_USE_SSL] = "0";
+	mapDefaultValues[gstrEMAIL_POSSIBLE_INVALID_SERVER] = "0";
+	mapDefaultValues[gstrEMAIL_POSSIBLE_INVALID_SENDER_ADDRESS] = "0";
+
 	mapDefaultValues[gstrALLOW_RESTARTABLE_PROCESSING] = "0";
 	mapDefaultValues[gstrSEND_ALERTS_TO_EXTRACT] = "0";
 	mapDefaultValues[gstrSEND_ALERTS_TO_SPECIFIED] = "0";

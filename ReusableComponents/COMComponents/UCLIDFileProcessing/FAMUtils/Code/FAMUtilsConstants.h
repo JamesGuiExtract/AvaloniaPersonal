@@ -37,6 +37,8 @@ static const string gstrMAX_SLEEP_BETWEEN_DB_CHECKS = "MaxMillisecondsBetweenChe
 static const string gstrLAST_DB_INFO_CHANGE = "LastDBInfoChange";
 static const string gstrSTORE_FTP_EVENT_HISTORY = "StoreFTPEventHistory";
 static const string gstrALTERNATE_COMPONENT_DATA_DIR = "AlternateComponentDataDir";
+
+static const string gstrEMAIL_ENABLE_SETTINGS = "EmailEnableSettings";
 static const string gstrEMAIL_SERVER = "EmailServer";
 static const string gstrEMAIL_PORT = "EmailPort";
 static const string gstrEMAIL_SENDER_NAME = "EmailSenderName";
@@ -46,6 +48,9 @@ static const string gstrEMAIL_USERNAME = "EmailUsername";
 static const string gstrEMAIL_PASSWORD = "EmailPassword";
 static const string gstrEMAIL_TIMEOUT = "EmailTimeout";
 static const string gstrEMAIL_USE_SSL = "EmailUseSSL";
+static const string gstrEMAIL_POSSIBLE_INVALID_SERVER = "EmailPossibleInvalidServer";
+static const string gstrEMAIL_POSSIBLE_INVALID_SENDER_ADDRESS = "EmailPossibleInvalidSenderAddress";
+
 static const string gstrALLOW_RESTARTABLE_PROCESSING = "AllowRestartableProcessing";
 static const string gstrDATABASEID = "DatabaseID";
 static const string gstrSEND_ALERTS_TO_EXTRACT = "SendAlertsToExtract";
