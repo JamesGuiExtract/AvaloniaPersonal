@@ -7,8 +7,14 @@ if defined programfiles(x86) set programfiles=%programfiles(x86)%
 REM Set component directory
 set CommonComponentsDir=%programfiles%\Extract Systems\CommonComponents
 
-REM Supply numbered file sets every 2 seconds for 6 hours
-START "" CopyNumberedSets  Images Source 2 6
+REM Copy Demo_LabDE DEP
+COPY C:\Demo_LabDE\Solution\Bin\*.dll .\Solution\Bin\
+
+REM Copy Demo_LabDE OMDB
+COPY "C:\Demo_LabDE\Solution\Database Files\*.sdf" ".\Solution\Database Files\"
+
+REM Supply numbered file sets every 4 seconds for 6 hours
+START "" CopyNumberedSets  Images Source 4 6
 
 REM Execute command-line for desired test
 START "" "%CommonComponentsDir%\ProcessFiles.exe" MemoryLeak_1.fps /s
