@@ -58,7 +58,6 @@ CopyExtractCommonFiles: CleanupExtractCommonFiles ObfuscateFiles
     @ECHO Copying the ExtractCommon files to installation directory...
 	@COPY /v  "$(BinariesFolder)\Obfuscated\*.dll" "$(ExtractCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /v  "$(BinariesFolder)\UGMFC.dll" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
-    @COPY /v  "$(BinariesFolder)\USBLicenseKeyManager.exe" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\SafeNetUtils.dll" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_EXCEPTIONMGMTLib.dll" "$(ExtractCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMUTILSLib.dll" "$(ExtractCommonInstallFilesRootDir)\DotNetFiles"
