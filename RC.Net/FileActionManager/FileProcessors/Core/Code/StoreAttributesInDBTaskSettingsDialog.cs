@@ -210,7 +210,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     using (var aasd = new AddAttributeSetDialog(_attributeDBManager))
                     {
-                        var result = aasd.ShowDialog();
+                        aasd.ShowDialog();
 
                         // refresh the combobox list always, so that in the case where the user cancels the dialog,
                         // the previously displayed attribute name is re-displayed. This prevents the <add new...>
