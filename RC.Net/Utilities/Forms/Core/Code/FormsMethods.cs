@@ -1045,6 +1045,33 @@ namespace Extract.Utilities.Forms
         {
             return FormsMethods.GetAllControls(form);
         }
+
+        /// <summary>
+        /// Safely closes the form - if the call is from a thread that didn't create the form,
+        /// uses Invoke.
+        /// NOTE: This method can throw an Exception.
+        /// </summary>
+        /// <param name="control">The control to operate on</param>
+        /// <param name="action">The action to perform on the control</param>
+        public static void SafeInvoke(this Control control, Action action)
+        {
+            try
+            {
+                if (control.InvokeRequired)
+                {
+                    control.Invoke(action);
+                }
+                else
+                {
+                    action();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39240");
+            }
+        }
+
     }
 
     /// <summary>

@@ -44,6 +44,17 @@ namespace Extract.Utilities.Forms
         #region IProgressStatusDialog Members
 
         /// <summary>
+        /// Helper method to pass as action to SafeAction, used in Close()
+        /// </summary>
+        void DoClose()
+        {
+            if (_statusForm.Visible)
+            {
+                _statusForm.Hide();
+            }
+        }
+
+        /// <summary>
         /// Closes (hides) the <see cref="ProgressStatusDialogForm"/>.
         /// </summary>
         public void Close()
@@ -60,12 +71,9 @@ namespace Extract.Utilities.Forms
                 // before attempting to close.
                 _modalDialogClosable.WaitOne();
 
-                _closed = true;
+                _statusForm.SafeInvoke(DoClose);
 
-                if (_statusForm.Visible)
-                {
-                    _statusForm.Hide();
-                }
+                _closed = true;
             }
             catch (Exception ex)
             {
@@ -152,14 +160,17 @@ namespace Extract.Utilities.Forms
                         nDelayBetweenRefreshes, bShowCloseButton, hStopEvent);
                 }
 
-                _closed = false;
-                _statusForm.UpdateTitle(strWindowTitle);
-                _statusForm.ProgressStatus = pProgressStatus;
+                _statusForm.SafeInvoke(() =>
+                    {
+                        _closed = false;
+                        _statusForm.UpdateTitle(strWindowTitle);
+                        _statusForm.ProgressStatus = pProgressStatus;
 
-                if (!_statusForm.Visible)
-                {
-                    _statusForm.Show(new WindowWrapper(hWndParent));
-                }
+                        if (!_statusForm.Visible)
+                        {
+                            _statusForm.Show(new WindowWrapper(hWndParent));
+                        }
+                    });
 
                 return HResult.Ok;
             }
@@ -204,7 +215,7 @@ namespace Extract.Utilities.Forms
                 }
 
                 _closed = false;
-                _statusForm.UpdateTitle(strWindowTitle);
+                _statusForm.SafeInvoke(() => _statusForm.UpdateTitle(strWindowTitle));
                 _statusForm.ProgressStatus = pProgressStatus;
             }
             catch (Exception ex)
@@ -242,7 +253,12 @@ namespace Extract.Utilities.Forms
                 }
                 else
                 {
-                    return (int)_statusForm.ShowDialog(new WindowWrapper(hWndParent));
+                    int retValue = 0;
+                    _statusForm.SafeInvoke(() =>
+                        {
+                            retValue = (int)_statusForm.ShowDialog(new WindowWrapper(hWndParent));
+                        });
+                    return retValue;
                 }
             }
             catch (Exception ex)
@@ -272,7 +288,12 @@ namespace Extract.Utilities.Forms
                             "Cannot get title until dialog has been shown.");
                     }
 
-                    return _statusForm.Text;
+                    string text = null;
+                    _statusForm.SafeInvoke(() =>
+                        {
+                            text = _statusForm.Text;
+                        });
+                    return text;
                 }
                 catch (Exception ex)
                 {
@@ -290,7 +311,7 @@ namespace Extract.Utilities.Forms
                             "Cannot set title until dialog has been shown.");
                     }
 
-                    _statusForm.UpdateTitle(value);
+                    _statusForm.SafeInvoke(() => _statusForm.UpdateTitle(value));
                 }
                 catch (Exception ex)
                 {
