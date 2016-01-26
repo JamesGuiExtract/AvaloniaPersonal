@@ -566,10 +566,15 @@ namespace Extract.AttributeFinder.Rules
                     .ToIUnknownVector<ComRasterZone>();
 
                 // Update the spatial string
-                LongToObjectMap ocrPageInfos = value.SpatialPageInfos;
-                LongToObjectMap imagePageInfos = value.GetUnrotatedPageInfoMap();
-                value.CreateHybridString(shrunkZones, value.String, value.SourceDocName, imagePageInfos);
-                value.TranslateToNewPageInfo(ocrPageInfos);
+                // Leave the value the way it was if no zones are left after shrinking
+                // https://extract.atlassian.net/browse/ISSUE-13531
+                if (shrunkZones.Size() > 0)
+                {
+                    LongToObjectMap ocrPageInfos = value.SpatialPageInfos;
+                    LongToObjectMap imagePageInfos = value.GetUnrotatedPageInfoMap();
+                    value.CreateHybridString(shrunkZones, value.String, value.SourceDocName, imagePageInfos);
+                    value.TranslateToNewPageInfo(ocrPageInfos);
+                }
             }
         }
 
