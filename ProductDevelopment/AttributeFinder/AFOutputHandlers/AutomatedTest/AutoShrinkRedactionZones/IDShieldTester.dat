@@ -13,3 +13,8 @@
 
 // Test shrinking an attribute on rotated and skewed pages
 <TESTFOLDER>;.\Test03.rsd;..\MergeAttributes\Images\RotationOrientationSkew;;$DirOf(<SourceDocName>)\..\..\..\AutoShrinkRedactionZones\Test03.voa
+
+// Test almost empty region
+// https://extract.atlassian.net/browse/ISSUE-13531
+<TESTFOLDER>;.\Test04.rsd;.\ISSUE-13531;;$DirOf(<SourceDocName>)\..\Test04.voa
+
