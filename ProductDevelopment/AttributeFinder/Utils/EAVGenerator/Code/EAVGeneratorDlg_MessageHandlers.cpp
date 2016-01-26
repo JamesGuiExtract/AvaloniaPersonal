@@ -512,7 +512,7 @@ void CEAVGeneratorDlg::OnBtnSplit()
 				ipSplitter->SplitAttribute(ipAttribToSplit, NULL, NULL);
 
 				// get the level of the attribute that was split [P16 #2863]
-				// (ie. the number of periods preceding its name)
+				// (i.e. the number of periods preceding its name)
 				string strName = (LPCTSTR) 
 					m_listAttributes.GetItemText(nSelectedItemIndex, NAME_COLUMN);
 				int iLevel = strName.find_first_not_of('.', 0);
@@ -549,12 +549,11 @@ void CEAVGeneratorDlg::OnBtnSavefile()
 		if (m_strCurrentFileName.empty())
 		{
 			OnBtnSaveas();
-			return;
 		}
-
-		saveAttributes(m_strCurrentFileName.c_str());
-
-		setModified(false);
+		else
+		{
+			saveAttributes(m_strCurrentFileName.c_str());
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06209")
 }
@@ -629,27 +628,35 @@ void CEAVGeneratorDlg::OnBtnSaveas()
 
 				string strFileName = (LPCTSTR)zFileName;
 
-				// Check to see that the file doesn't exist
-				if (isValidFile(strFileName))
+				try
 				{
-					// Prompt the user
-					if (MessageBox(zFileName + " already exists, overwrite?", "File Exists",
-						MB_YESNO | MB_ICONWARNING) == IDNO)
+					try
 					{
-						// Continue to reprompt the user
-						continue;
+						// Check to see that the file doesn't exist
+						if (isValidFile(strFileName))
+						{
+							reserveFileName(zFileName);
+
+							// Prompt the user
+							if (MessageBox(zFileName + " already exists, overwrite?", "File Exists",
+								MB_YESNO | MB_ICONWARNING) == IDNO)
+							{
+								// Continue to re-prompt the user
+								continue;
+							}
+						}
+
+						saveAttributes(zFileName);
 					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39253");
 				}
+				catch (UCLIDException &ue)
+				{
+					// Ensure any pending file lock is released in the case of an exception.
+					releaseReservedFileName();
 
-				// save all attributes accordingly
-				saveAttributes(zFileName);
-
-				m_strCurrentFileName = strFileName;
-
-				// Set window caption
-				updateWindowCaption(zFileName);
-
-				setModified(false);
+					throw ue;
+				}
 			}
 
 			// Break out of the loop
@@ -729,20 +736,11 @@ void CEAVGeneratorDlg::OnBtnNew()
 		_lastCodePos = "40";
 
 		// clear current file name
-		m_strCurrentFileName = "";
+		setCurrentFileName("");
 		_lastCodePos = "50";
-
-		updateButtons();
-		_lastCodePos = "60";
-
-		updateWindowCaption("");
-		_lastCodePos = "70";
 
 		UpdateData(FALSE);
 		_lastCodePos = "80";
-
-		setModified(false);
-		_lastCodePos = "90";
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06229")	
 }

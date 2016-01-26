@@ -13,7 +13,7 @@
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
 #include <FAMUtilsConstants.h>
-
+#include <ExtractFileLock.h>
 
 //-------------------------------------------------------------------------------------------------
 // Preprocessor directives
@@ -328,7 +328,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionI
 			m_ipRoleNotifyFAM = pRoleNotifyFAM;
 			ASSERT_RESOURCE_ALLOCATION("ELI14523", m_ipRoleNotifyFAM != __nullptr );
 
-			// release any memory that may have been allocated to managely previously spawned-off
+			// release any memory that may have been allocated to manage previously spawned-off
 			// file supplier threads
 			releaseSupplyingThreadDataObjects();
 
@@ -891,6 +891,14 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 			{
 				return S_OK;
 			}
+
+			// https://extract.atlassian.net/browse/ISSUE-13573
+			// Automatically ignore ".ExtractLock" files to ensure they don't end up being
+			// inadvertently queued.
+			if (endsWith(strFile, gszLOCK_FILE_EXTENSION))
+			{
+				return S_OK;
+			}
 			
 			// Add the file to the database
 			VARIANT_BOOL vbAlreadyExists;
@@ -1190,7 +1198,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 
-			// Add the file to the database with the Mofified Flag set
+			// Add the file to the database with the Modified Flag set
 			VARIANT_BOOL bAlreadyExists;
 			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(),
@@ -1336,7 +1344,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderRenamed(BSTR bstrOldFolder, BST
 
 
 			// TODO: Database end needs to be implemented
-			//		 This currently doesnt do anything
+			//		 This currently doesn't do anything
 
 			if (m_hWndOfUI != __nullptr)
 			{

@@ -1536,3 +1536,16 @@ bool isSentenceCase(const string& strText)
         && strText.substr(1).find_first_of(gstrUPPER_ALPHA) == string::npos;
 }
 //--------------------------------------------------------------------------------------------------
+bool endsWith(const string& strValue, const string& strEnding)
+{
+	// Adapted from:
+	// http://stackoverflow.com/questions/874134/find-if-string-ends-with-another-string-in-c
+    if (strEnding.size() <= strValue.size())
+	{
+		equal(strEnding.rbegin(), strEnding.rend(), strValue.rbegin());
+	}
+	else
+	{
+		return false;
+	}
+}

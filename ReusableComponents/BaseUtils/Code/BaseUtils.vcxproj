@@ -206,6 +206,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="ExtractFileLock.cpp" />
     <ClCompile Include="ExtractMFCUtils.cpp" />
     <ClCompile Include="FailureDetectionAndReportingMgr.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -389,6 +390,7 @@
     <ClInclude Include="DateUtil.h" />
     <ClInclude Include="DefinedTypes.h" />
     <ClInclude Include="DocTagUtils.h" />
+    <ClInclude Include="ExtractFileLock.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="MapInitializationTemplate.h" />
     <ClInclude Include="MemLeakDetection.h" />

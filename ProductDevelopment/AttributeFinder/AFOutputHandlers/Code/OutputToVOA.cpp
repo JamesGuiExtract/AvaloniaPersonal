@@ -10,6 +10,7 @@
 #include <AFTagManager.h>
 #include <ComponentLicenseIDs.h>
 #include <TemporaryFileName.h>
+#include <ExtractFileLock.h>
 
 #include <io.h>
 
@@ -138,7 +139,7 @@ STDMETHODIMP COutputToVOA::raw_ProcessOutput(IIUnknownVector *pAttributes, IAFDo
 	{
 		validateLicense();
 
-		// expand ny tags in the filename
+		// expand any tags in the filename
 		AFTagManager tagMgr;
 		string strFileName = tagMgr.expandTagsAndFunctions(m_strFileName, pAFDoc);
 
@@ -152,6 +153,8 @@ STDMETHODIMP COutputToVOA::raw_ProcessOutput(IIUnknownVector *pAttributes, IAFDo
 		{
 			createDirectory(strFolder);
 		}
+
+		ExtractFileLock(strFileName, true, "Rules: Output to VOA");
 
 		// Save the Attributes to the file
 		string strStorageManagerIID = asString(CLSID_AttributeStorageManager);

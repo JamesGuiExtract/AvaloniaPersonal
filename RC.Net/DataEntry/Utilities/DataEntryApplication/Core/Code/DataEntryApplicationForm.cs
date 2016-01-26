@@ -489,6 +489,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         bool _invisible;
 
         /// <summary>
+        /// https://extract.atlassian.net/browse/ISSUE-13573
+        /// Used to prevent simultaneous modification of a voa file from multiple Extract Systems
+        /// processes.
+        /// </summary>
+        ExtractFileLock _voaFileLock = new ExtractFileLock();
+
+        /// <summary>
         /// This checks the user.config file to make sure it is not corrupt when the each instance 
         /// is created and when each instance is destroyed and if it is good makes a backup and 
         /// if corrupted will replace with the backup if available otherwise the config file will be deleted
@@ -1701,6 +1708,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _exitToolStripMenuItem.Dispose();
                         _exitToolStripMenuItem = null;
                     }
+                    if (_voaFileLock != null)
+                    {
+                        _voaFileLock.Dispose();
+                        _voaFileLock = null;
+                    }
                 }
                 catch { }
             }
@@ -1836,6 +1848,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (!_imageViewer.IsImageAvailable)
                 {
+                    _voaFileLock.ReleaseLock();
+
                     // The goto next invalid and unviewed buttons and menu options will be enabled via
                     // the DataEntryControlHost.UnviewedItemsFound and InvalidItemsFound events.
                     _gotoNextInvalidCommand.Enabled = false;
@@ -1892,6 +1906,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     string dataFilename = _imageViewer.ImageFile + ".voa";
                     if (File.Exists(dataFilename))
                     {
+                        _voaFileLock = new ExtractFileLock(dataFilename);
                         attributes.LoadFrom(dataFilename, false);
                     }
 
@@ -2915,6 +2930,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 else
                 {
+                    string dataFilename = _imageViewer.ImageFile + ".voa";
+                    _voaFileLock.GetLock(dataFilename,
+                        _standAloneMode ? "" : "Data entry verification");
+
                     bool saved = _dataEntryControlHost.SaveData(validateData);
 
                     if (saved && !_standAloneMode && _fileProcessingDb != null)
@@ -3853,6 +3872,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                             if (File.Exists(dataFilename))
                             {
+                                _voaFileLock.GetLock(dataFilename,
+                                    _standAloneMode ? "" : "Data entry verification");
                                 attributes.LoadFrom(dataFilename, false);
                             }
 

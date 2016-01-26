@@ -195,22 +195,6 @@ void PickFileAndDelimiterDlg::OnOK()
 					return;
 				}
 			}
-
-			// if this dialog is served as a close dialog
-			// make sure the file has read/write permission if exists
-			if (fileExistsAndIsReadOnly(m_zFileName.GetString()))
-			{
-				// change the mode to read/write
-				if (_chmod(m_zFileName, _S_IREAD | _S_IWRITE) == -1)
-				{
-					CString zMsg("Failed to save ");
-					zMsg += m_zFileName;
-					zMsg += ". Please make sure the file is not shared by another program.";
-					// failed to change the mode
-					AfxMessageBox(zMsg);
-					return;
-				}
-			}
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04268");

@@ -82,6 +82,11 @@ namespace Extract.Redaction.Verification
                     _magnifierDockableWindow.Dispose();
                     _magnifierDockableWindow = null;
                 }
+                if (_voaFileLock != null)
+                {
+                    _voaFileLock.Dispose();
+                    _voaFileLock = null;
+                }
             }
 
             // Release unmanaged resources

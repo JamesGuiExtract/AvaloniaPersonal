@@ -21,6 +21,7 @@
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <ExtractFileLock.h>
 
 #include <string>
 #include <vector>
@@ -209,6 +210,8 @@ void changeAttributePath(const string& strNewPath, const vector<string>& vecVOAF
 					_lastCodePos = "100";
 				}
 			}
+
+			ExtractFileLock(asString(bstrVOAFileName), true);
 
 			// save the modified IUnknownVector back to the VOA file
 			string strStorageManagerIID = asString(CLSID_AttributeStorageManager);

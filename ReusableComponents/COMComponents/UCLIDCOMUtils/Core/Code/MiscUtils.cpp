@@ -17,6 +17,7 @@
 #include <ComponentLicenseIDs.h>
 #include <PromptDlg.h>
 #include <Misc.h>
+#include <ExtractFileLock.h>
 
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -548,7 +549,7 @@ STDMETHODIMP CMiscUtils::GetStringOptionallyFromFile(BSTR bstrFileName, BSTR *pb
 		// A string to hold all uncommented text read from the file
 		string strFromFile = "";
 	
-		// If the file is an encrpted file
+		// If the file is an encrypted file
 		if ( strExt == ".etf" )
 		{
 			// Define a encrypted file manager object to read encrypted file
@@ -1348,6 +1349,66 @@ STDMETHODIMP CMiscUtils::HasNumericFileExtension(BSTR bstrFileName, VARIANT_BOOL
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36711");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::CreateExtractFileLock(BSTR bstrFileName, BSTR bstrContext, void **pLock)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI39257", pLock != nullptr);
+
+		validateLicense();
+
+		*pLock = new ExtractFileLock(asString(bstrFileName), true, asString(bstrContext));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39258");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::DeleteExtractFileLock(void *pLock)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI39259", pLock != nullptr);
+
+		validateLicense();
+
+		ExtractFileLock *pExtractFileLock = static_cast<ExtractFileLock*>(pLock);
+		ASSERT_RUNTIME_CONDITION("ELI39260", pExtractFileLock->IsValid(),
+			"Cannot release invalid file lock.");
+
+		delete pExtractFileLock;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39261");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::IsExtractFileLockForFile(void *pLock, BSTR bstrFileName, 
+												  VARIANT_BOOL *pbIsForFile)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI39262", pLock != nullptr);
+		ASSERT_ARGUMENT("ELI39263", pbIsForFile != nullptr);
+
+		validateLicense();
+
+		ExtractFileLock *pExtractFileLock = static_cast<ExtractFileLock*>(pLock);
+		ASSERT_RUNTIME_CONDITION("ELI39264", pExtractFileLock->IsValid(), "File lock is not valid.");
+
+		*pbIsForFile = asVariantBool(pExtractFileLock->IsForFile(asString(bstrFileName)));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39265");
 }
 
 //-------------------------------------------------------------------------------------------------

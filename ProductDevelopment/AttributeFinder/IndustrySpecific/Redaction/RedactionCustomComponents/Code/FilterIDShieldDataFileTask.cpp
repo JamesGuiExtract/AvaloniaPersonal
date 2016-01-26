@@ -11,6 +11,7 @@
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <StringTokenizer.h>
+#include <ExtractFileLock.h>
 
 #include <string>
 
@@ -126,7 +127,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(IFileRecord* pFileReco
 			throw uex;
 		}
 
-		// Load the attibutes from the VOA file
+		// Load the attributes from the VOA file
 		IIUnknownVectorPtr ipAttributesToFilter(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI24789", ipAttributesToFilter != __nullptr);
 		ipAttributesToFilter->LoadFrom(strVOAToRead.c_str(), VARIANT_FALSE);
@@ -159,6 +160,8 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(IFileRecord* pFileReco
 				ipNewAttributes->PushBack(ipAttribute);
 			}
 		}
+
+		ExtractFileLock(strVOAToWrite, true, "ID Shield: Filter data file");
 
 		// Now save the filtered attributes
 		string strStorageManagerIID = asString(CLSID_AttributeStorageManager);

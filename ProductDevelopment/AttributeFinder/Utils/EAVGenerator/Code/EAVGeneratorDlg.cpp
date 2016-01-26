@@ -760,8 +760,7 @@ void CEAVGeneratorDlg::openEAVFile(const CString& zFileName)
 		string strLine(fileReader.getLineText());
 		if (!strLine.empty())
 		{
-			// parse the line into tokens, make sure there're
-			// exact 2 or 3 tokens
+			// parse the line into tokens, make sure they're exact 2 or 3 tokens
 			vector<string> vecTokens;
 			StringTokenizer::sGetTokens(strLine, "|", vecTokens);
 			int nNumOfTokens = vecTokens.size();
@@ -818,17 +817,8 @@ void CEAVGeneratorDlg::openEAVFile(const CString& zFileName)
 		// select first item of the list
 		selectListItem(0);
 	}
-	
-	updateButtons();
 
-	// update current file name
-	m_strCurrentFileName = (LPCTSTR)zFileName;
-
-	// Update the window caption
-	updateWindowCaption(zFileName);
-
-	// reset flag
-	setModified(false);
+	setCurrentFileName(zFileName);
 }
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::openVOAFile(const CString& zFileName)
@@ -841,8 +831,7 @@ void CEAVGeneratorDlg::openVOAFile(const CString& zFileName)
 	// Display the Attributes
 	displayAttributes( ipAttributes );
 
-	// update current file name
-	m_strCurrentFileName = (LPCTSTR)zFileName;
+	setCurrentFileName(zFileName);
 
 	if (m_listAttributes.GetItemCount() > 0)
 	{
@@ -884,14 +873,6 @@ void CEAVGeneratorDlg::openVOAFile(const CString& zFileName)
 		}
 	}
 	
-	updateButtons();
-
-	// Update the window caption
-	updateWindowCaption(zFileName);
-
-	// reset flag
-	setModified(false);
-
 	// set the focus to the list control
 	m_listAttributes.SetFocus();
 }
@@ -919,38 +900,43 @@ bool CEAVGeneratorDlg::promptForSaving()
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::saveAttributes(const CString& zFileName)
 {
-	// make sure the file has read/write permission if exists
-	if (fileExistsAndIsReadOnly(zFileName.GetString()))
+	try
 	{
-		// change the mode to read/write
-		if (_chmod(zFileName, _S_IREAD | _S_IWRITE) == -1)
+		try
 		{
-			CString zMsg("Failed to save ");
-			zMsg += zFileName;
-			zMsg += ". Please make sure the file is not shared by another program.";
-			// failed to change the mode
-			AfxMessageBox(zMsg);
-			return;
-		}
-	}
+			// Before writing to the new filename, make sure no other Extract Systems process has
+			// it locked.
+			reserveFileName(zFileName);
 
-	// Check file type
-	string strExt = getExtensionFromFullPath( LPCTSTR(zFileName), true );
-	if (strExt == ".eav")
-	{
-		// EAV file
-		saveAttributesToEAV( zFileName );
+			// Check file type
+			string strExt = getExtensionFromFullPath( LPCTSTR(zFileName), true );
+			if (strExt == ".eav")
+			{
+				// EAV file
+				saveAttributesToEAV( zFileName );
+			}
+			else if (strExt == ".voa" || strExt == ".evoa")
+			{
+				// VOA file
+				saveAttributesToVOA( zFileName );
+			}
+			else
+			{
+				// Throw exception
+				UCLIDException ue( "ELI07911", "Unexpected file extension.");
+				ue.addDebugInfo( "File To Save", LPCTSTR(zFileName) );
+				throw ue;
+			}
+
+			setCurrentFileName(zFileName);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39252")
 	}
-	else if (strExt == ".voa" || strExt == ".evoa")
+	catch (UCLIDException &ue)
 	{
-		// VOA file
-		saveAttributesToVOA( zFileName );
-	}
-	else
-	{
-		// Throw exception
-		UCLIDException ue( "ELI07911", "Unexpected file extension.");
-		ue.addDebugInfo( "File To Save", LPCTSTR(zFileName) );
+		// Ensure any pending file lock is released in the case of an exception.
+		releaseReservedFileName();
+
 		throw ue;
 	}
 }
@@ -1087,10 +1073,21 @@ void CEAVGeneratorDlg::selectListItem(int iIndex)
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::setModified(bool bModified)
 {
-	m_bFileModified = bModified;
-
-	// update the state of the Save button
-	m_apToolBar->GetToolBarCtrl().EnableButton(IDC_BTN_SAVEFILE, m_bFileModified ? TRUE : FALSE);
+	// If another Extract process had this file locked on open, this file is to be considered in
+	// read-only mode; don't prompt for saving.
+	if (m_upFileLock.get() == nullptr || !m_upFileLock->IsLockedByAnotherProcess())
+	{
+		m_bFileModified = bModified;
+	
+		// update the state of the Save button
+		m_apToolBar->GetToolBarCtrl().EnableButton(IDC_BTN_SAVEFILE, m_bFileModified ? TRUE : FALSE);
+	}
+	else
+	{
+		// If the file is locked by another process, it should always be considered unmodified so as
+		// not to allow or prompt for save.
+		m_bFileModified = false;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::updateButtons()
@@ -1242,6 +1239,86 @@ void CEAVGeneratorDlg::updateList(int nColumnNumber, const CString& zText)
 	m_listAttributes.SetItemText(nSelectedItemIndex, nColumnNumber, strText.c_str());
 }
 //-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::setCurrentFileName(const CString& zFileName)
+{
+	m_strCurrentFileName = (LPCTSTR)zFileName;
+
+	if (m_strCurrentFileName.empty())
+	{
+		m_upPendingFileLock.reset();
+		m_upFileLock.reset();
+	}
+	else
+	{
+		// If we already had a pending lock on the file, transfer it as the primary file lock. (A
+		// pending file lock is guaranteed that IsLockedByAnotherProcess is not set)
+		if (m_upPendingFileLock.get() != nullptr && m_upPendingFileLock->IsForFile(m_strCurrentFileName))
+		{
+			m_upFileLock = move(m_upPendingFileLock);
+		}
+		// If the currently locked file is a different one than zFileName, lock the new one instead.
+		else if (m_upFileLock.get() == nullptr || !m_upFileLock->IsForFile(m_strCurrentFileName))
+		{
+			// Passing false to not throw if a lock can't be taken; user will be allowed to proceed in
+			// "read-only mode".
+			m_upFileLock.reset(new ExtractFileLock(m_strCurrentFileName, false));
+		}
+
+		// In case there was an pending lock not for this file.
+		releaseReservedFileName();
+
+		if (m_upFileLock->IsLockedByAnotherProcess())
+		{
+			string strMessage = m_upFileLock->GetExternalLockInfo() +
+				"\r\n\r\nYou will not be able to save this file.";
+			::MessageBox(m_hWnd, strMessage.c_str(), "File is locked", MB_OK);
+		}
+	}
+
+	updateWindowCaption(zFileName);
+	updateButtons();
+	setModified(false);
+}
+//-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::reserveFileName(const CString& zFileName)
+{
+	string strFileName = (LPCTSTR)zFileName;
+	
+	// If we already have this file open, no need to use m_upPendingFileLock.
+	if (m_upFileLock.get() != nullptr && m_upFileLock->IsForFile(strFileName))
+	{
+		if (m_upFileLock->IsLockedByAnotherProcess())
+		{
+			UCLIDException ue("ELI39251", "Cannot save file; file is locked by another process.");
+			m_upFileLock->addExternalLockInfo(ue);
+			throw ue;
+		}
+	}
+	else if ((m_upPendingFileLock.get() == nullptr || !m_upPendingFileLock->IsForFile(strFileName)))
+	{
+		// First reset the lock for any previously pending file so it is released even in the case
+		// the new file cannot be locked.
+		m_upPendingFileLock.reset();
+
+		// Pass true to throw an exception if another Extract process has this file locked.
+		m_upPendingFileLock.reset(new ExtractFileLock(strFileName, true));
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::releaseReservedFileName()
+{
+	try
+	{
+		if (m_upPendingFileLock.get() != nullptr)
+		{
+			m_upPendingFileLock.reset();
+		}
+	}
+	// Since this method is called in the case of an exception, log any exceptions resetting 
+	// m_upPendingFileLock to avoid masking the primary exception.
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI39254");
+}
+//-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::updateWindowCaption(const CString& zFileName)
 {
 	// Default caption
@@ -1255,6 +1332,11 @@ void CEAVGeneratorDlg::updateWindowCaption(const CString& zFileName)
 		strResult = getFileNameFromFullPath( LPCTSTR(zFileName) );
 		strResult += " - ";
 		strResult += strWINDOW_TITLE;
+
+		if (m_upFileLock.get() != nullptr && m_upFileLock->IsLockedByAnotherProcess())
+		{
+			strResult += " (Read-only)";
+		}
 	}
 	else
 	{

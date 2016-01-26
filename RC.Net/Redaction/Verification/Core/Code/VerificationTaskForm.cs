@@ -190,6 +190,13 @@ namespace Extract.Redaction.Verification
         readonly RedactionFileLoader _currentVoa;
 
         /// <summary>
+        /// https://extract.atlassian.net/browse/ISSUE-13573
+        /// Used to prevent simultaneous modification of a voa file from multiple Extract Systems
+        /// processes.
+        /// </summary>
+        ExtractFileLock _voaFileLock = new ExtractFileLock();
+
+        /// <summary>
         /// The file processing database.
         /// </summary>
         FileProcessingDB _fileDatabase;
@@ -1086,6 +1093,8 @@ namespace Extract.Redaction.Verification
             VerificationMemento memento = GetCurrentDocument();
             RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
 
+            _voaFileLock.GetLock(memento.AttributesFile,
+                _standAloneMode ? "" : "ID Shield verification");
             _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime,
                 _settings, _standAloneMode, false);
 
@@ -1218,9 +1227,13 @@ namespace Extract.Redaction.Verification
             }
             else
             {
-                // If collecting expected data, the image will have already been collected and we
-                // we want to overwrite any existing expected data file.
-                File.Copy(memento.AttributesFile, memento.ExpectedAttributesFileName, true);
+                using (new ExtractFileLock(memento.ExpectedAttributesFileName,
+                    _standAloneMode ? "" : "ID Shield verification"))
+                {
+                    // If collecting expected data, the image will have already been collected and we
+                    // we want to overwrite any existing expected data file.
+                    File.Copy(memento.AttributesFile, memento.ExpectedAttributesFileName, true);
+                }
             }
         }
 
@@ -2547,6 +2560,8 @@ namespace Extract.Redaction.Verification
             // Load the voa
             VerificationMemento memento = GetCurrentDocument();
 
+            _voaFileLock.GetLock(memento.AttributesFile,
+                _standAloneMode ? "" : "ID Shield verification");
             _currentVoa.LoadFrom(memento.AttributesFile, memento.SourceDocument);
 
             // Set the controls
@@ -3400,6 +3415,8 @@ namespace Extract.Redaction.Verification
                 }
                 else
                 {
+                    _voaFileLock.ReleaseLock();
+
                     // No image is open. Clear the grid.
                     // (This resets the dirty flag as well [FIDSC #3846])
                     _redactionGridView.Clear();

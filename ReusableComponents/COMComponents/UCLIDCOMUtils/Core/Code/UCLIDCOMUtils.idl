@@ -437,7 +437,7 @@ library UCLID_COMUTILSLib
 		//				strPrompt1- The static text that should appear above the description edit box
 		//				strPrompt2- The static text that should appear above the object selection 
 		//					combo box.
-		//				strCategory- The registered category name (ie, FP_FILE_PROC_CATEGORYNAME)
+		//				strCategory- The registered category name (i.e., FP_FILE_PROC_CATEGORYNAME)
 		//				pObj- An ObjectWithDescription to initialize the object selection box, 
 		//					configuration info and description and to receive the user's changes. 
 		//				vbAllowNone- Should the user be allowed to select "<NONE>"
@@ -455,7 +455,7 @@ library UCLID_COMUTILSLib
 		//					"Select [strTitleAfterSelect]"
 		//				strPrompt1- The static text that should appear above the description edit box
 		//				strPrompt2- The static text that should appear above the object selection combo box
-		//				strCategory- The registered category name (ie, FP_FILE_PROC_CATEGORYNAME)
+		//				strCategory- The registered category name (i.e., FP_FILE_PROC_CATEGORYNAME)
 		//				pObj- An ObjectWithDescription to initialize the object selection box, configuration 
 		//					info and description and to receive the user's changes.
 		//				vbAllowNone- Should the user be allowed to select "<NONE>"
@@ -479,7 +479,7 @@ library UCLID_COMUTILSLib
 		// ARGS:		bstrTitleAfterSelect- The title bar of the dialog will display 
 		//					"Select [strTitleAfterSelect]"
 		//				bstrPrompt- The static text that should appear above the object selection combo box
-		//				bstrCategory- The registered category name (ie, FP_FAM_REPORTS_CATEGORYNAME)
+		//				bstrCategory- The registered category name (i.e., FP_FAM_REPORTS_CATEGORYNAME)
 		//				pObj- An ObjectWithDescription to initialize the object selection box 
 		//					and configuration info receive the user's changes. 
 		//				NOTE: The ObjectWithDescription's description will never be set or modified
@@ -1076,7 +1076,7 @@ library UCLID_COMUTILSLib
 			[out, retval] VARIANT_BOOL* pvbDirty);
 		//---------------------------------------------------------------------------------------------
 		// PROMISE: Requests windows shell to open the specified document with the application registered
-		//			to the filetype of the document. Throws an exception if the request fails.
+		//			to the file type of the document. Throws an exception if the request fails.
 		// ARGS:	bstrFilename- The filename of the document to open
 		[id(22), helpstring("method ShellOpenDocument")] HRESULT ShellOpenDocument([in] BSTR bstrFilename);
 		//-----------------------------------------------------------------------------------------
@@ -1131,8 +1131,31 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Indicates whether the extension of bstrFileName is numeric (sometimes used for
 		//			image files).
-		[id(29), helpstring("method IsNumericFileExtension")] HRESULT HasNumericFileExtension(
+		[id(29), helpstring("method HasNumericFileExtension")] HRESULT HasNumericFileExtension(
 			[in] BSTR bstrFileName, [out, retval] VARIANT_BOOL* pvbValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Attempts to create a corresponding ".ExtractLock" file to indicate to other
+		//			Extract Systems processes that bstrFileName is already being edited (so edits
+		//			from other contexts are prevented).
+		// bstrFileName- The filename to attempt to lock for editing.
+		// bstrContext- What should be reported to other Extract processes as what has the file
+		//				locked. (FAM task name, for instance) If not specified, the currently
+		//				running executable name will be used.
+		// pLock-	Points to the underlying c++ ExtractFileLock class instance used to manage the
+		//			lock.
+		[id(30), helpstring("method CreateExtractFileLock")] HRESULT CreateExtractFileLock(
+			[in] BSTR bstrFileName, [in] BSTR bstrContext, [out, retval] void **pLock);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Deletes the corresponding ".ExtractLock" file to re-allow other Extract Systems
+		// processes to modify bstrFileName. pLock must be the same value returned by the
+		//	CreateExtractFileLock call for this file.
+		[id(31), helpstring("method DeleteExtractFileLock")] HRESULT DeleteExtractFileLock(
+			[in] void *pLock);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Checks whether the file lock represented by pLock is for the specified
+		//			bstrFileName.
+		[id(32), helpstring("method IsExtractFileLockForFile")] HRESULT IsExtractFileLockForFile(
+			[in] void *pLock, [in] BSTR bstrFileName, [out, retval] VARIANT_BOOL *pbIsForFile);
 	};
 	[
 		object,

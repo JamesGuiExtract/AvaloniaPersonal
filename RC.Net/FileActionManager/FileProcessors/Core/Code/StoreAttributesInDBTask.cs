@@ -1,13 +1,14 @@
-﻿using Extract.AttributeFinder;
+﻿using AttributeDbMgrComponentsLib;
+using Extract.AttributeFinder;
 using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-using AttributeDbMgrComponentsLib;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -535,7 +536,11 @@ namespace Extract.FileActionManager.FileProcessors
                                                                 expandedAttrSetName,
                                                                 MOST_RECENT_ATTRIBUTE);
 
-                    voaData.SaveTo(voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    using (new ExtractFileLock(voaFileName, "Retrieve attributes in database"))
+                    {
+                        voaData.SaveTo(voaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    }
+
                     voaData.ReportMemoryUsage();
                 }
 

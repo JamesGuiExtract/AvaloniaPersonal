@@ -403,7 +403,7 @@ void CRuleSetEditor::closeFile()
 {
 	// create a new ruleset object
 	UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
-	ASSERT_RESOURCE_ALLOCATION("ELI0", ipRuleSet != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI39255", ipRuleSet != __nullptr);
 
 	// use the new/empty ruleset object as the object associated with
 	// this UI.
@@ -713,7 +713,7 @@ void CRuleSetEditor::refreshUIFromAttribute()
 		// Make sure that there is an input validator present
 		if( m_zIVDescription.IsEmpty() )
 		{
-			// if there isnt an IV, disable the checkbox
+			// if there isn't an IV, disable the checkbox
 			GetDlgItem( IDC_CHECK_INPUT_VALIDATOR )->EnableWindow( FALSE );
 			m_bInputValidator = FALSE;
 		}
@@ -1338,7 +1338,7 @@ void CRuleSetEditor::updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescri
 		throw ue;
 	}
 
-	// check if Object has no description (ie. no Object is selected)
+	// check if Object has no description (i.e. no Object is selected)
 	if( zEditControlText.IsEmpty() )
 	{
 		// disable checkbox
@@ -1347,7 +1347,7 @@ void CRuleSetEditor::updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescri
 		// uncheck checkbox
 		bCheckBoxState = FALSE;
 	}
-	else // object has description (ie. object is non-empty)
+	else // object has description (i.e. object is non-empty)
 	{
 		// enable checkbox
 		pCheckBox->EnableWindow(TRUE);
@@ -1414,7 +1414,7 @@ void CRuleSetEditor::doResize()
 	m_wMgr.moveAnchoredAll(*GetDlgItem(IDC_STATIC_RULES), m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredAll(*GetDlgItem(IDC_LIST_RULES), m_nDefaultW, m_nDefaultH, FALSE);
 
-	// Move/resize contols anchored top, left right
+	// Move/resize controls anchored top, left right
 	m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_EDIT_PREPROCESSOR), m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_COMBO_ATTRIBUTES), m_nDefaultW, m_nDefaultH, FALSE);
 

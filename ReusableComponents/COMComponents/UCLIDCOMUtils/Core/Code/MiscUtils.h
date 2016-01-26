@@ -112,6 +112,10 @@ public:
 	STDMETHOD(HasImageFileExtension)(BSTR bstrFileName, VARIANT_BOOL* pvbValue);
 	STDMETHOD(HasNumericFileExtension)(BSTR bstrFileName, VARIANT_BOOL* pvbValue);
 
+	STDMETHOD(CreateExtractFileLock)(BSTR bstrFileName, BSTR bstrContext, void **pLock);
+	STDMETHOD(DeleteExtractFileLock)(void *pLock);
+	STDMETHOD(IsExtractFileLockForFile)(void *pLock, BSTR bstrFileName, VARIANT_BOOL *pbIsForFile);
+
 	// PROMISE:	Determines whether the specified object supports configuration either via
 	//			ISpecifyPropertyPages or IConfigurableObject
 	// RETURNS: true if configuration is supported; false if it is not.

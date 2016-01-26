@@ -112,7 +112,7 @@ void CRuleSetPropertiesDlg::OnOK()
 					m_ruleSetPropertiesPage.Apply();
 					m_ruleSetCommentsPage.Apply();
 				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39256");
 			}
 			catch (UCLIDException &ue)
 			{

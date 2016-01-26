@@ -15,6 +15,7 @@
 #include <MiscLeadUtils.h>
 #include <DateUtil.h>
 #include <COMUtilsMethods.h>
+#include <ExtractFileLock.h>
 
 #include <string>
 #include <set>
@@ -2022,6 +2023,8 @@ void CRedactionTask::storeMetaData(const string& strVoaFile, IIUnknownVectorPtr 
             bOverwroteOutput);
         ASSERT_RESOURCE_ALLOCATION("ELI28349", ipMetaData != __nullptr);
         ipAttributes->PushBack(ipMetaData);
+
+		ExtractFileLock(strVoaFile, true, "ID Shield: Create redacted image");
 
         // Save the voa with the new metadata
 		string strStorageManagerIID = asString(CLSID_AttributeStorageManager);

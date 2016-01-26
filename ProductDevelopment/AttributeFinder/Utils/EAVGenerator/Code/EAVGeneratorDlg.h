@@ -6,6 +6,7 @@
 #include "..\..\..\..\InputFunnel\IFCore\Code\InputManagerEventHandler.h"
 #include <ImageButtonWithStyle.h>
 #include <WindowPersistenceMgr.h>
+#include <ExtractFileLock.h>
 
 #include <memory>
 #include <set>
@@ -193,6 +194,13 @@ private:
 	// GUID's of attributes currently loaded
 	set<string> m_setOfGUIDs;
 
+	// A lock to protect write access to the currently open voa/eav file.
+	unique_ptr<ExtractFileLock> m_upFileLock;
+	
+	// A lock to protect access to a different voa/eav than the current file that is about to be
+	// written (save-as).
+	unique_ptr<ExtractFileLock> m_upPendingFileLock;
+
 	//////////
 	// Methods
 	//////////
@@ -283,6 +291,17 @@ private:
 	// updates the list item
 	// nColumnNumber -- which column to update
 	void updateList(int nColumnNumber, const CString& zText);
+
+	// Takes care of locking the file and updating the UI to reflect having the specified filename
+	// open.
+	void setCurrentFileName(const CString& zFileName);
+
+	// Attempts to lock the specified filename which is different than the current filename and is
+	// about to be written (via save-as). To be used in case of exception; will not throw exceptions.
+	void reserveFileName(const CString& zFileName);
+
+	// Releases any lock that is held on a filename that was to be saved.
+	void releaseReservedFileName();
 
 	// a method to update the window caption depending upon the currently
 	// loaded file (if any)

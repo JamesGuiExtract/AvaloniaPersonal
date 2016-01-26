@@ -840,6 +840,9 @@ EXPORT_BaseUtils int findWordMatch(const string& strInput,
 // Checks whether or not the provided string is in sentence case (i.e. only the first
 // word has been capitalized)
 EXPORT_BaseUtils bool isSentenceCase(const string& strText);
+//------------------------------------------------------------------------------------------------
+// Does strValue end with strValue?
+EXPORT_BaseUtils bool endsWith(const string& strValue, const string& strEnding);
 
 //-------------------------------------------------------------------------------------------------
 // ********* Number Operations **********
