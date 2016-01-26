@@ -84,6 +84,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="TestCommentedTextFileReader.cs" />
+    <Compile Include="TestExtractFileLock.cs" />
     <Compile Include="TestExtractSettings.cs" />
     <Compile Include="TestUtilityMethods.cs" />
   </ItemGroup>
