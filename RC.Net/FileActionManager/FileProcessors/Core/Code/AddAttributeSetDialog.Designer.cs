@@ -51,14 +51,14 @@
             this.AttributeSetNameTextBox.Location = new System.Drawing.Point(15, 25);
             this.AttributeSetNameTextBox.Name = "AttributeSetNameTextBox";
             this.AttributeSetNameTextBox.Size = new System.Drawing.Size(290, 20);
-            this.AttributeSetNameTextBox.TabIndex = 1;
+            this.AttributeSetNameTextBox.TabIndex = 0;
             this.AttributeSetNameTextBox.TextChanged += new System.EventHandler(this.HandleTextChanged_AttributeSetNameTextBox);
             // 
-            // CancelButton
+            // _CancelButton
             // 
             this._CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this._CancelButton.Location = new System.Drawing.Point(230, 62);
-            this._CancelButton.Name = "CancelButton";
+            this._CancelButton.Name = "_CancelButton";
             this._CancelButton.Size = new System.Drawing.Size(75, 23);
             this._CancelButton.TabIndex = 2;
             this._CancelButton.Text = "Cancel";
@@ -70,15 +70,17 @@
             this.OkButton.Location = new System.Drawing.Point(149, 62);
             this.OkButton.Name = "OkButton";
             this.OkButton.Size = new System.Drawing.Size(75, 23);
-            this.OkButton.TabIndex = 3;
+            this.OkButton.TabIndex = 1;
             this.OkButton.Text = "OK";
             this.OkButton.UseVisualStyleBackColor = true;
             this.OkButton.Click += new System.EventHandler(this.OkButton_Click);
             // 
             // AddAttributeSetDialog
             // 
+            this.AcceptButton = this.OkButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._CancelButton;
             this.ClientSize = new System.Drawing.Size(317, 97);
             this.Controls.Add(this.OkButton);
             this.Controls.Add(this._CancelButton);
