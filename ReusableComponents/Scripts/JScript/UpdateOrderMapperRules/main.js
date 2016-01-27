@@ -22,9 +22,9 @@ function main(args) {
 
     var WSHShell = new ActiveXObject("WScript.Shell");
 
-    if (fso.fileExists("C:\\Engineering\\Binaries\\Release\\SQLCompactExporter.exe")) {
-        var exporter = "\"C:\\Engineering\\Binaries\\Release\\SQLCompactExporter.exe\" \"" + databasePath + "\"";
-        var importer = "\"C:\\Engineering\\Binaries\\Release\\SQLCompactImporter.exe\" \"" + databasePath + "\"";
+    if (fso.fileExists("C:\\Engineering\\Binaries\\Debug\\SQLCompactExporter.exe")) {
+        var exporter = "\"C:\\Engineering\\Binaries\\Debug\\SQLCompactExporter.exe\" \"" + databasePath + "\"";
+        var importer = "\"C:\\Engineering\\Binaries\\Debug\\SQLCompactImporter.exe\" \"" + databasePath + "\"";
     } else if (WSHShell.ExpandEnvironmentStrings("%ProgramFiles(x86)%") == "%ProgramFiles(x86)%") {
         var exporter = "\"C:\\Program Files\\Extract Systems\\CommonComponents\\SQLCompactExporter.exe\" \"" + databasePath + "\"";
         var importer = "\"C:\\Program Files\\Extract Systems\\CommonComponents\\SQLCompactImporter.exe\" \"" + databasePath + "\"";
