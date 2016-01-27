@@ -4990,7 +4990,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut5</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut6</td><td>Help</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut7</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
-		<row><td>NewShortcut8</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut9</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 	</table>
 
@@ -5094,7 +5093,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut5</td><td>newfolder1</td><td>##ID_STRING8##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]USSFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut6</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING9##</td><td>Help</td><td>[TARGET_HELP]FlexIndex.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut7</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING10##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]UserLicense.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut8</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING21##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]USBLicenseKeyManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut9</td><td>newfolder1</td><td>##ID_STRING24##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]DetectAndReportFailure.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
 
