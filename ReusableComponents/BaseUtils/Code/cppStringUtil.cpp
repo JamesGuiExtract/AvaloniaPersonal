@@ -1542,7 +1542,7 @@ bool endsWith(const string& strValue, const string& strEnding)
 	// http://stackoverflow.com/questions/874134/find-if-string-ends-with-another-string-in-c
     if (strEnding.size() <= strValue.size())
 	{
-		equal(strEnding.rbegin(), strEnding.rend(), strValue.rbegin());
+		return equal(strEnding.rbegin(), strEnding.rend(), strValue.rbegin());
 	}
 	else
 	{
