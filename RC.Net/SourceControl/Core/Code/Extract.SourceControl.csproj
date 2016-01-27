@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -18,8 +18,7 @@
     <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
+    <FileUpgradeFlags />
     <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation />
     <TargetFrameworkProfile />
@@ -55,19 +54,19 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="VaultClientIntegrationLib, Version=5.1.2.19281, Culture=neutral, PublicKeyToken=500623c275bd78a9, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\APIs\Vault\5.1.2\VaultClientIntegrationLib.dll</HintPath>
     </Reference>
     <Reference Include="VaultClientNetLib, Version=5.1.2.19281, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\APIs\Vault\5.1.2\VaultClientNetLib.dll</HintPath>
     </Reference>
     <Reference Include="VaultClientOperationsLib, Version=5.1.2.19281, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\APIs\Vault\5.1.2\VaultClientOperationsLib.dll</HintPath>
     </Reference>
     <Reference Include="VaultLib, Version=5.1.2.19281, Culture=neutral, PublicKeyToken=a74d7badb9387c36, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\APIs\Vault\5.1.2\VaultLib.dll</HintPath>
     </Reference>
   </ItemGroup>

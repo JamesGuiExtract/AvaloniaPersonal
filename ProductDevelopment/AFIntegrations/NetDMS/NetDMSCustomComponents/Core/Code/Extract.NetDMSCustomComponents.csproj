@@ -49,16 +49,16 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DexFlow.Client">
+    <Reference Include="DexFlow.Client, Version=2.13.0.6, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\DexFlow.Client.dll</HintPath>
     </Reference>
-    <Reference Include="DexFlow.Framework">
+    <Reference Include="DexFlow.Framework, Version=2.13.0.6, Culture=neutral, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\DexFlow.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Dx_DocContent">
+    <Reference Include="Dx_DocContent, Version=2.13.0.6, Culture=neutral, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\Dx_DocContent.dll</HintPath>
     </Reference>
-    <Reference Include="Dx_DocDescriptor">
+    <Reference Include="Dx_DocDescriptor, Version=2.13.0.6, Culture=neutral, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\Dx_DocDescriptor.dll</HintPath>
     </Reference>
     <Reference Include="Extract.Drawing">
@@ -93,7 +93,7 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ScriptingSupport">
+    <Reference Include="ScriptingSupport, Version=2.13.0.6, Culture=neutral, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\ScriptingSupport.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -108,7 +108,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="WorkflowContext">
+    <Reference Include="WorkflowContext, Version=2.13.0.6, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\WorkflowContext.dll</HintPath>
     </Reference>
   </ItemGroup>

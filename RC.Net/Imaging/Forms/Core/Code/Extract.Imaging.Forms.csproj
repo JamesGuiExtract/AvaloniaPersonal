@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -18,8 +18,7 @@
     <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
+    <FileUpgradeFlags />
     <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation />
     <TargetFrameworkProfile />
@@ -68,32 +67,32 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.dll</HintPath>
     </Reference>
     <Reference Include="Leadtools.Annotations, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="Leadtools.Codecs, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Drawing">
+    <Reference Include="Leadtools.Drawing, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.Drawing.dll</HintPath>
     </Reference>
     <Reference Include="Leadtools.ImageProcessing.Color, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.ImageProcessing.Color.dll</HintPath>
     </Reference>
     <Reference Include="Leadtools.WinForms, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -292,8 +291,7 @@
     </Compile>
     <Compile Include="ImagePageData.cs" />
     <Compile Include="ImageViewerEventArguments.cs" />
-    <Compile Include="Highlight.cs">
-    </Compile>
+    <Compile Include="Highlight.cs" />
     <Compile Include="LayerObjectsCollection.cs" />
     <Compile Include="IImageViewerControl.cs" />
     <Compile Include="ImageViewer.cs">
@@ -744,8 +742,7 @@
     <Compile Include="ThumbnailViewer.Designer.cs">
       <DependentUpon>ThumbnailViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="ThumbnailWorker.cs">
-    </Compile>
+    <Compile Include="ThumbnailWorker.cs" />
     <Compile Include="ToolStripButtonConstants.cs" />
     <Compile Include="Controls\ZoomInToolStripButton.cs">
       <SubType>Component</SubType>

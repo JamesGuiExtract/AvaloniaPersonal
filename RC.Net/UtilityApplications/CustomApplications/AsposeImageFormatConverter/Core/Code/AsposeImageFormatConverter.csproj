@@ -50,7 +50,7 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aspose.Pdf">
+    <Reference Include="Aspose.Pdf, Version=9.8.0.0, Culture=neutral, PublicKeyToken=6947866647e416ec, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\APIs\Aspose\Aspose.Pdf for .Net 9.8\Bin\net4.0\Aspose.Pdf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
