@@ -364,6 +364,7 @@ namespace Extract.Utilities.ContextTags
                             _tagValues = database.TagValue
                                 .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
                                     tagValue.CustomTag.Name != "")
+                                .OrderBy(tagValue => tagValue.CustomTag.Name)
                                 .ToDictionary(tagValue => 
                                     tagValue.CustomTag.Name, tagValue => tagValue.Value);
                         }
