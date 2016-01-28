@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Extract.DataEntry.LabDE
@@ -222,8 +223,16 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// Gets any result component codes from <see paramref="orderMappingDbConnection"/> that the
-        /// specified <see paramref="componentAKA"/> may refer to using the AKAs defined in
+        /// ****************************************************************************************
+        /// Don't use this method. Instead, use GetComponentNamesFromAKA (or GetComponentCodesFromAKA
+        /// for TestCodes instead of OfficialNames) so that both URS AKAs and customer-specific AKAs
+        /// are used to generate the list. Using one of those two methods instead means that the
+        /// separate query against the customer-specific OrderMappingDB can/should be removed from
+        /// the DEP. It also means that the AKA can be mapped to a Result Component even if the AKA
+        /// appears both in the customer-specific DB and the URS DB for the same Result Component.
+        /// ****************************************************************************************
+        /// Gets any result component official names from <see paramref="orderMappingDbConnection"/>
+        /// that the specified <see paramref="componentAKA"/> may refer to using the AKAs defined in
         /// <see paramref="componentDataDb"/>.
         /// </summary>
         /// <param name="customerDB">A <see cref="DbConnection"/> to the
@@ -232,21 +241,25 @@ namespace Extract.DataEntry.LabDE
         /// </param>
         /// <param name="componentAKA">A value that is to be treated as a potential AKA in the URS
         /// database.</param>
-        /// <param name="orderCode">If not empty, the returned result codes will be restricted to
+        /// <param name="orderCode">If not empty, the returned names will be restricted to
         /// components mapped to the specified order.</param>
-        /// <returns>An array of any result component codes <see paramref="componentAKA"/> may refer
-        /// to.</returns>
+        /// <returns>An array of any result component official names <see paramref="componentAKA"/>
+        /// may refer to.</returns>
+        [Obsolete("GetComponentCodesFromESAKA is deprecated. Use GetComponentNamesFromAKA instead.")]
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ESAKA")]
         public static string[] GetComponentCodesFromESAKA(DbConnection customerDB,
             DbConnection componentDataDB, string componentAKA, string orderCode)
         {
             try
             {
+                var truncatedComponentAKA = componentAKA.Length > 255 ? componentAKA.Substring(0, 255) : componentAKA;
+                var truncatedOrderCode = orderCode.Length > 25 ? orderCode.Substring(0, 25) : orderCode;
+
                 // Find all component codes componentAKA may refer to in the URS DB>
                 var ESComponentCodes = DBMethods.GetQueryResultsAsStringArray(componentDataDB,
                         "SELECT [ESComponentAKA].[ESComponentCode] FROM [ESComponentAKA] " +
-                        "WHERE [Name] LIKE @0",
-                        new Dictionary<string, string>() { { "@0", componentAKA } }, "");
+                        "WHERE [Name] = @0",
+                        new Dictionary<string, string>() { { "@0", truncatedComponentAKA } }, "");
 
                 // Translate this to the component codes in the customer DB and ignore any AKAs in
                 // the DisabledESComponentAKA table.
@@ -256,11 +269,11 @@ namespace Extract.DataEntry.LabDE
                     "INNER JOIN [LabOrderTest] ON [LabTest].[TestCode] = [LabOrderTest].[TestCode] " +
                     "INNER JOIN [ComponentToESComponentMap] ON [LabTest].[TestCode] = [ComponentToESComponentMap].[ComponentCode] " +
                     "LEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode] " +
-                    "   AND [DisabledESComponentAKA].[ESComponentAKA] LIKE @0 " +
-                    "WHERE (LEN(@1) = 0 OR [OrderCode] LIKE @1) " +
+                    "   AND [DisabledESComponentAKA].[ESComponentAKA] = @0 " +
+                    "WHERE (LEN(@1) = 0 OR [OrderCode] = @1) " +
                     "AND [DisabledESComponentAKA].[ESComponentCode] IS NULL " +
                     "AND [ComponentToESComponentMap].[ESComponentCode] IN ('" + string.Join("','", ESComponentCodes) + "')",
-                    new Dictionary<string, string>() { { "@0", componentAKA }, { "@1", orderCode } }, "");
+                    new Dictionary<string, string>() { { "@0", truncatedComponentAKA }, { "@1", truncatedOrderCode } }, "");
 
                 return customerComponentCodes;
             }
@@ -270,6 +283,102 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        /// <summary>
+        /// Gets any result component codes from <see paramref="orderMappingDbConnection"/> that the
+        /// specified <see paramref="componentAKA"/> may refer to using the AKAs defined in
+        /// <see paramref="componentDataDb"/> or <see paramref="customerDB"/>.
+        /// </summary>
+        /// <param name="customerDB">A <see cref="DbConnection"/> to the
+        /// customer-specific OrderMappingDB.</param>
+        /// <param name="componentDataDB">>A <see cref="DbConnection"/> to the URS OrderMappingDB.
+        /// </param>
+        /// <param name="componentAKA">A value that is to be treated as a potential AKA in the 
+        /// databases.</param>
+        /// <param name="orderCode">If not empty, the returned result codes will be restricted to
+        /// components mapped to the specified order.</param>
+        /// <returns>An array of any result component codes <see paramref="componentAKA"/> may refer
+        /// to.</returns>
+        public static string[] GetComponentCodesFromAKA(DbConnection customerDB,
+            DbConnection componentDataDB, string componentAKA, string orderCode)
+        {
+            try
+            {
+                var truncatedComponentAKA = componentAKA.Length > 255 ? componentAKA.Substring(0, 255) : componentAKA;
+                var truncatedOrderCode = orderCode.Length > 25 ? orderCode.Substring(0, 25) : orderCode;
+
+                // Find all component codes componentAKA may refer to in the URS DB>
+                var ESComponentCodes = DBMethods.GetQueryResultsAsStringArray(componentDataDB,
+                        "SELECT [ESComponentAKA].[ESComponentCode] FROM [ESComponentAKA] " +
+                        "WHERE [Name] = @0",
+                        new Dictionary<string, string>() { { "@0", truncatedComponentAKA } }, "");
+
+                // Translate these to the component codes in the customer DB and ignore any AKAs in
+                // the DisabledESComponentAKA table.
+                var customerComponentCodes = DBMethods.GetQueryResultsAsStringArray(
+                    customerDB,
+                    "SELECT [LabTest].[TestCode] FROM [LabTest] " +
+                    "INNER JOIN [LabOrderTest] ON [LabTest].[TestCode] = [LabOrderTest].[TestCode] " +
+                    "INNER JOIN [ComponentToESComponentMap] ON [LabTest].[TestCode] = [ComponentToESComponentMap].[ComponentCode] " +
+                    "LEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode] " +
+                    "   AND [DisabledESComponentAKA].[ESComponentAKA] = @0 " +
+                    "WHERE (LEN(@1) = 0 OR [OrderCode] = @1) " +
+                    "AND [DisabledESComponentAKA].[ESComponentCode] IS NULL " +
+                    "AND [ComponentToESComponentMap].[ESComponentCode] IN ('" + string.Join("','", ESComponentCodes) + "') " +
+                    "UNION SELECT [AlternateTestName].[TestCode] FROM [AlternateTestName] " +
+                    "INNER JOIN [LabOrderTest] ON [AlternateTestName].[TestCode] = [LabOrderTest].[TestCode] " +
+                    "WHERE [Name] = @0 AND [StatusCode] = 'A' " +
+                    "AND (LEN(@1) = 0 OR [OrderCode] = @1) "
+                    , new Dictionary<string, string>() { { "@0", truncatedComponentAKA }, { "@1", truncatedOrderCode } }, "");
+
+                return customerComponentCodes;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39268");
+            }
+        }
+
+        /// <summary>
+        /// Gets any result component official names from <see paramref="orderMappingDbConnection"/>
+        /// that the specified <see paramref="componentAKA"/> may refer to using the AKAs defined in
+        /// <see paramref="componentDataDb"/> or <see paramref="customerDB"/>.
+        /// </summary>
+        /// <param name="customerDB">A <see cref="DbConnection"/> to the
+        /// customer-specific OrderMappingDB.</param>
+        /// <param name="componentDataDB">>A <see cref="DbConnection"/> to the URS OrderMappingDB.
+        /// </param>
+        /// <param name="componentAKA">A value that is to be treated as a potential AKA in the 
+        /// databases.</param>
+        /// <param name="orderCode">If not empty, the returned names will be restricted to
+        /// components mapped to the specified order.</param>
+        /// <returns>An array of any result component official names <see paramref="componentAKA"/>
+        /// may refer to.</returns>
+        public static string[] GetComponentNamesFromAKA(DbConnection customerDB,
+            DbConnection componentDataDB, string componentAKA, string orderCode)
+        {
+            try
+            {
+                var componentCodes = GetComponentCodesFromAKA(customerDB, componentDataDB, componentAKA, orderCode)
+                    .Select(testCode => "'" + testCode.Replace("'", "''") + "'").ToList();
+
+                if (componentCodes.Count == 0)
+                {
+                    return new string[0];
+                }
+
+                // Translate these to the official name in the customer DB
+                var componentNames = DBMethods.GetQueryResultsAsStringArray(
+                    customerDB,
+                    "SELECT [OfficialName] FROM [LabTest] " +
+                    "WHERE [TestCode] IN (" + string.Join(",", componentCodes) + ")");
+
+                return componentNames;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39269");
+            }
+        }
         #endregion Public Methods
 
         #region Private Members
