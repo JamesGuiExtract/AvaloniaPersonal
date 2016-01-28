@@ -376,6 +376,9 @@ private:
 	// a GUID is duplicated
 	void addGUIDToSet(IIdentifiableObjectPtr ipIdentityObject);
 
+	// PURPOSE: Convenience method that takes a lot of low-level conditional tests and provides
+	// a logical high-level view of the condition.
+	bool LockNotWritableAndPendingLockNotExists(const std::string& strFileName);
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

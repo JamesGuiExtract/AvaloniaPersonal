@@ -1075,7 +1075,9 @@ void CEAVGeneratorDlg::setModified(bool bModified)
 {
 	// If another Extract process had this file locked on open, this file is to be considered in
 	// read-only mode; don't prompt for saving.
-	if (m_upFileLock.get() == nullptr || !m_upFileLock->IsLockedByAnotherProcess())
+	if (m_upFileLock.get() == nullptr || 
+		(!m_upFileLock->IsLockedByAnotherProcess() && 
+		!m_upFileLock->IsReadOnly()))
 	{
 		m_bFileModified = bModified;
 	
@@ -1280,21 +1282,18 @@ void CEAVGeneratorDlg::setCurrentFileName(const CString& zFileName)
 	setModified(false);
 }
 //-------------------------------------------------------------------------------------------------
+bool CEAVGeneratorDlg::LockNotWritableAndPendingLockNotExists(const std::string& strFileName)
+{
+	bool existingFileLock = m_upFileLock.get() != nullptr && m_upFileLock->IsForFile(strFileName) && m_upFileLock->HaveLock();
+	bool lockNotHeldByPendingFileLock = m_upPendingFileLock.get() == nullptr || !m_upPendingFileLock->IsForFile(strFileName);
+
+	return !existingFileLock && lockNotHeldByPendingFileLock;
+}
+//-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::reserveFileName(const CString& zFileName)
 {
 	string strFileName = (LPCTSTR)zFileName;
-	
-	// If we already have this file open, no need to use m_upPendingFileLock.
-	if (m_upFileLock.get() != nullptr && m_upFileLock->IsForFile(strFileName))
-	{
-		if (m_upFileLock->IsLockedByAnotherProcess())
-		{
-			UCLIDException ue("ELI39251", "Cannot save file; file is locked by another process.");
-			m_upFileLock->addExternalLockInfo(ue);
-			throw ue;
-		}
-	}
-	else if ((m_upPendingFileLock.get() == nullptr || !m_upPendingFileLock->IsForFile(strFileName)))
+	if (LockNotWritableAndPendingLockNotExists(strFileName))
 	{
 		// First reset the lock for any previously pending file so it is released even in the case
 		// the new file cannot be locked.
@@ -1333,7 +1332,9 @@ void CEAVGeneratorDlg::updateWindowCaption(const CString& zFileName)
 		strResult += " - ";
 		strResult += strWINDOW_TITLE;
 
-		if (m_upFileLock.get() != nullptr && m_upFileLock->IsLockedByAnotherProcess())
+		if (m_upFileLock.get() != nullptr && 
+			(m_upFileLock->IsLockedByAnotherProcess() || 
+			m_upFileLock->IsReadOnly()))
 		{
 			strResult += " (Read-only)";
 		}
