@@ -32,7 +32,7 @@ IDR_DOCUMENTSORTER      REGISTRY                "DocumentSorter.rgs"
 IDR_AFUTILITY           REGISTRY                "AFUtility.rgs"
 IDR_DOCUMENTCLASSIFIERPP REGISTRY                "DocumentClassifierPP.rgs"
 IDR_SPATIALATTRIBUTEMERGEUTILS REGISTRY                "SpatialAttributeMergeUtils.rgs"
-IDR_AFEXPRESSIONFORMATTER REGISTRY              "AFExpressionFormatter.rgs"
+IDR_AFEXPRESSIONFORMATTER REGISTRY                "AFExpressionFormatter.rgs"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -80,13 +80,13 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904B0"
+        BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "AFUtils Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFUtils"
-            VALUE "LegalCopyright", "Copyright 2016"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2016"
             VALUE "OriginalFilename", "AFUtils.DLL"
             VALUE "ProductName", "AFUtils Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

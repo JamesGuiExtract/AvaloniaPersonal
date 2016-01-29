@@ -65,13 +65,13 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904B0"
+        BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "AFCore Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFCore"
-            VALUE "LegalCopyright", "Copyright 2016"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2016"
             VALUE "OriginalFilename", "AFCore.DLL"
             VALUE "ProductName", "AFCore Module"
             VALUE "ProductVersion", "1, 0, 0, 1"
@@ -623,8 +623,8 @@ BEGIN
     ID_FILE_OPEN            "Open rule set"
     ID_FILE_SAVE            "Save rule set"
     ID_INDICATOR_COUNTERS   "Counters: NNN"
-	ID_INDICATOR_SWIPING	"Swiping = No"
     ID_INDICATOR_INTERNAL_USE_ONLY "InternalUseOnly = Yes"
+    ID_INDICATOR_SWIPING    "Swiping = No"
     IDS_FLEXINDEX_PRODUCT   "FLEX Index"
     IDS_IDSHIELD_PRODUCT    "ID Shield"
     IDS_UNKNOWN_PRODUCT     "Unknown"

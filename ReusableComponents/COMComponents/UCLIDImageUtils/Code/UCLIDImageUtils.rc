@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -67,13 +65,13 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904B0"
+        BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "UCLIDImageUtils Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "UCLIDImageUtils"
-            VALUE "LegalCopyright", "Copyright 2016"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2016"
             VALUE "OriginalFilename", "UCLIDImageUtils.DLL"
             VALUE "ProductName", "UCLIDImageUtils Module"
             VALUE "ProductVersion", "1, 0, 0, 1"
@@ -100,12 +98,12 @@ IDR_IMAGELINEUTILITY    REGISTRY                "ImageLineUtility.rgs"
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "UCLIDImageUtils"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

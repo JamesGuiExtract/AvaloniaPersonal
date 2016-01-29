@@ -65,13 +65,13 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904B0"
+        BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "UCLIDCOMUtils Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "UCLIDCOMUtils"
-            VALUE "LegalCopyright", "Copyright 2016"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2016"
             VALUE "OriginalFilename", "UCLIDCOMUtils.DLL"
             VALUE "ProductName", "UCLIDCOMUtils Module"
             VALUE "ProductVersion", "1, 0, 0, 1"
