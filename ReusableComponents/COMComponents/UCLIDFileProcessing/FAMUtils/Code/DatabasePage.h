@@ -29,6 +29,11 @@ public:
 	//			to update the DB status field on the database page
 	virtual void OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
 		string& rstrAdvConnStrProperties) = 0;
+
+	// PURPOSE: Prompts user to select the context (ContactTags.sdf) to use. Assuming the user
+	//			chooses a context, rbDBTagsAvailable will indicate whether the specified context
+	//			has the <DatabaseServer> and <DatabaseName> tags defined.
+	virtual bool PromptToSelectContext(bool& rbDBTagsAvailable) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -81,8 +86,11 @@ public:
 	// PROMISE: To enable or disable the entire property page
 	void enableAllControls(bool bEnableAll);
 
-	// PROMISE: To Set the text for the current context with the indicated text color
-	void setCurrentContextText(const string& strCurrentContextText, COLORREF crColor = RGB(0, 0, 0) /* Black */);
+	// PROMISE: To update context related controls on the database tab.
+	// bFPSSaved- true if the current state is associated with an FPS file.
+	// bValidContext- true if valid context is currently selected.
+	// strContextName- The active context name.
+	void setCurrentContextState(bool bFPSSaved, bool bValidContext, const string& strContextName);
 	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -98,6 +106,7 @@ protected:
 	afx_msg void OnBnClickedButtonLastUsedDb();
 	afx_msg void OnBnClickedButtonAdvConnStrProperties();
 	afx_msg void OnBnClickedButtonUseCurrentContextDatabase();
+	afx_msg void OnBnClickedButtonSelectContext();
 	afx_msg void OnBnClickedCurrentContextLabel();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
@@ -124,10 +133,12 @@ private:
 	CEdit m_editConnectStatus;
 	CStatic m_labelCurrentContextLabel;
 	CStatic m_labelCurrentContext;
+	CFont m_contextLabelFont;
 	CButton m_btnAdvConnStrProperties;
 	CButton m_btnRefresh;
 	CButton m_btnConnectLastUsedDB;
 	CButton m_btnUseCurrentContextDatabase;
+	CButton m_btnSelectContext;
 
 	// Pointer is used to call SetDBConfigFile
 	IDBConfigNotifications* m_pNotifyDBConfigChangedObject;

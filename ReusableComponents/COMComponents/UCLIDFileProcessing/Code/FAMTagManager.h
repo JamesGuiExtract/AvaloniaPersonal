@@ -8,6 +8,9 @@
 #include <vector>
 #include <map>
 
+class IConfigurationSettingsPersistenceMgr;
+class MRUList;
+
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -81,6 +84,7 @@ public:
 	STDMETHOD(put_DatabaseName)(BSTR strDatabaseName);
 	STDMETHOD(get_ActionName)(BSTR *strActionName);
 	STDMETHOD(put_ActionName)(BSTR strActionName);
+	STDMETHOD(RefreshContextTags)();
 
 private:
 
@@ -118,6 +122,10 @@ private:
 	// pointer to the utility object to use for path function expansion.
 	IMiscUtilsPtr m_ipMiscUtils;
 
+	// Used to maintain MRU list for recent contexts
+	unique_ptr<IConfigurationSettingsPersistenceMgr> m_upUserCfgMgr;
+	unique_ptr<MRUList> m_upContextMRUList;
+
 	//////////
 	//Methods
 	/////////
@@ -129,6 +137,9 @@ private:
 		std::vector<std::string>& rvecTagNames) const;
 
 	void expandTags(std::string &strInput, const std::string &strSourceDocName);
+
+	// Refreshes context tag info based on current FPSFileDir from ContextTags.sdf.
+	void refreshContextTags();
 
 	void validateLicense();
 };

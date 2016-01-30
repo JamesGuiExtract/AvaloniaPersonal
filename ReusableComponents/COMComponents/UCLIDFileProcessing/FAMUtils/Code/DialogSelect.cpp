@@ -42,6 +42,20 @@ CDialogSelect::CDialogSelect(const string& strServer, CWnd* pParent /*=NULL*/)
 	m_comboData.setSQLServer(strServer);
 }
 //-------------------------------------------------------------------------------------------------
+CDialogSelect::CDialogSelect(const string& strPrompt, const string& strCaption,
+							 const vector<string>& vecCustomList, const string& strDefaultValue/* = ""*/,
+							 CWnd* pParent /*=NULL*/)
+	: CDialog(CDialogSelect::IDD, pParent),
+	m_zComboValue(""),
+	m_comboData(DBInfoCombo::kCustomList),
+	m_strServer(""),
+	m_strPrompt(strPrompt),
+	m_strCaption(strCaption),
+	m_vecCustomList(vecCustomList),
+	m_strDefaultValue(strDefaultValue)
+{
+}
+//-------------------------------------------------------------------------------------------------
 CDialogSelect::~CDialogSelect()
 {
 	try
@@ -110,6 +124,13 @@ BOOL CDialogSelect::OnInitDialog()
 			{
 				m_comboData.showSpecialValue(gstrDATABASE_NAME_TAG);
 			}
+			break;
+
+		case DBInfoCombo::kCustomList:
+			SetWindowTextA(m_strCaption.c_str());
+			m_staticComboLabel.SetWindowTextA(m_strPrompt.c_str());
+			m_comboData.convertToDropDownList();
+			m_comboData.setList(m_vecCustomList, m_strDefaultValue);
 			break;
 
 		default:

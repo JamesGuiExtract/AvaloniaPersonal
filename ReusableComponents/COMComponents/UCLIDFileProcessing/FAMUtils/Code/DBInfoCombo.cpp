@@ -12,6 +12,7 @@
 #include <ExtractMFCUtils.h>
 #include <RegistryPersistenceMgr.h>
 #include <Win32Util.h>
+#include <XBrowseForFolder.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -54,7 +55,7 @@ DBInfoCombo::EDBInfoType DBInfoCombo::getDBInfoType()
 	return m_eDBInfoType;
 }
 //-------------------------------------------------------------------------------------------------
-void DBInfoCombo::showSpecialValue(string strValue)
+void DBInfoCombo::showSpecialValue(const string& strValue)
 {
 	m_setSpecialValues.insert(strValue);
 }
@@ -104,6 +105,24 @@ void DBInfoCombo::OnCbnSelendok()
 					case kDatabaseName:
 						getDBNameList(m_strServer, vecList);
 						break;
+					case kCustomList:
+						char pszPath[MAX_PATH + 1];
+						if (XBrowseForFolder(m_hWnd, m_strDefaultValue.c_str(), pszPath, sizeof(pszPath) ))
+						{
+							// Add the selected directory to the combo if it is not already there.
+							int iPos = FindStringExact(-1, pszPath);
+							if (iPos == CB_ERR)
+							{
+								iPos = AddString(pszPath);
+							}
+							SetCurSel(iPos);
+						}
+						else
+						{
+							SetCurSel(-1);
+						}
+						return;
+						break;
 					default:
 						THROW_LOGIC_ERROR_EXCEPTION("ELI18100");
 					};
@@ -114,7 +133,8 @@ void DBInfoCombo::OnCbnSelendok()
 					throw;
 				}
 
-				// Load the combo box
+				// Type kCustomList returns from in the switch above and does not reset the list.
+
 				loadComboBoxFromVector(*this, vecList);
 				if ( m_eDBInfoType == kServerName )
 				{
@@ -179,6 +199,49 @@ void DBInfoCombo::OnCbnDropdown()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18102");
+}
+//-------------------------------------------------------------------------------------------------
+void DBInfoCombo::convertToDropDownList()
+{
+	// Styles on a combo box can't be dynamically changed. Need to re-create with the new style.
+	int nID = GetDlgCtrlID();
+	CRect rect;
+	GetWindowRect(rect);
+	DWORD dwStyle = GetStyle();
+	DWORD dwExStyle = GetExStyle();
+	CWnd *pPrevWindow = GetNextWindow(GW_HWNDPREV);
+	CWnd *pParentWnd = GetParent();
+	pParentWnd->ScreenToClient(rect);
+	CFont *pFont = GetFont();
+	DestroyWindow();
+	dwStyle &= ~CBS_DROPDOWN;
+	dwStyle &= ~CBS_SORT;
+	dwStyle |= CBS_DROPDOWNLIST;
+	CreateEx(dwExStyle, "COMBOBOX", "", dwStyle, rect, pParentWnd, nID);
+	SetFont(pFont, FALSE);
+	SetWindowPos(pPrevWindow, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+}
+//-------------------------------------------------------------------------------------------------
+void DBInfoCombo::setList(const vector<string>& vecList, const string& strDefaultValue)
+{
+	// Add Browse string to list
+	AddString(gstrBROWSE_STRING.c_str());
+
+	for each (string strValue in vecList)
+	{
+		AddString(strValue.c_str());
+	}
+
+	if (!strDefaultValue.empty())
+	{
+		m_strDefaultValue = strDefaultValue;
+
+		int iPos = FindStringExact(-1, strDefaultValue.c_str());
+		if (iPos != CB_ERR)
+		{
+			SetCurSel(iPos);
+		}
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

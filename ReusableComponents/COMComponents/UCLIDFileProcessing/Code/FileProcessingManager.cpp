@@ -1516,10 +1516,17 @@ void CFileProcessingManager::setAdvConnString(string strAdvConnString)
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingManager::refreshDatabaseSettings()
 {
-	// Make sure the FPSFileDir is set to the current path to the FPS file - this will also refresh
-	// the tags from the custom tags database
-	m_ipFAMTagManager->FPSFileDir = getDirectoryFromFullPath(m_strFPSFileName).c_str();
-	
+	// Make sure the FPSFileDir is set to the current path to the FPS file; otherwise refresh
+	// the context tags from the ContextTags.sdf file.
+	if (m_ipFAMTagManager->FPSFileDir.length() == 0)
+	{
+		m_ipFAMTagManager->FPSFileDir = getDirectoryFromFullPath(m_strFPSFileName).c_str();
+	}
+	else
+	{
+		m_ipFAMTagManager->RefreshContextTags();
+	}
+
 	// Update the Database settings
 	getFPMDB()->DatabaseServer = m_ipFAMTagManager->ExpandTagsAndFunctions(m_strDBServer.c_str(), "");
 	getFPMDB()->DatabaseName = m_ipFAMTagManager->ExpandTagsAndFunctions(m_strDBName.c_str(), "");

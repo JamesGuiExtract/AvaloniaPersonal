@@ -20,8 +20,10 @@
 #include <FAMUtilsConstants.h>
 #include <SuspendWindowUpdates.h>
 #include <FAMUtilsConstants.h>
+#include <DialogSelect.h>
 
 #include <vector>
+#include <map>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -125,8 +127,8 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
 		m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_PROCESS);
 		ASSERT_RESOURCE_ALLOCATION("ELI14999", m_hIcon != __nullptr);
 
-		m_ipFAMTagUtility.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI37906", m_ipFAMTagUtility != __nullptr);
+		m_ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
+		ASSERT_RESOURCE_ALLOCATION("ELI37906", m_ipFAMTagManager != __nullptr);
 
 		ma_pCfgMgr = unique_ptr<FileProcessingConfigMgr>(new
 			FileProcessingConfigMgr());
@@ -134,8 +136,17 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
 		// create a registry config mgr for the MRU list settings
 		m_upUserConfig.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER,
 			gstrREG_ROOT_KEY + "\\UCLIDFileProcessing\\FileProcessingDlg"));
-
 		m_upMRUList.reset(new MRUList(m_upUserConfig.get(), "\\MRUList", "File_%d", 8));
+
+		// https://extract.atlassian.net/browse/ISSUE-13528
+		// It seems to me a mistake that m_upUserConfig uses gstrREG_ROOT_KEY instead of
+		// gstrCOM_COMPONENTS_REG_PATH, but rather than fix it (which would either lose MRU data for
+		// customers as a result of upgrading, or would require code to port the list to the new
+		// location) I am just creating a different RegistryPersistenceMgr instance.
+		m_upUserConfig2.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER,
+			gstrCOM_COMPONENTS_REG_PATH + "\\UCLIDFileProcessing"));
+		m_upContextMRUList.reset(
+			new MRUList(m_upUserConfig2.get(), "\\ContextsMRUList", "File_%d", 12));
 
 		m_dlgOptions.setConfigManager(ma_pCfgMgr.get());
 
@@ -1569,14 +1580,9 @@ void FileProcessingDlg::OnToolsEditCustomTags()
 
 	try
 	{
-		m_ipFAMTagUtility->EditCustomTags((long)m_hWnd);
-
-		m_bUpdatingConnection = true;
-		m_propDatabasePage.refreshConnection();
+		editCustomTags();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38104");
-
-	m_bUpdatingConnection = false;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnToolbarDropDown(NMHDR* pNMHDR, LRESULT *plr)
@@ -1674,15 +1680,13 @@ LRESULT FileProcessingDlg::OnWorkItemStatusChange(WPARAM wParam, LPARAM lParam)
 //--------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
 										  string& rstrAdvConnStrProperties)
-{ 
+{
 	try
 	{
 		// Set the database status on the database page
 		m_propDatabasePage.setDBConnectionStatus(gstrCONNECTING);
 		emptyWindowsMessageQueue();
 		CWaitCursor cWait;
-
-		bool bFPSFileSaved = !m_strCurrFPSFilename.empty();
 
 		// The connection parameters only need to be change on the FPM since the FPM will set these
 		// values of the DB.
@@ -1694,58 +1698,54 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 		getFPM()->DatabaseName = rstrDatabase.c_str();
 		getFPM()->AdvancedConnectionStringProperties = rstrAdvConnStrProperties.c_str();
 
-		// Using tags for server and/or database - attempt to expand the tags
-		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
-		ASSERT_RESOURCE_ALLOCATION("ELI38050", ipFAMTag != __nullptr);
-
 		// Determine if tags need to be expanded
-		bool bTagsToExpand = asCppBool(ipFAMTag->StringContainsTags(rstrServer.c_str())) || 
-					asCppBool(ipFAMTag->StringContainsTags(rstrDatabase.c_str())) ||
-					asCppBool(ipFAMTag->StringContainsTags(rstrAdvConnStrProperties.c_str()));
+		bool bTagsToExpand = asCppBool(m_ipFAMTagManager->StringContainsTags(rstrServer.c_str())) ||
+			asCppBool(m_ipFAMTagManager->StringContainsTags(rstrDatabase.c_str())) ||
+			asCppBool(m_ipFAMTagManager->StringContainsTags(rstrAdvConnStrProperties.c_str()));
 
 		if (bTagsToExpand)
 		{
 			// The FPS file needs to have been saved
-			if (!bFPSFileSaved)
+			if (m_strCurrFPSFilename.empty() && m_ipFAMTagManager->FPSFileDir.length() == 0)
 			{
 				// Inform the users that the configuration needs to be saved
 				if (MessageBox("The configuration needs to be saved for the context to be identified.\r\nSave now?",
 					"Save Configuration?", MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
 				{
 					// Prompt for save
-					bFPSFileSaved = saveFile(string(""), false);
+					bTagsToExpand = saveFile(string(""), false);
 				}
 			}
 			
-			if (bFPSFileSaved)
+			if (bTagsToExpand)
 			{
-				ipFAMTag->FPSFileName = m_strCurrFPSFilename.c_str();
-				ipFAMTag->FPSFileDir = getDirectoryFromFullPath(m_strCurrFPSFilename).c_str();
+				refreshContext();
 
 				// Expand tags
-				string strExpandedServerName = ipFAMTag->ExpandTags(rstrServer.c_str(), "");
-				string strExpandedDBName = ipFAMTag->ExpandTags(rstrDatabase.c_str(), "");
-				string strExpandedAdvConnStrProperties = ipFAMTag->ExpandTags(rstrAdvConnStrProperties.c_str(), "");
+				string strExpandedServerName = m_ipFAMTagManager->ExpandTags(rstrServer.c_str(), "");
+				string strExpandedDBName = m_ipFAMTagManager->ExpandTags(rstrDatabase.c_str(), "");
+				string strExpandedAdvConnStrProperties =
+					m_ipFAMTagManager->ExpandTags(rstrAdvConnStrProperties.c_str(), "");
 
 				// Determine if there are still tags that need to be expanded
-				bTagsToExpand = asCppBool(ipFAMTag->StringContainsTags(strExpandedServerName.c_str())) || 
-					asCppBool(ipFAMTag->StringContainsTags(strExpandedDBName.c_str())) ||
-					asCppBool(ipFAMTag->StringContainsTags(strExpandedAdvConnStrProperties.c_str()));
+				bTagsToExpand = asCppBool(m_ipFAMTagManager->StringContainsTags(strExpandedServerName.c_str())) || 
+					asCppBool(m_ipFAMTagManager->StringContainsTags(strExpandedDBName.c_str())) ||
+					asCppBool(m_ipFAMTagManager->StringContainsTags(strExpandedAdvConnStrProperties.c_str()));
 
 				// If tags still need to be expanded open the edit context tags UI
 				if (bTagsToExpand && !m_bUpdatingConnection)
 				{
-					m_ipFAMTagUtility->EditCustomTags((long)GetSafeHwnd());
+					getTagUtility()->EditCustomTags((long)GetSafeHwnd());
 
-					ipFAMTag->FPSFileDir = getDirectoryFromFullPath(m_strCurrFPSFilename).c_str(); 
-					strExpandedServerName = ipFAMTag->ExpandTags(rstrServer.c_str(), "");
-					strExpandedDBName = ipFAMTag->ExpandTags(rstrDatabase.c_str(), "");
-					strExpandedAdvConnStrProperties = ipFAMTag->ExpandTags(rstrAdvConnStrProperties.c_str(), "");
+					refreshContext();
+					strExpandedServerName = m_ipFAMTagManager->ExpandTags(rstrServer.c_str(), "");
+					strExpandedDBName = m_ipFAMTagManager->ExpandTags(rstrDatabase.c_str(), "");
+					strExpandedAdvConnStrProperties =
+						m_ipFAMTagManager->ExpandTags(rstrAdvConnStrProperties.c_str(), "");
 				
-					// if the tags have not been expanded open the context database
-					bTagsToExpand = asCppBool(ipFAMTag->StringContainsTags(strExpandedServerName.c_str())) || 
-						asCppBool(ipFAMTag->StringContainsTags(strExpandedDBName.c_str())) ||
-						asCppBool(ipFAMTag->StringContainsTags(strExpandedAdvConnStrProperties.c_str()));
+					bTagsToExpand = asCppBool(m_ipFAMTagManager->StringContainsTags(strExpandedServerName.c_str())) || 
+						asCppBool(m_ipFAMTagManager->StringContainsTags(strExpandedDBName.c_str())) ||
+						asCppBool(m_ipFAMTagManager->StringContainsTags(strExpandedAdvConnStrProperties.c_str()));
 
 					if (!bTagsToExpand)
 					{
@@ -1795,6 +1795,30 @@ void FileProcessingDlg::OnDBConfigChanged(string& rstrServer, string& rstrDataba
 
 	// Update the status and UI
 	updateUIForCurrentDBStatus();
+	updateMenuAndToolbar();
+}
+//-------------------------------------------------------------------------------------------------
+bool FileProcessingDlg::PromptToSelectContext(bool& rbDBTagsAvailable)
+{
+	bool bResult = false;
+
+	if (m_strCurrFPSFilename.empty())
+	{
+		bResult = displayRecentContextSelection(); 
+	}
+	else if (!isValidContext())
+	{
+		editCustomTags();
+
+		bResult = isValidContext();
+	}
+
+	if (bResult)
+	{
+		rbDBTagsAvailable = areDatabaseTagsDefined();
+	}
+
+	return bResult;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1900,6 +1924,7 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	bool bEnableStop = false;
 	bool bProcessingStarted = (getFPM()->ProcessingStarted == VARIANT_TRUE);
 	bool bProcessingPaused = false;
+	bool bContextSelected = (m_ipFAMTagManager->ActiveContext.length() > 0);
 
 	// update the menu items
 	CMenu* pMenu = GetMenu();
@@ -1956,7 +1981,7 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	pMenu->EnableMenuItem(ID_PROCESS_PAUSEPROCESSING, MF_BYCOMMAND | (bEnablePause ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(ID_PROCESS_STOPPROCESSING, MF_BYCOMMAND | (bEnableStop ? MF_ENABLED: MF_GRAYED) );
 	pMenu->EnableMenuItem(2, MF_BYPOSITION | (bRunningStatus ? MF_GRAYED : MF_ENABLED) );
-	pMenu->EnableMenuItem(ID_TOOLS_EDITCUSTOMTAGS, MF_BYCOMMAND | (m_strCurrFPSFilename.empty() ? MF_GRAYED : MF_ENABLED) );
+	pMenu->EnableMenuItem(ID_TOOLS_EDITCUSTOMTAGS, MF_BYCOMMAND | (bContextSelected ? MF_ENABLED : MF_GRAYED) );
 
 	// Enable/disable the controls on the database page based on whether
 	// we are currently processing or not
@@ -2289,56 +2314,43 @@ void FileProcessingDlg::updateUI()
 
 	// Set the title bar text
 	CString szTitle = "File Action Manager";
-	
-	if (m_strCurrFPSFilename != "" && m_bDBConnectionReady)
+	string strActiveContext = asString(m_ipFAMTagManager->ActiveContext);
+	string strFile = getFileNameFromFullPath(m_strCurrFPSFilename);
+	bool bFileSaved = !strFile.empty();
+	if (!bFileSaved)
 	{
-		// Get the Context path	
-		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
-		ASSERT_RESOURCE_ALLOCATION("ELI38084", ipFAMTag != __nullptr);
+		strFile = "[Unsaved file]";
+	}
 
-		string strActiveContext = asString(ipFAMTag->ActiveContext);
+	vector<string> strTitleComponents;
+	if (m_bDBConnectionReady || !strActiveContext.empty())
+	{
+		strTitleComponents.push_back(strFile);
+	}
+	if (m_bDBConnectionReady)
+	{
+		strTitleComponents.push_back(
+			Util::Format("%s on %s",
+				asString(getDBPointer()->DatabaseName).c_str(),
+				asString(getDBPointer()->DatabaseServer).c_str()));
+	}
+	if (!strActiveContext.empty())
+	{
+		strTitleComponents.push_back(strActiveContext);
+	}
+	strTitleComponents.push_back("File Action Manager");
 
-		string strFile = getFileNameFromFullPath(m_strCurrFPSFilename);
+	szTitle = asString(strTitleComponents, false, " - ").c_str();
 		
-		// if the context path is empty display the title without context
-		if (strActiveContext.empty())
-		{
-			szTitle.Format("%s - %s on %s - File Action Manager", strFile.c_str(),
-				asString(getDBPointer()->DatabaseName).c_str(), asString(getDBPointer()->DatabaseServer).c_str());
-			m_propDatabasePage.setCurrentContextText("");
-		}
-		else
-		{
-			
-			if (strActiveContext == "No context defined!")
-			{
-				// Set the context string to not defined in red
-				m_propDatabasePage.setCurrentContextText(strActiveContext, RGB(255,0,0) /* Red */);
-			}
-			else
-			{
-				// set the context string in default color
-				m_propDatabasePage.setCurrentContextText(strActiveContext);
-			}
-
-			// Setup title that contains the current context
-			szTitle.Format("%s - %s on %s - %s - File Action Manager", strFile.c_str(),
-				asString(getDBPointer()->DatabaseName).c_str(), asString(getDBPointer()->DatabaseServer).c_str(),
-				strActiveContext.c_str());
-		}
-	}
-	else
-	{
-		m_propDatabasePage.setCurrentContextText("");
-	}
-
-	// Add the Processing state string if 
 	if (!m_strProcessingStateString.empty())
 	{
 		string strTitle = szTitle;
 		szTitle.Format("%s (%s)", strTitle.c_str(), m_strProcessingStateString.c_str());
 	}
 	SetWindowText(szTitle);
+
+	// Update context related controls on the database tab.
+	m_propDatabasePage.setCurrentContextState(bFileSaved, isValidContext(), strActiveContext);
 }
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingDlg::isFAMReady()
@@ -2451,6 +2463,13 @@ bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfiguratio
 		// Get the default file name based on action 
 		strFileName = (m_strCurrFPSFilename.empty()) ? getDefaultFileName(): m_strCurrFPSFilename;
 
+		// Use the currently selected context as the default save location.
+		if (m_ipFAMTagManager->FPSFileDir.length() > 0)
+		{
+			strFileName = removeLastSlashFromPath(asString(m_ipFAMTagManager->FPSFileDir))
+				+ "\\" + strFileName;
+		}
+
 		const static string strFilter = "File Processing Specifications (*.fps)|*.fps|"
 											"All Files (*.*)|*.*||";
 		
@@ -2467,8 +2486,6 @@ bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfiguratio
 			return false;
 		}
 
-		clearContext();
-
 		strFileName = (LPCTSTR) fileDlg.GetPathName();
 
 		// if the file already exists ask the user if they want to overwrite it
@@ -2479,6 +2496,23 @@ bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfiguratio
 			if (nRet == IDNO)
 			{
 				return false;
+			}
+		}
+
+		if (m_ipFAMTagManager->ActiveContext.length() > 0)
+		{
+			string strOldFPSFileDir = asString(m_ipFAMTagManager->FPSFileDir).c_str();
+			string strNewFPSFileDir = getDirectoryFromFullPath(strFileName).c_str();
+			if (_stricmp(strOldFPSFileDir.c_str(), strNewFPSFileDir.c_str()) != 0)
+			{
+				int nRet = MessageBox("The active context will not apply in this FPS file location.\r\n"
+					"Proper context tag values will need to be ensured.\r\n\r\n"
+					"Are you sure you want to save to this location?", 
+					"Changing Context", MB_YESNO );
+				if (nRet == IDNO)
+				{
+					return false;
+				}
 			}
 		}
 	}
@@ -3177,7 +3211,132 @@ string FileProcessingDlg::getDefaultFileName()
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::clearContext()
 {
-	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTag = m_ipFAMTagUtility;
-	ASSERT_RESOURCE_ALLOCATION("ELI38085", ipFAMTag != __nullptr);
-	ipFAMTag->FPSFileDir = "";
+	m_ipFAMTagManager->FPSFileDir = "";
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::refreshContext()
+{
+	if (m_ipFAMTagManager->FPSFileDir.length() == 0)
+	{
+		m_ipFAMTagManager->FPSFileName = m_strCurrFPSFilename.c_str();
+		m_ipFAMTagManager->FPSFileDir = getDirectoryFromFullPath(m_strCurrFPSFilename).c_str();
+	}
+	else
+	{
+		m_ipFAMTagManager->RefreshContextTags();
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::editCustomTags()
+{
+	try
+	{
+		getTagUtility()->EditCustomTags((long)m_hWnd);
+
+		m_bUpdatingConnection = true;
+		m_propDatabasePage.refreshConnection();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39297");
+
+	m_bUpdatingConnection = false;
+}
+//-------------------------------------------------------------------------------------------------
+bool FileProcessingDlg::displayRecentContextSelection()
+{
+	m_upContextMRUList->readFromPersistentStore();
+	vector<string> vecContexts;
+
+	long nSize = m_upContextMRUList->getCurrentListSize();
+	IContextTagProviderPtr m_ipContextTags("Extract.Utilities.ContextTags.ContextTagProvider");
+	ASSERT_RESOURCE_ALLOCATION("ELI39300", m_ipContextTags != nullptr);
+
+	map<string, string> mapContextOptions;
+
+	for(long i = 0; i < nSize; i++)
+	{
+		string strPath = m_upContextMRUList->at(i);
+		m_ipContextTags->ContextPath = strPath.c_str();
+		string strContext = asString(m_ipContextTags->ActiveContext);
+		if (isValidContext(strContext))
+		{
+			string strContextOption = Util::Format("%s (%s)", 
+				strContext.c_str(), strPath.c_str());
+			mapContextOptions[strContextOption] = strPath;
+			vecContexts.push_back(strContextOption);
+		}
+	}
+
+	CDialogSelect dlgSelect("Select the context to use:", "Select Context", vecContexts,
+		nSize > 0 ? vecContexts.front() : "");
+
+	if (dlgSelect.DoModal() == IDOK)
+	{
+		string strLastFPSFileDir = asString(m_ipFAMTagManager->FPSFileDir);
+
+		string strSelectedValue = (LPCTSTR)dlgSelect.m_zComboValue;
+		auto selectedOption = mapContextOptions.find(strSelectedValue);
+		m_ipFAMTagManager->FPSFileDir = (selectedOption == mapContextOptions.end())
+			? strSelectedValue.c_str()
+			: selectedOption->second.c_str();
+		// Prompt not only for a directory without a ContextTags.sdf file, but also for where an
+		// existing ContextTags.sdf does not have a context for FPSFileDir.
+		if (!isValidContext())
+		{
+			CString zWarning;
+			zWarning.Format("A context does not yet exist for the path:\r\n"
+				"\"%s\"\r\n\r\n"
+				"Do you wish to create one now?", dlgSelect.m_zComboValue);
+
+			int nResponse = MessageBox(zWarning, "Create context?",
+				MB_YESNO| MB_ICONEXCLAMATION);
+			if (nResponse != IDYES)
+			{
+				// If user decided no to create new context, switch back to the old one.
+				m_ipFAMTagManager->FPSFileDir = strLastFPSFileDir.c_str();
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+bool FileProcessingDlg::areDatabaseTagsDefined()
+{
+	IVariantVectorPtr ipContextTags = getTagUtility()->GetCustomFileTags();
+	ASSERT_RESOURCE_ALLOCATION("ELI39298", ipContextTags != nullptr);
+
+	long nSize = ipContextTags->Size;
+	int nCountDBTags = 0;		
+	for (long i = 0; i < nSize; i++)
+	{
+		string strTag = asString(ipContextTags->Item[i].bstrVal);
+		if (strTag == gstrDATABASE_SERVER_TAG ||
+			strTag == gstrDATABASE_NAME_TAG)
+		{
+			nCountDBTags++;
+		}
+	}
+
+	return (nCountDBTags == 2);
+}
+//-------------------------------------------------------------------------------------------------
+bool FileProcessingDlg::isValidContext(string strContext/* = ""*/)
+{
+	if (strContext.empty())
+	{
+		strContext = asString(m_ipFAMTagManager->ActiveContext);
+	}
+
+	return (!strContext.empty() && strContext != "No context defined!");
+}
+//-------------------------------------------------------------------------------------------------
+ITagUtilityPtr FileProcessingDlg::getTagUtility()
+{
+	ITagUtilityPtr ipTagUtility = m_ipFAMTagManager;
+	ASSERT_RESOURCE_ALLOCATION("ELI39274", ipTagUtility != nullptr);
+
+	return ipTagUtility;
 }

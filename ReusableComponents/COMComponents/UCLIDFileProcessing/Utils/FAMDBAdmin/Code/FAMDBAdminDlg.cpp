@@ -989,6 +989,13 @@ void CFAMDBAdminDlg::OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
 	// Enable the menus
 	enableMenus();
 }
+//-------------------------------------------------------------------------------------------------
+bool CFAMDBAdminDlg::PromptToSelectContext(bool& rbDBTagsAvailable)
+{
+	// FAMDBAdmin does not support context management.
+
+	THROW_LOGIC_ERROR_EXCEPTION("ELI39303");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods

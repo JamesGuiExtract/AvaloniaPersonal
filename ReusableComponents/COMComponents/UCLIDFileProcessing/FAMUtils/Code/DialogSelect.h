@@ -19,6 +19,11 @@ public:
 	
 	// This constructor causes object to use Server names in combo box
 	CDialogSelect(CWnd* pParent = NULL);   // standard constructor
+
+	// This constructor causes displays the specified list (along with a browse option that opens a
+	// folder browser) in a read-only dropdown.
+	CDialogSelect(const string& strPrompt, const string& strCaption,
+		const vector<string>& vecCustomList, const string& strDefaultValue = "", CWnd* pParent = NULL);
 	
 	virtual ~CDialogSelect();
 
@@ -58,6 +63,12 @@ private:
 	// Whether gstrDATABASE_SERVER_TAG should be show in the dropdown when the combo is of type
 	// kServerName.
 	bool m_bShowDBNameTag;
+
+	// These variables are used only for kCustomList type.
+	string m_strPrompt;
+	string m_strCaption;
+	vector<string> m_vecCustomList;
+	string m_strDefaultValue;
 
 public:
 	// Control value

@@ -8,6 +8,8 @@
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <MRUList.h>
+#include <IConfigurationSettingsPersistenceMgr.h>
 
 //--------------------------------------------------------------------------------------------------
 // Tag names
@@ -46,6 +48,11 @@ CFAMTagManager::CFAMTagManager()
 		ms_ipContextTagProvider.CreateInstance("Extract.Utilities.ContextTags.ContextTagProvider");
 		ASSERT_RESOURCE_ALLOCATION("ELI37903", ms_ipContextTagProvider != __nullptr);
 	}
+
+	m_upUserCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER,
+		gstrCOM_COMPONENTS_REG_PATH + "\\UCLIDFileProcessing"));
+		
+	m_upContextMRUList.reset(new MRUList(m_upUserCfgMgr.get(), "\\ContextsMRUList", "File_%d", 12));
 }
 //--------------------------------------------------------------------------------------------------
 CFAMTagManager::~CFAMTagManager()
@@ -113,23 +120,7 @@ STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
 		// the folder has not changed
 		// https://extract.atlassian.net/browse/ISSUE-13068
 		// https://extract.atlassian.net/browse/ISSUE-13078
-		ms_ipContextTagProvider->RefreshTags();
-		
-		// https://extract.atlassian.net/browse/ISSUE-13001
-		// Cache the context the tag values to avoid frequent COM calls which also tend to leak
-		// memory since the returned VariantVector type is not currently supported by the
-		// ReportMemoryUsage framework.
-		ms_mapContextTags.clear();
-		IVariantVectorPtr ipTagNames = ms_ipContextTagProvider->GetTagNames();
-		ASSERT_RESOURCE_ALLOCATION("ELI37905", ipTagNames != __nullptr);
-
-		long nTagCount = ipTagNames->Size;
-		for (long i = 0; i < nTagCount; i++)
-		{
-			string strName = asString(ipTagNames->Item[i].bstrVal);
-			string strValue = ms_ipContextTagProvider->GetTagValue(ipTagNames->Item[i].bstrVal);
-			ms_mapContextTags[strName] = strValue;
-		}
+		refreshContextTags();
 
 		return S_OK;
 	}
@@ -730,6 +721,20 @@ STDMETHODIMP CFAMTagManager::put_ActionName(BSTR strActionName)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38314");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::RefreshContextTags()
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		refreshContextTags();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39273");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -937,6 +942,46 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 		string strValue = iter->second;
 
 		replaceVariable(rstrInput, strTag, strValue);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMTagManager::refreshContextTags()
+{
+	ms_ipContextTagProvider->RefreshTags();
+
+	// https://extract.atlassian.net/browse/ISSUE-13528
+	// Update the context MRU based upon whether there is a valid context at FPSFileDir
+	string strContextPath = asString(ms_ipContextTagProvider->ContextPath);
+	if (!strContextPath.empty())
+	{
+		m_upContextMRUList->readFromPersistentStore();
+
+		if (ms_ipContextTagProvider->ActiveContext.length() == 0)
+		{
+			m_upContextMRUList->removeItem(strContextPath);
+		}
+		else
+		{
+			m_upContextMRUList->addItem(strContextPath);
+		}
+
+		m_upContextMRUList->writeToPersistentStore();
+	}
+
+	// https://extract.atlassian.net/browse/ISSUE-13001
+	// Cache the context the tag values to avoid frequent COM calls which also tend to leak
+	// memory since the returned VariantVector type is not currently supported by the
+	// ReportMemoryUsage framework.
+	ms_mapContextTags.clear();
+	IVariantVectorPtr ipTagNames = ms_ipContextTagProvider->GetTagNames();
+	ASSERT_RESOURCE_ALLOCATION("ELI37905", ipTagNames != __nullptr);
+
+	long nTagCount = ipTagNames->Size;
+	for (long i = 0; i < nTagCount; i++)
+	{
+		string strName = asString(ipTagNames->Item[i].bstrVal);
+		string strValue = ms_ipContextTagProvider->GetTagValue(ipTagNames->Item[i].bstrVal);
+		ms_mapContextTags[strName] = strValue;
 	}
 }
 //-------------------------------------------------------------------------------------------------

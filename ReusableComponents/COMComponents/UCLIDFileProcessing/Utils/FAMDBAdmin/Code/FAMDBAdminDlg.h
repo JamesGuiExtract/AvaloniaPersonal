@@ -74,6 +74,11 @@ public:
 	virtual void OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
 		string& rstrAdvConnStrProperties);
 
+	// Prompts user to select the context (ContactTags.sdf) to use. Assuming the user chooses a
+	// context, rbDBTagsAvailable will indicate whether the specified context has the
+	// <DatabaseServer> and <DatabaseName> tags defined.
+	bool PromptToSelectContext(bool& rbDBTagsAvailable);
+
 	// Method called to cause the summary tab to refresh its data
 	// If nActionID is -1, all actions are refreshed. Otherwise, only the action with the specified
 	// action ID is refreshed.

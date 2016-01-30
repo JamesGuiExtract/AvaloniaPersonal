@@ -2179,6 +2179,9 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Sets the Action name
 		[propget, id(16), helpstring("property ActionName")] HRESULT ActionName([out, retval] BSTR *strActionName);
 		[propput, id(16), helpstring("property ActionName")] HRESULT ActionName([in] BSTR strActionName);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Refreshes context tag info based on current FPSFileDir from ContextTags.sdf.
+		[id(17), helpstring("method RefreshContextTags")] HRESULT RefreshContextTags();
 	};
 
 	[

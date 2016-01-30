@@ -99,6 +99,11 @@ public:
 	void OnDBConfigChanged(
 		string& rstrServer, string& rstrDatabase, string& rstrAdvConnStrProperties);
 
+	// Prompts user to select the context (ContactTags.sdf) to use. Assuming the user chooses a
+	// context, rbDBTagsAvailable will indicate whether the specified context has the
+	// <DatabaseServer> and <DatabaseName> tags defined.
+	bool PromptToSelectContext(bool& rbDBTagsAvailable);
+
 protected:
 // Overrides
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
@@ -289,9 +294,13 @@ private:
 	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_upUserConfig;
 	std::unique_ptr<MRUList> m_upMRUList;
 
+	// MRU for contexts
+	unique_ptr<IConfigurationSettingsPersistenceMgr> m_upUserConfig2;
+	unique_ptr<MRUList> m_upContextMRUList;
+
 	// Used to determine if <DatabaseServer> and <DatabaseName> environment specific path tags are
 	// available for use in m_propDatabasePage.
-	ITagUtilityPtr m_ipFAMTagUtility;
+	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr m_ipFAMTagManager;
 
 	////////////
 	// Methods
@@ -402,4 +411,23 @@ private:
 
 	// Clears the settings that indicate a context
 	void clearContext();
+
+	// Refreshes context tag info based on current FPSFileDir from ContextTags.sdf.
+	void refreshContext();
+
+	// Displays custom tags editor
+	void editCustomTags();
+
+	// Displays dialog allowing used to select from recently used contexts or to browse to one
+	// manually.
+	bool displayRecentContextSelection();
+
+	// Indicates whether an active context has defined the <DatabaseServer> and <DatabaseName> tags.
+	bool areDatabaseTagsDefined();
+
+	// Checks that strContext is populated and not a special string indicating a missing context.
+	bool isValidContext(string strContext = "");
+
+	// Retrieves get an ITagUtility interface pointer to m_ipFAMTagManager.
+	ITagUtilityPtr getTagUtility();
 };

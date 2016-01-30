@@ -91,6 +91,7 @@ void DatabasePage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON_LAST_USED_DB, m_btnConnectLastUsedDB);
 	DDX_Control(pDX, IDC_BUTTON_CONN_STR, m_btnAdvConnStrProperties);
 	DDX_Control(pDX, IDC_BUTTON_USE_CURRENT_CONTEXT, m_btnUseCurrentContextDatabase);
+	DDX_Control(pDX, IDC_BUTTON_SELECT_CONTEXT, m_btnSelectContext);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -104,6 +105,7 @@ BEGIN_MESSAGE_MAP(DatabasePage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BUTTON_LAST_USED_DB, &DatabasePage::OnBnClickedButtonLastUsedDb)
 	ON_BN_CLICKED(IDC_BUTTON_CONN_STR, &DatabasePage::OnBnClickedButtonAdvConnStrProperties)
 	ON_BN_CLICKED(IDC_BUTTON_USE_CURRENT_CONTEXT, &DatabasePage::OnBnClickedButtonUseCurrentContextDatabase)
+	ON_BN_CLICKED(IDC_BUTTON_SELECT_CONTEXT, &DatabasePage::OnBnClickedButtonSelectContext)
 	ON_BN_CLICKED(IDC_STATIC_CURRENT_CONTEXT_LABEL, &DatabasePage::OnBnClickedCurrentContextLabel)
 	ON_BN_CLICKED(IDC_STATIC_CURRENT_CONTEXT, &DatabasePage::OnBnClickedCurrentContextLabel)
 	ON_WM_CTLCOLOR()
@@ -124,6 +126,14 @@ BOOL DatabasePage::OnInitDialog()
 
 		// Call the setBrowsEnabled using the flag
 		setBrowseEnabled(m_bBrowseEnabled);
+
+		// Create an underline font for the current context label to indicate click-ability.
+		CFont *pFont = m_labelCurrentContext.GetFont();
+		LOGFONT lf; 
+		pFont->GetLogFont(&lf);
+		lf.lfUnderline = true;
+		m_contextLabelFont.CreateFontIndirect(&lf);
+		m_labelCurrentContext.SetFont(&m_contextLabelFont);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16161");
 	
@@ -219,7 +229,8 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 		}
 
 		int iLRMargin, iDistBetween, iBrowseBtnWidth, iRefreshBtnWidth;
-		CRect rectDlg, rectServer, rectBrowseBtn, rectRefreshBtn, rectConnectLastDBBtn, rectCurrContext;
+		CRect rectDlg, rectServer, rectBrowseBtn, rectRefreshBtn, rectConnectLastDBBtn,
+			rectCurrContextDBBtn, rectSelectContextBtn, rectCurrContextLabel;
 
 		// Get the Pages client window
 		GetClientRect(&rectDlg);
@@ -240,9 +251,12 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 		m_btnConnectLastUsedDB.GetWindowRect(&rectConnectLastDBBtn);
 		ScreenToClient(&rectConnectLastDBBtn);
 
+		m_btnConnectLastUsedDB.GetWindowRect(&rectCurrContextDBBtn);
+		ScreenToClient(&rectCurrContextDBBtn);
+
 		// Get the current context edit box size and position
-		m_labelCurrentContext.GetWindowRect(&rectCurrContext);
-		ScreenToClient(&rectCurrContext);
+		m_labelCurrentContext.GetWindowRect(&rectCurrContextLabel);
+		ScreenToClient(&rectCurrContextLabel);
 
 		// Calculate the space to leave to the right and left
 		iLRMargin = rectServer.left - rectDlg.left;
@@ -306,17 +320,23 @@ void DatabasePage::OnSize(UINT nType, int cx, int cy)
 		// Move the ConnectLastDB button
 		rectConnectLastDBBtn.left = rectRefreshBtn.right - rectConnectLastDBBtn.Width();
 		rectConnectLastDBBtn.right = rectRefreshBtn.right;
-		rectConnectLastDBBtn.top = rectRefreshBtn.bottom + iDistBetween;
+		rectConnectLastDBBtn.top = rectResize.bottom + (iDistBetween * 2);
 		rectConnectLastDBBtn.bottom = rectConnectLastDBBtn.top + rectRefreshBtn.Height();
 		m_btnConnectLastUsedDB.MoveWindow(rectConnectLastDBBtn);
 
 		// Move the use current context database button
-		rectResize.left = rectConnectLastDBBtn.left - 4 - rectConnectLastDBBtn.Width();
-		rectResize.right = rectConnectLastDBBtn.left - 4;
-		rectResize.top = rectConnectLastDBBtn.top;
-		rectResize.bottom = rectConnectLastDBBtn.bottom;
-		
-		m_btnUseCurrentContextDatabase.MoveWindow(rectResize);
+		rectCurrContextDBBtn.left = rectConnectLastDBBtn.left - iDistBetween - rectConnectLastDBBtn.Width();
+		rectCurrContextDBBtn.right = rectConnectLastDBBtn.left - iDistBetween;
+		rectCurrContextDBBtn.top = rectConnectLastDBBtn.top;
+		rectCurrContextDBBtn.bottom = rectConnectLastDBBtn.bottom;
+		m_btnUseCurrentContextDatabase.MoveWindow(rectCurrContextDBBtn);
+
+		// Move the select context button
+		rectSelectContextBtn.left = rectCurrContextDBBtn.left - rectCurrContextDBBtn.Width();
+		rectSelectContextBtn.right = rectCurrContextDBBtn.left - iDistBetween;
+		rectSelectContextBtn.top = rectCurrContextDBBtn.top;
+		rectSelectContextBtn.bottom = rectCurrContextDBBtn.bottom;
+		m_btnSelectContext.MoveWindow(rectSelectContextBtn);
 
 		// Size the Current context edit box
 		positionContextLabel();
@@ -428,6 +448,34 @@ void DatabasePage::OnBnClickedButtonUseCurrentContextDatabase()
 		notifyObjects();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38064");
+}
+//-------------------------------------------------------------------------------------------------
+void DatabasePage::OnBnClickedButtonSelectContext()
+{
+	try
+	{
+		bool bDBTagsAvailable = false;
+		if (m_pNotifyDBConfigChangedObject != __nullptr)
+		{
+			if (!m_pNotifyDBConfigChangedObject->PromptToSelectContext(bDBTagsAvailable))
+			{
+				return;
+			}
+		}
+
+		if (bDBTagsAvailable)
+		{
+			m_zServer = gstrDATABASE_SERVER_TAG.c_str();
+			m_zDBName = gstrDATABASE_NAME_TAG.c_str();
+			setServer(gstrDATABASE_SERVER_TAG);
+			setDatabase(gstrDATABASE_NAME_TAG);
+		}
+
+		UpdateData(FALSE);
+
+		notifyObjects();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39299");
 }
 //-------------------------------------------------------------------------------------------------
 void DatabasePage::OnBnClickedCurrentContextLabel()
@@ -580,6 +628,7 @@ void DatabasePage::setBrowseEnabled(bool bBrowseEnabled)
 		m_btnAdvConnStrProperties.EnableWindow(asMFCBool(m_bBrowseEnabled));
 		m_btnConnectLastUsedDB.ShowWindow(m_bBrowseEnabled ? SW_SHOW : SW_HIDE);
 		m_btnUseCurrentContextDatabase.ShowWindow(m_bBrowseEnabled ? SW_SHOW : SW_HIDE);
+		m_btnSelectContext.ShowWindow(m_bBrowseEnabled ? SW_SHOW : SW_HIDE);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -632,20 +681,38 @@ void DatabasePage::enableAllControls(bool bEnableAll)
 	m_editAdvConnStrProperties.EnableWindow(bEnable);
 }
 //-------------------------------------------------------------------------------------------------
-void DatabasePage::setCurrentContextText(const string& strCurrentContextText, COLORREF crColor)
+void DatabasePage::setCurrentContextState(bool bFPSSaved, bool bValidContext, 
+										  const string& strContextName)
 {
 	// Make sure the current context edit control is visible if there is a context to display.
-	int nShow = strCurrentContextText.empty() ? SW_HIDE : SW_SHOW;
+	int nShow = strContextName.empty() ? SW_HIDE : SW_SHOW;
 	m_labelCurrentContextLabel.ShowWindow(nShow);
 	m_labelCurrentContext.ShowWindow(nShow);
 
 	// set the text color that should be used for the edit control
-	m_crContextTextColor = crColor;
+	m_crContextTextColor = bValidContext
+			?  RGB(0,0,255) /* Blue */
+			: RGB(255,0,0) /* Red */;
 
 	// set the text of the Current context edit control
-	m_labelCurrentContext.SetWindowText(strCurrentContextText.c_str());
+	m_labelCurrentContext.SetWindowText(strContextName.c_str());
 
 	positionContextLabel();
+
+	if (m_pNotifyDBConfigChangedObject != nullptr)
+	{
+		m_btnUseCurrentContextDatabase.EnableWindow(asMFCBool(bValidContext));
+
+		m_btnSelectContext.EnableWindow(!bValidContext || !bFPSSaved);
+		m_btnSelectContext.SetWindowText((!bValidContext && bFPSSaved)
+			? "Create context..."
+			: "Select context...");
+	}
+	else
+	{
+		m_btnUseCurrentContextDatabase.EnableWindow(FALSE);
+		m_btnSelectContext.EnableWindow(FALSE);
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void DatabasePage::positionContextLabel()

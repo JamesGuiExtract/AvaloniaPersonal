@@ -16,7 +16,8 @@ public:
 	// Enum for the type of info displayed in combo box list
 	enum EDBInfoType {
 		kServerName,
-		kDatabaseName
+		kDatabaseName,
+		kCustomList
 	};
 
 	DBInfoCombo(EDBInfoType eDBInfoType);
@@ -29,7 +30,14 @@ public:
 	
 	// Allows a special value to be added to the options in the dropdown in addition to the items
 	// that would normally appear.
-	void showSpecialValue(string strValue);
+	void showSpecialValue(const string& strValue);
+
+	// Converts the combo to a read-only (CBS_DROPDOWNLIST style). Unlike the default editable
+	// control, The combo's values will not be sorted.
+	void convertToDropDownList();
+
+	// Sets the list of items when kCustomList is being used.
+	void setList(const vector<string>& vecList, const string& strDefaultValue);
 
 protected:
 	DECLARE_MESSAGE_MAP()
@@ -50,6 +58,9 @@ private:
 
 	// A set of all the special values to be displayed in the dropdown.
 	set<string> m_setSpecialValues;
+
+	// When using kCustomList, the default value to select in the combo.
+	string m_strDefaultValue;
 
 	// Gets a list of installed SQL instances from the registry and adds (local)\<instance> to
 	// the list box.  If the instance is named MSSQL
