@@ -149,7 +149,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="FAMUtils.def" />
-    <None Include="resource" />
     <None Include="res\FAMUtils.rc2" />
   </ItemGroup>
   <ItemGroup>
