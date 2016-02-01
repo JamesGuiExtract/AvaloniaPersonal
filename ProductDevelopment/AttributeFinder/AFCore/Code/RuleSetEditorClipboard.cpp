@@ -474,8 +474,9 @@ void CRuleSetEditor::OnEditPaste()
 				// Display the Document Preprocessor description
 				m_zPPDescription = (char *) ipPreprocessor->GetDescription();
 
-				// enable and set the value of the checkbox
+				// enable and set the value of the checkboxes
 				GetDlgItem( IDC_CHECK_DOCUMENT_PP )->EnableWindow( TRUE );
+				GetDlgItem( IDC_CHECK_IGNORE_PP_ERRORS )->EnableWindow( TRUE );
 				if( ipPreprocessor->GetEnabled() == VARIANT_TRUE )
 				{
 					m_bDocumentPP = TRUE;
@@ -505,7 +506,7 @@ void CRuleSetEditor::OnEditPaste()
 				throw UCLIDException( "ELI07734", "Clipboard object is not an Output Handler." );
 			}
 
-			// Set Output Handlerr
+			// Set Output Handler
 			IObjectWithDescriptionPtr ipOH = ipObject;
 			if (ipOH != __nullptr)
 			{
@@ -519,8 +520,9 @@ void CRuleSetEditor::OnEditPaste()
 				// Display the Output Handler description
 				m_zOutputHandlerDescription = (char *) ipOH->GetDescription();
 				
-				// enable and set the value of the checkbox
+				// enable and set the value of the checkboxes
 				GetDlgItem( IDC_CHECK_OUTPUT_HANDLER )->EnableWindow( TRUE );
+				GetDlgItem( IDC_CHECK_IGNORE_OH_ERRORS )->EnableWindow( TRUE );
 				if( ipOH->GetEnabled() == VARIANT_TRUE )
 				{
 					m_bOutputHandler = TRUE;
@@ -650,6 +652,7 @@ void CRuleSetEditor::OnEditDelete()
 
 				// disable the checkbox
 				GetDlgItem( IDC_CHECK_DOCUMENT_PP )->EnableWindow( FALSE );
+				GetDlgItem( IDC_CHECK_IGNORE_PP_ERRORS )->EnableWindow( FALSE );
 				m_bDocumentPP = FALSE;
 				UpdateData(FALSE);
 			}
@@ -675,6 +678,7 @@ void CRuleSetEditor::OnEditDelete()
 
 				// disable the checkbox
 				GetDlgItem( IDC_CHECK_OUTPUT_HANDLER )->EnableWindow( FALSE );
+				GetDlgItem( IDC_CHECK_IGNORE_OH_ERRORS )->EnableWindow( FALSE );
 				m_bOutputHandler = FALSE;
 				UpdateData( FALSE );
 			}

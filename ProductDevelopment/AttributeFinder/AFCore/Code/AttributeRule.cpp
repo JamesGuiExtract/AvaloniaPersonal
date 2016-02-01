@@ -20,7 +20,8 @@ using namespace std;
 //         : m_ipDocPreprocessor is added in version 3
 //		   : m_bIgnoreErrors, m_bIgnorePreprocessorErrors, m_bIgnoreModifierErrors: version 4
 //		   : CIdentifiableObject: version 5
-const unsigned long gnCurrentVersion = 5;
+//		   : m_ipOutputHandler, m_bIgnoreOutputHandlerErrors: version 6
+const unsigned long gnCurrentVersion = 6;
 const long nNUM_PROGRESS_ITEMS_PER_VALUE_MODIFYING_RULE = 1;
 
 //-------------------------------------------------------------------------------------------------
@@ -33,6 +34,7 @@ m_bApplyModifyingRules(false),
 m_bIgnoreErrors(false),
 m_bIgnorePreprocessorErrors(false),
 m_bIgnoreModifierErrors(false),
+m_bIgnoreOutputHandlerErrors(false),
 m_bDirty(false)
 {
 }
@@ -109,9 +111,15 @@ STDMETHODIMP CAttributeRule::raw_CopyFrom(IUnknown * pObject)
 		ASSERT_RESOURCE_ALLOCATION("ELI08222", ipPreTemp != __nullptr);
 		m_ipDocPreprocessor = ipPreTemp->Clone();
 
+		// Set this object's Rule-Specific Output Handler
+		IObjectWithDescriptionPtr ipOHTemp = ipSource->GetRuleSpecificOutputHandler();
+		ASSERT_RESOURCE_ALLOCATION("ELI39275", ipOHTemp != __nullptr);
+		m_ipOutputHandler = ipOHTemp->Clone();
+
 		m_bIgnoreErrors = asCppBool(ipSource->IgnoreErrors);
 		m_bIgnoreModifierErrors = asCppBool(ipSource->IgnoreModifierErrors);
 		m_bIgnorePreprocessorErrors = asCppBool(ipSource->IgnorePreprocessorErrors);
+		m_bIgnoreOutputHandlerErrors = asCppBool(ipSource->IgnoreOutputHandlerErrors);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08223");
 
@@ -403,6 +411,37 @@ STDMETHODIMP CAttributeRule::put_IgnoreModifierErrors(VARIANT_BOOL newVal)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::get_IgnoreOutputHandlerErrors(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bIgnoreOutputHandlerErrors);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39276");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::put_IgnoreOutputHandlerErrors(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bIgnoreOutputHandlerErrors = asCppBool(newVal);
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39277");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc, 
 											   IProgressStatus *pProgressStatus,
 											   IIUnknownVector **pAttributes)
@@ -431,6 +470,9 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 				// Determine the number of enabled value modifying rules
 				long nNumValueModifyingRules = getEnabledValueModifyingRulesCount();
 
+				// Determine whether an enabled rule-level output handler exists and is enabled
+				bool bEnabledOutputHandlerExists = enabledOutputHandlerExists();
+
 				// Progress related constants
 				// NOTE: the constants below are weighted such that the time it takes to run the rules for an average attribute
 				// is approximately double the amount of time it takes to execute either the pre-processor or the output handler.
@@ -438,10 +480,12 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 				const long nNUM_PROGRESS_ITEMS_PRE_PROCESSOR = 1;
 				const long nNUM_PROGRESS_ITEMS_VALUE_FINDING_RULE = 2;
 				const long nNUM_PROGRESS_ITEMS_VALUE_MODIFYING_RULES = nNumValueModifyingRules * nNUM_PROGRESS_ITEMS_PER_VALUE_MODIFYING_RULE;
+				const long nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER = 1;
 				long nTOTAL_PROGRESS_ITEMS = nNUM_PROGRESS_ITEMS_INITIALIZE + // initializing is always going to happen
 					nNUM_PROGRESS_ITEMS_VALUE_FINDING_RULE + // value finding rule is always going to be run
 					nNUM_PROGRESS_ITEMS_VALUE_MODIFYING_RULES; // # of items for any enabled value modifying rules
 				nTOTAL_PROGRESS_ITEMS += bEnabledAttributePreProcessorExists ? nNUM_PROGRESS_ITEMS_PRE_PROCESSOR : 0;
+				nTOTAL_PROGRESS_ITEMS += bEnabledOutputHandlerExists ? nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER : 0;
 
 				// Initialize and update progress status
 				if (ipProgressStatus)
@@ -620,6 +664,49 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 				IStrToStrMapPtr ipStrMap = ipAFDoc->StringTags;
 				ASSERT_RESOURCE_ALLOCATION("ELI20203", ipStrMap != __nullptr);
 				ipStrMap->Merge(ipAFDocCopy->StringTags, kAppend);
+
+				try
+				{
+					try
+					{
+						// Run rule-specific Output Handler is exists and is enabled
+						if (bEnabledOutputHandlerExists)
+						{
+							UCLID_AFCORELib::IOutputHandlerPtr ipOutputHandler = m_ipOutputHandler->Object;
+							ASSERT_RUNTIME_CONDITION("ELI39304", ipOutputHandler != __nullptr,
+								"Invalid OutputHandler object!");
+							// Update progress status
+							if (ipProgressStatus)
+							{
+								ipProgressStatus->StartNextItemGroup("Executing field-rule output-handler...", 
+									nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER);
+							}
+
+							// Create a pointer to the Sub-ProgressStatus object, depending upon whether
+							// the caller requested progress information
+							IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+								__nullptr : ipProgressStatus->SubProgressStatus;
+
+							PROFILE_RULE_OBJECT(asString(m_ipOutputHandler->GetDescription()), "",
+								ipOutputHandler, 0)
+
+							// Execute the local attribute-level output handler rule
+							ipOutputHandler->ProcessOutput(ipResultingValues, ipAFDocCopy, ipProgressStatus); 
+						}
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39282");
+				}
+				catch(UCLIDException& ue)
+				{
+					if (m_bIgnoreOutputHandlerErrors)
+					{
+						ue.log();
+					}
+					else
+					{
+						throw ue;
+					}
+				}
 			}
 		}
 
@@ -670,6 +757,44 @@ STDMETHODIMP CAttributeRule::put_RuleSpecificDocPreprocessor(IObjectWithDescript
 		m_bDirty = true;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05862")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::get_RuleSpecificOutputHandler(IObjectWithDescription **pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (m_ipOutputHandler == __nullptr)
+		{
+			m_ipOutputHandler.CreateInstance(CLSID_ObjectWithDescription);
+			ASSERT_RESOURCE_ALLOCATION("ELI39288", m_ipOutputHandler != __nullptr);
+		}
+
+		IObjectWithDescriptionPtr ipShallowCopy = m_ipOutputHandler;
+		*pVal = ipShallowCopy.Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39289")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::put_RuleSpecificOutputHandler(IObjectWithDescription *newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_ipOutputHandler = newVal;
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39290")
 
 	return S_OK;
 }
@@ -740,6 +865,10 @@ STDMETHODIMP CAttributeRule::IsDirty(void)
 // Version 3:
 //   * Additionally saved:
 //            Document Preprocessor (as ObjectWithDescription)
+// Version 6:
+//   * Additionally saved:
+//            Output Handler (as ObjectWithDescription)
+//			  Ignore output handler errors (bool)
 STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -803,6 +932,11 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 			dataReader >> m_bIgnoreModifierErrors;
 		}
 
+		if (nDataVersion >= 6)
+		{
+			dataReader >> m_bIgnoreOutputHandlerErrors;
+		}
+
 		// Separately read the value finding rule object from the stream
 		IPersistStreamPtr ipObj;
 		readObjectFromStream(ipObj, pStream, "ELI09952");
@@ -850,6 +984,17 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 			loadGUID(pStream);
 		}
 
+		// If the version # is 6 or higher, then load the
+		// rule-specific OutputHandler object-with-description
+		if (nDataVersion >= 6)
+		{
+			ipObj = __nullptr;
+			readObjectFromStream(ipObj, pStream, "ELI39278");
+			ASSERT_RUNTIME_CONDITION("ELI39279", ipObj != __nullptr,
+				"OutputHandler object could not be read from stream!");
+			m_ipOutputHandler = ipObj;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -877,6 +1022,7 @@ STDMETHODIMP CAttributeRule::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bIgnoreErrors;
 		dataWriter << m_bIgnorePreprocessorErrors;
 		dataWriter << m_bIgnoreModifierErrors;
+		dataWriter << m_bIgnoreOutputHandlerErrors;
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -918,6 +1064,15 @@ STDMETHODIMP CAttributeRule::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
+
+		// Separately write the OutputHandler object-with-description to the stream
+		ipPersistentObj = getOutputHandler();
+		if (ipPersistentObj == __nullptr)
+		{
+			throw UCLIDException( "ELI39280", 
+				"OutputHandler object does not support persistence!" );
+		}
+		writeObjectToStream( ipPersistentObj, pStream, "ELI39281", fClearDirty );
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -1014,6 +1169,21 @@ IObjectWithDescriptionPtr CAttributeRule::getDocPreprocessor()
 		return m_ipDocPreprocessor;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI16927");
+}
+//-------------------------------------------------------------------------------------------------
+IObjectWithDescriptionPtr CAttributeRule::getOutputHandler()
+{
+	try
+	{
+		if (m_ipOutputHandler == __nullptr)
+		{
+			m_ipOutputHandler.CreateInstance(CLSID_ObjectWithDescription);
+			ASSERT_RESOURCE_ALLOCATION("ELI39295", m_ipOutputHandler != __nullptr);
+		}
+
+		return m_ipOutputHandler;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39296");
 }
 //-------------------------------------------------------------------------------------------------
 void CAttributeRule::applyModifyingRulesOnAttribute(UCLID_AFCORELib::IAttributePtr& ripAttribute, 
@@ -1161,5 +1331,11 @@ long CAttributeRule::getEnabledValueModifyingRulesCount()
 	}
 
 	return nCount;
+}
+//-------------------------------------------------------------------------------------------------
+bool CAttributeRule::enabledOutputHandlerExists()
+{
+	return (m_ipOutputHandler != __nullptr) && (m_ipOutputHandler->Object != __nullptr) &&
+		asCppBool( m_ipOutputHandler->GetEnabled() );
 }
 //-------------------------------------------------------------------------------------------------

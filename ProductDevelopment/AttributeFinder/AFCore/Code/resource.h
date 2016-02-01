@@ -119,6 +119,7 @@
 #define IDC_EDIT_PREPROCESSOR           283
 #define IDC_BTN_SELECTPP                284
 #define IDI_ICON_RULE_TESTER            285
+#define IDC_EDIT_OUTPUTHANDLER          285
 #define IDC_EDIT_PRD_VERSION            286
 #define IDC_STATIC_PP                   287
 #define IDC_STATIC_ATTR                 288
@@ -162,6 +163,7 @@
 #define IDC_CHECK_OUTPUT_HANDLER        326
 #define IDC_CHECK_AFRULE_DOC_PP         327
 #define IDC_CHECK_SWIPING_RULE          328
+#define IDC_CHECK_AFRULE_OH             328
 #define IDC_CHECK_PERFORM_OCR           329
 #define IDC_FKB_VERSION                 330
 #define IDC_CHECK_IGNORE_AS_ERRORS      331
@@ -190,6 +192,9 @@
 #define IDC_BTN_EDIT_COUNTER            368
 #define IDC_BTN_DELETE_COUNTER          369
 #define IDC_EDIT_ID                     370
+#define IDC_STATIC_USE_OH               371
+#define IDC_BTN_SELECT_OH               372
+#define ID_EDIT_DELETE                  6023
 #define ID_FILE_SAVEAS                  32768
 #define ID_FILE_EXIT                    32769
 #define ID_TOOLS_TEST                   32770
@@ -202,10 +207,6 @@
 #define ID_FILE_EXPORT                  32778
 #define ID_BUTTON_EXECUTE               32779
 #define ID_BUTTON_CLEAR                 32780
-
-// Use resource value previously defined in BaseUtils
-#define ID_EDIT_DELETE                  6023
-
 #define ID_CANCEL                       32782
 #define ID_EDIT_DUPLICATE               32783
 #define ID_TOOLS_HARNESS                32784
@@ -222,7 +223,7 @@
 #define ID_BUTTON_ABOUT                 32799
 #define ID_INDICATOR_COUNTERS           57604
 #define ID_INDICATOR_INTERNAL_USE_ONLY  57605
-#define ID_INDICATOR_SWIPING			57606
+#define ID_INDICATOR_SWIPING            57606
 #define IDS_FLEXINDEX_PRODUCT           57607
 #define IDS_IDSHIELD_PRODUCT            57608
 #define IDS_UNKNOWN_PRODUCT             57609
@@ -235,7 +236,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        371
 #define _APS_NEXT_COMMAND_VALUE         32800
-#define _APS_NEXT_CONTROL_VALUE         371
+#define _APS_NEXT_CONTROL_VALUE         373
 #define _APS_NEXT_SYMED_VALUE           134
 #endif
 #endif

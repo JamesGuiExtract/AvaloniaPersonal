@@ -30,16 +30,13 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-// Dialog size bounds
-const int	giADDRULEDLG_MIN_WIDTH			= 410;
-const int	giADDRULEDLG_MIN_HEIGHT			= 365;
-
 // Column widths
 const int giENABLE_LIST_COLUMN = 0;
 const int giDESC_LIST_COLUMN = 1;
 
 const bstr_t gbstrATTRIBUTE_MODIFYING_RULE_DISPLAY_NAME = "Attribute Modifying Rule";
 const bstr_t gbstrRULE_SPECIFIC_DOCUMENT_PREPROCESSOR_DISPLAY_NAME = "Rule-Specific Document Preprocessor";
+const bstr_t gbstrRULE_SPECIFIC_OUTPUT_HANDLER_DISPLAY_NAME = "Rule-Specific Output Handler";
 
 //-------------------------------------------------------------------------------------------------
 // CAddRuleDlg dialog
@@ -51,7 +48,10 @@ CAddRuleDlg::CAddRuleDlg(IClipboardObjectManagerPtr ipCBMgr,
 	m_eContextMenuCtrl(kNoControl),
 	m_ipDocPreprocessor(__nullptr),
 	m_bInitialized(false), 
-	m_ipRule(ipRule), m_ipClipboardMgr(ipCBMgr)
+	m_ipRule(ipRule),
+	m_ipClipboardMgr(ipCBMgr),
+	m_ipOutputHandler(__nullptr),
+	m_wMgr(this, "")
 {
 	// create MiscUtils object
 	m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
@@ -62,8 +62,10 @@ CAddRuleDlg::CAddRuleDlg(IClipboardObjectManagerPtr ipCBMgr,
 	m_zDescription = _T("");
 	m_zPrompt = _T("Select Attribute Finding rule");
 	m_zPPDescription = _T("");
+	m_zOHDescription = _T("");
 	m_bIgnoreModErrors = FALSE;
 	m_bIgnoreDocPPErrors = FALSE;
+	m_bIgnoreOHErrors = FALSE;
 	//}}AFX_DATA_INIT
 }
 //-------------------------------------------------------------------------------------------------
@@ -81,13 +83,17 @@ void CAddRuleDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_CONRULE, m_btnConRule);
 	DDX_Control(pDX, IDC_BTN_ADDRULE, m_btnAddRule);
 	DDX_Control(pDX, IDC_BTN_SELECTPP, m_btnSelectPreprocessor);
+	DDX_Control(pDX, IDC_BTN_SELECT_OH, m_btnSelectOutputHandler);
 	DDX_Check(pDX, IDC_CHECK_MODIFY, m_bApplyMod);
 	DDX_Check(pDX, IDC_CHECK_AFRULE_DOC_PP, m_bDocPP);
+	DDX_Check(pDX, IDC_CHECK_AFRULE_OH, m_bOH);
 	DDX_Text(pDX, IDC_EDIT_DESC, m_zDescription);
 	DDX_Text(pDX, IDC_STATIC_DESC, m_zPrompt);
 	DDX_Text(pDX, IDC_EDIT_PREPROCESSOR, m_zPPDescription);
+	DDX_Text(pDX, IDC_EDIT_OUTPUTHANDLER, m_zOHDescription);
 	DDX_Check(pDX, IDC_CHECK_IGNORE_PP_ERRORS, m_bIgnoreDocPPErrors);
 	DDX_Check(pDX, IDC_CHECK_IGNORE_MODIFIER_ERRORS, m_bIgnoreModErrors);
+	DDX_Check(pDX, IDC_CHECK_IGNORE_OH_ERRORS, m_bIgnoreOHErrors);
 	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
@@ -100,14 +106,17 @@ BEGIN_MESSAGE_MAP(CAddRuleDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_RULEUP, OnBtnRuleUp)
 	ON_BN_CLICKED(IDC_BTN_RULEDOWN, OnBtnRuleDown)
 	ON_BN_CLICKED(IDC_BTN_SELECTPP, OnBtnSelectPreprocessor)
+	ON_BN_CLICKED(IDC_BTN_SELECT_OH, OnBtnSelectOutputHandler)
 	ON_BN_CLICKED(IDC_CHECK_MODIFY, OnCheckModify)
 	ON_BN_CLICKED(IDC_CHECK_AFRULE_DOC_PP, &CAddRuleDlg::OnBnClickedCheckAfruleDocPp)
+	ON_BN_CLICKED(IDC_CHECK_AFRULE_OH, &CAddRuleDlg::OnBnClickedCheckAFRuleOH)
 	ON_CBN_SELCHANGE(IDC_COMBO_RULE, OnSelchangeComboRule)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_RULES, OnClickListRules)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_RULES, OnDblclkListRules)
 	ON_WM_MOUSEACTIVATE()
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_RULES, OnRclickListRules)
 	ON_NOTIFY(NM_RCLICK, IDC_EDIT_PREPROCESSOR, OnRclickEditPreprocessor)
+	ON_NOTIFY(NM_RCLICK, IDC_EDIT_OUTPUTHANDLER, OnRclickEditOutputHandler)
 	ON_COMMAND(ID_EDIT_CUT, OnEditCut)
 	ON_COMMAND(ID_EDIT_COPY, OnEditCopy)
 	ON_COMMAND(ID_EDIT_PASTE, OnEditPaste)
@@ -119,6 +128,7 @@ BEGIN_MESSAGE_MAP(CAddRuleDlg, CDialog)
 	ON_WM_GETMINMAXINFO()
 	//}}AFX_MSG_MAP
 	ON_STN_DBLCLK(IDC_EDIT_PREPROCESSOR, &CAddRuleDlg::OnDoubleClickDocumentPreprocessor)
+	ON_STN_DBLCLK(IDC_EDIT_OUTPUTHANDLER, &CAddRuleDlg::OnDoubleClickOutputHandler)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -142,6 +152,17 @@ BOOL CAddRuleDlg::OnInitDialog()
 	{	
 		CDialog::OnInitDialog();
 		
+		// Save original client width/height
+		CRect rectDlg;
+		GetClientRect(rectDlg);
+		m_nDefaultW = rectDlg.Width();
+		m_nDefaultH = rectDlg.Height();
+	
+		// Save minimum window width/height
+		GetWindowRect(rectDlg);
+		m_nMinWidth = rectDlg.Width() * 4 / 5;
+		m_nMinHeight = rectDlg.Height() * 4 / 5;
+
 		// Set Up and Down bitmaps to buttons
 		m_btnRuleUp.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_UP)));
 		m_btnRuleDown.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_DOWN)));
@@ -166,6 +187,9 @@ BOOL CAddRuleDlg::OnInitDialog()
 
 		// Set the AttributeModifyingRules and the checkbox
 		setAMRules();
+
+		// Set the Output Handler
+		setOutputHandler();
 
 		// Initialize the buttons' enabled/disabled states
 		setButtonStates();
@@ -592,6 +616,37 @@ void CAddRuleDlg::OnBtnSelectPreprocessor()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06085")
 }
 //-------------------------------------------------------------------------------------------------
+void CAddRuleDlg::OnBtnSelectOutputHandler() 
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
+
+	try
+	{
+		// make sure the output handler is non-null
+		if (m_ipOutputHandler == __nullptr)
+		{
+			setOutputHandler();
+		}
+
+		// get position of output handler commands button
+		RECT rect;
+		m_btnSelectOutputHandler.GetWindowRect(&rect);
+
+		// allow the user to select and configure the document preprocessor
+		VARIANT_BOOL vbDirty = m_ipMiscUtils->HandlePlugInObjectCommandButtonClick(m_ipOutputHandler,
+			"Rule-Specific Output Handler", get_bstr_t(AFAPI_OUTPUT_HANDLERS_CATEGORYNAME),
+			VARIANT_TRUE, gRequiredInterfaces.ulCount, gRequiredInterfaces.pIIDs, rect.right, rect.top);
+
+		if (vbDirty == VARIANT_TRUE)
+		{
+			// update the output handler controls to reflect changes
+			updateOutputHandlerCheckBoxAndEditControl();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06085")
+}
+//-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::OnClickListRules(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -809,9 +864,13 @@ void CAddRuleDlg::OnOK()
 
 			// Store the Document Preprocessor
 			m_ipRule->RuleSpecificDocPreprocessor = m_ipDocPreprocessor;
+
+			// Store the Output Handler
+			m_ipRule->RuleSpecificOutputHandler = m_ipOutputHandler;
 			
 			m_ipRule->IgnorePreprocessorErrors = asVariantBool(m_bIgnoreDocPPErrors);
 			m_ipRule->IgnoreModifierErrors = asVariantBool(m_bIgnoreModErrors);
+			m_ipRule->IgnoreOutputHandlerErrors = asVariantBool(m_bIgnoreOHErrors);
 		}
 
 		CDialog::OnOK();
@@ -866,8 +925,9 @@ BOOL CAddRuleDlg::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 			LRESULT	result = 0;
 
 			// Get positions of controls of interest
-			CRect	rectPre;
+			CRect	rectPre, rectOH;
 			GetDlgItem( IDC_EDIT_PREPROCESSOR )->GetWindowRect( &rectPre );
+			GetDlgItem( IDC_EDIT_OUTPUTHANDLER )->GetWindowRect( &rectOH );
 
 			// Get mouse position
 			CPoint	point;
@@ -879,6 +939,13 @@ BOOL CAddRuleDlg::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 			{
 				// Create and manage a context menu for Preprocessor
 				OnRclickEditPreprocessor( NULL, &result );
+			}
+			// Check to see if right-click in Output Handler edit box
+			else if ((point.x >= rectOH.left) && (point.x <= rectOH.right) &&
+				(point.y >= rectOH.top) && (point.y <= rectOH.bottom))
+			{
+				// Create and manage a context menu for Output Handler
+				OnRclickEditOutputHandler( NULL, &result );
 			}
 		}
 	}
@@ -1035,6 +1102,73 @@ void CAddRuleDlg::OnRclickEditPreprocessor(NMHDR* pNMHDR, LRESULT* pResult)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06086")
 }
 //-------------------------------------------------------------------------------------------------
+void CAddRuleDlg::OnRclickEditOutputHandler(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
+
+	try
+	{
+		// Load the context menu
+		CMenu menu;
+		menu.LoadMenu( IDR_MNU_CONTEXT );
+		CMenu *pContextMenu = menu.GetSubMenu( 0 );
+
+		// Clear the flag
+		m_eContextMenuCtrl = kOutputHandler;
+
+		//////////////////////////
+		// Enable or disable items
+		//////////////////////////
+		UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
+		UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+
+		if (m_ipOutputHandler == __nullptr)
+		{
+			// No Rule defined, therefore no OutputHandler
+			pContextMenu->EnableMenuItem(ID_EDIT_CUT, nDisable);
+			pContextMenu->EnableMenuItem(ID_EDIT_COPY, nDisable);
+			pContextMenu->EnableMenuItem(ID_EDIT_DELETE, nDisable);
+		}
+		else
+		{
+			// Rule defined, now retrieve the OutputHandler description
+			CString	zDesc;
+			zDesc = (char *)m_ipOutputHandler->Description;
+			// OutputHandler is not defined
+			pContextMenu->EnableMenuItem(ID_EDIT_CUT, zDesc.IsEmpty() ? nDisable : nEnable);
+			pContextMenu->EnableMenuItem(ID_EDIT_COPY, zDesc.IsEmpty() ? nDisable : nEnable);
+			pContextMenu->EnableMenuItem(ID_EDIT_DELETE, zDesc.IsEmpty() ? nDisable : nEnable);
+			
+			// Check Clipboard object type
+			if (m_ipClipboardMgr->ObjectIsTypeWithDescription( 
+				IID_IOutputHandler ))
+			{
+				// Object is an ObjectWithDescription item
+				// where the object is a Document OutputHandler
+				pContextMenu->EnableMenuItem( ID_EDIT_PASTE, nEnable );
+			}
+			else
+			{
+				// Object is not an ObjectWithDescription item
+				// where the object is a Document OutputHandler
+				pContextMenu->EnableMenuItem( ID_EDIT_PASTE, nDisable );
+			}
+		}
+
+		// Map the point to the correct position
+		CPoint	point;
+		GetCursorPos(&point);
+		
+		// Display and manage the context menu
+		pContextMenu->TrackPopupMenu( TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, 
+			point.x, point.y, this );
+
+		*pResult = 0;
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39301")
+}
+//-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::OnDoubleClickDocumentPreprocessor()
 {
 	try
@@ -1061,6 +1195,32 @@ void CAddRuleDlg::OnDoubleClickDocumentPreprocessor()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16042")
 }
 //-------------------------------------------------------------------------------------------------
+void CAddRuleDlg::OnDoubleClickOutputHandler()
+{
+	try
+	{
+		// make sure the doc OutputHandler is non-null
+		if (m_ipOutputHandler == __nullptr)
+		{
+			setOutputHandler();
+		}
+
+		// update m_upOutputHandler based on user input
+		VARIANT_BOOL vbDirty = m_ipMiscUtils->HandlePlugInObjectDoubleClick(
+			m_ipOutputHandler, gbstrRULE_SPECIFIC_OUTPUT_HANDLER_DISPLAY_NAME,
+			get_bstr_t(AFAPI_OUTPUT_HANDLERS_CATEGORYNAME), 
+			VARIANT_TRUE, gRequiredInterfaces.ulCount, gRequiredInterfaces.pIIDs);
+
+		// check if m_upOutputHandler was modified
+		if (vbDirty == VARIANT_TRUE)
+		{
+			// refresh the OutputHandler check box and edit control to reflect changes
+			updateOutputHandlerCheckBoxAndEditControl();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39302")
+}
+//-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::OnChangeEditDesc() 
 {
 	UpdateData(TRUE);
@@ -1068,160 +1228,64 @@ void CAddRuleDlg::OnChangeEditDesc()
 //--------------------------------------------------------------------------------------------------
 void CAddRuleDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
-	// Minimum width to allow display of buttons, text, list
-	lpMMI->ptMinTrackSize.x = giADDRULEDLG_MIN_WIDTH;
-
-	// Minimum height to allow display of list, edit boxes, buttons
-	lpMMI->ptMinTrackSize.y = giADDRULEDLG_MIN_HEIGHT;
+	lpMMI->ptMinTrackSize.x = m_nMinWidth;
+	lpMMI->ptMinTrackSize.y = m_nMinHeight;
+	CDialog::OnGetMinMaxInfo(lpMMI);
 }
 //--------------------------------------------------------------------------------------------------
 void CAddRuleDlg::OnSize(UINT nType, int cx, int cy) 
 {
 	try
 	{
+
+		CDialog::OnSize(nType, cx, cy);
+
 		if (m_bInitialized)
 		{
-			////////////////////////////
-			// Prepare controls for move
-			////////////////////////////
-			CRect	rectDlg;
-			CRect	rectOK;
-			CRect	rectCancel;
-			CRect	rectList;
-			CRect	rectAdd;
-			CRect	rectDel;
-			CRect	rectMod;
-			CRect	rectSelect;
-			CRect	rectConfigure;
-			CRect	rectPrompt;
-			CRect	rectPre;
-			CRect	rectDesc;
-			CRect	rectCombo;
-			CRect	rectUp;
-			CRect	rectIECheck;
+			// Move/resize controls anchored all
+			m_wMgr.moveAnchoredAll(*GetDlgItem(IDC_LIST_RULES), m_nDefaultW, m_nDefaultH, FALSE);
 
-			// Get total dialog size
-			GetWindowRect( &rectDlg );
-			ScreenToClient( &rectDlg );
+			// Move/resize controls anchored top, left right
+			m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_EDIT_PREPROCESSOR), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_EDIT_DESC), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_COMBO_RULE), m_nDefaultW, m_nDefaultH, FALSE);
 
-			// Get original position of controls
-			GetDlgItem( IDOK )->GetWindowRect( rectOK );
-			GetDlgItem( IDCANCEL )->GetWindowRect( rectCancel );
-			GetDlgItem( IDC_LIST_RULES )->GetWindowRect( rectList );
-			GetDlgItem( IDC_BTN_ADDRULE )->GetWindowRect( rectAdd );
-			GetDlgItem( IDC_BTN_DELRULE )->GetWindowRect( rectDel );
-			GetDlgItem( IDC_BTN_CONRULE )->GetWindowRect( rectMod );
-			GetDlgItem( IDC_STATIC_CONFIGURE )->GetWindowRect( rectPrompt );
-			GetDlgItem( IDC_BTN_SELECTPP )->GetWindowRect( rectSelect );
-			GetDlgItem( IDC_BTN_CONRULE2 )->GetWindowRect( rectConfigure );
-			GetDlgItem( IDC_EDIT_PREPROCESSOR )->GetWindowRect( rectPre );
-			GetDlgItem( IDC_EDIT_DESC )->GetWindowRect( rectDesc );
-			GetDlgItem( IDC_COMBO_RULE )->GetWindowRect( rectCombo );
-			GetDlgItem( IDC_BTN_RULEUP )->GetWindowRect( rectUp );
-			GetDlgItem( IDC_CHECK_IGNORE_MODIFIER_ERRORS )->GetWindowRect( rectIECheck );
-			
-			// Compute space between buttons
-			int iDiffX1 = rectCancel.left - rectOK.right;
+			// Move controls anchored top and right
+			m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_SELECTPP), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_CONRULE2), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_ADDRULE), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_CONRULE), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_DELRULE), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_RULEDOWN), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_RULEUP), m_nDefaultW, m_nDefaultH, FALSE);
 
-			// Convert to client coordinates to facilitate the move
-			ScreenToClient( &rectOK );
-			ScreenToClient( &rectCancel );
-			ScreenToClient( &rectList );
-			ScreenToClient( &rectAdd );
-			ScreenToClient( &rectDel );
-			ScreenToClient( &rectMod );
-			ScreenToClient( &rectPrompt );
-			ScreenToClient( &rectSelect );
-			ScreenToClient( &rectConfigure );
-			ScreenToClient( &rectPre );
-			ScreenToClient( &rectDesc );
-			ScreenToClient( &rectCombo );
-			ScreenToClient( &rectUp );
-			ScreenToClient( &rectIECheck );
+			// Move controls anchored bottom and left
+			m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_IGNORE_MODIFIER_ERRORS), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_STATIC_USE_OH), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_AFRULE_OH), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_IGNORE_OH_ERRORS), m_nDefaultW, m_nDefaultH, FALSE);
 
-			///////////////
-			// Do the moves
-			///////////////
-			// OK and Cancel buttons
-			GetDlgItem( IDCANCEL )->MoveWindow( cx - iDiffX1 - rectCancel.Width(), 
-				cy - iDiffX1 - rectCancel.Height(), 
-				rectCancel.Width(), rectCancel.Height(), TRUE );
+			// Move controls anchored bottom, left and right
+			m_wMgr.moveAnchoredBottomLeftRight(*GetDlgItem(IDC_EDIT_OUTPUTHANDLER), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredBottomLeftRight(*GetDlgItem(IDC_STATIC_CONFIGURE), m_nDefaultW, m_nDefaultH, FALSE);
 
-			GetDlgItem( IDOK )->MoveWindow( cx - 2*iDiffX1 - rectOK.Width() - rectCancel.Width(), 
-				cy - iDiffX1 - rectOK.Height(), 
-				rectOK.Width(), rectOK.Height(), TRUE );
-			 
+			// Move controls anchored bottom and right
+			m_wMgr.moveAnchoredBottomRight(*GetDlgItem(IDC_BTN_SELECT_OH), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredBottomRight(*GetDlgItem(IDOK), m_nDefaultW, m_nDefaultH, FALSE);
+			m_wMgr.moveAnchoredBottomRight(*GetDlgItem(IDCANCEL), m_nDefaultW, m_nDefaultH, FALSE);
 
-			// List and Configuration prompt and IE checkbox
-			// Save relative position of ignore modifier errors checkbox
-			int nIESpacing = rectIECheck.top - rectList.bottom;
+			// Update default values
+			CRect rectDlg;
+			GetClientRect(rectDlg);
+			m_nDefaultW = rectDlg.Width();
+			m_nDefaultH = rectDlg.Height();
 
-			// Move the list
-			rectList.InflateRect( 0, 0, 
-				cx - 3*iDiffX1 - rectSelect.Width() - rectList.Width(), 
-				cy - 2*iDiffX1 - rectOK.Height() - rectList.top - rectPrompt.Height() - rectList.Height() );
-			GetDlgItem( IDC_LIST_RULES )->MoveWindow(rectList, TRUE);
-
-			// Move checkbox
-			rectIECheck.MoveToY(rectList.bottom+nIESpacing);
-			GetDlgItem( IDC_CHECK_IGNORE_MODIFIER_ERRORS )->MoveWindow(rectIECheck, TRUE);
-
-			//resize the description column
-			m_listRules.SetColumnWidth(giDESC_LIST_COLUMN, LVSCW_AUTOSIZE_USEHEADER);
-
-			GetDlgItem( IDC_STATIC_CONFIGURE )->MoveWindow( 
-				rectPrompt.left, cy - iDiffX1 - rectPrompt.Height(), 
-				rectPrompt.Width(), rectPrompt.Height(), TRUE );
-
-			// Add, Remove, Configure, Up, Down buttons
-			GetDlgItem( IDC_BTN_ADDRULE )->MoveWindow( 
-				cx - iDiffX1 - rectAdd.Width(), rectAdd.top, 
-				rectAdd.Width(), rectAdd.Height(), TRUE );
-
-			GetDlgItem( IDC_BTN_DELRULE )->MoveWindow( 
-				cx - iDiffX1 - rectDel.Width(), rectDel.top, 
-				rectDel.Width(), rectDel.Height(), TRUE );
-
-			GetDlgItem( IDC_BTN_CONRULE )->MoveWindow( 
-				cx - iDiffX1 - rectMod.Width(), rectMod.top, 
-				rectMod.Width(), rectMod.Height(), TRUE );
-
-			GetDlgItem( IDC_BTN_RULEUP )->MoveWindow( 
-				cx - iDiffX1 - rectMod.Width(), rectUp.top, 
-				rectUp.Width(), rectUp.Height(), TRUE );
-
-			GetDlgItem( IDC_BTN_RULEDOWN )->MoveWindow( 
-				cx - iDiffX1 - rectUp.Width(), rectUp.top, 
-				rectUp.Width(), rectUp.Height(), TRUE );
-
-			// Preprocessor button and description
-			GetDlgItem( IDC_BTN_SELECTPP )->MoveWindow( 
-				cx - iDiffX1 - rectSelect.Width(), rectSelect.top, 
-				rectSelect.Width(), rectSelect.Height(), TRUE );
-
-			GetDlgItem( IDC_EDIT_PREPROCESSOR )->MoveWindow( 
-				rectPre.left, rectPre.top, 
-				cx - 3*iDiffX1 - rectSelect.Width(), rectPre.Height(), TRUE );
-
-			// Rule button, combo, description
-			GetDlgItem( IDC_BTN_CONRULE2 )->MoveWindow( 
-				cx - iDiffX1 - rectConfigure.Width(), rectConfigure.top, 
-				rectConfigure.Width(), rectConfigure.Height(), TRUE );
-
-			GetDlgItem( IDC_COMBO_RULE )->MoveWindow( 
-				rectCombo.left, rectCombo.top, 
-				cx - 3*iDiffX1 - rectConfigure.Width(), rectCombo.Height(), TRUE );
-
-			GetDlgItem( IDC_EDIT_DESC )->MoveWindow( 
-				rectDesc.left, rectDesc.top, 
-				cx - 2*iDiffX1, rectDesc.Height(), TRUE );
-
-			InvalidateRect(rectOK);
+			// Refresh window
+			Invalidate();
+			UpdateWindow();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05346");
-
-	CDialog::OnSize(nType, cx, cy);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1469,7 +1533,7 @@ void CAddRuleDlg::setButtonStates()
 
 	m_listRules.SetColumnWidth(giDESC_LIST_COLUMN, LVSCW_AUTOSIZE_USEHEADER);
 
-	// if current selected valud finding rule is a configurable object
+	// if current selected value finding rule is a configurable object
 	// enable the Configure button
 	BOOL bEnable = FALSE;	
 	ISpecifyPropertyPagesPtr ipPP(m_ipAFRule);
@@ -1501,6 +1565,17 @@ void CAddRuleDlg::setButtonStates()
 	pIgnoreErrBtn = (CButton *)GetDlgItem(IDC_CHECK_IGNORE_MODIFIER_ERRORS);
 	ASSERT_RESOURCE_ALLOCATION("ELI32948", pIgnoreErrBtn != __nullptr);
 	pIgnoreErrBtn->EnableWindow(asMFCBool(bModifiersEnabled));
+
+	// Always enable the Select Output Handler button
+	m_btnSelectOutputHandler.EnableWindow( TRUE );
+
+	CButton* pOHButton = (CButton *)GetDlgItem(IDC_CHECK_AFRULE_OH);
+	ASSERT_RESOURCE_ALLOCATION("ELI39283", pOHButton != __nullptr);
+	bool bOHE = (pOHButton->GetCheck() == BST_CHECKED);
+
+	pIgnoreErrBtn = (CButton *)GetDlgItem(IDC_CHECK_IGNORE_OH_ERRORS);
+	ASSERT_RESOURCE_ALLOCATION("ELI39284", pIgnoreErrBtn != __nullptr);
+	pIgnoreErrBtn->EnableWindow(asMFCBool(bOHE));
 }
 //-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::setDescription() 
@@ -1525,6 +1600,8 @@ void CAddRuleDlg::setPreprocessor()
 		// Retrieve Object With Description
 		m_ipDocPreprocessor = m_ipRule->RuleSpecificDocPreprocessor;
 		ASSERT_RESOURCE_ALLOCATION( "ELI13947", m_ipDocPreprocessor != __nullptr)
+
+		m_bIgnoreDocPPErrors = asMFCBool(m_ipRule->IgnorePreprocessorErrors);
 
 		// update controls
 		updatePreprocessorCheckBoxAndEditControl();
@@ -1636,11 +1713,26 @@ void CAddRuleDlg::setAMRules()
 
 	// Set the checkboxes
 	m_bApplyMod = asMFCBool(m_ipRule->ApplyModifyingRules);
-	m_bIgnoreDocPPErrors = asMFCBool(m_ipRule->IgnorePreprocessorErrors);
 	m_bIgnoreModErrors = asMFCBool(m_ipRule->IgnoreModifierErrors);
 
 	// Refresh the display
 	UpdateData( FALSE );
+}
+//-------------------------------------------------------------------------------------------------
+void CAddRuleDlg::setOutputHandler() 
+{
+	// Retrieve Output Handler from Rule
+	if (m_ipRule != __nullptr)
+	{
+		// Retrieve Object With Description
+		m_ipOutputHandler = m_ipRule->RuleSpecificOutputHandler;
+		ASSERT_RESOURCE_ALLOCATION( "ELI39285", m_ipOutputHandler != __nullptr)
+
+		m_bIgnoreOHErrors = asMFCBool(m_ipRule->IgnoreOutputHandlerErrors);
+
+		// update controls
+		updateOutputHandlerCheckBoxAndEditControl();
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::showReminder() 
@@ -1688,6 +1780,24 @@ void CAddRuleDlg::OnBnClickedCheckAfruleDocPp()
 	else
 	{
 		m_ipDocPreprocessor->PutEnabled( VARIANT_FALSE );
+	}
+
+	setButtonStates();
+}
+//-------------------------------------------------------------------------------------------------
+void CAddRuleDlg::OnBnClickedCheckAFRuleOH()
+{
+	UpdateData( TRUE );
+	
+	// Check what the checkbox is set to and then
+	// Enable or Disable the Output Handler accordingly
+	if( m_bOH == TRUE )
+	{
+		m_ipOutputHandler->PutEnabled( VARIANT_TRUE );
+	}
+	else
+	{
+		m_ipOutputHandler->PutEnabled( VARIANT_FALSE );
 	}
 
 	setButtonStates();
@@ -1750,6 +1860,52 @@ void CAddRuleDlg::updatePreprocessorCheckBoxAndEditControl()
 		ipPPWithDesc->Enabled = m_ipDocPreprocessor->Enabled;
 		m_bDocPP = asMFCBool(m_ipDocPreprocessor->Enabled == VARIANT_TRUE);
 
+		// Enable the ignore errors check-box
+		pCheckBox = (CButton*) GetDlgItem( IDC_CHECK_IGNORE_PP_ERRORS );
+		pCheckBox->EnableWindow( TRUE );
+	}
+	UpdateData( FALSE );
+}
+//-------------------------------------------------------------------------------------------------
+void CAddRuleDlg::updateOutputHandlerCheckBoxAndEditControl()
+{
+	// Use smart pointer
+	IObjectWithDescriptionPtr ipOHWithDesc = m_ipOutputHandler;
+
+	// Retrieve the Output Handler description
+	_bstr_t _bstrText = ipOHWithDesc->Description;
+	
+	// Update the displayed Preprocessor description
+	m_zOHDescription = (const char *)_bstrText;
+
+	// get check box
+	CButton* pCheckBox = (CButton*) GetDlgItem( IDC_CHECK_AFRULE_OH );
+
+	// validate check box
+	if( !pCheckBox )
+	{
+		UCLIDException ue("ELI39286", "Unable to access check box resource.");
+		throw ue;
+	}
+
+	if( m_zOHDescription.IsEmpty() )
+	{
+		//if the user selected 'None' disable and clear the checkbox
+		pCheckBox->EnableWindow( FALSE );
+		m_bOH = FALSE;
+	}
+	else
+	{	
+		// Enable the checkbox
+		pCheckBox->EnableWindow( TRUE );
+
+		// Set the checkbox based on the previous enabled value
+		ipOHWithDesc->Enabled = m_ipOutputHandler->Enabled;
+		m_bOH = asMFCBool(m_ipOutputHandler->Enabled == VARIANT_TRUE);
+
+		// Enable the ignore errors check-box
+		pCheckBox = (CButton*) GetDlgItem( IDC_CHECK_IGNORE_OH_ERRORS );
+		pCheckBox->EnableWindow( TRUE );
 	}
 	UpdateData( FALSE );
 }

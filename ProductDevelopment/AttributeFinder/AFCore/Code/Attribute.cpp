@@ -125,17 +125,22 @@ STDMETHODIMP CAttribute::put_Name(BSTR newVal)
 
 		string strName = asString(newVal);
 
-		if(strName.length() == 0)
+		if(strName != m_strAttributeName)
 		{
-			UCLIDException ue("ELI10275", "Invalid Attribute Name. Name is empty.");
-			throw ue;
+
+			// Zero-length names are valid (it is the initial state for an attribute)
+			// With the addition of rule-specific output handlers it is better to not treat this as
+			// an exception.
+			// https://extract.atlassian.net/browse/ISSUE-13607
+			if(!strName.empty())
+			{
+				// Check that Name is a valid Identifier
+				validateIdentifier( strName );
+			}
+
+			m_bDirty = true;
+			m_strAttributeName = strName;
 		}
-
-		// Check that Name is a valid Identifier
-		validateIdentifier( strName );
-
-		m_bDirty = true;
-		m_strAttributeName = strName;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04141");
 

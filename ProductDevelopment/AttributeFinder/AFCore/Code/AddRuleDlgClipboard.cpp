@@ -111,6 +111,18 @@ void CAddRuleDlg::OnEditCopy()
 			}
 			break;
 
+			// Output Handler
+			case kOutputHandler:
+			{
+				// Retrieve existing Output Handler
+				IUnknownPtr	ipObject = m_ipOutputHandler;
+				ASSERT_RESOURCE_ALLOCATION( "ELI39291", ipObject != __nullptr );
+
+				// ClipboardManager will handle the Copy
+				m_ipClipboardMgr->CopyObjectToClipboard( ipObject );
+			}
+			break;
+
 			default:
 				// Create and throw exception
 				UCLIDException ue( "ELI06176", "Unable to Copy item." );
@@ -263,12 +275,6 @@ void CAddRuleDlg::OnEditPaste()
 				}
 
 				m_listRules.SetFocus();
-
-				// Update the display
-				UpdateData( FALSE );
-
-				// Update button states
-				setButtonStates();
 			}
 			break;
 
@@ -315,8 +321,54 @@ void CAddRuleDlg::OnEditPaste()
 						{
 							m_bDocPP = FALSE;
 						}
+					}
+				}
+			}
+			break;
 
-						UpdateData( FALSE );
+			// Output Handler
+			case kOutputHandler:
+			{
+				// Test ClipboardManager object to see if it is an Output Handler
+				IUnknownPtr	ipObject( __nullptr );
+				if (m_ipClipboardMgr->ObjectIsTypeWithDescription( IID_IOutputHandler ))
+				{
+					// Retrieve object from ClipboardManager
+					ipObject = m_ipClipboardMgr->GetObjectInClipboard();
+					ASSERT_RESOURCE_ALLOCATION( "ELI39292", ipObject != __nullptr );
+				}
+				else
+				{
+					// Throw exception, object is not an Output Handler
+					throw UCLIDException( "ELI39293", 
+						"Clipboard object is not an Output Handler." );
+				}
+
+				if (m_ipRule != __nullptr)
+				{
+					// Clone object before using
+					ICopyableObjectPtr ipCopy = ipObject;
+					ASSERT_RESOURCE_ALLOCATION("ELI39294", ipCopy != __nullptr);
+
+					// Set Output Handler
+					IObjectWithDescriptionPtr	ipOH = ipCopy->Clone();
+					if (ipOH != __nullptr)
+					{
+						m_ipOutputHandler = ipOH;
+						
+						// Display the Output Handler description
+						m_zOHDescription = (char *) ipOH->GetDescription();
+
+						// enable the checkbox, and set it's value accordingly
+						GetDlgItem( IDC_CHECK_AFRULE_OH )->EnableWindow( TRUE );
+						if( ipOH->GetEnabled() == VARIANT_TRUE )
+						{
+							m_bOH = TRUE;
+						}
+						else
+						{
+							m_bOH = FALSE;
+						}
 					}
 				}
 			}
@@ -329,6 +381,12 @@ void CAddRuleDlg::OnEditPaste()
 				throw ue;
 				break;
 		}
+
+		// Update the display
+		UpdateData( FALSE );
+
+		// Update button states
+		setButtonStates();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05526")
 }
@@ -376,6 +434,43 @@ void CAddRuleDlg::OnEditDelete()
 					GetDlgItem( IDC_CHECK_AFRULE_DOC_PP )->EnableWindow( FALSE );
 					m_bDocPP = FALSE;
 					UpdateData( FALSE );
+
+					// Update button states
+					setButtonStates();
+				}
+			}
+			break;
+
+			// Output Handler
+			case kOutputHandler:
+			{
+				// Retrieve existing Output Handler description
+				CString	zDesc;
+				zDesc = (char *)m_ipOutputHandler->Description;
+
+				// Request confirmation
+				CString	zPrompt;
+				int		iResult;
+				zPrompt.Format( "Are you sure that Output Handler '%s' should be deleted?", 
+					zDesc );
+				iResult = MessageBox( zPrompt.operator LPCTSTR(), "Confirm Delete", 
+					MB_YESNO | MB_ICONQUESTION );
+
+				// Act on response
+				if (iResult == IDYES)
+				{
+					// Clear Output Handler object
+					m_ipOutputHandler = __nullptr;
+					m_ipRule->RuleSpecificOutputHandler = __nullptr;
+						
+					// Display the empty Output Handler description
+					m_zOHDescription = "";
+					GetDlgItem( IDC_CHECK_AFRULE_OH )->EnableWindow( FALSE );
+					m_bOH = FALSE;
+					UpdateData( FALSE );
+
+					// Update button states
+					setButtonStates();
 				}
 			}
 			break;
@@ -387,9 +482,6 @@ void CAddRuleDlg::OnEditDelete()
 				throw ue;
 				break;
 		}
-
-		// Update button states
-		setButtonStates();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05528")
 }

@@ -18,6 +18,7 @@
 #include "resource.h"
 
 #include <string>
+#include <WindowPersistenceMgr.h>
 
 using namespace std;
 
@@ -29,7 +30,8 @@ class CAddRuleDlg : public CDialog
 	{
 		kNoControl,
 		kRulesList,
-		kPreprocessor
+		kPreprocessor,
+		kOutputHandler
 	}	EControlSelected;
 
 // Construction
@@ -53,13 +55,17 @@ public:
 	CButton	m_btnConRule;
 	CButton	m_btnAddRule;
 	CButton	m_btnSelectPreprocessor;
+	CButton	m_btnSelectOutputHandler;
 	BOOL	m_bApplyMod;
 	BOOL    m_bDocPP;
+	BOOL    m_bOH;
 	CString	m_zDescription;
 	CString	m_zPrompt;
 	CString	m_zPPDescription;
+	CString	m_zOHDescription;
 	BOOL	m_bIgnoreDocPPErrors;
 	BOOL	m_bIgnoreModErrors;
+	BOOL	m_bIgnoreOHErrors;
 	//}}AFX_DATA
 
 
@@ -83,6 +89,7 @@ protected:
 	afx_msg void OnBtnRuleUp();
 	afx_msg void OnBtnRuleDown();
 	afx_msg void OnBtnSelectPreprocessor();
+	afx_msg void OnBtnSelectOutputHandler();
 	virtual void OnOK();
 	afx_msg void OnCheckModify();
 	afx_msg void OnSelchangeComboRule();
@@ -103,6 +110,9 @@ protected:
 	afx_msg void OnBnClickedCheckAfruleDocPp();
 	//}}AFX_MSG
 	afx_msg void OnDoubleClickDocumentPreprocessor();
+	afx_msg void OnRclickEditOutputHandler(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnBnClickedCheckAFRuleOH();
+	afx_msg void OnDoubleClickOutputHandler();
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -118,6 +128,9 @@ private:
 
 	// Pointer to Document Preprocessor and description
 	IObjectWithDescriptionPtr m_ipDocPreprocessor;
+
+	// Pointer to Output Handler and description
+	IObjectWithDescriptionPtr m_ipOutputHandler;
 
 	// Stores association between registered Object names and ProgIDs.
 	// The collection of names populates the combo box.
@@ -186,6 +199,9 @@ private:
 	// Set the AttributeModifyingRules and the checkbox
 	void	setAMRules();
 
+	// Set the Output Handler and the edit box
+	void	setOutputHandler();
+
 	// Show or hide the static text that tells the user the selected Attribute 
 	// Finding Rule still needs to be configured
 	void	showReminder();
@@ -199,6 +215,25 @@ private:
 	//          refreshes the dialog.
 	void updatePreprocessorCheckBoxAndEditControl();
 
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: updates the output handler check box and edit control
+	//          using corresponding values in m_ipOutputHandler
+	// REQUIRE: m_ipDocPreprocessor must be non-NULL
+	// PROMISE: sets the checkbox according to whether m_ipDocOutputHandler is enabled.
+	//          puts m_ipOutputHandler's description in the edit control box.
+	//          refreshes the dialog.
+	void updateOutputHandlerCheckBoxAndEditControl();
+
+	// Initial width and heights used to anchor controls
+	int m_nDefaultW;
+	int m_nDefaultH;
+
+	// Minimum dimensions
+	int m_nMinWidth;
+	int m_nMinHeight;
+
+	// Window position mgr
+	WindowPersistenceMgr m_wMgr;
 };
 
 //{{AFX_INSERT_LOCATION}}

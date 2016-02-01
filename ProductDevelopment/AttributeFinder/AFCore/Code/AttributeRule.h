@@ -68,12 +68,16 @@ public:
 		/*[out, retval]*/ IIUnknownVector** pAttributes);
 	STDMETHOD(get_RuleSpecificDocPreprocessor)(/*[out, retval]*/ IObjectWithDescription* *pVal);
 	STDMETHOD(put_RuleSpecificDocPreprocessor)(/*[in]*/ IObjectWithDescription *newVal);
+	STDMETHOD(get_RuleSpecificOutputHandler)(/*[out, retval]*/ IObjectWithDescription* *pVal);
+	STDMETHOD(put_RuleSpecificOutputHandler)(/*[in]*/ IObjectWithDescription *newVal);
 	STDMETHOD(get_IgnoreErrors)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_IgnoreErrors)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_IgnorePreprocessorErrors)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_IgnorePreprocessorErrors)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_IgnoreModifierErrors)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_IgnoreModifierErrors)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_IgnoreOutputHandlerErrors)(/*[out, retval]*/ VARIANT_BOOL *pVal);
+	STDMETHOD(put_IgnoreOutputHandlerErrors)(/*[in]*/ VARIANT_BOOL newVal);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -94,6 +98,9 @@ private:
 	// Document Preprocessor
 	IObjectWithDescriptionPtr m_ipDocPreprocessor;
 
+	// Output Handler
+	IObjectWithDescriptionPtr m_ipOutputHandler;
+
 	// description for current attribute rule
 	std::string m_strAttributeRuleDescription;
 	
@@ -106,6 +113,7 @@ private:
 	bool m_bIgnoreErrors;
 	bool m_bIgnorePreprocessorErrors;
 	bool m_bIgnoreModifierErrors;
+	bool m_bIgnoreOutputHandlerErrors;
 
 	// flag to keep track of whether this object has changed
 	// since the last save-to-stream operation
@@ -126,6 +134,12 @@ private:
 	// PROMISE: to create an instance of DocumentPreprocessor and assign it to m_ipDocPreprocessor 
 	//			if m_ipDocPreprocessor is __nullptr
 	IObjectWithDescriptionPtr getDocPreprocessor();
+	//----------------------------------------------------------------------------------------------
+	// PURPOSE: to return m_ipOutputHandler
+	//
+	// PROMISE: to create an instance of ObjectWithDescription and assign it to m_ipOutputHandler 
+	//			if m_ipOutputHandler is __nullptr
+	IObjectWithDescriptionPtr getOutputHandler();
 	//----------------------------------------------------------------------------------------------
 	// apply modifying rules on the attribute
 	// bRecursive - whether or not to apply rules on all its sub attributes recursively
@@ -148,4 +162,8 @@ private:
 	// A method to determine if a preprocessor object is associated with this attribute
 	// rule, and also whether it is enabled.
 	bool enabledAttributePreProcessorExists();
+	//----------------------------------------------------------------------------------------------
+	// A method to determine if there is an output handler object associated with this attribute
+	// rule, and also whether it is enabled.
+	bool enabledOutputHandlerExists();
 };

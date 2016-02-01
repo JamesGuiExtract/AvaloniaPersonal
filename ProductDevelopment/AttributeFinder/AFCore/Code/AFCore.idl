@@ -213,6 +213,13 @@ library UCLID_AFCORELib
 		//-----------------------------------------------------------------------------------------
 		[propget, id(10), helpstring("property IgnoreModifierErrors")] HRESULT IgnoreModifierErrors([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(10), helpstring("property IgnoreModifierErrors")] HRESULT IgnoreModifierErrors([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// return IOutputHandler with a description
+		[propget, id(11), helpstring("property RuleSpecificOutputHandler")] HRESULT RuleSpecificOutputHandler([out, retval] IObjectWithDescription **pVal);
+		[propput, id(11), helpstring("property RuleSpecificOutputHandler")] HRESULT RuleSpecificOutputHandler([in] IObjectWithDescription *newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(12), helpstring("property IgnoreOutputHandlerErrors")] HRESULT IgnoreOutputHandlerErrors([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(12), helpstring("property IgnoreOutputHandlerErrors")] HRESULT IgnoreOutputHandlerErrors([in] VARIANT_BOOL newVal);
 	};
 
 	[
