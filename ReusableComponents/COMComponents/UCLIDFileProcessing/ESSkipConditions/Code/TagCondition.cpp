@@ -199,7 +199,7 @@ STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecord
 		long lSize = ipTagsOnFile->Size;
 		for (long i=0; i < lSize; i++)
 		{
-			mapTagsOnFile[asString(m_ipVecTags->Item[i].bstrVal)] = 0;
+			mapTagsOnFile[asString(ipTagsOnFile->Item[i].bstrVal)] = 0;
 		}
 
 		// Iterate through all of the tags
