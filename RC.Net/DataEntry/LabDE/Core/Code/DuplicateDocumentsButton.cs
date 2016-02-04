@@ -100,6 +100,12 @@ namespace Extract.DataEntry.LabDE
         List<IFAMFileInspectorColumn> _ffiCustomColumns = new List<IFAMFileInspectorColumn>();
 
         /// <summary>
+        /// Keeps track of documents this instance has requested be checked-out in the context of
+        /// the current document to avoid repeatedly re-checking whether they need to be.
+        /// </summary>
+        HashSet<int> _checkedOutFiles = new HashSet<int>();
+
+        /// <summary>
         /// The patient first name for the current document.
         /// </summary>
         string _firstName;
@@ -118,6 +124,13 @@ namespace Extract.DataEntry.LabDE
         /// A comma-delimited list of collection dates for the current document.
         /// </summary>
         string _collectionDate;
+
+        /// <summary>
+        /// Indicates whether pending files that are apparent duplicates of the displayed document
+        /// should be automatically checked out for processing by this instance even before the
+        /// button is pressed.
+        /// </summary>
+        bool _autoCheckoutDuplicateFiles = true;
 
         /// <summary>
         /// The original <see cref="P:Control.BackColor"/> for the button. Used to restore the color
@@ -401,6 +414,29 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether pending files that are apparent duplicates
+        /// of the displayed document should be automatically checked out for processing by this
+        /// instance even before the button is pressed.
+        /// </summary>
+        /// <value><see langword="true"/> if apparent duplicates should be automatically checked out;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        [Category("LabDE Configuration Setting")]
+        [DefaultValue(true)]
+        public bool AutoCheckoutDuplicateFiles
+        {
+            get
+            {
+                return _autoCheckoutDuplicateFiles;
+            }
+
+            set
+            {
+                _autoCheckoutDuplicateFiles = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the patient first name from the current document.
         /// </summary>
         /// <value>
@@ -623,6 +659,13 @@ namespace Extract.DataEntry.LabDE
                 {
                     Enabled = false;
                 }
+                else if (!Enabled)
+                {
+                    // This button will be disabled either between documents or when patient info is
+                    // being substantially changed. In either case, it is a good opportunity to clear
+                    // the set of files that need not be re-checked for check-out.
+                    _checkedOutFiles.Clear();
+                }
             }
             catch (Exception ex)
             {
@@ -659,7 +702,7 @@ namespace Extract.DataEntry.LabDE
 
         #endregion Event handlers
 
-        #region protected members
+        #region Protected Members
 
         /// <summary>
         /// Gets the <see cref="FileProcessingDB"/> currently being used.
@@ -671,9 +714,9 @@ namespace Extract.DataEntry.LabDE
         {
             get
             {
-                return (DataEntryControlHost == null)
+                return (DataEntryApplication == null)
                     ? null
-                    : DataEntryControlHost.DataEntryApplication.FileProcessingDB;
+                    : DataEntryApplication.FileProcessingDB;
             }
         }
 
@@ -754,23 +797,51 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         protected virtual void UpdateButtonState()
         {
-            BackColor = _originalBackColor;
-
-            int duplicateCount = 0;
-
-            if (KeyFieldsArePopulated)
+            // If this is not visible, do not bother updating the button state.
+            if (Visible)
             {
-                Enabled = true;
-                duplicateCount = GetMatchingDocumentCount() - 1;
-                Flash = (duplicateCount > 0);
-            }
-            else
-            {
-                Enabled = false;
-                Flash = false;
-            }
+                BackColor = _originalBackColor;
 
-            Text = string.Format(CultureInfo.CurrentCulture, _BUTTON_LABEL_TEXT, duplicateCount);
+                int duplicateCount = 0;
+
+                if (KeyFieldsArePopulated)
+                {
+                    Enabled = true;
+                    duplicateCount = GetMatchingDocumentCount() - 1;
+                    Flash = (duplicateCount > 0);
+
+                    if (AutoCheckoutDuplicateFiles)
+                    {
+                        CheckOutDuplicateFiles();
+                    }
+                }
+                else
+                {
+                    Enabled = false;
+                    Flash = false;
+                }
+
+                Text = string.Format(CultureInfo.CurrentCulture, _BUTTON_LABEL_TEXT, duplicateCount);
+            }
+        }
+
+        #endregion Protected Members
+
+        #region Private Members
+
+        /// <summary>
+        /// Gets the <see cref="IDataEntryApplication"/> in which this button exists.
+        /// NOTE: This property is private because some DEP implementations already included a
+        /// definition this would conflict with.
+        /// </summary>
+        IDataEntryApplication DataEntryApplication
+        {
+            get
+            {
+                return (DataEntryControlHost == null)
+                    ? null
+                    : DataEntryControlHost.DataEntryApplication;
+            }
         }
 
         /// <summary>
@@ -808,6 +879,47 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
-        #endregion Private members
+        /// <summary>
+        /// Checks out (grabs) for processing all files currently pending on this action that appear
+        /// to be duplicates of the file currently displayed.
+        /// https://extract.atlassian.net/browse/ISSUE-13568
+        /// </summary>
+        void CheckOutDuplicateFiles()
+        {
+            // Compile a set of FileIDs that appear to be duplicates of this one.
+            Recordset duplicateFileIDRecordset =
+                FileProcessingDB.GetResultsForQuery(DuplicateDocumentsQuery);
+
+            HashSet<int> duplicateFileIDs = new HashSet<int>();
+            while (!duplicateFileIDRecordset.EOF)
+            {
+                duplicateFileIDs.Add((int)duplicateFileIDRecordset.Fields["ID"].Value);
+
+                duplicateFileIDRecordset.MoveNext();
+            }
+            duplicateFileIDRecordset.Close();
+
+            // Check each file that hasn't already been checked out to see if it should be checked
+            // out.
+            foreach (int fileID in duplicateFileIDs
+                .Where(fileID => !_checkedOutFiles.Contains(fileID)))
+            {
+                EActionStatus actionStatus =
+                    DataEntryApplication.FileProcessingDB.GetFileStatus(
+                        fileID, DataEntryApplication.DatabaseActionName, false);
+
+                // Only attempt to check out files that are currently pending for verification.
+                if (actionStatus == EActionStatus.kActionPending)
+                {
+                    if (DataEntryApplication.FileRequestHandler.CheckoutForProcessing(
+                        fileID, out actionStatus))
+                    {
+                        _checkedOutFiles.Add(fileID);
+                    }
+                }
+            }
+        }
+
+        #endregion Private Members
     }
 }
