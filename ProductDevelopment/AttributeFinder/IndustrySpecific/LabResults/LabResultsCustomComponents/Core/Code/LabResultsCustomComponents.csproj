@@ -64,6 +64,9 @@
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ScintillaNET, Version=2.4.0.0, Culture=neutral, PublicKeyToken=948d6c9751444115, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\..\..\RC.Net\APIs\ScintillaNET v2.4\ScintillaNET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
@@ -75,6 +78,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LinkedItemsTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="OrderMappingDBCache.cs" />
     <Compile Include="LabDEOrderMapper.cs" />
     <Compile Include="LabDEOrderMapperConfigurationForm.cs">
