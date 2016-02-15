@@ -2,7 +2,7 @@
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlServerCe;
+using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -30,7 +30,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// The active, open connection passed from the parent form.
         /// </summary>
-        SqlCeConnection _connection;
+        DbConnection _connection;
 
         #endregion Fields
 
@@ -38,7 +38,7 @@ namespace Extract.SQLCDBEditor
 
         /// <summary>
         /// Column index of the selectors - a column of checkbox controls embedded
-        /// in the zeroeth column of the grid.
+        /// in the zeroth column of the grid.
         /// </summary>
         const int _selectColumnIndex = 0;
 
@@ -62,7 +62,7 @@ namespace Extract.SQLCDBEditor
         /// <param name="databaseFileName">The database file in use</param>
         /// <param name="tableNames">a list of table names, used to populate the grid view</param>
         /// <param name="connection">the current open connection that is in use</param>
-        public ExportTablesForm(string databaseFileName, string[] tableNames, SqlCeConnection connection)
+        public ExportTablesForm(string databaseFileName, string[] tableNames, DbConnection connection)
         {
             InitializeComponent();
 
@@ -87,7 +87,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 // This is done to work around an issue when the current selected cell 
-                // is in the zeroeth (select) column - the checkbox isn't updated.
+                // is in the zeroth (select) column - the checkbox isn't updated.
                 var cell = TablesGridView.CurrentCell;
                 var startRow = cell.RowIndex;
                 var startCol = cell.ColumnIndex;

@@ -3,7 +3,7 @@ using Extract.SQLCDBEditor;
 using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
-using System.Data.SqlServerCe;
+using System.Data.Common;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -37,9 +37,9 @@ namespace Extract.Utilities.ContextTags
         #region Fields
 
         /// <summary>
-        /// The <see cref="SqlCeConnection"/> for the database to be edited.
+        /// The <see cref="DbConnection"/> for the database to be edited.
         /// </summary>
-        SqlCeConnection _connection;
+        DbConnection _connection;
         
         /// <summary>
         /// A <see cref="ContextTagDatabase"/> instance representing the database.
@@ -165,9 +165,9 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         /// <param name="pluginManager">The <see cref="ISQLCDBEditorPluginManager"/> manager for
         /// this plugin.</param>
-        /// <param name="connection">The <see cref="SqlCeConnection"/> for use by the plugin.</param>
+        /// <param name="connection">The <see cref="DbConnection"/> for use by the plugin.</param>
         public override void LoadPlugin(ISQLCDBEditorPluginManager pluginManager,
-            SqlCeConnection connection)
+            DbConnection connection)
         {
             try
             {
@@ -220,7 +220,7 @@ namespace Extract.Utilities.ContextTags
 
                 if (_database == null)
                 {
-                    _database = new ContextTagDatabase((SqlCeConnection)_connection);
+                    _database = new ContextTagDatabase(_connection);
                 }
 
                 // In cases where the data has been modified via the database and not the table, 

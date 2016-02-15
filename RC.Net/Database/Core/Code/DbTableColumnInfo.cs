@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlServerCe;
+using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
@@ -9,7 +9,7 @@ namespace Extract.Database
 {
 
     /// <summary>
-    /// This class contains basic column information for SQLCE column
+    /// This class contains basic column information for a database column
     /// </summary>
     public class ColumnInfo
     {
@@ -133,7 +133,7 @@ namespace Extract.Database
                 string cType = this.ColumnType.ToUpperInvariant();
 
                 if (true == cType.Contains("CHAR") ||
-                    true == cType.Contains("NTEXT") ||         // no longer supported in SQLCE v3.5, might occur in older DB
+                    true == cType.Contains("NTEXT") ||  // not supported in SQLCE v3.5, might occur in older DB
                     true == cType.Contains("VARBINARY"))
                 {
                     return true;
@@ -156,7 +156,7 @@ namespace Extract.Database
     /// </summary>
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
     [SuppressMessage("Microsoft.Naming", "CA1710: RenameToEndInCollection")]
-    public class SqlCeTableColumnInfo : IEnumerable<ColumnInfo>
+    public class DbTableColumnInfo : IEnumerable<ColumnInfo>
     {
         #region Fields
 
@@ -186,14 +186,14 @@ namespace Extract.Database
         /// CTOR retrieves table column info
         /// </summary>
         /// <param name="tableName">name of the table to get column information for</param>
-        /// <param name="connection">open connection to SQL CE database</param>
-        public SqlCeTableColumnInfo(string tableName, SqlCeConnection connection)
+        /// <param name="connection">open connection to database</param>
+        public DbTableColumnInfo(string tableName, DbConnection connection)
         {
             TableName = tableName;
             _columns = new List<ColumnInfo>();
 
             var query = String.Format(CultureInfo.InvariantCulture, "SELECT TOP (1) * FROM [{0}];", TableName);
-            SqlCeCommand cmd = new SqlCeCommand(query.ToString(), connection);
+            DbCommand cmd = DBMethods.CreateDBCommand(connection, query, null);
 
             var reader = cmd.ExecuteReader();
             DataTable dt = reader.GetSchemaTable();
@@ -225,7 +225,7 @@ namespace Extract.Database
         /// indexer that retrieves specified column info
         /// </summary>
         /// <param name="index">index value must be less than Count of internal 
-        /// collection of columns(enforced). Use SqlCeTableColumnInfo.Count to determine 
+        /// collection of columns(enforced). Use DbTableColumnInfo.Count to determine 
         /// maximum extent of the collection.</param>
         /// <returns>The specified ColumnInfo</returns>
         public ColumnInfo this[int index]

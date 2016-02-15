@@ -57,7 +57,7 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// Db connection associated with this manager.
         /// </summary>
-        SqlCeConnection _connection;
+        DbConnection _connection;
 
         /// <summary>
         /// The current schema version of the database.
@@ -96,7 +96,7 @@ namespace Extract.Utilities.ContextTags
         /// Initializes a new instance of the <see cref="ContextTagDatabaseManager"/> class.
         /// </summary>
         /// <param name="connection">The database connection.</param>
-        public ContextTagDatabaseManager(SqlCeConnection connection)
+        public ContextTagDatabaseManager(DbConnection connection)
         {
             try
             {
@@ -472,13 +472,13 @@ namespace Extract.Utilities.ContextTags
                     throw new ArgumentNullException("connection");
                 }
 
-                var sqlConnection = connection as SqlCeConnection;
-                if (sqlConnection == null)
+                if (!(connection is SqlCeConnection))
                 {
                     throw new ExtractException("ELI37975",
                         "This schema updater only works on SqlCe connections.");
                 }
-                _connection = sqlConnection;
+
+                _connection = connection;
                 _databaseFile = _connection.Database;
                 _versionNumber = 0;
             }
@@ -562,14 +562,14 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Gets the type name of an SQLCDBEditorPlugin that should completely replace the normal
-        /// SQLCDBEditor UI (no tables, queries or tabs)
+        /// Gets or sets the SQLCDBEditorPlugin implementation(s) that should completely replace the
+        /// normal SQLCDBEditor UI (no tables, queries or tabs)
         /// </summary>
-        public string UIReplacementPlugin
+        public IEnumerable<object> UIReplacementPlugins
         {
             get
             {
-                return "Extract.Utilities.ContextTags.ContextTagsPlugin";
+                return new object[] { new ContextTagsPlugin() };
             }
         }
 

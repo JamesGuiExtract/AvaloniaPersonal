@@ -82,7 +82,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SqlCeColumnInfo.cs" />
+    <Compile Include="DbTableColumnInfo.cs" />
     <Compile Include="DatabaseConnectionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

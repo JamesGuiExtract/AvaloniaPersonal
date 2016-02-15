@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,9 +55,9 @@ namespace Extract.Database
             CancellationTokenSource cancelTokenSource);
 
         /// <summary>
-        /// Gets the type name of an SQLCDBEditorPlugin that should completely replace the normal
-        /// SQLCDBEditor UI (no tables, queries or tabs)
+        /// Gets or sets the SQLCDBEditorPlugin implementation(s) that should completely replace the
+        /// normal SQLCDBEditor UI (no tables, queries or tabs)
         /// </summary>
-        string UIReplacementPlugin { get; }
+        IEnumerable<object> UIReplacementPlugins { get; }
     }
 }

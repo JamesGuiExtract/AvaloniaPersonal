@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Globalization;
 using System.IO;
@@ -129,14 +130,14 @@ namespace Extract.Database
                 if (args[i].Equals("/rd", StringComparison.OrdinalIgnoreCase))
                 {
                     i++;
-                    ExtractException.Assert("ELI27122", "Missing row delimeter value.", i < args.Length);
+                    ExtractException.Assert("ELI27122", "Missing row delimiter value.", i < args.Length);
 
                     RowDelimiter = ParamUnescape(args[i]);
                 }
                 else if (args[i].Equals("/cd", StringComparison.OrdinalIgnoreCase))
                 {
                     i++;
-                    ExtractException.Assert("ELI27123", "Missing column delimeter value.", i < args.Length);
+                    ExtractException.Assert("ELI27123", "Missing column delimiter value.", i < args.Length);
 
                     ColumnDelimiter = ParamUnescape(args[i]);
                 }
@@ -180,8 +181,8 @@ namespace Extract.Database
         /// Replaces printable escape sequences for carriage returns, line feeds and tab characters
         /// with the characters themselves.
         /// </summary>
-        /// <param name="parameter">The parameter to unescape.</param>
-        /// <returns>The unescaped parameter.</returns>
+        /// <param name="parameter">The parameter to un-escape.</param>
+        /// <returns>The un-escaped parameter.</returns>
         static string ParamUnescape(string parameter)
         {
             if (parameter == null)
@@ -212,17 +213,17 @@ namespace Extract.Database
         /// Exports a table in an SQL compact DB into a text file.
         /// NOTE: This is the form used by programs that already have an open connection to DB.
         /// </summary>
-        public static string ExportToFile(ExportSettings settings, SqlCeConnection sqlConnection, bool writeEmptyFile = false)
+        public static string ExportToFile(ExportSettings settings, DbConnection sqlConnection, bool writeEmptyFile = false)
         {
             try
             {
-                SqlCeTableColumnInfo tableColumnInfo = new SqlCeTableColumnInfo(settings.TableName, sqlConnection);
+                DbTableColumnInfo tableColumnInfo = new DbTableColumnInfo(settings.TableName, sqlConnection);
 
                 // Issue the query
-                using (SqlCeCommand queryCommand = new SqlCeCommand(settings.Query, sqlConnection))
+                using (DbCommand queryCommand = DBMethods.CreateDBCommand(sqlConnection, settings.Query, null))
                 {
                     // Initialize a reader for the results.
-                    using (SqlCeDataReader reader = queryCommand.ExecuteReader())
+                    using (DbDataReader reader = queryCommand.ExecuteReader())
                     {
                         int rowsExported = 0;
 

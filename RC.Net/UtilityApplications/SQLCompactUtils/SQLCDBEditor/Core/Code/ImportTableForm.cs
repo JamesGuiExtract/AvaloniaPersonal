@@ -1,9 +1,9 @@
 ﻿using Extract.Database;
 using Extract.Utilities.Forms;
 using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlServerCe;
-using System.Diagnostics.CodeAnalysis;
+using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -22,7 +22,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// The data adapter to populate <see cref="_resultsTable"/> for database tables.
         /// </summary>
-        SqlCeDataAdapter _adapter = null;
+        DbDataAdapter _adapter = null;
 
         /// <summary>
         /// The data table representing the table contents or query results.
@@ -52,7 +52,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// The active, open connection passed from the parent form.
         /// </summary>
-        SqlCeConnection _connection;
+        DbConnection _connection;
 
         #endregion Fields
 
@@ -61,7 +61,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// Default CTOR
         /// </summary>
-        public ImportTableForm(string databaseFileName, string[] tableNames, SqlCeConnection connection)
+        public ImportTableForm(string databaseFileName, string[] tableNames, DbConnection connection)
         {
             ExtractException.Assert("ELI39099", "Database file name is empty", !String.IsNullOrEmpty(databaseFileName));
             _databaseFilename = databaseFileName;
@@ -340,7 +340,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 bool appendMode = AppendRadioButton.Checked;
-                SqlCeTableColumnInfo tci = new SqlCeTableColumnInfo(_tablename, _connection);
+                DbTableColumnInfo tci = new DbTableColumnInfo(_tablename, _connection);
                 foreach (var line in textRows)
                 {
                     if (String.IsNullOrWhiteSpace(line))
@@ -442,7 +442,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 ExtractException.Assert("ELI39104",
-                                        "There are no table names in the curent database",
+                                        "There are no table names in the current database",
                                         tableNames.Length > 0);
                 foreach (var tableName in tableNames)
                 {
@@ -495,12 +495,15 @@ namespace Extract.SQLCDBEditor
                 _adapter = null;
             }
 
-            _adapter = new SqlCeDataAdapter("SELECT TOP (1) * FROM " + _tablename, _connection);
+            DbProviderFactory providerFactory = DBMethods.GetDBProvider(_connection);
+            _adapter = providerFactory.CreateDataAdapter();
+            _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection, 
+                "SELECT TOP (1) * FROM " + _tablename, null);
             _adapter.Fill(_resultsTable);
         }
 
         /// <summary>
-        /// Notify the user that an auto-increment columnm will not be imported (or
+        /// Notify the user that an auto-increment column will not be imported (or
         /// clear the message depending on the makeVisible flag).
         /// </summary>
         /// <param name="makeVisible">true to display the text box and message, false otherwise</param>
@@ -509,7 +512,7 @@ namespace Extract.SQLCDBEditor
             ColumnNotImportedTextBox.Visible = makeVisible;
             if (makeVisible)
             {
-                SqlCeTableColumnInfo tci = new SqlCeTableColumnInfo(_tablename, _connection);
+                DbTableColumnInfo tci = new DbTableColumnInfo(_tablename, _connection);
 
                 int countOfAutoIncrementColumns = tci.Count(c => c.IsAutoIncrement);
                 if (countOfAutoIncrementColumns < 1)

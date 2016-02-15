@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -88,7 +89,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// Opened connection to the current database.
         /// </summary>
-        SqlCeConnection _connection;
+        DbConnection _connection;
 
         /// <summary>
         /// The table names in the currently open database.
@@ -614,7 +615,7 @@ namespace Extract.SQLCDBEditor
 
                     Control previouslyActiveControl = ActiveControl;
 
-                    OpenTableOrQuery(queryAndResultsControl, false);
+                    OpenTableOrQuery(queryAndResultsControl, false, true);
 
                     // Return focus to the list box to prevent it from losing focus by clicking in it.
                     if (previouslyActiveControl == _navigationDockContainer)
@@ -739,7 +740,7 @@ namespace Extract.SQLCDBEditor
             {
                 if (_contextMenuItem != null)
                 {
-                    OpenTableOrQuery(_contextMenuItem, true);
+                    OpenTableOrQuery(_contextMenuItem, true, true);
                 }
             }
             catch (Exception ex)
@@ -824,11 +825,14 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                OpenTableOrQuery((QueryAndResultsControl)sender, true);
+                OpenTableOrQuery((QueryAndResultsControl)sender, true, true);
 
                 // Re-activate the primary tab make it clear to the user that the control was moved
                 // and they may now open another table/query.
-                _primaryTab.Activate();
+                if (_primaryTab != null)
+                {
+                    _primaryTab.Activate();
+                }
             }
             catch (Exception ex)
             {
@@ -885,10 +889,10 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                if (UsingUIReplacement)
+                if (!e.DockControl.AllowClose)
                 {
-                    // Prevent closing a UI replacement plugin (did not succeed in removing the
-                    //close button entirely)
+                    // Prevent closing a UI replacement plugin or any other tab that has been
+                    // programmatically set AllowClose = false.
                     e.Cancel = true;
                     return;
                 }
@@ -1389,9 +1393,8 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                using (ExportTablesForm exportTables = new ExportTablesForm(_databaseWorkingCopyFileName,
-                                                             _tableNames.ToArray<string>(),
-                                                             _connection))
+                using (ExportTablesForm exportTables = new ExportTablesForm(
+                    _databaseWorkingCopyFileName, _tableNames.ToArray(), _connection))
                 {
                     exportTables.ShowDialog();
                 }
@@ -1421,18 +1424,36 @@ namespace Extract.SQLCDBEditor
 
             set
             {
-                _usingUIReplacement = value;
-                _primaryTab.ShowOptions = !value;
-                _newQueryToolStripButton.Visible = !value;
-                _newQueryToolStripMenuItem.Visible = !value;
-                
-                if (_usingUIReplacement)
+                if (value != _usingUIReplacement)
                 {
-                    _navigationDockContainer.Hide();
-                }
-                else
-                {
-                    _navigationDockContainer.Show();
+                    _usingUIReplacement = value;
+                    _newQueryToolStripButton.Visible = !value;
+                    _newQueryToolStripMenuItem.Visible = !value;
+
+                    if (_usingUIReplacement)
+                    {
+                        _navigationDockContainer.Hide();
+                        if (_primaryTab != null)
+                        {
+                            _primaryTab.Close();
+                            _primaryTab.Dispose();
+                            _primaryTab = null;
+                        }
+                    }
+                    else
+                    {
+                        if (_primaryTab == null)
+                        {
+                            _primaryTab = new TabbedDocument();
+                            _primaryTab.AllowClose = false;
+                            _primaryTab.Manager = _sandDockManager;
+                            _primaryTab.Text = "";
+                            _primaryTab.TabImage = Resources.Star;
+                            _primaryTab.OpenDocument(WindowOpenMethod.OnScreen);
+                            _primaryTab.Closing += HandleTabbedDocumentClosing;
+                        }
+                        _navigationDockContainer.Show();
+                    }
                 }
             }
         }
@@ -1566,13 +1587,16 @@ namespace Extract.SQLCDBEditor
         /// <param name="openInNewTab"><see langword="true"/> to open in a separate tab that will
         /// not be used to display any other table or query, or <see langword="false"/> to open
         /// into the primary tab.</param>
-        void OpenTableOrQuery(QueryAndResultsControl queryAndResultsControl, bool openInNewTab)
+        /// <param name="activate"><see langword="true"/> if the tab should be activated; otherwise,
+        /// <see langword="false"/>.</param>
+        void OpenTableOrQuery(QueryAndResultsControl queryAndResultsControl, bool openInNewTab, bool activate)
         {
             try
             {
+                queryAndResultsControl.SuspendLayout();
                 SuspendLayout();
 
-                OpenTableOrQueryCore(queryAndResultsControl, openInNewTab);
+                OpenTableOrQueryCore(queryAndResultsControl, openInNewTab, activate);
             }
             catch (Exception ex)
             {
@@ -1581,6 +1605,7 @@ namespace Extract.SQLCDBEditor
             finally
             {
                 ResumeLayout(true);
+                queryAndResultsControl.ResumeLayout(true);
             }
         }
 
@@ -1593,7 +1618,9 @@ namespace Extract.SQLCDBEditor
         /// <param name="openInNewTab"><see langword="true"/> to open in a separate tab that will
         /// not be used to display any other table or query, or <see langword="false"/> to open
         /// into the primary tab.</param>
-        void OpenTableOrQueryCore(QueryAndResultsControl queryAndResultsControl, bool openInNewTab)
+        /// <param name="activate"><see langword="true"/> if the tab should be activated; otherwise,
+        /// <see langword="false"/>.</param>
+        void OpenTableOrQueryCore(QueryAndResultsControl queryAndResultsControl, bool openInNewTab, bool activate)
         {
             // When a queryAndResultsControl is displayed, update the status bar with this control's
             // active status message (if any).
@@ -1632,12 +1659,20 @@ namespace Extract.SQLCDBEditor
                 {
                     tabbedDocument = new TabbedDocument(_sandDockManager, queryAndResultsControl,
                         queryAndResultsControl.DisplayName);
-                    tabbedDocument.OpenWith(_primaryTab);
+                    if (_primaryTab != null)
+                    {
+                        tabbedDocument.OpenWith(_primaryTab);
+                    }
+                    else
+                    {
+                        tabbedDocument.Open(WindowOpenMethod.OnScreen);
+                    }
                     tabbedDocument.Closing += HandleTabbedDocumentClosing;
                     tabbedDocument.Closed += HandleTabbedDocumentClosed;
+                    tabbedDocument.AllowClose = !UsingUIReplacement;
                 }
                 // ... or close the control currently in the primary tab and open it there.
-                else
+                else if (_primaryTab != null)
                 {
                     if (_primaryTab.Controls.Count > 0)
                     {
@@ -1660,7 +1695,10 @@ namespace Extract.SQLCDBEditor
                 queryAndResultsControl.RefreshData(false, false);
             }
 
-            tabbedDocument.Activate();
+            if (activate)
+            {
+                tabbedDocument.Activate();
+            }
         }
 
         /// <summary>
@@ -1774,7 +1812,10 @@ namespace Extract.SQLCDBEditor
                     _queriesBindingSource.ResetBindings(false);
 
                     // Activate the primary tab to ensure the table/query list selection gets updated.
-                    _primaryTab.Activate();
+                    if (_primaryTab != null)
+                    {
+                        _primaryTab.Activate();
+                    }
                 }
             }
             catch (Exception ex)
@@ -1813,7 +1854,7 @@ namespace Extract.SQLCDBEditor
 
             if (invalidQueryAndResultsControl != null)
             {
-                OpenTableOrQuery(invalidQueryAndResultsControl, false);
+                OpenTableOrQuery(invalidQueryAndResultsControl, false, true);
                 string errorText = invalidQueryAndResultsControl.ShowInvalidData();
                 var ee = new ExtractException("ELI34626", "Unable to save; \"" +
                     invalidQueryAndResultsControl.DisplayName + "\" has invalid data.");
@@ -2007,18 +2048,21 @@ namespace Extract.SQLCDBEditor
                 CheckSchemaVersionAndPromptForUpdate();
 
                 if (_schemaManager != null &&
-                    !string.IsNullOrWhiteSpace(_schemaManager.UIReplacementPlugin))
+                    _schemaManager.UIReplacementPlugins != null &&
+                    _schemaManager.UIReplacementPlugins.Any())
                 {
                     UsingUIReplacement = true;
 
-                    SQLCDBEditorPlugin uiReplacementPlugin =
-                        (SQLCDBEditorPlugin)UtilityMethods.CreateTypeFromTypeName(
-                            _schemaManager.UIReplacementPlugin);
+                    foreach (var plugin in _schemaManager.UIReplacementPlugins
+                        .Cast<SQLCDBEditorPlugin>())
+                    {
+                        var pluginControl = new QueryAndResultsControl(plugin);
+                        OpenTableOrQuery(pluginControl, true, false);
+                        _pluginList.Add(pluginControl);
+                    }
 
-                    var pluginControl = new QueryAndResultsControl(uiReplacementPlugin);
-                    _pluginList.Add(pluginControl);
-
-                    OpenTableOrQuery(pluginControl, false);
+                    //OpenTableOrQuery(_pluginList.First(), false);
+                    ((TabbedDocument)_pluginList.First().Parent).Activate();
                 }
                 else
                 {
@@ -2258,6 +2302,7 @@ namespace Extract.SQLCDBEditor
                 }
                 else
                 {
+                    tabbedDocument.AllowClose = true;
                     tabbedDocument.Close();
                 }
             }
@@ -2317,9 +2362,12 @@ namespace Extract.SQLCDBEditor
             if (TableNames.Contains("Settings"))
             {
                 // Setup dataAdapter to get the data
+                DbProviderFactory providerFactory = DBMethods.GetDBProvider(_connection);
+                using (var adapter = providerFactory.CreateDataAdapter())
                 using (var table = new DataTable())
-                using (var adapter = new SqlCeDataAdapter("SELECT * FROM Settings", _connection))
                 {
+                    adapter.SelectCommand = DBMethods.CreateDBCommand(_connection,
+                        "SELECT * FROM Settings", null);
                     table.Locale = CultureInfo.CurrentCulture;
 
                     // Fill the table with the data from the dataAdapter
@@ -2375,6 +2423,8 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
+                var databaseType = _connection.GetType();
+
                 // Store the db name and close the open database
                 string tempName = _databaseFileName;
                 CloseDatabase();
@@ -2385,8 +2435,7 @@ namespace Extract.SQLCDBEditor
                 {
                     var tempTask = Task.Factory.StartNew(() =>
                     {
-                        using (var connection = new SqlCeConnection(
-                            SqlCompactMethods.BuildDBConnectionString(tempName, false)))
+                        using (var connection = (DbConnection)Activator.CreateInstance(databaseType))
                         {
                             _schemaManager.SetDatabaseConnection(connection);
                             try
@@ -2496,7 +2545,7 @@ namespace Extract.SQLCDBEditor
 
             _pendingQueryList.Add(queryAndResultsControl);
 
-            OpenTableOrQuery(queryAndResultsControl, true);
+            OpenTableOrQuery(queryAndResultsControl, true, true);
         }
 
         /// <summary>
@@ -2523,12 +2572,15 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         void ClearPrimaryTab()
         {
-            _primaryTab.Controls.Clear();
-            _primaryTab.TabText = "";
-            _primaryTab.AllowClose = false;
+            if (_primaryTab != null)
+            {
+                _primaryTab.Controls.Clear();
+                _primaryTab.TabText = "";
+                _primaryTab.AllowClose = false;
 
-            _tablesListBox.ClearSelected();
-            _queriesListBox.ClearSelected();
+                _tablesListBox.ClearSelected();
+                _queriesListBox.ClearSelected();
+            }
         }
 
         /// <summary>

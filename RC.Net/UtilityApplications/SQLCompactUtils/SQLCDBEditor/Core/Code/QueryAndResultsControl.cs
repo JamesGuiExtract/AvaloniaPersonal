@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlServerCe;
+using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -59,7 +59,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// The connection to the database.
         /// </summary>
-        SqlCeConnection _connection;
+        DbConnection _connection;
 
         /// <summary>
         /// The name of the loaded database table.
@@ -79,12 +79,12 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// The data adapter to populate <see cref="_resultsTable"/> for database tables.
         /// </summary>
-        SqlCeDataAdapter _adapter;
+        DbDataAdapter _adapter;
 
         /// <summary>
-        /// The <see cref="SqlCeCommandBuilder"/> used to facilitate database table editing.
+        /// The <see cref="DbCommandBuilder"/> used to facilitate database table editing.
         /// </summary>
-        SqlCeCommandBuilder _commandBuilder;
+        DbCommandBuilder _commandBuilder;
 
         /// <summary>
         /// Stores the MaxLength for each column in the table for use in calculating default column
@@ -267,6 +267,8 @@ namespace Extract.SQLCDBEditor
                 _resultsTable.Locale = CultureInfo.CurrentCulture;
                 Name = plugin.DisplayName;
                 _plugin = plugin;
+
+                _plugin.SuspendLayout();
                 _plugin.DataChanged += HandlePluginDataChanged;
                 _plugin.StatusMessageChanged += HandlePluginStatusMessageChanged;
                 QueryAndResultsType = QueryAndResultsType.Plugin;
@@ -426,7 +428,7 @@ namespace Extract.SQLCDBEditor
                             {
                                 // Ensure ErrorText is cleared for all rows in the table.
                                 foreach (var row in _resultsGrid.Rows
-                                    .OfType<DataGridViewRow>()
+                                    .Cast<DataGridViewRow>()
                                     .Where(row => !string.IsNullOrEmpty(row.ErrorText)))
                                 {
                                     row.ErrorText = null;
@@ -535,7 +537,7 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="connection">The connection to the database.</param>
         /// <param name="tableName">Name of the database table.</param>
-        public void LoadTable(SqlCeConnection connection, string tableName)
+        public void LoadTable(DbConnection connection, string tableName)
         {
             try
             {
@@ -569,7 +571,7 @@ namespace Extract.SQLCDBEditor
         /// Loads the control data using a query and populates the results grid.
         /// </summary>
         /// <param name="connection">The connection to the database.</param>
-        public void LoadQuery(SqlCeConnection connection)
+        public void LoadQuery(DbConnection connection)
         {
             try
             {
@@ -588,7 +590,7 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="connection">The connection to the database.</param>
         /// <param name="query">The query.</param>
-        public void LoadQuery(SqlCeConnection connection, string query)
+        public void LoadQuery(DbConnection connection, string query)
         {
             try
             {
@@ -637,8 +639,8 @@ namespace Extract.SQLCDBEditor
         /// Loads the plugin by providing it the <see paramref="connection"/> and using the 
         /// <see cref="SQLCDBEditorPlugin.BindingSource"/> it creates using the connection.
         /// </summary>
-        /// <param name="connection">The <see cref="SqlCeConnection"/> to the database.</param>
-        void LoadPluginViaBindingSource(SqlCeConnection connection)
+        /// <param name="connection">The <see cref="DbConnection"/> to the database.</param>
+        void LoadPluginViaBindingSource(DbConnection connection)
         {
             _lastUsedParameters.Clear();
 
@@ -666,7 +668,7 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="connection">The connection to the database.</param>
         /// <param name="query">The query.</param>
-        void LoadQueryCore(SqlCeConnection connection, string query)
+        void LoadQueryCore(DbConnection connection, string query)
         {
             ExtractException.Assert("ELI38266", "No query can be loaded from this control type.",
                 QueryAndResultsType == QueryAndResultsType.Query ||
@@ -708,7 +710,7 @@ namespace Extract.SQLCDBEditor
         /// Loads a plugin into this instance.
         /// </summary>
         /// <param name="connection">The connection to the database.</param>
-        public void LoadPlugin(SqlCeConnection connection)
+        public void LoadPlugin(DbConnection connection)
         {
             try
             {
@@ -720,7 +722,7 @@ namespace Extract.SQLCDBEditor
                 _resultsSplitContainer.Panel1.Controls.Clear();
                 _resultsSplitContainer.Panel2.Controls.Clear();
 
-                if (!string.IsNullOrEmpty(_plugin.Query) || UsingPluginBindingSource)
+                if (_plugin.DisplayGrid)
                 {
                     _resultsSplitContainer.Panel1.Controls.Add(_resultsPanel);
                     _resultsSplitContainer.Panel1Collapsed = false;
@@ -752,9 +754,17 @@ namespace Extract.SQLCDBEditor
                 {
                     LoadPluginViaBindingSource(connection);
                 }
-                else
+                else if (!string.IsNullOrWhiteSpace(_plugin.Query))
                 {
                     LoadQueryCore(connection, _plugin.Query);
+
+                    _plugin.LoadPlugin(this, _connection);
+                }
+                else
+                {
+                    _connection = connection;
+                    _plugin.LoadPlugin(this, _connection);
+                    IsLoaded = true;
                 }
             }
             catch (Exception ex)
@@ -805,7 +815,7 @@ namespace Extract.SQLCDBEditor
                         // are preserved even if invalid. Note that this call will clear any
                         // constraints on latestDataTable.
                         DataIsValid = MergeRowsIntoTable(latestDataTable, _resultsTable.Rows
-                            .OfType<DataRow>()
+                            .Cast<DataRow>()
                             .Where(row => row.HasErrors));
                     }
                     else
@@ -932,7 +942,7 @@ namespace Extract.SQLCDBEditor
                 : ListSortDirection.Ascending;
             int scrollPos = _resultsGrid.FirstDisplayedScrollingRowIndex;
             int[] columnWidths = _resultsGrid.Columns
-                .OfType<DataGridViewColumn>()
+                .Cast<DataGridViewColumn>()
                 .Select(column => column.Width)
                 .ToArray();
 
@@ -1031,10 +1041,12 @@ namespace Extract.SQLCDBEditor
                 }
 
                 // Populate latestDataTable with the query results.
-                using (SqlCeCommand command = (SqlCeCommand)DBMethods.CreateDBCommand(
+                DbProviderFactory providerFactory = DBMethods.GetDBProvider(_connection);
+                using (DbDataAdapter adapter = providerFactory.CreateDataAdapter())
+                using (DbCommand command = DBMethods.CreateDBCommand(
                     _connection, _masterQuery, parameters))
-                using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(command))
                 {
+                    adapter.SelectCommand = command;
                     adapter.Fill(latestDataTable);
                 }
 
@@ -1150,7 +1162,7 @@ namespace Extract.SQLCDBEditor
                             string query = "SELECT ";
 
                             query += string.Join("\r\n\t,", _resultsTable.Columns
-                                .OfType<DataColumn>()
+                                .Cast<DataColumn>()
                                 .Select(column => "[" + column.ColumnName + "]"));
                             query += "\r\n\tFROM [" + Name + "]";
 
@@ -1228,7 +1240,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 DataGridViewRow firstInvalidRow = _resultsGrid.Rows
-                    .OfType<DataGridViewRow>()
+                    .Cast<DataGridViewRow>()
                     .FirstOrDefault(row => !string.IsNullOrEmpty(row.ErrorText));
 
                 if (firstInvalidRow != null)
@@ -1359,7 +1371,7 @@ namespace Extract.SQLCDBEditor
         protected override void OnLayout(LayoutEventArgs e)
         {
             try
-            {
+            {                
                 base.OnLayout(e);
 
                 // If this is the first time Layout has been raised since loading, this control is now its final size.
@@ -1368,18 +1380,15 @@ namespace Extract.SQLCDBEditor
                 {
                     _initialLayoutComplete = true;
 
+                    if (_plugin != null)
+                    {
+                        _plugin.ResumeLayout(true);
+                    }
+
                     AutoSizeColumns();
 
                     if (QueryAndResultsType == QueryAndResultsType.Plugin)
                     {
-                        // Plugins with binding sources will have been loaded already (when
-                        // UsingPluginBindingSource, load is necessary to initialize
-                        // _resultsGrid.DataSource).
-                        if (!UsingPluginBindingSource)
-                        {
-                            _plugin.LoadPlugin(this, _connection);
-                        }
-
                         // SelectionChanged will not have been registered by the plugin until
                         // _plugin.LoadPlugin is called, so fire a selection event now so that the
                         // plugin registers the initial selection.
@@ -1401,6 +1410,12 @@ namespace Extract.SQLCDBEditor
         {
             if (disposing)
             {
+                if (_plugin != null)
+                {
+                    _plugin.Dispose();
+                    _plugin = null;
+                }
+
                 if (_adapter != null)
                 {
                     _adapter.Dispose();
@@ -2090,7 +2105,7 @@ namespace Extract.SQLCDBEditor
         /// <param name="tableName">Name of the table to load.</param>
         /// <returns>The loaded table.</returns>
         [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
-        void LoadTableFromDatabase(SqlCeConnection connection, string tableName)
+        void LoadTableFromDatabase(DbConnection connection, string tableName)
         {
             if (_adapter != null)
             {
@@ -2105,17 +2120,20 @@ namespace Extract.SQLCDBEditor
             }
 
             // Setup dataAdapter to get the data
-            _adapter = new SqlCeDataAdapter("SELECT * FROM " + tableName, connection);
+            DbProviderFactory providerFactory = DBMethods.GetDBProvider(connection);
+            _adapter = providerFactory.CreateDataAdapter();
+            _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection, 
+                "SELECT * FROM " + tableName, null);
+
+            // Create a command builder for the adapter that allow edits made in the _resultsGrid
+            // to be applied back to the database.
+            _commandBuilder = providerFactory.CreateCommandBuilder();
+            _commandBuilder.DataAdapter = _adapter;
 
             // Fill the table with the data from the dataAdapter
             _adapter.Fill(_resultsTable);
             ApplySchema(_resultsTable);
             StoreColumnSizes(_resultsTable);
-
-            // Create a command builder for the adapter that allow edits made in the _resultsGrid
-            // to be applied back to the database.
-            _commandBuilder = new SqlCeCommandBuilder();
-            _commandBuilder.DataAdapter = _adapter;
         }
 
         /// <summary>
@@ -2151,21 +2169,18 @@ namespace Extract.SQLCDBEditor
                 // Check for auto increment fields and default column values
                 foreach (DataColumn c in table.Columns)
                 {
-                    // Get the information for the current column
-                    using (SqlCeCommand sqlcmd = new SqlCeCommand(
-                        "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
-                        Name + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
+                    using (DbCommand command = DBMethods.CreateDBCommand(_connection,
+                        "SELECT * FROM INFORMATION_SCHEMA.COLUMNS " +
+                        "WHERE TABLE_NAME = @0 AND COLUMN_NAME = @1 ",
+                        new Dictionary<string, string> { { "@0", Name }, { "@1", c.ColumnName } }))
+                    using (DbDataReader sqlReader = command.ExecuteReader())
                     {
-                        using (SqlCeResultSet columnsResult =
-                            sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
+                        // Get the first record in the result set - should only be one
+                        if (sqlReader.Read())
                         {
-                            // Get the first record in the result set - should only be one
-                            if (columnsResult.ReadFirst())
-                            {
-                                SetColumnAutoIncrement(c, columnsResult);
+                            SetColumnAutoIncrement(c, sqlReader);
 
-                                SetColumnDefaultValue(c, columnsResult);
-                            }
+                            SetColumnDefaultValue(c, sqlReader);
                         }
                     }
                 }
@@ -2198,9 +2213,9 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="dataColumn">The <see cref="DataColumn"/> to which auto-increment settings
         /// should be applied.</param>
-        /// <param name="columnSchema">The <see cref="SqlCeResultSet"/> containing schema info for
+        /// <param name="columnSchema">The <see cref="DbDataReader"/> containing schema info for
         /// the column.</param>
-        static int SetColumnAutoIncrement(DataColumn dataColumn, SqlCeResultSet columnSchema)
+        static int SetColumnAutoIncrement(DataColumn dataColumn, DbDataReader columnSchema)
         {
             int colPos = -1;
             try
@@ -2241,19 +2256,18 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="dataColumn">The <see cref="DataColumn"/> to which any default value should
         /// be applied.</param>
-        /// <param name="columnSchema">The <see cref="SqlCeResultSet"/> containing schema info for
+        /// <param name="columnSchema">The <see cref="DbDataReader"/> containing schema info for
         /// the column.</param>
-        static void SetColumnDefaultValue(DataColumn dataColumn, SqlCeResultSet columnSchema)
+        static void SetColumnDefaultValue(DataColumn dataColumn, DbDataReader columnSchema)
         {
             int colPos = -1;
             try
             {
                 // Set the default for a column if one is defined
-                colPos = columnSchema.GetOrdinal("COLUMN_HASDEFAULT");
-                if (columnSchema.GetBoolean(colPos))
+                colPos = columnSchema.GetOrdinal("COLUMN_DEFAULT");
+                if (!columnSchema.IsDBNull(colPos))
                 {
                     // Set the default value for the column
-                    colPos = columnSchema.GetOrdinal("COLUMN_DEFAULT");
                     dataColumn.DefaultValue = columnSchema.GetValue(colPos);
                 }
             }
@@ -2378,7 +2392,7 @@ namespace Extract.SQLCDBEditor
         {
             // Iterate all auto-increment columns in the DB.
             foreach (DataColumn dataColumn in _resultsTable.Columns
-                .OfType<DataColumn>()
+                .Cast<DataColumn>()
                 .Where(column => column.AutoIncrement))
             {
                 // Query the next auto-increment value for this column from the DB.
@@ -2419,7 +2433,7 @@ namespace Extract.SQLCDBEditor
         /// <param name="connection">The connection to the database to use if needed to define the
         /// available values for a query.</param>
         /// <param name="query">The query.</param>
-        void ParseQuery(SqlCeConnection connection, string query)
+        void ParseQuery(DbConnection connection, string query)
         {
             // Remove any existing parameter controls.
             RemoveParameterControls();
@@ -2543,7 +2557,7 @@ namespace Extract.SQLCDBEditor
         void RemoveParameterControls()
         {
             List<Control> oldControls =
-                new List<Control>(_parametersTableLayoutPanel.Controls.OfType<Control>());
+                new List<Control>(_parametersTableLayoutPanel.Controls.Cast<Control>());
 
             _parametersTableLayoutPanel.Controls.Clear();
             _parametersTableLayoutPanel.RowCount = 1;
@@ -2642,7 +2656,7 @@ namespace Extract.SQLCDBEditor
                 // row... so add it to a temporary copy of the table with a transaction that gets
                 // rolled back to test if it would be able to be added to _resultsTable without error.
                 using (DataTable tableCopy = row.Table.Copy())
-                using (SqlCeTransaction transaction = _connection.BeginTransaction(IsolationLevel.Serializable))
+                using (DbTransaction transaction = _connection.BeginTransaction(IsolationLevel.Serializable))
                 {
                     if (_adapter.InsertCommand == null)
                     {
@@ -2837,7 +2851,7 @@ namespace Extract.SQLCDBEditor
 
                 // Save the current available value list so it can be compared to the new list.
                 string[] originalAvailableValuesList = comboBox.Items
-                    .OfType<string>()
+                    .Cast<string>()
                     .ToArray();
 
                 try
@@ -2969,11 +2983,11 @@ namespace Extract.SQLCDBEditor
             {
                 eventHandler(this,
                     new GridSelectionEventArgs(_resultsGrid.SelectedRows
-                        .OfType<DataGridViewRow>()
+                        .Cast<DataGridViewRow>()
                         .Select(gridRow => gridRow.DataBoundItem)
-                        .OfType<DataRowView>()
+                        .Cast<DataRowView>()
                         .Select(dataRow => dataRow.Row)
-                        .OfType<DataRow>()));
+                        .Cast<DataRow>()));
             }
         }
 

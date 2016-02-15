@@ -905,10 +905,10 @@ namespace Extract.FileActionManager.Database
         }
 
         /// <summary>
-        /// Gets the type name of an SQLCDBEditorPlugin that should completely replace the normal
-        /// SQLCDBEditor UI (no tables, queries or tabs)
+        /// Gets or sets the SQLCDBEditorPlugin implementation(s) that should completely replace the
+        /// normal SQLCDBEditor UI (no tables, queries or tabs)
         /// </summary>
-        public string UIReplacementPlugin
+        public IEnumerable<object> UIReplacementPlugins
         {
             get
             {

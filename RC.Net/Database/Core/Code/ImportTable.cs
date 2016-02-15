@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -63,7 +64,7 @@ namespace Extract.Database
         /// When true, this instance is an "extended usage" scenario. 
         /// Originally this code was used by a console application,
         /// and that application has fewer requirements, so this flag has been added
-        /// to ensure backward compatability.
+        /// to ensure backward compatibility.
         /// </summary>
         public bool ExtendedUse { get; set; }
 
@@ -99,7 +100,7 @@ namespace Extract.Database
 
         /// <summary>
         /// Initializes a new <see cref="Settings"/> instance.
-        /// This CTOR is used by console apps, passed comamnd line args.
+        /// This CTOR is used by console apps, passed command line args.
         /// </summary>
         /// <param name="args">The command-line arguments the application was launched with.</param>
         public ImportSettings(string[] args)
@@ -121,14 +122,14 @@ namespace Extract.Database
                 if (args[i].Equals("/rd", StringComparison.OrdinalIgnoreCase))
                 {
                     i++;
-                    ExtractException.Assert("ELI27132", "Missing row delimeter value.", i < args.Length);
+                    ExtractException.Assert("ELI27132", "Missing row delimiter value.", i < args.Length);
 
                     RowDelimiter = ParamUnescape(args[i]);
                 }
                 else if (args[i].Equals("/cd", StringComparison.OrdinalIgnoreCase))
                 {
                     i++;
-                    ExtractException.Assert("ELI27133", "Missing column delimeter value.", i < args.Length);
+                    ExtractException.Assert("ELI27133", "Missing column delimiter value.", i < args.Length);
 
                     ColumnDelimiter = ParamUnescape(args[i]);
                 }
@@ -147,8 +148,8 @@ namespace Extract.Database
         /// Replaces printable escape sequences for carriage returns, line feeds and tab characters
         /// with the characters themselves.
         /// </summary>
-        /// <param name="parameter">The parameter to unescape.</param>
-        /// <returns>The unescaped parameter.</returns>
+        /// <param name="parameter">The parameter to un-escape.</param>
+        /// <returns>The un-escaped parameter.</returns>
         static string ParamUnescape(string parameter)
         {
             if (parameter == null)
@@ -186,12 +187,12 @@ namespace Extract.Database
         /// <returns>Tuple where Item1 is an int which is the number of rows that failed,
         ///  and Item2 is a string[] that is the set of execution messages, one for each row 
         ///  operation processed</returns>        
-        public static Tuple<int, string[]> ImportFromFile( ImportSettings settings, SqlCeConnection sqlConnection )
+        public static Tuple<int, string[]> ImportFromFile( ImportSettings settings, DbConnection sqlConnection )
         {
             List<string> messages = new List<string>();
             int rowsProcessed = 0;
             int rowsFailed = 0;
-            SqlCeTransaction tx = null;
+            DbTransaction tx = null;
 
             try
             {
@@ -207,7 +208,7 @@ namespace Extract.Database
                 // Obtain information about the columns the data is to be imported into.
                 List<int> columnSizes = new List<int>();
                 List<string> columnNames = new List<string>();
-                SqlCeTableColumnInfo tci = new SqlCeTableColumnInfo(settings.TableName, sqlConnection);
+                DbTableColumnInfo tci = new DbTableColumnInfo(settings.TableName, sqlConnection);
                 foreach (var ci in tci)
                 {
                     columnNames.Add(ci.ColumnName);
@@ -215,13 +216,14 @@ namespace Extract.Database
                 }
 
                 ExtractException.Assert("ELI27253",
-                                        "Could not get column info for table: " + settings.TableName,
-                                        columnSizes.Count > 0);
+                    "Could not get column info for table: " + settings.TableName,
+                    columnSizes.Count > 0);
 
                 if (settings.ReplaceData)
                 {
                     string deleteRows = "DELETE FROM " + settings.TableName;
-                    using (SqlCeCommand deleteCommand = new SqlCeCommand(deleteRows, sqlConnection))
+                    using (DbCommand deleteCommand =
+                        DBMethods.CreateDBCommand(sqlConnection, deleteRows, null))
                     {
                         deleteCommand.ExecuteNonQuery();
                     }
@@ -368,7 +370,7 @@ namespace Extract.Database
 
         /// <summary>
         /// This function splits columns in the presence of embedded quote marks
-        /// when useAdvancedSplitter is true. for backwards compatability, it also
+        /// when useAdvancedSplitter is true. for backwards compatibility, it also
         /// includes the original split-based algorithm, used by console apps.
         /// </summary>
         /// <param name="rowText">The line of text to split</param>
@@ -440,7 +442,7 @@ namespace Extract.Database
         #region Private Functions
 
         /// <summary>
-        /// Replace all double quote marks, adn then remove any leading and trailing double quote (") characters 
+        /// Replace all double quote marks, and then remove any leading and trailing double quote (") characters 
         /// </summary>
         /// <param name="value">input string to remove quotes from</param>
         /// <returns>Returns string with double quote characters at start and 
@@ -466,28 +468,22 @@ namespace Extract.Database
         /// Insert a row into the table, overwriting what was present.
         /// </summary>
         /// <param name="settings">import settings</param>
-        /// <param name="connection">sql ce connection, open</param>
+        /// <param name="connection">database connection, open</param>
         /// <param name="columnValues">a set of column values for the row being inserted</param>
         /// <param name="columnInfo">column information</param>
         /// <param name="tx">transaction context</param>
         /// <returns>result string</returns>
         static string ReplaceInsert(ImportSettings settings,
-                                    SqlCeConnection connection,
+                                    DbConnection connection,
                                     Dictionary<string, string> columnValues,
-                                    SqlCeTableColumnInfo columnInfo,
-                                    SqlCeTransaction tx)
+                                    DbTableColumnInfo columnInfo,
+                                    DbTransaction tx)
         {
             // Only set identity_insert ON|OFF iff the table has an identity column.
             bool hasAutoIncrement = columnInfo.Count(column => column.IsAutoIncrement) > 0;
 
-            var cmdOp = String.Format(CultureInfo.InvariantCulture,
-                                      "SET IDENTITY_INSERT {0} ON",
-                                      settings.TableName);
-
-            using (SqlCeCommand command = new SqlCeCommand())
+            using (DbCommand command = DBMethods.CreateDBCommand(connection, settings.CommandText, columnValues))
             {
-                command.Connection = connection;
-               
                 if (settings.UseTransaction)
                 {
                     command.Transaction = tx;
@@ -495,26 +491,16 @@ namespace Extract.Database
 
                 if (hasAutoIncrement)
                 {
-                    command.CommandText = cmdOp;            
-                    command.ExecuteNonQuery();
-                }
-
-                command.CommandText = settings.CommandText;
-                foreach (string key in columnValues.Keys)
-                {
-                    command.Parameters.AddWithValue(key, columnValues[key]);
+                    SetIdentityInsert(connection, settings.UseTransaction ? tx : null,
+                        settings.TableName, true);
                 }
 
                 command.ExecuteNonQuery();
 
                 if (hasAutoIncrement)
                 {
-                    var cmdOpOff = String.Format(CultureInfo.InvariantCulture,
-                                                 "SET IDENTITY_INSERT {0} OFF",
-                                                 settings.TableName);
-
-                    command.CommandText = cmdOpOff;
-                    command.ExecuteNonQuery();
+                    SetIdentityInsert(connection, settings.UseTransaction ? tx : null,
+                        settings.TableName, false);
                 }
 
                 StringBuilder sb = new StringBuilder();
@@ -525,28 +511,50 @@ namespace Extract.Database
         }
 
         /// <summary>
-        /// Append a row to the table.
+        /// Turns IDENTITY_INSERT on or off for the specified <see paramref="tableName"/>.
         /// </summary>
-        /// <param name="settings">import setttings</param>
-        /// <param name="connection">sql ce connection, open</param>
-        /// <param name="columnValues">set of column values for the row being inserted</param>
-        /// <param name="tx">transaction context</param>
-        /// <returns>result string</returns>
-        static string AppendInsert(ImportSettings settings, 
-                                   SqlCeConnection connection, 
-                                   Dictionary<string, string>columnValues,
-                                   SqlCeTransaction tx)
+        /// <param name="connection">The open <see cref="DbConnection"/> to use.</param>
+        /// <param name="tx">The <see cref="DbTransaction"/> to use or <see langword="null"/> if no
+        /// transaction is to be used.</param>
+        /// <param name="tableName">Name of the table for which IDENTITY_INSERT is to be modified.
+        /// </param>
+        /// <param name="setOn"><see langword="true"/> to set IDENTITY_INSERT ON;
+        /// <see langword="false"/> to set IDENTITY_INSERT OFF.</param>
+        static void SetIdentityInsert(DbConnection connection, DbTransaction tx, string tableName, bool setOn)
         {
-            using (SqlCeCommand command = new SqlCeCommand(settings.CommandText, connection))
+            using (var command = DBMethods.CreateDBCommand(connection,
+                    string.Format(CultureInfo.InvariantCulture,
+                        "SET IDENTITY_INSERT [{0}] {1}", tableName, setOn ? "ON" : "OFF"), 
+                    null))
             {
-                if (settings.UseTransaction)
+                if (tx != null)
                 {
                     command.Transaction = tx;
                 }
 
-                foreach (string key in columnValues.Keys)
+                command.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// Append a row to the table.
+        /// </summary>
+        /// <param name="settings">import settings</param>
+        /// <param name="connection">database connection, open</param>
+        /// <param name="columnValues">set of column values for the row being inserted</param>
+        /// <param name="tx">transaction context</param>
+        /// <returns>result string</returns>
+        static string AppendInsert(ImportSettings settings, 
+                                   DbConnection connection, 
+                                   Dictionary<string, string>columnValues,
+                                   DbTransaction tx)
+        {
+            using (var command = DBMethods.CreateDBCommand(
+                connection, settings.CommandText, columnValues))
+            {
+                if (settings.UseTransaction)
                 {
-                    command.Parameters.AddWithValue(key, columnValues[key]);
+                    command.Transaction = tx;
                 }
 
                 command.ExecuteNonQuery();
@@ -569,7 +577,7 @@ namespace Extract.Database
         /// <returns>array of included column names</returns>
         static string[] CopyIncludedColumns(List<string> columnNames, 
                                             int columnCount,
-                                            SqlCeTableColumnInfo columnInfo, 
+                                            DbTableColumnInfo columnInfo, 
                                             bool replaceMode)
         {
             if (replaceMode)

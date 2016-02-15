@@ -1,9 +1,7 @@
-﻿using Extract.Database;
-using Extract.Licensing;
-using Extract.Utilities;
+﻿using Extract.Licensing;
 using System;
 using System.ComponentModel;
-using System.Data.SqlServerCe;
+using System.Data.Common;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -43,9 +41,9 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// Initializes a new instance of the <see cref="ContextEditingForm"/> class.
         /// </summary>
-        /// <param name="connection">The <see cref="SqlCeConnection"/> of the database to edit.
+        /// <param name="connection">The <see cref="DbConnection"/> of the database to edit.
         /// </param>
-        public ContextEditingForm(SqlCeConnection connection)
+        public ContextEditingForm(DbConnection connection)
         {
             try
             {
@@ -120,7 +118,7 @@ namespace Extract.Utilities.ContextTags
                 DataGridViewColumn nameColumn = _dataGridView.Columns["_nameColumn"];
 		        DataGridViewColumn fpsFileDirColumn = _dataGridView.Columns["_fpsFileDirColumn"];
 
-                if (_dataGridView.Rows.OfType<DataGridViewRow>()
+                if (_dataGridView.Rows.Cast<DataGridViewRow>()
                     .Where(row => !row.IsNewRow)
                     .Select(row => row.Cells[nameColumn.Index])
                     .Any(cell => string.IsNullOrWhiteSpace(cell.Value as string)))
@@ -131,7 +129,7 @@ namespace Extract.Utilities.ContextTags
                     return;
                 }
 
-                if (_dataGridView.Rows.OfType<DataGridViewRow>()
+                if (_dataGridView.Rows.Cast<DataGridViewRow>()
                     .Where(row => !row.IsNewRow)
                     .Select(row => row.Cells[fpsFileDirColumn.Index])
                     .Any(cell => string.IsNullOrWhiteSpace(cell.Value as string)))
@@ -142,7 +140,7 @@ namespace Extract.Utilities.ContextTags
                     return;
                 }
 
-                if (_dataGridView.Rows.OfType<DataGridViewRow>()
+                if (_dataGridView.Rows.Cast<DataGridViewRow>()
                     .Where (row => !row.IsNewRow)
                     .Select(row => row.Cells[fpsFileDirColumn.Index])
                     .Any(cell => !((string)cell.Value).StartsWith(@"\\",
@@ -166,7 +164,7 @@ namespace Extract.Utilities.ContextTags
                 {
                     // Remove any trailing backslash to ensure as best as possible that paths
                     // will match exactly when identifying the current context.
-                    foreach (var cell in _dataGridView.Rows.OfType<DataGridViewRow>()
+                    foreach (var cell in _dataGridView.Rows.Cast<DataGridViewRow>()
                                 .Where(row => !row.IsNewRow)
                                 .Select(row => row.Cells[fpsFileDirColumn.Index])
                                 .Where(cell => ((string)cell.Value).EndsWith(@"\", 

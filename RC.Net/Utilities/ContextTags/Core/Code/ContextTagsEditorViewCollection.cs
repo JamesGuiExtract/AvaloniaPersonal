@@ -145,7 +145,7 @@ namespace Extract.Utilities.ContextTags
             try
             {
                 return new PropertyDescriptorCollection(_defaultViewRow.GetProperties()
-                    .OfType<PropertyDescriptor>()
+                    .Cast<PropertyDescriptor>()
                     .Where(property => listAccessors == null ||
                         listAccessors.Any(accessor => accessor.PropertyType == property.PropertyType))
                     .ToArray());
@@ -424,7 +424,7 @@ namespace Extract.Utilities.ContextTags
                 // database.
                 if (e.Action == NotifyCollectionChangedAction.Add)
                 {
-                    foreach (var row in e.NewItems.OfType<ContextTagsEditorViewRow>())
+                    foreach (var row in e.NewItems.Cast<ContextTagsEditorViewRow>())
                     {
                         row.Initialize(_database);
                         dataChanged = true;
@@ -433,7 +433,7 @@ namespace Extract.Utilities.ContextTags
                 }
                 else if (e.Action == NotifyCollectionChangedAction.Remove)
                 {
-                    foreach (var row in e.OldItems.OfType<ContextTagsEditorViewRow>())
+                    foreach (var row in e.OldItems.Cast<ContextTagsEditorViewRow>())
                     {
                         if (row.HasBeenCommitted)
                         {

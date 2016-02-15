@@ -4,6 +4,7 @@ using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Data.Common;
 
 namespace Extract.SQLCDBEditor
 {
@@ -50,6 +51,20 @@ namespace Extract.SQLCDBEditor
             {
                 throw new ExtractException("ELI34831",
                     "Cannot use base class instance ofSQLCDBEditorPlugin class.");
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether [display grid].
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if [display grid]; otherwise, <see langword="false"/>.
+        /// </value>
+        public virtual bool DisplayGrid
+        {
+            get
+            {
+                return true;
             }
         }
 
@@ -136,9 +151,9 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="pluginManager">The <see cref="ISQLCDBEditorPluginManager"/> manager for
         /// this plugin.</param>
-        /// <param name="connection">The <see cref="SqlCeConnection"/> for use by the plugin.</param>
+        /// <param name="connection">The <see cref="DbConnection"/> for use by the plugin.</param>
         public virtual void LoadPlugin(ISQLCDBEditorPluginManager pluginManager,
-            SqlCeConnection connection)
+            DbConnection connection)
         {
             throw new ExtractException("ELI34833",
                 "Cannot use un-derived instance ofSQLCDBEditorPlugin class.");

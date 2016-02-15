@@ -1,12 +1,15 @@
 ﻿using Extract.Licensing;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Extract.Database
 {
@@ -437,6 +440,138 @@ namespace Extract.Database
             }
         }
 
+        /// <summary>
+        /// Formats the data from the specified <see paramref="query"/> into the provided
+        /// <see paramref="dataGridView"/> using the formatting options specified. The columns
+        /// (along with the column names) will be generated via the schema of the query result;
+        /// columns are assumed not to be pre-created.
+        /// <para><b>Note</b></para>
+        /// The <see paramref="dataGridView"/> will be bound to a <see cref="DataTable"/> which will
+        /// be automatically disposed upon any subsequent call into this method; Final disposal of
+        /// the <see cref="DataTable"/>, however, is the responsibility of the caller.
+        /// </summary>
+        /// <param name="connection">The an open <see cref="DbConnection"/> be used to execute the
+        /// query.</param>
+        /// <param name="query">The query that is to generate the data for the grid.</param>
+        /// <param name="parameters">A <see cref="Dictionary{T, T}"/> of parameter names and values
+        /// that need to be parameterized for the command if specified, <see langword="null"/> if
+        /// parameters are not being used. Note that if parameters are being used, the parameter
+        /// names must have already been inserted into <see paramref="query"/>.</param>
+        /// <param name="dataGridView">The <see cref="DataGridView"/> to be populated with the
+        /// query results.</param>
+        /// <param name="resetLayout"><see langword="true"/> if columns widths and sorting is
+        /// is to be reset; <see langword="false"/> to maintain existing column sizes and sorting.
+        /// </param>
+        /// <param name="resetScrollPos"><see langword="true"/> if the scroll position of the grid
+        /// is to be reset; <see langword="false"/> to maintain existing scroll position if possible.
+        /// </param>
+        /// <param name="fitHeaderText"><see langword="true"/> if, when <see paramref="resetLayout"/>
+        /// is <see langword="true"/>, column widths should be sized to the width of the header text
+        /// (regardless of any width or fill weights specified); <see langword="false"/> if the
+        /// columns initial sizing can be narrower than the header text.
+        /// </param>
+        /// <param name="columnLayouts">An array of <see cref="ColumnLayout"/> instances specifying
+        /// layout and formatting of the column of the same ordinal. Can be <see langword="null"/> to
+        /// use default formatting for all columns, can include less than the number columns to use
+        /// default formatting for the remaining columns or can have <see langword="null"/> at any
+        /// index to indicate the column of the matching ordinal should use default formatting.
+        /// </param>
+        public static void FormatDataIntoGrid(DbConnection connection, string query,
+            Dictionary<string, string> parameters, DataGridView dataGridView, bool resetLayout,
+            bool resetScrollPos, bool fitHeaderText, params ColumnLayout[] columnLayouts)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.ExtractCoreObjects, "ELI39340", _OBJECT_NAME);
+
+                DataTable queryResults = ExecuteDBQuery(connection, query, parameters);
+
+                int sortedColumnIndex = -1;
+                ListSortDirection sortOrder = ListSortDirection.Ascending;
+                int scrollPos = 0;
+                int[] columnWidths = null;
+                string[] columnNames = null;
+
+                if (!resetLayout)
+                {
+                    // If updating the results, keep track of the sort order, last scroll position,
+                    // and column sized so that we can keep the same data visible.
+                    sortedColumnIndex = (dataGridView.SortedColumn == null)
+                        ? -1
+                        : dataGridView.SortedColumn.Index;
+                    sortOrder = (dataGridView.SortOrder == SortOrder.Descending)
+                        ? ListSortDirection.Descending
+                        : ListSortDirection.Ascending;
+                    columnWidths = dataGridView.Columns
+                        .OfType<DataGridViewColumn>()
+                        .Select(column => column.Width)
+                        .ToArray();
+                    columnNames = dataGridView.Columns
+                        .OfType<DataGridViewColumn>()
+                        .Select(column => column.Name)
+                        .ToArray();
+                }
+
+                if (!resetScrollPos)
+                {
+                    scrollPos = dataGridView.FirstDisplayedScrollingRowIndex;
+                }
+
+                var oldData = dataGridView.DataSource as IDisposable;
+                if (oldData != null)
+                {
+                    oldData.Dispose();
+                }
+
+                dataGridView.DataSource = queryResults;
+
+                // If the new columns differ from the previous columns, the layout should be reset
+                // despite the passed-in resetLayout value.
+                if (!resetLayout &&
+                    !columnNames.SequenceEqual(
+                        dataGridView.Columns
+                        .OfType<DataGridViewColumn>()
+                        .Select(column => column.Name)))
+                {
+                    resetLayout = true;
+                }
+
+                if (resetLayout)
+                {
+                    LayoutGridColumns(dataGridView, queryResults, fitHeaderText, columnLayouts);
+                }
+                else
+                {
+                    // Re-apply the previous column widths.
+                    foreach (DataGridViewColumn column in dataGridView.Columns)
+                    {
+                        column.Width = columnWidths[column.Index];
+                    }
+
+                    // Restore the previous sort order.
+                    if (sortedColumnIndex >= 0)
+                    {
+                        dataGridView.Sort(dataGridView.Columns[sortedColumnIndex], sortOrder);
+                    }
+                }
+
+                // Re-apply the previous vertical scroll position for tables to try to make it
+                // appear that the table was updated in-place.
+                if (!resetScrollPos && scrollPos >= 0 && scrollPos < dataGridView.RowCount)
+                {
+                    dataGridView.FirstDisplayedScrollingRowIndex = scrollPos;
+                }
+
+                dataGridView.Refresh();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39338");
+            }
+        }
+
         #endregion Methods
 
         #region Private Members
@@ -499,6 +634,274 @@ namespace Extract.Database
             return score;
         }
 
+        /// <summary>
+        /// Helper method for <see cref="FormatDataIntoGrid"/>. Applies layout and formatting of
+        /// <see paramref="dataGridView"/>'s columns.
+        /// </summary>
+        /// <param name="dataGridView">The <see cref="DataGridView"/> instance whose columns are to
+        /// be formatted.</param>
+        /// <param name="dataTable">The <see cref="DataTable"/> to which
+        /// <see paramref="dataGridView"/> is bound.</param>
+        /// <param name="fitHeaderText"><see langword="true"/> if column widths should be sized to
+        /// the width of the header text (regardless of any width or fill weights specified);
+        /// <see langword="false"/> if the columns initial sizing can be narrower than the header
+        /// text.
+        /// </param>
+        /// <param name="specifiedLayouts">An array of <see cref="ColumnLayout"/> instances specifying
+        /// layout and formatting of the column of the same ordinal. Can be <see langword="null"/> to
+        /// use default formatting for all columns, can include less than the number columns to use
+        /// default formatting for the remaining columns or can have <see langword="null"/> at any
+        /// index to indicate the column of the matching ordinal should use default formatting.
+        /// </param>
+        static void LayoutGridColumns(DataGridView dataGridView, DataTable dataTable,
+            bool fitHeaderText, ColumnLayout[] specifiedLayouts)
+        {
+            if (dataGridView.Columns.Count == 0)
+            {
+                return;
+            }
+
+            // Keeps track of the effective ColumnLayout instances used for each column, even for
+            // columns where not any/all layout info was supplied.
+            var columnLayouts = new List<ColumnLayout>();
+
+            // font and graphics will be used to measure header text to enforce fitHeaderText.
+            var font = dataGridView.ColumnHeadersDefaultCellStyle.Font;
+            using (var graphics = dataGridView.CreateGraphics())
+            {
+                foreach (var column in dataGridView.Columns.OfType<DataGridViewColumn>())
+                {
+                    ColumnLayout layout = GetColumnLayout(column, dataTable, specifiedLayouts);
+                    columnLayouts.Add(layout);
+
+                    if (layout.FillWeight != null)
+                    {
+                        column.FillWeight = layout.FillWeight.Value;
+                        column.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+                    else
+                    {
+                        column.Width = layout.Width.Value;
+                        column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                    }
+
+                    if (layout.Style != null)
+                    {
+                        column.DefaultCellStyle = layout.Style;
+                    }
+
+                    if (layout.HeaderStyle != null)
+                    {
+                        column.HeaderCell.Style = layout.HeaderStyle;
+                    }
+
+                    // Seems like there should be a way to get appropriate column width for header
+                    // text without side-effect such as triggering other columns to resize, but I
+                    // couldn't find such a way. Trial and error seems to show header text plus
+                    // "X" provides appropriate width for a non-sortable column or "XXX" to allow
+                    // for the sort indicator.
+                    // Temporarily set MinimumWidth to this width.
+                    if (fitHeaderText)
+                    {
+                        string padding = (column.SortMode == DataGridViewColumnSortMode.Automatic)
+                            ? "XXX"
+                            : "X";
+
+                        int headerTextWidth = (int)Math.Ceiling(
+                            graphics.MeasureString(column.HeaderText + padding, font).Width);
+                        column.MinimumWidth = 
+                            Math.Max(layout.MinimumWidth.Value, (int)(headerTextWidth));
+                    }
+                }
+
+                // Perform a layout to apply the default column sizes.
+                dataGridView.PerformLayout();
+            }
+
+            int lastColumnIndex = dataGridView.Columns.Count - 1;
+
+            // Remove column auto-size (and any other temporary settings) that were needed for the
+            // initial layout so that after the initial layout column sizing is manual with the
+            // exception of the last column which will fill all remaining space as the columns are
+            // manually resized.
+            foreach (var column in dataGridView.Columns
+                    .Cast<DataGridViewColumn>()
+                    .Take(lastColumnIndex))
+            {
+                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                // Now that column is sized to allow for header text, restore intended
+                // MinimumWidth.
+                if (fitHeaderText)
+                {
+                    column.MinimumWidth = columnLayouts[column.Index].MinimumWidth.Value;
+                }
+            }
+
+            dataGridView.Columns[lastColumnIndex].AutoSizeMode =
+                DataGridViewAutoSizeColumnMode.Fill;
+        }
+
+        /// <summary>
+        /// Helper method for <see cref="FormatDataIntoGrid"/>. Retrieves or initializes a 
+        /// <see cref="ColumnLayout"/> instance for the specified <see paramref="ColumnLayout"/>.
+        /// </summary>
+        /// <param name="column">The <see cref="DataGridViewColumn"/> for which a
+        /// <see cref="ColumnLayout"/> instance is needed.</param>
+        /// <param name="dataTable">The <see cref="DataTable"/> serving as the data source
+        /// for the <see cref="DataGridView"/> that this column belongs to.</param>
+        /// <param name="specifiedLayouts">An array of <see cref="ColumnLayout"/>s dictated by the
+        /// caller layouts that should be used if the array contains an instance at the
+        /// <see paramref="column"/>'s ordinal.</param>
+        /// <returns>An initialized <see cref="ColumnLayout"/> instance.</returns>
+        static ColumnLayout GetColumnLayout(DataGridViewColumn column, DataTable dataTable, 
+            ColumnLayout[] specifiedLayouts)
+        {
+            ColumnLayout layout = column.Index < specifiedLayouts.Length
+                ? specifiedLayouts[column.Index]
+                : new ColumnLayout();
+
+            // The column index may exist in specifiedLayouts as null.
+            if (layout == null)
+            {
+                layout = new ColumnLayout();
+            }
+
+            ExtractException.Assert("ELI39341", "Conflicting column width specification.",
+                !layout.FillWeight.HasValue || !layout.Width.HasValue);
+
+            // If neither fill weight nor width have been specified, initialize the layout with
+            // default sizing appropriate for the column data type.
+            if (!layout.FillWeight.HasValue && !layout.Width.HasValue)
+            {
+                if (column.ValueType == typeof(bool))
+                {
+                    // Bool fields do not need to scale larger with size as the table does and
+                    // can have a smaller min width.
+                    layout.Width = 25;
+                    if (!layout.MinimumWidth.HasValue)
+                    {
+                        layout.MinimumWidth = 25;
+                    }
+                }
+                else if (column.ValueType == typeof(string))
+                {
+                    // For columns containing string data, use the max length of the column as a
+                    // clue for how the columns should be sized relative to other columns in the
+                    // table.
+                    if (dataTable != null)
+                    {
+                        int maxLength = dataTable.Columns[column.Index].MaxLength;
+
+                        // For text fields that can be > 10 chars but not unlimited, scale up from
+                        // a fill weight of 1.0 logarithmically.
+                        // MaxLength 10	 = 1.0
+                        // MaxLength 50	 = 2.6
+                        // MaxLength 500 = 4.9
+                        if (maxLength > 10)
+                        {
+                            layout.FillWeight = (float)Math.Log((double)maxLength / 3.7);
+
+                            // Cap the max fill weight at 7 (MaxLength >= ~5000)
+                            if (layout.FillWeight.Value > 7.0F)
+                            {
+                                layout.FillWeight = 7.0F;                               
+                            }
+                        }
+                        else if (maxLength == -1)
+                        {
+                            // Fields with no limit should have max fill weight of 7.
+                            layout.FillWeight = 7.0F;
+                        }
+                    }
+
+                    if (!layout.FillWeight.HasValue)
+                    {
+                        layout.FillWeight = 1.0F;
+                    }
+                }
+                else
+                {
+                    // Any other column with non-string is unlikely to benefit from greater width.
+                    // Assign a static size that should fit most numbers.
+                    layout.Width = 75;
+                }
+            }
+
+            if (!layout.MinimumWidth.HasValue)
+            {
+                layout.MinimumWidth = 50;
+            }
+
+            return layout;
+        }
+
         #endregion Private Members
+    }
+
+    /// <summary>
+    /// Helper class for <see cref="DBMethods.FormatDataIntoGrid"/>. Encapsulates layout and
+    /// formatting to be used for a given column of the grid being formated.
+    /// </summary>
+    public class ColumnLayout
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnLayout"/> class.
+        /// </summary>
+        /// <param name="fillWeight">A value representing the initial width of the column relative
+        /// to the widths of other columns whose size is to be calculated based on grid width. Must
+        /// be <see langword="null"/> if <see cref="Width"/> is specified.</param>
+        /// <param name="width">Gets or sets the width a column should be initialized to regardless
+        /// of total grid width. Must be <see langword="null"/> if <see cref="FillWeight"/> is
+        /// specified.</param>
+        /// <param name="minimumWidth">The minimum allowed width of the column.</param>
+        /// <param name="style">A <see cref="DataGridViewCellStyle"/> to use for cells in the column
+        /// (except the column header cell).</param>
+        /// <param name="headerStyle">A <see cref="DataGridViewCellStyle"/> to use for the column
+        /// header.</param>
+        public ColumnLayout(float? fillWeight = null, int? width = null, int? minimumWidth = null,
+            DataGridViewCellStyle style = null, DataGridViewCellStyle headerStyle = null)
+        {
+            try
+            {
+                FillWeight = fillWeight;
+                Width = width;
+                MinimumWidth = minimumWidth;
+                Style = style;
+                HeaderStyle = headerStyle;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39342");
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value representing the initial width of the column relative to the widths
+        /// of other columns whose size is to be calculated based on grid width. Must be
+        /// <see langword="null"/> if <see cref="Width"/> is specified.
+        /// </summary>
+        public float? FillWeight { get; set; }
+
+        /// <summary>
+        /// Gets or sets the width a column should be initialized to regardless of total grid width.
+        /// Must be <see langword="null"/> if <see cref="FillWeight"/> is specified.
+        /// </summary>
+        public int? Width { get; set; }
+
+        /// <summary>
+        /// Gets or sets the minimum allowed width of the column.
+        /// </summary>
+        public int? MinimumWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets a <see cref="DataGridViewCellStyle"/> to use for cells in the column
+        /// (except the column header cell).
+        /// </summary>
+        public DataGridViewCellStyle Style { get; set; }
+
+        /// <summary>
+        /// Gets or sets a <see cref="DataGridViewCellStyle"/> to use for the column header.
+        /// </summary>
+        public DataGridViewCellStyle HeaderStyle { get; set; }
     }
 }

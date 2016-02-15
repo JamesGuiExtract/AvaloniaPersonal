@@ -45,7 +45,7 @@ namespace Extract.Utilities.ContextTags
         /// Initializes a new instance of the <see cref="ContextTagDatabase"/> class.
         /// </summary>
         /// <param name="connection">The connection.</param>
-        public ContextTagDatabase(SqlCeConnection connection)
+        public ContextTagDatabase(DbConnection connection)
             : base(connection)
         {
         }

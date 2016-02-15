@@ -1,9 +1,7 @@
-﻿using Extract.Database;
-using Extract.Licensing;
-using Extract.Utilities;
+﻿using Extract.Licensing;
 using System;
 using System.ComponentModel;
-using System.Data.SqlServerCe;
+using System.Data.Common;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.ContextTags
@@ -42,11 +40,11 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateContextForm"/> class.
         /// </summary>
-        /// <param name="connection">The <see cref="SqlCeConnection"/> of the database to edit.
+        /// <param name="connection">The <see cref="DbConnection"/> of the database to edit.
         /// </param>
         /// <param name="fpsFileDir">The FPS file directory to associate with the new context.
         /// </param>
-        public CreateContextForm(SqlCeConnection connection, string fpsFileDir)
+        public CreateContextForm(DbConnection connection, string fpsFileDir)
         {
             try
             {

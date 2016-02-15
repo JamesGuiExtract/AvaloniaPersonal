@@ -341,7 +341,7 @@ namespace Extract.Utilities.ContextTags
                     dbConnectionInfo.UseLocalSqlCeCopy = true;
 
                     using (ContextTagDatabase database = new ContextTagDatabase(
-                        (SqlCeConnection)dbConnectionInfo.ManagedDbConnection))
+                        dbConnectionInfo.ManagedDbConnection))
                     {
                         // In case some users are using a mapped drive, convert to a UNC path to try
                         // to ensure as much as possible that all users accessing the same folder

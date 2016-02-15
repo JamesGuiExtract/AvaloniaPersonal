@@ -4,7 +4,7 @@ using Extract.Imaging.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlServerCe;
+using System.Data.Common;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -71,9 +71,9 @@ namespace Extract.SQLCDBEditor.Plugins
         ISQLCDBEditorPluginManager _pluginManager;
 
         /// <summary>
-        /// The <see cref="SqlCeConnection"/> to use for this plugin.
+        /// The <see cref="DbConnection"/> to use for this plugin.
         /// </summary>
-        SqlCeConnection _connection;
+        DbConnection _connection;
 
         /// <summary>
         /// The <see cref="DataRow"/> associated with the currently selected row in the query
@@ -185,10 +185,10 @@ namespace Extract.SQLCDBEditor.Plugins
         /// </summary>
         /// <param name="pluginManager">The <see cref="ISQLCDBEditorPluginManager"/> for this
         /// plugin.</param>
-        /// <param name="connection">The <see cref="SqlCeConnection"/> this plugin should use to
+        /// <param name="connection">The <see cref="DbConnection"/> this plugin should use to
         /// query/update the database.</param>
         public override void LoadPlugin(ISQLCDBEditorPluginManager pluginManager,
-            SqlCeConnection connection)
+            DbConnection connection)
         {
             try
             {
