@@ -55,10 +55,11 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Gets a value indicating whether [display grid].
+        /// Gets a value indicating whether the plugin will display the editor provided grid with
+        /// data populated with the results of the <see cref="Query"/> property.
         /// </summary>
-        /// <value>
-        /// 	<see langword="true"/> if [display grid]; otherwise, <see langword="false"/>.
+        /// <value><see langword="true"/> if the plugin will display the editor provided grid;
+        /// otherwise, <see langword="false"/>.
         /// </value>
         public virtual bool DisplayGrid
         {

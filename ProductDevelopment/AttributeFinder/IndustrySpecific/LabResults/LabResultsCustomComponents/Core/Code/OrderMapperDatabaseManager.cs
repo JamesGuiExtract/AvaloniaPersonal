@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
 namespace Extract.LabResultsCustomComponents
@@ -1260,12 +1261,27 @@ namespace Extract.LabResultsCustomComponents
         {
             get
             {
-                return null;
-//                return new object[] 
-//                {
-//                    new OrdersPlugin(),
-//                    new ComponentsPlugin()
-//                };
+                try
+                {
+                    // For testing purposes, use LabDE configuration UI plugins if database is
+                    // opened while the shift key is down.
+                    if (Control.ModifierKeys.HasFlag(Keys.Shift))
+                    {
+                        return new object[]
+                        {
+                            new OrdersPlugin()/*,
+                            new ComponentsPlugin()*/
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39343");
+                }              
             }
         }
 
