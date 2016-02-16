@@ -686,34 +686,35 @@ namespace Extract.Utilities.Parsers
         {
             string expandedPattern = "";
 
-            try
+            // if internal variable is null, create a new parser with the pattern and options.
+            if (_regexParser == null)
             {
-                // if internal variable is null, create a new parser with the pattern and options.
-                if (_regexParser == null)
+                // If an ExpressionFormatter has been specified, use it to do any necessary
+                // custom formatting of the pattern.
+                expandedPattern = (ExpressionFormatter == null)
+                    ? _pattern
+                    : ExpressionFormatter.FormatExpression(_pattern);
+
+                // Expand any fuzzy search terms into the equivalent regular expression.
+                expandedPattern = FuzzySearchRegexBuilder.ExpandFuzzySearchExpressions(expandedPattern);
+
+                try
                 {
-                    // If an ExpressionFormatter has been specified, use it to do any necessary
-                    // custom formatting of the pattern.
-                    expandedPattern = (ExpressionFormatter == null)
-                        ? _pattern
-                        : ExpressionFormatter.FormatExpression(_pattern);
-
-                    // Expand any fuzzy search terms into the equivalent regular expression.
-                    expandedPattern = FuzzySearchRegexBuilder.ExpandFuzzySearchExpressions(expandedPattern);
-
                     _regexParser = new Regex(expandedPattern, RegexOptions);
                 }
+                catch (Exception ex)
+                {
+                    
+                    ExtractException ee = new ExtractException("ELI28437",
+                        "Unable to initialize regular expression parser!");
+                    ee.AddDebugData("Error", ex.Message, true);
+                    ee.AddDebugData("Pattern", _pattern, true);
+                    ee.AddDebugData("Expanded pattern", expandedPattern, true);
+                    throw ee;
+                }
+            }
 
-                return _regexParser;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI28437",
-                    "Unable to initialize regular expression parser!");
-                ee.AddDebugData("Error", ex.Message, true);
-                ee.AddDebugData("Pattern", _pattern, true);
-                ee.AddDebugData("Expanded pattern", expandedPattern, true);
-                throw ee;
-            }
+            return _regexParser;
         }
 
         #endregion
