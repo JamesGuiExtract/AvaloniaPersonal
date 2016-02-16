@@ -440,11 +440,13 @@ namespace Extract.Database
             }
         }
 
-        /// <summary>
+        /// <overloads>
         /// Formats the data from the specified <see paramref="query"/> into the provided
         /// <see paramref="dataGridView"/> using the formatting options specified. The columns
         /// (along with the column names) will be generated via the schema of the query result;
         /// columns are assumed not to be pre-created.
+        /// </overloads>
+        /// <summary>
         /// <para><b>Note</b></para>
         /// The <see paramref="dataGridView"/> will be bound to a <see cref="DataTable"/> which will
         /// be automatically disposed upon any subsequent call into this method; Final disposal of
@@ -488,6 +490,58 @@ namespace Extract.Database
 
                 DataTable queryResults = ExecuteDBQuery(connection, query, parameters);
 
+                var oldData = dataGridView.DataSource as IDisposable;
+
+                FormatDataIntoGrid(queryResults, dataGridView, resetLayout, resetScrollPos,
+                    fitHeaderText, columnLayouts);
+
+                if (oldData != null)
+                {
+                    oldData.Dispose();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39367");
+            }
+        }
+
+        /// <summary>
+        /// Formats the data from the specified <see paramref="DataTable"/> into the provided
+        /// <see paramref="dataGridView"/> using the formatting options specified. The columns
+        /// (along with the column names) will be generated via the schema of the query result;
+        /// columns are assumed not to be pre-created.
+        /// </summary>
+        /// <param name="data">The <see cref="DataTable"/> to be used as the data source.</param>
+        /// <param name="dataGridView">The <see cref="DataGridView"/> to be populated with the
+        /// <see cref="DataTable"/> data.</param>
+        /// <param name="resetLayout"><see langword="true"/> if columns widths and sorting is
+        /// is to be reset; <see langword="false"/> to maintain existing column sizes and sorting.
+        /// </param>
+        /// <param name="resetScrollPos"><see langword="true"/> if the scroll position of the grid
+        /// is to be reset; <see langword="false"/> to maintain existing scroll position if possible.
+        /// </param>
+        /// <param name="fitHeaderText"><see langword="true"/> if, when <see paramref="resetLayout"/>
+        /// is <see langword="true"/>, column widths should be sized to the width of the header text
+        /// (regardless of any width or fill weights specified); <see langword="false"/> if the
+        /// columns initial sizing can be narrower than the header text.
+        /// </param>
+        /// <param name="columnLayouts">An array of <see cref="ColumnLayout"/> instances specifying
+        /// layout and formatting of the column of the same ordinal. Can be <see langword="null"/> to
+        /// use default formatting for all columns, can include less than the number columns to use
+        /// default formatting for the remaining columns or can have <see langword="null"/> at any
+        /// index to indicate the column of the matching ordinal should use default formatting.
+        /// </param>
+        public static void FormatDataIntoGrid(DataTable data, DataGridView dataGridView, bool resetLayout,
+            bool resetScrollPos, bool fitHeaderText, params ColumnLayout[] columnLayouts)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.ExtractCoreObjects, "ELI39340", _OBJECT_NAME);
+
                 int sortedColumnIndex = -1;
                 ListSortDirection sortOrder = ListSortDirection.Ascending;
                 int scrollPos = 0;
@@ -519,13 +573,7 @@ namespace Extract.Database
                     scrollPos = dataGridView.FirstDisplayedScrollingRowIndex;
                 }
 
-                var oldData = dataGridView.DataSource as IDisposable;
-                if (oldData != null)
-                {
-                    oldData.Dispose();
-                }
-
-                dataGridView.DataSource = queryResults;
+                dataGridView.DataSource = data;
 
                 // If the new columns differ from the previous columns, the layout should be reset
                 // despite the passed-in resetLayout value.
@@ -540,7 +588,7 @@ namespace Extract.Database
 
                 if (resetLayout)
                 {
-                    LayoutGridColumns(dataGridView, queryResults, fitHeaderText, columnLayouts);
+                    LayoutGridColumns(dataGridView, data, fitHeaderText, columnLayouts);
                 }
                 else
                 {
@@ -635,7 +683,7 @@ namespace Extract.Database
         }
 
         /// <summary>
-        /// Helper method for <see cref="FormatDataIntoGrid"/>. Applies layout and formatting of
+        /// Helper method for FormatDataIntoGrid. Applies layout and formatting of
         /// <see paramref="dataGridView"/>'s columns.
         /// </summary>
         /// <param name="dataGridView">The <see cref="DataGridView"/> instance whose columns are to
@@ -742,7 +790,7 @@ namespace Extract.Database
         }
 
         /// <summary>
-        /// Helper method for <see cref="FormatDataIntoGrid"/>. Retrieves or initializes a 
+        /// Helper method for FormatDataIntoGrid. Retrieves or initializes a 
         /// <see cref="ColumnLayout"/> instance for the specified <see paramref="ColumnLayout"/>.
         /// </summary>
         /// <param name="column">The <see cref="DataGridViewColumn"/> for which a
@@ -839,7 +887,7 @@ namespace Extract.Database
     }
 
     /// <summary>
-    /// Helper class for <see cref="DBMethods.FormatDataIntoGrid"/>. Encapsulates layout and
+    /// Helper class for FormatDataIntoGrid. Encapsulates layout and
     /// formatting to be used for a given column of the grid being formated.
     /// </summary>
     public class ColumnLayout

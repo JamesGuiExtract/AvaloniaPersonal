@@ -1269,8 +1269,8 @@ namespace Extract.LabResultsCustomComponents
                     {
                         return new object[]
                         {
-                            new OrdersPlugin()/*,
-                            new ComponentsPlugin()*/
+                            new OrdersPlugin(),
+                            new ComponentsPlugin()
                         };
                     }
                     else

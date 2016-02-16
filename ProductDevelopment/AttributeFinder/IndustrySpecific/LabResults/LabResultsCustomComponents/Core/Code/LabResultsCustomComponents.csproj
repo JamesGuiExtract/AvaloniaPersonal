@@ -79,6 +79,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentsDataSource.cs" />
+    <Compile Include="ComponentsPlugin.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ComponentsPlugin.Designer.cs">
+      <DependentUpon>ComponentsPlugin.cs</DependentUpon>
+    </Compile>
     <Compile Include="LinkedItemsTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -158,6 +165,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ComponentsPlugin.resx">
+      <DependentUpon>ComponentsPlugin.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LabDEOrderMapperConfigurationForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>LabDEOrderMapperConfigurationForm.cs</DependentUpon>
