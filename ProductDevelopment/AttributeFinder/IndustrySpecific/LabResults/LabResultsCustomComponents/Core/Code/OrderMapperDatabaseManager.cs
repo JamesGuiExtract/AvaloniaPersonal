@@ -1265,7 +1265,12 @@ namespace Extract.LabResultsCustomComponents
                 {
                     // For testing purposes, use LabDE configuration UI plugins if database is
                     // opened while the shift key is down.
-                    if (Control.ModifierKeys.HasFlag(Keys.Shift))
+                    // NOTE: I am seeing occasional exceptions when opening a database with the
+                    // shift key down that I think result from the shift key being lifted between the
+                    // time UIReplacementPlugins is checked for null and the time it is checked for
+                    // Any(). I am not going to bother addressing this issue since this is only a
+                    // temporary internal issue.
+                    if (SystemMethods.IsExtractInternal() && Control.ModifierKeys.HasFlag(Keys.Shift))
                     {
                         return new object[]
                         {

@@ -32,6 +32,15 @@ namespace Extract.Utilities
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// Caches a determination as to whether the this process is running internally at Extract.
+        /// </summary>
+        static bool? _isExtractInternal;
+
+        #endregion Fields
+
         /// <summary>
         /// Enumerates all <see cref="ManagementObject"/>s of the specified class.
         /// </summary>
@@ -473,6 +482,30 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI37644");
+            }
+        }
+
+        /// <summary>
+        /// Determines whether this process is running internally at Extract by checking for drive
+        /// mappings to either fnp2 or es-it-dc-01.
+        /// </summary>
+        /// <returns> <see langword="true"/> if this process is running internally at Extract;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool IsExtractInternal()
+        {
+            try
+            {
+                if (!_isExtractInternal.HasValue)
+                {
+                    _isExtractInternal = NativeMethods.isInternalToolsLicensed();
+                }
+
+                return _isExtractInternal.Value;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39370");
             }
         }
     }

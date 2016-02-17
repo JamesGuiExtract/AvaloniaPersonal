@@ -818,7 +818,7 @@ namespace Extract.Utilities
         /// <returns>TRUE if the function succeeds; otherwise, FALSE.</returns>
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool LogonUser(
+        static extern bool LogonUser(
             StringBuilder userName,
             StringBuilder domain,
             IntPtr password,
@@ -826,6 +826,19 @@ namespace Extract.Utilities
             LogonProvider logonProvider,
             out IntPtr token
             );
+
+        /// <summary>
+        /// Determines whether this process is running internally at Extract by checking for drive
+        /// mappings to either fnp2 or es-it-dc-01.
+        /// </summary>
+        /// <returns> <see langword="true"/> if the software is running internally at Extract;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        [DllImport("BaseUtils.dll", EntryPoint = "?isInternalToolsLicensed@@YA_NXZ",
+            CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true,
+            CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool isInternalToolsLicensed();
 
         #endregion NativeMethods P/Invokes
 

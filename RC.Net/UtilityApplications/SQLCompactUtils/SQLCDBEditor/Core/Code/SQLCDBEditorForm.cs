@@ -1591,12 +1591,20 @@ namespace Extract.SQLCDBEditor
         /// <see langword="false"/>.</param>
         void OpenTableOrQuery(QueryAndResultsControl queryAndResultsControl, bool openInNewTab, bool activate)
         {
+            // If an opened tab is not activated, it doesn't get sized correctly (even if
+            // PerformLayout is called). Therefore, allow all tabs to activated when opened so that
+            // the tab layout can initialize, then restore the last active tab if active is false.
+            // Lock control updates during this time so that there is no flicker as tabs temporarily
+            // activate.
+            DockControl activeTab = _sandDockManager.ActiveTabbedDocument;
+            FormsMethods.LockControlUpdate(this, true);
+
             try
             {
                 queryAndResultsControl.SuspendLayout();
                 SuspendLayout();
 
-                OpenTableOrQueryCore(queryAndResultsControl, openInNewTab, activate);
+                OpenTableOrQueryCore(queryAndResultsControl, openInNewTab);
             }
             catch (Exception ex)
             {
@@ -1604,8 +1612,22 @@ namespace Extract.SQLCDBEditor
             }
             finally
             {
-                ResumeLayout(true);
-                queryAndResultsControl.ResumeLayout(true);
+                try
+                {
+                    ResumeLayout(true);
+                    queryAndResultsControl.ResumeLayout(true);
+                    if (!activate && activeTab != null)
+                    {
+                        activeTab.Activate();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI39369");
+                }
+
+                FormsMethods.LockControlUpdate(this, false);
+                Invalidate(true);
             }
         }
 
@@ -1618,9 +1640,7 @@ namespace Extract.SQLCDBEditor
         /// <param name="openInNewTab"><see langword="true"/> to open in a separate tab that will
         /// not be used to display any other table or query, or <see langword="false"/> to open
         /// into the primary tab.</param>
-        /// <param name="activate"><see langword="true"/> if the tab should be activated; otherwise,
-        /// <see langword="false"/>.</param>
-        void OpenTableOrQueryCore(QueryAndResultsControl queryAndResultsControl, bool openInNewTab, bool activate)
+        void OpenTableOrQueryCore(QueryAndResultsControl queryAndResultsControl, bool openInNewTab)
         {
             // When a queryAndResultsControl is displayed, update the status bar with this control's
             // active status message (if any).
@@ -1695,10 +1715,7 @@ namespace Extract.SQLCDBEditor
                 queryAndResultsControl.RefreshData(false, false);
             }
 
-            if (activate)
-            {
-                tabbedDocument.Activate();
-            }
+            tabbedDocument.Activate();
         }
 
         /// <summary>
@@ -2047,12 +2064,13 @@ namespace Extract.SQLCDBEditor
 
                 CheckSchemaVersionAndPromptForUpdate();
 
-                if (_schemaManager != null &&
+                UsingUIReplacement =
+                    _schemaManager != null &&
                     _schemaManager.UIReplacementPlugins != null &&
-                    _schemaManager.UIReplacementPlugins.Any())
-                {
-                    UsingUIReplacement = true;
+                    _schemaManager.UIReplacementPlugins.Any();
 
+                if (UsingUIReplacement)
+                {
                     foreach (var plugin in _schemaManager.UIReplacementPlugins
                         .Cast<SQLCDBEditorPlugin>())
                     {
@@ -2060,13 +2078,9 @@ namespace Extract.SQLCDBEditor
                         OpenTableOrQuery(pluginControl, true, false);
                         _pluginList.Add(pluginControl);
                     }
-
-                    //OpenTableOrQuery(_pluginList.First(), false);
-                    ((TabbedDocument)_pluginList.First().Parent).Activate();
                 }
                 else
                 {
-                    UsingUIReplacement = false;
                     LoadTableList();
                     LoadQueryList();
                     LoadPluginList();
