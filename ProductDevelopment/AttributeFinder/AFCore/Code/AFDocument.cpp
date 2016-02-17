@@ -225,25 +225,26 @@ STDMETHODIMP CAFDocument::PartialClone(VARIANT_BOOL vbCloneAttributes, VARIANT_B
 			bool bCloneAttributes = asCppBool(vbCloneAttributes);
 			bool bCloneText = asCppBool(vbCloneText);
 
+			// Copy references to document and attribute hierarchy
+			ipDocCopy->Attribute = UCLID_AFCORELib::IAttributePtr(CLSID_Attribute);
+			ipDocCopy->Attribute->Value = m_ipAttribute->Value;
+			ipDocCopy->Attribute->SubAttributes = m_ipAttribute->SubAttributes;
+
 			// Clone the attribute hierarchy beneath the top-level document attribute, but not the
 			// document text.
 			if (bCloneAttributes)
 			{
-				ipDocCopy->Attribute = UCLID_AFCORELib::IAttributePtr(CLSID_Attribute);
 				ICopyableObjectPtr ipCopyObj(m_ipAttribute->SubAttributes);
 				ASSERT_RESOURCE_ALLOCATION("ELI36256", ipCopyObj != __nullptr);
 				ipDocCopy->Attribute->SubAttributes = IIUnknownVectorPtr(ipCopyObj->Clone());
-				ipDocCopy->Attribute->Value = m_ipAttribute->Value;
 			}
 			// Clone the document text but not the attribute hierarchy beneath the top-level
 			// document attribute.
 			if (bCloneText)
 			{
-				ipDocCopy->Attribute = UCLID_AFCORELib::IAttributePtr(CLSID_Attribute);
 				ICopyableObjectPtr ipCopyObj(m_ipAttribute->Value);
 				ASSERT_RESOURCE_ALLOCATION("ELI36257", ipCopyObj != __nullptr);
 				ipDocCopy->Attribute->Value = ISpatialStringPtr(ipCopyObj->Clone());
-				ipDocCopy->Attribute->SubAttributes = m_ipAttribute->SubAttributes;
 			}
 		}
 		if (m_ipStringTags != __nullptr)
