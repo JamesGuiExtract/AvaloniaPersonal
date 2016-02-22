@@ -495,7 +495,8 @@ namespace Extract.DataEntry.LabDE
             string query = declarationsClause + "\r\n\r\n" +
                 "SELECT " + columnsClause + "\r\n, [LabDEOrderFile].[FileID]\r\n " +
                 "FROM [LabDEOrder] \r\n" +
-                "INNER JOIN [LabDEPatient] ON [LabDEOrder].[PatientMRN] = [LabDEPatient].[MRN] \r\n" +
+                "INNER JOIN [LabDEPatient] p ON [LabDEOrder].[PatientMRN] = p.[MRN] \r\n" +
+                "INNER JOIN [LabDEPatient] ON p.[CurrentMRN] = [LabDEPatient].[MRN] \r\n" +
                 "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [LabDEOrder].[OrderNumber] \r\n" +
                 (selectViaQuery
                     ? "INNER JOIN @OrderNumbers ON [LabDEOrder].[OrderNumber] = [@OrderNumbers].[OrderNumber]"
@@ -1121,9 +1122,10 @@ namespace Extract.DataEntry.LabDE
                 !string.IsNullOrWhiteSpace(order.OrderCode))
             {
                 List<string> queryParts = new List<string>();
-                queryParts.Add("SELECT [LabDEOrder].[OrderNumber] FROM [LabDEOrder] " +
-                    "WHERE [PatientMRN] = '" + order.PatientMRN.Replace("'", "''") + "'");
-                queryParts.Add("SELECT [LabDEOrder].[OrderNumber] FROM [LabDEOrder] " +
+                queryParts.Add("SELECT [OrderNumber] FROM [LabDEOrder] " +
+                    "INNER JOIN [LabDEPatient] ON [PatientMRN] = [MRN] " +
+                    "WHERE [CurrentMRN] = '" + order.PatientMRN.Replace("'", "''") + "'");
+                queryParts.Add("SELECT [OrderNumber] FROM [LabDEOrder] " +
                     "WHERE [OrderCode] = '" + order.OrderCode.Replace("'", "''") + "'");
 
                 if (!ShowUnavailableOrders)

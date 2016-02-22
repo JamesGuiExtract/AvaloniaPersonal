@@ -33,8 +33,10 @@ using namespace std;
 //			  Prefixed table names with "LabDE", added CollectionDate column to LabDEOrderFile
 // Version 5: Added DOB index on LabDEPatient table.
 // Version 6: Changed AddOrUpdateLabDEOrder stored procedure to be created as dbo.
+// Version 7: https://extract.atlassian.net/browse/ISSUE-13579
+//			  Added MergedInto and CurrentMRN column to LabDEPatient table.
 // WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
-static const long glLABDE_DB_SCHEMA_VERSION = 6;
+static const long glLABDE_DB_SCHEMA_VERSION = 7;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
@@ -188,7 +190,7 @@ int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("exec sp_rename 'Patient', 'LabDEPatient'");
 		vecQueries.push_back("ALTER TABLE LabDEOrderFile ADD [CollectionDate] DATETIME");
 		vecQueries.push_back(gstrDROP_PROCEDURE_ADD_OR_UPDATE_ORDER);
-		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_V4);
 
 		// Change Default value for ReceivedDateTime field on LabDEOrder
 		vecQueries.push_back("UPDATE LabDEOrder SET ReceivedDateTime = GETDATE() WHERE (ReceivedDateTime IS NULL)");
@@ -259,7 +261,7 @@ int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps,
 		
 		// Update AddOrUpdateLabDEOrder stored procedure to make it dbo
 		vecQueries.push_back(gstrDROP_PROCEDURE_ADD_OR_UPDATE_ORDER);
-		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_V4);
 
 		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
 			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
@@ -269,6 +271,43 @@ int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38405");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion7(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 7;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 10;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		
+		vecQueries.push_back("ALTER TABLE [LabDEPatient] ADD [MergedInto] NVARCHAR(20) NULL");
+		vecQueries.push_back("ALTER TABLE [LabDEPatient] ADD [CurrentMRN] NVARCHAR(20) NULL ");
+		vecQueries.push_back("UPDATE [LabDEPatient] SET [CurrentMRN] = [MRN]");
+		vecQueries.push_back("ALTER TABLE [LabDEPatient] ALTER COLUMN [CurrentMRN] NVARCHAR(20) NOT NULL ");
+		vecQueries.push_back(gstrADD_FK_PATIENT_MERGEDINTO);
+		vecQueries.push_back(gstrADD_FK_PATIENT_CURRENTMRN);
+		vecQueries.push_back(gstrCREATE_PATIENT_CURRENT_MRN_INDEX);
+		vecQueries.push_back(gstrCREATE_PROCEDURE_MERGE_PATIENTS);
+		// Rename AddOrUpdateLabDEOrder to LabDEAddOrUpdateOrder
+		vecQueries.push_back(gstrDROP_PROCEDURE_ADD_OR_UPDATE_ORDER);
+		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39371");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -411,7 +450,10 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
 		vecCreateQueries.push_back(gstrCREATE_PATIENT_FIRSTNAME_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_PATIENT_LASTNAME_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_PATIENT_DOB_INDEX);
+		vecCreateQueries.push_back(gstrCREATE_PATIENT_CURRENT_MRN_INDEX);
 		vecCreateQueries.push_back(gstrPOPULATE_ORDER_STATUSES);
+		vecCreateQueries.push_back(gstrADD_FK_PATIENT_MERGEDINTO);
+		vecCreateQueries.push_back(gstrADD_FK_PATIENT_CURRENTMRN);
 		vecCreateQueries.push_back(gstrADD_FK_ORDER_PATIENT_MRN);
 		vecCreateQueries.push_back(gstrADD_FK_ORDER_ORDERSTATUS);
 		vecCreateQueries.push_back(gstrCREATE_ORDER_MRN_INDEX);
@@ -425,6 +467,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
 		{
 			// Add stored procedures
 			vecCreateQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
+			vecCreateQueries.push_back(gstrCREATE_PROCEDURE_MERGE_PATIENTS);
 		}
 
 		// Execute the queries to create the LabDE tables
@@ -704,8 +747,16 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion6(ipConnection, pnNumSteps, NULL);
 					}
+					break;
 
-			case 6:	// current schema
+			case 6: // The schema update from 6 to 7 needs to take place against FAM DB schema version 136
+					if (nFAMDBSchemaVersion == 136)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion7(ipConnection, pnNumSteps, NULL);
+					}
+					break;
+
+			case 7:	// current schema
 					break;
 
 			default:
