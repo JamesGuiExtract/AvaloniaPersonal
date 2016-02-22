@@ -202,7 +202,8 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
 	"	@LastName NVARCHAR(50), "
 	"	@Suffix NVARCHAR(50), "
 	"	@DOB DATETIME, "
-	"	@Gender NCHAR(1) "
+	"	@Gender NCHAR(1), "
+	"	@Warning NVARCHAR(1000) = NULL OUTPUT "
 	"AS "
 	"BEGIN "
 
@@ -211,11 +212,10 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
 	"	SET NOCOUNT ON; "
 	"	BEGIN TRAN Tran1; "
 
-	"	DECLARE @warning NVARCHAR(1000) "
 	"	DECLARE @currentMRN NVARCHAR(20) "
 	"	DECLARE @originalValues TABLE (MergedInto NVARCHAR(20), CurrentMRN NVARCHAR(20)) "
-	"	DECLARE @orignalMergedInto NVARCHAR(20) "
-	"	DECLARE @orignalCurrentMRN NVARCHAR(20) "
+	"	DECLARE @originalMergedInto NVARCHAR(20) "
+	"	DECLARE @originalCurrentMRN NVARCHAR(20) "
 	"	DECLARE @targetExists INT "
 
 	"	IF (SELECT COUNT([MRN]) FROM [LabDEPatient] WHERE [MRN] = @SourceMRN) = 0 "
@@ -263,27 +263,27 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
 	"		WHERE [MRN] = @TargetMRN "
 
 	// Warn if merging a record that was already merged.
-	"	SELECT @orignalMergedInto = [MergedInto], @orignalCurrentMRN = [CurrentMRN] "
+	"	SELECT @originalMergedInto = [MergedInto], @originalCurrentMRN = [CurrentMRN] "
 	"		FROM @originalValues "
-	"	IF (@orignalMergedInto IS NOT NULL) AND (@TargetMRN IS NOT NULL) "
+	"	IF (@originalMergedInto IS NOT NULL) AND (@TargetMRN IS NOT NULL) "
 	"	BEGIN "
-	"		SET @warning = 'Warning: Patient ' + @SourceMRN + "
-	"			' was already merged into ' + @orignalCurrentMRN + '.' "
-	"		IF (@orignalCurrentMRN <> @currentMRN) "
+	"		SET @Warning = 'Warning: Patient ' + @SourceMRN + "
+	"			' was already merged into ' + @originalCurrentMRN + '.' "
+	"		IF (@originalCurrentMRN <> @currentMRN) "
 	"		BEGIN "
-	"			SET @warning = @warning + ' Now merged to ' + @currentMRN + ' instead.'; "
+	"			SET @Warning = @Warning + ' Now merged to ' + @currentMRN + ' instead.'; "
 	"		END "
 	"	END "
 	// Warn if un-merging a record that wasn't merged.
-	"	ELSE IF (@orignalMergedInto IS NULL) AND (@TargetMRN IS NULL) "
+	"	ELSE IF (@originalMergedInto IS NULL) AND (@TargetMRN IS NULL) "
 	"	BEGIN "
-	"		SET @warning = 'Warning: Cannot un-merge; patient ' + @SourceMRN + "
+	"		SET @Warning = 'Warning: Cannot un-merge; patient ' + @SourceMRN + "
 	"			' was not merged.' "
 	"	END "
 	// Warn if merging into a record that is itself already merged.
 	"	ELSE IF (@TargetMRN IS NOT NULL) AND @currentMRN <> @TargetMRN "
 	"	BEGIN "
-	"		SET @warning = 'Warning: Merged patient ' + @SourceMRN + "
+	"		SET @Warning = 'Warning: Merged patient ' + @SourceMRN + "
 	"			' into ' + @TargetMRN + ' which has already been merged to ' "
 	"			+ @currentMRN; "
 	"	END "
@@ -312,8 +312,6 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
 	"	) "
 
 	"	COMMIT TRAN Tran1; "
-
-	"	SELECT @warning "
 	"	RETURN "
 
 	"END";
