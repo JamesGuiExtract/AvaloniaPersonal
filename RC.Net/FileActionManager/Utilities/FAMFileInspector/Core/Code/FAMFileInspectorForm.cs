@@ -4190,9 +4190,11 @@ namespace Extract.FileActionManager.Utilities
                     });
 
                     // Cancel _queryTask and wait for it to finish.
-                    _queryCanceler.Cancel();
+                    // https://extract.atlassian.net/browse/ISSUE-13633
+                    // Moved the Cancel call into the try block as well.
                     try
                     {
+                        _queryCanceler.Cancel();
                         _queryTask.Wait();
                     }
                     catch { }  // Ignore any exceptions; we don't care about this task anymore.
