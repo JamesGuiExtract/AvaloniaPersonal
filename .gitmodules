@@ -1,9 +1,9 @@
 [submodule "Rules"]
 	path = Rules
-	url = git@bitbucket.org:testextract/rules.git
+	url = M:\\GitRepos\\Rules
 [submodule "ReusableComponents/APIs"]
 	path = ReusableComponents/APIs
-	url = git@bitbucket.org:testextract/rcapis.git
+	url = M:\\GitRepos\\RCAPIs
 [submodule "RC.Net/APIs"]
 	path = RC.Net/APIs
-	url = git@bitbucket.org:testextract/rcnetapis.git
+	url = M:\\GitRepos\\RCNetAPIs
