@@ -1617,11 +1617,14 @@ Test|N/A
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|18:50
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|98
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|18:50
@@ -1661,8 +1664,15 @@ Test|N/A
 ..Value|3.8
 ..TestCode|K
 ..ESNames|Potassium
-.Name|POTASSIUM
-.OrderCode|K
+.Component|GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|121
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|04:00
@@ -1917,8 +1927,15 @@ Test|N/A
 ..Value|4.0
 ..TestCode|K
 ..ESNames|Potassium
-.Name|POTASSIUM
-.OrderCode|K
+.Component|GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|140
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|04:15
@@ -2266,14 +2283,12 @@ Test|N/A
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|13:09
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|102
-.Name|UnknownOrder
-Test|N/A
-.CollectionDate|09/29/2008
-.CollectionTime|13:09
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -2286,8 +2301,8 @@ Test|N/A
 ..Value|3.8
 ..TestCode|K
 ..ESNames|Potassium
-.Name|ELECTROLYTE PANEL
-.OrderCode|LYTES
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|14:30
@@ -2310,15 +2325,13 @@ Test|N/A
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|14:30
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|113
-.Name|UnknownOrder
-Test|N/A
-.CollectionDate|09/29/2008
-.CollectionTime|14:30
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -2331,8 +2344,8 @@ Test|N/A
 ..Value|3.7
 ..TestCode|K
 ..ESNames|Potassium
-.Name|ELECTROLYTE PANEL
-.OrderCode|LYTES
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|15:54
@@ -2355,15 +2368,13 @@ Test|N/A
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|15:54
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|117
-.Name|UnknownOrder
-Test|N/A
-.CollectionDate|09/29/2008
-.CollectionTime|15:54
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -2376,8 +2387,8 @@ Test|N/A
 ..Value|4.1
 ..TestCode|K
 ..ESNames|Potassium
-.Name|ELECTROLYTE PANEL
-.OrderCode|LYTES
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|16:35
@@ -2400,15 +2411,13 @@ Test|N/A
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|16:35
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|134
-.Name|UnknownOrder
-Test|N/A
-.CollectionDate|09/29/2008
-.CollectionTime|16:35
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -2421,8 +2430,8 @@ Test|N/A
 ..Value|4.1
 ..TestCode|K
 ..ESNames|Potassium
-.Name|ELECTROLYTE PANEL
-.OrderCode|LYTES
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|17:52
@@ -2445,15 +2454,13 @@ Test|N/A
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|17:52
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|107
-.Name|UnknownOrder
-Test|N/A
-.CollectionDate|09/29/2008
-.CollectionTime|17:52
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -2466,8 +2473,8 @@ Test|N/A
 ..Value|3.5
 ..TestCode|K
 ..ESNames|Potassium
-.Name|ELECTROLYTE PANEL
-.OrderCode|LYTES
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|18:14
@@ -2490,15 +2497,13 @@ Test|N/A
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|18:14
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|107
-.Name|UnknownOrder
-Test|N/A
-.CollectionDate|09/29/2008
-.CollectionTime|18:14
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -2512,8 +2517,8 @@ Test|N/A
 ..Value|3.2
 ..TestCode|K
 ..ESNames|Potassium
-.Name|ELECTROLYTE PANEL
-.OrderCode|LYTES
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|22:30
@@ -2620,1196 +2625,1589 @@ Test|N/A
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|07:10
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|145
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.9
+..TestCode|K
+..ESNames|Potassium
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|09/21/2008
 .CollectionTime|10:10
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|209
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/21/2008
 .CollectionTime|12:09
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|161
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/21/2008
 .CollectionTime|15:09
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|93
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/21/2008
 .CollectionTime|16:01
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|99
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/21/2008
 .CollectionTime|19:19
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|93
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/22/2008
 .CollectionTime|02:01
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|53
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/22/2008
 .CollectionTime|02:31
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|91
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/22/2008
 .CollectionTime|06:50
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|127
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/22/2008
 .CollectionTime|09:04
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|201
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/22/2008
 .CollectionTime|11:08
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|245
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/22/2008
 .CollectionTime|16:42
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|120
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/22/2008
 .CollectionTime|20:55
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|148
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/23/2008
 .CollectionTime|02:06
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|169
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/23/2008
 .CollectionTime|07:14
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|338
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/23/2008
 .CollectionTime|09:29
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|395
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/23/2008
 .CollectionTime|10:57
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|P
 ..Range|70-105
 ..Units|MG/DL
 ..Value|406
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/23/2008
 .CollectionTime|13:08
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|252
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/23/2008
 .CollectionTime|14:07
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|187
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/23/2008
 .CollectionTime|16:12
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|216
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/23/2008
 .CollectionTime|20:02
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|173
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/23/2008
 .CollectionTime|23:58
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|99
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|02:09
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|132
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|06:58
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|184
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|08:26
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|251
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|09:14
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|257
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|10:18
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|232
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|11:00
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|209
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|12:16
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|205
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|13:30
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|203
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|14:24
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|191
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|16:47
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|261
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|21:23
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|353
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|22:53
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|372
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/24/2008
 .CollectionTime|23:38
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|355
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|01:32
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|275
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|03:35
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|235
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|06:47
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|170
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|11:07
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|391
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|13:49
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|294
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|15:53
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|298
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|16:57
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|306
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|17:58
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|295
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|19:26
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|253
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|21:16
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|245
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/25/2008
 .CollectionTime|23:29
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|163
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|05:23
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|189
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|06:51
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|172
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|07:58
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|182
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|10:49
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|317
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|12:36
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|222
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|15:12
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|307
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|16:39
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|230
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|17:26
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|289
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|19:23
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|231
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/26/2008
 .CollectionTime|20:53
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|144
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/27/2008
 .CollectionTime|00:23
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|90
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/27/2008
 .CollectionTime|04:13
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|145
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/27/2008
 .CollectionTime|07:01
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|171
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/27/2008
 .CollectionTime|11:20
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|210
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/27/2008
 .CollectionTime|14:21
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|254
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/27/2008
 .CollectionTime|16:04
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|184
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/27/2008
 .CollectionTime|20:17
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|152
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|00:11
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|73
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|02:58
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|123
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|07:06
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|138
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|10:32
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|198
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|12:25
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|305
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|13:48
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|178
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|16:02
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|180
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|18:01
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|79
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|20:39
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|167
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/28/2008
 .CollectionTime|23:58
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|53
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|00:31
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|95
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|01:57
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|104
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|06:15
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|187
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|07:21
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|245
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|08:41
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|262
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|09:57
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|218
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|11:20
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|106
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.1
+..TestCode|K
+..ESNames|Potassium
+.Name|BASIC METABOLIC PANEL
+.OrderCode|BMP1
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|12:35
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|57
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|19:57
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|88
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|21:08
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|109
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|22:19
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|91
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/29/2008
 .CollectionTime|23:14
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|127
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|01:02
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|210
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|01:56
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|198
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|03:09
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|185
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|03:53
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|144
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|05:14
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|128
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|06:08
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|88
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|07:15
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|62
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|07:40
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|66
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|08:10
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|82
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|09:05
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|124
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|09:51
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|178
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|10:56
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|177
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|12:10
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|138
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|13:10
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|89
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|13:59
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|50
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|14:24
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|76
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|15:01
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|72
-.Name|UnknownOrder
-Test|N/A
-.CollectionDate|09/30/2008
-.CollectionTime|16:00
-.Component|POC GLUCOSE
-..Flag|H
-..Range|70-105
-..Units|MG/DL
-..Value|121
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|17:28
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|205
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|18:25
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|157
-.Name|UnknownOrder
-Test|N/A
-.CollectionDate|09/30/2008
-.CollectionTime|19:30
-.Component|POC GLUCOSE
-..Flag|H
-..Range|70-105
-..Units|MG/DL
-..Value|140
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|21:09
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|91
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|22:08
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|68
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/30/2008
 .CollectionTime|23:01
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|87
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|00:09
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|116
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|01:03
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|137
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|02:45
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|113
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|04:21
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|88
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|05:13
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|129
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|06:13
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|200
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|10:06
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|337
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|11:47
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|281
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|15:28
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|174
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|18:47
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|P
 ..Range|70-105
 ..Units|MG/DL
 ..Value|418
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|21:01
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|387
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|22:09
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|327
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|00:56
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|229
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|03:25
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|145
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|05:13
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|135
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|07:16
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|127
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|10:55
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|P
 ..Range|70-105
 ..Units|MG/DL
 ..Value|455
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|12:35
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|P
 ..Range|70-105
 ..Units|MG/DL
 ..Value|405
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|13:36
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|369
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|15:36
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|243
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|18:21
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|144
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/02/2008
 .CollectionTime|19:44
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|103
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/03/2008
 .CollectionTime|00:54
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|53
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/03/2008
 .CollectionTime|02:40
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|103
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/03/2008
 .CollectionTime|09:47
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|183
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|10/03/2008
 .CollectionTime|11:27
-.Component|POC GLUCOSE
+.Component|GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|109
-.Name|UnknownOrder
+..TestCode|GLU
+..ESNames|Glucose Blood;Glucose Fasting
+.Name|GLUCOSE
+.OrderCode|GLUC
 Test|N/A
 .CollectionDate|09/21/2008
 .CollectionTime|09:14
@@ -3830,28 +4228,6 @@ Test|N/A
 ..TestCode|TROPI
 .Name|TROPONIN I
 .OrderCode|TROPI
-Test|N/A
-.CollectionDate|09/29/2008
-.CollectionTime|23:20
-.Component|POTASSIUM
-..Range|3.5-5.1
-..Units|MMOL/L
-..Value|4.1
-..TestCode|K
-..ESNames|Potassium
-.Name|POTASSIUM
-.OrderCode|K
-Test|N/A
-.CollectionDate|10/01/2008
-.CollectionTime|11:10
-.Component|POTASSIUM
-..Range|3.5-5.1
-..Units|MMOL/L
-..Value|3.9
-..TestCode|K
-..ESNames|Potassium
-.Name|POTASSIUM
-.OrderCode|K
 Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|17:00
