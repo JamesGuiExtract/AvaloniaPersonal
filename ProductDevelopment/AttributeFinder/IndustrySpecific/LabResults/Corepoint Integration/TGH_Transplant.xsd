@@ -169,6 +169,13 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
+							<xs:element name="CSN" minOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 							<xs:element name="Name" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
