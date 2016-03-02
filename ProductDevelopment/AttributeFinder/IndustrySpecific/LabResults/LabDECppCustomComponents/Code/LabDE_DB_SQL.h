@@ -192,6 +192,14 @@ static const string gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER =
 // a warning will be returned.
 // If @UpdateInfo is 1, the data passed in will be used to update the record referenced by
 // @TargetMRN (or @SourceMRN if @TargetMRN is NULL)
+// Warnings returned:
+// - Warning: Patient [MRN], subject of merge, does not exist.
+// - Warning: Patient [MRN], target of un-merge, did not exist; created record.
+// - Warning: Patient merge target [MRN] did not exist; created record.
+// - Warning: Patient [MRN] was already merged into [MRN].
+// - Warning: Patient [MRN] was already merged into [MRN]. Now merged to [MRN] instead.
+// - Warning: Merged patient [MRN] into [MRN] which was already merged into [MRN]
+// - Warning: Cannot un-merge; patient [MRN] was not merged.
 static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
 	"CREATE PROCEDURE [dbo].[LabDEMergePatients] "
 	"	@SourceMRN NVARCHAR(20), "
@@ -220,8 +228,16 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
 
 	"	IF (SELECT COUNT([MRN]) FROM [LabDEPatient] WHERE [MRN] = @SourceMRN) = 0 "
 	"	BEGIN "
-	"		SET @warning = 'Patient does not exist: ' + @SourceMRN "
-	"		RAISERROR (@warning, 18, 1) "
+	"		IF (@TargetMRN IS NULL) "
+	"		BEGIN "
+	"			SET @warning = 'Warning: Patient ' + @SourceMRN + "
+	"				', target of un-merge, did not exist; created record.' "
+	"		END "
+	"		ELSE "
+	"		BEGIN "
+	"			SET @warning = 'Warning: Patient ' + @SourceMRN + "
+	"				', subject of merge, does not exist.' "
+	"		END "
 	"	END "
 
 	// Target record will be @SourceMRN if un-merging buy setting @TargetMRN as NULL
@@ -231,11 +247,17 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
 	// If the merge target does not exist
 	"	IF @targetExists = 0  "
 	"	BEGIN "
-	"		SET @warning = 'Warning: Patient merge target ' + @TargetMRN + "
-	"			' did not exist; created record.' "
+	"		DECLARE @newMRN NVARCHAR(20) "
+	"		SET @newMRN = COALESCE(@TargetMRN, @SourceMRN) "
+
+	"		IF (@TargetMRN IS NOT NULL) " // @Warning will be assigned above for un-merge
+	"		BEGIN "
+	"			SET @warning = 'Warning: Patient merge target ' + @newMRN + "
+	"				' did not exist; created record.' "
+	"		END "
 	"		INSERT INTO [LabDEPatient]  "
 	"			([MRN], [FirstName], [MiddleName], [LastName], [Suffix], [DOB], [Gender], [CurrentMRN]) "
-	"			VALUES (@TargetMRN, @FirstName, @MiddleName, @LastName, @Suffix, @DOB, @Gender, @TargetMRN) "
+	"			VALUES (@newMRN, @FirstName, @MiddleName, @LastName, @Suffix, @DOB, @Gender, @newMRN) "
 	"	END "
 	// else if the target record's info should be updated.
 	"	ELSE IF @UpdateInfo = 1 "
@@ -275,7 +297,7 @@ static const string gstrCREATE_PROCEDURE_MERGE_PATIENTS =
 	"		END "
 	"	END "
 	// Warn if un-merging a record that wasn't merged.
-	"	ELSE IF (@originalMergedInto IS NULL) AND (@TargetMRN IS NULL) "
+	"	ELSE IF (@originalMergedInto IS NULL) AND (@TargetMRN IS NULL) AND @warning IS NULL"
 	"	BEGIN "
 	"		SET @Warning = 'Warning: Cannot un-merge; patient ' + @SourceMRN + "
 	"			' was not merged.' "
