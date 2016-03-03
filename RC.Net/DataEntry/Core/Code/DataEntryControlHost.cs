@@ -7,12 +7,14 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -734,6 +736,17 @@ namespace Extract.DataEntry
         /// </summary>
         DateTime? _performanceTestingStartTime;
 
+        /// <summary>
+        /// Indicates whether RDT is licensed.
+        /// </summary>
+        bool _rdtLicense;
+
+        /// <summary>
+        /// Specifies a <see cref="Control"/> that is the target of a property dump drag-drop
+        /// operation (available only with RDT license).
+        /// </summary>
+        Control _propertyDumpTarget;
+
         #endregion Fields
 
         #region Delegates
@@ -772,6 +785,9 @@ namespace Extract.DataEntry
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI23666", _OBJECT_NAME);
+
+                _rdtLicense = LicenseUtilities.IsLicensed(
+                    LicenseIdName.RuleDevelopmentToolkitObjects);
 
                 Config = new ConfigSettings<Properties.Settings>();
 
@@ -1475,6 +1491,14 @@ namespace Extract.DataEntry
 
                         return true;
                     }
+                }
+
+                // https://extract.atlassian.net/browse/ISSUE-13640
+                // If RDT is licensed, implement ability to dump all control properties to a text
+                // file.
+                if (_rdtLicense)
+                {
+                    ProcessPropertyDumpDragDrop(m);
                 }
             }
             catch (Exception ex)
@@ -7933,6 +7957,62 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException.Log("ELI38427", ex);
+            }
+        }
+
+        /// <summary>
+        /// Implements ability to dump all control properties to a text
+        /// file. All child controls will be recursively dumped as well (including the rows/columns
+        /// of and DataGridViews).
+        /// https://extract.atlassian.net/browse/ISSUE-13640
+        /// </summary>
+        /// <param name="m">The <see cref="Message"/> to be processed as a potential start of a
+        /// property dump drag/drop operation.</param>
+        void ProcessPropertyDumpDragDrop(Message m)
+        {
+            // Get the position of the mouse in screen coordinates.
+            Point mousePosition = new Point((int)((uint)m.LParam & 0x0000FFFF),
+                                            (int)((uint)m.LParam & 0xFFFF0000) >> 16);
+
+            // Mouse + Ctrl down within ClientRectangle
+            if (m.Msg == WindowsMessage.LeftButtonDown &&
+                Control.ModifierKeys.HasFlag(Keys.Control) &&
+                ClientRectangle.Contains(mousePosition))
+            {
+                if (_propertyDumpTarget == null)
+                {
+                    _propertyDumpTarget = FormsMethods.GetClickedControl(m);
+                }
+            }
+            else if (m.Msg == WindowsMessage.LeftButtonUp)
+            {
+                _propertyDumpTarget = null;
+            }
+            else if (m.Msg == WindowsMessage.MouseMove)
+            {
+                // If _propertyDumpTarget has been assigned by mouse down and the mouse is no longer
+                // within ClientRectangle, start a drag drop operation.
+                if (_propertyDumpTarget != null && !ClientRectangle.Contains(mousePosition))
+                {
+                    string propertyListing = _propertyDumpTarget.GetPropertyListing();
+
+                    // Create a DataObject to represent the property dump either as a string or a
+                    // file.
+                    var dragData = new DataObject();
+                    dragData.SetText(propertyListing);
+                    using (var tempFile = new TemporaryFile(
+                        null, _propertyDumpTarget.Name + ".txt", null, false))
+                    {
+                        File.WriteAllText(tempFile.FileName, propertyListing);
+
+                        var dragFileCollection = new StringCollection();
+                        dragFileCollection.Add(tempFile.FileName);
+                        dragData.SetFileDropList(dragFileCollection);
+
+                        DoDragDrop(dragData, DragDropEffects.Copy);
+                        _propertyDumpTarget = null;
+                    }
+                }
             }
         }
 

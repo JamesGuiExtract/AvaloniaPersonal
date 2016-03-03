@@ -359,6 +359,18 @@ namespace Extract.Utilities.Forms
         [DllImport("user32.dll")]
         static extern IntPtr DispatchMessage([In] ref NativeMessage lpmsg);
 
+        /// <summary>
+        /// The GetParent function retrieves a handle to the specified window's parent or owner.
+        /// </summary>
+        /// <param name="hWnd">Handle to the window whose parent window handle is to be retrieved.
+        /// </param>
+        /// <returns>If the window is a child window, the return value is a handle to the parent
+        /// window. If the window is a top-level window, the return value is a handle to the owner
+        /// window. If the window is a top-level unowned window or if the function fails, the return
+        /// value is NULL.</returns>
+        [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
+        internal static extern IntPtr GetParent(IntPtr hWnd);
+
         #endregion P/Invokes
 
         #region Constants
