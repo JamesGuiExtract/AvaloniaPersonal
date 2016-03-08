@@ -146,6 +146,8 @@ namespace Extract.DataEntry
             {
                 _rootAttribute = rootAttribute;
                 _dbConnections = dbConnections;
+
+                AttributeStatusInfo.QueryCacheCleared += (o, e) => { CachedResult = null; };
             }
             catch (Exception ex)
             {

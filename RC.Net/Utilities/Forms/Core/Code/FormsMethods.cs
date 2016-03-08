@@ -1073,12 +1073,15 @@ namespace Extract.Utilities.Forms
                 var dataGridView = control as DataGridView;
                 if (dataGridView != null)
                 {
-                    foreach (var column in dataGridView.Columns.Cast<DataGridViewColumn>())
+                    foreach (var column in dataGridView.Columns.Cast<DataGridViewColumn>()
+                        .Where(column => !string.IsNullOrEmpty(column.Name)))
                     {
                         GetDataGridViewBandPropertyListing(column, output, levelsDeep + 1);
                     }
 
-                    foreach (var row in dataGridView.Rows.Cast<DataGridViewRow>())
+                    foreach (var row in dataGridView.Rows.Cast<DataGridViewRow>()
+                        .Where(row => !string.IsNullOrEmpty(
+                            (TypeDescriptor.GetProperties(row)["Name"].GetValue(row) ?? "").ToString())))
                     {
                         GetDataGridViewBandPropertyListing(row, output, levelsDeep + 1);
                     }
