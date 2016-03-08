@@ -1189,9 +1189,13 @@ namespace Extract.DataEntry
                     // once as it is in the validation list, and the second time with a leading
                     // space. This way, a user can press space in an empty cell to see all possible
                     // values.
-                    autoCompleteValues = autoCompleteValues.Concat(
-                        autoCompleteValues.Select(value => " " + value))
-                        .ToArray();
+                    AutoCompleteStringCollection newAutoCompleteList =
+                        new AutoCompleteStringCollection();
+                    for (int i = 0; i < autoCompleteValues.Length; i++)
+                    {
+                        newAutoCompleteList.Add(" " + autoCompleteValues[i]);
+                    }
+                    newAutoCompleteList.AddRange(autoCompleteValues);
 
                     // If autoCompleteMode or autoCompleteSource have changed, an update is needed.
                     bool updateRequired = (autoCompleteMode != AutoCompleteMode.SuggestAppend ||
@@ -1201,8 +1205,20 @@ namespace Extract.DataEntry
                     // different, an update is required.
                     if (!updateRequired)
                     {
-                        updateRequired = (autoCompleteList.Count != autoCompleteValues.Length)
-                            || !autoCompleteList.Cast<string>().SequenceEqual(autoCompleteValues);
+                        // If they are not the same size, an update is required.
+                        if (newAutoCompleteList.Count != autoCompleteList.Count)
+                        {
+                            updateRequired = true;
+                        }
+                        // ...or if the new list differs at all from the old list, an update is
+                        // required.
+                        else if (autoCompleteList.Count != newAutoCompleteList
+                                    .Cast<string>()
+                                    .Intersect(autoCompleteList.Cast<string>())
+                                    .Count())
+                        {
+                            updateRequired = true;
+                        }
                     }
 
                     // Only change auto-complete settings if required... the act of doing so
@@ -1210,9 +1226,6 @@ namespace Extract.DataEntry
                     // https://connect.microsoft.com/VisualStudio/feedback/details/116641
                     if (updateRequired)
                     {
-                        var newAutoCompleteList = new AutoCompleteStringCollection();
-                        newAutoCompleteList.AddRange(autoCompleteValues);
-
                         // Initialize auto-complete mode in case validation lists are used.
                         autoCompleteMode = AutoCompleteMode.SuggestAppend;
                         autoCompleteSource = AutoCompleteSource.CustomSource;
