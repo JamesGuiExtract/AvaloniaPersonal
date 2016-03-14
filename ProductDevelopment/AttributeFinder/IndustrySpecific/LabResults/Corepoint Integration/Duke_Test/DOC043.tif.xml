@@ -1,6 +1,6 @@
 <FlexData>
 	<MessageSequenceNumberFile>
-		<FullText>D:\LabDE\Solution\MessageSequenceNumber.txt</FullText>
+		<FullText>\\vboxsrv\C_DRIVE\LabDE_Duke\Solution\MessageSequenceNumber.txt</FullText>
 	</MessageSequenceNumberFile>
 	<OperatorComments>
 		<FullText/>
@@ -85,13 +85,13 @@
 		<LabInfo>
 			<FullText/>
 			<LabCode>
-				<FullText/>
+				<FullText>3040000057</FullText>
 			</LabCode>
 			<LabDisplay>
 				<FullText>LABCORP BURLINGTON, 1447 York Court Burlington</FullText>
 			</LabDisplay>
 			<LabIdentifier>
-				<FullText/>
+				<FullText>LABCORP BURLINGTON</FullText>
 			</LabIdentifier>
 		</LabInfo>
 		<ResultDate>
