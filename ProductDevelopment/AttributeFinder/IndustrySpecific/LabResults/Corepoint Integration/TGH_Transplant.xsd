@@ -32,6 +32,13 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="DeptCode">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FullText" type="xs:string" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="LabInfo">
 					<xs:complexType>
 						<xs:sequence>
