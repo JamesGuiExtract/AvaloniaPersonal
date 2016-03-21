@@ -2,6 +2,9 @@
 	<MessageSequenceNumberFile>
 		<FullText>D:\LabDE\Solution\MessageSequenceNumber.txt</FullText>
 	</MessageSequenceNumberFile>
+	<Filename>
+		<FullText>D:\LabDE\input\DOC043.tif</FullText>
+	</Filename>
 	<OperatorComments>
 		<FullText/>
 	</OperatorComments>

@@ -2,6 +2,9 @@
 	<MessageSequenceNumberFile>
 		<FullText>D:\LabDE\Solution\MessageSequenceNumber.txt</FullText>
 	</MessageSequenceNumberFile>
+	<Filename>
+		<FullText>D:\LabDE\input\DOC005.tif</FullText>
+	</Filename>
 	<OperatorComments>
 		<FullText/>
 	</OperatorComments>
@@ -62,10 +65,10 @@
 	<Test>
 		<FullText>N/A</FullText>
 		<OrderNumber>
-			<FullText>72815</FullText>
+			<FullText>728159</FullText>
 		</OrderNumber>
 		<CSN>
-			<FullText>100557244</FullText>
+			<FullText>109090909</FullText>
 		</CSN>
 		<Name>
 			<FullText>AMYLASE EXTERNAL</FullText>
