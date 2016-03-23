@@ -77,7 +77,7 @@ namespace Extract.Utilities
         // reference.
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "0#")]
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "1#")]
-        public static void Swap<T>(ref T valueOne, ref T valueTwo) where T : struct
+        public static void Swap<T>(ref T valueOne, ref T valueTwo)
         {
             try
             {
@@ -445,6 +445,112 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 ex.ExtractLog(eliCode);
+            }
+        }
+
+        /// <summary>
+        /// Computes the Damerau-Levenshtein Distance between two strings, represented as arrays of
+        /// integers, where each integer represents the code point of a character in the source string.
+        /// Includes an optional threshold which can be used to indicate the maximum allowable distance.
+        /// From: http://stackoverflow.com/questions/9453731/how-to-calculate-distance-similarity-measure-of-given-2-strings
+        /// (http://stackoverflow.com/users/842685/joshua-honig)
+        /// Modified to prevent user from having to pass in threshold value.
+        /// </summary>
+        /// <param name="source">The first string to compare.</param>
+        /// <param name="target">The second string to compare.</param>
+        /// <returns><see cref="int.MaxValue"/> if threshold exceeded; otherwise the
+        /// Damerau-Levenshtein distance between the strings</returns>
+        public static int LevenshteinDistance(string source, string target)
+        {
+            return LevenshteinDistance(source, target, int.MaxValue);
+        }
+
+        /// <summary>
+        /// Computes the Damerau-Levenshtein Distance between two strings, represented as arrays of
+        /// integers, where each integer represents the code point of a character in the source string.
+        /// Includes an optional threshold which can be used to indicate the maximum allowable distance.
+        /// From: http://stackoverflow.com/questions/9453731/how-to-calculate-distance-similarity-measure-of-given-2-strings
+        /// (http://stackoverflow.com/users/842685/joshua-honig)
+        /// </summary>
+        /// <param name="source">The first string to compare.</param>
+        /// <param name="target">The second string to compare.</param>
+        /// <param name="threshold">Maximum allowable distance</param>
+        /// <returns><see cref="int.MaxValue"/> if threshold exceeded; otherwise the
+        /// Damerau-Levenshtein distance between the strings</returns>
+        public static int LevenshteinDistance(string source, string target, int threshold)
+        {
+            try
+            {
+                int length1 = source.Length;
+                int length2 = target.Length;
+
+                // Return trivial case - difference in string lengths exceeds threshold
+                if (Math.Abs(length1 - length2) > threshold) { return int.MaxValue; }
+
+                // Ensure arrays [i] / length1 use shorter length 
+                if (length1 > length2)
+                {
+                    Swap(ref target, ref source);
+                    Swap(ref length1, ref length2);
+                }
+
+                int maxi = length1;
+                int maxj = length2;
+
+                int[] dCurrent = new int[maxi + 1];
+                int[] dMinus1 = new int[maxi + 1];
+                int[] dMinus2 = new int[maxi + 1];
+                int[] dSwap;
+
+                for (int i = 0; i <= maxi; i++) { dCurrent[i] = i; }
+
+                int jm1 = 0, im1 = 0, im2 = -1;
+
+                for (int j = 1; j <= maxj; j++)
+                {
+
+                    // Rotate
+                    dSwap = dMinus2;
+                    dMinus2 = dMinus1;
+                    dMinus1 = dCurrent;
+                    dCurrent = dSwap;
+
+                    // Initialize
+                    int minDistance = int.MaxValue;
+                    dCurrent[0] = j;
+                    im1 = 0;
+                    im2 = -1;
+
+                    for (int i = 1; i <= maxi; i++)
+                    {
+
+                        int cost = source[im1] == target[jm1] ? 0 : 1;
+
+                        int del = dCurrent[im1] + 1;
+                        int ins = dMinus1[i] + 1;
+                        int sub = dMinus1[im1] + cost;
+
+                        //Fastest execution for min value of 3 integers
+                        int min = (del > ins) ? (ins > sub ? sub : ins) : (del > sub ? sub : del);
+
+                        if (i > 1 && j > 1 && source[im2] == target[jm1] && source[im1] == target[j - 2])
+                            min = Math.Min(min, dMinus2[im2] + cost);
+
+                        dCurrent[i] = min;
+                        if (min < minDistance) { minDistance = min; }
+                        im1++;
+                        im2++;
+                    }
+                    jm1++;
+                    if (minDistance > threshold) { return int.MaxValue; }
+                }
+
+                int result = dCurrent[maxi];
+                return (result > threshold) ? int.MaxValue : result;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39425");
             }
         }
     }
