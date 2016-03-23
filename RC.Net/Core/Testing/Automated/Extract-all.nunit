@@ -2,6 +2,7 @@
   <Settings activeconfig="Release"/>
   <Config name="Debug" binpathtype="Auto" runtimeFramework="any" appbase="C:\Engineering\binaries\debug">
 		<assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
+		<assembly path="Extract.AttributeFinder.Test.dll" />
     	<assembly path="Extract.DataEntry.DEP.StandardLabDE.Test.dll" />
 		<assembly path="Extract.DataEntry.LabDE.Test.dll" />
     	<assembly path="Extract.DataEntry.Test.dll" />
@@ -16,8 +17,9 @@
 		<assembly path="Extract.Utilities.Parsers.Test.dll" />
   </Config>
   <Config name="Release" binpathtype="Auto" runtimeFramework="any">
-	<assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
-	<assembly path="Extract.DataEntry.LabDE.Test.dll" />
+		<assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
+		<assembly path="Extract.AttributeFinder.Test.dll" />
+		<assembly path="Extract.DataEntry.LabDE.Test.dll" />
     	<assembly path="Extract.DataEntry.Test.dll" />
     	<assembly path="Extract.Encryption.Test.dll" />
     	<assembly path="Extract.FileActionManager.Database.Test.dll" />
