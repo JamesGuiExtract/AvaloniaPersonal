@@ -142,7 +142,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)..\..\..\..\..\core\testing\automated\extract-all.config" "$(TargetDir)Extract-all.config" /y /r
+    <PostBuildEvent>echo f | xcopy "$(ProjectDir)..\..\..\..\..\core\testing\automated\extract-all.config" "$(TargetDir)Extract-all.config" /y /r
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
