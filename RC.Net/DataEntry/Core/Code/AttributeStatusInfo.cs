@@ -1282,17 +1282,17 @@ namespace Extract.DataEntry
                 // Create a new statusInfo instance (or retrieve an existing one).
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-//                // https://extract.atlassian.net/browse/ISSUE-12548
-//                // The data entry framework does not support having the same attribute mapped to two
-//                // different controls simultaneously.
-//                if (statusInfo._owningControl != null)
-//                {
-//                    ExtractException.Assert("ELI37798", "Invalid configuration; an attribute has " +
-//                        "been mapped to multiple controls.",
-//                        statusInfo._owningControl == owningControl, "Attribute", attribute.Name,
-//                        "Control 1", ((Control)statusInfo._owningControl).Name,
-//                        "Control 2", ((Control)owningControl).Name);
-//                }
+                // https://extract.atlassian.net/browse/ISSUE-12548
+                // The data entry framework does not support having the same attribute mapped to two
+                // different controls simultaneously.
+                if (statusInfo._owningControl != null)
+                {
+                    ExtractException.Assert("ELI37798", "Invalid configuration; an attribute has " +
+                        "been mapped to multiple controls.",
+                        statusInfo._owningControl == owningControl, "Attribute", attribute.Name,
+                        "Control 1", ((Control)statusInfo._owningControl).Name,
+                        "Control 2", ((Control)owningControl).Name);
+                }
 
                 statusInfo._owningControl = owningControl;
 

@@ -74,12 +74,12 @@ namespace Extract.DataEntry
         static List<Tuple<AutoUpdateTrigger, DataEntryQuery>> _queriesPendingUpdate;
 
         /// <summary>
-        /// Keeps track of all queries that have been triggered within an active call to
-        /// <see cref="ExecuteAllPendingTriggers"/> to prevent them from being re-queued for
-        /// execution within the same call thereby causing an infinite loop.
+        /// Keeps track of the number of time all queries that have been triggered within an active
+        /// call to <see cref="ExecuteAllPendingTriggers"/> to prevent them from being endlessly
+        /// re-queued for execution within the same call thereby causing an infinite loop.
         /// </summary>
         [ThreadStatic]
-        static HashSet<DataEntryQuery> _pendingQueriesHandled;
+        static Dictionary<DataEntryQuery, int> _pendingQueryExecutionCount;
 
         /// <summary>
         /// Keeps track of whether the <see cref="_queriesPendingUpdate"/> are in the process of
@@ -352,10 +352,24 @@ namespace Extract.DataEntry
                     // https://extract.atlassian.net/browse/ISSUE-13506
                     // https://extract.atlassian.net/browse/ISSUE-13538
                     // If we are currently in an ExecuteAllPendingTriggers call, to prevent an
-                    // infinite do not re-queue a query that has already been triggered within the
-                    // active ExecuteAllPendingTriggers call.
-                    if (_pendingQueriesHandled != null &&
-                        _pendingQueriesHandled.Contains(dataEntryQuery))
+                    // infinite do not re-queue a query that has already been triggered more than
+                    // once within the active ExecuteAllPendingTriggers call.
+                    // https://extract.atlassian.net/browse/ISSUE-13667
+                    // Modified the initial recursion prevention to allow each query to execute
+                    // twice. This mirrors similar recursion management code in AttributeStatusInfo
+                    // where _attributesBeingModified prevents allows an edited attribute to be
+                    // subsequently updated once in addition as a result of a query execution
+                    // chain, but not again. Therefor, in the latest implementation here, given:
+                    // - Auto-update query 1 on attribute A that formats attribute A
+                    // - Auto-update query 2 on attribute B that updates attribute B based on A
+                    // - Auto-update query 3 on attribute A that updates attribute A based on A & B
+                    // Then query 1 should be allowed to execute once as part of the initial edit of
+                    // attribute A, again in reaction to a execution of query 3, then any further
+                    // executions of query 1 should be prevented. 
+                    int executionCount = 0;
+                    if (_pendingQueryExecutionCount != null &&
+                        _pendingQueryExecutionCount.TryGetValue(dataEntryQuery, out executionCount) &&
+                        executionCount > 1)
                     {
                         // No nothing to prevent the possibility of an infinite loop.
                     }
@@ -725,7 +739,7 @@ namespace Extract.DataEntry
             try
             {
                 _executingPendingTriggers = true;
-                _pendingQueriesHandled = new HashSet<DataEntryQuery>();
+                _pendingQueryExecutionCount = new Dictionary<DataEntryQuery, int>();
 
                 // [DataEntry:1292]
                 // https://extract.atlassian.net/browse/ISSUE-13149
@@ -749,7 +763,15 @@ namespace Extract.DataEntry
                     }
 
                     DataEntryQuery dataEntryQuery = pendingTrigger.Item2;
-                    _pendingQueriesHandled.Add(dataEntryQuery);
+                    if (_pendingQueryExecutionCount.ContainsKey(dataEntryQuery))
+                    {
+                        _pendingQueryExecutionCount[dataEntryQuery] =
+                            _pendingQueryExecutionCount[dataEntryQuery] + 1;
+                    }
+                    else
+                    {
+                        _pendingQueryExecutionCount[dataEntryQuery] = 1;
+                    }
 
                     // Always ensure a default query applies updates as part of a full
                     // auto-update trigger to ensure normal auto-update triggers can apply
@@ -772,7 +794,7 @@ namespace Extract.DataEntry
                 AttributeStatusInfo.ForgetLastAppliedStringValues();
 
                 _executingPendingTriggers = false;
-                _pendingQueriesHandled = null;
+                _pendingQueryExecutionCount = null;
             }
         }
 
