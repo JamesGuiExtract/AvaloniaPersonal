@@ -109,13 +109,6 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="CSN" minOccurs="0">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
 				<xs:element name="PhysicianInfo" minOccurs="1">
 					<xs:complexType>
 						<xs:sequence>
@@ -163,6 +156,13 @@
 						<xs:sequence>
 							<xs:element name="FullText" minOccurs="1" type="xs:string" />
 							<xs:element name="OrderNumber" minOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="CSN" minOccurs="0">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="FullText" type="xs:string" />
@@ -309,13 +309,6 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="OrderingDeptCode">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>

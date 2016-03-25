@@ -41,9 +41,6 @@
 			<FullText>1224205</FullText>
 		</MR_Number>
 	</PatientInfo>
-	<CSN>
-		<FullText>0123456789</FullText>
-	</CSN>
 	<PhysicianInfo>
 		<FullText/>
 		<OrderingPhysicianName>
@@ -67,6 +64,9 @@
 		<OrderNumber>
 			<FullText>0001</FullText>
 		</OrderNumber>
+		<CSN>
+			<FullText>11111</FullText>
+		</CSN>
 		<Name>
 			<FullText>CBC</FullText>
 		</Name>
@@ -226,6 +226,9 @@
 		<OrderNumber>
 			<FullText>0002</FullText>
 		</OrderNumber>
+		<CSN>
+			<FullText>22222</FullText>
+		</CSN>
 		<Name>
 			<FullText>CBC AND DIFF</FullText>
 		</Name>
@@ -451,6 +454,9 @@
 		<OrderNumber>
 			<FullText>0003</FullText>
 		</OrderNumber>
+		<CSN>
+			<FullText>33333</FullText>
+		</CSN>
 		<Name>
 			<FullText>EOSINOPHIL COUNT</FullText>
 		</Name>
@@ -506,7 +512,4 @@
 			</Comment>
 		</Component>
 	</Test>
-	<OrderingDeptCode>
-		<FullText>CFT LTX HPB</FullText>
-	</OrderingDeptCode>
 </FlexData>

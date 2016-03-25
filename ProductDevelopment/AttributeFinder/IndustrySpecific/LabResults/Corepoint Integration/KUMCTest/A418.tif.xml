@@ -41,9 +41,6 @@
 			<FullText>00000001</FullText>
 		</MR_Number>
 	</PatientInfo>
-	<CSN>
-		<FullText>0123456789</FullText>
-	</CSN>
 	<PhysicianInfo>
 		<FullText/>
 		<OrderingPhysicianName>
@@ -65,8 +62,11 @@
 	<Test>
 		<FullText/>
 		<OrderNumber>
-			<FullText/>
+			<FullText>0001</FullText>
 		</OrderNumber>
+		<CSN>
+			<FullText>99999</FullText>
+		</CSN>
 		<Name>
 			<FullText>HEMOGLOBIN A1c</FullText>
 		</Name>
@@ -125,8 +125,11 @@
 	<Test>
 		<FullText/>
 		<OrderNumber>
-			<FullText/>
+			<FullText>0002</FullText>
 		</OrderNumber>
+		<CSN>
+			<FullText>99999</FullText>
+		</CSN>
 		<Name>
 			<FullText>CBC</FullText>
 		</Name>
@@ -281,7 +284,4 @@
 			</Comment>
 		</Component>
 	</Test>
-	<OrderingDeptCode>
-		<FullText>CFT KPTX NEP</FullText>
-	</OrderingDeptCode>
 </FlexData>
