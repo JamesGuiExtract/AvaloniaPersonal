@@ -243,9 +243,11 @@ namespace Extract.AttributeFinder
         /// the attribute hierarchy.
         /// </summary>
         /// <param name="xpath">The XPath expression to evaluate</param>
-        /// <returns>A <see cref="object"/> representing the XPath result. This may be an
-        /// enumeration for queries that return sequences. Any individual result that represents an
-        /// XML node will return the corresponding <see cref="IAttribute"/>.</returns>
+        /// <returns>A <see cref="object"/> representing the XPath result. This will be a
+        /// <see cref="List{T}"/> of objects for queries that return sequences. Any selected element
+        /// in the result that represents an XML node will return the corresponding
+        /// <see cref="IAttribute"/>.
+        /// </returns>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
         public object Evaluate(string xpath)
         {
@@ -266,9 +268,11 @@ namespace Extract.AttributeFinder
         /// <param name="iterator">The <see cref="XPathIterator"/> whose current position should
         /// serve as the basis for <see paramref="xpath"/>'s evaluation.</param>
         /// <param name="xpath">The XPath expression to evaluate</param>
-        /// <returns>A <see cref="object"/> representing the XPath result. This may be an
-        /// enumeration for queries that return sequences. Any individual result that represents an
-        /// XML node will return the corresponding <see cref="IAttribute"/>.</returns>
+        /// <returns>A <see cref="object"/> representing the XPath result. This will be a
+        /// <see cref="List{T}"/> of objects for queries that return sequences. Any selected element
+        /// in the result that represents an XML node will return the corresponding
+        /// <see cref="IAttribute"/>.
+        /// </returns>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
         public object Evaluate(XPathIterator iterator, string xpath)
         {
@@ -289,9 +293,11 @@ namespace Extract.AttributeFinder
         /// <param name="attribute">The <see cref="IAttribute"/> which should serve as the basis for
         /// <see paramref="xpath"/>'s evaluation.</param>
         ///<param name="xpath">The XPath expression to evaluate</param>
-        /// <returns>A <see cref="object"/> representing the XPath result. This may be an
-        /// enumeration for queries that return sequences. Any individual result that represents an
-        /// XML node will return the corresponding <see cref="IAttribute"/>.</returns>
+        /// <returns>A <see cref="object"/> representing the XPath result. This will be a
+        /// <see cref="List{T}"/> of objects for queries that return sequences. Any selected element
+        /// in the result that represents an XML node will return the corresponding
+        /// <see cref="IAttribute"/>.
+        /// </returns>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
         public object Evaluate(IAttribute attribute, string xpath)
         {
@@ -316,9 +322,9 @@ namespace Extract.AttributeFinder
         /// <see paramref="xpathIteration"/>.</param>
         /// <returns>An enumeration of <see cref="object"/>s representing the results for each
         /// attribute selected by <see paramref="xpathIteration"/>. Each element in the enumeration
-        /// may itself be an enumeration for an <see paramref="xpathQuery"/> that returns sequences.
-        /// Any individual result that represents an XML node will return the corresponding
-        /// <see cref="IAttribute"/>.</returns>
+        /// may itself be a <see cref="List{T}"/> of objects for an <see paramref="xpathQuery"/>
+        /// that returns sequences. Any individual result that represents an XML node will return
+        /// the corresponding <see cref="IAttribute"/>.</returns>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
         public IEnumerable<object> EvaluateOver(string xpathIteration, string xpathQuery)
         {
@@ -484,9 +490,11 @@ namespace Extract.AttributeFinder
         /// <param name="navigator">The <see cref="XPathNavigator"/> which should serve as the basis
         /// for <see paramref="xpath"/>'s evaluation.</param>
         /// <param name="xpath">The XPath expression to evaluate</param>
-        /// <returns>A <see cref="object"/> representing the XPath result. This may be an
-        /// enumeration for queries that return sequences. Any individual result that represents an
-        /// XML node will return the corresponding <see cref="IAttribute"/>.</returns>
+        /// <returns>A <see cref="object"/> representing the XPath result. This will be a
+        /// <see cref="List{T}"/> of objects for queries that return sequences. Any selected element
+        /// in the result that represents an XML node will return the corresponding
+        /// <see cref="IAttribute"/>.
+        /// </returns>
         object InternalEvaluate(XPathNavigator navigator, string xpath)
         {
             var expression = XPathExpression.Compile(xpath);
@@ -501,7 +509,7 @@ namespace Extract.AttributeFinder
         /// caller that is dealing with an <see cref="IAttribute"/> hierarchy rather than XML.
         /// </summary>
         /// <param name="result">The raw result of an XPath evaluation.</param>
-        /// <returns>A <see cref="object"/> where an enumeration will replace
+        /// <returns>A <see cref="object"/> where an object list will replace
         /// <see cref="XPathNodeIterator"/>s for queries that return sequences and where any
         /// individual result that represents an XML node will return the corresponding
         /// <see cref="IAttribute"/> instead.</returns>
@@ -511,6 +519,8 @@ namespace Extract.AttributeFinder
             if (nodeIterator == null)
             {
                 // A singular result.
+                // I don't think it is possible for an XPath query to return a node on its own
+                // (rather than 1 node in a node collection), but just in case...
                 var node = result as IHasXmlNode;
                 if (node != null)
                 {
@@ -518,17 +528,16 @@ namespace Extract.AttributeFinder
                     IAttribute attribute = null;
                     if (_nodeToAttributeMap.TryGetValue(node.GetNode(), out attribute))
                     {
-                        return attribute;
+                        yield return attribute;
                     }
                 }
 
                 // Otherwise just return the raw result
-                return result;
+                yield return result;
             }
             else
             {
-                List<IAttribute> attributeList = null;
-                List<object> objectList = null;
+                List<object> objectList = new List<object>();
                 while (nodeIterator.MoveNext())
                 {
                     object value = nodeIterator.Current.Value;
@@ -541,35 +550,17 @@ namespace Extract.AttributeFinder
                         _nodeToAttributeMap.TryGetValue(currentNode.GetNode(), out attribute);
                     }
 
-                    // Append to attributeList for queries where every element is a node (attribute)
-                    if (attribute != null && objectList == null)
-                    {
-                        if (attributeList == null)
-                        {
-                            attributeList = new List<IAttribute>();
-                        }
-
-                        attributeList.Add(attribute);
-                    }
-                    // Append to objectList for queries where any element is not a node (attribute)
-                    else
-                    {
-                        if (attributeList != null)
-                        {
-                            objectList = new List<object>(attributeList);
-                            attributeList = null;
-                        }
-                        else if (objectList == null)
-                        {
-                            objectList = new List<object>();
-                        }
-
-                        objectList.Add(value);
-                    }
+                    // While the intent is the objectList can contain a mix of both IAttributes and
+                    // native types if that's what the XPath query selects, it seems that in such
+                    // cases XPathNavigator.Evaluate only returns the nodes (attributes).
+                    yield return attribute ?? value;
+                    //objectList.Add(attribute ?? value);
                 }
 
-                return (object)attributeList ?? (object)objectList;
+                //return objectList;
             }
+
+            yield return null;
         }
 
         #endregion Private Members

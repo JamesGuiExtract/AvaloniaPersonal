@@ -91,13 +91,15 @@ namespace Extract.AttributeFinder.Test
             var xpathContext = GetXPathContext();
 
             var result = xpathContext.Evaluate("/*/Test[3]/Component[3]/Value");
-            var attributeList = result as List<IAttribute>;
+            var objectList = result as List<object>;
 
-            Assert.That(attributeList != null);
-            Assert.That(attributeList.Count == 1);
-            Assert.That(attributeList[0].Name == "Value");
-            Assert.That(attributeList[0].Value.String == "12.7");
-            Assert.That(attributeList[0].Value.HasSpatialInfo());
+            Assert.That(objectList != null);
+            Assert.That(objectList.Count == 1);
+            var attribute = objectList.First() as IAttribute;
+            Assert.That(attribute != null);
+            Assert.That(attribute.Name == "Value");
+            Assert.That(attribute.Value.String == "12.7");
+            Assert.That(attribute.Value.HasSpatialInfo());
         }
 
         [Test, Category("XPath")]
@@ -133,13 +135,14 @@ namespace Extract.AttributeFinder.Test
             var xpathContext = GetXPathContext();
 
             var result = xpathContext.Evaluate("/*/Test/*[@Type='Date']");
-            var attributeList = result as List<IAttribute>;
+            var objectList = result as List<object>;
 
-            Assert.That(attributeList != null);
-            Assert.That(attributeList.Count == 3);
-            Assert.That(attributeList[0].Name == "CollectionDate");
-            Assert.That(attributeList[1].Value.String == "09/09/2009");
-            Assert.That(attributeList[2].Type == "Date");
+            Assert.That(objectList != null);
+            var attributes = objectList.OfType<IAttribute>().ToArray();
+            Assert.That(attributes.Length == 3);
+            Assert.That(attributes[0].Name == "CollectionDate");
+            Assert.That(attributes[1].Value.String == "09/09/2009");
+            Assert.That(attributes[2].Type == "Date");
         }
 
         [Test, Category("XPath")]
@@ -160,12 +163,14 @@ namespace Extract.AttributeFinder.Test
             var xpathContext = GetXPathContext();
 
             var result = xpathContext.Evaluate("/*/Test[3]/Component[3]");
-            var attributeList = result as List<IAttribute>;
+            var objectList = result as List<object>;
 
-            Assert.That(attributeList != null);
-            Assert.That(attributeList[0].Value.String == "HEMOGLOBIN");
+            Assert.That(objectList != null);
+            var attribute = objectList.OfType<IAttribute>().SingleOrDefault();
+            Assert.That(attribute != null);
+            Assert.That(attribute.Value.String == "HEMOGLOBIN");
 
-            result = xpathContext.Evaluate(attributeList[0], "string(following-sibling::Component[1]/text()[1])");
+            result = xpathContext.Evaluate(attribute, "string(following-sibling::Component[1]/text()[1])");
 
             Assert.IsInstanceOf<string>(result);
             Assert.That((string)result == "HEMATOCRIT");
