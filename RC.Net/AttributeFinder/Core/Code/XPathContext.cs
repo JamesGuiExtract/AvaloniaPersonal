@@ -550,9 +550,6 @@ namespace Extract.AttributeFinder
                         _nodeToAttributeMap.TryGetValue(currentNode.GetNode(), out attribute);
                     }
 
-                    // While the intent is the objectList can contain a mix of both IAttributes and
-                    // native types if that's what the XPath query selects, it seems that in such
-                    // cases XPathNavigator.Evaluate only returns the nodes (attributes).
                     objectList.Add(attribute ?? value);
                 }
 

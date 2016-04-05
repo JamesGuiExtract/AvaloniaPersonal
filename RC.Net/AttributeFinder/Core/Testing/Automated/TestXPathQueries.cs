@@ -219,6 +219,23 @@ namespace Extract.AttributeFinder.Test
             }
         }
 
+        [Test, Category("XPath")]
+        public static void Test11_MixedResultTypes()
+        {
+            var xpathContext = GetXPathContext();
+            var result = xpathContext.Evaluate("/*/PatientInfo|/*/PatientInfo/Name/*/text()|/*/Test");
+
+            var objectList = result as List<object>;
+            Assert.That(objectList != null);
+            Assert.That(objectList.Count == 6);
+            Assert.IsInstanceOf<IAttribute>(objectList[0]);
+            Assert.IsInstanceOf<string>(objectList[1]);
+            Assert.IsInstanceOf<string>(objectList[2]);
+            Assert.IsInstanceOf<IAttribute>(objectList[3]);
+            Assert.IsInstanceOf<IAttribute>(objectList[4]);
+            Assert.IsInstanceOf<IAttribute>(objectList[5]);
+        }
+
         #endregion Tests
 
         #region Helper Functions
