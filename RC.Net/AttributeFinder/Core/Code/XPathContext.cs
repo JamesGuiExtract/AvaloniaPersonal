@@ -528,12 +528,12 @@ namespace Extract.AttributeFinder
                     IAttribute attribute = null;
                     if (_nodeToAttributeMap.TryGetValue(node.GetNode(), out attribute))
                     {
-                        yield return attribute;
+                        return attribute;
                     }
                 }
 
                 // Otherwise just return the raw result
-                yield return result;
+                return result;
             }
             else
             {
@@ -553,14 +553,11 @@ namespace Extract.AttributeFinder
                     // While the intent is the objectList can contain a mix of both IAttributes and
                     // native types if that's what the XPath query selects, it seems that in such
                     // cases XPathNavigator.Evaluate only returns the nodes (attributes).
-                    yield return attribute ?? value;
-                    //objectList.Add(attribute ?? value);
+                    objectList.Add(attribute ?? value);
                 }
 
-                //return objectList;
+                return objectList;
             }
-
-            yield return null;
         }
 
         #endregion Private Members
