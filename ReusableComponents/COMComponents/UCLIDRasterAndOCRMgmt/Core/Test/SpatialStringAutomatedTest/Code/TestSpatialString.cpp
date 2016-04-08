@@ -1,4 +1,4 @@
-/ TestSpatialString.cpp : Implementation of CTestSpatialString
+// TestSpatialString.cpp : Implementation of CTestSpatialString
 #include "stdafx.h"
 #include "SpatialStringAutomatedTest.h"
 #include "TestSpatialString.h"

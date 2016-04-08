@@ -1695,6 +1695,15 @@ void CRuleSetEditor::OnDoubleClickOutputHandler()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16041")
 }
 //-------------------------------------------------------------------------------------------------
+void CRuleSetEditor::OnDoubleClickRunMode()
+{
+	try
+	{
+		OnBtnSelectRunMode();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39502")
+}
+//-------------------------------------------------------------------------------------------------
 int CRuleSetEditor::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -2076,3 +2085,25 @@ void CRuleSetEditor::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37588");
 }
 //--------------------------------------------------------------------------------------------------
+void CRuleSetEditor::OnBtnSelectRunMode()
+{
+	try
+	{
+		// Create instance of the run mode configure form using the Prog ID - to avoid circular dependency
+		UCLID_AFCORELib::IRunModeConfigurePtr ipConfigure;
+		ipConfigure.CreateInstance("Extract.AttributeFinder.Forms.ConfigureRunModeForm");
+		ASSERT_RESOURCE_ALLOCATION("ELI39399", ipConfigure != __nullptr);
+		
+		// Get the RunMode interface pointer of the ruleset
+		UCLID_AFCORELib::IRunModePtr ipRunMode(m_ipRuleSet);
+		ASSERT_RESOURCE_ALLOCATION("ELI39463", ipRunMode != __nullptr);
+
+		// Configure the run mode
+		ipConfigure->ConfigureRunMode(ipRunMode, (long)this->m_hWnd);
+
+		// Update the Run mode text box
+		updateRunModeTextBox();
+		UpdateData(FALSE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39398");
+}

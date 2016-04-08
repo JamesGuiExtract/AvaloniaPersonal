@@ -53,6 +53,18 @@ library UCLID_AFCORELib
 		kRuleTesterHelpAbout = 3
 	} EHelpAboutType;
 
+	typedef
+	[
+		uuid(699A3C70-B2AE-4F69-AADA-EC01CAD77A55),
+		helpstring("Extract ERuleSetRunMode")
+	]
+	enum ERuleSetRunMode
+	{
+		kPassInputVOAToOutput = 0,
+		kRunPerDocument = 1,
+		kRunPerPage = 2
+	} ERuleSetRunMode;
+			
 	//////////////
 	// Interfaces
 	//////////////
@@ -454,6 +466,47 @@ library UCLID_AFCORELib
 
 	[
 		object,
+		uuid(DA7F55A0-F810-4805-A0D4-791933CDB54E),
+		dual,
+		helpstring("IRunMode Interface"),
+		pointer_default(unique)
+	]
+	interface IRunMode : IDispatch
+	{
+		[propget, id(1), helpstring("property RunMode")] HRESULT RunMode([out, retval] ERuleSetRunMode *pRunMode);
+		[propput, id(1), helpstring("property RunMode")] HRESULT RunMode([in] ERuleSetRunMode runMode);
+		[propget, id(2), helpstring("property InsertAttributesUnderParent")] HRESULT InsertAttributesUnderParent(
+			[out, retval] VARIANT_BOOL *pbInsertAttributesUnderParent);
+		[propput, id(2), helpstring("property InsertAttributesUnderParent")] HRESULT InsertAttributesUnderParent(
+			[in]  VARIANT_BOOL bInsertAttributesUnderParent);
+		[propget, id(3), helpstring("property InsertParentName")] HRESULT InsertParentName(
+			[out, retval] BSTR *pbstrInsertParentName);
+		[propput, id(3), helpstring("property InsertParentName")] HRESULT InsertParentName(
+			[in] BSTR bstrInsertParentName);
+		[propget, id(4), helpstring("property InsertParentValue")] HRESULT InsertParentValue(
+			[out, retval] BSTR *pbstrInsertParentValue);
+		[propput, id(4), helpstring("property InsertParentValue")] HRESULT InsertParentValue(
+			[in] BSTR bstrInsertParentValue);
+		[propget, id(5), helpstring("property DeepCopyInput")] HRESULT DeepCopyInput(
+			[out, retval] VARIANT_BOOL *pbDeepCopyInput);
+		[propput, id(5), helpstring("property DeepCopyInput")] HRESULT DeepCopyInput(
+			[in]  VARIANT_BOOL bDeepCopyInput);	
+	}
+
+	[
+		object,
+		uuid(28A2F3D4-5F34-493C-A62E-332F26FD4A56),
+		dual,
+		helpstring("IRunModeConfigure Interface"),
+		pointer_default(unique)
+	]
+	interface IRunModeConfigure : IDispatch
+	{
+		[id(1), helpstring("method ConfigureRunMode")] HRESULT ConfigureRunMode([in] IRunMode *pRunMode, long nHandle);
+	}
+
+	[
+		object,
 		uuid(28A2337C-2F24-4F0B-ADBC-95FE5E51AB59),
 		dual,
 		helpstring("IOutputHandler Interface"),
@@ -755,6 +808,7 @@ library UCLID_AFCORELib
 	{
 		[default] interface IRuleSet;
 		interface IRuleSetUI;
+		interface IRunMode;
 		interface ILicensedComponent;
 		interface ICopyableObject;
 	};

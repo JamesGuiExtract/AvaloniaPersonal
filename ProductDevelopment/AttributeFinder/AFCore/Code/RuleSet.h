@@ -28,6 +28,7 @@ class ATL_NO_VTABLE CRuleSet :
 	public IDispatchImpl<IRuleSetUI, &IID_IRuleSetUI, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IIdentifiableObject, &IID_IIdentifiableObject, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<IRunMode, &IID_IRunMode, &LIBID_UCLID_AFCORELib>,
 	public CIdentifiableObject
 {
 public:
@@ -47,6 +48,7 @@ BEGIN_COM_MAP(CRuleSet)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IIdentifiableObject)
+	COM_INTERFACE_ENTRY(IRunMode)
 END_COM_MAP()
 
 public:
@@ -101,6 +103,18 @@ public:
 	STDMETHOD(get_CustomCounters)(IIUnknownVector **pVal);
 	STDMETHOD(put_CustomCounters)(IIUnknownVector *pNewVal);
 	STDMETHOD(FlushCounters)();
+
+	// IRunMode
+	STDMETHOD(get_RunMode)(ERuleSetRunMode *pRunMode);
+	STDMETHOD(put_RunMode)(ERuleSetRunMode runMode);
+	STDMETHOD(get_InsertAttributesUnderParent)(VARIANT_BOOL *pbInsertAttributesUnderParent);
+	STDMETHOD(put_InsertAttributesUnderParent)(VARIANT_BOOL bInsertAttributesUnderParent);
+	STDMETHOD(get_InsertParentName)(BSTR* pInsertParentName);
+	STDMETHOD(put_InsertParentName)(BSTR InsertParentName);
+	STDMETHOD(get_InsertParentValue)(BSTR* pInsertParentValue);
+	STDMETHOD(put_InsertParentValue)(BSTR InsertParentValue);
+	STDMETHOD(get_DeepCopyInput)(VARIANT_BOOL *pbDeepCopyInput);
+	STDMETHOD(put_DeepCopyInput)(VARIANT_BOOL bDeepCopyInput);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -212,7 +226,22 @@ private:
 	// Keep track of the number of Rulesets in existence. Before the last closes, flush any
 	// accumulated counts.
 	static int ms_referenceCount;
+	
+	// RuleSet run mode
+	ERuleSetRunMode m_eRuleSetRunMode;
 
+	// Flag to indicate if attributes should be put under a parent node
+	bool m_bInsertAttributesUnderParent;
+	
+	// Name of the parent node to put the attributes under if m_bInsertAttributesUnderParent is true
+	string m_strInsertParentName;
+
+	// Value for the parent node if m_bInsertAttributesUnderParent is true
+	string m_strInsertParentValue;
+
+	// Flag to indicate that the attributes should be cloned when m_eRuleSetRunMode == kPassInputVOAToOutput
+	bool m_bDeepCopyInput;
+	
 	/////////////////
 	// Helper functions
 	/////////////////
@@ -284,4 +313,20 @@ private:
 	// 2) At least one counter is enabled
 	// 3) This is an internal ruleset
 	bool isLicensedToSave();
+
+	// Creates an attribute with the given strName, value of ipValue and subattributes ipAttributes
+	UCLID_AFCORELib::IAttributePtr createParentAttribute(string strName, ISpatialStringPtr ipValue, 
+		IIUnknownVectorPtr ipAttributes);
+
+	// Returns a IIUnknownVector of AFDocuments to process 
+	// if the Run mode is kPassInputVOAToOutput returns an empty vector
+	IIUnknownVectorPtr setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc);
+
+	// if the run mode is kPassInputVOAToOutput will return attributes from AFDoc that
+	// is passed in modified based on the run mode flags
+	// otherwise will return an empty vector
+	IIUnknownVectorPtr passVOAToOutput(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc);
+	
+	// Create parent value using the attributes on the AFDocument and the settings
+	ISpatialStringPtr createParentValueFromAFDocAttributes(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, string pageString);
 };

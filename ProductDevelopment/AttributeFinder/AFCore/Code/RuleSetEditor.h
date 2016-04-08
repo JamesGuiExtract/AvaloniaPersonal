@@ -71,6 +71,7 @@ public:
 	CRuleGrid m_listRules;
 	CButton	m_btnDelAttr;
 	CButton	m_btnRenAttr;
+	CButton m_btnSelectMode;
 	CComboBox	m_comboAttr;
 	BOOL	m_bStopWhenValueFound;
 	BOOL	m_bDocumentPP;
@@ -84,6 +85,7 @@ public:
 	CString	m_zIVDescription;
 	CString	m_zAttributeSplitterDescription;
 	CString	m_zOutputHandlerDescription;
+	CString m_zRuleSetMode;
 	//}}AFX_DATA
 
 
@@ -163,7 +165,9 @@ protected:
 	afx_msg void OnDoubleClickInputValidator();
 	afx_msg void OnDoubleClickAttributeSplitter();
 	afx_msg void OnDoubleClickOutputHandler();
+	afx_msg void OnDoubleClickRunMode();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
+	afx_msg void OnBtnSelectRunMode();
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -320,4 +324,7 @@ private:
 	void validateRuleSetCanBeSaved();
 
 	void doResize();
+
+	// Update the RunMode text box based on the run mode settings
+	void updateRunModeTextBox();
 };

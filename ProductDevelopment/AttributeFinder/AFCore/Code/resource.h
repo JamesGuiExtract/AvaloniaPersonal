@@ -120,6 +120,7 @@
 #define IDC_BTN_SELECTPP                284
 #define IDI_ICON_RULE_TESTER            285
 #define IDC_EDIT_OUTPUTHANDLER          285
+#define IDC_EDIT_MODE                   285
 #define IDC_EDIT_PRD_VERSION            286
 #define IDC_STATIC_PP                   287
 #define IDC_STATIC_ATTR                 288
@@ -194,6 +195,8 @@
 #define IDC_EDIT_ID                     370
 #define IDC_STATIC_USE_OH               371
 #define IDC_BTN_SELECT_OH               372
+#define IDC_BUTTON_MODE_SELECT          373
+#define IDC_STATIC_RUN_MODE             374
 #define ID_EDIT_DELETE                  6023
 #define ID_FILE_SAVEAS                  32768
 #define ID_FILE_EXIT                    32769
@@ -236,7 +239,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        371
 #define _APS_NEXT_COMMAND_VALUE         32800
-#define _APS_NEXT_CONTROL_VALUE         373
+#define _APS_NEXT_CONTROL_VALUE         375
 #define _APS_NEXT_SYMED_VALUE           134
 #endif
 #endif

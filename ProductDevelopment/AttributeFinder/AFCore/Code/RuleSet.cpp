@@ -20,7 +20,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 15;
+const unsigned long gnCurrentVersion = 16;
 // Version 3:
 //   Added Output Handler persistence
 // Version 7:
@@ -37,6 +37,7 @@ const unsigned long gnCurrentVersion = 15;
 // Version 13: Added Comments
 // Version 14: Added m_bUsePagesIndexingCounter and m_ipCustomCounters
 // Version 15: Removed m_strKeySerialNumbers
+// Version 16: Added RunMode properties
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
@@ -56,6 +57,9 @@ unique_ptr<SafeNetLicenseMgr> CRuleSet::m_apSafeNetMgr(__nullptr);
 
 int CRuleSet::ms_referenceCount = 0;
 
+const string gstrPAGE_CONTENT_TAG = "<PageContent>";
+const string gstrPAGE_NUMBER_TAG = "<PageNumber>";
+
 //-------------------------------------------------------------------------------------------------
 // CRuleSet
 //-------------------------------------------------------------------------------------------------
@@ -74,7 +78,12 @@ m_bSwipingRule(false),
 m_strFKBVersion(""),
 m_bIgnorePreprocessorErrors(false),
 m_bIgnoreOutputHandlerErrors(false),
-m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current version number
+m_nVersionNumber(gnCurrentVersion), // by default, all rulesets are the current version number
+m_eRuleSetRunMode(kRunPerDocument),
+m_bInsertAttributesUnderParent(false),
+m_strInsertParentName(""),
+m_strInsertParentValue(""),
+m_bDeepCopyInput(false)
 {
 	try
 	{
@@ -155,6 +164,7 @@ STDMETHODIMP CRuleSet::InterfaceSupportsErrorInfo(REFIID riid)
 	{
 		&IID_IRuleSet,
 		&IID_IRuleSetUI,
+		&IID_IRunMode,
 		&IID_ILicensedComponent,
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
@@ -313,6 +323,16 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					throw UCLIDException("ELI04375", "Unable to retrieve names of attributes from ruleset.");
 				}
 
+				// Create an AFDocument and pass it along to the attribute rule info
+				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
+				ASSERT_ARGUMENT("ELI05874", ipAFDoc != __nullptr);
+
+				IIUnknownVectorPtr ipAFDocsToRun = setupRunMode(ipAFDoc);
+				ASSERT_RESOURCE_ALLOCATION("ELI39437", ipAFDocsToRun != __nullptr);
+
+				// Get the number of AFDocs that will need to run rules on
+				int nAFDocs = ipAFDocsToRun->Size();
+
 				// Determine the total number of attributes for which rules will need to be run
 				// The number of attributes need to be known now so that we can do a good job
 				// of providing progress information.
@@ -335,7 +355,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				const long nNUM_PROGRESS_ITEMS_ATTRIBUTES = nNumAttributesToRunRulesFor * nNUM_PROGRESS_ITEMS_PER_ATTRIBUTE;
 				const long nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER = 1;
 				long nTOTAL_PROGRESS_ITEMS = nNUM_PROGRESS_ITEMS_INITIALIZE + // initializing is always going to happen
-					nNUM_PROGRESS_ITEMS_ATTRIBUTES; // attribute rules are always going to be run
+					nNUM_PROGRESS_ITEMS_ATTRIBUTES * nAFDocs;
 				nTOTAL_PROGRESS_ITEMS += bEnabledDocumentPreprocessorExists ? nNUM_PROGRESS_ITEMS_PRE_PROCESSOR : 0;
 				nTOTAL_PROGRESS_ITEMS += bEnabledOutputHandlerExists ? nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER : 0;
 
@@ -393,9 +413,9 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					ipSession->SetFKBVersion("");
 				}
 
-				// Create an AFDocument and pass it along to the attribute rule info
-				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
-				ASSERT_ARGUMENT("ELI05874", ipAFDoc != __nullptr);
+				// Create a vector to keep all the attribute search results to return to caller later
+				IIUnknownVectorPtr ipFoundAttributes(CLSID_IUnknownVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI04374", ipFoundAttributes != __nullptr);
 
 				// https://extract.atlassian.net/browse/ISSUE-12265
 				// Ensure the dimensions (in pixels) of each page as reported by the OCR engine
@@ -411,6 +431,12 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 				// If any counters are set decrement them here
 				decrementCounters(ipAFDoc);
+
+				// If RunMode is kPassInputVOAToOutput then set the input attributes to the found attributes
+				if (m_eRuleSetRunMode == kPassInputVOAToOutput)
+				{
+					ipFoundAttributes = passVOAToOutput(ipAFDoc);
+				}
 
 				// Try/catch for preprocessors
 				try
@@ -457,69 +483,84 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 						throw ue;
 					}
 				}
-
-				// Create a vector to keep all the attribute search results to return to caller later
-				IIUnknownVectorPtr ipFoundAttributes(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI04374", ipFoundAttributes != __nullptr);
-
-				// Iterate through all the attributes and execute their associated rules
-				int iNumAttributeNames = ipAttributeNames->Size;
-				for (int i = 0; i < iNumAttributeNames; i++)
+				
+				for (int doc = 0; doc < nAFDocs; doc++)
 				{
-					// get the attribute find info associated with the current attribute
-					_bstr_t _bstrAttributeName = ipAttributeNames->GetItem(i);
-
-					// Before continuing, make sure that either all the attributes were
-					// requested to be processed, or that the current attribute is one 
-					// among the list of attributes requested to be processed.
-					if (pvecAttributeNames != __nullptr && 
-						pvecAttributeNames->Contains(_bstrAttributeName) == VARIANT_FALSE)
+					UCLID_AFCORELib::IAFDocumentPtr ipCurrAFDoc = ipAFDocsToRun->At(doc);					
+					
+					IIUnknownVectorPtr ipFoundOnCurrent(CLSID_IUnknownVector);
+					ASSERT_RESOURCE_ALLOCATION("ELI39441", ipFoundOnCurrent != __nullptr);
+		
+					// Iterate through all the attributes and execute their associated rules
+					int iNumAttributeNames = ipAttributeNames->Size;
+					for (int i = 0; i < iNumAttributeNames; i++)
 					{
-						// skip processing this attribute
-						continue;
-					}
+						// get the attribute find info associated with the current attribute
+						_bstr_t _bstrAttributeName = ipAttributeNames->GetItem(i);
 
-					// Update Progress Status
-					if (ipProgressStatus)
+						// Before continuing, make sure that either all the attributes were
+						// requested to be processed, or that the current attribute is one 
+						// among the list of attributes requested to be processed.
+						if (pvecAttributeNames != __nullptr && 
+							pvecAttributeNames->Contains(_bstrAttributeName) == VARIANT_FALSE)
+						{
+							// skip processing this attribute
+							continue;
+						}
+
+						// Update Progress Status
+						if (ipProgressStatus)
+						{
+							string strStatusText = "Executing rules for field " + asString(_bstrAttributeName) + string("...");
+							ipProgressStatus->StartNextItemGroup(strStatusText.c_str(), nNUM_PROGRESS_ITEMS_PER_ATTRIBUTE);
+						}
+
+						// get the attribute finding information for the current attribute
+						UCLID_AFCORELib::IAttributeFindInfoPtr ipAttributeFindInfo = 
+							m_ipAttributeNameToInfoMap->GetValue(_bstrAttributeName);
+						if (ipAttributeFindInfo == __nullptr)
+						{
+							UCLIDException ue("ELI04376", "Unable to retrieve attribute rules info.");
+							string stdstrAttribute = _bstrAttributeName;
+							ue.addDebugInfo("Attribute", stdstrAttribute);
+							throw ue;
+						}
+
+						// Create a pointer to the Sub-ProgressStatus object, depending upon whether
+						// the caller requested progress information
+						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+							__nullptr : ipProgressStatus->SubProgressStatus;
+
+						PROFILE_RULE_OBJECT(asString(_bstrAttributeName), "Attribute finder block",
+							ipAttributeFindInfo, 0)
+
+						// find all attributes values for the current attribute
+						IIUnknownVectorPtr ipAttributes = 
+							ipAttributeFindInfo->ExecuteRulesOnText(ipCurrAFDoc, ipSubProgressStatus);
+
+						// for each attribute that was found, update the "name" part of the
+						// attribute object to be the name of the current attribute
+						long nNumAttributes = ipAttributes->Size();
+						for (int j = 0; j < nNumAttributes; j++)
+						{
+							UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(j);
+							ipAttribute->Name = _bstrAttributeName;
+						}
+
+						// append results to the result vector of found attributes.
+						ipFoundOnCurrent->Append(ipAttributes);
+					}
+					if (m_bInsertAttributesUnderParent)
 					{
-						string strStatusText = "Executing rules for field " + asString(_bstrAttributeName) + string("...");
-						ipProgressStatus->StartNextItemGroup(strStatusText.c_str(), nNUM_PROGRESS_ITEMS_PER_ATTRIBUTE);
-					}
+						ISpatialStringPtr ipValue(CLSID_SpatialString);
+						ipValue =  createParentValueFromAFDocAttributes(ipCurrAFDoc, asString(doc+1));
 
-					// get the attribute finding information for the current attribute
-					UCLID_AFCORELib::IAttributeFindInfoPtr ipAttributeFindInfo = 
-						m_ipAttributeNameToInfoMap->GetValue(_bstrAttributeName);
-					if (ipAttributeFindInfo == __nullptr)
+						ipFoundAttributes->PushBack(createParentAttribute(m_strInsertParentName, ipValue, ipFoundOnCurrent));
+					}
+					else
 					{
-						UCLIDException ue("ELI04376", "Unable to retrieve attribute rules info.");
-						string stdstrAttribute = _bstrAttributeName;
-						ue.addDebugInfo("Attribute", stdstrAttribute);
-						throw ue;
+						ipFoundAttributes->Append(ipFoundOnCurrent);
 					}
-
-					// Create a pointer to the Sub-ProgressStatus object, depending upon whether
-					// the caller requested progress information
-					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
-						__nullptr : ipProgressStatus->SubProgressStatus;
-
-					PROFILE_RULE_OBJECT(asString(_bstrAttributeName), "Attribute finder block",
-						ipAttributeFindInfo, 0)
-
-					// find all attributes values for the current attribute
-					IIUnknownVectorPtr ipAttributes = 
-						ipAttributeFindInfo->ExecuteRulesOnText(ipAFDoc, ipSubProgressStatus);
-
-					// for each attribute that was found, update the "name" part of the
-					// attribute object to be the name of the current attribute
-					long nNumAttributes = ipAttributes->Size();
-					for (int j = 0; j < nNumAttributes; j++)
-					{
-						UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(j);
-						ipAttribute->Name = _bstrAttributeName;
-					}
-
-					// append results to the result vector of found attributes.
-					ipFoundAttributes->Append(ipAttributes);
 				}
 
 				// Try/catch for output handlers
@@ -1302,6 +1343,184 @@ STDMETHODIMP CRuleSet::FlushCounters()
 }
 
 //-------------------------------------------------------------------------------------------------
+// IRunMode
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_RunMode(ERuleSetRunMode *pRunMode)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		*pRunMode = m_eRuleSetRunMode;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39386")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_RunMode(ERuleSetRunMode runMode)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		if (m_eRuleSetRunMode != runMode)
+		{
+			m_eRuleSetRunMode = runMode;
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39387")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_InsertAttributesUnderParent(VARIANT_BOOL *pbInsertAttributesUnderParent)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		*pbInsertAttributesUnderParent = asVariantBool(m_bInsertAttributesUnderParent);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39388")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_InsertAttributesUnderParent(VARIANT_BOOL bInsertAttributesUnderParent)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		bool newValue = asCppBool(bInsertAttributesUnderParent);
+		
+		if (m_bInsertAttributesUnderParent != newValue)
+		{
+			m_bInsertAttributesUnderParent = newValue;
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39389")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_InsertParentName(BSTR* pInsertParentName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		*pInsertParentName = _bstr_t(m_strInsertParentName.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39390")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_InsertParentName(BSTR InsertParentName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		string newValue = asString(InsertParentName);
+		if (newValue != m_strInsertParentName)
+		{
+			m_strInsertParentName = newValue;
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39391")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_InsertParentValue(BSTR* pInsertParentValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		*pInsertParentValue = _bstr_t(m_strInsertParentValue.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39392")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_InsertParentValue(BSTR InsertParentValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		string newValue = asString(InsertParentValue);
+		if (m_strInsertParentValue != newValue)
+		{
+			m_strInsertParentValue = newValue;
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39393")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_DeepCopyInput(VARIANT_BOOL *pbDeepCopyInput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		*pbDeepCopyInput = asVariantBool(m_bDeepCopyInput);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39394")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_DeepCopyInput(VARIANT_BOOL bDeepCopyInput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		bool newValue = asCppBool(bDeepCopyInput);
+		if (m_bDeepCopyInput != newValue)
+		{
+			m_bDeepCopyInput = newValue;
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39395")
+}
+
+//-------------------------------------------------------------------------------------------------
 // IPersistStream
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::GetClassID(CLSID *pClassID)
@@ -1407,6 +1626,12 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 
 		// whether or not this is a version 2 and beyond
 		bool bVersion2AndBeyond = false;
+
+		m_eRuleSetRunMode = kRunPerDocument;
+		m_bInsertAttributesUnderParent = false;
+		m_strInsertParentName = "";
+		m_strInsertParentValue = "";
+		m_bDeepCopyInput = false;
 
 		// read signature from stream and ensure that it is correct
 		CComBSTR bstrSignature;
@@ -1514,6 +1739,21 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			{
 				dataReader >> m_bUsePagesIndexingCounter;
 				dataReader >> bHasCustomCounters;
+			}
+
+			if (m_nVersionNumber >= 16)
+			{
+				long lRuleSetRunMode;
+				dataReader >> lRuleSetRunMode;
+				m_eRuleSetRunMode = (ERuleSetRunMode) lRuleSetRunMode;
+		
+				dataReader >> m_bInsertAttributesUnderParent;
+		
+				dataReader >> m_strInsertParentName;
+		
+				dataReader >> m_strInsertParentValue;
+		
+				dataReader >> m_bDeepCopyInput;
 			}
 		}
 
@@ -1650,6 +1890,17 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		
 		bool bHasCustomCounters = (m_ipCustomCounters != nullptr && m_ipCustomCounters->Size() > 0);
 		dataWriter << bHasCustomCounters;
+
+		long lRuleSetRunMode = (int) m_eRuleSetRunMode;
+		dataWriter << lRuleSetRunMode;
+
+		dataWriter << m_bInsertAttributesUnderParent;
+
+		dataWriter << m_strInsertParentName;
+
+		dataWriter << m_strInsertParentValue;
+
+		dataWriter << m_bDeepCopyInput;
 
 		// flush bytes
 		dataWriter.flushToByteStream();
@@ -1836,6 +2087,11 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		m_bIgnoreOutputHandlerErrors = asCppBool(ipSource->IgnoreOutputHandlerErrors);
 
 		m_strComments = asString(ipSource->Comments);
+		UCLID_AFCORELib::IRunModePtr ipRunMode(ipSource);
+		m_eRuleSetRunMode = (ERuleSetRunMode)ipRunMode->RunMode;
+		m_bInsertAttributesUnderParent = asCppBool(ipRunMode->InsertAttributesUnderParent);
+		m_strInsertParentName = asString(ipRunMode->InsertParentName);
+		m_strInsertParentValue = asString(ipRunMode->InsertParentValue);
 
 		return S_OK;
 	}
@@ -2208,3 +2464,126 @@ bool CRuleSet::isLicensedToSave()
 	return isUsingCounter() || m_bRuleSetOnlyForInternalUse || isRdtLicensed();
 }
 //-------------------------------------------------------------------------------------------------
+UCLID_AFCORELib::IAttributePtr CRuleSet::createParentAttribute(string strName, ISpatialStringPtr ipValue, 
+		IIUnknownVectorPtr ipAttributes)
+{
+	UCLID_AFCORELib::IAttributePtr ipParent(CLSID_Attribute);
+	ASSERT_RESOURCE_ALLOCATION("ELI39438", ipParent != __nullptr);
+
+	ipParent->Name = strName.c_str();
+	ipParent->Value = ipValue;
+	ipParent->SubAttributes = ipAttributes;
+
+	return ipParent;
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
+{
+	IIUnknownVectorPtr ipAFDocsToRun(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI39437", ipAFDocsToRun != __nullptr);
+
+	IMiscUtilsPtr ipMiscUtils = getMiscUtils();
+	ITagUtilityPtr ipTagUtility = ipMiscUtils;
+
+	if (m_eRuleSetRunMode == kRunPerDocument)
+	{
+		ipAFDocsToRun->PushBack(ipAFDoc);
+	}
+	else if (m_eRuleSetRunMode == kRunPerPage)
+	{
+		ISpatialStringPtr ipDocText = ipAFDoc->Text;
+		IIUnknownVectorPtr ipPages =  ipDocText->GetPages();
+		int nPages = ipPages->Size();
+		for (int i = 0; i < nPages; i++)
+		{
+			UCLID_AFCORELib::IAFDocumentPtr ipPageDoc(CLSID_AFDocument);
+			ipPageDoc->StringTags = ipAFDoc->StringTags;
+			ipPageDoc->ObjectTags = ipAFDoc->ObjectTags;
+			ipPageDoc->Text = (ISpatialStringPtr) ipPages->At(i);
+			ipAFDocsToRun->PushBack(ipPageDoc);
+		}
+	}
+
+	return ipAFDocsToRun;
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CRuleSet::passVOAToOutput(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
+{
+	IIUnknownVectorPtr ipOutput(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI39467", ipOutput != __nullptr);	
+	
+	// if run mode is not kPassInputVOAToOutput return empty vector
+	if (m_eRuleSetRunMode != kPassInputVOAToOutput)
+	{
+		return ipOutput;
+	}
+
+	UCLID_AFCORELib::IAttributePtr ipAttribute(ipAFDoc->Attribute);
+
+	// The documents attribute is null
+	if (ipAttribute == __nullptr)
+	{
+		// return empty vector
+		return ipOutput;
+	}
+
+	// return the attributes under the configured parent
+	if (m_bInsertAttributesUnderParent)
+	{
+		ISpatialStringPtr ipValue(CLSID_SpatialString);
+
+		// Create the value from the AFDocAttributes
+		ipValue = createParentValueFromAFDocAttributes(ipAFDoc, "All");
+
+		IIUnknownVectorPtr ipSubAttributes;
+						 
+		if (m_bDeepCopyInput)
+		{
+			ipSubAttributes = ipAttribute->SubAttributes->Clone();
+		}
+		else
+		{
+			ipSubAttributes = ipAttribute->SubAttributes;
+		}
+		ipOutput->PushBack(
+			createParentAttribute(m_strInsertParentName, ipValue, ipSubAttributes));
+	}
+	else
+	{
+		if (m_bDeepCopyInput)
+		{
+			ipOutput = ipAttribute->SubAttributes->Clone();
+		}
+		else
+		{
+			ipOutput = ipAttribute->SubAttributes;
+		}
+	}
+	return ipOutput;
+}
+//-------------------------------------------------------------------------------------------------
+ISpatialStringPtr CRuleSet::createParentValueFromAFDocAttributes(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, string pageString)
+{
+	ISpatialStringPtr ipValue(CLSID_SpatialString);
+	IMiscUtilsPtr ipMiscUtils = getMiscUtils();
+	ITagUtilityPtr ipTagUtility = ipMiscUtils;
+
+	ipMiscUtils->AddTag(gstrPAGE_NUMBER_TAG.c_str(), pageString.c_str());
+
+	// If the only tag is the page content tag clone the text of the document
+	if (m_strInsertParentValue == gstrPAGE_CONTENT_TAG)
+	{
+		// Clone the text of the document for the attribute
+		ICopyableObjectPtr ipClone(ipAFDoc->Text);
+		ipValue = ipClone->Clone();
+	}
+	else
+	{
+		// Add the text of the document non spatially
+		ipMiscUtils->AddTag(gstrPAGE_CONTENT_TAG.c_str(), ipAFDoc->Text->String);
+		ipValue->AppendString(ipMiscUtils->ExpandTagsAndFunctions(
+			m_strInsertParentValue.c_str(), ipTagUtility,	ipAFDoc->Text->SourceDocName,NULL));
+		ipValue->SourceDocName = ipAFDoc->Text->SourceDocName;
+	}
+	return ipValue;
+}

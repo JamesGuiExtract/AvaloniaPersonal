@@ -215,6 +215,7 @@ void CRuleSetEditor::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_DELRULE, m_btnDelRule);
 	DDX_Control(pDX, IDC_BTN_DELATTR, m_btnDelAttr);
 	DDX_Control(pDX, IDC_BTN_RENATTR, m_btnRenAttr);
+	DDX_Control(pDX, IDC_BUTTON_MODE_SELECT, m_btnSelectMode);
 	DDX_Control(pDX, IDC_COMBO_ATTRIBUTES, m_comboAttr);
 	DDX_Check(pDX, IDC_CHECK_STOP, m_bStopWhenValueFound);
 	DDX_Check(pDX, IDC_CHECK_DOCUMENT_PP, m_bDocumentPP);
@@ -228,6 +229,7 @@ void CRuleSetEditor::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_IV, m_zIVDescription);
 	DDX_Text(pDX, IDC_EDIT_ATTRIBUTE_SPLITTER, m_zAttributeSplitterDescription);
 	DDX_Text(pDX, IDC_EDIT_OH, m_zOutputHandlerDescription);
+	DDX_Text(pDX, IDC_EDIT_MODE, m_zRuleSetMode);
 	//}}AFX_DATA_MAP
 	DDX_Control(pDX, IDC_BTN_SELECT_ATTRIBUTE_SPLITTER, m_btnSelectAttributeSplitter);
 }
@@ -292,7 +294,9 @@ BEGIN_MESSAGE_MAP(CRuleSetEditor, CDialog)
 	ON_STN_DBLCLK(IDC_EDIT_ATTRIBUTE_SPLITTER, &CRuleSetEditor::OnDoubleClickAttributeSplitter)
 	ON_STN_DBLCLK(IDC_EDIT_IV, &CRuleSetEditor::OnDoubleClickInputValidator)
 	ON_STN_DBLCLK(IDC_EDIT_PREPROCESSOR, &CRuleSetEditor::OnDoubleClickDocumentPreprocessor)
+	ON_STN_DBLCLK(IDC_EDIT_MODE, &CRuleSetEditor::OnDoubleClickRunMode)
 	ON_WM_GETMINMAXINFO()
+	ON_BN_CLICKED(IDC_BUTTON_MODE_SELECT, &CRuleSetEditor::OnBtnSelectRunMode)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -384,6 +388,7 @@ void CRuleSetEditor::openFile(string strFileName)
 		m_strCurrentFileName = m_strLastFileOpened;
 		updateWindowCaption();
 		setStatusBarText();
+		updateRunModeTextBox();
 	}
 	catch (...)
 	{
@@ -504,6 +509,9 @@ void CRuleSetEditor::enableEditFeatures(bool bEnable)
 		vecRSDControlIDs.push_back(IDC_CHECK_IGNORE_OH_ERRORS);
 		vecRSDControlIDs.push_back(IDC_STATIC_CHECK_PP);
 		vecRSDControlIDs.push_back(IDC_STATIC_CHECK_IE);
+		vecRSDControlIDs.push_back(IDC_EDIT_MODE);
+		vecRSDControlIDs.push_back(IDC_BUTTON_MODE_SELECT);
+		vecRSDControlIDs.push_back(IDC_STATIC_RUN_MODE);
 	}
 	
 	// Show/Hide the controls that should only be shown in edit-mode
@@ -791,6 +799,8 @@ void CRuleSetEditor::refreshUIFromAttribute()
 		GetDlgItem( IDC_CHECK_IGNORE_AS_ERRORS )->EnableWindow( FALSE );
 		m_bIgnoreAttSplitterErrors = FALSE;
 	}
+
+	updateRunModeTextBox();
 
 	UpdateData(FALSE);
 
@@ -1417,6 +1427,7 @@ void CRuleSetEditor::doResize()
 	// Move/resize controls anchored top, left right
 	m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_EDIT_PREPROCESSOR), m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_COMBO_ATTRIBUTES), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopLeftRight(*GetDlgItem(IDC_EDIT_MODE), m_nDefaultW, m_nDefaultH, FALSE);
 
 	// Move controls anchored top and right
 	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_SELECTPP), m_nDefaultW, m_nDefaultH, FALSE);
@@ -1428,6 +1439,7 @@ void CRuleSetEditor::doResize()
 	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_CONRULE), m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_RULEUP), m_nDefaultW, m_nDefaultH, FALSE);
 	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BTN_RULEDOWN), m_nDefaultW, m_nDefaultH, FALSE);
+	m_wMgr.moveAnchoredTopRight(*GetDlgItem(IDC_BUTTON_MODE_SELECT), m_nDefaultW, m_nDefaultH, FALSE);
 
 	// Move controls anchored bottom and left
 	m_wMgr.moveAnchoredBottomLeft(*GetDlgItem(IDC_CHECK_STOP), m_nDefaultW, m_nDefaultH, FALSE);
@@ -1482,3 +1494,31 @@ void CRuleSetEditor::doResize()
 	UpdateWindow();
 }
 //-------------------------------------------------------------------------------------------------
+void CRuleSetEditor::updateRunModeTextBox()
+{
+	UCLID_AFCORELib::IRunModePtr ipRunMode(m_ipRuleSet);
+
+	string strParentString = "";
+	if (asCppBool(ipRunMode->InsertAttributesUnderParent))
+	{
+		strParentString = ", " + ipRunMode->InsertParentName + ", " + ipRunMode->InsertParentValue;
+	}
+
+	string strDeepCopy = "";
+	switch (ipRunMode->RunMode)
+	{
+	case kRunPerDocument:
+		m_zRuleSetMode = ("Run attribute rules on entire document" + strParentString).c_str();
+		break;
+	case kRunPerPage:
+		m_zRuleSetMode = ("Run attribute rules per page" + strParentString).c_str();
+		break;
+	case kPassInputVOAToOutput:
+		if (asCppBool(ipRunMode->DeepCopyInput))
+		{
+			strDeepCopy = ", deep copy";
+		}
+		m_zRuleSetMode = ("Pass input VOA to output" + strParentString + strDeepCopy).c_str();
+		break;
+	}
+}
