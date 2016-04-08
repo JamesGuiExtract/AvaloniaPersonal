@@ -633,6 +633,15 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 									ipSubProgressStatus, true);
 							}
 
+							// Output handlers may require an attribute name, so a temporary
+							// name is assigned here iff the name is empty. This is overwritten
+							// later, after ProcessOutput is called.
+							string name = asString(ipAttribute->Name);
+							if (name.empty())
+							{
+								ipAttribute->Name = _bstr_t("_temp");
+							}
+
 							// [P13 #4668]
 							// only add the resulting value to the return vector if it's not empty
 							ipAttrValue = ipAttribute->Value;

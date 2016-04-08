@@ -89,6 +89,22 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Sets the position of the error glyph. By default the glyph is outside the textbox 
+        /// on the right side. Move the error glyph to inside the text box on the right side.
+        /// </summary>
+        /// <param name="textBox">The textbox this extension method applies too (this)</param>
+        /// <param name="errorProvider">The error provider associated with the textbox</param>
+        /// <param name="alignment">The ErrorIconAlignment enum value to use for the control.</param>
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
+        static public void SetErrorGlyphPosition(this TextBoxBase textBox,
+                                                 ErrorProvider errorProvider,
+                                                 ErrorIconAlignment alignment)
+        {
+            errorProvider.SetIconPadding(textBox, ErrorGlyphOffset(errorProvider));
+            errorProvider.SetIconAlignment(textBox, alignment);
+        }
+
+        /// <summary>
         /// This method makes it easy to get the text value from a required-denoted text box.
         /// </summary>
         /// <param name="textBox">The textbox this extension method applies too (this)</param>
