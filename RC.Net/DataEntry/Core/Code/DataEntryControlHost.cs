@@ -1334,6 +1334,11 @@ namespace Extract.DataEntry
                     if (_imageViewer != null && _active)
                     {
                         UnregisterForEvents();
+
+                        if (_attributes != null)
+                        {
+                            ClearHighlights();
+                        }
                     }
 
                     // Store the new image viewer internally
@@ -1345,10 +1350,24 @@ namespace Extract.DataEntry
                         if (_active)
                         {
                             RegisterForEvents();
+
+                            if (_attributes != null)
+                            {
+                                CreateAllAttributeHighlights(_attributes, null);
+                            }
                         }
 
                         _imageViewer.DefaultHighlightColor = _defaultHighlightColor;
                         _imageViewer.AllowBandedSelection = false;
+                        _changingData = false;
+                    }
+                    else
+                    {
+                        // In the case that the image viewer is being set to null, we may not be
+                        // switching documents, but it may be activating a pagination tab. In this
+                        // case, image viewer events and processing should be prevented just as they
+                        // are when switching documents.
+                        _changingData = true;
                     }
                 }
                 catch (Exception e)
@@ -2581,7 +2600,7 @@ namespace Extract.DataEntry
                 // Since the data associated with the currently selected control has been cleared,
                 // set _activeDataControl to null so that the next control focus change is processed
                 // re-initializes the current selection even if the same control is still selected.
-                if (_activeDataControl != null)
+                if (_activeDataControl != null && _imageViewer != null)
                 {
                     _activeDataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
                     _activeDataControl = null;
@@ -8014,6 +8033,56 @@ namespace Extract.DataEntry
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Removes all highlights that have been added to the <see cref="ImageViewer"/> in
+        /// conjunction with the data currently being verified.
+        /// </summary>
+        void ClearHighlights()
+        {
+            List<IAttribute> tooltipAttributes = new List<IAttribute>(_attributeToolTips.Keys);
+            foreach (IAttribute attribute in tooltipAttributes)
+            {
+                RemoveAttributeToolTip(attribute);
+            }
+
+            List<IAttribute> errorIconAttributes = new List<IAttribute>(_attributeErrorIcons.Keys);
+            foreach (IAttribute attribute in errorIconAttributes)
+            {
+                RemoveAttributeErrorIcon(attribute);
+            }
+
+            foreach (CompositeHighlightLayerObject highlight in _highlightAttributes.Keys)
+            {
+                if (_imageViewer.LayerObjects.Contains(highlight))
+                {
+                    _imageViewer.LayerObjects.Remove(highlight, true, false);
+                }
+                else
+                {
+                    highlight.Dispose();
+                }
+            }
+
+            if (_hoverToolTip != null)
+            {
+                _hoverToolTip.Dispose();
+                _hoverToolTip = null;
+            }
+
+            if (_userNotificationTooltip != null)
+            {
+                _userNotificationTooltip.Dispose();
+                _userNotificationTooltip = null;
+            }
+
+            _highlightAttributes.Clear();
+            _displayedAttributeHighlights.Clear();
+            _attributeHighlights.Clear();
+            _controlSelectionState.Clear();
+            _controlToolTipAttributes.Clear();
+            _hoverAttribute = null;
         }
 
         #endregion Private Members

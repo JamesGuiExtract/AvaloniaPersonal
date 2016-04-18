@@ -457,11 +457,12 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-bool FPRecordManager::checkoutForProcessing(long nFileId, EActionStatus *peaPreviousStatus)
+bool FPRecordManager::checkoutForProcessing(long nFileId, bool bAllowQueuedStatusOverride,
+											EActionStatus *peaPreviousStatus)
 {
 	ASSERT_ARGUMENT("ELI37489", peaPreviousStatus != __nullptr);
 
-	return loadTaskFromDB(nFileId, peaPreviousStatus);
+	return loadTaskFromDB(nFileId, bAllowQueuedStatusOverride, peaPreviousStatus);
 }
 //-------------------------------------------------------------------------------------------------
 bool FPRecordManager::moveToFrontOfQueue(long nFileId)
@@ -922,21 +923,24 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 				{
 					_lastCodePos = "210";
 					// Notify the DB that the file was processed
-					m_ipFPMDB->NotifyFileProcessed(nTaskID, m_strAction.c_str());
+					m_ipFPMDB->NotifyFileProcessed(nTaskID, m_strAction.c_str(),
+						task.getAllowedQueuedStatusOverride());
 					m_nNumberOfFilesProcessedSuccessfully++;
 				}
 				else if ( eNewStatus == kRecordFailed )
 				{
 					_lastCodePos = "220";
 					// Notify the DB that the file failed to process
-					m_ipFPMDB->NotifyFileFailed(nTaskID, m_strAction.c_str(), task.m_strException.c_str());
+					m_ipFPMDB->NotifyFileFailed(nTaskID, m_strAction.c_str(), task.m_strException.c_str(),
+						task.getAllowedQueuedStatusOverride());
 
 					m_nNumberOfFilesFailed++;
 				}
 				else if ( eNewStatus == kRecordSkipped )
 				{
 					_lastCodePos = "225";
-					m_ipFPMDB->NotifyFileSkipped(nTaskID, m_nActionID);
+					m_ipFPMDB->NotifyFileSkipped(nTaskID, m_nActionID,
+						task.getAllowedQueuedStatusOverride());
 					m_nNumberOfFilesProcessedSuccessfully++;
 				}
 
@@ -1097,7 +1101,8 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 	return nNumFilesAddedToQ;
 }
 //-------------------------------------------------------------------------------------------------
-bool FPRecordManager::loadTaskFromDB(long nFileId, EActionStatus *peaPreviousStatus)
+bool FPRecordManager::loadTaskFromDB(long nFileId, bool bAllowQueuedStatusOverride,
+									 EActionStatus *peaPreviousStatus)
 {
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipRecord = m_ipFPMDB->GetFileToProcess(nFileId,
 		m_strAction.c_str());
@@ -1105,7 +1110,7 @@ bool FPRecordManager::loadTaskFromDB(long nFileId, EActionStatus *peaPreviousSta
 	if (ipRecord != __nullptr)
 	{
 		// Create task with File ID and name
-		FileProcessingRecord fpTask( ipRecord );
+		FileProcessingRecord fpTask(ipRecord, "", bAllowQueuedStatusOverride);
 
 		// Initially, FallbackStatus will be the same as the status before lock.
 		*peaPreviousStatus = (EActionStatus)ipRecord->FallbackStatus;

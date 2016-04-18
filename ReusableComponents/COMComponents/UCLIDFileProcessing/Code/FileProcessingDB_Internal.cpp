@@ -706,7 +706,7 @@ string CFileProcessingDB::asStatusName(EActionStatus eStatus)
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nFileID, 
 											long nActionID, string strFileName, 
-											string strQueueEventCode)
+											string strQueueEventCode, long long llFileSize/* =-1*/)
 {
 	try
 	{
@@ -739,8 +739,11 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 			setLongField(ipFields, "FileID",  nFileID);
 			_lastCodePos = "40";
 
-			setLongField(ipFields, "ActionID", nActionID);
-			_lastCodePos = "45";
+			if (strQueueEventCode != "P")
+			{
+				setLongField(ipFields, "ActionID", nActionID);
+				_lastCodePos = "45";
+			}
 
 			setStringField(ipFields, "DateTimeStamp", 
 				getSQLServerDateTime(ipConnection));
@@ -770,7 +773,6 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 				_lastCodePos = "80_30";
 
 				// Get the file size
-				long long llFileSize;
 				llFileSize = getSizeOfFile(strFileName);
 				_lastCodePos = "80_40";
 
@@ -778,6 +780,18 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 				setLongLongField(ipFields, "FileSizeInBytes", llFileSize);
 				_lastCodePos = "80_50";
 			}
+			else if (strQueueEventCode == "P")
+			{
+				_lastCodePos = "80_60";
+
+				if (llFileSize >= 0)
+				{
+					// Set the file size in the table
+					setLongLongField(ipFields, "FileSizeInBytes", llFileSize);
+					_lastCodePos = "80_70";
+				}
+			}
+
 			// Update the QueueEvent table
 			ipQueueEventSet->Update();
 			_lastCodePos = "90";
@@ -1506,6 +1520,9 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 
 		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
 			"VALUES('R', 'File was renamed')");
+
+		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('P', 'File was programmatically added without being queued')");
 
 		vecQueries.push_back(gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES);
 

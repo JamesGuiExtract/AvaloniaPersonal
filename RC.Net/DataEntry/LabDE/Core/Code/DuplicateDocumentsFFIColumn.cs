@@ -623,7 +623,7 @@ namespace Extract.DataEntry.LabDE
                     value = DoNothingOption;
                     EActionStatus previousStatus = EActionStatus.kActionUnattempted;
                     if (DataEntryApplication.FileRequestHandler.CheckoutForProcessing(
-                        fileID, out previousStatus))
+                        fileID, true, out previousStatus))
                     {
                         _inUseFiles.Remove(fileID);
 

@@ -110,6 +110,7 @@
     </Compile>
     <Compile Include="Retry.cs" />
     <Compile Include="ExtractSettingsBase.cs" />
+    <Compile Include="Sequencer.cs" />
     <Compile Include="SourceDocumentPathTags.cs" />
     <Compile Include="StreamMethods.cs" />
     <Compile Include="StringPair.cs" />

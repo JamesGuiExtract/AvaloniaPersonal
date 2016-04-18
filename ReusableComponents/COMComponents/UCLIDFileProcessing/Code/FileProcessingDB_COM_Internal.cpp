@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 136;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 137;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1394,7 +1394,33 @@ int UpdateToSchemaVersion136(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39237");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion137(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 137;
 
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('P', 'File was programmatically added without being queued')");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39585");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -1943,7 +1969,8 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction )
+bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
+													 VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
 	{
@@ -1964,7 +1991,8 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 
 				// change the given files state to completed unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", false, true);
+				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", false,
+					asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
 
@@ -1989,7 +2017,8 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  BSTR strAction,  
-	BSTR strException)
+												  BSTR strException,
+												  VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
 	{
@@ -2014,7 +2043,8 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 
 				// change the given files state to Failed unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString, false, true);
+				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString, false,
+					asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
 
@@ -3428,7 +3458,8 @@ bool CFileProcessingDB::GetActionName_Internal(bool bDBLocked, long nActionID, B
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID, long nActionID)
+bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID, long nActionID,
+												   VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
 	{
@@ -3449,7 +3480,8 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 
 				// Set the file state to skipped unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, strActionName, "S", "", false, true, nActionID);
+				setFileActionState(ipConnection, nFileID, strActionName, "S", "", false,
+					asCppBool(vbAllowQueuedStatusOverride), nActionID);
 
 				tg.CommitTrans();
 
@@ -6505,7 +6537,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 133:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion134);
 				case 134:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion135);
 				case 135:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion136);
-				case 136:	break;
+				case 136:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion137);
+				case 137:	break;
 
 				default:
 					{
@@ -9277,6 +9310,70 @@ bool CFileProcessingDB::SetSecureCounterAlertLevel_Internal(bool bDBLocked, long
 		{
 			return false;
 		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, long long llFileSize,
+												long lPageCount, EFilePriority ePriority, long* pnID)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI39584", pnID != __nullptr);
+
+			// Replace any occurrences of ' with '' this is because SQL Server use the ' to indicate
+			// the beginning and end of a string
+			string strFileName = asString(bstrFile);
+			replaceVariable(strFileName, "'", "''");
+
+			string strSQL = Util::Format(
+				"INSERT INTO FAMFile ([FileName], [FileSize], [Pages], [Priority]) "
+					"OUTPUT INSERTED.[ID] "
+					"VALUES ('%s', %lld, %d, %d)", strFileName.c_str(), llFileSize, lPageCount, ePriority);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+				long nID = -1;
+				executeCmdQuery(ipConnection, strSQL, "ID", &nID);
+
+				// Update QueueEvent table if enabled
+				if (m_bUpdateQueueEventTable)
+				{
+					// add a new QueueEvent record 
+					addQueueEventRecord(ipConnection, nID, -1, asString(bstrFile), "P", llFileSize);
+				}
+
+				// Commit the changes to the database
+				tg.CommitTrans();
+
+				*pnID = nID;
+
+			END_CONNECTION_RETRY(ipConnection, "ELI39573");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39574");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		ue.addDebugInfo("FileName", asString(bstrFile));
 		throw ue;
 	}
 	return true;

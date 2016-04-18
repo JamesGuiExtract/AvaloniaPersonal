@@ -57,7 +57,7 @@
             this._deleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this._insertCopiedMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._insertDocumentSeparatorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._toggleDocumentSeparatorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -487,7 +487,7 @@
             this._deleteMenuItem,
             this.toolStripSeparator2,
             this._insertCopiedMenuItem,
-            this._insertDocumentSeparatorMenuItem});
+            this._toggleDocumentSeparatorMenuItem});
             this._editMenuItem.Name = "_editMenuItem";
             this._editMenuItem.Size = new System.Drawing.Size(39, 20);
             this._editMenuItem.Text = "Edit";
@@ -530,13 +530,13 @@
             this._insertCopiedMenuItem.Text = "&Insert copied item(s)";
             this._insertCopiedMenuItem.Click += new System.EventHandler(this.HandleInsertCopiedMenuItem_Click);
             // 
-            // _insertDocumentSeparatorMenuItem
+            // _toggleDocumentSeparatorMenuItem
             // 
-            this._insertDocumentSeparatorMenuItem.Name = "_insertDocumentSeparatorMenuItem";
-            this._insertDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Space";
-            this._insertDocumentSeparatorMenuItem.Size = new System.Drawing.Size(259, 22);
-            this._insertDocumentSeparatorMenuItem.Text = "&Toggle document separator";
-            this._insertDocumentSeparatorMenuItem.Click += new System.EventHandler(this.HandleInsertDocumentSeparator_Click);
+            this._toggleDocumentSeparatorMenuItem.Name = "_toggleDocumentSeparatorMenuItem";
+            this._toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Space";
+            this._toggleDocumentSeparatorMenuItem.Size = new System.Drawing.Size(259, 22);
+            this._toggleDocumentSeparatorMenuItem.Text = "&Toggle document separator";
+            this._toggleDocumentSeparatorMenuItem.Click += new System.EventHandler(this.HandleInsertDocumentSeparator_Click);
             // 
             // _toolsToolStripMenuItem
             // 
@@ -649,7 +649,7 @@
         internal System.Windows.Forms.ToolStripMenuItem _deleteMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         internal System.Windows.Forms.ToolStripMenuItem _insertCopiedMenuItem;
-        internal System.Windows.Forms.ToolStripMenuItem _insertDocumentSeparatorMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem _toggleDocumentSeparatorMenuItem;
         internal System.Windows.Forms.ToolStripMenuItem _outputSelectedDocumentsMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private Imaging.Forms.OneToOneZoomToolStripButton _oneToOneZoomToolStripButton;

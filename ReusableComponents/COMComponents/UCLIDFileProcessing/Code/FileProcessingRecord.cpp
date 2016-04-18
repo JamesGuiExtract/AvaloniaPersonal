@@ -33,7 +33,7 @@ FileProcessingRecord::FileProcessingRecord()
 }
 //-------------------------------------------------------------------------------------------------
 FileProcessingRecord::FileProcessingRecord(const UCLID_FILEPROCESSINGLib::IFileRecordPtr& ipFileRcd,
-									   const string& strMachine)
+					const string& strMachine/* = ""*/, bool bAllowedQueuedStatusOverride/* = true*/)
 {
 	reset();
 	m_strMachine = strMachine.empty() ? getComputerName() : strMachine;
@@ -41,6 +41,7 @@ FileProcessingRecord::FileProcessingRecord(const UCLID_FILEPROCESSINGLib::IFileR
 	
 	// Set the File Record
 	m_lfrFileRcd.setRecord(ipFileRcd);
+	m_lfrFileRcd.AllowedQueuedStatusOverride = bAllowedQueuedStatusOverride;
 }
 //-------------------------------------------------------------------------------------------------
 FileProcessingRecord::FileProcessingRecord(const FileProcessingRecord& task)
@@ -343,6 +344,16 @@ UCLID_FILEPROCESSINGLib::EActionStatus FileProcessingRecord::getFallbackStatus()
 		throw ue;
 	}
 	return m_lfrFileRcd.FileRecord->FallbackStatus;
+}
+//-------------------------------------------------------------------------------------------------
+bool FileProcessingRecord::getAllowedQueuedStatusOverride() const
+{
+	if (m_lfrFileRcd.FileRecord == NULL)
+	{
+		UCLIDException ue("ELI39576", "File record is not set.");
+		throw ue;
+	}
+	return m_lfrFileRcd.AllowedQueuedStatusOverride;
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileRecordPtr FileProcessingRecord::getFileRecord() 

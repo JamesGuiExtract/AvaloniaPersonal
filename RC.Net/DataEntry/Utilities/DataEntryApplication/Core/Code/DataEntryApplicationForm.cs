@@ -5,6 +5,7 @@ using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
+using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -271,6 +272,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         int _fileId;
 
         /// <summary>
+        /// The name of the file being processed.
+        /// </summary>
+        string _fileName;
+
+        /// <summary>
         /// The ID of the action being processed.
         /// </summary>
         int _actionId;
@@ -504,6 +510,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         UserConfigChecker _userConfigChecker = new UserConfigChecker();
 
+        /// <summary>
+        /// The names of documents that have been output so far as part of an ongoing commit of
+        /// pagination from the <see cref="_paginationPanel"/>. This is a stack so that enumerating
+        /// the documents will start with the last one output and end with the first.
+        /// </summary>
+        Stack<string> _pendingPaginationOutputStack = new Stack<string>();
+
         #endregion Fields
 
         #region Constructors
@@ -697,6 +710,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // For pre-fetching purposes, allow the ImageViewer to cache images.
                 _imageViewer.CacheImages = true;
+
+                if (_paginationPanel != null)
+                {
+                    _paginationPanel.ImageViewer = _imageViewer;
+                }
 
                 _invoker = new ControlInvoker(this);
             }
@@ -990,12 +1008,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             try
             {
+                // In order to keep the order documents are displayed in sync with the
+                // _paginationPanel, swap out the loading file for another if necessary.
+                if (_paginationPanel != null && ReorderAccordingToPagination(fileName))
+                {
+                    return;
+                }
+
                 ExtractException.Assert("ELI29830", "Unexpected file processing database!",
                     _fileProcessingDb == fileProcessingDB);
                 ExtractException.Assert("ELI29831", "Unexpected database action ID!",
                     _fileProcessingDb == null || _actionId == actionID);
 
                 _fileId = fileID;
+                _fileName = fileName;
 
                 _tagFileToolStripButton.Database = fileProcessingDB;
                 _tagFileToolStripButton.FileId = fileID;
@@ -1027,6 +1053,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     _fileProcessingDBComment = null;
                 }
+
+                if (_paginationPanel != null)
+                {
+                    _paginationPanel.LoadFile(fileName, false);
+                }
             }
             catch (Exception ex)
             {
@@ -1049,6 +1080,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 _imageViewer.CacheImage(fileName);
+
+                if (_paginationPanel != null)
+                {
+                    _paginationPanel.LoadFile(fileName, false);
+                }
 
                 // [DataEntry:1151]
                 // It appears in some cases the image viewer ends up trying to display highlights
@@ -1121,6 +1157,27 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 UserConfigChecker.EnsureValidUserConfigFile();
 
                 base.OnLoad(e);
+
+                if (!_standAloneMode && Control.ModifierKeys.HasFlag(Keys.Shift))
+                {
+                    // Show pagination tab before showing the data tab to trigger the pagination
+                    // control to be created and loaded.
+                    _paginationTab.Show();
+                    _dataTab.Show();
+                }
+                else
+                {
+                    // If pagination is not needed, move the panel that houses the DEP out of the
+                    // tab control and directly into the left side of _splitContainer. 
+                    _dataTab.Controls.Remove(_scrollPanel);
+                    _splitContainer.Panel1.Controls.Remove(_tabControl);
+                    _splitContainer.Panel1.Controls.Add(_scrollPanel);
+
+                    _dataTab = null;
+                    _tabControl = null;
+                    _paginationTab = null;
+                    _paginationPanel = null;
+                }
 
                 // Set the application name
                 if (string.IsNullOrEmpty(_actionName))
@@ -1754,6 +1811,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         public event EventHandler<VerificationExceptionGeneratedEventArgs> ExceptionGenerated;
 
+        /// <summary>
+        /// This event indicates the value of <see cref="ShowAllHighlights"/> has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> ShowAllHighlightsChanged;
+
         #endregion Events
 
         #region Event Handlers
@@ -1811,6 +1873,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                // When processing a document change, we need to ensure that the data entry
+                // verification tab is again made active so that all events that need to be
+                // processed for a document change in verification are registered.
+                if (_dataTab != null)
+                {
+                    _tabControl.SelectedTab = _dataTab;
+                }
+
                 AbortProcessing(EFileProcessingResult.kProcessingSkipped, true);
             }
             catch (Exception ex)
@@ -2761,6 +2831,152 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
         }
 
+        /// <summary>
+        /// Handles the TabControl.SelectedIndexChanged event of the <see cref="_tabControl"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleTabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!_isLoaded)
+                {
+                    return;
+                }
+
+                if (_tabControl.SelectedTab == _dataTab && _dataEntryControlHost.ImageViewer == null)
+                {
+                    // The pagination control may have opened a different document; switch back to
+                    // the document being verified.
+                    if (_imageViewer.ImageFile != _fileName)
+                    {
+                        _imageViewer.OpenImage(_fileName, false);
+                    }
+
+                    _dataEntryControlHost.ImageViewer = _imageViewer;
+                    _imageViewer.ImageFileChanged += HandleImageFileChanged;
+                    _imageViewer.ImageFileClosing += HandleImageFileClosing;
+                    _imageViewer.LoadingNewImage += HandleLoadingNewImage;
+                }
+                else if (_tabControl.SelectedTab != _dataTab && _dataEntryControlHost.ImageViewer != null)
+                {
+                    // These events are handled in the context of data entry verification. If
+                    // pagination is active these events should be ignored.
+                    _imageViewer.ImageFileChanged -= HandleImageFileChanged;
+                    _imageViewer.ImageFileClosing -= HandleImageFileClosing;
+                    _imageViewer.LoadingNewImage -= HandleLoadingNewImage;
+                    // Setting ImageViewer to null will unregister image viewer events we shouldn't
+                    // handle while in pagination.
+                    _dataEntryControlHost.ImageViewer = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39546");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationPanel.CreatingOutputDocument"/> of the
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandlePaginationPanel_CreatingOutputDocument(object sender, CreatingOutputDocumentEventArgs e)
+        {
+            try
+            {
+                // Keep the processing queue paused until the Paginated event.
+                FileRequestHandler.PauseProcessingQueue();
+
+                var pathTags = new SourceDocumentPathTags(e.SourceDocumentNames.First());
+                e.OutputFileName = pathTags.Expand("$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
+
+                // Add the file to the DB and check it out for this process before actually writing
+                // it to outputPath to prevent a running file supplier from grabbing it and another
+                // process from getting it.
+                int fileID = FileProcessingDB.AddFileNoQueue(
+                    e.OutputFileName, e.FileSize, e.PageCount, EFilePriority.kPriorityNormal);
+                EActionStatus previousStatus;
+                bool success =
+                    FileRequestHandler.CheckoutForProcessing(fileID, false, out previousStatus);
+                ExtractException.Assert("ELI39621", "Failed to check out file", success,
+                    "FileID", fileID);
+                success = FileRequestHandler.SetFallbackStatus(fileID, EActionStatus.kActionPending);
+                ExtractException.Assert("ELI39622", "Failed to set fallback status", success,
+                    "FileID", fileID);
+                _pendingPaginationOutputStack.Push(e.OutputFileName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39595");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationPanel.Paginated"/> event of the
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PaginatedEventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePaginationPanel_Paginated(object sender, PaginatedEventArgs e)
+        {
+            try
+            {
+                // HandlePaginationPanel_CreatingOutputDocument should have already paused the
+                // queue, but ensure that's the case.
+                FileRequestHandler.PauseProcessingQueue();
+
+                // In order for files to be delayed (and any prompting or other UI tasks
+                // accomplished by the DEP), the data tab must be given back focus.
+                _tabControl.SelectedTab = _dataTab;
+
+                // _pendingPaginationOutput is a stack because we need to insert them to the front
+                // of the _paginationPanel in reverse order so that they end up in the original
+                // order.
+                foreach (string paginatedFileName in _pendingPaginationOutputStack)
+                {
+                    _paginationPanel.LoadFile(paginatedFileName, true);
+                }
+
+                // The first paginated file should be the next document to be displayed.
+                int firstFileId = FileProcessingDB.GetFileID(_pendingPaginationOutputStack.Last());
+                bool success = RequestFile(firstFileId);
+                ExtractException.Assert("ELI39624", "Failed to request file.", success, "File ID",
+                    firstFileId);
+
+                // In order for the file we've requested to come up, the currently displayed file
+                // needs to be delayed.
+                DelayFile();
+
+                // Once the newly paginated files are loaded, the source documents for the newly
+                // paginated output should be "completed".
+                // TODO: Will this shortcut to complete via releasing the file cause any problems
+                // such as will stats in the DB?
+                foreach (var sourceFileName in e.PaginatedDocumentSources)
+                {
+                    int sourceFileID = FileProcessingDB.GetFileID(sourceFileName);
+                    success = FileRequestHandler.SetFallbackStatus(sourceFileID, EActionStatus.kActionCompleted);
+                    ExtractException.Assert("ELI39623", "Failed to set fallback status", success,
+                        "FileID", sourceFileID);
+                    ReleaseFile(sourceFileID);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39547");
+            }
+            finally
+            {
+                _pendingPaginationOutputStack.Clear();
+                FileRequestHandler.ResumeProcessingQueue();
+            }
+        }
+
         #endregion Event Handlers
 
         #region IDataEntryApplication Members
@@ -3005,6 +3221,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         public void SkipFile()
         {
+            // When processing a document change, we need to ensure that the data entry
+            // verification tab is again made active so that all events that need to be
+            // processed for a document change in verification are registered.
+            if (_dataTab != null)
+            {
+                _tabControl.SelectedTab = _dataTab;
+            }
+
             if (InvokeRequired)
             {
                 _invoker.Invoke((MethodInvoker)(() =>
@@ -3102,11 +3326,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 throw ex.AsExtract("ELI37500");
             }
         }
-
-        /// <summary>
-        /// This event indicates the value of <see cref="ShowAllHighlights"/> has changed.
-        /// </summary>
-        public event EventHandler<EventArgs> ShowAllHighlightsChanged;
 
         #endregion IDataEntryApplication Members
 
@@ -3230,6 +3449,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // by events raised during this process.
                     PreventSaveOfDirtyData = true;
 
+                    if (_paginationPanel != null)
+                    {
+                        _paginationPanel.RemoveSourceFile(_fileName);
+                    }
+
                     _imageViewer.CloseImage();
 
                     if (_fileProcessingDb != null)
@@ -3271,6 +3495,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _activeDataEntryConfig.Config.Settings.PreventSave)
             {
                 return response;
+            }
+
+            // When saving a document or processing a document change, we need to ensure that the
+            // data entry verification tab is again made active so that all events that need to be
+            // processed for a document change in verification are registered.
+            if (_dataTab != null)
+            {
+                _tabControl.SelectedTab = _dataTab;
             }
 
             if (_imageViewer.IsImageAvailable && (commitData || _dataEntryControlHost.Dirty))
@@ -3356,6 +3588,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // by events raised during this process.
                 PreventSaveOfDirtyData = true;
 
+                if (_paginationPanel != null && processingResult != EFileProcessingResult.kProcessingDelayed)
+                {
+                    _paginationPanel.RemoveSourceFile(_fileName);
+                }
+
                 _imageViewer.CloseImage();
 
                 // Record statistics to database that need to happen when a file is closed.
@@ -3406,6 +3643,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     if (_imageViewer.IsImageAvailable)
                     {
+                        if (_paginationPanel != null)
+                        {
+                            _paginationPanel.RemoveSourceFile(_fileName);
+                        }
+
                         _imageViewer.CloseImage();
                     }
                 }
@@ -3447,9 +3689,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _defaultDataEntryConfig = LoadDataEntryConfiguration(masterConfigFileName, null);
 
                 // Hide the document type combo.
-                _splitContainer.Panel1.Controls.Remove(_documentTypePanel);
-                _scrollPanel.Height += _scrollPanel.Location.Y;
-                _scrollPanel.Location = new Point(0, 0);
+                if (_dataTab != null)
+                {
+                    _dataTab.Controls.Remove(_documentTypePanel);
+                }
+                else
+                {
+                    _splitContainer.Panel1.Controls.Remove(_documentTypePanel);
+                }
+                _scrollPanel.Dock = DockStyle.Fill;
                 return;
             }
 
@@ -4673,8 +4921,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _scrollPanel.Controls.Clear();
                 }
 
+                Control mainDataControl = (Control)_dataTab ?? _dataEntryControlHost;
+
                 // Pad by _DATA_ENTRY_PANEL_PADDING around DEP content
-                _dataEntryControlHost.Location
+                mainDataControl.Location
                     = new Point(_DATA_ENTRY_PANEL_PADDING, _DATA_ENTRY_PANEL_PADDING);
                 _splitContainer.SplitterWidth = _DATA_ENTRY_PANEL_PADDING;
                 if (_registry.Settings.SplitterPosition > 0)
@@ -4683,7 +4933,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 else
                 {
-                    _splitContainer.SplitterDistance = _dataEntryControlHost.Size.Width +
+                    _splitContainer.SplitterDistance = mainDataControl.Size.Width +
                         _DATA_ENTRY_PANEL_PADDING + _scrollPanel.AutoScrollMargin.Width;
                 }
 
@@ -4692,6 +4942,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 int horizontalPadding =
                     (2 * _DATA_ENTRY_PANEL_PADDING) + _scrollPanel.AutoScrollMargin.Width;
+                if (_dataTab != null)
+                {
+                    horizontalPadding += _tabControl.Margin.Horizontal;
+                    horizontalPadding += _dataTab.Margin.Horizontal + _dataTab.Padding.Horizontal;
+                }
 
                 // The splitter should respect the minimum size of the DEP.
                 _splitContainer.Panel1MinSize =
@@ -4709,13 +4964,57 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _scrollPanel.Width = _splitContainer.SplitterDistance;
                 }
 
-                _dataEntryControlHost.Width = _scrollPanel.Width - horizontalPadding;
+                mainDataControl.Width = _scrollPanel.Width - horizontalPadding;
+                if (_dataTab != null)
+                {
+                    _dataEntryControlHost.Width = _dataTab.ClientRectangle.Width;
+                    _scrollPanel.Width = _dataTab.ClientRectangle.Width;
+                }
 
                 // Add the DEP to an auto-scroll pane to allow scrolling if the DEP is too
                 // long. (The scroll pane is sized to allow the full width of the DEP to 
                 // display initially) 
                 _scrollPanel.Controls.Add(_dataEntryControlHost);
             }
+        }
+
+        /// <summary>
+        /// Ensures the <see paramref="fileName"/> being loaded is in sync with the next file
+        /// displayed in the pagination tab.
+        /// </summary>
+        /// <param name="fileName">The name of the file that is currently loading</param>
+        /// <returns><see langword="true"/> if the currently loading document needs to be swapped
+        /// out to correspond with the order of documents in pagination.</returns>
+        bool ReorderAccordingToPagination(string fileName)
+        {
+            // The _paginationControl will ensure documents are processed in the order they are
+            // displayed in the pagination control. Occasionally it will force a different file
+            // to come up in place of the fileName. In this case, return immediately to allow
+            // the file it wants to come up.
+            var expectedDocumentOrder = (_paginationPanel == null)
+                ? null
+                : _paginationPanel.SourceDocuments;
+            if (expectedDocumentOrder != null && expectedDocumentOrder.Count > 0)
+            {
+                if (expectedDocumentOrder[0] != fileName)
+                {
+                    FileRequestHandler.PauseProcessingQueue();
+                    int neededFileId = FileProcessingDB.GetFileID(expectedDocumentOrder[0]);
+                    RequestFile(neededFileId);
+                   return true;
+                }
+
+                // To help prevent that we might need to swap out the next file that attempts to
+                // load, request the subsequent document so that it is what comes into
+                // verification after this file.
+                if (expectedDocumentOrder.Count > 1)
+                {
+                    int nextFileID = FileProcessingDB.GetFileID(expectedDocumentOrder[1]);
+                    RequestFile(nextFileID);
+                }
+            }
+
+            return false;
         }
 
         #endregion Private Members

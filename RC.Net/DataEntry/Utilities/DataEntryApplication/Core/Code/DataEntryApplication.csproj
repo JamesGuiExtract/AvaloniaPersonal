@@ -312,6 +312,10 @@
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj">
+      <Project>{A6CEC41C-8703-4687-9395-8B067AC03098}</Project>
+      <Name>PaginationUtility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.DataEntry.csproj">
       <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
       <Name>Extract.DataEntry</Name>

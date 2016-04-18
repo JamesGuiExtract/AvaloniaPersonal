@@ -149,8 +149,8 @@ public:
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 // IFileRequestHandler
-	STDMETHOD(CheckoutForProcessing)(long nFileID, EActionStatus* pPrevStatus,
-		VARIANT_BOOL* pSucceeded);
+	STDMETHOD(CheckoutForProcessing)(long nFileID, VARIANT_BOOL vbAllowQueuedStatusOverride,
+		EActionStatus* pPrevStatus, VARIANT_BOOL* pSucceeded);
 	STDMETHOD(MoveToFrontOfProcessingQueue)(long nFileID, VARIANT_BOOL* pSucceeded);
 	STDMETHOD(ReleaseFile)(long nFileID, VARIANT_BOOL* pSucceeded);
 	STDMETHOD(SetFallbackStatus)(long nFileID, EActionStatus esFallbackStatus,

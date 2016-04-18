@@ -541,7 +541,7 @@ STDMETHODIMP CFileProcessingMgmtRole::raw_RequiresAdminAccess(VARIANT_BOOL* pbRe
 // IFileRequestHandler
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingMgmtRole::CheckoutForProcessing(long nFileID,
-	EActionStatus* pPrevStatus, VARIANT_BOOL* pSucceeded)
+	VARIANT_BOOL vbAllowQueuedStatusOverride, EActionStatus* pPrevStatus, VARIANT_BOOL* pSucceeded)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -582,7 +582,8 @@ STDMETHODIMP CFileProcessingMgmtRole::CheckoutForProcessing(long nFileID,
 		{
 			// No process currently has the field; request the FPRecordManger to lock it for
 			// processing and add it to the internal queue.
-			bResult = m_pRecordMgr->checkoutForProcessing(nFileID, pPrevStatus);
+			bResult = m_pRecordMgr->checkoutForProcessing(nFileID,
+				asCppBool(vbAllowQueuedStatusOverride), pPrevStatus);
 		}
 		
 		*pSucceeded = asVariantBool(bResult);

@@ -17,7 +17,7 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// Allows manipulation of the pages of input documents in order to generate output documents
     /// that can contain any combination and sequence of input documents.
     /// </summary>
-    public partial class PaginationUtilityForm : Form
+    internal partial class PaginationUtilityForm : Form, IPaginationUtility
     {
         #region Constants
 
@@ -40,20 +40,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             FileSystemMethods.UserApplicationDataPath, "PaginationUtility", "PaginationUtility.xml");
 
         /// <summary>
-        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// Name for the mutex used to serialize persistence of the control and form layout.
         /// </summary>
         static readonly string _FORM_PERSISTENCE_MUTEX_STRING =
             "97BC14EC-DEED-4826-AE47-6CD1CC502AAB";
-
-        /// <summary>
-        /// The number of times clipboard copy operations should be attempted before giving up.
-        /// </summary>
-        internal static readonly int _CLIPBOARD_RETRY_COUNT = 10;
-
-        /// <summary>
-        /// The name of the custom clipboard data format to use.
-        /// </summary>
-        static readonly string _CLIPBOARD_DATA_FORMAT = "ExtractPaginationClipboardDataFormat";
 
         /// <summary>
         /// The number of pages that can be safely loaded at once without exceeding the limit of
@@ -76,7 +66,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         ConfigSettings<Settings> _config;
 
         /// <summary>
-        /// The <see cref="T:IEnumerator{string}"/> which interates input documents to be loaded
+        /// The <see cref="T:IEnumerator{string}"/> which iterates input documents to be loaded
         /// into the UI.
         /// </summary>
         IEnumerator<string> _inputFileEnumerator;
@@ -182,11 +172,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         FileStream _lockFile;
 
         /// <summary>
-        /// A copy of the last data put on the clipboard.
-        /// </summary>
-        ClipboardData _currentClipboardData = null;
-
-        /// <summary>
         /// <see langword="true"/> if the user has accepted the current settings or they have been
         /// specified via command line; otherwise <see langword="false"/>.
         /// </summary>
@@ -204,7 +189,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="PaginationUtilityForm"/> class.
         /// </summary>
-        /// <param name="configurationFileName">If this instance is to use pre-detemined settings,
+        /// <param name="configurationFileName">If this instance is to use pre-determined settings,
         /// the name of the configuration file containing the settings to use; <see langword="null"/>
         /// otherwise.</param>
         public PaginationUtilityForm(string configurationFileName = null)
@@ -451,14 +436,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Creates a new <see cref="OutputDocument"/> based on the specified
-        /// <see paramref="inputFileName"/>.
+        /// <see paramref="originalDocName"/>.
         /// </summary>
-        /// <param name="inputFileName">The name that should be used as the basis for the new
+        /// <param name="originalDocName">The name that should be used as the basis for the new
         /// document's filename.</param>
         /// <returns>The new <see cref="OutputDocument"/>.</returns>
-        internal OutputDocument CreateOutputDocument(string inputFileName)
+        public OutputDocument CreateOutputDocument(string originalDocName)
         {
-            string outputDocumentName = GenerateOutputDocumentName(inputFileName);
+            string outputDocumentName = GenerateOutputDocumentName(originalDocName);
             OutputDocument outputDocument = new OutputDocument(outputDocumentName);
             outputDocument.DocumentOutputting += HandelOutputDocument_DocumentOutputting;
             outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
@@ -468,192 +453,148 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Places the specified <see paramref="data"/> of the specified <see paramref="format"/>
-        /// to the clipboard with retries. A backup copy is kept for use by the pagination utility
-        /// even if all attempts fail.
+        /// Gets the <see cref="Page"/> instance(s) that represent the page(s) of the specified
+        /// <see paramref="fileName"/>.
         /// </summary>
-        /// <param name="pages">The data.</param>
-        internal void SetClipboardData(IEnumerable<Page> pages)
+        /// <param name="fileName">The image file for which <see cref="Page"/> instance(s) should be
+        /// retrieved.</param>
+        /// <param name="pageNumber">If <see langword="null"/>, all pages will be retrieved;
+        /// otherwise only the specified page will be retrieved.</param>
+        /// <returns>The <see cref="Page"/> instance(s) that represent the page(s) of the specified
+        /// <see paramref="fileName"/>.</returns>
+        public IEnumerable<Page> GetDocumentPages(string fileName, int? pageNumber)
         {
-            try
+            // See if the document indicated is already open as a SourceDocument.
+            SourceDocument document = _sourceDocuments
+                .Where(doc => doc.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase))
+                .SingleOrDefault();
+
+            // If not, open it as a SourceDocument.
+            if (document == null)
             {
-                using (new TemporaryWaitCursor())
-                {
-                    Exception clipboardException = null;
-
-                    DereferenceLastClipboardData();
-
-                    // Register custom data format or get it if it's already registered
-                    DataFormats.Format format = DataFormats.GetFormat(_CLIPBOARD_DATA_FORMAT);
-
-                    _currentClipboardData = new ClipboardData(pages);
-
-                    IDataObject dataObject = new DataObject();
-                    dataObject.SetData(format.Name, false, _currentClipboardData);
-
-                    // Retry loop in case copy or clipboard data validation fail.
-                    for (int i = 0; i < _CLIPBOARD_RETRY_COUNT; i++)
-                    {
-                        try
-                        {
-                            // Techinically un-necessary, but the clipboard can be flakey, so maybe
-                            // this will help?
-                            if (i > 0)
-                            {
-                                Clipboard.Clear();
-
-                                System.Threading.Thread.Sleep(200);
-                            }
-
-                            Clipboard.SetDataObject(dataObject, false);
-
-                            // Validate the data can be retrieved and that it matches the data that
-                            // was placed on the clipboard.
-                            var validataionData = GetClipboardData();
-                            ExtractException.Assert("ELI35513", "Clipboard data failed validation.",
-                                validataionData != null);
-
-                            foreach (Page page in pages.Where(page => page != null))
-                            {
-                                page.AddReference(this);
-                            }
-
-                            // Success; break out of loop.
-                            clipboardException = null;
-                            return;
-                        }
-                        catch (Exception ex)
-                        {
-                            clipboardException = ex;
-                        }
-                    }
-
-                    // Throw the last exception that was caught in the retry loop.
-                    if (clipboardException != null)
-                    {
-                        _currentClipboardData = null;
-                        throw clipboardException;
-                    }
-                }
+                document = OpenDocument(fileName);
             }
-            catch (Exception ex)
+
+            // Document may be null if the document was already open; don't treat null as an error,
+            // just ignore.
+            if (document == null)
             {
-                throw new ExtractException("ELI35514", "Failed to copy data to clipboard.", ex);
+                yield break;
+            }
+
+            ExtractException.Assert("ELI35506", "Cannot find source page(s).",
+                pageNumber == null || document.Pages.Count >= pageNumber,
+                "Filename", fileName,
+                "Page number", pageNumber);
+
+            // Return the correct page from the SourceDocument.
+            if (pageNumber != null)
+            {
+                yield return document.Pages[pageNumber.Value - 1];
+            }
+            else
+            {
+                foreach (Page page in document.Pages)
+                {
+                    yield return page;
+                }
             }
         }
 
         /// <summary>
-        /// Retrieves as an enumerable of <see cref="Page"/>s the data from the clipboard.
+        /// A <see cref="ToolStripItem"/> intended to trigger a cut operation or
+        /// <see langword="null"/> if no such item is available.
         /// </summary>
-        /// <returns>An enumerable of <see cref="Page"/>s that represents the data
-        /// currently on the clipboard, or <see langword="null"/> if there is no pagination utility
-        /// data on the clipboard.</returns>
-        internal IEnumerable<Page> GetClipboardData()
+        public ToolStripItem CutMenuItem
         {
-            try
+            get
             {
-                IDataObject dataObject = Clipboard.GetDataObject();
-                ClipboardData clipboardData = dataObject.GetData(_CLIPBOARD_DATA_FORMAT) as ClipboardData;
-
-                if (_currentClipboardData != null && !_currentClipboardData.Equals(clipboardData))
-                {
-                    DereferenceLastClipboardData();
-                }
-
-                // If we found ClipboardData on the clipboard, convert it to an array of Pages.
-                if (clipboardData != null)
-                {
-                    return clipboardData.GetPages(this);
-                }
-
-                // If we found FileDrop data on the clipboard, convert it to an array of Pages.
-                if (dataObject.GetDataPresent(DataFormats.FileDrop))
-                {
-                    return GetPagesFromFileDrop(dataObject);
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35516");
+                return _cutMenuItem;
             }
         }
 
         /// <summary>
-        /// Retrieves as an enumerable of <see cref="Page"/>s the from the specified
-        /// <see paramref="dataObject"/> using the <see cref="DataFormats.FileDrop"/> format.
+        /// A <see cref="ToolStripItem"/> intended to trigger a copy operation or 
+        /// <see langword="null"/> if no such item is available.
         /// </summary>
-        /// <returns>An enumerable of <see cref="Page"/>s that represents the data
-        /// in <see paramref="dataObject"/>, or <see langword="null"/> if there is no such data in
-        /// <see paramref="dataObject"/>.</returns>
-        internal IEnumerable<Page> GetPagesFromFileDrop(IDataObject dataObject)
+        public ToolStripItem CopyMenuItem
         {
-            bool returnedPages = false;
-
-            string[] windowsFileList = dataObject.GetData(DataFormats.FileDrop) as string[];
-            if (windowsFileList != null)
+            get
             {
-                foreach (string fileName in windowsFileList)
-                {
-                    // See if the document indicated is already open as a SourceDocument.
-                    SourceDocument document = _sourceDocuments
-                        .Where(doc =>
-                            doc.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase))
-                        .SingleOrDefault();
-
-                    // If not, open it as a SourceDocument.
-                    if (document == null)
-                    {
-                        document = OpenDocument(fileName);
-                    }
-
-                    ExtractException.Assert("ELI35573", "Unable to retrieve document",
-                        document != null, "Filename", fileName);
-
-                    // Return null to insert a document separator before the first page.
-                    yield return null;
-
-                    // Return the each page from the document
-                    foreach (Page page in document.Pages)
-                    {
-                        returnedPages = true;
-                        yield return page;
-                    }
-                }
-            }
-
-            if (returnedPages)
-            {
-                // Return null to insert a document separator after the last page (as long as there
-                // were any pages that were returned.
-                yield return null;
+                return _copyMenuItem;
             }
         }
 
         /// <summary>
-        /// Indicates whether the clipboard has data of type _CLIPBOARD_DATA_FORMAT.
+        /// A <see cref="ToolStripItem"/> intended to trigger a insert copied data operation or
+        /// <see langword="null"/> if no such item is available.
         /// </summary>
-        /// <returns><see langword="true"/> if the there is data of type _CLIPBOARD_DATA_FORMAT on
-        /// the clipboard, <see langword="false"/> otherwise.</returns>
-        internal static bool ClipboardHasData()
+        public ToolStripItem InsertCopiedMenuItem
         {
-            try
+            get
             {
-                IDataObject dataObject = Clipboard.GetDataObject();
-                if (dataObject != null)
-                {
-                    return dataObject.GetDataPresent(_CLIPBOARD_DATA_FORMAT) ||
-                           dataObject.GetDataPresent(DataFormats.FileDrop);
-                }
-
-                return false;
+                return _insertCopiedMenuItem;
             }
-            // If there was an exception reading data from the clipboard, treat it as if there
-            // was not data on the clipboard.
-            catch { }
+        }
 
-            return false;
+        /// <summary>
+        /// A <see cref="ToolStripItem"/> intended to trigger a delete operation or
+        /// <see langword="null"/> if no such item is available.
+        /// </summary>
+        public ToolStripItem DeleteMenuItem
+        {
+            get
+            {
+                return _deleteMenuItem;
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="ToolStripItem"/> intended to trigger a print operation or
+        /// <see langword="null"/> if no such item is available.
+        /// </summary>
+        public ToolStripItem PrintMenuItem
+        {
+            get
+            {
+                return _printMenuItem;
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="ToolStripItem"/> intended to toggle a document separator ahead of the
+        /// currently selected page or <see langword="null"/> if no such item is available.
+        /// </summary>
+        public ToolStripItem ToggleDocumentSeparatorMenuItem
+        {
+            get
+            {
+                return _toggleDocumentSeparatorMenuItem;
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="ToolStripButton"/> intended to trigger output the currently selected
+        /// document(s) or <see langword="null"/> if no such item is available.
+        /// </summary>
+        public ToolStripButton OutputDocumentToolStripButton
+        {
+            get
+            {
+                return _outputDocumentToolStripButton;
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="ToolStripItem"/> intended to trigger output the currently selected
+        /// document(s) or <see langword="null"/> if no such item is available.
+        /// </summary>
+        public ToolStripMenuItem OutputSelectedDocumentsMenuItem
+        {
+            get
+            {
+                return _outputSelectedDocumentsMenuItem;
+            }
         }
 
         #endregion Methods
@@ -746,7 +687,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // "processed" to be deleted/moved, but do it before any page controls are removed
                 // or disposed of, otherwise this will cause documents to moved/processed when they
                 // haven't been.
-                DereferenceLastClipboardData();
+                _primaryPageLayoutControl.DereferenceLastClipboardData();
 
                 base.OnClosing(e);
             }
@@ -1058,7 +999,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
-        /// <see cref="_insertDocumentSeparatorMenuItem"/>.
+        /// <see cref="_toggleDocumentSeparatorMenuItem"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
@@ -1171,7 +1112,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // and pages that were on the clipboard, but are no longer on the clipboard.
                     // This ensures input documents no longer being used are moved/deleted in a
                     // timely fashion.
-                    GetClipboardData();
+                    _primaryPageLayoutControl.GetClipboardData();
 
                     CheckIfSourceDocumentsProcessed(e.Page.SourceDocument);
 
@@ -1188,7 +1129,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35528");
+                throw ex.AsExtract("ELI35528");
             }
         }
 
@@ -1207,10 +1148,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 foreach (Page page in e.Pages)
                 {
                     _pagesPendingLoad.Enqueue(page);
-
-                    // So that a source document isn't considered "processed" before all pages have
-                    // been loaded into the UI, reference all pages pending load.
-                    page.AddReference(this);
                 }
 
                 // The load next document command should be disabled until all pending pages have
@@ -1220,7 +1157,30 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35674");
+                throw ex.AsExtract("ELI35674");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PageLayoutControl.PagesDereferenced"/> event of an
+        /// <see cref="PageLayoutControl"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PaginationUtility.PagesDereferencedEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandlePageLayoutControl_PagesDereferenced(object sender, PagesDereferencedEventArgs e)
+        {
+            try
+            {
+                CheckIfSourceDocumentsProcessed(e.Pages
+                    .Where(page => page != null)
+                    .Select(page => page.SourceDocument)
+                    .Distinct()
+                    .ToArray());
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39506");
             }
         }
 
@@ -1243,7 +1203,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35627");
+                throw ex.AsExtract("ELI35627");
             }
         }
 
@@ -1266,7 +1226,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 e.Cancel = true;
-                ex.ExtractDisplay("ELI35605");
+                throw ex.AsExtract("ELI35605");
             }
         }
 
@@ -1297,7 +1257,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35529");
+                throw ex.AsExtract("ELI35529");
             }
         }
 
@@ -1383,7 +1343,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35530");
+                throw ex.AsExtract("ELI35530");
             }
         }
 
@@ -1687,7 +1647,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     else
                     {
-                        // If any non-critical settings change or the utililty was not yet active,
+                        // If any non-critical settings change or the utility was not yet active,
                         // go ahead and apply the settings without a restart.
                         _config.Save();
                     }
@@ -1727,7 +1687,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Clears all active <see cref="PaginationControl"/>s and their associated data and
-        /// restores the utility to a state equivilant to just having opened the utility.
+        /// restores the utility to a state equivalent to just having opened the utility.
         /// </summary>
         void Restart()
         {
@@ -1795,6 +1755,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _primaryPageLayoutControl.StateChanged -= HandlePageLayoutControl_StateChanged;
                 _primaryPageLayoutControl.PageDeleted -= HandlePageLayoutControl_PageDeleted;
                 _primaryPageLayoutControl.PagesPendingLoad -= HandlePageLayoutControl_PagesPendingLoad;
+                _primaryPageLayoutControl.PagesDereferenced -= HandlePageLayoutControl_PagesDereferenced;
                 _primaryPageLayoutControl.LoadNextDocumentRequest -= HandleLayoutControl_LoadNextDocumentRequest;
                 // If the control contains a lot of pagination controls, it can take a long time to
                 // remove-- I am unclear why (it has to do with more than just whether thumbnails
@@ -1815,6 +1776,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
             _primaryPageLayoutControl.PagesPendingLoad += HandlePageLayoutControl_PagesPendingLoad;
+            _primaryPageLayoutControl.PagesDereferenced += HandlePageLayoutControl_PagesDereferenced;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandleLayoutControl_LoadNextDocumentRequest;
             _pageLayoutToolStripContainer.ContentPanel.Controls.Add(_primaryPageLayoutControl);
             _primaryPageLayoutControl.Focus();
@@ -1850,7 +1812,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 try
                 {
-                    // If there is an existing lock file, if it can be openend the instance
+                    // If there is an existing lock file, if it can be opened the instance
                     // that created it is not still open and it can therefore be ignored.
                     _lockFile = File.Open(lockFileName, FileMode.OpenOrCreate,
                         FileAccess.ReadWrite, FileShare.None);
@@ -1860,7 +1822,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 catch
                 {
-                    // But if it couldn't be deleted, another instance of the paginiation
+                    // But if it couldn't be deleted, another instance of the pagination
                     // utility is already working on this folder; prevent this instance from
                     // using it.
                     ExtractException ee = new ExtractException("ELI35537",
@@ -1874,46 +1836,46 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Generates a new name an <see cref="OutputDocument"/> based on the specified
-        /// <see paramref="fileName"/> that is unique compared to any pending output document, any
+        /// <see paramref="originalDocName"/> that is unique compared to any pending output document, any
         /// existing document or any document that has been output by this instance whether or not
         /// the file still exists.
         /// </summary>
-        /// <param name="fileName">The filename that should serve as the basis for the new document
+        /// <param name="originalDocName">The filename that should serve as the basis for the new document
         /// name.</param>
         /// <returns>The unique document name.</returns>
-        internal string GenerateOutputDocumentName(string fileName)
+        public string GenerateOutputDocumentName(string originalDocName)
         {
             // If fileName is from the input folder and we are to preserve the sub-folder hierarchy,
             // replace the input folder with the output folder in the path.
             if (_config.Settings.PreserveSubFoldersInOutput &&
-                fileName.StartsWith(_config.Settings.InputFolder, StringComparison.OrdinalIgnoreCase))
+                originalDocName.StartsWith(_config.Settings.InputFolder, StringComparison.OrdinalIgnoreCase))
             {
-                fileName = fileName.Substring(_config.Settings.InputFolder.Length);
-                fileName = fileName.TrimStart('\\');
-                fileName = Path.Combine(_config.Settings.OutputFolder, fileName);
+                originalDocName = originalDocName.Substring(_config.Settings.InputFolder.Length);
+                originalDocName = originalDocName.TrimStart('\\');
+                originalDocName = Path.Combine(_config.Settings.OutputFolder, originalDocName);
             }
             else
             {
                 // Otherwise, user the filename without directory as the basis for a file to be
                 // output into the root of the output directory.
-                fileName = Path.Combine(_config.Settings.OutputFolder, Path.GetFileName(fileName));
+                originalDocName = Path.Combine(_config.Settings.OutputFolder, Path.GetFileName(originalDocName));
             }
 
-            string baseFilename = fileName;
+            string baseFilename = originalDocName;
             string directory = Path.GetDirectoryName(baseFilename);
             string extension = Path.GetExtension(baseFilename);
             baseFilename = Path.GetFileNameWithoutExtension(baseFilename);
 
             if (_config.Settings.RandomizeOutputFileName)
             {
-                fileName = Path.Combine(directory, baseFilename + "_" +
+                originalDocName = Path.Combine(directory, baseFilename + "_" +
                     UtilityMethods.GetRandomString(10, true, false, true) +
                     extension);
             }
 
-            if (IsOutputFileNameAvailable(fileName, false, false))
+            if (IsOutputFileNameAvailable(originalDocName, false, false))
             {
-                return fileName;
+                return originalDocName;
             }
             
             // If the filename was not available modify the output filename in a loop by either
@@ -2028,7 +1990,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 .Select(file => file.FullName);
             _inputFileEnumerator = inputEnumerable.GetEnumerator();
 
-            // Initialze a folder watcher that will be activated to watch for added files once there
+            // Initialize a folder watcher that will be activated to watch for added files once there
             // are no more files available in the input folder.
             _inputFolderWatcher = new FileSystemWatcher(_config.Settings.InputFolder);
             _inputFolderWatcher.IncludeSubdirectories = _config.Settings.IncludeSubfolders;
@@ -2100,11 +2062,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         if (sourceDocument != null)
                         {
-                            // The will call Application.DoEvents in the midst of loading a document to
+                            // This will call Application.DoEvents in the midst of loading a document to
                             // keep the UI responsive as pages are loaded. This allows an opportunity
                             // for there to be multiple calls into LoadNextDocument at the same time.
                             _primaryPageLayoutControl.CreateOutputDocument(sourceDocument,
-                                _config.Settings.AutoInsertDocumentBoundaries);
+                                false, _config.Settings.AutoInsertDocumentBoundaries);
 
                             return true;
                         }
@@ -2247,13 +2209,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 
                 _primaryPageLayoutControl.AddPages(pagesToLoad);
-
-                // Now that these pages have been loaded, they are referenced by the page controls
-                // so the reference from this object can be released.
-                foreach (Page page in pagesToLoad)
-                {
-                    page.RemoveReference(this);
-                }
             }
 
             bool ranOutOfDocuments = false;
@@ -2273,7 +2228,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If no documents were loaded, call CreateOutputDocument so that the load next
                 // document button gets added.
                 _primaryPageLayoutControl.CreateOutputDocument(null,
-                    _config.Settings.AutoInsertDocumentBoundaries);
+                    false, _config.Settings.AutoInsertDocumentBoundaries);
             }
 
             // As long as there are no pages pending to be loaded, enable the load next document
@@ -2303,28 +2258,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         LoadMorePages();
                     }
                 });
-            }
-        }
-
-        /// <summary>
-        /// Removes any references to pages last copied to the clipboard so that the input document
-        /// can be deleted/moved if there are no other existing copies of the pages' document(s).
-        /// </summary>
-        void DereferenceLastClipboardData()
-        {
-            if (_currentClipboardData != null)
-            {
-                Page[] clipboardPages = _currentClipboardData.GetPages(this).ToArray();
-                foreach (Page page in clipboardPages.Where(page => page != null))
-                {
-                    page.RemoveReference(this);
-                }
-
-                CheckIfSourceDocumentsProcessed(clipboardPages
-                    .Where(page => page != null)
-                    .Select(page => page.SourceDocument)
-                    .Distinct()
-                    .ToArray());
             }
         }
 

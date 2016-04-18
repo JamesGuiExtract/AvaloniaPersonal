@@ -1169,9 +1169,16 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 	"	INNER JOIN FileActionStatus on FileActionStatus.FileID = ATABLE.ID AND FileActionStatus.ActionID = <ActionID>  \r\n"
 	"	WHERE ATABLE.ActionStatus <> 'R'; \r\n"
 	"	IF (1 = <RecordFASTEntry>) BEGIN"
+	//	If a file that is currently unattempted is being moved to processing, first add a FAST table
+	//	entry from U->P before adding a record from P -> R
 	"		INSERT INTO FileActionStateTransition (FileID, ActionID,  ASC_From, ASC_To,  \r\n"
 	"			DateTimeStamp, FAMUserID, MachineID, Exception, Comment) \r\n"
-	"		SELECT id, <ActionID> as ActionID, ASC_From, 'R' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
+	"		SELECT id, <ActionID> as ActionID, 'U', 'P' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
+	"			<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
+	"			WHERE ASC_From = 'U'; \r\n"
+	"		INSERT INTO FileActionStateTransition (FileID, ActionID,  ASC_From, ASC_To,  \r\n"
+	"			DateTimeStamp, FAMUserID, MachineID, Exception, Comment) \r\n"
+	"		SELECT id, <ActionID> as ActionID, CASE WHEN ASC_From = 'U' THEN 'P' ELSE ASC_From END, 'R' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
 	"			<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
 	"	END; \r\n"
 	"	INSERT INTO LockedFile(FileID,ActionID,ActiveFAMID,StatusBeforeLock) \r\n"

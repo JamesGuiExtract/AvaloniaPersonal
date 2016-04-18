@@ -6,6 +6,7 @@
 
 #include <afxmt.h>
 #include <memory>
+#include <map>
 
 using namespace ADODB;
 
@@ -45,6 +46,10 @@ public:
 	void CommitTrans();
 private:
 	// Variables
+
+	// Indicates if this instance is currently nested within another TransactionGuard for the same
+	// connection. In this case a DB transaction (which would fail) will not be initiated.
+	bool m_bNestedTransaction;
 	
 	// Flag that is true while a transaction has been started
 	// this will be set to false if Commit has been called
@@ -56,6 +61,9 @@ private:
 	// if an exception is generated the lock gets released
 	// https://extract.atlassian.net/browse/ISSUE-12694
 	std::unique_ptr <CSingleLock> m_upLock;
+
+	// Keeps track of any existing TransactionGuards for each DB connection.
+	static std::map<_ConnectionPtr, DWORD> m_mapExistingTransactions;
 
 	// Connection Pointer
 	ADODB::_ConnectionPtr m_ipConnection;

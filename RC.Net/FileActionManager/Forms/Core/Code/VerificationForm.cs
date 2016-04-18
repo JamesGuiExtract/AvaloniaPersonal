@@ -166,6 +166,14 @@ namespace Extract.FileActionManager.Forms
         List<int> _waitingFileIDQueue = new List<int>();
 
         /// <summary>
+        /// The queue of IDs of files currently being held in the prefetch stage ("processing" in
+        /// the verification task on threads other than the thread for which the currently displayed
+        /// file is running on). The files are in order of the time that they entered the queue and,
+        /// thus, will be processed in that same order.
+        /// </summary>
+        Sequencer<int> _waitingFileSequencer = new Sequencer<int>(100);
+
+        /// <summary>
         /// The IDs of all files for which a request has been made to delay processing.
         /// </summary>
         HashSet<int> _delayedFiles = new HashSet<int>();
@@ -185,7 +193,7 @@ namespace Extract.FileActionManager.Forms
         /// displayed or to delay processing of specific files.
         /// </summary>
         static object _lockFileRequest = new object();
-		
+
 	    #endregion VerificationForm Fields
 
         #region VerificationForm Delegates
@@ -355,7 +363,10 @@ namespace Extract.FileActionManager.Forms
                         _exceptionThrownEvent.Reset();
                         _closedEvent.Reset();
                         _lastException = null;
+                        _requestedFileID = -1;
+                        _waitRequestedFile.Set();
                         _waitingFileIDQueue.Clear();
+                        _waitingFileSequencer.Clear();
                         
                         _uiThread = CreateUserInterfaceThread(VerificationApplicationThread,
                             creator, minStackSize);
@@ -421,16 +432,17 @@ namespace Extract.FileActionManager.Forms
                 CheckForRequestedFile(fileID);
 
                 // Attempt to get the lock for the verification UI thread, but don't block at this
-                // point if its not available. Although unlikely, from my reading int appears the
+                // point if its not available. Although unlikely, from my reading it appears the
                 // lock could attempt here could allow a new file to sneak past already waiting
                 // files. Therefore, only try for the lock if we know of no currently waiting files.
-                haveLock = _waitingFileIDQueue.Count == 0 && _lock.TryLock();
+                haveLock = _waitingFileSequencer.Count == 0 && _lock.TryLock();
 
                 if (!haveLock)
                 {
                     lock (_lockFileRequest)
                     {
                         _waitingFileIDQueue.Add(fileID);
+                        _waitingFileSequencer.AddToQueue(fileID);
                     }
 
                     // Wait until the UI thread has finished loading its document before
@@ -441,6 +453,8 @@ namespace Extract.FileActionManager.Forms
                     // Need to log exception when loading prefetched file
                     try
                     {
+                        _waitingFileSequencer.WaitForTurn(fileID);
+
                         // While waiting for the verification UI thread, prefetch data so that
                         // MainForm.Open call on this thread will have less work to do and execute
                         // faster.
@@ -470,10 +484,11 @@ namespace Extract.FileActionManager.Forms
                             if (_delayedFiles.Contains(fileID))
                             {
                                 _waitingFileIDQueue.Remove(fileID);
+                                _waitingFileSequencer.Remove(fileID);
                                 _delayedFiles.Remove(fileID);
 
-                                // If all files requested to be delayed have been delayed, reset
-                                // _fileDelayedEvent so that files stop spinning until the next file
+                                // If all files requested to be released have been released, reset
+                                // _fileReleasedEvent so that files stop spinning until the next file
                                 // is needed or delayed.
                                 if (_delayedFiles.Count == 0)
                                 {
@@ -515,7 +530,7 @@ namespace Extract.FileActionManager.Forms
                     }
                 }
 
-                // Needs to be set before file is removed from _waitingFileIDQueue so RequestFile
+                // Needs to be set before file is removed from _prefetchSequencer so RequestFile
                 // can know for sure whether a requested file is available.
                 _currentFileID = fileID;
 
@@ -530,6 +545,7 @@ namespace Extract.FileActionManager.Forms
                     }
 
                     _waitingFileIDQueue.Remove(fileID);
+                    _waitingFileSequencer.Remove(fileID);
                 }
 
                 _fileLoadedEvent.Reset();
@@ -593,6 +609,7 @@ namespace Extract.FileActionManager.Forms
 
                 // If the FileID for the current file is in the _waitingFileQueue - remove it
                 _waitingFileIDQueue.Remove(fileID);
+                _waitingFileSequencer.Remove(fileID);
 
                 // Always display exceptions that arise from a verification task.
                 ex.ExtractDisplay("ELI37834");
@@ -872,13 +889,10 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                ExtractException.Assert("ELI37492", "Cannot interrupt pending file request.",
-                    _requestedFileID == -1 || _requestedFileID == fileID);
-
                 lock (_lockFileRequest)
                 {
                     _requestedFileID = fileID;
-                    
+
                     if (_currentFileID == fileID || _waitingFileIDQueue.Contains(fileID))
                     {
                         // The form is already holding the requested file. Return true to indicate

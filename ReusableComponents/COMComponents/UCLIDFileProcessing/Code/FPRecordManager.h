@@ -99,7 +99,7 @@ public:
 	//			peaPreviousStatus indicates the status of the file before being set to processing.
 	// RETURNS: true if the file was able to be checked out or it was already checked out, false
 	//			if another process already had the file checked out.
-	bool checkoutForProcessing(long nFileId, EActionStatus *peaPreviousStatus);
+	bool checkoutForProcessing(long nFileId, bool bAllowQueuedStatusOverride, EActionStatus *peaPreviousStatus);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Moves the specified file to the front of the queue to ensure it is the next file
 	//			that starts processing.
@@ -358,7 +358,7 @@ private:
 	long loadTasksFromDB(long nNumToLoad);
 	//---------------------------------------------------------------------------------------------
 	// Loads specified file from the database. Returns true if the file was loaded.
-	bool loadTaskFromDB(long nFileId, EActionStatus *peaPreviousStatus);
+	bool loadTaskFromDB(long nFileId, bool bAllowQueuedStatusOverride, EActionStatus *peaPreviousStatus);
 	// Loads max of nNumToLoad workitems from the database to the workItem processing queue
 	// returns the number of records loaded
 	long loadWorkItemsFromDB(long nNumToLoad, UCLID_FILEPROCESSINGLib::EFilePriority eMinPriority);

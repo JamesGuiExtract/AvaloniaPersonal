@@ -6,34 +6,65 @@
 
 #include <UCLIDException.h>
 
+std::map<_ConnectionPtr, DWORD> TransactionGuard::m_mapExistingTransactions;
+
 //-------------------------------------------------------------------------------------------------
 // TransactionGuard
 //-------------------------------------------------------------------------------------------------
 TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection,
 	IsolationLevelEnum isolationLevel, CMutex *pMutex)
 : m_ipConnection(ipConnection)
+, m_bTransactionStarted(false)
+, m_bNestedTransaction(false)
 , m_upLock(__nullptr)
 {
 	ASSERT_ARGUMENT("ELI14624", ipConnection != __nullptr );
 
 	try
 	{
+		DWORD dwThreadId = GetCurrentThreadId();
+
+		if (m_mapExistingTransactions.find(ipConnection) != m_mapExistingTransactions.end())
+		{
+			if (dwThreadId != m_mapExistingTransactions[ipConnection])
+			{
+				THROW_LOGIC_ERROR_EXCEPTION("ELI39572");
+			}
+			else
+			{
+				// There is already a transaction open on this connection; trying to start another
+				// would fail.
+				m_bNestedTransaction = true;
+				return;
+			}
+		}
+
 		if (pMutex != __nullptr)
 		{
 			m_upLock.reset(new CSingleLock(pMutex, TRUE));
 		}
 
 		ipConnection->IsolationLevel = isolationLevel;
-	
+
 		// Start a transaction
 		ipConnection->BeginTrans();
 		m_bTransactionStarted = true;
+
+		m_mapExistingTransactions[ipConnection] = dwThreadId;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38458");
 }
 //-------------------------------------------------------------------------------------------------
 TransactionGuard::~TransactionGuard()
 {
+	// If this was a nested transaction, no action was performed that needs to be undone.
+	if (m_bNestedTransaction)
+	{
+		return;
+	}
+
+	m_mapExistingTransactions.erase(m_ipConnection);
+
 	// Need to catch any exceptions and log them because this could be called within a catch
 	// and don't want to throw an exception from a catch
 	try
@@ -67,13 +98,16 @@ void TransactionGuard::CommitTrans()
 {
 	try
 	{
-		// Commit open transaction
-		m_ipConnection->CommitTrans();
+		if (!m_bNestedTransaction)
+		{
+			// Commit open transaction
+			m_ipConnection->CommitTrans();
 		
-		// There is no longer a transaction in progress-- so reset the started flag
-		m_bTransactionStarted = false;
+			// There is no longer a transaction in progress-- so reset the started flag
+			m_bTransactionStarted = false;
 
-		m_upLock.reset(__nullptr);
+			m_upLock.reset(__nullptr);
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27607")
 }

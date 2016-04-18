@@ -912,7 +912,7 @@ namespace Extract.DataEntry.LabDE
                 if (actionStatus == EActionStatus.kActionPending)
                 {
                     if (DataEntryApplication.FileRequestHandler.CheckoutForProcessing(
-                        fileID, out actionStatus))
+                        fileID, true, out actionStatus))
                     {
                         _checkedOutFiles.Add(fileID);
                     }

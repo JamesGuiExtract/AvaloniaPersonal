@@ -888,9 +888,9 @@ library UCLID_FILEPROCESSINGLib
 		// Methods related to setting / getting file status
 		// -----------------------------------------------------------------------------------------------
 		[id(6), helpstring("method NotifyFileProcessed")] HRESULT NotifyFileProcessed([in] long nFileID, 
-			[in] BSTR strAction);
+			[in] BSTR strAction, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 		[id(7), helpstring("method NotifyFileFailed")] HRESULT NotifyFileFailed([in] long nFileID, 
-			[in] BSTR strAction, [in] BSTR strException);
+			[in] BSTR strAction, [in] BSTR strException, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 		// For the SetFileStatusTo methods, if vbAllowQueuedStatusOverride is VARIANT_TRUE and the
 		// QueuedActionStatusChange table has a pending change for the file, that change will be applied.
 		// If vbAllowQueuedStatusOverride is VARIANT_FALSE, the QueuedActionStatusChange will be ignored.
@@ -1082,7 +1082,7 @@ library UCLID_FILEPROCESSINGLib
 			[in] long nActionID, [out, retval] BSTR* pbstrActionName);
 		// -----------------------------------------------------------------------------------------------
 		[id(46), helpstring("method NotifyFileSkipped")] HRESULT NotifyFileSkipped([in] long nFileID,
-			[in] long nActionID);
+			[in] long nActionID, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to comment strings
@@ -1744,6 +1744,14 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Sets the alert level and alert multiple for the specified secure counter.
 		[id(158), helpstring("method SetSecureCounterAlertLevel")] HRESULT SetSecureCounterAlertLevel(
 			[in] long nCounterID, [in] long nAlertLevel, [in] long nAlertMultiple);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To add the file to the database without making it pending for any action. This call
+		//			does not expect the file to exist at the specified location. Because of this, the
+		//			file size and page count must be supplied by the caller.
+		// RETURNS: The ID that has been associated with the file.
+		[id(159), helpstring("method AddFileNoQueue")] HRESULT AddFileNoQueue([in] BSTR strFile,
+			[in] long long llFileSize, [in] LONG lPageCount,  [in] EFilePriority ePriority,
+			[out, retval] long* pnID);
 	};
 
 	[
@@ -2046,12 +2054,15 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Requests that the current instance lock the specified file for processing and
 		//			add it to the current process's set of files to process.
 		// ARGS:	nFileID- The file to checkout
+		//			vbAllowQueuedStatusOverride - Whether QueuedActionStatusChange records
+		//				should be honored when this file comes out of processing.
 		//			pPrevStatus- The status of the file in the current action before being checked out.
 		//			pSucceeded- VARIANT_TRUE if the file was able to be checked out (or the current
 		//				process already had it checked out). VARIANT_FALSE if another process already
 		//				had the file checked out.
 		[id(1), helpstring("method CheckoutForProcessing")] HRESULT CheckoutForProcessing(
-			[in] long nFileID, [out] EActionStatus* pPrevStatus, [out, retval] VARIANT_BOOL* pSucceeded);
+			[in] long nFileID, [in] VARIANT_BOOL vbAllowQueuedStatusOverride,
+			[out] EActionStatus* pPrevStatus, [out, retval] VARIANT_BOOL* pSucceeded);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Moves the specified file to the front of the current process's internal queue
 		//			of files checked out for processing to ensure it is the next file that starts

@@ -127,8 +127,9 @@ public:
 		IFileRecord** ppFileRecord);
 	STDMETHOD(RemoveFile)(BSTR strFile, BSTR strAction);
 	STDMETHOD(RemoveFolder)(BSTR strFolder, BSTR strAction);
-	STDMETHOD(NotifyFileProcessed)(long nFileID, BSTR strAction);
-	STDMETHOD(NotifyFileFailed)(long nFileID, BSTR strAction, BSTR strException);
+	STDMETHOD(NotifyFileProcessed)(long nFileID, BSTR strAction, VARIANT_BOOL vbAllowQueuedStatusOverride);
+	STDMETHOD(NotifyFileFailed)(long nFileID, BSTR strAction, BSTR strException,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(SetFileStatusToPending)(long nFileID, BSTR strAction,
 		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(SetFileStatusToUnattempted)(long nFileID, BSTR strAction,
@@ -181,7 +182,8 @@ public:
 	STDMETHOD(AsStatusName)(EActionStatus eaStatus, BSTR *pbstrStatusName);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* pnFileID);
 	STDMETHOD(GetActionName)(long nActionID, BSTR* pbstrActionName);
-	STDMETHOD(NotifyFileSkipped)(long nFileID, long nActionID);
+	STDMETHOD(NotifyFileSkipped)(long nFileID, long nActionID,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(SetFileActionComment)(long nFileID, long nActionID, BSTR bstrComment);
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
@@ -307,6 +309,8 @@ public:
 	STDMETHOD(get_ConnectedDatabaseServer)(BSTR* pbstrDatabaseServer);
 	STDMETHOD(get_ConnectedDatabaseName)(BSTR* pbstrDatabaseName);
 	STDMETHOD(SetSecureCounterAlertLevel)(long nCounterID, long nAlertLevel, long nAlertMultiple);
+	STDMETHOD(AddFileNoQueue)(BSTR bstrFile, long long llFileSize, long lPageCount,
+		EFilePriority ePriority, long* pnID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -593,9 +597,11 @@ private:
 	string asStatusName(EActionStatus eStatus);
 
 	// PROMISE:	To add a single record to the QueueEvent table in the database with the given data
-	//			using the connection provided
+	//			using the connection provided. For calls where a file that does not yet exist at the
+	//			specified location is being programmatically added, llFileSize can be used to
+	//			specify the files size recorded in the QueueEvent table.
 	void addQueueEventRecord(_ConnectionPtr ipConnection, long nFileID, long nActionID,
-		string strFileName, string strQueueEventCode);
+		string strFileName, string strQueueEventCode, long long llFileSize = -1);
 
 	// PROMISE: To add a single record to the FileActionStateTransition table with the given data
 	// ARGS:	ipConnection	- Connection object to use to update the tables
@@ -1084,8 +1090,10 @@ private:
 		EActionStatus eNewStatus, VARIANT_BOOL bSkipPageCount, VARIANT_BOOL * pbAlreadyExists,
 		EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord);
 	bool RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR strAction);
-	bool NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction);
-	bool NotifyFileFailed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,  BSTR strException);
+	bool NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
+	bool NotifyFileFailed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,  BSTR strException,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool SetFileStatusToPending_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
 		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool SetFileStatusToUnattempted_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
@@ -1119,7 +1127,8 @@ private:
 	bool GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery, _Recordset** ppVal);
 	bool GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, long *pnFileID);
 	bool GetActionName_Internal(bool bDBLocked, long nActionID, BSTR *pbstrActionName);
-	bool NotifyFileSkipped_Internal(bool bDBLocked, long nFileID, long nActionID);
+	bool NotifyFileSkipped_Internal(bool bDBLocked, long nFileID, long nActionID,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool SetFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR bstrComment);
 	bool GetFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID, 
 		BSTR* pbstrComment);
@@ -1221,6 +1230,8 @@ private:
 	bool SecureCounterConsistencyCheck_Internal(bool bDBLocked, VARIANT_BOOL* pvbValid);
 	bool GetCounterUpdateRequestCode_Internal(bool bDBLocked, BSTR* pstrUpdateRequestCode);
 	bool SetSecureCounterAlertLevel_Internal(bool bDBLocked, long nCounterID, long nAlertLevel, long nAlertMultiple);
+	bool AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, long long llFileSize, long lPageCount,
+		EFilePriority ePriority, long* pnID);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

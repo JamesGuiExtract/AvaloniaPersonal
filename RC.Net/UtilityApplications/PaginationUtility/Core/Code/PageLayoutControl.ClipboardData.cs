@@ -4,10 +4,11 @@ using System.Linq;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
-    partial class PaginationUtilityForm
+    partial class PageLayoutControl
     {
         /// <summary>
-        /// Represents <see cref="PaginationControl"/>s copied to the clipboard by this utility.
+        /// Represents <see cref="PaginationControl"/>s copied to the clipboard by a
+        /// <see cref="PageLayoutControl"/>.
         /// </summary>
         [Serializable]
         class ClipboardData
@@ -47,11 +48,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// <summary>
             /// Gets the <see cref="IEnumerable{Page}"/> represented by this clipboard data.
             /// </summary>
-            /// <param name="paginationUtility">The <see cref="PaginationUtilityForm"/> the data is
-            /// needed for.</param>
+/// <param name="paginationUtility">The <see cref="IPaginationUtility"/> the data is
+/// needed for.</param>
             /// <returns>The <see cref="IEnumerable{Page}"/> represented by this clipboard data.
             /// </returns>
-            public IEnumerable<Page> GetPages(PaginationUtilityForm paginationUtility)
+            public IEnumerable<Page> GetPages(IPaginationUtility paginationUtility)
             {
                 // Convert each entry in _pageData into either null (for a document boundary) or a
                 // Page instance.
@@ -66,32 +67,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     string fileName = pageData.Item1;
                     int pageNumber = pageData.Item2;
 
-                    // See if the document indicated is already open as a SourceDocument.
-                    SourceDocument document = paginationUtility._sourceDocuments
-                        .Where(doc =>
-                            doc.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase))
-                        .SingleOrDefault();
+                    var page = paginationUtility.GetDocumentPages(fileName, pageNumber);
 
-                    // If not, open it as a SourceDocument.
-                    if (document == null)
-                    {
-                        document = paginationUtility.OpenDocument(fileName);
-                    }
-
-                    // If unable to open then document, don't throw an exception, just act as though
-                    // the data was not on the clipboard in the first place.
-                    if (document == null)
+                    // If unable to get page data, don't throw an exception, just act as though the
+                    // data was not on the clipboard in the first place.
+                    if (page == null || !page.Any())
                     {
                         break;
                     }
 
-                    ExtractException.Assert("ELI35506", "Cannot find source page.",
-                        document != null && document.Pages.Count >= pageNumber,
-                        "Filename", fileName,
-                        "Page number", pageNumber);
-
-                    // Return the correct page from the SourceDocument.
-                    yield return document.Pages[pageNumber - 1];
+                    yield return page.Single();
                 }
             }
 
@@ -112,21 +97,21 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    // An equivilant object must be a ClipboardData instance.
+                    // An equivalent object must be a ClipboardData instance.
                     var clipboardData = obj as ClipboardData;
                     if (clipboardData == null)
                     {
                         return false;
                     }
 
-                    // An equivilant object must have the same number of entries in _pageData.
+                    // An equivalent object must have the same number of entries in _pageData.
                     var pageData = clipboardData._pageData;
                     if (pageData.Count != _pageData.Count)
                     {
                         return false;
                     }
 
-                    // An equivilant object must have equivalent entries in _pageData.
+                    // An equivalent object must have equivalent entries in _pageData.
                     for (int i = 0; i < _pageData.Count; i++)
                     {
                         if ((pageData[i] == null) != (_pageData[i] == null))

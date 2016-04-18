@@ -261,7 +261,8 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13538");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::NotifyFileProcessed(long nFileID,  BSTR strAction)
+STDMETHODIMP CFileProcessingDB::NotifyFileProcessed(long nFileID,  BSTR strAction,
+													VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -270,19 +271,20 @@ STDMETHODIMP CFileProcessingDB::NotifyFileProcessed(long nFileID,  BSTR strActio
 		// Check License
 		validateLicense();
 
-		if (!NotifyFileProcessed_Internal(false, nFileID, strAction))
+		if (!NotifyFileProcessed_Internal(false, nFileID, strAction, vbAllowQueuedStatusOverride))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			NotifyFileProcessed_Internal(true, nFileID, strAction);
+			NotifyFileProcessed_Internal(true, nFileID, strAction, vbAllowQueuedStatusOverride);
 		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13541");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::NotifyFileFailed(long nFileID,  BSTR strAction,  BSTR strException)
+STDMETHODIMP CFileProcessingDB::NotifyFileFailed(long nFileID,  BSTR strAction,  BSTR strException,
+												 VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -291,12 +293,12 @@ STDMETHODIMP CFileProcessingDB::NotifyFileFailed(long nFileID,  BSTR strAction, 
 		// Check License
 		validateLicense();
 
-		if (!NotifyFileFailed_Internal(false, nFileID, strAction, strException))
+		if (!NotifyFileFailed_Internal(false, nFileID, strAction, strException, vbAllowQueuedStatusOverride))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			NotifyFileFailed_Internal(true, nFileID, strAction, strException);
+			NotifyFileFailed_Internal(true, nFileID, strAction, strException, vbAllowQueuedStatusOverride);
 		}
 		return S_OK;
 	}
@@ -1367,7 +1369,8 @@ STDMETHODIMP CFileProcessingDB::GetActionName(long nActionID, BSTR *pbstrActionN
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26771");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID)
+STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID,
+												  VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
 	{
@@ -1375,12 +1378,12 @@ STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID)
 
 		validateLicense();
 
-		if (!NotifyFileSkipped_Internal(false, nFileID, nActionID))
+		if (!NotifyFileSkipped_Internal(false, nFileID, nActionID, vbAllowQueuedStatusOverride))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
-			NotifyFileSkipped_Internal(true, nFileID, nActionID);
+			NotifyFileSkipped_Internal(true, nFileID, nActionID, vbAllowQueuedStatusOverride);
 		}
 		return S_OK;
 	}
@@ -3770,6 +3773,28 @@ STDMETHODIMP CFileProcessingDB::SetSecureCounterAlertLevel(long nCounterID, long
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39131");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AddFileNoQueue(BSTR bstrFile, long long llFileSize,
+											   long lPageCount, EFilePriority ePriority, long* pnID)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		if (!AddFileNoQueue_Internal(false, bstrFile, llFileSize, lPageCount, ePriority, pnID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
+				gstrSECURE_COUNTER_DB_LOCK);
+
+			AddFileNoQueue_Internal(true, bstrFile, llFileSize, lPageCount, ePriority, pnID);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39575");
 }
 
 //-------------------------------------------------------------------------------------------------

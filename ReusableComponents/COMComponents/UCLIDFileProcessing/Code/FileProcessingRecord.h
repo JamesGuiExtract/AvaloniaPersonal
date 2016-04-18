@@ -35,7 +35,7 @@ public:
 	// This ctor will automatically populate m_strMachineName, m_eStatus
 	// and m_strStartTime
 	FileProcessingRecord(const UCLID_FILEPROCESSINGLib::IFileRecordPtr& ipFileRcd,
-		const string& strMachine = "");
+		const string& strMachine = "", bool bAllowedQueuedStatusOverride = true);
 	//---------------------------------------------------------------------------------------------
 	// copy ctor and assignment operator
 	FileProcessingRecord(const FileProcessingRecord& task);
@@ -129,6 +129,10 @@ public:
 	//			or the file is otherwise released from processing status.
 	UCLID_FILEPROCESSINGLib::EActionStatus getFallbackStatus() const;
 	//---------------------------------------------------------------------------------------------
+	// PROMISE: Gets whether any QueuedActionStatusChanges should be honored when this file exists
+	//			processing.
+	bool getAllowedQueuedStatusOverride() const;
+	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the underlying file record
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecord();
 
@@ -147,10 +151,11 @@ private:
 		long ActionID;
 		long long FileSize;
 		long NumberOfPages;
+		bool AllowedQueuedStatusOverride;
 		UCLID_FILEPROCESSINGLib::EFilePriority Priority;
 
 		LocalFileRecord() : FileRecord(NULL), FileID(-1), ActionID(-1),
-			FileSize(-1), NumberOfPages(-1),
+			FileSize(-1), NumberOfPages(-1), AllowedQueuedStatusOverride(true),
 			Priority((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault)
 		{
 		}
