@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities
@@ -10,6 +11,17 @@ namespace Extract.Utilities
     /// </summary>
     public static class CollectionMethods
     {
+        #region Private Fields
+
+        /// <summary>
+        /// Thread static random number generator used by Shuffle methods
+        /// </summary>
+        private static readonly ThreadLocal<Random> _shuffleRandom = new ThreadLocal<Random>(() => new Random());
+
+        #endregion Private Fields
+
+        #region Public Methods
+
         /// <summary>
         /// Removes all elements of the specified list and calls <see cref="IDisposable.Dispose"/> 
         /// on all items that implement <see cref="IDisposable"/>.
@@ -445,5 +457,74 @@ namespace Extract.Utilities
                 throw ex.AsExtract("ELI37887");
             }
         }
+
+        /// <summary>
+        /// Knuth shuffle (a.k.a. the Fisher-Yates shuffle) for arrays.
+        /// Performs an in-place random permutation of an array.
+        /// Adapted from https://www.rosettacode.org/wiki/Knuth_shuffle#C.23
+        /// </summary>
+        /// <typeparam name="T">The type of the objects in the array</typeparam>
+        /// <param name="array">The array to shuffle</param>
+        /// <param name="randomNumberGenerator">An instance of <see cref="System.Random"/> to be used
+        /// to generate the permutation. If <see langword="null"/> then a thread-local, static instance
+        /// will be used.</param>
+        public static void Shuffle<T>(T[] array, Random randomNumberGenerator=null)
+        {
+            try
+            {
+                var rng = randomNumberGenerator ?? _shuffleRandom.Value;
+
+                int length = array.Length;
+
+                for (int i = 0; i < length - 1; i++)
+                {
+                    // Don't select from the entire array length on subsequent loops or the result will be biased
+                    int j = rng.Next(i, length);
+                    UtilityMethods.Swap(ref array[i], ref array[j]);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI39499", ex);
+            }
+        }
+
+        /// <summary>
+        /// Knuth shuffle (a.k.a. the Fisher-Yates shuffle) for two arrays.
+        /// Performs an in-place random permutation of two arrays.
+        /// The same permutation is applied to both arrays and each array must be the same length.
+        /// Adapted from https://www.rosettacode.org/wiki/Knuth_shuffle#C.23
+        /// </summary>
+        /// <typeparam name="T1">The type of the objects in the first array</typeparam>
+        /// <typeparam name="T2">The type of the objects in the second array</typeparam>
+        /// <param name="array1">The first array to shuffle</param>
+        /// <param name="array2">The second array to shuffle</param>
+        /// <param name="randomNumberGenerator">An instance of <see cref="System.Random"/> to be used
+        /// to generate the permutation. If <see langword="null"/> then a thread-local, static instance
+        /// will be used.</param>
+        public static void Shuffle<T1, T2>(T1[] array1, T2[] array2, Random randomNumberGenerator=null)
+        {
+            try
+            {
+                var rng = randomNumberGenerator ?? _shuffleRandom.Value;
+
+                int length = array1.Length;
+                ExtractException.Assert("ELI39500", "Arrays are not of the same length", array2.Length == length);
+
+                for (int i = 0; i < length - 1; i++)
+                {
+                    // Don't select from the entire array length on subsequent loops or the result will be biased
+                    int j = rng.Next(i, length);
+                    UtilityMethods.Swap(ref array1[i], ref array1[j]);
+                    UtilityMethods.Swap(ref array2[i], ref array2[j]);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI39501", ex);
+            }
+        }
+
+        #endregion Public Methods
     }
 }

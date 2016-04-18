@@ -1,5 +1,6 @@
 using Extract.Licensing;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Extract.Utilities
@@ -45,23 +47,31 @@ namespace Extract.Utilities
         /// <summary>
         /// Used to validate names for XML elements.
         /// </summary>
-        static RegexStringValidator _xmlNameValidator;
+        static ThreadLocal<RegexStringValidator> _xmlNameValidator = new ThreadLocal<RegexStringValidator>(() =>
+            {
+                string nameStartChar = @":A-Z_a-z\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD";
+                string nameChar = @"-.0-9\xB7\u0300-\u036F\u203F-\u2040" + nameStartChar;
+
+                return new RegexStringValidator("^[" + nameStartChar + "][" + nameChar + "]+$");
+            });
 
         /// <summary>
         /// Used to validate email addresses.
         /// </summary>
-        static Regex _emailValidator;
+        static ThreadLocal<Regex> _emailValidator = new ThreadLocal<Regex>(() =>
+                new Regex(@"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+                    RegexOptions.IgnoreCase) );
 
         /// <summary>
         /// Used to validate identifiers (identifiers must start with either an underscore
         /// or a letter and can be followed by 0 or more underscores, letters or numbers).
         /// </summary>
-        static Regex _identifierValidator;
+        static ThreadLocal<Regex> _identifierValidator = new ThreadLocal<Regex>(() => new Regex(@"^[_a-zA-Z]\w*$"));
 
         /// <summary>
-        /// Mutex used for regex creation
+        /// Random number generator used by GetRandomString
         /// </summary>
-        static object _lock = new object();
+        static readonly ThreadLocal<Random> _randomNumberGenerator = new ThreadLocal<Random>(() => new Random());
 
         #endregion Fields
 
@@ -261,22 +271,7 @@ namespace Extract.Utilities
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI31717", _OBJECT_NAME);
 
-                if (_xmlNameValidator == null)
-                {
-                    lock (_lock)
-                    {
-                        if (_xmlNameValidator == null)
-                        {
-                            string nameStartChar = @":A-Z_a-z\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD";
-                            string nameChar = @"-.0-9\xB7\u0300-\u036F\u203F-\u2040" + nameStartChar;
-
-                            _xmlNameValidator = new RegexStringValidator("^[" + nameStartChar
-                                + "][" + nameChar + "]+$");
-                        }
-                    }
-                }
-
-                _xmlNameValidator.Validate(name);
+                _xmlNameValidator.Value.Validate(name);
             }
             catch (Exception ex)
             {
@@ -300,19 +295,7 @@ namespace Extract.Utilities
         {
             try
             {
-                if (_emailValidator == null)
-                {
-                    lock (_lock)
-                    {
-                        if (_emailValidator == null)
-                        {
-                            _emailValidator = new Regex(@"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
-                                RegexOptions.IgnoreCase);
-                        }
-                    }
-                }
-
-                return _emailValidator.IsMatch(emailAddress);
+                return _emailValidator.Value.IsMatch(emailAddress);
             }
             catch (Exception ex)
             {
@@ -334,18 +317,7 @@ namespace Extract.Utilities
         {
             try
             {
-                if (_identifierValidator == null)
-                {
-                    lock (_lock)
-                    {
-                        if (_identifierValidator == null)
-                        {
-                            _identifierValidator = new Regex(@"^[_a-zA-Z]\w*$");
-                        }
-                    }
-                }
-
-                return identifiers.All(s => _identifierValidator.IsMatch(s));
+                return identifiers.All(s => _identifierValidator.Value.IsMatch(s));
             }
             catch (Exception ex)
             {
@@ -385,11 +357,10 @@ namespace Extract.Utilities
         public static string GetRandomString(int size, bool uppercase, bool lowercase, bool digits)
         {
             try 
-	        {	        
+            {            
                 ExtractException.Assert("ELI33379", "GetRandomString: empty character domain.",
                     uppercase || lowercase || digits);
 
-		        Random random = new Random();
                 string charDomain = (uppercase ? _UPPERCASE_LETTERS : "") +
                                     (lowercase ? _LOWERCASE_LETTERS : "") +
                                     (digits ? _DIGITS : "");
@@ -398,15 +369,15 @@ namespace Extract.Utilities
                 StringBuilder sb = new StringBuilder(size);
                 for (int i = 0; i < size; i++)
                 {
-                    sb.Append(charDomain[random.Next(domainSize)]);
+                    sb.Append(charDomain[_randomNumberGenerator.Value.Next(domainSize)]);
                 }
 
                 return sb.ToString();
-	        }
-	        catch (Exception ex)
-	        {
-		        throw ex.AsExtract("ELI33378");
-	        }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33378");
+            }
         }
 
         /// <summary>
@@ -551,6 +522,313 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39425");
+            }
+        }
+
+        /// <summary>
+        /// Parse pageRange, returns start and end page.
+        /// </summary>
+        /// <param name="pageRange">The string representation of the page range. Must have exactly one dash (-) and either start page, end page or both.</param>
+        /// <param name="startPageNumber">Out parameter that will be set to the start page number. Could be 0, which means it's empty (no start page was present in the range).</param>
+        /// <param name="endPageNumber">Out parameter that will be set to the end page number. Must be greater than 0 if start page is empty.</param>
+        private static void GetStartAndEndPage(string pageRange, out int startPageNumber, out int endPageNumber)
+        {
+            // assume this is a range of page numbers, or last X number of pages
+            // Further parse the string with delimiter as '-'
+            string[] tokens = pageRange.Split('-');
+            if (tokens.Length != 2)
+            {
+                var ue = new ExtractException("ELI39577", "Invalid format for page range or last X number of pages.");
+                ue.AddDebugData("Page range", pageRange, false);
+                throw ue;
+            }
+          
+            string startPage = tokens[0].Trim();
+            // start page could be empty
+            startPageNumber = 0;
+            if (!string.IsNullOrWhiteSpace(startPage))
+            {
+                if(startPage == "0")
+                {
+                    var ue = new ExtractException("ELI39578", "Starting page cannot be zero.");
+                    ue.AddDebugData("Page range", pageRange, false);
+                    throw ue;
+                }
+                // make sure the start page is a number
+                if (!Int32.TryParse(startPage, out startPageNumber))
+                {
+                    var ue = new ExtractException("ELI39579", "Could not parse starting page of range.");
+                    ue.AddDebugData("Starting page", startPage, false);
+                    throw ue;
+                }
+            }
+          
+            string endPage = tokens[1].Trim();
+            // end page must not be empty if start page is empty
+            if (string.IsNullOrWhiteSpace(startPage) && string.IsNullOrWhiteSpace(endPage))
+            {
+                var ue = new ExtractException("ELI39580", "Starting and ending page can't be both empty.");
+                ue.AddDebugData("Page range", pageRange, false);
+                throw ue;
+            }
+            else if (string.IsNullOrWhiteSpace(endPage))
+            {
+                // if start page is not empty, but end page is empty, for instance, 2-,
+                // then the user wants to get all pages from the starting page until the end
+                endPageNumber = 0;
+                return;
+            }
+          
+            if (!Int32.TryParse(endPage, out endPageNumber))
+            {
+                var ue = new ExtractException("ELI39581", "Could not parse ending page of range.");
+                ue.AddDebugData("Ending page", endPage, false);
+                throw ue;
+            }
+          
+            // make sure the start page number is less than the end page number
+            if (startPageNumber >= endPageNumber)
+            {
+                var ue = new ExtractException("ELI39582", "Start page number must be less than the end page number.");
+                ue.AddDebugData("Page range", pageRange, false);
+                throw ue;
+            }
+
+            return;
+        }
+
+        /// <summary>
+        /// Updates <see paramref="pageNumbers"/> with new page numbers.
+        /// </summary>
+        /// <param name="pageNumbers">The set of page numbers to update.</param>
+        /// <param name="totalNumberOfPages">The total number of pages in the image</param>
+        /// <param name="startPage">First page number of a range</param>
+        /// <param name="endPage">Last page number of a range</param>
+        /// <param name="throwExceptionOnPageOutOfRange">Whether to throw an exception if <see paramref="endPage"/>
+        /// or <see paramref="startpage"/> are greater than <see paramref="totalNumberOfPages"/></param>
+        private static void updatePageNumbers(HashSet<int> pageNumbers, 
+                               int totalNumberOfPages, 
+                               int startPage, 
+                               int endPage,
+                               bool throwExceptionOnPageOutOfRange)
+        {
+            bool endOutOfRange = endPage > totalNumberOfPages;
+            if (throwExceptionOnPageOutOfRange)
+            {
+                if (endOutOfRange)
+                {
+                    var ue = new ExtractException("ELI39602", "Specified end page number is out of range.");
+                    ue.AddDebugData("End Page Number", endPage, false);
+                    ue.AddDebugData("Total Number Of Pages", totalNumberOfPages, false);
+                    throw ue;
+                }
+                else if (startPage > totalNumberOfPages)
+                {
+                    var ue = new ExtractException("ELI39603", "Specified start page number is out of range.");
+                    ue.AddDebugData("Start Page Number", startPage, false);
+                    ue.AddDebugData("Total Number Of Pages", totalNumberOfPages, false);
+                    throw ue;
+                }
+            }
+
+            int lastPageNumber = !endOutOfRange && endPage > 0 ? endPage : totalNumberOfPages;
+            for (int n = startPage; n <= lastPageNumber; n++)
+            {
+                pageNumbers.Add(n);
+            }
+        }
+
+        /// <summary>
+        /// Updates <see paramref="pageNumbers"/> with new page number(s).
+        /// </summary>
+        /// <param name="pageNumbers">The set of page numbers to update.</param>
+        /// <param name="totalNumberOfPages">The total number of pages in the image</param>
+        /// <param name="pageNumber">Page number or last X page numbers to add to the set.</param>
+        /// <param name="throwExceptionOnPageOutOfRange">Whether to throw an exception if <see paramref="pageNumber"/> is greater than <see paramref="totalNumberOfPages"/></param>
+        /// <param name="lastPagesDefined">If <see langref="true"/> then <see paramref="pageNumber"/> represents the last X number of pages.
+        /// If <see langref="false"/> then <see paramref="pageNumber"/> is a single page number</param>
+        private static void updatePageNumbers(HashSet<int> pageNumbers, 
+                               int totalNumberOfPages, 
+                               int pageNumber,
+                               bool throwExceptionOnPageOutOfRange,
+                               bool lastPagesDefined = false)
+        {
+            // Check if the page number is valid
+            bool pageOutOfRange = pageNumber > totalNumberOfPages;
+            if (pageOutOfRange)
+            {
+                // Throw exception if specified
+                if (throwExceptionOnPageOutOfRange)
+                {
+                    var ue = new ExtractException("ELI39606", "Specified page number is out of range.");
+                    ue.AddDebugData("Page Number", pageNumber, false);
+                    ue.AddDebugData("Total Number Of Pages", totalNumberOfPages, false);
+                    throw ue;
+                }
+                // Check if not last page defined just return
+                else if (!lastPagesDefined)
+                {
+                    return;
+                }
+            }
+            if (lastPagesDefined)
+            {
+                int n = !pageOutOfRange ? (totalNumberOfPages - pageNumber) + 1 : 1;
+                for (; n <= totalNumberOfPages; n++)
+                {
+                    pageNumbers.Add(n);
+                }
+            }
+            else
+            {
+                pageNumbers.Add(pageNumber);
+            }
+        }
+
+        /// <summary>
+        /// Based on the total number of pages and specified page numbers string, return a set of page numbers.
+        /// Whoever calls this function, must have already called validatePageNumbers() to make sure the validity of 
+        /// strSpecifiedPageNumbers.
+        /// </summary>
+        /// <param name="specifiedPageNumbers">String containing specified page numbers in various formats.</param>
+        /// <param name="totalPages">The total number of pages in the image</param>
+        /// <param name="throwExceptionOnPageOutOfRange">Whether to throw an exception if a page number
+        /// is greater than <see paramref="totalPages"/></param>
+        /// <returns>A set of page numbers in ascending order.</returns>
+        private static HashSet<int> FillPageNumbersSet(string specifiedPageNumbers, int totalPages, bool throwExceptionOnPageOutOfRange)
+        {
+            // Assume before this methods is called, the caller has already called ValidatePageNumbers()
+            string[] tokens = specifiedPageNumbers.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var pageNumbers = new HashSet<int>();
+
+            for (int n = 0; n < tokens.Length; n++)
+            {
+                // trim any leading/trailing white spaces
+                string token = tokens[n].Trim();
+
+                // if the token contains a dash
+                if (token.IndexOf('-') != -1)
+                {
+                    // start page could be empty
+                    int startPage, endPage;
+                    GetStartAndEndPage(token, out startPage, out endPage);
+
+                    if (startPage > 0 &&
+                        (endPage > startPage || endPage <= 0))
+                    {
+                        // range of pages
+                        updatePageNumbers(pageNumbers, totalPages, startPage, endPage,
+                            throwExceptionOnPageOutOfRange);
+                    }
+                    else
+                    {
+                        // last X number of pages
+                        updatePageNumbers(pageNumbers, totalPages, endPage,
+                            throwExceptionOnPageOutOfRange, true);
+                    }
+                }
+                else
+                {
+                    // assume this is a page number
+                    int pageNumber;
+                    if (!Int32.TryParse(token, out pageNumber))
+                    {
+                        var ue = new ExtractException("ELI39604", "Could not parse page number.");
+                        ue.AddDebugData("Page Number", token, false);
+                        throw ue;
+                    }
+                    if (pageNumber <= 0)
+                    {
+                        var ue = new ExtractException("ELI39605", "Invalid page number.");
+                        ue.AddDebugData("Page Number", pageNumber, false);
+                        throw ue;
+                    }
+
+                    // single page number
+                    updatePageNumbers(pageNumbers, totalPages, pageNumber,
+                        throwExceptionOnPageOutOfRange);
+                }
+            }
+
+            return pageNumbers;
+        }
+
+        /// <summary>
+        /// Validate specifiedPageNumbers. Throws exception if the string is invalid.
+        /// Valid page number format: single pages (eg. 2, 5), a range of pages (eg. 4-8),
+        /// or last X number of pages (eg. -3). They must be separated by comma (,). When
+        /// a range of pages is specified, starting page number must be less than ending page number.
+        /// </summary>
+        /// <param name="specifiedPageNumbers">String containing specified page numbers in various formats.</param>
+        public static void ValidatePageNumbers(string specifiedPageNumbers)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(specifiedPageNumbers))
+                {
+                    throw new ExtractException("ELI39607", "Specified page number string is empty.");
+                }
+
+                // parse string into tokens
+                string[] tokens = specifiedPageNumbers.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                for (int n = 0; n < tokens.Length; n++)
+                {
+                    // trim any leading/trailing white spaces
+                    string token = tokens[n].Trim();
+
+                    // if the token contains a dash
+                    if (token.IndexOf('-') != -1)
+                    {
+                        // start page could be empty
+                        int startPage, endPage;
+                        GetStartAndEndPage(token, out startPage, out endPage);
+                    }
+                    else
+                    {
+                        // assume this is a page number
+                        int pageNumber;
+                        if (!Int32.TryParse(token, out pageNumber))
+                        {
+                            var ue = new ExtractException("ELI39609", "Could not parse page number.");
+                            ue.AddDebugData("Page Number", token, false);
+                            throw ue;
+                        }
+                        if (pageNumber <= 0)
+                        {
+                            var ue = new ExtractException("ELI39610", "Invalid page number.");
+                            ue.AddDebugData("Page Number", pageNumber, false);
+                            throw ue;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39612");
+            }
+        }
+
+        /// <summary>
+        /// Based on the total number of pages and specified page numbers string, return an enumeration
+        /// of page numbers in an ascending order.
+        /// Whoever calls this function, must have already called validatePageNumbers() to make sure the validity of 
+        /// strSpecifiedPageNumbers.
+        /// </summary>
+        /// <param name="specifiedPageNumbers">String containing specified page numbers in various formats.</param>
+        /// <param name="totalPages">The total number of pages in the image</param>
+        /// <param name="throwExceptionOnPageOutOfRange">Whether to throw an exception if a page number
+        /// is greater than <see paramref="totalPages"/></param>
+        /// <returns>An enumeration of page numbers in ascending order.</returns>
+        public static IEnumerable<int> GetPageNumbersFromString(string specifiedPageNumbers, int totalPages, bool throwExceptionOnPageOutOfRange)
+        {
+            try
+            {
+                var pageNumbers = FillPageNumbersSet(specifiedPageNumbers, totalPages, throwExceptionOnPageOutOfRange);
+                return pageNumbers.OrderBy(p => p);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39611");
             }
         }
     }

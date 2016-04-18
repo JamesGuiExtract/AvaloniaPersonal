@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Extract.Utilities.Test
@@ -333,6 +334,263 @@ namespace Extract.Utilities.Test
         }
 
         #endregion TypesThatImplementInterface
+
+        #region Shuffle
+
+        /// <summary>
+        /// Tests shuffling an array with a fixed random seed.
+        /// </summary>
+        [Test, Category("Shuffle")]
+        [CLSCompliant(false)]
+        public static void ShuffleWithSeed()
+        {
+            var rng = new Random(0);
+            int[] array = { 1, 2, 3, 4 };
+            int[] expected = { 3, 4, 2, 1 };
+            CollectionMethods.Shuffle(array, rng);
+            CollectionAssert.AreEqual(expected, array);
+        }
+
+        /// <summary>
+        /// Tests shuffling two arrays with a fixed random seed.
+        /// </summary>
+        [Test, Category("Shuffle")]
+        [CLSCompliant(false)]
+        public static void Shuffle2WithSeed()
+        {
+            var rng = new Random(0);
+            int[] array1 = { 1, 2, 3, 4 };
+            int[] expected1 = { 3, 4, 2, 1 };
+            string[] array2 = { "one", "two", "three", "four" };
+            string[] expected2 = { "three", "four", "two", "one" };
+            CollectionMethods.Shuffle(array1, array2, rng);
+            CollectionAssert.AreEqual(expected1, array1);
+            CollectionAssert.AreEqual(expected2, array2);
+        }
+
+        // Helper method to generate all permutations of an array
+        private static IEnumerable<IEnumerable<T>>
+            GetPermutations<T>(IEnumerable<T> list, int length)
+        {
+            if (length == 1) return list.Select(t => new T[] { t });
+            return GetPermutations(list, length - 1)
+                .SelectMany(t => list.Where(o => !t.Contains(o)),
+                    (t1, t2) => t1.Concat(new T[] { t2 }));
+        }
+
+        /// <summary>
+        /// Tests shuffling an array with no specified seed.
+        /// </summary>
+        [Test, Category("Shuffle")]
+        [CLSCompliant(false)]
+        public static void ShuffleWithoutSeed()
+        {
+            Dictionary<string, int> results = GetPermutations(new[] { 1, 2, 3, 4 }, 4)
+                .Select(a => Tuple.Create(String.Join("", a), 0))
+                .ToDictionary(t => t.Item1, t => t.Item2);
+
+            for (int i = 0; i < 600000; i++)
+            {
+                int[] array = { 1, 2, 3, 4 };
+                CollectionMethods.Shuffle(array);
+                string result = String.Join("", array);
+                results[result]++;
+            }
+
+            // This assertion is to make sure that the generated permutations are distributed fairly evenly
+            Assert.That(results.Values.Select(count => Math.Abs(25000 - count)).All(difference => difference < 1000),
+                "There is a (slight) chance of the random distributions being very unbalanced so this assertion might fail.");
+
+            // Repeat the process in order to test that the same distribution does not happen each time
+            Dictionary<string, int> results2 = GetPermutations(new[] { 1, 2, 3, 4 }, 4)
+                .Select(a => Tuple.Create(String.Join("", a), 0))
+                .ToDictionary(t => t.Item1, t => t.Item2);
+
+            for (int i = 0; i < 600000; i++)
+            {
+                int[] array = { 1, 2, 3, 4 };
+                CollectionMethods.Shuffle(array);
+                string result = String.Join("", array);
+                results2[result]++;
+            }
+            
+            // If different permutation frequencies occurred then the shuffle algorithm is not biased
+            var permutationsOrderedByCount = results.OrderBy(kv => kv.Value).Select(kv => kv.Key).ToArray();
+            var permutationsOrderedByCount2 = results2.OrderBy(kv => kv.Value).Select(kv => kv.Key).ToArray();
+            CollectionAssert.AreNotEqual(permutationsOrderedByCount, permutationsOrderedByCount2,
+                "There is a chance that this assertion will fail occasionally.");
+        }
+
+        /// <summary>
+        /// Tests shuffling two arrays with no specified seed.
+        /// </summary>
+        [Test, Category("Shuffle")]
+        [CLSCompliant(false)]
+        public static void Shuffle2WithoutSeed()
+        {
+            Dictionary<string, int> results1 = GetPermutations(new[] { 1, 2, 3, 4 }, 4)
+                .Select(a => Tuple.Create(String.Join("", a), 0))
+                .ToDictionary(t => t.Item1, t => t.Item2);
+
+            Dictionary<string, int> results2 = GetPermutations(new[] { "one", "two", "three", "four" }, 4)
+                .Select(a => Tuple.Create(String.Join("", a), 0))
+                .ToDictionary(t => t.Item1, t => t.Item2);
+
+            for (int i = 0; i < 600000; i++)
+            {
+                int[] array1 = { 1, 2, 3, 4 };
+                string[] array2 = { "one", "two", "three", "four" };
+                CollectionMethods.Shuffle(array1, array2);
+                string result1 = String.Join("", array1);
+                string result2 = String.Join("", array2);
+                results1[result1]++;
+                results2[result2]++;
+            }
+            Assert.That(results1.Values.Select(count => Math.Abs(25000 - count)).All(difference => difference < 1000),
+                "There is a (slight) chance of the random distributions being very unbalanced so this assertion might fail.");
+            CollectionAssert.AreEqual(results1.Values, results2.Values);
+        }
+
+        #endregion Shuffle
+
+        #region GetRandomString
+
+        /// <summary>
+        /// Tests generating a random string in a loop to make sure numbers aren't repeated very much.
+        /// </summary>
+        [Test, Category("GetRandomString")]
+        [CLSCompliant(false)]
+        public static void GetRandomStrings()
+        {
+            string[] results = new string[600000];
+
+            for (int i = 0; i < 600000; i++)
+            {
+                results[i] = UtilityMethods.GetRandomString(10, true, false, true);
+            }
+            Assert.That(results.Distinct().Count() == 600000,
+                "There is a (slight) chance of generating repeated random strings so this assertion might fail.");
+        }
+
+        #endregion GetRandomString
+
+        #region ValidatePageNumbers
+
+        /// <summary>
+        /// Tests ValidatePageNumbers on valid strings
+        /// </summary>
+        [Test, Category("ValidatePageNumbers")]
+        [CLSCompliant(false)]
+        public static void ValidPageNumbers()
+        {
+            Assert.DoesNotThrow(() => UtilityMethods.ValidatePageNumbers("1-3"));
+            Assert.DoesNotThrow(() => UtilityMethods.ValidatePageNumbers("-3"));
+            Assert.DoesNotThrow(() => UtilityMethods.ValidatePageNumbers("3-"));
+            Assert.DoesNotThrow(() => UtilityMethods.ValidatePageNumbers("1,2,3-,-1,4,5,1-10"));
+        }
+
+        /// <summary>
+        /// Tests ValidatePageNumbers on invalid strings
+        /// </summary>
+        [Test, Category("ValidatePageNumbers")]
+        [CLSCompliant(false)]
+        public static void InvalidPageNumbers()
+        {
+            Assert.Throws<ExtractException>(() => UtilityMethods.ValidatePageNumbers("1--3"));
+            Assert.Throws<ExtractException>(() => UtilityMethods.ValidatePageNumbers("1--"));
+            Assert.Throws<ExtractException>(() => UtilityMethods.ValidatePageNumbers("--1"));
+            Assert.Throws<ExtractException>(() => UtilityMethods.ValidatePageNumbers(""));
+            Assert.Throws<ExtractException>(() => UtilityMethods.ValidatePageNumbers("abc"));
+            Assert.Throws<ExtractException>(() => UtilityMethods.ValidatePageNumbers("1A-3"));
+            Assert.Throws<ExtractException>(() => UtilityMethods.ValidatePageNumbers("A-B"));
+        }
+
+        #endregion ValidatePageNumbers
+
+        #region GetPageNumbersFromString
+
+        /// <summary>
+        /// Tests generating page numbers from range string
+        /// </summary>
+        [Test, Category("GetPageNumbersFromString")]
+        [CLSCompliant(false)]
+        public static void GetPageRangesFromString()
+        {
+            var result = UtilityMethods.GetPageNumbersFromString("1-3", 3, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("1-3", 2, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("1-", 3, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("-1", 3, false);
+            CollectionAssert.AreEquivalent(new[] { 3 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("-2", 3, false);
+            CollectionAssert.AreEquivalent(new[] { 2, 3 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("-3", 3, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("3-", 3, false);
+            CollectionAssert.AreEquivalent(new[] { 3 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("4-", 3, false);
+            CollectionAssert.AreEquivalent(new int[0], result);
+
+            result = UtilityMethods.GetPageNumbersFromString("-4", 3, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
+        }
+
+        /// <summary>
+        /// Tests generating page numbers from multiple ranges
+        /// </summary>
+        [Test, Category("GetPageNumbersFromString")]
+        [CLSCompliant(false)]
+        public static void GetMultiplePageRangesFromString()
+        {
+            var result = UtilityMethods.GetPageNumbersFromString("1,-1", 4, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 4 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("1,1-3", 4, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("1,1-3", 2, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("-1, 3, 10", 300, false);
+            CollectionAssert.AreEquivalent(new[] { 3, 10, 300 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("271-, 3, 10", 300, false);
+            CollectionAssert.AreEquivalent(new[] { 3, 10, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300 }, result);
+        }
+
+        /// <summary>
+        /// Tests exception handling generating page numbers from formatted string
+        /// </summary>
+        [Test, Category("GetPageNumbersFromString")]
+        [CLSCompliant(false)]
+        public static void GetPageNumbersFromStringExceptions()
+        {
+            var ex = Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("4-2", 3, false));
+            Assert.That( ex.Message, Is.EqualTo("Start page number must be less than the end page number.") );
+
+            ex = Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("-0", 3, false));
+            Assert.That( ex.Message, Is.EqualTo("Start page number must be less than the end page number.") );
+
+            ex = Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("2-4", 3, true));
+            Assert.That( ex.Message, Is.EqualTo("Specified end page number is out of range.") );
+
+            ex = Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("-4", 3, true));
+            Assert.That( ex.Message, Is.EqualTo("Specified page number is out of range.") );
+
+            ex = Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("4-", 3, true));
+            Assert.That( ex.Message, Is.EqualTo("Specified start page number is out of range.") );
+        }
+
+        #endregion GetPageNumbersFromString
 
         #endregion TestMethods
     }
