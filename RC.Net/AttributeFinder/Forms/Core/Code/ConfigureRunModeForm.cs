@@ -11,6 +11,7 @@ namespace Extract.AttributeFinder.Forms
     /// </summary>
     [ComVisible(true)]
     [Guid("4E3CADA1-A857-42D0-A326-21B7BEE58D75")]
+    [CLSCompliant(false)]
     public partial class ConfigureRunModeForm : Form, IRunModeConfigure
     {
         #region Constructors 
