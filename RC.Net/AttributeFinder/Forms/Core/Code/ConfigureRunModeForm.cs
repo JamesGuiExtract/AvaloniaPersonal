@@ -45,7 +45,7 @@ namespace Extract.AttributeFinder.Forms
         /// <summary>
         /// Method used to configure Run mode settings
         /// </summary>
-        /// <param name="pRunMode">The <see cref="IRunMode"> object that is being configured</param>
+        /// <param name="pRunMode">The <see cref="IRunMode"/> object that is being configured</param>
         /// <param name="nHandle">The handle to the parent window</param>
         public void ConfigureRunMode(IRunMode pRunMode, int nHandle)
         {
