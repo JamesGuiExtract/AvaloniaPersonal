@@ -89,7 +89,7 @@
             this._okButton.Location = new System.Drawing.Point(450, 435);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(87, 23);
-            this._okButton.TabIndex = 5;
+            this._okButton.TabIndex = 15;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -101,7 +101,7 @@
             this._cancelButton.Location = new System.Drawing.Point(543, 435);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(87, 23);
-            this._cancelButton.TabIndex = 6;
+            this._cancelButton.TabIndex = 16;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             this._cancelButton.Click += new System.EventHandler(this._cancelButton_Click);
@@ -114,7 +114,7 @@
             this._attributeValueTextBox.Multiline = true;
             this._attributeValueTextBox.Name = "_attributeValueTextBox";
             this._attributeValueTextBox.Size = new System.Drawing.Size(525, 40);
-            this._attributeValueTextBox.TabIndex = 3;
+            this._attributeValueTextBox.TabIndex = 11;
             this._attributeValueTextBox.TextChanged += new System.EventHandler(this.TextBox_TextChanged);
             this._attributeValueTextBox.Enter += new System.EventHandler(this.HandleFocusEnter);
             this._attributeValueTextBox.Leave += new System.EventHandler(this.HandleFocusLeave);
@@ -158,7 +158,7 @@
             this._attributeTypeTextBox.Multiline = true;
             this._attributeTypeTextBox.Name = "_attributeTypeTextBox";
             this._attributeTypeTextBox.Size = new System.Drawing.Size(522, 40);
-            this._attributeTypeTextBox.TabIndex = 4;
+            this._attributeTypeTextBox.TabIndex = 14;
             this._attributeTypeTextBox.TextChanged += new System.EventHandler(this.TextBox_TextChanged);
             this._attributeTypeTextBox.Enter += new System.EventHandler(this.HandleFocusEnter);
             this._attributeTypeTextBox.Leave += new System.EventHandler(this.HandleFocusLeave);
@@ -169,7 +169,7 @@
             this._removeButton.Location = new System.Drawing.Point(543, 132);
             this._removeButton.Name = "_removeButton";
             this._removeButton.Size = new System.Drawing.Size(87, 23);
-            this._removeButton.TabIndex = 8;
+            this._removeButton.TabIndex = 3;
             this._removeButton.Text = "Remove";
             this._removeButton.UseVisualStyleBackColor = true;
             this._removeButton.Click += new System.EventHandler(this._removeButton_Click);
@@ -225,7 +225,7 @@
             this._attributeNameTextBox.Multiline = true;
             this._attributeNameTextBox.Name = "_attributeNameTextBox";
             this._attributeNameTextBox.Size = new System.Drawing.Size(522, 40);
-            this._attributeNameTextBox.TabIndex = 2;
+            this._attributeNameTextBox.TabIndex = 8;
             this._attributeNameTextBox.TextChanged += new System.EventHandler(this.TextBox_TextChanged);
             this._attributeNameTextBox.Enter += new System.EventHandler(this.HandleFocusEnter);
             this._attributeNameTextBox.Leave += new System.EventHandler(this.HandleFocusLeave);
@@ -246,7 +246,7 @@
             this._nameCheckBox.Location = new System.Drawing.Point(105, 228);
             this._nameCheckBox.Name = "_nameCheckBox";
             this._nameCheckBox.Size = new System.Drawing.Size(75, 17);
-            this._nameCheckBox.TabIndex = 11;
+            this._nameCheckBox.TabIndex = 6;
             this._nameCheckBox.Text = "use XPath";
             this._nameCheckBox.UseVisualStyleBackColor = true;
             this._nameCheckBox.CheckedChanged += new System.EventHandler(this.CheckBoxChanged);
@@ -261,7 +261,7 @@
             this._valueCheckBox.Location = new System.Drawing.Point(105, 297);
             this._valueCheckBox.Name = "_valueCheckBox";
             this._valueCheckBox.Size = new System.Drawing.Size(75, 17);
-            this._valueCheckBox.TabIndex = 13;
+            this._valueCheckBox.TabIndex = 9;
             this._valueCheckBox.Text = "use XPath";
             this._valueCheckBox.UseVisualStyleBackColor = true;
             this._valueCheckBox.CheckedChanged += new System.EventHandler(this.CheckBoxChanged);
@@ -274,7 +274,7 @@
             this._typeCheckBox.Location = new System.Drawing.Point(105, 366);
             this._typeCheckBox.Name = "_typeCheckBox";
             this._typeCheckBox.Size = new System.Drawing.Size(75, 17);
-            this._typeCheckBox.TabIndex = 15;
+            this._typeCheckBox.TabIndex = 12;
             this._typeCheckBox.Text = "use XPath";
             this._typeCheckBox.UseVisualStyleBackColor = true;
             this._typeCheckBox.CheckedChanged += new System.EventHandler(this.CheckBoxChanged);
@@ -287,7 +287,7 @@
             this._nameDoNotCreateIfEmptyCheckBox.Location = new System.Drawing.Point(308, 229);
             this._nameDoNotCreateIfEmptyCheckBox.Name = "_nameDoNotCreateIfEmptyCheckBox";
             this._nameDoNotCreateIfEmptyCheckBox.Size = new System.Drawing.Size(229, 17);
-            this._nameDoNotCreateIfEmptyCheckBox.TabIndex = 12;
+            this._nameDoNotCreateIfEmptyCheckBox.TabIndex = 7;
             this._nameDoNotCreateIfEmptyCheckBox.Text = "Do not create attribute if this value is empty";
             this._nameDoNotCreateIfEmptyCheckBox.UseVisualStyleBackColor = true;
             this._nameDoNotCreateIfEmptyCheckBox.CheckedChanged += new System.EventHandler(this.CheckBoxChanged);
@@ -299,7 +299,7 @@
             this._valueDoNotCreateIfEmptyCheckBox.Location = new System.Drawing.Point(308, 297);
             this._valueDoNotCreateIfEmptyCheckBox.Name = "_valueDoNotCreateIfEmptyCheckBox";
             this._valueDoNotCreateIfEmptyCheckBox.Size = new System.Drawing.Size(229, 17);
-            this._valueDoNotCreateIfEmptyCheckBox.TabIndex = 14;
+            this._valueDoNotCreateIfEmptyCheckBox.TabIndex = 10;
             this._valueDoNotCreateIfEmptyCheckBox.Text = "Do not create attribute if this value is empty";
             this._valueDoNotCreateIfEmptyCheckBox.UseVisualStyleBackColor = true;
             this._valueDoNotCreateIfEmptyCheckBox.CheckedChanged += new System.EventHandler(this.CheckBoxChanged);
@@ -311,7 +311,7 @@
             this._typeDoNotCreateIfEmptyCheckBox.Location = new System.Drawing.Point(308, 366);
             this._typeDoNotCreateIfEmptyCheckBox.Name = "_typeDoNotCreateIfEmptyCheckBox";
             this._typeDoNotCreateIfEmptyCheckBox.Size = new System.Drawing.Size(229, 17);
-            this._typeDoNotCreateIfEmptyCheckBox.TabIndex = 16;
+            this._typeDoNotCreateIfEmptyCheckBox.TabIndex = 13;
             this._typeDoNotCreateIfEmptyCheckBox.Text = "Do not create attribute if this value is empty";
             this._typeDoNotCreateIfEmptyCheckBox.UseVisualStyleBackColor = true;
             this._typeDoNotCreateIfEmptyCheckBox.CheckedChanged += new System.EventHandler(this.CheckBoxChanged);
@@ -327,7 +327,7 @@
             this._duplicateButton.Location = new System.Drawing.Point(543, 103);
             this._duplicateButton.Name = "_duplicateButton";
             this._duplicateButton.Size = new System.Drawing.Size(87, 23);
-            this._duplicateButton.TabIndex = 7;
+            this._duplicateButton.TabIndex = 2;
             this._duplicateButton.Text = "Duplicate";
             this._duplicateButton.UseVisualStyleBackColor = true;
             this._duplicateButton.Click += new System.EventHandler(this._duplicateButton_Click);
@@ -339,7 +339,7 @@
             this._downButton.Location = new System.Drawing.Point(595, 161);
             this._downButton.Name = "_downButton";
             this._downButton.Size = new System.Drawing.Size(35, 35);
-            this._downButton.TabIndex = 10;
+            this._downButton.TabIndex = 5;
             this._downButton.UseVisualStyleBackColor = true;
             this._downButton.Click += new System.EventHandler(this._downButton_Click);
             // 
@@ -350,7 +350,7 @@
             this._upButton.Location = new System.Drawing.Point(543, 161);
             this._upButton.Name = "_upButton";
             this._upButton.Size = new System.Drawing.Size(35, 35);
-            this._upButton.TabIndex = 9;
+            this._upButton.TabIndex = 4;
             this._upButton.UseVisualStyleBackColor = true;
             this._upButton.Click += new System.EventHandler(this._upButton_Click);
             // 
