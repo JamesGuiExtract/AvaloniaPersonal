@@ -83,6 +83,13 @@
     <Compile Include="ConfigurableObjectControl.Designer.cs">
       <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="CreateAttribute.cs" />
+    <Compile Include="CreateAttributeSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateAttributeSettingsDialog.designer.cs">
+      <DependentUpon>CreateAttributeSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataEntryPreloader.cs" />
     <Compile Include="DataEntryPreloaderSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -328,6 +335,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ConfigurableObjectControl.resx">
       <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateAttributeSettingsDialog.resx">
+      <DependentUpon>CreateAttributeSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DataEntryPreloaderSettingsDialog.resx">
       <DependentUpon>DataEntryPreloaderSettingsDialog.cs</DependentUpon>

@@ -27,15 +27,36 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Removes marker text from a textbox, and restores the font color to black.
+        /// Removes marker text from a textbox, and restores the font color to black, BUT only
+        /// if the required marker is actually already set in the textbox.
         /// </summary>
         /// <param name="textBox"></param>
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         static public void RemoveRequiredMarker(this TextBoxBase textBox)
         {
-            textBox.ForeColor = System.Drawing.Color.Black;
-            textBox.Text = "";
-            textBox.Refresh();
+            if (textBox.IsRequiredMarkerSet())
+            {
+                textBox.ForeColor = System.Drawing.Color.Black;
+                textBox.Text = "";
+                textBox.Refresh();
+            }
+            else
+            {
+                var text = textBox.Text;
+                if (text.Contains(REQUIRED_FIELD_MARKER))
+                {
+                    var contents = RemoveTrailingRequiredText(text);
+                    textBox.ForeColor = System.Drawing.Color.Black;
+                    textBox.Text = contents;
+                    textBox.Refresh();
+                    textBox.SafeBeginInvoke("ELI39626", () =>
+                        {
+                            textBox.SelectionStart = contents.Length;
+                            textBox.SelectionLength = 0;
+                            textBox.Focus();
+                        });
+                }
+            }
         }
 
         /// <summary>
@@ -112,7 +133,22 @@ namespace Extract.Utilities.Forms
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         static public string TextValue(this TextBoxBase textBox)
         {
-            return IsRequiredMarkerSet(textBox) ? "" : textBox.Text;
+            if (IsRequiredMarkerSet(textBox))
+            {
+                return "";
+            }
+            else
+            {
+                var text = textBox.Text;
+                if (text.Contains(REQUIRED_FIELD_MARKER))
+                {
+                    return RemoveTrailingRequiredText(text);
+                }
+                else
+                {
+                    return text;
+                }
+            }
         }
 
         /// <summary>
@@ -136,6 +172,18 @@ namespace Extract.Utilities.Forms
             {
                 throw ex.AsExtract("ELI39231");
             }
+        }
+
+        /// <summary>
+        /// Removes the trailing required field marker text. This can occur when performing
+        /// character-by-character validation in textbox fields.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The text that remains when the required marker has been removed.</returns>
+        static string RemoveTrailingRequiredText(string text)
+        {
+            int end = text.IndexOf(REQUIRED_FIELD_MARKER);
+            return text.Substring(0, length: end);
         }
     }
 }
