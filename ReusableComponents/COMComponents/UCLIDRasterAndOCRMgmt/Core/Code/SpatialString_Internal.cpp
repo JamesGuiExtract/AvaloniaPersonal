@@ -4112,3 +4112,43 @@ ILongToObjectMapPtr CSpatialString::getUnrotatedPageInfoMap()
 
 	return ipResult;
 }
+//-------------------------------------------------------------------------------------------------
+UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialString::makeBlankPage(int nPage, string textForPage)
+{
+	// Create the spatial string for the page
+	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipPage(CLSID_SpatialString);
+	ASSERT_RESOURCE_ALLOCATION("ELI39512", ipPage != __nullptr);
+
+	// Set the source doc name
+	ipPage->SourceDocName = m_strSourceDocName.c_str();
+
+	// Get the size of the page
+	int nHeight, nWidth;
+	getImagePixelHeightAndWidth(m_strSourceDocName, nHeight, nWidth, nPage);
+
+	// Set a long rectangle with the boundaries
+	ILongRectanglePtr ipRect( CLSID_LongRectangle );
+	ASSERT_RESOURCE_ALLOCATION("ELI39513", ipRect != __nullptr);
+
+	ipRect->SetBounds(0, 0, nWidth, nHeight);
+
+	// create a spatial page info with an orientation of kRotNone and a skew of 0.0
+	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
+	ASSERT_RESOURCE_ALLOCATION("ELI39515", ipPageInfo != __nullptr);
+	ipPageInfo->Initialize(nWidth, nHeight, UCLID_RASTERANDOCRMGMTLib::kRotNone, 0.0);
+	
+	// Create the page infos map for the page
+	ILongToObjectMapPtr ipPageInfos = __nullptr;
+	ipPageInfos.CreateInstance(CLSID_LongToObjectMap);
+	ASSERT_RESOURCE_ALLOCATION("ELI39516", ipPageInfos != __nullptr);
+	ipPageInfos->Set(nPage, ipPageInfo);
+
+	// Create a pseudo-spatial string
+	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(CLSID_RasterZone);
+	ASSERT_RESOURCE_ALLOCATION("ELI39514", ipZone != __nullptr);
+	ipZone->CreateFromLongRectangle(ipRect, nPage);
+	ipPage->CreatePseudoSpatialString(ipZone, textForPage.c_str(),
+		m_strSourceDocName.c_str(), ipPageInfos);
+
+	return ipPage;
+}

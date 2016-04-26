@@ -553,7 +553,24 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					if (m_bInsertAttributesUnderParent)
 					{
 						ISpatialStringPtr ipValue(CLSID_SpatialString);
-						ipValue =  createParentValueFromAFDocAttributes(ipCurrAFDoc, asString(doc+1));
+						
+						// if non-spatial just assume the page number is 1 + current doc number
+						int nPageNumber = doc+1;
+						int nLastPageNumber = nPageNumber;
+
+						// If the document has spatial info get the first and last page
+						if (ipCurrAFDoc->Text->HasSpatialInfo() == VARIANT_TRUE)
+						{
+							// Page number should match the current count
+							ASSERT_RUNTIME_CONDITION("ELI39671", nPageNumber != ipCurrAFDoc->Text->GetFirstPageNumber(),
+								"Unexpected page number.");
+							nLastPageNumber = ipCurrAFDoc->Text->GetLastPageNumber();
+						}
+
+						// if the First and last page are the same use that page number otherwise
+						// use the word "All"
+						string strPageNumber = (nPageNumber == nLastPageNumber) ? asString(nPageNumber) : "All";
+						ipValue =  createParentValueFromAFDocAttributes(ipCurrAFDoc, strPageNumber);
 
 						ipFoundAttributes->PushBack(createParentAttribute(m_strInsertParentName, ipValue, ipFoundOnCurrent));
 					}
@@ -2492,7 +2509,8 @@ IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDo
 	else if (m_eRuleSetRunMode == kRunPerPage)
 	{
 		ISpatialStringPtr ipDocText = ipAFDoc->Text;
-		IIUnknownVectorPtr ipPages =  ipDocText->GetPages();
+		IIUnknownVectorPtr ipPages =  ipDocText->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
+
 		int nPages = ipPages->Size();
 		for (int i = 0; i < nPages; i++)
 		{

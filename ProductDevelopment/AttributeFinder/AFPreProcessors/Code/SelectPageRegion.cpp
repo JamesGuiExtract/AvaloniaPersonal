@@ -1319,7 +1319,7 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 		else
 		{
 			// Get the collection of pages and the count
-			IIUnknownVectorPtr ipPages = ipInputText->GetPages();
+			IIUnknownVectorPtr ipPages = ipInputText->GetPages(VARIANT_FALSE, "");
 			ASSERT_RESOURCE_ALLOCATION("ELI28168", ipPages != __nullptr);
 			long nSize = ipPages->Size();
 

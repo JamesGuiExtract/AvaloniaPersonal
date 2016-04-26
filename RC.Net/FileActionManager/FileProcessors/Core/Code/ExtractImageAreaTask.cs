@@ -946,7 +946,7 @@ namespace Extract.FileActionManager.FileProcessors
             foreach (SpatialString spatialString in targetAttributes
                 .ToIEnumerable<IAttribute>()
                 .Where(attribute => attribute.Value.HasSpatialInfo())
-                .SelectMany(attribute => attribute.Value.GetPages().ToIEnumerable<SpatialString>()))
+                .SelectMany(attribute => attribute.Value.GetPages(false, "").ToIEnumerable<SpatialString>()))
             {
                 if (UseOverallBounds)
                 {

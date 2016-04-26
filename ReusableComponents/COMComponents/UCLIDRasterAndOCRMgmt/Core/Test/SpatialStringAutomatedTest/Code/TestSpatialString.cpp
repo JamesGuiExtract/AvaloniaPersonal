@@ -94,6 +94,7 @@ STDMETHODIMP CTestSpatialString::raw_RunAutomatedTests(IVariantVector* pParams, 
 		runTestCase23();
 		runTestCase24();
 		runTestCase25();
+		runTestCase26();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06681")
 
@@ -2346,7 +2347,7 @@ void CTestSpatialString::runTestCase22()
 			ipComplete->IsEqualTo( ipMulti ) == VARIANT_TRUE  && (m_ipSpatialString->GetMode() == kSpatialMode) &&
 			(ipMultipleSpatialString->GetMode() == kSpatialMode))
 		{
-			// Successfull test if both spatial strings are equal
+			// Successful test if both spatial strings are equal
 			bSuccess = true;
 		}
 		// Post contents of spatial strings
@@ -2746,6 +2747,188 @@ bool CTestSpatialString::testCase25Helper(vector<string>& rvecFilesToJoin, strin
 	ASSERT_RESOURCE_ALLOCATION("ELI37807", ipCompare != __nullptr);
 
 	return compareSpatialStrings(m_ipSpatialString, ipSS);
+}
+//--------------------------------------------------------------------------------------------------
+void CTestSpatialString::runTestCase26()
+{
+	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_26_1"), 
+		get_bstr_t("Testing GetPages(vbIncludeBlankPages, strTextForBlankPage) method - VARIANT_TRUE, \"__EMPTY___\""), kAutomatedTestCase); 
+	
+	bool bExceptionCaught = false;
+	bool bSuccess = true;
+	try
+	{
+		m_ipSpatialString->Clear();
+
+		// Load test document that has 3 blank pages - 1, 3, 5 with pages 2 and 4 having text
+		string strUSSFile = m_strTestFilesFolder + "TestImageWithBlanks.tif.uss";
+		m_ipSpatialString->LoadFrom( get_bstr_t( strUSSFile.c_str() ), VARIANT_FALSE );
+
+		IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_TRUE, "___EMPTY___");
+
+		string strExpectedPagesFile = m_strTestFilesFolder + "TestImageWithBlanks.tif.vpss";
+
+		bSuccess = testCase26Helper(strExpectedPagesFile, ipPages);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39545", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_26_2"), 
+		get_bstr_t("Testing GetPages(vbIncludeBlankPages, strTextForBlankPage) method - VARIANT_FALSE, \"\" "), kAutomatedTestCase); 
+	
+	bExceptionCaught = false;
+	bSuccess = true;
+	try
+	{
+		IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_FALSE, "");
+
+		string strExpectedPagesFile = m_strTestFilesFolder + "TestImageWithBlanks_NoBlanks.tif.vpss";
+
+		bSuccess = testCase26Helper(strExpectedPagesFile, ipPages);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39587", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_26_3"), 
+		get_bstr_t("Testing GetPages(vbIncludeBlankPages, strTextForBlankPage) method - VARIANT_TRUE, \"\" "), kAutomatedTestCase); 
+	
+	bExceptionCaught = false;
+	bSuccess = true;
+	try
+	{
+		try
+		{
+			IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_TRUE, "");
+			bSuccess = false;
+			m_ipResultLogger->AddTestCaseNote("Exception should have been thrown.");
+		}
+		catch(...)
+		{
+			bSuccess = true;
+			m_ipResultLogger->AddTestCaseNote("Exception was thrown as expected.");
+		}
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39678", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_26_4"), 
+		get_bstr_t("Testing GetPages(vbIncludeBlankPages, strTextForBlankPage) method - VARIANT_TRUE, \"__EMPTY___\" with hybrid string"), kAutomatedTestCase); 
+	
+	bExceptionCaught = false;
+	bSuccess = true;
+	try
+	{
+		// convert the spatial string we are working with to hybrid
+		m_ipSpatialString->DowngradeToHybridMode();
+
+		IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_TRUE, "___EMPTY___");
+		
+		string strExpectedPagesFile = m_strTestFilesFolder + "TestImageWithBlanks_Hybrid.tif.vpss";
+		
+		bSuccess = testCase26Helper(strExpectedPagesFile, ipPages);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39590", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_26_5"), 
+		get_bstr_t("Testing GetPages(vbIncludeBlankPages, strTextForBlankPage) method - VARIANT_FALSE, \"\" with hybrid string"), kAutomatedTestCase); 
+	
+	bExceptionCaught = false;
+	bSuccess = true;
+	try
+	{
+		IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_FALSE, "");
+
+		string strExpectedPagesFile = m_strTestFilesFolder + "TestImageWithBlanks_NoBlanks_Hybrid.tif.vpss";
+		
+		bSuccess = testCase26Helper(strExpectedPagesFile, ipPages);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39592", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+	string strUSSFile = m_strTestFilesFolder + "image2blankTogether.tif.uss";
+	m_ipSpatialString->LoadFrom( get_bstr_t( strUSSFile.c_str() ), VARIANT_FALSE );
+		
+	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_26_6"), 
+	get_bstr_t("Testing GetPages(vbIncludeBlankPages, strTextForBlankPage) method with 2 blank pages together - VARIANT_TRUE, \"___EMPTY___\" "), 
+		kAutomatedTestCase); 
+	
+	bExceptionCaught = false;
+	bSuccess = true;
+	try
+	{
+		IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_TRUE, "___EMPTY___");
+
+		string strExpectedPagesFile = m_strTestFilesFolder + "image2blankTogether_WithBlanks.tif.vpss";
+		
+		bSuccess = testCase26Helper(strExpectedPagesFile, ipPages);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39677", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_26_7"), 
+		get_bstr_t("Testing GetPages(vbIncludeBlankPages, strTextForBlankPage) method with" 
+		"2 blank pages together - VARIANT_TRUE, \"___EMPTY___\" with hybrid string"), kAutomatedTestCase); 
+
+
+	// convert the spatial string we are working with to hybrid
+	m_ipSpatialString->DowngradeToHybridMode();
+	
+	bExceptionCaught = false;
+	bSuccess = true;
+	try
+	{
+		IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_TRUE, "___EMPTY___");
+
+		string strExpectedPagesFile = m_strTestFilesFolder + "image2blankTogether_WithBlanks_Hybrid.tif.vpss";
+		
+		bSuccess = testCase26Helper(strExpectedPagesFile, ipPages);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39679", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
+
+}
+//--------------------------------------------------------------------------------------------------
+bool CTestSpatialString::testCase26Helper(string strExpectedPagesFile, IIUnknownVectorPtr ipPages)
+{
+	bool bSuccess = true;
+
+	IIUnknownVectorPtr ipExpectedPages(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI39583", ipExpectedPages != __nullptr);
+	
+	ipExpectedPages->LoadFrom(strExpectedPagesFile.c_str(), VARIANT_FALSE);
+
+	long nPages = ipPages->Size();
+
+	if (nPages != ipExpectedPages->Size())
+	{
+		bSuccess = false;
+		string strMsg = "Expected " + asString(ipExpectedPages->Size()) + " but returned " + asString(nPages);
+		m_ipResultLogger->AddTestCaseNote(strMsg.c_str());
+	}
+	else
+	{
+		// Make sure the pages match
+		for (long i = 0; i < nPages; i++)
+		{
+			ISpatialStringPtr ipPage = ipPages->At(i);
+			ISpatialStringPtr ipExpectedPage = ipExpectedPages->At(i);
+
+			if (!compareSpatialStrings(ipPage, ipExpectedPage))
+			{
+				m_ipResultLogger->AddTestCaseNote(("Page " + asString(i) + " did not match expected.").c_str());
+				bSuccess = false;
+			}
+		}
+	}
+	return bSuccess;
 }
 //--------------------------------------------------------------------------------------------------
 bool CTestSpatialString::compareSpatialStrings(ISpatialStringPtr ipSS1, ISpatialStringPtr ipSS2)

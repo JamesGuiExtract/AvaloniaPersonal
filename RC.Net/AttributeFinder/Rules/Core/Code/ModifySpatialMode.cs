@@ -730,7 +730,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 if (ZoneCountCondition == ModifySpatialModeRasterZoneCountCondition.SinglePage)
                 {
-                    int pageCount = spatialString.GetPages().ToIEnumerable<SpatialString>().Count();
+                    int pageCount = spatialString.GetPages(false, "").ToIEnumerable<SpatialString>().Count();
 
                     if (pageCount > 1)
                     {
@@ -800,7 +800,7 @@ namespace Extract.AttributeFinder.Rules
             // Flatten all pages into an array to force the enumeration to occur before we modify
             // spatialString.
             var spatialStringPages =
-                spatialString.GetPages().ToIEnumerable<SpatialString>().ToArray();
+                spatialString.GetPages(false, "").ToIEnumerable<SpatialString>().ToArray();
 
             // Loop for each page in the source spatialString. Each page's value will be constructed
             // with all of the original text into a raster zone that encapsulates all spatial area

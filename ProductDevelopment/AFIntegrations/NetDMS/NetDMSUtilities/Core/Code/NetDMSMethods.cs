@@ -213,7 +213,7 @@ namespace Extract.NetDMSUtilities
                 .Select(item => item.Attribute)
                 .Where(attribute => attribute.Redacted)
                 .SelectMany(attribute =>
-                    attribute.SpatialString.GetPages()
+                    attribute.SpatialString.GetPages(false, "")
                         .ToIEnumerable<SpatialString>()))
             {
                 RedactionArea redactionArea = new RedactionArea();

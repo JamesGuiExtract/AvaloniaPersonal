@@ -542,7 +542,7 @@ STDMETHODIMP CMicrFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus *p
 		if (ipSS != __nullptr && ipSS->HasSpatialInfo() == VARIANT_TRUE)
 		{
 			// Get the pages from the spatial string [FlexIDSCore #3522]
-			IIUnknownVectorPtr ipPages = ipSS->GetPages();
+			IIUnknownVectorPtr ipPages = ipSS->GetPages(VARIANT_FALSE, "");
 			ASSERT_RESOURCE_ALLOCATION("ELI25600", ipPages != __nullptr);
 
 			// Build a vector of pages to process

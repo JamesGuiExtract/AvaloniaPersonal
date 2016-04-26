@@ -1207,7 +1207,7 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 	}
 
 	// break the input into pages
-	IIUnknownVectorPtr ipPages = ipInputText->GetPages();
+	IIUnknownVectorPtr ipPages = ipInputText->GetPages(VARIANT_FALSE, "");
 
 	// instantiate spatial strings to hold the results
 	ISpatialStringPtr ipOuterRegion, ipCurrentRegion;

@@ -670,7 +670,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 // Loop through each page of the attribute.
                 foreach (SpatialString pageText in
-                    spatialString.GetPages().ToIEnumerable<SpatialString>())
+                    spatialString.GetPages(false, "").ToIEnumerable<SpatialString>())
                 {
                     // [FlexIDSCore:5093] Don't process any pages without spatial info.
                     int page = pageText.GetFirstPageNumber();

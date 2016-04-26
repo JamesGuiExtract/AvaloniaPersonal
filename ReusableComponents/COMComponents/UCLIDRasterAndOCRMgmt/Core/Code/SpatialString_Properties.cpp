@@ -6,6 +6,7 @@
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <COMUtils.h>
+#include <MiscLeadUtils.h>
 
 #include <cmath>
 
@@ -777,7 +778,8 @@ STDMETHODIMP CSpatialString::GetRelativePages(long nStartPageNum, long nEndPageN
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08568");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
+STDMETHODIMP CSpatialString::GetPages(VARIANT_BOOL vbIncludeBlankPages, BSTR strTextForBlankPages,
+	IIUnknownVector **pvecPages)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -793,6 +795,16 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 			UCLIDException ue("ELI25861", "GetPages is not valid for a non-spatial string!");
 			throw ue;
 		}
+
+		// Get the last expected page number - if including blank pages this goes to the source 
+		// document if not just gets the last page number in this spatial string
+		long nExpectedLastPage = asCppBool(vbIncludeBlankPages) ? 
+			getNumberOfPagesInImage(m_strSourceDocName) : getLastPageNumber();
+
+		// set the next expected page to the first page
+		long nExpectedNextPage = 1;
+
+		string strForBlankPage = asString(strTextForBlankPages);
 
 		// Create vector for resulting ISpatialStrings
 		IIUnknownVectorPtr ipPages(CLSID_IUnknownVector);
@@ -818,6 +830,20 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 			for (map<long, vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr>>::iterator it = mapZonesToPages.begin();
 				it != mapZonesToPages.end(); it++)
 			{
+				// if including blank pages check if the current page is greater than the next
+				// expected page, if it is there are blank pages that need to be inserted
+				if (asCppBool(vbIncludeBlankPages))
+				{
+					// Insert all the missing blank pages
+					while(it->first > nExpectedNextPage)
+					{
+						ipPages->PushBack(makeBlankPage(nExpectedNextPage, strForBlankPage));
+						nExpectedNextPage++;
+					}
+					// The next expected page will be 1 more than the current page
+					nExpectedNextPage = it->first + 1;
+				}
+
 				// Build the collection of raster zones for this page
 				IIUnknownVectorPtr ipPageZones(CLSID_IUnknownVector);
 				ASSERT_RESOURCE_ALLOCATION("ELI25863", ipPageZones != __nullptr);
@@ -846,6 +872,17 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 
 			// Get the page number from the letter
 			long nCurrPage = letter.m_usPageNumber;
+
+			// Add missing pages at the front of the document if including blank pages
+			if (asCppBool(vbIncludeBlankPages))
+			{
+				while (nCurrPage > nExpectedNextPage)
+				{
+					ipPages->PushBack( makeBlankPage(nExpectedNextPage, strForBlankPage));
+					nExpectedNextPage++;
+				}
+				nExpectedNextPage = nCurrPage + 1;
+			}
 
 			// Set the start position to beginning of the string
 			long nStartPos = 0;
@@ -877,6 +914,17 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 
 					// Update the current page number
 					nCurrPage = tempLetter.m_usPageNumber;
+
+					// Add any missing blank pages if including blanks
+					if (asCppBool(vbIncludeBlankPages))
+					{
+						while (nCurrPage > nExpectedNextPage)
+						{
+							ipPages->PushBack( makeBlankPage(nExpectedNextPage, strForBlankPage));
+							nExpectedNextPage++;
+						}
+						nExpectedNextPage = nCurrPage + 1;
+					}
 				}
 			}
 
@@ -888,6 +936,16 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 					getSubString(nStartPos, nNumLetters - 1);
 				ASSERT_RESOURCE_ALLOCATION("ELI25866", ipItem != __nullptr);
 				ipPages->PushBack( ipItem );
+			}
+		}
+
+		// add missing pages at the end of the document
+		if (asCppBool(vbIncludeBlankPages))
+		{
+			while (nExpectedNextPage <= nExpectedLastPage)
+			{
+				ipPages->PushBack( makeBlankPage(nExpectedNextPage, strForBlankPage));
+				nExpectedNextPage++;
 			}
 		}
 

@@ -238,7 +238,7 @@ void CSpatialStringSearcherTester::processTestCase(std::vector<std::string>& vec
 
 		if(ipSS->HasSpatialInfo() == VARIANT_TRUE)
 		{
-			IIUnknownVectorPtr ipPages = ipSS->GetPages();
+			IIUnknownVectorPtr ipPages = ipSS->GetPages(VARIANT_FALSE, "");
 			lNumPages = ipPages->Size();
 			if (lPageNum > lNumPages || lPageNum < 1)
 			{	

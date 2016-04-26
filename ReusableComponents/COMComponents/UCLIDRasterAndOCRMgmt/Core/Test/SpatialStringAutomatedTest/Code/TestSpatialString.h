@@ -82,12 +82,16 @@ private:
 	void runTestCase23(); // added as per [p13 #4942] - 03/28/2008 - JDS
 	void runTestCase24(); // added as per [LegacyRCAndUtils #4976] - 05/14/2008 - JDS
 	void runTestCase25();
+	void runTestCase26(); // Added to test GetPages changes for blank pages - https://extract.atlassian.net/browse/ISSUE-13697
 
 	// Sets the test file folder
 	void setTestFileFolder(IVariantVectorPtr ipParams, const std::string &strTCLFile);
 
 	// used by test case 25 to load, combine and compare strings
 	bool testCase25Helper(vector<string>& rvecFilesToJoin, string& expected);
+
+	// Used by test case 26 to test the output
+	bool testCase26Helper(string strExpectedPagesFile, IIUnknownVectorPtr ipPages);
 
 	// Compares the spatial strings and the page info sturcture of the 2 strings 
 	// This is needed because the IsEqualTo of Spatial string class does not 

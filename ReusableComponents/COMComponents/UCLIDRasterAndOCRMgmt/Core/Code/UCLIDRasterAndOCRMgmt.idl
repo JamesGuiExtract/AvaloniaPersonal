@@ -674,7 +674,13 @@ library UCLID_RASTERANDOCRMGMTLib
 		// REQUIRE: GetMode() != kNonSpatialMode
 		// PROMISE: Return a collection of spatial strings. Each spatial string has spatial data from only
 		//			one page.
-		[id(40), helpstring("method GetPages")] HRESULT GetPages([out, retval] IIUnknownVector **pvecPages);
+		//			vbIncludeBlankPages == VARIANT_TRUE will create spatial strings for the pages
+		//			that do not exist in the spatial string - they will have a space that has
+		//			spatial information for the entire page
+		//			strTextForBlankPage -- Text that will be placed in the spatial string for the page
+		//			that will be created as a pseudo-spatial string with the dimensions of the page
+		[id(40), helpstring("method GetPages")] HRESULT GetPages(VARIANT_BOOL vbIncludeBlankPages, 
+			BSTR strTextForBlankPage, [out, retval] IIUnknownVector **pvecPages);
 		//-----------------------------------------------------------------------------------------
 		// REQUIRE: GetMode() == kSpatialMode
 		// PURPOSE:	Return an approximation of the Line Height(in pixels) of a spatial string

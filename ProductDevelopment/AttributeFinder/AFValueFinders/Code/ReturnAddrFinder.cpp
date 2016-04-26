@@ -263,7 +263,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 				ipSearcher->SetBoundaryResolution(kLine);
 
 				// get the pages of the spatial string
-				IIUnknownVectorPtr ipPages(ipSS->GetPages());
+				IIUnknownVectorPtr ipPages(ipSS->GetPages(VARIANT_FALSE, ""));
 				ASSERT_RESOURCE_ALLOCATION("ELI20429", ipPages != __nullptr);
 
 				// find prefixes on each page of the document [P16 #2943]

@@ -92,7 +92,7 @@ public:
 	STDMETHOD(ConsolidateString)( BSTR strConsolidateString, VARIANT_BOOL bCaseSensitive);
 	STDMETHOD(UpdatePageNumber)( long nPageNumber);
 	STDMETHOD(GetSpecifiedPages)( long nStartPageNum,  long nEndPageNum,  ISpatialString** ppResultString);
-	STDMETHOD(GetPages)( IIUnknownVector **pvecPages);
+	STDMETHOD(GetPages)(VARIANT_BOOL vbIncludeBlankPages, BSTR strTextForBlankPages, IIUnknownVector **pvecPages);
 	STDMETHOD(GetAverageLineHeight)( long *lpHeight);
 	STDMETHOD(GetAverageCharWidth)( long* lpWidth);
 	STDMETHOD(GetAverageCharHeight)( long *lpHeight);
@@ -635,5 +635,9 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// Gets the spatial page info map of the spatial string without any deskew or rotation applied.
 	ILongToObjectMapPtr getUnrotatedPageInfoMap();
+	//----------------------------------------------------------------------------------------------
+	// Creates a blank page by going to the source document and getting the dimensions of the page
+	// and then creates a pseudo-spatial string with the given text
+	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr makeBlankPage(int nPage, string textForPage);
 	//----------------------------------------------------------------------------------------------
 };

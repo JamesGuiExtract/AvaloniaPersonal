@@ -1418,7 +1418,7 @@ unsigned long CIDShieldTester::countExpectedAttributesOnSelectedPages(
 
 		if (asCppBool(ipValue->HasSpatialInfo()))
 		{
-			IIUnknownVectorPtr ipPages = ipValue->GetPages();
+			IIUnknownVectorPtr ipPages = ipValue->GetPages(VARIANT_FALSE, "");
 			ASSERT_RESOURCE_ALLOCATION("ELI35303", ipPages != __nullptr);
 			
 			// If the expected attribute spans multiple pages, check if any of the selected pages is
