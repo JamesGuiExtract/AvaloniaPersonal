@@ -235,6 +235,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         PaginationControl _commandTargetControl;
 
         /// <summary>
+        /// Indicates whether the <see cref="PrimarySelection"/> should update the displayed page in
+        /// the <see cref="ImageViewer"/>.
+        /// </summary>
+        bool _enablePageDisplay = true;
+
+        /// <summary>
         /// Context menu option that allows the selected PaginationControls to be cut.
         /// </summary>
         readonly ToolStripMenuItem _cutMenuItem = new ToolStripMenuItem("Cut");
@@ -592,6 +598,47 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets whether the primarily selected <see cref="PageThumbnailControl"/> should
+        /// update the displayed page in the <see cref="ImageViewer"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if the primarily selected page should update the displayed
+        /// page in the <see cref="ImageViewer"/>; otherwise, <see langword="false"/>.</value>
+        public bool EnablePageDisplay
+        {
+            get
+            {
+                return _enablePageDisplay;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _enablePageDisplay)
+                    {
+                        // If page display is not enabled, the ImageViewer needs to be deactivated
+                        // for all pages so that when selection changes the pages don't try to close
+                        // the currently displayed document.
+                        if (!value)
+                        {
+                            foreach (var pageControl in
+                                _flowLayoutPanel.Controls.OfType<PageThumbnailControl>())
+                            {
+                                pageControl.DeactivateImageViewer();
+                            }
+                        }
+
+                        _enablePageDisplay = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39663");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether document output should only be able to be
         /// initiated by the <see cref="IPaginationUtility"/>.
         /// </summary>
@@ -632,6 +679,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="sourceDocument">The <see cref="SourceDocument"/> to be loaded as an
         /// <see cref="OutputDocument"/>.</param>
+        /// <param name="pages">The page numbers from <see paramref="sourceDocument"/> that should
+        /// be used or <see landword="null"/> to us all pages.</param>
         /// <param name="addAtFront"><see langword="true"/> if the new document should be loaded at
         /// the front (top) or <see langword="false"/> to add the document at the end (bottom).
         /// NOTE: If loading documents at the front, all pages will be loaded even it if results in
@@ -639,8 +688,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         /// <param name="insertSeparator"><see langword="true"/> if a separator should be inserted
         /// before creating the new; otherwise, <see langword="false"/>.</param>
-        public void CreateOutputDocument(SourceDocument sourceDocument, bool addAtFront,
-            bool insertSeparator)
+        /// <returns>The <see cref="OutputDocument"/> that was created.</returns>
+        public OutputDocument CreateOutputDocument(SourceDocument sourceDocument,
+            IEnumerable<int> pages, bool addAtFront, bool insertSeparator)
         {
             bool removedLoadNextDocumentButton = false;
 
@@ -657,17 +707,16 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (sourceDocument == null)
                     {
-                        return;
+                        return null;
                     }
 
-                    Control lastControl = addAtFront
+                    var lastPageControl = addAtFront
                         ? _flowLayoutPanel.Controls
                             .OfType<PageThumbnailControl>()
-                            .LastOrDefault()
+                            .FirstOrDefault()
                         : _flowLayoutPanel.Controls
                             .OfType<PageThumbnailControl>()
-                            .FirstOrDefault();
-                    var lastPageControl = lastControl as PageThumbnailControl;
+                            .LastOrDefault();
                     OutputDocument outputDocument = null;
                     bool usingExistingDocument = false;
 
@@ -675,7 +724,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // we need to add a separator.
                     if (insertSeparator && lastPageControl != null)
                     {
-                        InsertPaginationControl(new PaginationSeparator(), addAtFront ? 0 : -1);
+                        InsertPaginationControl(new PaginationSeparator(), 
+                            index: addAtFront ? 0 : -1);
                     }
                     else if (lastPageControl != null)
                     {
@@ -690,38 +740,48 @@ namespace Extract.UtilityApplications.PaginationUtility
                     outputDocument = outputDocument ??
                         GetOutputDocumentFromUtility(sourceDocument.FileName);
 
-                    Page[] pagesToLoad;
-                    bool allPagesCanBeLoaded = true;
-                    if (addAtFront)
-                    {
-                        pagesToLoad = sourceDocument.Pages.Reverse().ToArray();
-                    }
-                    else
-                    {
-                        pagesToLoad = sourceDocument.Pages.ToArray();
+                    var pagesSet = (pages == null) ? null : new HashSet<int>(pages);
+                    var pagesToLoad = (pagesSet == null)
+                        ? sourceDocument.Pages.ToArray()
+                        : sourceDocument.Pages.Where(page =>
+                            pagesSet
+                                .Contains(page.OriginalPageNumber))
+                                .ToArray();
 
+                    bool allPagesCanBeLoaded = true;
+                    if (!addAtFront)
+                    {
                         // Handle case that loading pagesToLoad would exceed _MAX_LOADED_PAGES.
                         allPagesCanBeLoaded = CanAllPagesBeLoaded(ref pagesToLoad);
                     }
+
+                    int pageIndex = addAtFront ? 0 : -1;
 
                     // Create a page control for every page in sourceDocument.
                     foreach (Page page in pagesToLoad)
                     {
                         InsertPaginationControl(new PageThumbnailControl(outputDocument, page),
-                            addAtFront ? 0 : -1);
+                            pageIndex);
+
+                        pageIndex = addAtFront ? pageIndex + 1 : -1;
                     }
 
                     // As long as all pages could be loaded and we haven't appended to the end of an
                     // existing document, indicate that if the document is output in its present
                     // form, it can simply be copied to the output path rather than require it to be
                     // re-assembled.
-                    outputDocument.InOriginalForm = allPagesCanBeLoaded && !usingExistingDocument;
+                    if (allPagesCanBeLoaded && !usingExistingDocument)
+                    {
+                        outputDocument.SetOriginalForm();
+                    }
 
                     this.SafeBeginInvoke("ELI35612", () =>
                     {
                         // Ensure this control has keyboard focus after loading a document.
                         Focus();
                     });
+
+                    return outputDocument;
                 }
             }
             catch (Exception ex)
@@ -740,6 +800,71 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     ex.ExtractDisplay("ELI35624");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads the specified <see paramref="outputDocument"/> into the panel using the specified
+        /// <see paramref="pages"/>.
+        /// </summary>
+        /// <param name="outputDocument">The <see cref="OutputDocument"/> to load.</param>
+        /// <param name="pages">The <see cref="Page"/> instances to load into the document.</param>
+        public void LoadOutputDocument(OutputDocument outputDocument, IEnumerable<Page> pages)
+        {
+            bool removedLoadNextDocumentButton = false;
+
+            try
+            {
+                using (new PageLayoutControlUpdateLock(this))
+                {
+                    // While new pages are being added, remove the load next document control.
+                    RemovePaginationControl(_loadNextDocumentButtonControl, false);
+                    removedLoadNextDocumentButton = true;
+
+                    Control lastPageControl = _flowLayoutPanel.Controls
+                        .OfType<PageThumbnailControl>()
+                        .LastOrDefault();
+
+                    // If insertSeparator == true and the last control is currently a page control,
+                    // we need to add a separator.
+                    if (lastPageControl != null)
+                    {
+                        InsertPaginationControl(new PaginationSeparator(), index: -1);
+                    }
+
+                    // Create a page control for every page in sourceDocument.
+                    foreach (var page in pages)
+                    {
+                        InsertPaginationControl(new PageThumbnailControl(outputDocument, page),
+                            index: -1);
+                    }
+
+                    outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
+
+                    this.SafeBeginInvoke("ELI39641", () =>
+                    {
+                        // Ensure this control has keyboard focus after loading a document.
+                        Focus();
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39642");
+            }
+            finally
+            {
+                try
+                {
+                    if (removedLoadNextDocumentButton)
+                    {
+                        AddPaginationControl(_loadNextDocumentButtonControl);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI39643");
                 }
             }
         }
@@ -1056,6 +1181,30 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39509");
+            }
+        }
+
+        /// <summary>
+        /// Selects the first <see cref="PageThumbnailControl"/>.
+        /// </summary>
+        public void SelectFirstPage()
+        {
+            try
+            {
+                var firstPage = _flowLayoutPanel.Controls
+                    .OfType<PageThumbnailControl>()
+                    .FirstOrDefault();
+
+                if (firstPage != null)
+                {
+                    ClearSelection();
+                    SelectControl(firstPage, true, true);
+                    ProcessControlSelection(firstPage, null, true, Keys.None);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39646");
             }
         }
 
@@ -1977,7 +2126,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <returns></returns>
         bool AddPaginationControl(PaginationControl control)
         {
-            return InsertPaginationControl(control, -1);
+            return InsertPaginationControl(control, index: -1);
         }
 
         /// <summary>

@@ -141,6 +141,9 @@
     <Compile Include="PageThumbnailControl.Designer.cs">
       <DependentUpon>PageThumbnailControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="PageThumbnailControl.Stylists.cs">
+      <DependentUpon>PageThumbnailControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="PaginationControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -209,6 +212,10 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <Compile Include="PaginationPanel.ExtendedOutputDocument.cs">
+      <DependentUpon>PaginationPanel.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

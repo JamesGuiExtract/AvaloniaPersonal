@@ -2066,7 +2066,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                             // keep the UI responsive as pages are loaded. This allows an opportunity
                             // for there to be multiple calls into LoadNextDocument at the same time.
                             _primaryPageLayoutControl.CreateOutputDocument(sourceDocument,
-                                false, _config.Settings.AutoInsertDocumentBoundaries);
+                                pages: null, addAtFront: false,
+                                insertSeparator: _config.Settings.AutoInsertDocumentBoundaries);
 
                             return true;
                         }
@@ -2228,7 +2229,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If no documents were loaded, call CreateOutputDocument so that the load next
                 // document button gets added.
                 _primaryPageLayoutControl.CreateOutputDocument(null,
-                    false, _config.Settings.AutoInsertDocumentBoundaries);
+                    pages: null, addAtFront: false,
+                    insertSeparator: _config.Settings.AutoInsertDocumentBoundaries);
             }
 
             // As long as there are no pages pending to be loaded, enable the load next document

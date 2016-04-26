@@ -80,7 +80,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<EventArgs> ThumbnailChanged;
 
         /// <summary>
-        /// Raised when the orienatation of the <see cref="ThumbnailImage"/> has changed.
+        /// Raised when the orientation of the <see cref="ThumbnailImage"/> has changed.
         /// </summary>
         public event EventHandler<EventArgs> OrientationChanged;
 
@@ -200,7 +200,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets a value indicating whether any object has has an active reference to this instance.
+        /// Gets a value indicating whether any object has an active reference to this instance.
         /// </summary>
         /// <value><see langword="true"/> if there is an active reference; otherwise,
         /// <see langword="false"/>.
@@ -258,6 +258,33 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Properties
+
+        #region Static Methods
+
+        /// <summary>
+        /// Gets whether the two specified <see cref="Page"/> sequences are equal in terms of their
+        /// source document names, page numbers an page orientations.
+        /// </summary>
+        /// <param name="first">The first <see cref="Page"/> sequence to compare.</param>
+        /// <param name="second">The second <see cref="Page"/> sequence to compare.</param>
+        /// <returns></returns>
+        static public bool PagesAreEqual(IEnumerable<Page> first, IEnumerable<Page> second)
+        {
+            try
+            {
+                return first
+                    .Select(page => new Tuple<string, int, int>(
+                        page.OriginalDocumentName, page.OriginalPageNumber, page.ImageOrientation))
+                    .SequenceEqual(second.Select(page => new Tuple<string, int, int>(
+                        page.OriginalDocumentName, page.OriginalPageNumber, page.ImageOrientation)));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39662");
+            }
+        }
+
+        #endregion Static Methods
 
         #region Methods
 
@@ -330,7 +357,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch { }
             }
 
-            // Dispose of ummanaged resources
+            // Dispose of unmanaged resources
         }
 
         #endregion IDisposable Members

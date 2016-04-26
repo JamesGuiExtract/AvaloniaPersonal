@@ -4,6 +4,7 @@ using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Drawing;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -25,9 +26,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
 
         /// <summary>
-        /// The font to use when drawing an asterix to indicate a page is one of multiple copies.
+        /// A <see cref="PageStylist"/> that overlays the word "COPY" on any
+        /// <see cref="PageThumbnailControl"/> instances that reference the same page as another.
         /// </summary>
-        static readonly Font _COPY_INDICATOR_FONT = new Font("Sans Serif", 20);
+        static readonly OverlayTextStylist _COPY_INDICATOR_STYLIST = new CopiedPageStylist();
 
         #endregion Constants
 
@@ -59,6 +61,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         ImageViewer _activeImageViewer;
 
+        /// <summary>
+        /// The <see cref="PageStylist"/>s being used to apply styles to this instance.
+        /// </summary>
+        HashSet<PageStylist> _pageStylists = new HashSet<PageStylist>();
+
         #endregion Fields
 
         #region Constructors
@@ -73,6 +80,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 InitializeComponent();
+
+                AddStylist(_COPY_INDICATOR_STYLIST);
             }
             catch (Exception ex)
             {
@@ -87,13 +96,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// added.</param>
         /// <param name="page">The <see cref="Page"/> represented by this instance.</param>
         public PageThumbnailControl(OutputDocument document, Page page)
-            : base()
+            : this()
         {
             try
             {
                 ExtractException.Assert("ELI35473", "Null argument exception.", page != null);
-
-                InitializeComponent();
 
                 Document = document;
                 _page = page;
@@ -221,7 +228,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-  
+
         /// <summary>
         /// Gets a value indicating whether this page is currently being displayed in an
         /// <see cref="ImageViewer"/>.
@@ -239,7 +246,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Gets or sets a value indicating whether this instance is highlighted.
         /// </summary>
-        /// <value><see langword="true"/> if this instance is hilighted; otherwise,
+        /// <value><see langword="true"/> if this instance is highlighted; otherwise,
         /// <see langword="false"/>.
         /// </value>
         public override bool Highlighted
@@ -254,7 +261,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // Refresh _outerPanel to update the indication of whether it is currently the
                 // primary selection.
-                _outerPanel.Invalidate();
+                _outerPanel.Invalidate(false);
             }
         }
 
@@ -309,7 +316,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Displays or closed the <see cref="Page"/> in the specified <see paramref="ImageViewer"/>.
         /// </summary>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> that should diplay or close the
+        /// <param name="imageViewer">The <see cref="ImageViewer"/> that should display or close the
         /// page.</param>
         /// <param name="display"><see langword="true"/> to display the image;
         /// <see langword="false"/> to close it.</param>
@@ -317,6 +324,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                if (!PageLayoutControl.EnablePageDisplay)
+                {
+                    return;
+                }
+
                 // Show the image only if this instance is currently in a PageLayoutControl.
                 if (display && ParentForm != null)
                 {
@@ -382,6 +394,31 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Deactivates <see cref="_activeImageViewer"/> when <see cref="Page"/> is no longer being
+        /// displayed.
+        /// </summary>
+        public void DeactivateImageViewer()
+        {
+            if (_activeImageViewer != null)
+            {
+                _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
+                _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
+                _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
+                _activeImageViewer = null;
+            }
+        }
+
+        /// <summary>
+        /// Adds <see paramref="stylist"/> to the set of <see cref="PageStylist"/>s being used by
+        /// this instance.
+        /// </summary>
+        /// <param name="stylist">The <see cref="PageStylist"/> to be used by this instance.</param>
+        public void AddStylist(PageStylist stylist)
+        {
+            _pageStylists.Add(stylist);
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -404,10 +441,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     base.Selected = value;
 
-                    // Indicate selection with the BackColor of _outerPanel
-                    _outerPanel.BackColor = value
-                        ? SystemColors.ControlDark
-                        : SystemColors.Control;
+                    _borderPanel.Invalidate();
                 }
             }
         }
@@ -427,7 +461,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     // [DotNetRCAndUtils:959]
                     // For reasons I don't understand, the dispose of one PageThumbnailControl can
-                    // sometimes trigger the OnLoad call of a subsquent PageThumbnailControl.
+                    // sometimes trigger the OnLoad call of a subsequent PageThumbnailControl.
                     // Ensure the page thumbnail exists before trying to use it.
                     if (!IsDisposed && _page != null && _page.ThumbnailImage != null)
                     {
@@ -526,15 +560,38 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 UpdateThumbnail();
-
-                if (Document != null)
-                {
-                    Document.InOriginalForm = false;
-                }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35566");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Paint"/> event of the <see cref="_borderPanel"/> control
+        /// in order to indicate the selection state.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleBorderPanel_Paint(object sender, PaintEventArgs e)
+        {
+            try
+            {
+                var brush = ExtractBrushes.GetSolidBrush(Selected
+                    ? SystemColors.ControlDark
+                    : SystemColors.Control);
+
+                e.Graphics.FillRectangle(brush, e.ClipRectangle);
+
+                foreach (var style in _pageStylists)
+                {
+                    style.PaintBackground(this, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39634");
             }
         }
 
@@ -548,10 +605,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (Page.MultipleCopiesExist)
+                foreach (var style in _pageStylists)
                 {
-                    var brush = ExtractBrushes.GetSolidBrush(Color.SeaGreen);
-                    e.Graphics.DrawString("*", _COPY_INDICATOR_FONT, brush, new Point(0, 0));
+                    style.PaintForeground(this, e);
                 }
             }
             catch (Exception ex)
@@ -574,7 +630,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (Highlighted)
                 {
                     var highlightBrush = ExtractBrushes.GetSolidBrush(SystemColors.Highlight);
-                    e.Graphics.FillRectangle(highlightBrush, _outerPanel.ClientRectangle);
+                    e.Graphics.FillRectangle(highlightBrush, e.ClipRectangle);
                 }
             }
             catch (Exception ex)
@@ -692,21 +748,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _rasterPictureBox.Invalidate();
                 }
             });
-        }
-
-        /// <summary>
-        /// Deactivates <see cref="_activeImageViewer"/> when <see cref="Page"/> is no longer being
-        /// displayed.
-        /// </summary>
-        void DeactivateImageViewer()
-        {
-            if (_activeImageViewer != null)
-            {
-                _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
-                _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
-                _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
-                _activeImageViewer = null;
-            }
         }
 
         #endregion Private Members

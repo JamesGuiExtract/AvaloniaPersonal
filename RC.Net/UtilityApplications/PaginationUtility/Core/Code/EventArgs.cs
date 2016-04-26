@@ -153,13 +153,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// document originate.</param>
         /// <param name="pageCount">The number of pages the output document will have.</param>
         /// <param name="fileSize">The size in bytes the output document will be.</param>
+        /// <param name="suggestedPaginationAccepted"><see langword="true"/> if suggested pagination
+        /// was accepted, <see langword="false"/> if suggested pagination was rejected or
+        /// <see langword="null"/> if there was no suggested pagination for this document.</param>
         public CreatingOutputDocumentEventArgs(IEnumerable<string> sourceDocumentNames,
-            int pageCount, long fileSize)
+            int pageCount, long fileSize, bool? suggestedPaginationAccepted)
             : base()
         {
             SourceDocumentNames = sourceDocumentNames.ToList().AsReadOnly();
             PageCount = pageCount;
             FileSize = fileSize;
+            SuggestedPaginationAccepted = suggestedPaginationAccepted;
         }
 
         /// <summary>
@@ -190,6 +194,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets whether there was suggested pagination and whether it was accepted.
+        /// </summary>
+        /// <value><see langword="true"/> if suggested pagination was accepted,
+        /// <see langword="false"/> if suggested pagination was rejected or <see langword="null"/>
+        /// if there was no suggested pagination for this document.</value>
+        public bool? SuggestedPaginationAccepted
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets or sets the file name to which the output document will be written.
         /// </summary>
         public string OutputFileName
@@ -210,10 +226,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="paginatedDocumentSources">The source documents that were used to generate
         /// the paginated output. These documents will no longer be referenced by the
         /// <see cref="PaginationPanel"/>.</param>
-        public PaginatedEventArgs(IEnumerable<string> paginatedDocumentSources)
+        /// <param name="disregardedPaginationSources">All documents applied as they exist on disk
+        /// but for which there was differing suggested pagination.</param>
+        public PaginatedEventArgs(IEnumerable<string> paginatedDocumentSources,
+            IEnumerable<string> disregardedPaginationSources)
             : base()
         {
             PaginatedDocumentSources = paginatedDocumentSources.ToList().AsReadOnly();
+            DisregardedPaginationSources = disregardedPaginationSources.ToList().AsReadOnly();
         }
 
         /// <summary>
@@ -221,6 +241,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// will no longer be referenced by the <see cref="PaginationPanel"/>
         /// </summary>
         public ReadOnlyCollection<string> PaginatedDocumentSources
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// All documents applied as they exist on disk but for which there was differing suggested
+        /// pagination.
+        /// </summary>
+        public ReadOnlyCollection<string> DisregardedPaginationSources
         {
             get;
             private set;

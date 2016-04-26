@@ -91,6 +91,7 @@
             this._borderPanel.Name = "_borderPanel";
             this._borderPanel.Size = new System.Drawing.Size(134, 160);
             this._borderPanel.TabIndex = 4;
+            this._borderPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.HandleBorderPanel_Paint);
             // 
             // _outerPanel
             // 

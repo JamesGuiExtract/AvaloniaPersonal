@@ -1,6 +1,7 @@
 using Extract.Database;
 using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
 using Extract.FileActionManager.Forms;
+using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -517,6 +518,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         Stack<string> _pendingPaginationOutputStack = new Stack<string>();
 
+        /// <summary>
+        /// Indicates whether a pagination event from the <see cref="_paginationPanel"/> is
+        /// currently being processed.
+        /// </summary>
+        bool _paginating;
+
         #endregion Fields
 
         #region Constructors
@@ -1012,6 +1019,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // _paginationPanel, swap out the loading file for another if necessary.
                 if (_paginationPanel != null && ReorderAccordingToPagination(fileName))
                 {
+                    AbortProcessing(EFileProcessingResult.kProcessingDelayed, false);
                     return;
                 }
 
@@ -1042,6 +1050,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _dataEntryDatabaseManager.Initialize(fileProcessingDB);
                 }
 
+                if (_paginationPanel != null)
+                {
+                    LoadDocumentForPagination(fileName);
+
+                    if (_paginationPanel.IsPaginationSuggested(fileName))
+                    {
+                        _tabControl.SelectedTab = _paginationTab;
+                        _paginationPanel.PendingChanges = true;
+
+                        // If pagination has been suggested, don't bother loading the data for the
+                        // current document; either the suggestion will be accepted trigger new
+                        // files to be loaded or the suggestion will be rejected triggering the
+                        // document to be sent back to the rules.
+                        return;
+                    }
+                }
+
                 _imageViewer.OpenImage(fileName, false);
 
                 if (_fileProcessingDb != null && _dataEntryControlHost != null)
@@ -1052,11 +1077,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 else
                 {
                     _fileProcessingDBComment = null;
-                }
-
-                if (_paginationPanel != null)
-                {
-                    _paginationPanel.LoadFile(fileName, false);
                 }
             }
             catch (Exception ex)
@@ -1083,7 +1103,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (_paginationPanel != null)
                 {
-                    _paginationPanel.LoadFile(fileName, false);
+                    LoadDocumentForPagination(fileName);
                 }
 
                 // [DataEntry:1151]
@@ -2089,6 +2109,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                // Make sure ImageViewer activity in pagination UI doesn't get interpreted as a file
+                // getting closed in verification.
+                if (_paginating)
+                {
+                    return;
+                }
+
                 if (!PreventSaveOfDirtyData)
                 {
                     // Check for unsaved data and cancel the close if necessary.
@@ -2832,6 +2859,38 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Handles the TabControl.Selecting event of the <see cref="_tabControl"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="TabControlCancelEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandleTabControl_Selecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e)
+        {
+            try
+            {
+                if (e.TabPage != _paginationTab && _paginationPanel.PendingChanges)
+                {
+                    UtilityMethods.ShowMessageBox("You must apply or revert pagination changes.",
+                        "Uncommitted changes", false);
+                    e.Cancel = true;
+                }
+                // Though not easily reproducible, switching to the pagination tab before a
+                // document is fully loaded can cause exceptions for a null _imageViewer in
+                // FinalizeDocumentLoad. Prevent tab changes until a document fully loaded,
+                // though allow for tab changes for form setup before any files are loaded.                    
+                else if (_imageViewer.IsImageAvailable && _dataEntryControlHost != null &&
+                    !_dataEntryControlHost.IsDocumentLoaded)
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39669");
+            }
+        }
+
+        /// <summary>
         /// Handles the TabControl.SelectedIndexChanged event of the <see cref="_tabControl"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -2850,15 +2909,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     // The pagination control may have opened a different document; switch back to
                     // the document being verified.
-                    if (_imageViewer.ImageFile != _fileName)
+                    if (!_paginating && _imageViewer.ImageFile != _fileName)
                     {
                         _imageViewer.OpenImage(_fileName, false);
                     }
+
+                    // Ensure the _paginationPanel won't try to do anything with the image viewer
+                    // while the data tab has focus.
+                    _paginationPanel.EnablePageDisplay = false;
 
                     _dataEntryControlHost.ImageViewer = _imageViewer;
                     _imageViewer.ImageFileChanged += HandleImageFileChanged;
                     _imageViewer.ImageFileClosing += HandleImageFileClosing;
                     _imageViewer.LoadingNewImage += HandleLoadingNewImage;
+
+                    // Skip, save and commit are only available while the data tab is active.
+                    _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                    _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
                 }
                 else if (_tabControl.SelectedTab != _dataTab && _dataEntryControlHost.ImageViewer != null)
                 {
@@ -2870,6 +2938,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Setting ImageViewer to null will unregister image viewer events we shouldn't
                     // handle while in pagination.
                     _dataEntryControlHost.ImageViewer = null;
+
+                    // Skip, save and commit are only available while the data tab is active.
+                    _skipProcessingMenuItem.Enabled = false;
+                    _saveAndCommitFileCommand.Enabled = false;
+                    _saveMenuItem.Enabled = false;
+
+                    _paginationPanel.EnablePageDisplay = true;
+                    _paginationPanel.SelectFirstPage();
                 }
             }
             catch (Exception ex)
@@ -2900,15 +2976,22 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // process from getting it.
                 int fileID = FileProcessingDB.AddFileNoQueue(
                     e.OutputFileName, e.FileSize, e.PageCount, EFilePriority.kPriorityNormal);
-                EActionStatus previousStatus;
-                bool success =
-                    FileRequestHandler.CheckoutForProcessing(fileID, false, out previousStatus);
-                ExtractException.Assert("ELI39621", "Failed to check out file", success,
-                    "FileID", fileID);
-                success = FileRequestHandler.SetFallbackStatus(fileID, EActionStatus.kActionPending);
-                ExtractException.Assert("ELI39622", "Failed to set fallback status", success,
-                    "FileID", fileID);
-                _pendingPaginationOutputStack.Push(e.OutputFileName);
+                
+                // Only grab the file back into the current verification session if suggested
+                // pagination boundaries were accepted (meaning the rules should have already found
+                // everything we would expect them to find for this document).
+                if (e.SuggestedPaginationAccepted.HasValue && e.SuggestedPaginationAccepted.Value)
+                {
+                    EActionStatus previousStatus;
+                    bool success =
+                        FileRequestHandler.CheckoutForProcessing(fileID, false, out previousStatus);
+                    ExtractException.Assert("ELI39621", "Failed to check out file", success,
+                        "FileID", fileID);
+                    success = FileRequestHandler.SetFallbackStatus(fileID, EActionStatus.kActionPending);
+                    ExtractException.Assert("ELI39622", "Failed to set fallback status", success,
+                        "FileID", fileID);
+                    _pendingPaginationOutputStack.Push(e.OutputFileName);
+                }
             }
             catch (Exception ex)
             {
@@ -2927,8 +3010,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // HandlePaginationPanel_CreatingOutputDocument should have already paused the
-                // queue, but ensure that's the case.
+                _paginating = true;
+
+                // HandlePaginationPanel_CreatingOutputDocument will have already paused the
+                // queue in most cases, but not if the applied pagination matched source doc form.
                 FileRequestHandler.PauseProcessingQueue();
 
                 // In order for files to be delayed (and any prompting or other UI tasks
@@ -2940,30 +3025,66 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // order.
                 foreach (string paginatedFileName in _pendingPaginationOutputStack)
                 {
-                    _paginationPanel.LoadFile(paginatedFileName, true);
+                    _paginationPanel.LoadFile(paginatedFileName, true, null, false, null);
+                }
+
+                // Keep track of whether the current file was completed so it doesn't end up getting
+                // separately completed from different blocks.
+                bool completedCurrentFile = false;
+
+                // Once the newly paginated files are loaded, the source documents for the newly
+                // paginated output or any documents for which suggested pagination was ignored
+                // should be completed.
+                foreach (var sourceFileName in
+                    e.PaginatedDocumentSources.Union(e.DisregardedPaginationSources))
+                {
+                    _paginationPanel.RemoveSourceFile(sourceFileName);
+
+                    // If sourceFileName is the current file in verification, complete the file
+                    // normally.
+                    if (sourceFileName == _fileName)
+                    {
+                        _imageViewer.CloseImage();
+
+                        if (_fileProcessingDb != null)
+                        {
+                            // Record statistics to database that need to happen when a file is closed.
+                            RecordFileProcessingDatabaseStatistics(onLoad: false,
+                                attributes: _dataEntryControlHost.MostRecentlySavedAttributes);
+                        }
+
+                        OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+                        completedCurrentFile = true;
+                    }
+                    // If sourceFileName is not the current file in verification, it needs to be
+                    // manually released from the current process and directed to "complete" via
+                    // fallback status.
+                    else
+                    {
+                        int sourceFileID = FileProcessingDB.GetFileID(sourceFileName);
+                        var success = FileRequestHandler.SetFallbackStatus(
+                            sourceFileID, EActionStatus.kActionCompleted);
+                        ExtractException.Assert("ELI39623", "Failed to set fallback status", success,
+                            "FileID", sourceFileID);
+                        ReleaseFile(sourceFileID);
+                    }
                 }
 
                 // The first paginated file should be the next document to be displayed.
-                int firstFileId = FileProcessingDB.GetFileID(_pendingPaginationOutputStack.Last());
-                bool success = RequestFile(firstFileId);
-                ExtractException.Assert("ELI39624", "Failed to request file.", success, "File ID",
-                    firstFileId);
-
-                // In order for the file we've requested to come up, the currently displayed file
-                // needs to be delayed.
-                DelayFile();
-
-                // Once the newly paginated files are loaded, the source documents for the newly
-                // paginated output should be "completed".
-                // TODO: Will this shortcut to complete via releasing the file cause any problems
-                // such as will stats in the DB?
-                foreach (var sourceFileName in e.PaginatedDocumentSources)
+                string fileNameToLoad = _pendingPaginationOutputStack.LastOrDefault();
+                if (!string.IsNullOrEmpty(fileNameToLoad))
                 {
-                    int sourceFileID = FileProcessingDB.GetFileID(sourceFileName);
-                    success = FileRequestHandler.SetFallbackStatus(sourceFileID, EActionStatus.kActionCompleted);
-                    ExtractException.Assert("ELI39623", "Failed to set fallback status", success,
-                        "FileID", sourceFileID);
-                    ReleaseFile(sourceFileID);
+                    int fileIdToLoad = FileProcessingDB.GetFileID(fileNameToLoad);
+                    bool success = RequestFile(fileIdToLoad);
+                    ExtractException.Assert("ELI39624", "Failed to request file.", success,
+                        "File ID", fileIdToLoad);
+
+                    // In order for the file we've requested to come up, the currently displayed file
+                    // needs to be delayed.
+                    if (!completedCurrentFile && fileNameToLoad != _fileName)
+                    {
+                        DelayFile();
+                    }
                 }
             }
             catch (Exception ex)
@@ -2972,6 +3093,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             finally
             {
+                _paginating = false;
                 _pendingPaginationOutputStack.Clear();
                 FileRequestHandler.ResumeProcessingQueue();
             }
@@ -3200,7 +3322,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException.Assert("ELI37451", "Invalid operation.",
                     !_standAloneMode && _fileProcessingDb != null);
 
-                if (_imageViewer.IsImageAvailable)
+                // If is no image loaded, there is no file to delay. (While paginating the normal
+                // document load may have been short-circuited; assume there is a document to
+                // delay).
+                if (_paginating || _imageViewer.IsImageAvailable)
                 {
                     AbortProcessing(EFileProcessingResult.kProcessingDelayed, false);
                 }
@@ -3305,7 +3430,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <para><b>Note</b></para>
         /// The requested file will not be shown until the currently displayed file is closed. If
         /// the requested file needs to replace the currently displayed file immediately,
-        /// <see cref="DelayFile"/> should be called after RequestFile.
+        /// <see cref="DelayFile()"/> should be called after RequestFile.
         /// </summary>
         /// <param name="fileID">The ID of the file to release.</param>
         /// <returns><see langword="true"/> if the file is currently processing in the verification
@@ -4998,10 +5123,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 if (expectedDocumentOrder[0] != fileName)
                 {
-                    FileRequestHandler.PauseProcessingQueue();
-                    int neededFileId = FileProcessingDB.GetFileID(expectedDocumentOrder[0]);
-                    RequestFile(neededFileId);
-                   return true;
+                    try
+                    {
+                        FileRequestHandler.PauseProcessingQueue();
+                        int neededFileId = FileProcessingDB.GetFileID(expectedDocumentOrder[0]);
+                        RequestFile(neededFileId);
+                    }
+                    finally
+                    {
+                        FileRequestHandler.ResumeProcessingQueue();
+                    }
+                    return true;
                 }
 
                 // To help prevent that we might need to swap out the next file that attempts to
@@ -5015,6 +5147,81 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Loads <see paramref="fileName"/> into <see cref="_paginationPanel"/> if it is available
+        /// and displays any rules-suggested pagination for the file.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        void LoadDocumentForPagination(string fileName)
+        {
+            if (_paginationPanel == null || _paginationPanel.SourceDocuments.Contains(fileName))
+            {
+                return;
+            }
+
+            // Look in the voa file for rules-suggested pagination.
+            // TODO: Warn if the document was previously paginated.
+            string dataFilename = fileName + ".voa";
+            if (File.Exists(dataFilename))
+            {
+                IUnknownVector attributes = new IUnknownVector();
+                attributes.LoadFrom(dataFilename, false);
+                var attributeArray = attributes
+                    .ToIEnumerable<IAttribute>()
+                    .ToArray();
+                var rootAttributeNames = attributeArray
+                    .Select(attribute => attribute.Name)
+                    .Distinct();
+
+                // If only "Document" attributes exist at the root of the VOA file, there is
+                // rules-suggested pagination.
+                // TODO: If there is only a single document, extract the document data and don't
+                // show suggested pagination.
+                if (rootAttributeNames.Count() == 1 &&
+                    rootAttributeNames.Single().Equals("Document", StringComparison.OrdinalIgnoreCase))
+                {
+                    int pageCount = 0;
+                    using (var codecs = new ImageCodecs())
+                    using (var reader = codecs.CreateReader(fileName))
+                    {
+                        pageCount = reader.PageCount;
+                    }
+
+                    // Iterate each virtual document suggested by the rules and add as a separate
+                    // document as far as the _paginationPanel is concerned.
+                    foreach (var documentAttribute in attributeArray)
+                    {
+                        // There should be two attributes under the root Document attribute:
+                        // Pages- The range/list specification of pages to be included.
+                        // DocumentData- The data (redaction or indexing() the rules found for the
+                        //  virtual document.
+                        var pages =
+                            UtilityMethods.GetPageNumbersFromString(
+                                documentAttribute.SubAttributes
+                                .ToIEnumerable<IAttribute>()
+                                .Single(attribute => attribute.Name.Equals(
+                                    "Pages", StringComparison.OrdinalIgnoreCase))
+                                .Value.String, pageCount, true);
+
+                        var documentData = documentAttribute.SubAttributes
+                            .ToIEnumerable<IAttribute>()
+                            .Where(attribute => attribute.Name.Equals(
+                                "DocumentData", StringComparison.OrdinalIgnoreCase))
+                            .Select(data => data.SubAttributes)
+                            .SingleOrDefault() ?? new IUnknownVector();
+
+                        _paginationPanel.LoadFile(fileName, false, pages, true, documentData);
+                    }
+
+                    return;
+                }
+            }
+
+            // If there was no rules-suggested pagination, go ahead and load the physical document
+            // into the _paginationPanel
+            _paginationPanel.LoadFile(fileName, false);
         }
 
         #endregion Private Members

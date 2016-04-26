@@ -176,9 +176,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._tabControl.Location = new System.Drawing.Point(0, 0);
             this._tabControl.Name = "_tabControl";
             this._tabControl.SelectedIndex = 0;
-            this._tabControl.SelectedIndexChanged += new EventHandler(HandleTabControl_SelectedIndexChanged);
             this._tabControl.Size = new System.Drawing.Size(184, 506);
             this._tabControl.TabIndex = 0;
+            this._tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(HandleTabControl_Selecting);
+            this._tabControl.SelectedIndexChanged += new EventHandler(HandleTabControl_SelectedIndexChanged);
             // 
             // _dataTab
             // 
@@ -251,6 +252,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _paginationPanel
             // 
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._paginationPanel.HighlightSinglySelectedDocument = true;
             this._paginationPanel.ImageViewer = null;
             this._paginationPanel.Location = new System.Drawing.Point(0, 0);
             this._paginationPanel.Margin = new System.Windows.Forms.Padding(0);

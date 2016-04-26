@@ -1,8 +1,4 @@
 ﻿using Extract.Imaging;
-using Extract.Utilities;
-using Leadtools;
-using Leadtools.Codecs;
-using Leadtools.ImageProcessing;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,6 +21,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// the document.
         /// </summary>
         List<PageThumbnailControl> _pageControls = new List<PageThumbnailControl>();
+
+        /// <summary>
+        /// The <see cref="Page"/>s that represent the state which <see cref="SetOriginalForm"/> was
+        /// called.
+        /// </summary>
+        List<Page> _originalPages = null;
 
         #endregion Fields
 
@@ -95,15 +97,86 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the document has changed compared to the input
-        /// document for all the pages.
+        /// Gets or sets a value indicating whether the document has changed compared to the point
+        /// at which <see cref="SetOriginalForm"/> was called.
         /// </summary>
-        /// <value><see langword="true"/> if in its original form; otherwise, <see langword="false"/>.
+        /// <value><see langword="true"/> if in the original form; otherwise, <see langword="false"/>.
         /// </value>
         public bool InOriginalForm
         {
-            get;
-            set;
+            get
+            {
+                try
+                {
+                    // If there are no original pages specified, only in original form if there are no
+                    // page controls.
+                    if (_originalPages == null)
+                    {
+                        return !_pageControls.Any();
+                    }
+
+                    // Ensure the same sequence of and orientation of current pages compared to
+                    // _originalPages.
+                    var currentPages = _pageControls.Select(c => c.Page);
+                    return Page.PagesAreEqual(currentPages, _originalPages);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39659");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the document has changed compared to the input
+        /// the source documents as they currently exist on disk.
+        /// </summary>
+        /// <value><see langword="true"/> if in the source document form; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool InSourceDocForm
+        {
+            get
+            {
+                try
+                {
+                    var pages = _pageControls
+                                .Select(c => c.Page)
+                                .ToArray();
+
+                    // If there is not exactly one source document for this output document, the
+                    // document cannot be in source document form.
+                    if (pages.Select(page => page.SourceDocument)
+                        .Distinct()
+                        .Count() != 1)
+                    {
+                        return false;
+                    }
+
+                    var currentPages = _pageControls.Select(c => c.Page);
+                    var sourceDocPages = pages.First().SourceDocument.Pages;
+
+                    // Ensure the same sequence of and orientation of current pages compared to
+                    // sourceDocPages.
+                    return Page.PagesAreEqual(currentPages, sourceDocPages);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39660");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the document's <see cref="Page"/>s as they existed when
+        /// <see cref="SetOriginalForm"/> was called.
+        /// </summary>
+        public ReadOnlyCollection<Page> OriginalPages
+        {
+            get
+            {
+                return _originalPages.AsReadOnly();
+            }
         }
 
         #endregion Properties
@@ -111,11 +184,27 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Methods
 
         /// <summary>
+        /// Defines the current document state as the one represented by <see cref="OriginalPages"/>
+        /// and <see cref="InOriginalForm"/>.
+        /// </summary>
+        public void SetOriginalForm()
+        {
+            try
+            {
+                _originalPages = new List<Page>(_pageControls.Select(c => c.Page));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39661");
+            }
+        }
+
+        /// <summary>
         /// Adds the specified <see paramref="pageControl"/> as the last page of the document.
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> representing the page
         /// to be added.</param>
-        public void AddPage(PageThumbnailControl pageControl)
+        public virtual void AddPage(PageThumbnailControl pageControl)
         {
             try
             {
@@ -134,15 +223,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> representing the page
         /// to be inserted.</param>
         /// <param name="pageNumber">The page number the new page should be inserted at.</param>
-        public void InsertPage(PageThumbnailControl pageControl, int pageNumber)
+        public virtual void InsertPage(PageThumbnailControl pageControl, int pageNumber)
         {
             try
             {
                 ExtractException.Assert("ELI35551", "Invalid page number",
                     pageNumber > 0 && pageNumber <= _pageControls.Count + 1,
                     "Document", FileName, "Page", pageNumber);
-
-                InOriginalForm = false;
 
                 if (pageNumber <= _pageControls.Count)
                 {
@@ -170,8 +257,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 ExtractException.Assert("ELI35553", "Null argument exception.", pageControl != null);
-
-                InOriginalForm = false;
 
                 _pageControls.Remove(pageControl);
 
@@ -206,7 +291,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     Directory.CreateDirectory(directory);
                 }
 
-                if (InOriginalForm)
+                bool copyOriginalDocument = InOriginalForm;
+                if (copyOriginalDocument)
                 {
                     // [DotNetRCAndUtils:972]
                     // If the extension of the file has changed, it is likely the user is intending
@@ -217,13 +303,13 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (!extension.Equals(originalExtension, StringComparison.OrdinalIgnoreCase))
                     {
-                        // If the extension has changed, set InOriginalForm to false to trigger the
-                        // document to be manually output.
-                        InOriginalForm = false;
+                        // If the extension has changed, manually output the document in order to
+                        // ensure it is written into the intended format.
+                        copyOriginalDocument = false;
                     }
                 }
 
-                if (InOriginalForm)
+                if (copyOriginalDocument)
                 {
                     // If the document has not been changed from its original form, it can simply be
                     // copied to _fileName rather than require it to be re-assembled.

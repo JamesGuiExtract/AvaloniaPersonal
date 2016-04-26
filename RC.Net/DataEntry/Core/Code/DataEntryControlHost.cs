@@ -730,6 +730,12 @@ namespace Extract.DataEntry
         bool _isLoaded;
 
         /// <summary>
+        /// Indicates whether a document has been completely loaded. (finished
+        /// <see cref="FinalizeDocumentLoad"/>)
+        /// </summary>
+        bool _isDocumentLoaded;
+
+        /// <summary>
         /// Keeps track of the start time when Config.Settings.PerformanceTesting is true.
         /// When enabled, the UI will automatically move to the next document after each is loaded.
         /// When processing stops and the UI is closed, it will log an exception with total run time.
@@ -1303,6 +1309,22 @@ namespace Extract.DataEntry
             get
             {
                 return _changingData;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value used to indicate whether the UI has a document and it has finished loading.
+        /// </summary>
+        /// <value><see langword="true"/> if there is a document that has finished loading;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool IsDocumentLoaded
+        {
+            get
+            {
+                return _isDocumentLoaded;
             }
         }
 
@@ -2509,6 +2531,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                _isDocumentLoaded = false;
+
                 // Set flag to indicate that a document change is in progress so that highlights
                 // are not redrawn as the spatial info of the controls are updated.
                 _changingData = true;
@@ -7774,6 +7798,8 @@ namespace Extract.DataEntry
                 // that they don't get used later on after the value has been changed to something
                 // else.
                 ExecuteOnIdle("ELI37382", () => AttributeStatusInfo.ForgetLastAppliedStringValues());
+
+                ExecuteOnIdle("ELI39651", () => _isDocumentLoaded = true);
 
                 if (_attributes != null && _attributes.Size() > 0 &&
                     AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataLoad))
