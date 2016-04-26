@@ -4,10 +4,10 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Xml.XPath;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -643,6 +643,19 @@ namespace Extract.AttributeFinder.Rules
 
                 while (iter.MoveNext())
                 {
+                    if (null == iter.CurrentAttribute)
+                    {
+                        ExtractException ee = 
+                            new ExtractException("ELI39681", 
+                                                 "No Attribute was found for the XPath expression");
+                        ee.AddDebugData("PossibleCause", 
+                                        String.Format(CultureInfo.CurrentCulture,
+                                                      "XPath root query: {0}", 
+                                                      _root), 
+                                        encrypt: false);
+                        throw ee;
+                    }
+
                     foreach (var subAttr in _subattributesToCreate)
                     {
                         IAttribute newAttr = new AttributeClass();
@@ -659,10 +672,9 @@ namespace Extract.AttributeFinder.Rules
                         }
                         catch (Exception ex)
                         {
-                            var msg = String.Format("Setting subattribute.Name to: {0}, generated exception: {1}",
-                                                    eval.QueryResult,
-                                                    ex.Message);
-                            var ee = new ExtractException("ELI39464", msg, ex);
+                            var ee = new ExtractException("ELI39464", "Failed to set subattribute name", ex);
+                            ee.AddDebugData("Name", eval.QueryResult, encrypt: false);
+                            ee.AddDebugData("Reason", ex.AsExtract("").Message, false);
                             exceptions.Add(ee);
                             continue;
                         }
@@ -699,10 +711,9 @@ namespace Extract.AttributeFinder.Rules
                         }
                         catch (Exception ex)
                         {
-                            var msg = String.Format("Setting subattribute.Type to: {0}, generated exception: {1}",
-                                                    eval.QueryResult,
-                                                    ex.Message);
-                            var ee = new ExtractException("ELI39625", msg, ex);
+                            var ee = new ExtractException("ELI39625", "Failed to set subattribute Type", ex);
+                            ee.AddDebugData("TypeName", eval.QueryResult, encrypt: false);
+                            ee.AddDebugData("Reason", ex.AsExtract("").Message, false);
                             exceptions.Add(ee);
                             continue;
                         }
