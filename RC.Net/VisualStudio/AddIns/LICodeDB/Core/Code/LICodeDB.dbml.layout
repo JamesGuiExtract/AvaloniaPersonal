@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="LICodeDB">
+  <DataContextMoniker Name="/LICodeDBDataContext" />
+  <nestedChildShapes>
+    <classShape Id="329d4465-e108-4e61-a4c3-81a11789fdd6" absoluteBounds="3.5, 4.875, 2, 1.0016910807291666">
+      <DataClassMoniker Name="/LICodeDBDataContext/GetLICodesResult" />
+      <nestedChildShapes>
+        <elementListCompartment Id="c0e7afaa-9eb7-4a04-8f6f-e78ba4584296" absoluteBounds="3.515, 5.335, 1.9700000000000002, 0.44169108072916663" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

@@ -11,7 +11,7 @@
     </StartupObject>
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>LICode</AssemblyName>
-    <RootNamespace>LICode</RootNamespace>
+    <RootNamespace>ExtractLICode</RootNamespace>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
@@ -54,6 +54,7 @@
     <Reference Include="Extensibility, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -65,10 +66,8 @@
     <Compile Include="LICode.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="LICodeHandler.cs" />
     <Compile Include="PasteLI.cs" />
     <Compile Include="ReplaceLI.cs" />
-    <Compile Include="SourceControlMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="EnvDTE">
@@ -89,20 +88,18 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="LICode.AddIn" />
+    <Content Include="LICode.AddIn">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\RC.Net\SourceControl\Core\Code\Extract.SourceControl.csproj">
-      <Project>{3019DD00-4096-4158-B1AE-09E537B6A520}</Project>
-      <Name>Extract.SourceControl</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\RC.Net\VisualStudio\AddIns\Core\Code\Extract.VisualStudio.AddIns.csproj">
       <Project>{981AB0AA-D788-484A-A2BA-984426022F51}</Project>
       <Name>Extract.VisualStudio.AddIns</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\SourceControl\Code\SourceControl.csproj">
-      <Project>{052DB25A-500B-4E48-95EA-63086C3B1C2A}</Project>
-      <Name>SourceControl</Name>
+    <ProjectReference Include="..\..\..\..\RC.Net\VisualStudio\AddIns\LICodeDB\Core\Code\LICodeDB.csproj">
+      <Project>{74416F8A-22A0-45E1-9F29-9CBC0A7A735B}</Project>
+      <Name>LICodeDB</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />

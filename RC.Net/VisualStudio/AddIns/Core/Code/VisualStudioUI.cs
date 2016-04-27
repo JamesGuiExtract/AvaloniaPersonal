@@ -1,9 +1,6 @@
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.CommandBars;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Extract.VisualStudio.AddIns
 {

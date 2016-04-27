@@ -1,7 +1,10 @@
 using EnvDTE;
 using EnvDTE80;
+using Extract.LICodeDB;
 using Extract.VisualStudio.AddIns;
+using LICodeDB;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace LICode
@@ -41,10 +44,15 @@ namespace LICode
             TextSelection selection = (TextSelection)_dte.ActiveDocument.Selection;
 
             // Instantiate an LICodeHandler to retrieve LI code
-            using (LICodeHandler LIHandler = new LICodeHandler())
+            LICodeDBDataContext LIDB = new LICodeDBDataContext();
             {
+                // Get one new li code
+                var LIRecords = (_liType == LIType.Exception) ? LIDB.GetEliCodes(1) : LIDB.GetMliCodes(1);
+
+                var rec = LIRecords.First();
+                
                 // Get the next LI code
-                string LICode = (string)(_liType == LIType.Exception ? LIHandler.NextELICode : LIHandler.NextMLICode);
+                string LICode = rec.LICode;
 
                 // Insert the LI code, replacing text if any is selected
                 selection.Insert(LICode, (int)vsInsertFlags.vsInsertFlagsContainNewText);
@@ -53,8 +61,6 @@ namespace LICode
                 // to the right of the recently inserted text
                 selection.CharRight(false, 1);
 
-                // Commit the changes to LI dat file
-                LIHandler.CommitChanges();
             }
         }
 

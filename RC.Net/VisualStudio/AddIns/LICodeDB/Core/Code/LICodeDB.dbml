@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="EngineeringUtility" Class="LICodeDBDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=ENGSVR;Initial Catalog=EngineeringLICodeDB;Integrated Security=True" SettingsObjectName="LICodeDB.Properties.Settings" SettingsPropertyName="EngineeringLICodeDBConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="" Member="GetLICodesResults">
+    <Type Name="GetLICodesResult">
+      <Column Name="LICode" Member="LICode" Storage="_LICode" Type="System.String" DbType="nvarchar(13)" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Function Name="dbo.GetEliCodes" Method="GetEliCodes">
+    <Parameter Name="NumberOfCodes" Parameter="numberOfCodes" Type="System.Int32" DbType="Int" />
+    <Return Type="ISingleResult&lt;GetLICodesResult&gt;" />
+  </Function>
+  <Function Name="dbo.GetMliCodes" Method="GetMliCodes">
+    <Parameter Name="NumberOfCodes" Parameter="numberOfCodes" Type="System.Int32" DbType="Int" />
+    <Return Type="ISingleResult&lt;GetLICodesResult&gt;" />
+  </Function>
+</Database>

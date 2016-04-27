@@ -1,7 +1,10 @@
 using EnvDTE;
 using EnvDTE80;
 using Extract.VisualStudio.AddIns;
+using LICodeDB;
 using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace LICode
@@ -45,21 +48,45 @@ namespace LICode
             // Get the selection text
             TextSelection selection = (TextSelection)_dte.ActiveDocument.Selection;
 
-            // Instantiate an LICodeHandler to replace LI codes
-            using (LICodeHandler LIHandler = new LICodeHandler())
-            {
-                // Retrieve the clipboard text with LI codes replaced
-                string output = LIHandler.ReplaceLICodesInText(clipboardText);
+            // Retrieve the clipboard text with LI codes replaced
+            string output = ReplaceLICodesInText(clipboardText);
 
-                // Replace the selected text with the next LI codes
-                selection.Insert(output, (int)vsInsertFlags.vsInsertFlagsContainNewText);
+            // Replace the selected text with the next LI codes
+            selection.Insert(output, (int)vsInsertFlags.vsInsertFlagsContainNewText);
 
-                // Deselect the inserted text and set the active cursor to the right of the recently inserted text
-                selection.CharRight(false, 1);
+            // Deselect the inserted text and set the active cursor to the right of the recently inserted text
+            selection.CharRight(false, 1);
+        }
 
-                // Commit the changes to LI code files
-                LIHandler.CommitChanges();
-            }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="textToReplace"></param>
+        /// <returns></returns>
+        public string ReplaceLICodesInText(string textToReplace)
+        {
+            // replace the selected text with new LI codes
+            Regex regex = new Regex("\"(M|E)LI\\d+\"", RegexOptions.Compiled);
+            return regex.Replace(textToReplace, ReplaceLIMatch);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="match"></param>
+        /// <returns></returns>
+        public string ReplaceLIMatch(Match match)
+        {
+            // Instantiate an LICodeHandler to retrieve LI code
+            LICodeDBDataContext LIDB = new LICodeDBDataContext();
+
+            // Get one new li code
+            var LIRecords = match.Value[1] == 'E' ? LIDB.GetEliCodes(1) : LIDB.GetMliCodes(1);
+
+            var rec = LIRecords.First();
+
+            // Get the next LI code
+            return rec.LICode;
         }
 
         #endregion PasteLI Methods
