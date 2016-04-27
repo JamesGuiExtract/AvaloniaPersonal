@@ -34,28 +34,35 @@ namespace Extract.Utilities.Forms
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         static public void RemoveRequiredMarker(this TextBoxBase textBox)
         {
-            if (textBox.IsRequiredMarkerSet())
+            try
             {
-                textBox.ForeColor = System.Drawing.Color.Black;
-                textBox.Text = "";
-                textBox.Refresh();
-            }
-            else
-            {
-                var text = textBox.Text;
-                if (text.Contains(REQUIRED_FIELD_MARKER))
+                if (textBox.IsRequiredMarkerSet())
                 {
-                    var contents = RemoveTrailingRequiredText(text);
                     textBox.ForeColor = System.Drawing.Color.Black;
-                    textBox.Text = contents;
+                    textBox.Text = "";
                     textBox.Refresh();
-                    textBox.SafeBeginInvoke("ELI39626", () =>
-                        {
-                            textBox.SelectionStart = contents.Length;
-                            textBox.SelectionLength = 0;
-                            textBox.Focus();
-                        });
                 }
+                else
+                {
+                    var text = textBox.Text;
+                    if (text.Contains(REQUIRED_FIELD_MARKER))
+                    {
+                        var contents = RemoveTrailingRequiredText(text);
+                        textBox.ForeColor = System.Drawing.Color.Black;
+                        textBox.Text = contents;
+                        textBox.Refresh();
+                        textBox.SafeBeginInvoke("ELI39626", () =>
+                            {
+                                textBox.SelectionStart = contents.Length;
+                                textBox.SelectionLength = 0;
+                                textBox.Focus();
+                            });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39686");
             }
         }
 
@@ -133,21 +140,28 @@ namespace Extract.Utilities.Forms
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         static public string TextValue(this TextBoxBase textBox)
         {
-            if (IsRequiredMarkerSet(textBox))
+            try
             {
-                return "";
-            }
-            else
-            {
-                var text = textBox.Text;
-                if (text.Contains(REQUIRED_FIELD_MARKER))
+                if (IsRequiredMarkerSet(textBox))
                 {
-                    return RemoveTrailingRequiredText(text);
+                    return "";
                 }
                 else
                 {
-                    return text;
+                    var text = textBox.Text;
+                    if (text.Contains(REQUIRED_FIELD_MARKER))
+                    {
+                        return RemoveTrailingRequiredText(text);
+                    }
+                    else
+                    {
+                        return text;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39687");
             }
         }
 
@@ -182,7 +196,7 @@ namespace Extract.Utilities.Forms
         /// <returns>The text that remains when the required marker has been removed.</returns>
         static string RemoveTrailingRequiredText(string text)
         {
-            int end = text.IndexOf(REQUIRED_FIELD_MARKER);
+            int end = text.IndexOf(REQUIRED_FIELD_MARKER, StringComparison.Ordinal);
             return text.Substring(0, length: end);
         }
     }
