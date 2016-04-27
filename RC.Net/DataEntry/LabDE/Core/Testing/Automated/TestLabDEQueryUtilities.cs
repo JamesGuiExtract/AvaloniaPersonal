@@ -1654,5 +1654,21 @@ namespace Extract.DataEntry.LabDE.Test
 
             Assert.That(valid == true);
         }
+
+        [Test, Category("ValidateFlagAgainstValueAndRange")]
+        public static void TestInvalidValue()
+        {
+            bool valid = LabDEQueryUtilities.ValidateFlagAgainstValueAndRange("", "23. .4", "12.0-14");
+
+            Assert.That(valid == true);
+        }
+
+        [Test, Category("ValidateFlagAgainstValueAndRange")]
+        public static void TestInvalidRange()
+        {
+            bool valid = LabDEQueryUtilities.ValidateFlagAgainstValueAndRange("L", "1.2", "0.02.0-6.9");
+
+            Assert.That(valid == true);
+        }
     }
 }

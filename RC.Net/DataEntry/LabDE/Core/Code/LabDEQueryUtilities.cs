@@ -96,7 +96,9 @@ namespace Extract.DataEntry.LabDE
                 double? valueMax = ParseMaxValue(value, out valueMaxBias);
 
                 // If we are not able to parse either the min or max value, don't warn.
-                if (valueMin == null && valueMax == null)
+                if (valueMinBias == ComparisonBias.Error ||
+                    valueMaxBias == ComparisonBias.Error ||
+                    (valueMin == null && valueMax == null))
                 {
                     return true;
                 }
@@ -119,7 +121,9 @@ namespace Extract.DataEntry.LabDE
                 double? rangeMax = ParseMaxValue(range, out rangeMaxBias);
 
                 // If we are not able to parse either the min or max of range, don't warn.
-                if (rangeMin == null && rangeMax == null)
+                if (rangeMinBias == ComparisonBias.Error ||
+                    rangeMaxBias == ComparisonBias.Error ||
+                    rangeMin == null && rangeMax == null)
                 {
                     return true;
                 }
@@ -218,7 +222,8 @@ namespace Extract.DataEntry.LabDE
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI38425");
+                ex.ExtractLog("ELI38425");
+                return true;
             }
         }
 
@@ -402,7 +407,12 @@ namespace Extract.DataEntry.LabDE
             /// <summary>
             /// First value must be strictly greater than the second value.
             /// </summary>
-            MustBeGreaterThan = 2
+            MustBeGreaterThan = 2,
+
+            /// <summary>
+            /// There was an error parsing the value.
+            /// </summary>
+            Error = 3
         }
 
         /// <summary>
@@ -453,39 +463,51 @@ namespace Extract.DataEntry.LabDE
         /// value.</returns>
         static double? ParseMinValue(string value, out ComparisonBias valueMinBias)
         {
-            var valueMinMatch =
-                Regex.Match(value, @"(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?<=>(/|OR)?=)[\d\.]+)",
-                    RegexOptions.IgnoreCase);
-
-            // Set bias as to whether equivalence is allowed.
-            valueMinBias = valueMinMatch.Success
-                ? ComparisonBias.MayBeEqualTo
-                : ComparisonBias.MustBeGreaterThan;
-
-            string valueMinString = null;
-            if (valueMinMatch.Success)
+            try
             {
-                valueMinString = valueMinMatch.Value;
-            }
-            else
-            {
-                // If equivalence is not allowed, parse for minimum where equivalence is not
-                // permitted.
-                valueMinMatch = Regex.Match(value, @"(?<=>)[\d\.]+", RegexOptions.IgnoreCase);
+                var valueMinMatch =
+                        Regex.Match(value, @"(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?<=>(/|OR)?=)[\d\.]+)",
+                            RegexOptions.IgnoreCase);
+
+                // Set bias as to whether equivalence is allowed.
+                valueMinBias = valueMinMatch.Success
+                    ? ComparisonBias.MayBeEqualTo
+                    : ComparisonBias.MustBeGreaterThan;
+
+                string valueMinString = null;
                 if (valueMinMatch.Success)
                 {
                     valueMinString = valueMinMatch.Value;
                 }
-            }
+                else
+                {
+                    // If equivalence is not allowed, parse for minimum where equivalence is not
+                    // permitted.
+                    valueMinMatch = Regex.Match(value, @"(?<=>)[\d\.]+", RegexOptions.IgnoreCase);
+                    if (valueMinMatch.Success)
+                    {
+                        valueMinString = valueMinMatch.Value;
+                    }
+                }
 
-            // Convert valueMinString to a double
-            double? valueMin = null;
-            if (!string.IsNullOrEmpty(valueMinString))
+                // Convert valueMinString to a double
+                double? valueMin = null;
+                if (!string.IsNullOrEmpty(valueMinString))
+                {
+                    valueMin = double.Parse(valueMinString, CultureInfo.CurrentCulture);
+                }
+
+                return valueMin;
+            }
+            catch
             {
-                valueMin = double.Parse(valueMinString, CultureInfo.CurrentCulture);
+                // https://extract.atlassian.net/browse/ISSUE-13738
+                // The regex to identify valid numbers is not foolproof (nor, do I think, should we
+                // ever count on it being so. Rather than throw an exception just return null if we
+                // failed to parse the value.
+                valueMinBias = ComparisonBias.Error;
+                return null;
             }
-
-            return valueMin;
         }
 
         /// <summary>
@@ -500,40 +522,52 @@ namespace Extract.DataEntry.LabDE
         /// value.</returns>
         static double? ParseMaxValue(string value, out ComparisonBias valueMaxBias)
         {
-            // Parse the maximum possible value where it is considered in-range if equal.
-            var valueMaxMatch =
-                Regex.Match(value, @"(^([\d\.]+)$)|((?<=\d+-)[\d\.]+)|((?<=<(/|OR)?=)[\d\.]+)",
-                    RegexOptions.IgnoreCase);
-
-            // Set bias as to whether equivalence is allowed.
-            valueMaxBias = valueMaxMatch.Success
-                ? ComparisonBias.MayBeEqualTo
-                : ComparisonBias.MustBeLessThan;
-
-            string valueMaxString = null;
-            if (valueMaxMatch.Success)
+            try
             {
-                valueMaxString = valueMaxMatch.Value;
-            }
-            else
-            {
-                // If equivalence is not allowed, parse for maximum where equivalence is not
-                // permitted.
-                valueMaxMatch = Regex.Match(value, @"(?<=<)[\d\.]+", RegexOptions.IgnoreCase);
+                // Parse the maximum possible value where it is considered in-range if equal.
+                var valueMaxMatch =
+                    Regex.Match(value, @"(^([\d\.]+)$)|((?<=\d+-)[\d\.]+)|((?<=<(/|OR)?=)[\d\.]+)",
+                        RegexOptions.IgnoreCase);
+
+                // Set bias as to whether equivalence is allowed.
+                valueMaxBias = valueMaxMatch.Success
+                    ? ComparisonBias.MayBeEqualTo
+                    : ComparisonBias.MustBeLessThan;
+
+                string valueMaxString = null;
                 if (valueMaxMatch.Success)
                 {
                     valueMaxString = valueMaxMatch.Value;
                 }
-            }
+                else
+                {
+                    // If equivalence is not allowed, parse for maximum where equivalence is not
+                    // permitted.
+                    valueMaxMatch = Regex.Match(value, @"(?<=<)[\d\.]+", RegexOptions.IgnoreCase);
+                    if (valueMaxMatch.Success)
+                    {
+                        valueMaxString = valueMaxMatch.Value;
+                    }
+                }
 
-            // Convert valueMaxString to a double
-            double? valueMax = null;
-            if (!string.IsNullOrEmpty(valueMaxString))
+                // Convert valueMaxString to a double
+                double? valueMax = null;
+                if (!string.IsNullOrEmpty(valueMaxString))
+                {
+                    valueMax = double.Parse(valueMaxString, CultureInfo.CurrentCulture);
+                }
+
+                return valueMax;
+            }
+            catch
             {
-                valueMax = double.Parse(valueMaxString, CultureInfo.CurrentCulture);
+                // https://extract.atlassian.net/browse/ISSUE-13738
+                // The regex to identify valid numbers is not foolproof (nor, do I think, should we
+                // ever count on it being so. Rather than throw an exception just return null if we
+                // failed to parse the value.
+                valueMaxBias = ComparisonBias.Error;
+                return null;
             }
-
-            return valueMax;
         }
 
         #endregion Private Members
