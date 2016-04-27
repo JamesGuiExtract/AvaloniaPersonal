@@ -246,6 +246,7 @@
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\ISLockPermissions.dll</td></row>
+		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 	</table>
 
@@ -315,6 +316,7 @@
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>ExtractCommonAppFolder</td><td>{F1E4A6BB-F90F-46C5-A49B-727F68211701}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FieldActivation</td><td>{3198502E-576E-4944-83FB-5CEBA591DF96}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>fieldactutil.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NonSelfRegCC</td><td>{1A0C142E-8089-4CFF-9A65-B9176C53AFC8}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>usblicensekeymanager.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UUsafe32.dll</td><td>{BAA2F71D-781F-4961-98FB-1715CC627C78}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>uusafe32.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
@@ -381,6 +383,10 @@
 		<col def="S255">ISComments</col>
 		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
+		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
 		<row><td>NewDriverError</td><td>19</td><td/><td>Unable to install new Sentinel Driver</td><td/><td/></row>
 		<row><td>OldDriverError</td><td>19</td><td/><td>Unable to uninstall old Sentinel Driver</td><td/><td/></row>
@@ -1146,6 +1152,7 @@
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>fieldactutil.exe</td><td>FieldActivation</td><td>FIELDA~1.EXE|FieldActUtil.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_FIELDACTIVATION_FILES&gt;\FieldActUtil.exe</td><td>1</td><td/></row>
+		<row><td>usblicensekeymanager.exe</td><td>NonSelfRegCC</td><td>USBLIC~1.EXE|USBLicenseKeyManager.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGCC_FILES&gt;\USBLicenseKeyManager.exe</td><td>1</td><td/></row>
 		<row><td>uusafe32.dll</td><td>UUsafe32.dll</td><td>UUsafe32.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_FIELDACTIVATION_FILES&gt;\UUsafe32.dll</td><td>1</td><td/></row>
 	</table>
 
@@ -1287,6 +1294,7 @@
 		<col def="S0">Miscellaneous</col>
 		<row><td>ExtractCommonAppFolder</td><td/><td/><td>_37907DAE_2072_44EF_87EB_F7AD13511568_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FieldActivation</td><td/><td/><td>_94CB8EED_363C_42D4_BE99_3E7FA0968D70_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NonSelfRegCC</td><td/><td/><td>_9DF854DC_4F87_424F_9664_F72D07939AAF_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UUsafe32.dll</td><td/><td/><td>_56B51402_AD24_471E_BC88_0E3D875A2FB3_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
@@ -1346,6 +1354,7 @@
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
 		<row><td>FieldActivation</td><td>&lt;PATH_TO_FIELDACTIVATION_FILES&gt;</td><td>4</td><td/><td>FieldActUtil.exe, uusafe32.dll</td><td>0</td></row>
+		<row><td>NonSelfRegCC</td><td>&lt;PATH_TO_NONSELFREGCC_FILES&gt;</td><td>4</td><td/><td>USBLicenseKeyManager.exe</td><td>10</td></row>
 	</table>
 
 	<table name="ISFeatureExtended">
@@ -1605,6 +1614,7 @@
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
 		<row><td>PATH_TO_FIELDACTIVATION_FILES</td><td>P:\LicenseManager\Files\FieldActivation</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INSTALLSCRIPTS_FILES</td><td>&lt;ISProjectFolder&gt;\..\..\..\..\..\ProductDevelopment\Common\InstallScripts</td><td/><td>2</td></row>
+		<row><td>PATH_TO_NONSELFREGCC_FILES</td><td>P:\LicenseManager\Files\NonSelfRegCC</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
@@ -3188,6 +3198,10 @@
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
 		<row><td>ISLockPermissionsCost</td><td/><td>1456</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td/><td>5851</td><td/><td/></row>
+		<row><td>ISSelfRegisterCosting</td><td/><td>2201</td><td/><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td/><td>5501</td><td/><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td/><td>6401</td><td/><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td/><td>2202</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>
 		<row><td>InstallFinalize</td><td/><td>6400</td><td>InstallFinalize</td><td/></row>
 		<row><td>InstallInitialize</td><td/><td>1501</td><td>InstallInitialize</td><td/></row>
