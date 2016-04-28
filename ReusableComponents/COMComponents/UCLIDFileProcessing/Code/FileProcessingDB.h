@@ -71,7 +71,7 @@ static const string gstrDB_QUEUED_ACTION_STATUS_CHANGE = "QueuedActionStatusChan
 static const string gstrDB_FIELD_SEARCH = "FieldSearch";
 static const string gstrDB_LAUNCH_APP= "LaunchApp"; // No long exists, but keep for schema updates
 static const string gstrDB_FILE_HANDLER= "FileHandler";
-static const string gstrDB_FEATURE= "Feature";
+static const string gstrDB_FEATURE= "Feature";	
 static const string gstrWORK_ITEM="WorkItem";
 static const string gstrWORK_ITEM_GROUP="WorkItemGroup";
 static const string gstrMETADATA_FIELD="MetadataField";
@@ -80,6 +80,7 @@ static const string gstrTASK_CLASS="TaskClass";
 static const string gstrFILE_TASK_SESSION="FileTaskSession";
 static const string gstrSECURE_COUNTER="SecureCounter";
 static const string gstrSECURE_COUNTER_VALUE_CHANGE="SecureCounterValueChange";
+static const string gstrPAGINATION="Pagination";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -295,8 +296,8 @@ public:
 	STDMETHOD(GetLastConnectionStringConfiguredThisProcess)(BSTR *pbstrConnectionString);
 	STDMETHOD(get_ActiveFAMID)(long *pnActiveFAMID);
 	STDMETHOD(get_FAMSessionID)(long *pnFAMSessionID);
-	STDMETHOD(RecordFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, double dDuration,
-		double dOverheadTime, long *pnFileTaskSessionID);
+	STDMETHOD(StartFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, long *pnFileTaskSessionID);
+	STDMETHOD(UpdateFileTaskSession)(long nFileTaskSessionID, double dDuration, double dOverheadTime);
 	STDMETHOD(GetFileNameFromFileID)( /*[in]*/ long fileID, /*[out, retval]*/ BSTR* pbstrFileName );
 	STDMETHOD(GetSecureCounters)(VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	STDMETHOD(GetSecureCounterName)(long nCounterID, BSTR *pstrCounterName);
@@ -311,6 +312,8 @@ public:
 	STDMETHOD(SetSecureCounterAlertLevel)(long nCounterID, long nAlertLevel, long nAlertMultiple);
 	STDMETHOD(AddFileNoQueue)(BSTR bstrFile, long long llFileSize, long lPageCount,
 		EFilePriority ePriority, long* pnID);
+	STDMETHOD(AddPaginationHistory)(BSTR bstrOutputFile, IIUnknownVector* pSourcePageInfo,
+		long nFileTaskSessionID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1220,8 +1223,8 @@ private:
 	bool AddMetadataField_Internal(bool bDBLocked, const string& strMetadataFieldName);
 	bool DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMetadataFieldName);
 	bool RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
-	bool RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, double dDuration,
-		double dOverheadTime, long *pnFileTaskSessionID);
+	bool StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, long *pnFileTaskSessionID);
+	bool UpdateFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID, double dDuration, double dOverheadTime);
 	bool GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	bool GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName);
 	bool ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode, BSTR *pbstrResult);
@@ -1232,6 +1235,8 @@ private:
 	bool SetSecureCounterAlertLevel_Internal(bool bDBLocked, long nCounterID, long nAlertLevel, long nAlertMultiple);
 	bool AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, long long llFileSize, long lPageCount,
 		EFilePriority ePriority, long* pnID);
+	bool AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrOutputFile, IIUnknownVector* pSourcePageInfo,
+		long nFileTaskSessionID);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

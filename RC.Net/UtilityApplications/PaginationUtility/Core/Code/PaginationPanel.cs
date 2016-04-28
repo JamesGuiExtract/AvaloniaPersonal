@@ -736,10 +736,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 outputDocument = (ExtendedOutputDocument)sender;
                 tempFile = _tempFiles[outputDocument];
 
-                var sourceDocNames = outputDocument.PageControls
-                    .Select(c => c.Page.SourceDocument.FileName)
-                    .Distinct();
-
                 int pageCount = 0;
                 using (var codecs = new ImageCodecs())
                 using (var reader = codecs.CreateReader(tempFile.FileName))
@@ -752,8 +748,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ? (bool ?)(outputDocument.InOriginalForm ? true : false)
                     : null;
 
+                var sourcePageInfo = outputDocument.PageControls
+                    .Select(c => new PageInfo()
+                    {
+                        DocumentName = c.Page.OriginalDocumentName,
+                        PageNum = c.Page.OriginalPageNumber
+                    });
+
                 var eventArgs = new CreatingOutputDocumentEventArgs(
-                    sourceDocNames, pageCount, fileSize, suggestedPaginationAccepted);
+                    sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted);
                 OnCreatingOutputDocument(eventArgs);
                 string outputFileName = eventArgs.OutputFileName;
 

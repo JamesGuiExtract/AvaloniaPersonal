@@ -583,7 +583,7 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcess
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31413");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(BSTR bstrTaskClassGuid, long lFileID,
+STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long nFileTaskSessionID,
 		double dDuration, double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
 		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
 		long lTotalManualRedactions, long lNumPagesAutoAdvanced)
@@ -592,10 +592,8 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(BSTR bstrTaskClassGuid, long
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		// Use the FAMDB's RecordFileTaskSession to add the FileTaskSesson. Since it has it's own
-		// optimistic locking, no need to do so here.
-		long nFileTaskSessionID = m_ipFAMDB->RecordFileTaskSession(
-			bstrTaskClassGuid, lFileID, dDuration, dOverheadTime);
+		// UpdateFileTaskSession has it's own optimistic locking, no need to do so here.
+		m_ipFAMDB->UpdateFileTaskSession(nFileTaskSessionID, dDuration, dOverheadTime);
 
 		if (!AddIDShieldData_Internal(false, nFileTaskSessionID, lNumHCDataFound, lNumMCDataFound,
 			lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, lTotalManualRedactions,

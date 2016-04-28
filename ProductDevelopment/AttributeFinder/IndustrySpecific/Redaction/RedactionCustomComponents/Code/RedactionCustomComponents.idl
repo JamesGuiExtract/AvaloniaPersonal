@@ -569,7 +569,7 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
         // PROMISE: To add a record in the IDShieldData table in the database for the file with the
         //          given values.
         [id(5), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData(
-			[in] BSTR bstrTaskClassGuid, [in] long lFileID, 
+			[in] long nFileTaskSessionID, 
             [in] double dDuration, [in] double dOverheadTime, [in] long lNumHCDataFound,
 			[in] long lNumMCDataFound, [in] long lNumLCDataFound, [in] long lNumCluesDataFound,
 			[in] long lTotalRedactions, [in] long lTotalManualRedactions,

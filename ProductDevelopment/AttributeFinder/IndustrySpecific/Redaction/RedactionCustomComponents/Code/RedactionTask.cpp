@@ -183,6 +183,15 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         _lastCodePos = "40";
 
         long nFileID = ipFileRecord->FileID;
+		
+		// Start a FileTaskSession if a database is provided
+		long nFileTaskSessionID(-1);
+        IFileProcessingDBPtr ipFAMDB(pDB);
+		if (ipFAMDB != nullptr)
+		{
+			nFileTaskSessionID = 
+				ipFAMDB->StartFileTaskSession(gstrREDACTION_TASK_GUID.c_str(), nFileID);
+		}
 
         // Default to successful completion
         *pResult = kProcessingSuccessful;
@@ -658,7 +667,6 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
             strImageName, strOutputName, bOutputFileExists);
 
         // Add ID Shield data if a database is provided
-        IFileProcessingDBPtr ipFAMDB(pDB);
         if (ipFAMDB != __nullptr)
         {
             // Set the FAMDB pointer
@@ -666,7 +674,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 				getIDShieldDBPtr(ipFAMDB);
 
             // Add the IDShieldData record to the database
-            ipIDSDB->AddIDShieldData(gstrREDACTION_TASK_GUID.c_str(), nFileID,
+            ipIDSDB->AddIDShieldData(nFileTaskSessionID,
 				swProcessingTime.getElapsedTime(), 0, 
                 idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
                 idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions,

@@ -33,6 +33,12 @@ namespace Extract.Redaction.Verification
         readonly int _actionId;
 
         /// <summary>
+        /// The ID of the currently active FileTaskSession row. <see langword="null"/> if there is
+        /// no such row.
+        /// </summary>
+        int? _fileTaskSessionId;
+
+        /// <summary>
         /// The voa file with the current (perhaps uncommitted) redactions.
         /// </summary>
         readonly string _voaFile;
@@ -171,6 +177,23 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _actionId;
+            }
+        }
+
+        /// <summary>
+        /// The ID of the currently active FileTaskSession row. <see langword="null"/> if there is
+        /// no such row.
+        /// </summary>
+        public int? FileTaskSessionID
+        {
+            get
+            {
+                return _fileTaskSessionId;
+            }
+
+            set
+            {
+                _fileTaskSessionId = value;
             }
         }
 

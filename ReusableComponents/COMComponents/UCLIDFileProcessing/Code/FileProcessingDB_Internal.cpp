@@ -1257,6 +1257,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FAST_FILEID_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATION_ORIGINALFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATION_DESTFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATION_FILETASKSESSION_INDEX);
 		
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -1333,6 +1336,10 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_TASK_CLASS_FK);
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK);
+		vecQueries.push_back(gstrADD_PAGINATION_SOURCEFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_PAGINATION_DESTFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_PAGINATION_ORIGINALFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_PAGINATION_FILETASKSESSION_FK);
 
 		// Don't create the FK between the Secure counter tables unless at least one
 		// of the SercureCounter tables had to be created
@@ -1476,6 +1483,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE);
 	vecQueries.push_back(gstrCREATE_TASK_CLASS);
 	vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION);
+	vecQueries.push_back(gstrCREATE_PAGINATION);
 
 	return vecQueries;
 }
@@ -2843,7 +2851,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFILE_TASK_SESSION);
 	vecTables.push_back(gstrSECURE_COUNTER);
 	vecTables.push_back(gstrSECURE_COUNTER_VALUE_CHANGE);
-
+	vecTables.push_back(gstrPAGINATION);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

@@ -39,7 +39,7 @@ library AttributeDbMgrComponentsLib
 		HRESULT FAMDB([in] IFileProcessingDB* newVal);
 
 		[id(2), helpstring("method CreateNewAttributeSetForFile")] 
-		HRESULT CreateNewAttributeSetForFile([in] long fileID, 
+		HRESULT CreateNewAttributeSetForFile([in] long nFileTaskSessionID, 
 											 [in] BSTR bstrAttributeSetName, 
 											 [in] IIUnknownVector* ipAttributes, 
 											 [in] VARIANT_BOOL vbStoreRasterZone,

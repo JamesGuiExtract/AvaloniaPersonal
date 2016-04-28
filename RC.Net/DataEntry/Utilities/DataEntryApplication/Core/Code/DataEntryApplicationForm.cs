@@ -288,6 +288,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         string _actionName;
 
         /// <summary>
+        /// The ID of the currently active FileTaskSession row. <see langword="null"/> if there is
+        /// no such row.
+        /// </summary>
+        int? _fileTaskSessionID;
+
+        /// <summary>
         /// The <see cref="ITagUtility"/> interface of the <see cref="FAMTagManager"/> provided to
         /// expand path tags/functions.
         /// </summary>
@@ -297,13 +303,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Allows data entry specific database operations.
         /// </summary>
         DataEntryProductDBMgr _dataEntryDatabaseManager;
-
-        /// <summary>
-        /// A token value that allows "OnLoad" DataEntryCounterValue DB entries to be made once the
-        /// corresponding DataEntryData table entry is made. -1 indicates there is no pending counts
-        /// to be stored.
-        /// </summary>
-        int _counterStatisticsToken = -1;
 
         /// <summary>
         /// Specifies whether counts will be recorded for the defined data entry counters (only if
@@ -1030,6 +1029,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _fileId = fileID;
                 _fileName = fileName;
+                _fileTaskSessionID = null;
+
+                StartFileTaskSession();
 
                 _tagFileToolStripButton.Database = fileProcessingDB;
                 _tagFileToolStripButton.FileId = fileID;
@@ -1643,7 +1645,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // Record statistics to database that needs to happen when a file is closed.
                         if (!_standAloneMode && _dataEntryDatabaseManager != null)
                         {
-                            RecordFileProcessingDatabaseStatistics(false, null);
+                            RecordCounts(onLoad: false, attributes: null);
+                            EndFileTaskSession();
                         }
                     }
                 }
@@ -2009,10 +2012,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _dataEntryControlHost.SetDatabaseConnections(GetDatabaseConnections());
                     }
 
-                    // Record database statistics on load
+                    // Record counts on load
                     if (!_standAloneMode && _fileProcessingDb != null)
                     {
-                        RecordFileProcessingDatabaseStatistics(true, attributes);
+                        RecordCounts(onLoad: true, attributes: attributes);
                     }
 
                     // If a DEP is being used, load the data into it
@@ -2128,7 +2131,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // Record statistics to database that need to happen when a file is closed.
                         if (!_standAloneMode && _dataEntryDatabaseManager != null)
                         {
-                            RecordFileProcessingDatabaseStatistics(false, null);
+                            RecordCounts(onLoad: false, attributes: null);
+                            EndFileTaskSession();
                         }
 
                         // https://extract.atlassian.net/browse/ISSUE-13051
@@ -2968,7 +2972,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Keep the processing queue paused until the Paginated event.
                 FileRequestHandler.PauseProcessingQueue();
 
-                var pathTags = new SourceDocumentPathTags(e.SourceDocumentNames.First());
+                var pathTags = new SourceDocumentPathTags(e.SourcePageInfo.First().DocumentName);
                 e.OutputFileName = pathTags.Expand("$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
 
                 // Add the file to the DB and check it out for this process before actually writing
@@ -2976,7 +2980,22 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // process from getting it.
                 int fileID = FileProcessingDB.AddFileNoQueue(
                     e.OutputFileName, e.FileSize, e.PageCount, EFilePriority.kPriorityNormal);
-                
+
+                // Format source page info into an IUnknownVector of StringPairs (filename, page).
+                var sourcePageInfo = e.SourcePageInfo
+                    .Select(info => new StringPairClass()
+                    {
+                        StringKey = info.DocumentName,
+                        StringValue = info.PageNum.ToString(CultureInfo.InvariantCulture)
+                    })
+                    .ToIUnknownVector();
+
+                ExtractException.Assert("ELI39699", "FileTaskSession was not started.",
+                    _fileTaskSessionID.HasValue);
+
+                FileProcessingDB.AddPaginationHistory(
+                    e.OutputFileName, sourcePageInfo, _fileTaskSessionID.Value);
+
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
                 // everything we would expect them to find for this document).
@@ -3036,7 +3055,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // paginated output or any documents for which suggested pagination was ignored
                 // should be completed.
                 foreach (var sourceFileName in
-                    e.PaginatedDocumentSources.Union(e.DisregardedPaginationSources))
+                     e.PaginatedDocumentSources.Union(e.DisregardedPaginationSources))
                 {
                     _paginationPanel.RemoveSourceFile(sourceFileName);
 
@@ -3046,12 +3065,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         _imageViewer.CloseImage();
 
-                        if (_fileProcessingDb != null)
-                        {
-                            // Record statistics to database that need to happen when a file is closed.
-                            RecordFileProcessingDatabaseStatistics(onLoad: false,
-                                attributes: _dataEntryControlHost.MostRecentlySavedAttributes);
-                        }
+                        // Record statistics to database that need to happen when a file is closed.
+                        RecordCounts(onLoad: false, attributes: null);
+                        EndFileTaskSession();
 
                         OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
                         completedCurrentFile = true;
@@ -3584,8 +3600,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     if (_fileProcessingDb != null)
                     {
                         // Record statistics to database that need to happen when a file is closed.
-                        RecordFileProcessingDatabaseStatistics(
-                            false, _dataEntryControlHost.MostRecentlySavedAttributes);
+                        RecordCounts(onLoad: false,
+                            attributes: _dataEntryControlHost.MostRecentlySavedAttributes);
+                        EndFileTaskSession();
                     }
 
                     OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
@@ -3721,7 +3738,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _imageViewer.CloseImage();
 
                 // Record statistics to database that need to happen when a file is closed.
-                RecordFileProcessingDatabaseStatistics(false, null);
+                RecordCounts(onLoad: false, attributes: null);
+                EndFileTaskSession();
 
                 OnFileComplete(processingResult);
             }
@@ -4948,56 +4966,54 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Records statistics to the file processing database.
+        /// Create a new FileTaskSession table row and starts a timer for the session.
         /// </summary>
-        /// <param name="onLoad"><see langword="true"/> if a new file is being opened,
-        /// <see langword="false"/> if processing of a file is ending.</param>
-        /// <param name="attributes">The attributes to be associated with recorded statistics.
-        /// </param>
-        void RecordFileProcessingDatabaseStatistics(bool onLoad, IUnknownVector attributes)
+        void StartFileTaskSession()
         {
             try
             {
-                ExtractException.Assert("ELI29829", "Cannot record database statistics since the " +
-                    "database manager has not been initialized!", _dataEntryDatabaseManager != null);
+                _recordedDatabaseData = false;
 
-                if (onLoad)
+                _fileTaskSessionID = FileProcessingDB.StartFileTaskSession(
+                    _VERIFICATION_TASK_GUID, _fileId);
+
+                // If the timer is currently running, its current time will be the overhead time
+                // (time since the previous document was saved. Restart the timer to track the
+                // screen time of this document.
+                if (_fileProcessingStopwatch != null && _fileProcessingStopwatch.IsRunning)
                 {
-                    _recordedDatabaseData = false;
-
-                    // If the timer is currently running, its current time will be the overhead time (time
-                    // since the previous document was saved. Restart the timer to track the screen time of
-                    // this document.
-                    if (_fileProcessingStopwatch != null && _fileProcessingStopwatch.IsRunning)
-                    {
-                        _overheadElapsedTime = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
-                        _fileProcessingStopwatch.Restart();
-                    }
-                    // The timer will need to be started for the first document. 
-                    else
-                    {
-                        _overheadElapsedTime = 0;
-                        _fileProcessingStopwatch = new Stopwatch();
-                        _fileProcessingStopwatch.Start();
-                    }
-
-                    // Enable input event tracking.
-                    if (_inputEventTracker != null)
-                    {
-                        _inputEventTracker.RegisterControl(this);
-                    }
-
-                    if (_countersEnabled)
-                    {
-                        // Calculate the initial counter values and receive a token that will allow
-                        // the counts to be stored once the associated DataEntryData table row is
-                        // added.
-                        _counterStatisticsToken = -1;
-                        _dataEntryDatabaseManager.RecordCounterValues(
-                            ref _counterStatisticsToken, 0, attributes);
-                    }
+                    _overheadElapsedTime = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
+                    _fileProcessingStopwatch.Restart();
                 }
-                else if (!_recordedDatabaseData && CurrentlyRecordingStatistics)
+                // The timer will need to be started for the first document. 
+                else
+                {
+                    _overheadElapsedTime = 0;
+                    _fileProcessingStopwatch = new Stopwatch();
+                    _fileProcessingStopwatch.Start();
+                }
+
+                // Enable input event tracking.
+                if (_inputEventTracker != null)
+                {
+                    _inputEventTracker.RegisterControl(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39702");
+            }
+        }
+
+        /// <summary>
+        /// Ends the current FileTaskSession by recording the DateTimeStamp and duration to the
+        /// FileTaskSession row.
+        /// </summary>
+        void EndFileTaskSession()
+        {
+            try
+            {
+                if (CurrentlyRecordingStatistics)
                 {
                     // Don't count input when a document is not open.
                     if (_inputEventTracker != null)
@@ -5008,23 +5024,54 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
                     _fileProcessingStopwatch.Restart();
 
-                    int instanceId = _fileProcessingDb.RecordFileTaskSession(
-                        _VERIFICATION_TASK_GUID, _fileId, elapsedSeconds,
-                        _overheadElapsedTime.Value);
-
-                    if (_countersEnabled)
-                    {
-                        _dataEntryDatabaseManager.RecordCounterValues(
-                            ref _counterStatisticsToken, instanceId, attributes);
-                    }
-
-                    // Ensure we never inappropriately record an entry for a file.
-                    _recordedDatabaseData = true;
+                    _fileProcessingDb.UpdateFileTaskSession(
+                        _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value);
                 }
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI29864", ex);
+                throw ex.AsExtract("ELI39703");
+            }
+        }
+
+        /// <summary>
+        /// Records counts for the current document (represented by <see paramref="attributes"/>) to
+        /// the DataEntryCounterValue table.
+        /// </summary>
+        /// <param name="onLoad"><see langword="true"/> if a new file is being opened,
+        /// <see langword="false"/> if processing of a file is ending.</param>
+        /// <param name="attributes">The attributes to be used to generate counts.</param>
+        void RecordCounts(bool onLoad, IUnknownVector attributes)
+        {
+            try
+            {
+                if (_countersEnabled)
+                {
+                    ExtractException.Assert("ELI29829", "Cannot record database statistics since the " +
+                        "database manager has not been initialized!", _dataEntryDatabaseManager != null);
+
+                    ExtractException.Assert("ELI39701",
+                        "Cannot record counts; there is not active FileTaskSession.",
+                        _fileTaskSessionID != null);
+
+                    if (onLoad)
+                    {
+                        _recordedDatabaseData = false;
+                    }
+
+                    if (onLoad || !_recordedDatabaseData)
+                    {
+                        _dataEntryDatabaseManager.RecordCounterValues(
+                            onLoad, _fileTaskSessionID.Value, attributes);
+
+                        // Ensure we never inappropriately record an entry for a file.
+                        _recordedDatabaseData = !onLoad;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39704");
             }
         }
 

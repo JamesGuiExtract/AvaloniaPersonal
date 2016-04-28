@@ -71,7 +71,7 @@ public:
 		IProgressStatus* pProgressStatus);
 
 // IDataEntryProductDBMgr Methods
-	STDMETHOD(RecordCounterValues)(long* plInstanceToken, long lDataEntryDataInstanceID,
+	STDMETHOD(RecordCounterValues)(VARIANT_BOOL vbOnLoad, long lFileTaskSessionID,
 		IIUnknownVector* pAttributes);
 	STDMETHOD(Initialize)(IFileProcessingDB* pFAMDB);
 
@@ -89,13 +89,6 @@ private:
 
 	// An IAFUtility instance to be used to execute attribute queries.
 	IAFUtilityPtr m_ipAFUtility;
-
-	// Maintains SQL commands to store counts from the data once an associated DataEntryTable entry
-	// is available.
-	map<long, vector<string> > m_mapVecCounterValueInsertionQueries;
-
-	// The value of the next token to be assigned.
-	volatile long m_lNextInstanceToken;
 
 	// Contains the number of times an attempt to reconnect. Each time the reconnect attempt times
 	// out an exception will be logged.
@@ -129,8 +122,8 @@ private:
 	void validateLicense();
 
 	// Internal versions of external methods that may require database locking
-	bool RecordCounterValues_Internal(bool bDBLocked, long* plInstanceToken,
-		long lDataEntryDataInstanceID, IIUnknownVector* pAttributes);
+	bool RecordCounterValues_Internal(bool bDBLocked, VARIANT_BOOL vbOnLoad,
+		long lFileTaskSessionID, IIUnknownVector* pAttributes);
 
 	// Retrieves the set of SQL queries used to create the DataEntry specific database tables.
 	const vector<string> getTableCreationQueries(bool bAddUserTables);

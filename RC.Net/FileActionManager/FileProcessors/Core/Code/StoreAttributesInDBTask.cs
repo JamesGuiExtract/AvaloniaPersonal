@@ -512,12 +512,10 @@ namespace Extract.FileActionManager.FileProcessors
                                             "VOA filename",
                                             voaFileName);
 
-                    const double unusedDuration = 0.0;
-                    const double unusedOverheadTime = 0.0;
-                    int fileTaskSessionID = pDB.RecordFileTaskSession(_CLASS_GUID,
-                                                                       pFileRecord.FileID,
-                                                                       unusedDuration,
-                                                                       unusedOverheadTime);
+                    IntervalTimer timer = new IntervalTimer();
+                    timer.Start();
+                    int fileTaskSessionID = pDB.StartFileTaskSession(_CLASS_GUID,
+                                                                     pFileRecord.FileID);
                     IUnknownVector voaData = new IUnknownVector();
                     voaData.LoadFrom(voaFileName, false);
                     voaData.ReportMemoryUsage();
@@ -527,6 +525,8 @@ namespace Extract.FileActionManager.FileProcessors
                                                                       voaData,
                                                                       StoreRasterZones,
                                                                       StoreEmptyAttributes);
+
+                    pDB.UpdateFileTaskSession(fileTaskSessionID, timer.ElapsedSeconds, 0);
                 }
                 else
                 {

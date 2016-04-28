@@ -78,7 +78,7 @@ public:
 // IAttributeDBMgr Methods
 	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
 
-	STDMETHOD(CreateNewAttributeSetForFile)(long nFileID,
+	STDMETHOD(CreateNewAttributeSetForFile)(long nFileTaskSessionID,
 											BSTR bstrAttributeSetName,
 											IIUnknownVector* pAttributes,
 											VARIANT_BOOL vbStoreRasterZone,

@@ -72,7 +72,7 @@ public:
 		long* pnNumSteps, IProgressStatus* pProgressStatus);
 
 // IIDShieldProductDBMgr Methods
-	STDMETHOD(AddIDShieldData)(BSTR bstrTaskClassGuid, long lFileID, double dDuration,
+	STDMETHOD(AddIDShieldData)(long nFileTaskSessionID, double dDuration,
 		double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound,
 		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
 		long lNumPagesAutoAdvanced);

@@ -1640,12 +1640,12 @@ library UCLID_FILEPROCESSINGLib
 		// Gets the FAMSessionID for the current FAM session; 0 if there is no current FAMSession.
 		[propget, id(144), helpstring("property FAMSessionID")] HRESULT FAMSessionID([out, retval] long* pnFAMSessionID);
 		// -----------------------------------------------------------------------------------------------
-		// PURPOSE: Adds a row to the FileTaskSession table. It is assumed that the specified bstrTaskClassGuid
-		//			already exists in the TaskClass table.
+		// PURPOSE: Adds a row to the FileTaskSession table for a task that has been started. The timestamp
+		//			and duration columns will be NULL at this point. It is assumed that the specified
+		//			bstrTaskClassGuid already exists in the TaskClass table.
 		// RETURNS: The ID of the added FileTaskSession row.
-		[id(145), helpstring("methods RecordFileTaskSession")] HRESULT RecordFileTaskSession([in] BSTR bstrTaskClassGuid,
-			[in] long nFileID, [in] double dDuration, [in] double dOverheadTime,
-			[out, retval] long *pnFileTaskSessionID);
+		[id(145), helpstring("methods StartFileTaskSession")] HRESULT StartFileTaskSession(
+			[in] BSTR bstrTaskClassGuid, [in] long nFileID, [out, retval] long *pnFileTaskSessionID);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To execute the specified command query and return the number of affected rows
 		// AND a long long value of a named column.
@@ -1752,6 +1752,22 @@ library UCLID_FILEPROCESSINGLib
 		[id(159), helpstring("method AddFileNoQueue")] HRESULT AddFileNoQueue([in] BSTR strFile,
 			[in] long long llFileSize, [in] LONG lPageCount,  [in] EFilePriority ePriority,
 			[out, retval] long* pnID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To add data to the Pagination table indicating the source of all pages for the
+		//			newly generated bstrOutputFile.
+		//			pSourcePageInfo is expected to be an IUnknownVector with the same number of items
+		//			as there are pages in bstrOutputFile. Each item in the vector is expected to be a
+		//			IStringPair instance where the StringKey is the filename of the document the
+		//			respective page came from and the StringValue is the string representation of the
+		//			page number.
+		[id(160), helpstring("method AddPaginationHistory")] HRESULT AddPaginationHistory(
+			[in] BSTR bstrOutputFile, [in] IIUnknownVector* pSourcePageInfo,
+			[in] long nFileTaskSessionID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Applies the specified durations to the specified FileTaskSession row. The
+		//			DateTimeStamp will also be applied.
+		[id(161), helpstring("methods UpdateFileTaskSession")] HRESULT UpdateFileTaskSession(
+			[in] long nFileTaskSessionID, [in] double dDuration, [in] double dOverheadTime);
 	};
 
 	[

@@ -149,27 +149,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new <see cref="CreatingOutputDocumentEventArgs"/> instance.
         /// </summary>
-        /// <param name="sourceDocumentNames">The source documents from which the pages of the output
-        /// document originate.</param>
+        /// <param name="sourcePageInfo"><see cref="PageInfo"/>s that indicate the source document
+        /// page for each respective page in the output file that is being produced.</param>
         /// <param name="pageCount">The number of pages the output document will have.</param>
         /// <param name="fileSize">The size in bytes the output document will be.</param>
         /// <param name="suggestedPaginationAccepted"><see langword="true"/> if suggested pagination
         /// was accepted, <see langword="false"/> if suggested pagination was rejected or
         /// <see langword="null"/> if there was no suggested pagination for this document.</param>
-        public CreatingOutputDocumentEventArgs(IEnumerable<string> sourceDocumentNames,
+        public CreatingOutputDocumentEventArgs(IEnumerable<PageInfo> sourcePageInfo,
             int pageCount, long fileSize, bool? suggestedPaginationAccepted)
             : base()
         {
-            SourceDocumentNames = sourceDocumentNames.ToList().AsReadOnly();
+            SourcePageInfo = sourcePageInfo.ToList().AsReadOnly();
             PageCount = pageCount;
             FileSize = fileSize;
             SuggestedPaginationAccepted = suggestedPaginationAccepted;
         }
 
         /// <summary>
-        /// The source documents from which the pages of the output document originate.
+        /// The <see cref="PageInfo"/>s that indicate the source document page for each respective
+        /// page in the output file that is being produced.
         /// </summary>
-        public ReadOnlyCollection<string> SourceDocumentNames
+        public ReadOnlyCollection<PageInfo> SourcePageInfo
         {
             get;
             private set;
@@ -209,6 +210,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets or sets the file name to which the output document will be written.
         /// </summary>
         public string OutputFileName
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
+    /// Represents a specific page of a document.
+    /// </summary>
+    public class PageInfo
+    {
+        /// <summary>
+        /// The filename of the document.
+        /// </summary>
+        public string DocumentName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The page number in the document.
+        /// </summary>
+        public int PageNum
         {
             get;
             set;

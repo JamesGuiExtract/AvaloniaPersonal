@@ -174,7 +174,6 @@ CDataEntryProductDBMgr::CDataEntryProductDBMgr()
 : m_ipFAMDB(NULL)
 , m_ipDBConnection(NULL)
 , m_ipAFUtility(NULL)
-, m_lNextInstanceToken(0)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
 {
@@ -610,18 +609,19 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 //-------------------------------------------------------------------------------------------------
 // IDataEntryProductDBMgr Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
-									long lDataEntryDataInstanceID, IIUnknownVector* pAttributes)
+STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(VARIANT_BOOL vbOnLoad,
+														 long lFileTaskSessionID, 
+														 IIUnknownVector* pAttributes)
 {
 	try
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		
-		if (!RecordCounterValues_Internal(false, plInstanceToken, lDataEntryDataInstanceID, pAttributes))
+		if (!RecordCounterValues_Internal(false, vbOnLoad, lFileTaskSessionID, pAttributes))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
-			RecordCounterValues_Internal(true, plInstanceToken,	lDataEntryDataInstanceID, pAttributes);
+			RecordCounterValues_Internal(true, vbOnLoad, lFileTaskSessionID, pAttributes);
 		}
 
 		return S_OK;
@@ -753,48 +753,21 @@ IAFUtilityPtr CDataEntryProductDBMgr::getAFUtility()
 //-------------------------------------------------------------------------------------------------
 // Internal versions of Interface methods
 //-------------------------------------------------------------------------------------------------
-bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* plInstanceToken,
-									long lDataEntryDataInstanceID, IIUnknownVector* pAttributes)
+bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, VARIANT_BOOL vbOnLoad,
+									long lFileTaskSessionID, IIUnknownVector* pAttributes)
 {
 	try
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI29052", plInstanceToken != __nullptr);
-
 			IIUnknownVectorPtr ipAttributes(pAttributes);
 
-			// -1 instance token indicates the counts are "OnLoad" counts and that a new instance
-			// token needs to be returned.
-			bool bOnLoad = (*plInstanceToken == -1);
-			if (bOnLoad)
-			{
-				*plInstanceToken = m_lNextInstanceToken++;
-			}
-
-			// Create or find the set of queries to record counts for the specified hierarchy of
-			// attributes.
-			vector<string>& strQueries = m_mapVecCounterValueInsertionQueries[*plInstanceToken];
+			bool bOnLoad = asCppBool(vbOnLoad);
 
 			// If there is nothing to record, return now.
-			if ((bOnLoad && ipAttributes == __nullptr) ||
-				(!bOnLoad && ipAttributes == __nullptr && strQueries.empty()))
+			if (ipAttributes == __nullptr)
 			{
 				return S_OK;
-			}
-
-			// If counts are for "OnSave", update any existing "OnLoad" queries with the specified
-			// DataEntryData instance ID.
-			if (!bOnLoad)
-			{
-				string strInstanceID = asString(lDataEntryDataInstanceID);
-
-				for (size_t i = 0; i < strQueries.size(); i++)
-				{
-					string strQuery = strQueries[i];
-					replaceVariable(strQuery, "<InstanceID>", strInstanceID);
-					strQueries[i] = strQuery;
-				}
 			}
 
 			// Validate data entry schema
@@ -814,6 +787,8 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 			{
 				throw UCLIDException("ELI29053", "Data entry counters are not currently enabled.");
 			}
+
+			vector<string> vecQueries;
 
 			if (ipAttributes != __nullptr)
 			{
@@ -845,8 +820,8 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 
 					// Insert a query that to record the counts into the vector of queries for the
 					// current data entry instance.
-					strQueries.push_back(gstrINSERT_DATAENTRY_COUNTER_VALUE + "(" +
-						(bOnLoad ? "<InstanceID>" : asString(lDataEntryDataInstanceID)) + ", " +
+					vecQueries.push_back(gstrINSERT_DATAENTRY_COUNTER_VALUE + "(" +
+						asString(lFileTaskSessionID) + ", " +
 						asString(lCounterID) + ", " + (bOnLoad ? "'L'" : "'S'") + ", " +
 						asString(matchingAttributes->Size()) + ")");
 
@@ -856,19 +831,15 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 
 			// If this is call is for "OnSave" so that we now have a data entry instance ID, record the
 			// counts.
-			if (!bOnLoad && !strQueries.empty())
+			if (!vecQueries.empty())
 			{
 				// Create a transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
-				executeVectorOfSQL(ipConnection, strQueries);
+				executeVectorOfSQL(ipConnection, vecQueries);
 
 				// Commit the transactions
 				tg.CommitTrans();
-
-				// Now that the counts have been recorded, clear the queries from the map.
-				m_mapVecCounterValueInsertionQueries.erase(
-					m_mapVecCounterValueInsertionQueries.find(*plInstanceToken));
 			}
 
 			END_ADO_CONNECTION_RETRY(

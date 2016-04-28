@@ -374,6 +374,17 @@ static const string gstrCREATE_SECURE_COUNTER_VALUE_CHANGE =
 	"  HashValue bigint NOT NULL, "
 	"  Comment nvarchar(max)) ";
 
+static const string gstrCREATE_PAGINATION =
+	"CREATE TABLE [Pagination] ( "
+	"	[ID] INT IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Pagination] PRIMARY KEY CLUSTERED, "
+	"	[SourceFileID] INT NOT NULL, "
+	"	[SourcePage] INT NOT NULL, "
+	"	[DestFileID] INT NOT NULL, "
+	"	[DestPage] INT NOT NULL, "
+	"	[OriginalFileID] INT NOT NULL, "
+	"	[OriginalPage] INT NOT NULL, "
+	"	[FileTaskSessionID] INT NOT NULL)";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -463,6 +474,18 @@ static const string gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX =
 static const string gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX = 
 	"CREATE NONCLUSTERED INDEX [IX_FileTaskSession_FAMSession] ON [dbo].[FileTaskSession] "
 	"([FAMSessionID] ASC)";
+
+static const string gstrCREATE_PAGINATION_ORIGINALFILE_INDEX =
+	"CREATE NONCLUSTERED INDEX [IX_Pagination_OriginalFile] ON "
+	"	[dbo].[Pagination] ([OriginalFileID])";
+
+static const string gstrCREATE_PAGINATION_DESTFILE_INDEX =
+	"CREATE UNIQUE NONCLUSTERED INDEX [IX_Pagination_DestFile] ON "
+	"	[dbo].[Pagination] ([DestFileID], [DestPage])";
+
+static const string gstrCREATE_PAGINATION_FILETASKSESSION_INDEX = 
+	"CREATE NONCLUSTERED INDEX [IX_Pagination_FileTaskSession] ON "
+	"	[dbo].[Pagination] ([FileTaskSessionID])";
 
 	// Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
@@ -923,6 +946,28 @@ static const string gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK =
 	"ALTER TABLE [dbo].SecureCounterValueChange "
 	"WITH NOCHECK ADD CONSTRAINT FK_SecureCounterValueChange_FAMSession FOREIGN KEY (LastUpdatedByFAMSessionID) "
 	"REFERENCES dbo.[FAMSession] (ID)";
+
+static const string gstrADD_PAGINATION_SOURCEFILE_FAMFILE_FK =
+	"ALTER TABLE [dbo].[Pagination] "
+	"WITH CHECK ADD CONSTRAINT [FK_Pagination_SourceFile_FAMFile] "
+	"FOREIGN KEY (SourceFileID) REFERENCES dbo.[FAMFile] ([ID])";
+
+static const string gstrADD_PAGINATION_DESTFILE_FAMFILE_FK =
+	"ALTER TABLE [dbo].[Pagination] "
+	"WITH CHECK ADD CONSTRAINT [FK_Pagination_DestFile_FAMFile] "
+	"FOREIGN KEY (DestFileID) REFERENCES dbo.[FAMFile] ([ID])";
+
+static const string gstrADD_PAGINATION_ORIGINALFILE_FAMFILE_FK =
+	"ALTER TABLE [dbo].[Pagination] "
+	"WITH CHECK ADD CONSTRAINT [FK_Pagination_OriginalFile_FAMFile] "
+	"FOREIGN KEY (OriginalFileID) REFERENCES dbo.[FAMFile] ([ID])";
+
+static const string gstrADD_PAGINATION_FILETASKSESSION_FK = 
+	"ALTER TABLE [dbo].[Pagination]  "
+	" WITH CHECK ADD CONSTRAINT [FK_Pagination_FileTaskSession] FOREIGN KEY([FileTaskSessionID]) "
+	" REFERENCES [dbo].[FileTaskSession] ([ID])"
+	" ON UPDATE CASCADE "
+	" ON DELETE CASCADE ";
 
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_NAME_VAL = "<LockName>";
@@ -1460,16 +1505,20 @@ const string gstrGET_WORK_ITEM_GROUP_ID =
 	"FROM workItemTotals "
 	"WHERE CountOfWorkItems = NumberOfWorkItems ";
 
-static const string gstrINSERT_FILETASKSESSION_DATA = 
+static const string gstrSTART_FILETASKSESSION_DATA = 
 	"INSERT INTO [dbo].[FileTaskSession] "
 	" ([FAMSessionID]"
 	"  ,[TaskClassID]"
-	"  ,[FileID]"
-    "  ,[DateTimeStamp]"
-    "  ,[Duration]"
-	"  ,[OverheadTime])"
+	"  ,[FileID])"
 	"  OUTPUT INSERTED.ID"
-	"  VALUES (<FAMSessionID>, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = '<TaskClassGuid>'), <FileID>, GETDATE(), <Duration>, <OverheadTime>)";
+	"  VALUES (<FAMSessionID>, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = '<TaskClassGuid>'), <FileID>)";
+
+static const string gstrUPDATE_FILETASKSESSION_DATA = 
+	"UPDATE [dbo].[FileTaskSession] SET "
+	"		[DateTimeStamp] = GETDATE(), "
+	"		[Duration] = <Duration>, "
+	"		[OverheadTime] = <OverheadTime> "
+	"	WHERE [ID] = <FileTaskSessionID>";
 
 static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES = 
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
@@ -1499,4 +1548,31 @@ static const string gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE =
 	"		OR [scvc].[ID] IS NULL) "
 	"		ORDER BY [sc].[ID] ";
 
- 
+static const string gstrSELECT_SINGLE_PAGINATED_PAGE =
+	"SELECT [ID] AS [SourceFileID], <SourcePage> AS [SourcePage], <DestPage> AS [DestPage] "
+	"	FROM [FAMFile] WHERE [FileName] = '<SourceFileName>'";
+
+static const string gstrINSERT_INTO_PAGINATION =
+	"DECLARE @DestFileID INT \r\n"
+	"SELECT @DestFileID = [ID] FROM [FAMFile] WHERE [FileName] = '<DestFileName>' \r\n"
+
+	"INSERT INTO [Pagination] ([SourceFileID], [SourcePage], [DestFileID], [DestPage], [OriginalFileID], [OriginalPage], [FileTaskSessionID]) \r\n"
+	"	SELECT [NewPaginations].[SourceFileID], \r\n"
+	"		[NewPaginations].[SourcePage], \r\n"
+	"		@DestFileID AS [DestFileID], \r\n"
+	"		[NewPaginations].[DestPage], \r\n"
+	"		COALESCE([OriginalPages].[OriginalFileID], [NewPaginations].[SourceFileID]), \r\n"
+	"		COALESCE([OriginalPages].[OriginalPage], [NewPaginations].[SourcePage]), \r\n"
+	"		<FAMSessionID> AS [FileTaskSessionID] \r\n"
+	"		FROM \r\n"
+	"		( \r\n"
+	"			<SelectPaginations> \r\n"
+	"		) AS [NewPaginations] \r\n"
+	"		LEFT JOIN \r\n"
+	"		( \r\n"
+	"			SELECT [DestFileID], [DestPage], [OriginalFileID], [OriginalPage] \r\n"
+	"				FROM [Pagination] \r\n"
+	"				GROUP BY [DestFileID], [DestPage], [OriginalFileID], [OriginalPage] \r\n"
+	"		) AS [OriginalPages] \r\n"
+	"		ON [NewPaginations].[SourceFileID] = [OriginalPages].[DestFileID] \r\n"
+	"			AND [NewPaginations].[SourcePage] = [OriginalPages].[DestPage]";

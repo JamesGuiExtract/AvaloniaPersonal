@@ -36,16 +36,13 @@ library UCLID_DATAENTRYCUSTOMCOMPONENTSLib
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To record counts into the DataEntryCounterValue table for all counters defined
 		//			in the DataEntryCounterDefinition table. 
-		// ARGS:	-plInstanceToken: -1 to calculate counter values associated with OnLoad.
-		//			If >= 0, counts are to be performed in associated with OnSave and
-		//			plInstanceToken identifies associated OnLoad counts that should be recorded
-		//			under the same lDataEntryDataInstanceID. A >= 0 token is no longer valid after
-		//			calling this method as the token data is cleared.
-		//			-lDataEntryDataInstanceID: The ID from the DataEntryData table that the counts
-		//			should be associated with. Ignored if plInstanceToken == -1.
+		// ARGS:	-bOnLoad: VARIANT_TRUE to calculate counter values associated with OnLoad.
+		//				or VARIANTE_FALSE if the values are to be associated with OnSave.
+		//			-lFileTaskSessionID: The ID from the FileTaskSession table that the counts
+		//				should be associated with.
 		//			- pAttributes: The attributes on which the counts should be performed.
 		[id(3), helpstring("method RecordCounterValues")] HRESULT RecordCounterValues(
-			[in, out] long* plInstanceToken, [in] long lDataEntryDataInstanceID,
+			[in] VARIANT_BOOL bOnLoad, [in] long lFileTaskSessionID,
 			[in] IIUnknownVector* pAttributes);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Initializes the class instance to record DataEntry data against the specified

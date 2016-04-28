@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 137;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 138;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1420,6 +1420,39 @@ int UpdateToSchemaVersion137(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39585");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion138(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 138;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_PAGINATION);
+		vecQueries.push_back(gstrCREATE_PAGINATION_ORIGINALFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATION_DESTFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_PAGINATION_FILETASKSESSION_INDEX);
+		vecQueries.push_back(gstrADD_PAGINATION_SOURCEFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_PAGINATION_DESTFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_PAGINATION_ORIGINALFILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_PAGINATION_FILETASKSESSION_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39680");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6538,7 +6571,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 134:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion135);
 				case 135:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion136);
 				case 136:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion137);
-				case 137:	break;
+				case 137:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion138);
+				case 138:	break;
 
 				default:
 					{
@@ -8636,8 +8670,8 @@ bool CFileProcessingDB::RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOl
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, 
-					long nFileID, double dDuration, double dOverheadTime, long *pnFileTaskSessionID)
+bool CFileProcessingDB::StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid,
+	long nFileID, long *pnFileTaskSessionID)
 {
 	try
 	{
@@ -8655,12 +8689,10 @@ bool CFileProcessingDB::RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstr
 
 			validateDBSchemaVersion();
 
-			string strInsertSQL = gstrINSERT_FILETASKSESSION_DATA;
+			string strInsertSQL = gstrSTART_FILETASKSESSION_DATA;
 			replaceVariable(strInsertSQL, "<FAMSessionID>", asString(m_nFAMSessionID));
 			replaceVariable(strInsertSQL, "<TaskClassGuid>", asString(bstrTaskClassGuid));
 			replaceVariable(strInsertSQL, "<FileID>", asString(nFileID));
-			replaceVariable(strInsertSQL, "<Duration>", asString(dDuration));
-			replaceVariable(strInsertSQL, "<OverheadTime>", asString(dOverheadTime));
 
 			long nFileTaskSessionID = 0;
 			executeCmdQuery(ipConnection, strInsertSQL, false, pnFileTaskSessionID);
@@ -8668,6 +8700,46 @@ bool CFileProcessingDB::RecordFileTaskSession_Internal(bool bDBLocked, BSTR bstr
 			END_CONNECTION_RETRY(ipConnection, "ELI38640");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38641");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::UpdateFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID,
+	double dDuration, double dOverheadTime)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			validateDBSchemaVersion();
+
+			string strUpdateSQL = gstrUPDATE_FILETASKSESSION_DATA;
+			replaceVariable(strUpdateSQL, "<FileTaskSessionID>", asString(nFileTaskSessionID));
+			replaceVariable(strUpdateSQL, "<Duration>", asString(dDuration));
+			replaceVariable(strUpdateSQL, "<OverheadTime>", asString(dOverheadTime));
+
+			executeCmdQuery(ipConnection, strUpdateSQL);
+			
+			END_CONNECTION_RETRY(ipConnection, "ELI39694");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39695");
 	}
 	catch(UCLIDException &ue)
 	{
@@ -9374,6 +9446,82 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 			return false;
 		}
 		ue.addDebugInfo("FileName", asString(bstrFile));
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrOutputFile,
+													  IIUnknownVector* pSourcePageInfo,
+													  long nFileTaskSessionID)
+{
+	try
+	{
+		try
+		{
+			IIUnknownVectorPtr ipSourcePageInfo(pSourcePageInfo);
+			ASSERT_ARGUMENT("ELI39683", ipSourcePageInfo != __nullptr);
+
+			// Compile selection queries that will produce a result set with the corresponding
+			// source and destination pages for all pages in the output document.
+			vector<string> vecPageSelections;
+			long nCount = ipSourcePageInfo->Size();
+			for (long i = 0; i < nCount; i++)
+			{
+				IStringPairPtr ipPageInfo = ipSourcePageInfo->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI39688", ipPageInfo != nullptr);
+
+				string strSourceDocName = asString(ipPageInfo->StringKey);
+				replaceVariable(strSourceDocName, "'", "''");
+				string strPageNum = asString(ipPageInfo->StringValue);
+
+				string strPageSelection = gstrSELECT_SINGLE_PAGINATED_PAGE;
+				replaceVariable(strPageSelection, "<SourceFileName>",  strSourceDocName);
+				replaceVariable(strPageSelection, "<SourcePage>",  strPageNum);
+				replaceVariable(strPageSelection, "<DestPage>",  asString(i + 1));
+
+				vecPageSelections.push_back(strPageSelection);
+			}
+
+			// Use this data in gstrINSERT_INTO_PAGINATION which will compute the OriginalFileID
+			// and OriginalPage columns for all of the new data.
+			string strSQL = gstrINSERT_INTO_PAGINATION;
+			string strOutputFile = asString(bstrOutputFile);
+			replaceVariable(strOutputFile, "'", "''");
+			replaceVariable(strSQL, "<DestFileName>", strOutputFile);
+			replaceVariable(strSQL, "<SelectPaginations>", asString(vecPageSelections, false, "\r\nUNION\r\n"));
+			replaceVariable(strSQL, "<FAMSessionID>", asString(nFileTaskSessionID));
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
+
+				executeCmdQuery(ipConnection, strSQL);
+
+				// Commit the changes to the database
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI39684");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39685");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		ue.addDebugInfo("PaginatedFile", asString(bstrOutputFile));
 		throw ue;
 	}
 	return true;

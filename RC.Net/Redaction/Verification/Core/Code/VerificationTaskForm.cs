@@ -1009,26 +1009,30 @@ namespace Extract.Redaction.Verification
                 VerificationMemento memento = GetCurrentDocument();
                 RedactionCounts counts = _redactionGridView.GetRedactionCounts();
 
+                ExtractException.Assert("ELI39697", "FileTaskSession has was not started.",
+                    memento.FileTaskSessionID.HasValue);
+
                 // Add the data to the database
-                AddDatabaseData(memento.FileId, counts, _screenTimeInterval.ElapsedSeconds,
-                    _overheadTimeInterval.ElapsedSeconds);
+                AddDatabaseData(memento.FileTaskSessionID.Value, counts,
+                    _screenTimeInterval.ElapsedSeconds, _overheadTimeInterval.ElapsedSeconds);
             }
         }
 
         /// <summary>
         /// Adds IDShield data to the File Action Manager database.
         /// </summary>
-        /// <param name="fileId">The unique file ID for the data being added.</param>
+        /// <param name="fileTaskSessionID">The FileTaskSession table row to which the data should
+        /// be linked.</param>
         /// <param name="counts">The counts of redaction categories.</param>
         /// <param name="screenTime">The number of seconds the document has been displayed.</param>
         /// <param name="overheadTime">The number of seconds between the previous document being
         /// saved/closed and the current document being displayed. If this is the first document
         /// displayed (or the first since the last call to <see cref="Standby"/>, this time will be 0.
         /// </param>
-        void AddDatabaseData(int fileId, RedactionCounts counts, double screenTime,
+        void AddDatabaseData(int fileTaskSessionID, RedactionCounts counts, double screenTime,
             double overheadTime)
         {
-            _idShieldDatabase.AddIDShieldData(_VERIFY_TASK_GUID, fileId, screenTime, overheadTime,
+            _idShieldDatabase.AddIDShieldData(fileTaskSessionID, screenTime, overheadTime,
                 counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence,
                 counts.Clues, counts.Total, counts.Manual, _setSlideshowAdvancedPages.Count);
         }
@@ -1354,6 +1358,9 @@ namespace Extract.Redaction.Verification
             _screenTimeInterval = null;
 
             VerificationMemento thisMemento = GetCurrentDocument();
+
+            thisMemento.FileTaskSessionID =
+                _fileDatabase.StartFileTaskSession(_VERIFY_TASK_GUID, thisMemento.FileId);
 
             // If the timer is currently running, its current time will be the overhead time (time
             // since the previous document was saved. Restart the timer to track the screen time of
