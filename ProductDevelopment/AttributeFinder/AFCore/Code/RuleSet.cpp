@@ -562,7 +562,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 						if (ipCurrAFDoc->Text->HasSpatialInfo() == VARIANT_TRUE)
 						{
 							// Page number should match the current count
-							ASSERT_RUNTIME_CONDITION("ELI39671", nPageNumber != ipCurrAFDoc->Text->GetFirstPageNumber(),
+							ASSERT_RUNTIME_CONDITION("ELI39671", nPageNumber == ipCurrAFDoc->Text->GetFirstPageNumber(),
 								"Unexpected page number.");
 							nLastPageNumber = ipCurrAFDoc->Text->GetLastPageNumber();
 						}
