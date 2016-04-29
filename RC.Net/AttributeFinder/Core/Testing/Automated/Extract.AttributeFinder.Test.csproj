@@ -166,9 +166,6 @@
     <EmbeddedResource Include="Resources\A418.tif.TestCreateAttributes.voa" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\A418.tif.TestCreateAttributes.uss" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\CreateSubattrFlexIndex2.rsd" />
   </ItemGroup>
   <ItemGroup>
@@ -187,6 +184,16 @@
     <EmbeddedResource Include="Resources\TestImage013.tif.test.voa" />
     <EmbeddedResource Include="Resources\TestImage013.tif.uss" />
     <EmbeddedResource Include="Resources\TestImage013.tif.voa" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\A418.tif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\A418.tif.uss" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Example02.tif" />
+    <EmbeddedResource Include="Resources\TestImage013.tif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

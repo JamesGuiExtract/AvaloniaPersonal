@@ -27,8 +27,9 @@ namespace Extract.AttributeFinder.Test
         #region Test One File Names
 
         const string _TEST_ONE_RSD_FILE = "Resources.CreateAttribute_3SubAttrs.rsd";
+        const string _A418_TIF_FILE = "Resources.A418.tif";
         const string _A418_VOA_FILE = "Resources.A418.tif.TestCreateAttributes.voa";
-        const string _A418_USS_FILE = "Resources.A418.tif.TestCreateAttributes.uss";
+        const string _A418_USS_FILE = "Resources.A418.tif.uss";
         const string _A418_EXPECTED_VOA_FILE = "Resources.A418_xpath_3_subattrs_added.voa";
 
         #endregion Test One File Names
@@ -37,6 +38,7 @@ namespace Extract.AttributeFinder.Test
 
         const string _TEST_TWO_RSD_FILE = "Resources.CreateSubattrFlexIndex2.rsd";
         const string _EXAMPLE_02_VOA_FILE = "Resources.Example02.tif.voa";
+        const string _EXAMPLE_02_TIF_FILE = "Resources.Example02.tif";
         const string _EXAMPLE_02_USS_FILE = "Resources.Example02.tif.uss";
         const string _EXAMPLE02_EXPECTED_VOA_FILE = "Resources.Example02.tif.test.voa";
 
@@ -46,6 +48,7 @@ namespace Extract.AttributeFinder.Test
 
         const string _TEST_THREE_RSD_FILE = "Resources.CreateSubAttrIdShield_testImage013.rsd";
         const string _TEST_IMAGE_013_VOA_FILE = "Resources.TestImage013.tif.voa";
+        const string _TEST_IMAGE_013_TIF_FILE = "Resources.TestImage013.tif";
         const string _TEST_IMAGE_013_USS_FILE = "Resources.TestImage013.tif.uss";
         const string _TEST_IMAGE_013_EXPECTED_VOA_FILE = "Resources.TestImage013.tif.test.voa";
 
@@ -84,13 +87,14 @@ namespace Extract.AttributeFinder.Test
         /// returned IUnknownVector should match the IUnknownVector loaded from the reference file.
         /// The original document is A418.tif, from Demo_LabDE/Input.
         /// </summary>
-        [Test, Category("Interactive")]        
+        [Test, Category("CreateAttribute")]        
         public static void Test1()
         {
             DoTest(_A418_VOA_FILE, 
                    _A418_USS_FILE, 
                    _TEST_ONE_RSD_FILE, 
-                   _A418_EXPECTED_VOA_FILE);
+                   _A418_EXPECTED_VOA_FILE,
+                   _A418_TIF_FILE);
         }
 
         /// <summary>
@@ -100,13 +104,14 @@ namespace Extract.AttributeFinder.Test
         /// loaded from the reference file.
         /// The original document is Example02.tif, from Demo_FlexIndex/Input.
         /// </summary>
-        [Test, Category("Interactive")]
+        [Test, Category("CreateAttribute")]
         public static void Test2()
         {
             DoTest(_EXAMPLE_02_VOA_FILE, 
                    _EXAMPLE_02_USS_FILE, 
                    _TEST_TWO_RSD_FILE, 
-                   _EXAMPLE02_EXPECTED_VOA_FILE);
+                   _EXAMPLE02_EXPECTED_VOA_FILE,
+                   _EXAMPLE_02_TIF_FILE);
         }
 
         /// <summary>
@@ -115,13 +120,14 @@ namespace Extract.AttributeFinder.Test
         /// loaded from the reference file.
         /// The original document is TestImage013.tif, from Demo_IDShield/Input.
         /// </summary>
-        [Test, Category("Interactive")]
+        [Test, Category("CreateAttribute")]
         public static void Test3()
         {
             DoTest(_TEST_IMAGE_013_VOA_FILE, 
                    _TEST_IMAGE_013_USS_FILE, 
                    _TEST_THREE_RSD_FILE, 
-                   _TEST_IMAGE_013_EXPECTED_VOA_FILE);
+                   _TEST_IMAGE_013_EXPECTED_VOA_FILE,
+                   _TEST_IMAGE_013_TIF_FILE); 
         }
 
         #endregion Public Test Functions
@@ -144,15 +150,20 @@ namespace Extract.AttributeFinder.Test
         /// Loads the voa file that is an embedded resource.
         /// </summary>
         /// <param name="voaFilename">The voa filename.</param>
-        /// <param name="loadFromResource">true by default, when true loads from resource, when 
-        /// false, uses filename directly with translating it from the resource.</param>
+        /// <param name="filenameToApply">filename to set the attributes primary spatial string SourceDocName to.
+        /// This is necessary because otherwise the spatial string IsEqualTo() compare will return false always.</param>
         /// <returns>loaded IUknownVector</returns>
-        static IUnknownVector LoadVoaFile(string voaFilename, bool loadFromResource = true)
+        static IUnknownVector LoadVoaFile(string voaFilename, string filenameToApply = "")
         {
             IUnknownVector attributes = new IUnknownVector();
 
-            var filename = loadFromResource ? _testFiles.GetFile(voaFilename) : voaFilename;
+            var filename = _testFiles.GetFile(voaFilename);
             attributes.LoadFrom(filename, bSetDirtyFlagToTrue: false);
+
+            if (!string.IsNullOrWhiteSpace(filenameToApply))
+            {
+                ((IAttribute)attributes.At(0)).Value.SourceDocName = filenameToApply;
+            }
 
             return attributes;
         }
@@ -161,13 +172,18 @@ namespace Extract.AttributeFinder.Test
         /// Loads the uss file.
         /// </summary>
         /// <param name="ussFilename">The uss filename.</param>
+        /// <param name="filenameToApply">A filename to set the SourceDocName to. This is necessary 
+        /// because AttributeFinderEngine.FindAttributes() accesses the SourceDocName; not setting
+        /// this causes an exception when it tries to locate original file.</param>
         /// <returns>loaded SpatialString</returns>
-        static SpatialString LoadUssFile(string ussFilename)
+        static SpatialString LoadUssFile(string ussFilename, string filenameToApply)
         {
             SpatialString ss = new SpatialString();
 
             var filename = _testFiles.GetFile(ussFilename);
             ss.LoadFrom(filename, bSetDirtyFlagToTrue: false);
+
+            ss.SourceDocName = filenameToApply;
 
             return ss;
         }
@@ -179,10 +195,12 @@ namespace Extract.AttributeFinder.Test
         /// <param name="sourceUssFilename">The source uss filename.</param>
         /// <param name="rsdFilename">The RSD filename.</param>
         /// <param name="expectedVoaFilename">The expected voa filename.</param>
+        /// <param name="originalTifFilename">Name of the original .tif file</param>
         static void DoTest(string sourceVoaFilename,
                            string sourceUssFilename,
                            string rsdFilename,
-                           string expectedVoaFilename)
+                           string expectedVoaFilename,
+                           string originalTifFilename)
         {
             // load the source voa file
             IUnknownVector attributesFromSourceVoa = LoadVoaFile(sourceVoaFilename);
@@ -190,7 +208,11 @@ namespace Extract.AttributeFinder.Test
             AFDocument doc = new AFDocument();
             doc.Attribute.SubAttributes.Append(attributesFromSourceVoa);
 
-            SpatialString ssText = LoadUssFile(sourceUssFilename);
+            // Need the original .tif file as well, or FindAttributes() throws an error.
+            var tifFilename = _testFiles.GetFile(originalTifFilename);
+
+            SpatialString ssText = LoadUssFile(sourceUssFilename, filenameToApply: tifFilename);
+
             doc.Text = ssText;
 
             // run the rsd file
@@ -206,7 +228,8 @@ namespace Extract.AttributeFinder.Test
                                                                 bstrAlternateComponentDataDir: "",
                                                                 pProgressStatus: null);
 
-            var expectedVoaAttributes = LoadVoaFile(expectedVoaFilename);
+            var expectedVoaAttributes = LoadVoaFile(expectedVoaFilename, filenameToApply: tifFilename);
+
             bool match = ((IComparableObject)expectedVoaAttributes).IsEqualTo(attributesCreatedFromRules);
 
             Assert.That(match);
