@@ -1,6 +1,8 @@
 ﻿using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -14,7 +16,7 @@ namespace Extract.AttributeFinder.Test
     /// </summary>
     [TestFixture]
     [NUnit.Framework.Category("RuleSetRunMode")]
-    class TestRuleSetRunMode
+    public class TestRuleSetRunMode
     {
         #region Constants
 
@@ -281,6 +283,7 @@ namespace Extract.AttributeFinder.Test
         }
 
         [Test, Category("RuleSetRunMode")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ato")]
         public static void Test10_RunModePassInputVOAtoOutput()
         {
             RuleSet rules = GetBaseRuleSet();
@@ -300,6 +303,7 @@ namespace Extract.AttributeFinder.Test
         }
 
         [Test, Category("RuleSetRunMode")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ato")]
         public static void Test11_RunModePassInputVOAtoOutputUnderParentSourceDocName()
         {
             RuleSet rules = GetBaseRuleSet();
@@ -349,6 +353,7 @@ namespace Extract.AttributeFinder.Test
         }
 
         [Test, Category("RuleSetRunMode")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ato")]
         public static void Test12_RunModePassInputVOAtoOutputDeepCopy()
         {
             RuleSet rules = GetBaseRuleSet();
@@ -369,6 +374,7 @@ namespace Extract.AttributeFinder.Test
         }
 
         [Test, Category("RuleSetRunMode")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ato")]
         public static void Test13_RunModePassInputVOAtoOutputUnderParentSourceDocNameDeepCopy()
         {
             RuleSet rules = GetBaseRuleSet();
@@ -489,7 +495,7 @@ namespace Extract.AttributeFinder.Test
                     // Call recursively on subattributes
                     sourceDocName = GetSourceDocNameFromVector(a.SubAttributes);
                 }
-                if (sourceDocName != "")
+                if (!String.IsNullOrWhiteSpace(sourceDocName))
                 {
                     return sourceDocName;
                 }
@@ -525,6 +531,8 @@ namespace Extract.AttributeFinder.Test
             return a2.Size() == 0;
         }
 
+
+        [SuppressMessage("Microsoft.Performance", "CA1820:TestForEmptyStringsUsingStringLength")]
         static void TestDefaultRunModeSettings(IRunMode runMode, string messagePrefix)
         {
             Assert.That(runMode.RunMode == ERuleSetRunMode.kRunPerDocument,
