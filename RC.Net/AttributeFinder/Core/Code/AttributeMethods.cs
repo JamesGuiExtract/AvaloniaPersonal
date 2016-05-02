@@ -125,7 +125,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Translates all spatial <see cref="IAttribute"/> values in <see paramref="attributes"/>
         /// to be associated with the <see paramref="newDocumentName"/> where
-        /// <see paramref="pageMap"/> relates each original page a corresponding page number in
+        /// <see paramref="pageMap"/> relates each original page to a corresponding page number in
         /// <see paramref="newDocumentName"/>.
         /// </summary>
         /// <param name="attributes">The <see cref="IAttribute"/> hierarchy to update.</param>
@@ -171,7 +171,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Translates a <see cref="SpatialString"/> in <see cref="ESpatialStringMode.kSpatialMode"/>
         /// to be associated with the <see paramref="newDocumentName"/> where
-        /// <see paramref="pageMap"/> relates each original page a corresponding page number in
+        /// <see paramref="pageMap"/> relates each original page to a corresponding page number in
         /// <see paramref="newDocumentName"/>.
         /// </summary>
         /// <param name="value">The <see cref="SpatialString"/> value to translate.</param>
@@ -219,8 +219,9 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Translates a <see cref="SpatialString"/> in <see cref="ESpatialStringMode.kHybridMode"/>
-        /// to be associated with the <see paramref="newDocumentName"/> where <see paramref="pageMap"/>
-        /// relates each original page a corresponding page number in <see paramref="newDocumentName"/>.
+        /// to be associated with the <see paramref="newDocumentName"/> where
+        /// <see paramref="pageMap"/> relates each original page to a corresponding page number in
+        /// <see paramref="newDocumentName"/>.
         /// </summary>
         /// <param name="value">The <see cref="SpatialString"/> value to translate.</param>
         /// <param name="newDocumentName">The name of the file with which the value should now be

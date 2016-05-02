@@ -5366,13 +5366,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                var sourceUSSFiles = pageMap.Keys
+                var sourceUSSData = pageMap.Keys
                     .Select(sourcePage => sourcePage.Item1)
                     .Distinct()
-                    .ToDictionary(sourceDocName => sourceDocName, sourceDocName =>
+                    .Where(sourceFileName => File.Exists(sourceFileName + ".uss"))
+                    .ToDictionary(sourceFileName => sourceFileName, sourceFileName =>
                     {
                         var ussData = new SpatialString();
-                        ussData.LoadFrom(sourceDocName + ".uss", false);
+                        ussData.LoadFrom(sourceFileName + ".uss", false);
                         return ussData;
                     });
 
@@ -5380,22 +5381,28 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 foreach (var pageInfo in pageMap)
                 {
                     string sourceDocName = pageInfo.Key.Item1;
-                    int sourcePage = pageInfo.Key.Item2;
-                    int destPage = pageInfo.Value;
-                    var pageData = sourceUSSFiles[sourceDocName]
-                        .GetSpecifiedPages(sourcePage, sourcePage);
-                    if (pageData.HasSpatialInfo())
+                    SpatialString sourceDocData;
+                    if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData) &&
+                        sourceDocData.HasSpatialInfo())
                     {
-                        pageData.SourceDocName = newDocumentName;
-                        pageData.UpdatePageNumber(destPage);
+                        int sourcePage = pageInfo.Key.Item2;
+                        int destPage = pageInfo.Value;
+                        var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
+                        if (pageData.HasSpatialInfo())
+                        {
+                            pageData.UpdatePageNumber(destPage);
 
-                        newPageData.PushBack(pageData);
+                            newPageData.PushBack(pageData);
+                        }
                     }
                 }
 
                 var newUSSData = new SpatialString();
-                newUSSData.CreateFromSpatialStrings(newPageData);
-
+                if (newPageData.Size() > 0)
+                {
+                    newUSSData.CreateFromSpatialStrings(newPageData);
+                }
+                newUSSData.SourceDocName = newDocumentName;
                 newUSSData.SaveTo(newDocumentName + ".uss", true, false);
             }
             catch (Exception ex)
