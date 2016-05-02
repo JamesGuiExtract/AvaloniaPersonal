@@ -156,14 +156,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="suggestedPaginationAccepted"><see langword="true"/> if suggested pagination
         /// was accepted, <see langword="false"/> if suggested pagination was rejected or
         /// <see langword="null"/> if there was no suggested pagination for this document.</param>
+        /// <param name="documentData">Data that has been associated with the document.</param>
         public CreatingOutputDocumentEventArgs(IEnumerable<PageInfo> sourcePageInfo,
-            int pageCount, long fileSize, bool? suggestedPaginationAccepted)
+            int pageCount, long fileSize, bool? suggestedPaginationAccepted, object documentData)
             : base()
         {
             SourcePageInfo = sourcePageInfo.ToList().AsReadOnly();
             PageCount = pageCount;
             FileSize = fileSize;
             SuggestedPaginationAccepted = suggestedPaginationAccepted;
+            DocumentData = documentData;
         }
 
         /// <summary>
@@ -207,6 +209,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets data that has been associated with the document data.
+        /// </summary>
+        public object DocumentData
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets or sets the file name to which the output document will be written.
         /// </summary>
         public string OutputFileName
@@ -233,7 +244,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// The page number in the document.
         /// </summary>
-        public int PageNum
+        public int Page
         {
             get;
             set;

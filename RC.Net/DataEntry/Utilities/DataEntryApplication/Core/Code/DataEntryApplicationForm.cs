@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.Database;
 using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
 using Extract.FileActionManager.Forms;
@@ -75,6 +76,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// A string representation of the GUID of the data entry verification task.
         /// </summary>
         static readonly string _VERIFICATION_TASK_GUID = typeof(ComClass).GUID.ToString("B");
+
+        /// <summary>
+        /// A string representation of the GUID for <see cref="AttributeStorageManagerClass"/> 
+        /// </summary>
+        static readonly string _ATTRIBUTE_STORAGE_MANAGER_GUID =
+            typeof(AttributeStorageManagerClass).GUID.ToString("B");
 
         #endregion Constants
 
@@ -500,6 +507,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// processes.
         /// </summary>
         ExtractFileLock _voaFileLock = new ExtractFileLock();
+
+        /// <summary>
+        /// Maps document names to VOA file data that as been cached for use for the file.
+        /// </summary>
+        Dictionary<string, IUnknownVector> _cachedVOAData = new Dictionary<string, IUnknownVector>();
 
         /// <summary>
         /// This checks the user.config file to make sure it is not corrupt when the each instance 
@@ -1014,6 +1026,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             try
             {
+                _cachedVOAData.Remove(fileName);
+
                 // In order to keep the order documents are displayed in sync with the
                 // _paginationPanel, swap out the loading file for another if necessary.
                 if (_paginationPanel != null && ReorderAccordingToPagination(fileName))
@@ -1085,6 +1099,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 RaiseVerificationException("ELI23871", ex, true);
             }
+            finally
+            {
+                // Cached VOA file data should only be used within the context of the Open call.
+                _cachedVOAData.Remove(fileName);
+            }
         }
 
         /// <summary>
@@ -1105,7 +1124,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (_paginationPanel != null)
                 {
-                    LoadDocumentForPagination(fileName);
+                    // This method must be run in the UI thread since it is loading attributes for
+                    // use in the UI thread.
+                    FormsMethods.ExecuteInUIThread(this, () => LoadDocumentForPagination(fileName));
                 }
 
                 // [DataEntry:1151]
@@ -1993,16 +2014,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _imageViewerForm.Text = imageName + " - " + _imageViewerForm.Text;
                     }
 
-                    IUnknownVector attributes = (IUnknownVector)new IUnknownVectorClass();
-
-                    // If an image was loaded, look for and attempt to load corresponding data.
-                    string dataFilename = _imageViewer.ImageFile + ".voa";
-                    if (File.Exists(dataFilename))
-                    {
-                        _voaFileLock = new ExtractFileLock(dataFilename);
-                        attributes.LoadFrom(dataFilename, false);
-                    }
-
+                    IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
                     if (!LoadCorrectConfigForData(attributes) && _dataEntryControlHost != null)
                     {
                         // [DataEntry:729]
@@ -2986,7 +2998,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     .Select(info => new StringPairClass()
                     {
                         StringKey = info.DocumentName,
-                        StringValue = info.PageNum.ToString(CultureInfo.InvariantCulture)
+                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
                     })
                     .ToIUnknownVector();
 
@@ -3001,6 +3013,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // everything we would expect them to find for this document).
                 if (e.SuggestedPaginationAccepted.HasValue && e.SuggestedPaginationAccepted.Value)
                 {
+                    // Produce a voa file for the paginated document using the data the rules suggested.
+                    var documentData = e.DocumentData as IIUnknownVector;
+                    if (documentData != null)
+                    {
+                        int pageCounter = 1;
+                        var pageNumMap = e.SourcePageInfo.ToDictionary(
+                            pageInfo => pageInfo.Page, pageInfo => pageCounter++);
+
+                        AttributeMethods.TranslateAttributesToNewDocument(
+                            documentData, e.OutputFileName, pageNumMap);
+
+                        documentData.SaveTo(e.OutputFileName + ".voa", false,
+                            _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    }
+
                     EActionStatus previousStatus;
                     bool success =
                         FileRequestHandler.CheckoutForProcessing(fileID, false, out previousStatus);
@@ -4258,16 +4285,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // If a DEP is being used, load the data into it
                         if (_dataEntryControlHost != null)
                         {
-                            IUnknownVector attributes = (IUnknownVector)new IUnknownVectorClass();
-                            string dataFilename = _imageViewer.ImageFile + ".voa";
-
-                            if (File.Exists(dataFilename))
-                            {
-                                _voaFileLock.GetLock(dataFilename,
-                                    _standAloneMode ? "" : "Data entry verification");
-                                attributes.LoadFrom(dataFilename, false);
-                            }
-
+                            IUnknownVector attributes = GetVOAData(_imageViewer.ImageFile);
                             _dataEntryControlHost.LoadData(attributes);
 
                             // Undo/redo command should be unavailable until a change is actually made.
@@ -5199,6 +5217,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Loads <see paramref="fileName"/> into <see cref="_paginationPanel"/> if it is available
         /// and displays any rules-suggested pagination for the file.
+        /// <para><b>NOTE</b></para>
+        /// This method must be run in the UI thread since it is loading attributes for use in the
+        /// UI thread.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         void LoadDocumentForPagination(string fileName)
@@ -5213,8 +5234,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             string dataFilename = fileName + ".voa";
             if (File.Exists(dataFilename))
             {
-                IUnknownVector attributes = new IUnknownVector();
-                attributes.LoadFrom(dataFilename, false);
+                IUnknownVector attributes = GetVOAData(fileName);
+                // Allow DEP to use the data loaded here rather than separately re-loading it.
+                _cachedVOAData[fileName] = attributes;
+
                 var attributeArray = attributes
                     .ToIEnumerable<IAttribute>()
                     .ToArray();
@@ -5236,6 +5259,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         pageCount = reader.PageCount;
                     }
 
+                    bool? suggestedPagination = null;
+                    
                     // Iterate each virtual document suggested by the rules and add as a separate
                     // document as far as the _paginationPanel is concerned.
                     foreach (var documentAttribute in attributeArray)
@@ -5259,7 +5284,27 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             .Select(data => data.SubAttributes)
                             .SingleOrDefault() ?? new IUnknownVector();
 
-                        _paginationPanel.LoadFile(fileName, false, pages, true, documentData);
+                        if (!suggestedPagination.HasValue)
+                        {
+                            if (attributeArray.Length == 1 &&
+                                pages.Count() == pageCount)
+                            {
+                                suggestedPagination = false;
+
+                                // If there is only one virtual document associated with this
+                                // document, treat the voa file as if it only contained the data
+                                // for verification (and not the Document/DocumentData hierarchy
+                                // used for pagination).
+                                _cachedVOAData[fileName] = documentData;
+                            }
+                            else
+                            {
+                                suggestedPagination = true;
+                            }
+                        }
+
+                        _paginationPanel.LoadFile(
+                            fileName, false, pages, suggestedPagination.Value, documentData);
                     }
 
                     return;
@@ -5269,6 +5314,35 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // If there was no rules-suggested pagination, go ahead and load the physical document
             // into the _paginationPanel
             _paginationPanel.LoadFile(fileName, false);
+        }
+
+        /// <summary>
+        /// Loads the data from the specified VOA file or retrieve data that has already been
+        /// cached for the file.
+        /// </summary>
+        /// <param name="fileName">The file for which VOA data should be loaded.</param>
+        /// <returns>The VOA data.</returns>
+        IUnknownVector GetVOAData(string fileName)
+        {
+            IUnknownVector attributes = null;
+
+            if (_cachedVOAData.TryGetValue(fileName, out attributes))
+            {
+                return attributes;
+            }
+
+            attributes = (IUnknownVector)new IUnknownVectorClass();
+
+            // If an image was loaded, look for and attempt to load corresponding data.
+            string dataFilename = fileName + ".voa";
+            if (File.Exists(dataFilename))
+            {
+                _voaFileLock.GetLock(dataFilename,
+                    _standAloneMode ? "" : "Data entry verification");
+
+                attributes.LoadFrom(dataFilename, false);
+            }
+            return attributes;
         }
 
         #endregion Private Members

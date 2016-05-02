@@ -748,15 +748,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ? (bool ?)(outputDocument.InOriginalForm ? true : false)
                     : null;
 
+                object documentData = outputDocument.InOriginalForm 
+                    ? outputDocument.DocumentData
+                    : null;
+
                 var sourcePageInfo = outputDocument.PageControls
                     .Select(c => new PageInfo()
                     {
                         DocumentName = c.Page.OriginalDocumentName,
-                        PageNum = c.Page.OriginalPageNumber
+                        Page = c.Page.OriginalPageNumber
                     });
 
                 var eventArgs = new CreatingOutputDocumentEventArgs(
-                    sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted);
+                    sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, documentData);
                 OnCreatingOutputDocument(eventArgs);
                 string outputFileName = eventArgs.OutputFileName;
 

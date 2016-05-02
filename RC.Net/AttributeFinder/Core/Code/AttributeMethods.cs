@@ -1,7 +1,8 @@
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using UCLID_COMUTILSLib;
-
+using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 using IAttribute = UCLID_AFCORELib.IAttribute;
 
@@ -13,6 +14,8 @@ namespace Extract.AttributeFinder
     [CLSCompliant(false)]
     public static class AttributeMethods
     {
+        #region Public Methods
+
         /// <summary>
         /// Gets a single attribute by name from the specified vector of attributes. Throws an 
         /// exception if more than one attribute is found.
@@ -117,5 +120,145 @@ namespace Extract.AttributeFinder
                 throw ExtractException.AsExtractException("ELI29737", ex);
             }
         }
+
+        /// <summary>
+        /// Translates all spatial <see cref="IAttribute"/> values in <see paramref="attributes"/>
+        /// to be associated with the <see paramref="newDocumentName"/> where
+        /// <see paramref="pageNumMap"/> relates each original page number to the new page number.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/> hierarchy to update.</param>
+        /// <param name="newDocumentName">The name of the file with which the attribute values should now be
+        /// associated.</param>
+        /// <param name="pageNumMap">Each key represents the old page number and the corresponding
+        /// value represents the new page number in <see paramref="newDocumentName"/>.</param>
+        public static void TranslateAttributesToNewDocument(IIUnknownVector attributes,
+            string newDocumentName, Dictionary<int, int> pageNumMap)
+        {
+            try
+            {
+                foreach (IAttribute attribute in attributes.ToIEnumerable<IAttribute>())
+                {
+                    TranslateAttributesToNewDocument(attribute.SubAttributes,
+                        newDocumentName, pageNumMap);
+
+                    SpatialString value = attribute.Value;
+                    if (value.GetMode() == ESpatialStringMode.kSpatialMode)
+                    {
+                        attribute.Value = TranslateSpatialStringToNewDocument(
+                            value, newDocumentName, pageNumMap);
+                    }
+                    else if (value.GetMode() == ESpatialStringMode.kHybridMode)
+                    {
+                        attribute.Value = TranslateHybridStringToNewDocument(
+                            value, newDocumentName, pageNumMap);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39708");
+            }
+        }
+
+        #endregion Public Methods
+
+        #region Private Methods
+
+        /// <summary>
+        /// Translates a <see cref="SpatialString"/> in <see cref="ESpatialStringMode.kSpatialMode"/>
+        /// to be associated with the <see paramref="newDocumentName"/> where
+        /// <see paramref="pageNumMap"/> relates each original page number to the new page number.
+        /// </summary>
+        /// <param name="value">The <see cref="SpatialString"/> value to translate.</param>
+        /// <param name="newDocumentName">The name of the file with which the value should now be
+        /// associated.</param>
+        /// <param name="pageNumMap">Each key represents the old page number and the corresponding
+        /// value represents the new page number in <see paramref="newDocumentName"/>.</param>
+        /// <returns>The translated <see cref="SpatialString"/>.</returns>
+        static SpatialString TranslateSpatialStringToNewDocument(SpatialString value,
+            string newDocumentName, Dictionary<int, int> pageNumMap)
+        {
+            ExtractException.Assert("ELI39709", "Unexpected spatial mode.",
+                value.GetMode() == ESpatialStringMode.kSpatialMode);
+
+            var updatedPages = new List<SpatialString>();
+            foreach (SpatialString page in value.GetPages(false, "")
+                .ToIEnumerable<SpatialString>())
+            {
+                int oldPageNum = page.GetFirstPageNumber();
+                int newPageNum;
+                if (pageNumMap.TryGetValue(oldPageNum, out newPageNum))
+                {
+                    page.UpdatePageNumber(newPageNum);
+                    page.SourceDocName = newDocumentName;
+                    updatedPages.Add(page);
+                }
+            }
+
+            SpatialString updatedValue = new SpatialString();
+            if (updatedPages.Count == 0)
+            {
+                updatedValue.CreateNonSpatialString(value.String, newDocumentName);
+            }
+            else
+            {
+                updatedValue.CreateFromSpatialStrings(
+                    updatedPages.ToIUnknownVector<SpatialString>());
+            }
+            return updatedValue;
+        }
+
+        /// <summary>
+        /// Translates a <see cref="SpatialString"/> in <see cref="ESpatialStringMode.kHybridMode"/>
+        /// to be associated with the <see paramref="newDocumentName"/> where <see paramref="pageNumMap"/>
+        /// relates each original page number to the new page number.
+        /// </summary>
+        /// <param name="value">The <see cref="SpatialString"/> value to translate.</param>
+        /// <param name="newDocumentName">The name of the file with which the value should now be
+        /// associated.</param>
+        /// <param name="pageNumMap">Each key represents the old page number and the corresponding
+        /// value represents the new page number in <see paramref="newDocumentName"/>.</param>
+        /// <returns>The translated <see cref="SpatialString"/>.</returns>
+        static SpatialString TranslateHybridStringToNewDocument(SpatialString value,
+            string newDocumentName, Dictionary<int, int> pageNumMap)
+        {
+            ExtractException.Assert("ELI39710", "Unexpected spatial mode.",
+                value.GetMode() == ESpatialStringMode.kHybridMode);
+
+            var updatedRasterZones = new List<IRasterZone>();
+            var updatedPageInfoMap = new LongToObjectMap();
+            foreach (IRasterZone rasterZone in value.GetOCRImageRasterZones()
+                .ToIEnumerable<IRasterZone>())
+            {
+                int oldPageNum = rasterZone.PageNumber;
+                int newPageNum;
+                if (pageNumMap.TryGetValue(oldPageNum, out newPageNum))
+                {
+                    rasterZone.PageNumber = newPageNum;
+                    updatedRasterZones.Add(rasterZone);
+                    if (!updatedPageInfoMap.Contains(newPageNum))
+                    {
+                        var copyable = (ICopyableObject)value.GetPageInfo(oldPageNum);
+                        var newPageInfo = (SpatialPageInfo)copyable.Clone();
+
+                        updatedPageInfoMap.Set(newPageNum, newPageInfo);
+                    }
+                }
+            }
+
+            SpatialString updatedValue = new SpatialString();
+            if (updatedRasterZones.Count == 0)
+            {
+                updatedValue.CreateNonSpatialString(value.String, newDocumentName);
+            }
+            else
+            {
+                updatedValue.CreateHybridString(updatedRasterZones.ToIUnknownVector<IRasterZone>(),
+                    value.String, newDocumentName, updatedPageInfoMap);
+            }
+            return updatedValue;
+        }
+
+        #endregion Private Methods
     }
 }

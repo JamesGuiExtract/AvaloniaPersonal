@@ -341,8 +341,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="text">The text to validate.</param>
         /// <returns>true if valid</returns>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public static bool IsValidXpathExpression(string text)
+        public static bool IsValidXPathExpression(string text)
         {
             try
             {
