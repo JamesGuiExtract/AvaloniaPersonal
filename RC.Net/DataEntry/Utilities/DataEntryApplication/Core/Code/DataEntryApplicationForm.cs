@@ -3019,7 +3019,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         int pageCounter = 1;
                         var pageNumMap = e.SourcePageInfo.ToDictionary(
-                            pageInfo => pageInfo.Page, pageInfo => pageCounter++);
+                            pageInfo => pageInfo.Page, _ => pageCounter++);
 
                         AttributeMethods.TranslateAttributesToNewDocument(
                             documentData, e.OutputFileName, pageNumMap);
