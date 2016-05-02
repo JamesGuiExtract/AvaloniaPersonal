@@ -28,6 +28,7 @@ using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_DATAENTRYCUSTOMCOMPONENTSLib;
 using UCLID_FILEPROCESSINGLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.DataEntry.Utilities.DataEntryApplication
 {
@@ -3008,6 +3009,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 FileProcessingDB.AddPaginationHistory(
                     e.OutputFileName, sourcePageInfo, _fileTaskSessionID.Value);
 
+                // Produce a uss file for the paginated document using the uss data from the
+                // source documents
+                int pageCounter = 1;
+                var pageMap = e.SourcePageInfo.ToDictionary(
+                    pageInfo => new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page),
+                    _ => pageCounter++);
+
+                CreateUSSForPaginatedDocument(e.OutputFileName, pageMap);
+
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
                 // everything we would expect them to find for this document).
@@ -3017,12 +3027,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     var documentData = e.DocumentData as IIUnknownVector;
                     if (documentData != null)
                     {
-                        int pageCounter = 1;
-                        var pageNumMap = e.SourcePageInfo.ToDictionary(
-                            pageInfo => pageInfo.Page, _ => pageCounter++);
-
                         AttributeMethods.TranslateAttributesToNewDocument(
-                            documentData, e.OutputFileName, pageNumMap);
+                            documentData, e.OutputFileName, pageMap);
 
                         documentData.SaveTo(e.OutputFileName + ".voa", false,
                             _ATTRIBUTE_STORAGE_MANAGER_GUID);
@@ -5343,6 +5349,59 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 attributes.LoadFrom(dataFilename, false);
             }
             return attributes;
+        }
+
+        /// <summary>
+        /// Creates a new uss file for the specified <see paramref="newDocumentName"/> based upon
+        /// the specified <see paramref="pageMap"/> that relates the source pages to the
+        /// corresponding pages in <see paramref="newDocumentName"/>.
+        /// </summary>
+        /// <param name="newDocumentName">The name of the document for which the uss file is being
+        /// created.</param>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new page number in 
+        /// <see paramref="newDocumentName"/>.</param>
+        static void CreateUSSForPaginatedDocument(string newDocumentName,
+            Dictionary<Tuple<string, int>, int> pageMap)
+        {
+            try
+            {
+                var sourceUSSFiles = pageMap.Keys
+                    .Select(sourcePage => sourcePage.Item1)
+                    .Distinct()
+                    .ToDictionary(sourceDocName => sourceDocName, sourceDocName =>
+                    {
+                        var ussData = new SpatialString();
+                        ussData.LoadFrom(sourceDocName + ".uss", false);
+                        return ussData;
+                    });
+
+                var newPageData = new IUnknownVector();
+                foreach (var pageInfo in pageMap)
+                {
+                    string sourceDocName = pageInfo.Key.Item1;
+                    int sourcePage = pageInfo.Key.Item2;
+                    int destPage = pageInfo.Value;
+                    var pageData = sourceUSSFiles[sourceDocName]
+                        .GetSpecifiedPages(sourcePage, sourcePage);
+                    if (pageData.HasSpatialInfo())
+                    {
+                        pageData.SourceDocName = newDocumentName;
+                        pageData.UpdatePageNumber(destPage);
+
+                        newPageData.PushBack(pageData);
+                    }
+                }
+
+                var newUSSData = new SpatialString();
+                newUSSData.CreateFromSpatialStrings(newPageData);
+
+                newUSSData.SaveTo(newDocumentName + ".uss", true, false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39708");
+            }
         }
 
         #endregion Private Members

@@ -1,6 +1,7 @@
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -124,33 +125,36 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Translates all spatial <see cref="IAttribute"/> values in <see paramref="attributes"/>
         /// to be associated with the <see paramref="newDocumentName"/> where
-        /// <see paramref="pageNumMap"/> relates each original page number to the new page number.
+        /// <see paramref="pageMap"/> relates each original page a corresponding page number in
+        /// <see paramref="newDocumentName"/>.
         /// </summary>
         /// <param name="attributes">The <see cref="IAttribute"/> hierarchy to update.</param>
-        /// <param name="newDocumentName">The name of the file with which the attribute values should now be
-        /// associated.</param>
-        /// <param name="pageNumMap">Each key represents the old page number and the corresponding
-        /// value represents the new page number in <see paramref="newDocumentName"/>.</param>
+        /// <param name="newDocumentName">The name of the file with which the attribute values
+        /// should now be associated.</param>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new page number in 
+        /// <see paramref="newDocumentName"/>.</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static void TranslateAttributesToNewDocument(IIUnknownVector attributes,
-            string newDocumentName, Dictionary<int, int> pageNumMap)
+            string newDocumentName, Dictionary<Tuple<string, int>, int> pageMap)
         {
             try
             {
                 foreach (IAttribute attribute in attributes.ToIEnumerable<IAttribute>())
                 {
                     TranslateAttributesToNewDocument(attribute.SubAttributes,
-                        newDocumentName, pageNumMap);
+                        newDocumentName, pageMap);
 
                     SpatialString value = attribute.Value;
                     if (value.GetMode() == ESpatialStringMode.kSpatialMode)
                     {
                         attribute.Value = TranslateSpatialStringToNewDocument(
-                            value, newDocumentName, pageNumMap);
+                            value, newDocumentName, pageMap);
                     }
                     else if (value.GetMode() == ESpatialStringMode.kHybridMode)
                     {
                         attribute.Value = TranslateHybridStringToNewDocument(
-                            value, newDocumentName, pageNumMap);
+                            value, newDocumentName, pageMap);
                     }
                 }
             }
@@ -167,27 +171,32 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Translates a <see cref="SpatialString"/> in <see cref="ESpatialStringMode.kSpatialMode"/>
         /// to be associated with the <see paramref="newDocumentName"/> where
-        /// <see paramref="pageNumMap"/> relates each original page number to the new page number.
+        /// <see paramref="pageMap"/> relates each original page a corresponding page number in
+        /// <see paramref="newDocumentName"/>.
         /// </summary>
         /// <param name="value">The <see cref="SpatialString"/> value to translate.</param>
         /// <param name="newDocumentName">The name of the file with which the value should now be
         /// associated.</param>
-        /// <param name="pageNumMap">Each key represents the old page number and the corresponding
-        /// value represents the new page number in <see paramref="newDocumentName"/>.</param>
-        /// <returns>The translated <see cref="SpatialString"/>.</returns>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new page number in 
+        /// <see paramref="newDocumentName"/>.</param>
         static SpatialString TranslateSpatialStringToNewDocument(SpatialString value,
-            string newDocumentName, Dictionary<int, int> pageNumMap)
+            string newDocumentName, Dictionary<Tuple<string, int>, int> pageMap)
         {
             ExtractException.Assert("ELI39709", "Unexpected spatial mode.",
                 value.GetMode() == ESpatialStringMode.kSpatialMode);
+
+            string sourceDocName = value.SourceDocName;
 
             var updatedPages = new List<SpatialString>();
             foreach (SpatialString page in value.GetPages(false, "")
                 .ToIEnumerable<SpatialString>())
             {
                 int oldPageNum = page.GetFirstPageNumber();
+
                 int newPageNum;
-                if (pageNumMap.TryGetValue(oldPageNum, out newPageNum))
+                if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum), 
+                        out newPageNum))
                 {
                     page.UpdatePageNumber(newPageNum);
                     page.SourceDocName = newDocumentName;
@@ -210,20 +219,22 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Translates a <see cref="SpatialString"/> in <see cref="ESpatialStringMode.kHybridMode"/>
-        /// to be associated with the <see paramref="newDocumentName"/> where <see paramref="pageNumMap"/>
-        /// relates each original page number to the new page number.
+        /// to be associated with the <see paramref="newDocumentName"/> where <see paramref="pageMap"/>
+        /// relates each original page a corresponding page number in <see paramref="newDocumentName"/>.
         /// </summary>
         /// <param name="value">The <see cref="SpatialString"/> value to translate.</param>
         /// <param name="newDocumentName">The name of the file with which the value should now be
         /// associated.</param>
-        /// <param name="pageNumMap">Each key represents the old page number and the corresponding
-        /// value represents the new page number in <see paramref="newDocumentName"/>.</param>
-        /// <returns>The translated <see cref="SpatialString"/>.</returns>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new page number in 
+        /// <see paramref="newDocumentName"/>.</param>
         static SpatialString TranslateHybridStringToNewDocument(SpatialString value,
-            string newDocumentName, Dictionary<int, int> pageNumMap)
+            string newDocumentName, Dictionary<Tuple<string, int>, int> pageMap)
         {
             ExtractException.Assert("ELI39710", "Unexpected spatial mode.",
                 value.GetMode() == ESpatialStringMode.kHybridMode);
+
+            string sourceDocName = value.SourceDocName;
 
             var updatedRasterZones = new List<IRasterZone>();
             var updatedPageInfoMap = new LongToObjectMap();
@@ -232,7 +243,8 @@ namespace Extract.AttributeFinder
             {
                 int oldPageNum = rasterZone.PageNumber;
                 int newPageNum;
-                if (pageNumMap.TryGetValue(oldPageNum, out newPageNum))
+                if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum), 
+                        out newPageNum))
                 {
                     rasterZone.PageNumber = newPageNum;
                     updatedRasterZones.Add(rasterZone);
