@@ -73,7 +73,7 @@ namespace Extract.FileActionManager.Database
                 _unlockCode = unlockCode;
                 if (unlockCode)
                 {
-                    _confirmationLabel.Text = "The counter unlock was successfully!";
+                    _confirmationLabel.Text = "The counter unlock was successful!";
                     _confirmationGroupBox.Text =
                         "Please send the following confirmation of the unlock to Extract Systems";
                 }
