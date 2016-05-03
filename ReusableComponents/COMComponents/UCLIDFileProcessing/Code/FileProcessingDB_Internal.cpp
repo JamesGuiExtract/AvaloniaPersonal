@@ -5745,7 +5745,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 			// Add a create record to the map
 			mapCounters[counterOp.m_nCounterID] = counterOp;
 			strOperationPerformed = "Created counter " + counterOp.m_strCounterName + " with " 
-				+ asString(counterOp.m_nValue) + " counts.";
+				+ commaFormatNumber((LONGLONG)counterOp.m_nValue) + " counts.";
 			ueLog.addDebugInfo("Create counter", counterChange.m_nCounterID);
 			ueLog.addDebugInfo("CounterName", mapCounters[counterOp.m_nCounterID].m_strCounterName);
 			ueLog.addDebugInfo("CounterValue", mapCounters[counterOp.m_nCounterID].m_nValue);
@@ -5759,7 +5759,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 			// Update the counterOp record in map to the counterOp being performed
 			mapCounters[counterOp.m_nCounterID] = counterOp;
 			strOperationPerformed = "Set counter " + counterOp.m_strCounterName + " to "
-				+ asString(counterOp.m_nValue) + " counts.";
+				+ commaFormatNumber((LONGLONG)counterOp.m_nValue) + " counts.";
 			ueLog.addDebugInfo("Set counter", counterChange.m_nCounterID);
 			ueLog.addDebugInfo("CounterName", mapCounters[counterOp.m_nCounterID].m_strCounterName);
 			ueLog.addDebugInfo("CounterValue", mapCounters[counterOp.m_nCounterID].m_nValue);
@@ -5774,7 +5774,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 			mapCounters[counterOp.m_nCounterID].m_eOperation = kSet;
 			mapCounters[counterOp.m_nCounterID].m_nValue = counterChange.m_nToValue;
 			strOperationPerformed = "Incremented counter " + counterOp.m_strCounterName + " by "
-				+ asString(counterOp.m_nValue) + ".";
+				+ commaFormatNumber((LONGLONG)counterOp.m_nValue) + ".";
 			ueLog.addDebugInfo("Increment counter", counterChange.m_nCounterID);
 			ueLog.addDebugInfo("CounterName", mapCounters[counterOp.m_nCounterID].m_strCounterName);
 			ueLog.addDebugInfo("CounterValue", mapCounters[counterOp.m_nCounterID].m_nValue);
@@ -5792,7 +5792,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 			mapCounters[counterOp.m_nCounterID].m_nValue = counterChange.m_nToValue;
 
 			strOperationPerformed = "Decremented counter " + counterOp.m_strCounterName + " by "
-				+ asString(counterOp.m_nValue) + ".";
+				+ commaFormatNumber((LONGLONG)counterOp.m_nValue) + ".";
 			ueLog.addDebugInfo("Decrement counter", counterChange.m_nCounterID);
 			ueLog.addDebugInfo("CounterName", mapCounters[counterOp.m_nCounterID].m_strCounterName);
 			ueLog.addDebugInfo("CounterValue", mapCounters[counterOp.m_nCounterID].m_nValue);
@@ -6051,4 +6051,17 @@ void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
 	// The DatabaseID should be valid now so check it and throw exception if it isn't
 	checkDatabaseIDValid(ipConnection, true);
 }
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::InvalidatePreviousCachedInfoIfNecessary()
+{
+	// If the database name has changed, then invalidate the previous cached info.
+	if (!m_DatabaseIDValues.m_strName.empty() && 
+		m_DatabaseIDValues.m_strName != m_strDatabaseName)
+	{
+		m_bDatabaseIDValuesValidated = false;
+		m_strEncryptedDatabaseID = "";
+		m_DatabaseIDValues = DatabaseIDValues();
+	}
+}
+
 

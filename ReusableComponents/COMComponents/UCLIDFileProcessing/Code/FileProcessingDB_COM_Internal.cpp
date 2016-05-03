@@ -8765,8 +8765,6 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 
 			BEGIN_CONNECTION_RETRY();
 			
-			ipConnection = getDBConnection();
-
 			// Use any already existing m_ipSecureCounters unless refreshing.
 			if (!asCppBool(vbRefresh) && m_ipSecureCounters != __nullptr)
 			{
@@ -8776,12 +8774,10 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 				return S_OK;
 			}
 
-			// Get a list of all of the counters from the database
-			string strQuery = gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE;
+			InvalidatePreviousCachedInfoIfNecessary();
 
 			// Get the connection for the thread and save it locally.
 			ipConnection = getDBConnection();
-
 			bool bIsDatabaseIDValid = checkDatabaseIDValid(ipConnection, false);
 
 			// Get the last issued FAMFile id
@@ -8795,7 +8791,8 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
 
-			// Open the Action table
+			// Get a list of all of the counters from the database
+			string strQuery = gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE;
 			ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 				adLockReadOnly, adCmdText);
 
@@ -9210,6 +9207,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 			BEGIN_CONNECTION_RETRY();
 
 				ipConnection = getDBConnection();
+
 				bool bValid = checkDatabaseIDValid(ipConnection, false);
 
 				DatabaseIDValues DBIDValue = m_DatabaseIDValues;
@@ -9229,7 +9227,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				// Open the Action table
+				// Open the secure counter table
 				ipResultSet->Open(gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.c_str(), 
 					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
 					adCmdText);

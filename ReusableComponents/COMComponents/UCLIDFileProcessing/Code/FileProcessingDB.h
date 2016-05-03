@@ -1237,6 +1237,7 @@ private:
 		EFilePriority ePriority, long* pnID);
 	bool AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrOutputFile, IIUnknownVector* pSourcePageInfo,
 		long nFileTaskSessionID);
+	void InvalidatePreviousCachedInfoIfNecessary();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)
