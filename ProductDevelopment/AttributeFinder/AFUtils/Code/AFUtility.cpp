@@ -505,7 +505,7 @@ STDMETHODIMP CAFUtility::GetAttributesFromFile(BSTR strFileName, IIUnknownVector
 			// Read the attributes from the EAV file
 			generateAttributesFromEAVFile(strFile, ipRetAttributes);
 		}
-		else if (strExt == ".voa")
+		else if (strExt == ".voa" || strExt == ".evoa")
 		{
 			// Load the file into the IUnknownVector object directly
 			ipRetAttributes->LoadFrom(strFileName, VARIANT_FALSE);
@@ -2542,4 +2542,3 @@ const char* CAFUtility::getINIFileName()
 	return ms_strINIFileName.c_str();
 }
 //-------------------------------------------------------------------------------------------------
-

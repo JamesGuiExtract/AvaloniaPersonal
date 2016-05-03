@@ -1,0 +1,292 @@
+﻿using Extract.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using ComAttribute = UCLID_AFCORELib.Attribute;
+
+namespace Extract.AttributeFinder
+{
+    /// <summary>
+    /// An IFeatureVectorizer that produces feature vectors from <see cref="ComAttribute"/>s
+    /// </summary>
+    [CLSCompliant(false)]
+    public class AttributeFeatureVectorizer : IFeatureVectorizer
+    {
+        #region Private Fields
+
+        /// <summary>
+        /// The name of the feature vectorizer, which is also the name of protoFeature attributes from which this vectorizer will derive features
+        /// </summary>
+        private string _name;
+
+        /// <summary>
+        /// Bag-of-words object to be created if/when it is needed
+        /// </summary>
+        private Lazy<Accord.MachineLearning.BagOfWords> _bagOfWords;
+
+        /// <summary>
+        /// Set of values seen during configuration
+        /// </summary>
+        private HashSet<string> _distinctValuesSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        #endregion Private Fields
+
+
+        #region Constructors
+
+        /// <summary>
+        /// Creates an instance of <see cref="AttributeFeatureVectorizer"/>
+        /// </summary>
+        /// <param name="name">The name of proto-feature attributes that this instance will use to generate its feature vector.</param>
+        public AttributeFeatureVectorizer(string name)
+        {
+            Name = name;
+            Enabled = true;
+            FeatureType = FeatureVectorizerType.Exists;
+
+            // Set up initialization of the bag of words object for if/when it is used
+            _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
+                new Accord.MachineLearning.BagOfWords(DistinctValuesSeen.ToArray()));
+        }
+
+        #endregion Constructors
+
+
+        #region Properties
+
+        /// <summary>
+        /// The name of the feature vectorizer, which is also the name of protoFeature attributes from which this vectorizer will derive features
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            private set
+            {
+                if (value != _name)
+                {
+                    if (!UtilityMethods.IsValidIdentifier(value))
+                    {
+                        throw new ExtractException("ELI39619", @"Name must be a valid identifier of the form [_a-zA-Z]\w*");
+                    }
+                    _name = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets the <see cref="FeatureVectorizerType"/> of this feature vectorizer (controls how the input is interpreted)
+        /// </summary>
+        public FeatureVectorizerType FeatureType { get; set; }
+
+        /// <summary>
+        /// Whether changing the <see cref="FeatureVectorizerType"/> is allowed. Always <see langref="true"/>.
+        /// </summary>
+        public bool IsFeatureTypeChangeable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Whether this feature vectorizer will produce a feature vector of length
+        /// <see cref="FeatureVectorLength"/> (if <see langref="true"/>) or of zero length (if <see langref="false"/>)
+        /// </summary>
+        public bool Enabled { get; set; }
+
+        /// <summary>
+        /// The number of numeric values seen during configuration
+        /// </summary>
+        public uint CountOfNumericValuesOccurred { get; set; }
+
+        /// <summary>
+        /// The number of non-numeric values seen during configuration
+        /// </summary>
+        public uint CountOfNonnumericValuesOccurred { get; set; }
+
+        /// <summary>
+        /// The number of cases where multiple attributes were present in a single example
+        /// </summary>
+        public uint CountOfMultipleValuesOccurred { get; set; }
+
+        /// <summary>
+        /// A collection of distinct attribute values seen during configuration
+        /// </summary>
+        public IEnumerable<string> DistinctValuesSeen
+        {
+            get
+            {
+                return _distinctValuesSeen.OrderBy(s => s, StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
+        /// <summary>
+        /// The length of the feature vector that this vectorizer will produce.
+        /// </summary>
+        public int FeatureVectorLength
+        {
+            get
+            {
+                switch (FeatureType)
+                {
+                    case FeatureVectorizerType.Exists:
+                        return 1;
+                    case FeatureVectorizerType.Numeric:
+                        return 2;
+                    case FeatureVectorizerType.DiscreteTerms:
+                        return DistinctValuesSeen.Count() + 1;
+                    default:
+                        return 0;
+                }
+            }
+        }
+
+        #endregion Properties
+
+
+        #region Internal Methods
+
+        /// <summary>
+        /// Configures this instance by examining the values of all <see paramref="protoFeatures"/>.
+        /// After this method has been run, this object will be ready to produce feature vectors
+        /// </summary>
+        /// <param name="protoFeatures">The values to consider when configuring.</param>
+        internal void ConfigureFromTrainingData(IEnumerable<string> protoFeatures)
+        {
+            try
+            {
+                // Track values seen and their types
+                foreach (var protoFeature in protoFeatures)
+                {
+                    _distinctValuesSeen.Add(protoFeature);
+                    double _;
+                    if (Double.TryParse(protoFeature, out _))
+                    {
+                        CountOfNumericValuesOccurred++;
+                    }
+                    else
+                    {
+                        CountOfNonnumericValuesOccurred++;
+                    }
+                }
+
+                // If there are multiple values then set FeatureType to be DiscreteTerms
+                if (protoFeatures.Count() > 1)
+                {
+                    CountOfMultipleValuesOccurred++;
+                    FeatureType = FeatureVectorizerType.DiscreteTerms;
+                }
+                // If FeatureType is Exists (default) that means that only one distinct value has been seen before this point
+                // and so need to check to see if the type should be switched to numeric or discrete
+                else if (FeatureType == FeatureVectorizerType.Exists)
+                {
+                    if (_distinctValuesSeen.Count > 1)
+                    {
+                        if (CountOfNonnumericValuesOccurred > 0)
+                        {
+                            FeatureType = FeatureVectorizerType.DiscreteTerms;
+                        }
+                        else
+                        {
+                            FeatureType = FeatureVectorizerType.Numeric;
+                        }
+                    }
+                }
+
+                if (_bagOfWords.IsValueCreated)
+                {
+                    _bagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
+                        new Accord.MachineLearning.BagOfWords(DistinctValuesSeen.ToArray()));
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39524");
+            }
+        }
+
+        /// <summary>
+        /// Get feature vector using top-level <see cref="ComAttribute"/>s
+        /// </summary>
+        /// <param name="protoFeatures">The mapping of names to <see cref="ComAttribute"/>s to use for protoFeatures of this
+        /// <see cref="AttributeFeatureVectorizer"/></param>
+        /// <returns>Array of doubles of <see cref="FeatureVectorLength"/> or length of zero if not <see cref="Enabled"/></returns>
+        internal double[] GetDocumentFeatureVector(NameToProtoFeaturesMap protoFeatures)
+        {
+            try
+            {
+                if (!Enabled)
+                {
+                    return new double[0];
+                }
+
+                IEnumerable<string> values = protoFeatures.GetProtoFeatureValues(Name);
+
+                // Each type of feature vectorizer will have an exists component
+                double exists = values.Any() ? 1.0 : 0.0;
+
+                switch (FeatureType)
+                {
+                    // Just return exists/not exists value
+                    case FeatureVectorizerType.Exists:
+                        return new[] { exists };
+
+                    // Return feature value + exists/not exists value
+                    case FeatureVectorizerType.Numeric:
+                        var firstNumeric = values.Select(value =>
+                        {
+                            double number;
+                            bool success = double.TryParse(value, out number);
+                            return new { number, success };
+                        })
+                        .FirstOrDefault(pair => pair.success);
+                        var feature = firstNumeric == null ? 0.0 : firstNumeric.number;
+                        return new[] { feature, exists }; 
+
+                    // Return BoW feature vector + exists/not exists value
+                    case FeatureVectorizerType.DiscreteTerms:
+                        var features = _bagOfWords.Value.GetFeatureVector(values.ToArray()).Select(i => (double)i);
+                        return features.Concat(new[] { exists }).ToArray();
+
+                    default:
+                        throw new ExtractException("ELI39525", "Unsupported FeatureType: " + FeatureType.ToString());
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39526");
+            }
+        }
+
+        /// <summary>
+        /// Gets the feature vector using <see cref="NameToProtoFeaturesMap"/>s
+        /// </summary>
+        /// <param name="pagesOfProtoFeatures">The collection of <see cref="ComAttribute"/>s to search for
+        /// Pages of sub-attribute protoFeatures of this <see cref="AttributeFeatureVectorizer"/>
+        /// (Page sub-attributes with names that matches the name of this instance)</param>
+        /// <returns>If <see cref="Enabled"/>, then an enumeration of feature vectors that has a length equal to
+        /// that of <see paramref="pagesOfProtoFeatures"/>. Else, an empty enumeration.</returns>
+        internal IEnumerable<double[]> GetPaginationFeatureVectors(IEnumerable<NameToProtoFeaturesMap> pagesOfProtoFeatures)
+        {
+            try
+            {
+                if (!Enabled)
+                {
+                    return Enumerable.Empty<double[]>();
+                }
+
+                return pagesOfProtoFeatures.Select(GetDocumentFeatureVector);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39527");
+            }
+        }
+
+        #endregion Internal Methods
+    }
+}
