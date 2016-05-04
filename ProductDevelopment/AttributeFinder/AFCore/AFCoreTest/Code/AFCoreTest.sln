@@ -728,8 +728,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Tes
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "..\ConsoleApplication1\ConsoleApplication1.csproj", "{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3926,24 +3924,6 @@ Global
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Template|Win32.ActiveCfg = Release|x86
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Template|x86.ActiveCfg = Release|x86
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Template|x86.Build.0 = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Debug|Win32.ActiveCfg = Debug|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Debug|x86.ActiveCfg = Debug|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Debug|x86.Build.0 = Debug|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Release|Any CPU.ActiveCfg = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Release|Mixed Platforms.Build.0 = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Release|Win32.ActiveCfg = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Release|x86.ActiveCfg = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Release|x86.Build.0 = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Template|Any CPU.ActiveCfg = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Template|Mixed Platforms.ActiveCfg = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Template|Mixed Platforms.Build.0 = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Template|Win32.ActiveCfg = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Template|x86.ActiveCfg = Release|x86
-		{9EEDD3B3-9F3D-4935-BE3D-740E54E625CD}.Template|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
