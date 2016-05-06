@@ -77,6 +77,10 @@
       <HintPath>..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.Math.3.0.2\lib\net40\Accord.Math.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Accord.Neuro, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.Neuro.3.0.2\lib\net40\Accord.Neuro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Accord.Statistics, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.Statistics.3.0.2\lib\net40\Accord.Statistics.dll</HintPath>
       <Private>True</Private>
@@ -131,6 +135,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -140,11 +145,17 @@
     <Compile Include="AttributeFeatureVectorizer.cs" />
     <Compile Include="AttributeFinderPathTags.cs" />
     <Compile Include="AttributeMethods.cs" />
+    <Compile Include="ITrainableClassifier.cs" />
+    <Compile Include="LearningMachine.cs" />
     <Compile Include="LearningMachineDataEncoder.cs" />
     <Compile Include="MemoryManagerExtensionMethods.cs" />
+    <Compile Include="MulticlassSupportVectorMachineClassifier.cs" />
+    <Compile Include="MultilabelSupportVectorMachineClassifier.cs" />
+    <Compile Include="NeuralNetworkClassifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AttributesFile.cs" />
     <Compile Include="SpatialStringFeatureVectorizer.cs" />
+    <Compile Include="SupportVectorMachineClassifier.cs" />
     <Compile Include="XPathContext.cs" />
     <Compile Include="XPathContextFunctions.cs">
       <DependentUpon>XPathContext.cs</DependentUpon>
@@ -212,22 +223,27 @@
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
       <Name>Extract.Interfaces</Name>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

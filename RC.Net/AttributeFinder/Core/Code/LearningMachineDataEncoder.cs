@@ -183,7 +183,12 @@ namespace Extract.AttributeFinder
         // Enables low probability classification to result in an 'other' category and allows for categories that are
         // represented in testing data but not in training data.
         static readonly string _UNKNOWN_CATEGORY = "Unknown_CB588EBE-4861-40FF-A640-BEF6BB42A54A";
-        static readonly int _UNKNOWN_CATEGORY_CODE = 0;
+
+        /// <summary>
+        /// Code reserved to represent an 'other' category that will not be assigned to a real
+        /// category when usage is <see cref="LearningMachineUsage.DocumentCategorization"/>
+        /// </summary>
+        public static readonly int UnknownCategoryCode = 0;
 
         // Used for pagination categories
         static readonly string _FIRST_PAGE_CATEGORY = "FirstPage";
@@ -319,11 +324,11 @@ namespace Extract.AttributeFinder
         #region Public Methods
 
         /// <summary>
-        /// Gets an enumeration of answers (category names) from a VOA file
+        /// Gets an enumeration of predictions (category names) from a VOA file
         /// </summary>
         /// <param name="attributesFilePath">The path to the VOA or EAV file</param>
         /// <param name="numberOfPages">The number of pages in the associated image</param>
-        /// <returns>An enumeration of answers (category names) from a VOA file</returns>
+        /// <returns>An enumeration of predictions (category names) from a VOA file</returns>
         public static IEnumerable<string> ExpandPaginationAnswerVOA(string attributesFilePath, int numberOfPages)
         {
             try
@@ -426,8 +431,8 @@ namespace Extract.AttributeFinder
         /// <param name="ussFilePaths">The paths to the USS files to be used to configure this object</param>
         /// <param name="inputVOAFilePaths">The paths to the proto-feature VOA files to be used to
         /// configure this object</param>
-        /// <param name="answersOrAnswerFiles">The answers for each example (if <see cref="MachineUsage"/> is
-        /// <see cref="LearningMachineUsage.DocumentCategorization"/>) or the paths to VOA files of answers
+        /// <param name="answersOrAnswerFiles">The predictions for each example (if <see cref="MachineUsage"/> is
+        /// <see cref="LearningMachineUsage.DocumentCategorization"/>) or the paths to VOA files of predictions
         /// (if <see cref="MachineUsage"/> is <see cref="LearningMachineUsage.Pagination"/></param>
         public void ComputeEncodings(string[] ussFilePaths, string[] inputVOAFilePaths, string[] answersOrAnswerFiles)
         {
@@ -479,8 +484,8 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="ussFilePaths">The paths to the USS files to be used to generate the feature vectors</param>
         /// <param name="inputVOAFilePaths">The paths to the VOA files to be used to generate the feature vectors</param>
-        /// <param name="answersOrAnswerFiles">The answers for each example (if <see cref="MachineUsage"/> is
-        /// <see cref="LearningMachineUsage.DocumentCategorization"/>) or the paths to VOA files of answers
+        /// <param name="answersOrAnswerFiles">The predictions for each example (if <see cref="MachineUsage"/> is
+        /// <see cref="LearningMachineUsage.DocumentCategorization"/>) or the paths to VOA files of predictions
         /// (if <see cref="MachineUsage"/> is <see cref="LearningMachineUsage.Pagination"/></param>
         /// <returns>A tuple where the first item is an enumeration of feature vectors and the second
         /// item is an enumeration of answer codes for each example</returns>
@@ -687,7 +692,7 @@ namespace Extract.AttributeFinder
         /// <param name="ussFilePaths">The uss paths of each input file</param>
         /// <param name="inputVOAFilePaths">The input VOA paths corresponding to each uss file</param>
         /// <param name="answers">The categories for each input file</param>
-        /// <returns>A tuple of feature vectors and answers</returns>
+        /// <returns>A tuple of feature vectors and predictions</returns>
         private Tuple<double[][], int[]> GetDocumentFeatureVectorAndAnswerCollection
             (string[] ussFilePaths, string[] inputVOAFilePaths, string[] answers)
         {
@@ -729,7 +734,7 @@ namespace Extract.AttributeFinder
                     int answerCode;
                     if (!AnswerNameToCode.TryGetValue(answer, out answerCode))
                     {
-                        answerCode = _UNKNOWN_CATEGORY_CODE;
+                        answerCode = UnknownCategoryCode;
                     }
 
                     featureVectors[i] = featureVector;
@@ -829,7 +834,7 @@ namespace Extract.AttributeFinder
         /// <param name="ussFilePaths">The paths to the USS files to be used to configure this object</param>
         /// <param name="inputVOAFilePaths">The paths to the proto-feature VOA files to be used to
         /// configure this object</param>
-        /// <param name="answers">The answers (categories) for each example</param>
+        /// <param name="answers">The predictions (categories) for each example</param>
         private void ComputeDocumentEncodings(string[] ussFilePaths, string[] inputVOAFilePaths, string[] answers)
         {
             // Configure SpatialStringFeatureVectorizer
@@ -855,8 +860,8 @@ namespace Extract.AttributeFinder
 
             // Add category names and codes
             // Add an 'other' category
-            AnswerCodeToName.Add(_UNKNOWN_CATEGORY_CODE, _UNKNOWN_CATEGORY);
-            AnswerNameToCode.Add(_UNKNOWN_CATEGORY, _UNKNOWN_CATEGORY_CODE);
+            AnswerCodeToName.Add(UnknownCategoryCode, _UNKNOWN_CATEGORY);
+            AnswerNameToCode.Add(_UNKNOWN_CATEGORY, UnknownCategoryCode);
 
             // Add category code for each name seen
             int nextCategoryCode = 0;
@@ -879,7 +884,7 @@ namespace Extract.AttributeFinder
         /// <param name="ussFilePaths">The paths to the USS files to be used to configure this object</param>
         /// <param name="inputVOAFilePaths">The paths to the proto-feature VOA files to be used to
         /// configure this object</param>
-        /// <param name="answerFiles">The paths to VOA files of answers</param>
+        /// <param name="answerFiles">The paths to VOA files of predictions</param>
         private void ComputePaginationEncodings(string[] ussFilePaths, string[] inputVOAFilePaths, string[] answerFiles)
         {
             // Configure SpatialStringFeatureVectorizer

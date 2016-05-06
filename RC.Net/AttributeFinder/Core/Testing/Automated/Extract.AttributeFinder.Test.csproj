@@ -57,10 +57,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestLearningMachine.cs" />
     <Compile Include="TestLearningMachineDataEncoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestCreateAttribute.cs" />
     <Compile Include="TestRuleSetRunMode.cs" />
+    <Compile Include="TestTrainableClassifiers.cs" />
     <Compile Include="TestXPathQueries.cs" />
     <EmbeddedResource Include="Resources\A418.tif.voa" />
   </ItemGroup>
