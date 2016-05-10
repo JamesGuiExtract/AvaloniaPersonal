@@ -32,6 +32,8 @@ namespace Extract.Redaction
 
         static readonly string _OBJECT_NAME = typeof (RedactionFileLoader).ToString();
 
+        const string _PERSISTED_CONTEXT_TYPE = "_PersistedContext";
+
         #endregion Constants
 
         #region Fields
@@ -132,6 +134,12 @@ namespace Extract.Redaction
         /// file. Keep track of whether we have already saved.
         /// </summary>
         bool _alreadySaved;
+
+        /// <summary>
+        /// AFUtility gets used a lot for queries, so keep one here for re-use.
+        /// </summary>
+        AFUtility _utility = new AFUtility();
+
 
         #endregion Fields
 
@@ -792,10 +800,11 @@ namespace Extract.Redaction
         /// isolated cases this may be okay. <see langword="true"/> allows a save even if it as
         /// already been saved. <see langword="false"/> asserts that the VOA file has not been
         /// previously saved.</param>
+        /// <param name="sessionContext">session context data to be saved</param>
         [CLSCompliant(false)]
         public void SaveVerificationSession(string fileName,
             RedactionFileChanges changes, TimeInterval time, VerificationSettings settings,
-            bool standAloneMode, bool allowDuplicateSave)
+            bool standAloneMode, bool allowDuplicateSave, SessionContext sessionContext)
         {
             try
             {
@@ -811,7 +820,7 @@ namespace Extract.Redaction
 
                 // Calculate the new sensitive items
                 SaveSession(sessionName, sessionId, fileName, changes, time, sessionData,
-                    allowDuplicateSave);
+                    allowDuplicateSave, sessionContext);
             }
             catch (Exception ex)
             {
@@ -974,6 +983,62 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Finds any subattribute named "_visited".
+        /// </summary>
+        /// <param name="subattributes">vector of subattributes to search for named subattribute.</param>
+        /// <returns>return an IUnknownVector, either empty (no match), or populated (on match)</returns>
+        IUnknownVector GetVisitedSubAttribute(IUnknownVector subattributes)
+        {
+            var attr = _utility.QueryAttributes(subattributes, strQuery: "_Visited", bRemoveMatches: false);
+            return attr;
+        }
+
+        /// <summary>
+        /// Marks the visited status of all redactions.
+        /// </summary>
+        /// <param name="visitedItems">The visited redaction items.</param>
+        /// NOTE: By adding a "_visited" subattribute to the sensitive item attribute,
+        /// the subattribute is saved into the VOA file as a side-effect.
+        void MarkVisitedStatusOfAllRedactions(List<int> visitedItems)
+        {
+            try
+            {
+                int index = 0;
+                foreach (var item in _sensitiveItems)
+                {
+                    string strValue = visitedItems.IndexOf(index) > -1 ? "true" : "false";
+                    var attr = item.Attribute.ComAttribute;
+                    var subattrs = attr.SubAttributes;
+
+                    var visitedSubattr = GetVisitedSubAttribute(subattrs);
+                    if (visitedSubattr.Size() > 0)
+                    {
+                        // Here when subattribute named "_visited" already exists - 
+                        // overwrite it's current true|false value 
+                        var foundAttr = ((UCLID_AFCORELib.Attribute)visitedSubattr.At(0));
+                        SpatialString ss = foundAttr.Value;
+                        ss.CreateNonSpatialString(strValue, ss.SourceDocName);
+                    }
+                    else
+                    {
+                        // Here when _visited subattribute does NOT exist, create it with true|false value
+                        ComAttribute subAttr = _comAttribute.Create(name: "_Visited",
+                                                                    value: strValue,
+                                                                    type: _PERSISTED_CONTEXT_TYPE);
+
+                        AttributeMethods.AppendChildren(attr, subAttr);
+                    }
+
+                    ++index;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39769");
+            }
+        }
+
+        /// <summary>
         /// Modifies the VOA file and appends a session metadata COM attribute.
         /// </summary>
         /// <param name="sessionName">The name of the session metadata COM attribute.</param>
@@ -988,9 +1053,10 @@ namespace Extract.Redaction
         /// a VOA file to use for redacted output. <see langword="true"/> allows a save even if
         /// it as already been saved. <see langword="false"/> asserts that the VOA file has not been
         /// previously saved.</param>
+        /// <param name="sessionContext">session context data to save</param>
         void SaveSession(string sessionName, int lastSessionId, string fileName, 
             RedactionFileChanges changes, TimeInterval time, ComAttribute sessionData,
-            bool allowDuplicateSave)
+            bool allowDuplicateSave, SessionContext sessionContext = null)
         {
             if (!allowDuplicateSave && _alreadySaved)
             {
@@ -1012,6 +1078,14 @@ namespace Extract.Redaction
 
             // Append change entries
             AppendChangeEntries(session, changes);
+
+            // Append session context entries
+            if (null != sessionContext)
+            {
+                MarkVisitedStatusOfAllRedactions(sessionContext.VisitedRedactions);
+                AppendSessionContext(session, sessionContext, sensitiveItems);
+            }
+
             attributes.PushBack(session);
 
             // Save the attributes
@@ -1260,6 +1334,122 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Adds the value to attribute.
+        /// </summary>
+        /// <param name="attribute">The attribute.</param>
+        /// <param name="value">The value.</param>
+        void AddPersistedContext(ComAttribute attribute, int value)
+        {
+            try
+            {
+                var strValue = value.ToString(CultureInfo.InvariantCulture);
+                AddPersistedContext(attribute, strValue);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39751");
+            }
+        }
+
+        void AddPersistedContext(ComAttribute attribute, string value)
+        {
+            try
+            {
+                SpatialString ss = new SpatialString();
+                ss.CreateNonSpatialString(value, SourceDocument);
+
+                attribute.Value = ss;
+                attribute.Type = _PERSISTED_CONTEXT_TYPE;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39751");
+            }
+        }
+        
+
+        /// <summary>
+        /// Creates the session context attribute, with children corresponding to the four parameters.
+        /// </summary>
+        /// <param name="visitedPages">The visited pages.</param>
+        /// <param name="currentPageIndex">Index of the current page.</param>
+        /// <param name="selectedRedactionItems">The selected redaction items.</param>
+        /// <param name="sensitiveItems">List of sensitive items, used to retrieve GUID for each
+        /// listed sensitive attribute that is currently selected (if any)</param>
+        /// <param name="parent">parent attribute to attach subattributes too</param>
+        void CreateSessionContextAttribute(List<int> visitedPages,
+                                           int currentPageIndex,
+                                           List<int> selectedRedactionItems,
+                                           List<SensitiveItem> sensitiveItems,
+                                           ComAttribute parent)
+        {
+            try
+            {
+                // child attributes
+                ComAttribute pages = _comAttribute.Create("_VisitedPages");
+                List<int> visitedPagesOnesRelative = visitedPages.Select(page => page + 1).ToList();
+//                string pageRange = ConvertRange.ToRangeString(visitedPagesOnesRelative);
+                string pageRange = visitedPagesOnesRelative.ToRangeString();
+                AddPersistedContext(pages, pageRange);
+
+                ComAttribute currentPage = _comAttribute.Create("_CurrentPage");
+                AddPersistedContext(currentPage, currentPageIndex);
+
+                ComAttribute selectedRedactions = _comAttribute.Create("_SelectedRedactionItems");
+                List<String> selectedSensitiveItemGUIDs = new List<string>();
+                foreach (var index in selectedRedactionItems)
+                {
+                    ExtractException.Assert("ELI39763",
+                                            String.Format(CultureInfo.InvariantCulture,
+                                                          "Index value: {0} from the selectedRedactionItems list exceeds" +
+                                                          " the sensitive items count: {1}.",
+                                                          index,
+                                                          sensitiveItems.Count),
+                                            index < sensitiveItems.Count);
+
+                    var item = sensitiveItems[index].Attribute.ComAttribute;
+                    string guid = ((IIdentifiableObject)item).InstanceGUID.ToString();
+                    selectedSensitiveItemGUIDs.Add(guid);
+                }
+
+                string guidsListed = String.Join(", ", selectedSensitiveItemGUIDs);
+                AddPersistedContext(selectedRedactions, guidsListed);
+
+                AttributeMethods.AppendChildren(parent,
+                                                pages,
+                                                currentPage,
+                                                selectedRedactions);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39745");
+            }
+        }
+
+        /// <summary>
+        /// Appends session context to the parent attribute.
+        /// </summary>
+        /// <param name="parent">The parent.</param>
+        /// <param name="sessionContext">The session context to append.</param>
+        /// <param name="sensitiveItems">List of sensitive items, used to retrieve attribute GUID for the 
+        /// selected redaction items.</param>
+        void AppendSessionContext(ComAttribute parent, SessionContext sessionContext, List<SensitiveItem> sensitiveItems)
+        {
+            try
+            {
+                CreateSessionContextAttribute(sessionContext.VisitedPages,
+                                              sessionContext.CurrentPageIndex,
+                                              sessionContext.SelectedRedactionItems,
+                                              sensitiveItems,
+                                              parent);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39744");
+            }
+        }
+
+        /// <summary>
         /// Appends metadata about what changes were made.
         /// </summary>
         /// <param name="session">The session metadata COM attribute to which the changes should 
@@ -1505,5 +1695,65 @@ namespace Extract.Redaction
         }
 
         #endregion Methods
+    }
+
+    /// <summary>
+    /// This is a data transfer class, just to package and move case session context data easily.
+    /// </summary>
+    public class SessionContext
+    {
+        /// <summary>
+        /// Gets or sets the visited redactions.
+        /// </summary>
+        /// <value>
+        /// The visited redactions.
+        /// </value>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public List<int> VisitedRedactions { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the visited pages.
+        /// </summary>
+        /// <value>
+        /// The visited pages.
+        /// </value>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public List<int> VisitedPages { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the selected redaction items.
+        /// </summary>
+        /// <value>
+        /// The selected redaction items.
+        /// </value>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public List<int> SelectedRedactionItems { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the index of the current page.
+        /// </summary>
+        /// <value>
+        /// The index of the current page.
+        /// </value>
+        public int CurrentPageIndex { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionContext"/> class.
+        /// </summary>
+        /// <param name="visitedRedactions">The visited redactions.</param>
+        /// <param name="visitedPages">The visited pages.</param>
+        /// <param name="selectedRedactionItems">The selected redaction items.</param>
+        /// <param name="currentPageIndex">Index of the current page.</param>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public SessionContext(List<int> visitedRedactions,
+                              List<int> visitedPages,
+                              List<int> selectedRedactionItems,
+                              int currentPageIndex)
+        {
+            VisitedRedactions = visitedRedactions;
+            VisitedPages = visitedPages;
+            SelectedRedactionItems = selectedRedactionItems;
+            CurrentPageIndex = currentPageIndex;
+        }
     }
 }

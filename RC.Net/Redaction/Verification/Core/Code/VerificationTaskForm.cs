@@ -964,8 +964,19 @@ namespace Extract.Redaction.Verification
                         _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
 
                         RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
+
+                        SessionContext sessionContext = new SessionContext(SafeListOfInt(memento.VisitedRedactions),
+                                                                           SafeListOfInt(memento.VisitedPages),
+                                                                           memento.Selection.ToList(),
+                                                                           GetCurrentPage());
+
                         _currentVoa.SaveVerificationSession(tempVoaFile.FileName,
-                            changes, new TimeInterval(DateTime.Now, 0), _settings, _standAloneMode, true);
+                                                            changes, 
+                                                            new TimeInterval(DateTime.Now, 0), 
+                                                            _settings, 
+                                                            _standAloneMode, 
+                                                            true,
+                                                            sessionContext);
 
                         _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
 
@@ -1089,18 +1100,36 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Helper function to "safely" return a List of int from a VisitedItemsCollection, 
+        /// which may be null.
+        /// </summary>
+        /// <param name="items">The collection of items.</param>
+        /// <returns>non-null List of int</returns>
+        static List<int> SafeListOfInt(VisitedItemsCollection items)
+        {
+            return items != null ? items.ToList() : new List<int>();
+        }
+
+        /// <summary>
         /// Saves the current vector of attributes file to the specified location.
         /// </summary>
         /// <param name="screenTime">The duration of time spent verifying the document.</param>
         void SaveCurrentMemento(TimeInterval screenTime)
         {
+            UpdateMemento();
+
             VerificationMemento memento = GetCurrentDocument();
             RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
+
+            SessionContext sessionContext = new SessionContext(SafeListOfInt(memento.VisitedRedactions),
+                                                               SafeListOfInt(memento.VisitedPages),
+                                                               memento.Selection.ToList(),
+                                                               GetCurrentPage());
 
             _voaFileLock.GetLock(memento.AttributesFile,
                 _standAloneMode ? "" : "ID Shield verification");
             _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime,
-                _settings, _standAloneMode, false);
+                _settings, _standAloneMode, false, sessionContext);
 
             // Clear the dirty flag [FIDSC #3846]
             _redactionGridView.Dirty = false;

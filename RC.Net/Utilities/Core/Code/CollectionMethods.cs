@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Threading;
 using UCLID_COMUTILSLib;
 
@@ -524,6 +526,54 @@ namespace Extract.Utilities
                 throw ExtractException.AsExtractException("ELI39501", ex);
             }
         }
+
+        /// <summary>
+        /// Converts a list of int into a range string; e.g.: 1,2,3,4,7,8,9,12 = "1-4, 7-9, 12"
+        /// </summary>
+        /// <param name="listOfNumbers">The list of numbers.</param>
+        /// <returns>a string representation of the range values</returns>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        static public string ToRangeString(this List<int> listOfNumbers)
+        {
+            try
+            {
+                StringBuilder result = new StringBuilder();
+
+                for (int i = 0; i < listOfNumbers.Count; i++)
+                {
+                    var temp = listOfNumbers[i];
+
+                    // add a number 
+                    result.Append(listOfNumbers[i]);
+
+                    // skip number(s) between a range
+                    while (i < listOfNumbers.Count - 1 &&
+                           listOfNumbers[i + 1] == listOfNumbers[i] + 1)
+                    {
+                        ++i;
+                    }
+
+                    // add the range
+                    if (temp != listOfNumbers[i])
+                    {
+                        result.Append("-").Append(listOfNumbers[i]);
+                    }
+
+                    // add comma
+                    if (i != listOfNumbers.Count - 1)
+                    {
+                        result.Append(", ");
+                    }
+                }
+
+                return result.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39753");
+            }
+        }
+
 
         #endregion Public Methods
     }
