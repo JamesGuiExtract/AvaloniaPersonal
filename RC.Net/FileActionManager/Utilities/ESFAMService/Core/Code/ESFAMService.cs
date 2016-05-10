@@ -2,6 +2,7 @@ using Extract.FileActionManager.Database;
 using Extract.Licensing;
 using Extract.Utilities;
 using FAMProcessLib;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -81,7 +82,37 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(ESFAMService).ToString();
 
+        /// <summary>
+        /// The Maximum time to wait for a process to exit after processing has stopped
+        /// </summary>
+        const int _MAX_WAIT_FOR_PROCESS_EXIT = 30000;
+
         #endregion Constants
+
+        #region Enums
+
+        /// <summary>
+        /// Enum for the process wait result when waiting for a FAMProcess to exit and a stop request
+        /// </summary>
+        enum ProcessWaitResult
+        {
+            /// <summary>
+            /// Indicates the _stopProcessing is signaled
+            /// </summary>
+            StopRequested = 0,
+
+            /// <summary>
+            /// Indicates the process exited
+            /// </summary>
+            ProcessExited = 1,
+
+            /// <summary>
+            /// Indicates the wait timed out
+            /// </summary>
+            ProcessTimeOut = WaitHandle.WaitTimeout
+        }
+
+        #endregion
 
         #region Fields
 
@@ -412,6 +443,11 @@ namespace Extract.FileActionManager.Utilities
                 ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
                 int numberOfFilesToProcess = arguments.NumberOfFilesToProcess;
 
+				// Log Application to indicate this thread is starting.
+                ExtractException eeStarted = new ExtractException("ELI39766", "Application Trace: Service FAMProcess thread has started.");
+                eeStarted.AddDebugData("ThreadID", Thread.CurrentThread.ManagedThreadId,false);
+                eeStarted.Log();
+
                 if (!File.Exists(arguments.FpsFileName))
                 {
                     var ee = new ExtractException("ELI32302", "Cannot find FPS file.");
@@ -487,18 +523,18 @@ namespace Extract.FileActionManager.Utilities
                         ee.Log();
                     }
 
-                    // Sleep for two seconds and check if processing has stopped
-                    // or the FAMProcess has exited
-                    while (_stopProcessing != null && !_stopProcessing.WaitOne(0)
-                        && !process.HasExited && famProcess.IsRunning)
+                    // Wait until the process has exited, a stop is requested or processing has stopped
+                    ProcessWaitResult waitResult = new ProcessWaitResult();
+                    do
                     {
-                        Thread.Sleep(2000);
+                        waitResult = WaitForProcessExitOrStopRequest(process, 2000);
                     }
+                    while (waitResult == ProcessWaitResult.ProcessTimeOut && famProcess.IsRunning);
 
                     // [LegacyRCAndUtils:6367]
                     // If stop processing has been called, don't bother to check whether famProcess
                     // has ended naturally because we already know we need the process to stop.
-                    if (_stopProcessing != null && _stopProcessing.WaitOne(0))
+                    if (waitResult == ProcessWaitResult.StopRequested)
                     {
                         break;
                     }
@@ -520,6 +556,14 @@ namespace Extract.FileActionManager.Utilities
 
                     // Safely close the running process (any exceptions logged rather than thrown).
                     CloseProcess(ref famProcess, ref process);
+                    
+					// Log Application trace to show that the FAM instance is stopped
+                    ExtractException eeClosed = 
+                        new ExtractException("ELI39764", "Application Trace: FAM instance has stopped.");
+                    eeClosed.AddDebugData("FPS Filename", fpsFileName, false);
+                    eeClosed.AddDebugData("Process ID", processID, false);
+                    eeClosed.AddDebugData("Number Of Files To Process", numberOfFilesToProcess, false);
+                    eeClosed.Log();
                 }
                 while (keepProcessing && _stopProcessing != null && !_stopProcessing.WaitOne(0));
             }
@@ -598,6 +642,11 @@ namespace Extract.FileActionManager.Utilities
                         stopService = true;
                     }
                 }
+
+				// Log Application trace exception to indicate this thread is exiting.
+                ExtractException eeThreadExited = new ExtractException("ELI39765", "Application Trace: Service FAMProcess thread has exited.");
+                eeThreadExited.AddDebugData("ThreadID", Thread.CurrentThread.ManagedThreadId, false);
+                eeThreadExited.Log();
 
                 if (stopService)
                 {
@@ -750,17 +799,7 @@ namespace Extract.FileActionManager.Utilities
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
 
-                    // Wait for the process to exit
-                    while (process != null && !process.HasExited)
-                    {
-                        Thread.Sleep(1000);
-
-                        // If stop processing has been called exit the loop respawn loop.
-                        if (_stopProcessing != null && _stopProcessing.WaitOne(0))
-                        {
-                            return;
-                        }
-                    }
+                    WaitForProcessExitOrStopRequest(process, _MAX_WAIT_FOR_PROCESS_EXIT);
                 }
             }
             catch (Exception ex)
@@ -788,6 +827,40 @@ namespace Extract.FileActionManager.Utilities
                 
                 process = null;
                 famProcess = null;
+            }
+        }
+
+        /// <summary>
+        /// Method waits on the given process to exit or the _stopProcessing event to signal.
+        /// This should only be called after processing has stopped and the process should be
+        /// exiting.
+        /// </summary>
+        /// <param name="process">The process to wait for exit</param>
+        /// <param name="timeOut">The number of milliseconds to wait</param>
+        /// <returns>
+        /// 	<see cref="ProcessWaitResult.StopRequested"/> if _stopProcessing is signaled,
+        /// 	<see cref="ProcessWaitResult.ProcessExited"/> if process has exited
+        ///		<see cref="ProcessWaitResult.ProcessTimeOut"/> if _stopProcessing has not been signaled and process has not exited
+		/// </returns>
+        ProcessWaitResult WaitForProcessExitOrStopRequest(Process process, int timeOut)
+        {
+            if (process == null || process.HasExited)
+            {
+                return (_stopProcessing.WaitOne(0)) ? 
+                    ProcessWaitResult.StopRequested : ProcessWaitResult.ProcessExited;
+            }
+
+            // Wait for the process to exit
+            using (SafeWaitHandle safeWaitHandleForProcess = new SafeWaitHandle(process.Handle, false))
+            using (ManualResetEvent processExitEvent = new ManualResetEvent(true))
+            {
+                processExitEvent.SafeWaitHandle = safeWaitHandleForProcess;
+
+                // _stopProcessing is first because if both are signaled the lowest index will be 
+                // returned from the WaitAny
+                WaitHandle[] waitHandleList = new WaitHandle[] { _stopProcessing, processExitEvent };
+
+                return (ProcessWaitResult)WaitHandle.WaitAny(waitHandleList, timeOut);
             }
         }
 
