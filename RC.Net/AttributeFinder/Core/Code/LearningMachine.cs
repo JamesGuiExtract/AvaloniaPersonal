@@ -1,18 +1,338 @@
 ﻿using Accord.Math;
 using Accord.Statistics.Analysis;
+using Extract.Utilities;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
+using System.Globalization;
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder
 {
     /// <summary>
     /// Class to hold a trained machine, data encoder and training stats
     /// </summary>
-    [SuppressMessage("Microsoft.Design", "CA1053:StaticHolderTypesShouldNotHaveConstructors",Justification="Temporary situation")]
-    public class LearningMachine
+    [CLSCompliant(false)]
+    public class LearningMachine : IDisposable
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets the encoder to be used to create feature vectors
+        /// </summary>
+        public LearningMachineDataEncoder Encoder
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets the classifier to be trained and used to compute answers with encoded feature vectors
+        /// </summary>
+        public ITrainableClassifier Classifier
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="LearningMachineUsage"/> of this instance
+        /// </summary>
+        public LearningMachineUsage Usage
+        {
+            get
+            {
+                return Encoder == null ? LearningMachineUsage.Unknown : Encoder.MachineUsage;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="LearningMachineType"/> of this instance
+        /// </summary>
+        public LearningMachineType MachineType 
+        {
+            get
+            {
+                if (Classifier as MulticlassSupportVectorMachineClassifier != null)
+                {
+                    return LearningMachineType.MulticlassSVM;
+                }
+                else if (Classifier as MultilabelSupportVectorMachineClassifier != null)
+                {
+                    return LearningMachineType.MultilabelSVM;
+                }
+                else if (Classifier as NeuralNetworkClassifier != null)
+                {
+                    return LearningMachineType.ActivationNetwork;
+                }
+                else
+                {
+                    return LearningMachineType.Unknown;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The seed to use for random number generation
+        /// </summary>
+        public int RandomNumberSeed
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets whether this classifier has been trained and is ready to compute answers
+        /// </summary>
+        public bool IsTrained
+        {
+            get
+            {
+                return Classifier == null ? false : Classifier.IsTrained;
+            }
+        }
+
+        /// <summary>
+        /// Whether to use Unknown as a value if answer probability is low
+        /// </summary>
+        public bool UseUnknownCategory
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The threshold level below which probability will be considered to signify Unknown
+        /// </summary>
+        public double UnknownCategoryCutoff
+        {
+            get;
+            set;
+        }
+
+        #endregion Properties
+
+        #region Constructors
+
+        /// <summary>
+        /// Creates an instance with default values
+        /// </summary>
+        public LearningMachine()
+        {
+            Classifier = new MulticlassSupportVectorMachineClassifier();
+            Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000));
+        }
+
+        #endregion Constructors
+
+        #region Public Methods
+
+        /// <summary>
+        /// Trains and tests the machine using files specified with <see paramref="inputConfig"/>
+        /// </summary>
+        /// <param name="inputConfig">The <see cref="InputConfiguration"/> instance used to get training/testing files</param>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        public Tuple<double, double> TrainMachine(InputConfiguration inputConfig)
+        {
+            try
+            {
+                // Compute input files and answers
+                string[] ussFiles, voaFiles, answersOrAnswerFiles;
+                inputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles);
+
+                Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles);
+                var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles);
+
+                // Divide data into training and testing subsets
+                var rng = new Random(RandomNumberSeed);
+                List<int> trainIdx, testIdx;
+                GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2, inputConfig.TrainingSetPercentage / 100.0, out trainIdx, out testIdx, rng);
+
+                // Training set
+                double[][] trainInputs = featureVectorsAndAnswers.Item1.Submatrix(trainIdx);
+                int[] trainOutputs = featureVectorsAndAnswers.Item2.Submatrix(trainIdx);
+
+                // Testing set
+                double[][] testInputs = featureVectorsAndAnswers.Item1.Submatrix(testIdx);
+                int[] testOutputs = featureVectorsAndAnswers.Item2.Submatrix(testIdx);
+
+                // Train the classifier
+                Classifier.TrainClassifier(trainInputs, trainOutputs, rng);
+
+                return Tuple.Create(GetAccuracyScore(Classifier, trainInputs, trainOutputs), GetAccuracyScore(Classifier, testInputs, testOutputs));
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39755");
+            }
+        }
+
+        /// <summary>
+        /// Computes an answer for the input data
+        /// </summary>
+        /// <remarks>If <see paramref="preserveInputAttributes"/>=<see langref="true"/> and
+        /// <see cref="Usage"/>=<see cref="LearningMachineUsage.Pagination"/> then the input Page <see cref="ComAttribute"/>s will be
+        /// returned as subattributes of the resulting Document <see cref="ComAttribute"/>s.</remarks>
+        /// <param name="document">The <see cref="SpatialString"/> used for encoding auto-BoW features</param>
+        /// <param name="protoFeaturesOrPagesOfProtoFeatures">The VOA used for encoding attribute features</param>
+        /// <param name="preserveInputAttributes">Whether to preserve the input <see cref="ComAttribute"/>s or not.</param>
+        /// <returns>A VOA representation of the computed answer</returns>
+        public IUnknownVector ComputeAnswer(SpatialString document, IUnknownVector protoFeaturesOrPagesOfProtoFeatures, bool preserveInputAttributes)
+        {
+            try
+            {
+                ExtractException.Assert("ELI39762", "Machine has not been trained", IsTrained);
+
+                if (preserveInputAttributes && protoFeaturesOrPagesOfProtoFeatures == null)
+                {
+                    protoFeaturesOrPagesOfProtoFeatures = new IUnknownVectorClass();
+                }
+
+                IEnumerable<double[]> inputs = Encoder.GetFeatureVectors(document, protoFeaturesOrPagesOfProtoFeatures);
+                IEnumerable<Tuple<int, double?>> outputs = inputs.Select(Classifier.ComputeAnswer);
+                if (Usage == LearningMachineUsage.DocumentCategorization)
+                {
+                    IEnumerable<ComAttribute> categories = outputs.Select(answerAndScore =>
+                        {
+                            string category;
+                            if (UseUnknownCategory && answerAndScore.Item2 != null && answerAndScore.Item2 < UnknownCategoryCutoff)
+                            {
+                                category = "Unknown";
+                            }
+                            else
+                            {
+                                category = Encoder.AnswerCodeToName[answerAndScore.Item1];
+                            }
+                            var ss = new SpatialStringClass();
+                            ss.CreateNonSpatialString(category, document.SourceDocName);
+                            return new ComAttribute { Name = "DocumentType", Value = ss };
+                        });
+                    if (preserveInputAttributes)
+                    {
+                        return protoFeaturesOrPagesOfProtoFeatures.ToIEnumerable<ComAttribute>()
+                            .Concat(categories).ToIUnknownVector();
+                    }
+                    else
+                    {
+                        return categories.ToIUnknownVector();
+                    }
+                }
+                else if (Usage == LearningMachineUsage.Pagination)
+                {
+                    var inputPageAttributes = new List<ComAttribute>();
+                    var resultingAttributes = new List<ComAttribute>();
+                    if (preserveInputAttributes)
+                    {
+                        foreach (var attribute in protoFeaturesOrPagesOfProtoFeatures.ToIEnumerable<ComAttribute>())
+                        {
+                            if (attribute.Name.Equals(LearningMachineDataEncoder.PageAttributeName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                inputPageAttributes.Add(attribute);
+                            }
+                            else
+                            {
+                                resultingAttributes.Add(attribute);
+                            }
+                        }
+                    }
+
+                    List<bool> isFirstPage = outputs.Select(answerAndScore =>
+                        answerAndScore.Item1 == LearningMachineDataEncoder.FirstPageCategoryCode)
+                        .ToList();
+                    int numberOfPages = isFirstPage.Count + 1;
+                    int firstPageInRange = 1;
+
+                    // Calculate where each document ends by checking to see if the next page number is a predicted
+                    // first page or is greater than the number of pages in the image.
+                    for (int nextPageNumber = 2; nextPageNumber <= numberOfPages + 1; nextPageNumber++)
+                    {
+                        // isFirstPage is zero-indexed and does not include the first page of the image
+                        if (nextPageNumber > numberOfPages || isFirstPage[nextPageNumber - 2])
+                        {
+                            int lastPageInRange = nextPageNumber - 1;
+
+                            // Get OCRed text for the page range for the Document value
+                            var ss = document.GetSpecifiedPages(firstPageInRange, lastPageInRange);
+                            // Prevent empty value that could result in the attribute getting thrown away
+                            if (string.IsNullOrEmpty(ss.String))
+                            {
+                                ss.CreateNonSpatialString(" ", ss.SourceDocName);
+                            }
+                            var documentAttribute = new ComAttribute { Name = "Document", Value = ss };
+
+                            // Add a Pages attribute to denote the range of pages in this document
+                            ss = new SpatialStringClass();
+                            ss.CreateNonSpatialString(string.Format(CultureInfo.CurrentCulture, "{0}-{1}", firstPageInRange, lastPageInRange),
+                                document.SourceDocName);
+                            documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
+                            resultingAttributes.Add(documentAttribute);
+
+                            // Add input page attributes that are in this range
+                            if (preserveInputAttributes)
+                            {
+                                for (int i = firstPageInRange - 1; i < lastPageInRange; i++)
+                                {
+                                    documentAttribute.SubAttributes.PushBack(inputPageAttributes[i]);
+                                }
+                            }
+
+                            // Set up next page range
+                            firstPageInRange = nextPageNumber;
+                        }
+                    }
+
+                    return resultingAttributes.ToIUnknownVector();
+                }
+                else
+                {
+                    throw new ExtractException("ELI39768", "Unsupported LearningMachineUsage: " + Usage.ToString());
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39770");
+            }
+        }
+
+        #endregion Public Methods
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="LearningMachine"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <overloads>Releases resources used by the <see cref="LearningMachine"/>.</overloads>
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="LearningMachine"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                var disposable = Classifier as IDisposable;
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable Members
+
         #region Static Methods
 
         /// <summary>
@@ -31,6 +351,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                ExtractException.Assert("ELI39761", "Fraction must be between 0 and 1", subset1Fraction <= 1 && subset1Fraction >= 0);
                 subset1Indexes = new List<int>();
                 subset2Indexes = new List<int>();
                 foreach(var category in categories.Distinct())
@@ -70,7 +391,7 @@ namespace Extract.AttributeFinder
                 if (classifier.NumberOfClasses == 2)
                 {
                     var cm = new ConfusionMatrix(predictions, outputs);
-                    return cm.FScore;
+                    return Double.IsNaN(cm.FScore) ? 0.0 : cm.FScore;
                 }
                 else
                 {

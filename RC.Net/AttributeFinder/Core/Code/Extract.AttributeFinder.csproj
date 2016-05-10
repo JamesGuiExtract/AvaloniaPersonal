@@ -133,6 +133,8 @@
       <HintPath>..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.SpellChecker.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
@@ -145,6 +147,7 @@
     <Compile Include="AttributeFeatureVectorizer.cs" />
     <Compile Include="AttributeFinderPathTags.cs" />
     <Compile Include="AttributeMethods.cs" />
+    <Compile Include="InputConfiguration.cs" />
     <Compile Include="ITrainableClassifier.cs" />
     <Compile Include="LearningMachine.cs" />
     <Compile Include="LearningMachineDataEncoder.cs" />

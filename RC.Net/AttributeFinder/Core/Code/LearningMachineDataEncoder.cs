@@ -22,14 +22,19 @@ namespace Extract.AttributeFinder
     public enum LearningMachineUsage
     {
         /// <summary>
+        /// Unknown usage
+        /// </summary>
+        Unknown = 0,
+
+        /// <summary>
         /// MachineUsage will be predicting the category of an input document
         /// </summary>
-        DocumentCategorization = 0,
+        DocumentCategorization = 1,
 
         /// <summary>
         /// MachineUsage will be predicting where document boundaries should be created
         /// </summary>
-        Pagination = 1
+        Pagination = 2,
     }
 
     /// <summary>
@@ -38,20 +43,25 @@ namespace Extract.AttributeFinder
     public enum LearningMachineType
     {
         /// <summary>
+        /// Unknown type
+        /// </summary>
+        Unknown = 0,
+        
+        /// <summary>
         /// Accord.Neuro.ActivationNetwork
         /// </summary>
-        ActivationNetwork = 0,
+        ActivationNetwork = 1,
 
         /// <summary>
         /// Accord.MachineLearning.VectorMachines.MulticlassSupportVectorMachine
         /// </summary>
-        MulticlassSVM = 1,
+        MulticlassSVM = 2,
         
         /// <summary>
         /// Accord.MachineLearning.VectorMachines.MultilabelSupportVectorMachine
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multilabel")]
-        MultilabelSVM = 2
+        MultilabelSVM = 3
     }
 
     /// <summary>
@@ -190,14 +200,22 @@ namespace Extract.AttributeFinder
         /// </summary>
         public static readonly int UnknownCategoryCode = 0;
 
-        // Used for pagination categories
+        /// <summary>
+        /// Code used to represent the prediction that a page pair encloses a document break
+        /// </summary>
+        public static readonly int FirstPageCategoryCode = 1;
+
+        // Private values used for pagination categories
         static readonly string _FIRST_PAGE_CATEGORY = "FirstPage";
-        static readonly int _FIRST_PAGE_CATEGORY_CODE = 1;
         static readonly string _NOT_FIRST_PAGE_CATEGORY = "NotFirstPage";
         static readonly int _NOT_FIRST_PAGE_CATEGORY_CODE = 0;
 
-        // For pagination, the name for page attributes
-        static readonly string _PAGE_ATTRIBUTE_NAME = "Page";
+        /// <summary>
+        /// The name of page attributes that have pagination protofeature subattributes
+        /// </summary>
+        public static readonly string PageAttributeName = "Page";
+
+        // For pagination, the query for answer page range attributes
         static readonly string _PAGE_ATTRIBUTE_QUERY = "Document/Pages";
 
         #endregion Constants
@@ -580,7 +598,7 @@ namespace Extract.AttributeFinder
         {
             var pages = attributes
                 .ToIEnumerable<ComAttribute>()
-                .Where(a => a.Name.Equals(_PAGE_ATTRIBUTE_NAME, StringComparison.OrdinalIgnoreCase));
+                .Where(a => a.Name.Equals(PageAttributeName, StringComparison.OrdinalIgnoreCase));
 
             return pages.Skip(1).Select(pageAttr => GetFilteredMapOfNamesToValues(pageAttr.SubAttributes));
         }
@@ -911,8 +929,8 @@ namespace Extract.AttributeFinder
             // Add category names and codes
             AnswerCodeToName.Add(_NOT_FIRST_PAGE_CATEGORY_CODE, _NOT_FIRST_PAGE_CATEGORY);
             AnswerNameToCode.Add(_NOT_FIRST_PAGE_CATEGORY, _NOT_FIRST_PAGE_CATEGORY_CODE);
-            AnswerCodeToName.Add(_FIRST_PAGE_CATEGORY_CODE, _FIRST_PAGE_CATEGORY);
-            AnswerNameToCode.Add(_FIRST_PAGE_CATEGORY, _FIRST_PAGE_CATEGORY_CODE);
+            AnswerCodeToName.Add(FirstPageCategoryCode, _FIRST_PAGE_CATEGORY);
+            AnswerNameToCode.Add(_FIRST_PAGE_CATEGORY, FirstPageCategoryCode);
         }
 
         /// <summary>
