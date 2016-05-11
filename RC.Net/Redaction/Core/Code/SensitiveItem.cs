@@ -1,4 +1,6 @@
+using Extract.AttributeFinder;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
@@ -20,6 +22,16 @@ namespace Extract.Redaction
         /// The attribute associated with the <see cref="SensitiveItem"/>.
         /// </summary>
         readonly RedactionItem _attribute;
+
+        /// <summary>
+        /// Was this instance previously visited in prior verification session?
+        /// </summary>
+        bool _previouslyVisited;
+
+        /// <summary>
+        /// Was this instance previously selected in prior verification session?
+        /// </summary>
+        bool _previouslySelected;
 
         #endregion Fields
 
@@ -45,6 +57,8 @@ namespace Extract.Redaction
         {
             _level = level;
             _attribute = attribute;
+            _previouslyVisited = false;
+            _previouslySelected = false;
         }
 
         #endregion Constructors
@@ -72,6 +86,67 @@ namespace Extract.Redaction
             get
             {
                 return _level;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether prior verification visited this sensitive item.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if prior verification visited this; otherwise, <c>false</c>.
+        /// </value>
+        public bool PriorVerificationVisitedThis
+        {
+            get
+            {
+                return _previouslyVisited;
+            }
+            set
+            {
+                _previouslyVisited = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether prior verfication selected this sensitive item.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if prior verfication selected this; otherwise, <c>false</c>.
+        /// </value>
+        public bool PriorVerificationSelectedThis
+        {
+            get
+            {
+                return _previouslySelected;
+            }
+            set
+            {
+                _previouslySelected = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the unique identifier.
+        /// </summary>
+        /// <value>
+        /// The unique identifier, as a string.
+        /// </value>
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "GUID")]
+        public string GUID
+        {
+            get
+            {
+                try
+                {
+                    var attribute = this.Attribute.ComAttribute;
+                    string guid = AttributeMethods.AttributeGuidAsString(attribute);
+
+                    return guid;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39780");
+                }
             }
         }
 

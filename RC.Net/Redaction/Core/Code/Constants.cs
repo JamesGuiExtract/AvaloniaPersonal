@@ -15,6 +15,26 @@ namespace Extract.Redaction
         public static readonly string VerificationSessionMetaDataName = "_VerificationSession";
 
         /// <summary>
+        /// The visited item meta data name.
+        /// </summary>
+        public static readonly string VisitedItemMetaDataName = "_Visited";
+
+        /// <summary>
+        /// The selected redaction items meta data name.
+        /// </summary>
+        public static readonly string SelectedRedactionItemsMetaDataName = "_SelectedRedactionItems";
+
+        /// <summary>
+        /// The visited pages meta data name.
+        /// </summary>
+        public static readonly string VisitedPagesMetaDataName = "_VisitedPages";
+
+        /// <summary>
+        /// The current page meta data name.
+        /// </summary>
+        public static readonly string CurrentPageMetaDataName = "_CurrentPage";
+
+        /// <summary>
         /// The name to apply to the metadata attribute for IDShield OnDemand sessions.
         /// </summary>
         public static readonly string OnDemandSessionMetaDataName = "_OnDemandSession";

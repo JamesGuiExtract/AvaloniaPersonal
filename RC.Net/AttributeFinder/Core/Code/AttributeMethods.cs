@@ -272,6 +272,17 @@ namespace Extract.AttributeFinder
             return updatedValue;
         }
 
+        /// <summary>
+        /// Gets the GUID associated with the specified Attribute, as a string value.
+        /// </summary>
+        /// <param name="attribute">The attribute.</param>
+        /// <returns>GUID as string</returns>
+        public static string AttributeGuidAsString(ComAttribute attribute)
+        {
+            string guid = ((IIdentifiableObject)attribute).InstanceGUID.ToString();
+            return guid;
+        }
+
         #endregion Private Methods
     }
 }

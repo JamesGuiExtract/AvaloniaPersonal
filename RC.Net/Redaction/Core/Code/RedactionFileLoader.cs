@@ -140,6 +140,15 @@ namespace Extract.Redaction
         /// </summary>
         AFUtility _utility = new AFUtility();
 
+        /// <summary>
+        /// The pages visited in the prior verification session
+        /// </summary>
+        List<int> _visitedPages;
+
+        /// <summary>
+        /// The last visited page in the prior verification session
+        /// </summary>
+        int _currentPage;
 
         #endregion Fields
 
@@ -323,6 +332,36 @@ namespace Extract.Redaction
                 return _sourceDocument;
             }
         }
+
+        /// <summary>
+        /// Gets the pages visited during the last verification session.
+        /// </summary>
+        /// <value>
+        /// The visited pages.
+        /// </value>
+        public ReadOnlyCollection<int> VisitedPages
+        {
+            get
+            {
+                ReadOnlyCollection<int> visited = new ReadOnlyCollection<int>(_visitedPages);
+                return visited;
+            }
+        }
+
+        /// <summary>
+        /// Gets the page that was current during the last verification session.
+        /// </summary>
+        /// <value>
+        /// The current page.
+        /// </value>
+        public int CurrentPage
+        {
+            get
+            {
+                return _currentPage;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -462,6 +501,9 @@ namespace Extract.Redaction
             // NOTE: This must be done after initializing _verificationSessions
             InitializeSensitiveItems(_sensitiveItems);
 
+            GetVisitedPages();
+            GetCurrentPage();
+
             // Store the remaining attributes
             int count = attributes.Size();
             for (int i = 0; i < count; i++)
@@ -473,6 +515,76 @@ namespace Extract.Redaction
                 {
                     _insensitiveAttributes.Add(attribute);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the pages visited during the last verification session.
+        /// </summary>
+        void GetVisitedPages()
+        {
+            try
+            {
+                // Find the most recent verification session, and retrieve the visited pages from there.
+                var lastSession = GetLastVerificationSession();
+                if (null == lastSession)
+                {
+                    return;
+                }
+
+                var visitedPages = AttributeMethods.GetSingleAttributeByName(lastSession.SubAttributes,
+                                                                             Constants.VisitedPagesMetaDataName);
+                if (null == visitedPages)
+                {
+                    return;
+                }
+
+                var pages = visitedPages.Value.String;
+                if (String.IsNullOrWhiteSpace(pages))
+                {
+                    return;
+                }
+
+                UtilityMethods.ValidatePageNumbers(pages);
+                var pagesAsInts = UtilityMethods.GetPageNumbersFromString(pages,
+                                                                          totalPages: Int32.MaxValue,
+                                                                          throwExceptionOnPageOutOfRange: false);
+                _visitedPages = pagesAsInts.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39800");
+            }
+        }
+
+        /// <summary>
+        /// Gets the page that was the current page during the last verification session.
+        /// </summary>
+        void GetCurrentPage()
+        {
+            try
+            {
+                var lastSession = GetLastVerificationSession();
+                if (null == lastSession)
+                {
+                    return;
+                }
+
+                var currentPageAttr = AttributeMethods.GetSingleAttributeByName(lastSession.SubAttributes,
+                                                                                Constants.CurrentPageMetaDataName);
+                if (null == currentPageAttr)
+                {
+                    return;
+                }
+
+                var current = currentPageAttr.Value.String;
+                var page = Int32.Parse(current, CultureInfo.InvariantCulture);
+
+                _currentPage = page;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39801");
             }
         }
 
@@ -655,6 +767,148 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Visiteds the value.
+        /// </summary>
+        /// <param name="visited">The visited.</param>
+        /// <returns>true if the _Visited attribute value is "true", otherwise false</returns>
+        static bool VisitedValue(ComAttribute visited)
+        {
+            try
+            {
+                if (null == visited)
+                {
+                    return false;
+                }
+
+                ExtractException.Assert("ELI39785",
+                                        String.Format(CultureInfo.InvariantCulture,
+                                                      "Attempt to get the visited state" +
+                                                      " from an attribute named: {0}, should be: {1}",
+                                                      visited.Name,
+                                                      Constants.VisitedItemMetaDataName),
+                                        visited.Name == Constants.VisitedItemMetaDataName);
+
+                string value = visited.Value.String;
+                return String.Equals(value, "Yes", StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39784");
+            }
+        }
+
+        /// <summary>
+        /// Sets the state of the prior verification - was each sensitive item visited?
+        /// </summary>
+        /// <param name="item">The item.</param>
+        static void SetPriorVerificationVisitedState(SensitiveItem item)
+        {
+            ComAttribute itemAttr = item.Attribute.ComAttribute;
+            IUnknownVector subAttrs = itemAttr.SubAttributes;
+
+            ComAttribute visited = AttributeMethods.GetSingleAttributeByName(subAttrs, 
+                                                                             Constants.VisitedItemMetaDataName);
+            item.PriorVerificationVisitedThis = VisitedValue(visited);
+        }
+
+        /// <summary>
+        /// Returns the last verification session.
+        /// </summary>
+        /// <returns>last session attribute</returns>
+        ComAttribute GetLastVerificationSession()
+        {
+            try
+            {
+                if (_verificationSessions.Count() == 0)
+                {
+                    return null;
+                }
+
+                foreach (var attribute in _verificationSessions)
+                {
+                    var value = attribute.Value.String;
+                    if (!String.IsNullOrWhiteSpace(value))
+                    {
+                        int sessionId = int.Parse(value, CultureInfo.CurrentCulture);
+                        if (sessionId == _verificationSessionId)
+                        {
+                            return attribute;
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39799");
+            }
+        }
+
+        /// <summary>
+        /// Gets the GUIDs string that specifies the selected redaction items.
+        /// </summary>
+        /// <returns>comma-delimited list of GUID strings, or empty if not found</returns>
+        string GetSelectedRedactionItemsAsGUIDs()
+        {
+            try
+            {
+                var lastSession = GetLastVerificationSession();
+                if (null == lastSession)
+                {
+                    return String.Empty;
+                }
+
+                var selectedItemsAttr =
+                    AttributeMethods.GetSingleAttributeByName(lastSession.SubAttributes,
+                                                              Constants.SelectedRedactionItemsMetaDataName);
+                if (null == selectedItemsAttr)
+                {
+                    return String.Empty;
+                }
+
+                string guids = selectedItemsAttr.Value.String;
+                return guids;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39783");
+            }
+        }
+
+        /// <summary>
+        /// Sets the state of the prior verification sensitive items selections.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        void SetPriorVerificationSelectedState(SensitiveItem item)
+        {
+            try
+            {
+                var selectedItemsGuids = GetSelectedRedactionItemsAsGUIDs();
+                if (String.IsNullOrWhiteSpace(selectedItemsGuids))
+                {
+                    return;
+                }
+
+                string[] guids = selectedItemsGuids.Split(',');
+                foreach (var guid in guids)
+                {
+                    if (item.GUID == guid.Trim())
+                    {
+                        item.PriorVerificationSelectedThis = true;
+                        return;
+                    }
+                }
+
+                item.PriorVerificationSelectedThis = false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39782");
+            }
+        }
+
+        /// <summary>
         /// Assigns the ID and initial redacted state of the specified sensitive items.
         /// </summary>
         /// <param name="sensitiveItems">The sensitive items to initialize.</param>
@@ -670,6 +924,9 @@ namespace Extract.Redaction
                     // https://extract.atlassian.net/browse/ISSUE-7569
                     item.Attribute.Redacted = item.Level.Output;
                 }
+
+                SetPriorVerificationVisitedState(item);
+                SetPriorVerificationSelectedState(item);
             }
         }
 
@@ -989,7 +1246,9 @@ namespace Extract.Redaction
         /// <returns>return an IUnknownVector, either empty (no match), or populated (on match)</returns>
         IUnknownVector GetVisitedSubAttribute(IUnknownVector subattributes)
         {
-            var attr = _utility.QueryAttributes(subattributes, strQuery: "_Visited", bRemoveMatches: false);
+            var attr = _utility.QueryAttributes(subattributes, 
+                                                strQuery: Constants.VisitedItemMetaDataName, 
+                                                bRemoveMatches: false);
             return attr;
         }
 
@@ -1006,7 +1265,7 @@ namespace Extract.Redaction
                 int index = 0;
                 foreach (var item in _sensitiveItems)
                 {
-                    string strValue = visitedItems.IndexOf(index) > -1 ? "true" : "false";
+                    string strValue = visitedItems.IndexOf(index) > -1 ? "Yes" : "No";
                     var attr = item.Attribute.ComAttribute;
                     var subattrs = attr.SubAttributes;
 
@@ -1014,7 +1273,7 @@ namespace Extract.Redaction
                     if (visitedSubattr.Size() > 0)
                     {
                         // Here when subattribute named "_visited" already exists - 
-                        // overwrite it's current true|false value 
+                        // overwrite it's current Yes|No value 
                         var foundAttr = ((UCLID_AFCORELib.Attribute)visitedSubattr.At(0));
                         SpatialString ss = foundAttr.Value;
                         ss.CreateNonSpatialString(strValue, ss.SourceDocName);
@@ -1022,7 +1281,7 @@ namespace Extract.Redaction
                     else
                     {
                         // Here when _visited subattribute does NOT exist, create it with true|false value
-                        ComAttribute subAttr = _comAttribute.Create(name: "_Visited",
+                        ComAttribute subAttr = _comAttribute.Create(name: Constants.VisitedItemMetaDataName,
                                                                     value: strValue,
                                                                     type: _PERSISTED_CONTEXT_TYPE);
 
@@ -1388,7 +1647,6 @@ namespace Extract.Redaction
                 // child attributes
                 ComAttribute pages = _comAttribute.Create("_VisitedPages");
                 List<int> visitedPagesOnesRelative = visitedPages.Select(page => page + 1).ToList();
-//                string pageRange = ConvertRange.ToRangeString(visitedPagesOnesRelative);
                 string pageRange = visitedPagesOnesRelative.ToRangeString();
                 AddPersistedContext(pages, pageRange);
 
@@ -1407,8 +1665,7 @@ namespace Extract.Redaction
                                                           sensitiveItems.Count),
                                             index < sensitiveItems.Count);
 
-                    var item = sensitiveItems[index].Attribute.ComAttribute;
-                    string guid = ((IIdentifiableObject)item).InstanceGUID.ToString();
+                    string guid = sensitiveItems[index].GUID;
                     selectedSensitiveItemGUIDs.Add(guid);
                 }
 
