@@ -524,11 +524,25 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         UserConfigChecker _userConfigChecker = new UserConfigChecker();
 
         /// <summary>
-        /// The names of documents that have been output so far as part of an ongoing commit of
-        /// pagination from the <see cref="_paginationPanel"/>. This is a stack so that enumerating
-        /// the documents will start with the last one output and end with the first.
+        /// A panel that is available to view/edit key data fields associated with either physical
+        /// or proposed paginated documents.
         /// </summary>
-        Stack<string> _pendingPaginationOutputStack = new Stack<string>();
+        IPaginationDocumentDataPanel _paginationDocumentDataPanel;
+
+        /// <summary>
+        /// Attributes that have been modified in the _paginationDocumentDataPanel and need to be
+        /// refreshed in the DEP.
+        /// </summary>
+        HashSet<IAttribute> _paginagionAttributesToRefresh = new HashSet<IAttribute>();
+
+        /// <summary>
+        /// During a pagination operation in the <see cref="_paginationPanel"/>, the name, position
+        /// in the panel, and data of documents that have been output exactly as suggested and,
+        /// therefore, should be immediately loaded back in for verification.
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        List<Tuple<string, int, PaginationDocumentData>> _paginationOutputToReload =
+            new List<Tuple<string, int, PaginationDocumentData>>();
 
         /// <summary>
         /// Indicates whether a pagination event from the <see cref="_paginationPanel"/> is
@@ -1204,6 +1218,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (!_standAloneMode && Control.ModifierKeys.HasFlag(Keys.Shift))
                 {
+                    LoadPaginationDocumentDataPanel();
+
                     // Show pagination tab before showing the data tab to trigger the pagination
                     // control to be created and loaded.
                     _paginationTab.Show();
@@ -2040,6 +2056,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         {
                             // Monitor for changes to the document type from the DEP.
                             GetDocumentType(attributes, true);
+                        }
+
+                        // Now that the data has been loaded into the DEP, update the document data
+                        // in the pagination panel so that it is sharing the same attributes
+                        // hierarchy with the DEP (rather than a separately loaded copy).
+                        if (_paginationPanel != null && _paginationDocumentDataPanel != null)
+                        {
+                            PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes);
+
+                            // The AttributeValueChanged event only needs to be registered in
+                            // conjunction with the currently active document in verification in
+                            // order to synchronize data between the two.
+                            documentData.AttributeValueChanged += HandleDocumentData_AttributeValueChanged;
+
+                            _paginationPanel.UpdateDocumentData(_fileName, documentData);
                         }
                     }
                 }
@@ -2899,6 +2930,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     !_dataEntryControlHost.IsDocumentLoaded)
                 {
                     e.Cancel = true;
+
+                    // Schedule the tab change to occur once the document has fully loaded.
+                    _dataEntryControlHost.ExecuteOnIdle("ELI39750", () =>
+                        _tabControl.SelectedTab = _paginationTab);
                 }
             }
             catch (Exception ex)
@@ -2924,16 +2959,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (_tabControl.SelectedTab == _dataTab && _dataEntryControlHost.ImageViewer == null)
                 {
+                    // Ensure the _paginationPanel won't try to do anything with the image viewer
+                    // while the data tab has focus.
+                    _paginationPanel.Park();
+
                     // The pagination control may have opened a different document; switch back to
                     // the document being verified.
                     if (!_paginating && _imageViewer.ImageFile != _fileName)
                     {
                         _imageViewer.OpenImage(_fileName, false);
                     }
-
-                    // Ensure the _paginationPanel won't try to do anything with the image viewer
-                    // while the data tab has focus.
-                    _paginationPanel.EnablePageDisplay = false;
 
                     _dataEntryControlHost.ImageViewer = _imageViewer;
                     _imageViewer.ImageFileChanged += HandleImageFileChanged;
@@ -2944,6 +2979,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
+
+                    // Refresh any attributes that were modified in the _paginationDocumentDataPanel
+                    // so that it's value stays in sync.
+                    foreach (IAttribute attribute in _paginagionAttributesToRefresh)
+                    {
+                        AttributeStatusInfo.SetValue(attribute, attribute.Value, true, true);
+                        AttributeStatusInfo.GetOwningControl(attribute).RefreshAttributes(true, attribute);
+                    }
+
+                    _paginagionAttributesToRefresh.Clear();
                 }
                 else if (_tabControl.SelectedTab != _dataTab && _dataEntryControlHost.ImageViewer != null)
                 {
@@ -2961,13 +3006,31 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _saveAndCommitFileCommand.Enabled = false;
                     _saveMenuItem.Enabled = false;
 
-                    _paginationPanel.EnablePageDisplay = true;
-                    _paginationPanel.SelectFirstPage();
+                    _paginationPanel.Resume();
                 }
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI39546");
+                ex.ExtractDisplay("ELI39546");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationPanel.DocumentDataRequest"/> of the
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DocumentDataRequestEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandlePaginationPanel_DocumentDataRequest(object sender, DocumentDataRequestEventArgs e)
+        {
+            try
+            {
+                e.DocumentData = GetAsPaginationDocumentData(new IUnknownVector());
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39792");
             }
         }
 
@@ -3024,14 +3087,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (e.SuggestedPaginationAccepted.HasValue && e.SuggestedPaginationAccepted.Value)
                 {
                     // Produce a voa file for the paginated document using the data the rules suggested.
-                    var documentData = e.DocumentData as IIUnknownVector;
+                    var documentData = e.DocumentData as PaginationDocumentData;
                     if (documentData != null)
                     {
                         AttributeMethods.TranslateAttributesToNewDocument(
-                            documentData, e.OutputFileName, pageMap);
+                            documentData.Attributes, e.OutputFileName, pageMap);
 
-                        documentData.SaveTo(e.OutputFileName + ".voa", false,
+                        documentData.Attributes.SaveTo(e.OutputFileName + ".voa", false,
                             _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                        // Though saved out to file, it is this object that will be used for the
+                        // newly paginated document; it should not be marked dirty at this point.
+                        documentData.SetOriginalForm();
                     }
 
                     EActionStatus previousStatus;
@@ -3042,7 +3108,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     success = FileRequestHandler.SetFallbackStatus(fileID, EActionStatus.kActionPending);
                     ExtractException.Assert("ELI39622", "Failed to set fallback status", success,
                         "FileID", fileID);
-                    _pendingPaginationOutputStack.Push(e.OutputFileName);
+                    _paginationOutputToReload.Add(
+                        new Tuple<string, int, PaginationDocumentData>(
+                            e.OutputFileName, e.Position, documentData));
                 }
             }
             catch (Exception ex)
@@ -3068,21 +3136,28 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // queue in most cases, but not if the applied pagination matched source doc form.
                 FileRequestHandler.PauseProcessingQueue();
 
-                // In order for files to be delayed (and any prompting or other UI tasks
-                // accomplished by the DEP), the data tab must be given back focus.
-                _tabControl.SelectedTab = _dataTab;
-
-                // _pendingPaginationOutput is a stack because we need to insert them to the front
-                // of the _paginationPanel in reverse order so that they end up in the original
-                // order.
-                foreach (string paginatedFileName in _pendingPaginationOutputStack)
+                // Reload files into the pagination pane that were generated using rules-suggested
+                // breaks.
+                foreach (var output in _paginationOutputToReload)
                 {
-                    _paginationPanel.LoadFile(paginatedFileName, true, null, false, null);
+                    string fileName = output.Item1;
+                    // Position is the index of the first page of the controls out of all pagination
+                    // controls, though what position means doesn't really need to be interpreted in
+                    // this scope.
+                    int position = output.Item2;
+                    PaginationDocumentData documentData = output.Item3;
+                    _paginationPanel.LoadFile(fileName, position, null, false, documentData);
                 }
 
-                // Keep track of whether the current file was completed so it doesn't end up getting
-                // separately completed from different blocks.
-                bool completedCurrentFile = false;
+                foreach (var item in e.ModifiedDocumentData)
+                {
+                    string sourceFileName = item.Key;
+                    PaginationDocumentData documentData = (PaginationDocumentData)item.Value;
+
+                    string dataFileName = sourceFileName + ".voa";
+                    documentData.Attributes.SaveTo(dataFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    documentData.SetOriginalForm();
+                }
 
                 // Once the newly paginated files are loaded, the source documents for the newly
                 // paginated output or any documents for which suggested pagination was ignored
@@ -3096,6 +3171,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // normally.
                     if (sourceFileName == _fileName)
                     {
+                        // In order for files to be completed (and any prompting or other UI tasks
+                        // accomplished by the DEP), the data tab must be given back focus.
+                        _tabControl.SelectedTab = _dataTab;
+
                         _imageViewer.CloseImage();
 
                         // Record statistics to database that need to happen when a file is closed.
@@ -3103,7 +3182,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         EndFileTaskSession();
 
                         OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
-                        completedCurrentFile = true;
                     }
                     // If sourceFileName is not the current file in verification, it needs to be
                     // manually released from the current process and directed to "complete" via
@@ -3118,23 +3196,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         ReleaseFile(sourceFileID);
                     }
                 }
-
-                // The first paginated file should be the next document to be displayed.
-                string fileNameToLoad = _pendingPaginationOutputStack.LastOrDefault();
-                if (!string.IsNullOrEmpty(fileNameToLoad))
-                {
-                    int fileIdToLoad = FileProcessingDB.GetFileID(fileNameToLoad);
-                    bool success = RequestFile(fileIdToLoad);
-                    ExtractException.Assert("ELI39624", "Failed to request file.", success,
-                        "File ID", fileIdToLoad);
-
-                    // In order for the file we've requested to come up, the currently displayed file
-                    // needs to be delayed.
-                    if (!completedCurrentFile && fileNameToLoad != _fileName)
-                    {
-                        DelayFile();
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -3143,8 +3204,31 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             finally
             {
                 _paginating = false;
-                _pendingPaginationOutputStack.Clear();
+                _paginationOutputToReload.Clear();
                 FileRequestHandler.ResumeProcessingQueue();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationDocumentData.AttributeValueChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="AttributeValueChangedEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandleDocumentData_AttributeValueChanged(object sender, AttributeValueChangedEventArgs e)
+        {
+            try
+            {
+                _paginagionAttributesToRefresh.Add(e.ModifiedAttribute);
+
+                // This event is registered only for the active document's data an not for any other
+                // document displayed in the pagination panel this will not block the modified
+                // status for any document except the active one.
+                e.MarkAsModified = !_paginationPanel.IsInOriginalForm(_fileName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39752");
             }
         }
 
@@ -5175,6 +5259,31 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Loads any <see cref="IPaginationDocumentDataPanel"/> that has been defined in the DEP
+        /// assembly.
+        /// </summary>
+        void LoadPaginationDocumentDataPanel()
+        {
+            string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
+                _activeDataEntryConfig.Config.Settings.DataEntryPanelFileName);
+
+            // May be null if the DEP assembly does define an IPaginationDocumentDataPanel.
+            _paginationDocumentDataPanel =
+                UtilityMethods.CreateTypeFromAssembly<IPaginationDocumentDataPanel>(
+                    dataEntryPanelFileName);
+            _paginationPanel.DocumentDataPanel = _paginationDocumentDataPanel;
+
+            if (_paginationDocumentDataPanel != null)
+            {
+                // Allows config file to be able to update _paginationDocumentDataPanel.
+                _activeDataEntryConfig.Config.ApplyObjectSettings(
+                    _paginationDocumentDataPanel.Control);
+
+                _paginationPanel.DocumentDataRequest += HandlePaginationPanel_DocumentDataRequest;
+            }
+        }
+
+        /// <summary>
         /// Ensures the <see paramref="fileName"/> being loaded is in sync with the next file
         /// displayed in the pagination tab.
         /// </summary>
@@ -5244,6 +5353,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Allow DEP to use the data loaded here rather than separately re-loading it.
                 _cachedVOAData[fileName] = attributes;
 
+                PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes);
+
                 var attributeArray = attributes
                     .ToIEnumerable<IAttribute>()
                     .ToArray();
@@ -5283,12 +5394,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                                     "Pages", StringComparison.OrdinalIgnoreCase))
                                 .Value.String, pageCount, true);
 
-                        var documentData = documentAttribute.SubAttributes
+                        var documentAttributes = documentAttribute.SubAttributes
                             .ToIEnumerable<IAttribute>()
                             .Where(attribute => attribute.Name.Equals(
                                 "DocumentData", StringComparison.OrdinalIgnoreCase))
                             .Select(data => data.SubAttributes)
                             .SingleOrDefault() ?? new IUnknownVector();
+
+                        documentData = GetAsPaginationDocumentData(documentAttributes);
 
                         if (!suggestedPagination.HasValue)
                         {
@@ -5301,7 +5414,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                                 // document, treat the voa file as if it only contained the data
                                 // for verification (and not the Document/DocumentData hierarchy
                                 // used for pagination).
-                                _cachedVOAData[fileName] = documentData;
+                                _cachedVOAData[fileName] = documentAttributes;
                             }
                             else
                             {
@@ -5310,16 +5423,35 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _paginationPanel.LoadFile(
-                            fileName, false, pages, suggestedPagination.Value, documentData);
+                            fileName, -1, pages, suggestedPagination.Value, documentData);
                     }
 
                     return;
                 }
+
+                // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
+                _paginationPanel.LoadFile(fileName, -1, null, false, documentData);
+                return;
             }
 
             // If there was no rules-suggested pagination, go ahead and load the physical document
             // into the _paginationPanel
-            _paginationPanel.LoadFile(fileName, false);
+            _paginationPanel.LoadFile(fileName, -1);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="PaginationDocumentData"/> instance representing the specified
+        /// <see paramref="attributes"/> if the <see cref="_paginationDocumentDataPanel"/> is
+        /// available.
+        /// </summary>
+        /// <param name="attributes">The attributes.</param>
+        /// <returns>The <see cref="PaginationDocumentData"/> instance or <see langword="null"/> if
+        /// the <see cref="_paginationDocumentDataPanel"/> is not available.</returns>
+        PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes)
+        {
+            return (_paginationDocumentDataPanel != null)
+                ? _paginationDocumentDataPanel.GetDocumentData(attributes)
+                : null;
         }
 
         /// <summary>

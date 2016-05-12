@@ -200,6 +200,9 @@
     <Compile Include="DataEntryScrollPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="IPaginationDocumentDataPanel.cs" />
+    <Compile Include="PaginationDataField.cs" />
+    <Compile Include="PaginationDocumentData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VerificationSettings.cs" />

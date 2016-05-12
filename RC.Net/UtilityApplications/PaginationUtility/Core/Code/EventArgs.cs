@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -142,6 +143,78 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
+    /// The event arguments for the <see cref="PageLayoutControl.DocumentSplit"/> event.
+    /// </summary>
+    internal class DocumentSplitEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentDataRequestEventArgs"/> class.
+        /// </summary>
+        /// <param name="originalDocument"></param>
+        /// <param name="newDocument"></param>
+        public DocumentSplitEventArgs(OutputDocument originalDocument, OutputDocument newDocument)
+        {
+            OriginalDocument = originalDocument;
+            NewDocument = newDocument;
+        }
+
+        /// <summary>
+        /// Gets or sets 
+        /// </summary>
+        public OutputDocument OriginalDocument
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets 
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public OutputDocument NewDocument
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
+    /// The event arguments for the <see cref="PageLayoutControl.DocumentsMerged"/> event.
+    /// </summary>
+    internal class DocumentsMergedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentsMergedEventArgs"/> class.
+        /// </summary>
+        /// <param name="resultingDocument"></param>
+        /// <param name="discardedDocument"></param>
+        public DocumentsMergedEventArgs(OutputDocument resultingDocument, OutputDocument discardedDocument)
+        {
+            ResultingDocument = resultingDocument;
+            DiscardedDocument = discardedDocument;
+        }
+
+        /// <summary>
+        /// Gets or sets 
+        /// </summary>
+        public OutputDocument ResultingDocument
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets 
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public OutputDocument DiscardedDocument
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
     /// Event args for a <see cref="PaginationPanel.CreatingOutputDocument"/> event.
     /// </summary>
     public class CreatingOutputDocumentEventArgs : EventArgs
@@ -156,15 +229,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="suggestedPaginationAccepted"><see langword="true"/> if suggested pagination
         /// was accepted, <see langword="false"/> if suggested pagination was rejected or
         /// <see langword="null"/> if there was no suggested pagination for this document.</param>
+        /// <param name="position">The position the document was in <see cref="PaginationPanel"/>.
+        /// <para><b>Note</b></para>
+        /// This is not a document index. The caller should not try to interpret this value;
+        /// it's use should be limited to passing as the position argument of
+        /// PaginationPanel.LoadFile.
+        /// </param>
         /// <param name="documentData">Data that has been associated with the document.</param>
         public CreatingOutputDocumentEventArgs(IEnumerable<PageInfo> sourcePageInfo,
-            int pageCount, long fileSize, bool? suggestedPaginationAccepted, object documentData)
+            int pageCount, long fileSize, bool? suggestedPaginationAccepted, int position,
+            IDocumentData documentData)
             : base()
         {
             SourcePageInfo = sourcePageInfo.ToList().AsReadOnly();
             PageCount = pageCount;
             FileSize = fileSize;
             SuggestedPaginationAccepted = suggestedPaginationAccepted;
+            Position = position;
             DocumentData = documentData;
         }
 
@@ -209,9 +290,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// The position the document was in <see cref="PaginationPanel"/>.
+        /// <para><b>Note</b></para>
+        /// This is not a document index. The caller should not try to interpret this value;
+        /// it's use should be limited to passing as the position argument of
+        /// PaginationPanel.LoadFile.
+        /// </summary>
+        public int Position
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets data that has been associated with the document data.
         /// </summary>
-        public object DocumentData
+        public IDocumentData DocumentData
         {
             get;
             private set;
@@ -264,12 +358,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see cref="PaginationPanel"/>.</param>
         /// <param name="disregardedPaginationSources">All documents applied as they exist on disk
         /// but for which there was differing suggested pagination.</param>
+        /// <param name="modifiedDocumentData">All documents names and associated
+        /// <see cref="IDocumentData"/> where data was modified, but the document pages have not
+        /// been modified compared to pagination on disk.</param>   
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public PaginatedEventArgs(IEnumerable<string> paginatedDocumentSources,
-            IEnumerable<string> disregardedPaginationSources)
+            IEnumerable<string> disregardedPaginationSources,
+            IEnumerable<KeyValuePair<string, IDocumentData>> modifiedDocumentData)
             : base()
         {
             PaginatedDocumentSources = paginatedDocumentSources.ToList().AsReadOnly();
             DisregardedPaginationSources = disregardedPaginationSources.ToList().AsReadOnly();
+            ModifiedDocumentData = modifiedDocumentData.ToList().AsReadOnly();
         }
 
         /// <summary>
@@ -290,6 +390,58 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets all documents names and associated <see cref="IDocumentData"/> where data was
+        /// modified, but the document pages have not been modified compared to pagination on disk.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public ReadOnlyCollection<KeyValuePair<string, IDocumentData>> ModifiedDocumentData
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
+    /// The event arguments for the <see cref="PaginationPanel.DocumentDataRequest"/> event.
+    /// </summary>
+    public class DocumentDataRequestEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentDataRequestEventArgs"/> class.
+        /// </summary>
+        /// <param name="sourceDocNames">The names of the source document(s) to which the document
+        /// data would pertain.</param>
+        public DocumentDataRequestEventArgs(params string[] sourceDocNames)
+        {
+            try
+            {
+                SourceDocNames = sourceDocNames.ToList().AsReadOnly();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39791");
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ReadOnlyCollection<string> SourceDocNames
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="OutputDocument"/> to be associated with the new document.
+        /// </summary>
+        public IDocumentData DocumentData
+        {
+            get;
+            set;
         }
     }
 }

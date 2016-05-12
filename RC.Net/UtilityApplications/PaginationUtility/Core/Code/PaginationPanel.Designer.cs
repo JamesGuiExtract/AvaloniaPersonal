@@ -34,6 +34,8 @@
             this._applyToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToSourceToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToOriginalToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this._toolStripContainer.ContentPanel.SuspendLayout();
             this._toolStripContainer.TopToolStripPanel.SuspendLayout();
             this._toolStripContainer.SuspendLayout();
             this._topToolStrip.SuspendLayout();
@@ -45,6 +47,7 @@
             // 
             // _toolStripContainer.ContentPanel
             // 
+            this._toolStripContainer.ContentPanel.Controls.Add(this._tableLayoutPanel);
             this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(454, 281);
             this._toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._toolStripContainer.LeftToolStripPanelVisible = false;
@@ -69,7 +72,7 @@
             this._revertToOriginalToolStripButton});
             this._topToolStrip.Location = new System.Drawing.Point(3, 0);
             this._topToolStrip.Name = "_topToolStrip";
-            this._topToolStrip.Size = new System.Drawing.Size(410, 25);
+            this._topToolStrip.Size = new System.Drawing.Size(379, 25);
             this._topToolStrip.TabIndex = 0;
             // 
             // _applyToolStripButton
@@ -100,6 +103,20 @@
             this._revertToOriginalToolStripButton.Text = "Revert to suggested pagination";
             this._revertToOriginalToolStripButton.Click += new System.EventHandler(this.HandleRevertToOriginalToolStripButton_Click);
             // 
+            // _tableLayoutPanel
+            // 
+            this._tableLayoutPanel.ColumnCount = 1;
+            this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this._tableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
+            this._tableLayoutPanel.Name = "_tableLayoutPanel";
+            this._tableLayoutPanel.RowCount = 2;
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._tableLayoutPanel.Size = new System.Drawing.Size(454, 281);
+            this._tableLayoutPanel.TabIndex = 0;
+            // 
             // PaginationPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -107,6 +124,7 @@
             this.Controls.Add(this._toolStripContainer);
             this.Name = "PaginationPanel";
             this.Size = new System.Drawing.Size(454, 306);
+            this._toolStripContainer.ContentPanel.ResumeLayout(false);
             this._toolStripContainer.TopToolStripPanel.ResumeLayout(false);
             this._toolStripContainer.TopToolStripPanel.PerformLayout();
             this._toolStripContainer.ResumeLayout(false);
@@ -124,5 +142,6 @@
         private System.Windows.Forms.ToolStripButton _applyToolStripButton;
         private System.Windows.Forms.ToolStripButton _revertToSourceToolStripButton;
         private System.Windows.Forms.ToolStripButton _revertToOriginalToolStripButton;
+        private System.Windows.Forms.TableLayoutPanel _tableLayoutPanel;
     }
 }

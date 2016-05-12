@@ -1,9 +1,9 @@
 ﻿using Extract.Drawing;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -184,9 +184,61 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!pageControl.Document.InSourceDocForm)
+                if (!pageControl.Document.InOriginalForm)
                 {
                     base.PaintForeground(pageControl, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39735");
+            }
+        }
+    }
+
+    /// <summary>
+    /// A <see cref="PageStylist"/> that uses a red asterisk to indicated pages that have been
+    /// "modified" (that are part of a pending <see cref="OutputDocument"/> that does not match
+    /// the document as it currently exists on disk).
+    /// </summary>
+    internal class NewOutputPageStylist : OverlayTextStylist
+    {
+        /// <summary>
+        /// The <see cref="Font"/> to use to draw the asterisk.
+        /// </summary>
+        static readonly Font _INDICATOR_FONT = new Font("Sans Serif", 21);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NewOutputPageStylist"/> class.
+        /// </summary>
+        public NewOutputPageStylist()
+            : base("+", Color.Green, _INDICATOR_FONT, new StringFormat()
+            {
+                Alignment = StringAlignment.Far,
+                LineAlignment = StringAlignment.Near
+            })
+        {
+        }
+
+        /// <summary>
+        /// Allows foreground of the specified <see paramref="pageControl"/> to be painted.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to paint.</param>
+        /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
+        /// <see paramref="pageControl"/>.</param>
+        public override void PaintForeground(PageThumbnailControl pageControl, PaintEventArgs e)
+        {
+            try
+            {
+                if (!pageControl.Document.InSourceDocForm)
+                {
+                    var modifiedClipRectangle = e.ClipRectangle;
+                    modifiedClipRectangle.Height -= 12;
+                    modifiedClipRectangle.Location = new Point(
+                        e.ClipRectangle.X, e.ClipRectangle.Y + 12);
+
+                    var newArgs = new PaintEventArgs(e.Graphics, modifiedClipRectangle);
+                    base.PaintForeground(pageControl, newArgs);
                 }
             }
             catch (Exception ex)

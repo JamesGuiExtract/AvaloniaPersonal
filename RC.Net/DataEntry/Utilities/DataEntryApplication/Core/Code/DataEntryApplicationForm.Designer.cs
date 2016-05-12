@@ -162,7 +162,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._splitContainer.Panel2.Controls.Add(this._dockContainer);
             this._splitContainer.Panel2.Controls.Add(this._dockContainer1);
             this._splitContainer.Panel2.Controls.Add(this._imageViewer);
-            this._splitContainer.Size = new System.Drawing.Size(1097, 506);
+            this._splitContainer.Size = new System.Drawing.Size(1097, 510);
             this._splitContainer.SplitterDistance = 184;
             this._splitContainer.SplitterWidth = 3;
             this._splitContainer.TabIndex = 0;
@@ -176,10 +176,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._tabControl.Location = new System.Drawing.Point(0, 0);
             this._tabControl.Name = "_tabControl";
             this._tabControl.SelectedIndex = 0;
-            this._tabControl.Size = new System.Drawing.Size(184, 506);
+            this._tabControl.Size = new System.Drawing.Size(184, 510);
             this._tabControl.TabIndex = 0;
-            this._tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(HandleTabControl_Selecting);
-            this._tabControl.SelectedIndexChanged += new EventHandler(HandleTabControl_SelectedIndexChanged);
+            this._tabControl.SelectedIndexChanged += new System.EventHandler(this.HandleTabControl_SelectedIndexChanged);
+            this._tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.HandleTabControl_Selecting);
             // 
             // _dataTab
             // 
@@ -188,7 +188,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._dataTab.Location = new System.Drawing.Point(4, 22);
             this._dataTab.Name = "_dataTab";
             this._dataTab.Padding = new System.Windows.Forms.Padding(0, 0, 0, 3);
-            this._dataTab.Size = new System.Drawing.Size(176, 480);
+            this._dataTab.Size = new System.Drawing.Size(176, 484);
             this._dataTab.TabIndex = 0;
             this._dataTab.Text = "Data";
             this._dataTab.UseVisualStyleBackColor = true;
@@ -229,13 +229,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _scrollPanel
             // 
-            this._scrollPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this._scrollPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._scrollPanel.AutoScroll = true;
             this._scrollPanel.Location = new System.Drawing.Point(-3, 41);
             this._scrollPanel.Name = "_scrollPanel";
-            this._scrollPanel.Size = new System.Drawing.Size(182, 416);
+            this._scrollPanel.Size = new System.Drawing.Size(182, 420);
             this._scrollPanel.TabIndex = 0;
             // 
             // _paginationTab
@@ -244,7 +244,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationTab.Location = new System.Drawing.Point(4, 22);
             this._paginationTab.Margin = new System.Windows.Forms.Padding(0);
             this._paginationTab.Name = "_paginationTab";
-            this._paginationTab.Size = new System.Drawing.Size(176, 477);
+            this._paginationTab.Size = new System.Drawing.Size(176, 484);
             this._paginationTab.TabIndex = 1;
             this._paginationTab.Text = "Pagination";
             this._paginationTab.UseVisualStyleBackColor = true;
@@ -257,10 +257,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationPanel.Location = new System.Drawing.Point(0, 0);
             this._paginationPanel.Margin = new System.Windows.Forms.Padding(0);
             this._paginationPanel.Name = "_paginationPanel";
-            this._paginationPanel.Size = new System.Drawing.Size(176, 477);
+            this._paginationPanel.Size = new System.Drawing.Size(176, 484);
             this._paginationPanel.TabIndex = 0;
-            this._paginationPanel.CreatingOutputDocument += new EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(HandlePaginationPanel_CreatingOutputDocument);
-            this._paginationPanel.Paginated += new EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(HandlePaginationPanel_Paginated);
+            this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
+            this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
             // 
             // _dockContainer
             // 
@@ -313,7 +313,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._dockContainer1.Location = new System.Drawing.Point(706, 0);
             this._dockContainer1.Manager = this._sandDockManager;
             this._dockContainer1.Name = "_dockContainer1";
-            this._dockContainer1.Size = new System.Drawing.Size(204, 506);
+            this._dockContainer1.Size = new System.Drawing.Size(204, 510);
             this._dockContainer1.TabIndex = 2;
             // 
             // _thumbnailDockableWindow
@@ -326,7 +326,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._thumbnailDockableWindow.Location = new System.Drawing.Point(4, 18);
             this._thumbnailDockableWindow.Name = "_thumbnailDockableWindow";
             this._thumbnailDockableWindow.PrimaryControl = this;
-            this._thumbnailDockableWindow.Size = new System.Drawing.Size(200, 464);
+            this._thumbnailDockableWindow.Size = new System.Drawing.Size(200, 468);
             this._thumbnailDockableWindow.TabIndex = 0;
             this._thumbnailDockableWindow.Text = "Page thumbnails";
             // 
@@ -336,7 +336,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._thumbnailViewer.ImageViewer = null;
             this._thumbnailViewer.Location = new System.Drawing.Point(0, 0);
             this._thumbnailViewer.Name = "_thumbnailViewer";
-            this._thumbnailViewer.Size = new System.Drawing.Size(200, 464);
+            this._thumbnailViewer.Size = new System.Drawing.Size(200, 468);
             this._thumbnailViewer.TabIndex = 0;
             // 
             // _imageViewer

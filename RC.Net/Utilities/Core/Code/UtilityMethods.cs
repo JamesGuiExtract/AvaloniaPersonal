@@ -216,7 +216,7 @@ namespace Extract.Utilities
         /// <typeparam name="T">The type to load from the assembly.</typeparam>
         /// <param name="assemblyFileName">Name of the assembly file.</param>
         /// <returns>A new instance of <typeparamref name="T"/>.</returns>
-        public static T CreateTypeFromAssembly<T>(string assemblyFileName) where T : class, new()
+        public static T CreateTypeFromAssembly<T>(string assemblyFileName) where T : class
         {
             try
             {
@@ -231,10 +231,10 @@ namespace Extract.Utilities
 
                 T value = null;
                 // Using reflection, iterate the classes in the assembly looking for one that 
-                // implements DataEntryControlHost
+                // implements T
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (type.BaseType == typeof(T))
+                    if (typeof(T).IsAssignableFrom(type))
                     {
                         if (value != null)
                         {

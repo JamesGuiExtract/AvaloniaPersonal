@@ -21,6 +21,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             static ModifiedPageStylist _MODIFIED_STYLIST = new ModifiedPageStylist();
 
             /// <summary>
+            /// A <see cref="PageStylist"/> that uses a red asterisk to indicated pages that have been
+            /// "modified" (that are part of a pending <see cref="OutputDocument"/> that does not match
+            /// the document as it currently exists on disk).
+            /// </summary>
+            static NewOutputPageStylist _NEW_OUTPUT_STYLIST = new NewOutputPageStylist();
+
+            /// <summary>
+            /// A <see cref="PageStylist"/> that indicates document data has been modified via a
+            /// pencil glyph.
+            /// </summary>
+            static EditedDocumentPageStylist _EDITED_STYLIST = new EditedDocumentPageStylist();
+
+            /// <summary>
             /// A <see cref="PageStylist"/> that indicates a document page that is part of the only
             /// <see cref="OutputDocument"/> for which pages are currently selected.
             /// </summary>
@@ -31,6 +44,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// all of the currently selected pages) should be indicated with a blue background.
             /// </summary>
             bool _highlightSinglySelectedDocument;
+
+            /// <summary>
+            /// The document data that is associated with this instance (VOA file data, for instance).
+            /// </summary>
+            IDocumentData _documentData;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ExtendedOutputDocument"/> class.
@@ -46,6 +64,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             /// <summary>
+            /// Raised when the <see cref="DocumentData"/> for this instance is modified.
+            /// </summary>
+            public event EventHandler<EventArgs> DocumentDataChanged;
+
+            /// <summary>
             /// Gets or sets a value indicating the there was pagination suggested for the current
             /// document.
             /// </summary>
@@ -59,15 +82,45 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             /// <summary>
-            /// Gets or sets VOA data that is associated with this instance.
+            /// Gets or sets document data that is associated with this instance (VOA file data,
+            /// for instance).
             /// </summary>
             /// <value>
-            /// The VOA data that is associated with this instance.
+            /// The document data that is associated with this instance.
             /// </value>
-            public object DocumentData
+            public IDocumentData DocumentData
             {
-                get;
-                set;
+                get
+                {
+                    return _documentData;
+                }
+
+                set
+                {
+                    try
+                    {
+                        if (value != _documentData)
+                        {
+                            if (_documentData != null)
+                            {
+                                _documentData.ModifiedChanged -= HandleDocumentData_ModifiedChanged;
+                            }
+
+                            _documentData = value;
+
+                            if (_documentData != null)
+                            {
+                                _documentData.ModifiedChanged += HandleDocumentData_ModifiedChanged;
+                            }
+
+                            OnDocumentDataChanged();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex.AsExtract("ELI39795");
+                    }
+                }
             }
 
             /// <summary>
@@ -82,6 +135,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     base.AddPage(pageControl);
 
                     pageControl.AddStylist(_MODIFIED_STYLIST);
+                    pageControl.AddStylist(_NEW_OUTPUT_STYLIST);
+                    pageControl.AddStylist(_EDITED_STYLIST);
                     if (_highlightSinglySelectedDocument)
                     {
                         pageControl.AddStylist(_SELECTED_DOC_STYLIST);
@@ -107,6 +162,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     base.InsertPage(pageControl, pageNumber);
 
                     pageControl.AddStylist(_MODIFIED_STYLIST);
+                    pageControl.AddStylist(_NEW_OUTPUT_STYLIST);
+                    pageControl.AddStylist(_EDITED_STYLIST);
                     if (_highlightSinglySelectedDocument)
                     {
                         pageControl.AddStylist(_SELECTED_DOC_STYLIST);
@@ -115,6 +172,37 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI39668");
+                }
+            }
+
+            /// <summary>
+            /// Handles the <see cref="IDocumentData.ModifiedChanged"/> event for
+            /// <see cref="DocumentData"/>.
+            /// </summary>
+            /// <param name="sender">The source of the event.</param>
+            /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+            /// </param>
+            void HandleDocumentData_ModifiedChanged(object sender, EventArgs e)
+            {
+                try
+                {
+                    OnDocumentDataChanged();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39796");
+                }
+            }
+
+            /// <summary>
+            /// Raises the <see cref="DocumentDataChanged"/> event.
+            /// </summary>
+            void OnDocumentDataChanged()
+            {
+                var eventHandler = DocumentDataChanged;
+                if (eventHandler != null)
+                {
+                    eventHandler(this, new EventArgs());
                 }
             }
         }

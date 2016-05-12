@@ -347,7 +347,7 @@ namespace Extract.Utilities
         /// <param name="instance">The IStrToStr instance to convert.</param>
         /// <returns>A dictionary of type Dictionary</returns>
         [CLSCompliant(false)]
-        public static Dictionary<string, string> ToDictionary(this IStrToStrMap instance)
+        public static Dictionary<string, string> ComToDictionary(this IStrToStrMap instance)
         {
             try
             {

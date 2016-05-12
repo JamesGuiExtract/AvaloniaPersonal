@@ -90,7 +90,9 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="IDocumentData.cs" />
     <Compile Include="IPaginationUtility.cs" />
+    <Compile Include="IDocumentDataPanel.cs" />
     <Compile Include="PaginationLayoutEngine.cs" />
     <Compile Include="PageLayoutControl.ClipboardData.cs">
       <DependentUpon>PageLayoutControl.cs</DependentUpon>
@@ -101,6 +103,10 @@
     </Compile>
     <Compile Include="PaginationPanel.Designer.cs">
       <DependentUpon>PaginationPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PaginationPanel.EditedDataPageStylist.cs">
+      <DependentUpon>PaginationPanel.cs</DependentUpon>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="PaginationUtilityForm.FormStateManager.cs">
       <SubType>Form</SubType>
@@ -278,6 +284,7 @@
     <None Include="Resources\office_128.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Edit.png" />
     <Content Include="Resources\PaginationUtility.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

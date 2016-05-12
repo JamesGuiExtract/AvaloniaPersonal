@@ -5,6 +5,7 @@ using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -26,6 +27,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         PageLayoutControl _primaryPageLayoutControl;
 
         /// <summary>
+        /// The <see cref="IDocumentDataPanel"/> used to display document specific fields
+        /// corresponding to the currently selected document.
+        /// </summary>
+        IDocumentDataPanel _documentDataPanel;
+
+        /// <summary>
         /// All <see cref="SourceDocument"/>s currently active in the UI in the order they appeared
         /// before any user edits.
         /// </summary>
@@ -37,9 +44,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         object _sourceDocumentLock = new object();
 
         /// <summary>
-        /// The set of all <see cref="OutputDocument"/>s currently active in the UI.
+        /// The set of all <see cref="ExtendedOutputDocument"/>s currently active in the UI.
         /// </summary>
-        HashSet<ExtendedOutputDocument> _pendingDocuments = new HashSet<ExtendedOutputDocument>();
+        ObservableCollection<ExtendedOutputDocument> _pendingDocuments =
+            new ObservableCollection<ExtendedOutputDocument>();
 
         /// <summary>
         /// The <see cref="ExtendedOutputDocument"/>s that were originally present as a result of
@@ -68,12 +76,33 @@ namespace Extract.UtilityApplications.PaginationUtility
         List<string> _outputDocumentNames = new List<string>();
 
         /// <summary>
+        /// While in the process of committing pagination output, keeps track of the control index
+        /// of the first page in the panel for each document being output. This allows the new
+        /// document to be loaded into the same position in the panel via the position parameter
+        /// of LoadFile.
+        /// </summary>
+        Dictionary<OutputDocument, int> _outputDocumentPositions;
+
+        /// <summary>
         /// Keeps track of whether pagination is suggested for a particular source file name and the
         /// VOA file data that needs to be assigned.
         /// </summary>
-        Dictionary<string, Tuple<bool, object>> _documentData =
-            new Dictionary<string, Tuple<bool, object>>();
+        Dictionary<string, Tuple<bool, IDocumentData>> _documentData =
+            new Dictionary<string, Tuple<bool, IDocumentData>>();
 
+        /// <summary>
+        /// Indicates the actively selected document. (the document reflected in
+        /// <see cref="DocumentDataPanel"/>)
+        /// </summary>
+        ExtendedOutputDocument _activeDocument;
+
+        /// <summary>
+        /// Indicates a document for which data could not be successfully saved. This data will need
+        /// to be corrected before doing anything else.
+        /// <see cref="DocumentDataPanel"/>)
+        /// </summary>
+        ExtendedOutputDocument _invalidDocumentData;        
+        
         /// <summary>
         /// Indicated a manually overridden value for <see cref="PendingChanges"/> or
         /// <see langword="null"/> if there is no manually overridden value
@@ -108,6 +137,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 InitializeComponent();
+
+                _pendingDocuments.CollectionChanged += HandlePendingDocuments_CollectionChanged;
             }
             catch (Exception ex)
             {
@@ -118,6 +149,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Constructors
 
         #region Events
+
+        /// <summary>
+        /// Raised when a new prospective document has been defined in the panel and
+        /// <see cref="IDocumentData"/> should be assigned if needed.
+        /// </summary>
+        public event EventHandler<DocumentDataRequestEventArgs> DocumentDataRequest;
 
         /// <summary>
         /// Raised when a newly paginated document is generated.
@@ -176,7 +213,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     else
                     {
                         return (_pendingDocuments != null) &&
-                            _pendingDocuments.Any(document => !document.InOriginalForm);
+                            _pendingDocuments.Any(document => !document.InOriginalForm ||
+                                (document.DocumentData != null && document.DocumentData.Modified));
                     }
                 }
                 catch (Exception ex)
@@ -242,7 +280,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see paramref="sourceFileName"/>.
         /// </summary>
         /// <param name="sourceFileName">Name of the source file to which this query relates.</param>
-        /// <returns><see langword="true"/> if has been suggested; otherwise, <see langword="false"/>.
+        /// <returns><see langword="true"/> if pagination has been suggested; otherwise, 
+        /// <see langword="false"/>.
         /// </returns>
         public bool IsPaginationSuggested(string sourceFileName)
         {
@@ -260,6 +299,73 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets whether the pagination pane depicts the document in the same form it exists on disk.
+        /// <see paramref="sourceFileName"/>.
+        /// </summary>
+        /// <param name="sourceFileName">Name of the source file to which this query relates.</param>
+        /// <returns><see langword="true"/> if the document is unmodified compared to how it exists
+        /// on disk; otherwise, <see langword="false"/>.
+        /// </returns>
+        public bool IsInOriginalForm(string sourceFileName)
+        {
+            try
+            {
+                var matchingDocuments = _primaryPageLayoutControl.Documents
+                    .Where(doc => doc.InOriginalForm &&
+                        doc.PageControls.First().Page.OriginalDocumentName.Equals(sourceFileName,
+                            StringComparison.OrdinalIgnoreCase));
+
+                return (matchingDocuments.Count() == 1) &&
+                    matchingDocuments.Single().InOriginalForm;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39816");
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IDocumentDataPanel"/> to display and allow editing
+        /// of data associated with any singly selected document or <see langword="null"/> if no
+        /// such panel is available.
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
+        public IDocumentDataPanel DocumentDataPanel
+        {
+            get
+            {
+                return _documentDataPanel;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _documentDataPanel)
+                    {
+                        if (_documentDataPanel != null)
+                        {
+                            _tableLayoutPanel.Controls.Remove(_documentDataPanel.Control);
+                        }
+
+                        _documentDataPanel = value;
+
+                        if (_documentDataPanel != null)
+                        {
+                            _tableLayoutPanel.Controls.Add(_documentDataPanel.Control);
+                            _documentDataPanel.Control.Dock = DockStyle.Fill;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39716");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -268,27 +374,31 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Loads the specified documents pages into the pane.
         /// </summary>
         /// <param name="fileName">Name of the file to load.</param>
-        /// <param name="loadAtFront"><see langword="true"/> to insert the pages at the front (top);
-        /// <see langword="false"/> to add them at then end (bottom).</param>
-        public void LoadFile(string fileName, bool loadAtFront)
+        /// <param name="position">The position at which a document should be loaded. 0 = Load at
+        /// the front (top), -1 = load at the end (bottom). Any other value should be a value
+        /// passed via <see cref="CreatingOutputDocumentEventArgs"/> and not a value the caller
+        /// should expect to be able to calculate.</param>
+        public void LoadFile(string fileName, int position)
         {
-            LoadFile(fileName, loadAtFront, null, false, null);
+            LoadFile(fileName, position, null, false, null);
         }
 
         /// <summary>
         /// Loads the specified documents pages into the pane.
         /// </summary>
         /// <param name="fileName">Name of the file to load.</param>
-        /// <param name="loadAtFront"><see langword="true"/> to insert the pages at the front (top);
-        /// <see langword="false"/> to add them at then end (bottom).</param>
+        /// <param name="position">The position at which a document should be loaded. 0 = Load at
+        /// the front (top), -1 = load at the end (bottom). Any other value should be a value
+        /// passed via <see cref="CreatingOutputDocumentEventArgs"/> and not a value the caller
+        /// should expect to be able to calculate.</param>
         /// <param name="pages">The page numbers from <see paramref="fileName"/> to be loaded or
         /// <see langword="null"/> to load all pages.</param>
         /// <param name="paginationSuggested"><see langword="true"/> if pagination has been
         /// suggested for this document; <see langword="false"/> if it has not been.</param>
         /// <param name="documentData">The VOA file data associated with <see paramref="fileName"/>.
         /// </param>
-        public void LoadFile(string fileName, bool loadAtFront, IEnumerable<int> pages,
-            bool paginationSuggested, object documentData)
+        public void LoadFile(string fileName, int position, IEnumerable<int> pages,
+            bool paginationSuggested, IDocumentData documentData)
         {
             try
             {
@@ -299,7 +409,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // IPaginationUtility.CreateOutputDocument.
                     if (paginationSuggested || documentData != null)
                     {
-                        _documentData[fileName] = new Tuple<bool, object>(paginationSuggested, documentData);
+                        _documentData[fileName] = new Tuple<bool, IDocumentData>(
+                            paginationSuggested, documentData);
                     }
 
                     var sourceDocument = OpenDocument(fileName);
@@ -311,7 +422,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // for there to be multiple calls into LoadNextDocument at the same time.
                         var outputDocument = 
                             (ExtendedOutputDocument)_primaryPageLayoutControl.CreateOutputDocument(
-                                sourceDocument, pages, loadAtFront, true);
+                                sourceDocument, pages, position, true);
 
                         _originalDocuments.Add(outputDocument);
                         var setOutputDocs = _sourceToOriginalDocuments.GetOrAdd(
@@ -329,6 +440,43 @@ namespace Extract.UtilityApplications.PaginationUtility
             finally
             {
                 _documentData.Remove(fileName);
+            }
+        }
+
+        /// <summary>
+        /// Updates the data associated with the specified <see paramref="sourceFileName"/>.
+        /// <para><b>Note:</b></para>
+        /// The document's data can be updated only in the case that the currently represented
+        /// pagination does not differ at all with how this document currently exists on disk.
+        /// </summary>
+        /// <param name="sourceFileName">The name of the document for</param>
+        /// <param name="documentData">The data to associate with <see paramref="sourceFileName"/>.
+        /// (replaces any previously assigned data)</param>
+        /// <returns><see langword="true"/> if the document data was updated,
+        /// <see langword="false"/> if it was not because the represented pagination differs with
+        /// the document on disk.</returns>
+        public bool UpdateDocumentData(string sourceFileName, IDocumentData documentData)
+        {
+            try
+            {
+                var matchingDocuments = _primaryPageLayoutControl.Documents
+                    .Where(doc => doc.InOriginalForm &&
+                        doc.PageControls.First().Page.OriginalDocumentName.Equals(sourceFileName,
+                            StringComparison.OrdinalIgnoreCase));
+
+                if (matchingDocuments.Count() == 1)
+                {
+                    var document = (ExtendedOutputDocument)matchingDocuments.Single();
+                    UpdateDocumentData(document, documentData);
+
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39720");
             }
         }
 
@@ -382,17 +530,37 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Selects the first <see cref="PageThumbnailControl"/>.
+        /// Prepares for application focus to be moved to another control (such as verification) by
+        /// saving pending data and disabling interaction with the <see cref="ImageViewer"/>.
         /// </summary>
-        public void SelectFirstPage()
+        public void Park()
         {
             try
             {
+                SaveActiveDocumentData();
+                EnablePageDisplay = false;
+                _primaryPageLayoutControl.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39787");
+            }
+        }
+
+        /// <summary>
+        /// Prepares for application focus to be given to this panel by enabling interaction with
+        /// the <see cref="ImageViewer"/>.
+        /// </summary>
+        public void Resume()
+        {
+            try
+            {
+                EnablePageDisplay = true;
                 _primaryPageLayoutControl.SelectFirstPage();
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI39666");
+                throw ex.AsExtract("ELI39788");
             }
         }
 
@@ -419,11 +587,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                 outputDocument.DocumentOutputting += HandleOutputDocument_DocumentOutputting;
                 outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
 
-                Tuple<bool, object> documentData;
+                Tuple<bool, IDocumentData> documentData;
                 if (_documentData.TryGetValue(originalDocName, out documentData))
                 {
                     outputDocument.PaginationSuggested = documentData.Item1;
                     outputDocument.DocumentData = documentData.Item2;
+                    outputDocument.DocumentData.ModifiedChanged += DocumentData_ModifiedChanged;
+                }
+                else
+                {
+                    var args = new DocumentDataRequestEventArgs(originalDocName);
+                    OnDocumentDataRequest(args);
+                    ((ExtendedOutputDocument)outputDocument).DocumentData = args.DocumentData;
                 }
 
                 _pendingDocuments.Add(outputDocument);
@@ -736,6 +911,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 outputDocument = (ExtendedOutputDocument)sender;
                 tempFile = _tempFiles[outputDocument];
 
+                var sourcePageInfo = outputDocument.PageControls
+                    .Select(c => new PageInfo()
+                    {
+                        DocumentName = c.Page.OriginalDocumentName,
+                        Page = c.Page.OriginalPageNumber
+                    });
+
                 int pageCount = 0;
                 using (var codecs = new ImageCodecs())
                 using (var reader = codecs.CreateReader(tempFile.FileName))
@@ -748,19 +930,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ? (bool ?)(outputDocument.InOriginalForm ? true : false)
                     : null;
 
-                object documentData = outputDocument.InOriginalForm 
+                int position = _outputDocumentPositions[outputDocument];
+
+                IDocumentData documentData = outputDocument.InOriginalForm 
                     ? outputDocument.DocumentData
                     : null;
 
-                var sourcePageInfo = outputDocument.PageControls
-                    .Select(c => new PageInfo()
-                    {
-                        DocumentName = c.Page.OriginalDocumentName,
-                        Page = c.Page.OriginalPageNumber
-                    });
-
                 var eventArgs = new CreatingOutputDocumentEventArgs(
-                    sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, documentData);
+                    sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, position,
+                    documentData);
                 OnCreatingOutputDocument(eventArgs);
                 string outputFileName = eventArgs.OutputFileName;
 
@@ -850,18 +1028,187 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _revertToOriginalToolStripButton.Enabled =
-                    _pendingDocuments.Any(doc => doc.PaginationSuggested && !doc.InOriginalForm);
-                _revertToSourceToolStripButton.Enabled =
-                    _pendingDocuments.Any(doc => !doc.InSourceDocForm);
-                _applyToolStripButton.Enabled =
-                    PendingChanges || // Value can be overridden; need to enabled apply whenever true.
-                    _revertToOriginalToolStripButton.Enabled ||
-                    _revertToSourceToolStripButton.Enabled;
+                UpdateCommandStates();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39568");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IDocumentData.ModifiedChanged"/> event for the document data of
+        /// any of the <see cref="_pendingDocuments"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void DocumentData_ModifiedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateCommandStates();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39771");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PageLayoutControl.SelectionChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePageLayoutControl_SelectionChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                ExtendedOutputDocument newActiveDocument = null;
+                if (_primaryPageLayoutControl.PartiallySelectedDocuments.Count() == 1)
+                {
+                    newActiveDocument = (ExtendedOutputDocument)
+                        _primaryPageLayoutControl.PartiallySelectedDocuments.Single();
+                }
+
+                if (_invalidDocumentData != null && newActiveDocument != _invalidDocumentData)
+                {
+                    return;
+                }
+
+                if (newActiveDocument != _activeDocument)
+                {
+                    if (DocumentDataPanel != null)
+                    {
+                        if (!SaveActiveDocumentData())
+                        {
+                            return;
+                        }
+
+                        _activeDocument = newActiveDocument;
+
+                        DocumentDataPanel.LoadData(
+                            (_activeDocument == null) 
+                                ? null 
+                                : _activeDocument.DocumentData);
+                    }
+
+                    _activeDocument = newActiveDocument;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39714");
+            }
+        }
+
+        /// <summary>
+        /// Handles the DocumentSplit event of the _primaryPageLayoutControl control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DocumentSplitEventArgs"/> instance containing the event data.</param>
+        void HandlePrimaryPageLayoutControl_DocumentSplit(object sender, DocumentSplitEventArgs e)
+        {
+            try
+            {
+                _activeDocument = null;
+
+                var args = new DocumentDataRequestEventArgs(
+                    e.OriginalDocument.PageControls
+                        .Select(c => c.Page.OriginalDocumentName)
+                        .Distinct()
+                        .ToArray());
+                OnDocumentDataRequest(args);
+
+                UpdateDocumentData((ExtendedOutputDocument)e.OriginalDocument, args.DocumentData);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39817");
+            }
+        }
+
+        /// <summary>
+        /// Handles the DocumentsMerged event of the _primaryPageLayoutControl control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DocumentsMergedEventArgs"/> instance containing the event data.</param>
+        void HandlePrimaryPageLayoutControl_DocumentsMerged(object sender, DocumentsMergedEventArgs e)
+        {
+            try
+            {
+                _activeDocument = null;
+
+                var args = new DocumentDataRequestEventArgs(
+                    e.ResultingDocument.PageControls
+                        .Select(c => c.Page.OriginalDocumentName)
+                        .Distinct()
+                        .ToArray());
+                OnDocumentDataRequest(args);
+
+                UpdateDocumentData((ExtendedOutputDocument)e.ResultingDocument, args.DocumentData);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39818");
+            }
+        }
+
+        /// <summary>
+        /// Handles the ObservableCollection.CollectionChanged event of
+        /// <see cref="_pendingDocuments"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandlePendingDocuments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            try
+            {
+                if (e.NewItems != null)
+                {
+                    foreach (var newDocument in e.NewItems.Cast<ExtendedOutputDocument>())
+                    {
+                        newDocument.DocumentDataChanged += HandleDocument_DocumentDataChanged;
+                    }
+                }
+
+                if (e.OldItems != null)
+                {
+                    foreach (var oldDocument in e.OldItems.Cast<ExtendedOutputDocument>())
+                    {
+                        oldDocument.DocumentDataChanged -= HandleDocument_DocumentDataChanged;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39793");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ExtendedOutputDocument.DocumentDataChanged"/> event for all
+        /// <see cref="_pendingDocuments"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleDocument_DocumentDataChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                var document = (ExtendedOutputDocument)sender;
+
+                foreach (var pageControl in document.PageControls)
+                {
+                    pageControl.Invalidate();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39794");
             }
         }
 
@@ -878,15 +1225,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (_primaryPageLayoutControl != null)
             {
                 _primaryPageLayoutControl.StateChanged -= HandlePageLayoutControl_StateChanged;
-//                _primaryPageLayoutControl.PageDeleted -= HandlePageLayoutControl_PageDeleted;
-//                _primaryPageLayoutControl.PagesPendingLoad -= HandlePageLayoutControl_PagesPendingLoad;
-//                _primaryPageLayoutControl.LoadNextDocumentRequest -= HandleLayoutControl_LoadNextDocumentRequest;
+                _primaryPageLayoutControl.SelectionChanged -= HandlePageLayoutControl_SelectionChanged;
+                _primaryPageLayoutControl.DocumentSplit -= HandlePrimaryPageLayoutControl_DocumentSplit;
+                _primaryPageLayoutControl.DocumentsMerged -= HandlePrimaryPageLayoutControl_DocumentsMerged;
                 // If the control contains a lot of pagination controls, it can take a long time to
                 // remove-- I am unclear why (it has to do with more than just whether thumbnails
                 // are still being loaded. Disposing of the control first allows it to be quickly
                 // removed.
                 _primaryPageLayoutControl.Dispose();
-                _toolStripContainer.ContentPanel.Controls.Remove(_primaryPageLayoutControl);
+                _tableLayoutPanel.Controls.Remove(_primaryPageLayoutControl);
 
                 // Perform a GC to force a cleanup of everything before loading the new
                 // _primaryPageLayoutControl
@@ -899,10 +1246,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.Dock = DockStyle.Fill;
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
-//            _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
-            //_primaryPageLayoutControl.PagesPendingLoad += HandlePageLayoutControl_PagesPendingLoad;
-            //_primaryPageLayoutControl.LoadNextDocumentRequest += HandleLayoutControl_LoadNextDocumentRequest;
-            _toolStripContainer.ContentPanel.Controls.Add(_primaryPageLayoutControl);
+            _primaryPageLayoutControl.SelectionChanged += HandlePageLayoutControl_SelectionChanged;
+            _primaryPageLayoutControl.DocumentSplit += HandlePrimaryPageLayoutControl_DocumentSplit;
+            _primaryPageLayoutControl.DocumentsMerged += HandlePrimaryPageLayoutControl_DocumentsMerged;
+            _tableLayoutPanel.Controls.Add(_primaryPageLayoutControl);
+            _tableLayoutPanel.Controls.SetChildIndex(_primaryPageLayoutControl, 0);
             _primaryPageLayoutControl.Focus();
         }
 
@@ -964,17 +1312,33 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // If document data could not be saved, abort the commit operation.
+                if (_invalidDocumentData != null || !SaveActiveDocumentData())
+                {
+                    return;
+                }
+
                 _commitingChanges = true;
 
                 _outputDocumentNames.Clear();
 
                 // Depending upon the manipulations that occurred, there may be some pending
                 // documents that have been left without any pages. Disregard these.
-                _pendingDocuments.RemoveWhere(doc => !doc.PageControls.Any());
+                var documentsToRemove = _pendingDocuments
+                    .Where(doc => !doc.PageControls.Any())
+                    .ToArray();
+                foreach (var document in documentsToRemove)
+                {
+                    _pendingDocuments.Remove(document);
+                }
 
                 var outputDocuments = _pendingDocuments
                     .Where(document => !document.InSourceDocForm)
                     .ToList();
+
+                _outputDocumentPositions = _primaryPageLayoutControl.Documents
+                    .ToDictionary(
+                        doc => doc, doc => _primaryPageLayoutControl.GetDocumentPosition(doc));
 
                 var sourceDocuments =
                     outputDocuments.SelectMany(doc => doc.PageControls)
@@ -996,16 +1360,31 @@ namespace Extract.UtilityApplications.PaginationUtility
                         !doc.InOriginalForm)
                     .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
 
-                OnPaginated(sourceDocuments.Select(doc => doc.FileName), disregardedPagination);
+                var sourcesWithModifiedData = _pendingDocuments
+                    .Where(doc => doc.InSourceDocForm &&
+                        doc.DocumentData != null && doc.DocumentData.Modified)
+                    .Select(doc => new KeyValuePair<string, IDocumentData>(
+                        doc.PageControls.First().Page.OriginalDocumentName, doc.DocumentData));
+
+                OnPaginated(sourceDocuments.Select(doc => doc.FileName),
+                    disregardedPagination,
+                    sourcesWithModifiedData);
 
                 foreach (var document in _pendingDocuments)
                 {
                     document.PaginationSuggested = false;
+                    document.SetOriginalForm();
+                    foreach (var pageControl in document.PageControls)
+                    {
+                        pageControl.Invalidate();
+                    }
                 }
 
                 ApplyOrderOfLoadedSourceDocuments();
 
                 _pendingChangesOverride = null;
+
+                UpdateCommandStates();
             }
             catch (Exception ex)
             {
@@ -1014,6 +1393,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             finally
             {
                 _commitingChanges = false;
+                _outputDocumentPositions.Clear();
             }
         }
 
@@ -1041,15 +1421,33 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (revertToSource)
             {
-                for (int i = 0; i < sourceDocArray.Length; i++)
+                foreach (SourceDocument sourceDocument in sourceDocArray)
                 {
-                    var sourceDocument = sourceDocArray[i];
-                    var outputDocument = _sourceToOriginalDocuments[sourceDocument]
-                        .OrderBy(doc => doc.OriginalPages.Select(page => page.OriginalPageNumber).Min())
-                        .First();
-                    _primaryPageLayoutControl.LoadOutputDocument(
-                        outputDocument, sourceDocument.Pages);
-                    _pendingDocuments.Add(outputDocument);
+                    // Reverting a document for which there was not suggested pagination
+                    HashSet<ExtendedOutputDocument> outputDocuments = null;
+                    if (_sourceToOriginalDocuments.TryGetValue(sourceDocument, out outputDocuments) &&
+                        outputDocuments.Count == 1)
+                    {
+                        var outputDocument = outputDocuments.Single();
+                        _primaryPageLayoutControl.LoadOutputDocument(
+                            outputDocument, outputDocument.OriginalPages);
+                        outputDocument.DocumentData.Revert();
+                        _pendingDocuments.Add(outputDocument);
+                    }
+                    // Reverting a document for which there was suggested pagination. Rather than
+                    // reverting document data, a new document data instance will be needed.
+                    else
+                    {
+                        // CreateOutputDocument will add the document to _pendingDocuments.
+                        var outputDocument = ((IPaginationUtility)this).CreateOutputDocument(sourceDocument.FileName);
+                        outputDocument.SetOriginalForm();
+
+                        var args = new DocumentDataRequestEventArgs(sourceDocument.FileName);
+                        OnDocumentDataRequest(args);
+                        ((ExtendedOutputDocument)outputDocument).DocumentData = args.DocumentData;
+
+                        _primaryPageLayoutControl.LoadOutputDocument(outputDocument, sourceDocument.Pages);
+                    }
                 }
             }
             else
@@ -1060,12 +1458,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _primaryPageLayoutControl.LoadOutputDocument(
                         outputDocument, outputDocument.OriginalPages);
-                    _pendingDocuments.Add(outputDocument);
+                    if (!_pendingDocuments.Contains(outputDocument))
+                    {
+                        _pendingDocuments.Add(outputDocument);
+                    }
+
+                    outputDocument.DocumentData.Revert();
                 }
             }
 
             _primaryPageLayoutControl.SelectFirstPage();
             _primaryPageLayoutControl.Focus();
+
+            UpdateCommandStates();
         }
 
         /// <summary>
@@ -1092,6 +1497,97 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Saves the data from any defined <see cref="DocumentDataPanel"/> into the
+        /// <see cref=" _activeDocument"/> (if there is one).
+        /// </summary>
+        /// <returns><see langword="true"/> if the data was save or <see langword="false"/> if the
+        /// data could not be saved and needs to be corrected.
+        /// <para><b>Note</b></para>
+        /// It is the responsibility of the DocumentDataPanel to inform the user of any data issues
+        /// that need correction.
+        /// </returns>
+        bool SaveActiveDocumentData()
+        {
+            if (DocumentDataPanel == null || _activeDocument == null)
+            {
+                return true;
+            }
+            else if (DocumentDataPanel.SaveData(_activeDocument.DocumentData))
+            {
+                _invalidDocumentData = null;
+                return true;
+            }
+            else
+            {
+                _invalidDocumentData = _activeDocument;
+                this.SafeBeginInvoke("ELI39721", () =>
+                {
+                    try
+                    {
+                        _primaryPageLayoutControl.SelectDocument(_activeDocument);
+                    }
+                    finally
+                    {
+                        _invalidDocumentData = null;
+                    }
+                });
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates the data associated with the specified <see paramref="sourceFileName"/>.
+        /// </summary>
+        /// <param name="outputDocument"></param>
+        /// <param name="documentData">The data to associate with <see paramref="sourceFileName"/>.
+        /// (replaces any previously assigned data)</param>
+        void UpdateDocumentData(ExtendedOutputDocument outputDocument, IDocumentData documentData)
+        {
+            if (outputDocument.DocumentData != null)
+            {
+                outputDocument.DocumentData.ModifiedChanged -= DocumentData_ModifiedChanged;
+            }
+            outputDocument.DocumentData = documentData;
+            if (outputDocument.DocumentData != null)
+            {
+                outputDocument.DocumentData.ModifiedChanged += DocumentData_ModifiedChanged;
+            }
+        }
+
+        /// <summary>
+        /// Updates the states of the pagination command buttons.
+        /// </summary>
+        void UpdateCommandStates()
+        {
+            var nonEmptyDocs = _pendingDocuments.Where(doc => doc.PageControls.Any());
+            bool isDocDataEdited = nonEmptyDocs.Any(doc =>
+                doc.DocumentData != null && doc.DocumentData.Modified);
+
+            _revertToOriginalToolStripButton.Enabled =
+                nonEmptyDocs.Any(doc => !doc.InOriginalForm || isDocDataEdited);
+            _revertToSourceToolStripButton.Enabled =
+                nonEmptyDocs.Any(doc => !doc.InSourceDocForm || isDocDataEdited);
+            _applyToolStripButton.Enabled =
+                PendingChanges || // Value can be overridden; need to enabled apply whenever true.
+                _revertToOriginalToolStripButton.Enabled ||
+                _revertToSourceToolStripButton.Enabled;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DocumentDataRequest"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="DocumentDataRequestEventArgs"/> instance containing
+        /// the event data.</param>
+        void OnDocumentDataRequest(DocumentDataRequestEventArgs eventArgs)
+        {
+            var eventHandler = DocumentDataRequest;
+            if (eventHandler != null)
+            {
+                eventHandler(this, eventArgs);
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="CreatingOutputDocument"/> event.
         /// </summary>
         /// <param name="eventArgs">The <see cref="CreatingOutputDocumentEventArgs"/> instance to
@@ -1113,13 +1609,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see cref="PaginationPanel"/>.</param>
         /// <param name="disregardedPaginationSources">All documents applied as they exist on disk
         /// but for which there was differing suggested pagination.</param>
+        /// <param name="modifiedDocumentData">All documents names and associated
+        /// <see cref="IDocumentData"/> where data was modified, but the document pages have not
+        /// been modified compared to pagination on disk.</param>   
         void OnPaginated(IEnumerable<string> paginatedDocumentSources,
-            IEnumerable<string> disregardedPaginationSources)
+            IEnumerable<string> disregardedPaginationSources,
+            IEnumerable<KeyValuePair<string, IDocumentData>> modifiedDocumentData)
         {
             var eventHandler = Paginated;
             if (eventHandler != null)
             {
-                eventHandler(this, new PaginatedEventArgs(paginatedDocumentSources, disregardedPaginationSources));
+                eventHandler(this, new PaginatedEventArgs(
+                    paginatedDocumentSources, disregardedPaginationSources, modifiedDocumentData));
             }
         }
 

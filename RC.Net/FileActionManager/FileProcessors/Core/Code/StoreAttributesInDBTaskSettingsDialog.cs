@@ -178,7 +178,7 @@ namespace Extract.FileActionManager.FileProcessors
             _attributeSetNameComboBox.Items.Clear();
 
             var attributeNames = _attributeDBManager.GetAllAttributeSetNames();
-            List<string> names = attributeNames.ToDictionary().Keys.ToList();
+            List<string> names = attributeNames.ComToDictionary().Keys.ToList();
             names.Sort((s1, s2) => String.Compare(s1, s2, StringComparison.OrdinalIgnoreCase));
             _attributeSetNameComboBox.Items.AddRange(names.ToArray());
 
