@@ -82,7 +82,7 @@ namespace Extract.IDShieldStatisticsReporter
             FileSystemMethods.UserApplicationDataPath, "ID Shield", "StatisticsReporterForm.xml");
 
         /// <summary>
-        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// Name for the mutex used to serialize persistence of the control and form layout.
         /// </summary>
         static readonly string _MUTEX_STRING = "186DAD15-746F-411F-AE2E-12C241D6989F";
 
@@ -107,7 +107,7 @@ namespace Extract.IDShieldStatisticsReporter
 
         /// <summary>
         /// A <see cref="IDShieldVOAFileContentsCondition"/> used to configure the automated
-        /// redation conditions.
+        /// redaction conditions.
         /// </summary>
         IDShieldVOAFileContentsCondition _automatedConditionObject;
 
@@ -260,7 +260,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// when analysis is run.
         /// </summary>
         /// <value>
-        /// The the filename of the custom report template.
+        /// The filename of the custom report template.
         /// </value>
         public string CustomReportTemplate
         {
@@ -305,7 +305,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// Gets or sets the name of a report to print every time analysis is run.
         /// </summary>
         /// <value>
-        /// The the name of a report to print every time analysis is run.
+        /// The name of a report to print every time analysis is run.
         /// </value>
         public string ReportToPrint
         {
@@ -478,7 +478,7 @@ namespace Extract.IDShieldStatisticsReporter
                 }
             }
 
-            // Initialize the quatifier.
+            // Initialize the quantifier.
             if (quantifier != null)
             {
                 if (quantifier.Equals("any", StringComparison.OrdinalIgnoreCase))
@@ -499,7 +499,7 @@ namespace Extract.IDShieldStatisticsReporter
                 }
             }
 
-            // Initialize the quatifier the doc types.
+            // Initialize the quantifier the doc types.
             if (docTypes != null)
             {
                 string[] docTypeArray = docTypes.Split(',');
@@ -524,7 +524,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// <see cref="IDShieldVOAFileContentsCondition"/>.</param>
         /// <param name="quantifier">A <see langword="string"/> representing the quantifier from the
         /// <see cref="IDShieldVOAFileContentsCondition"/>.</param>
-        /// <param name="docTypes">A <see langword="string"/> represneting the doc types from the
+        /// <param name="docTypes">A <see langword="string"/> representing the doc types from the
         /// <see cref="IDShieldVOAFileContentsCondition"/>.</param>
         static void ApplyCondition(IDShieldVOAFileContentsCondition conditionObject, out string condition,
             out string quantifier, out string docTypes)
@@ -924,7 +924,7 @@ namespace Extract.IDShieldStatisticsReporter
         }
 
         /// <summary>
-        /// Handles file list list box <see cref="Control.DoubleClick"/> event.
+        /// Handles file list box <see cref="Control.DoubleClick"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
@@ -1503,7 +1503,7 @@ namespace Extract.IDShieldStatisticsReporter
         }
 
         /// <summary>
-        /// Uses the currently seleted analysis type to update dependent controls as necessary.
+        /// Uses the currently selected analysis type to update dependent controls as necessary.
         /// </summary>
         void UpdateControlsBasedOnAnalysisType()
         {
@@ -1573,7 +1573,7 @@ namespace Extract.IDShieldStatisticsReporter
         }
 
         /// <summary>
-        /// Populates the statisitics.
+        /// Populates the statistics.
         /// </summary>
         void PopulateStatisitics()
         {
@@ -1603,7 +1603,7 @@ namespace Extract.IDShieldStatisticsReporter
         }
 
         /// <summary>
-        /// Populates all all file lists to the file list combo based on the currently selected
+        /// Populates all file lists to the file list combo based on the currently selected
         /// test results folder.
         /// </summary>
         void PopulateFileLists()

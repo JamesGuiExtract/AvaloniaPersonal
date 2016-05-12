@@ -21,6 +21,7 @@ const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 const string strDATABASE_SERVER_TAG = "<DatabaseServer>";
 const string strDATABASE_NAME_TAG = "<DatabaseName>";
 const string strDATABASE_ACTION_TAG = "<ActionName>";
+const string strMRU_MUTEX_NAME = "ExtractContextMRURegistryMutex";
 
 //--------------------------------------------------------------------------------------------------
 // Statics
@@ -37,6 +38,7 @@ map<string, string> CFAMTagManager::ms_mapContextTags;
 CFAMTagManager::CFAMTagManager()
 : m_ipMiscUtils(CLSID_MiscUtils)
 , m_bAlwaysShowDatabaseTags(false)
+, m_mutexMRU(FALSE,strMRU_MUTEX_NAME.c_str())
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI35226", m_ipMiscUtils != __nullptr);
 
@@ -954,6 +956,10 @@ void CFAMTagManager::refreshContextTags()
 	string strContextPath = asString(ms_ipContextTagProvider->ContextPath);
 	if (!strContextPath.empty())
 	{
+		// Lock the mutex while the registry is being updated this is a named mutex so all processes
+		// on the computer will stop for this
+		CSingleLock lock(&m_mutexMRU, TRUE);
+
 		m_upContextMRUList->readFromPersistentStore();
 
 		if (ms_ipContextTagProvider->ActiveContext.length() == 0)

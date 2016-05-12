@@ -108,6 +108,9 @@ private:
 	// Controls access to the above static variables.
 	static CMutex ms_mutex;
 
+	// Mutex for accessing the MRU context list in the registry
+	CMutex m_mutexMRU;
+
 	// Indicates whether database path tags should be used to 
 	bool m_bAlwaysShowDatabaseTags;
 

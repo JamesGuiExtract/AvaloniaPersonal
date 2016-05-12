@@ -38,7 +38,7 @@ public:
 	// PURPOSE:	Add the most recent file at the top of the queue
 	// REQUIRE:	If the FIFO queue size reaches its maximum, every entry added to the queue will be
 	//			always placed at the top, and the bottom most item will be removed from the queue.
-	// ARGS:	strMRUName:	The most rectent used file name
+	// ARGS:	strMRUName:	The most recent used file name
 	//
 	void addItem(const std::string& strMRUName);
 	//==============================================================================================
