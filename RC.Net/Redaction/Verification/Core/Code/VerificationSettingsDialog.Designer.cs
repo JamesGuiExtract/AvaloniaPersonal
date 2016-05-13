@@ -73,9 +73,9 @@ namespace Extract.Redaction.Verification
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this._redactionQaExplanatoryTextBox = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this._redactionVerifyExplanatoryTextLabel = new System.Windows.Forms.Label();
             this._redactionQaComboBox = new System.Windows.Forms.ComboBox();
             this._redactionQaRadioButton = new System.Windows.Forms.RadioButton();
             this._redactionVerificationRadioButton = new System.Windows.Forms.RadioButton();
@@ -466,9 +466,9 @@ namespace Extract.Redaction.Verification
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this._redactionQaExplanatoryTextBox);
+            this.groupBox1.Controls.Add(this.label5);
+            this.groupBox1.Controls.Add(this._redactionVerifyExplanatoryTextLabel);
             this.groupBox1.Controls.Add(this._redactionQaComboBox);
             this.groupBox1.Controls.Add(this._redactionQaRadioButton);
             this.groupBox1.Controls.Add(this._redactionVerificationRadioButton);
@@ -477,34 +477,38 @@ namespace Extract.Redaction.Verification
             this.groupBox1.Size = new System.Drawing.Size(429, 151);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Resume verification options";
+            this.groupBox1.Text = "Verification mode";
             // 
-            // label4
+            // _redactionQaExplanatoryTextBox
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(22, 124);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(159, 13);
-            this.label4.TabIndex = 5;
-            this.label4.Text = "document most recently verified)";
+            this._redactionQaExplanatoryTextBox.BackColor = System.Drawing.SystemColors.Window;
+            this._redactionQaExplanatoryTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this._redactionQaExplanatoryTextBox.Location = new System.Drawing.Point(27, 114);
+            this._redactionQaExplanatoryTextBox.Multiline = true;
+            this._redactionQaExplanatoryTextBox.Name = "_redactionQaExplanatoryTextBox";
+            this._redactionQaExplanatoryTextBox.ReadOnly = true;
+            this._redactionQaExplanatoryTextBox.Size = new System.Drawing.Size(377, 31);
+            this._redactionQaExplanatoryTextBox.TabIndex = 7;
+            this._redactionQaExplanatoryTextBox.Text = "(You will see viewed status of redaction items and pages as of the time the docum" +
+    "entation most recently verified)";
             // 
-            // label3
+            // label5
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(22, 111);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(357, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "(You will see viewed status of redaction items and pages as of the time the";
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(104, 90);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(211, 13);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "viewed status of redaction items and pages";
             // 
-            // label2
+            // _redactionVerifyExplanatoryTextLabel
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(22, 39);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(382, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "(In this mode you will automatically continue verification where it was last left" +
+            this._redactionVerifyExplanatoryTextLabel.AutoSize = true;
+            this._redactionVerifyExplanatoryTextLabel.Location = new System.Drawing.Point(22, 39);
+            this._redactionVerifyExplanatoryTextLabel.Name = "_redactionVerifyExplanatoryTextLabel";
+            this._redactionVerifyExplanatoryTextLabel.Size = new System.Drawing.Size(382, 13);
+            this._redactionVerifyExplanatoryTextLabel.TabIndex = 1;
+            this._redactionVerifyExplanatoryTextLabel.Text = "(In this mode you will automatically continue verification where it was last left" +
     " off)";
             // 
             // _redactionQaComboBox
@@ -522,6 +526,7 @@ namespace Extract.Redaction.Verification
             this._redactionQaComboBox.Name = "_redactionQaComboBox";
             this._redactionQaComboBox.Size = new System.Drawing.Size(73, 21);
             this._redactionQaComboBox.TabIndex = 3;
+            this._redactionQaComboBox.SelectedIndexChanged += new System.EventHandler(this._redactionQaComboBox_SelectedIndexChanged);
             // 
             // _redactionQaRadioButton
             // 
@@ -532,6 +537,7 @@ namespace Extract.Redaction.Verification
             this._redactionQaRadioButton.TabIndex = 2;
             this._redactionQaRadioButton.Text = "Redaction QA";
             this._redactionQaRadioButton.UseVisualStyleBackColor = true;
+            this._redactionQaRadioButton.CheckedChanged += new System.EventHandler(this._redactionQaRadioButton_CheckedChanged);
             // 
             // _redactionVerificationRadioButton
             // 
@@ -544,6 +550,7 @@ namespace Extract.Redaction.Verification
             this._redactionVerificationRadioButton.TabStop = true;
             this._redactionVerificationRadioButton.Text = "Redaction verification";
             this._redactionVerificationRadioButton.UseVisualStyleBackColor = true;
+            this._redactionVerificationRadioButton.CheckedChanged += new System.EventHandler(this._redactionVerificationRadioButton_CheckedChanged);
             // 
             // groupBox6
             // 
@@ -667,8 +674,8 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.ComboBox _redactionQaComboBox;
         private System.Windows.Forms.RadioButton _redactionQaRadioButton;
         private System.Windows.Forms.RadioButton _redactionVerificationRadioButton;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label _redactionVerifyExplanatoryTextLabel;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox _redactionQaExplanatoryTextBox;
     }
 }

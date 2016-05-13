@@ -1,4 +1,5 @@
 using Extract.FileActionManager.Forms;
+using Extract.Redaction;
 using Extract.Utilities.Forms;
 using System;
 using System.Windows.Forms;
@@ -13,6 +14,16 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public partial class VerificationSettingsDialog : Form
     {
+        #region Constants
+        static readonly string _PRESERVED_REDACTION_QA_TEXT = "(You will see viewed status of redaction items" +
+                                                              " and pages as of the time the documentation most " +
+                                                              " recently verified)";
+
+        static readonly string _RESET_REDACTION_QA_TEXT = "(You will not see viewed status of redaction items" +
+                                                              " and pages as of the time the documentation most " +
+                                                              " recently verified)";
+        #endregion
+
         #region Fields
 
         /// <summary>
@@ -76,7 +87,7 @@ namespace Extract.Redaction.Verification
                 _actionNameComboBox.Items.Add(actionNames[i]);
             }
 
-            _redactionQaComboBox.SelectedIndex = 0;
+            UpdateRedactionVerificationState(settings.RedactionVerificationMode.VerificationMode);
         }
 
         #endregion Constructors
@@ -121,10 +132,33 @@ namespace Extract.Redaction.Verification
             bool launchInFullScreenMode = _launchFullScreenCheckBox.Checked;
             SlideshowSettings slideshowSettings = GetSlideshowSettings();
             bool allowTags = _allowTagsCheckBox.Checked;
+            VerificationModeSetting verificationModeSetting = GetVerificationModeSetting();
 
             return new VerificationSettings(general, feedback, dataFile, useBackdropImage,
                 backdropImage, action, enableInputTracking, launchInFullScreenMode,
-                slideshowSettings, allowTags, _tagSettings);
+                slideshowSettings, allowTags, _tagSettings, verificationModeSetting);
+        }
+
+        /// <summary>
+        /// Gets the verification mode setting.
+        /// </summary>
+        /// <returns></returns>
+        VerificationModeSetting GetVerificationModeSetting()
+        {
+            if (_redactionVerificationRadioButton.Checked)
+            {
+                return new VerificationModeSetting(VerificationMode.Verify);
+            }
+
+            const int preserveIndex = 0;
+            if (preserveIndex == _redactionQaComboBox.SelectedIndex)
+            {
+                return new VerificationModeSetting(VerificationMode.QAModePreserveViewStatus);
+            }
+            else
+            {
+                return new VerificationModeSetting(VerificationMode.QAModeResetViewStatus);
+            }
         }
 
         /// <summary>
@@ -336,6 +370,53 @@ namespace Extract.Redaction.Verification
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Updates the state of the redaction verification controls.
+        /// </summary>
+        /// <param name="mode">The mode.</param>
+        void UpdateRedactionVerificationState(VerificationMode mode)
+        {
+            if (mode == VerificationMode.Verify)
+            {
+                _redactionVerificationRadioButton.Checked = true;
+                _redactionQaComboBox.SelectedIndex = 0;
+                _redactionQaExplanatoryTextBox.Visible = false;
+            }
+            else
+            {
+                _redactionQaRadioButton.Checked = true;
+
+                const int preserveIndex = 0;
+                const int resetIndex = 1;
+
+                _redactionQaComboBox.SelectedIndex =
+                    mode == VerificationMode.QAModePreserveViewStatus ? preserveIndex : resetIndex;
+            }
+        }
+
+        /// <summary>
+        /// Changes the text to track redaction qa drop down.
+        /// </summary>
+        void ChangeTextToTrackRedactionQaDropDown()
+        {
+            try
+            {
+                const int preservedSelectedIndex = 0;
+                if (preservedSelectedIndex == _redactionQaComboBox.SelectedIndex)
+                {
+                    _redactionQaExplanatoryTextBox.Text = _PRESERVED_REDACTION_QA_TEXT;
+                }
+                else
+                {
+                    _redactionQaExplanatoryTextBox.Text = _RESET_REDACTION_QA_TEXT;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39832");
+            }
         }
 
         #endregion Methods
@@ -635,6 +716,65 @@ namespace Extract.Redaction.Verification
                 ExtractException ee = ExtractException.AsExtractException("ELI26310", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the CheckedChanged event of the _redactionVerificationRadioButton control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void _redactionVerificationRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _redactionVerifyExplanatoryTextLabel.Visible = _redactionVerificationRadioButton.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39829");
+            }
+        }
+
+        /// <summary>
+        /// Handles the CheckedChanged event of the _redactionQaRadioButton control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void _redactionQaRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                bool checkd = _redactionQaRadioButton.Checked;
+
+                _redactionQaExplanatoryTextBox.Visible = checkd;
+                _redactionQaComboBox.Enabled = checkd;
+
+                if (checkd)
+                {
+                    ChangeTextToTrackRedactionQaDropDown();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39830");
+            }
+        }
+
+        /// <summary>
+        /// Handles the SelectedIndexChanged event of the _redactionQaComboBox control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void _redactionQaComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                ChangeTextToTrackRedactionQaDropDown();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39831");
             }
         }
 

@@ -45,7 +45,9 @@ namespace Extract.Redaction.Verification
         /// <para>Version 9</para>
         /// Added tag selection/filtering settings.
         /// </summary>
-        const int _CURRENT_VERSION = 9;
+        /// <para>Version 10</para>
+        /// Added Verification mode settings (resume verification, verify QA)
+        const int _CURRENT_VERSION = 10;
         
         #endregion Constants
 

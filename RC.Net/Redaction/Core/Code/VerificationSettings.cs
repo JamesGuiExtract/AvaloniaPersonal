@@ -68,6 +68,8 @@ namespace Extract.Redaction
         /// </summary>
         FileTagSelectionSettings _tagSettings;
 
+        VerificationModeSetting _verificationModeSetting;
+
         #endregion Fields
 
         #region Constructors
@@ -76,7 +78,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
         public VerificationSettings() 
-            : this(null, null, null, false, null, null, false, false, null, true, null)
+            : this(null, null, null, false, null, null, false, false, null, true, null, null)
         {
 
         }
@@ -89,7 +91,7 @@ namespace Extract.Redaction
             string inputFile, bool useBackdropImage, string backdropImage, 
             SetFileActionStatusSettings actionStatus, bool enableInputTracking,
             bool launchInFullScreenMode, SlideshowSettings slideshowSettings, bool allowTags,
-            FileTagSelectionSettings tagSettings)
+            FileTagSelectionSettings tagSettings, VerificationModeSetting verificationModeSetting)
         {
             _generalSettings = general ?? new GeneralVerificationSettings();
             _feedbackSettings = feedback ?? new FeedbackSettings();
@@ -102,6 +104,8 @@ namespace Extract.Redaction
             _slideshowSettings = slideshowSettings ?? new SlideshowSettings();
             _allowTags = allowTags;
             _tagSettings = tagSettings ?? new FileTagSelectionSettings();
+            _verificationModeSetting = 
+                verificationModeSetting ?? new VerificationModeSetting(VerificationMode.Verify);
         }
 
         #endregion Constructors
@@ -252,6 +256,20 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets the verification mode setting.
+        /// </summary>
+        /// <value>
+        /// The redaction verification mode.
+        /// </value>
+        public VerificationModeSetting RedactionVerificationMode
+        {
+            get
+            {
+                return _verificationModeSetting;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -279,6 +297,8 @@ namespace Extract.Redaction
                 SlideshowSettings slideshowSettings = null;
                 bool allowTags = true;
                 FileTagSelectionSettings tagSettings = null;
+                int verifyMode = 0;
+                VerificationModeSetting verificationModeSetting = null;
 
                 if (reader.Version < 2)
                 {
@@ -312,10 +332,20 @@ namespace Extract.Redaction
                     allowTags = reader.ReadBoolean();
                     tagSettings = FileTagSelectionSettings.ReadFrom(reader);
                 }
+                if (reader.Version >= 10)
+                {
+                    verifyMode = reader.ReadInt32();
+                    verificationModeSetting = new VerificationModeSetting((VerificationMode)verifyMode);
+                }
+                else
+                {
+                    verificationModeSetting = new VerificationModeSetting(VerificationMode.Verify);
+                }
 
                 return new VerificationSettings(general, feedback, inputFile, useBackdropImage,
                     backdropImage, actionStatusSettings, enableInputTracking,
-                    launchInFullScreenMode, slideshowSettings, allowTags, tagSettings);
+                    launchInFullScreenMode, slideshowSettings, allowTags, tagSettings,
+                    verificationModeSetting);
             }
             catch (Exception ex)
             {
@@ -345,6 +375,7 @@ namespace Extract.Redaction
                 _slideshowSettings.WriteTo(writer);
                 writer.Write(_allowTags);
                 _tagSettings.WriteTo(writer);
+                writer.Write((int)RedactionVerificationMode.VerificationMode);
             }
             catch (Exception ex)
             {
