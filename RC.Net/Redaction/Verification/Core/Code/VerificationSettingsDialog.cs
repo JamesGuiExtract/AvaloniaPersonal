@@ -75,6 +75,8 @@ namespace Extract.Redaction.Verification
             {
                 _actionNameComboBox.Items.Add(actionNames[i]);
             }
+
+            _redactionQaComboBox.SelectedIndex = 0;
         }
 
         #endregion Constructors
@@ -637,5 +639,10 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion Event Handlers
+
+        private void VerificationSettingsDialog_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
