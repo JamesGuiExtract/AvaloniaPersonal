@@ -101,6 +101,15 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// The <see cref="DateTime"/> that this classifier was last trained
+        /// </summary>
+        public DateTime LastTrainedOn
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Trains the classifier to recognize classifications
         /// </summary>
         /// <param name="inputs">The input feature vectors</param>
@@ -151,17 +160,28 @@ namespace Extract.AttributeFinder
                     var complexitiesToTryDesc = new double[] { 0.1, 0.033, 0.01, 0.0033, 0.001};
                     double bestComplexity = 1;
                     double bestScore = int.MinValue;
+                    double bestTrainScore = int.MinValue;
                     for (int i = 0; i < complexitiesToTryAsc.Length; i++)
                     {
                         double complexity = complexitiesToTryAsc[i];
                         TrainClassifier(trainInputs, trainOutputs, complexity);
                         double score = GetAccuracyScore(cvInputs, cvOutputs);
+                        double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
                         if (score > bestScore)
                         {
                             bestScore = score;
                             bestComplexity = complexity;
+                            bestTrainScore = Math.Max(bestTrainScore, trainScore);
                         }
-                        else if (score < bestScore)
+                        else if (score == bestScore)
+                        {
+                            if (trainScore > bestTrainScore)
+                            {
+                                bestTrainScore = trainScore;
+                                bestComplexity = complexity;
+                            }
+                        }
+                        else
                         {
                             break;
                         }
@@ -171,12 +191,22 @@ namespace Extract.AttributeFinder
                         double complexity = complexitiesToTryDesc[i];
                         TrainClassifier(trainInputs, trainOutputs, complexity);
                         double score = GetAccuracyScore(cvInputs, cvOutputs);
+                        double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
                         if (score > bestScore)
                         {
                             bestScore = score;
                             bestComplexity = complexity;
+                            bestTrainScore = Math.Max(bestTrainScore, trainScore);
                         }
-                        else if (score < bestScore)
+                        else if (score == bestScore)
+                        {
+                            if (trainScore > bestTrainScore)
+                            {
+                                bestTrainScore = trainScore;
+                                bestComplexity = complexity;
+                            }
+                        }
+                        else
                         {
                             break;
                         }
@@ -188,6 +218,7 @@ namespace Extract.AttributeFinder
                 TrainClassifier(inputs, outputs, Complexity);
 
                 IsTrained = true;
+                LastTrainedOn = DateTime.Now;
             }
             catch (Exception e)
             {
@@ -201,6 +232,36 @@ namespace Extract.AttributeFinder
         /// <param name="inputs">The feature vector</param>
         /// <returns>The answer code and score</returns>
         public abstract Tuple<int, double?> ComputeAnswer(double[] inputs);
+
+        /// <summary>
+        /// Whether this instance has the same configured properties as another
+        /// </summary>
+        /// <param name="otherClassifier">The <see cref="ITrainableClassifier"/> to compare with this instance</param>
+        /// <returns><see langword="true"/> if the configurations are the same, else <see langword="false"/></returns>
+        public virtual bool IsConfigurationEqualTo(ITrainableClassifier otherClassifier)
+        {
+            try
+            {
+                if (Object.ReferenceEquals(this, otherClassifier))
+                {
+                    return true;
+                }
+
+                var other = otherClassifier as SupportVectorMachineClassifier;
+                if (other == null
+                    || other.AutomaticallyChooseComplexityValue != AutomaticallyChooseComplexityValue
+                    || other.Complexity != Complexity)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39821");
+            }
+        }
 
         #endregion ITrainableClassifier
 

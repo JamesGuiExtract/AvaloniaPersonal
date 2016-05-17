@@ -35,6 +35,11 @@ namespace Extract.AttributeFinder
         /// </summary>
         private string _pagesToProcess;
 
+        /// <summary>
+        /// The name of this feature vectorizer
+        /// </summary>
+        private string _name;
+
         #endregion Private Fields
 
         #region Constructors
@@ -72,7 +77,17 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// The name of the feature vectorizer. Used for display purposes only
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                _name = string.IsNullOrWhiteSpace(value) ? null : value;
+            }
+        }
 
         /// <summary>
         /// Gets the <see cref="FeatureVectorizerType"/> of this feature vectorizer
@@ -92,7 +107,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Whether changing the <see cref="FeatureVectorizerType"/> is allowed. Always <see langref="false"/>.
+        /// Whether changing the <see cref="FeatureVectorizerType"/> is allowed. Always <see langword="false"/>.
         /// </summary>
         public bool IsFeatureTypeChangeable
         {
@@ -104,7 +119,7 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Whether this feature vectorizer will produce a feature vector of length
-        /// <see cref="FeatureVectorLength"/> (if <see langref="true"/>) or of zero length (if <see langref="false"/>)
+        /// <see cref="FeatureVectorLength"/> (if <see langword="true"/>) or of zero length (if <see langword="false"/>)
         /// </summary>
         public bool Enabled { get; set; }
 
@@ -122,14 +137,15 @@ namespace Extract.AttributeFinder
             {
                 try
                 {
-                    if (value != _pagesToProcess)
+                    string newValue = string.IsNullOrWhiteSpace(value) ? null : value;
+                    if (newValue != _pagesToProcess)
                     {
-                        if (!String.IsNullOrWhiteSpace(value))
+                        if (!String.IsNullOrWhiteSpace(newValue))
                         {
-                            UtilityMethods.ValidatePageNumbers(value);
+                            UtilityMethods.ValidatePageNumbers(newValue);
                         }
 
-                        _pagesToProcess = value;
+                        _pagesToProcess = newValue;
                     }
                 }
                 catch (Exception e)
@@ -157,7 +173,12 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return _bagOfWords == null ? Enumerable.Empty<string>() : _bagOfWords.StringToCode.Keys;
+                // Order by code to match original order of terms passed to constructor
+                // This could be interesting to see (since terms will have been ordered by TFIDF score)
+                // and simplifies reconstructing the bag of words when cloning or deserializing
+                return _bagOfWords == null
+                    ? Enumerable.Empty<string>()
+                    : _bagOfWords.CodeToString.OrderBy(p => p.Key).Select(p => p.Value);
             }
         }
 
@@ -175,7 +196,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Whether this instance is ready to generate feature vectors
         /// </summary>
-        public bool IsConfigured
+        public bool AreEncodingsComputed
         {
             get
             {
@@ -185,6 +206,32 @@ namespace Extract.AttributeFinder
 
         #endregion Properties
 
+        #region Public Methods
+
+        /// <summary>
+        /// Creates a deep clone of this instance
+        /// </summary>
+        /// <returns>A clone of this instance</returns>
+        public SpatialStringFeatureVectorizer DeepClone()
+        {
+            try
+            {
+                var clone = (SpatialStringFeatureVectorizer)MemberwiseClone();
+
+                var valuesSeen = DistinctValuesSeen.ToArray();
+                if (valuesSeen.Length > 0)
+                {
+                    clone._bagOfWords = new Accord.MachineLearning.BagOfWords(valuesSeen);
+                }
+                return clone;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39804");
+            }
+        }
+
+        #endregion Public Methods
 
         #region Internal Methods
 
@@ -195,7 +242,7 @@ namespace Extract.AttributeFinder
         /// <param name="ussFiles">Paths to the spatial string files from which to collect terms for the bag-of-words
         /// vocabulary.</param>
         /// <param name="answers">The categories that each uss file belongs to.</param>
-        internal void ConfigureFromDocumentTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answers)
+        internal void ComputeEncodingsFromDocumentTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answers)
         {
             try
             {
@@ -242,7 +289,7 @@ namespace Extract.AttributeFinder
         /// vocabulary.</param>
         /// <param name="answerFiles">The paths to the VOA files that contain the expected pagination boundary information
         /// for each uss file.</param>
-        internal void ConfigureFromPaginationTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answerFiles)
+        internal void ComputeEncodingsFromPaginationTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answerFiles)
         {
             try
             {
@@ -290,7 +337,7 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Get feature vector from document text using computed <see cref="_bagOfWords"/>. Throws
-        /// an exception if <see cref="ConfigureFromDocumentTrainingData"/> has not been called.
+        /// an exception if <see cref="ComputeEncodingsFromDocumentTrainingData"/> has not been called.
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> to be used to generate the feature vector.</param>
         /// <returns>Array of doubles of <see cref="FeatureVectorLength"/> or length of zero if not <see cref="Enabled"/></returns>
@@ -298,7 +345,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                ExtractException.Assert("ELI39529", "This object has not been fully configured.", IsConfigured);
+                ExtractException.Assert("ELI39529", "This object has not been fully configured.", AreEncodingsComputed);
 
                 string[] terms = GetTerms(GetDocumentText(document)).ToArray();
                 return _bagOfWords.GetFeatureVector(terms).Select(i => (double)i).ToArray();
@@ -311,7 +358,7 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Get feature vectors from page text using computed <see cref="_bagOfWords"/>. Throws
-        /// an exception if <see cref="ConfigureFromPaginationTrainingData"/> has not been called.
+        /// an exception if <see cref="ComputeEncodingsFromPaginationTrainingData"/> has not been called.
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> to be used to generate the feature vectors.</param>
         /// <returns>If <see cref="Enabled"/> then an enumeration of feature vectors that has a length of
@@ -334,8 +381,84 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Whether this instance is configured as another
+        /// </summary>
+        /// <param name="other">The other <see cref="SpatialStringFeatureVectorizer"/> to compare with</param>
+        /// <returns><see langword="true"/> if the configurations are the same, else <see langword="false"/></returns>
+        internal bool IsConfigurationEqualTo(SpatialStringFeatureVectorizer other)
+        {
+            if (Object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            if (other == null
+                || other.Enabled != Enabled
+                || other.MaxFeatures != MaxFeatures
+                || other.Name != Name
+                || other.PagesToProcess != PagesToProcess
+                || other.ShingleSize != ShingleSize
+                )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         #endregion Internal Methods
 
+        #region Overrides
+
+        /// <summary>
+        /// Whether this instance is equal to another.
+        /// </summary>
+        /// <param name="obj">The instance to compare with</param>
+        /// <returns><see langword="true"/> if this instance has equal property values, else <see langword="false"/></returns>
+        public override bool Equals(object obj)
+        {
+            if (Object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            var other = obj as SpatialStringFeatureVectorizer;
+            if (other == null
+                || !IsConfigurationEqualTo(other)
+                || other.FeatureVectorLength != FeatureVectorLength
+                || other._bagOfWords != null && _bagOfWords != null &&
+                    !other._bagOfWords.CodeToString.SequenceEqual(_bagOfWords.CodeToString)
+                )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the hash code for this object
+        /// </summary>
+        /// <returns>The hash code for this object</returns>
+        public override int GetHashCode()
+        {
+            var hash = HashCode.Start
+                .Hash(AreEncodingsComputed)
+                .Hash(Enabled)
+                .Hash(MaxFeatures)
+                .Hash(Name)
+                .Hash(PagesToProcess)
+                .Hash(ShingleSize);
+            foreach (var keyValuePair in _bagOfWords.CodeToString)
+            {
+                hash = hash.Hash(keyValuePair.Value);
+            }
+
+            return hash;
+        }
+
+        #endregion Overrides
 
         #region Private Methods
 
@@ -343,7 +466,7 @@ namespace Extract.AttributeFinder
         /// Gets the string value from a <see cref="ISpatialString"/> limited to <see cref="PagesToProcess"/>
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> from which to get text.</param>
-        /// <returns>A substring of the <see cref="ISpatialString"/> as a plain <see langref="string"/>.</returns>
+        /// <returns>A substring of the <see cref="ISpatialString"/> as a plain <see langword="string"/>.</returns>
         private string GetDocumentText(ISpatialString document)
         {
             if (String.IsNullOrWhiteSpace(PagesToProcess))
@@ -362,7 +485,7 @@ namespace Extract.AttributeFinder
         /// Gets the string value from a <see cref="ISpatialString"/> limited to <see cref="PagesToProcess"/>
         /// </summary>
         /// <param name="ussPath">The path to the saved <see cref="ISpatialString"/> from which to get text.</param>
-        /// <returns>A substring of the <see cref="ISpatialString"/> as a plain <see langref="string"/>.</returns>
+        /// <returns>A substring of the <see cref="ISpatialString"/> as a plain <see langword="string"/>.</returns>
         private string GetDocumentText(string ussPath)
         {
             try
@@ -438,7 +561,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Helper function to turn a while loop into an <see langref="IEnumerable"/>
+        /// Helper function to turn a while loop into an <see langword="IEnumerable"/>
         /// </summary>
         /// <param name="condition"></param>
         /// <returns></returns>

@@ -644,9 +644,10 @@ namespace Extract.Utilities
         /// <param name="pageNumbers">The set of page numbers to update.</param>
         /// <param name="totalNumberOfPages">The total number of pages in the image</param>
         /// <param name="pageNumber">Page number or last X page numbers to add to the set.</param>
-        /// <param name="throwExceptionOnPageOutOfRange">Whether to throw an exception if <see paramref="pageNumber"/> is greater than <see paramref="totalNumberOfPages"/></param>
-        /// <param name="lastPagesDefined">If <see langref="true"/> then <see paramref="pageNumber"/> represents the last X number of pages.
-        /// If <see langref="false"/> then <see paramref="pageNumber"/> is a single page number</param>
+        /// <param name="throwExceptionOnPageOutOfRange">Whether to throw an exception if <see paramref="pageNumber"/>
+        /// is greater than <see paramref="totalNumberOfPages"/></param>
+        /// <param name="lastPagesDefined">If <see langword="true"/> then <see paramref="pageNumber"/> represents the last X number of pages.
+        /// If <see langword="false"/> then <see paramref="pageNumber"/> is a single page number</param>
         private static void updatePageNumbers(HashSet<int> pageNumbers, 
                                int totalNumberOfPages, 
                                int pageNumber,

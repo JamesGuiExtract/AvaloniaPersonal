@@ -247,6 +247,179 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(0.8, accuracy);
         }
 
+        // Test comparison method for neural net
+        [Test, Category("TrainableClassifier")]
+        public static void TestConfigurationEqualToNeuralNet()
+        {
+            Tuple<double[][], int[]> results = GetDocumentCategorizationData();
+            double[][] inputs = results.Item1;
+            int[] outputs = results.Item2;
+            var classifier1 = new NeuralNetworkClassifier
+            {
+                HiddenLayers = new[] { 10, 20 },
+                MaxTrainingIterations = 100,
+                NumberOfCandidateNetworksToBuild = 2,
+                SigmoidAlpha = 2.0,
+                UseCrossValidationSets = true
+            };
+            var classifier2 = new NeuralNetworkClassifier
+            {
+                HiddenLayers = new[] { 10, 20 },
+                MaxTrainingIterations = 100,
+                NumberOfCandidateNetworksToBuild = 2,
+                SigmoidAlpha = 2.0,
+                UseCrossValidationSets = true
+            };
+
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Change each setting and assert that the classifiers are different
+
+            // Number of hidden layers different
+            classifier2.HiddenLayers = new[] { 10 };
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Order of hidden layers different
+            classifier2.HiddenLayers = new[] { 20, 10 };
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.HiddenLayers = new[] { 10, 20 };
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Max training iterations different
+            classifier2.MaxTrainingIterations = 1;
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.MaxTrainingIterations = 100;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Number of candidate networks different
+            classifier2.NumberOfCandidateNetworksToBuild = 5;
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.NumberOfCandidateNetworksToBuild = 2;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Sigmoid alpha different
+            classifier2.SigmoidAlpha = 1.0;
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.SigmoidAlpha = 2.0;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Training one classifier should not affect configuration equality
+            classifier1.TrainClassifier(inputs, outputs);
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+            Assert.That(classifier2.IsConfigurationEqualTo(classifier1));
+        }
+
+        // Test comparison method for multiclass svm
+        [Test, Category("TrainableClassifier")]
+        public static void TestConfigurationEqualToMulticlassSVM()
+        {
+            Tuple<double[][], int[]> results = GetDocumentCategorizationData();
+            double[][] inputs = results.Item1;
+            int[] outputs = results.Item2;
+            var classifier1 = new MulticlassSupportVectorMachineClassifier
+            {
+                AutomaticallyChooseComplexityValue = true,
+                Complexity = 1.0
+            };
+            var classifier2 = new MulticlassSupportVectorMachineClassifier
+            {
+                AutomaticallyChooseComplexityValue = true,
+                Complexity = 1.0
+            };
+
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Change each setting and assert that the classifiers are different
+            classifier2.AutomaticallyChooseComplexityValue = false;
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.AutomaticallyChooseComplexityValue = true;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            classifier2.Complexity = 0.1;
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.Complexity = 1.0;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Training one classifier should not affect configuration equality
+            // except that complexity property value might change
+            classifier1.TrainClassifier(inputs, outputs);
+            classifier1.Complexity = classifier2.Complexity;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+            Assert.That(classifier2.IsConfigurationEqualTo(classifier1));
+        }
+
+        // Test comparison method for multilabel svm
+        [Test, Category("TrainableClassifier")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multilabel")]
+        public static void TestConfigurationEqualToMultilabelSVM()
+        {
+            Tuple<double[][], int[]> results = GetDocumentCategorizationData();
+            double[][] inputs = results.Item1;
+            int[] outputs = results.Item2;
+            var classifier1 = new MultilabelSupportVectorMachineClassifier
+            {
+                AutomaticallyChooseComplexityValue = false,
+                Complexity = 1.0,
+                CalibrateMachineToProduceProbabilities = true,
+                UseClassProportionsForComplexityWeights = true
+            };
+            var classifier2 = new MultilabelSupportVectorMachineClassifier
+            {
+                AutomaticallyChooseComplexityValue = false,
+                Complexity = 1.0,
+                CalibrateMachineToProduceProbabilities = true,
+                UseClassProportionsForComplexityWeights = true
+            };
+
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Change each setting and assert that the classifiers are different
+            classifier2.AutomaticallyChooseComplexityValue = true;
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.AutomaticallyChooseComplexityValue = false;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            classifier2.Complexity = 0.1;
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.Complexity = 1.0;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            classifier2.CalibrateMachineToProduceProbabilities = false;
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.CalibrateMachineToProduceProbabilities = true;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            classifier2.UseClassProportionsForComplexityWeights = false;
+            Assert.That(!classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Set back to the same
+            classifier2.UseClassProportionsForComplexityWeights = true;
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+
+            // Training one classifier should not affect configuration equality
+            classifier1.TrainClassifier(inputs, outputs);
+            Assert.That(classifier1.IsConfigurationEqualTo(classifier2));
+            Assert.That(classifier2.IsConfigurationEqualTo(classifier1));
+        }
+
         #endregion Tests
 
         #region Helper Methods

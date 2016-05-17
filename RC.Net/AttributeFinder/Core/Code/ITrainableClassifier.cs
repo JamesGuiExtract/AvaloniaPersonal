@@ -35,6 +35,16 @@ namespace Extract.AttributeFinder
         /// <returns>Whether this classifier has been trained and is ready to compute answers</returns>
         bool IsTrained { get; }
 
-        //event StatusUpdateEvent(); // TBD custom event data structure for showing progress status
+        /// <summary>
+        /// The <see cref="DateTime"/> that this classifier was last trained
+        /// </summary>
+        DateTime LastTrainedOn { get; }
+
+        /// <summary>
+        /// Whether this instance has the same configured properties as another
+        /// </summary>
+        /// <param name="otherClassifier">The <see cref="ITrainableClassifier"/> to compare with this instance</param>
+        /// <returns><see langword="true"/> if the configurations are the same, else <see langword="false"/></returns>
+        bool IsConfigurationEqualTo(ITrainableClassifier otherClassifier);
     }
 }

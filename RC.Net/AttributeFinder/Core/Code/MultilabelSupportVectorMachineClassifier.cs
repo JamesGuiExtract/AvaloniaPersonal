@@ -94,7 +94,7 @@ namespace Extract.AttributeFinder
         /// Computes answer code and score for the input feature vector
         /// </summary>
         /// <remarks>Answer score will be null unless <see cref="CalibrateMachineToProduceProbabilities"/>
-        /// was <see langref="true"/> when this instance was trained</remarks>
+        /// was <see langword="true"/> when this instance was trained</remarks>
         /// <param name="inputs">The feature vector</param>
         /// <returns>The answer code and score</returns>
         public override Tuple<int, double?> ComputeAnswer(double[] inputs)
@@ -124,6 +124,37 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39742");
+            }
+        }
+
+        /// <summary>
+        /// Whether this instance has the same configured properties as another
+        /// </summary>
+        /// <param name="otherClassifier">The <see cref="ITrainableClassifier"/> to compare with this instance</param>
+        /// <returns><see langword="true"/> if the configurations are the same, else <see langword="false"/></returns>
+        public override bool IsConfigurationEqualTo(ITrainableClassifier otherClassifier)
+        {
+            try
+            {
+                if (Object.ReferenceEquals(this, otherClassifier))
+                {
+                    return true;
+                }
+
+                var other = otherClassifier as MultilabelSupportVectorMachineClassifier;
+                if (other == null
+                    || !base.IsConfigurationEqualTo(other)
+                    || other.CalibrateMachineToProduceProbabilities != CalibrateMachineToProduceProbabilities
+                    || other.UseClassProportionsForComplexityWeights != UseClassProportionsForComplexityWeights)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39823");
             }
         }
 

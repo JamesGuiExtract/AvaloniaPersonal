@@ -88,7 +88,7 @@ namespace Extract.AttributeFinder.Test
         [Test, Category("LearningMachine")]
         public static void GetIndexesOfSubsetsByCategoryOneCategory()
         {
-            foreach (int size in new[] { 1, 1000})
+            foreach (int size in new[] { 1, 1000 })
             {
                 int[] originalIndexes = new int[size];
 
@@ -143,7 +143,7 @@ namespace Extract.AttributeFinder.Test
         [Test, Category("LearningMachine")]
         public static void GetIndexesOfSubsetsByCategoryMultipleCategories()
         {
-            foreach (int size in new[] { 1, 1000})
+            foreach (int size in new[] { 1, 1000 })
             {
                 var numberOfCategories = 10;
                 int[] data = new int[size];
@@ -182,16 +182,21 @@ namespace Extract.AttributeFinder.Test
         public static void TrainMachineDocTypesFromFolder()
         {
             SetDocumentCategorizationFiles();
-            var lm = new LearningMachine();
             var inputConfig = new InputConfiguration
-              {
-                  InputPath = _inputFolder,
-                  InputPathType = InputType.Folder,
-                  AttributesPath = "",
-                  AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
-                  TrainingSetPercentage = 80
-              };
-            var results = lm.TrainMachine(inputConfig);
+            {
+                InputPath = _inputFolder,
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm = new LearningMachine
+            {
+                InputConfig = inputConfig,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var results = lm.TrainMachine();
             Assert.Greater(results.Item1, 0.99);
             Assert.Greater(results.Item2, 0.99);
 
@@ -245,17 +250,18 @@ namespace Extract.AttributeFinder.Test
             SetPaginationFiles();
             var lm = new LearningMachine
             {
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false},
-                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination)
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = _inputFolder,
+                        InputPathType = InputType.Folder,
+                        AttributesPath = "<SourceDocName>.protofeatures.voa",
+                        AnswerPath = "<SourceDocName>.eav",
+                        TrainingSetPercentage = 50
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false }
             };
-            var results = lm.TrainMachine(new InputConfiguration
-              {
-                  InputPath = _inputFolder,
-                  InputPathType = InputType.Folder,
-                  AttributesPath = "<SourceDocName>.protofeatures.voa",
-                  AnswerPath = "<SourceDocName>.eav",
-                  TrainingSetPercentage = 50
-              });
+            var results = lm.TrainMachine();
             Assert.Greater(results.Item1, 0.90);
             Assert.Greater(results.Item2, 0.6);
         }
@@ -270,17 +276,18 @@ namespace Extract.AttributeFinder.Test
 
             var lm = new LearningMachine
             {
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false},
-                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination)
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = _csvPath,
+                        InputPathType = InputType.TextFileOrCsv,
+                        AttributesPath = "<SourceDocName>.protofeatures.voa",
+                        AnswerPath = "<SourceDocName>.eav",
+                        TrainingSetPercentage = 50
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false }
             };
-            var results = lm.TrainMachine(new InputConfiguration
-              {
-                  InputPath = _csvPath,
-                  InputPathType = InputType.TextFileOrCsv,
-                  AttributesPath = "<SourceDocName>.protofeatures.voa",
-                  AnswerPath = "<SourceDocName>.eav",
-                  TrainingSetPercentage = 50
-              });
+            var results = lm.TrainMachine();
             Assert.Greater(results.Item1, 0.90);
             Assert.Greater(results.Item2, 0.6);
         }
@@ -294,15 +301,20 @@ namespace Extract.AttributeFinder.Test
             _csvPath = Path.GetTempFileName();
             File.WriteAllLines(_csvPath, csvContents);
 
-            var lm = new LearningMachine();
-            var results = lm.TrainMachine(new InputConfiguration
-              {
-                  InputPath = _csvPath,
-                  InputPathType = InputType.TextFileOrCsv,
-                  AttributesPath = "",
-                  AnswerPath = "",
-                  TrainingSetPercentage = 80
-              });
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = _csvPath,
+                        InputPathType = InputType.TextFileOrCsv,
+                        AttributesPath = "",
+                        AnswerPath = "",
+                        TrainingSetPercentage = 80
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var results = lm.TrainMachine();
             Assert.Greater(results.Item1, 0.99);
             Assert.Greater(results.Item2, 0.99);
         }
@@ -317,15 +329,20 @@ namespace Extract.AttributeFinder.Test
             _csvPath = Path.GetTempFileName();
             File.WriteAllLines(_csvPath, csvContents);
 
-            var lm = new LearningMachine();
-            var results = lm.TrainMachine(new InputConfiguration
-              {
-                  InputPath = _csvPath,
-                  InputPathType = InputType.TextFileOrCsv,
-                  AttributesPath = "",
-                  AnswerPath = "",
-                  TrainingSetPercentage = 80
-              });
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = _csvPath,
+                        InputPathType = InputType.TextFileOrCsv,
+                        AttributesPath = "",
+                        AnswerPath = "",
+                        TrainingSetPercentage = 80
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var results = lm.TrainMachine();
             Assert.Greater(results.Item1, 0.99);
             Assert.Greater(results.Item2, 0.99);
         }
@@ -335,7 +352,7 @@ namespace Extract.AttributeFinder.Test
         {
             SetDocumentCategorizationFiles();
             string[][] csvTempContents = Directory.GetFiles(_inputFolder, "*.tif", SearchOption.AllDirectories)
-                .Select(imagePath => new [] {imagePath, Path.GetFileName(Path.GetDirectoryName(imagePath))}).ToArray();
+                .Select(imagePath => new[] { imagePath, Path.GetFileName(Path.GetDirectoryName(imagePath)) }).ToArray();
 
             csvTempContents[2][0] = "\"" + csvTempContents[2][0] + "\"";
             csvTempContents[3][1] = "\"Abstract of \"\"Support\"\" Judgment\"";
@@ -344,15 +361,20 @@ namespace Extract.AttributeFinder.Test
             _csvPath = Path.GetTempFileName();
             File.WriteAllLines(_csvPath, csvContents);
 
-            var lm = new LearningMachine();
-            var results = lm.TrainMachine(new InputConfiguration
-              {
-                  InputPath = _csvPath,
-                  InputPathType = InputType.TextFileOrCsv,
-                  AttributesPath = "",
-                  AnswerPath = "",
-                  TrainingSetPercentage = 80
-              });
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = _csvPath,
+                        InputPathType = InputType.TextFileOrCsv,
+                        AttributesPath = "",
+                        AnswerPath = "",
+                        TrainingSetPercentage = 80
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var results = lm.TrainMachine();
             Assert.Greater(results.Item1, 0.99);
             Assert.Greater(results.Item2, 0.99);
         }
@@ -362,20 +384,21 @@ namespace Extract.AttributeFinder.Test
         public static void CreateExpectedPaginationValues()
         {
             SetPaginationFiles();
+            var inputConfig = new InputConfiguration
+            {
+                InputPath = _inputFolder,
+                InputPathType = InputType.Folder,
+                AttributesPath = "<SourceDocName>.protofeatures.voa",
+                AnswerPath = "<SourceDocName>.eav",
+                TrainingSetPercentage = 50
+            };
             var lm = new LearningMachine
             {
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false},
+                InputConfig = inputConfig,
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination)
             };
-            var inputConfig = new InputConfiguration
-              {
-                  InputPath = _inputFolder,
-                  InputPathType = InputType.Folder,
-                  AttributesPath = "<SourceDocName>.protofeatures.voa",
-                  AnswerPath = "<SourceDocName>.eav",
-                  TrainingSetPercentage = 50
-              };
-            lm.TrainMachine(inputConfig);
+            lm.TrainMachine();
 
             // Build answer files from classifier output. This should give 100% accuracy
             // Also keep track of original input attributes and compare against recreated input attributes
@@ -403,7 +426,7 @@ namespace Extract.AttributeFinder.Test
                 evoaFiles[i] = fileName;
             }
             var results = lm.Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, evoaFiles);
-            double [][] inputs = results.Item1;
+            double[][] inputs = results.Item1;
             int[] outputs = results.Item2;
             Assert.AreEqual(1.0, LearningMachine.GetAccuracyScore(lm.Classifier, inputs, outputs));
 
@@ -418,18 +441,200 @@ namespace Extract.AttributeFinder.Test
             CollectionAssert.IsEmpty(inputAttributesNotPreserved);
         }
 
+        // Test comparison method
+        [Test, Category("LearningMachine")]
+        public static void TestConfigurationEqualTo()
+        {
+            SetDocumentCategorizationFiles();
+            var inputConfig1 = new InputConfiguration
+            {
+                InputPath = _inputFolder,
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var inputConfig2 = new InputConfiguration
+            {
+                InputPath = _inputFolder,
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm1 = new LearningMachine
+            {
+                InputConfig = inputConfig1,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier { AutomaticallyChooseComplexityValue = false }
+            };
+            var lm2 = new LearningMachine
+            {
+                InputConfig = inputConfig2,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier { AutomaticallyChooseComplexityValue = false }
+            };
+
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            // Changing InputConfig makes not equal
+            lm1.InputConfig.AttributesPath = "Testing";
+            Assert.That(!lm1.IsConfigurationEqualTo(lm2));
+            lm1.InputConfig.AttributesPath = null;
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            // Changing Encoder makes not equal
+            lm1.Encoder.AutoBagOfWords.Enabled = false;
+            Assert.That(!lm1.IsConfigurationEqualTo(lm2));
+            lm1.Encoder.AutoBagOfWords.Enabled = true;
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            // Changing Classifier makes not equal
+            lm1.Classifier = new MultilabelSupportVectorMachineClassifier();
+            Assert.That(!lm1.IsConfigurationEqualTo(lm2));
+            lm1.Classifier = new MulticlassSupportVectorMachineClassifier { AutomaticallyChooseComplexityValue = false };
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            // Computing features for one machine does not affect configuration equality
+            lm1.ComputeEncodings();
+            Assert.That(lm1.Encoder.AreEncodingsComputed);
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+            Assert.That(lm2.IsConfigurationEqualTo(lm1));
+
+            // Training one machine does not affect configuration equality
+            lm1.TrainMachine();
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+            Assert.That(lm2.IsConfigurationEqualTo(lm1));
+
+            // Test setting values to null
+            lm2.InputConfig = null;
+            Assert.That(!lm1.IsConfigurationEqualTo(lm2));
+            Assert.That(!lm2.IsConfigurationEqualTo(lm1));
+            lm2.InputConfig = lm1.InputConfig;
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.Encoder = null;
+            Assert.That(!lm1.IsConfigurationEqualTo(lm2));
+            Assert.That(!lm2.IsConfigurationEqualTo(lm1));
+            lm2.Encoder = lm1.Encoder;
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            lm2.Classifier = null;
+            Assert.That(!lm1.IsConfigurationEqualTo(lm2));
+            Assert.That(!lm2.IsConfigurationEqualTo(lm1));
+            lm2.Classifier = lm1.Classifier;
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+        }
+
+        // Test shallow clone method
+        [Test, Category("LearningMachine")]
+        public static void TestShallowClone()
+        {
+            SetDocumentCategorizationFiles();
+            var inputConfig1 = new InputConfiguration
+            {
+                InputPath = _inputFolder,
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm1 = new LearningMachine
+            {
+                InputConfig = inputConfig1,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier { AutomaticallyChooseComplexityValue = false }
+            };
+            var lm2 = lm1.ShallowClone();
+
+            // Changing settings of a member changes for both original and clone
+            lm1.InputConfig.AttributesPath = "Testing";
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            lm1.Encoder.AutoBagOfWords.Enabled = false;
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            ((MulticlassSupportVectorMachineClassifier)lm1.Classifier).AutomaticallyChooseComplexityValue = true;
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            // Changing a setting on the original won't affect the clone
+            lm1.Classifier = null;
+            Assert.That(!lm1.IsConfigurationEqualTo(lm2));
+            Assert.That(!lm2.IsConfigurationEqualTo(lm1));
+        }
+
+        // Test input config equals
+        [Test, Category("LearningMachine")]
+        public static void TestInputConfigEquals()
+        {
+            var inputConfig1 = new InputConfiguration
+            {
+                InputPath = _inputFolder,
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+
+            var inputConfig2 = new InputConfiguration
+            {
+                InputPath = _inputFolder,
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+
+            Assert.AreEqual(inputConfig1, inputConfig2);
+
+            inputConfig1.InputPath = "Testing";
+            Assert.AreNotEqual(inputConfig1, inputConfig2);
+            inputConfig1.InputPath = inputConfig2.InputPath;
+            Assert.AreEqual(inputConfig1, inputConfig2);
+
+            inputConfig1.AttributesPath = "Testing";
+            Assert.AreNotEqual(inputConfig1, inputConfig2);
+            inputConfig1.AttributesPath = inputConfig2.AttributesPath;
+            Assert.AreEqual(inputConfig1, inputConfig2);
+
+            inputConfig1.AnswerPath = "Testing";
+            Assert.AreNotEqual(inputConfig1, inputConfig2);
+            inputConfig1.AnswerPath = inputConfig2.AnswerPath;
+            Assert.AreEqual(inputConfig1, inputConfig2);
+
+            inputConfig1.InputPathType = InputType.TextFileOrCsv;
+            Assert.AreNotEqual(inputConfig1, inputConfig2);
+            inputConfig1.InputPathType = inputConfig2.InputPathType;
+            Assert.AreEqual(inputConfig1, inputConfig2);
+
+            inputConfig1.TrainingSetPercentage = 20;
+            Assert.AreNotEqual(inputConfig1, inputConfig2);
+            inputConfig1.TrainingSetPercentage = inputConfig2.TrainingSetPercentage;
+            Assert.AreEqual(inputConfig1, inputConfig2);
+
+            // Test that null == ""
+            inputConfig1.InputPath = inputConfig1.AttributesPath = inputConfig1.AnswerPath = null;
+            inputConfig2.InputPath = inputConfig2.AttributesPath = inputConfig2.AnswerPath = "";
+            Assert.AreEqual(inputConfig1, inputConfig2);
+        }
+
         [Test, Category("Extended")]
         public static void ZTrainMachineFromLargeFolder()
         {
-            var lm = new LearningMachine();
-            var results = lm.TrainMachine(new InputConfiguration
-              {
-                  InputPath = @"K:\Common\Engineering\Sample Files\AtPac\CA - Amador\Set003\Images",
-                  InputPathType = InputType.Folder,
-                  AttributesPath = "",
-                  AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
-                  TrainingSetPercentage = 80
-              });
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = @"K:\Common\Engineering\Sample Files\AtPac\CA - Amador\Set003\Images",
+                        InputPathType = InputType.Folder,
+                        AttributesPath = "",
+                        AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                        TrainingSetPercentage = 80
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var results = lm.TrainMachine();
             Assert.Greater(results.Item1, 0.99);
             Assert.Greater(results.Item2, 0.93);
         }

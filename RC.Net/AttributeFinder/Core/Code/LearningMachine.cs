@@ -22,7 +22,16 @@ namespace Extract.AttributeFinder
         #region Properties
 
         /// <summary>
-        /// Gets the encoder to be used to create feature vectors
+        /// Gets/sets the input configuration
+        /// </summary>
+        public InputConfiguration InputConfig
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets/sets the encoder to be used to create feature vectors
         /// </summary>
         public LearningMachineDataEncoder Encoder
         {
@@ -31,7 +40,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Gets the classifier to be trained and used to compute answers with encoded feature vectors
+        /// Gets/sets the classifier to be trained and used to compute answers with encoded feature vectors
         /// </summary>
         public ITrainableClassifier Classifier
         {
@@ -77,7 +86,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// The seed to use for random number generation
+        /// Gets/sets the seed to use for random number generation
         /// </summary>
         public int RandomNumberSeed
         {
@@ -97,7 +106,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Whether to use Unknown as a value if answer probability is low
+        /// Gets/sets whether to use Unknown as a value if answer probability is low
         /// </summary>
         public bool UseUnknownCategory
         {
@@ -106,7 +115,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// The threshold level below which probability will be considered to signify Unknown
+        /// Gets/sets the threshold level below which probability will be considered to signify Unknown
         /// </summary>
         public double UnknownCategoryCutoff
         {
@@ -114,43 +123,68 @@ namespace Extract.AttributeFinder
             set;
         }
 
-        #endregion Properties
-
-        #region Constructors
-
         /// <summary>
-        /// Creates an instance with default values
+        /// Gets whether this instance has been configured
         /// </summary>
-        public LearningMachine()
+        public bool IsConfigured
         {
-            Classifier = new MulticlassSupportVectorMachineClassifier();
-            Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000));
+            get
+            {
+                return InputConfig != null && Encoder != null && Classifier != null;
+            }
         }
 
-        #endregion Constructors
+        #endregion Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Trains and tests the machine using files specified with <see paramref="inputConfig"/>
+        /// Computes encodings without training
         /// </summary>
-        /// <param name="inputConfig">The <see cref="InputConfiguration"/> instance used to get training/testing files</param>
-        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        public Tuple<double, double> TrainMachine(InputConfiguration inputConfig)
+        public void ComputeEncodings()
         {
             try
             {
+                ExtractException.Assert("ELI39803", "Machine is not fully configured", IsConfigured);
+
                 // Compute input files and answers
                 string[] ussFiles, voaFiles, answersOrAnswerFiles;
-                inputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles);
+                InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles);
 
                 Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39826");
+            }
+
+        }
+
+        /// <summary>
+        /// Trains and tests the machine using files specified with <see cref="InputConfig"/>
+        /// </summary>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        public Tuple<double, double> TrainMachine()
+        {
+            try
+            {
+                ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
+
+                // Compute input files and answers
+                string[] ussFiles, voaFiles, answersOrAnswerFiles;
+                InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles);
+
+                if (!Encoder.AreEncodingsComputed)
+                {
+                    Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles);
+                }
+
                 var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles);
 
                 // Divide data into training and testing subsets
                 var rng = new Random(RandomNumberSeed);
                 List<int> trainIdx, testIdx;
-                GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2, inputConfig.TrainingSetPercentage / 100.0, out trainIdx, out testIdx, rng);
+                GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2, InputConfig.TrainingSetPercentage / 100.0, out trainIdx, out testIdx, rng);
 
                 // Training set
                 double[][] trainInputs = featureVectorsAndAnswers.Item1.Submatrix(trainIdx);
@@ -174,7 +208,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Computes an answer for the input data
         /// </summary>
-        /// <remarks>If <see paramref="preserveInputAttributes"/>=<see langref="true"/> and
+        /// <remarks>If <see paramref="preserveInputAttributes"/>=<see langword="true"/> and
         /// <see cref="Usage"/>=<see cref="LearningMachineUsage.Pagination"/> then the input Page <see cref="ComAttribute"/>s will be
         /// returned as subattributes of the resulting Document <see cref="ComAttribute"/>s.</remarks>
         /// <param name="document">The <see cref="SpatialString"/> used for encoding auto-BoW features</param>
@@ -295,6 +329,60 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39770");
+            }
+        }
+
+        /// <summary>
+        /// Whether this instance is configured the same as another
+        /// </summary>
+        /// <param name="other">The <see cref="LearningMachine"/> to compare with</param>
+        /// <returns><see langword="true"/> if the configurations are the same, else <see langword="false"/></returns>
+        public bool IsConfigurationEqualTo(LearningMachine other)
+        {
+            try
+            {
+                if (Object.ReferenceEquals(this, other))
+                {
+                    return true;
+                }
+
+                if (other == null
+                    || other.MachineType != MachineType
+                    || other.RandomNumberSeed != RandomNumberSeed
+                    || other.UnknownCategoryCutoff != UnknownCategoryCutoff
+                    || other.Usage != Usage
+                    || other.UseUnknownCategory != UseUnknownCategory
+                    || other.Classifier == null && Classifier != null
+                    || other.Classifier != null && !other.Classifier.IsConfigurationEqualTo(Classifier)
+                    || other.Encoder == null && Encoder != null
+                    || other.Encoder != null && !other.Encoder.IsConfigurationEqualTo(Encoder)
+                    || other.InputConfig == null && InputConfig != null
+                    || other.InputConfig != null && !other.InputConfig.Equals(InputConfig)
+                    )
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39825");
+            }
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="LearningMachine"/> that is a shallow clone of this instance
+        /// </summary>
+        public LearningMachine ShallowClone()
+        {
+            try
+            {
+                return (LearningMachine)MemberwiseClone();
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39836");
             }
         }
 

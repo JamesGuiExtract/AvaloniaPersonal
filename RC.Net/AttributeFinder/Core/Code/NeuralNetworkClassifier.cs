@@ -59,7 +59,7 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// The maximum training iterations that will be run. Might be partially ignored
-        /// if <see cref="UseCrossValidationSets"/> is <see langref="true"/>
+        /// if <see cref="UseCrossValidationSets"/> is <see langword="true"/>
         /// </summary>
         public int MaxTrainingIterations
         {
@@ -132,6 +132,16 @@ namespace Extract.AttributeFinder
             get;
             private set;
         }
+
+        /// <summary>
+        /// The <see cref="DateTime"/> that this classifier was last trained
+        /// </summary>
+        public DateTime LastTrainedOn
+        {
+            get;
+            private set;
+        }
+
 
         /// <summary>
         /// Trains the classifier to recognize classifications
@@ -211,6 +221,7 @@ namespace Extract.AttributeFinder
                 }
 
                 IsTrained = true;
+                LastTrainedOn = DateTime.Now;
             }
             catch (Exception e)
             {
@@ -244,6 +255,39 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39727");
+            }
+        }
+
+        /// <summary>
+        /// Whether this instance has the same configured properties as another
+        /// </summary>
+        /// <param name="otherClassifier">The <see cref="ITrainableClassifier"/> to compare with this instance</param>
+        /// <returns><see langword="true"/> if the configurations are the same, else <see langword="false"/></returns>
+        public bool IsConfigurationEqualTo(ITrainableClassifier otherClassifier)
+        {
+            try
+            {
+                if (Object.ReferenceEquals(this, otherClassifier))
+                {
+                    return true;
+                }
+
+                var other = otherClassifier as NeuralNetworkClassifier;
+                if (other == null
+                    || !other.HiddenLayers.SequenceEqual(HiddenLayers)
+                    || other.MaxTrainingIterations != MaxTrainingIterations
+                    || other.NumberOfCandidateNetworksToBuild != NumberOfCandidateNetworksToBuild
+                    || other.SigmoidAlpha != SigmoidAlpha
+                    || other.UseCrossValidationSets != UseCrossValidationSets)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39822");
             }
         }
 

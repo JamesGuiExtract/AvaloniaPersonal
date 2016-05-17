@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -30,7 +31,20 @@ namespace Extract.AttributeFinder
     {
         #region Fields
 
-        AttributeFinderPathTags _pathTags = new AttributeFinderPathTags();
+        /// <summary>
+        /// Backing field for <see cref="AttributesPath"/>
+        /// </summary>
+        private string _attributesPath;
+
+        /// <summary>
+        /// Backing field for <see cref="AnswerPath"/>
+        /// </summary>
+        private string _answerPath;
+
+        /// <summary>
+        /// Backing field for <see cref="InputPath"/>
+        /// </summary>
+        private string _inputPath;
 
         #endregion Fields
 
@@ -41,8 +55,14 @@ namespace Extract.AttributeFinder
         /// </summary>
         public string InputPath
         {
-            get;
-            set;
+            get
+            {
+                return _inputPath;
+            }
+            set
+            {
+                _inputPath = string.IsNullOrWhiteSpace(value) ? null : value;
+            }
         }
 
         /// <summary>
@@ -59,8 +79,14 @@ namespace Extract.AttributeFinder
         /// </summary>
         public string AttributesPath
         {
-            get;
-            set;
+            get
+            {
+                return _attributesPath;
+            }
+            set
+            {
+                _attributesPath = string.IsNullOrWhiteSpace(value) ? null : value;
+            }
         }
 
         /// <summary>
@@ -68,8 +94,14 @@ namespace Extract.AttributeFinder
         /// </summary>
         public string AnswerPath
         {
-            get;
-            set;
+            get
+            {
+                return _answerPath;
+            }
+            set
+            {
+                _answerPath = string.IsNullOrWhiteSpace(value) ? null : value;
+            }
         }
 
         /// <summary>
@@ -79,6 +111,17 @@ namespace Extract.AttributeFinder
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets whether this instance is properly configured
+        /// </summary>
+        public bool IsConfigured
+        {
+            get
+            {
+                return !(string.IsNullOrEmpty(InputPath) || InputPathType == InputType.Folder && string.IsNullOrEmpty(AnswerPath));
+            }
         }
 
         #endregion Properties
@@ -94,14 +137,17 @@ namespace Extract.AttributeFinder
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public void GetInputData(out string[] spatialStringFilePaths, out string[] attributeFilePaths, out string[] answersOrAnswerFilePaths)
         {
-            List<string> imageFiles;
+            ExtractException.Assert("ELI39802", "This instance has not been fully configured", IsConfigured);
 
+            List<string> imageFiles;
             if (InputPathType == InputType.Folder)
             {
                 // Get all image files where there is a corresponding uss file
-                imageFiles = Directory.GetFiles(InputPath, "*.uss", SearchOption.AllDirectories)
+                imageFiles = Directory.EnumerateFiles(InputPath, "*.uss", SearchOption.AllDirectories)
                     .Select(ussPath => Path.ChangeExtension(ussPath, null))
-                    .Where(imagePath => File.Exists(imagePath)).ToList();
+                    .Where(imagePath => File.Exists(imagePath))
+                    .ToList();
+
 
                 answersOrAnswerFilePaths = new string[imageFiles.Count];
             }
@@ -169,28 +215,73 @@ namespace Extract.AttributeFinder
             {
                 throw new ExtractException("ELI39760", "Unknown input path type: " + InputPathType.ToString());
             }
-
             spatialStringFilePaths = new string[imageFiles.Count];
 
             // If no attributes path given then use null for the collection
             attributeFilePaths = string.IsNullOrWhiteSpace(AttributesPath) ? null : new string[imageFiles.Count];
 
+            var pathTags = new AttributeFinderPathTags();
+
             for (int i = 0; i < imageFiles.Count; i++)
             {
                 string imagePath = imageFiles[i];
-                _pathTags.Document = new UCLID_AFCORELib.AFDocumentClass { Text = new SpatialStringClass { SourceDocName = imagePath } };
+                pathTags.Document = new UCLID_AFCORELib.AFDocumentClass { Text = new SpatialStringClass { SourceDocName = imagePath } };
                 spatialStringFilePaths[i] = imagePath + ".uss";
                 if (attributeFilePaths != null)
                 {
-                    attributeFilePaths[i] = _pathTags.Expand(AttributesPath);
+                    attributeFilePaths[i] = pathTags.Expand(AttributesPath);
                 }
                 if (!string.IsNullOrWhiteSpace(AnswerPath))
                 {
-                    answersOrAnswerFilePaths[i] = _pathTags.Expand(AnswerPath);
+                    answersOrAnswerFilePaths[i] = pathTags.Expand(AnswerPath);
                 }
             }
         }
 
         #endregion Public Methods
+
+        #region Overrides
+
+        /// <summary>
+        /// Whether this instance has equal property values to another
+        /// </summary>
+        /// <param name="obj">The instance to compare with</param>
+        /// <returns><see langword="true"/> if this instance has equal property values, else <see langword="false"/></returns>
+        public override bool Equals(object obj)
+        {
+            if (Object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            var other = obj as InputConfiguration;
+            if (other == null
+                || other.AnswerPath != AnswerPath
+                || other.AttributesPath != AttributesPath
+                || other.InputPath != InputPath
+                || other.InputPathType != InputPathType
+                || other.TrainingSetPercentage != TrainingSetPercentage)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the hash code for this object
+        /// </summary>
+        /// <returns>The hash code for this object</returns>
+        public override int GetHashCode()
+        {
+            return HashCode.Start
+                .Hash(AnswerPath)
+                .Hash(AttributesPath)
+                .Hash(InputPath)
+                .Hash(InputPathType)
+                .Hash(TrainingSetPercentage);
+        }
+
+        #endregion Overrides
     }
 }

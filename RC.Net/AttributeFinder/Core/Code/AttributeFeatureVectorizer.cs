@@ -82,7 +82,7 @@ namespace Extract.AttributeFinder
         public FeatureVectorizerType FeatureType { get; set; }
 
         /// <summary>
-        /// Whether changing the <see cref="FeatureVectorizerType"/> is allowed. Always <see langref="true"/>.
+        /// Whether changing the <see cref="FeatureVectorizerType"/> is allowed. Always <see langword="true"/>.
         /// </summary>
         public bool IsFeatureTypeChangeable
         {
@@ -94,7 +94,7 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Whether this feature vectorizer will produce a feature vector of length
-        /// <see cref="FeatureVectorLength"/> (if <see langref="true"/>) or of zero length (if <see langref="false"/>)
+        /// <see cref="FeatureVectorLength"/> (if <see langword="true"/>) or of zero length (if <see langword="false"/>)
         /// </summary>
         public bool Enabled { get; set; }
 
@@ -148,6 +148,29 @@ namespace Extract.AttributeFinder
         #endregion Properties
 
 
+        #region Public Methods
+
+        /// <summary>
+        /// Creates a deep clone of this instance
+        /// </summary>
+        /// <returns>A clone of this instance</returns>
+        public AttributeFeatureVectorizer DeepClone()
+        {
+            try
+            {
+                var clone = (AttributeFeatureVectorizer)MemberwiseClone();
+                clone._distinctValuesSeen = new HashSet<string>(_distinctValuesSeen);
+                return clone;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39813");
+            }
+        }
+
+        #endregion Public Methods
+
+
         #region Internal Methods
 
         /// <summary>
@@ -155,7 +178,7 @@ namespace Extract.AttributeFinder
         /// After this method has been run, this object will be ready to produce feature vectors
         /// </summary>
         /// <param name="protoFeatures">The values to consider when configuring.</param>
-        internal void ConfigureFromTrainingData(IEnumerable<string> protoFeatures)
+        internal void ComputeEncodingsFromTrainingData(IEnumerable<string> protoFeatures)
         {
             try
             {
@@ -288,5 +311,59 @@ namespace Extract.AttributeFinder
         }
 
         #endregion Internal Methods
+
+        #region Overrides
+
+        /// <summary>
+        /// Whether this instance is equal to another.
+        /// </summary>
+        /// <remarks>Does not compare counts of types of values seen. Only compares <see cref="DistinctValuesSeen"/> if
+        /// <see cref="FeatureType"/> is <see cref="FeatureVectorizerType.DiscreteTerms"/></remarks>
+        /// <param name="obj">The instance to compare with</param>
+        /// <returns><see langword="true"/> if this instance has equal property values, else <see langword="false"/></returns>
+        public override bool Equals(object obj)
+        {
+            if (Object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            var other = obj as AttributeFeatureVectorizer;
+            if (other == null
+                || other.Enabled != Enabled
+                || other.FeatureType != FeatureType
+                || other.Name != Name
+                || FeatureType == FeatureVectorizerType.DiscreteTerms &&
+                   !other.DistinctValuesSeen.SequenceEqual(DistinctValuesSeen)
+                )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the hash code for this object
+        /// </summary>
+        /// <returns>The hash code for this object</returns>
+        public override int GetHashCode()
+        {
+            var hash = HashCode.Start
+                .Hash(Enabled)
+                .Hash(FeatureType)
+                .Hash(Name);
+            if (FeatureType == FeatureVectorizerType.DiscreteTerms)
+            {
+                foreach (var value in DistinctValuesSeen)
+                {
+                    hash = hash.Hash(value);
+                }
+            }
+
+            return hash;
+        }
+
+        #endregion Overrides
     }
 }

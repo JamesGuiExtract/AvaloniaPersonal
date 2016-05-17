@@ -123,7 +123,7 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Whether this feature vectorizer will produce a feature vector of length
-        /// <see cref="FeatureVectorLength"/> (if <see langref="true"/>) or of zero length (if <see langref="false"/>)
+        /// <see cref="FeatureVectorLength"/> (if <see langword="true"/>) or of zero length (if <see langword="false"/>)
         /// </summary>
         bool Enabled { get; set; }
     }
@@ -282,7 +282,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Gets/sets the AFQuery to select proto-feature attributes. If <see langref="null"/>
+        /// Gets/sets the AFQuery to select proto-feature attributes. If <see langword="null"/>
         /// then all attributes will be used.
         /// </summary>
         public string AttributeFilter { get; set; }
@@ -301,11 +301,11 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Gets whether this instance has been successfully configured with a call to <see cref="ComputeEncodings"/>
         /// </summary>
-        public bool IsConfigured
+        public bool AreEncodingsComputed
         {
             get
             {
-                return AutoBagOfWords != null && AutoBagOfWords.IsConfigured
+                return AutoBagOfWords != null && AutoBagOfWords.AreEncodingsComputed
                     || AutoBagOfWords == null && AttributeFeatureVectorizers.Any();
             }
         }
@@ -315,12 +315,17 @@ namespace Extract.AttributeFinder
 
         #region Constructors
 
+        // Reserve default constructor for private use
+        private LearningMachineDataEncoder()
+        {
+        }
+
         /// <summary>
         /// Creates an instance of <see cref="LearningMachineDataEncoder"/>
         /// </summary>
         /// <param name="usage">The <see cref="LearningMachineUsage"/> for this instance.</param>
         /// <param name="autoBagOfWords">The optional <see cref="SpatialStringFeatureVectorizer"/> for this instance.</param>
-        /// <param name="attributeFilter">AFQuery to select proto-feature attributes. If <see langref="null"/>
+        /// <param name="attributeFilter">AFQuery to select proto-feature attributes. If <see langword="null"/>
         /// then all attributes will be used.</param>
         /// <param name="negateFilter">Whether to use only attributes that are not selected by
         /// <see paramref="attributeFilter"/> for proto-features</param>
@@ -419,7 +424,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                ExtractException.Assert("ELI39691", "Object has not been configured", IsConfigured);
+                ExtractException.Assert("ELI39691", "Encodings have not been computed", AreEncodingsComputed);
 
                 if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                 {
@@ -484,12 +489,12 @@ namespace Extract.AttributeFinder
                     throw new ExtractException("ELI39539", "Unsupported LearningMachineUsage: " + MachineUsage.ToString());
                 }
 
-                ExtractException.Assert("ELI39693", "Unable to successfully compute encodings", IsConfigured);
+                ExtractException.Assert("ELI39693", "Unable to successfully compute encodings", AreEncodingsComputed);
             }
             catch (Exception e)
             {
                 // Clear any partially computed encodings
-                if (IsConfigured)
+                if (AreEncodingsComputed)
                 {
                     Clear();
                 }
@@ -512,7 +517,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                ExtractException.Assert("ELI39691", "Object has not been configured", IsConfigured);
+                ExtractException.Assert("ELI39691", "Encodings have not been computed", AreEncodingsComputed);
 
                 // Null or empty VOA collection is OK. Set to null to simplify code
                 if (inputVOAFilePaths != null && inputVOAFilePaths.Length == 0)
@@ -560,6 +565,78 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39544");
+            }
+        }
+
+        /// <summary>
+        /// Whether this instance is configured the same as another
+        /// </summary>
+        /// <param name="other">The <see cref="LearningMachineDataEncoder"/> to compare with</param>
+        /// <returns><see langword="true"/> if the configurations are the same, else <see langword="false"/></returns>
+        public bool IsConfigurationEqualTo(LearningMachineDataEncoder other)
+        {
+            try
+            {
+                if (Object.ReferenceEquals(this, other))
+                {
+                    return true;
+                }
+
+                if (other == null
+                    || other.AttributeFilter != AttributeFilter
+                    || (other.AutoBagOfWords == null) != (AutoBagOfWords == null)
+                    || other.AutoBagOfWords != null && !other.AutoBagOfWords.IsConfigurationEqualTo(AutoBagOfWords)
+                    || other.MachineUsage != MachineUsage
+                    || other.NegateFilter != NegateFilter
+                    || other.AreEncodingsComputed && AreEncodingsComputed &&
+                        (  !other.AttributeFeatureVectorizers.SequenceEqual(AttributeFeatureVectorizers)
+                        || other.AutoBagOfWords != null && !other.AutoBagOfWords.Equals(AutoBagOfWords)
+                        )
+                   )
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39824");
+            }
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="LearningMachineDataEncoder"/> that is a shallow clone of this instance
+        /// </summary>
+        public LearningMachineDataEncoder ShallowClone()
+        {
+            try
+            {
+                return (LearningMachineDataEncoder)MemberwiseClone();
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39834");
+            }
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="LearningMachineDataEncoder"/> that is a deep clone of this instance
+        /// </summary>
+        public LearningMachineDataEncoder DeepClone()
+        {
+            try
+            {
+                var clone = ShallowClone();
+                clone.AutoBagOfWords = AutoBagOfWords.DeepClone();
+                clone.AnswerCodeToName = new Dictionary<int, string>(AnswerCodeToName);
+                clone.AnswerNameToCode = new Dictionary<string, int>(AnswerNameToCode, StringComparer.OrdinalIgnoreCase);
+                clone.AttributeFeatureVectorizers = AttributeFeatureVectorizers.Select(afv => afv.DeepClone()).ToList();
+                return clone;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39835");
             }
         }
 
@@ -858,7 +935,7 @@ namespace Extract.AttributeFinder
             // Configure SpatialStringFeatureVectorizer
             if (AutoBagOfWords != null)
             {
-                AutoBagOfWords.ConfigureFromDocumentTrainingData(ussFilePaths, answers);
+                AutoBagOfWords.ComputeEncodingsFromDocumentTrainingData(ussFilePaths, answers);
             }
 
             // Configure AttributeFeatureVectorizer collection
@@ -872,7 +949,7 @@ namespace Extract.AttributeFinder
             {
                 string name = group.Key;
                 var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
-                vectorizer.ConfigureFromTrainingData(group.Value);
+                vectorizer.ComputeEncodingsFromTrainingData(group.Value);
             }
             AttributeFeatureVectorizers = vectorizerMap.Values;
 
@@ -908,7 +985,7 @@ namespace Extract.AttributeFinder
             // Configure SpatialStringFeatureVectorizer
             if (AutoBagOfWords != null)
             {
-                AutoBagOfWords.ConfigureFromPaginationTrainingData(ussFilePaths, answerFiles);
+                AutoBagOfWords.ComputeEncodingsFromPaginationTrainingData(ussFilePaths, answerFiles);
             }
 
             // Configure AttributeFeatureVectorizer collection
@@ -922,7 +999,7 @@ namespace Extract.AttributeFinder
             {
                 string name = group.Key;
                 var vectorizer = vectorizerMap.GetOrAdd(name, k => new AttributeFeatureVectorizer(k));
-                vectorizer.ConfigureFromTrainingData(group.Value);
+                vectorizer.ComputeEncodingsFromTrainingData(group.Value);
             }
             AttributeFeatureVectorizers = vectorizerMap.Values;
 
@@ -935,7 +1012,7 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Filter the <see paramref="protoFeatures"/> so that only the attributes that are selected
-        /// (or not selected if <see cref="NegateFilter"/> is <see langref="true"/>)
+        /// (or not selected if <see cref="NegateFilter"/> is <see langword="true"/>)
         /// by the <see cref="AttributeFilter"/> AFQuery are returned.
         /// </summary>
         /// <param name="protoFeatures">The vector of <see cref="ComAttribute"/>s to filter</param>
@@ -971,7 +1048,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Clear computed values. After this call, <see cref="IsConfigured"/>==<see langref="false"/>
+        /// Clear computed values. After this call, <see cref="AreEncodingsComputed"/>==<see langword="false"/>
         /// </summary>
         private void Clear()
         {

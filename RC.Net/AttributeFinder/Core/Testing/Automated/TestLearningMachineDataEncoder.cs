@@ -239,12 +239,12 @@ namespace Extract.AttributeFinder.Test
             _voaFiles[1] = "";
             var ex = Assert.Throws<ExtractException>(() => encoder.ComputeEncodings(_ussFiles, _voaFiles, _categories));
             Assert.That( ex.Message, Is.EqualTo("One or more errors occurred.") );
-            Assert.That(!encoder.IsConfigured);
+            Assert.That(!encoder.AreEncodingsComputed);
 
             _voaFiles[1] = "blah.voa";
             ex = Assert.Throws<ExtractException>(() => encoder.ComputeEncodings(_ussFiles, _voaFiles, _categories));
             Assert.That( ex.Message, Is.EqualTo("One or more errors occurred.") );
-            Assert.That(!encoder.IsConfigured);
+            Assert.That(!encoder.AreEncodingsComputed);
         }
 
         // Test exception handling: neither auto-bag-of-words nor attribute features is invalid
@@ -259,7 +259,7 @@ namespace Extract.AttributeFinder.Test
 
             // Can't use if not configured successfully
             ex = Assert.Throws<ExtractException>(() => encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, null, _categories));
-            Assert.That( ex.Message, Is.EqualTo("Object has not been configured") );
+            Assert.That( ex.Message, Is.EqualTo("Encodings have not been computed") );
 
             // Can't use if not configured successfully
             var uss = new UCLID_RASTERANDOCRMGMTLib.SpatialStringClass();
@@ -267,7 +267,7 @@ namespace Extract.AttributeFinder.Test
             var voa = new UCLID_COMUTILSLib.IUnknownVectorClass();
             voa.LoadFrom(_voaFiles[0], false);
             ex = Assert.Throws<ExtractException>(() => encoder.GetFeatureVectors(uss, voa));
-            Assert.That( ex.Message, Is.EqualTo("Object has not been configured") );
+            Assert.That( ex.Message, Is.EqualTo("Encodings have not been computed") );
         }
 
         // Helper function to create file lists for document categorization testing
@@ -368,12 +368,12 @@ namespace Extract.AttributeFinder.Test
             _voaFiles[1] = "";
             var ex = Assert.Throws<ExtractException>(() => encoder.ComputeEncodings(_ussFiles, _voaFiles, _categories));
             Assert.That( ex.Message, Is.EqualTo("Cannot get attributes from unsupported file type.") );
-            Assert.That(!encoder.IsConfigured);
+            Assert.That(!encoder.AreEncodingsComputed);
 
             _voaFiles[1] = "blah.voa";
             ex = Assert.Throws<ExtractException>(() => encoder.ComputeEncodings(_ussFiles, _voaFiles, _categories));
             Assert.That( ex.Message, Is.EqualTo("Specified file or folder can't be found.") );
-            Assert.That(!encoder.IsConfigured);
+            Assert.That(!encoder.AreEncodingsComputed);
         }
 
         // Test using only auto-bag-of-words feature
@@ -459,7 +459,7 @@ namespace Extract.AttributeFinder.Test
 
             // Can't use if not configured successfully
             ex = Assert.Throws<ExtractException>(() => encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, null, _categories));
-            Assert.That( ex.Message, Is.EqualTo("Object has not been configured") );
+            Assert.That( ex.Message, Is.EqualTo("Encodings have not been computed") );
 
             // Can't use if not configured successfully
             var uss = new UCLID_RASTERANDOCRMGMTLib.SpatialStringClass();
@@ -467,7 +467,7 @@ namespace Extract.AttributeFinder.Test
             var voa = new UCLID_COMUTILSLib.IUnknownVectorClass();
             voa.LoadFrom(_voaFiles[0], false);
             ex = Assert.Throws<ExtractException>(() => encoder.GetFeatureVectors(uss, voa));
-            Assert.That( ex.Message, Is.EqualTo("Object has not been configured") );
+            Assert.That( ex.Message, Is.EqualTo("Encodings have not been computed") );
         }
 
         // Tests changing feature types
@@ -518,6 +518,137 @@ namespace Extract.AttributeFinder.Test
             Assert.That(!encoder.AutoBagOfWords.IsFeatureTypeChangeable);
             var ex = Assert.Throws<ExtractException>(() => encoder.AutoBagOfWords.FeatureType = FeatureVectorizerType.Exists);
             Assert.That( ex.Message, Is.EqualTo("Cannot change type of SpatialStringFeatureVectorizer") );
+        }
+
+        // Test comparison methods
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void TestConfigurationEqualTo()
+        {
+            var encoder1 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization);
+            var encoder2 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization);
+            Assert.That(encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(encoder2.IsConfigurationEqualTo(encoder1));
+
+            encoder2 = new LearningMachineDataEncoder(LearningMachineUsage.Pagination);
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+
+            encoder2 = null;
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+
+            var autoBoW1 = new SpatialStringFeatureVectorizer("", 5, 2000);
+            var autoBoW2 = new SpatialStringFeatureVectorizer("", 5, 2000);
+            encoder1 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW1);
+            encoder2 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW2);
+
+            Assert.That(encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(encoder2.IsConfigurationEqualTo(encoder1));
+
+            encoder2.AutoBagOfWords.Enabled = false;
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+
+            encoder2 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization);
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+
+            autoBoW2.Enabled = true;
+            encoder1 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW1, "*@Feature");
+            encoder2 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW2);
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+
+            encoder2 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW2, "*@Feature");
+            Assert.That(encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(encoder2.IsConfigurationEqualTo(encoder1));
+
+            encoder1 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW1, "*@Feature", true);
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+
+            encoder2 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW2, "*@Feature", true);
+            Assert.That(encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(encoder2.IsConfigurationEqualTo(encoder1));
+
+            // Considered configurations equal if features only computed for one
+            SetDocumentCategorizationFiles();
+            encoder1.ComputeEncodings(_ussFiles, _voaFiles, _categories);
+            Assert.That(encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(encoder2.IsConfigurationEqualTo(encoder1));
+
+            // Considered equal if features computed for both and results are the same
+            encoder2.ComputeEncodings(_ussFiles, _voaFiles, _categories);
+            Assert.That(encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(encoder2.IsConfigurationEqualTo(encoder1));
+
+            // If encodings are computed for both, then changes to an attribute feature vectorizer will affect comparison
+            encoder1.AttributeFeatureVectorizers.First().Enabled = false;
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+
+            // Make them both match
+            encoder2.AttributeFeatureVectorizers.First().Enabled = false;
+            Assert.That(encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(encoder2.IsConfigurationEqualTo(encoder1));
+
+            // Changing a feature vectorizer that is not enabled also makes the encoders not equal
+            encoder1.AttributeFeatureVectorizers.First().FeatureType = FeatureVectorizerType.DiscreteTerms;
+            encoder2.AttributeFeatureVectorizers.First().FeatureType = FeatureVectorizerType.Exists;
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+        }
+
+        // Test shallow clone method
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void TestShallowClone()
+        {
+            var autoBoW1 = new SpatialStringFeatureVectorizer("", 5, 2000);
+            var encoder1 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW1);
+            var encoder2 = encoder1.ShallowClone();
+
+            // Changing settings of a member changes for both original and clone
+            encoder1.AutoBagOfWords.Enabled = false;
+            Assert.That(encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(encoder2.IsConfigurationEqualTo(encoder1));
+
+            // Compute encodings and clone again
+            SetDocumentCategorizationFiles();
+            encoder1.ComputeEncodings(_ussFiles, _voaFiles, _categories);
+            encoder2 = encoder1.ShallowClone();
+
+            // Changing settings of a feature vectorizer changes for both original and clone
+            encoder1.AttributeFeatureVectorizers.First().Enabled = false;
+            Assert.That(encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(encoder2.IsConfigurationEqualTo(encoder1));
+
+            // Changing a setting on the original won't affect the clone
+            encoder1.AttributeFilter = "*@Feature";
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+        }
+
+        // Test deep clone method
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void TestDeepClone()
+        {
+            var autoBoW1 = new SpatialStringFeatureVectorizer("", 5, 2000);
+            var encoder1 = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW1);
+            var encoder2 = encoder1.DeepClone();
+
+            // Changing settings of a member of original won't affect the clone
+            encoder1.AutoBagOfWords.Enabled = false;
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
+
+            // Compute encodings and clone again
+            SetDocumentCategorizationFiles();
+            encoder1.ComputeEncodings(_ussFiles, _voaFiles, _categories);
+            encoder2 = encoder1.DeepClone();
+
+            // Changing settings of a feature vectorizer of the original won't affect the clone
+            encoder1.AttributeFeatureVectorizers.First().Enabled = false;
+            Assert.That(!encoder1.IsConfigurationEqualTo(encoder2));
+            Assert.That(!encoder2.IsConfigurationEqualTo(encoder1));
         }
 
         #endregion Tests

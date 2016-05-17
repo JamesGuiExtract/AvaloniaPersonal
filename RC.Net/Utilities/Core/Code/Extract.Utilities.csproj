@@ -82,6 +82,7 @@
     <Compile Include="DataCache.cs" />
     <Compile Include="DateTimeMethods.cs" />
     <Compile Include="ExtractFileLock.cs" />
+    <Compile Include="HashCode.cs" />
     <Compile Include="IdentifiableObject.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
