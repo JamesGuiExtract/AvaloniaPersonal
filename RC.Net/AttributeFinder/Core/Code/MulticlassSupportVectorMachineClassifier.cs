@@ -11,6 +11,7 @@ namespace Extract.AttributeFinder
     /// One vs one SVM classifier
     /// </summary>
     [CLSCompliant(false)]
+    [Serializable]
     public class MulticlassSupportVectorMachineClassifier : SupportVectorMachineClassifier, IDisposable
     {
         #region Overrides

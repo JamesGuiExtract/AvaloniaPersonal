@@ -184,6 +184,7 @@ namespace Extract.AttributeFinder
     /// Object that can transform <see cref="ISpatialString"/>s and <see cref="ComAttribute"/>s into numeric feature vectors.
     /// </summary>
     [CLSCompliant(false)]
+    [Serializable]
     public class LearningMachineDataEncoder
     {
 

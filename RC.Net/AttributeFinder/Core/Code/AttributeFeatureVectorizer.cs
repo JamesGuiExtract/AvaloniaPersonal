@@ -10,6 +10,7 @@ namespace Extract.AttributeFinder
     /// An IFeatureVectorizer that produces feature vectors from <see cref="ComAttribute"/>s
     /// </summary>
     [CLSCompliant(false)]
+    [Serializable]
     public class AttributeFeatureVectorizer : IFeatureVectorizer
     {
         #region Private Fields

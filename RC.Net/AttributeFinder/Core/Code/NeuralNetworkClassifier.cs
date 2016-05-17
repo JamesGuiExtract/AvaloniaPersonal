@@ -11,6 +11,7 @@ namespace Extract.AttributeFinder
     /// <summary>
     /// Classifier that uses an Activation Network
     /// </summary>
+    [Serializable]
     public class NeuralNetworkClassifier : ITrainableClassifier
     {
 

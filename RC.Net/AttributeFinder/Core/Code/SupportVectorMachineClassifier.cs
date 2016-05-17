@@ -13,6 +13,7 @@ namespace Extract.AttributeFinder
     /// Base class for support vector machine classifiers
     /// </summary>
     [CLSCompliant(false)]
+    [Serializable]
     public abstract class SupportVectorMachineClassifier : ITrainableClassifier
     {
         /// <summary>

@@ -36,8 +36,9 @@ namespace Extract.AttributeFinder.Test
         /// Manages the test images needed for testing.
         /// </summary>
         static TestFileManager<TestLearningMachine> _testFiles;
-        static string _inputFolder;
-        static string _csvPath;
+        static List<string> _inputFolder = new List<string>();
+        static string _csvPath = Path.GetTempFileName();
+        static string _savedMachinePath = Path.GetTempFileName();
         static string[] _categories;
 
         #endregion Fields
@@ -68,15 +69,21 @@ namespace Extract.AttributeFinder.Test
             }
 
             // Delete temp dir
-            if (Directory.Exists(_inputFolder))
+            foreach(var dir in _inputFolder.Where(dir => Directory.Exists(dir)))
             {
-                Directory.Delete(_inputFolder, true);
+                Directory.Delete(dir, true);
             }
 
             // Delete tmp csv
             if (File.Exists(_csvPath))
             {
                 File.Delete(_csvPath);
+            }
+
+            // Delete saved machine
+            if (File.Exists(_savedMachinePath))
+            {
+                File.Delete(_savedMachinePath);
             }
         }
 
@@ -184,7 +191,7 @@ namespace Extract.AttributeFinder.Test
             SetDocumentCategorizationFiles();
             var inputConfig = new InputConfiguration
             {
-                InputPath = _inputFolder,
+                InputPath = _inputFolder.Last(),
                 InputPathType = InputType.Folder,
                 AttributesPath = "",
                 AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
@@ -252,7 +259,7 @@ namespace Extract.AttributeFinder.Test
             {
                 InputConfig = new InputConfiguration
                     {
-                        InputPath = _inputFolder,
+                        InputPath = _inputFolder.Last(),
                         InputPathType = InputType.Folder,
                         AttributesPath = "<SourceDocName>.protofeatures.voa",
                         AnswerPath = "<SourceDocName>.eav",
@@ -270,8 +277,7 @@ namespace Extract.AttributeFinder.Test
         public static void TrainMachinePaginationFromList()
         {
             SetPaginationFiles();
-            string[] listContents = Directory.GetFiles(_inputFolder, "*.tif", SearchOption.AllDirectories);
-            _csvPath = Path.GetTempFileName();
+            string[] listContents = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories);
             File.WriteAllLines(_csvPath, listContents);
 
             var lm = new LearningMachine
@@ -296,9 +302,8 @@ namespace Extract.AttributeFinder.Test
         public static void TrainMachineFromCsv()
         {
             SetDocumentCategorizationFiles();
-            string[] csvContents = Directory.GetFiles(_inputFolder, "*.tif", SearchOption.AllDirectories)
+            string[] csvContents = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories)
                 .Select(imagePath => string.Join(",", imagePath, Path.GetFileName(Path.GetDirectoryName(imagePath)))).ToArray();
-            _csvPath = Path.GetTempFileName();
             File.WriteAllLines(_csvPath, csvContents);
 
             var lm = new LearningMachine
@@ -323,10 +328,9 @@ namespace Extract.AttributeFinder.Test
         public static void TrainMachineFromCsvWithHeader()
         {
             SetDocumentCategorizationFiles();
-            string[] csvContents = Directory.GetFiles(_inputFolder, "*.tif", SearchOption.AllDirectories)
+            string[] csvContents = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories)
                 .Select(imagePath => string.Join(",", imagePath, Path.GetFileName(Path.GetDirectoryName(imagePath)))).ToArray();
             csvContents = new[] { "Image Paths, <Category>" }.Concat(csvContents).ToArray();
-            _csvPath = Path.GetTempFileName();
             File.WriteAllLines(_csvPath, csvContents);
 
             var lm = new LearningMachine
@@ -351,14 +355,13 @@ namespace Extract.AttributeFinder.Test
         public static void TrainMachineFromCsvWithQuotes()
         {
             SetDocumentCategorizationFiles();
-            string[][] csvTempContents = Directory.GetFiles(_inputFolder, "*.tif", SearchOption.AllDirectories)
+            string[][] csvTempContents = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories)
                 .Select(imagePath => new[] { imagePath, Path.GetFileName(Path.GetDirectoryName(imagePath)) }).ToArray();
 
             csvTempContents[2][0] = "\"" + csvTempContents[2][0] + "\"";
             csvTempContents[3][1] = "\"Abstract of \"\"Support\"\" Judgment\"";
 
             string[] csvContents = csvTempContents.Select(x => string.Join(",", x)).ToArray();
-            _csvPath = Path.GetTempFileName();
             File.WriteAllLines(_csvPath, csvContents);
 
             var lm = new LearningMachine
@@ -386,7 +389,7 @@ namespace Extract.AttributeFinder.Test
             SetPaginationFiles();
             var inputConfig = new InputConfiguration
             {
-                InputPath = _inputFolder,
+                InputPath = _inputFolder.Last(),
                 InputPathType = InputType.Folder,
                 AttributesPath = "<SourceDocName>.protofeatures.voa",
                 AnswerPath = "<SourceDocName>.eav",
@@ -448,7 +451,7 @@ namespace Extract.AttributeFinder.Test
             SetDocumentCategorizationFiles();
             var inputConfig1 = new InputConfiguration
             {
-                InputPath = _inputFolder,
+                InputPath = _inputFolder.Last(),
                 InputPathType = InputType.Folder,
                 AttributesPath = "",
                 AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
@@ -456,7 +459,7 @@ namespace Extract.AttributeFinder.Test
             };
             var inputConfig2 = new InputConfiguration
             {
-                InputPath = _inputFolder,
+                InputPath = _inputFolder.Last(),
                 InputPathType = InputType.Folder,
                 AttributesPath = "",
                 AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
@@ -533,7 +536,7 @@ namespace Extract.AttributeFinder.Test
             SetDocumentCategorizationFiles();
             var inputConfig1 = new InputConfiguration
             {
-                InputPath = _inputFolder,
+                InputPath = _inputFolder.Last(),
                 InputPathType = InputType.Folder,
                 AttributesPath = "",
                 AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
@@ -569,7 +572,7 @@ namespace Extract.AttributeFinder.Test
         {
             var inputConfig1 = new InputConfiguration
             {
-                InputPath = _inputFolder,
+                InputPath = _inputFolder.Last(),
                 InputPathType = InputType.Folder,
                 AttributesPath = "",
                 AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
@@ -578,7 +581,7 @@ namespace Extract.AttributeFinder.Test
 
             var inputConfig2 = new InputConfiguration
             {
-                InputPath = _inputFolder,
+                InputPath = _inputFolder.Last(),
                 InputPathType = InputType.Folder,
                 AttributesPath = "",
                 AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
@@ -618,6 +621,122 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(inputConfig1, inputConfig2);
         }
 
+        // Test serializing multi class svm
+        [Test, Category("LearningMachine")]
+        public static void TestSerializingMulticlass()
+        {
+            SetDocumentCategorizationFiles();
+            var inputConfig1 = new InputConfiguration
+            {
+                InputPath = _inputFolder.Last(),
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm1 = new LearningMachine
+            {
+                InputConfig = inputConfig1,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+
+            lm1.TrainMachine();
+            var savedMachine = new System.IO.MemoryStream();
+            lm1.Save(savedMachine);
+            savedMachine.Position = 0;
+            var lm2 = LearningMachine.Load(savedMachine);
+
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            // Test output
+            string[] ussFiles, voaFiles, answers;
+            lm2.InputConfig.GetInputData(out ussFiles, out voaFiles, out answers);
+            for (int i = 0; i < ussFiles.Length; i++)
+            {
+                var uss = new SpatialStringClass();
+                uss.LoadFrom(ussFiles[i], false);
+                Assert.AreEqual(answers[i], ((ComAttribute)lm2.ComputeAnswer(uss, null, false).At(0)).Value.String);
+            }
+        }
+
+        // Test serializing multi label svm
+        [Test, Category("LearningMachine")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multilabel")]
+        public static void TestSerializingMultilabel()
+        {
+            SetDocumentCategorizationFiles();
+            var inputConfig1 = new InputConfiguration
+            {
+                InputPath = _inputFolder.Last(),
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm1 = new LearningMachine
+            {
+                InputConfig = inputConfig1,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MultilabelSupportVectorMachineClassifier()
+            };
+
+            lm1.TrainMachine();
+            var savedMachine = new System.IO.MemoryStream();
+            lm1.Save(savedMachine);
+            savedMachine.Position = 0;
+            var lm2 = LearningMachine.Load(savedMachine);
+
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            // Test output
+            string[] ussFiles, voaFiles, answers;
+            lm2.InputConfig.GetInputData(out ussFiles, out voaFiles, out answers);
+            for (int i = 0; i < ussFiles.Length; i++)
+            {
+                var uss = new SpatialStringClass();
+                uss.LoadFrom(ussFiles[i], false);
+                Assert.AreEqual(answers[i], ((ComAttribute)lm2.ComputeAnswer(uss, null, false).At(0)).Value.String);
+            }
+        }
+
+        // Test serializing neural network
+        [Test, Category("LearningMachine")]
+        public static void TestSerializingNeuralNetToFile()
+        {
+            SetPaginationFiles();
+            string[] listContents = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories);
+            File.WriteAllLines(_csvPath, listContents);
+
+            var lm1 = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                    {
+                        InputPath = _csvPath,
+                        InputPathType = InputType.TextFileOrCsv,
+                        AttributesPath = "<SourceDocName>.protofeatures.voa",
+                        AnswerPath = "<SourceDocName>.eav",
+                        TrainingSetPercentage = 50
+                    },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false }
+            };
+            lm1.TrainMachine();
+            lm1.Save(_savedMachinePath);
+            var lm2 = LearningMachine.Load(_savedMachinePath);
+
+            Assert.That(lm1.IsConfigurationEqualTo(lm2));
+
+            // Test output
+            string[] ussFiles, voaFiles, answerFiles;
+            lm2.InputConfig.GetInputData(out ussFiles, out voaFiles, out answerFiles);
+            var results = lm2.Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answerFiles);
+            var featureVectors = results.Item1;
+            var answers = results.Item2;
+            var score = LearningMachine.GetAccuracyScore(lm2.Classifier, featureVectors, answers);
+            Assert.Greater(score, 0.80);
+        }
+
         [Test, Category("Extended")]
         public static void ZTrainMachineFromLargeFolder()
         {
@@ -647,27 +766,27 @@ namespace Extract.AttributeFinder.Test
         // These images are stapled together from Demo_LabDE images
         private static void SetPaginationFiles()
         {
-            _inputFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(_inputFolder);
+            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+            Directory.CreateDirectory(_inputFolder.Last());
 
             for (int i = 0; i < 7; i++)
             {
                 var baseName = "Resources.LearningMachine.Pagination.Pagination_{0:D3}.tif{1}";
 
                 string resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, "");
-                string path = Path.Combine(_inputFolder, resourceName);
+                string path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
 
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".uss");
-                path = Path.Combine(_inputFolder, resourceName);
+                path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
 
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".protofeatures.voa");
-                path = Path.Combine(_inputFolder, resourceName);
+                path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
 
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".eav");
-                path = Path.Combine(_inputFolder, resourceName);
+                path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
             }
         }
@@ -677,8 +796,8 @@ namespace Extract.AttributeFinder.Test
         // These files are from Demo_FlexIndex
         private static void SetDocumentCategorizationFiles()
         {
-            _inputFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(_inputFolder);
+            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+            Directory.CreateDirectory(_inputFolder.Last());
 
             _categories = new string[]
             {
@@ -696,7 +815,7 @@ namespace Extract.AttributeFinder.Test
 
             foreach(var category in _categories)
             {
-                string folder = Path.Combine(_inputFolder, category);
+                string folder = Path.Combine(_inputFolder.Last(), category);
                 Directory.CreateDirectory(folder);
             }
 
@@ -704,15 +823,15 @@ namespace Extract.AttributeFinder.Test
             {
                 var baseName = "Resources.LearningMachine.DocumentCategorization.Example{0:D2}.tif{1}";
                 string resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, "");
-                string path = Path.Combine(_inputFolder, _categories[i], resourceName);
+                string path = Path.Combine(_inputFolder.Last(), _categories[i], resourceName);
                 _testFiles.GetFile(resourceName, path);
 
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".uss");
-                path = Path.Combine(_inputFolder, _categories[i], resourceName);
+                path = Path.Combine(_inputFolder.Last(), _categories[i], resourceName);
                 _testFiles.GetFile(resourceName, path);
 
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".voa");
-                path = Path.Combine(_inputFolder, _categories[i], resourceName);
+                path = Path.Combine(_inputFolder.Last(), _categories[i], resourceName);
                 _testFiles.GetFile(resourceName, path);
             }
         }

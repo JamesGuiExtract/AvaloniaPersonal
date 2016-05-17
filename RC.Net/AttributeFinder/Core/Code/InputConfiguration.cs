@@ -27,6 +27,7 @@ namespace Extract.AttributeFinder
     /// <summary>
     /// Class to hold specification of input files and to build the actual arrays
     /// </summary>
+    [Serializable]
     public class InputConfiguration
     {
         #region Fields

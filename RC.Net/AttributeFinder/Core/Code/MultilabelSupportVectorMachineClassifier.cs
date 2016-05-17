@@ -11,6 +11,7 @@ namespace Extract.AttributeFinder
     /// </summary>
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multilabel")]
     [CLSCompliant(false)]
+    [Serializable]
     public class MultilabelSupportVectorMachineClassifier : SupportVectorMachineClassifier, IDisposable
     {
         #region Properties

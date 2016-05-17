@@ -10,6 +10,8 @@ using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using System.Globalization;
 using ComAttribute = UCLID_AFCORELib.Attribute;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 
 namespace Extract.AttributeFinder
 {
@@ -17,6 +19,7 @@ namespace Extract.AttributeFinder
     /// Class to hold a trained machine, data encoder and training stats
     /// </summary>
     [CLSCompliant(false)]
+    [Serializable]
     public class LearningMachine : IDisposable
     {
         #region Properties
@@ -168,40 +171,27 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
-
-                // Compute input files and answers
-                string[] ussFiles, voaFiles, answersOrAnswerFiles;
-                InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles);
-
-                if (!Encoder.AreEncodingsComputed)
-                {
-                    Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles);
-                }
-
-                var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles);
-
-                // Divide data into training and testing subsets
-                var rng = new Random(RandomNumberSeed);
-                List<int> trainIdx, testIdx;
-                GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2, InputConfig.TrainingSetPercentage / 100.0, out trainIdx, out testIdx, rng);
-
-                // Training set
-                double[][] trainInputs = featureVectorsAndAnswers.Item1.Submatrix(trainIdx);
-                int[] trainOutputs = featureVectorsAndAnswers.Item2.Submatrix(trainIdx);
-
-                // Testing set
-                double[][] testInputs = featureVectorsAndAnswers.Item1.Submatrix(testIdx);
-                int[] testOutputs = featureVectorsAndAnswers.Item2.Submatrix(testIdx);
-
-                // Train the classifier
-                Classifier.TrainClassifier(trainInputs, trainOutputs, rng);
-
-                return Tuple.Create(GetAccuracyScore(Classifier, trainInputs, trainOutputs), GetAccuracyScore(Classifier, testInputs, testOutputs));
+                return TrainAndTestMachine(testOnly: false);
             }
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39755");
+            }
+        }
+
+        /// <summary>
+        /// Tests the machine using files specified with <see cref="InputConfig"/>
+        /// </summary>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        public Tuple<double, double> TestMachine()
+        {
+            try
+            {
+                return TrainAndTestMachine(testOnly: true);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39807");
             }
         }
 
@@ -386,7 +376,124 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Save machine to specified file
+        /// </summary>
+        /// <param name="fileName">File name to save machine into.</param>
+        public void Save(string fileName)
+        {
+            try
+            {
+                using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    Save(stream);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39809");
+            }
+        }
+
+        /// <summary>
+        /// Save machine to specified stream
+        /// </summary>
+        /// <param name="stream">Stream to save machine into</param>
+        public void Save(Stream stream)
+        {
+            try
+            {
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, this);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39810");
+            }
+        }
+
+        /// <summary>
+        /// Load machine from specified file
+        /// </summary>
+        /// <param name="fileName">File name to load machine from</param>
+        /// <returns>Returns instance of <see cref="LearningMachine"/> with all properties initialized from file</returns>
+        public static LearningMachine Load(string fileName)
+        {
+            try
+            {
+                using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    LearningMachine machine = Load(stream);
+                    return machine;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39808");
+            }
+        }
+
+        /// <summary>
+        /// Load machine from specified stream.
+        /// </summary>
+        /// <param name="stream">Stream to load machine from.</param>
+        /// <returns>Returns instance of <see cref="LearningMachine"/> class with all properties initialized from file.</returns>
+        public static LearningMachine Load(Stream stream)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            LearningMachine network = (LearningMachine)formatter.Deserialize(stream);
+            return network;
+        }
+
         #endregion Public Methods
+
+
+        #region Private Methods
+
+        /// <summary>
+        /// Optionally trains and then tests the machine using files specified with <see cref="InputConfig"/>
+        /// </summary>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        private Tuple<double, double> TrainAndTestMachine(bool testOnly)
+        {
+            ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
+
+            // Compute input files and answers
+            string[] ussFiles, voaFiles, answersOrAnswerFiles;
+            InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles);
+
+            if (!Encoder.AreEncodingsComputed)
+            {
+                Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles);
+            }
+
+            var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles);
+
+            // Divide data into training and testing subsets
+            var rng = new Random(RandomNumberSeed);
+            List<int> trainIdx, testIdx;
+            GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2, InputConfig.TrainingSetPercentage / 100.0, out trainIdx, out testIdx, rng);
+
+            // Training set
+            double[][] trainInputs = featureVectorsAndAnswers.Item1.Submatrix(trainIdx);
+            int[] trainOutputs = featureVectorsAndAnswers.Item2.Submatrix(trainIdx);
+
+            // Testing set
+            double[][] testInputs = featureVectorsAndAnswers.Item1.Submatrix(testIdx);
+            int[] testOutputs = featureVectorsAndAnswers.Item2.Submatrix(testIdx);
+
+            // Train the classifier
+            if (!testOnly)
+            {
+                Classifier.TrainClassifier(trainInputs, trainOutputs, rng);
+            }
+
+            return Tuple.Create(GetAccuracyScore(Classifier, trainInputs, trainOutputs), GetAccuracyScore(Classifier, testInputs, testOutputs));
+        }
+
+
+        #endregion Private Methods
+
 
         #region IDisposable Members
 
@@ -420,6 +527,7 @@ namespace Extract.AttributeFinder
         }
 
         #endregion IDisposable Members
+
 
         #region Static Methods
 

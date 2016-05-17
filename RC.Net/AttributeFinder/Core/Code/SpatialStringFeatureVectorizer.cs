@@ -20,6 +20,7 @@ namespace Extract.AttributeFinder
     /// An IFeatureVectorizer that produces feature vectors from <see cref="ISpatialString"/>s
     /// </summary>
     [CLSCompliant(false)]
+    [Serializable]
     public class SpatialStringFeatureVectorizer : IFeatureVectorizer
     {
         #region Private Fields
@@ -175,7 +176,7 @@ namespace Extract.AttributeFinder
             {
                 // Order by code to match original order of terms passed to constructor
                 // This could be interesting to see (since terms will have been ordered by TFIDF score)
-                // and simplifies reconstructing the bag of words when cloning or deserializing
+                // and simplifies reconstructing the bag of words when cloning
                 return _bagOfWords == null
                     ? Enumerable.Empty<string>()
                     : _bagOfWords.CodeToString.OrderBy(p => p.Key).Select(p => p.Value);
