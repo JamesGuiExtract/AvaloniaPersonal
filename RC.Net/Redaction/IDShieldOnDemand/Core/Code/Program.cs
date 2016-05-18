@@ -69,7 +69,8 @@ namespace IDShieldOnDemand
                     new SlideshowSettings(false, false, "", false, "", EActionStatus.kActionUnattempted,
                         false, new ObjectWithDescription(), false, false, 1, false),
                     false,
-                    null);
+                    null,
+                    verificationModeSetting: null);
 
                 _verifyForm = new VerificationTaskForm(settings, new FAMTagManager());
 
