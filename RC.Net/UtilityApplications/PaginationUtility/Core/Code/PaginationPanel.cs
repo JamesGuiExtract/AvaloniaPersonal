@@ -354,7 +354,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         if (_documentDataPanel != null)
                         {
-                            _tableLayoutPanel.Controls.Add(_documentDataPanel.Control);
+                            _tableLayoutPanel.Controls.Add(_documentDataPanel.Control, 0, 0);
                             _documentDataPanel.Control.Dock = DockStyle.Fill;
                         }
                     }
@@ -1249,8 +1249,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.SelectionChanged += HandlePageLayoutControl_SelectionChanged;
             _primaryPageLayoutControl.DocumentSplit += HandlePrimaryPageLayoutControl_DocumentSplit;
             _primaryPageLayoutControl.DocumentsMerged += HandlePrimaryPageLayoutControl_DocumentsMerged;
-            _tableLayoutPanel.Controls.Add(_primaryPageLayoutControl);
-            _tableLayoutPanel.Controls.SetChildIndex(_primaryPageLayoutControl, 0);
+            _tableLayoutPanel.Controls.Add(_primaryPageLayoutControl, 0, 1);
             _primaryPageLayoutControl.Focus();
         }
 

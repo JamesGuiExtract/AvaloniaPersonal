@@ -35,7 +35,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="attributes">The <see cref="IAttribute"/> hierarchy (voa data) on which this
         /// instance is based.</param>
-        public PaginationDocumentData(IUnknownVector attributes)
+        protected PaginationDocumentData(IUnknownVector attributes)
         {
             _attributes = attributes;
         }

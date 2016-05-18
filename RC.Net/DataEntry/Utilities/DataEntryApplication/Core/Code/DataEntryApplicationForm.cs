@@ -2985,7 +2985,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     foreach (IAttribute attribute in _paginagionAttributesToRefresh)
                     {
                         AttributeStatusInfo.SetValue(attribute, attribute.Value, true, true);
-                        AttributeStatusInfo.GetOwningControl(attribute).RefreshAttributes(true, attribute);
+                        var owningControl = AttributeStatusInfo.GetOwningControl(attribute);
+                        if (owningControl != null)
+                        {
+                            owningControl.RefreshAttributes(true, attribute);
+                        }
                     }
 
                     _paginagionAttributesToRefresh.Clear();
@@ -3225,6 +3229,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // document displayed in the pagination panel this will not block the modified
                 // status for any document except the active one.
                 e.MarkAsModified = !_paginationPanel.IsInOriginalForm(_fileName);
+                _paginationDocumentDataPanel.ShowMessage("You are modifying data for the document being verified.");
             }
             catch (Exception ex)
             {

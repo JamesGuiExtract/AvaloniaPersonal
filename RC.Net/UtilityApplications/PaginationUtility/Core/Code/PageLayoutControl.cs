@@ -1599,10 +1599,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     _toolTipControl = originControl as PageThumbnailControl;
-                    if (_toolTipControl != null)
-                    {
-                        _toolTipControl.SetToolTip(_toolTip);
-                    }
+                }
+
+                if (_toolTipControl != null)
+                {
+                    _toolTipControl.SetToolTip(_toolTip);
                 }
 
                 // If the mouse button is down and the sending control is already selected, start a

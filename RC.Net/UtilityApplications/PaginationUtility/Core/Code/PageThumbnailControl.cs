@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -65,6 +66,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The <see cref="PageStylist"/>s being used to apply styles to this instance.
         /// </summary>
         HashSet<PageStylist> _pageStylists = new HashSet<PageStylist>();
+
+        /// <summary>
+        /// Keeps track of the last tooltip message displayed for this control.
+        /// </summary>
+        string _toolTipText;
 
         #endregion Fields
 
@@ -305,7 +311,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SetToolTip(this, toolTip);
+                // Get the location of the mouse relative to the _rasterPictureBox (the surface to
+                // which stylists draw).
+                var mouseLocation = _rasterPictureBox.PointToClient(Control.MousePosition);
+
+                // Check if any of the stylists drawing at this position have their own tooltip text
+                // to use.
+                string newToolTipText = _pageStylists
+                    .Select(stylist => stylist.GetToolTipText(this, _rasterPictureBox, mouseLocation))
+                    .FirstOrDefault(text => !string.IsNullOrWhiteSpace(text));
+                    newToolTipText = newToolTipText ?? Page.OriginalDocumentName;
+
+                if (newToolTipText != _toolTipText)
+                {
+                    _toolTipText = newToolTipText;
+                    SetToolTip(this, toolTip, newToolTipText);
+                }
             }
             catch (Exception ex)
             {
@@ -584,9 +605,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 e.Graphics.FillRectangle(brush, e.ClipRectangle);
 
-                foreach (var style in _pageStylists)
+                foreach (var stylist in _pageStylists)
                 {
-                    style.PaintBackground(this, e);
+                    stylist.PaintBackground(this, e);
                 }
             }
             catch (Exception ex)
@@ -605,9 +626,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                foreach (var style in _pageStylists)
+                foreach (var stylist in _pageStylists)
                 {
-                    style.PaintForeground(this, e);
+                    stylist.PaintForeground(this, _rasterPictureBox, e);
                 }
             }
             catch (Exception ex)
@@ -712,17 +733,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
-        /// Associates the specified <see paramref="toolTip"/> with this control.
+        /// Recursively associates the specified <see paramref="toolTip"/> and
+        /// <see paramref="toolTipText"/> with the specified <see paramref="control"/>.
         /// </summary>
-        /// <param name="control">The <see cref="Control"/>.</param>
-        /// <param name="toolTip">The <see cref="ToolTip"/> to associate with this control.</param>
-        void SetToolTip(Control control, ToolTip toolTip)
+        /// <param name="control">The <see cref="Control"/> to which the tooltip should be applied.
+        /// </param>
+        /// <param name="toolTip">The <see cref="ToolTip"/> to apply.</param>
+        /// <param name="toolTipText">The tooltip text to apply.</param>
+        void SetToolTip(Control control, ToolTip toolTip, string toolTipText)
         {
+            toolTip.SetToolTip(control, toolTipText);
+
             foreach (Control childControl in control.Controls)
             {
-                toolTip.SetToolTip(childControl, Page.OriginalDocumentName);
-
-                SetToolTip(childControl, toolTip);
+                SetToolTip(childControl, toolTip, toolTipText);
             }
         }
 

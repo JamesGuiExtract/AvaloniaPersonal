@@ -13,6 +13,42 @@ namespace Extract.UtilityApplications.PaginationUtility
     internal abstract class PageStylist
     {
         /// <summary>
+        /// Gets the tooltip text to display for this stylist.
+        /// </summary>
+        protected virtual string ToolTipText
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the stylist is visible on the specified <see paramref="pageControl"/>.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which visibility
+        /// should be checked.</param>
+        /// <returns><see langword="true"/> if visible for the <see paramref="pageControl"/>.
+        /// </returns>
+        protected virtual bool IsVisibleFor(PageThumbnailControl pageControl)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the area of <see paramref="hostingControl"/> to which the stylist will do any
+        /// foreground drawing.
+        /// </summary>
+        /// <param name="hostingControl">The <see cref="Control"/> on which the stylist will do any
+        /// foreground drawing.</param>
+        /// <returns>A <see cref="Rectangle"/> describing the area to which the stylist will draw.
+        /// </returns>
+        virtual protected Rectangle GetDrawRectangle(Control hostingControl)
+        {
+            return hostingControl.ClientRectangle;
+        }
+
+        /// <summary>
         /// Allows the background of the specified <see paramref="pageControl"/> to be painted.
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to paint.</param>
@@ -26,10 +62,47 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Allows foreground of the specified <see paramref="pageControl"/> to be painted.
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to paint.</param>
+        /// <param name="paintingControl">The specific <see cref="Control"/> within
+        /// <see paramref="pageControl"/>being painted.</param>
         /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
         /// <see paramref="pageControl"/>.</param>
-        public virtual void PaintForeground(PageThumbnailControl pageControl, PaintEventArgs e)
+        public virtual void PaintForeground(PageThumbnailControl pageControl,
+            Control paintingControl, PaintEventArgs e)
         {
+        }
+     
+        /// <summary>
+        /// Gets tooltip text that should be displayed based on the specified
+        /// <see paramref="mouseLocation"/> relative to <see paramref="hostingControl"/>.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which the tooltip
+        /// text would be displayed.</param>
+        /// <param name="hostingControl">The child <see cref="Control"/> of
+        /// <see paramref="pageControl"/> that corresponds to foreground painting and
+        /// <see paramref="mouseLocation"/>.</param>
+        /// <param name="mouseLocation"></param>
+        /// <returns>The tooltip text to display, or <see langword="null"/> if this stylist has no
+        /// special tooltip to display.</returns>
+        public virtual string GetToolTipText(PageThumbnailControl pageControl,
+            Control hostingControl, Point mouseLocation)
+        {
+            try
+            {
+                if (IsVisibleFor(pageControl) &&
+                        !string.IsNullOrWhiteSpace(ToolTipText) &&
+                        GetDrawRectangle(hostingControl).Contains(mouseLocation))
+                {
+                    return ToolTipText;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39850");
+            }
         }
     }
 
@@ -88,24 +161,38 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Allows foreground of the specified <see paramref="pageControl"/> to be painted.
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to paint.</param>
+        /// <param name="paintingControl">The specific <see cref="Control"/> within
+        /// <see paramref="pageControl"/>being painted.</param>
         /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
         /// <see paramref="pageControl"/>.</param>
-        public override void PaintForeground(PageThumbnailControl pageControl, PaintEventArgs e)
+        public override void PaintForeground(PageThumbnailControl pageControl,
+            Control paintingControl, PaintEventArgs e)
         {
             try
             {
-                var font = _font ?? FontMethods.GetFontThatFits(_text, e.Graphics,
-                    e.ClipRectangle.Size, pageControl.Font.FontFamily, pageControl.Font.Style);
-
-                var brush = ExtractBrushes.GetSolidBrush(_textColor);
-
-                StringFormat format = _format ?? new StringFormat()
+                if (IsVisibleFor(pageControl))
                 {
-                    Alignment = StringAlignment.Center,
-                    LineAlignment = StringAlignment.Center
-                };
+                    Rectangle drawRectangle = GetDrawRectangle(paintingControl);
 
-                e.Graphics.DrawString(_text, font, brush, e.ClipRectangle, format);
+                    var font = _font ?? FontMethods.GetFontThatFits(_text, e.Graphics,
+                       drawRectangle.Size, pageControl.Font.FontFamily, pageControl.Font.Style);
+
+                    var brush = ExtractBrushes.GetSolidBrush(_textColor);
+
+                    StringFormat format = _format ?? new StringFormat()
+                    {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center
+                    };
+                    // Hack fix for ModifiedPageStylist. The asterisk seems to insist to draw to
+                    // high (50% above the top of drawRectangle).
+                    if (_text == "*")
+                    {
+                        drawRectangle.Offset(0, 6);
+                        drawRectangle.Inflate(0, 6);
+                    }
+                    e.Graphics.DrawString(_text, font, brush, drawRectangle, format);
+                }
             }
             catch (Exception ex)
             {
@@ -129,24 +216,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Allows foreground of the specified <see paramref="pageControl"/> to be painted.
+        /// Gets whether the stylist is visible on the specified <see paramref="pageControl"/>.
         /// </summary>
-        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to paint.</param>
-        /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
-        /// <see paramref="pageControl"/>.</param>
-        public override void PaintForeground(PageThumbnailControl pageControl, PaintEventArgs e)
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which visibility
+        /// should be checked.</param>
+        /// <returns><see langword="true"/> if visible for the <see paramref="pageControl"/>.
+        /// </returns>
+        protected override bool IsVisibleFor(PageThumbnailControl pageControl)
         {
-            try
-            {
-                if (pageControl.Page.MultipleCopiesExist)
-                {
-                    base.PaintForeground(pageControl, e);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39673");
-            }
+            return pageControl.Page.MultipleCopiesExist;
         }
     }
 
@@ -166,33 +244,47 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Initializes a new instance of the <see cref="ModifiedPageStylist"/> class.
         /// </summary>
         public ModifiedPageStylist()
-            : base("*", Color.Red, _INDICATOR_FONT, new StringFormat()
-            {
-                Alignment = StringAlignment.Far,
-                LineAlignment = StringAlignment.Near
-            })
+            : base("*", Color.Red, _INDICATOR_FONT, null)
         {
         }
 
         /// <summary>
-        /// Allows foreground of the specified <see paramref="pageControl"/> to be painted.
+        /// Gets the tooltip text to display for this stylist.
         /// </summary>
-        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to paint.</param>
-        /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
-        /// <see paramref="pageControl"/>.</param>
-        public override void PaintForeground(PageThumbnailControl pageControl, PaintEventArgs e)
+        protected override string ToolTipText
         {
-            try
+            get
             {
-                if (!pageControl.Document.InOriginalForm)
-                {
-                    base.PaintForeground(pageControl, e);
-                }
+                return "This page has been modified.";
             }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39735");
-            }
+        }
+
+        /// <summary>
+        /// Gets whether the stylist is visible on the specified <see paramref="pageControl"/>.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which visibility
+        /// should be checked.</param>
+        /// <returns><see langword="true"/> if visible for the <see paramref="pageControl"/>.
+        /// </returns>
+        protected override bool IsVisibleFor(PageThumbnailControl pageControl)
+        {
+            return !pageControl.Document.InOriginalForm;
+        }
+
+        /// <summary>
+        /// Gets the area of <see paramref="hostingControl"/> to which the stylist will do any
+        /// foreground drawing.
+        /// </summary>
+        /// <param name="hostingControl">The <see cref="Control"/> on which the stylist will do any
+        /// foreground drawing.</param>
+        /// <returns>A <see cref="Rectangle"/> describing the area to which the stylist will draw.
+        /// </returns>
+        protected override Rectangle GetDrawRectangle(Control hostingControl)
+        {
+            // Top icon
+            Size size = new Size(16, 16);
+            Point location = new Point(hostingControl.ClientRectangle.Right - size.Width - 3, 4);
+            return new Rectangle(location, size);
         }
     }
 
@@ -212,39 +304,47 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Initializes a new instance of the <see cref="NewOutputPageStylist"/> class.
         /// </summary>
         public NewOutputPageStylist()
-            : base("+", Color.Green, _INDICATOR_FONT, new StringFormat()
-            {
-                Alignment = StringAlignment.Far,
-                LineAlignment = StringAlignment.Near
-            })
+            : base("+", Color.Green, _INDICATOR_FONT, null)
         {
         }
 
         /// <summary>
-        /// Allows foreground of the specified <see paramref="pageControl"/> to be painted.
+        /// Gets the tooltip text to display for this stylist.
         /// </summary>
-        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to paint.</param>
-        /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
-        /// <see paramref="pageControl"/>.</param>
-        public override void PaintForeground(PageThumbnailControl pageControl, PaintEventArgs e)
+        protected override string ToolTipText
         {
-            try
+            get
             {
-                if (!pageControl.Document.InSourceDocForm)
-                {
-                    var modifiedClipRectangle = e.ClipRectangle;
-                    modifiedClipRectangle.Height -= 12;
-                    modifiedClipRectangle.Location = new Point(
-                        e.ClipRectangle.X, e.ClipRectangle.Y + 12);
+                return "This page will be output as part of a new document.";
+            }
+        }
 
-                    var newArgs = new PaintEventArgs(e.Graphics, modifiedClipRectangle);
-                    base.PaintForeground(pageControl, newArgs);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39674");
-            }
+        /// <summary>
+        /// Gets whether the stylist is visible on the specified <see paramref="pageControl"/>.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which visibility
+        /// should be checked.</param>
+        /// <returns><see langword="true"/> if visible for the <see paramref="pageControl"/>.
+        /// </returns>
+        protected override bool IsVisibleFor(PageThumbnailControl pageControl)
+        {
+            return !pageControl.Document.InSourceDocForm;
+        }
+
+        /// <summary>
+        /// Gets the area of <see paramref="hostingControl"/> to which the stylist will do any
+        /// foreground drawing.
+        /// </summary>
+        /// <param name="hostingControl">The <see cref="Control"/> on which the stylist will do any
+        /// foreground drawing.</param>
+        /// <returns>A <see cref="Rectangle"/> describing the area to which the stylist will draw.
+        /// </returns>
+        protected override Rectangle GetDrawRectangle(Control hostingControl)
+        {
+            // 2nd icon to top
+            Size size = new Size(16, 16);
+            Point location = new Point(hostingControl.ClientRectangle.Right - size.Width - 4, size.Height + 4);
+            return new Rectangle(location, size);
         }
     }
 
@@ -261,6 +361,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         HashSet<PageThumbnailControl> _paintedPages = new HashSet<PageThumbnailControl>();
 
         /// <summary>
+        /// Gets whether the stylist is visible on the specified <see paramref="pageControl"/>.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which visibility
+        /// should be checked.</param>
+        /// <returns><see langword="true"/> if visible for the <see paramref="pageControl"/>.
+        /// </returns>
+        protected override bool IsVisibleFor(PageThumbnailControl pageControl)
+        {
+            var selectedDocs = pageControl.PageLayoutControl.PartiallySelectedDocuments;
+
+            return (selectedDocs.Count() == 1 &&
+                selectedDocs.Single() == pageControl.Document);
+        }
+
+        /// <summary>
         /// Allows the background of the specified <see paramref="pageControl"/> to be painted.
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to paint.</param>
@@ -270,10 +385,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var selectedDocs = pageControl.PageLayoutControl.PartiallySelectedDocuments;
-
-                if (selectedDocs.Count() == 1 &&
-                    selectedDocs.Single() == pageControl.Document)
+                if (IsVisibleFor(pageControl))
                 {
                     var color = Color.FromArgb(50, SystemColors.Highlight);
                     var brush = ExtractBrushes.GetSolidBrush(color);

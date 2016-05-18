@@ -17,5 +17,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// instance is needed.</param>
         /// <returns>The <see cref="PaginationDocumentData"/> instance.</returns>
         PaginationDocumentData GetDocumentData(IUnknownVector attributes);
+
+        /// <summary>
+        /// Provides a message to be displayed.
+        /// </summary>
+        /// <param name="message">The message to display.</param>
+        void ShowMessage(string message);
     }
 }
