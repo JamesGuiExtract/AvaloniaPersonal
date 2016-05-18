@@ -2,16 +2,16 @@
 using Accord.Statistics.Analysis;
 using Extract.Utilities;
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
-using System.Globalization;
 using ComAttribute = UCLID_AFCORELib.Attribute;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 
 namespace Extract.AttributeFinder
 {
@@ -403,8 +403,8 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                IFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(stream, this);
+                var serializer = new NetDataContractSerializer();
+                serializer.Serialize(stream, this);
             }
             catch (Exception e)
             {
@@ -440,9 +440,17 @@ namespace Extract.AttributeFinder
         /// <returns>Returns instance of <see cref="LearningMachine"/> class with all properties initialized from file.</returns>
         public static LearningMachine Load(Stream stream)
         {
-            IFormatter formatter = new BinaryFormatter();
-            LearningMachine network = (LearningMachine)formatter.Deserialize(stream);
-            return network;
+            try
+            {
+                var serializer = new NetDataContractSerializer();
+                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple; // Allows for different assembly versions
+                LearningMachine network = (LearningMachine)serializer.Deserialize(stream);
+                return network;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39810");
+            }
         }
 
         #endregion Public Methods
