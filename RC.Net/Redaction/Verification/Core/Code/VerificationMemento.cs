@@ -100,6 +100,16 @@ namespace Extract.Redaction.Verification
         /// </summary>
         HashSet<int> _selection = new HashSet<int>();
 
+        /// <summary>
+        /// The redaction verification continue dialog has been displayed once, or not
+        /// </summary>
+        bool _continueDialogDisplayed;
+
+        /// <summary>
+        /// Continuing redaction - so don't perform normal selection of first grid row.
+        /// </summary>
+        bool _continuingRedactionSuspendNormalSelection;
+
         #endregion Fields
 
         #region Constructors
@@ -409,6 +419,44 @@ namespace Extract.Redaction.Verification
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the continue dialog has been 
+        /// displayed once already in this session.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if [continue dialog displayed]; otherwise, <c>false</c>.
+        /// </value>
+        public bool ContinueDialogDisplayed
+        {
+            get
+            {
+                return _continueDialogDisplayed;
+            }
+            set
+            {
+                _continueDialogDisplayed = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to suspend navigation due to being in 
+        /// "Continue verification" mode.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if [continuing redaction suspend navigation]; otherwise, <c>false</c>.
+        /// </value>
+        public bool ContinuingRedactionSuspendNavigation
+        {
+            get
+            {
+                return _continuingRedactionSuspendNormalSelection;
+            }
+            set
+            {
+                _continuingRedactionSuspendNormalSelection = value;
+            }
         }
 
         #endregion Properties

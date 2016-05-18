@@ -1097,6 +1097,10 @@ namespace Extract.Redaction.Verification
 
             // Update visited pages and rows
             UpdateMemento();
+
+            // Prevent a Save that doesn't complete verification from causing the Continue Verification 
+            // dialog from appearing immediately.
+            GetCurrentDocument().ContinueDialogDisplayed = true;
         }
 
         /// <summary>
@@ -2615,7 +2619,62 @@ namespace Extract.Redaction.Verification
                 _imageViewer.OcrData = memento.OcrData;
             }
 
+            VerificationResume();
+
             return memento;
+        }
+
+        /// <summary>
+        /// Process verification resume, iff this document is being re-visited AND verification is incomplete.
+        /// </summary>
+        void VerificationResume()
+        {
+            try
+            {
+                if (_settings.RedactionVerificationMode.VerificationMode != VerificationMode.Verify ||
+                    GetCurrentDocument().ContinueDialogDisplayed)
+                {
+                    return;
+                }
+                
+                // These two values must be set before the _currentVoa can determine if the document has been 
+                // previously verified, and if that session was completed.
+                _currentVoa.NumberOfDocumentPages = _imageViewer.PageCount;
+                _currentVoa.VerifyAllPagesMode = _settings.General.VerifyAllPages;
+
+                if (_currentVoa.DocumentHasBeenVerifiedPreviously() &&
+                    !_currentVoa.DocumentVerificationIsComplete())
+                {
+                    // Make sure to only display this dialog once
+                    GetCurrentDocument().ContinueDialogDisplayed = true;
+
+                    using (ContinueVerify cv = new ContinueVerify())
+                    {
+                        cv.ShowDialog(this);
+                        if (cv.ContinueVerifySession)
+                        {
+                            // signal to suspend normal selection of first item on first page...
+                            GetCurrentDocument().ContinuingRedactionSuspendNavigation = true;
+
+                            // update the visited rows
+                            var visitedIndexes = _currentVoa.GetVisitedSensitiveItemIndexes;
+                            _redactionGridView.UpdateVisitedRows(visitedIndexes);
+
+                            // Set position to first unvisited sensitive item
+                            var selections = _currentVoa.IndexOfFirstUnvisitedSensitiveItem();
+                            _redactionGridView.Select(selections, updateZoom: true);
+
+                            // Now update the visited pages
+                            var visitedPages = _currentVoa.VisitedPagesAsZeroRelativeCollection();
+                            _pageSummaryView.SetVisitedPages(visitedPages);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.AsExtract("ELI39846");
+            }
         }
 
         /// <summary>
@@ -3477,6 +3536,11 @@ namespace Extract.Redaction.Verification
         /// the sensitive items selected the last time the document was viewed)</param>
         void InitializeNavigation(VerificationMemento memento)
         {
+            if (memento.ContinuingRedactionSuspendNavigation)
+            {
+                return;
+            }
+            
             if (memento.ImagePageData == null)
             {
                 // If the document was not previously viewed, get the ImagePageData (ZoomInfo,

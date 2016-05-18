@@ -1,4 +1,5 @@
 using Extract.AttributeFinder;
+using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
@@ -150,7 +151,16 @@ namespace Extract.Redaction
         /// </summary>
         int _currentPage;
 
+        /// <summary>
+        /// The number of pages in the current document
+        /// </summary>
+        int _numberOfDocumentPages;
         #endregion Fields
+
+        /// <summary>
+        /// A flag that indicates if verify all pages mode is enabled or not.
+        /// </summary>
+        bool _verifyAllPagesMode;
 
         #region Constructors
 
@@ -362,6 +372,66 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets or sets the number of document pages.
+        /// </summary>
+        /// <value>
+        /// The number of document pages.
+        /// </value>
+        public int NumberOfDocumentPages
+        {
+            get
+            {
+                return _numberOfDocumentPages;
+            }
+            set
+            {
+                _numberOfDocumentPages = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [verify all pages mode].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [verify all pages mode]; otherwise, <c>false</c>.
+        /// </value>
+        public bool VerifyAllPagesMode
+        {
+            get
+            {
+                return _verifyAllPagesMode;
+            }
+            set
+            {
+                _verifyAllPagesMode = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the visited sensitive item indexes as a list of int.
+        /// </summary>
+        /// <returns>List of int with indexes of visited items.</returns>
+        public ReadOnlyCollection<int> GetVisitedSensitiveItemIndexes
+        {
+            get
+            {
+                try
+                {
+                    var indexList = Enumerable
+                                        .Range(0, _sensitiveItems.Count)
+                                        .Where(i => _sensitiveItems[i].PriorVerificationVisitedThis)
+                                        .ToList();
+
+                    return new ReadOnlyCollection<int>(indexList);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39843");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -519,37 +589,13 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets the pages visited during the last verification session.
+        /// Gets all the pages visited during the all of the verification sessions.
         /// </summary>
         void GetVisitedPages()
         {
             try
             {
-                // Find the most recent verification session, and retrieve the visited pages from there.
-                var lastSession = GetLastVerificationSession();
-                if (null == lastSession)
-                {
-                    return;
-                }
-
-                var visitedPages = AttributeMethods.GetSingleAttributeByName(lastSession.SubAttributes,
-                                                                             Constants.VisitedPagesMetaDataName);
-                if (null == visitedPages)
-                {
-                    return;
-                }
-
-                var pages = visitedPages.Value.String;
-                if (String.IsNullOrWhiteSpace(pages))
-                {
-                    return;
-                }
-
-                UtilityMethods.ValidatePageNumbers(pages);
-                var pagesAsInts = UtilityMethods.GetPageNumbersFromString(pages,
-                                                                          totalPages: Int32.MaxValue,
-                                                                          throwExceptionOnPageOutOfRange: false);
-                _visitedPages = pagesAsInts.ToList();
+                _visitedPages = GetPagesVisitedDuringAllSessions();
             }
             catch (Exception ex)
             {
@@ -587,6 +633,7 @@ namespace Extract.Redaction
                 throw ex.AsExtract("ELI39801");
             }
         }
+
 
         /// <summary>
         /// Ensures the specified vector of attributes contains a file information attribute with 
@@ -819,6 +866,23 @@ namespace Extract.Redaction
         {
             try
             {
+                return GetVerificationSession(_verificationSessionId);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39799");
+            }
+        }
+
+        /// <summary>
+        /// Gets the specified verification session.
+        /// </summary>
+        /// <param name="sessionId">The session identifier of the session to retrieve</param>
+        /// <returns>null if not found, or the ComAttribute of the requested session</returns>
+        ComAttribute GetVerificationSession(int sessionId)
+        {
+            try
+            {
                 if (_verificationSessions.Count() == 0)
                 {
                     return null;
@@ -829,8 +893,8 @@ namespace Extract.Redaction
                     var value = attribute.Value.String;
                     if (!String.IsNullOrWhiteSpace(value))
                     {
-                        int sessionId = int.Parse(value, CultureInfo.CurrentCulture);
-                        if (sessionId == _verificationSessionId)
+                        int currentSessionId = int.Parse(value, CultureInfo.CurrentCulture);
+                        if (sessionId == currentSessionId)
                         {
                             return attribute;
                         }
@@ -841,8 +905,9 @@ namespace Extract.Redaction
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI39799");
+                throw ex.AsExtract("ELI39838");
             }
+
         }
 
         /// <summary>
@@ -1255,17 +1320,19 @@ namespace Extract.Redaction
         /// <summary>
         /// Marks the visited status of all redactions.
         /// </summary>
+        /// <param name="sensitiveItems">The (updated) list of sensitive items</param>
         /// <param name="visitedItems">The visited redaction items.</param>
         /// NOTE: By adding a "_visited" subattribute to the sensitive item attribute,
         /// the subattribute is saved into the VOA file as a side-effect.
-        void MarkVisitedStatusOfAllRedactions(List<int> visitedItems)
+        void MarkVisitedStatusOfAllRedactions(List<SensitiveItem> sensitiveItems, List<int> visitedItems)
         {
             try
             {
                 int index = 0;
-                foreach (var item in _sensitiveItems)
+                foreach (var item in sensitiveItems)
                 {
-                    string strValue = visitedItems.IndexOf(index) > -1 ? "Yes" : "No";
+                    bool visited = visitedItems.IndexOf(index) > -1 || item.Attribute.ComAttribute.Name == "Manual";
+                    string strValue = visited ? "Yes" : "No";
                     var attr = item.Attribute.ComAttribute;
                     var subattrs = attr.SubAttributes;
 
@@ -1341,7 +1408,7 @@ namespace Extract.Redaction
             // Append session context entries
             if (null != sessionContext)
             {
-                MarkVisitedStatusOfAllRedactions(sessionContext.VisitedRedactions);
+                MarkVisitedStatusOfAllRedactions(sensitiveItems, sessionContext.VisitedRedactions);
                 AppendSessionContext(session, sessionContext, sensitiveItems);
             }
 
@@ -1944,11 +2011,173 @@ namespace Extract.Redaction
             // Add each attribute to the result
             for (int i = 0; i < count; i++)
             {
-                ComAttribute attribute = (ComAttribute) vector.At(i);
+                ComAttribute attribute = (ComAttribute)vector.At(i);
                 attributes.Add(attribute);
             }
 
             return attributes;
+        }
+
+        /// <summary>
+        /// Gets the visited pages as zero relative collection.
+        /// </summary>
+        /// <returns>returns a VisitedItemsCollection of bools that correspond to zero-relative
+        /// page indexes, true for pages that have been visited, false otherwise</returns>
+        public VisitedItemsCollection VisitedPagesAsZeroRelativeCollection()
+        {
+            try
+            {
+                var pages = VisitedPages;
+                var pagesZeroRelative = pages.Select(page => page - 1);
+                VisitedItemsCollection visitedPages = new VisitedItemsCollection(_numberOfDocumentPages);
+                foreach (int index in pagesZeroRelative)
+                {
+                    visitedPages[index] = true;
+                }
+
+                return visitedPages;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39847");
+            }
+        }
+
+        /// <summary>
+        /// Get the list of visited pages from the specified session attribute.
+        /// </summary>
+        /// <param name="attribute">The attribute.</param>
+        /// <returns></returns>
+        static List<int> VisitedPagesFromSessionAttribute(ComAttribute attribute)
+        {
+            try
+            {
+                var visitedPages = AttributeMethods.GetSingleAttributeByName(attribute.SubAttributes,
+                                                                             Constants.VisitedPagesMetaDataName);
+                if (null == visitedPages)
+                {
+                    return new List<int>();
+                }
+
+                var pages = visitedPages.Value.String;
+                if (String.IsNullOrWhiteSpace(pages))
+                {
+                    return new List<int>();
+                }
+
+                UtilityMethods.ValidatePageNumbers(pages);
+                var pagesAsInts = UtilityMethods.GetPageNumbersFromString(pages,
+                                                                          totalPages: Int32.MaxValue,
+                                                                          throwExceptionOnPageOutOfRange: false);
+                return pagesAsInts.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39839");
+            }
+        }
+
+        /// <summary>
+        /// Gets the pages visited during all verification sessions.
+        /// </summary>
+        /// <returns>list of all visited pages</returns>
+        List<int> GetPagesVisitedDuringAllSessions()
+        {
+            List<int> allVisitedPages = new List<int>();
+
+            for (int i = 1; i <= _verificationSessions.Count(); ++i)
+            {
+                var attr = GetVerificationSession(i);
+                if (null == attr)
+                {
+                    continue;
+                }
+
+                allVisitedPages.AddRange(VisitedPagesFromSessionAttribute(attr));
+            }
+
+            return allVisitedPages.Distinct().ToList();
+        }
+
+        /// <summary>
+        /// Haves all pages been visited?
+        /// This method walks through ALL of the verification sessions to determine this.
+        /// </summary>
+        /// <returns>true if all pages have been visited in one or more verification sessions</returns>
+        bool HaveAllPagesBeenVisited()
+        {
+            List<int> allVisitedPages = GetPagesVisitedDuringAllSessions();
+            var numberOfPages = allVisitedPages.Count();
+            return numberOfPages == _numberOfDocumentPages;
+        }
+
+        /// <summary>
+        /// Determines whether the document has been verified previously. Opening the document will always
+        /// signal that the first item and the first page have been visited, so here items are only 
+        /// considered to be visited if more than the first has been marked as visited. 
+        /// </summary>
+        /// <returns>true if document has been verified before, else false</returns>
+        public bool DocumentHasBeenVerifiedPreviously()
+        {
+            try
+            {
+                if (0 == _verificationSessions.Count())
+                {
+                    return false;
+                }
+
+                var itemsVisited = (_sensitiveItems.Where(item => true == item.PriorVerificationVisitedThis)).Count();
+                return itemsVisited > 1;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39841");
+            }
+        }
+
+        /// <summary>
+        /// Is verification of the document complete?
+        /// I.E. have all sensitive items been visited, and, if the user is required to visit all
+        /// the document pages, has this been done?
+        /// </summary>
+        /// <returns>true if verification is complete</returns>
+        public bool DocumentVerificationIsComplete()
+        {
+            try
+            {
+                var itemsNotVisited =
+                    (_sensitiveItems.Where(item => false == item.PriorVerificationVisitedThis)).Count();
+                if (itemsNotVisited > 0)
+                {
+                    return false;
+                }
+
+                return _verifyAllPagesMode ? HaveAllPagesBeenVisited() : true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39842");
+            }
+        }
+
+        /// <summary>
+        /// Gets the index of the first unvisited sensitive item.
+        /// </summary>
+        /// <returns>index value of element, or -1 if not found.</returns>
+        public ReadOnlyCollection<int> IndexOfFirstUnvisitedSensitiveItem()
+        {
+            try
+            {
+                int index = _sensitiveItems.FindIndex(item => false == item.PriorVerificationVisitedThis);
+                List<int> selections = new List<int>();
+                selections.Add(index);
+
+                return new ReadOnlyCollection<int>(selections);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39848");
+            }
         }
 
         #endregion Methods

@@ -1217,6 +1217,28 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Updates the visited rows in the data grid.
+        /// </summary>
+        /// <param name="rowIndexes">The list of row indexes.</param>
+        public void UpdateVisitedRows(IEnumerable<int> rowIndexes)
+        {
+            try
+            {
+                foreach (int index in rowIndexes)
+                {
+                    DataGridViewRow row = _dataGridView.Rows[index];
+                    MarkAsVisited(row);
+                }
+
+                UpdateSelection();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39844");
+            }
+        }
+
+        /// <summary>
         /// Gets the exemptions codes that are common to all the selected redactions.
         /// </summary>
         /// <returns>The exemptions codes that are common to all the selected redactions.</returns>

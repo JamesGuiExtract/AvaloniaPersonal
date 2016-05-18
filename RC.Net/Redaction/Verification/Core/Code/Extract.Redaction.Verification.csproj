@@ -153,6 +153,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContinueVerify.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ContinueVerify.Designer.cs">
+      <DependentUpon>ContinueVerify.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExemptionCodeListDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -371,6 +377,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ContinueVerify.resx">
+      <DependentUpon>ContinueVerify.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ExemptionCodeListDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ExemptionCodeListDialog.cs</DependentUpon>
