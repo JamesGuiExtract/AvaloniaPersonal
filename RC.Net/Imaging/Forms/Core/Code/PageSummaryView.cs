@@ -373,6 +373,16 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Goes to the specified page.
+        /// </summary>
+        /// <param name="pageIndex">Index of the page.</param>
+        public void GoToPage(int pageIndex)
+        {
+            PageChangedEventArgs changePage = new PageChangedEventArgs(pageIndex);
+            HandlePageChanged(this, changePage);
+        }
+
         #endregion Methods
 
         #region Overrides

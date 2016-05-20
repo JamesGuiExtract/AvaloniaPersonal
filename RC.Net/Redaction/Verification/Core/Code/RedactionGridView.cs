@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
@@ -701,6 +702,30 @@ namespace Extract.Redaction.Verification
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets the last viewed item page number
+        /// </summary>
+        /// <param name="index">index of last visited sensitive item</param> 
+        /// <returns>Page numberof item</returns>
+        public int GetLastViewedItemPageNumber(int index)
+        {
+            try
+            {
+                ExtractException.Assert("ELI39873",
+                                        String.Format(CultureInfo.InvariantCulture,
+                                                      "Index value: {0}, is out-of-range, maximum: {1}",
+                                                      index,
+                                                      _dataGridView.Rows.Count),
+                                        index < _dataGridView.Rows.Count);
+
+                return _redactions[index].PageNumber;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39871");
+            }
         }
 
         #endregion Properties
@@ -1746,7 +1771,7 @@ namespace Extract.Redaction.Verification
                     "Unable to determine next unviewed row.", ex);
             }
         }
-
+        
         /// <summary>
         /// Determines the index of the row before the currently selected row.
         /// </summary>

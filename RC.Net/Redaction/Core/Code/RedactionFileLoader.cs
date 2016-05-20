@@ -2106,9 +2106,16 @@ namespace Extract.Redaction
         /// <returns>true if all pages have been visited in one or more verification sessions</returns>
         bool HaveAllPagesBeenVisited()
         {
-            List<int> allVisitedPages = GetPagesVisitedDuringAllSessions();
-            var numberOfPages = allVisitedPages.Count();
-            return numberOfPages == _numberOfDocumentPages;
+            return _numberOfDocumentPages == NumberOfVisitedPages();
+        }
+
+        /// <summary>
+        /// Gets the number of visited pages.
+        /// </summary>
+        /// <returns>number of visited pages</returns>
+        int NumberOfVisitedPages()
+        {
+            return GetPagesVisitedDuringAllSessions().Count;
         }
 
         /// <summary>
@@ -2121,13 +2128,13 @@ namespace Extract.Redaction
         {
             try
             {
-                if (0 == _verificationSessions.Count())
+                if (0 == _verificationSessions.Count() || 0 == _sensitiveItems.Count)
                 {
                     return false;
                 }
 
                 var itemsVisited = (_sensitiveItems.Where(item => true == item.PriorVerificationVisitedThis)).Count();
-                return itemsVisited > 1;
+                return itemsVisited > 1 || (_numberOfDocumentPages > 1 && NumberOfVisitedPages() > 1);
             }
             catch (Exception ex)
             {
@@ -2136,39 +2143,18 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Is verification of the document complete?
-        /// I.E. have all sensitive items been visited, and, if the user is required to visit all
-        /// the document pages, has this been done?
+        /// Gets the index of the last visited sensitive item.
         /// </summary>
-        /// <returns>true if verification is complete</returns>
-        public bool DocumentVerificationIsComplete()
+        /// <returns>row index value, wrapped in a ReadOnlyCollection of int, for ease-of-use</returns>
+        public ReadOnlyCollection<int> IndexOfLastVisitedSensitiveItem()
         {
             try
             {
-                var itemsNotVisited =
-                    (_sensitiveItems.Where(item => false == item.PriorVerificationVisitedThis)).Count();
-                if (itemsNotVisited > 0)
-                {
-                    return false;
-                }
+                int index = _sensitiveItems.FindLastIndex(item => item.PriorVerificationVisitedThis);
 
-                return _verifyAllPagesMode ? HaveAllPagesBeenVisited() : true;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39842");
-            }
-        }
+                const int noItemsVisited = -1;
+                index = noItemsVisited == index ? 0 : index;
 
-        /// <summary>
-        /// Gets the index of the first unvisited sensitive item.
-        /// </summary>
-        /// <returns>index value of element, or -1 if not found.</returns>
-        public ReadOnlyCollection<int> IndexOfFirstUnvisitedSensitiveItem()
-        {
-            try
-            {
-                int index = _sensitiveItems.FindIndex(item => false == item.PriorVerificationVisitedThis);
                 List<int> selections = new List<int>();
                 selections.Add(index);
 

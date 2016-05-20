@@ -10,6 +10,7 @@ using Extract.Utilities.Forms;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -2621,6 +2622,8 @@ namespace Extract.Redaction.Verification
 
             VerificationResume();
 
+            QAModePreserveVisitedState();
+
             return memento;
         }
 
@@ -2634,6 +2637,11 @@ namespace Extract.Redaction.Verification
                 if (_settings.RedactionVerificationMode.VerificationMode != VerificationMode.Verify ||
                     GetCurrentDocument().ContinueDialogDisplayed)
                 {
+                    // When tabbing forward and backward through the documents, the memento state is preserved,
+                    // so ContinueDialogDisplayed can be true when reentering the document. In that case
+                    // ContinuingRedactionSuspendNavigation is also true - clear the flag here so that 
+                    // navigation can proceed as normal.
+                    GetCurrentDocument().ContinuingRedactionSuspendNavigation = false;
                     return;
                 }
                 
@@ -2642,8 +2650,7 @@ namespace Extract.Redaction.Verification
                 _currentVoa.NumberOfDocumentPages = _imageViewer.PageCount;
                 _currentVoa.VerifyAllPagesMode = _settings.General.VerifyAllPages;
 
-                if (_currentVoa.DocumentHasBeenVerifiedPreviously() &&
-                    !_currentVoa.DocumentVerificationIsComplete())
+                if (_currentVoa.DocumentHasBeenVerifiedPreviously())
                 {
                     // Make sure to only display this dialog once
                     GetCurrentDocument().ContinueDialogDisplayed = true;
@@ -2656,17 +2663,10 @@ namespace Extract.Redaction.Verification
                             // signal to suspend normal selection of first item on first page...
                             GetCurrentDocument().ContinuingRedactionSuspendNavigation = true;
 
-                            // update the visited rows
-                            var visitedIndexes = _currentVoa.GetVisitedSensitiveItemIndexes;
-                            _redactionGridView.UpdateVisitedRows(visitedIndexes);
+                            UpdateTheVisitedSensitiveItems();
+                            UpdateTheVisitedPages();
 
-                            // Set position to first unvisited sensitive item
-                            var selections = _currentVoa.IndexOfFirstUnvisitedSensitiveItem();
-                            _redactionGridView.Select(selections, updateZoom: true);
-
-                            // Now update the visited pages
-                            var visitedPages = _currentVoa.VisitedPagesAsZeroRelativeCollection();
-                            _pageSummaryView.SetVisitedPages(visitedPages);
+                            SetPositionToLastPageOrLastItemOnLastPage();
                         }
                     }
                 }
@@ -2674,6 +2674,93 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ex.AsExtract("ELI39846");
+            }
+        }
+
+        /// <summary>
+        /// Displays QA Preserve mode, iff the verification is so configured .
+        /// </summary>
+        void QAModePreserveVisitedState()
+        {
+            try
+            {
+                if (_settings.RedactionVerificationMode.VerificationMode != VerificationMode.QAModePreserveViewStatus)
+                {
+                    return;
+                }
+
+                // These two values must be set before the _currentVoa can correctly
+                // get visited info.
+                _currentVoa.NumberOfDocumentPages = _imageViewer.PageCount;
+                _currentVoa.VerifyAllPagesMode = _settings.General.VerifyAllPages;
+
+                UpdateTheVisitedSensitiveItems();
+                UpdateTheVisitedPages();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39856");
+            }
+        }
+
+        /// <summary>
+        /// Updates the visited sensitive items.
+        /// </summary>
+        void UpdateTheVisitedSensitiveItems()
+        {
+            try
+            {
+                var visitedIndexes = _currentVoa.GetVisitedSensitiveItemIndexes;
+                _redactionGridView.UpdateVisitedRows(visitedIndexes);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39863");
+            }
+        }
+
+        /// <summary>
+        /// Updates the visited pages.
+        /// </summary>
+        void UpdateTheVisitedPages()
+        {
+            try
+            {
+                var visitedPages = _currentVoa.VisitedPagesAsZeroRelativeCollection();
+                _pageSummaryView.SetVisitedPages(visitedPages);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39864");
+            }
+        }
+
+        /// <summary>
+        /// Sets the position to the last page and last item on that page, or the last item visited if 
+        /// that item is on the last page.
+        /// </summary>
+        void SetPositionToLastPageOrLastItemOnLastPage()
+        {
+            try
+            {
+                var selection = _currentVoa.IndexOfLastVisitedSensitiveItem();
+                var rowIndex = selection[0];
+
+                var pageIndex = _redactionGridView.GetLastViewedItemPageNumber(rowIndex);
+
+                var lastVisitedPage = _currentVoa.VisitedPages.Last();
+                if (lastVisitedPage > pageIndex)
+                {
+                    _pageSummaryView.GoToPage(lastVisitedPage);
+                }
+                else
+                {
+                    _redactionGridView.Select(selection, updateZoom: true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39874");
             }
         }
 
