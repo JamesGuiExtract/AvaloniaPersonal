@@ -383,6 +383,34 @@ namespace Extract.Imaging.Forms
             HandlePageChanged(this, changePage);
         }
 
+        /// <summary>
+        /// Marks a page with one or more sensitive items.
+        /// </summary>
+        /// <param name="pageIndex">Index of the page.</param>
+        public void DenotePageWithSensitiveItem(int pageIndex)
+        {
+            try
+            {
+                _dataGridView.CurrentCellChanged -= HandleDataGridViewCurrentCellChanged;
+
+                var cell = GetCellByPageNumber(pageIndex);
+                string value = cell.Value.ToString();
+                if (!value.Contains("*"))
+                {
+                    value += '*';
+                    cell.Value = value;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39880");
+            }
+            finally
+            {
+                _dataGridView.CurrentCellChanged += HandleDataGridViewCurrentCellChanged;
+            }
+        }
+
         #endregion Methods
 
         #region Overrides

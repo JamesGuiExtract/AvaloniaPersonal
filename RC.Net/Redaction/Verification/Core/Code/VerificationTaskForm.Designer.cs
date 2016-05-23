@@ -455,9 +455,9 @@ namespace Extract.Redaction.Verification
             label4.AutoSize = true;
             label4.Location = new System.Drawing.Point(4, 3);
             label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(76, 13);
+            label4.Size = new System.Drawing.Size(215, 13);
             label4.TabIndex = 1;
-            label4.Text = "Page summary";
+            label4.Text = "Page summary (* = contains redaction items)";
             // 
             // _pageSummaryView
             // 

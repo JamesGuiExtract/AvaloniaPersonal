@@ -2197,6 +2197,23 @@ namespace Extract.Redaction.Verification
             return row < 0 ? _imageViewer.PageNumber : _redactionGridView.Rows[row].PageNumber;
         }
 
+        void MarkPagesWithSensitiveItems()
+        {
+            List<int> pagesWithSensitiveItems = new List<int>();
+
+            for (int i = 0; i < _redactionGridView.Rows.Count; ++i)
+            {
+                int pageOfItem = GetActivePageByRowIndex(i);
+                pagesWithSensitiveItems.Add(pageOfItem);
+            }
+
+            var pagesToMark = pagesWithSensitiveItems.Distinct();
+            foreach (int page in pagesToMark)
+            {
+                _pageSummaryView.DenotePageWithSensitiveItem(page);
+            }
+        }
+
         /// <summary>
         /// Goes to or checks the availability to go to the first redaction or page at or before
         /// the specified redaction and page, whichever comes last. 
@@ -2623,6 +2640,8 @@ namespace Extract.Redaction.Verification
             VerificationResume();
 
             QAModePreserveVisitedState();
+
+            MarkPagesWithSensitiveItems();
 
             return memento;
         }
