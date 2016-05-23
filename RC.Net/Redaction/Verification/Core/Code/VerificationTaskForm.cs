@@ -2197,6 +2197,9 @@ namespace Extract.Redaction.Verification
             return row < 0 ? _imageViewer.PageNumber : _redactionGridView.Rows[row].PageNumber;
         }
 
+        /// <summary>
+        /// Marks any pages with sensitive items - placing an asterisk after the page number in the cell.
+        /// </summary>
         void MarkPagesWithSensitiveItems()
         {
             List<int> pagesWithSensitiveItems = new List<int>();
