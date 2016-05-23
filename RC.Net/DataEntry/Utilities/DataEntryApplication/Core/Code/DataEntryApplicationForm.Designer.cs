@@ -368,7 +368,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this._toolStripContainer.Name = "_toolStripContainer";
             this._toolStripContainer.RightToolStripPanelVisible = false;
-            this._toolStripContainer.Size = new System.Drawing.Size(1097, 60);
+            this._toolStripContainer.Size = new System.Drawing.Size(1097, 61);
             this._toolStripContainer.TabIndex = 0;
             this._toolStripContainer.TabStop = false;
             this._toolStripContainer.Text = "_toolStripContainer";
