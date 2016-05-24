@@ -38,7 +38,10 @@ int esNoMemoryHandler( size_t n )
 {
 	// Create and throw a UCLIDException
 	UCLIDException ue("ELI12938", "Memory Allocation Failure.");
-	ue.addDebugInfo( "Size", n );
+	// https://extract.atlassian.net/browse/ISSUE-13764
+	// Do not make calls to addDebug info here as it will lead to memory being allocated to the
+	// heap. Since we are already handling a memory allocation issue, this can lead to an infinite
+	// loop that crashes the process.
 	throw ue;
 }
 
