@@ -9419,7 +9419,7 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 
 				long nID = -1;
-				executeCmdQuery(ipConnection, strSQL, "ID", &nID);
+				executeCmdQuery(ipConnection, strSQL, false, &nID);
 
 				// Update QueueEvent table if enabled
 				if (m_bUpdateQueueEventTable)

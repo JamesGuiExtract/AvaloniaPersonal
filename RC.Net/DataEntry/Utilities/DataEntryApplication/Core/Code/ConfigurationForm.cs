@@ -26,6 +26,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         FileTagSelectionSettings _tagSettings;
 
         /// <summary>
+        /// The settings for pagination.
+        /// </summary>
+        PaginationSettings _paginationSettings;
+
+        /// <summary>
         /// The <see cref="FileProcessingDB"/>.
         /// </summary>
         FileProcessingDB _fileProcessingDB;
@@ -58,6 +63,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _fileNameTagsButton.PathTags = new FileActionManagerPathTags();
                 _settings = new VerificationSettings(settings);
                 _tagSettings = _settings.TagSettings;
+                _paginationSettings = _settings.PaginationSettings;
             }
             catch (Exception ex)
             {
@@ -102,6 +108,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _enableCountersCheckBox.Checked = _settings.CountersEnabled;
                 _allowTagsCheckBox.Checked = _settings.AllowTags;
                 _tagSettingsButton.Enabled = _allowTagsCheckBox.Checked;
+                _paginationSettings = _settings.PaginationSettings;
+                _paginationCheckBox.Checked = _settings.PaginationEnabled;
+                _paginationSettingsButton.Enabled = _paginationCheckBox.Checked;
 
                 // Display the form modally and wait for the result
                 if (ShowDialog() == DialogResult.OK)
@@ -111,7 +120,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _enableInputTrackingCheckBox.Checked,
                         _enableCountersCheckBox.Checked,
                         _allowTagsCheckBox.Checked,
-                        _tagSettings);
+                        _tagSettings,
+                        _paginationCheckBox.Checked,
+                        _paginationSettings);
 
                     return true;
                 }
@@ -147,6 +158,25 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ex.ExtractDisplay("ELI37238");
             }
         }
+        
+        /// <summary>
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
+        /// <see cref="_paginationCheckBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePaginationCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _paginationSettingsButton.Enabled = _paginationCheckBox.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39861");
+            }
+        }
 
         /// <summary>
         /// Handles the <see cref="_tagSettingsButton"/> <see cref="Control.Click"/> event.
@@ -172,6 +202,31 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ex.ExtractDisplay("ELI37220");
             }
         }
+        
+        /// <summary>
+        /// Handles the <see cref="_paginationSettingsButton"/> <see cref="Control.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePaginationSettingsButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                using (PaginationSettingsDialog dialog =
+                    new PaginationSettingsDialog(_settings.PaginationSettings, _fileProcessingDB))
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        _paginationSettings = new PaginationSettings(dialog.Settings);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39862");
+            }
+        }
 
         /// <summary>
         /// Handles the case that the user clicked the browse button for the configuration file.
@@ -184,7 +239,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // The OpenFileDialog cless will not work in a multithreaded apartment. Initialize a
+                // The OpenFileDialog class will not work in a multithreaded apartment. Initialize a
                 // new thread in single thread apartment mode for the open file dialog.
                 Thread browseForFileThread = new Thread(new ParameterizedThreadStart(BrowseForFile));
                 browseForFileThread.SetApartmentState(ApartmentState.STA);

@@ -44,9 +44,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <item>3: Added _inputEventTrackingEnabled</item>
         /// <item>4: Added _countersEnabled</item>
         /// <item>5: Added file tag selection settings</item>
+        /// <item>6: Added pagination</item>
         /// </list>
         /// </summary>
-        static readonly int _CURRENT_VERSION = 5;
+        static readonly int _CURRENT_VERSION = 6;
 
         #endregion Constants
 

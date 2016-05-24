@@ -1430,7 +1430,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         var outputDocument = outputDocuments.Single();
                         _primaryPageLayoutControl.LoadOutputDocument(
                             outputDocument, outputDocument.OriginalPages);
-                        outputDocument.DocumentData.Revert();
+                        if (outputDocument.DocumentData != null)
+                        {
+                            outputDocument.DocumentData.Revert();
+                        }
                         _pendingDocuments.Add(outputDocument);
                     }
                     // Reverting a document for which there was suggested pagination. Rather than
@@ -1462,7 +1465,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _pendingDocuments.Add(outputDocument);
                     }
 
-                    outputDocument.DocumentData.Revert();
+                    if (outputDocument.DocumentData != null)
+                    {
+                        outputDocument.DocumentData.Revert();
+                    }
                 }
             }
 

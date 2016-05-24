@@ -1216,7 +1216,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 base.OnLoad(e);
 
-                if (!_standAloneMode && Control.ModifierKeys.HasFlag(Keys.Shift))
+                if (!_standAloneMode && _settings.PaginationEnabled)
                 {
                     LoadPaginationDocumentDataPanel();
 
@@ -3052,14 +3052,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Keep the processing queue paused until the Paginated event.
                 FileRequestHandler.PauseProcessingQueue();
 
-                var pathTags = new SourceDocumentPathTags(e.SourcePageInfo.First().DocumentName);
-                e.OutputFileName = pathTags.Expand("$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
+                e.OutputFileName = GetPaginatedDocumentFileName(e);
+
+                bool grabForImmediateVerification =
+                    e.SuggestedPaginationAccepted.HasValue && e.SuggestedPaginationAccepted.Value;
+
+                EFilePriority priority = grabForImmediateVerification
+                    ? EFilePriority.kPriorityNormal
+                    : GetPriorityForFile(e);
 
                 // Add the file to the DB and check it out for this process before actually writing
                 // it to outputPath to prevent a running file supplier from grabbing it and another
                 // process from getting it.
-                int fileID = FileProcessingDB.AddFileNoQueue(
-                    e.OutputFileName, e.FileSize, e.PageCount, EFilePriority.kPriorityNormal);
+                int fileID = AddFileWithNameConflictResolve(e, priority);
 
                 // Format source page info into an IUnknownVector of StringPairs (filename, page).
                 var sourcePageInfo = e.SourcePageInfo
@@ -3088,33 +3093,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
                 // everything we would expect them to find for this document).
-                if (e.SuggestedPaginationAccepted.HasValue && e.SuggestedPaginationAccepted.Value)
+                if (grabForImmediateVerification)
                 {
-                    // Produce a voa file for the paginated document using the data the rules suggested.
-                    var documentData = e.DocumentData as PaginationDocumentData;
-                    if (documentData != null)
-                    {
-                        AttributeMethods.TranslateAttributesToNewDocument(
-                            documentData.Attributes, e.OutputFileName, pageMap);
-
-                        documentData.Attributes.SaveTo(e.OutputFileName + ".voa", false,
-                            _ATTRIBUTE_STORAGE_MANAGER_GUID);
-                        // Though saved out to file, it is this object that will be used for the
-                        // newly paginated document; it should not be marked dirty at this point.
-                        documentData.SetOriginalForm();
-                    }
-
-                    EActionStatus previousStatus;
-                    bool success =
-                        FileRequestHandler.CheckoutForProcessing(fileID, false, out previousStatus);
-                    ExtractException.Assert("ELI39621", "Failed to check out file", success,
-                        "FileID", fileID);
-                    success = FileRequestHandler.SetFallbackStatus(fileID, EActionStatus.kActionPending);
-                    ExtractException.Assert("ELI39622", "Failed to set fallback status", success,
-                        "FileID", fileID);
-                    _paginationOutputToReload.Add(
-                        new Tuple<string, int, PaginationDocumentData>(
-                            e.OutputFileName, e.Position, documentData));
+                    GrabDocumentForVerification(fileID, e, pageMap);
+                }
+                else if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
+                {
+                    EActionStatus oldStatus;
+                    FileProcessingDB.SetStatusForFile(fileID,
+                        _settings.PaginationSettings.PaginationOutputAction,
+                        EActionStatus.kActionPending, false, false, out oldStatus);
                 }
             }
             catch (Exception ex)
@@ -3163,6 +3151,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     documentData.SetOriginalForm();
                 }
 
+                bool completeActiveFile = false;
+
                 // Once the newly paginated files are loaded, the source documents for the newly
                 // paginated output or any documents for which suggested pagination was ignored
                 // should be completed.
@@ -3175,17 +3165,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // normally.
                     if (sourceFileName == _fileName)
                     {
-                        // In order for files to be completed (and any prompting or other UI tasks
-                        // accomplished by the DEP), the data tab must be given back focus.
-                        _tabControl.SelectedTab = _dataTab;
-
-                        _imageViewer.CloseImage();
-
-                        // Record statistics to database that need to happen when a file is closed.
-                        RecordCounts(onLoad: false, attributes: null);
-                        EndFileTaskSession();
-
-                        OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+                        completeActiveFile = true;
                     }
                     // If sourceFileName is not the current file in verification, it needs to be
                     // manually released from the current process and directed to "complete" via
@@ -3198,7 +3178,33 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         ExtractException.Assert("ELI39623", "Failed to set fallback status", success,
                             "FileID", sourceFileID);
                         ReleaseFile(sourceFileID);
+
+                        // PaginationSourceAction allows a paginated source to be moved into a
+                        // cleanup action even when it is completed for this action without actually
+                        // having completed all FAM tasks.
+                        if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationSourceAction))
+                        {
+                            EActionStatus oldStatus;
+                            FileProcessingDB.SetStatusForFile(sourceFileID,
+                                _settings.PaginationSettings.PaginationSourceAction,
+                                EActionStatus.kActionPending, false, true, out oldStatus);
+                        }
                     }
+                }
+
+                if (completeActiveFile)
+                {
+                    // In order for files to be completed (and any prompting or other UI tasks
+                    // accomplished by the DEP), the data tab must be given back focus.
+                    _tabControl.SelectedTab = _dataTab;
+
+                    _imageViewer.CloseImage();
+
+                    // Record statistics to database that need to happen when a file is closed.
+                    RecordCounts(onLoad: false, attributes: null);
+                    EndFileTaskSession();
+
+                    OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
                 }
             }
             catch (Exception ex)
@@ -5489,6 +5495,150 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Generates the filename for pagination output based on the current pagination settings
+        /// for the specified argument <see paramref="e"/>.
+        /// </summary>
+        /// <param name="e">A <see cref="CreatingOutputDocumentEventArgs"/> relating to the
+        /// pagination output that is being generated.</param>
+        /// <returns>The filename that should be used for this pagination output.</returns>
+        string GetPaginatedDocumentFileName(CreatingOutputDocumentEventArgs e)
+        {
+            try
+            {
+                string outputDocPath = _settings.PaginationSettings.PaginationOutputPath;
+                string sourceDocName = e.SourcePageInfo.First().DocumentName;
+                var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, sourceDocName);
+                if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
+                {
+                    string query = string.Format(CultureInfo.InvariantCulture,
+                        "SELECT COUNT(DISTINCT([DestFileID])) AS [SubDocIndex] " +
+                        "   FROM [Pagination] " +
+                        "   INNER JOIN [FAMFile] ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
+                        "   WHERE [FileName] = '{0}'",
+                        sourceDocName.Replace("'", "''"));
+
+                    var recordset = FileProcessingDB.GetResultsForQuery(query);
+                    int subDocIndex = (int)recordset.Fields["SubDocIndex"].Value;
+                    recordset.Close();
+
+                    pathTags.AddTag(PaginationSettings.SubDocIndexTag,
+                        subDocIndex.ToString(CultureInfo.InvariantCulture));
+                }
+                if (outputDocPath.Contains(PaginationSettings.FirstPageTag))
+                {
+                    int firstPageNum = e.SourcePageInfo
+                        .Where(page => page.DocumentName == sourceDocName)
+                        .Min(page => page.Page);
+
+                    pathTags.AddTag(PaginationSettings.FirstPageTag,
+                        firstPageNum.ToString(CultureInfo.InvariantCulture));
+                }
+                if (outputDocPath.Contains(PaginationSettings.LastPageTag))
+                {
+                    int lastPageNum = e.SourcePageInfo
+                        .Where(page => page.DocumentName == sourceDocName)
+                        .Max(page => page.Page);
+
+                    pathTags.AddTag(PaginationSettings.LastPageTag,
+                        lastPageNum.ToString(CultureInfo.InvariantCulture));
+                }
+
+                return pathTags.Expand(_settings.PaginationSettings.PaginationOutputPath);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39891");
+            }
+        }
+
+        /// <summary>
+        /// Gets the priority to assign a paginated output file that needs to be sent back for
+        /// processing.
+        /// </summary>
+        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance relating to
+        /// the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this call is
+        /// being made.</param>
+        EFilePriority GetPriorityForFile(CreatingOutputDocumentEventArgs e)
+        {
+            try
+            {
+                var sourceDocNames = string.Join(", ",
+                        e.SourcePageInfo
+                            .Select(page => "'" + page.DocumentName.Replace("'", "''") + "'")
+                            .Distinct());
+
+                string query = string.Format(CultureInfo.InvariantCulture,
+                    "SELECT MAX([FAMFile].[Priority]) AS [MaxPriority] FROM [FileActionStatus]" +
+                    "   INNER JOIN [FAMFile] ON [FileID] = [FAMFile].[ID]" +
+                    "   WHERE [ActionID] = {0}" +
+                    "   AND [FileName] IN ({1})", _actionId, sourceDocNames);
+
+                var recordset = FileProcessingDB.GetResultsForQuery(query);
+                var priority = (EFilePriority)recordset.Fields["MaxPriority"].Value;
+                recordset.Close();
+
+                priority = (EFilePriority)
+                    Math.Max((int)priority,
+                        (int)_settings.PaginationSettings.PaginatedOutputPriority);
+
+                return priority;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39892");
+            }
+        }
+
+        /// <summary>
+        /// Attempts add the filename associates with the argument <see paramref="e"/> to the FAM DB
+        /// with the FileProcessingDB AddFileNoQueue method. If the add fails because
+        /// the file already exists in the DB, it will add 6 random chars before the extension and
+        /// try one more time.</summary>
+        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance relating to
+        /// the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this call is
+        /// being made.</param>
+        /// <param name="priority">The <see cref="EFilePriority"/> that should be assigned for the
+        /// file.</param>
+        /// <returns>The ID of the newly added filename in the FAMFile table.</returns>
+        int AddFileWithNameConflictResolve(CreatingOutputDocumentEventArgs e, EFilePriority priority)
+        {
+            int fileID = -1;
+
+            try
+            {
+                fileID = FileProcessingDB.AddFileNoQueue(
+                    e.OutputFileName, e.FileSize, e.PageCount, priority);
+            }
+            catch (Exception ex)
+            {
+                // Query to see if the e.OutputFileName can be found in the database.
+                string query = string.Format(CultureInfo.InvariantCulture,
+                    "SELECT [ID] FROM [FAMFile] WHERE [FileName] = '{0}'",
+                    e.OutputFileName.Replace("'", "''"));
+
+                var recordset = FileProcessingDB.GetResultsForQuery(query);
+                bool fileExistsInDB = !recordset.EOF;
+                recordset.Close();
+                if (fileExistsInDB)
+                {
+                    var pathTags = new SourceDocumentPathTags(e.OutputFileName);
+                    e.OutputFileName = pathTags.Expand(
+                        "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
+
+                    fileID = FileProcessingDB.AddFileNoQueue(
+                        e.OutputFileName, e.FileSize, e.PageCount, priority);
+                }
+                else
+                {
+                    // The file was not in the database, the call failed for another reason.
+                    throw ex.AsExtract("ELI39890");
+                }
+            }
+
+            return fileID;
+        }
+
+        /// <summary>
         /// Creates a new uss file for the specified <see paramref="newDocumentName"/> based upon
         /// the specified <see paramref="pageMap"/> that relates the source pages to the
         /// corresponding pages in <see paramref="newDocumentName"/>.
@@ -5545,6 +5695,55 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39708");
+            }
+        }
+
+        /// <summary>
+        /// Grabs the specified document for immediate verification in the current session. Any
+        /// indexing data included in <see paramref="e"/> will be saved to VOA and used by
+        /// verification.
+        /// </summary>
+        /// <param name="fileID">The FAM file ID of the document.</param>
+        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance containing
+        /// data about the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this
+        /// call is being made.</param>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new page number in 
+        /// <see paramref="newDocumentName"/>.</param>
+        void GrabDocumentForVerification(int fileID, CreatingOutputDocumentEventArgs e,
+            Dictionary<Tuple<string, int>, int> pageMap)
+        {
+            try
+            {
+                // Produce a voa file for the paginated document using the data the rules suggested.
+                var documentData = e.DocumentData as PaginationDocumentData;
+                if (documentData != null)
+                {
+                    AttributeMethods.TranslateAttributesToNewDocument(
+                        documentData.Attributes, e.OutputFileName, pageMap);
+
+                    documentData.Attributes.SaveTo(e.OutputFileName + ".voa", false,
+                        _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    // Though saved out to file, it is this object that will be used for the
+                    // newly paginated document; it should not be marked dirty at this point.
+                    documentData.SetOriginalForm();
+                }
+
+                EActionStatus previousStatus;
+                bool success =
+                    FileRequestHandler.CheckoutForProcessing(fileID, false, out previousStatus);
+                ExtractException.Assert("ELI39621", "Failed to check out file", success,
+                    "FileID", fileID);
+                success = FileRequestHandler.SetFallbackStatus(fileID, EActionStatus.kActionPending);
+                ExtractException.Assert("ELI39622", "Failed to set fallback status", success,
+                    "FileID", fileID);
+                _paginationOutputToReload.Add(
+                    new Tuple<string, int, PaginationDocumentData>(
+                        e.OutputFileName, e.Position, documentData));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39889");
             }
         }
 

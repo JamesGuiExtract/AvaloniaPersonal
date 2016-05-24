@@ -21,9 +21,19 @@ namespace Extract.Utilities.Forms
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         static public void SetRequiredMarker(this TextBoxBase textBox)
         {
-            textBox.ForeColor = System.Drawing.Color.SandyBrown;
-            textBox.Text = REQUIRED_FIELD_MARKER;
-            textBox.Refresh();
+            try
+            {
+                if (!textBox.IsRequiredMarkerSet())
+                {
+                    textBox.ForeColor = System.Drawing.Color.SandyBrown;
+                    textBox.Text = REQUIRED_FIELD_MARKER;
+                    textBox.Invalidate();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39879");
+            }
         }
 
         /// <summary>
@@ -40,17 +50,23 @@ namespace Extract.Utilities.Forms
                 {
                     textBox.ForeColor = System.Drawing.Color.Black;
                     textBox.Text = "";
-                    textBox.Refresh();
+                    textBox.Invalidate();
                 }
                 else
                 {
+                    // 5/20/2016 SNK
+                    // This may be dead code. The intent was that if a cursor is moved into a
+                    // control and a character is entered at the front, that the entered character
+                    // is not also erased as part of clearing REQUIRED_FIELD_MARKER. At one point,
+                    // this was necessary. However, I believe proper handling of OnEnter should
+                    // result in the marker being cleared before text is entered.
                     var text = textBox.Text;
                     if (text.Contains(REQUIRED_FIELD_MARKER))
                     {
                         var contents = RemoveTrailingRequiredText(text);
                         textBox.ForeColor = System.Drawing.Color.Black;
                         textBox.Text = contents;
-                        textBox.Refresh();
+                        textBox.Invalidate();
                         textBox.SafeBeginInvoke("ELI39626", () =>
                             {
                                 textBox.SelectionStart = contents.Length;

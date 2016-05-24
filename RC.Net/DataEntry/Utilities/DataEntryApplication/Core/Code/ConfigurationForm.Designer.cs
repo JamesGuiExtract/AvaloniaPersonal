@@ -39,6 +39,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._fileNameTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._tagSettingsButton = new System.Windows.Forms.Button();
             this._allowTagsCheckBox = new System.Windows.Forms.CheckBox();
+            this._paginationCheckBox = new System.Windows.Forms.CheckBox();
+            this._paginationSettingsButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // _label1
@@ -74,10 +76,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(327, 120);
+            this._okButton.Location = new System.Drawing.Point(327, 153);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 8;
+            this._okButton.TabIndex = 10;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             // 
@@ -85,10 +87,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(408, 120);
+            this._cancelButton.Location = new System.Drawing.Point(408, 153);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 9;
+            this._cancelButton.TabIndex = 11;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -144,12 +146,35 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._allowTagsCheckBox.UseVisualStyleBackColor = true;
             this._allowTagsCheckBox.CheckedChanged += new System.EventHandler(this.HandleAllowTagsCheckBox_CheckedChanged);
             // 
+            // _paginationCheckBox
+            // 
+            this._paginationCheckBox.AutoSize = true;
+            this._paginationCheckBox.Location = new System.Drawing.Point(15, 126);
+            this._paginationCheckBox.Name = "_paginationCheckBox";
+            this._paginationCheckBox.Size = new System.Drawing.Size(111, 17);
+            this._paginationCheckBox.TabIndex = 8;
+            this._paginationCheckBox.Text = "Enable pagination";
+            this._paginationCheckBox.UseVisualStyleBackColor = true;
+            this._paginationCheckBox.CheckedChanged += new System.EventHandler(this.HandlePaginationCheckBox_CheckedChanged);
+            // 
+            // _paginationSettingsButton
+            // 
+            this._paginationSettingsButton.Location = new System.Drawing.Point(143, 122);
+            this._paginationSettingsButton.Name = "_paginationSettingsButton";
+            this._paginationSettingsButton.Size = new System.Drawing.Size(75, 23);
+            this._paginationSettingsButton.TabIndex = 9;
+            this._paginationSettingsButton.Text = "Settings...";
+            this._paginationSettingsButton.UseVisualStyleBackColor = true;
+            this._paginationSettingsButton.Click += new System.EventHandler(this.HandlePaginationSettingsButtonClick);
+            // 
             // ConfigurationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(495, 155);
+            this.ClientSize = new System.Drawing.Size(495, 188);
             this.ControlBox = false;
+            this.Controls.Add(this._paginationSettingsButton);
+            this.Controls.Add(this._paginationCheckBox);
             this.Controls.Add(this._tagSettingsButton);
             this.Controls.Add(this._allowTagsCheckBox);
             this.Controls.Add(this._fileNameTagsButton);
@@ -182,5 +207,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fileNameTagsButton;
         private System.Windows.Forms.Button _tagSettingsButton;
         private System.Windows.Forms.CheckBox _allowTagsCheckBox;
+        private System.Windows.Forms.CheckBox _paginationCheckBox;
+        private System.Windows.Forms.Button _paginationSettingsButton;
     }
 }

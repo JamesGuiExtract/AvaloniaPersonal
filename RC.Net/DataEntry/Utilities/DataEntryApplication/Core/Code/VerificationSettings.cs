@@ -1,6 +1,6 @@
-﻿using Extract.Interop;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Interop;
 using System;
-using Extract.FileActionManager.Forms;
 
 namespace Extract.DataEntry.Utilities.DataEntryApplication
 {
@@ -12,30 +12,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Fields
 
         /// <summary>
-        /// The name of the DataEntry configuration file to use for the
-        /// <see cref="DataEntryApplicationForm"/>.
-        /// </summary>
-        string _configFileName;
-
-        /// <summary>
-        /// Specifies whether input event tracking should be logged in the database.
-        /// </summary>
-        bool _inputEventTrackingEnabled;
-
-        /// <summary>
-        /// Specifies whether counts will be recorded for the defined data entry counters.
-        /// </summary>
-        bool _countersEnabled;
-
-        /// <summary>
-        /// Specifies whether the users are able to apply tags.
-        /// </summary>
-        bool _allowTags = true;
-
-        /// <summary>
         /// Specifies which tags should be available to the users.
         /// </summary>
         FileTagSelectionSettings _tagSettings = new FileTagSelectionSettings();
+
+        /// <summary>
+        /// The settings for pagination.
+        /// </summary>
+        PaginationSettings _paginationSettings = new PaginationSettings();
 
         #endregion Fields
 
@@ -45,7 +29,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
         public VerificationSettings()
-            : this(null, false, false, true, null)
+            : this(null, false, false, true, null, false, null)
         {
         }
 
@@ -55,7 +39,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="configFileName">The name of the DataEntry configuration file to use for the
         /// <see cref="DataEntryApplicationForm"/>.</param>
         public VerificationSettings(string configFileName)
-            : this(configFileName, false, false, true, null)
+            : this(configFileName, false, false, true, null, false, null)
         {
         }
 
@@ -66,36 +50,46 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// from.</param>
         public VerificationSettings(VerificationSettings source)
         {
-            _configFileName = source.ConfigFileName;
-            _inputEventTrackingEnabled = source.InputEventTrackingEnabled;
-            _countersEnabled = source.CountersEnabled;
-            _allowTags = source.AllowTags;
+            ConfigFileName = source.ConfigFileName;
+            InputEventTrackingEnabled = source.InputEventTrackingEnabled;
+            CountersEnabled = source.CountersEnabled;
+            AllowTags = source.AllowTags;
             _tagSettings = (source.TagSettings == null)
                 ? new FileTagSelectionSettings()
                 : new FileTagSelectionSettings(source.TagSettings);
+            PaginationEnabled = source.PaginationEnabled;
+            _paginationSettings = (source.PaginationSettings == null)
+                ? new PaginationSettings()
+                : new PaginationSettings(source.PaginationSettings);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VerificationSettings"/> class with the 
+        /// Initializes a new instance of the <see cref="VerificationSettings"/> class with the
         /// specified settings.
         /// </summary>
         /// <param name="configFileName">The name of the DataEntry configuration file to use for the
-        /// <see cref="DataEntryApplicationForm"/>.
-        /// </param>
+        /// <see cref="DataEntryApplicationForm"/>.</param>
         /// <param name="inputEventTrackingEnabled">Specifies whether input event tracking should be
         /// logged in the database.</param>
         /// <param name="countersEnabled">Specifies whether counts will be recorded for the defined
         /// data entry counters.</param>
         /// <param name="allowTags">Specifies whether the users are able to apply tags.</param>
         /// <param name="tagSettings">Specifies which tags should be available to the users.</param>
+        /// <param name="paginationEnabled"><see langword="true"/> if pagination should be enabled;
+        /// otherwise, <see langword="false"/></param>
+        /// <param name="paginationSettings">A <see cref="PaginationSettings"/> specifying the
+        /// settings for pagination.</param>
         public VerificationSettings(string configFileName, bool inputEventTrackingEnabled,
-            bool countersEnabled, bool allowTags, FileTagSelectionSettings tagSettings)
+            bool countersEnabled, bool allowTags, FileTagSelectionSettings tagSettings,
+            bool paginationEnabled, PaginationSettings paginationSettings)
         {
-            _configFileName = configFileName;
-            _inputEventTrackingEnabled = inputEventTrackingEnabled;
-            _countersEnabled = countersEnabled;
-            _allowTags = allowTags;
+            ConfigFileName = configFileName;
+            InputEventTrackingEnabled = inputEventTrackingEnabled;
+            CountersEnabled = countersEnabled;
+            AllowTags = allowTags;
             _tagSettings = tagSettings ?? new FileTagSelectionSettings();
+            PaginationEnabled = paginationEnabled;
+            _paginationSettings = paginationSettings ?? new PaginationSettings();
         }
 
         #endregion Constructors
@@ -109,10 +103,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <value>The name of the DataEntry configuration file to use.</value>
         public string ConfigFileName
         {
-            get
-            {
-                return _configFileName;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -125,10 +117,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// otherwise.</value>
         public bool InputEventTrackingEnabled
         {
-            get
-            {
-                return _inputEventTrackingEnabled;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -141,10 +131,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <see langword="false"/> otherwise.</value>
         public bool CountersEnabled
         {
-            get
-            {
-                return _countersEnabled;
-            }
+            get;
+            private set;
         }
         
         /// <summary>
@@ -154,10 +142,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <see langword="false"/> otherwise.</value>
         public bool AllowTags
         {
-            get
-            {
-                return _allowTags;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -172,6 +158,26 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             get
             {
                 return _tagSettings;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether pagination is to be enabled.
+        /// </summary>
+        public bool PaginationEnabled
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// A <see cref="PaginationSettings"/> specifying the settings for pagination.
+        /// </summary>
+        public PaginationSettings PaginationSettings
+        {
+            get
+            {
+                return _paginationSettings;
             }
         }
 
@@ -196,6 +202,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 bool countersEnabled = false;
                 bool allowTags = true;
                 var tagSettings = new FileTagSelectionSettings();
+                bool paginationEnabled = false;
+                var paginationSettings = new PaginationSettings();
 
                 if (reader.Version >= 2)
                 {
@@ -218,8 +226,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     tagSettings = FileTagSelectionSettings.ReadFrom(reader);
                 }
 
+                if (reader.Version >= 6)
+                {
+                    paginationEnabled = reader.ReadBoolean();
+                    paginationSettings = PaginationSettings.ReadFrom(reader);
+                }
+
                 return new VerificationSettings(configFileName, inputEventTrackingEnabled,
-                    countersEnabled, allowTags, tagSettings);
+                    countersEnabled, allowTags, tagSettings, paginationEnabled, paginationSettings);
             }
             catch (Exception ex)
             {
@@ -238,11 +252,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                writer.Write(_configFileName);
-                writer.Write(_inputEventTrackingEnabled);
-                writer.Write(_countersEnabled);
-                writer.Write(_allowTags);
+                writer.Write(ConfigFileName);
+                writer.Write(InputEventTrackingEnabled);
+                writer.Write(CountersEnabled);
+                writer.Write(AllowTags);
                 _tagSettings.WriteTo(writer);
+                writer.Write(PaginationEnabled);
+                _paginationSettings.WriteTo(writer);
             }
             catch (Exception ex)
             {
