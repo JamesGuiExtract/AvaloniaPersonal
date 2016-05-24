@@ -2300,7 +2300,7 @@ void CTestSpatialString::runTestCase22()
 			ipComplete->IsEqualTo( ipMulti ) == VARIANT_TRUE  && !m_ipSpatialString->HasSpatialInfo() &&
 			!ipMultipleSpatialString->HasSpatialInfo() )
 		{
-			// Successfull test if both spatial strings are equal
+			// Successful test if both spatial strings are equal
 			bSuccess = true;
 		}
 		// Post contents of spatial strings
@@ -2894,6 +2894,28 @@ void CTestSpatialString::runTestCase26()
 	}
 	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39679", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
+	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_26_8"), 
+		get_bstr_t("Testing GetPages(vbIncludeBlankPages, strTextForBlankPage) method with" 
+		"Empty non spatial string for image with 4 pages - VARIANT_TRUE, \"___EMPTY___\""), kAutomatedTestCase); 
+
+	// Testing a blank spatial string with existing image (needed to get the page count)
+	string strSourceDocName = m_strTestFilesFolder + "image2blankTogether.tif";
+	m_ipSpatialString->Clear();
+	m_ipSpatialString->SourceDocName = strSourceDocName.c_str();
+
+	bExceptionCaught = false;
+	bSuccess = true;
+	try
+	{
+		IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_TRUE, "___EMPTY___");
+
+		string strExpectedPagesFile = m_strTestFilesFolder + "image2blankTogether_EmptyString.tif.vpss";
+		
+		bSuccess = testCase26Helper(strExpectedPagesFile, ipPages);
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI39679", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CTestSpatialString::testCase26Helper(string strExpectedPagesFile, IIUnknownVectorPtr ipPages)

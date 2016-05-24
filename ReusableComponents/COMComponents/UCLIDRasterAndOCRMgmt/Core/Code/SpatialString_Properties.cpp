@@ -790,7 +790,8 @@ STDMETHODIMP CSpatialString::GetPages(VARIANT_BOOL vbIncludeBlankPages, BSTR str
 		validateLicense();
 
 		// Ensure the string is spatial
-		if (m_eMode == kNonSpatialMode)
+		if (m_eMode == kNonSpatialMode && 
+			!(asCppBool(vbIncludeBlankPages) && m_strString.empty() &&  !m_strSourceDocName.empty()))
 		{
 			UCLIDException ue("ELI25861", "GetPages is not valid for a non-spatial string!");
 			throw ue;
@@ -940,6 +941,7 @@ STDMETHODIMP CSpatialString::GetPages(VARIANT_BOOL vbIncludeBlankPages, BSTR str
 		}
 
 		// add missing pages at the end of the document
+		// this will add all of the pages in the case of an empty string
 		if (asCppBool(vbIncludeBlankPages))
 		{
 			while (nExpectedNextPage <= nExpectedLastPage)
