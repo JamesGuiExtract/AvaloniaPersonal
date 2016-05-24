@@ -189,7 +189,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 using (FileTagSelectionDialog dialog =
-                    new FileTagSelectionDialog(_settings.TagSettings, _fileProcessingDB))
+                    new FileTagSelectionDialog(_tagSettings, _fileProcessingDB))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
@@ -214,7 +214,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 using (PaginationSettingsDialog dialog =
-                    new PaginationSettingsDialog(_settings.PaginationSettings, _fileProcessingDB))
+                    new PaginationSettingsDialog(_paginationSettings, _fileProcessingDB))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
