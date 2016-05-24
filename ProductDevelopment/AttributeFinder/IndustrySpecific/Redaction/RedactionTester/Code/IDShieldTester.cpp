@@ -25,7 +25,7 @@ using namespace std;
 // Constants
 //-------------------------------------------------------------------------------------------------
 // Path to the registry key for minimum overlap of raster zone that will 'pass' the test
-const string gstrMIN_OVERLAP_REGISTRY_KEY_PATH = gstrAF_REG_ROOT_FOLDER_PATH + 
+const string gstrMIN_OVERLAP_REGISTRY_KEY_PATH = gstrAF_REG_ROOT_FOLDER_PATH +
 									"\\IndustrySpecific\\Redaction";
 const string gstrOVERLAP_PERCENT_FOLDER = "\\RedactionTester";
 const string gstrOVERLAP_PERCENT_KEY = "RasterZoneOverlapLeniency";
@@ -57,11 +57,11 @@ const string gstrFILES_WITH_OVERLAPPING_EXPECTED_REDACTIONS =
 											"\\Files_AtLeastOneOverlappingExpectedRedaction.txt";
 
 // Files output in analyzeDataForVerificationBasedRedaction
-const string gstrFILES_CORRECTLY_SELECTED_FOR_REVIEW = 
+const string gstrFILES_CORRECTLY_SELECTED_FOR_REVIEW =
 	"\\SensitiveFiles_SelectedForReview.txt";
-const string gstrFILES_INCORRECTLY_SELECTED_FOR_REVIEW = 
+const string gstrFILES_INCORRECTLY_SELECTED_FOR_REVIEW =
 	"\\InsensitiveFiles_SelectedForReview.txt";
-const string gstrFILES_MISSED_BEING_SELECTED_FOR_REVIEW = 
+const string gstrFILES_MISSED_BEING_SELECTED_FOR_REVIEW =
 	"\\SensitiveFiles_NotSelectedForReview.txt";
 
 // File output in analyzeDataForAutomatedRedaction
@@ -73,13 +73,13 @@ const string gstrFILES_WITH_CLUES = "\\Files_AtLeastOneFoundClue.txt";
 
 const string gstrFILES_CORRECTLY_SELECTED_FOR_REDACTION =
 	"\\SensitiveFiles_AutomaticallyRedacted.txt";
-const string gstrFILES_INCORRECTLY_SELECTED_FOR_REDACTION = 
+const string gstrFILES_INCORRECTLY_SELECTED_FOR_REDACTION =
 	"\\InsensitiveFiles_AutomaticallyRedacted.txt";
 const string gstrFILES_MISSED_BEING_SELECTED_FOR_REDACTION =
 	"\\SensitiveFiles_NotSelectedForRedaction.txt";
 
 // Files output in countDocTypes
-const string gstrFILES_CLASSIFIED_AS_MORE_THAN_ONE_DOC_TYPE = 
+const string gstrFILES_CLASSIFIED_AS_MORE_THAN_ONE_DOC_TYPE =
 	"\\DocType_MultipleDocTypes.txt";
 const string gstrUNKNOWN_DOC_TYPE_FILES = "\\DocType_Unknown.txt";
 // Known DocType files are written to DocType - TypeName.txt (P16 #2769)
@@ -217,44 +217,44 @@ m_ipAttrFinderEngine(CLSID_AttributeFinderEngine)
 		ASSERT_RESOURCE_ALLOCATION("ELI36104", m_ipTagUtility != __nullptr);
 
 		// Map the result fields to names for use by custom reports.
-		m_mapStatisticFields["TotalExpectedRedactions"] = &m_ulTotalExpectedRedactions;
-		m_mapStatisticFields["NumCorrectRedactionsByDocument"] = &m_ulNumCorrectRedactionsByDocument;
-		m_mapStatisticFields["NumCorrectRedactionsByPage"] = &m_ulNumCorrectRedactionsByPage;
-		m_mapStatisticFields["NumOverRedactions"] = &m_ulNumOverRedactions;
-		m_mapStatisticFields["NumUnderRedactions"] = &m_ulNumUnderRedactions;
-		m_mapStatisticFields["NumMisses"] = &m_ulNumMisses;
-		m_mapStatisticFields["TotalFilesProcessed"] = &m_ulTotalFilesProcessed;
-		m_mapStatisticFields["NumFilesWithExpectedRedactions"] = &m_ulNumFilesWithExpectedRedactions;
-		m_mapStatisticFields["NumFilesSelectedForReview"] = &m_ulNumFilesSelectedForReview;
-		m_mapStatisticFields["NumPagesInFilesSelectedForReview"] = &m_ulNumPagesInFilesSelectedForReview;
-		m_mapStatisticFields["NumPagesSelectedForReview"] = &m_ulNumPagesSelectedForReview;
-		m_mapStatisticFields["NumFilesAutomaticallyRedacted"] = &m_ulNumFilesAutomaticallyRedacted;
-		m_mapStatisticFields["NumExpectedRedactionsInReviewedFiles"] = &m_ulNumExpectedRedactionsInReviewedFiles;
-		m_mapStatisticFields["NumExpectedRedactionsInRedactedFiles"] = &m_ulNumExpectedRedactionsInRedactedFiles;
+		m_mapStatisticFields["TotalExpectedRedactions"] = &m_iccCounters.m_ulTotalExpectedRedactions;
+		m_mapStatisticFields["NumCorrectRedactionsByDocument"] = &m_iccCounters.m_ulNumCorrectRedactionsByDocument;
+		m_mapStatisticFields["NumCorrectRedactionsByPage"] = &m_iccCounters.m_ulNumCorrectRedactionsByPage;
+		m_mapStatisticFields["NumOverRedactions"] = &m_iccCounters.m_ulNumOverRedactions;
+		m_mapStatisticFields["NumUnderRedactions"] = &m_iccCounters.m_ulNumUnderRedactions;
+		m_mapStatisticFields["NumMisses"] = &m_iccCounters.m_ulNumMisses;
+		m_mapStatisticFields["TotalFilesProcessed"] = &m_iccCounters.m_ulTotalFilesProcessed;
+		m_mapStatisticFields["NumFilesWithExpectedRedactions"] = &m_iccCounters.m_ulNumFilesWithExpectedRedactions;
+		m_mapStatisticFields["NumFilesSelectedForReview"] = &m_iccCounters.m_ulNumFilesSelectedForReview;
+		m_mapStatisticFields["NumPagesInFilesSelectedForReview"] = &m_iccCounters.m_ulNumPagesInFilesSelectedForReview;
+		m_mapStatisticFields["NumPagesSelectedForReview"] = &m_iccCounters.m_ulNumPagesSelectedForReview;
+		m_mapStatisticFields["NumFilesAutomaticallyRedacted"] = &m_iccCounters.m_ulNumFilesAutomaticallyRedacted;
+		m_mapStatisticFields["NumExpectedRedactionsInReviewedFiles"] = &m_iccCounters.m_ulNumExpectedRedactionsInReviewedFiles;
+		m_mapStatisticFields["NumExpectedRedactionsInRedactedFiles"] = &m_iccCounters.m_ulNumExpectedRedactionsInRedactedFiles;
 		m_mapStatisticFields["NumFilesWithExistingVOA"] = &m_ulNumFilesWithExistingVOA;
-		m_mapStatisticFields["NumFilesWithOverlappingExpectedRedactions"] = &m_ulNumFilesWithOverlappingExpectedRedactions;
-		m_mapStatisticFields["TotalPages"] = &m_ulTotalPages;
-		m_mapStatisticFields["NumPagesWithExpectedRedactions"] = &m_ulNumPagesWithExpectedRedactions;
-		m_mapStatisticFields["DocsClassified"] = &m_ulDocsClassified;
+		m_mapStatisticFields["NumFilesWithOverlappingExpectedRedactions"] = &m_iccCounters.m_ulNumFilesWithOverlappingExpectedRedactions;
+		m_mapStatisticFields["TotalPages"] = &m_iccCounters.m_ulTotalPages;
+		m_mapStatisticFields["NumPagesWithExpectedRedactions"] = &m_iccCounters.m_ulNumPagesWithExpectedRedactions;
+		m_mapStatisticFields["DocsClassified"] = &m_iccCounters.m_ulDocsClassified;
 
-		m_mapStatisticFields["AutomatedTotalExpectedRedactions"] = &automatedStatistics.m_ulTotalExpectedRedactions;
-		m_mapStatisticFields["AutomatedExpectedRedactionsInSelectedFiles"] = &automatedStatistics.m_ulExpectedRedactionsInSelectedFiles;
-		m_mapStatisticFields["AutomatedFoundRedactions"] = &automatedStatistics.m_ulFoundRedactions;
-		m_mapStatisticFields["AutomatedNumCorrectRedactions"] = &automatedStatistics.m_ulNumCorrectRedactions;
-		m_mapStatisticFields["AutomatedNumFalsePositives"] = &automatedStatistics.m_ulNumFalsePositives;
-		m_mapStatisticFields["AutomatedNumOverRedactions"] = &automatedStatistics.m_ulNumOverRedactions;
-		m_mapStatisticFields["AutomatedNumUnderRedactions"] = &automatedStatistics.m_ulNumUnderRedactions;
-		m_mapStatisticFields["AutomatedNumMisses"] = &automatedStatistics.m_ulNumMisses;
+		m_mapStatisticFields["AutomatedTotalExpectedRedactions"] = &m_iccCounters.m_automatedStatistics.m_ulTotalExpectedRedactions;
+		m_mapStatisticFields["AutomatedExpectedRedactionsInSelectedFiles"] = &m_iccCounters.m_automatedStatistics.m_ulExpectedRedactionsInSelectedFiles;
+		m_mapStatisticFields["AutomatedFoundRedactions"] = &m_iccCounters.m_automatedStatistics.m_ulFoundRedactions;
+		m_mapStatisticFields["AutomatedNumCorrectRedactions"] = &m_iccCounters.m_automatedStatistics.m_ulNumCorrectRedactions;
+		m_mapStatisticFields["AutomatedNumFalsePositives"] = &m_iccCounters.m_automatedStatistics.m_ulNumFalsePositives;
+		m_mapStatisticFields["AutomatedNumOverRedactions"] = &m_iccCounters.m_automatedStatistics.m_ulNumOverRedactions;
+		m_mapStatisticFields["AutomatedNumUnderRedactions"] = &m_iccCounters.m_automatedStatistics.m_ulNumUnderRedactions;
+		m_mapStatisticFields["AutomatedNumMisses"] = &m_iccCounters.m_automatedStatistics.m_ulNumMisses;
 
-		m_mapStatisticFields["VerificationTotalExpectedRedactions"] = &verificationStatistics.m_ulTotalExpectedRedactions;
-		m_mapStatisticFields["VerificationExpectedRedactionsInSelectedFiles"] = &verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
-		m_mapStatisticFields["VerificationExpectedRedactionsInSelectedPages"] = &verificationStatistics.m_ulExpectedRedactionsInSelectedPages;
-		m_mapStatisticFields["VerificationFoundRedactions"] = &verificationStatistics.m_ulFoundRedactions;
-		m_mapStatisticFields["VerificationNumCorrectRedactions"] = &verificationStatistics.m_ulNumCorrectRedactions;
-		m_mapStatisticFields["VerificationNumFalsePositives"] = &verificationStatistics.m_ulNumFalsePositives;
-		m_mapStatisticFields["VerificationNumOverRedactions"] = &verificationStatistics.m_ulNumOverRedactions;
-		m_mapStatisticFields["VerificationNumUnderRedactions"] = &verificationStatistics.m_ulNumUnderRedactions;
-		m_mapStatisticFields["VerificationNumMisses"] = &verificationStatistics.m_ulNumMisses;
+		m_mapStatisticFields["VerificationTotalExpectedRedactions"] = &m_iccCounters.m_verificationStatistics.m_ulTotalExpectedRedactions;
+		m_mapStatisticFields["VerificationExpectedRedactionsInSelectedFiles"] = &m_iccCounters.m_verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
+		m_mapStatisticFields["VerificationExpectedRedactionsInSelectedPages"] = &m_iccCounters.m_verificationStatistics.m_ulExpectedRedactionsInSelectedPages;
+		m_mapStatisticFields["VerificationFoundRedactions"] = &m_iccCounters.m_verificationStatistics.m_ulFoundRedactions;
+		m_mapStatisticFields["VerificationNumCorrectRedactions"] = &m_iccCounters.m_verificationStatistics.m_ulNumCorrectRedactions;
+		m_mapStatisticFields["VerificationNumFalsePositives"] = &m_iccCounters.m_verificationStatistics.m_ulNumFalsePositives;
+		m_mapStatisticFields["VerificationNumOverRedactions"] = &m_iccCounters.m_verificationStatistics.m_ulNumOverRedactions;
+		m_mapStatisticFields["VerificationNumUnderRedactions"] = &m_iccCounters.m_verificationStatistics.m_ulNumUnderRedactions;
+		m_mapStatisticFields["VerificationNumMisses"] = &m_iccCounters.m_verificationStatistics.m_ulNumMisses;
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI15179");
 }
@@ -320,7 +320,7 @@ STDMETHODIMP CIDShieldTester::GenerateCustomReport(BSTR bstrReportTemplate)
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CIDShieldTester::InterfaceSupportsErrorInfo(REFIID riid)
 {
-	static const IID* arr[] = 
+	static const IID* arr[] =
 	{
 		&IID_IIDShieldTester,
 		&IID_ITestableComponent,
@@ -372,7 +372,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			}
 			else
 			{
-				// Key does not exist, create a key with the default value and 
+				// Key does not exist, create a key with the default value and
 				// overwrite the key if an invalid one exists
 				rpm.createKey(gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_PERCENT_KEY, gstrOVERLAP_DEFAULT_VALUE, true);
 				strOverlapLeniency = gstrOVERLAP_DEFAULT_VALUE;
@@ -380,19 +380,19 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 
 			// Use the key that was in the registry, or the default one as the above blocks determine
 			m_dOverlapLeniencyPercent = asDouble( strOverlapLeniency );
-			
+
 			// Excess redaction area percentage
 			// if a key exists, use the one that is currently in the registry
 			string strOverRedactionERAP = "";
 			if (rpm.keyExists(gstrOVERLAP_PERCENT_FOLDER, gstrOVER_REDACTION_PERCENT_KEY))
 			{
-				strOverRedactionERAP = rpm.getKeyValue(gstrOVERLAP_PERCENT_FOLDER, 
+				strOverRedactionERAP = rpm.getKeyValue(gstrOVERLAP_PERCENT_FOLDER,
 					gstrOVER_REDACTION_PERCENT_KEY, gstrOVER_REDACTION_ERAP_DEFAULT_VALUE);
 			}
 			else
 			{
 				// key does not exist, create a key with the default value
-				rpm.createKey(gstrOVERLAP_PERCENT_FOLDER, gstrOVER_REDACTION_PERCENT_KEY, 
+				rpm.createKey(gstrOVERLAP_PERCENT_FOLDER, gstrOVER_REDACTION_PERCENT_KEY,
 					gstrOVER_REDACTION_ERAP_DEFAULT_VALUE, true);
 				strOverRedactionERAP = gstrOVER_REDACTION_ERAP_DEFAULT_VALUE;
 			}
@@ -400,18 +400,18 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			// use the key from the registry or the default as set above
 			m_dOverRedactionERAP = asDouble(strOverRedactionERAP);
 
-			// Overlap minumum
+			// Overlap minimum
 			// If a key exists, use the one that is currently in the registry
 			string strOverlapMinimumPercent = "";
 			if (rpm.keyExists(gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_MINUMUM_PERCENT_KEY))
 			{
-				strOverlapMinimumPercent = rpm.getKeyValue(gstrOVERLAP_PERCENT_FOLDER, 
+				strOverlapMinimumPercent = rpm.getKeyValue(gstrOVERLAP_PERCENT_FOLDER,
 					gstrOVERLAP_MINUMUM_PERCENT_KEY, gstrOVERLAP_MINUMUM_DEFAULT_VALUE);
 			}
 			else
 			{
 				// key does not exist, create a key with the default value
-				rpm.createKey(gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_MINUMUM_PERCENT_KEY, 
+				rpm.createKey(gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_MINUMUM_PERCENT_KEY,
 					gstrOVERLAP_MINUMUM_DEFAULT_VALUE, true);
 				strOverlapMinimumPercent = gstrOVERLAP_MINUMUM_DEFAULT_VALUE;
 			}
@@ -420,7 +420,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_dOverlapMinimumPercent = asDouble(strOverlapMinimumPercent);
 
 			// reset all variables associated with the test
-			m_mapDocTypeCount.clear();
+			m_mapDocTypeCounts.clear();
 			m_setVerificationCondition.clear();
 			m_strVerificationCondition = "";
 			m_strVerificationQuantifier = "";
@@ -433,33 +433,14 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_setTypesToBeTested.clear();
 			m_setDocTypesToBeVerified.clear();
 			m_setDocTypesToBeAutomaticallyRedacted.clear();
-			m_ulTotalExpectedRedactions = 0;
-			m_ulNumCorrectRedactionsByDocument = 0;
-			m_ulNumCorrectRedactionsByPage = 0;
-			m_ulNumOverRedactions = 0;
-			m_ulNumUnderRedactions = 0;
-			m_ulNumMisses = 0;
-			m_ulTotalFilesProcessed = 0;
-			m_ulNumFilesWithExpectedRedactions = 0;
-			m_ulNumFilesSelectedForReview = 0;
-			m_ulNumPagesInFilesSelectedForReview = 0;
-			m_ulNumPagesSelectedForReview = 0;
-			m_ulNumFilesAutomaticallyRedacted = 0;
-			m_ulNumExpectedRedactionsInReviewedFiles = 0;
-			m_ulNumExpectedRedactionsInRedactedFiles = 0;
+			m_iccCounters.clear();
 			m_ulNumFilesWithExistingVOA = 0;
-			m_ulNumFilesWithOverlappingExpectedRedactions = 0;
-			m_ulTotalPages = 0;
-			m_ulNumPagesWithExpectedRedactions = 0;
-			m_ulDocsClassified = 0;
 			m_bOutputHybridStats = false;
 			m_bOutputAutomatedStatsOnly = false;
 			m_bOutputVerificationByDocumentStats = true;
 			m_bOutputVerificationByPageStats = false;
 			m_apRedactionTester.reset();
 			m_apVerificationTester.reset();
-			automatedStatistics.reset();
-			verificationStatistics.reset();
 			m_bOutputDirectoryInitialized = false;
 			m_strTestOutputPath = "$InsertBeforeExt(<FoundVoaFile>,.testoutput)";
 
@@ -471,7 +452,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			{
 				THROW_LOGIC_ERROR_EXCEPTION("ELI14548")
 			}
-			
+
 			// Get the .dat file
 			// if pParams is not empty and the second item is specified,
 			// then the second item is the master dat file
@@ -482,7 +463,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 				strMasterDatFileName = asString(_bstr_t(ipParams->GetItem(1)));
 				if (!strMasterDatFileName.empty())
 				{
-					strTestRuleSetsFile = ::getAbsoluteFileName( asString( strTCLFile ), 
+					strTestRuleSetsFile = ::getAbsoluteFileName( asString( strTCLFile ),
 						strMasterDatFileName, true );
 				}
 			}
@@ -490,7 +471,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			{
 				UCLIDException ue("ELI15167", "Required master testing .DAT file missing.");
 				throw ue;
-			}	
+			}
 
 			// Determine the Analysis folder to create the log files in
 			getOutputDirectory(getDirectoryFromFullPath(strTestRuleSetsFile));
@@ -678,7 +659,7 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 			m_setDocTypesToBeVerified.empty())
 		{
 			// Both condition settings must be set before test folder can take place
-			UCLIDException ue("ELI25180", 
+			UCLIDException ue("ELI25180",
 				"Either a verification attribute condition or doc type condition must be set.");
 			throw ue;
 		}
@@ -687,13 +668,13 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 			m_setDocTypesToBeAutomaticallyRedacted.empty())
 		{
 			// Both condition settings must be set before test folder can take place
-			UCLIDException ue("ELI25162", 
+			UCLIDException ue("ELI25162",
 				"Either an automated redaction condition or doc type condition must be set.");
 			throw ue;
 		}
 		else if(nNumTokens != 5)
 		{
-			UCLIDException ue("ELI15173", 
+			UCLIDException ue("ELI15173",
 				"Invalid number of arguments for <TESTFOLDER> in DAT file.");
 			ue.addDebugInfo("Line Text", strLineText);
 			ue.addDebugInfo("Number of Args", nNumTokens);
@@ -702,7 +683,7 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 		else
 		{
 			// Handle Test Folder line
-			handleTestFolder(vecTokens[1], vecTokens[2], vecTokens[3], 
+			handleTestFolder(vecTokens[1], vecTokens[2], vecTokens[3],
 				vecTokens[4], strCurrentDatFileName);
 		}
 	}
@@ -724,7 +705,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 	if ( vecTokens.size() == 2 )
 	{
 		// Check which type of setting this is, and verify that the specified setting has not
-		// yet been set. 
+		// yet been set.
 		// [FlexIDSCore #3359 - JDS 03/30/2009]
 		if ( vecTokens[0] == "VerificationCondition")
 		{
@@ -750,7 +731,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		{
 			if (! m_strRedactionQuery.empty())
 			{
-				throw UCLIDException("ELI15236", 
+				throw UCLIDException("ELI15236",
 					"Query for automated redaction can only be set once.");
 			}
 
@@ -777,7 +758,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 
 			m_eaqRedactionQuantifier = validateConditionString(m_strRedactionQuantifier, "ELI25157");
 		}
-		// [p16 #2606 - JDS] 
+		// [p16 #2606 - JDS]
 		else if (vecTokens[0] == "CreateTestOutputVOAFiles")
 		{
 			if (vecTokens[1] == "1")
@@ -944,14 +925,14 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string& strImageDir, 
+void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string& strImageDir,
 										string strFoundVOAFile, string strExpectedVOAFile,
 										const string& strCurrentDatFileName)
 {
 	// allow rules file to be defined as relative path [p16 #2343]
 	string strAbsoluteRulesFile = getAbsoluteFileName(strCurrentDatFileName, strRulesFile, true);
 
-	// check for relative path to image directory, 
+	// check for relative path to image directory,
 	// and if relative make absolute [p16 #2343]
 	string strAbsoluteImageDir = strImageDir;
 	if (!isAbsolutePath(strAbsoluteImageDir))
@@ -979,7 +960,7 @@ void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string&
 			setImageFilesToTest.insert(*iterFileName);
 		}
 	}
-	
+
 	// Process each file in the folder
 	int nTestCastNum = 1;
 	for (set<string>::iterator iterImageFileName = setImageFilesToTest.begin();
@@ -1001,18 +982,18 @@ void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string&
 
 		string strFoundVOAFileWithExpandedTags =
 			expandTagsAndFunctions(strFoundVOAFileWithTags, strImageFileName);
-		string strExpectedVOAFileWithExpandedTags = 
+		string strExpectedVOAFileWithExpandedTags =
 			expandTagsAndFunctions(strExpectedVOAFileWithTags, strImageFileName);
-		
+
 		// Execute the test case.
-		handleTestCase( strAbsoluteRulesFile, strImageFileName, strOCRResults, 
-			strFoundVOAFileWithExpandedTags, strExpectedVOAFileWithExpandedTags, nTestCastNum++, 
+		handleTestCase( strAbsoluteRulesFile, strImageFileName, strOCRResults,
+			strFoundVOAFileWithExpandedTags, strExpectedVOAFileWithExpandedTags, nTestCastNum++,
 			strCurrentDatFileName);
 	}// end for
 }
 //-------------------------------------------------------------------------------------------------
-void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& strImageFile, 
-									 const string& strSourceDoc, string& strFoundVOAFile, 
+void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& strImageFile,
+									 const string& strSourceDoc, string& strFoundVOAFile,
 									 string& strExpectedVOAFile, const int iTestCaseNum,
 									 const string& strCurrentDatFileName)
 {
@@ -1028,13 +1009,13 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			string strNoteFile = strImageFile + ".nte";
 
 			// Start the test case labeling it as the .dat file
-			m_ipResultLogger->StartTestCase(asString( iTestCaseNum ).c_str(), 
+			m_ipResultLogger->StartTestCase(asString( iTestCaseNum ).c_str(),
 				strCurrentDatFileName.c_str(), kAutomatedTestCase);
 
 			// Add the image file as an executable (via double click) note
 			m_ipResultLogger->AddTestCaseFile( strImageFile.c_str() );
 
-			// Add the strSourceDoc if it differs from the image file 
+			// Add the strSourceDoc if it differs from the image file
 			if (strSourceDoc != strImageFile)
 			{
 				m_ipResultLogger->AddTestCaseFile( strSourceDoc.c_str() );
@@ -1050,15 +1031,15 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				m_ipResultLogger->AddTestCaseFile( strExpectedVOAFile.c_str() );
 			}
 
-			// the Found VOA file may or may not be defined.  If it is not defined, that means we have to 
+			// the Found VOA file may or may not be defined.  If it is not defined, that means we have to
 			// run the rules.
 			if (!strFoundVOAFile.empty())
 			{
 				m_ipResultLogger->AddTestCaseFile( strFoundVOAFile.c_str() );
 			}
 
-			// Add a note file. If this file exists in the directory and this test case 
-			// fails, the node will automatically collapse. 
+			// Add a note file. If this file exists in the directory and this test case
+			// fails, the node will automatically collapse.
 			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strNoteFile.c_str()));
 
 			// If the expected file exists, load the data from it
@@ -1109,12 +1090,12 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			// Add the file to the list in the appropriate log file
 			if( ipExpectedAttributesWithoutType->Size() > 0 )
 			{
-				appendToFile(strImageFile, 
+				appendToFile(strImageFile,
 					m_strOutputFileDirectory + gstrFILES_WITH_EXPECTED_REDACTIONS);
 			}
 			else
 			{
-				appendToFile(strImageFile, 
+				appendToFile(strImageFile,
 					m_strOutputFileDirectory + gstrFILES_WITH_NO_EXPECTED_REDACTIONS);
 			}
 
@@ -1143,7 +1124,7 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 
 				// If it exists, use the uss file to get the document text to check OCR confidence.
 				string strUSSFile = strImageFile + ".uss";
-				if (isValidFile(strUSSFile))	
+				if (isValidFile(strUSSFile))
 				{
 					ipInputText.CreateInstance(CLSID_SpatialString);
 					ASSERT_RESOURCE_ALLOCATION("ELI35112", ipInputText != __nullptr);
@@ -1155,7 +1136,7 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			else
 			{
 				// Get the attributes by running the rules on the OCR'd document.
-				ipFoundAttributes = m_ipAttrFinderEngine->FindAttributes(ipAFDoc, strSourceDoc.c_str(), 
+				ipFoundAttributes = m_ipAttrFinderEngine->FindAttributes(ipAFDoc, strSourceDoc.c_str(),
 					-1, strRulesFile.c_str(), NULL, VARIANT_FALSE, "", NULL);
 				ASSERT_RESOURCE_ALLOCATION("ELI15204", ipFoundAttributes != __nullptr);
 
@@ -1180,23 +1161,21 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			// Add this file to the list in the appropriate log file
 			if(ipFoundAttributesWithoutType->Size() > 0)
 			{
-				appendToFile(strImageFile, 
+				appendToFile(strImageFile,
 					m_strOutputFileDirectory + gstrFILES_WITH_FOUND_REDACTIONS);
 			}
 			else
 			{
-				appendToFile(strImageFile, 
+				appendToFile(strImageFile,
 					m_strOutputFileDirectory + gstrFILES_WITH_NO_FOUND_REDACTIONS);
 			}
 
 			// display found and expected attributes side by side
 			string strFoundAttr = m_ipAFUtility->GetAttributesAsString(ipFoundAttributes);
 			string strExpectedAttr = m_ipAFUtility->GetAttributesAsString(ipExpectedAttributes);
-			m_ipResultLogger->AddTestCaseCompareData("Text of Compared Spatial Strings", 
+			m_ipResultLogger->AddTestCaseCompareData("Text of Compared Spatial Strings",
 				"Expected Attributes", strExpectedAttr.c_str(),
 				"Found Attributes", strFoundAttr.c_str());
-
-			countDocTypes(ipFoundAttributes, strImageFile, ipAFDoc, bCalculatedFoundValues);
 
 			// [FlexIDSCore:3039]
 			// If generating a testoutput VOA file, the path should be based upon strFoundVOAFile,
@@ -1205,9 +1184,19 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				? ""
 				: expandTagsAndFunctions(m_strTestOutputPath, strImageFile);
 
+			// This is used to get the counts for the current document and will be added to the
+			// total counts for the over all counts and for the document type count
+			IDShieldCounterClass iccCounts;
+			iccCounts.clear();
+
 			// update internal stats and determine whether this test case passed
-			bool bResult = updateStatisticsAndDetermineTestCaseResult(ipExpectedAttributes, 
-				ipFoundAttributes, strImageFile, strTestOutputVOAFile);
+			bool bResult = updateStatisticsAndDetermineTestCaseResult(ipExpectedAttributes,
+				ipFoundAttributes, strImageFile, strTestOutputVOAFile, iccCounts);
+
+			// Add the counts for this file to the totals
+			m_iccCounters += iccCounts;
+
+			countDocTypes(ipFoundAttributes, strImageFile, ipAFDoc, bCalculatedFoundValues, iccCounts);
 
 			// Append the text of the note at the end of the test case
 			string strNote = "";
@@ -1217,7 +1206,7 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			}
 			if( !strNote.empty() )
 			{
-				// Chop off the end of the note if it extends past 120 characters. 
+				// Chop off the end of the note if it extends past 120 characters.
 				// The note file's text will be displayed in it's entirety as a detail note.
 				string strTitle = strNote;
 				if( strNote.size() > 120 )
@@ -1246,29 +1235,30 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVectorPtr ipExpectedAttributes,
 																 IIUnknownVectorPtr ipFoundAttributes,
 																 const string& strSourceDoc,
-																 const string& strTestOutputVOAFile)
+																 const string& strTestOutputVOAFile,
+																 IDShieldCounterClass &iccCounts)
 {
 	ASSERT_ARGUMENT("ELI19879", ipExpectedAttributes != __nullptr);
 	ASSERT_ARGUMENT("ELI19880", ipFoundAttributes != __nullptr);
 
 	// increment the total number of files processed
-	m_ulTotalFilesProcessed++;
+	iccCounts.m_ulTotalFilesProcessed++;
 
 	// get size of expected attributes vector
 	long lExpectedSize = ipExpectedAttributes->Size();
 
 	// increment total number of expected redactions
-	m_ulTotalExpectedRedactions += lExpectedSize;
+	iccCounts.m_ulTotalExpectedRedactions += lExpectedSize;
 
 	// if there is at least one expected redaction, increment the count of files
 	// containing expected redactions
 	if (lExpectedSize > 0)
 	{
-		m_ulNumFilesWithExpectedRedactions++;
+		iccCounts.m_ulNumFilesWithExpectedRedactions++;
 	}
 
 	unsigned long ulNumPages = getNumberOfPagesInImage(strSourceDoc);
-	m_ulTotalPages += ulNumPages;
+	iccCounts.m_ulTotalPages += ulNumPages;
 
 	// if user wants a list of files with HCData, MCData, LCData, etc. then
 	// gather the attribute names from the found attributes and
@@ -1313,14 +1303,14 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 	countExpectedOverlapsAndPages(ipExpectedAttributes, ulNumOverlappingExpected,
 		ulNumPagesWithRedactions);
 
-	m_ulNumPagesWithExpectedRedactions += ulNumPagesWithRedactions;
+	iccCounts.m_ulNumPagesWithExpectedRedactions += ulNumPagesWithRedactions;
 
 	// if there is at least 1 overlapping expected redaction increment the number of
 	// files with overlapping expected redactions and add a text node indicating
 	// the number of overlapping expected redactions for this test case
 	if (ulNumOverlappingExpected > 0)
 	{
-		m_ulNumFilesWithOverlappingExpectedRedactions++;
+		iccCounts.m_ulNumFilesWithOverlappingExpectedRedactions++;
 		appendToFile(strSourceDoc,
 			m_strOutputFileDirectory + gstrFILES_WITH_OVERLAPPING_EXPECTED_REDACTIONS);
 
@@ -1332,7 +1322,7 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 	// Determine if the file is selected for automatic redaction
 	bool bSelectedForAutomatedProcess = false;
 	bool bSelectedForVerification = false;
-	
+
 	if (m_bOutputAutomatedStatsOnly)
 	{
 		// Ensure the redaction condition is refreshed
@@ -1368,14 +1358,14 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 		// Analyze the attributes for automated redaction. Also process files not selected for
 		// review if computing only automated stats
 		return analyzeDataForAutomatedRedaction(ipExpectedAttributes, ipFoundAttributes,
-			bSelectedForAutomatedProcess, strSourceDoc, strTestOutputVOAFile);
+			bSelectedForAutomatedProcess, strSourceDoc, strTestOutputVOAFile, iccCounts);
 	}
 	else
 	{
 		// Analyze the attributes for verification based redaction. Include documents that were
 		// not otherwise selected for either process in hybrid mode.
 		return analyzeDataForVerificationBasedRedaction(ipExpectedAttributes, ipFoundAttributes,
-				bSelectedForVerification, strSourceDoc, strTestOutputVOAFile, ulNumPages);
+				bSelectedForVerification, strSourceDoc, strTestOutputVOAFile, ulNumPages, iccCounts);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1420,7 +1410,7 @@ unsigned long CIDShieldTester::countExpectedAttributesOnSelectedPages(
 		{
 			IIUnknownVectorPtr ipPages = ipValue->GetPages(VARIANT_FALSE, "");
 			ASSERT_RESOURCE_ALLOCATION("ELI35303", ipPages != __nullptr);
-			
+
 			// If the expected attribute spans multiple pages, check if any of the selected pages is
 			// a selected page.
 			long nPageCount = ipPages->Size();
@@ -1448,7 +1438,8 @@ bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 														bool bSelectedForVerification,
 														const string& strSourceDoc,
 														const string& strTestOutputVOAFile,
-														unsigned long ulNumPagesInDoc)
+														unsigned long ulNumPagesInDoc,
+														IDShieldCounterClass &iccCounts)
 {
 	ASSERT_ARGUMENT("ELI18507", ipExpectedAttributes != __nullptr);
 	ASSERT_ARGUMENT("ELI18508", ipFoundAttributes != __nullptr);
@@ -1460,13 +1451,16 @@ bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 		? countExpectedAttributesOnSelectedPages(ipExpectedAttributes, ipFoundAttributes, ulSelectedPages)
 		: 0;
 
-	// analyze the expected and found attributes 
+	// analyze the expected and found attributes
 	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
 		ipExpectedAttributes, ipFoundAttributes, ulExpectedAttributesOnSelectedPages,
 		bSelectedForVerification, strSourceDoc, strTestOutputVOAFile);
 
-	// update total statistics
-	verificationStatistics += testCaseStatistics;
+	iccCounts.m_verificationStatistics += testCaseStatistics;
+
+	iccCounts.m_ulNumOverRedactions += testCaseStatistics.m_ulNumOverRedactions;
+	iccCounts.m_ulNumUnderRedactions += testCaseStatistics.m_ulNumUnderRedactions;
+	iccCounts.m_ulNumMisses += testCaseStatistics.m_ulNumMisses;
 
 	// Attribute counts reported should not include the DocumentType attribute
 	IIUnknownVectorPtr ipExpectedAttributesWithoutType =
@@ -1479,12 +1473,12 @@ bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 	if (bSelectedForVerification)
 	{
 		// increment the number of files and pages that would be selected for review
-		m_ulNumFilesSelectedForReview++;
-		m_ulNumPagesInFilesSelectedForReview += ulNumPagesInDoc;
-		m_ulNumPagesSelectedForReview += ulSelectedPages;
+		iccCounts.m_ulNumFilesSelectedForReview++;
+		iccCounts.m_ulNumPagesInFilesSelectedForReview += ulNumPagesInDoc;
+		iccCounts.m_ulNumPagesSelectedForReview += ulSelectedPages;
 
 		// increment the number of expected redactions in files selected for review
-		m_ulNumExpectedRedactionsInReviewedFiles += lExpectedSize;
+		iccCounts.m_ulNumExpectedRedactionsInReviewedFiles += lExpectedSize;
 
 		// If there are one or more redactions and at least one filtered attribute, then add
 		// this file to the FilesCorrectlySelectedForReview.txt file.
@@ -1518,18 +1512,22 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 													   IIUnknownVectorPtr ipFoundAttributes,
 													   bool bSelectedForAutomatedProcess,
 													   const string& strSourceDoc,
-													   const string& strTestOutputVOAFile)
+													   const string& strTestOutputVOAFile,
+													   IDShieldCounterClass &iccCounts)
 {
 	ASSERT_ARGUMENT("ELI18509", ipExpectedAttributes != __nullptr);
 	ASSERT_ARGUMENT("ELI18510", ipFoundAttributes != __nullptr);
 
-	// analyze the expected and found attributes 
+	// analyze the expected and found attributes
 	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
 		ipExpectedAttributes, ipFoundAttributes, 0, bSelectedForAutomatedProcess,
 		strSourceDoc, strTestOutputVOAFile);
 
-	// update total statistics
-	automatedStatistics += testCaseStatistics;
+	iccCounts.m_automatedStatistics += testCaseStatistics;
+
+	iccCounts.m_ulNumOverRedactions += testCaseStatistics.m_ulNumOverRedactions;
+	iccCounts.m_ulNumUnderRedactions += testCaseStatistics.m_ulNumUnderRedactions;
+	iccCounts.m_ulNumMisses += testCaseStatistics.m_ulNumMisses;
 
 	// Attribute counts reported should not include the DocumentType attribute
 	IIUnknownVectorPtr ipExpectedAttributesWithoutType =
@@ -1541,10 +1539,10 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 
 	if (bSelectedForAutomatedProcess)
 	{
-		m_ulNumFilesAutomaticallyRedacted++;
+		iccCounts.m_ulNumFilesAutomaticallyRedacted++;
 
 		// increment the number of expected redactions in files selected for redaction
-		m_ulNumExpectedRedactionsInRedactedFiles += lExpectedSize;
+		iccCounts.m_ulNumExpectedRedactionsInRedactedFiles += lExpectedSize;
 
 		// If there are one or more redactions and at least one filtered attribute, then add
 		// this file to the FilesCorrectlySelectedForReview.txt file.
@@ -1581,9 +1579,9 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 									   ISpatialStringPtr ipFoundSS)
 {
-	// If the expected Spatial string object is not spatial, then there is no reason to test 
+	// If the expected Spatial string object is not spatial, then there is no reason to test
 	// for a found raster zone that matches it. No raster zone will be able to match a non-spatial
-	// spatial string. However, since this is a non-spatial string, it is counted as a failure and 
+	// spatial string. However, since this is a non-spatial string, it is counted as a failure and
 	// the tests should move on to the next document.
 	IIUnknownVectorPtr ipExpectedRasterZones;
 
@@ -1594,7 +1592,7 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 	else
 	{
 		ipExpectedRasterZones = ipExpectedSS->GetOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI15186", ipExpectedRasterZones != __nullptr);		
+		ASSERT_RESOURCE_ALLOCATION("ELI15186", ipExpectedRasterZones != __nullptr);
 	}
 
 	IIUnknownVectorPtr ipFoundRasterZones;
@@ -1618,7 +1616,7 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 		ASSERT_RESOURCE_ALLOCATION("ELI15188", ipExpectedRZ != __nullptr);
 
 		bool bFoundMatch = false;
-		
+
 		// Check it against each found raster zone for a match within the limits of the overlap
 		long lFoundSize = ipFoundRasterZones->Size();
 		for( int f = 0; f < lFoundSize; f++)
@@ -1647,14 +1645,14 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 				break;
 			}
 		}// end for found
-		
-		// If there was an expected value that did not have a matching found value, then these two 
+
+		// If there was an expected value that did not have a matching found value, then these two
 		// attributes are not spatially equivalent, return false.
 		if(! bFoundMatch )
 		{
 			return false;
 		}
-	}// end for expeceted
+	}// end for expected
 
 	// If all the expected attributes had a match, return true.
 	return true;
@@ -1694,7 +1692,7 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 		ipAutoRedactedAttributes.CreateInstance(CLSID_IUnknownVector);
 	}
 	ASSERT_RESOURCE_ALLOCATION("ELI29334", ipAutoRedactedAttributes != __nullptr);
-	
+
 	if (testCaseStatistics.m_ulFoundRedactions != 0 &&
 		testCaseStatistics.m_ulTotalExpectedRedactions != 0)
 	{
@@ -1714,7 +1712,7 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 				 ulFoundIndex++)
 			{
 				getMatchInfo(s2dMatchInfos[ulExpectedIndex][ulFoundIndex],
-					ipExpectedAttributes->At(ulExpectedIndex), 
+					ipExpectedAttributes->At(ulExpectedIndex),
 					ipAutoRedactedAttributes->At(ulFoundIndex));
 			}
 		}
@@ -1750,7 +1748,7 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 					// Keep track of overlapping founds (anything not marked overlapping will be
 					// marked as a false positive).
 					setOverlappingFounds.insert(ulFoundIndex);
-					
+
 					// check the area of overlap
 					if ((miTemp.getPercentOfExpectedAreaRedacted() < m_dOverlapLeniencyPercent))
 					{
@@ -1771,7 +1769,7 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 								s2dMatchInfos(ulExpectedIndex, 0).m_ipExpectedAttribute, "Expected",
 								testCaseStatistics.m_ulNumCorrectRedactions);
 						}
-						
+
 						// Look to see if we have already determined the found attribute to be an
 						// over-redaction.
 						bool bOverRedaction =
@@ -1851,7 +1849,7 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 	}
 
 	//--------------------------------------------------------
-	// File output section 
+	// File output section
 	//--------------------------------------------------------
 	// if at least 1 correctly found then output to files with correct redactions
 	if (testCaseStatistics.m_ulNumCorrectRedactions > 0)
@@ -1863,14 +1861,14 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 	// if at least 1 over redaction then output to files with over redactions
 	if (testCaseStatistics.m_ulNumOverRedactions > 0)
 	{
-		appendToFile(strSourceDoc, 
+		appendToFile(strSourceDoc,
 			m_strOutputFileDirectory + gstrFILES_WITH_OVER_REDACTIONS);
 	}
 
 	// if at least 1 under redaction then output to files with under redactions
 	if (testCaseStatistics.m_ulNumUnderRedactions > 0)
 	{
-		appendToFile(strSourceDoc, 
+		appendToFile(strSourceDoc,
 			m_strOutputFileDirectory + gstrFILES_WITH_UNDER_REDACTIONS);
 	}
 
@@ -1904,7 +1902,7 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 	}
 
 	// test case is considered failed if:
-	// 1 or more redactions was missed 
+	// 1 or more redactions was missed
 	// OR if there are 1 or more under redactions
 	// OR if there are 1 or more over redactions
 	// OR if there are 1 or more false positives
@@ -1918,8 +1916,8 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 	else
 	{
 		testCaseStatistics.m_bTestCaseResult = true;
-	}	
-	
+	}
+
 	return testCaseStatistics;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1938,7 +1936,7 @@ bool CIDShieldTester::getIsOverredaction(const SafeTwoDimensionalArray<MatchInfo
 	}
 
 	// get the area of the found redaction
-	double dAreaOfFoundRedaction = 
+	double dAreaOfFoundRedaction =
 		s2dMatchInfos(0, ulFoundIndex).m_dAreaOfFoundRedaction;
 
 	double dERAP = 0.0;
@@ -1947,7 +1945,7 @@ bool CIDShieldTester::getIsOverredaction(const SafeTwoDimensionalArray<MatchInfo
 	if (!MathVars::isZero(dAreaOfFoundRedaction))
 	{
 		// compute the excess redaction area percentage
-		dERAP = (dAreaOfFoundRedaction - dTotalOverlapArea) / 
+		dERAP = (dAreaOfFoundRedaction - dTotalOverlapArea) /
 			dAreaOfFoundRedaction;
 		dERAP *= 100.0;
 
@@ -1972,7 +1970,7 @@ void CIDShieldTester::RecordStatistic(const string& strLabel, IAttributePtr ipRe
 		addAttributeToTestOutputVOA(ipRelatedAttribute, strLabel, strSourceVOA);
 	}
 
-	// Incremement the provided counter.
+	// Increment the provided counter.
 	rulCount++;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1985,11 +1983,11 @@ void CIDShieldTester::displaySummaryStatistics()
 	string strStatisticSummary = "Image analysis:\r\n";
 
 	CString zTemp;
-	zTemp.Format("\tFiles tested: %d", m_ulTotalFilesProcessed);
+	zTemp.Format("\tFiles tested: %d", m_iccCounters.m_ulTotalFilesProcessed);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
-	zTemp.Format("\tPages tested: %d", m_ulTotalPages);
+	zTemp.Format("\tPages tested: %d", m_iccCounters.m_ulTotalPages);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
@@ -2007,25 +2005,27 @@ void CIDShieldTester::displaySummaryStatistics()
 	}
 
 	// Calculate the number of files with expected redactions
-	zTemp.Format("\tFiles containing sensitive data items: %d (%0.1f%%)",	
-					m_ulNumFilesWithExpectedRedactions, 
-					getRatioAsPercentOfTwoLongs(m_ulNumFilesWithExpectedRedactions, m_ulTotalFilesProcessed));	
+	zTemp.Format("\tFiles containing sensitive data items: %d (%0.1f%%)",
+					m_iccCounters.m_ulNumFilesWithExpectedRedactions,
+					getRatioAsPercentOfTwoLongs(m_iccCounters.m_ulNumFilesWithExpectedRedactions,
+					m_iccCounters.m_ulTotalFilesProcessed));
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
 	// Calculate the number of pages with expected redactions
-	zTemp.Format("\tPages containing sensitive data items: %d (%0.1f%%)",	
-					m_ulNumPagesWithExpectedRedactions, 
-					getRatioAsPercentOfTwoLongs(m_ulNumPagesWithExpectedRedactions, m_ulTotalPages));	
+	zTemp.Format("\tPages containing sensitive data items: %d (%0.1f%%)",
+					m_iccCounters.m_ulNumPagesWithExpectedRedactions,
+					getRatioAsPercentOfTwoLongs(m_iccCounters.m_ulNumPagesWithExpectedRedactions,
+					m_iccCounters.m_ulTotalPages));
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
-	zTemp.Format("\tSensitive data items: %d", m_ulTotalExpectedRedactions);
+	zTemp.Format("\tSensitive data items: %d", m_iccCounters.m_ulTotalExpectedRedactions);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
-	zTemp.Format("\tDocuments with overlapping sensitive data items: %d ", 
-		m_ulNumFilesWithOverlappingExpectedRedactions);
+	zTemp.Format("\tDocuments with overlapping sensitive data items: %d ",
+		m_iccCounters.m_ulNumFilesWithOverlappingExpectedRedactions);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
@@ -2052,16 +2052,16 @@ void CIDShieldTester::displaySummaryStatistics()
 
 		strStatisticSummary += "\tManually review: Files that contain "
 			+ m_strVerificationQuantifier + " " + strDataTypes + "\r\n";
-		
+
 		// In the case that both verification selection methods are being used, it is better
 		// explained simply by seeing the two separate final results sections that are output.
 		if (m_bOutputVerificationByDocumentStats && !m_bOutputVerificationByPageStats)
 		{
-			strStatisticSummary += "\tAll pages of documents with sensitive data reviewed.\r\n";
+			strStatisticSummary += "\tPage review mode: All pages of documents with sensitive data.\r\n";
 		}
 		else if (!m_bOutputVerificationByDocumentStats && m_bOutputVerificationByPageStats)
 		{
-			strStatisticSummary += "\tOnly pages with sensitive data reviewed.\r\n";
+			strStatisticSummary += "\tPage review mode: Only pages with sensitive data.\r\n";
 		}
 	}
 
@@ -2096,7 +2096,7 @@ void CIDShieldTester::displaySummaryStatistics()
 	// If limiting testing to specified doc type, indicates the doc type being tested.
 	if (!m_setTypesToBeTested.empty())
 	{
-		strStatisticSummary += "\tLimit data types to be tested to: " + 
+		strStatisticSummary += "\tLimit data types to be tested to: " +
 			getSetAsDelimitedList(m_setTypesToBeTested) + "\r\n";
 	}
 
@@ -2118,19 +2118,17 @@ void CIDShieldTester::displaySummaryStatistics()
 			continue;
 		}
 
-		// Compute the number of correct redactions based on whether this is hyrbid stats or not
-		unsigned long ulNumCorrectRedactions;
+		// Compute the number of correct redactions based on whether this is hybrid stats or not
+		unsigned long ulNumCorrectRedactions = m_iccCounters.m_automatedStatistics.m_ulNumCorrectRedactions;
 		if (bOutputtingByDocumentStats)
 		{
-			ulNumCorrectRedactions = automatedStatistics.m_ulNumCorrectRedactions +
-				verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
-			m_ulNumCorrectRedactionsByDocument = ulNumCorrectRedactions;
+			ulNumCorrectRedactions += m_iccCounters.m_verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
+			m_iccCounters.m_ulNumCorrectRedactionsByDocument = ulNumCorrectRedactions;
 		}
 		else
 		{
-			ulNumCorrectRedactions = automatedStatistics.m_ulNumCorrectRedactions +
-				verificationStatistics.m_ulExpectedRedactionsInSelectedPages;
-			m_ulNumCorrectRedactionsByPage = ulNumCorrectRedactions;
+			ulNumCorrectRedactions += m_iccCounters.m_verificationStatistics.m_ulExpectedRedactionsInSelectedPages;
+			m_iccCounters.m_ulNumCorrectRedactionsByPage = ulNumCorrectRedactions;
 		}
 
 		strStatisticSummary += "\r\nFinal results of above workflow";
@@ -2146,7 +2144,7 @@ void CIDShieldTester::displaySummaryStatistics()
 		zTemp.Format(
 			"\tSensitive data items redacted after processing: %d (%0.1f%%)",
 				ulNumCorrectRedactions, getRatioAsPercentOfTwoLongs(
-					ulNumCorrectRedactions, m_ulTotalExpectedRedactions));
+					ulNumCorrectRedactions, m_iccCounters.m_ulTotalExpectedRedactions));
 		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 		strStatisticSummary += zTemp + "\r\n";
 
@@ -2156,17 +2154,20 @@ void CIDShieldTester::displaySummaryStatistics()
 			{
 				// Label for number of files selected for review
 				zTemp.Format("\tFiles selected for review: %d (%0.1f%%) containing %d (%0.1f%%) pages",
-					m_ulNumFilesSelectedForReview, getRatioAsPercentOfTwoLongs(
-						m_ulNumFilesSelectedForReview, m_ulTotalFilesProcessed),
-					m_ulNumPagesInFilesSelectedForReview, getRatioAsPercentOfTwoLongs(
-						m_ulNumPagesInFilesSelectedForReview, m_ulTotalPages));
+					m_iccCounters.m_ulNumFilesSelectedForReview, getRatioAsPercentOfTwoLongs(
+						m_iccCounters.m_ulNumFilesSelectedForReview,
+						m_iccCounters. m_ulTotalFilesProcessed),
+					m_iccCounters.m_ulNumPagesInFilesSelectedForReview, getRatioAsPercentOfTwoLongs(
+						m_iccCounters.m_ulNumPagesInFilesSelectedForReview,
+						m_iccCounters.m_ulTotalPages));
 			}
 			else
 			{
 				// Label for number of pages selected for review
 				zTemp.Format("\tPages selected for review: %d (%0.1f%%)",
-					m_ulNumPagesSelectedForReview, getRatioAsPercentOfTwoLongs(
-						m_ulNumPagesSelectedForReview, m_ulTotalPages));
+					m_iccCounters.m_ulNumPagesSelectedForReview, getRatioAsPercentOfTwoLongs(
+						m_iccCounters.m_ulNumPagesSelectedForReview,
+						m_iccCounters.m_ulTotalPages));
 			}
 
 			m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
@@ -2177,12 +2178,12 @@ void CIDShieldTester::displaySummaryStatistics()
 		{
 			// Note for the number of false positives found
 			zTemp.Format("\tFalse positives in redacted images: %d ",
-				automatedStatistics.m_ulNumFalsePositives);
+				m_iccCounters.m_automatedStatistics.m_ulNumFalsePositives);
 			m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 			strStatisticSummary += zTemp + "\r\n";
 
 			// if m_ulNumFalsePositives == 0, append "(ROCE = n/a)"
-			if(automatedStatistics.m_ulNumFalsePositives <= 0)
+			if(m_iccCounters.m_automatedStatistics.m_ulNumFalsePositives <= 0)
 			{
 				zTemp = "\tRatio of correctly redacted items to false positives: n/a";
 			}
@@ -2192,7 +2193,7 @@ void CIDShieldTester::displaySummaryStatistics()
 				// Use integer division to get a whole number ratio as a result
 				zTemp.Format("\tRatio of correctly redacted items to false positives: %0.1f",
 					((double)ulNumCorrectRedactions /
-					 (double)automatedStatistics.m_ulNumFalsePositives));
+					 (double)m_iccCounters.m_automatedStatistics.m_ulNumFalsePositives));
 			}
 			m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 			strStatisticSummary += zTemp + "\r\n";
@@ -2208,53 +2209,54 @@ void CIDShieldTester::displaySummaryStatistics()
 			// Make a note for the number of expected redactions in the reviewed files
 			// (This number would be a duplicate statistic in a standard workflow).
 			zTemp.Format("\tSensitive data items in files presented for review: %d (%0.1f%%)",
-				verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
+				m_iccCounters.m_verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
 				getRatioAsPercentOfTwoLongs(
-					verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
-					m_ulTotalExpectedRedactions));
+					m_iccCounters.m_verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
+					m_iccCounters.m_ulTotalExpectedRedactions));
 			m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 			strStatisticSummary += zTemp + "\r\n";
 		}
 
-		strStatisticSummary += displayStatisticsSection(verificationStatistics, true);
+		strStatisticSummary += displayStatisticsSection(m_iccCounters.m_verificationStatistics, true);
 	}
 
 	if (m_bOutputHybridStats || m_bOutputAutomatedStatsOnly)
 	{
 		strStatisticSummary += "\r\nAutomated redaction efficiency:\r\n";
-		
+
 		// Label for Number of files selected for review
 		zTemp.Format("\tAutomatically redacted files: %d (%0.1f%%)",
-			m_ulNumFilesAutomaticallyRedacted, getRatioAsPercentOfTwoLongs(
-				m_ulNumFilesAutomaticallyRedacted, m_ulTotalFilesProcessed));
+			m_iccCounters.m_ulNumFilesAutomaticallyRedacted, getRatioAsPercentOfTwoLongs(
+				m_iccCounters.m_ulNumFilesAutomaticallyRedacted,
+				m_iccCounters.m_ulTotalFilesProcessed));
 		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 		strStatisticSummary += zTemp + "\r\n";
 
 		// Make a note for the number of expected redactions in the automatically redacted files
 		zTemp.Format("\tSensitive data items in automatically redacted files: %d (%0.1f%%)",
-			automatedStatistics.m_ulExpectedRedactionsInSelectedFiles, 
-			getRatioAsPercentOfTwoLongs(automatedStatistics.m_ulExpectedRedactionsInSelectedFiles,
-				m_ulTotalExpectedRedactions));
+			m_iccCounters.m_automatedStatistics.m_ulExpectedRedactionsInSelectedFiles,
+			getRatioAsPercentOfTwoLongs(m_iccCounters.m_automatedStatistics.m_ulExpectedRedactionsInSelectedFiles,
+				m_iccCounters.m_ulTotalExpectedRedactions));
 		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 		strStatisticSummary += zTemp + "\r\n";
 
-		strStatisticSummary += displayStatisticsSection(automatedStatistics, false);
+		strStatisticSummary += displayStatisticsSection(m_iccCounters.m_automatedStatistics, false);
 	}
 
-	// If the number of correct redactions match the number of total expected redactions, then 
+	// If the number of correct redactions match the number of total expected redactions, then
 	// the test was 100% successful.
 	bool bOneHundredPercentSuccess =
-		automatedStatistics.m_bTestCaseResult && verificationStatistics.m_bTestCaseResult;
+		m_iccCounters.m_automatedStatistics.m_bTestCaseResult && m_iccCounters.m_verificationStatistics.m_bTestCaseResult;
 	if (m_bOutputVerificationByDocumentStats)
 	{
 		bOneHundredPercentSuccess &=
-			(m_ulTotalExpectedRedactions == m_ulNumCorrectRedactionsByDocument);
+			(m_iccCounters.m_ulTotalExpectedRedactions == m_iccCounters.m_ulNumCorrectRedactionsByDocument);
 	}
 	if (m_bOutputVerificationByPageStats)
 	{
 		bOneHundredPercentSuccess &=
-			(m_ulTotalExpectedRedactions == m_ulNumCorrectRedactionsByPage);
-	}	
+			(m_iccCounters.m_ulTotalExpectedRedactions == m_iccCounters.m_ulNumCorrectRedactionsByPage);
+	}
 
 	m_ipResultLogger->EndTestCase(bOneHundredPercentSuccess ? VARIANT_TRUE : VARIANT_FALSE);
 
@@ -2281,7 +2283,7 @@ void CIDShieldTester::generateCustomReport(string strReportTemplate)
 	// template.
 	do
 	{
-		string strLine = evaluateCustomReportParamters(fileReader.getLineText());
+		string strLine = evaluateCustomReportParameters(fileReader.getLineText());
 
 		if (!strLine.empty())
 		{
@@ -2300,12 +2302,12 @@ void CIDShieldTester::generateCustomReport(string strReportTemplate)
 	appendToFile(strReport, m_strOutputFileDirectory + "\\" + strReportName + ".txt");
 }
 //-------------------------------------------------------------------------------------------------
-string CIDShieldTester::evaluateCustomReportParamters(const string& strSourceLine)
+string CIDShieldTester::evaluateCustomReportParameters(const string& strSourceLine)
 {
 	stringCSIS strLineCSIS(strSourceLine, false);
 
 	// Iterate through the line and evaluate all fields, enclosing the fields in
-	// gstrPRELIM_ARG_MARKER so that mathemetical expressions can be found afterward.
+	// gstrPRELIM_ARG_MARKER so that mathematical expressions can be found afterward.
 	for (auto iterStatisticsFields = m_mapStatisticFields.begin();
 			iterStatisticsFields != m_mapStatisticFields.end();
 			iterStatisticsFields++)
@@ -2325,7 +2327,7 @@ string CIDShieldTester::evaluateCustomReportParamters(const string& strSourceLin
 	string strLine = (string)strLineCSIS;
 
 	// Search for and evaluate any simple mathematical expression where two arguments are separated
-	// by a single mathematical argument charater. Floating point values are supported for all
+	// by a single mathematical argument character. Floating point values are supported for all
 	// types in case of a compound mathematical expression. Supported operations are *, /, +, - and %
 	// where % will add a % sign to the resulting value and will be last in precedence so that it is
 	// always executed last.
@@ -2380,7 +2382,7 @@ bool CIDShieldTester::evaluateCustomReportMathematicalExpression(const string &s
 		}
 	}
 
-	// 
+	//
 	if (nFirstPosEnd != string::npos)
 	{
 		size_t nFirstPos = strLine.rfind("$", nFirstPosEnd - 1) + 1;
@@ -2398,7 +2400,7 @@ bool CIDShieldTester::evaluateCustomReportMathematicalExpression(const string &s
 
 		switch (cOperation)
 		{
-			case '*': 
+			case '*':
 				zResult.Format("%0.2f", dArg1 * dArg2);
 				break;
 			case '/':
@@ -2407,7 +2409,7 @@ bool CIDShieldTester::evaluateCustomReportMathematicalExpression(const string &s
 			case '%':
 				zResult.Format("%0.1f%%", dArg1 / dArg2 * 100.0);
 				break;
-			case '+': 
+			case '+':
 				zResult.Format("%0.2f", dArg1 + dArg2);
 				break;
 			case '-':
@@ -2476,7 +2478,7 @@ string CIDShieldTester::displayStatisticsSection(
 	return strStatisticsSection;
 }
 //-------------------------------------------------------------------------------------------------
-double CIDShieldTester::getRatioAsPercentOfTwoLongs(unsigned long ulNumerator, 
+double CIDShieldTester::getRatioAsPercentOfTwoLongs(unsigned long ulNumerator,
 													unsigned long ulDenominator)
 {
 	if( ulDenominator > 0 )
@@ -2493,51 +2495,42 @@ void CIDShieldTester::displayDocumentTypeStats()
 {
 	// Create a string to piece together for the statistics log file
 	string strStatsForLogFile = "";
-	
+
 	// Display the number of documents classified for each type
-	string strDocumentTypeLabel = "Document type distribution:";
+	string strDocumentTypeLabel = "Document type analysis:";
 	strStatsForLogFile += strDocumentTypeLabel + "\r\n";
 
-	m_ipResultLogger->StartTestCase("", strDocumentTypeLabel.c_str(), kSummaryTestCase);
-	map<string,int>::const_iterator iter;
-	m_ulDocsClassified = 0;
+	map<string, IDShieldCounterClass>::const_iterator iter;
+	m_iccCounters.m_ulDocsClassified = 0;
 
 	// Iterate through the document classifier map that was created above
-	for( iter = m_mapDocTypeCount.begin(); iter != m_mapDocTypeCount.end(); ++iter )
+	for( iter = m_mapDocTypeCounts.begin(); iter != m_mapDocTypeCounts.end(); ++iter )
 	{
 		// Get the doc type and the number of them found from the map
-		string strType = "\t" + iter->first;
-		int iNumber = iter->second;
-
-		// Create the string to display
-		strType.append( ": " + asString(iNumber) );
-
-		// Make a node in the result tree for this doc type
-		m_ipResultLogger->AddTestCaseNote( strType.c_str() );
-		strStatsForLogFile += strType + "\r\n";
+		strStatsForLogFile += displayDocumentStats(iter->first, iter->second);
+		int iNumber = iter->second.m_ulDocsClassified;
 
 		// Total number of documents classified
-		m_ulDocsClassified += iNumber;
+		m_iccCounters.m_ulDocsClassified += iNumber;
+
 	}
 
 	// Output the printed statistics to a file so they can be viewed later without running
 	// the test again.
 	appendToFile( strStatsForLogFile, m_strOutputFileDirectory + gstrFILE_FOR_STATISTICS );
-	
-	// End the test case
-	m_ipResultLogger->EndTestCase(VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const string& strSourceDoc,
-									IAFDocumentPtr ipAFDoc, bool bCalculatedFoundValues)
+									IAFDocumentPtr ipAFDoc, bool bCalculatedFoundValues,
+									IDShieldCounterClass iccCounters)
 {
 	// Get the document types from the found attributes vector
-	IIUnknownVectorPtr ipDocTypes= m_ipAFUtility->QueryAttributes( ipFoundAttributes, 
+	IIUnknownVectorPtr ipDocTypes= m_ipAFUtility->QueryAttributes( ipFoundAttributes,
 								gstrDOCTYPEQUERY.c_str(), VARIANT_FALSE);
 	ASSERT_RESOURCE_ALLOCATION("ELI15769", ipDocTypes != __nullptr);
-	
+
 	if( bCalculatedFoundValues && ipDocTypes->Size() == 0)
-	{	
+	{
 		// Get the doc types from the AFDoc and put them into attributes in the Found IIUnknownVectorPtr
 		IStrToObjectMapPtr ipObjMap = ipAFDoc->GetObjectTags();
 		ASSERT_RESOURCE_ALLOCATION("ELI15772", ipObjMap != __nullptr);
@@ -2557,14 +2550,14 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 				{
 					// Get the string for the doc type
 					string strDocTypeValue = asString (ipDocumentTypes->GetItem(x).bstrVal);
-					
+
 					// Create an attribute for this doc type and put it into the found attributes vector
 					IAttributePtr ipAttr(CLSID_Attribute);
 					ASSERT_RESOURCE_ALLOCATION("ELI15767", ipAttr != __nullptr);
 
 					// Set the type of the attribute to doc type
 					ipAttr->Name = get_bstr_t( "DocumentType" );
-					
+
 					// Create a spatial string to use as the value of the attribute
 					ISpatialStringPtr ipSS(CLSID_SpatialString);
 					ASSERT_RESOURCE_ALLOCATION("ELI15768", ipSS != __nullptr);
@@ -2581,84 +2574,76 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 	}
 
 	// Get the document types from the found attributes vector
-	ipDocTypes= m_ipAFUtility->QueryAttributes( ipFoundAttributes, 
+	ipDocTypes= m_ipAFUtility->QueryAttributes( ipFoundAttributes,
 							gstrDOCTYPEQUERY.c_str(), VARIANT_FALSE);
 	ASSERT_RESOURCE_ALLOCATION("ELI15207", ipDocTypes != __nullptr);
 
 	// Get the number of document types
 	long nDocTypes = ipDocTypes->Size();
 
-	// If there is no doc type, then add this file to the unknown doc type log file and 
+	// If there is no doc type, then add this file to the unknown doc type log file and
 	// make an entry in the doc type map for the unknown type.
-	if( nDocTypes == 0 )
+	if( nDocTypes == 0 || nDocTypes > 1)
 	{
-		string strDocLogFilePath = m_strOutputFileDirectory + gstrUNKNOWN_DOC_TYPE_FILES;
+		// This document was classified.
+		iccCounters.m_ulDocsClassified++;
+		string strDocLogFilePath = m_strOutputFileDirectory + 
+			((nDocTypes == 0) ? gstrUNKNOWN_DOC_TYPE_FILES : gstrFILES_CLASSIFIED_AS_MORE_THAN_ONE_DOC_TYPE);
 		appendToFile( strSourceDoc, strDocLogFilePath );
 
-		const string strDocType = "Unknown";
+		const string strDocType = "Unknown/Multiple";
 
 		// Add the unknown doc type to the test logger as a test case note
 		m_ipResultLogger->AddTestCaseNote( strDocType.c_str() );
 
 		// If the unknown doc type does not yet exist, enter it into the table
-		if (m_mapDocTypeCount.find(strDocType) == m_mapDocTypeCount.end())
+		if (m_mapDocTypeCounts.find(strDocType) == m_mapDocTypeCounts.end())
 		{
-			m_mapDocTypeCount[strDocType] = 1;
+			m_mapDocTypeCounts[strDocType] = iccCounters;
 		}
 		else
 		{
-			m_mapDocTypeCount[strDocType]++;
+			m_mapDocTypeCounts[strDocType] += iccCounters;
 		}
 	}
 	else
 	{
-		// For each type this document is classified as
-		for( int i = 0; i < nDocTypes; i++ )
+		// This document was classified.
+		iccCounters.m_ulDocsClassified++;
+
+		// Get the attribute
+		IAttributePtr ipAtt = ipDocTypes->At( 0 );
+		ASSERT_RESOURCE_ALLOCATION("ELI15208", ipAtt != __nullptr);
+
+		// Get the spatial string that contains the doc type info
+		ISpatialStringPtr ipSpatial = ipAtt->Value;
+		ASSERT_RESOURCE_ALLOCATION("ELI15209", ipSpatial != __nullptr);
+
+		// Get the string of the doc type
+		string strDocType = asString(ipSpatial->String);
+
+		// Add the Doc Type to the test logger as a test case note
+		m_ipResultLogger->AddTestCaseNote( strDocType.c_str() );
+
+		// If this doc type does not yet exist, enter it into the table
+		if (m_mapDocTypeCounts.find(strDocType) == m_mapDocTypeCounts.end())
 		{
-			// Get the attribute
-			IAttributePtr ipAtt = ipDocTypes->At( i );
-			ASSERT_RESOURCE_ALLOCATION("ELI15208", ipAtt != __nullptr);
-
-			// Get the spatial string that contains the doc type info
-			ISpatialStringPtr ipSpatial = ipAtt->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI15209", ipSpatial != __nullptr);
-
-			// Get the string of the doc type
-			string strDocType = asString(ipSpatial->String);
-
-			// Add the Doc Type to the test logger as a test case note
-			m_ipResultLogger->AddTestCaseNote( strDocType.c_str() );
-
-			// If this doc type does not yet exist, enter it into the table
-			if (m_mapDocTypeCount.find(strDocType) == m_mapDocTypeCount.end())
-			{
-				m_mapDocTypeCount[strDocType] = 1;
-			}
-			else
-			{
-				m_mapDocTypeCount[strDocType]++;
-			}
-
-			// Declare the output file path to be used.
-			string strDocTypeFilePath = "";
-
-			// If there is more than one doc type, the file should be added to the log file
-			// ONE time and one time only.  
-			if( i == 1 )
-			{
-				strDocTypeFilePath = m_strOutputFileDirectory + gstrFILES_CLASSIFIED_AS_MORE_THAN_ONE_DOC_TYPE;
-
-				// Append the source doc path to the file's list
-				appendToFile( strSourceDoc, strDocTypeFilePath );
-			}
-
-			// Open the list file for this document type
-			strDocTypeFilePath = m_strOutputFileDirectory + "\\" + gstrDOC_TYPE_PREFIX + 
-				strDocType + ".txt";
-
-			// Append the source doc path to the file's list
-			appendToFile( strSourceDoc, strDocTypeFilePath );
+			m_mapDocTypeCounts[strDocType] = iccCounters;
 		}
+		else
+		{
+			m_mapDocTypeCounts[strDocType] += iccCounters;
+		}
+
+		// Declare the output file path to be used.
+		string strDocTypeFilePath = "";
+
+		// Open the list file for this document type
+		strDocTypeFilePath = m_strOutputFileDirectory + "\\" + gstrDOC_TYPE_PREFIX +
+			strDocType + ".txt";
+
+		// Append the source doc path to the file's list
+		appendToFile( strSourceDoc, strDocTypeFilePath );
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -2788,7 +2773,7 @@ bool CIDShieldTester::spatialStringsOverlap(ISpatialStringPtr ipSS1, ISpatialStr
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-void CIDShieldTester::getMatchInfo(MatchInfo& rMatchInfo, IAttributePtr ipExpected, 
+void CIDShieldTester::getMatchInfo(MatchInfo& rMatchInfo, IAttributePtr ipExpected,
 										IAttributePtr ipFound)
 {
 	ASSERT_ARGUMENT("ELI18423", ipExpected != __nullptr);
@@ -2907,7 +2892,7 @@ double CIDShieldTester::computeTotalAreaOfOverlap(IAttributePtr ipExpected, IAtt
 	return (bAttributesOverlap ? dAreaOfOverlap : 0);
 }
 //-------------------------------------------------------------------------------------------------
-void CIDShieldTester::addAttributeToTestOutputVOA(IAttributePtr ipAttribute, 
+void CIDShieldTester::addAttributeToTestOutputVOA(IAttributePtr ipAttribute,
 												  const string &strPrefix,
 												  const string &strSourceVOA)
 {
@@ -2937,8 +2922,8 @@ void CIDShieldTester::addAttributeToTestOutputVOA(IAttributePtr ipAttribute,
 	m_ipTestOutputVOAVector->PushBack(ipNewAttribute);
 }
 //-------------------------------------------------------------------------------------------------
-void CIDShieldTester::countAttributeNames(IIUnknownVectorPtr ipFoundAttributes, 
-										  unsigned long &rulHCData, unsigned long &rulMCData, 
+void CIDShieldTester::countAttributeNames(IIUnknownVectorPtr ipFoundAttributes,
+										  unsigned long &rulHCData, unsigned long &rulMCData,
 										  unsigned long &rulLCData, unsigned long &rulClues)
 {
 	ASSERT_ARGUMENT("ELI18504", ipFoundAttributes != __nullptr);
@@ -3033,7 +3018,7 @@ IIUnknownVectorPtr CIDShieldTester::filterDocumentTypeAttributes(IIUnknownVector
 
 	// loop through each element of the attribute vector to look for DocumentType attributes.
 	for (long i=0; i < lSize; i++)
-	{				   
+	{
 		IAttributePtr ipAttribute = ipAttributeVector->At(i);
 		ASSERT_RESOURCE_ALLOCATION("ELI36112", ipAttribute != __nullptr);
 
@@ -3187,6 +3172,127 @@ string CIDShieldTester::expandTagsAndFunctions(const string& strInput, const str
 	return strExpanded;
 }
 //-------------------------------------------------------------------------------------------------
+string  CIDShieldTester::displayDocumentStats(const string & strDocumentType, const IDShieldCounterClass& stats)
+{
+	string strStatisticSummary = "";
+
+	string strType = "\t" + strDocumentType + ": ";
+	strStatisticSummary += strType + "\r\n";
+
+	m_ipResultLogger->StartTestCase("", strType.c_str(), kSummaryTestCase);
+
+	CString zTemp;
+
+	zTemp.Format("\t\tFiles tested: %d", stats.m_ulTotalFilesProcessed);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	zTemp.Format("\t\tPages tested: %d", stats.m_ulTotalPages);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	// Calculate the number of files with expected redactions
+	zTemp.Format("\t\tFiles containing sensitive data items: %d (%0.1f%%)",
+					stats.m_ulNumFilesWithExpectedRedactions,
+					getRatioAsPercentOfTwoLongs(stats.m_ulNumFilesWithExpectedRedactions,
+					stats.m_ulTotalFilesProcessed));
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	// Calculate the number of pages with expected redactions
+	zTemp.Format("\t\tPages containing sensitive data items: %d (%0.1f%%)",
+					stats.m_ulNumPagesWithExpectedRedactions,
+					getRatioAsPercentOfTwoLongs(stats.m_ulNumPagesWithExpectedRedactions,
+					stats.m_ulTotalPages));
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	zTemp.Format("\t\tSensitive data items: %d", stats.m_ulTotalExpectedRedactions);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	zTemp.Format("\t\tDocuments with overlapping sensitive data items: %d ",
+		stats.m_ulNumFilesWithOverlappingExpectedRedactions);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	if (!m_bOutputAutomatedStatsOnly || m_bOutputHybridStats)
+	{
+		zTemp = CString("\t\tCorrect redactions presented to reviewers");
+		zTemp.Format(zTemp + ": %d", stats.m_verificationStatistics.m_ulNumCorrectRedactions);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+
+		zTemp = CString("\t\tOver-redactions presented to reviewers" );
+		zTemp.Format(zTemp + ": %d", stats.m_verificationStatistics.m_ulNumOverRedactions);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+
+		zTemp = CString("\t\tUnder-redactions presented to reviewers");
+		zTemp.Format(zTemp + ": %d", stats.m_verificationStatistics.m_ulNumUnderRedactions);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+
+		zTemp = CString("\t\tFalse positives presented to reviewers");
+		zTemp.Format(zTemp + ": %d ", stats.m_verificationStatistics.m_ulNumFalsePositives);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+
+		if(stats.m_verificationStatistics.m_ulNumFalsePositives <= 0)
+		{
+			zTemp = CString("\t\tRatio of correctly redacted items to false positives: n/a");
+		}
+		else
+		{
+			zTemp.Format("\t\tRatio of correctly redacted items to false positives: %0.1f",
+				((double) stats.m_verificationStatistics.m_ulNumCorrectRedactions /
+					(double)stats.m_verificationStatistics.m_ulNumFalsePositives));
+		}
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+	}
+
+	if (m_bOutputAutomatedStatsOnly || m_bOutputHybridStats)
+	{
+		zTemp = CString("\t\tCorrect redactions");
+		zTemp.Format(zTemp + ": %d", stats.m_automatedStatistics.m_ulNumCorrectRedactions);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+
+		zTemp = CString("\t\tOver-redactions");
+		zTemp.Format(zTemp + ": %d", stats.m_automatedStatistics.m_ulNumOverRedactions);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+
+		zTemp = CString("\t\tUnder-redactions");
+		zTemp.Format(zTemp + ": %d", stats.m_automatedStatistics.m_ulNumUnderRedactions);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+
+		zTemp = CString("\t\tFalse positives");
+		zTemp.Format(zTemp + ": %d ", stats.m_automatedStatistics.m_ulNumFalsePositives);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+
+		if(stats.m_automatedStatistics.m_ulNumFalsePositives <= 0)
+		{
+			zTemp = CString("\t\tRatio of correctly redacted items to false positives: n/a");
+		}
+		else
+		{
+			zTemp.Format("\t\tRatio of correctly redacted items to false positives: %0.1f",
+				((double) stats.m_automatedStatistics.m_ulNumCorrectRedactions /
+					(double)stats.m_automatedStatistics.m_ulNumFalsePositives));
+		}
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+	}
+
+	m_ipResultLogger->EndTestCase(VARIANT_TRUE);
+
+	return strStatisticSummary;
+}
+//-------------------------------------------------------------------------------------------------
 CIDShieldTester::TestCaseStatistics::TestCaseStatistics()
 : m_bTestCaseResult(true)
 , m_ulTotalExpectedRedactions(0)
@@ -3231,4 +3337,101 @@ CIDShieldTester::TestCaseStatistics& CIDShieldTester::TestCaseStatistics::operat
 
 	return *this;
 }
+
 //-------------------------------------------------------------------------------------------------
+// CIDShieldTester::IDShieldCounterClass Class
+//-------------------------------------------------------------------------------------------------
+CIDShieldTester::IDShieldCounterClass::IDShieldCounterClass() :
+	m_ulTotalExpectedRedactions (0),
+	m_ulNumCorrectRedactionsByDocument (0),
+	m_ulNumCorrectRedactionsByPage (0),
+	m_ulNumOverRedactions (0),
+	m_ulNumUnderRedactions (0),
+	m_ulNumMisses (0),
+	m_ulTotalFilesProcessed (0),
+	m_ulNumFilesWithExpectedRedactions (0),
+	m_ulNumFilesSelectedForReview (0),
+	m_ulNumPagesInFilesSelectedForReview (0),
+	m_ulNumPagesSelectedForReview (0),
+	m_ulNumExpectedRedactionsInReviewedFiles (0),
+	m_ulNumExpectedRedactionsInRedactedFiles (0),
+	m_ulNumFilesAutomaticallyRedacted (0),
+	m_ulNumFilesWithOverlappingExpectedRedactions (0),
+	m_ulTotalPages (0),
+	m_ulNumPagesWithExpectedRedactions (0)
+{
+
+}
+//-------------------------------------------------------------------------------------------------
+CIDShieldTester::IDShieldCounterClass::IDShieldCounterClass(const IDShieldCounterClass& c)
+{
+	m_ulTotalExpectedRedactions = c.m_ulTotalExpectedRedactions;
+	m_ulNumCorrectRedactionsByDocument = c.m_ulNumCorrectRedactionsByDocument;
+	m_ulNumCorrectRedactionsByPage = c.m_ulNumCorrectRedactionsByPage;
+	m_ulNumOverRedactions = c.m_ulNumOverRedactions;
+	m_ulNumUnderRedactions = c.m_ulNumUnderRedactions;
+	m_ulNumMisses = c.m_ulNumMisses;
+	m_ulTotalFilesProcessed = c.m_ulTotalFilesProcessed;
+	m_ulNumFilesWithExpectedRedactions = c.m_ulNumFilesWithExpectedRedactions;
+	m_ulNumFilesSelectedForReview = c.m_ulNumFilesSelectedForReview;
+	m_ulNumPagesInFilesSelectedForReview = c.m_ulNumPagesInFilesSelectedForReview;
+	m_ulNumPagesSelectedForReview = c.m_ulNumPagesSelectedForReview;
+	m_ulNumExpectedRedactionsInReviewedFiles = c.m_ulNumExpectedRedactionsInReviewedFiles;
+	m_ulNumExpectedRedactionsInRedactedFiles = c.m_ulNumExpectedRedactionsInRedactedFiles;
+	m_ulNumFilesAutomaticallyRedacted = c.m_ulNumFilesAutomaticallyRedacted;
+	m_ulNumFilesWithOverlappingExpectedRedactions = c.m_ulNumFilesWithOverlappingExpectedRedactions;
+	m_ulTotalPages = c.m_ulTotalPages;
+	m_ulNumPagesWithExpectedRedactions = c.m_ulNumPagesWithExpectedRedactions;
+	m_ulDocsClassified = c.m_ulDocsClassified;
+	m_automatedStatistics = c.m_automatedStatistics;
+	m_verificationStatistics = c.m_verificationStatistics;
+}
+//-------------------------------------------------------------------------------------------------
+CIDShieldTester::IDShieldCounterClass& CIDShieldTester::IDShieldCounterClass::operator +=(const IDShieldCounterClass& rhs)
+{
+	m_ulTotalExpectedRedactions += rhs.m_ulTotalExpectedRedactions;
+	m_ulNumCorrectRedactionsByDocument += rhs.m_ulNumCorrectRedactionsByDocument;
+	m_ulNumCorrectRedactionsByPage += rhs.m_ulNumCorrectRedactionsByPage;
+	m_ulNumOverRedactions += rhs.m_ulNumOverRedactions;
+	m_ulNumUnderRedactions += rhs.m_ulNumUnderRedactions;
+	m_ulNumMisses += rhs.m_ulNumMisses;
+	m_ulTotalFilesProcessed += rhs.m_ulTotalFilesProcessed;
+	m_ulNumFilesWithExpectedRedactions += rhs.m_ulNumFilesWithExpectedRedactions;
+	m_ulNumFilesSelectedForReview += rhs.m_ulNumFilesSelectedForReview;
+	m_ulNumPagesInFilesSelectedForReview += rhs.m_ulNumPagesInFilesSelectedForReview;
+	m_ulNumPagesSelectedForReview += rhs.m_ulNumPagesSelectedForReview;
+	m_ulNumExpectedRedactionsInReviewedFiles += rhs.m_ulNumExpectedRedactionsInReviewedFiles;
+	m_ulNumExpectedRedactionsInRedactedFiles += rhs.m_ulNumExpectedRedactionsInRedactedFiles;
+	m_ulNumFilesAutomaticallyRedacted += rhs.m_ulNumFilesAutomaticallyRedacted;
+	m_ulNumFilesWithOverlappingExpectedRedactions += rhs.m_ulNumFilesWithOverlappingExpectedRedactions;
+	m_ulTotalPages += rhs.m_ulTotalPages;
+	m_ulNumPagesWithExpectedRedactions += rhs.m_ulNumPagesWithExpectedRedactions;
+	m_ulDocsClassified += rhs.m_ulDocsClassified;
+	m_automatedStatistics += rhs.m_automatedStatistics;
+	m_verificationStatistics += rhs.m_verificationStatistics;
+	return *this;
+}
+//-------------------------------------------------------------------------------------------------
+void CIDShieldTester::IDShieldCounterClass::clear()
+{
+	m_ulTotalExpectedRedactions = 0;
+	m_ulNumCorrectRedactionsByDocument = 0;
+	m_ulNumCorrectRedactionsByPage = 0;
+	m_ulNumOverRedactions = 0;
+	m_ulNumUnderRedactions = 0;
+	m_ulNumMisses = 0;
+	m_ulTotalFilesProcessed = 0;
+	m_ulNumFilesWithExpectedRedactions = 0;
+	m_ulNumFilesSelectedForReview = 0;
+	m_ulNumPagesInFilesSelectedForReview = 0;
+	m_ulNumPagesSelectedForReview = 0;
+	m_ulNumExpectedRedactionsInReviewedFiles = 0;
+	m_ulNumExpectedRedactionsInRedactedFiles = 0;
+	m_ulNumFilesAutomaticallyRedacted = 0;
+	m_ulNumFilesWithOverlappingExpectedRedactions = 0;
+	m_ulTotalPages = 0;
+	m_ulNumPagesWithExpectedRedactions = 0;
+	m_ulDocsClassified = 0;
+	m_automatedStatistics.reset();
+	m_verificationStatistics.reset();
+}

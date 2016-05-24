@@ -142,6 +142,44 @@ private:
 		unsigned long m_ulNumMisses;
 	};
 
+
+	class IDShieldCounterClass
+	{
+	// counters
+	public:
+		IDShieldCounterClass();
+		IDShieldCounterClass(const IDShieldCounterClass& c);
+
+		IDShieldCounterClass& operator +=(const IDShieldCounterClass& rhs);
+
+		void clear();
+
+		// Statistics for files selected for automated redaction
+		CIDShieldTester::TestCaseStatistics m_automatedStatistics;
+
+		// Statistics for files selected for review	
+		CIDShieldTester::TestCaseStatistics m_verificationStatistics;
+
+		unsigned long m_ulTotalExpectedRedactions; 
+		unsigned long m_ulNumCorrectRedactionsByDocument; 
+		unsigned long m_ulNumCorrectRedactionsByPage; 
+		unsigned long m_ulNumOverRedactions; 
+		unsigned long m_ulNumUnderRedactions; 
+		unsigned long m_ulNumMisses;
+		unsigned long m_ulTotalFilesProcessed; 
+		unsigned long m_ulNumFilesWithExpectedRedactions; 
+		unsigned long m_ulNumFilesSelectedForReview;
+		unsigned long m_ulNumPagesInFilesSelectedForReview; 
+		unsigned long m_ulNumPagesSelectedForReview;
+		unsigned long m_ulNumExpectedRedactionsInReviewedFiles; 
+		unsigned long m_ulNumExpectedRedactionsInRedactedFiles;
+		unsigned long m_ulNumFilesAutomaticallyRedacted; 
+		unsigned long m_ulNumFilesWithOverlappingExpectedRedactions;
+		unsigned long m_ulTotalPages; 
+		unsigned long m_ulNumPagesWithExpectedRedactions; 
+		unsigned long m_ulDocsClassified;
+	};
+
 	/////////////////
 	// Variables
 	/////////////////
@@ -190,26 +228,14 @@ private:
 	// Specifies to output stats assuming visited only pages that contained any sensitive data.
 	bool m_bOutputVerificationByPageStats;
 
-	// Statistics for files selected for automated redaction
-	CIDShieldTester::TestCaseStatistics automatedStatistics;
-
-	// Statistics for files selected for review
-	CIDShieldTester::TestCaseStatistics verificationStatistics;
-
-	// counters
-	unsigned long m_ulTotalExpectedRedactions, m_ulNumCorrectRedactionsByDocument, 
-		m_ulNumCorrectRedactionsByPage, m_ulNumOverRedactions, m_ulNumUnderRedactions, m_ulNumMisses,
-		m_ulTotalFilesProcessed, m_ulNumFilesWithExpectedRedactions, m_ulNumFilesSelectedForReview,
-		m_ulNumPagesInFilesSelectedForReview, m_ulNumPagesSelectedForReview,
-		m_ulNumExpectedRedactionsInReviewedFiles, m_ulNumExpectedRedactionsInRedactedFiles,
-		m_ulNumFilesAutomaticallyRedacted, m_ulNumFilesWithOverlappingExpectedRedactions,
-		m_ulTotalPages, m_ulNumPagesWithExpectedRedactions, m_ulDocsClassified;
+	// Keeps the counts for all documents/pages
+	IDShieldCounterClass m_iccCounters;
 
 	// Map of field names available in a custom report to their unsigned long values.
 	map<string, unsigned long*> m_mapStatisticFields;
 
-	// Map to keep track of document types
-	map<string, int> m_mapDocTypeCount;
+	// Map to keep track of counts for document types
+	map<string, IDShieldCounterClass> m_mapDocTypeCounts;
 
 	// vector to hold attributes for the test output VOA vector
 	IIUnknownVectorPtr m_ipTestOutputVOAVector;
@@ -278,19 +304,19 @@ private:
 	// Creates a custom report using the specified report template.
 	void generateCustomReport(string strReportTemplate);
 
-	// Evaluates and expands all field parameters and mathmatical expressions in a report line.
-	string evaluateCustomReportParamters(const string& strSourceLine);
+	// Evaluates and expands all field parameters and mathematical expressions in a report line.
+	string evaluateCustomReportParameters(const string& strSourceLine);
 
-	// Locates the first instance of one of the specified mathmematical expressions in a line of a
+	// Locates the first instance of one of the specified mathematical expressions in a line of a
 	// custom report, evaluates it, and returns the expression's location, length and result.
 	bool evaluateCustomReportMathematicalExpression(const string &strLine,
 		const vector<char>& vecAllowedOperations, size_t &rnPos, size_t &rnLen, string &strResult);
 
-	// Wraps preliminarly expanded custom report arguments to make them easily identifiable for
+	// Wraps preliminary expanded custom report arguments to make them easily identifiable for
 	// evaluating mathematical expressions.
 	string CIDShieldTester::wrapPrelimArg(const string &strArgument);
 
-	// PROMISE: Logs the statistics associcated with the specified TestCaseStatistics instance.
+	// PROMISE: Logs the statistics associated with the specified TestCaseStatistics instance.
 	string displayStatisticsSection(const CIDShieldTester::TestCaseStatistics& sectionStatistics,
 									bool bVerificationStatistics);
 
@@ -302,7 +328,8 @@ private:
 	bool updateStatisticsAndDetermineTestCaseResult(IIUnknownVectorPtr ipExpectedAttributes,
 													 IIUnknownVectorPtr ipFoundAttributes,
 													 const string& strSourceDoc,
-													 const string& strTestOutputVOAFile);
+													 const string& strTestOutputVOAFile,
+													 IDShieldCounterClass &iccCounts);
 
 	// PROMISE: This method counts all expected attributes that are on a page that has at least one
 	//			HC/MC/LC/Clue attribute on the same page.
@@ -320,7 +347,8 @@ private:
 												  bool bSelectedForVerification,
 												  const string& strSourceDoc,
 												  const string& strTestOutputVOAFile,
-												  unsigned long ulNumPagesInDoc);
+												  unsigned long ulNumPagesInDoc,
+												  IDShieldCounterClass &iccCounts);
 
 	// PROMISE: This method updates m_ulNumCorrectRedactions and m_ulNumFalsePositives using
 	//			the analyzeExpectedAndFoundAttributes() method.
@@ -333,7 +361,8 @@ private:
 										  IIUnknownVectorPtr ipFoundAttributes,
 										  bool bSelectedForAutomatedProcess,
 										  const string& strSourceDoc,
-										  const string& strTestOutputVOAFile);
+										  const string& strTestOutputVOAFile,
+										  IDShieldCounterClass &iccCounts);
 
 	// PROMISE: This method compares two spatial strings using the GetAreaOverlappingWith method from 
 	//          IRasterZone. If the two spatial strings overlap within the percentage specified in the 
@@ -345,7 +374,7 @@ private:
 	// ARGS:	bDocumentSelected indicates whether the document was selected for automatic
 	//			redaction or verification (depending on the test being executed).
 	//			ipExpectedAttributesOnSelectedPages indicates that when stats are being generated
-	//			based on verifiers visiting only pages containing senstive data, what expected
+	//			based on verifiers visiting only pages containing sensitive data, what expected
 	//			attributes exist on those pages. It can be null if ByPage stats are not needed.
 	//			If strTestOutputVOAFile is specified, a testoutput voa file will be written to this
 	//			path.
@@ -384,7 +413,8 @@ private:
 	//			found attributes vector if there was a valid Found VOA file supplied. Otherwise
 	//			the doc types will be populated from the AFDoc. 
 	void countDocTypes( IIUnknownVectorPtr ipFoundAttributes, const string& strSourceDoc,
-						IAFDocumentPtr ipAFDoc, bool bCalculatedFoundValues);
+						IAFDocumentPtr ipAFDoc, bool bCalculatedFoundValues, 
+						IDShieldCounterClass iccCounts);
 
 	// PROMISE: to compare each of the Expected attributes with themselves and return the number of
 	//			attributes that overlap as well as the number of pages with expected redactions.
@@ -440,6 +470,9 @@ private:
 	string getSetAsDelimitedList(const set<string>& setValues);
 
 	string expandTagsAndFunctions(const string& strInput, const string& strSourceDoc);
+
+	// PROMISE: To Output the document statistics for the given document type
+	string displayDocumentStats(const string & strDocumentType, const IDShieldCounterClass& stats);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(IDShieldTester), CIDShieldTester)

@@ -1439,6 +1439,14 @@ namespace Extract.IDShieldStatisticsReporter
                         PopulateFileLists();
                     }
 
+					// Put a copy of the dat file in the analysis folder
+                    string copyDatFileName = _currentResultsFolder + "\\settings.dat";
+                    File.Copy(settingsFile.FileName, copyDatFileName, true);
+
+					// Create tcl file that will use the saved dat file
+                    string tclForCopy = _IDSHIELD_TESTER_PROGID + ";;" + copyDatFileName;
+                    File.WriteAllText(_currentResultsFolder + "\\test.tcl", tclForCopy);
+
                     _tabControl.SelectTab(_reviewTab);
                     if (_reviewTabControl.TabPages.Contains(_customReportTab))
                     {
