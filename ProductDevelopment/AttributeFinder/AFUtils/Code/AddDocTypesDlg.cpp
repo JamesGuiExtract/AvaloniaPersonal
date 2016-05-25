@@ -205,8 +205,19 @@ void AddDocTypesDlg::populateListBox()
 	m_listTypes.ResetContent();
 
 	// Get vector of document types
-	IVariantVectorPtr ipTypes = m_ipDocUtils->GetDocumentTypes( _bstr_t( m_strCategory.c_str() ) );
-	ASSERT_RESOURCE_ALLOCATION("ELI11938", ipTypes != __nullptr);
+	IVariantVectorPtr ipTypes = nullptr;
+	try
+	{
+		ipTypes = m_ipDocUtils->GetDocumentTypes( _bstr_t( m_strCategory.c_str() ) );
+		ASSERT_RESOURCE_ALLOCATION("ELI11938", ipTypes != __nullptr);
+	}
+	catch (_com_error&)
+	{
+		// This will happen when there are no document types associated with the category, 
+		// possibly because the category is dynamic.
+		m_listTypes.InsertString(0, "No associated document types found for the specified category.");
+		return;
+	}
 
 	// Get vector of Special types
 	int i;
