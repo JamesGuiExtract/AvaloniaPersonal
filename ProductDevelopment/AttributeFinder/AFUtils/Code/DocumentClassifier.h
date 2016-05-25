@@ -164,6 +164,9 @@ private:
 	// classification.
 	bool useExistingResults(IAFDocumentPtr ipAFDoc);
 
+	std::string GetDocumentClassifierFolder();
+
+
 	void validateLicense();
 };
 

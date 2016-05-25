@@ -8,6 +8,7 @@
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <cpputil.h>
+#include <FileIterator.h>
 #include <CommentedTextFileReader.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
@@ -479,6 +480,41 @@ STDMETHODIMP CDocumentClassifier::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IDocumentClassificationUtils
 //-------------------------------------------------------------------------------------------------
+namespace
+{
+	// In this context, a "valid" dix file is one that does not contain a folder path in it.
+	bool FolderContainsValidIdxFile(const std::string& subFolder)
+	{
+		std::string completeName = subFolder + "\\" + "DocTypes.idx";
+		if (!isFileOrFolderValid(completeName))
+		{
+			return false;
+		}
+
+		// The file exists, BUT is it valid? It is NOT valid if it contains a folder path.
+		// open the file
+		ifstream ifs(completeName.c_str());
+		if (!ifs.is_open())
+		{
+			return false;
+		}
+
+		// use CommentedTextFileReader to read the file line by line
+		const char dirSeparator = '\\';
+		CommentedTextFileReader fileReader(ifs);
+		while (!fileReader.reachedEndOfStream())
+		{
+			std::string text = fileReader.getLineText();
+			if (text.find(dirSeparator) != std::string::npos)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(IVariantVector** ppIndustries)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -492,9 +528,26 @@ STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(IVariantVector** ppIndus
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
 		ASSERT_RESOURCE_ALLOCATION("ELI11917", ipVec != __nullptr);
 
-		// Add the industries
-		ipVec->PushBack( get_bstr_t( gstrCOUNTY_DOC_INDUSTRY ) );
-		ipVec->PushBack( get_bstr_t( gstrLEGAL_DESC_INDUSTRY ) );
+		// Get a list of subfolders, and check each one for the presence of a "valid" DocType.idx file
+		// (i.e. contents contain document classifier names, not a path).
+		// If present, add the subfolder name to the list.
+		std::string documentClassifierFolder = GetDocumentClassifierFolder();
+		std::string subFolderSearch = documentClassifierFolder + "*.*";
+		FileIterator fi(subFolderSearch);
+
+		while (fi.moveNext())
+		{
+			if (fi.isDirectory())
+			{
+				std::string subSubName = fi.getFileName();
+				std::string subFolderName = documentClassifierFolder + subSubName;
+				if (FolderContainsValidIdxFile(subFolderName))
+				{
+					// Save only the end-leaf subfolder name, not entire path.
+					ipVec->PushBack(get_bstr_t(subSubName));
+				}
+			}
+		}
 
 		// Provide vector to caller
 		*ppIndustries = ipVec.Detach();
@@ -805,6 +858,21 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 	}
 }
 //-------------------------------------------------------------------------------------------------
+std::string CDocumentClassifier::GetDocumentClassifierFolder()
+{
+	if (m_ipAFUtility == __nullptr)
+	{
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI39895", m_ipAFUtility != __nullptr);
+	}
+
+	string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder();
+	string documentClassifierFolder = strComponentDataFolder 
+								+ "\\" + DOC_CLASSIFIERS_FOLDER + "\\";
+
+	return documentClassifierFolder;
+}
+//-------------------------------------------------------------------------------------------------
 void CDocumentClassifier::loadDocTypeFiles(const string& strSpecificIndustryName)
 {
 	if (m_ipAFUtility == __nullptr)
@@ -829,10 +897,9 @@ void CDocumentClassifier::loadDocTypeFiles(const string& strSpecificIndustryName
 	// create a new vector of doc type interpreters
 	vector<DocTypeInterpreter> vecDocTypeInterpreters;
 
-	string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder();
-	string strIndustrySpecificFolder = strComponentDataFolder 
-								+ "\\" + DOC_CLASSIFIERS_FOLDER 
-								+ "\\" + strSpecificIndustryName;
+	std::string documentClassifierFolder = GetDocumentClassifierFolder();
+	string strIndustrySpecificFolder = documentClassifierFolder + strSpecificIndustryName;
+
 	// get doc type index file based on the industry category name
 	string strDocTypeIndexFile = strIndustrySpecificFolder + "\\" + DOC_TYPE_INDEX_FILE;
 
