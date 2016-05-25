@@ -125,6 +125,13 @@
       <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="InputFinder.cs" />
+    <Compile Include="LearningMachineOutputHandler.cs" />
+    <Compile Include="LearningMachineOutputHandlerSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LearningMachineOutputHandlerSettingsDialog.Designer.cs">
+      <DependentUpon>LearningMachineOutputHandlerSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ModifySpatialMode.cs" />
     <Compile Include="ModifySpatialModeSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -353,6 +360,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ExtractOcrTextInImageAreaSettingsDialog.resx">
       <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LearningMachineOutputHandlerSettingsDialog.resx">
+      <DependentUpon>LearningMachineOutputHandlerSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ModifySpatialModeSettingsDialog.resx">
       <DependentUpon>ModifySpatialModeSettingsDialog.cs</DependentUpon>
