@@ -1,6 +1,7 @@
 ﻿using Extract.Utilities;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using System.Linq;
 
 namespace Extract.AttributeFinder
 {
@@ -110,7 +111,37 @@ namespace Extract.AttributeFinder
             {
                 if (FunctionName == "Levenshtein")
                 {
-                    return UtilityMethods.LevenshteinDistance((string)args[0], (string)args[1]);
+                    // Translate node sets into strings. Return null if a node set is empty
+                    var stringArgs = args.Select(a =>
+                        {
+                            var nodeIterator = a as XPathNodeIterator;
+                            if (nodeIterator != null)
+                            {
+                                return nodeIterator.MoveNext()
+                                    ? nodeIterator.Current.Value
+                                    : null;
+                            }
+                            else if (a == null)
+                            {
+                                return null;
+                            }
+                            else
+                            {
+                                if (typeof(string).IsInstanceOfType(a))
+                                {
+                                    var ue = new ExtractException("ELI39927",
+                                        "Application trace: Unexpected argument to es:Levenshtein function");
+                                    ue.AddDebugData("Type", a.GetType().ToString(), false);
+                                    ue.Log();
+                                }
+                                return a.ToString();
+                            }
+                        }).ToArray();
+                    if (stringArgs.Any(a => a == null))
+                    {
+                        return null;
+                    }
+                    return UtilityMethods.LevenshteinDistance(stringArgs[0], stringArgs[1]);
                 }
 
                 return null;

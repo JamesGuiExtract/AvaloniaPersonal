@@ -155,6 +155,19 @@ namespace Extract.AttributeFinder.Test
 
             Assert.IsInstanceOf<double>(result);
             Assert.That((double)result == 2);
+
+            // Test evaluating node sets instead of strings
+            result = xpathContext.Evaluate(
+                "es:Levenshtein(/*/Test[3]/Component[5]/Value, /*/Test[3]/Component[6]/Value)");
+
+            Assert.IsInstanceOf<double>(result);
+            Assert.That((double)result == 2);
+
+            // Test evaluating an empty node set
+            result = xpathContext.Evaluate(
+                "es:Levenshtein(/*/Test[3]/Component[5]/Zebra, /*/Test[3]/Component[6]/Value)");
+
+            CollectionAssert.IsEmpty((IEnumerable<object>)result);
         }
 
         [Test, Category("XPath")]
@@ -234,6 +247,25 @@ namespace Extract.AttributeFinder.Test
             Assert.IsInstanceOf<IAttribute>(objectList[3]);
             Assert.IsInstanceOf<IAttribute>(objectList[4]);
             Assert.IsInstanceOf<IAttribute>(objectList[5]);
+        }
+
+        [Test, Category("XPath")]
+        public static void Test12_MoreLevenshtein()
+        {
+            var xpathContext = GetXPathContext();
+
+            // Test evaluating node sets instead of strings
+            var result = xpathContext.Evaluate(
+                "es:Levenshtein(/*/Test[3]/Component[5]/Value, /*/Test[3]/Component[6]/Value)");
+
+            Assert.IsInstanceOf<double>(result);
+            Assert.That((double)result == 2);
+
+            // Test evaluating an empty node set
+            result = xpathContext.Evaluate(
+                "es:Levenshtein(/*/Test[3]/Component[5]/Zebra, /*/Test[3]/Component[6]/Value)");
+
+            CollectionAssert.IsEmpty((IEnumerable<object>)result);
         }
 
         #endregion Tests
