@@ -127,7 +127,7 @@ namespace Extract.AttributeFinder
                             }
                             else
                             {
-                                if (typeof(string).IsInstanceOfType(a))
+                                if (!typeof(string).IsInstanceOfType(a))
                                 {
                                     var ue = new ExtractException("ELI39927",
                                         "Application trace: Unexpected argument to es:Levenshtein function");
