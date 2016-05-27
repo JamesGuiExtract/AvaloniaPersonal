@@ -86,7 +86,7 @@
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(450, 435);
+            this._okButton.Location = new System.Drawing.Point(450, 444);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(87, 23);
             this._okButton.TabIndex = 15;
@@ -98,13 +98,12 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(543, 435);
+            this._cancelButton.Location = new System.Drawing.Point(552, 444);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(87, 23);
             this._cancelButton.TabIndex = 16;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
-            this._cancelButton.Click += new System.EventHandler(this._cancelButton_Click);
             // 
             // _attributeValueTextBox
             // 
@@ -121,8 +120,6 @@
             // 
             // _rootTextBox
             // 
-            this._rootTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this._rootTextBox.Location = new System.Drawing.Point(16, 27);
             this._rootTextBox.Name = "_rootTextBox";
             this._rootTextBox.Size = new System.Drawing.Size(521, 20);
@@ -166,7 +163,7 @@
             // _removeButton
             // 
             this._removeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._removeButton.Location = new System.Drawing.Point(543, 132);
+            this._removeButton.Location = new System.Drawing.Point(552, 132);
             this._removeButton.Name = "_removeButton";
             this._removeButton.Size = new System.Drawing.Size(87, 23);
             this._removeButton.TabIndex = 3;
@@ -177,7 +174,7 @@
             // _AddButton
             // 
             this._AddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._AddButton.Location = new System.Drawing.Point(543, 74);
+            this._AddButton.Location = new System.Drawing.Point(552, 74);
             this._AddButton.Name = "_AddButton";
             this._AddButton.Size = new System.Drawing.Size(87, 23);
             this._AddButton.TabIndex = 1;
@@ -250,7 +247,7 @@
             this._nameCheckBox.Text = "use XPath";
             this._nameCheckBox.UseVisualStyleBackColor = true;
             this._nameCheckBox.CheckedChanged += new System.EventHandler(this.CheckBoxChanged);
-            this._nameCheckBox.CheckStateChanged += new System.EventHandler(this._nameAndTypeCheckBox_CheckStateChanged);
+            this._nameCheckBox.CheckStateChanged += new System.EventHandler(this.CheckBox_CheckStateChanged);
             // 
             // _valueCheckBox
             // 
@@ -265,7 +262,7 @@
             this._valueCheckBox.Text = "use XPath";
             this._valueCheckBox.UseVisualStyleBackColor = true;
             this._valueCheckBox.CheckedChanged += new System.EventHandler(this.CheckBoxChanged);
-            this._valueCheckBox.CheckStateChanged += new System.EventHandler(this._valueCheckBox_CheckStateChanged);
+            this._valueCheckBox.CheckStateChanged += new System.EventHandler(this.CheckBox_CheckStateChanged);
             // 
             // _typeCheckBox
             // 
@@ -278,7 +275,7 @@
             this._typeCheckBox.Text = "use XPath";
             this._typeCheckBox.UseVisualStyleBackColor = true;
             this._typeCheckBox.CheckedChanged += new System.EventHandler(this.CheckBoxChanged);
-            this._typeCheckBox.CheckStateChanged += new System.EventHandler(this._nameAndTypeCheckBox_CheckStateChanged);
+            this._typeCheckBox.CheckStateChanged += new System.EventHandler(this.CheckBox_CheckStateChanged);
             // 
             // _nameDoNotCreateIfEmptyCheckBox
             // 
@@ -324,7 +321,7 @@
             // _duplicateButton
             // 
             this._duplicateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._duplicateButton.Location = new System.Drawing.Point(543, 103);
+            this._duplicateButton.Location = new System.Drawing.Point(552, 103);
             this._duplicateButton.Name = "_duplicateButton";
             this._duplicateButton.Size = new System.Drawing.Size(87, 23);
             this._duplicateButton.TabIndex = 2;
@@ -336,7 +333,7 @@
             // 
             this._downButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._downButton.Image = ((System.Drawing.Image)(resources.GetObject("_downButton.Image")));
-            this._downButton.Location = new System.Drawing.Point(595, 161);
+            this._downButton.Location = new System.Drawing.Point(604, 161);
             this._downButton.Name = "_downButton";
             this._downButton.Size = new System.Drawing.Size(35, 35);
             this._downButton.TabIndex = 5;
@@ -347,7 +344,7 @@
             // 
             this._upButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._upButton.Image = ((System.Drawing.Image)(resources.GetObject("_upButton.Image")));
-            this._upButton.Location = new System.Drawing.Point(543, 161);
+            this._upButton.Location = new System.Drawing.Point(552, 161);
             this._upButton.Name = "_upButton";
             this._upButton.Size = new System.Drawing.Size(35, 35);
             this._upButton.TabIndex = 4;
@@ -367,7 +364,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(645, 494);
+            this.ClientSize = new System.Drawing.Size(654, 504);
             this.ControlBox = false;
             this.Controls.Add(this._duplicateButton);
             this.Controls.Add(this._typeDoNotCreateIfEmptyCheckBox);
@@ -394,7 +391,7 @@
             this.Controls.Add(this._cancelButton);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(661, 510);
+            this.MinimumSize = new System.Drawing.Size(670, 520);
             this.Name = "CreateAttributeSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

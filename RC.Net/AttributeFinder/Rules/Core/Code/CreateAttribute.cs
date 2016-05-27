@@ -192,6 +192,23 @@ namespace Extract.AttributeFinder.Rules
         }
 
         /// <summary>
+        /// Copies the subattribute. Used to make deep copy.
+        /// </summary>
+        /// <param name="attribute">The attribute.</param>
+        private void DeepCopySubattribute(AttributeNameAndTypeAndValue attribute)
+        {
+            _subattributesToCreate.Add(new AttributeNameAndTypeAndValue(attribute.Name,
+                                                                        attribute.TypeOfAttribute,
+                                                                        attribute.Value,
+                                                                        attribute.NameContainsXPath,
+                                                                        attribute.TypeContainsXPath,
+                                                                        attribute.ValueContainsXPath,
+                                                                        attribute.DoNotCreateIfNameIsEmpty,
+                                                                        attribute.DoNotCreateIfTypeIsEmpty,
+                                                                        attribute.DoNotCreateIfValueIsEmpty));
+        }
+
+        /// <summary>
         /// Duplicates the subattribute.
         /// </summary>
         /// <param name="index">The index of the subattribute to duplicate.</param>
@@ -315,28 +332,6 @@ namespace Extract.AttributeFinder.Rules
         }
 
         /// <summary>
-        /// Deletes the subattributes.
-        /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Subattributes")]
-        public void DeleteSubattributes()
-        {
-            try
-            {
-                for (int i = SubattributeComponentCount - 1; i >= 0; --i)
-                {
-                    DeleteSubattributeComponents(i);
-                }
-
-                _subattributesToCreate = null;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39628");
-            }
-        }
-
-        /// <summary>
         /// Swaps the attribute components. For use with the dialog up/down buttons.
         /// </summary>
         /// <param name="index1">The index1.</param>
@@ -442,13 +437,45 @@ namespace Extract.AttributeFinder.Rules
         }
 
         /// <summary>
+        /// Part of the return type of AttributeIsValid(), this enum specifies the failed component
+        /// of the attribute, for advanced error handling. Note that the first invalid component is 
+        /// flagged - no attempt is made to deal with multiple validation errors.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:DoNotNestPublicEnum")]        
+        public enum AttributeComponentId
+        {
+            /// <summary>
+            /// Used when the attribute components are all valid
+            /// </summary>
+            NotApplicable,
+
+            /// <summary>
+            /// Used when the name portion of the attribute is invalid
+            /// </summary>
+            Name,
+
+            /// <summary>
+            /// Used when the value portion of the attribute is invalid
+            /// </summary>
+            Value,
+
+            /// <summary>
+            /// Used when the type portion of the attribute is invalid
+            /// </summary>
+            Type        
+        }
+
+        /// <summary>
         /// Is the attribute valid?
         /// </summary>
         /// <param name="index">index of the specified attribute</param>
-        /// <returns>true if the specified attribute is valid (complete)</returns>
+        /// <returns>Tuple of bool, AttributeComponentId. .Item1 = true if the specified attribute is valid (complete).
+        /// Item2 is set to NotApplicable if Item1 is true (attribute is valid), otherwise it is set to 
+        /// indicate the component of the attribute that is at fault.
+        /// </returns>
         [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
-        public bool AttributeIsValid(int index)
+        public Tuple<bool, AttributeComponentId> AttributeIsValid(int index)
         {
             try
             {
@@ -460,9 +487,33 @@ namespace Extract.AttributeFinder.Rules
 
                 var subAttr = _subattributesToCreate[index];
 
-                return TextIsValid(subAttr.Name, subAttr.NameContainsXPath, emptyTextIsAllowed: false) &&
-                       TextIsValid(subAttr.Value, subAttr.ValueContainsXPath, emptyTextIsAllowed: true, isValue: true) &&
-                       TextIsValid(subAttr.TypeOfAttribute, subAttr.TypeContainsXPath, emptyTextIsAllowed: true);
+                bool bName = TextIsValid(subAttr.Name, subAttr.NameContainsXPath, emptyTextIsAllowed: false);
+                bool bValue = TextIsValid(subAttr.Value, subAttr.ValueContainsXPath, emptyTextIsAllowed: true, isValue: true);
+                bool bType = TextIsValid(subAttr.TypeOfAttribute, subAttr.TypeContainsXPath, emptyTextIsAllowed: true);
+                bool bRet = bName && bValue && bType;
+
+                AttributeComponentId aci = new AttributeComponentId();
+                if (false == bRet)
+                {
+                    if (!bName)
+                    {
+                        aci = AttributeComponentId.Name;
+                    }
+                    else if (!bValue)
+                    {
+                        aci = AttributeComponentId.Value;
+                    }
+                    else if (!bType)
+                    {
+                        aci = AttributeComponentId.Type;
+                    }
+                }
+                else
+                {
+                    aci = AttributeComponentId.NotApplicable;
+                }
+
+                return new Tuple<bool, AttributeComponentId>(bRet, aci);
             }
             catch (Exception ex)
             {
@@ -481,7 +532,7 @@ namespace Extract.AttributeFinder.Rules
                 var stateIsValid = TextIsValid(_root, xPathEnabled: true);
                 for (int i = 0; i < SubattributeComponentCount; ++i)
                 {
-                    if (!AttributeIsValid(i))
+                    if (!AttributeIsValid(i).Item1)
                     {
                         stateIsValid = false;
                     }
@@ -999,7 +1050,12 @@ namespace Extract.AttributeFinder.Rules
         void CopyFrom(CreateAttribute source)
         {
             _root = source._root;
-            _subattributesToCreate = source._subattributesToCreate;
+
+            _subattributesToCreate = new List<AttributeNameAndTypeAndValue>();
+            foreach (var attr in source._subattributesToCreate)
+            {
+                DeepCopySubattribute(attr);
+            }
 
             _dirty = true;
         }

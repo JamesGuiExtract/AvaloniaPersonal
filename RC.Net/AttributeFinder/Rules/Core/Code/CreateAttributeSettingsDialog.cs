@@ -21,10 +21,11 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(CreateAttributeSettingsDialog).ToString();
 
-        const string _INVALID_XPATH_ERROR_PROMPT =
+        static readonly string _INVALID_XPATH_ERROR_PROMPT =
             "Only underscore, letters, digits and valid XPath characters can be used";
 
-        const string _INVALID_NONXPATH_ERROR_PROMPT = "Only underscore, letters and digits can be used";
+        static readonly string _INVALID_NONXPATH_ERROR_PROMPT = "Only underscore, letters and digits can be used";
+
         #endregion Constants
 
         #region Fields
@@ -49,7 +50,6 @@ namespace Extract.AttributeFinder.Rules
         /// </param>
         public CreateAttributeSettingsDialog(CreateAttribute settings)
         {
-
             try
             {
                 // Validate the license
@@ -102,8 +102,8 @@ namespace Extract.AttributeFinder.Rules
         /// <value>The <see cref="CreateAttribute"/> to configure.</value>
         public CreateAttribute Settings
         {
-            get;
-            set;
+            get; 
+            set; 
         }
 
         #endregion Properties
@@ -172,14 +172,10 @@ namespace Extract.AttributeFinder.Rules
 
                 for (int i = 0; i < Settings.SubattributeComponentCount; ++i)
                 {
-                    if (!Settings.AttributeIsValid(i))
+                    var valid = Settings.AttributeIsValid(i);
+                    if (!valid.Item1)
                     {
-                        SetCurrentRow(i);
-                        SetSelectedRow(i);
-
-                        SetTextAndChecksFromSubAttribute(i);
-
-                        _attributeNameTextBox.Focus();
+                        SetErrorOrRequiredCue(i, invalidComponent: valid.Item2);
 
                         this.DialogResult = DialogResult.None;
                         return;
@@ -227,10 +223,12 @@ namespace Extract.AttributeFinder.Rules
 
                 // Add a blank row to the data grid view...
                 // NOTE that the value can't be empty, or the row isn't added.
+                _suspendTextAndCheckboxChangedEvents = true;
                 _nameDataGridView.Rows.Add(" ");
 
                 // and set the current cell to prevent an ugly multiple cell selection...
                 _nameDataGridView.CurrentCell = _nameDataGridView.Rows[lastRow].Cells[0];
+                _suspendTextAndCheckboxChangedEvents = false;
 
                 // and position the current row on the newly added blank row...
                 SetSelectedRow(lastRow);
@@ -242,6 +240,7 @@ namespace Extract.AttributeFinder.Rules
 
                 // and set focus to the name text box so user doesn't need to do this manually
                 _attributeNameTextBox.Focus();
+                _attributeNameTextBox.ForeColor = System.Drawing.Color.Black;
 
                 // and set required fields - not in the Name textbox, as the focus is there, not 
                 // the Type textbox, only required when use xpath is checked, by default it is not checked.
@@ -283,11 +282,18 @@ namespace Extract.AttributeFinder.Rules
                 int index = e.RowIndex;
                 SetSelectedRow(index);
 
-                _duplicateButton.Enabled = Settings.AttributeIsValid(index);
+                var valid = Settings.AttributeIsValid(index);
+                bool isValid = valid.Item1;
+                _duplicateButton.Enabled = isValid;
                 _removeButton.Enabled = true;
                 UpdateUpDownButtons(index);
 
                 SetTextAndChecksFromSubAttribute(index);
+
+                if (!isValid)
+                {
+                    SetErrorOrRequiredCue(index, invalidComponent: valid.Item2, suspendRowOperations: true);
+                }
             }
             catch (Exception ex)
             {
@@ -338,6 +344,7 @@ namespace Extract.AttributeFinder.Rules
 
                 var textBox = (TextBox)sender;
                 var text = textBox.TextValue();
+
                 if (String.IsNullOrWhiteSpace(text))
                 {
                     _suspendTextAndCheckboxChangedEvents = true;
@@ -351,6 +358,7 @@ namespace Extract.AttributeFinder.Rules
                     // NOTE: if checkBox is null, then it is the _rootTextBox, which always takes an xpath statement,
                     // hence the "use xpath" flag is set to true below if null.
                     bool checkd = checkBox == null ? true : checkBox.Checked;
+
                     var isValid = CreateAttribute.TextIsValid(text, checkd);
                     var msg = isValid ? "" : "invalid characters in statement";
 
@@ -361,6 +369,10 @@ namespace Extract.AttributeFinder.Rules
 
                 UpdateActiveSubattribute();
                 SetAddAndDuplicateButtonsEnabledState();
+                if (null != _nameDataGridView.CurrentRow)
+                {
+                    UpdateUpDownButtons(_nameDataGridView.CurrentRow.Index);
+                }
             }
             catch (Exception ex)
             {
@@ -476,48 +488,6 @@ namespace Extract.AttributeFinder.Rules
         }
 
         /// <summary>
-        /// Handles the Click event of the _cancelButton control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        private void _cancelButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (HResult.Ok == Settings.IsDirty())
-                {
-                    CustomizableMessageBox cmb = new CustomizableMessageBox();
-                    cmb.Caption = "Unsaved modifications";
-                    cmb.Text = "Are you sure you want to exit without saving changes?";
-                    cmb.AddButton(CustomizableMessageBoxButtons.Yes, defaultButton: false);
-                    cmb.AddButton(CustomizableMessageBoxButtons.No, defaultButton: true);
-                    cmb.Show(this);
-
-                    if (cmb.Result == "No")
-                    {
-                        this.DialogResult = System.Windows.Forms.DialogResult.None;
-                        return;
-                    }
-                }
-
-                Settings.Root = _rootTextBox.TextValue();
-                if (!Settings.StateIsValid())
-                {
-                    Settings.DeleteSubattributes();
-                    Settings.Root = String.Empty;
-                    Settings.Root = null;
-                    Settings = null;
-                }
-            }
-
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39492");
-            }
-        }
-
-        /// <summary>
         /// Handles the Click event of the _duplicateButton - duplicates a subsattribute
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -559,7 +529,7 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        private void _nameAndTypeCheckBox_CheckStateChanged(object sender, EventArgs e)
+        private void CheckBox_CheckStateChanged(object sender, EventArgs e)
         {
             try
             {
@@ -570,7 +540,7 @@ namespace Extract.AttributeFinder.Rules
 
                 // here to validate associated text box when the check state changes
                 var checkBox = (CheckBox)sender;
-                TextBox textBox = checkBox == _nameCheckBox ? _attributeNameTextBox : _attributeTypeTextBox;
+                TextBox textBox = GetAssociatedTextBox(checkBox);
 
                 var text = textBox.TextValue();
                 var checkd = checkBox.Checked;
@@ -580,7 +550,8 @@ namespace Extract.AttributeFinder.Rules
                     textBox.SetError(_errorProvider, String.Empty);
                     UpdateActiveSubattribute();
 
-                    if (checkBox == _typeCheckBox)
+                    if (checkBox == _typeCheckBox ||
+                        checkBox == _valueCheckBox)
                     {
                         if (checkd && String.IsNullOrWhiteSpace(text))
                         {
@@ -589,7 +560,7 @@ namespace Extract.AttributeFinder.Rules
                         else
                         {
                             textBox.RemoveRequiredMarker();
-                        }                    
+                        }
                     }
                 }
                 else
@@ -601,39 +572,6 @@ namespace Extract.AttributeFinder.Rules
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39598");
-            }
-        }
-
-        /// <summary>
-        /// Handles the CheckStateChanged event of the _valueCheckBox control. This is different than the 
-        /// "NameAndType" specific handler because when the "use xpath" checkbox is not checked, the value
-        /// text is always valid, so validity check is only relevant when "use xpath" is checked.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        private void _valueCheckBox_CheckStateChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                var text = _attributeValueTextBox.TextValue();
-                bool checkd = ((CheckBox)sender).Checked;
-
-                if (!checkd || String.IsNullOrWhiteSpace(text))
-                {
-                    _attributeValueTextBox.SetError(_errorProvider, String.Empty);
-                }
-                else
-                {
-                    // Here when there is text, and the use XPath checkbox is checked.
-                    var isValid = CreateAttribute.TextIsValid(text, xPathEnabled: true);
-                    var errText = isValid ? String.Empty : _INVALID_XPATH_ERROR_PROMPT;
-                    _attributeValueTextBox.SetError(_errorProvider, errText);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39617");
             }
         }
 
@@ -674,15 +612,19 @@ namespace Extract.AttributeFinder.Rules
                 var text = textbox.Text;
                 if (String.IsNullOrWhiteSpace(text))
                 {
-                    if (textbox == _attributeTypeTextBox)
+                    if (textbox == _attributeTypeTextBox ||
+                        textbox == _attributeValueTextBox)
                     {
-                        if (_typeCheckBox.Checked)
+                        var checkBox = GetAssociatedXpathCheckBox(textbox);
+
+                        if (checkBox.Checked)
                         {
                             textbox.SetRequiredMarker();
                         }
                     }
                     else
                     {
+                        // Name or Root text boxes
                         textbox.SetRequiredMarker();
                     }
                 }
@@ -974,8 +916,9 @@ namespace Extract.AttributeFinder.Rules
                 int rowCount = _nameDataGridView.Rows.Count;
                 int lastRow = rowCount == 0 ? 0 : rowCount - 1;
 
-                bool upState = rowCount > 1 && rowIndex != 0;
-                bool downState = rowCount > 1 && rowIndex != lastRow;
+                bool valid = AttributeAtGridRowIsValid(rowIndex);
+                bool upState = rowCount > 1 && rowIndex != 0 && valid;
+                bool downState = rowCount > 1 && rowIndex != lastRow && valid;
 
                 _upButton.Enabled = upState;
                 _downButton.Enabled = downState;
@@ -1032,7 +975,7 @@ namespace Extract.AttributeFinder.Rules
             }
 
             int index = _nameDataGridView.CurrentRow.Index;
-            var enabled = validChar && Settings.AttributeIsValid(index);
+            var enabled = validChar && Settings.AttributeIsValid(index).Item1;
             _AddButton.Enabled = enabled;
             _duplicateButton.Enabled = enabled;
         }
@@ -1041,7 +984,7 @@ namespace Extract.AttributeFinder.Rules
         /// Gets the associated xpath CheckBox.
         /// </summary>
         /// <param name="textBox">The text box.</param>
-        /// <returns>The associated text box, or null</returns>
+        /// <returns>The associated check box, or null</returns>
         CheckBox GetAssociatedXpathCheckBox(TextBox textBox)
         {
             if (textBox == _attributeNameTextBox)
@@ -1062,7 +1005,136 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
-        #endregion Private Methods
-    }
+        /// <summary>
+        /// Gets the text box associated with the specified check box.
+        /// </summary>
+        /// <param name="checkBox">The check box.</param>
+        /// <returns>The associated text box, or null</returns>
+        TextBox GetAssociatedTextBox(CheckBox checkBox)
+        {
+            if (checkBox == _nameCheckBox || checkBox == _nameDoNotCreateIfEmptyCheckBox)
+            {
+                return _attributeNameTextBox;
+            }
+            else if (checkBox == _valueCheckBox || checkBox == _valueDoNotCreateIfEmptyCheckBox)
+            {
+                return _attributeValueTextBox;
+            }
+            else if (checkBox == _typeCheckBox || checkBox == _typeDoNotCreateIfEmptyCheckBox)
+            {
+                return _attributeTypeTextBox;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
+        /// <summary>
+        /// Determines if the attribute at current grid row is valid.
+        /// </summary>
+        /// <returns>true or false</returns>
+        bool AttributeAtCurrentGridRowIsValid()
+        {
+            if (null == _nameDataGridView.CurrentRow)
+            {
+                return false;
+            }
+
+            int index = _nameDataGridView.CurrentRow.Index;
+            return Settings.AttributeIsValid(index).Item1;
+        }
+
+        /// <summary>
+        /// Is the attribute at the specified grid row valid?
+        /// </summary>
+        /// <param name="rowIndex">Index of the row.</param>
+        /// <returns>true if valid, false otherwise</returns>
+        bool AttributeAtGridRowIsValid(int rowIndex)
+        {
+            if (null == _nameDataGridView.Rows)
+            {
+                return false;
+            }
+
+            return Settings.AttributeIsValid(rowIndex).Item1;
+        }
+
+        /// <summary>
+        /// Sets the error or required cue for a specified attribute.
+        /// </summary>
+        /// <param name="rowIndex">Index of the row.</param>
+        /// <param name="invalidComponent">The invalid component.</param>
+        /// <param name="suspendRowOperations">when called from within a grid row event handler, it
+        /// is important to not perform grid row operations</param>
+        void SetErrorOrRequiredCue(int rowIndex, 
+                                   CreateAttribute.AttributeComponentId invalidComponent, 
+                                   bool suspendRowOperations = false)
+        {
+            if (!suspendRowOperations)
+            {
+                SetCurrentRow(rowIndex);
+                SetSelectedRow(rowIndex);
+                SetTextAndChecksFromSubAttribute(rowIndex);
+            }
+
+            _suspendTextAndCheckboxChangedEvents = true;
+
+            if (invalidComponent == CreateAttribute.AttributeComponentId.Name)
+            {
+                _attributeNameTextBox.Focus();
+                if (!String.IsNullOrWhiteSpace(_attributeNameTextBox.TextValue()))
+                {
+                    string error = _nameCheckBox.Checked ? _INVALID_XPATH_ERROR_PROMPT : _INVALID_NONXPATH_ERROR_PROMPT;
+                    _attributeNameTextBox.SetError(_errorProvider, error);
+                }
+            }
+            else
+            {
+                if (_nameCheckBox.Checked && String.IsNullOrWhiteSpace(_attributeNameTextBox.Text))
+                {
+                    _attributeNameTextBox.SetRequiredMarker();
+                }
+            }
+
+            if (invalidComponent == CreateAttribute.AttributeComponentId.Value)
+            {
+                _attributeValueTextBox.Focus();
+                if (!String.IsNullOrWhiteSpace(_attributeValueTextBox.TextValue()))
+                {
+                    string error = _valueCheckBox.Checked ? _INVALID_XPATH_ERROR_PROMPT : _INVALID_NONXPATH_ERROR_PROMPT;
+                    _attributeValueTextBox.SetError(_errorProvider, error);
+                }
+            }
+            else
+            {
+                if (_valueCheckBox.Checked && String.IsNullOrWhiteSpace(_attributeValueTextBox.Text))
+                {
+                    _attributeValueTextBox.SetRequiredMarker();
+                }
+            }
+
+            if (invalidComponent == CreateAttribute.AttributeComponentId.Type)
+            {
+                _attributeTypeTextBox.Focus();
+                if (!String.IsNullOrWhiteSpace(_attributeTypeTextBox.TextValue()))
+                {
+                    string error = _typeCheckBox.Checked ? _INVALID_XPATH_ERROR_PROMPT : _INVALID_NONXPATH_ERROR_PROMPT;
+                    _attributeTypeTextBox.SetError(_errorProvider, error);
+                }
+            }
+            else
+            {
+                if (_typeCheckBox.Checked && String.IsNullOrWhiteSpace(_attributeTypeTextBox.Text))
+                {
+                    _attributeTypeTextBox.SetRequiredMarker();
+                }
+            }
+
+            _suspendTextAndCheckboxChangedEvents = false;
+        }
+
+        #endregion Private Methods
+
+    }
 }
