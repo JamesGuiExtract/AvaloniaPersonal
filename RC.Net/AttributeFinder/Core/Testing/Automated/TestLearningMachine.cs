@@ -266,7 +266,8 @@ namespace Extract.AttributeFinder.Test
                         TrainingSetPercentage = 50
                     },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false }
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
+                RandomNumberSeed = 10
             };
             var results = lm.TrainMachine();
             Assert.Greater(results.Item1, 0.90);
@@ -291,7 +292,8 @@ namespace Extract.AttributeFinder.Test
                         TrainingSetPercentage = 50
                     },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false }
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
+                RandomNumberSeed = 10
             };
             var results = lm.TrainMachine();
             Assert.Greater(results.Item1, 0.90);
@@ -719,7 +721,8 @@ namespace Extract.AttributeFinder.Test
                         TrainingSetPercentage = 50
                     },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination),
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false }
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = false },
+                RandomNumberSeed = 10
             };
             lm1.TrainMachine();
             lm1.Save(_savedMachinePath);
@@ -728,13 +731,9 @@ namespace Extract.AttributeFinder.Test
             Assert.That(lm1.IsConfigurationEqualTo(lm2));
 
             // Test output
-            string[] ussFiles, voaFiles, answerFiles;
-            lm2.InputConfig.GetInputData(out ussFiles, out voaFiles, out answerFiles);
-            var results = lm2.Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answerFiles);
-            var featureVectors = results.Item1;
-            var answers = results.Item2;
-            var score = LearningMachine.GetAccuracyScore(lm2.Classifier, featureVectors, answers);
-            Assert.Greater(score, 0.80);
+            var results = lm2.TestMachine();
+            Assert.Greater(results.Item1, 0.90);
+            Assert.Greater(results.Item2, 0.6);
         }
 
         [Test, Category("Extended")]

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 
 namespace Extract.AttributeFinder
 {
@@ -120,12 +121,35 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                TrainClassifier(inputs, outputs, randomGenerator, _ => { }, CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39866");
+            }
+        }
+
+        /// <summary>
+        /// Trains the classifier to recognize classifications
+        /// </summary>
+        /// <param name="inputs">The input feature vectors</param>
+        /// <param name="outputs">The classes for each input</param>
+        /// <param name="randomGenerator">Random number generator to use for randomness</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        public void TrainClassifier(double[][] inputs, int[] outputs, Random randomGenerator, Action<StatusArgs> updateStatus,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
                 ExtractException.Assert("ELI39717", "No inputs given", inputs != null && inputs.Length > 0);
                 ExtractException.Assert("ELI39718", "Inputs and outputs are different lengths", inputs.Length == outputs.Length);
 
                 FeatureVectorLength = inputs[0].Length;
                 ExtractException.Assert("ELI39719", "Inputs are different lengths",
                     inputs.All(vector => vector.Length == FeatureVectorLength));
+
+                updateStatus(new StatusArgs { StatusMessage = "Building classifier..." });
 
                 NumberOfClasses = outputs.Max() + 1;
 
@@ -164,8 +188,12 @@ namespace Extract.AttributeFinder
                     double bestTrainScore = int.MinValue;
                     for (int i = 0; i < complexitiesToTryAsc.Length; i++)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        updateStatus(new StatusArgs
+                            { StatusMessage = "Choosing complexity value. Iteration {0}", Int32Value = 1 });
+
                         double complexity = complexitiesToTryAsc[i];
-                        TrainClassifier(trainInputs, trainOutputs, complexity);
+                        TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
                         double score = GetAccuracyScore(cvInputs, cvOutputs);
                         double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
                         if (score > bestScore)
@@ -181,6 +209,10 @@ namespace Extract.AttributeFinder
                                 bestTrainScore = trainScore;
                                 bestComplexity = complexity;
                             }
+                            else
+                            {
+                                break;
+                            }
                         }
                         else
                         {
@@ -189,8 +221,12 @@ namespace Extract.AttributeFinder
                     }
                     for (int i = 0; i < complexitiesToTryDesc.Length; i++)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        updateStatus(new StatusArgs
+                            { StatusMessage = "Choosing complexity value. Iteration {0}", Int32Value = 1 });
+
                         double complexity = complexitiesToTryDesc[i];
-                        TrainClassifier(trainInputs, trainOutputs, complexity);
+                        TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
                         double score = GetAccuracyScore(cvInputs, cvOutputs);
                         double trainScore = GetAccuracyScore(trainInputs, trainOutputs);
                         if (score > bestScore)
@@ -205,6 +241,10 @@ namespace Extract.AttributeFinder
                             {
                                 bestTrainScore = trainScore;
                                 bestComplexity = complexity;
+                            }
+                            else
+                            {
+                                break;
                             }
                         }
                         else
@@ -215,8 +255,11 @@ namespace Extract.AttributeFinder
                     Complexity = bestComplexity;
                 }
 
+                cancellationToken.ThrowIfCancellationRequested();
+
                 // Train classifier
-                TrainClassifier(inputs, outputs, Complexity);
+                updateStatus(new StatusArgs { StatusMessage = "Training classifier..." });
+                TrainClassifier(inputs, outputs, Complexity, updateStatus, cancellationToken);
 
                 IsTrained = true;
                 LastTrainedOn = DateTime.Now;
@@ -264,6 +307,16 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Clear training information
+        /// </summary>
+        public void Clear()
+        {
+            LastTrainedOn = DateTime.MinValue;
+            IsTrained = false;
+            Classifier = null;
+        }
+
         #endregion ITrainableClassifier
 
         #region Protected Methods
@@ -274,7 +327,10 @@ namespace Extract.AttributeFinder
         /// <param name="inputs">Array of feature vectors</param>
         /// <param name="outputs">Array of classes (category codes) for each input</param>
         /// <param name="complexity">Complexity value to use for training</param>
-        protected abstract void TrainClassifier(double[][] inputs, int[] outputs, double complexity);
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        protected abstract void TrainClassifier(double[][] inputs, int[] outputs, double complexity,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken);
 
         #endregion Protected Methods
 

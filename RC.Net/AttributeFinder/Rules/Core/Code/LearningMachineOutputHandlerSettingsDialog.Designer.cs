@@ -28,14 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LearningMachineOutputHandlerSettingsDialog));
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._preserveInputAttributesCheckBox = new System.Windows.Forms.CheckBox();
             this._savedMachinePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._savedMachineBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._savedMachineTextBox = new System.Windows.Forms.TextBox();
+            this._savedMachineBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
@@ -84,6 +83,13 @@
             this._savedMachinePathTagsButton.TextControl = this._savedMachineTextBox;
             this._savedMachinePathTagsButton.UseVisualStyleBackColor = true;
             // 
+            // _savedMachineTextBox
+            // 
+            this._savedMachineTextBox.Location = new System.Drawing.Point(13, 32);
+            this._savedMachineTextBox.Name = "_savedMachineTextBox";
+            this._savedMachineTextBox.Size = new System.Drawing.Size(281, 20);
+            this._savedMachineTextBox.TabIndex = 0;
+            // 
             // _savedMachineBrowseButton
             // 
             this._savedMachineBrowseButton.FileFilter = "Learning machine|*.lm|All files|*.*";
@@ -94,13 +100,6 @@
             this._savedMachineBrowseButton.Text = "...";
             this._savedMachineBrowseButton.TextControl = this._savedMachineTextBox;
             this._savedMachineBrowseButton.UseVisualStyleBackColor = true;
-            // 
-            // _savedMachineTextBox
-            // 
-            this._savedMachineTextBox.Location = new System.Drawing.Point(13, 32);
-            this._savedMachineTextBox.Name = "_savedMachineTextBox";
-            this._savedMachineTextBox.Size = new System.Drawing.Size(281, 20);
-            this._savedMachineTextBox.TabIndex = 0;
             // 
             // _cancelButton
             // 
@@ -126,6 +125,7 @@
             // 
             // LearningMachineOutputHandlerSettingsDialog
             // 
+            this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;

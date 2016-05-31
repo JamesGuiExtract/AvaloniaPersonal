@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UCLID_RASTERANDOCRMGMTLib;
+using System.Threading;
 
 namespace Extract.AttributeFinder
 {
@@ -243,7 +244,10 @@ namespace Extract.AttributeFinder
         /// <param name="ussFiles">Paths to the spatial string files from which to collect terms for the bag-of-words
         /// vocabulary.</param>
         /// <param name="answers">The categories that each uss file belongs to.</param>
-        internal void ComputeEncodingsFromDocumentTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answers)
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        internal void ComputeEncodingsFromDocumentTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answers,
+            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
         {
             try
             {
@@ -257,10 +261,10 @@ namespace Extract.AttributeFinder
                     using (var directory = FSDirectory.Open(tempDirectory))
                     {
                         // Create a Lucene inverted index out of the input texts
-                        WriteTermsToIndex(directory, textAndCategory);
+                        WriteTermsToIndex(directory, textAndCategory, updateStatus, cancellationToken);
 
                         // Use the index to score the terms and pick the top scoring
-                        string[] topScoringTerms = GetTopScoringTerms(directory);
+                        string[] topScoringTerms = GetTopScoringTerms(directory, updateStatus, cancellationToken);
 
                         // Create the bag-of-words object
                         _bagOfWords = new Accord.MachineLearning.BagOfWords(topScoringTerms);
@@ -290,7 +294,10 @@ namespace Extract.AttributeFinder
         /// vocabulary.</param>
         /// <param name="answerFiles">The paths to the VOA files that contain the expected pagination boundary information
         /// for each uss file.</param>
-        internal void ComputeEncodingsFromPaginationTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answerFiles)
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        internal void ComputeEncodingsFromPaginationTrainingData(IEnumerable<string> ussFiles, IEnumerable<string> answerFiles,
+            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
         {
             try
             {
@@ -311,10 +318,10 @@ namespace Extract.AttributeFinder
                     using (var directory = FSDirectory.Open(tempDirectory))
                     {
                         // Create a Lucene inverted index out of the input texts
-                        WriteTermsToIndex(directory, textAndCategory);
+                        WriteTermsToIndex(directory, textAndCategory, updateStatus, cancellationToken);
 
                         // Use the index to score the terms and pick the top scoring
-                        string[] topScoringTerms = GetTopScoringTerms(directory);
+                        string[] topScoringTerms = GetTopScoringTerms(directory, updateStatus, cancellationToken);
 
                         // Create the bag-of-words object
                         _bagOfWords = new Accord.MachineLearning.BagOfWords(topScoringTerms);
@@ -507,7 +514,7 @@ namespace Extract.AttributeFinder
         /// <param name="document">The <see cref="ISpatialString"/> from which to get text.</param>
         /// <returns>An enumeration of strings containing the text for each candidate first page
         /// (first page after possible pagination boundary)</returns>
-        private static IEnumerable<string> GetPaginationTexts(ISpatialString document)
+        internal static IEnumerable<string> GetPaginationTexts(ISpatialString document)
         {
             var pages = document.GetPages(true, " ").ToIEnumerable<ISpatialString>();
             return pages.Skip(1).Select(s => s.String);
@@ -539,15 +546,23 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="directory">The <see cref="FSDirectory"/> in which to write the index files.</param>
         /// <param name="textAndCategoryCollection">Collection of text and category pairs</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>The number of examples (<see paramref="inputTexts"/>) written</returns>
-        private void WriteTermsToIndex(FSDirectory directory, IEnumerable<Tuple<string, string>> textAndCategoryCollection)
+        private void WriteTermsToIndex(FSDirectory directory, IEnumerable<Tuple<string, string>> textAndCategoryCollection,
+            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
         {
             // I don't think it makes any difference which analyzer is used since an already-tokenized streams are passed in
             var analyzer = new SimpleAnalyzer();
             using (var writer = new IndexWriter(directory, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED))
             {
-                Parallel.ForEach(textAndCategoryCollection, textAndCategory =>
+                Parallel.ForEach(textAndCategoryCollection, (textAndCategory, loopState) =>
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        loopState.Stop();
+                    }
+
                     var text = textAndCategory.Item1;
                     var category = textAndCategory.Item2;
                     var tokenStream = GetTokenStream(text);
@@ -555,8 +570,15 @@ namespace Extract.AttributeFinder
                     document.Add(new Field("category", category, Field.Store.YES, Field.Index.NOT_ANALYZED));
                     document.Add(new Field("shingles", tokenStream));
                     writer.AddDocument(document);
+                    updateStatus(new StatusArgs { StatusMessage = "Writing terms to index... Texts processed: {0:N0}", Int32Value = 1 });
                 });
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                updateStatus(new StatusArgs { StatusMessage = "Writing index..." });
                 writer.Optimize();
+                cancellationToken.ThrowIfCancellationRequested();
+
                 writer.Commit();
             }
         }
@@ -577,8 +599,11 @@ namespace Extract.AttributeFinder
         /// by <see cref="WriteTermsToIndex"/>.
         /// </summary>
         /// <param name="directory">The <see cref="FSDirectory"/> where the index files have been written.</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>The <see cref="MaxFeatures"/> top-scoring terms in the index.</returns>
-        private string[] GetTopScoringTerms(FSDirectory directory)
+        private string[] GetTopScoringTerms(FSDirectory directory,
+            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
         {
             // Collect all terms (words and shingles)
             using (var reader = DirectoryReader.Open(directory, true))
@@ -597,7 +622,7 @@ namespace Extract.AttributeFinder
                 }
 
                 var terms = reader.Terms();
-                return IterateUntilFalse(terms.Next)
+                var topTerms = IterateUntilFalse(() => !cancellationToken.IsCancellationRequested && terms.Next())
                     .Select(_ => terms.Term)
                     .Where(term => term.Field != "category")
                     .Select(term =>
@@ -625,12 +650,17 @@ namespace Extract.AttributeFinder
                                      / (inverseDocumentFrequency + inverseCategoryFrequency);
 
                         double tfidf = augmentedTermFrequency * idf;
+                        updateStatus(new StatusArgs { StatusMessage = "Scoring Terms... Terms processed: {0:N0}", Int32Value = 1 });
                         return new { tfidf, term };
                     })
                     .OrderByDescending(pair => pair.tfidf)
                     .Take(MaxFeatures)
                     .Select(t => t.term.Text)
                     .ToArray();
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                return topTerms;
             }
         }
 

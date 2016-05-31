@@ -159,6 +159,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AttributesFile.cs" />
     <Compile Include="SpatialStringFeatureVectorizer.cs" />
+    <Compile Include="StatusArgs.cs" />
     <Compile Include="SupportVectorMachineClassifier.cs" />
     <Compile Include="XPathContext.cs" />
     <Compile Include="XPathContextFunctions.cs">

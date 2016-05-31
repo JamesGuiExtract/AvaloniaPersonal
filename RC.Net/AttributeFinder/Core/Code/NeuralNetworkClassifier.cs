@@ -5,6 +5,8 @@ using AForge.Neuro;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Globalization;
 
 namespace Extract.AttributeFinder
 {
@@ -45,6 +47,11 @@ namespace Extract.AttributeFinder
         /// </summary>
         private int _featureVectorLength;
 
+        /// <summary>
+        /// Backing field for <see cref="HiddenLayers"/>
+        /// </summary>
+        private int[] _hiddenLayers;
+
         #endregion Private Fields
 
         #region Properties
@@ -54,8 +61,14 @@ namespace Extract.AttributeFinder
         /// </summary>
         public IEnumerable<int> HiddenLayers
         {
-            get;
-            set;
+            get
+            {
+                return _hiddenLayers;
+            }
+            set
+            {
+                _hiddenLayers = value.ToArray();
+            }
         }
 
         /// <summary>
@@ -154,8 +167,31 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                TrainClassifier(inputs, outputs, randomGenerator, _ => { }, CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39867");
+            }
+        }
+
+        /// <summary>
+        /// Trains the classifier to recognize classifications
+        /// </summary>
+        /// <param name="inputs">The input feature vectors</param>
+        /// <param name="outputs">The classes for each input</param>
+        /// <param name="randomGenerator">Random number generator to use for randomness</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        public void TrainClassifier(double[][] inputs, int[] outputs, Random randomGenerator, Action<StatusArgs> updateStatus,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
                 ExtractException.Assert("ELI39717", "No inputs given", inputs != null && inputs.Length > 0);
                 ExtractException.Assert("ELI39718", "Inputs and outputs are different lengths", inputs.Length == outputs.Length);
+
+                updateStatus(new StatusArgs { StatusMessage = "Building classifier..." });
 
                 // If a random number generator was specified, then specify the random number generator
                 // for neuron initialization so that results are reproducible
@@ -191,7 +227,8 @@ namespace Extract.AttributeFinder
                 // Run training algorithm
                 if (!UseCrossValidationSets)
                 {
-                    _classifier = TrainClassifier(inputs, expandedOutputs, layers);
+                    updateStatus(new StatusArgs { StatusMessage = "Training classifier..." });
+                    _classifier = TrainClassifier(inputs, expandedOutputs, layers, updateStatus, cancellationToken);
                 }
                 else
                 {
@@ -199,6 +236,15 @@ namespace Extract.AttributeFinder
                     double lowestError = double.MaxValue;
                     for (int i = 0; i < numberOfNetworks; i++)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        updateStatus(new StatusArgs
+                        {
+                            TaskName = "TrainCandidateNet",
+                            ReplaceLastStatus = true,
+                            StatusMessage = string.Format(CultureInfo.CurrentCulture,
+                                "Training candidate classifier {0}", i + 1)
+                        });
+
                         // Split data into training and validation sets by getting random subsets of each
                         // category. This is to ensure at least one example of each class exists.
                         // Compute indexes for the two sets of data
@@ -213,7 +259,8 @@ namespace Extract.AttributeFinder
 
                         // Train the classifier
                         ActivationNetwork ann;
-                        double cvError = TrainClassifier(trainInputs, trainOutputs, cvInputs, cvOutputs, layers, out ann);
+                        double cvError = TrainClassifier(trainInputs, trainOutputs, cvInputs, cvOutputs, layers, out ann,
+                            updateStatus, cancellationToken);
                         if (cvError < lowestError)
                         {
                             _classifier = ann;
@@ -292,6 +339,16 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Clear training information
+        /// </summary>
+        public void Clear()
+        {
+            LastTrainedOn = DateTime.MinValue;
+            IsTrained = false;
+            _classifier = null;
+        }
+
         #endregion ITrainableClassifier
 
         #region Private Methods
@@ -302,8 +359,11 @@ namespace Extract.AttributeFinder
         /// <param name="trainInputs">Feature vectors to train with</param>
         /// <param name="trainOutputs">Classes (category codes) for each training input</param>
         /// <param name="layers">Sizes of hidden and output layers</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>The resulting network</returns>
-        private ActivationNetwork TrainClassifier(double[][] trainInputs, double[][] trainOutputs, int[] layers)
+        private ActivationNetwork TrainClassifier(double[][] trainInputs, double[][] trainOutputs, int[] layers,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             var ann = new ActivationNetwork(new BipolarSigmoidFunction(SigmoidAlpha), _featureVectorLength, layers);
             var initializer = new NguyenWidrow(ann);
@@ -312,7 +372,15 @@ namespace Extract.AttributeFinder
 
             for (int i = 1; i <= MaxTrainingIterations; i++)
             {
-                teacher.RunEpoch(trainInputs, trainOutputs);
+                cancellationToken.ThrowIfCancellationRequested();
+                double error = teacher.RunEpoch(trainInputs, trainOutputs);
+                updateStatus(new StatusArgs
+                {
+                    TaskName = "RunEpoch",
+                    ReplaceLastStatus = true,
+                    StatusMessage = string.Format(CultureInfo.CurrentCulture,
+                        "Training iteration: {0} Training error: {1:N4}", i, error)
+                });
             }
 
             return ann;
@@ -328,9 +396,12 @@ namespace Extract.AttributeFinder
         /// <param name="cvOutputs">Array of classes (category codes) for each cross-validation input</param>
         /// <param name="layers">Sizes of hidden and output layers</param>
         /// <param name="trainedNetwork">The resulting network</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>The cross-validation error value of the resulting network</returns>
         private double TrainClassifier(double[][] trainInputs, double[][] trainOutputs,
-            double[][] cvInputs, double[][] cvOutputs, int[] layers, out ActivationNetwork trainedNetwork)
+            double[][] cvInputs, double[][] cvOutputs, int[] layers, out ActivationNetwork trainedNetwork,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             ExtractException.Assert("ELI39725", "MaxTrainingIterations must be at least " + _WINDOW_SIZE,
                 MaxTrainingIterations >= _WINDOW_SIZE);
@@ -344,8 +415,19 @@ namespace Extract.AttributeFinder
 
             for (int i = 1; i <= MaxTrainingIterations; i++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 teacher.RunEpoch(trainInputs, trainOutputs);
+                double trainError = teacher.ComputeError(trainInputs, trainOutputs);
                 double cvError = teacher.ComputeError(cvInputs, cvOutputs);
+                updateStatus(new StatusArgs
+                {
+                    TaskName = "RunEpoch",
+                    ReplaceLastStatus = true,
+                    StatusMessage = string.Format(CultureInfo.CurrentCulture,
+                        "Training iteration: {0} Training error: {1:N4} Validation error: {2:N4}", i, trainError, cvError)
+                });
+                
                 var savedNN = new System.IO.MemoryStream();
                 ann.Save(savedNN);
                 history.Enqueue(Tuple.Create(savedNN, cvError));

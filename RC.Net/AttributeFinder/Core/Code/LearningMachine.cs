@@ -12,6 +12,7 @@ using System.Runtime.Serialization.Formatters;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
+using System.Threading;
 
 namespace Extract.AttributeFinder
 {
@@ -137,6 +138,15 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Record of machine training
+        /// </summary>
+        public string TrainingLog
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Public Methods
@@ -148,19 +158,37 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                ComputeEncodings(_ => { }, CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39811");
+            }
+        }
+
+        /// <summary>
+        /// Computes encodings without training
+        /// </summary>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        public void ComputeEncodings(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        {
+            try
+            {
                 ExtractException.Assert("ELI39803", "Machine is not fully configured", IsConfigured);
 
                 // Compute input files and answers
                 string[] ussFiles, voaFiles, answersOrAnswerFiles;
-                InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles);
+                InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles, updateStatus, cancellationToken);
 
-                Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles, updateStatus, cancellationToken);
             }
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39826");
             }
-
         }
 
         /// <summary>
@@ -171,7 +199,25 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                return TrainAndTestMachine(testOnly: false);
+                return TrainAndTestMachine(testOnly: false, updateStatus: _ => { }, cancellationToken: CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39755");
+            }
+        }
+
+        /// <summary>
+        /// Trains and tests the machine using files specified with <see cref="InputConfig"/>
+        /// </summary>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        public Tuple<double, double> TrainMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        {
+            try
+            {
+                return TrainAndTestMachine(false, updateStatus, cancellationToken);
             }
             catch (Exception e)
             {
@@ -187,7 +233,25 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                return TrainAndTestMachine(testOnly: true);
+                return TrainAndTestMachine(testOnly: true, updateStatus: _ => { }, cancellationToken: CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39807");
+            }
+        }
+
+        /// <summary>
+        /// Tests the machine using files specified with <see cref="InputConfig"/>
+        /// </summary>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
+        public Tuple<double, double> TestMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        {
+            try
+            {
+                return TrainAndTestMachine(true, updateStatus, cancellationToken);
             }
             catch (Exception e)
             {
@@ -298,7 +362,8 @@ namespace Extract.AttributeFinder
                             // Add input page attributes that are in this range
                             if (preserveInputAttributes)
                             {
-                                for (int i = firstPageInRange - 1; i < lastPageInRange; i++)
+                                for (int i = firstPageInRange - 1;
+                                    i < lastPageInRange && i < inputPageAttributes.Count; i++)
                                 {
                                     documentAttribute.SubAttributes.PushBack(inputPageAttributes[i]);
                                 }
@@ -321,6 +386,52 @@ namespace Extract.AttributeFinder
                 throw e.AsExtract("ELI39770");
             }
         }
+
+        /// <summary>
+        /// Computes the accuracy or F1 score of this machine
+        /// </summary>
+        /// <remarks>Unlike the static version of this method, the instance version is affected
+        /// by <see cref="UseUnknownCategory"/> and <see cref="UnknownCategoryCutoff"/> settings</remarks>
+        /// <param name="inputs">The feature vectors</param>
+        /// <param name="outputs">The expected results</param>
+        /// <returns>The F1 score if there are two classes else the overall agreement</returns>
+        public double GetAccuracyScore(double[][] inputs, int[] outputs)
+        {
+            try
+            {
+                int[] predictions = inputs.Apply(Classifier.ComputeAnswer)
+                    .Select(t =>
+                        {
+                            if (UseUnknownCategory && t.Item2 != null
+                                && t.Item2 < UnknownCategoryCutoff)
+                            {
+                                return LearningMachineDataEncoder.UnknownCategoryCode;
+                            }
+                            else
+                            {
+                                return t.Item1;
+                            }
+                        })
+
+                    .ToArray();
+                            
+                if (Classifier.NumberOfClasses == 2)
+                {
+                    var cm = new ConfusionMatrix(predictions, outputs);
+                    return Double.IsNaN(cm.FScore) ? 0.0 : cm.FScore;
+                }
+                else
+                {
+                    var gc = new GeneralConfusionMatrix(Classifier.NumberOfClasses, predictions, outputs);
+                    return gc.OverallAgreement;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39868");
+            }
+        }
+
 
         /// <summary>
         /// Whether this instance is configured the same as another
@@ -453,6 +564,26 @@ namespace Extract.AttributeFinder
             }
         }
 
+
+        /// <summary>
+        /// Creates a new instance that is a deep clone of this instance
+        /// </summary>
+        /// <returns>A deep clone of this instance</returns>
+        public LearningMachine DeepClone()
+        {
+            try
+            {
+                var savedMachine = new System.IO.MemoryStream();
+                Save(savedMachine);
+                savedMachine.Position = 0;
+                return LearningMachine.Load(savedMachine);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39872");
+            }
+        }
+
         #endregion Public Methods
 
 
@@ -461,21 +592,26 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Optionally trains and then tests the machine using files specified with <see cref="InputConfig"/>
         /// </summary>
+        /// <param name="testOnly">Whether to only test, not train and test</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        private Tuple<double, double> TrainAndTestMachine(bool testOnly)
+        private Tuple<double, double> TrainAndTestMachine(bool testOnly, Action<StatusArgs> updateStatus,
+            CancellationToken cancellationToken)
         {
             ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
 
             // Compute input files and answers
             string[] ussFiles, voaFiles, answersOrAnswerFiles;
-            InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles);
+            InputConfig.GetInputData(out ussFiles, out voaFiles, out answersOrAnswerFiles, updateStatus, cancellationToken);
 
             if (!Encoder.AreEncodingsComputed)
             {
-                Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles);
+                Encoder.ComputeEncodings(ussFiles, voaFiles, answersOrAnswerFiles, updateStatus, cancellationToken);
             }
 
-            var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles);
+            var featureVectorsAndAnswers = Encoder.GetFeatureVectorAndAnswerCollections(ussFiles, voaFiles, answersOrAnswerFiles,
+                updateStatus, cancellationToken);
 
             // Divide data into training and testing subsets
             var rng = new Random(RandomNumberSeed);
@@ -493,12 +629,13 @@ namespace Extract.AttributeFinder
             // Train the classifier
             if (!testOnly)
             {
-                Classifier.TrainClassifier(trainInputs, trainOutputs, rng);
+                Classifier.TrainClassifier(trainInputs, trainOutputs, rng, updateStatus, cancellationToken);
             }
 
-            return Tuple.Create(GetAccuracyScore(Classifier, trainInputs, trainOutputs), GetAccuracyScore(Classifier, testInputs, testOutputs));
-        }
+            cancellationToken.ThrowIfCancellationRequested();
 
+            return Tuple.Create(GetAccuracyScore(trainInputs, trainOutputs), GetAccuracyScore(testInputs, testOutputs));
+        }
 
         #endregion Private Methods
 

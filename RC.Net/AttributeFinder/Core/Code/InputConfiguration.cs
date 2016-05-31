@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using UCLID_RASTERANDOCRMGMTLib;
+using System.Threading;
 
 namespace Extract.AttributeFinder
 {
@@ -136,19 +137,44 @@ namespace Extract.AttributeFinder
         /// <param name="attributeFilePaths">Computed paths to feature VOA files</param>
         /// <param name="answersOrAnswerFilePaths">Computed answer strings or paths to answer files</param>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
-        public void GetInputData(out string[] spatialStringFilePaths, out string[] attributeFilePaths, out string[] answersOrAnswerFilePaths)
+        public void GetInputData(out string[] spatialStringFilePaths, out string[] attributeFilePaths,
+            out string[] answersOrAnswerFilePaths)
+        {
+            GetInputData(out spatialStringFilePaths, out attributeFilePaths, out answersOrAnswerFilePaths, _ => { }, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Builds data arrays from specification
+        /// </summary>
+        /// <param name="spatialStringFilePaths">Computed paths to USS input files</param>
+        /// <param name="attributeFilePaths">Computed paths to feature VOA files</param>
+        /// <param name="answersOrAnswerFilePaths">Computed answer strings or paths to answer files</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
+        public void GetInputData(out string[] spatialStringFilePaths, out string[] attributeFilePaths,
+            out string[] answersOrAnswerFilePaths,
+            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
         {
             ExtractException.Assert("ELI39802", "This instance has not been fully configured", IsConfigured);
 
-            List<string> imageFiles;
+            spatialStringFilePaths = new string[0];
+            attributeFilePaths = new string[0];
+            answersOrAnswerFilePaths = new string[0];
+            
+            List<string> imageFiles = new List<string>();
             if (InputPathType == InputType.Folder)
             {
                 // Get all image files where there is a corresponding uss file
-                imageFiles = Directory.EnumerateFiles(InputPath, "*.uss", SearchOption.AllDirectories)
+                foreach(var imagePath in Directory.EnumerateFiles(InputPath, "*.uss", SearchOption.AllDirectories)
                     .Select(ussPath => Path.ChangeExtension(ussPath, null))
-                    .Where(imagePath => File.Exists(imagePath))
-                    .ToList();
+                    .Where(imagePath => File.Exists(imagePath)))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
 
+                    imageFiles.Add(imagePath);
+                    updateStatus(new StatusArgs { StatusMessage = "Getting input files... {0:N0} files", Int32Value = 1 });
+                };
 
                 answersOrAnswerFilePaths = new string[imageFiles.Count];
             }
@@ -157,20 +183,27 @@ namespace Extract.AttributeFinder
                 // Text file list
                 if (!string.IsNullOrWhiteSpace(AnswerPath))
                 {
-                    imageFiles = File.ReadAllLines(InputPath).Select(line => line.Trim()).ToList();
+                    foreach (var line in File.ReadLines(InputPath))
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        imageFiles.Add(line.Trim());
+                        updateStatus(new StatusArgs { StatusMessage = "Getting input files... {0:N0} files", Int32Value = 1 });
+                    }
                     answersOrAnswerFilePaths = new string[imageFiles.Count];
                 }
                 // CSV of images and answers
                 else
                 {
                     ExtractException.Assert("ELI39756", "Input file does not exist", File.Exists(InputPath));
-                    imageFiles = new List<string>();
                     var answers = new List<string>();
                     using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(InputPath))
                     {
                         csvReader.Delimiters = new[] { "," };
                         while (!csvReader.EndOfData)
                         {
+                            cancellationToken.ThrowIfCancellationRequested();
+
                             string[] fields;
                             try
                             {
@@ -207,6 +240,7 @@ namespace Extract.AttributeFinder
                             ExtractException.Assert("ELI39759", "File doesn't exist", File.Exists(imageName));
                             imageFiles.Add(imageName);
                             answers.Add(answer);
+                            updateStatus(new StatusArgs { StatusMessage = "Getting input files... {0:N0} files", Int32Value = 1 });
                         }
                     }
                     answersOrAnswerFilePaths = answers.ToArray();
@@ -216,15 +250,17 @@ namespace Extract.AttributeFinder
             {
                 throw new ExtractException("ELI39760", "Unknown input path type: " + InputPathType.ToString());
             }
+
             spatialStringFilePaths = new string[imageFiles.Count];
 
             // If no attributes path given then use null for the collection
             attributeFilePaths = string.IsNullOrWhiteSpace(AttributesPath) ? null : new string[imageFiles.Count];
 
             var pathTags = new AttributeFinderPathTags();
-
             for (int i = 0; i < imageFiles.Count; i++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string imagePath = imageFiles[i];
                 pathTags.Document = new UCLID_AFCORELib.AFDocumentClass { Text = new SpatialStringClass { SourceDocName = imagePath } };
                 spatialStringFilePaths[i] = imagePath + ".uss";

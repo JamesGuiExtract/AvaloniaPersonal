@@ -4,6 +4,7 @@ using Accord.Math;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Extract.AttributeFinder
 {
@@ -22,7 +23,10 @@ namespace Extract.AttributeFinder
         /// <param name="inputs">Array of feature vectors</param>
         /// <param name="outputs">Array of classes (category codes) for each input</param>
         /// <param name="complexity">Complexity value to use for training</param>
-        protected override void TrainClassifier(double[][] inputs, int[] outputs, double complexity)
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        protected override void TrainClassifier(double[][] inputs, int[] outputs, double complexity,
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             // Build classifier
             var kernel = new Accord.Statistics.Kernels.Linear();
@@ -37,7 +41,17 @@ namespace Extract.AttributeFinder
                     return f;
                 };
 
-            teacher.Run();
+            teacher.SubproblemFinished +=
+                delegate
+                {
+                    updateStatus(new StatusArgs { StatusMessage = "Sub-problems finished: {0:N0}", Int32Value = 1 });
+                };
+
+            var error = teacher.Run(true, cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            updateStatus(new StatusArgs { StatusMessage = "Training error: {0}", DoubleValues = new[] { error } });
             Classifier = classifier;
         }
 
