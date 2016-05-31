@@ -41,3 +41,33 @@
 
 // Set string tag to value of multiple attributes
 <TESTCASE>;Test10.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+
+//-------------------------------------------------------------
+// Additional Preprocessor Tests
+//-------------------------------------------------------------
+
+// Test "Don't create any tags if a tag value would be empty" with "Set string tag"
+<TESTCASE>;Test11.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11-12-13-14.eav
+
+// Test "Don't create any tags if a tag value would be empty" with "Set object tag"
+<TESTCASE>;Test12.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11-12-13-14.eav
+
+// Test "Don't create any tags if a tag value would be empty" with Both "Set string tag"  and "Set object tag" and only "Set string tag" with an empty value
+<TESTCASE>;Test13.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11-12-13-14.eav
+
+// Test "Don't create any tags if a tag value would be empty" with Both "Set string tag"  and "Set object tag" and only "Set object tag" with an empty value
+<TESTCASE>;Test14.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11-12-13-14.eav
+
+// Test  "Don't create any tags if a tag value would be empty" for "Set string tag" with selected source attributes that selects no attributes
+<TESTCASE>;Test15.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+// Test  "Generate source attributes with RSD file" for "Set string tag" with selected source attributes that selects no attributes
+<TESTCASE>;Test16.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
+
+//-------------------------------------------------------------
+// Additional Output Handler Tests
+//------------------------------------------------------------- 
+
+// Test  "Generate source attributes with RSD file" for "Set object tag" with selected source attributes that selects attributes
+<TESTCASE>;Test17.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test17.eav

@@ -44,6 +44,7 @@ namespace Extract.AttributeFinder.Rules
 
                 _stringTagPathTagsButton.PathTags = new AttributeFinderPathTags();
                 _objectTagPathTagsButton.PathTags = new AttributeFinderPathTags();
+                _rsdFileNamePathTagsButton.PathTags = new AttributeFinderPathTags();
             }
             catch (Exception ex)
             {
@@ -104,6 +105,10 @@ namespace Extract.AttributeFinder.Rules
                     // Set state of main check boxes
                     _setStringTagCheckBox.Checked = Settings.SetStringTag;
                     _setObjectTagCheckBox.Checked = Settings.SetObjectTag;
+
+                    _noTagsIfEmptyCheckBox.Checked = Settings.NoTagsIfEmpty;
+                    _generateSourceAttributesWithRSDCheckBox.Checked = Settings.GenerateSourceAttributesWithRSDFile;
+                    _rsdFileNameTextBox.Text = Settings.SourceAttributeRSDFile;
 
                     // Enable/disable all controls based on checked states
                     SetEnabledStates();
@@ -175,6 +180,9 @@ namespace Extract.AttributeFinder.Rules
                     _useSelectedAttributesForObjectTag.Checked;
                 Settings.ObjectTagAttributeSelector =
                     (IAttributeSelector)_objectTagAttributeSelector.ConfigurableObject;
+                Settings.NoTagsIfEmpty = _noTagsIfEmptyCheckBox.Checked;
+                Settings.GenerateSourceAttributesWithRSDFile = _generateSourceAttributesWithRSDCheckBox.Checked;
+                Settings.SourceAttributeRSDFile = _rsdFileNameTextBox.Text;
 
                 DialogResult = DialogResult.OK;
             }
@@ -307,6 +315,17 @@ namespace Extract.AttributeFinder.Rules
                 }
             }
 
+            if (_generateSourceAttributesWithRSDCheckBox.Checked)
+            {
+                if (string.IsNullOrWhiteSpace(_rsdFileNameTextBox.Text))
+                {
+                     _rsdFileNameTextBox.Focus();
+                    UtilityMethods.ShowMessageBox("Please specify a RSD file name.",
+                        "Specify a RSD file name", false);
+                    return true;              
+                }
+            }
+
             return false;
         }
 
@@ -349,6 +368,12 @@ namespace Extract.AttributeFinder.Rules
                 _objectTagPathTagsButton.Enabled = _useSpecifiedValueForObjectTag.Checked;
                 _objectTagAttributeSelector.Enabled = _useSelectedAttributesForObjectTag.Checked;
             }
+
+            _rsdFileNameTextBox.Enabled = _generateSourceAttributesWithRSDCheckBox.Checked;
+            _rsdFileNamePathTagsButton.Enabled = _generateSourceAttributesWithRSDCheckBox.Checked;
+            _rsdFileNameBrowseButton.Enabled = _generateSourceAttributesWithRSDCheckBox.Checked;
+            _rsdFileGroupBox.Enabled = _generateSourceAttributesWithRSDCheckBox.Checked;
+
         }
 
         /// <summary>

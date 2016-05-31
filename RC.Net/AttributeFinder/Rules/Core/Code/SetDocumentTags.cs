@@ -158,6 +158,33 @@ namespace Extract.AttributeFinder.Rules
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets whether to create any tags if one has an empty value
+        /// </summary>
+        bool NoTagsIfEmpty
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether to generate source attributes with a RSD file
+        /// </summary>
+        bool GenerateSourceAttributesWithRSDFile
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the RSD file used to generate source attributes 
+        /// </summary>
+        string SourceAttributeRSDFile
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
@@ -179,7 +206,7 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -269,6 +296,21 @@ namespace Extract.AttributeFinder.Rules
         /// An <see cref="AttributeFinderPathTags"/> to expand tags from specified values.
         /// </summary>
         AttributeFinderPathTags _pathTags = new AttributeFinderPathTags();
+
+        /// <summary>
+        /// Whether to create any tags if one has an empty value
+        /// </summary>
+        bool _noTagsIfEmpty;
+
+        /// <summary>
+        /// Whether to generate source attributes with a RSD file
+        /// </summary>
+        bool _generateSourceAttributesWithRSDFile;
+
+        /// <summary>
+        /// The name of the RSD file used to generate source attributes, can use tags
+        /// </summary>
+        string _sourceAttributeRSDFile;
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to this instance since it was created;
@@ -734,6 +776,90 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
+        /// <summary>
+        /// Gets or sets whether to create any tags if one has an empty value
+        /// </summary>
+        public bool NoTagsIfEmpty
+        {
+            get
+            {
+                return _noTagsIfEmpty;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_noTagsIfEmpty != value)
+                    {
+                        _noTagsIfEmpty = value;
+                        
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39928");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether to generate source attributes with a RSD file
+        /// </summary>
+        public bool GenerateSourceAttributesWithRSDFile
+        {
+            get
+            {
+                return _generateSourceAttributesWithRSDFile;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_generateSourceAttributesWithRSDFile != value)
+                    {
+                        _generateSourceAttributesWithRSDFile = value;
+                        
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39943");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the RSD file used to generate source attributes
+        /// </summary>
+        public string SourceAttributeRSDFile
+        {
+            get
+            {
+                return _sourceAttributeRSDFile;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_sourceAttributeRSDFile != value)
+                    {
+                        _sourceAttributeRSDFile = value;
+
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39948");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region IDocumentProcessor
@@ -754,7 +880,8 @@ namespace Extract.AttributeFinder.Rules
                 ExtractException.Assert("ELI38584", "Rule is not properly configured.",
                     IsConfigured());
 
-                var sourceAttributes = pDocument.Attribute.SubAttributes;
+                var sourceAttributes = (GenerateSourceAttributesWithRSDFile) ? GetSourceAttributes(pDocument) 
+                    : pDocument.Attribute.SubAttributes;
 
                 setDocumentTags(pDocument, sourceAttributes);
 
@@ -789,7 +916,10 @@ namespace Extract.AttributeFinder.Rules
                 ExtractException.Assert("ELI38587", "Rule is not properly configured.",
                     IsConfigured());
 
-                setDocumentTags(pDoc, pAttributes);
+                var sourceAttributes = (GenerateSourceAttributesWithRSDFile) ? GetSourceAttributes(pDoc)
+                    : pAttributes;
+
+                setDocumentTags(pDoc, sourceAttributes);
 
                 // So that the garbage collector knows of and properly manages the associated
                 // memory.
@@ -913,6 +1043,11 @@ namespace Extract.AttributeFinder.Rules
                     {
                         return false;
                     }
+                }
+
+                if (GenerateSourceAttributesWithRSDFile)
+                {
+                    return !string.IsNullOrWhiteSpace(SourceAttributeRSDFile);
                 }
 
                 return true;
@@ -1074,6 +1209,19 @@ namespace Extract.AttributeFinder.Rules
                         }
                     }
 
+                    NoTagsIfEmpty = false;
+                    GenerateSourceAttributesWithRSDFile = false;
+                    SourceAttributeRSDFile = "";
+                    if (reader.Version > 1)
+                    {
+                        NoTagsIfEmpty = reader.ReadBoolean();
+                        GenerateSourceAttributesWithRSDFile = reader.ReadBoolean();
+                        if (GenerateSourceAttributesWithRSDFile)
+                        {
+                            SourceAttributeRSDFile = reader.ReadString();
+                        }
+                    }
+
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
@@ -1145,6 +1293,15 @@ namespace Extract.AttributeFinder.Rules
                         {
                             writer.Write((IPersistStream)ObjectTagAttributeSelector, clearDirty);
                         }
+                    }
+
+                    writer.Write(NoTagsIfEmpty);
+
+                    writer.Write(GenerateSourceAttributesWithRSDFile);
+
+                    if (GenerateSourceAttributesWithRSDFile)
+                    {
+                        writer.Write(SourceAttributeRSDFile);
                     }
 
                     // Write to the provided IStream.
@@ -1245,6 +1402,10 @@ namespace Extract.AttributeFinder.Rules
                 ObjectTagAttributeSelector = (IAttributeSelector)copyThis.Clone();
             }
 
+            NoTagsIfEmpty = source.NoTagsIfEmpty;
+            GenerateSourceAttributesWithRSDFile = source.GenerateSourceAttributesWithRSDFile;
+            SourceAttributeRSDFile = source.SourceAttributeRSDFile;
+
             _dirty = true;
         }
 
@@ -1255,28 +1416,27 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="sourceAttributes">Attributes to use for tag values.</param>
         void setDocumentTags(AFDocument document, IUnknownVector sourceAttributes)
         {
+            string valueForStringTag = null;
             if (SetStringTag)
             {
-                string value = null;
-
                 if (UseSpecifiedValueForStringTag)
                 {
                     // Expand any tags in the specified value
                     _pathTags.Document = document;
-                    value = _pathTags.Expand(SpecifiedValueForStringTag);
+                    valueForStringTag = _pathTags.Expand(SpecifiedValueForStringTag);
                 }
                 else if (UseTagValueForStringTag)
                 {
                     // Get the string tag value if it exists
                     if (document.StringTags.Contains(TagNameForStringTagValue))
                     {
-                        value = document.StringTags.GetValue(TagNameForStringTagValue);
+                        valueForStringTag = document.StringTags.GetValue(TagNameForStringTagValue);
                     }
                     // Get the object tag value if it exists, concatenate if there are multiple
                     // elements in the vector.
                     else if (document.ObjectTags.Contains(TagNameForStringTagValue))
                     {
-                        value = string.Join(Delimiter,
+                        valueForStringTag = string.Join(Delimiter,
                             ((IVariantVector)document.ObjectTags.GetValue(TagNameForStringTagValue))
                             .ToIEnumerable<string>());
                     }
@@ -1292,25 +1452,25 @@ namespace Extract.AttributeFinder.Rules
                             .SelectAttributes(sourceAttributes, document, sourceAttributes)
                             .ToIEnumerable<ComAttribute>()
                             .Select(attr => attr.Value.String);
-                        value = string.Join(Delimiter, values);
+                        valueForStringTag = string.Join(Delimiter, values);
                     }
                 }
-
-                // Set the string tag
-                document.StringTags.Set(StringTagName, value);
             }
-
+            
+            VariantVector objectTagValues = null;
             if (SetObjectTag)
             {
-                VariantVector values = null;
-
                 if (UseSpecifiedValueForObjectTag)
                 {
-                    values = new VariantVector();
+                    objectTagValues = new VariantVector();
 
                     // Expand any tags in the specified value
                     _pathTags.Document = document;
-                    values.PushBack(_pathTags.Expand(SpecifiedValueForObjectTag));
+                    string tagValue = _pathTags.Expand(SpecifiedValueForObjectTag);
+                    if (!NoTagsIfEmpty || !string.IsNullOrWhiteSpace(tagValue))
+                    {
+                        objectTagValues.PushBack(_pathTags.Expand(SpecifiedValueForObjectTag));
+                    }
                 }
                 else if (UseSelectedAttributesForObjectTagValue)
                 {
@@ -1318,17 +1478,100 @@ namespace Extract.AttributeFinder.Rules
                         new RuleObjectProfiler("", "", ObjectTagAttributeSelector, 0))
                     {
                         // Get all values as a VariantVector
-                        values = ObjectTagAttributeSelector
+                        objectTagValues = ObjectTagAttributeSelector
                             .SelectAttributes(sourceAttributes, document, sourceAttributes)
                             .ToIEnumerable<ComAttribute>()
                             .Select(attr => attr.Value.String)
                             .ToVariantVector();
                     }
                 }
-
-                // Set the object tag
-                document.ObjectTags.Set(ObjectTagName, values);
             }
+
+            bool createTags = !NoTagsIfEmpty;
+
+            if (NoTagsIfEmpty)
+            {
+                createTags = true;
+                if (SetStringTag)
+                {
+                    createTags = !string.IsNullOrWhiteSpace(valueForStringTag);
+                }
+
+                if (SetObjectTag)
+                {
+                    createTags = createTags && (objectTagValues.Size > 0);
+                } 
+            }
+
+            if (createTags)
+            {
+                if (SetStringTag)
+                {
+                    // Set the string tag
+                    document.StringTags.Set(StringTagName, valueForStringTag);
+                }
+
+                if (SetObjectTag)
+                {
+                    // Set the object tag
+                    document.ObjectTags.Set(ObjectTagName, objectTagValues);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads the rule set configured to be run.
+        /// </summary>
+        /// <param name="afDoc">A <see cref="AFDocument"/> to provide context for expanding
+        /// path tags.</param>
+        /// <returns>The <see cref="RuleSet"/>.</returns>
+        RuleSet LoadRuleset(AFDocument afDoc)
+        {
+            _pathTags.Document = afDoc;
+            string rsdFileName = _pathTags.Expand(_sourceAttributeRSDFile);
+
+            RuleSet ruleSet = new RuleSet();
+            ruleSet.LoadFrom(rsdFileName, false);
+
+            return ruleSet;
+        }
+
+        /// <summary>
+        /// Runs rules on the <see paramref="pDocument"/> if <see cref="GenerateSourceAttributesWithRSDFile"/>
+        /// is true
+        /// </summary>
+        /// <param name="pDocument">The <see cref="AFDocument"/> to run the rules on</param>
+        /// <returns>null if <see cref="GenerateSourceAttributesWithRSDFile"/> is false or the 
+        /// results of running the rules otherwise</returns>
+        IUnknownVector GetSourceAttributes(AFDocument pDocument)
+        {
+            IUnknownVector sourceAttributes = null;
+
+            if (GenerateSourceAttributesWithRSDFile)
+            {
+                // Clone the AFDocument so changes made by the rule set are not propagated
+
+                AFDocument afDoc = pDocument.PartialClone(false, true);
+
+                RuleSet rules = LoadRuleset(afDoc);
+
+                // Use ComObjectReleaser on the RuleExecutionSession so that the current RSD file name is
+                // handled correctly.
+                using (ComObjectReleaser ComObjectReleaser = new ComObjectReleaser())
+                {
+                    RuleExecutionSession session = new RuleExecutionSession();
+                    ComObjectReleaser.ManageObjects(session);
+                    session.SetRSDFileName(rules.FileName);
+
+                    sourceAttributes = rules.ExecuteRulesOnText(afDoc, null, "", null);
+
+                    // So that the garbage collector knows of and properly manages the associated
+                    // memory.
+                    sourceAttributes.ReportMemoryUsage();
+                }
+            }
+
+            return sourceAttributes;
         }
 
         #endregion Private Members
