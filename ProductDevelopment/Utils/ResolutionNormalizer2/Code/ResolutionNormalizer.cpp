@@ -160,31 +160,64 @@ void CResolutionNormalizerApp::processFile(const string& strFileName, double dRe
 
 	try
 	{
-		validateFileOrFolderExistence(strFileName);
-
-		int nOriginaPageCount(0);
-		int nPagesUpdated(0);
-
-		// Make a copy of the document to process so that if anything goes wrong, the original is
-		// not affected.
-		string strExt = getExtensionFromFullPath(strFileName);
-		ASSERT_RUNTIME_CONDITION("ELI39976", _strcmpi(".pdf", strExt.c_str()) != 0,
-			"ResolutionNormalizer2 does not support PDF files.");
-		unique_ptr<TemporaryFileName> pTempOutputFile(new TemporaryFileName(true, NULL, strExt.c_str()));
-		strTempFileName = pTempOutputFile->getName();
-		copyFile(strFileName, strTempFileName);
-
-		initNuanceEngineAndLicense();
-
-		normalizeResolution(strTempFileName, dResFactor, &nOriginaPageCount, &nPagesUpdated);
-
-		if (nPagesUpdated > 0)
+		try
 		{
-			finalizeAndValidateOutput(strTempFileName, nOriginaPageCount);
+			validateFileOrFolderExistence(strFileName);
 
-			// Normalization succeeded; replace the original file with the normalized version.
-			moveFile(strTempFileName, strFileName, true);
+			int nOriginaPageCount(0);
+			int nPagesUpdated(0);
+
+			// Make a copy of the document to process so that if anything goes wrong, the original is
+			// not affected.
+			string strExt = getExtensionFromFullPath(strFileName);
+			ASSERT_RUNTIME_CONDITION("ELI39976", _strcmpi(".pdf", strExt.c_str()) != 0,
+				"ResolutionNormalizer2 does not support PDF files.");
+			unique_ptr<TemporaryFileName> pTempOutputFile(new TemporaryFileName(true, NULL, strExt.c_str()));
+			strTempFileName = pTempOutputFile->getName();
+			copyFile(strFileName, strTempFileName);
+
+			initNuanceEngineAndLicense();
+
+			normalizeResolution(strTempFileName, dResFactor, &nOriginaPageCount, &nPagesUpdated);
+
+			if (nPagesUpdated > 0)
+			{
+				finalizeAndValidateOutput(strTempFileName, nOriginaPageCount);
+
+				// Normalization succeeded; replace the original file with the normalized version.
+
+				// https://extract.atlassian.net/browse/ISSUE-13775
+				// Retry 3 times to account for access denied exceptions encountered during an
+				// endurance test.
+				UCLIDException ueMoveError;
+				for (int i = 0; i < 3; i++)
+				{
+
+					try
+					{
+						try
+						{
+							moveFile(strTempFileName, strFileName, true);
+							return;
+						}
+						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39978")
+					}
+					catch (UCLIDException &ue)
+					{
+						UCLIDException ueTrace("ELI39980", "Application trace: Failed to move output.", ue);
+						ueTrace.addDebugInfo("Retries", i);
+						ueTrace.log();
+
+						ueMoveError = UCLIDException("ELI39979", "Failed to move output after retries.", ue);
+					}
+
+					Sleep(1000);
+				}
+
+				throw ueMoveError;
+			}
 		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39977");
 	}
 	catch (UCLIDException &ue)
 	{
