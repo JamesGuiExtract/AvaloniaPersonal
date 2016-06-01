@@ -377,6 +377,7 @@
 #define IDC_CHK_ONLY_RETURN_ONE_ATTRIBUTE_PER_GROUP 476
 #define IDC_CHK_ONLY_CREATE_ONE_ATTRIBUTE_PER_GROUP 476
 #define IDC_FIRST_MATCH_ONLY_INFO       477
+#define IDC_ATTRIBUTE_NAME_INFO         478
 
 // Next default values for new objects
 // 
@@ -384,7 +385,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1002
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         478
+#define _APS_NEXT_CONTROL_VALUE         479
 #define _APS_NEXT_SYMED_VALUE           200
 #endif
 #endif

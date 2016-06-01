@@ -4,6 +4,7 @@
 #define __FINDFROMRSDPP_H_
 
 #include "resource.h"       // main symbols
+#include <XInfoTip.h>
 
 EXTERN_C const CLSID CLSID_FindFromRSDPP;
 
@@ -33,17 +34,15 @@ BEGIN_MSG_MAP(CFindFromRSDPP)
 	MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 	COMMAND_HANDLER(IDC_BTN_BROWSE, BN_CLICKED, OnClickedBtnBrowse)
 	COMMAND_HANDLER(IDC_BTN_SELECT_DOC_TAG, BN_CLICKED, OnClickedSelectDocTag)
+	COMMAND_HANDLER(IDC_ATTRIBUTE_NAME_INFO, BN_CLICKED, OnClickedAttributeNameInfo)
 END_MSG_MAP()
-// Handler prototypes:
-//  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-//  LRESULT CommandHandler(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-//  LRESULT NotifyHandler(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 
 // Windows Message Handlers
 	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 		BOOL& bHandled);
 	LRESULT OnClickedBtnBrowse(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedAttributeNameInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 STDMETHOD(Apply)(void);
 
@@ -52,6 +51,7 @@ private:
 	ATLControls::CEdit m_editRSDFileName;
 	ATLControls::CButton m_btnBrowse;
 	ATLControls::CButton m_btnSelectDocTag;
+	CXInfoTip m_infoTip;
 };
 
 #endif //__FINDFROMRSDPP_H_

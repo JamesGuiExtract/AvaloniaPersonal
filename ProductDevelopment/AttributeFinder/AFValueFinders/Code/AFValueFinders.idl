@@ -625,8 +625,8 @@ library	UCLID_AFVALUEFINDERSLib
 	]
 	interface IFindFromRSD : IDispatch
 	{
-		[propget, id(1), helpstring("property AttributeName")] HRESULT AttributeName([out, retval] BSTR *pVal);
-		[propput, id(1), helpstring("property AttributeName")] HRESULT AttributeName([in] BSTR newVal);
+		[propget, id(1), helpstring("property AttributeNames")] HRESULT AttributeNames([out, retval] IVariantVector* *pVal);
+		[propput, id(1), helpstring("property AttributeNames")] HRESULT AttributeNames([in] IVariantVector* newVal);
 		[propget, id(2), helpstring("property RSDFileName")] HRESULT RSDFileName([out, retval] BSTR *pVal);
 		[propput, id(2), helpstring("property RSDFileName")] HRESULT RSDFileName([in] BSTR newVal);
 	};

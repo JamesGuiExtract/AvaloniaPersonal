@@ -11,6 +11,7 @@
 #include "..\..\AFCore\Code\Common.h"
 #include <AFTagManager.h>
 #include <DocTagUtils.h>
+#include <regex>
 
 //-------------------------------------------------------------------------------------------------
 // CFindFromRSDPP
@@ -34,17 +35,48 @@ STDMETHODIMP CFindFromRSDPP::Apply(void)
 
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
-			// get the SPM finder
+			// get the finder
 			UCLID_AFVALUEFINDERSLib::IFindFromRSDPtr ipFinder = m_ppUnk[i];
 
 			CComBSTR bstrName;
 			GetDlgItemText(IDC_EDIT_ATTRIBUTE_NAME, bstrName.m_str);
-			// Test if this is a valid attribute name
-			IAttributePtr ipTmpAttr(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI10248", ipTmpAttr != __nullptr);
+			string strAttributes = asString(bstrName);
+			IVariantVectorPtr ipAttributeNames(CLSID_VariantVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI39949", ipAttributeNames != __nullptr);
 
-			ipTmpAttr->Name = _bstr_t(bstrName);
-			ipFinder->AttributeName = _bstr_t(bstrName);
+			// Test if this is a valid attribute-name list
+			// Allow <All> or empty string
+			string pattern =
+				"\\s*(?:"
+					"(<All>)"
+					"|[_[:alpha:]]\\w*(?:\\s*\\n\\s*[_[:alpha:]]\\w*)*"
+				")\\s*";
+			regex rgxValidAttributeList(pattern, std::regex_constants::icase);
+
+			// Capture sub-match to see if special value occurred
+			smatch subMatches;
+			if (!regex_match(strAttributes, subMatches, rgxValidAttributeList))
+			{
+				throw UCLIDException("ELI39982", 
+					"Could not parse attribute name list!\r\n"
+					"Specify one attribute name per line. Use '<All>' to find all defined attributes.");
+			}
+
+			// Leave the vector empty if '<All>' was matched
+			// (first sub-match is entire match)
+			if (subMatches[1] == "")
+			{
+				// Split string list format into parts and add to vector.
+				regex rgxAttribute("\\b[_[:alpha:]]\\w*");
+				regex_iterator<string::iterator> it(strAttributes.begin(), strAttributes.end(), rgxAttribute);
+				regex_iterator<string::iterator> end;
+				for (; it != end; ++it)
+				{
+					ipAttributeNames->PushBack(_bstr_t(it->str().c_str()));
+				}
+			}
+
+			ipFinder->AttributeNames = ipAttributeNames;
 			
 			CComBSTR bstrRSDFileName;
 			GetDlgItemText(IDC_EDIT_RSD_FILE, bstrRSDFileName.m_str);
@@ -82,13 +114,30 @@ LRESULT CFindFromRSDPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 
 		if (ipFinder)
 		{
+			// create tooltip object
+			m_infoTip.Create(CWnd::FromHandle(m_hWnd));
+			// set no delay.
+			m_infoTip.SetShowDelay(0);
+
 			m_editAttributeName = GetDlgItem(IDC_EDIT_ATTRIBUTE_NAME);
 			m_editRSDFileName = GetDlgItem(IDC_EDIT_RSD_FILE);
 			m_btnSelectDocTag = GetDlgItem(IDC_BTN_SELECT_DOC_TAG);
 			m_btnSelectDocTag.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 
-			string strAttributeName = ipFinder->AttributeName;
-			m_editAttributeName.SetWindowText( strAttributeName.c_str());
+			IVariantVectorPtr ipAttributeNames = ipFinder->AttributeNames;
+			if (ipAttributeNames->Size > 0)
+			{
+				string strAttributeNames = asString(_bstr_t(ipAttributeNames->GetItem(0)));
+				for(int i=1; i < ipAttributeNames->Size; i++)
+				{
+					strAttributeNames += "\r\n" + asString(_bstr_t(ipAttributeNames->GetItem(i)));
+				}
+				m_editAttributeName.SetWindowText(strAttributeNames.c_str());
+			}
+			else
+			{
+				m_editAttributeName.SetWindowText("<All>");
+			}
 
 			string strRSDFileName = ipFinder->RSDFileName;
 			m_editRSDFileName.SetWindowText( strRSDFileName.c_str());
@@ -129,6 +178,24 @@ LRESULT CFindFromRSDPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND h
 		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editRSDFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12007");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CFindFromRSDPP::OnClickedAttributeNameInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// show tooltip info
+		CString zText("Specify one attribute name per line.\r\n"
+			"Use '<All>' to find all defined attributes.\r\n"
+			"NOTE: Attribute names are case-sensitive.");
+   
+		m_infoTip.Show(zText);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07536");
 
 	return 0;
 }

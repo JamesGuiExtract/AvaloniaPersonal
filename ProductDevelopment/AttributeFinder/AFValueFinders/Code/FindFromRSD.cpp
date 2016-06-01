@@ -22,13 +22,15 @@
 // Constants
 //-------------------------------------------------------------------------------------------------
 // Version 2: Added CIdentifiableObject
-const unsigned long gnCurrentVersion = 2;
+// Version 3: Added support for multiple attribute names
+const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
 // CFindFromRSD
 //-------------------------------------------------------------------------------------------------
 CFindFromRSD::CFindFromRSD()
-: m_cachedRuleSet(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
+: m_cachedRuleSet(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()),
+  m_ipAttributeNames(CLSID_VariantVector)
 {
 	try
 	{
@@ -77,21 +79,22 @@ STDMETHODIMP CFindFromRSD::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IFindFromRSD
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFindFromRSD::get_AttributeName(BSTR *pVal)
+STDMETHODIMP CFindFromRSD::get_AttributeNames(IVariantVector* *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
 		validateLicense();
-		*pVal = _bstr_t(m_strAttributeName.c_str()).copy();
+		IVariantVectorPtr ipShallowCopy = m_ipAttributeNames;
+		*pVal = ipShallowCopy.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10224")
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFindFromRSD::put_AttributeName(BSTR newVal)
+STDMETHODIMP CFindFromRSD::put_AttributeNames(IVariantVector *newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -99,22 +102,7 @@ STDMETHODIMP CFindFromRSD::put_AttributeName(BSTR newVal)
 	{
 		validateLicense();
 
-		string strTmp = asString( newVal );
-
-		if (strTmp.empty())
-		{
-			throw UCLIDException("ELI10225", "Please provide a valid attribute name.");
-		}
-
-		// Validate the attribute name
-		if (!isValidIdentifier(strTmp))
-		{
-			UCLIDException uex("ELI28578", "Invalid attribute name.");
-			uex.addDebugInfo("Invalid Name", strTmp);
-			throw uex;
-		}
-
-		m_strAttributeName = strTmp;
+		m_ipAttributeNames = newVal;
 		m_bDirty = true;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10226")
@@ -217,7 +205,13 @@ STDMETHODIMP CFindFromRSD::Load(IStream *pStream)
 		unsigned long nDataVersion = 0;
 		dataReader >> nDataVersion;
 		
-		dataReader >> m_strAttributeName;
+		if (nDataVersion <= 2)
+		{
+			std::string strAttributeName;
+			dataReader >> strAttributeName;
+			_bstr_t _bstrAttributeName(strAttributeName.c_str());
+			m_ipAttributeNames->PushBack(_bstrAttributeName);
+		}
 		dataReader >> m_strRSDFileName;
 
 		if (nDataVersion >= 2)
@@ -225,6 +219,15 @@ STDMETHODIMP CFindFromRSD::Load(IStream *pStream)
 			// Load the GUID for the IIdentifiableObject interface.
 			loadGUID(pStream);
 		}
+
+		if (nDataVersion >= 3)
+		{
+			IPersistStreamPtr ipObj;
+			readObjectFromStream( ipObj, pStream, "ELI39950" );
+			ASSERT_RESOURCE_ALLOCATION("ELI39951", ipObj != __nullptr);
+			m_ipAttributeNames = ipObj;
+		}
+
 
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
@@ -247,7 +250,6 @@ STDMETHODIMP CFindFromRSD::Save(IStream *pStream, BOOL fClearDirty)
 		ByteStream data;
 		ByteStreamManipulator dataWriter( ByteStreamManipulator::kWrite, data );
 		dataWriter << gnCurrentVersion;
-		dataWriter << m_strAttributeName;
 		dataWriter << m_strRSDFileName;
 		
 		dataWriter.flushToByteStream();
@@ -259,6 +261,11 @@ STDMETHODIMP CFindFromRSD::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
+
+		// Write the attribute names
+		IPersistStreamPtr ipObj( m_ipAttributeNames );
+		ASSERT_RESOURCE_ALLOCATION("ELI39952", ipObj != __nullptr);
+		writeObjectToStream( ipObj, pStream, "ELI39953", fClearDirty );
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -337,15 +344,18 @@ STDMETHODIMP CFindFromRSD::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		IAFDocumentPtr ipDocCopy = ipAFDoc->PartialClone(VARIANT_FALSE, VARIANT_TRUE);
 		ASSERT_RESOURCE_ALLOCATION("ELI10923", ipDocCopy != __nullptr);
 
-		IVariantVectorPtr ipAttributeNames(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI10245", ipAttributeNames != __nullptr);
-
-		_bstr_t _bstrAttributeName(m_strAttributeName.c_str());
-		ipAttributeNames->PushBack(_bstrAttributeName);
-
+		IIUnknownVectorPtr ipAttributes;
 		// pass the value into the rule set for further extraction
-		IIUnknownVectorPtr ipAttributes 
-			= m_cachedRuleSet.m_obj->ExecuteRulesOnText(ipDocCopy, ipAttributeNames, "", NULL);
+		if (m_ipAttributeNames->Size == 0)
+		{
+			// If no attribute names specified, pass null=find-all
+			ipAttributes = m_cachedRuleSet.m_obj->ExecuteRulesOnText(ipDocCopy, __nullptr, "", NULL);
+		}
+		else
+		{
+			ipAttributes = m_cachedRuleSet.m_obj->ExecuteRulesOnText(ipDocCopy, m_ipAttributeNames, "", NULL);
+		}
+
 
 		// Clear the cache if necessary
 		if (!m_bCacheRSD)
@@ -398,12 +408,7 @@ STDMETHODIMP CFindFromRSD::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		validateLicense();
 		bool bConfigured = true;
 
-		// if the attribute is invalid
-		if(m_strAttributeName.length() == 0)
-		{
-			bConfigured = false;
-		}
-		else if(m_strRSDFileName.length() == 0)
+		if(m_strRSDFileName.length() == 0)
 		{
 			bConfigured = false;
 		}
@@ -461,7 +466,9 @@ STDMETHODIMP CFindFromRSD::raw_CopyFrom(IUnknown *pObject)
 		UCLID_AFVALUEFINDERSLib::IFindFromRSDPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI10235", ipSource != __nullptr);
 
-		m_strAttributeName = asString(ipSource->AttributeName);
+		ICopyableObjectPtr ipCopyObj = ipSource->GetAttributeNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI39954", ipCopyObj != __nullptr);
+		m_ipAttributeNames = ipCopyObj->Clone();
 		m_strRSDFileName = asString(ipSource->RSDFileName);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10236");

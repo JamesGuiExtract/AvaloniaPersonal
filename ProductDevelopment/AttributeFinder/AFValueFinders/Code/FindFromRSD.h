@@ -60,8 +60,8 @@ END_CATEGORY_MAP()
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IFindFromRSD
-	STDMETHOD(get_AttributeName)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_AttributeName)(/*[in]*/ BSTR newVal);
+	STDMETHOD(get_AttributeNames)(/*[out, retval]*/ IVariantVector* *pVal);
+	STDMETHOD(put_AttributeNames)(/*[in]*/ IVariantVector* newVal);
 	STDMETHOD(get_RSDFileName)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_RSDFileName)(/*[in]*/ BSTR newVal);
 
@@ -97,7 +97,7 @@ public:
 	/////////////////
 	// Variables
 	/////////////////
-	std::string m_strAttributeName;
+	IVariantVectorPtr m_ipAttributeNames;
 	std::string m_strRSDFileName;
 
 	// RuleSet object created from RSD file to further parse the attribute
