@@ -1,9 +1,9 @@
 <FlexData>
 	<MessageSequenceNumberFile>
-		<FullText>D:\LabDE\Solution\MessageSequenceNumber.txt</FullText>
+		<FullText>\\vboxsrv\C_DRIVE\LabDE_Duke\Solution\MessageSequenceNumber.txt</FullText>
 	</MessageSequenceNumberFile>
 	<Filename>
-		<FullText>D:\LabDE\input\DOC005.tif</FullText>
+		<FullText>E:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\Duke_Test\DOC005.tif</FullText>
 	</Filename>
 	<OperatorComments>
 		<FullText/>
@@ -13,9 +13,6 @@
 	</ClueOnFirstPage>
 	<LabInfo>
 		<FullText>N/A</FullText>
-		<DefaultLabDisplay>
-			<FullText>LABCORP BURLINGTON, 1447 York Court Burlington</FullText>
-		</DefaultLabDisplay>
 		<Address>
 			<FullText>N/A</FullText>
 			<Address1>
