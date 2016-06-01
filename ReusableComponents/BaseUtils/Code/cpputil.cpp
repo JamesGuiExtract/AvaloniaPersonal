@@ -578,7 +578,30 @@ void runEXE(const string& strExeFullFileName, const string& strParameters,
 			{
 				// EXE successfully completed before the timeout
 			case WAIT_OBJECT_0:
-				break;
+				{
+					// https://extract.atlassian.net/browse/ISSUE-13785
+					// Checking for any exit code that is non-zero may be the more correct thing to
+					// do here, but as this check of the exit code has not existed until now, I am
+					// nervous about introducing an issue for a process that might return a non-zero
+					// exit code for a reason other than a complete failure. For now, only throw an
+					// exception if the exit code indicates a crash.
+					DWORD dwExitCode = 0;
+					GetExitCodeProcess(pPIW->pi.hProcess, &dwExitCode);
+					if (dwExitCode > 0x80000000)
+					{
+						UCLIDException ue("ELI39990", "Process failed!");
+						ue.addDebugInfo( "Exit code", dwExitCode);
+						throw ue;
+					}
+					else if (dwExitCode != 0)
+					{
+						UCLIDException ue("ELI39991", "Application trace: Unexpected exit code");
+						ue.addDebugInfo( "Exit code", dwExitCode);
+						ue.log();
+					}
+
+					break;
+				}
 
 				// EXE timed out, throw exception
 			case WAIT_TIMEOUT:
@@ -599,7 +622,10 @@ void runEXE(const string& strExeFullFileName, const string& strParameters,
 
 			default:
 				{
-					UCLIDException ue("ELI15934", "Unexpected return code from runEXE()!");
+					// 6/1/2016 SNK
+					// I suspect it was assumed in this default handler that dwResult of the process
+					// exit code. It is not. Added check for the exit code above.
+					UCLIDException ue("ELI15934", "Unexpected error in runEXE()!");
 					ue.addDebugInfo( "Return code", (unsigned long)dwResult );
 					throw ue;
 				}
