@@ -572,6 +572,15 @@ library UCLID_AFUTILSLib
 			[in] VARIANT_BOOL bAllowMultipleSelection, [in] VARIANT_BOOL bAllowSpecialTags, 
 			[in] VARIANT_BOOL bAllowMultiplyClassified, [out, retval] IVariantVector** ppTypes);
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Sets the path to the current DocumentsClassifier. If not set, the default 
+		//			path is used.
+		// REQUIRE: NONE
+		[propget, id(5), helpstring("property DocumentClassifiersPath")] HRESULT DocumentClassifiersPath([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property DocumentClassifiersPath")] HRESULT DocumentClassifiersPath([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets the DocumentClassifiers path fragment - useful for UI validation.
+		// REQUIRE: NONE
+		[propget, id(6), helpstring("property DocumentClassifiersPath")] HRESULT DocumentClassifiersSubfolderName([out, retval] BSTR *pVal);
 	};
 
 	[

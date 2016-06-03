@@ -117,6 +117,9 @@ public:
 		/*[in]*/ VARIANT_BOOL bAllowSpecialTags,
 		/*[in]*/ VARIANT_BOOL bAllowMultiplyClassified,
 		/*[out, retval]*/ IVariantVector** ppTypes);
+	STDMETHOD(get_DocumentClassifiersPath)(/*[out, retval]*/ BSTR *pVal);
+	STDMETHOD(put_DocumentClassifiersPath)(/*[in]*/ BSTR newVal);
+	STDMETHOD(get_DocumentClassifiersSubfolderName)(/*[out, retval]*/ BSTR *pVal);
 
 // IIdentifiableObject
 	STDMETHOD(get_InstanceGUID)(GUID *pVal);
@@ -142,6 +145,8 @@ private:
 
 	// Each industry name associated with a vector of DocType names
 	map<string, vector<string> > m_mapNameToVecDocTypes;
+
+	std::string m_documentClassifierPath;
 
 	//////////
 	// Methods

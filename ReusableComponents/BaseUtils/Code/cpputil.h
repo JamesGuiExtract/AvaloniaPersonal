@@ -20,6 +20,7 @@
 #include "ProcessInformationWrapper.h"
 #include "RegistryPersistenceMgr.h"
 #include "RegConstants.h"
+#include "DefinedTypes.h"
 
 #include <atltime.h>
 #include <string>
@@ -737,7 +738,6 @@ bool Contains( const std::string& text,            // the text to search
                const std::string& contains,        // the value or values to search text for
                ContainsMatchType matchType = MatchSubstring );  // search for string (default) or single chars
 //-------------------------------------------------------------------------------------------------
-
 // convert input cpp format string into a normal format string.
 // Example: "hello \n hello"(actual display is "hello <new line character> hello") 
 //           --> "hello \\n hello" (actual display is "hello \n hello")
@@ -1011,6 +1011,12 @@ EXPORT_BaseUtils int formatMessageBox(const char* szText, ...);
 // PROMISE: Returns corresponding bool value if lowercase conversion of strBool is "true" or "false" 
 //          otherwise will throw an exception
 EXPORT_BaseUtils bool asCppBool( string strBool);
+
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To split an input string into a collection of component parts by applying a delimiter
+// PROMISE: Returns a vector of strings; each string is a delimited component.
+EXPORT_BaseUtils VectorOfString Split( const std::string& source, const char delimiter );
+
 
 //-------------------------------------------------------------------------------------------------
 inline bool asCppBool(VARIANT_BOOL bValue)

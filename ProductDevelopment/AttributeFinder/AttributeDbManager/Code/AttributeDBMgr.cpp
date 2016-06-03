@@ -587,35 +587,6 @@ namespace
 		return sanitized;
 	}
 
-
-	// Split a string into a vector of string, using delimiter char.
-	// For an empty string, or a string that doesn't have the delimiter
-	// character in it, this routine will return a vector with only the 
-	// original source string in it.
-	// Note that this routine makes use of well-known std::string behavior:
-	// string::substr( start, len ) - if len > string::size(), the entire
-	// string from startPos to end is returned.
-	VectorOfString Split( const std::string& source, const char delimiter )
-	{
-		VectorOfString results;
-		size_t pos = 0;
-		size_t startPos = 0;
-		while ( true )
-		{
-			pos = source.find( delimiter, startPos );
-			const auto length = pos - startPos;
-			results.push_back( source.substr( startPos, length ) );
-			if ( pos == std::string::npos)
-			{
-				break;
-			}
-
-			startPos = pos + 1;
-		}
-
-		return std::move( results );
-	}
-
 	// NOTE: strAttributeSetName must be escaped for XML (apostrophe's escaped).
 	longlong GetAttributeSetID(string strAttributeSetName, _ConnectionPtr ipConnection)
 	{

@@ -115,17 +115,23 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,38,196,10
 END
 
-IDD_DLG_ADDDOCTYPES DIALOG 0, 0, 232, 174
+IDD_DLG_ADDDOCTYPES DIALOGEX 0, 0, 233, 219
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select Document Types"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LTEXT           "Select one or more of the following types:",IDC_STATIC,5,25,140,10
-    LISTBOX         IDC_LIST_CHOOSE_TYPES,5,35,222,113,LBS_SORT | LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,118,155,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,177,155,50,14
-    LTEXT           "Document Category:",IDC_STATIC,5,7,70,10
-    COMBOBOX        IDC_CMB_CATEGORY,75,5,152,55,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_ROOT_FOLDER,5,18,186,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_CUSTOM_FILTERS_DOC_TAG,195,18,12,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BUTTON_SELECT_FOLDER,211,18,18,12
+    COMBOBOX        IDC_CMB_CATEGORY,75,50,153,55,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST_CHOOSE_TYPES,5,80,223,113,LBS_SORT | LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,124,200,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,178,200,50,14
+    LTEXT           "Select one or more of the following types:",IDC_STATIC,5,70,140,10
+    LTEXT           "Document Category:",IDC_STATIC,5,52,70,10
+    LTEXT           "Root document classifiers folder:",IDC_STATIC,5,6,103,8
+    LTEXT           "FKB Version:",IDC_STATIC,5,35,42,8
+    EDITTEXT        IDC_EDIT_FKB_VERSION,54,35,60,10,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
 END
 
 
@@ -148,11 +154,20 @@ BEGIN
         LEFTMARGIN, 5
         RIGHTMARGIN, 227
         TOPMARGIN, 5
-        BOTTOMMARGIN, 169
+        BOTTOMMARGIN, 214
     END
 END
 #endif    // APSTUDIO_INVOKED
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SELECT_DOC_TAG_ARROW_ICON ICON                    "C:\\engineering\\ProductDevelopment\\AttributeFinder\\AFFileProcessors\\Code\\res\\SelectDocTagArrow.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

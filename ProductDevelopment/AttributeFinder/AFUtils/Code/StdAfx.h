@@ -13,8 +13,9 @@
 #include <afxdisp.h>
 #include <afxdlgs.h>
 #include <afxcmn.h>
-
+#include <afxext.h>
 #include <atlbase.h>
+
 //You may derive a class from CComModule and use it if you want to override
 //something, but do not change the name of _Module
 extern CComModule _Module;
@@ -40,11 +41,18 @@ using namespace UCLID_INPUTFUNNELLib;
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.tlb" named_guids
 using namespace UCLID_IMAGEUTILSLib;
 
-#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.tlb" named_guids
-using namespace UCLID_SSOCRLib;
-
 #import "..\..\AFCore\Code\AFCore.tlb" named_guids
 using namespace UCLID_AFCORELib;
+
+#import "Common Files\System\ADO\msado27.tlb" \
+	rename ("EOF", "adoEOF")
+using namespace ADODB;
+
+#import "..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
+using namespace Extract_Interfaces;
+
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.tlb" named_guids
+using namespace UCLID_SSOCRLib;
 
 #import "AFUtils.tlb"
 

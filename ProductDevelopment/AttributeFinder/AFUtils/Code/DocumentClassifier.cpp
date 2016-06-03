@@ -692,6 +692,48 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 	}	
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11926");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDocumentClassifier::get_DocumentClassifiersPath(BSTR* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		*pVal = get_bstr_t(m_documentClassifierPath).Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40000");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDocumentClassifier::put_DocumentClassifiersPath(BSTR bstrDocumentClassifiersPath)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		std::string path = asString(bstrDocumentClassifiersPath);
+		if (Contains(path, DOC_CLASSIFIERS_FOLDER))
+		{
+			m_documentClassifierPath = asString(bstrDocumentClassifiersPath);
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40001");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDocumentClassifier::get_DocumentClassifiersSubfolderName(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		*pVal = get_bstr_t(DOC_CLASSIFIERS_FOLDER).Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40003");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IIdentifiableObject
@@ -860,6 +902,11 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 //-------------------------------------------------------------------------------------------------
 std::string CDocumentClassifier::GetDocumentClassifierFolder()
 {
+	if (!m_documentClassifierPath.empty())
+	{
+		return m_documentClassifierPath + "\\";
+	}
+
 	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);

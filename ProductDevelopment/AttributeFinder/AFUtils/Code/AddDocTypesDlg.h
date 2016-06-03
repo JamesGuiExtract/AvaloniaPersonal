@@ -5,6 +5,8 @@
 
 #include "resource.h"       // main symbols
 
+#include <ImageButtonWithStyle.h>
+
 #include <vector>
 #include <string>
 
@@ -32,6 +34,9 @@ public:
 	enum { IDD = IDD_DLG_ADDDOCTYPES };
 	CListBox	m_listTypes;
 	CComboBox	m_cmbIndustry;
+	CEdit		m_editRootFolder;
+	CEdit		m_fkbVersion;
+	CImageButtonWithStyle m_btnCustomFiltersDocTag;
 	//}}AFX_DATA
 
 
@@ -50,6 +55,9 @@ protected:
 	virtual void OnOK();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSelchangeComboCategory();
+	afx_msg void OnButtonBrowseFile();
+	void OnClickedCustomFiltersDocTag();
+	void OnEditRootFolderLooseFocus();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -60,6 +68,20 @@ private:
 	void populateComboBox();
 
 	void populateListBox();
+
+	void SetDocTagButton();
+
+	void SetupFkbVersionTextBox();
+
+	void SetupRootFolder();
+
+	void SetRootFolderValue(const std::string& value);
+
+	std::string GetRootFolderValue();
+
+	void SetFkbVersion();
+
+	void UpdateCategoriesAndTypes();
 
 	///////////////
 	// Variables
@@ -86,6 +108,8 @@ private:
 
 	// Industry combo box will be disabled
 	bool		m_bLockIndustry;
+
+	std::string m_initialFkbPath;
 };
 
 //{{AFX_INSERT_LOCATION}}

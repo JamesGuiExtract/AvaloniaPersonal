@@ -541,7 +541,6 @@ bool Contains( const std::string& text,            // the text to search
 
     return std::string::npos != text.find( contains );
 }
-
 //--------------------------------------------------------------------------------------------------
 void makeFirstCharToUpper(string& strInput)
 {
@@ -1548,4 +1547,25 @@ bool endsWith(const string& strValue, const string& strEnding)
 	{
 		return false;
 	}
+}
+
+VectorOfString Split( const std::string& source, const char delimiter )
+{
+	VectorOfString results;
+	size_t pos = 0;
+	size_t startPos = 0;
+	while ( true )
+	{
+		pos = source.find( delimiter, startPos );
+		const auto length = pos - startPos;
+		results.push_back( source.substr( startPos, length ) );
+		if ( pos == std::string::npos)
+		{
+			break;
+		}
+
+		startPos = pos + 1;
+	}
+
+	return std::move( results );
 }

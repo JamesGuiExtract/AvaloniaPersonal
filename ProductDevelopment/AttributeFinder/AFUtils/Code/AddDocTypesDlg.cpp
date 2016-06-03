@@ -11,7 +11,9 @@
 #include <ExtractMFCUtils.h>
 #include <cpputil.h>
 #include <comutils.h>
+#include <DocTagUtils.h>
 #include "SpecialStringDefinitions.h"
+#include <XBrowseForFolder.h>
 
 using std::string;
 using std::vector;
@@ -21,6 +23,49 @@ using std::vector;
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace		
+{
+	// Given a path such as:
+	// C:\engineering\Binaries\FlexIndexComponents\ComponentData\15.3.0.48\DocumentClassifiers\County Document
+	// find the version - in this case : 15.3.0.48
+	//
+	std::string FindFkbVersionInPath(const std::string& path)
+	{
+		VectorOfString subfolders = Split(path, '\\');
+		if (subfolders.empty())
+		{
+			return "Not found";
+		}
+
+		for (size_t i = 0; i < subfolders.size(); ++i)
+		{
+			VectorOfString parts = Split(subfolders[i], '.');
+			if (4 == parts.size())
+			{
+				return subfolders[i];
+			}
+		}
+
+		return "Not found";
+	}
+
+	std::string ExpandFileName(const std::string& folder)
+	{
+		ITagUtilityPtr ipTagUtility(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI39992", ipTagUtility != __nullptr);
+
+		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI39996", ipAFDoc);
+
+		std::string expandedPath = asString(ipTagUtility->ExpandTagsAndFunctions(folder.c_str(),
+																				 "dummy.voa",
+																				 ipAFDoc));
+		return expandedPath;
+	}
+
+	const std::string notFoundText = "No document types found.";
+}
 
 //-------------------------------------------------------------------------------------------------
 // AddDocTypesDlg dialog
@@ -49,7 +94,10 @@ void AddDocTypesDlg::DoDataExchange(CDataExchange* pDX)
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(AddDocTypesDlg, CDialog)
 	//{{AFX_MSG_MAP(AddDocTypesDlg)
+	ON_BN_CLICKED(IDC_BTN_CUSTOM_FILTERS_DOC_TAG, OnClickedCustomFiltersDocTag)
 	ON_CBN_SELCHANGE(IDC_CMB_CATEGORY, OnSelchangeComboCategory)
+	ON_BN_CLICKED(IDC_BUTTON_SELECT_FOLDER, OnButtonBrowseFile)
+	ON_EN_KILLFOCUS(IDC_EDIT_ROOT_FOLDER, OnEditRootFolderLooseFocus)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -78,13 +126,23 @@ void AddDocTypesDlg::lockIndustrySelection()
 BOOL AddDocTypesDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
+
+	// Create the Document Classification Utils object
+	ASSERT_RUNTIME_CONDITION("ELI40002", m_ipDocUtils == nullptr, "m_ipDocUtils is set, should be NULL");
+	m_ipDocUtils.CreateInstance( CLSID_DocumentClassifier );
+	ASSERT_RESOURCE_ALLOCATION("ELI11935", m_ipDocUtils != __nullptr);
 	
 	// Clear collection of selected types
 	m_vecTypes.clear();
 
 	// Populate Combo box and list box
-	populateComboBox();
 	populateListBox();
+	SetDocTagButton();
+
+	SetupRootFolder();
+	SetupFkbVersionTextBox();
+
+	SetRootFolderValue("<ComponentDataDir>\\DocumentClassifiers");
 
 	// Set selection restriction on list box
 	if (!m_bAllowMultipleSelection)
@@ -112,9 +170,15 @@ void AddDocTypesDlg::OnOK()
 		{
 			continue;
 		}
+
 		CString cstr;
 		m_listTypes.GetText(i, cstr);
 		string str = cstr;
+		if (str == notFoundText)
+		{
+			continue;
+		}
+
 		m_vecTypes.push_back(str);
 	}
 	
@@ -138,13 +202,6 @@ void AddDocTypesDlg::OnSelchangeComboCategory()
 //-------------------------------------------------------------------------------------------------
 void AddDocTypesDlg::populateComboBox()
 {
-	// Create the Document Classification Utils object
-	if (m_ipDocUtils == __nullptr)
-	{
-		m_ipDocUtils.CreateInstance( CLSID_DocumentClassifier );
-		ASSERT_RESOURCE_ALLOCATION("ELI11935", m_ipDocUtils != __nullptr);
-	}
-
 	// Clear combo box before populating
 	m_cmbIndustry.ResetContent();
 
@@ -215,7 +272,7 @@ void AddDocTypesDlg::populateListBox()
 	{
 		// This will happen when there are no document types associated with the category, 
 		// possibly because the category is dynamic.
-		m_listTypes.InsertString(0, "No associated document types found for the specified category.");
+		m_listTypes.InsertString(0, notFoundText.c_str());
 		return;
 	}
 
@@ -246,3 +303,123 @@ void AddDocTypesDlg::populateListBox()
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void AddDocTypesDlg::SetDocTagButton()
+{
+	m_btnCustomFiltersDocTag.SubclassDlgItem(IDC_BTN_CUSTOM_FILTERS_DOC_TAG, 
+											 CWnd::FromHandle(m_hWnd));
+
+	m_btnCustomFiltersDocTag.SetIcon(::LoadIcon(_Module.m_hInstResource, 
+									 MAKEINTRESOURCE(IDI_SELECT_DOC_TAG_ARROW_ICON)));
+}
+//-------------------------------------------------------------------------------------------------
+void AddDocTypesDlg::SetupFkbVersionTextBox()
+{
+	m_fkbVersion.SubclassDlgItem(IDC_EDIT_FKB_VERSION, CWnd::FromHandle(m_hWnd));
+}
+
+void AddDocTypesDlg::SetupRootFolder()
+{
+	m_editRootFolder.SubclassDlgItem(IDC_EDIT_ROOT_FOLDER, CWnd::FromHandle(m_hWnd));
+}
+//-------------------------------------------------------------------------------------------------
+void AddDocTypesDlg::SetRootFolderValue(const std::string& value)
+{
+	m_editRootFolder.SetWindowText(value.c_str());
+	SetFkbVersion();
+	UpdateCategoriesAndTypes();
+}
+//-------------------------------------------------------------------------------------------------
+void AddDocTypesDlg::OnClickedCustomFiltersDocTag()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ChooseDocTagForEditBox(
+			ITagUtilityPtr(CLSID_AFUtility), m_btnCustomFiltersDocTag, m_editRootFolder);
+
+		SetFkbVersion();
+		UpdateCategoriesAndTypes();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI40005");
+}
+//-------------------------------------------------------------------------------------------------
+void AddDocTypesDlg::OnButtonBrowseFile()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		if (m_initialFkbPath.empty())
+		{
+			std::string folder = GetRootFolderValue();
+			m_initialFkbPath = ExpandFileName(folder);
+		}
+
+		// Display the folder browser
+		char pszPath[MAX_PATH + 1] = {0};
+		if(XBrowseForFolder(m_hWnd, m_initialFkbPath.c_str(), pszPath, sizeof(pszPath)))
+		{
+			// Ensure there is a path
+			if (pszPath != "")
+			{
+				// Set the path in the UI
+				m_editRootFolder.SetWindowText(pszPath);
+				m_initialFkbPath = pszPath;
+				SetFkbVersion();
+				UpdateCategoriesAndTypes();
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39981");
+}
+//-------------------------------------------------------------------------------------------------
+void AddDocTypesDlg::OnEditRootFolderLooseFocus()
+{
+	try
+	{
+		SetFkbVersion();
+		UpdateCategoriesAndTypes();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI39993");
+}
+//-------------------------------------------------------------------------------------------------
+std::string AddDocTypesDlg::GetRootFolderValue()
+{
+	std::vector<char> buf(1024, 0);
+	m_editRootFolder.GetWindowText(buf.data(), buf.size());
+
+	std::string folder(buf.data());
+	return folder;
+}
+//-------------------------------------------------------------------------------------------------
+void AddDocTypesDlg::SetFkbVersion()
+{
+	std::string folder = GetRootFolderValue();
+	folder = ExpandFileName(folder);
+	std::string folderVersion = FindFkbVersionInPath(folder);
+	m_fkbVersion.SetWindowText(folderVersion.c_str());
+}
+//-------------------------------------------------------------------------------------------------
+void AddDocTypesDlg::UpdateCategoriesAndTypes()
+{
+	std::string folder = GetRootFolderValue();
+	folder = ExpandFileName(folder);
+	std::string classifierSubfolderName = asString(m_ipDocUtils->DocumentClassifiersSubfolderName);
+
+	// Reset the category to prevent a spurious exception from being thrown in populatecomboBox() - 
+	// either this time or next time.
+	m_strCategory = "";
+	if (Contains(folder, classifierSubfolderName))
+	{
+		m_ipDocUtils->DocumentClassifiersPath = _bstr_t(folder.c_str());
+		populateComboBox();
+		populateListBox();
+	}
+	else
+	{
+		m_cmbIndustry.ResetContent();
+		m_listTypes.ResetContent();
+		m_listTypes.InsertString(0, notFoundText.c_str());
+	}
+}
