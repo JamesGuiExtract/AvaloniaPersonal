@@ -42,7 +42,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 Control parent = container as Control;
 
                 // Use DisplayRectangle so that parent.Padding is honored.
-                Rectangle parentDisplayRectangle = parent.ClientRectangle;
+                Rectangle parentDisplayRectangle = parent.DisplayRectangle;
+                // But use ClientRectangle width so that the vertical scrollbar is accounted for
+                // (when visible).
+                parentDisplayRectangle.Width = parent.ClientRectangle.Width;
                 Point nextControlLocation = parentDisplayRectangle.Location;
 
                 List<PaginationControl> redundantControls = new List<PaginationControl>();
