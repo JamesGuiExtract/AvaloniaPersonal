@@ -1441,12 +1441,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     else
                     {
                         // CreateOutputDocument will add the document to _pendingDocuments.
-                        var outputDocument = ((IPaginationUtility)this).CreateOutputDocument(sourceDocument.FileName);
+                        var outputDocument = (ExtendedOutputDocument)
+                            ((IPaginationUtility)this).CreateOutputDocument(sourceDocument.FileName);
                         outputDocument.SetOriginalForm();
+                        outputDocument.PaginationSuggested = true;
 
                         var args = new DocumentDataRequestEventArgs(sourceDocument.FileName);
                         OnDocumentDataRequest(args);
-                        ((ExtendedOutputDocument)outputDocument).DocumentData = args.DocumentData;
+                        outputDocument.DocumentData = args.DocumentData;
 
                         _primaryPageLayoutControl.LoadOutputDocument(outputDocument, sourceDocument.Pages);
                     }

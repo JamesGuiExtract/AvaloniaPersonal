@@ -26,12 +26,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
 
-        /// <summary>
-        /// A <see cref="PageStylist"/> that overlays the word "COPY" on any
-        /// <see cref="PageThumbnailControl"/> instances that reference the same page as another.
-        /// </summary>
-        static readonly OverlayTextStylist _COPY_INDICATOR_STYLIST = new CopiedPageStylist();
-
         #endregion Constants
 
         #region Fields
@@ -87,7 +81,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 InitializeComponent();
 
-                AddStylist(_COPY_INDICATOR_STYLIST);
+                AddStylist(new CopiedPageStylist(this), replaceExistingTypeInstances: true);
             }
             catch (Exception ex)
             {
@@ -318,7 +312,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Check if any of the stylists drawing at this position have their own tooltip text
                 // to use.
                 string newToolTipText = _pageStylists
-                    .Select(stylist => stylist.GetToolTipText(this, _rasterPictureBox, mouseLocation))
+                    .Select(stylist => stylist.GetToolTipText(_rasterPictureBox, mouseLocation))
                     .FirstOrDefault(text => !string.IsNullOrWhiteSpace(text));
                     newToolTipText = newToolTipText ?? Page.OriginalDocumentName;
 
@@ -435,9 +429,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// this instance.
         /// </summary>
         /// <param name="stylist">The <see cref="PageStylist"/> to be used by this instance.</param>
-        public void AddStylist(PageStylist stylist)
+        /// <param name="replaceExistingTypeInstances"></param>
+        public void AddStylist(PageStylist stylist, bool replaceExistingTypeInstances)
         {
-            _pageStylists.Add(stylist);
+            try
+            {
+                if (replaceExistingTypeInstances)
+                {
+                    _pageStylists.RemoveWhere(s => s.GetType() == stylist.GetType());
+                }
+
+                _pageStylists.Add(stylist);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40004");
+            }
         }
 
         #endregion Methods
@@ -607,7 +614,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 foreach (var stylist in _pageStylists)
                 {
-                    stylist.PaintBackground(this, e);
+                    stylist.PaintBackground(e);
                 }
             }
             catch (Exception ex)
@@ -628,7 +635,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 foreach (var stylist in _pageStylists)
                 {
-                    stylist.PaintForeground(this, _rasterPictureBox, e);
+                    stylist.PaintForeground(_rasterPictureBox, e);
                 }
             }
             catch (Exception ex)

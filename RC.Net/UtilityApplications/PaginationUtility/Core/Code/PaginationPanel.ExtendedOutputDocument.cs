@@ -14,32 +14,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         class ExtendedOutputDocument : OutputDocument
         {
             /// <summary>
-            /// A <see cref="PageStylist"/> that uses a red asterisk to indicated pages that have been
-            /// "modified" (that are part of a pending <see cref="OutputDocument"/> that does not match
-            /// the document as it currently exists on disk).
-            /// </summary>
-            static ModifiedPageStylist _MODIFIED_STYLIST = new ModifiedPageStylist();
-
-            /// <summary>
-            /// A <see cref="PageStylist"/> that uses a red asterisk to indicated pages that have been
-            /// "modified" (that are part of a pending <see cref="OutputDocument"/> that does not match
-            /// the document as it currently exists on disk).
-            /// </summary>
-            static NewOutputPageStylist _NEW_OUTPUT_STYLIST = new NewOutputPageStylist();
-
-            /// <summary>
-            /// A <see cref="PageStylist"/> that indicates document data has been modified via a
-            /// pencil glyph.
-            /// </summary>
-            static EditedDocumentPageStylist _EDITED_STYLIST = new EditedDocumentPageStylist();
-
-            /// <summary>
-            /// A <see cref="PageStylist"/> that indicates a document page that is part of the only
-            /// <see cref="OutputDocument"/> for which pages are currently selected.
-            /// </summary>
-            static SelectedDocumentStylist _SELECTED_DOC_STYLIST = new SelectedDocumentStylist();
-
-            /// <summary>
             /// Indicates whether singly selected documents (one and only one document that contains
             /// all of the currently selected pages) should be indicated with a blue background.
             /// </summary>
@@ -134,12 +108,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     base.AddPage(pageControl);
 
-                    pageControl.AddStylist(_MODIFIED_STYLIST);
-                    pageControl.AddStylist(_NEW_OUTPUT_STYLIST);
-                    pageControl.AddStylist(_EDITED_STYLIST);
+                    pageControl.AddStylist(new ModifiedPageStylist(pageControl),
+                        replaceExistingTypeInstances: true);
+                    pageControl.AddStylist(new NewOutputPageStylist(pageControl),
+                        replaceExistingTypeInstances: true);
+                    pageControl.AddStylist(new EditedDocumentPageStylist(pageControl),
+                        replaceExistingTypeInstances: true);
                     if (_highlightSinglySelectedDocument)
                     {
-                        pageControl.AddStylist(_SELECTED_DOC_STYLIST);
+                        pageControl.AddStylist(new SelectedDocumentStylist(pageControl),
+                            replaceExistingTypeInstances: true);
                     }
                 }
                 catch (Exception ex)
@@ -161,12 +139,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     base.InsertPage(pageControl, pageNumber);
 
-                    pageControl.AddStylist(_MODIFIED_STYLIST);
-                    pageControl.AddStylist(_NEW_OUTPUT_STYLIST);
-                    pageControl.AddStylist(_EDITED_STYLIST);
+                    pageControl.AddStylist(new ModifiedPageStylist(pageControl),
+                        replaceExistingTypeInstances: true);
+                    pageControl.AddStylist(new NewOutputPageStylist(pageControl),
+                        replaceExistingTypeInstances: true);
+                    pageControl.AddStylist(new EditedDocumentPageStylist(pageControl),
+                        replaceExistingTypeInstances: true);
                     if (_highlightSinglySelectedDocument)
                     {
-                        pageControl.AddStylist(_SELECTED_DOC_STYLIST);
+                        pageControl.AddStylist(new SelectedDocumentStylist(pageControl),
+                            replaceExistingTypeInstances: true);
                     }
                 }
                 catch (Exception ex)

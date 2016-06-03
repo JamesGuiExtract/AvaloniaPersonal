@@ -3165,6 +3165,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // normally.
                     if (sourceFileName == _fileName)
                     {
+                        // If suggested pagination was disregarded, the source document should be
+                        // treated as essentially new output that needs to be reprocessed by rules
+                        // since what the rules originally found doesn't apply to the source
+                        // document as a whole.
+                        if (e.DisregardedPaginationSources.Contains(sourceFileName))
+                        {
+                            EActionStatus oldStatus;
+                            FileProcessingDB.SetStatusForFile(_fileId,
+                                _settings.PaginationSettings.PaginationOutputAction,
+                                EActionStatus.kActionPending, false, false, out oldStatus);
+                        }
+
                         completeActiveFile = true;
                     }
                     // If sourceFileName is not the current file in verification, it needs to be
@@ -3194,26 +3206,35 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (completeActiveFile)
                 {
-                    // In order for files to be completed (and any prompting or other UI tasks
-                    // accomplished by the DEP), the data tab must be given back focus.
-                    _tabControl.SelectedTab = _dataTab;
+                    // If file completion is not invoked in a subsequent message handle, the current
+                    // file is not always completed as intended.
+                    this.SafeBeginInvoke("ELI39995", () =>
+                    {
+                        // In order for files to be completed (and any prompting or other UI tasks
+                        // accomplished by the DEP), the data tab must be given back focus.
+                        _tabControl.SelectedTab = _dataTab;
 
-                    _imageViewer.CloseImage();
+                        // Record statistics to database that need to happen when a file is closed.
+                        RecordCounts(onLoad: false, attributes: null);
+                        EndFileTaskSession();
 
-                    // Record statistics to database that need to happen when a file is closed.
-                    RecordCounts(onLoad: false, attributes: null);
-                    EndFileTaskSession();
+                        OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
 
-                    OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+                        _paginating = false;
+                    }, 
+                    true,
+                    // Ensure _paginating is reset in the case of an error completing the file.
+                    (ex) => _paginating = false);
                 }
             }
             catch (Exception ex)
             {
+                _paginating = false;
+
                 throw ex.AsExtract("ELI39547");
             }
             finally
             {
-                _paginating = false;
                 _paginationOutputToReload.Clear();
                 FileRequestHandler.ResumeProcessingQueue();
             }

@@ -59,8 +59,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         using (var separator = new PaginationSeparator())
                         {
-                            _uniformSize = new Size(separator.Width,
-                                PageThumbnailControl.UniformSize.Height);
+                            _uniformSize = new Size(-1, separator.Height);
                         }
                     }
 

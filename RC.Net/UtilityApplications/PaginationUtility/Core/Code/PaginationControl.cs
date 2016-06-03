@@ -95,7 +95,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 int left = (NextControl == null || NextControl.Left < Right)
-                    ? Right
+                    ? Right - Padding.Right
                     : NextControl.Left + (NextControl.Padding.Left / 2);
 
                 return new Point(left, Top);

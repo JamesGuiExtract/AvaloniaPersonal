@@ -17,6 +17,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         internal class EditedDocumentPageStylist : PageStylist
         {
             /// <summary>
+            /// Initializes a new instance of the <see cref="EditedDocumentPageStylist"/> class.
+            /// </summary>
+            /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which this stylist
+            /// is responsible.</param>
+            public EditedDocumentPageStylist(PageThumbnailControl pageControl)
+                : base(pageControl)
+            {
+            }
+
+            /// <summary>
             /// Gets the tooltip text to display for this stylist.
             /// </summary>
             protected override string ToolTipText
@@ -28,18 +38,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             /// <summary>
-            /// Gets whether the stylist is visible on the specified <see paramref="pageControl"/>.
+            /// Gets whether the stylist is visible.
             /// </summary>
-            /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which visibility
-            /// should be checked.</param>
-            /// <returns><see langword="true"/> if visible for the <see paramref="pageControl"/>.
-            /// </returns>
-            protected override bool IsVisibleFor(PageThumbnailControl pageControl)
+            /// <returns><see langword="true"/> if visible.</returns>
+            protected override bool IsVisible
             {
-                var outputDocument = (ExtendedOutputDocument)pageControl.Document;
+                get
+                {
+                    var outputDocument = (ExtendedOutputDocument)PageControl.Document;
 
-                return outputDocument.DocumentData != null &&
-                    outputDocument.DocumentData.Modified;
+                    return outputDocument.DocumentData != null &&
+                        outputDocument.DocumentData.Modified;
+                }
             }
 
             /// <summary>
@@ -59,21 +69,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             /// <summary>
-            /// Allows foreground of the specified <see paramref="pageControl"/> to be painted.
+            /// Allows foreground of the PageControl to be painted.
             /// </summary>
-            /// <param name="pageControl">The <see cref="PageThumbnailControl"/> to paint.</param>
             /// <param name="paintingControl">The specific <see cref="Control"/> within
-            /// <see paramref="pageControl"/>being painted.</param>
+            /// PageControl being painted.</param>
             /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
-            /// <see paramref="pageControl"/>.</param>
-            public override void PaintForeground(PageThumbnailControl pageControl,
-                Control paintingControl, PaintEventArgs e)
+            /// PageControl.</param>
+            public override void PaintForeground(Control paintingControl, PaintEventArgs e)
             {
                 InterpolationMode savedMode = e.Graphics.InterpolationMode;
 
                 try
                 {
-                    if (IsVisibleFor(pageControl))
+                    if (IsVisible)
                     {
                         e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                         // Positioned to allow for NewOutputPageStylist and ModifiedPageStylist to

@@ -336,6 +336,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _inUpdateOperation;
 
         /// <summary>
+        /// Indicates whether that the _flowLayoutPanel is resizing.
+        /// </summary>
+        bool _flowLayoutPanelResizing;
+
+        /// <summary>
         /// The <see cref="ToolTip"/> used to display the full source document path for
         /// <see cref="PageThumbnailControl"/>s.
         /// </summary>
@@ -415,6 +420,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _paginationUtility = paginationUtility;
                 _flowLayoutPanel.Click += HandleFlowLayoutPanel_Click;
+                _flowLayoutPanel.ClientSizeChanged += HandleFlowLayoutPanel_ClientSizeChanged;
                 ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).RedundantControlsFound +=
                     PaginationLayoutEngine_RedundantControlsFound;
                 _loadNextDocumentButtonControl.ButtonClick +=
@@ -1755,9 +1761,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _dropLocationIndex = _flowLayoutPanel.Controls.IndexOf(control);
                     Point location;
 
+                    // Because a lot of padding may be added to extend a page control out to the end
+                    // of a row, take the padding into account when deciding whether a drop should
+                    // occur before or after the page.
+                    int left = control.Left + control.Padding.Left;
+                    int right = control.Right - control.Padding.Right;
+                    int center = (right - left) / 2;
+
                     // Do not allow dropping after the load next document button.
                     if (control != _loadNextDocumentButtonControl &&
-                        (dragLocation.X - control.Left) > (control.Width / 2))
+                        (dragLocation.X - control.Left) > center)
                     {
                         _dropLocationIndex++;
                         location = control.TrailingInsertionPoint;
@@ -1883,6 +1896,38 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35453");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.ClientSizeChanged"/> event of the
+        /// <see cref="_flowLayoutPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleFlowLayoutPanel_ClientSizeChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // Invoke a Layout of the _flowLayoutPanel when the client size changes to prevent
+                // horizontal scroll bars from being displayed.
+                if (!_flowLayoutPanelResizing)
+                {
+                    _flowLayoutPanelResizing = true;
+
+                    this.SafeBeginInvoke("ELI39997", () =>
+                    {
+                        _flowLayoutPanel.PerformLayout();
+                        _flowLayoutPanelResizing = false;
+                    },
+                        true,
+                        (ex) => _flowLayoutPanelResizing = false);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39998");
             }
         }
 
@@ -2249,6 +2294,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <returns></returns>
         bool InsertPaginationControl(PaginationControl control, int index = -1)
         {
+            // Always place a pagination separator ahead of the load next document button to help
+            // distinguish it from the document above it.
+            if (index == -1 && control is LoadNextDocumentButtonControl)
+            {
+                var lastControl = _flowLayoutPanel.Controls.OfType<PaginationControl>().Last();
+                if (lastControl != null && !(lastControl is PaginationSeparator))
+                {
+                    AddPaginationControl(new PaginationSeparator());
+                }
+            }
+
             bool isPageControl = control is PageThumbnailControl;
 
             // A pagination separator is meaningless as the first control.

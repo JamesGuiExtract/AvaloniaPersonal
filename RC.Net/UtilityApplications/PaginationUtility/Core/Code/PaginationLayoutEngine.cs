@@ -42,7 +42,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 Control parent = container as Control;
 
                 // Use DisplayRectangle so that parent.Padding is honored.
-                Rectangle parentDisplayRectangle = parent.DisplayRectangle;
+                Rectangle parentDisplayRectangle = parent.ClientRectangle;
                 Point nextControlLocation = parentDisplayRectangle.Location;
 
                 List<PaginationControl> redundantControls = new List<PaginationControl>();
@@ -61,95 +61,72 @@ namespace Extract.UtilityApplications.PaginationUtility
                         "The PaginationLayoutEngine does not respect margins.",
                         control.Margin == Padding.Empty);
 
-                    bool useExtraPadding = false;
                     var separator = control as PaginationSeparator;
 
-                    PaginationControl previousSeparator =
-                        control.PreviousControl as PaginationSeparator;
+                    PaginationControl previousControl = control.PreviousControl as PaginationControl;
+                    PaginationControl previousSeparator = previousControl as PaginationSeparator;
                     if (separator == null)
                     {
-                        // If not a separator, if necessary, this control should allow extra space
-                        // in front of it so that a separator can be added without changing the
-                        // position of this control.
-                        if (previousSeparator == null || firstControl)
-                        {
-                            useExtraPadding = true;
-                        }
-
                         firstControl = false;
                     }
                     else if (firstControl || previousSeparator != null)
                     {
-                        // If this separator is preceeded by another separator or is the first
+                        // If this separator is preceded by another separator or is the first
                         // control, it is redundant and should be ignored.
                         redundantControls.Add(separator);
                         separator.Visible = false;
                         firstControl = false;
                         continue;
                     }
-
-                    // Calculate the X position the next control would be at.
-                    int nextXPosition = nextControlLocation.X;
+                    
                     if (separator != null)
                     {
-                        // For visual consistency, make sure the last control in a row is never a
-                        // separator. If this control is a separator and a following page control
-                        // would wrap, wrap this separator instead.
-                        nextXPosition += PaginationSeparator.UniformSize.Width +
-                            PageThumbnailControl.UniformSize.Width;
+                        // Resize the last page control before each separator so that it extends all
+                        // the way to the right edge of the panel. This allows for the drops to
+                        // occur anywhere to the right of that page.
+                        if (previousControl != null)
+                        {
+                            var newPadding = parentDisplayRectangle.Right - previousControl.Right;
+                            previousControl.Width = parentDisplayRectangle.Right - previousControl.Left;
+                            var padding = previousControl.Padding;
+                            padding.Right = newPadding;
+                            previousControl.Padding = padding;
+                        }
+
+                        nextControlLocation.X = parentDisplayRectangle.Left;
+                        nextControlLocation.Y += PageThumbnailControl.UniformSize.Height;
                     }
                     else
                     {
-                        nextXPosition += PageThumbnailControl.UniformSize.Width;
-                        if (useExtraPadding)
+                        // Calculate the X position the next control would be at.
+                        int nextXPosition = 
+                            nextControlLocation.X + PageThumbnailControl.UniformSize.Width;
+
+                        // If the next control would start beyond parentDisplayRectangle, wrap.
+                        if (nextXPosition > parentDisplayRectangle.Right)
                         {
-                            // Allow for padding that will be added below.
-                            nextXPosition += PaginationSeparator.UniformSize.Width;
+                            nextControlLocation.X = parentDisplayRectangle.Left;
+                            nextControlLocation.Y += (previousSeparator != null)
+                                ? previousSeparator.Height
+                                : PageThumbnailControl.UniformSize.Height;
                         }
-                    }
-
-                    // If the next control would start beyond parentDisplayRectangle, wrap.
-                    if (nextXPosition > parentDisplayRectangle.Right)
-                    {
-                        nextControlLocation.X = parentDisplayRectangle.Left;
-
-                        if (separator == null)
-                        {
-                            // Allow space for a separator to be added at the start of the row.
-                            useExtraPadding = true;
-                        }
-
-                        nextControlLocation.Y += PageThumbnailControl.UniformSize.Height;
                     }
 
                     // Size the control properly.
                     if (separator != null)
                     {
-                        control.Size = PaginationSeparator.UniformSize;
+                        control.Size = new Size(parentDisplayRectangle.Width, PaginationSeparator.UniformSize.Height);
                     }
                     else
                     {
-                        Padding normalPadding = ((NavigablePaginationControl)control).NormalPadding;
-
-                        if (useExtraPadding)
-                        {
-                            control.Padding = new Padding(
-                                normalPadding.Left + PaginationSeparator.UniformSize.Width,
-                                normalPadding.Top, normalPadding.Right, normalPadding.Bottom);
-                            control.Size = new Size(
-                                PageThumbnailControl.UniformSize.Width + PaginationSeparator.UniformSize.Width,
-                                PageThumbnailControl.UniformSize.Height);
-                        }
-                        else
-                        {
-                            control.Padding = normalPadding;
-                            control.Size = PageThumbnailControl.UniformSize;
-                        }
+                        control.Padding = ((NavigablePaginationControl)control).NormalPadding;
+                        control.Size = PageThumbnailControl.UniformSize;
                     }
 
                     control.Location = nextControlLocation;
 
                     nextControlLocation.X += control.Width;
+                    control.Invalidate();
                 }
 
                 OnRedundantControlsFound(redundantControls.ToArray());

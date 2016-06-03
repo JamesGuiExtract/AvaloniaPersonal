@@ -38,7 +38,7 @@
             this.BackColor = System.Drawing.SystemColors.Control;
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "PaginationSeparator";
-            this.Size = new System.Drawing.Size(13, 150);
+            this.Size = new System.Drawing.Size(500, 7);
             this.ResumeLayout(false);
 
         }

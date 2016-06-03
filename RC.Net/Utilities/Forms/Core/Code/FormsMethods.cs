@@ -493,8 +493,10 @@ namespace Extract.Utilities.Forms
         /// <param name="action">The <see cref="Action"/> to be invoked.</param>
         /// <param name="displayExceptions"><see langword="true"/> to display any exception caught;
         /// <see langword="false"/> to log instead.</param>
+        /// <param name="exceptionAction">A second action that should be executed in the case of an
+        /// exception an exception in <see paramref="action"/>.</param>
         public static void BeginInvoke(Control control, string eliCode, Action action,
-            bool displayExceptions = true)
+            bool displayExceptions = true, Action<Exception> exceptionAction = null)
         {
             try
             {
@@ -506,6 +508,18 @@ namespace Extract.Utilities.Forms
                         }
                         catch (Exception ex)
                         {
+                            if (exceptionAction != null)
+                            {
+                                try
+                                {
+                                    exceptionAction(ex);
+                                }
+                                catch (Exception errorAction)
+                                {
+                                    errorAction.ExtractLog("ELI39994");
+                                }
+                            }
+
                             if (displayExceptions)
                             {
                                 ex.ExtractDisplay(eliCode);
@@ -1197,10 +1211,12 @@ namespace Extract.Utilities.Forms
         /// <param name="action">The <see cref="Action"/> to be invoked.</param>
         /// <param name="displayExceptions"><see langword="true"/> to display any exception caught;
         /// <see langword="false"/> to log instead.</param>
+        /// <param name="exceptionAction">A second action that should be executed in the case of an
+        /// exception an exception in <see paramref="action"/>.</param>
         public static void SafeBeginInvoke(this Control control, string eliCode, Action action,
-            bool displayExceptions = true)
+            bool displayExceptions = true, Action<Exception> exceptionAction = null)
         {
-            FormsMethods.BeginInvoke(control, eliCode, action, displayExceptions);
+            FormsMethods.BeginInvoke(control, eliCode, action, displayExceptions, exceptionAction);
         }
 
         /// <summary>

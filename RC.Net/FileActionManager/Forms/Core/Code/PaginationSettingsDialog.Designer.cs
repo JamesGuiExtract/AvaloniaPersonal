@@ -74,28 +74,28 @@
             label2.AutoSize = true;
             label2.Location = new System.Drawing.Point(13, 56);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(258, 13);
+            label2.Size = new System.Drawing.Size(343, 13);
             label2.TabIndex = 4;
-            label2.Text = "Set unverified source documents to pending in action";
+            label2.Text = "After combining documents, set original source doc to pending in action";
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.Location = new System.Drawing.Point(13, 102);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(346, 13);
+            label3.Size = new System.Drawing.Size(301, 13);
             label3.TabIndex = 6;
-            label3.Text = "Set manually specified paginated output documents to pending in action";
+            label3.Text = "Set manually paginated output documents to pending in action";
             // 
             // label4
             // 
             label4.AutoSize = true;
             label4.Location = new System.Drawing.Point(13, 152);
             label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(484, 13);
+            label4.Size = new System.Drawing.Size(443, 13);
             label4.TabIndex = 8;
-            label4.Text = "Set priority of manually paginated outputs document to the greater of the source " +
-    "documents priority or:";
+            label4.Text = "Set priority of manually paginated document to the greater of the source document" +
+    "s priority or";
             // 
             // label5
             // 
@@ -118,7 +118,7 @@
             // 
             infoTip4.BackColor = System.Drawing.Color.Transparent;
             infoTip4.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("infoTip4.BackgroundImage")));
-            infoTip4.Location = new System.Drawing.Point(282, 56);
+            infoTip4.Location = new System.Drawing.Point(373, 56);
             infoTip4.Name = "infoTip4";
             infoTip4.Size = new System.Drawing.Size(16, 16);
             infoTip4.TabIndex = 14;
@@ -138,7 +138,7 @@
             // 
             infoTip2.BackColor = System.Drawing.Color.Transparent;
             infoTip2.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("infoTip2.BackgroundImage")));
-            infoTip2.Location = new System.Drawing.Point(373, 102);
+            infoTip2.Location = new System.Drawing.Point(340, 102);
             infoTip2.Name = "infoTip2";
             infoTip2.Size = new System.Drawing.Size(16, 16);
             infoTip2.TabIndex = 15;
