@@ -167,7 +167,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_SELECT_DOC_TAG_ARROW_ICON ICON                    "C:\\engineering\\ProductDevelopment\\AttributeFinder\\AFFileProcessors\\Code\\res\\SelectDocTagArrow.ico"
+IDI_SELECT_DOC_TAG_ARROW_ICON ICON                    "res\\SelectDocTagArrow.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
