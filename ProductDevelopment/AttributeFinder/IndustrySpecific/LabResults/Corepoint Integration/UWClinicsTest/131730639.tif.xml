@@ -1,9 +1,9 @@
 <FlexData>
 	<MessageSequenceNumberFile>
-		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\MessageSequenceNumber.txt</FullText>
+		<FullText>\\vboxsrv\C_DRIVE\LabDE_UWC\Solution\MessageSequenceNumber.txt</FullText>
 	</MessageSequenceNumberFile>
 	<Filename>
-		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\131730639.tif</FullText>
+		<FullText>E:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\131730639.tif</FullText>
 	</Filename>
 	<OperatorComments>
 		<FullText/>
@@ -46,9 +46,6 @@
 		<OrderCode>
 			<FullText>METB</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>METB</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/23/2014</FullText>
 		</CollectionDate>
@@ -448,9 +445,6 @@
 		<OrderCode>
 			<FullText>TEG</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>TEG</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/23/2014</FullText>
 		</CollectionDate>

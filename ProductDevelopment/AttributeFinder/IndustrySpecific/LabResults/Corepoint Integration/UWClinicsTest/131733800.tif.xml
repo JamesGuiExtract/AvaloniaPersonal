@@ -1,9 +1,9 @@
 <FlexData>
 	<MessageSequenceNumberFile>
-		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\MessageSequenceNumber.txt</FullText>
+		<FullText>\\vboxsrv\C_DRIVE\LabDE_UWC\Solution\MessageSequenceNumber.txt</FullText>
 	</MessageSequenceNumberFile>
 	<Filename>
-		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\131733800.tif</FullText>
+		<FullText>E:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\131733800.tif</FullText>
 	</Filename>
 	<OperatorComments>
 		<FullText/>
@@ -46,9 +46,6 @@
 		<OrderCode>
 			<FullText>TBIL</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>TBIL</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -100,6 +97,9 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<EpicCode>
+			<FullText>TBIL</FullText>
+		</EpicCode>
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
@@ -112,9 +112,6 @@
 		<OrderCode>
 			<FullText>DBIL</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>DBIL</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -166,6 +163,9 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<EpicCode>
+			<FullText>DBIL</FullText>
+		</EpicCode>
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
@@ -178,9 +178,6 @@
 		<OrderCode>
 			<FullText>ALKP</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>ALKP</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -232,6 +229,9 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<EpicCode>
+			<FullText>ALKP</FullText>
+		</EpicCode>
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
@@ -244,9 +244,6 @@
 		<OrderCode>
 			<FullText>AST</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>AST</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -298,6 +295,9 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<EpicCode>
+			<FullText>AST</FullText>
+		</EpicCode>
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
@@ -310,9 +310,6 @@
 		<OrderCode>
 			<FullText>ALT</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>ALT</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -364,6 +361,9 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<EpicCode>
+			<FullText>ALT</FullText>
+		</EpicCode>
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
@@ -376,9 +376,6 @@
 		<OrderCode>
 			<FullText>TP</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>TP</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -430,6 +427,9 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<EpicCode>
+			<FullText>TP</FullText>
+		</EpicCode>
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
@@ -442,9 +442,6 @@
 		<OrderCode>
 			<FullText>ALB</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>ALB</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -496,6 +493,9 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<EpicCode>
+			<FullText>ALB</FullText>
+		</EpicCode>
 	</Test>
 	<Test>
 		<FullText>N/A</FullText>
@@ -508,9 +508,6 @@
 		<OrderCode>
 			<FullText>CBC</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>CBC</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -934,7 +931,7 @@
 				<FullText>38.0-77.0</FullText>
 			</Range>
 			<Units>
-				<FullText/>
+				<FullText>%</FullText>
 			</Units>
 			<Flag>
 				<FullText/>
@@ -958,7 +955,7 @@
 				<FullText>12.0-50.0</FullText>
 			</Range>
 			<Units>
-				<FullText/>
+				<FullText>%</FullText>
 			</Units>
 			<Flag>
 				<FullText/>
@@ -982,7 +979,7 @@
 				<FullText>1.0-12.0</FullText>
 			</Range>
 			<Units>
-				<FullText/>
+				<FullText>%</FullText>
 			</Units>
 			<Flag>
 				<FullText/>
@@ -994,5 +991,8 @@
 				<FullText/>
 			</Comment>
 		</Component>
+		<EpicCode>
+			<FullText>CBC</FullText>
+		</EpicCode>
 	</Test>
 </FlexData>

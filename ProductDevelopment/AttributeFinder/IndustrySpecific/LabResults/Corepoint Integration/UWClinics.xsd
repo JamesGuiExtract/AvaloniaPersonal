@@ -113,13 +113,6 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element minOccurs="1" name="EpicCode">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="FullText" type="xs:string" />
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
 							<xs:element name="CollectionDate" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
@@ -230,6 +223,13 @@
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element minOccurs="0" name="EpicCode">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>

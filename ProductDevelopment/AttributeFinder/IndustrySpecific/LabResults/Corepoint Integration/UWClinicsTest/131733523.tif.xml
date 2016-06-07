@@ -1,9 +1,9 @@
 <FlexData>
 	<MessageSequenceNumberFile>
-		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\MessageSequenceNumber.txt</FullText>
+		<FullText>\\vboxsrv\C_DRIVE\LabDE_UWC\Solution\MessageSequenceNumber.txt</FullText>
 	</MessageSequenceNumberFile>
 	<Filename>
-		<FullText>C:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\131733523.tif</FullText>
+		<FullText>E:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\Corepoint Integration\UWClinicsTest\131733523.tif</FullText>
 	</Filename>
 	<OperatorComments>
 		<FullText/>
@@ -46,9 +46,6 @@
 		<OrderCode>
 			<FullText>BMET</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>BMET</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -208,9 +205,6 @@
 		<OrderCode>
 			<FullText>AST</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>AST</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -274,9 +268,6 @@
 		<OrderCode>
 			<FullText>ALKP</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>ALKP</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -340,9 +331,6 @@
 		<OrderCode>
 			<FullText>TBIL</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>TBIL</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
@@ -406,9 +394,6 @@
 		<OrderCode>
 			<FullText>LDH</FullText>
 		</OrderCode>
-		<EpicCode>
-			<FullText>LDH</FullText>
-		</EpicCode>
 		<CollectionDate>
 			<FullText>08/25/2014</FullText>
 		</CollectionDate>
