@@ -1342,6 +1342,41 @@ namespace Extract.Utilities.Forms
                 throw ex.AsExtract("ELI39378");
             }
         }
+
+        /// <summary>
+        /// Gets Parent <see cref="Control"/>s, recursively
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> to get ancestors of</param>
+        /// <returns>An enumeration of ancestor <see cref="Control"/>s</returns>
+        public static IEnumerable<Control> GetAncestors(this Control control)
+        {
+            var parent = control.Parent as Control;
+            if (parent != null)
+            {
+                foreach (Control ancestor in GetSelfAndAncestors(parent))
+                {
+                    yield return ancestor;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Helper method for <see cref="GetAncestors"/>
+        /// </summary>
+        /// <param name="control">The control to get ancestors of</param>
+        /// <returns>This control and all ancestors</returns>
+        private static IEnumerable<Control> GetSelfAndAncestors(Control control)
+        {
+            yield return control;
+            var parent = control.Parent as Control;
+            if (parent != null)
+            {
+                foreach (Control ancestor in GetSelfAndAncestors(parent))
+                {
+                    yield return ancestor;
+                }
+            }
+        }
     }
 
     /// <summary>
