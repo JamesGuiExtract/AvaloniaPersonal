@@ -14,7 +14,7 @@ using namespace std;
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
 // Type define the function for both Wow64RevertWow64FsRedirection and Wow64DisableWow64FsRedirection
-// This is done instead of using the functions specifiying the function directly because XP 32 bit 
+// This is done instead of using the functions specifying the function directly because XP 32 bit 
 // does not have the 2 functions and there for will not run unless the function address is 
 // mapped dynamically in code.
 typedef VOID (WINAPI *LPFN_WOW64_FS_REDIRECTION)(VOID *);
@@ -63,6 +63,28 @@ BOOL IsWow64()
 }
 
 //-------------------------------------------------------------------------------------------------
+// Checks if this windows 10
+// NOTE: This is not actually used. By including the call to VerifyVersionInfo in the code causes
+// the GetVersionEx call in GetOSKey to return the actual windows version.  If the call is not 
+// included GetVersionEx will return 6.2 for Windows Server 2012R2, Windows 8.1, Windows 10 and 
+// Windows 2016.  NOT TESTED
+//-------------------------------------------------------------------------------------------------
+bool IsWindows10()
+{
+	OSVERSIONINFOEX osviOver6;
+	osviOver6.dwMajorVersion = 10;
+	osviOver6.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	osviOver6.dwMinorVersion = 0;
+	ULONGLONG dwMask;
+	VER_SET_CONDITION(dwMask, VER_MAJORVERSION, VER_EQUAL);
+	VER_SET_CONDITION(dwMask, VER_MINORVERSION, VER_EQUAL);
+	if (VerifyVersionInfo(&osviOver6, VER_MAJORVERSION | VER_MINORVERSION, dwMask) == TRUE)
+	{
+		return true;
+	}
+}
+
+//-------------------------------------------------------------------------------------------------
 // GetOSKey - returns a string value that indicates the OS running
 //-------------------------------------------------------------------------------------------------
 string GetOSKey()
@@ -95,10 +117,23 @@ string GetOSKey()
 			{
 				strKeyString = "W7";
 			}
-			// Minor version of 2 is Windows 7
+			// Minor version of 2 is Windows 8
 			else if (osvi.dwMinorVersion == 2)
 			{
 				strKeyString = "W8";
+			}
+			// Minor version of 2 is Windows 8.1
+			else if (osvi.dwMinorVersion == 3)
+			{
+				strKeyString = "W81";
+			}
+		}
+		// Windows 10
+		else if (osvi.dwMajorVersion == 10)
+		{
+			if (osvi.dwMinorVersion == 0)
+			{
+				strKeyString = "W10";
 			}
 		}
 	}
@@ -128,9 +163,23 @@ string GetOSKey()
 		{
 			strKeyString = "W08R2";
 		}
+		// Minor version of 2 is Windows Server 2012
 		else if (osvi.dwMinorVersion == 2)
 		{
 			strKeyString = "WS12";
+		}
+		// Minor version of 3 is Windows Server 2012R2
+		else if (osvi.dwMinorVersion == 3)
+		{
+			strKeyString = "WS12R2";
+		}
+	}
+	// Major version of 10 is Windows Server 2016
+	else if (osvi.dwMajorVersion == 10)
+	{
+		if (osvi.dwMinorVersion == 0)
+		{
+			strKeyString = "WS16";
 		}
 	}
 	return strKeyString;
@@ -216,7 +265,7 @@ int RunCommand(const string &strCommand, const string &strDescription)
 	return iReturnValue;
 }
 //--------------------------------------------------------------------------------------------------
-// replaceVariable - Replaces each occurance of string t1 in string s with string t2
+// replaceVariable - Replaces each occurrence of string t1 in string s with string t2
 //					 This is exactly the same as the replaceVariable method in BaseUtils
 //--------------------------------------------------------------------------------------------------
 bool replaceVariable(string& s, const string& t1, const string& t2)
@@ -244,7 +293,7 @@ bool replaceVariable(string& s, const string& t1, const string& t2)
 }
 
 //-------------------------------------------------------------------------------------------------
-// WinMain - Main appliction function.
+// WinMain - Main application function.
 //-------------------------------------------------------------------------------------------------
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -340,7 +389,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 			MessageBox(NULL, zBuffer, "Install failed", 
 				MB_OK | MB_TOPMOST | MB_SYSTEMMODAL | MB_ICONEXCLAMATION);
 
-			// Return -1 since the the OS could not be determined.
+			// Return -1 since the OS could not be determined.
 			nReturn = -1;
 		}
 	}
