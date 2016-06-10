@@ -434,7 +434,12 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 					{
 						if(!fl->fileReadyForAccess(event.m_strFileNameNew))
 						{
-							fl->m_queEvents.push(event);
+							// Before putting the file back on the queue make sure it still exists
+							// https://extract.atlassian.net/browse/ISSUE-13789
+							if (isFileOrFolderValid(event.m_strFileNameNew))
+							{
+								fl->m_queEvents.push(event);
+							}
 							continue;	
 						}
 					}
