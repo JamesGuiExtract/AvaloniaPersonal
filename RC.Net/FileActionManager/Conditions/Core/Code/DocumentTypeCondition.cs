@@ -36,7 +36,7 @@ namespace Extract.FileActionManager.Conditions
         /// <summary>
         /// Current task version.
         /// </summary>
-        internal const int _CURRENT_VERSION = 1;
+        internal const int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -63,7 +63,12 @@ namespace Extract.FileActionManager.Conditions
         /// The default industry to use when displaying available document types in configuration.
         /// </summary>
         string _industry;
-
+        
+        /// <summary>
+        /// The path of the document classifier folder.
+        /// </summary>
+        string _documentClassifiersPath;
+        
         /// <summary>
         /// An <see cref="AFUtility"/> used to evaluate attribute queries.
         /// </summary>
@@ -230,6 +235,36 @@ namespace Extract.FileActionManager.Conditions
             }
         }
 
+        
+        /// <summary>
+        /// Gets or sets the document classifier path.
+        /// </summary>
+        /// <value>
+        /// The document classifer folder.
+        /// </value>
+        public string DocumentClassifiersPath
+        {
+            get
+            {
+                return _documentClassifiersPath;
+            }
+            set
+            {
+                try
+                {
+                    if (value != _documentClassifiersPath)
+                    {
+                        _documentClassifiersPath = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI40015", ex.Message);
+                }
+            }
+        }
+        
         #endregion Properties
 
         #region IFAMCondition Members
@@ -490,6 +525,12 @@ namespace Extract.FileActionManager.Conditions
                     VOAFileName = reader.ReadString();
                     DocumentTypes = reader.ReadStringArray();
                     Industry = reader.ReadString();
+
+                    
+                    if (reader.Version > 1)
+                    {
+                        DocumentClassifiersPath = reader.ReadString();
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -520,6 +561,7 @@ namespace Extract.FileActionManager.Conditions
                     writer.Write(VOAFileName);
                     writer.Write(DocumentTypes);
                     writer.Write(Industry);
+                    writer.Write(DocumentClassifiersPath);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -586,6 +628,7 @@ namespace Extract.FileActionManager.Conditions
             VOAFileName = source.VOAFileName;
             DocumentTypes = source.DocumentTypes;
             Industry = source.Industry;
+            DocumentClassifiersPath = source.DocumentClassifiersPath;
 
             _dirty = true;
         }

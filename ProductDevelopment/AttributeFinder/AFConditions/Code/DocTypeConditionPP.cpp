@@ -61,7 +61,6 @@ STDMETHODIMP CDocTypeConditionPP::Apply(void)
 			{
 				long nLength = m_listTypes.GetTextLen(ui);
 				unique_ptr<char[]> pBuf(new char[nLength+1]);
-				ASSERT_RESOURCE_ALLOCATION("ELI12925", pBuf.get() != __nullptr);
 				
 				m_listTypes.GetText(ui, pBuf.get());
 				_bstr_t bstrType(pBuf.get());
@@ -214,6 +213,12 @@ LRESULT CDocTypeConditionPP::OnClickedBtnAddTypes(WORD wNotifyCode,
 			}
 		}
 
+		UCLID_AFCONDITIONSLib::IDocTypeConditionPtr ipCondition = m_ppUnk[0];
+		if (ipCondition != __nullptr)
+		{
+			m_ipDocUtils->DocumentClassifiersPath = ipCondition->DocumentClassifiersPath;
+		}
+
 		// Display the dialog - with variable industry, multiple selection and special types
 		_bstr_t	bstrIndustry = get_bstr_t( m_strCategory.c_str() );
 		IVariantVectorPtr ipTypes = m_ipDocUtils->GetDocTypeSelection( 
@@ -221,6 +226,11 @@ LRESULT CDocTypeConditionPP::OnClickedBtnAddTypes(WORD wNotifyCode,
 
 		// Store the returned industry
 		m_strCategory = asString(bstrIndustry);
+
+		if (ipCondition != __nullptr)
+		{
+			ipCondition->DocumentClassifiersPath = m_ipDocUtils->DocumentClassifiersPath;
+		}
 
 		// Reset the content if new items have been selected
 		long lCount = ipTypes->Size;

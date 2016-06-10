@@ -15,6 +15,42 @@
 
 using namespace std;
 
+namespace 
+{
+	// In this context, a "valid" idx file is one that does not contain a folder path in it.
+	bool FolderContainsValidIdxFile(const std::string& subFolder)
+	{
+		std::string completeName = subFolder + "\\" + "DocTypes.idx";
+		if (!isFileOrFolderValid(completeName))
+		{
+			return false;
+		}
+
+		// The file exists, BUT is it valid? It is NOT valid if it contains a folder path.
+		// open the file
+		ifstream ifs(completeName.c_str());
+		if (!ifs.is_open())
+		{
+			return false;
+		}
+
+		// use CommentedTextFileReader to read the file line by line
+		const char dirSeparator = '\\';
+		CommentedTextFileReader fileReader(ifs);
+		while (!fileReader.reachedEndOfStream())
+		{
+			std::string text = fileReader.getLineText();
+			if (text.find(dirSeparator) != std::string::npos)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+}
+
+
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
@@ -480,41 +516,6 @@ STDMETHODIMP CDocumentClassifier::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IDocumentClassificationUtils
 //-------------------------------------------------------------------------------------------------
-namespace
-{
-	// In this context, a "valid" dix file is one that does not contain a folder path in it.
-	bool FolderContainsValidIdxFile(const std::string& subFolder)
-	{
-		std::string completeName = subFolder + "\\" + "DocTypes.idx";
-		if (!isFileOrFolderValid(completeName))
-		{
-			return false;
-		}
-
-		// The file exists, BUT is it valid? It is NOT valid if it contains a folder path.
-		// open the file
-		ifstream ifs(completeName.c_str());
-		if (!ifs.is_open())
-		{
-			return false;
-		}
-
-		// use CommentedTextFileReader to read the file line by line
-		const char dirSeparator = '\\';
-		CommentedTextFileReader fileReader(ifs);
-		while (!fileReader.reachedEndOfStream())
-		{
-			std::string text = fileReader.getLineText();
-			if (text.find(dirSeparator) != std::string::npos)
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-}
-//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(IVariantVector** ppIndustries)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -652,9 +653,22 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 		ASSERT_RESOURCE_ALLOCATION("ELI11925", ipVec != __nullptr);
 
 		// Create the selection dialog with multi-selection parameter
-		// Provide list of available types
-		AddDocTypesDlg dlg(strName, asCppBool(bAllowSpecialTags), 
-			asCppBool(bAllowMultipleSelection), asCppBool(bAllowMultiplyClassified));
+		// Provide list of available types + document classifiers path
+		//
+		// Note: the final arg uses m_documentClassifiersPath directly
+		// so that if the serialized path no longer exists, the user
+		// will see in the dialog that the path is no longer valid.
+		//
+		// Note: call GetDocumentClassifierFolder() for final arg, so 
+		// that if the deserialized value of m_documentClassifiersPath
+		// is no longer valid (renamed, moved, deleted) then this will
+		// auto-correct and pass a valid path to the dialog.
+		AddDocTypesDlg dlg(strName, 
+						   asCppBool(bAllowSpecialTags), 
+						   asCppBool(bAllowMultipleSelection), 
+						   asCppBool(bAllowMultiplyClassified),
+						   m_documentClassifiersPath);
+						   //GetDocumentClassifierFolder());
 
 		// Disable industry selection, if desired
 		if (!asCppBool(bAllowIndustryModification))
@@ -678,6 +692,8 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 			// Store selected industry name
 			string strReturnedIndustry = dlg.getSelectedIndustry();
 			*pbstrIndustry = get_bstr_t(strReturnedIndustry).Detach();
+
+			m_documentClassifiersPath = dlg.GetDocumentClassifiersFolder();
 		}
 		else
 		{
@@ -699,7 +715,7 @@ STDMETHODIMP CDocumentClassifier::get_DocumentClassifiersPath(BSTR* pVal)
 
 	try
 	{
-		*pVal = get_bstr_t(m_documentClassifierPath).Detach();
+		*pVal = get_bstr_t(m_documentClassifiersPath).Detach();
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40000");
@@ -714,7 +730,7 @@ STDMETHODIMP CDocumentClassifier::put_DocumentClassifiersPath(BSTR bstrDocumentC
 		std::string path = asString(bstrDocumentClassifiersPath);
 		if (Contains(path, DOC_CLASSIFIERS_FOLDER))
 		{
-			m_documentClassifierPath = asString(bstrDocumentClassifiersPath);
+			m_documentClassifiersPath = asString(bstrDocumentClassifiersPath);
 			m_bDirty = true;
 		}
 
@@ -734,7 +750,6 @@ STDMETHODIMP CDocumentClassifier::get_DocumentClassifiersSubfolderName(BSTR *pVa
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40003");
 }
-
 //-------------------------------------------------------------------------------------------------
 // IIdentifiableObject
 //-------------------------------------------------------------------------------------------------
@@ -902,15 +917,19 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 //-------------------------------------------------------------------------------------------------
 std::string CDocumentClassifier::GetDocumentClassifierFolder()
 {
-	if (!m_documentClassifierPath.empty())
-	{
-		return m_documentClassifierPath + "\\";
-	}
-
 	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
 		ASSERT_RESOURCE_ALLOCATION("ELI39895", m_ipAFUtility != __nullptr);
+	}
+
+	if (!m_documentClassifiersPath.empty() && isValidFolder(m_documentClassifiersPath))
+	{
+		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI39996", ipAFDoc);
+
+		std::string path = m_ipAFUtility->ExpandTagsAndFunctions(m_documentClassifiersPath.c_str(), ipAFDoc);
+		return path + "\\";
 	}
 
 	string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder();
@@ -1061,4 +1080,3 @@ void CDocumentClassifier::validateLicense()
 
 	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI05884", "Document Classifier");
 }
-//-------------------------------------------------------------------------------------------------

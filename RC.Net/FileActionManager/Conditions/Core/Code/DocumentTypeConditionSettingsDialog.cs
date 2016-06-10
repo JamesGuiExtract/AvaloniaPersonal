@@ -154,6 +154,25 @@ namespace Extract.FileActionManager.Conditions
         {
             try
             {
+                if (_documentTypeListBox.Items.Count > 0)
+                {
+                    using (CustomizableMessageBox cmb = new CustomizableMessageBox())
+                    {
+                        cmb.Caption = "Warning: selections will be discarded...";
+                        cmb.Text = "If you re-select document types, curerntly selected " +
+                            "document types will be discarded. Do you want to continue " +
+                            "(and discard selections)?";
+                        cmb.AddButton("OK", "OK", defaultButton: false);
+                        cmb.AddButton("Cancel", "Cancel", defaultButton: true);
+
+                        string result = cmb.Show(this);
+                        if (result == "Cancel")
+                        {
+                            return;
+                        }
+                    }
+                }
+
                 using (new TemporaryWaitCursor())
                 {
                     // If the industry is not set default it to the first in the industry list
@@ -174,20 +193,26 @@ namespace Extract.FileActionManager.Conditions
                         }
                     }
 
+                    _documentClassifier.DocumentClassifiersPath = Settings.DocumentClassifiersPath;
+
                     // Display the dialog - with variable industry, multiple selection and special types
                     VariantVector selectedTypes =
                         _documentClassifier.GetDocTypeSelection(ref _industry, true, true, true, true);
 
                     // Add any selected categories that are not already in _documentTypeListBox.
+                    if (_documentTypeListBox.Items.Count > 0)
+                    {
+                        _documentTypeListBox.Items.Clear();
+                    }
+
                     for (int i = 0; i < selectedTypes.Size; i++)
                     {
                         string documentType = selectedTypes[i].AsString();
-                        if (_documentTypeListBox.FindStringExact(documentType) == ListBox.NoMatches)
-                        {
-                            _documentTypeListBox.Items.Add(documentType);
-                        }
+                        _documentTypeListBox.Items.Add(documentType);
                     }
 
+                    Settings.DocumentClassifiersPath = _documentClassifier.DocumentClassifiersPath;
+                    Settings.Industry = _industry;
                     UpdateButtons();
                 }
             }

@@ -66,6 +66,8 @@ END_CATEGORY_MAP()
 	STDMETHOD(put_MinConfidence)(EDocumentConfidenceLevel newVal);
 	STDMETHOD(get_Category)(BSTR *pRetVal);
 	STDMETHOD(put_Category)(BSTR pNewVal);
+	STDMETHOD(get_DocumentClassifiersPath)(BSTR *pRetVal);
+	STDMETHOD(put_DocumentClassifiersPath)(BSTR pNewVal);
 
 // IAFCondition
 	STDMETHOD(raw_ProcessCondition)(IAFDocument *pAFDoc, VARIANT_BOOL* pbRetVal);
@@ -106,6 +108,8 @@ private:
 
 	// Selected category of document types
 	std::string	m_strCategory;
+
+	std::string m_documentClassifiersPath;
 
 	bool m_bAllowTypes;
 

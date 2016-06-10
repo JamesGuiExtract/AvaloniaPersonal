@@ -146,7 +146,7 @@ private:
 	// Each industry name associated with a vector of DocType names
 	map<string, vector<string> > m_mapNameToVecDocTypes;
 
-	std::string m_documentClassifierPath;
+	std::string m_documentClassifiersPath;
 
 	//////////
 	// Methods

@@ -17,8 +17,12 @@ class AddDocTypesDlg : public CDialog
 {
 // Construction
 public:
-	AddDocTypesDlg(std::string strIndustry, bool bAllowSpecialTags, 
-		bool bAllowMultiSelect, bool bAllowMultiplyClassified, CWnd* pParent = NULL);
+	AddDocTypesDlg(const std::string& strIndustry, 
+				   bool bAllowSpecialTags, 
+				   bool bAllowMultiSelect, 
+				   bool bAllowMultiplyClassified, 
+				   const std::string& documentClassifiersPath,  
+				   CWnd* pParent = NULL);
 
 	// Returns collection of selected document types
 	std::vector<std::string>& getChosenTypes();
@@ -28,6 +32,9 @@ public:
 
 	// Disables selection change in industry combo box
 	void	lockIndustrySelection();
+
+	// returns user-selected folder
+	std::string GetDocumentClassifiersFolder();
 
 // Dialog Data
 	//{{AFX_DATA(AddDocTypesDlg)
@@ -83,6 +90,12 @@ private:
 
 	void UpdateCategoriesAndTypes();
 
+	std::string ExpandFileName(const std::string& folder);
+
+	bool DocTypesAreSelected();
+
+	int GetPreviousComboboxIndex();
+
 	///////////////
 	// Variables
 	///////////////
@@ -110,6 +123,10 @@ private:
 	bool		m_bLockIndustry;
 
 	std::string m_initialFkbPath;
+
+	bool m_isFamContext;
+
+	ITagUtilityPtr m_ipTagManager;
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -18,7 +18,8 @@
 // Constants
 //-------------------------------------------------------------------------------------------------
 // Version 4: Added CIdentifiableObject
-const unsigned long gnCurrentVersion = 4;
+// Version 5: Added DocumentClassifiers path
+const unsigned long gnCurrentVersion = 5;
 
 //-------------------------------------------------------------------------------------------------
 // CDocTypeCondition
@@ -216,6 +217,40 @@ STDMETHODIMP CDocTypeCondition::put_Category(BSTR newVal)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDocTypeCondition::get_DocumentClassifiersPath(BSTR *pRetVal)
+{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI40020", pRetVal != __nullptr);
+
+		// Check licensing
+		validateLicense();
+
+		*pRetVal = _bstr_t( m_documentClassifiersPath.c_str() ).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40019")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDocTypeCondition::put_DocumentClassifiersPath(BSTR pNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check licensing
+		validateLicense();
+
+		m_documentClassifiersPath = asString(pNewVal);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40021")
+
+	return S_OK;
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAFCondition
@@ -405,6 +440,8 @@ STDMETHODIMP CDocTypeCondition::raw_CopyFrom(IUnknown *pObject)
 		m_eMinConfidence = ipSource->MinConfidence;
 		
 		m_strCategory = asString(ipSource->Category);
+
+		m_documentClassifiersPath = asString(ipSource->DocumentClassifiersPath);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12854");
 
@@ -512,6 +549,11 @@ STDMETHODIMP CDocTypeCondition::Load(IStream *pStream)
 			dataReader >> m_strCategory;
 		}
 
+		if (nDataVersion >= 5)
+		{
+			dataReader >> m_documentClassifiersPath;
+		}
+
 		// Load collection of document types
 		IPersistStreamPtr ipObj;
 		readObjectFromStream(ipObj, pStream, "ELI10823");
@@ -547,6 +589,7 @@ STDMETHODIMP CDocTypeCondition::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bAllowTypes;
 		dataWriter << (long)m_eMinConfidence;
 		dataWriter << m_strCategory;
+		dataWriter << m_documentClassifiersPath;
 
 		dataWriter.flushToByteStream();
 	

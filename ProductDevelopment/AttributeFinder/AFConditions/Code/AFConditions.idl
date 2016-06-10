@@ -55,6 +55,11 @@ library UCLID_AFCONDITIONSLib
 		// REQUIRE: the length of pNewVal > 0
 		[propput, id(4), helpstring("property Category")] HRESULT Category([in] BSTR pNewVal);
 		//-----------------------------------------------------------------------------------------
+		// PROMISE: Defines the DocumentClassifiers path
+		[propget, id(5), helpstring("property DocumentClassifiersPath")] HRESULT DocumentClassifiersPath([out, retval] BSTR *pRetVal);
+		// REQUIRE: none
+		[propput, id(5), helpstring("property DocumentClassifiersPath")] HRESULT DocumentClassifiersPath([in] BSTR pNewVal);
+		//-----------------------------------------------------------------------------------------
 	};
 
 	[
