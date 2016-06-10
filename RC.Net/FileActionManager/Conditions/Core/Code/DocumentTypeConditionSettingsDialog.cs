@@ -199,12 +199,12 @@ namespace Extract.FileActionManager.Conditions
                     VariantVector selectedTypes =
                         _documentClassifier.GetDocTypeSelection(ref _industry, true, true, true, true);
 
-                    // Add any selected categories that are not already in _documentTypeListBox.
-                    if (_documentTypeListBox.Items.Count > 0)
+                    if (_documentTypeListBox.Items.Count > 0 && selectedTypes.Size > 0)
                     {
                         _documentTypeListBox.Items.Clear();
                     }
 
+                    // Add any selected categories that are not already in _documentTypeListBox.
                     for (int i = 0; i < selectedTypes.Size; i++)
                     {
                         string documentType = selectedTypes[i].AsString();

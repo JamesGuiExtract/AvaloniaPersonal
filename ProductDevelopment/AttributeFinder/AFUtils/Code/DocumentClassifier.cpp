@@ -659,7 +659,8 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 		// so that if the serialized path no longer exists, the user
 		// will see in the dialog that the path is no longer valid.
 		//
-		// Note: call GetDocumentClassifierFolder() for final arg, so 
+		// Note: To automatically switch to a valid path,
+		// call GetDocumentClassifierFolder() for final arg, so 
 		// that if the deserialized value of m_documentClassifiersPath
 		// is no longer valid (renamed, moved, deleted) then this will
 		// auto-correct and pass a valid path to the dialog.
@@ -668,7 +669,6 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 						   asCppBool(bAllowMultipleSelection), 
 						   asCppBool(bAllowMultiplyClassified),
 						   m_documentClassifiersPath);
-						   //GetDocumentClassifierFolder());
 
 		// Disable industry selection, if desired
 		if (!asCppBool(bAllowIndustryModification))
