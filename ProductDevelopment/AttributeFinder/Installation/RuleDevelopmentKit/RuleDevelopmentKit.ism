@@ -3764,7 +3764,14 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Registry16</td><td>0</td><td>Extract Systems RSD File\shell</td><td/><td/><td>ISRegistryComponent</td><td>0</td></row>
 		<row><td>Registry17</td><td>0</td><td>Extract Systems RSD File\shell\open</td><td/><td/><td>ISRegistryComponent</td><td>0</td></row>
 		<row><td>Registry18</td><td>0</td><td>Extract Systems RSD File\shell\open\command</td><td/><td>"[COMMON_COMPONENTS]RuleSetEditor.exe" "%1"</td><td>ISRegistryComponent</td><td>0</td></row>
+		<row><td>Registry19</td><td>0</td><td>Extract Systems LM File\DefaultIcon</td><td>(Default)</td><td>[COMMON_COMPONENTS]LearningMachineEditor.exe,0</td><td>ISRegistryComponent</td><td>0</td></row>
 		<row><td>Registry2</td><td>1</td><td>Software\Extract Systems\TestingFramework\Settings</td><td>RootTestFilesFolder</td><td>[INSTALLDIR]AutomatedTesting\DiagnosticTestFiles</td><td>ISRegistryComponent</td><td>0</td></row>
+		<row><td>Registry20</td><td>0</td><td>Extract Systems LM File\shell\open</td><td/><td/><td>ISRegistryComponent</td><td>1</td></row>
+		<row><td>Registry21</td><td>0</td><td>Extract Systems LM File\shell\open</td><td>(Default)</td><td/><td>ISRegistryComponent</td><td>0</td></row>
+		<row><td>Registry22</td><td>0</td><td>Extract Systems LM File\shell\open\command</td><td>(Default)</td><td>"[COMMON_COMPONENTS]LearningMachineEditor.exe" "%1"</td><td>ISRegistryComponent</td><td>0</td></row>
+		<row><td>Registry23</td><td>0</td><td>.lm</td><td/><td>Extract Systems LM File</td><td>ISRegistryComponent</td><td>0</td></row>
+		<row><td>Registry24</td><td>0</td><td>Extract Systems LM File\shell</td><td/><td/><td>ISRegistryComponent</td><td>0</td></row>
+		<row><td>Registry4</td><td>0</td><td>.lm</td><td/><td/><td>ISRegistryComponent</td><td>1</td></row>
 		<row><td>Registry5</td><td>2</td><td>Software\Extract Systems\TestingFramework\Settings</td><td/><td/><td>ISRegistryComponent</td><td>0</td></row>
 		<row><td>Registry6</td><td>2</td><td>Software\Extract Systems\TestingFramework\Settings</td><td>RootTestFilesFolder</td><td>[INSTALLDIR]AutomatedTesting\DiagnosticTestFiles</td><td>ISRegistryComponent</td><td>0</td></row>
 		<row><td>Registry7</td><td>0</td><td>.eav</td><td/><td>Extract Systems EAV File</td><td>ISRegistryComponent</td><td>0</td></row>
