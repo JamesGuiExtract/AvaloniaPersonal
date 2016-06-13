@@ -103,6 +103,7 @@ CopyFilesToInstallFolder: CreateDestinationFolders
  	@COPY /V  "$(BinariesFolder)\OcrSingleDocument.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V  "$(BinariesFolder)\GetWordLengthDist.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V  "$(BinariesFolder)\CopyNumberedFiles.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+ 	@COPY /V  "$(BinariesFolder)\LearningMachineEditor.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"	
 	@COPY /V  "$(BinariesFolder)\ExpressionAndQueryTester.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(BinariesFolder)\Extract*test*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(RCDotNetDir)\Core\Testing\Automated\*.nunit" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
