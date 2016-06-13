@@ -69,7 +69,7 @@ namespace
 			name = fullname.substr(pos + 1);
 		}
 
-		if (0 == ::stricmp(name.c_str(), "RuleSetEditor.exe"))
+		if (0 == ::_stricmp(name.c_str(), "RuleSetEditor.exe"))
 		{
 			return false;
 		}
