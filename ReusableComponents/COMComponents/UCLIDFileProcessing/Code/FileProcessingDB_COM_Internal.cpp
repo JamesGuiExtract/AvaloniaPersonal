@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 138;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 139;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1453,6 +1453,32 @@ int UpdateToSchemaVersion138(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39680");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion139(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 139;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrADD_DB_PROCEXECUTOR_ROLE);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40042");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6572,7 +6598,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 135:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion136);
 				case 136:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion137);
 				case 137:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion138);
-				case 138:	break;
+				case 138:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion139);
+				case 139:	break;
 
 				default:
 					{

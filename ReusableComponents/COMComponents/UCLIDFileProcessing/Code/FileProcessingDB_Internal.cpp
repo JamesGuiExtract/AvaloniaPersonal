@@ -1348,6 +1348,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_SECURE_COUNTER_FK);
 		}
 
+		vecQueries.push_back(gstrADD_DB_PROCEXECUTOR_ROLE);
+
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
 	}

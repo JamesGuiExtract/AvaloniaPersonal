@@ -23,7 +23,7 @@ static const string gstrCREATE_LOCK_TABLE =
 
 static const string gstrCREATE_DB_INFO_TABLE = 
 	"CREATE TABLE [dbo].[DBInfo]([ID] int IDENTITY(1,1) NOT NULL, "
-	"[Name] [nvarchar](50) NOT NULL PRIMARY KEY CLUSTERED, "
+	"[Name] [nvarchar](50) NOT NULL CONSTRAINT [PK_DB_INFO] PRIMARY KEY CLUSTERED, "
 	"[Value] [nvarchar](max))";
 
 static const string gstrCREATE_ACTION_STATE_TABLE = "CREATE TABLE [dbo].[ActionState]([Code] [nvarchar](1) NOT NULL "
@@ -275,7 +275,7 @@ static const string gstrCREATE_FIELD_SEARCH_TABLE =
 	"CREATE TABLE [dbo].[FieldSearch]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FieldSearch] PRIMARY KEY CLUSTERED,"
 	"[Enabled] [bit] NOT NULL DEFAULT 1,"
-	"[FieldName] [nvarchar](64) NOT NULL UNIQUE,"
+	"[FieldName] [nvarchar](64) NOT NULL CONSTRAINT [IX_FieldSearch_FieldName] UNIQUE,"
 	"[AttributeQuery] [nvarchar](256) NOT NULL)";
 
 // Was LaunchApp in versions 114 and 115
@@ -283,7 +283,7 @@ static const string gstrCREATE_FILE_HANDLER_TABLE =
 	"CREATE TABLE [dbo].[FileHandler]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_LaunchApp] PRIMARY KEY CLUSTERED,"
 	"[Enabled] [bit] NOT NULL DEFAULT 1,"
-	"[AppName] [nvarchar](64) NOT NULL UNIQUE,"
+	"[AppName] [nvarchar](64) NOT NULL CONSTRAINT [IX_FileHandler_AppName] UNIQUE,"
 	"[IconPath] [nvarchar](260),"
 	"[ApplicationPath] [nvarchar](260) NOT NULL,"
 	"[Arguments] [ntext],"
@@ -296,7 +296,7 @@ static const string gstrCREATE_FEATURE_TABLE =
 	"CREATE TABLE [dbo].[Feature]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Feature] PRIMARY KEY CLUSTERED,"
 	"[Enabled] [bit] NOT NULL DEFAULT 1,"
-	"[FeatureName] [nvarchar](64) NOT NULL UNIQUE,"
+	"[FeatureName] [nvarchar](64) NOT NULL CONSTRAINT [IX_Feature_FeatureName] UNIQUE,"
 	"[FeatureDescription] [nvarchar](max),"
 	"[AdminOnly] [bit] NOT NULL DEFAULT 1)";
 
@@ -968,6 +968,13 @@ static const string gstrADD_PAGINATION_FILETASKSESSION_FK =
 	" REFERENCES [dbo].[FileTaskSession] ([ID])"
 	" ON UPDATE CASCADE "
 	" ON DELETE CASCADE ";
+
+static const string gstrADD_DB_PROCEXECUTOR_ROLE =
+	"IF DATABASE_PRINCIPAL_ID('db_procexecutor') IS NULL \r\n"
+	"BEGIN\r\n"
+	"	CREATE ROLE db_procexecutor \r\n"
+	"	GRANT EXECUTE TO db_procexecutor \r\n"
+	"END\r\n";
 
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_NAME_VAL = "<LockName>";
