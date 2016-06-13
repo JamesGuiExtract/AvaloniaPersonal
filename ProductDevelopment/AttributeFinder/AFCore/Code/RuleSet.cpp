@@ -73,7 +73,7 @@ m_bUsePaginationCounter(false),
 m_bUsePagesRedactionCounter(false),
 m_bUseDocsRedactionCounter(false),
 m_bUsePagesIndexingCounter(false),
-m_bRuleSetOnlyForInternalUse(false),
+m_bRuleSetOnlyForInternalUse(true),	// ISSUE-13087 - RDT: Make 'Internal Use Only' property checked by default
 m_bSwipingRule(false),
 m_strFKBVersion(""),
 m_bIgnorePreprocessorErrors(false),
