@@ -268,7 +268,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> representing the page
         /// to be inserted.</param>
-        /// <param name="pageIndex">The page number the new page should be inserted at.</param>
+        /// <param name="pageIndex">The index the new page should be inserted at.</param>
         public virtual void InsertPage(PageThumbnailControl pageControl, int pageIndex)
         {
             try

@@ -2933,21 +2933,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                     SelectedControls.Where(control => control != _loadNextDocumentButtonControl).Any();
 
             // The cut command is applicable to separators if the only thing selected is a
-            // separator.
+            // separator. Depending upon SetSelected to prevent mixed selection.
             bool enabledCutCommand = enableSelectionBasedCommands &&
-                !SelectedControls
+                (!SelectedControls
                     .OfType<PageThumbnailControl>()
                     .Any(page => page.Deleted) ||
-                SelectedControls.All(c => c.GetType() == typeof(PaginationSeparator));
+                SelectedControls.Any(c => c.GetType() == typeof(PaginationSeparator)));
 
             // The delete command is applicable to separators if the only thing selected is a
-            // separator.
+            // separator. Depending upon SetSelected to prevent mixed selection.
             bool enableDeleteCommand =
                 _commandTargetControl != null && _commandTargetControl.Selected &&
-                SelectedControls
+                (SelectedControls
                     .OfType<PageThumbnailControl>()
                     .Any(c => !c.Deleted) ||
-                SelectedControls.All(c => c.GetType() == typeof(PaginationSeparator));
+                SelectedControls.Any(c => c.GetType() == typeof(PaginationSeparator)));
             _deleteCommand.Enabled = enableDeleteCommand;
 
             // The un-delete command will be enabled only in the case that there are no deleted
