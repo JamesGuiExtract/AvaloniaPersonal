@@ -526,14 +526,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// A <see cref="ToolStripItem"/> intended to trigger a insert copied data operation or
+        /// A <see cref="ToolStripItem"/> intended to trigger a paste operation or
         /// <see langword="null"/> if no such item is available.
         /// </summary>
-        public ToolStripItem InsertCopiedMenuItem
+        public ToolStripItem PasteMenuItem
         {
             get
             {
-                return _insertCopiedMenuItem;
+                return _pasteMenuItem;
             }
         }
 
@@ -546,6 +546,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return _deleteMenuItem;
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="ToolStripItem"/> intended to trigger an un-delete operation or
+        /// <see langword="null"/> if no such item is available.
+        /// </summary>
+        public ToolStripItem UnDeleteMenuItem
+        {
+            get
+            {
+                return null;
             }
         }
 
@@ -1017,16 +1029,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the <see cref="_insertCopiedMenuItem"/>.
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_pasteMenuItem"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleInsertCopiedMenuItem_Click(object sender, EventArgs e)
+        void HandlePasteMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
-                _primaryPageLayoutControl.HandleInsertCopied();
+                _primaryPageLayoutControl.HandlePaste();
             }
             catch (Exception ex)
             {
@@ -1295,7 +1307,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _outputFileNameBrowseToolStripButton.Enabled = true;
                         _fileNameEditableDocument = selectedDocument;
 
-                        if (selectedDocument.PageControls.Count == 1)
+                        int pageCount = selectedDocument.PageControls.Where(page => !page.Deleted).Count();
+                        if (pageCount == 1)
                         {
                             _pagesToolStripLabel.Text = "1 page";
                         }
@@ -1303,7 +1316,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             _pagesToolStripLabel.Text =
                                 string.Format(CultureInfo.CurrentCulture, "{0:D} pages",
-                                    selectedDocument.PageControls.Count);
+                                    pageCount);
                         }
                     }
                     else
@@ -1582,19 +1595,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             _primaryPageLayoutControl.HandlePrintSelectedItems();
         }
-
-        /// <summary>
-        /// Handler invoked when the file menu is opened, so that the print item in that menu can 
-        /// be enabled/disabled depending on presence/absence of appropriate selection. 
-        /// </summary>
-        /// <param name="sender">unused</param>
-        /// <param name="e">unused</param>
-        void FileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
-        {
-            bool enable = _primaryPageLayoutControl.EnableSelectionBasedCommands();
-            _printMenuItem.Enabled = enable;
-        }
-        
 
         #endregion Event Handlers
 

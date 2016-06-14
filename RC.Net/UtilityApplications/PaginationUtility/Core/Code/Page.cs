@@ -200,6 +200,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets all <see cref="PageThumbnailControl"/>s currently referencing this instance.
+        /// </summary>
+        public IEnumerable<PageThumbnailControl> PageControlReferences
+        {
+            get
+            {
+                return _references.OfType<PageThumbnailControl>();
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether any object has an active reference to this instance.
         /// </summary>
         /// <value><see langword="true"/> if there is an active reference; otherwise,
@@ -221,7 +232,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether multiple copies of this page exist in the UI.
+        /// Gets or sets a value indicating whether multiple (non-deleted) copies of this page exist
+        /// in the UI.
         /// </summary>
         /// <value><see langword="true"/> if multiple copies exist; otherwise,
         /// <see langword="false"/>.
@@ -233,7 +245,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 try
                 {
                     return _references
-                        .Where(o => o is PageThumbnailControl)
+                        .OfType<PageThumbnailControl>()
+                        .Where(c => !c.Deleted)
                         .Count() > 1;
                 }
                 catch (Exception ex)

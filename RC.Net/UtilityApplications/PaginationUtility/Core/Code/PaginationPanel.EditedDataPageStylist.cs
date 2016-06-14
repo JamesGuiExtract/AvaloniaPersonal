@@ -45,10 +45,17 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 get
                 {
-                    var outputDocument = (ExtendedOutputDocument)PageControl.Document;
+                    if (PageControl.Deleted)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        var outputDocument = (ExtendedOutputDocument)PageControl.Document;
 
-                    return outputDocument.DocumentData != null &&
-                        outputDocument.DocumentData.Modified;
+                        return outputDocument.DocumentData != null &&
+                            outputDocument.DocumentData.Modified;
+                    }
                 }
             }
 

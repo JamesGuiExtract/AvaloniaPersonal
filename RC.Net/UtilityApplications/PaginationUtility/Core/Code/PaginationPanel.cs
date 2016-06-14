@@ -173,19 +173,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
-        /// Gets or sets whether singly selected documents (one and only one document that contains
-        /// all of the currently selected pages) should be indicated with a blue background.
-        /// </summary>
-        /// <value><see langword="true"/> if singly selected documents should be indicated with a
-        /// blue background; otherwise, <see langword="false"/>.
-        /// </value>
-        public bool HighlightSinglySelectedDocument
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets a value indicating whether there are any uncommitted changes to document pagination.
         /// </summary>
         /// <value><see langword="true"/> if there are uncommitted changes to document pagination;
@@ -582,8 +569,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 string outputDocumentName = GenerateOutputDocumentName(originalDocName);
-                ExtendedOutputDocument outputDocument = new ExtendedOutputDocument(
-                    outputDocumentName, HighlightSinglySelectedDocument);
+                var outputDocument = new ExtendedOutputDocument(outputDocumentName);
                 outputDocument.DocumentOutputting += HandleOutputDocument_DocumentOutputting;
                 outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
 
@@ -721,7 +707,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// A <see cref="ToolStripItem"/> intended to trigger a insert copied data operation or
         /// <see langword="null"/> if no such item is available.
         /// </summary>
-        public ToolStripItem InsertCopiedMenuItem
+        public ToolStripItem PasteMenuItem
         {
             get
             {
@@ -734,6 +720,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="null"/> if no such item is available.
         /// </summary>
         public ToolStripItem DeleteMenuItem
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="ToolStripItem"/> intended to trigger an un-delete operation or
+        /// <see langword="null"/> if no such item is available.
+        /// </summary>
+        public ToolStripItem UnDeleteMenuItem
         {
             get
             {
@@ -825,7 +823,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnLoad(e);
 
-                _imageViewer.EstablishConnections(this);
+                if (_imageViewer != null)
+                {
+                    _imageViewer.EstablishConnections(this);
+                }
 
                 ResetPrimaryPageLayoutControl();
             }
@@ -1116,6 +1117,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var args = new DocumentDataRequestEventArgs(
                     e.OriginalDocument.PageControls
+                        .Where(c => !c.Deleted)
                         .Select(c => c.Page.OriginalDocumentName)
                         .Distinct()
                         .ToArray());
@@ -1142,6 +1144,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var args = new DocumentDataRequestEventArgs(
                     e.ResultingDocument.PageControls
+                        .Where(c => !c.Deleted)
                         .Select(c => c.Page.OriginalDocumentName)
                         .Distinct()
                         .ToArray());
@@ -1309,6 +1312,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// processing file should remain in processing.</returns>
         void CommitPendingChanges()
         {
+            LockControlUpdates controlUpdateLock = null;
+
             try
             {
                 // If document data could not be saved, abort the commit operation.
@@ -1319,12 +1324,18 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _commitingChanges = true;
 
+                // Prevent the UI from trying to load/close pages in the image viewer as the
+                // operation is taking place.
+                _primaryPageLayoutControl.ClearSelection();
+                EnablePageDisplay = false;
+                controlUpdateLock = new LockControlUpdates(_primaryPageLayoutControl);
+
                 _outputDocumentNames.Clear();
 
                 // Depending upon the manipulations that occurred, there may be some pending
                 // documents that have been left without any pages. Disregard these.
                 var documentsToRemove = _pendingDocuments
-                    .Where(doc => !doc.PageControls.Any())
+                    .Where(doc => !doc.PageControls.Any(c => !c.Deleted))
                     .ToArray();
                 foreach (var document in documentsToRemove)
                 {
@@ -1340,7 +1351,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         doc => doc, doc => _primaryPageLayoutControl.GetDocumentPosition(doc));
 
                 var sourceDocuments =
-                    outputDocuments.SelectMany(doc => doc.PageControls)
+                    outputDocuments.SelectMany(doc => doc.PageControls.Where(c => !c.Deleted))
                         .Select(c => c.Page.SourceDocument)
                         .Distinct()
                         .ToArray();
@@ -1391,6 +1402,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
+                if (controlUpdateLock != null)
+                {
+                    controlUpdateLock.Dispose();
+                }
+                EnablePageDisplay = true;
                 _commitingChanges = false;
                 _outputDocumentPositions.Clear();
             }
@@ -1404,80 +1420,103 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// presented (will differ from source state if pagination was suggested).</param>
         void RevertPendingChanges(bool revertToSource)
         {
-            _primaryPageLayoutControl.ClearSelection();
+            LockControlUpdates controlUpdateLock = null;
 
-            foreach (var outputDocument in _pendingDocuments.ToArray())
+            try
             {
-                _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
-                _pendingDocuments.Remove(outputDocument);
-            }
+                // Prevent the UI from trying to load/close pages in the image viewer as the
+                // operation is taking place.
+                _primaryPageLayoutControl.ClearSelection();
+                controlUpdateLock = new LockControlUpdates(_primaryPageLayoutControl);
+                EnablePageDisplay = false;
 
-            SourceDocument[] sourceDocArray;
-            lock (_sourceDocumentLock)
-            {
-                sourceDocArray = _sourceDocuments.ToArray();
-            }
-
-            if (revertToSource)
-            {
-                foreach (SourceDocument sourceDocument in sourceDocArray)
+                foreach (var outputDocument in _pendingDocuments.ToArray())
                 {
-                    // Reverting a document for which there was not suggested pagination
-                    HashSet<ExtendedOutputDocument> outputDocuments = null;
-                    if (_sourceToOriginalDocuments.TryGetValue(sourceDocument, out outputDocuments) &&
-                        outputDocuments.Count == 1)
+                    _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
+                    _pendingDocuments.Remove(outputDocument);
+                }
+
+                SourceDocument[] sourceDocArray;
+                lock (_sourceDocumentLock)
+                {
+                    sourceDocArray = _sourceDocuments.ToArray();
+                }
+
+                if (revertToSource)
+                {
+                    foreach (SourceDocument sourceDocument in sourceDocArray)
                     {
-                        var outputDocument = outputDocuments.Single();
-                        _primaryPageLayoutControl.LoadOutputDocument(
-                            outputDocument, outputDocument.OriginalPages);
+                        // Reverting a document for which there was not suggested pagination
+                        HashSet<ExtendedOutputDocument> outputDocuments = null;
+                        if (_sourceToOriginalDocuments.TryGetValue(sourceDocument, out outputDocuments) &&
+                            outputDocuments.Count == 1)
+                        {
+                            var outputDocument = outputDocuments.Single();
+                            _primaryPageLayoutControl.LoadOutputDocument(
+                                outputDocument, outputDocument.OriginalPages, null);
+                            if (outputDocument.DocumentData != null)
+                            {
+                                outputDocument.DocumentData.Revert();
+                            }
+                            _pendingDocuments.Add(outputDocument);
+                        }
+                        // Reverting a document for which there was suggested pagination. Rather than
+                        // reverting document data, a new document data instance will be needed.
+                        else
+                        {
+                            // CreateOutputDocument will add the document to _pendingDocuments.
+                            var outputDocument = (ExtendedOutputDocument)
+                                ((IPaginationUtility)this).CreateOutputDocument(sourceDocument.FileName);
+                            outputDocument.SetOriginalForm();
+                            outputDocument.PaginationSuggested = true;
+
+                            var args = new DocumentDataRequestEventArgs(sourceDocument.FileName);
+                            OnDocumentDataRequest(args);
+                            outputDocument.DocumentData = args.DocumentData;
+
+                            _primaryPageLayoutControl.LoadOutputDocument(
+                                outputDocument, sourceDocument.Pages, null);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var outputDocument in sourceDocArray
+                        .SelectMany(source => _sourceToOriginalDocuments[source]
+                            .OrderBy(doc => doc.OriginalPages.Select(
+                                page => page.OriginalPageNumber).Min())))
+                    {
+                        _primaryPageLayoutControl.LoadOutputDocument(outputDocument,
+                            outputDocument.OriginalPages, outputDocument.OriginalDeletedPages);
+                        if (!_pendingDocuments.Contains(outputDocument))
+                        {
+                            _pendingDocuments.Add(outputDocument);
+                        }
+
                         if (outputDocument.DocumentData != null)
                         {
                             outputDocument.DocumentData.Revert();
                         }
-                        _pendingDocuments.Add(outputDocument);
-                    }
-                    // Reverting a document for which there was suggested pagination. Rather than
-                    // reverting document data, a new document data instance will be needed.
-                    else
-                    {
-                        // CreateOutputDocument will add the document to _pendingDocuments.
-                        var outputDocument = (ExtendedOutputDocument)
-                            ((IPaginationUtility)this).CreateOutputDocument(sourceDocument.FileName);
-                        outputDocument.SetOriginalForm();
-                        outputDocument.PaginationSuggested = true;
-
-                        var args = new DocumentDataRequestEventArgs(sourceDocument.FileName);
-                        OnDocumentDataRequest(args);
-                        outputDocument.DocumentData = args.DocumentData;
-
-                        _primaryPageLayoutControl.LoadOutputDocument(outputDocument, sourceDocument.Pages);
                     }
                 }
+
+                _primaryPageLayoutControl.SelectFirstPage();
+                _primaryPageLayoutControl.Focus();
+
+                UpdateCommandStates();
             }
-            else
+            catch (Exception ex)
             {
-                foreach (var outputDocument in sourceDocArray
-                    .SelectMany(source => _sourceToOriginalDocuments[source]
-                        .OrderBy(doc => doc.OriginalPages.Select(page => page.OriginalPageNumber).Min())))
-                {
-                    _primaryPageLayoutControl.LoadOutputDocument(
-                        outputDocument, outputDocument.OriginalPages);
-                    if (!_pendingDocuments.Contains(outputDocument))
-                    {
-                        _pendingDocuments.Add(outputDocument);
-                    }
-
-                    if (outputDocument.DocumentData != null)
-                    {
-                        outputDocument.DocumentData.Revert();
-                    }
-                }
+                throw ex.AsExtract("ELI40018");
             }
-
-            _primaryPageLayoutControl.SelectFirstPage();
-            _primaryPageLayoutControl.Focus();
-
-            UpdateCommandStates();
+            finally
+            {
+                if (controlUpdateLock != null)
+                {
+                    controlUpdateLock.Dispose();
+                }
+                EnablePageDisplay = true;
+            }
         }
 
         /// <summary>
@@ -1566,7 +1605,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void UpdateCommandStates()
         {
-            var nonEmptyDocs = _pendingDocuments.Where(doc => doc.PageControls.Any());
+            var nonEmptyDocs = _pendingDocuments.Where(doc =>
+                doc.PageControls.Any(c => !c.Deleted));
             bool isDocDataEdited = nonEmptyDocs.Any(doc =>
                 doc.DocumentData != null && doc.DocumentData.Modified);
 

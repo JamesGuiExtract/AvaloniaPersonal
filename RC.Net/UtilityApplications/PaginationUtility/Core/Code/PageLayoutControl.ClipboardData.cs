@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Extract.Utilities;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -17,12 +18,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             /// <summary>
             /// A list of <see cref="Tuple"/>s where the first item indicates the input filename the
-            /// a page is from and the second item indicates the page from that document. Any
-            /// <see langword="null"/> entries in this list indicate an output document boundary
-            /// which should be represented by a <see cref="PaginationSeparator"/> when pasted into
-            /// a <see cref="PageLayoutControl"/>.
+            /// a page is from, the second item indicates the page from that document and the third
+            /// whether the page was copied in a deleted state. Any <see langword="null"/> entries
+            /// in this list indicate an output document boundary which should be represented by a
+            /// <see cref="PaginationSeparator"/> when pasted into a <see cref="PageLayoutControl"/>.
             /// </summary>
-            List<Tuple<string, int>> _pageData;
+            List<Tuple<string, int, bool>> _pageData;
 
             #endregion Fields
 
@@ -31,14 +32,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// <summary>
             /// Initializes a new instance of the <see cref="ClipboardData"/> class.
             /// </summary>
-            /// <param name="pages">The <see cref="Page"/> instances to be copied to the clipboard
-            /// where any <see langword="null"/> entries indicate a document boundary.</param>
-            public ClipboardData(IEnumerable<Page> pages)
+            /// <param name="pages">The <see cref="Page"/> instances and corresponding deleted
+            /// states of those instances to be copied to the clipboard where any
+            /// <see langword="null"/> page references indicate a document boundary.</param>
+            public ClipboardData(IEnumerable<KeyValuePair<Page, bool>> pages)
             {
-                _pageData = new List<Tuple<string, int>>(
-                    pages.Select(page => (page == null)
+                _pageData = new List<Tuple<string, int, bool>>(
+                    pages.Select(page => (page.Key == null)
                         ? null
-                        : new Tuple<string, int>(page.OriginalDocumentName, page.OriginalPageNumber)));
+                        : new Tuple<string, int, bool>(
+                            page.Key.OriginalDocumentName, page.Key.OriginalPageNumber, page.Value)));
             }
 
             #endregion Constructors
@@ -48,24 +51,27 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// <summary>
             /// Gets the <see cref="IEnumerable{Page}"/> represented by this clipboard data.
             /// </summary>
-/// <param name="paginationUtility">The <see cref="IPaginationUtility"/> the data is
-/// needed for.</param>
-            /// <returns>The <see cref="IEnumerable{Page}"/> represented by this clipboard data.
+            /// <param name="paginationUtility">The <see cref="IPaginationUtility"/> the data is
+            /// needed for.</param>
+            /// <returns>The pages represented by this clipboard data where each <see cref="Page"/>
+            /// is paired with a <see langword="bool"/> indicating whether the page was copied in a
+            /// deleted state.
             /// </returns>
-            public IEnumerable<Page> GetPages(IPaginationUtility paginationUtility)
+            public IEnumerable<KeyValuePair<Page, bool>> GetPages(IPaginationUtility paginationUtility)
             {
                 // Convert each entry in _pageData into either null (for a document boundary) or a
                 // Page instance.
-                foreach(Tuple<string, int> pageData in _pageData)
+                foreach(Tuple<string, int, bool> pageData in _pageData)
                 {
                     if (pageData == null)
                     {
-                        yield return null;
+                        yield return new KeyValuePair<Page, bool>(null, false);
                         continue;
                     }
 
                     string fileName = pageData.Item1;
                     int pageNumber = pageData.Item2;
+                    bool deleted = pageData.Item3;
 
                     var page = paginationUtility.GetDocumentPages(fileName, pageNumber);
 
@@ -76,7 +82,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         break;
                     }
 
-                    yield return page.Single();
+                    yield return new KeyValuePair<Page, bool>(page.Single(), deleted);
                 }
             }
 
@@ -130,6 +136,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                             {
                                 return false;
                             }
+
+                            if (!pageData[i].Item3.Equals(_pageData[i].Item3))
+                            {
+                                return false;
+                            }
                         }
                     }
 
@@ -150,29 +161,30 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// </returns>
             public override int GetHashCode()
             {
-                int hashCode = base.GetHashCode();
+                var hash = HashCode.Start;
 
                 try
                 {
-                    hashCode = hashCode ^ _pageData.GetHashCode();
+                    hash = hash.Hash(_pageData.Count);
 
                     for (int i = 0; i < _pageData.Count; i++)
                     {
                         if (_pageData[i] != null)
                         {
-                            hashCode ^= _pageData[i].Item1.GetHashCode();
-                            hashCode ^= _pageData[i].Item2.GetHashCode();
+                            hash = hash
+                                .Hash(_pageData[i].Item1)
+                                .Hash(_pageData[i].Item2)
+                                .Hash(_pageData[i].Item3);
                         }
                     }
 
-                    return hashCode;
                 }
                 catch (Exception ex)
                 {
                     ex.ExtractDisplay("ELI35508");
                 }
 
-                return hashCode;
+                return hash;
             }
         }
 

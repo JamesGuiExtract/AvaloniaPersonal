@@ -271,6 +271,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         ApplicationCommand _deleteCommand;
 
         /// <summary>
+        /// Context menu option that allows the PaginationControls to be un-deleted.
+        /// </summary>
+        readonly ToolStripMenuItem _unDeleteMenuItem = new ToolStripMenuItem("Un-delete");
+
+        /// <summary>
+        /// The <see cref="ApplicationCommand"/> that controls the availability of the un-delete
+        /// operation.
+        /// </summary>
+        ApplicationCommand _unDeleteCommand;
+
+        /// <summary>
         /// Context menu option that allows the PaginationControls to be printed.
         /// </summary>
         readonly ToolStripMenuItem _printMenuItem = new ToolStripMenuItem("Print selected document(s)...");
@@ -283,14 +294,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the copied PaginationControls to be inserted.
         /// </summary>
-        readonly ToolStripMenuItem _insertCopiedMenuItem =
-            new ToolStripMenuItem("Insert copied item(s)");
+        readonly ToolStripMenuItem _pasteMenuItem = new ToolStripMenuItem("Paste");
 
         /// <summary>
-        /// The <see cref="ApplicationCommand"/> that controls the availability of the insert
-        /// copied items operation.
+        /// The <see cref="ApplicationCommand"/> that controls the availability of the paste
+        /// operation.
         /// </summary>
-        ApplicationCommand _insertCopiedCommand;
+        ApplicationCommand _pasteCommand;
 
         /// <summary>
         /// Context menu option that allows the a document separator prior to the selected page to
@@ -851,7 +861,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="outputDocument">The <see cref="OutputDocument"/> to load.</param>
         /// <param name="pages">The <see cref="Page"/> instances to load into the document.</param>
-        public void LoadOutputDocument(OutputDocument outputDocument, IEnumerable<Page> pages)
+        /// <param name="deletedPages">The <see cref="Page"/> instances in <see paramref="pages"/>
+        /// that should be loaded in a deleted state.</param>
+        public void LoadOutputDocument(OutputDocument outputDocument, IEnumerable<Page> pages,
+             IEnumerable<Page> deletedPages)
         {
             bool removedLoadNextDocumentButton = false;
 
@@ -877,8 +890,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Create a page control for every page in sourceDocument.
                     foreach (var page in pages)
                     {
-                        InsertPaginationControl(new PageThumbnailControl(outputDocument, page),
-                            index: -1);
+                        var pageControl = new PageThumbnailControl(outputDocument, page);
+                        if (deletedPages != null && deletedPages.Contains(page))
+                        {
+                            pageControl.Deleted = true;
+                        }
+
+                        InsertPaginationControl(pageControl, index: -1);
                     }
 
                     outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
@@ -975,7 +993,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         var newPageControl = new PageThumbnailControl(null, page);
 
-                        InitializePaginationControl(newPageControl, -1);
+                        int index = -1;
+                        InitializePaginationControl(newPageControl, ref index);
 
                         // Now that these pages have been loaded, they are referenced by the page controls
                         // so the reference from this object can be released.
@@ -1120,11 +1139,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="newControl">The control <see cref="PaginationControl"/> to initialize.
         /// </param>
         /// <param name="index">The control index at which <see paramref="newControl"/> should be
-        /// added.</param>
+        /// added.
+        /// <para><b>Note</b></para>
+        /// This index may be updated if inserting it at the specified index causes a deleted copy
+        /// of the page prior to this one to be removed.</param>
         /// <returns><see langword="true"/> if the control was successfully initialized;
         /// <see langword="false"/> if it was not (in which case it will have been disposed.
         /// </returns>
-        public bool InitializePaginationControl(PaginationControl newControl, int index)
+        public bool InitializePaginationControl(PaginationControl newControl, ref int index)
         {
             try
             {
@@ -1134,8 +1156,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return false;
                 }
 
-                // Determine which controls are before and after the removed control to determine
-                // how the new control affects the output documents.
+                // Determine which controls are before and after the added control to determine how
+                // the new control affects the output documents.
                 var nextPageControl = newControl.NextControl as PageThumbnailControl;
                 var previousPageControl = newControl.PreviousControl as PageThumbnailControl;
                 var newPageControl = newControl as PageThumbnailControl;
@@ -1150,14 +1172,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         newPageControl.Document = document;
 
-                        int newPageNumber = (previousPageControl == null)
-                            ? 1
-                            : previousPageControl.PageNumber + 1;
-                        document.InsertPage(newPageControl, newPageNumber);
+                        int newPageIndex = (previousPageControl == null)
+                            ? 0
+                            : previousPageControl.DocumentPageIndex + 1;
+                        document.InsertPage(newPageControl, newPageIndex);
 
                         // If this means the first page of the document is now from a different
                         // source document, rename the document based upon the new first page.
-                        if (newPageNumber == 1 && 
+                        if (newPageIndex == 0 && 
                             (nextPageControl == null ||
                             newPageControl.Page.SourceDocument != nextPageControl.Page.SourceDocument))
                         {
@@ -1175,6 +1197,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                         newPageControl.Document = document;
 
                         document.AddPage(newPageControl);
+                    }
+
+                    var deletedCopies = newPageControl.Page.PageControlReferences
+                        .Where(c => c != newPageControl && c.Deleted)
+                        .ToArray();
+
+                    // Any deleted copies of the page that exist in the pane should be deleted.
+                    if (deletedCopies.Length > 0)
+                    {
+                        DeleteControls(deletedCopies);
+                        index = _flowLayoutPanel.Controls.GetChildIndex(newPageControl);
                     }
                 }
                 else if (newControl is PaginationSeparator &&
@@ -1209,13 +1242,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (_currentClipboardData != null)
             {
-                Page[] clipboardPages = _currentClipboardData.GetPages(_paginationUtility).ToArray();
-                foreach (Page page in clipboardPages.Where(page => page != null))
+                KeyValuePair<Page, bool>[] clipboardPages =
+                    _currentClipboardData.GetPages(_paginationUtility)
+                    .ToArray();
+                foreach (var page in clipboardPages.Where(page => page.Key != null))
                 {
-                    page.RemoveReference(this);
+                    page.Key.RemoveReference(this);
                 }
 
-                OnPagesDereferenced(clipboardPages);
+                OnPagesDereferenced(clipboardPages.Select(p => p.Key).ToArray());
             }
         }
 
@@ -1347,13 +1382,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     false, true, false);
                 _copyMenuItem.Click += HandleCopyMenuItem_Click;
 
-                _insertCopiedMenuItem.ShortcutKeyDisplayString = "Ctrl + V";
-                _insertCopiedMenuItem.ShowShortcutKeys = true;
-                _insertCopiedCommand = new ApplicationCommand(Shortcuts,
-                    new Keys[] { Keys.Control | Keys.V }, HandleInsertCopied,
-                    JoinToolStripItems(_insertCopiedMenuItem, _paginationUtility.InsertCopiedMenuItem),
+                _pasteMenuItem.ShortcutKeyDisplayString = "Ctrl + V";
+                _pasteMenuItem.ShowShortcutKeys = true;
+                _pasteCommand = new ApplicationCommand(Shortcuts,
+                    new Keys[] { Keys.Control | Keys.V }, HandlePaste,
+                    JoinToolStripItems(_pasteMenuItem, _paginationUtility.PasteMenuItem),
                     false, true, false);
-                _insertCopiedMenuItem.Click += HandleInsertCopiedMenuItem_Click;
+                _pasteMenuItem.Click += HandlePasteMenuItem_Click;
 
                 _deleteMenuItem.ShortcutKeyDisplayString = "Del";
                 _deleteMenuItem.ShowShortcutKeys = true;
@@ -1362,6 +1397,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     JoinToolStripItems(_deleteMenuItem, _paginationUtility.DeleteMenuItem),
                     false, true, false);
                 _deleteMenuItem.Click += HandleDeleteMenuItem_Click;
+
+                _unDeleteMenuItem.ShortcutKeyDisplayString = "Shift + Del";
+                _unDeleteMenuItem.ShowShortcutKeys = true;
+                _unDeleteCommand = new ApplicationCommand(Shortcuts,
+                    new Keys[] { Keys.Shift| Keys.Delete }, HandleUnDeleteSelectedItems,
+                    JoinToolStripItems(_unDeleteMenuItem),
+                    false, true, false);
+                _unDeleteMenuItem.Click += HandleUnDeleteMenuItem_Click;
 
                 _printMenuItem.ShortcutKeyDisplayString = "Ctrl + P";
                 _printMenuItem.ShowShortcutKeys = true;
@@ -1444,10 +1487,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ContextMenuStrip = new ContextMenuStrip();
                 ContextMenuStrip.Items.Add(_cutMenuItem);
                 ContextMenuStrip.Items.Add(_copyMenuItem);
+                ContextMenuStrip.Items.Add(_pasteMenuItem);
                 ContextMenuStrip.Items.Add(_deleteMenuItem);
+                ContextMenuStrip.Items.Add(_unDeleteMenuItem);
+                ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_printMenuItem);
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
-                ContextMenuStrip.Items.Add(_insertCopiedMenuItem);
                 ContextMenuStrip.Items.Add(_toggleDocumentSeparatorMenuItem);
                 ContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
                 ContextMenuStrip.Closing += HandleContextMenuStrip_Closing;
@@ -1816,7 +1861,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
                         else if (e.Data.GetDataPresent(DataFormats.FileDrop))
                         {
-                            IEnumerable<Page> pages = GetPagesFromFileDrop(e.Data);
+                            IEnumerable<KeyValuePair<Page, bool>> pages =
+                                GetPagesFromFileDrop(e.Data);
                             InsertPages(pages, _dropLocationIndex);
                         }
                     }
@@ -2037,14 +2083,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the <see cref="_insertCopiedMenuItem"/>.
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_pasteMenuItem"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleInsertCopiedMenuItem_Click(object sender, EventArgs e)
+        void HandlePasteMenuItem_Click(object sender, EventArgs e)
         {
-            HandleInsertCopied();
+            HandlePaste();
         }
 
         /// <summary>
@@ -2056,6 +2102,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         void HandleDeleteMenuItem_Click(object sender, EventArgs e)
         {
             HandleDeleteSelectedItems();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_unDeleteMenuItem"/>
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleUnDeleteMenuItem_Click(object sender, EventArgs e)
+        {
+            HandleUnDeleteSelectedItems();
         }
 
         /// <summary>
@@ -2210,6 +2267,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (_primarySelection != null)
                     {
                         SetHighlightedAndDisplayed(_primarySelection, true);
+
+                        // _commandTargetControl is used for shortcut keys as well as for the
+                        // context menu. Set _commandTargetControl whenever the primary control is
+                        // being set to allow shortcuts keys to work even if the control hasn't been
+                        // clicked.
+                        _commandTargetControl = _primarySelection;
                     }
                 }
             }
@@ -2249,7 +2312,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return selectedControls;
             }
         }
-
 
         /// <summary>
         /// Gets the active <see cref="PaginationControl"/>.
@@ -2379,9 +2441,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         control.Dispose();
                     }
-                    else if (InitializePaginationControl(control, targetIndex++))
+                    else if (InitializePaginationControl(control, ref targetIndex))
                     {
                         SetSelected(control, true, true);
+                        targetIndex++;
                     }
                 }
 
@@ -2617,8 +2680,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="resetLastSelected"><see langword="true"/> if
         /// <see cref="_lastSelectedControl"/> should be reset if it is deselected;
         /// otherwise, <see langword="false"/>.</param>
-        void SetSelected(PaginationControl control, bool select, bool resetLastSelected)
+        /// <returns><see langword="true"/> if selection was applied, <see langword="false"/> if
+        /// selection could not be applied (such as because the control was of a different type than
+        /// controls already in the current selection.</returns>
+        bool SetSelected(PaginationControl control, bool select, bool resetLastSelected)
         {
+            if (select)
+            {
+                if (SelectedControls
+                    .Any(c => control.GetType() != c.GetType()))
+                {
+                    // Only controls of the same type should be able to be selected at once.
+                    return false;
+                }
+            }
+
             control.Selected = select;
 
             if (!select)
@@ -2640,6 +2716,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             OnSelectionChanged();
+
+            return true;
         }
 
         /// <summary>
@@ -2839,22 +2917,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// This method detects when conditions are valid for selection-based commands to be enabled.
-        /// </summary>
-        /// <returns>true when selection-based commands are valid, false otherwise</returns> 
-        /// https://extract.atlassian.net/browse/ISSUE-13187: In PaginationUtility, Cut and Copy menu items 
-        /// should be disabled if only separators are selected. 
-        internal bool EnableSelectionBasedCommands()
-        {
-            bool enableSelectionBasedCommands =
-                _commandTargetControl != null && _commandTargetControl.Selected &&
-                SelectedPageControls.ToArray().Length > 0 /*&&
-                SelectedControls.Where(control => control != _loadNextDocumentButtonControl).Any()*/;
-
-            return enableSelectionBasedCommands;
-        }
-
-        /// <summary>
         /// Updates the availability of the context menu and shortcut key commands based on the
         /// current selection and control state.
         /// </summary>
@@ -2865,27 +2927,53 @@ namespace Extract.UtilityApplications.PaginationUtility
                 : _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
             // Commands that operate on the active selection require there to be a selection and for
-            // the _commandTargetControl to be one of the selected items - AND these commands do NOT
-            // operate on pagination separators.
-            bool enableSelectionBasedCommands = EnableSelectionBasedCommands();
+            // the _commandTargetControl to be one of the selected items.
+            bool enableSelectionBasedCommands =
+                _commandTargetControl != null && _commandTargetControl.Selected &&
+                    SelectedControls.Where(control => control != _loadNextDocumentButtonControl).Any();
 
-            // The delete command is applicable to separators.
+            // The cut command is applicable to separators if the only thing selected is a
+            // separator.
+            bool enabledCutCommand = enableSelectionBasedCommands &&
+                !SelectedControls
+                    .OfType<PageThumbnailControl>()
+                    .Any(page => page.Deleted) ||
+                SelectedControls.All(c => c.GetType() == typeof(PaginationSeparator));
+
+            // The delete command is applicable to separators if the only thing selected is a
+            // separator.
             bool enableDeleteCommand =
                 _commandTargetControl != null && _commandTargetControl.Selected &&
-                SelectedControls.Where(control => control != _loadNextDocumentButtonControl).Any();
+                SelectedControls
+                    .OfType<PageThumbnailControl>()
+                    .Any(c => !c.Deleted) ||
+                SelectedControls.All(c => c.GetType() == typeof(PaginationSeparator));
             _deleteCommand.Enabled = enableDeleteCommand;
 
-            _cutCommand.Enabled =       enableSelectionBasedCommands;
-            _copyCommand.Enabled =      enableSelectionBasedCommands;
-            _printMenuItem.Enabled =    enableSelectionBasedCommands;
-            _printCommand.Enabled =     enableSelectionBasedCommands;
+            // The un-delete command will be enabled only in the case that there are no deleted
+            // pages included in the selection.
+            bool enableUnDeleteCommand =
+                _commandTargetControl != null && _commandTargetControl.Selected &&
+                SelectedControls
+                    .OfType<PageThumbnailControl>()
+                    .Any(c => c.Deleted);
+            _unDeleteCommand.Enabled = enableUnDeleteCommand;
+
+            bool enablePrintCommand =
+                _commandTargetControl != null && _commandTargetControl.Selected &&
+                SelectedPageControls.ToArray().Length > 0;
+
+            _cutCommand.Enabled = enabledCutCommand;
+            _copyCommand.Enabled = enableSelectionBasedCommands;
+            _printCommand.Enabled = enablePrintCommand;
 
             // Adjust the text of the insertion commands to be append commands if there is no
             // _commandTargetControl.
             if (_commandTargetControl == null)
             {
                 _toggleDocumentSeparatorCommand.Enabled = false;
-                _insertCopiedCommand.Enabled = false;
+                _pasteCommand.Enabled = false;
+                _toggleDocumentSeparatorMenuItem.Text = "Start new document on this page";
             }
             else
             {
@@ -2895,8 +2983,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _toggleDocumentSeparatorCommand.Enabled = contextMenuControlIndex != 0 &&
                     !controlIsSeparator && SelectedControls.Count() == 1;
 
+                if (_toggleDocumentSeparatorCommand.Enabled &&
+                    ((PageThumbnailControl)_commandTargetControl).PageNumber == 1)
+                {
+                    _toggleDocumentSeparatorMenuItem.Text = "Merge with previous document";
+                }
+                else
+                {
+                    _toggleDocumentSeparatorMenuItem.Text = "Start new document on this page";
+                }
+
                 // Inserted copied items requires there to be copied items and a single selection.
-                _insertCopiedCommand.Enabled = ClipboardHasData() &&
+                _pasteCommand.Enabled = ClipboardHasData() &&
                     SelectedControls.Count() == 1;
             }
 
@@ -2940,23 +3038,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Copies the selected <see cref="Page"/>s to clipboard.
+        /// Copies the selected <see cref="PaginationControl"/>s to the clipboard.
         /// </summary>
-        void CopySelectedPagesToClipboard()
+        void CopySelectionToClipboard()
         {
-            var copiedPages = new List<Page>();
+            var copiedPages = new List<KeyValuePair<Page, bool>>();
             foreach (PaginationControl control in SelectedControls
                 .Where(control => control != _loadNextDocumentButtonControl))
             {
                 PageThumbnailControl pageControl = control as PageThumbnailControl;
                 if (pageControl == null)
                 {
-                    // Add null to represent a document boundary (separator).
-                    copiedPages.Add(null);
+                    // Add null as the page reference to represent a document boundary (separator).
+                    copiedPages.Add(new KeyValuePair<Page, bool>(null, false));
                 }
                 else
                 {
-                    copiedPages.Add(pageControl.Page);
+                    copiedPages.Add(
+                        new KeyValuePair<Page, bool>(pageControl.Page, pageControl.Deleted));
                 }
             }
 
@@ -3054,7 +3153,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="copiedPages">The <see cref="Page"/>s to be inserted into this control.
         /// </param>
         /// <param name="index">The index at which the pages should be inserted.</param>
-        void InsertPages(IEnumerable<Page> copiedPages, int index)
+        void InsertPages(IEnumerable<KeyValuePair<Page, bool>> copiedPages, int index)
         {
             bool duplicatePagesExist = false;
             List<PaginationControl> insertedPaginationControls = new List<PaginationControl>();
@@ -3062,12 +3161,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             foreach (var page in copiedPages)
             {
                 // A null page represents a document boundary; insert a separator.
-                if (page == null)
+                if (page.Key == null)
                 {
                     var separator = new PaginationSeparator();
                     insertedPaginationControls.Add(separator);
 
-                    if (InitializePaginationControl(separator, index))
+                    if (InitializePaginationControl(separator, ref index))
                     {
                         index++;
                     }
@@ -3075,10 +3174,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Insert a new page control that uses the specified page.
                 else
                 {
-                    var newPageControl = new PageThumbnailControl(null, page);
+                    var newPageControl = new PageThumbnailControl(null, page.Key);
+                    newPageControl.Deleted = page.Value;
                     insertedPaginationControls.Add(newPageControl);
 
-                    if (InitializePaginationControl(newPageControl, index))
+                    if (InitializePaginationControl(newPageControl, ref index))
                     {
                         duplicatePagesExist |= newPageControl.Page.MultipleCopiesExist;
                         index++;
@@ -3178,9 +3278,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Places the specified <see paramref="pages"/> on the clipboard with retries. 
         /// </summary>
-        /// <param name="pages">The <see cref="Page"/>s to copy to the clipboard. Any instances of
-        /// <see langword="null"/> in the enumerable represent document boundaries.</param>
-        internal void SetClipboardData(IEnumerable<Page> pages)
+        /// <param name="pages">The <see cref="Page"/> instances and corresponding deleted
+        /// states of those instances to be copied to the clipboard where any
+        /// <see langword="null"/> page references indicate a document boundary.</param>
+        internal void SetClipboardData(IEnumerable<KeyValuePair<Page, bool>> pages)
         {
             try
             {
@@ -3220,9 +3321,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                             ExtractException.Assert("ELI35513", "Clipboard data failed validation.",
                                 validataionData != null);
 
-                            foreach (Page page in pages.Where(page => page != null))
+                            foreach (var page in pages.Where(page => page.Key != null))
                             {
-                                page.AddReference(this);
+                                page.Key.AddReference(this);
                             }
 
                             // Success; break out of loop.
@@ -3253,15 +3354,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Retrieves as an enumerable of <see cref="Page"/>s the data from the clipboard where any
         /// instances of <see langword="null"/> in the enumerable represent document boundaries.
         /// </summary>
-        /// <returns>An enumerable of <see cref="Page"/>s that represents the data
-        /// currently on the clipboard, or <see langword="null"/> if there is no pagination utility
-        /// data on the clipboard.</returns>
-        internal IEnumerable<Page> GetClipboardData()
+        /// <returns>The pages represented by this clipboard data where each <see cref="Page"/> is
+        /// paired with a <see langword="bool"/> indicating whether the page was copied in a deleted
+        /// state.
+        /// </returns>
+        internal IEnumerable<KeyValuePair<Page, bool>> GetClipboardData()
         {
             try
             {
                 IDataObject dataObject = Clipboard.GetDataObject();
-                ClipboardData clipboardData = dataObject.GetData(_CLIPBOARD_DATA_FORMAT) as ClipboardData;
+                ClipboardData clipboardData =
+                    dataObject.GetData(_CLIPBOARD_DATA_FORMAT) as ClipboardData;
 
                 if (_currentClipboardData != null && !_currentClipboardData.Equals(clipboardData))
                 {
@@ -3292,10 +3395,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Retrieves as an enumerable of <see cref="Page"/>s the from the specified
         /// <see paramref="dataObject"/> using the <see cref="DataFormats.FileDrop"/> format.
         /// </summary>
-        /// <returns>An enumerable of <see cref="Page"/>s that represents the data
-        /// in <see paramref="dataObject"/>, or <see langword="null"/> if there is no such data in
-        /// <see paramref="dataObject"/>.</returns>
-        internal IEnumerable<Page> GetPagesFromFileDrop(IDataObject dataObject)
+        /// <returns>The pages represented by <see paramref="dataObject"/> where each
+        /// <see cref="Page"/> is paired with a <see langword="bool"/> indicating whether the page
+        /// was copied in a deleted state.
+        /// <see langword="null"/> if there is no such data in <see paramref="dataObject"/>.
+        /// </returns>
+        internal IEnumerable<KeyValuePair<Page, bool>> GetPagesFromFileDrop(IDataObject dataObject)
         {
             bool returnedPages = false;
 
@@ -3305,10 +3410,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 foreach (string fileName in windowsFileList)
                 {
                     // Return the each page from the document
-                    foreach (Page page in _paginationUtility.GetDocumentPages(fileName, null))
+                    foreach (var page in _paginationUtility.GetDocumentPages(fileName, null))
                     {
                         returnedPages = true;
-                        yield return page;
+                        yield return new KeyValuePair<Page, bool>(page, false);
                     }
                 }
             }
@@ -3317,7 +3422,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 // Return null to insert a document separator after the last page (as long as there
                 // were any pages that were returned.
-                yield return null;
+                yield return new KeyValuePair<Page, bool>(null, false);
             }
         }
 
@@ -3569,11 +3674,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                CopySelectedPagesToClipboard();
+                CopySelectionToClipboard();
 
-                DeleteControls(SelectedControls
-                    .Where(control => control != _loadNextDocumentButtonControl)
-                    .ToArray());
+                // Mixed selection of pages and separators is not allowed.
+                if (SelectedControls.All(c => c is PaginationSeparator))
+                {
+                    DeleteControls(SelectedControls.ToArray());
+                }
+                else
+                {
+                    DeletePagesInCurrentSelection();
+                }
 
                 UpdateCommandStates();
             }
@@ -3590,7 +3701,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                CopySelectedPagesToClipboard();
+                CopySelectionToClipboard();
             }
             catch (Exception ex)
             {
@@ -3599,20 +3710,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles a UI command to insert the pages on the clipboard.
+        /// Handles a UI command to paste the pages on the clipboard.
         /// </summary>
-        internal void HandleInsertCopied()
+        internal void HandlePaste()
         {
             try
             {
                 using (new PageLayoutControlUpdateLock(this))
                 {
-                    IEnumerable<Page> copiedPages = GetClipboardData();
+                    IEnumerable<KeyValuePair<Page, bool>> copiedPages = GetClipboardData();
 
                     if (copiedPages != null && _commandTargetControl != null)
                     {
                         int pasteMaxCount = PaginationUtilityForm._MAX_LOADED_PAGES - PageCount;
-                        if (copiedPages.Count(page => page != null) > pasteMaxCount)
+                        if (copiedPages.Count(page => page.Key != null) > pasteMaxCount)
                         {
                             MessageBox.Show("No more than " +
                                 PaginationUtilityForm._MAX_LOADED_PAGES.ToString(CultureInfo.CurrentCulture) +
@@ -3644,15 +3755,74 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                DeleteControls(SelectedControls
-                    .Where(control => control != _loadNextDocumentButtonControl)
-                    .ToArray());
+                // Mixed selection of pages and separators is not allowed.
+                if (SelectedControls.All(c => c is PaginationSeparator))
+                {
+                    DeleteControls(SelectedControls.ToArray());
+                }
+                else
+                {
+                    DeletePagesInCurrentSelection();
+                }
 
                 UpdateCommandStates();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35469");
+            }
+        }
+
+        /// <summary>
+        /// Deletes the pages in current selection.
+        /// </summary>
+        void DeletePagesInCurrentSelection()
+        {
+            var pageControlsToDelete = new HashSet<PageThumbnailControl>(
+                SelectedControls.OfType<PageThumbnailControl>());
+            bool clearSelection = true;
+
+            foreach (var pageControl in pageControlsToDelete.ToArray())
+            {
+                // For any deleted page that is not referenced in another page control outside
+                // of the current selection, rather than be removed from the page, it should be
+                // marked as deleted.
+                if (!pageControl.Page.PageControlReferences.Any(
+                    c => c != pageControl && !pageControlsToDelete.Contains(c)))
+                {
+                    pageControlsToDelete.Remove(pageControl);
+                    pageControl.Deleted = true;
+                    clearSelection = false;
+                }
+            }
+
+            if (clearSelection)
+            {
+                ClearSelection();
+            }
+
+            DeleteControls(pageControlsToDelete.ToArray());
+        }
+
+        /// <summary>
+        /// Handles a UI command to un-delete the selected items.
+        /// </summary>
+        internal void HandleUnDeleteSelectedItems()
+        {
+            try
+            {
+                foreach (var pageControl in SelectedControls
+                    .OfType<PageThumbnailControl>()
+                    .ToArray())
+                {
+                    pageControl.Deleted = false;
+                }
+
+                UpdateCommandStates();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40045");
             }
         }
 
@@ -3839,7 +4009,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             int index = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
-                            InitializePaginationControl(new PaginationSeparator(), index);
+                            InitializePaginationControl(new PaginationSeparator(), ref index);
                         }
                     }
                 }

@@ -57,16 +57,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         ToolStripItem CopyMenuItem { get; }
 
         /// <summary>
-        /// A <see cref="ToolStripItem"/> intended to trigger a insert copied data operation or
+        /// A <see cref="ToolStripItem"/> intended to trigger a paste operation or
         /// <see langword="null"/> if no such item is available.
         /// </summary>
-        ToolStripItem InsertCopiedMenuItem { get; }
+        ToolStripItem PasteMenuItem { get; }
 
         /// <summary>
         /// A <see cref="ToolStripItem"/> intended to trigger a delete operation or
         /// <see langword="null"/> if no such item is available.
         /// </summary>
         ToolStripItem DeleteMenuItem { get; }
+
+        /// <summary>
+        /// A <see cref="ToolStripItem"/> intended to trigger an un-delete operation or
+        /// <see langword="null"/> if no such item is available.
+        /// </summary>
+        ToolStripItem UnDeleteMenuItem { get; }
 
         /// <summary>
         /// A <see cref="ToolStripItem"/> intended to trigger a print operation or

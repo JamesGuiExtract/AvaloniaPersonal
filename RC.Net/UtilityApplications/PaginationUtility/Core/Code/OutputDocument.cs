@@ -28,6 +28,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         List<Page> _originalPages = null;
 
+        /// <summary>
+        /// The <see cref="Page"/>s from <see cref="_originalPages"/> that were originally in a
+        /// deleted state.
+        /// </summary>
+        HashSet<Page> _originalDeletedPages = null;
+
         #endregion Fields
 
         #region Constructors
@@ -117,8 +123,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     // Ensure the same sequence of and orientation of current pages compared to
                     // _originalPages.
-                    var currentPages = _pageControls.Select(c => c.Page);
-                    return Page.PagesAreEqual(currentPages, _originalPages);
+                    var currentPages = _pageControls
+                        .Where(c => !c.Deleted)
+                        .Select(c => c.Page);
+                    return Page.PagesAreEqual(currentPages,
+                        _originalPages.Where(c => !_originalDeletedPages.Contains(c)));
                 }
                 catch (Exception ex)
                 {
@@ -141,8 +150,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 try
                 {
                     var pages = _pageControls
-                                .Select(c => c.Page)
-                                .ToArray();
+                        .Where(c => !c.Deleted)
+                        .Select(c => c.Page)
+                        .ToArray();
 
                     // If there is not exactly one source document for this output document, the
                     // document cannot be in source document form.
@@ -153,7 +163,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         return false;
                     }
 
-                    var currentPages = _pageControls.Select(c => c.Page);
+                    var currentPages = _pageControls
+                        .Where(c => !c.Deleted)
+                        .Select(c => c.Page);
                     var sourceDocPages = pages.First().SourceDocument.Pages;
 
                     // Ensure the same sequence of and orientation of current pages compared to
@@ -175,7 +187,33 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _originalPages.AsReadOnly();
+                try
+                {
+                    return _originalPages.AsReadOnly();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40046");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Page"/>s that were in a deleted state when
+        /// <see cref="SetOriginalForm"/> was called.
+        /// </summary>
+        public ReadOnlyCollection<Page> OriginalDeletedPages
+        {
+            get
+            {
+                try
+                {
+                    return _originalDeletedPages.ToList().AsReadOnly();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40047");
+                }
             }
         }
 
@@ -191,7 +229,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _originalPages = new List<Page>(_pageControls.Select(c => c.Page));
+                _originalPages = new List<Page>(_pageControls
+                    .Select(c => c.Page));
+
+                _originalDeletedPages = new HashSet<Page>(_pageControls
+                    .Where(c => c.Deleted)
+                    .Select(c => c.Page));
             }
             catch (Exception ex)
             {
@@ -208,7 +251,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                InsertPage(pageControl, _pageControls.Count + 1);
+                InsertPage(pageControl, _pageControls.Count);
             }
             catch (Exception ex)
             {
@@ -217,23 +260,31 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Inserts the specified <see paramref="pageControl"/> as <see paramref="pageNumber"/> of
-        /// the document.
+        /// Inserts the specified <see paramref="pageControl"/> at the specified zero-based page
+        /// index.
+        /// <para><b>Note</b></para>
+        /// index != page number; index may reflect preceding deleted pages that will not appear in
+        /// the resulting document.
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> representing the page
         /// to be inserted.</param>
-        /// <param name="pageNumber">The page number the new page should be inserted at.</param>
-        public virtual void InsertPage(PageThumbnailControl pageControl, int pageNumber)
+        /// <param name="pageIndex">The page number the new page should be inserted at.</param>
+        public virtual void InsertPage(PageThumbnailControl pageControl, int pageIndex)
         {
             try
             {
-                ExtractException.Assert("ELI35551", "Invalid page number",
-                    pageNumber > 0 && pageNumber <= _pageControls.Count + 1,
-                    "Document", FileName, "Page", pageNumber);
+                ExtractException.Assert("ELI35551", "Invalid page index",
+                    pageIndex >= 0 && pageIndex <= _pageControls.Count,
+                    "Document", FileName, "Page", pageIndex);
 
-                if (pageNumber <= _pageControls.Count)
+                if (!_pageControls.Contains(pageControl))
                 {
-                    _pageControls.Insert(pageNumber - 1, pageControl);
+                    pageControl.DeletedStateChanged += HandlePageControl_DeletedStateChanged;
+                }
+
+                if (pageIndex < _pageControls.Count)
+                {
+                    _pageControls.Insert(pageIndex, pageControl);
                 }
                 else
                 {
@@ -249,6 +300,26 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the DeletedStateChanged event of the pageControl control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandlePageControl_DeletedStateChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                foreach (var pageControl in _pageControls)
+                {
+                    pageControl.Invalidate();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40044");
+            }
+        }
+
+        /// <summary>
         /// Removes the specified <see paramref="pageControl"/> from the document.
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> that is to be removed.</param>
@@ -258,7 +329,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 ExtractException.Assert("ELI35553", "Null argument exception.", pageControl != null);
 
-                _pageControls.Remove(pageControl);
+                if (_pageControls.Remove(pageControl))
+                {
+                    pageControl.DeletedStateChanged -= HandlePageControl_DeletedStateChanged;
+                }
 
                 pageControl.Document = null;
             }
@@ -277,6 +351,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // If there are no un-deleted pages, there is nothing to output.
+                if (!_pageControls.Any(c => !c.Deleted))
+                {
+                    return true;
+                }
+
                 CancelEventArgs eventArgs = new CancelEventArgs();
                 OnDocumentOutputting(eventArgs);
                 if (eventArgs.Cancel)
@@ -292,6 +372,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 bool copyOriginalDocument = InOriginalForm;
+                Page firstPage = _pageControls
+                    .Where(pageControl => !pageControl.Deleted)
+                    .First()
+                    .Page;
                 if (copyOriginalDocument)
                 {
                     // [DotNetRCAndUtils:972]
@@ -299,7 +383,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // to output the document in a different format.
                     string extension = Path.GetExtension(FileName);
                     string originalExtension =
-                        Path.GetExtension(_pageControls[0].Page.OriginalDocumentName);
+                        Path.GetExtension(firstPage.OriginalDocumentName);
 
                     if (!extension.Equals(originalExtension, StringComparison.OrdinalIgnoreCase))
                     {
@@ -313,14 +397,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     // If the document has not been changed from its original form, it can simply be
                     // copied to _fileName rather than require it to be re-assembled.
-                    File.Copy(_pageControls[0].Page.OriginalDocumentName, FileName);
+                    File.Copy(firstPage.OriginalDocumentName, FileName);
                 }
                 else
                 {
                     // Otherwise, generate a new document using the current PageControls as the
                     // document's pages.
-                    var imagePages = PageControls.Select(pageControl =>
-                        new ImagePage(pageControl.Page.OriginalDocumentName,
+                    var imagePages = PageControls
+                        .Where(pageControl => !pageControl.Deleted)
+                        .Select(pageControl => new ImagePage(pageControl.Page.OriginalDocumentName,
                             pageControl.Page.OriginalPageNumber,
                             pageControl.Page.ImageOrientation));
 

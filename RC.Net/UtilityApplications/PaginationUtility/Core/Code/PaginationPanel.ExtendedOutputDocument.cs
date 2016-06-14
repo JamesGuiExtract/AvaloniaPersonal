@@ -14,12 +14,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         class ExtendedOutputDocument : OutputDocument
         {
             /// <summary>
-            /// Indicates whether singly selected documents (one and only one document that contains
-            /// all of the currently selected pages) should be indicated with a blue background.
-            /// </summary>
-            bool _highlightSinglySelectedDocument;
-
-            /// <summary>
             /// The document data that is associated with this instance (VOA file data, for instance).
             /// </summary>
             IDocumentData _documentData;
@@ -27,14 +21,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// <summary>
             /// Initializes a new instance of the <see cref="ExtendedOutputDocument"/> class.
             /// </summary>
-            /// <param name="fileName">The</param>
-            /// <param name="highlightSinglySelectedDocument">Indicates whether singly selected
-            /// documents (one and only one document that contains all of the currently selected
-            /// pages) should be indicated with a blue background.</param>
-            public ExtendedOutputDocument(string fileName, bool highlightSinglySelectedDocument)
+            /// <param name="fileName">The name to be assigned to this output document.</param>
+            public ExtendedOutputDocument(string fileName)
                 : base(fileName)
             {
-                _highlightSinglySelectedDocument = highlightSinglySelectedDocument;
             }
 
             /// <summary>
@@ -114,11 +104,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         replaceExistingTypeInstances: true);
                     pageControl.AddStylist(new EditedDocumentPageStylist(pageControl),
                         replaceExistingTypeInstances: true);
-                    if (_highlightSinglySelectedDocument)
-                    {
-                        pageControl.AddStylist(new SelectedDocumentStylist(pageControl),
-                            replaceExistingTypeInstances: true);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -145,11 +130,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         replaceExistingTypeInstances: true);
                     pageControl.AddStylist(new EditedDocumentPageStylist(pageControl),
                         replaceExistingTypeInstances: true);
-                    if (_highlightSinglySelectedDocument)
-                    {
-                        pageControl.AddStylist(new SelectedDocumentStylist(pageControl),
-                            replaceExistingTypeInstances: true);
-                    }
                 }
                 catch (Exception ex)
                 {

@@ -1087,6 +1087,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     if (_paginationPanel.IsPaginationSuggested(fileName))
                     {
+                        // When jumping straight into pagination, still update the title bar to
+                        // reflect the active document.
+                        string imageName = Path.GetFileName(fileName);
+                        base.Text = imageName + " - " + base.Text;
+                        if (_imageViewerForm != null)
+                        {
+                            _imageViewerForm.Text = imageName + " - " + _imageViewerForm.Text;
+                        }
+
                         _tabControl.SelectedTab = _paginationTab;
                         _paginationPanel.PendingChanges = true;
 
@@ -2916,24 +2925,27 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (e.TabPage != _paginationTab && _paginationPanel.PendingChanges)
+                if (!_paginating)
                 {
-                    UtilityMethods.ShowMessageBox("You must apply or revert pagination changes.",
-                        "Uncommitted changes", false);
-                    e.Cancel = true;
-                }
-                // Though not easily reproducible, switching to the pagination tab before a
-                // document is fully loaded can cause exceptions for a null _imageViewer in
-                // FinalizeDocumentLoad. Prevent tab changes until a document fully loaded,
-                // though allow for tab changes for form setup before any files are loaded.                    
-                else if (_imageViewer.IsImageAvailable && _dataEntryControlHost != null &&
-                    !_dataEntryControlHost.IsDocumentLoaded)
-                {
-                    e.Cancel = true;
+                    if (e.TabPage != _paginationTab && _paginationPanel.PendingChanges)
+                    {
+                        UtilityMethods.ShowMessageBox("You must apply or revert pagination changes.",
+                            "Uncommitted changes", false);
+                        e.Cancel = true;
+                    }
+                    // Though not easily reproducible, switching to the pagination tab before a
+                    // document is fully loaded can cause exceptions for a null _imageViewer in
+                    // FinalizeDocumentLoad. Prevent tab changes until a document fully loaded,
+                    // though allow for tab changes for form setup before any files are loaded.                    
+                    else if (_imageViewer.IsImageAvailable && _dataEntryControlHost != null &&
+                        !_dataEntryControlHost.IsDocumentLoaded)
+                    {
+                        e.Cancel = true;
 
-                    // Schedule the tab change to occur once the document has fully loaded.
-                    _dataEntryControlHost.ExecuteOnIdle("ELI39750", () =>
-                        _tabControl.SelectedTab = _paginationTab);
+                        // Schedule the tab change to occur once the document has fully loaded.
+                        _dataEntryControlHost.ExecuteOnIdle("ELI39750", () =>
+                            _tabControl.SelectedTab = _paginationTab);
+                    }
                 }
             }
             catch (Exception ex)
@@ -3214,11 +3226,28 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // accomplished by the DEP), the data tab must be given back focus.
                         _tabControl.SelectedTab = _dataTab;
 
+                        _imageViewer.CloseImage();
+
                         // Record statistics to database that need to happen when a file is closed.
                         RecordCounts(onLoad: false, attributes: null);
                         EndFileTaskSession();
 
                         OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+
+                        if (string.IsNullOrEmpty(_actionName))
+                        {
+                            base.Text = _brandingResources.ApplicationTitle;
+                        }
+                        else
+                        {
+                            base.Text = "Waiting - " + _brandingResources.ApplicationTitle +
+                                " (" + _actionName + ")";
+                        }
+
+                        if (_dataEntryControlHost != null)
+                        {
+                            _dataEntryControlHost.LoadData(null);
+                        }
 
                         _paginating = false;
                     }, 
@@ -5532,7 +5561,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
                 {
                     string query = string.Format(CultureInfo.InvariantCulture,
-                        "SELECT COUNT(DISTINCT([DestFileID])) AS [SubDocIndex] " +
+                        "SELECT COUNT(DISTINCT([DestFileID])) + 1 AS [SubDocIndex] " +
                         "   FROM [Pagination] " +
                         "   INNER JOIN [FAMFile] ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
                         "   WHERE [FileName] = '{0}'",

@@ -66,6 +66,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         string _toolTipText;
 
+        /// <summary>
+        /// Indicates whether the page should be considered deleted.
+        /// </summary>
+        bool _deleted;
+
         #endregion Fields
 
         #region Constructors
@@ -82,6 +87,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 InitializeComponent();
 
                 AddStylist(new CopiedPageStylist(this), replaceExistingTypeInstances: true);
+                AddStylist(new DeletedPageStylist(this), replaceExistingTypeInstances: true);
             }
             catch (Exception ex)
             {
@@ -170,6 +176,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Static Members
 
+        #region Events
+
+        /// <summary>
+        /// Raised to indicate the state of <see cref="Deleted"/> has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> DeletedStateChanged;
+
+        #endregion Events
+
         #region Properties
 
         /// <summary>
@@ -196,8 +211,27 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// The page number of this instance in the <see cref="Document"/> or zero if it does not
+        /// Gets the zero-based page index of the page within its current document or -1 if it is
+        /// not currently part of any document.
+        /// <para><b>Note</b></para>
+        /// The page index includes pages where <see cref="Deleted"/> is <see langword="true"/>.
+        /// </summary>
+        public int DocumentPageIndex
+        {
+            get
+            {
+                return (Document == null)
+                    ? -1
+                    : Document.PageControls.IndexOf(this);
+            }
+        }
+
+        /// <summary>
+        /// The page number of this instance in the <see cref="Document"/> or zero if it is not
         /// currently part of any document.
+        /// <para><b>Note</b></para>
+        /// The page number does not include pages where <see cref="Deleted"/> is
+        /// <see langword="true"/>.
         /// </summary>
         public int PageNumber
         {
@@ -205,7 +239,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    return (Document == null) ? 0 : Document.PageControls.IndexOf(this) + 1;
+                    return (Document == null || Deleted)
+                        ? 0
+                        : Document.PageControls
+                            .Where(c => !c.Deleted)
+                            .ToList()
+                            .IndexOf(this) + 1;
                 }
                 catch (Exception ex)
                 {
@@ -289,6 +328,38 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI35664");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="PageThumbnailControl"/> should
+        /// be considered deleted.
+        /// </summary>
+        /// <value><see langword="true"/> if deleted; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Deleted
+        {
+            get
+            {
+                return _deleted;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _deleted)
+                    {
+                        _deleted = value;
+                        Invalidate();
+
+                        OnDeletedStateChanged();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40048");
                 }
             }
         }
@@ -779,6 +850,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _rasterPictureBox.Invalidate();
                 }
             });
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DeletedStateChanged"/> event.
+        /// </summary>
+        void OnDeletedStateChanged()
+        {
+            var eventHandler = DeletedStateChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
         }
 
         #endregion Private Members

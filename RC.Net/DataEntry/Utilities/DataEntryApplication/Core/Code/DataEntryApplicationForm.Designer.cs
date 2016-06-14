@@ -252,7 +252,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _paginationPanel
             // 
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._paginationPanel.HighlightSinglySelectedDocument = true;
             this._paginationPanel.ImageViewer = null;
             this._paginationPanel.Location = new System.Drawing.Point(0, 0);
             this._paginationPanel.Margin = new System.Windows.Forms.Padding(0);

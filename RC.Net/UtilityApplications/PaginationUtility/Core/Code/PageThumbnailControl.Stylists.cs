@@ -258,7 +258,68 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return PageControl.Page.MultipleCopiesExist;
+                return !PageControl.Deleted &&
+                    PageControl.Page.MultipleCopiesExist;
+            }
+        }
+    }
+
+    /// <summary>
+    /// A <see cref="PageStylist"/> that overlays an "X" on any
+    /// <see cref="PageThumbnailControl"/> instances that have been deleted and will not appear in
+    /// any pagination output document.
+    /// </summary>
+    internal class DeletedPageStylist : OverlayTextStylist
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeletedPageStylist"/> class.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which this stylist
+        /// is responsible.</param>
+        public DeletedPageStylist(PageThumbnailControl pageControl)
+            : base(pageControl, "X", Color.FromArgb(99, Color.Red))
+        {
+        }
+
+        /// <summary>
+        /// Gets whether the stylist is visible.
+        /// </summary>
+        /// <returns><see langword="true"/> if visible.
+        /// </returns>
+        protected override bool IsVisible
+        {
+            get
+            {
+                return PageControl.Deleted;
+            }
+        }
+
+        /// <summary>
+        /// Allows foreground of the PageControl to be painted.
+        /// </summary>
+        /// <param name="paintingControl">The specific <see cref="Control"/> within
+        /// PageControl being painted.</param>
+        /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
+        /// PageControl.</param>
+        public override void PaintForeground(Control paintingControl, PaintEventArgs e)
+        {
+            try
+            {
+                if (IsVisible)
+                {
+                    var brush = ExtractBrushes.GetSolidBrush(Color.FromArgb(99, Color.Black));
+                    Rectangle drawRectangle = GetDrawRectangle(paintingControl);
+                    e.Graphics.FillRectangle(brush, drawRectangle);
+
+                    var pen = ExtractPens.GetThickPen(Color.Black);
+                    e.Graphics.DrawRectangle(pen, drawRectangle);
+
+                    base.PaintForeground(paintingControl, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40043");
             }
         }
     }
@@ -304,7 +365,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return !PageControl.Document.InOriginalForm;
+                return !PageControl.Deleted && !PageControl.Document.InOriginalForm;
             }
         }
 
@@ -370,7 +431,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return !PageControl.Document.InSourceDocForm;
+                return !PageControl.Deleted && !PageControl.Document.InSourceDocForm;
             }
         }
 
@@ -411,80 +472,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39999");
-            }
-        }
-    }
-
-    /// <summary>
-    /// A <see cref="PageStylist"/> that indicates a document page that is part of the only
-    /// <see cref="OutputDocument"/> for which pages are currently selected.
-    /// </summary>
-    internal class SelectedDocumentStylist : PageStylist
-    {
-        /// <summary>
-        /// The <see cref="PageThumbnailControl"/> instances that have been painted with document
-        /// selection.
-        /// </summary>
-        HashSet<PageThumbnailControl> _paintedPages = new HashSet<PageThumbnailControl>();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SelectedDocumentStylist"/> class.
-        /// </summary>
-        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which this stylist
-        /// is responsible.</param>
-        public SelectedDocumentStylist(PageThumbnailControl pageControl)
-            : base(pageControl)
-        {
-        }
-
-        /// <summary>
-        /// Gets whether the stylist is visible.
-        /// </summary>
-        /// <returns><see langword="true"/> if visible.</returns>
-        protected override bool IsVisible
-        {
-            get
-            {
-                var selectedDocs = PageControl.PageLayoutControl.PartiallySelectedDocuments;
-
-                return (selectedDocs.Count() == 1 &&
-                    selectedDocs.Single() == PageControl.Document);
-            }
-        }
-
-        /// <summary>
-        /// Allows the background of the specified PageControl to be painted.
-        /// </summary>
-        /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
-        /// PageControl.</param>
-        public override void PaintBackground(PaintEventArgs e)
-        {
-            try
-            {
-                if (IsVisible)
-                {
-                    var color = Color.FromArgb(50, SystemColors.Highlight);
-                    var brush = ExtractBrushes.GetSolidBrush(color);
-
-                    e.Graphics.FillRectangle(brush, e.ClipRectangle);
-
-                    _paintedPages.Add(PageControl);
-                }
-                else if (_paintedPages.Contains(PageControl))
-                {
-                    // Invalidate pages that were previously painted so that their appearance as
-                    // part of a selected document is cleared when appropriate.
-                    foreach (var paintedPage in _paintedPages)
-                    {
-                        paintedPage.Invalidate();
-                    }
-
-                    _paintedPages.Clear();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39675");
             }
         }
     }
