@@ -46,7 +46,7 @@ void getStartAndEndPage(const string& strPageRange, int& nStartPage, int& nEndPa
 	{
 		if(strStartPage == "0")
 		{
-			UCLIDException ue("ELI12950", "Starting page can not be zero.");
+			UCLIDException ue("ELI12950", "Starting page cannot be zero.");
 			ue.addDebugInfo("String", strPageRange);
 			throw ue;
 		}
@@ -71,13 +71,20 @@ void getStartAndEndPage(const string& strPageRange, int& nStartPage, int& nEndPa
 		nEndPage = 0;
 		return;
 	}
+
+	if(strEndPage == "0")
+	{
+		UCLIDException ue("ELI40060", "Ending page cannot be zero.");
+		ue.addDebugInfo("String", strPageRange);
+		throw ue;
+	}
 	
 	nEndPage = ::asLong(strEndPage);
 	
-	// make sure the start page number is less than the end page number
-	if (nStartPage >= nEndPage)
+	// make sure the start page number is less or equal to the end page number
+	if (nStartPage > nEndPage)
 	{
-		UCLIDException ue("ELI10264", "Start page number must be less than the end page number.");
+		UCLIDException ue("ELI10264", "Start page number must be less than or equal to the end page number.");
 		ue.addDebugInfo("Page range", strPageRange);
 		throw ue;
 	}
@@ -180,7 +187,7 @@ void fillPageNumberVector(vector<int>& rvecPageNumbers,
 			getStartAndEndPage(strToken, nStartPage, nEndPage);
 
 			if (nStartPage > 0 && 
-				(nEndPage > nStartPage || nEndPage <= 0))
+				(nEndPage >= nStartPage || nEndPage <= 0))
 			{
 				// range of pages
 				updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nStartPage, nEndPage,

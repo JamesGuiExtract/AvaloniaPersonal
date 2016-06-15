@@ -487,6 +487,7 @@ namespace Extract.Utilities.Test
             Assert.DoesNotThrow(() => UtilityMethods.ValidatePageNumbers("-3"));
             Assert.DoesNotThrow(() => UtilityMethods.ValidatePageNumbers("3-"));
             Assert.DoesNotThrow(() => UtilityMethods.ValidatePageNumbers("1,2,3-,-1,4,5,1-10"));
+            Assert.DoesNotThrow(() => UtilityMethods.ValidatePageNumbers("3-3"));
         }
 
         /// <summary>
@@ -542,6 +543,9 @@ namespace Extract.Utilities.Test
 
             result = UtilityMethods.GetPageNumbersFromString("-4", 3, false);
             CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, result);
+
+            result = UtilityMethods.GetPageNumbersFromString("1-1", 2, false);
+            CollectionAssert.AreEquivalent(new[] { 1 }, result);
         }
 
         /// <summary>
@@ -575,10 +579,10 @@ namespace Extract.Utilities.Test
         public static void GetPageNumbersFromStringExceptions()
         {
             var ex = Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("4-2", 3, false));
-            Assert.That( ex.Message, Is.EqualTo("Start page number must be less than the end page number.") );
+            Assert.That( ex.Message, Is.EqualTo("Start page number must be less than or equal to the end page number.") );
 
             ex = Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("-0", 3, false));
-            Assert.That( ex.Message, Is.EqualTo("Start page number must be less than the end page number.") );
+            Assert.That( ex.Message, Is.EqualTo("Ending page cannot be zero.") );
 
             ex = Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("2-4", 3, true));
             Assert.That( ex.Message, Is.EqualTo("Specified end page number is out of range.") );

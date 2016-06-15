@@ -578,6 +578,13 @@ namespace Extract.Utilities
                 endPageNumber = 0;
                 return;
             }
+
+            if(endPage == "0")
+            {
+                var ue = new ExtractException("ELI40054", "Ending page cannot be zero.");
+                ue.AddDebugData("Page range", pageRange, false);
+                throw ue;
+            }
           
             if (!Int32.TryParse(endPage, out endPageNumber))
             {
@@ -586,10 +593,10 @@ namespace Extract.Utilities
                 throw ue;
             }
           
-            // make sure the start page number is less than the end page number
-            if (startPageNumber >= endPageNumber)
+            // make sure the start page number is less than or equal to the end page number
+            if (startPageNumber > endPageNumber)
             {
-                var ue = new ExtractException("ELI39582", "Start page number must be less than the end page number.");
+                var ue = new ExtractException("ELI39582", "Start page number must be less than or equal to the end page number.");
                 ue.AddDebugData("Page range", pageRange, false);
                 throw ue;
             }
@@ -715,7 +722,7 @@ namespace Extract.Utilities
                     GetStartAndEndPage(token, out startPage, out endPage);
 
                     if (startPage > 0 &&
-                        (endPage > startPage || endPage <= 0))
+                        (endPage >= startPage || endPage <= 0))
                     {
                         // range of pages
                         updatePageNumbers(pageNumbers, totalPages, startPage, endPage,
