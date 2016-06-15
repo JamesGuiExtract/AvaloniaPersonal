@@ -6065,5 +6065,22 @@ void CFileProcessingDB::InvalidatePreviousCachedInfoIfNecessary()
 		m_DatabaseIDValues = DatabaseIDValues();
 	}
 }
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::isFileInPagination(_ConnectionPtr ipConnection, long nFileID)
+{
+	bool bResult = false;
+	
+	string strQuery =gstrACTIVE_PAGINATION_FILEID;
+	replaceVariable(strQuery, "<FileID>", asString(nFileID));
+	
+	// Create a pointer to a recordset
+	_RecordsetPtr ipResultSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI40053", ipResultSet != __nullptr);
+	
+	ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+		adLockReadOnly, adCmdText);
 
+	bResult = !asCppBool(ipResultSet->adoEOF);
 
+	return bResult;
+}

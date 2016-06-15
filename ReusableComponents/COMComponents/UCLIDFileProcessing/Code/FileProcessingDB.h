@@ -1082,6 +1082,9 @@ private:
 
 	void createAndStoreNewDatabaseID(_ConnectionPtr ipConnection);
 
+	// Checks if the file was created in a currently active FAMSession thru pagination.
+	bool isFileInPagination(_ConnectionPtr ipConnection, long nFileID);
+
 	void validateLicense();
 
 	// Internal implementation methods

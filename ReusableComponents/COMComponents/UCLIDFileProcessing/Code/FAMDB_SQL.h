@@ -1583,3 +1583,11 @@ static const string gstrINSERT_INTO_PAGINATION =
 	"		) AS [OriginalPages] \r\n"
 	"		ON [NewPaginations].[SourceFileID] = [OriginalPages].[DestFileID] \r\n"
 	"			AND [NewPaginations].[SourcePage] = [OriginalPages].[DestPage]";
+
+static const string gstrACTIVE_PAGINATION_FILEID = 
+	"SELECT        Pagination.DestFileID \r\n"
+	"FROM            ActiveFAM INNER JOIN \r\n"
+	"                         FAMSession ON ActiveFAM.FAMSessionID = FAMSession.ID INNER JOIN \r\n"
+	"                         FileTaskSession ON FAMSession.ID = FileTaskSession.FAMSessionID INNER JOIN \r\n"
+	"                         Pagination ON FileTaskSession.ID = Pagination.FileTaskSessionID \r\n"
+	"WHERE        (Pagination.DestFileID = <FileID>) \r\n";

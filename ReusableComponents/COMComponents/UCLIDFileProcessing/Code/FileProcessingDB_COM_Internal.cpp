@@ -1684,11 +1684,23 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				// Get the action ID and update the strActionName to stored value
 				long nActionID = getActionID(ipConnection, strActionName);
 				_lastCodePos = "45";
+				
+				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord = __nullptr;
+				FieldsPtr ipFields = __nullptr;
 
 				// if the file is in the FAMFile table get the ID
 				if (asCppBool(*pbAlreadyExists))
 				{
-					nID = getLongField(ipFileSet->Fields, "ID");
+					// Get the fields from the file set
+					ipFields = ipFileSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI30362", ipFields != __nullptr);
+
+					// Get the file record from the fields
+					ipOldRecord = getFileRecordFromFields(ipFields);
+					ASSERT_RESOURCE_ALLOCATION("ELI30363", ipOldRecord != __nullptr);
+
+					// Set the Current file Records ID
+					nID = ipOldRecord->FileID;
 				}
 
 				// Get the FileActionStatus recordset with the status of the file for the action
@@ -1696,6 +1708,22 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				_RecordsetPtr ipFileActionStatusSet = getFileActionStatusSet(ipConnection, nID, nActionID);
 				*pPrevStatus = (asCppBool(!ipFileActionStatusSet->adoEOF)) ?
 					asEActionStatus(getStringField(ipFileActionStatusSet->Fields, "ActionStatus")) : kActionUnattempted;
+
+				// Check if the existing file is currently from an active pagination process
+				if (asCppBool(*pbAlreadyExists) && isFileInPagination(ipConnection, nID))
+				{
+					// Update QueueEvent table if enabled
+					if (m_bUpdateQueueEventTable)
+					{
+						// add a new QueueEvent record 
+						addQueueEventRecord(ipConnection, nID, nActionID, asString(strFile), (bFileModified == VARIANT_TRUE) ? "M":"A");
+
+					// Commit the changes to the database
+					tg.CommitTrans();
+					}
+					*ppFileRecord = (IFileRecord*)ipOldRecord.Detach();
+					return true;
+				}
 
 				// Only update file size and page count if the previous status is unattempted
 				// or force status change is true
@@ -1754,7 +1782,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					ipFileSet->AddNew();
 
 					// Get the fields from the file set
-					FieldsPtr ipFields = ipFileSet->Fields;
+					ipFields = ipFileSet->Fields;
 					ASSERT_RESOURCE_ALLOCATION("ELI30361", ipFields != __nullptr);
 
 					// Set the fields from the new file record
@@ -1828,17 +1856,6 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				}
 				else
 				{
-					// Get the fields from the file set
-					FieldsPtr ipFields = ipFileSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI30362", ipFields != __nullptr);
-
-					// Get the file record from the fields
-					UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord = getFileRecordFromFields(ipFields);
-					ASSERT_RESOURCE_ALLOCATION("ELI30363", ipOldRecord != __nullptr);
-
-					// Set the Current file Records ID
-					nID = ipOldRecord->FileID;
-
 					_lastCodePos = "100";
 
 					// If Force processing is set need to update the status or if the previous status for this action was unattempted
