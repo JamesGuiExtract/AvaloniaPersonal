@@ -122,6 +122,7 @@
     <Compile Include="ThreadSpecificEventHandler.cs" />
     <Compile Include="TimeInterval.cs" />
     <Compile Include="UndoManager.cs" />
+    <Compile Include="Union.cs" />
     <Compile Include="UserConfigChecker.cs" />
     <Compile Include="UtilityExtensionMethods.cs" />
     <Compile Include="UtilityMethods.cs" />

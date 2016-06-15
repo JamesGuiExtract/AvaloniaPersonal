@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -94,7 +95,7 @@ namespace Extract.AttributeFinder
     /// and changing the type of a feature vectorizer, getting the feature vector length and viewing
     /// the values that it has been exposed to during configuration from training data.
     /// </summary>
-    public interface IFeatureVectorizer
+    public interface IFeatureVectorizer : INotifyPropertyChanged
     {
         /// <summary>
         /// The name of the feature
@@ -276,7 +277,7 @@ namespace Extract.AttributeFinder
         {
             get
             {
-                return AutoBagOfWords != null
+                return AutoBagOfWords != null && AutoBagOfWords.Enabled
                     ? AutoBagOfWords.FeatureVectorLength + AttributeFeatureVectorLength
                     : AttributeFeatureVectorLength;
             }
@@ -811,7 +812,7 @@ namespace Extract.AttributeFinder
                 }
             }
 
-            if (AutoBagOfWords == null)
+            if (AutoBagOfWords == null || !AutoBagOfWords.Enabled)
             {
                 return attributeFeatures.ToArray();
             }
@@ -859,12 +860,15 @@ namespace Extract.AttributeFinder
 
             }
 
-            if (AutoBagOfWords == null)
+            if (AutoBagOfWords == null || !AutoBagOfWords.Enabled)
             {
                 // Transpose from <# vectorizers> X <# page pairs> to <# page pairs> X <# vectorizers>
                 for (int i = 0; i < numberOfExamples; i++)
                 {
-                    yield return attributeFeatures.SelectMany(v => v[i]).ToArray();
+                    yield return attributeFeatures
+                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
+                        .SelectMany(v => v[i])
+                        .ToArray();
                 }
             }
             else
@@ -873,7 +877,10 @@ namespace Extract.AttributeFinder
                 numberOfExamples = shingleFeatures.Count;
                 for (int i = 0; i < numberOfExamples; i++)
                 {
-                    yield return shingleFeatures[i].Concat(attributeFeatures.SelectMany(v => v[i])).ToArray();
+                    yield return shingleFeatures[i].Concat(attributeFeatures
+                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
+                        .SelectMany(v => v[i]))
+                        .ToArray();
                 }
             }
         }
@@ -1090,7 +1097,6 @@ namespace Extract.AttributeFinder
                 }
             }
             AttributeFeatureVectorizers = vectorizerMap.Values;
-
 
             // Add category names and codes
             // Add an 'other' category

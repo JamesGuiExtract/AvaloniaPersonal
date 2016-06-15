@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UCLID_RASTERANDOCRMGMTLib;
 using System.Threading;
+using System.ComponentModel;
 
 namespace Extract.AttributeFinder
 {
@@ -31,16 +32,10 @@ namespace Extract.AttributeFinder
         /// </summary>
         private Accord.MachineLearning.BagOfWords _bagOfWords;
 
-        /// <summary>
-        /// A string representation of pages to be processed, e.g., 1-2 or -1
-        /// If computing pagination feature vectors then no pages should be specified.
-        /// </summary>
+        // Backing fields for properties
         private string _pagesToProcess;
-
-        /// <summary>
-        /// The name of this feature vectorizer
-        /// </summary>
         private string _name;
+        private bool _enabled;
 
         #endregion Private Fields
 
@@ -123,7 +118,21 @@ namespace Extract.AttributeFinder
         /// Whether this feature vectorizer will produce a feature vector of length
         /// <see cref="FeatureVectorLength"/> (if <see langword="true"/>) or of zero length (if <see langword="false"/>)
         /// </summary>
-        public bool Enabled { get; set; }
+        public bool Enabled
+        {
+            get
+            {
+                return _enabled;
+            }
+            set
+            {
+                if (value != _enabled)
+                {
+                    _enabled = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// Gets/sets the string representation of which pages to process.
@@ -468,7 +477,31 @@ namespace Extract.AttributeFinder
 
         #endregion Overrides
 
+        #region INotifyPropertyChanged
+
+        /// <summary>
+        /// Property changed event
+        /// </summary>
+        [field:NonSerialized]
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion INotifyPropertyChanged
+
         #region Private Methods
+
+        /// <summary>
+        /// This method is called by the Set accessor of each property
+        /// </summary>
+        /// <param name="propertyName">Optional name of property that changed</param>
+        /// In VS 2015 could use this: [CallerMemberName] String propertyName = ""
+        private void NotifyPropertyChanged(string propertyName = "")
+        {
+            var eventHandler = PropertyChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         /// <summary>
         /// Gets the string value from a <see cref="ISpatialString"/> limited to <see cref="PagesToProcess"/>

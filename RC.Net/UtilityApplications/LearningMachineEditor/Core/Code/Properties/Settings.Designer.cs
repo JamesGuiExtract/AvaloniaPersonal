@@ -22,5 +22,17 @@ namespace Extract.UtilityApplications.LearningMachineEditor.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DiffCommandLine {
+            get {
+                return ((string)(this["DiffCommandLine"]));
+            }
+            set {
+                this["DiffCommandLine"] = value;
+            }
+        }
     }
 }

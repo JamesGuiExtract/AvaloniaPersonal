@@ -1,7 +1,9 @@
 ﻿using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder
@@ -13,12 +15,15 @@ namespace Extract.AttributeFinder
     [Serializable]
     public class AttributeFeatureVectorizer : IFeatureVectorizer
     {
-        #region Private Fields
+        #region Fields
 
-        /// <summary>
-        /// The name of the feature vectorizer, which is also the name of protoFeature attributes from which this vectorizer will derive features
-        /// </summary>
+        // Backing fields for properties
         private string _name;
+        private FeatureVectorizerType _featureType;
+        private bool _enabled;
+        private uint _countOfNumericValuesOccurred;
+        private uint _countOfNonnumericValuesOccurred;
+        private uint _countOfMultipleValuesOccurred;
 
         /// <summary>
         /// Bag-of-words object to be created if/when it is needed
@@ -30,7 +35,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         private HashSet<string> _distinctValuesSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        #endregion Private Fields
+        #endregion Fields
 
 
         #region Constructors
@@ -73,6 +78,7 @@ namespace Extract.AttributeFinder
                         throw new ExtractException("ELI39619", @"Name must be a valid identifier of the form [_a-zA-Z]\w*");
                     }
                     _name = value;
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -80,7 +86,21 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Gets/sets the <see cref="FeatureVectorizerType"/> of this feature vectorizer (controls how the input is interpreted)
         /// </summary>
-        public FeatureVectorizerType FeatureType { get; set; }
+        public FeatureVectorizerType FeatureType
+        {
+            get
+            {
+                return _featureType;
+            }
+            set
+            {
+                if (value != _featureType)
+                {
+                    _featureType = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// Whether changing the <see cref="FeatureVectorizerType"/> is allowed. Always <see langword="true"/>.
@@ -97,22 +117,78 @@ namespace Extract.AttributeFinder
         /// Whether this feature vectorizer will produce a feature vector of length
         /// <see cref="FeatureVectorLength"/> (if <see langword="true"/>) or of zero length (if <see langword="false"/>)
         /// </summary>
-        public bool Enabled { get; set; }
+        public bool Enabled
+        {
+            get
+            {
+                return _enabled;
+            }
+            set
+            {
+                if (value != _enabled)
+                {
+                    _enabled = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// The number of numeric values seen during configuration
         /// </summary>
-        public uint CountOfNumericValuesOccurred { get; set; }
+        public uint CountOfNumericValuesOccurred
+        {
+            get
+            {
+                return _countOfNumericValuesOccurred;
+            }
+            private set
+            {
+                if (value != _countOfNumericValuesOccurred)
+                {
+                    _countOfNumericValuesOccurred = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// The number of non-numeric values seen during configuration
         /// </summary>
-        public uint CountOfNonnumericValuesOccurred { get; set; }
+        public uint CountOfNonnumericValuesOccurred
+        {
+            get
+            {
+                return _countOfNonnumericValuesOccurred;
+            }
+            private set
+            {
+                if (value != _countOfNonnumericValuesOccurred)
+                {
+                    _countOfNonnumericValuesOccurred = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// The number of cases where multiple attributes were present in a single example
         /// </summary>
-        public uint CountOfMultipleValuesOccurred { get; set; }
+        public uint CountOfMultipleValuesOccurred
+        {
+            get
+            {
+                return _countOfMultipleValuesOccurred;
+            }
+            set
+            {
+                if (value != _countOfMultipleValuesOccurred)
+                {
+                    _countOfMultipleValuesOccurred = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// A collection of distinct attribute values seen during configuration
@@ -366,5 +442,33 @@ namespace Extract.AttributeFinder
         }
 
         #endregion Overrides
+
+        #region INotifyPropertyChanged
+
+        /// <summary>
+        /// Property changed event
+        /// </summary>
+        [field:NonSerialized]
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion INotifyPropertyChanged
+
+        #region Private Methods
+
+        /// <summary>
+        /// This method is called by the Set accessor of each property
+        /// </summary>
+        /// <param name="propertyName">Optional name of property that changed</param>
+        /// In VS 2015 could use this: [CallerMemberName] String propertyName = ""
+        private void NotifyPropertyChanged(string propertyName = "")
+        {
+            var eventHandler = PropertyChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        #endregion Private Methods
     }
 }

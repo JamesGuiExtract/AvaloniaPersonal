@@ -112,7 +112,6 @@
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Computing features";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HandleComputingFeaturesStatus_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

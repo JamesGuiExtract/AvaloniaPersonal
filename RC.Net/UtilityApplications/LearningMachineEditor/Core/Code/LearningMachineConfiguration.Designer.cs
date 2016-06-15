@@ -126,7 +126,6 @@
             this.openMachineButton = new System.Windows.Forms.Button();
             this.saveMachineButton = new System.Windows.Forms.Button();
             this.newMachineButton = new System.Windows.Forms.Button();
-            this.statusStrip1.SuspendLayout();
             this.configurationTabControl.SuspendLayout();
             this.inputConfigurationTabPage.SuspendLayout();
             this.machineUsageGroupBox.SuspendLayout();
@@ -145,8 +144,6 @@
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 711);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1109, 22);
@@ -276,7 +273,6 @@
             this.documentCategorizationFolderFeatureVoaPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("documentCategorizationFolderFeatureVoaPathTagButton.Image")));
             this.documentCategorizationFolderFeatureVoaPathTagButton.Location = new System.Drawing.Point(501, 75);
             this.documentCategorizationFolderFeatureVoaPathTagButton.Name = "documentCategorizationFolderFeatureVoaPathTagButton";
-            this.documentCategorizationFolderFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.documentCategorizationFolderFeatureVoaPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.documentCategorizationFolderFeatureVoaPathTagButton.TabIndex = 5;
             this.documentCategorizationFolderFeatureVoaPathTagButton.TextControl = this.documentCategorizationFolderFeatureVoaTextBox;
@@ -346,7 +342,6 @@
             this.documentCategorizationFolderAnswerPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("documentCategorizationFolderAnswerPathTagButton.Image")));
             this.documentCategorizationFolderAnswerPathTagButton.Location = new System.Drawing.Point(501, 121);
             this.documentCategorizationFolderAnswerPathTagButton.Name = "documentCategorizationFolderAnswerPathTagButton";
-            this.documentCategorizationFolderAnswerPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.documentCategorizationFolderAnswerPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.documentCategorizationFolderAnswerPathTagButton.TabIndex = 8;
             this.documentCategorizationFolderAnswerPathTagButton.TextControl = this.documentCategorizationFolderAnswerTextBox;
@@ -444,7 +439,6 @@
             this.paginationAnswerVoaPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("paginationAnswerVoaPathTagButton.Image")));
             this.paginationAnswerVoaPathTagButton.Location = new System.Drawing.Point(501, 121);
             this.paginationAnswerVoaPathTagButton.Name = "paginationAnswerVoaPathTagButton";
-            this.paginationAnswerVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.paginationAnswerVoaPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.paginationAnswerVoaPathTagButton.TabIndex = 8;
             this.paginationAnswerVoaPathTagButton.TextControl = this.paginationAnswerVoaTextBox;
@@ -515,7 +509,6 @@
             this.paginationFeatureVoaPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("paginationFeatureVoaPathTagButton.Image")));
             this.paginationFeatureVoaPathTagButton.Location = new System.Drawing.Point(501, 75);
             this.paginationFeatureVoaPathTagButton.Name = "paginationFeatureVoaPathTagButton";
-            this.paginationFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.paginationFeatureVoaPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.paginationFeatureVoaPathTagButton.TabIndex = 5;
             this.paginationFeatureVoaPathTagButton.TextControl = this.paginationFeatureVoaTextBox;
@@ -610,7 +603,6 @@
             this.documentCategorizationCsvFeatureVoaPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("documentCategorizationCsvFeatureVoaPathTagButton.Image")));
             this.documentCategorizationCsvFeatureVoaPathTagButton.Location = new System.Drawing.Point(501, 75);
             this.documentCategorizationCsvFeatureVoaPathTagButton.Name = "documentCategorizationCsvFeatureVoaPathTagButton";
-            this.documentCategorizationCsvFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.documentCategorizationCsvFeatureVoaPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.documentCategorizationCsvFeatureVoaPathTagButton.TabIndex = 5;
             this.documentCategorizationCsvFeatureVoaPathTagButton.TextControl = this.documentCategorizationCsvFeatureVoaTextBox;
@@ -753,9 +745,9 @@
             this.useAttributeFeatureFilterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.useAttributeFeatureFilterCheckBox.Location = new System.Drawing.Point(6, 102);
             this.useAttributeFeatureFilterCheckBox.Name = "useAttributeFeatureFilterCheckBox";
-            this.useAttributeFeatureFilterCheckBox.Size = new System.Drawing.Size(148, 17);
+            this.useAttributeFeatureFilterCheckBox.Size = new System.Drawing.Size(134, 17);
             this.useAttributeFeatureFilterCheckBox.TabIndex = 1;
-            this.useAttributeFeatureFilterCheckBox.Text = "Use feature attributes that";
+            this.useAttributeFeatureFilterCheckBox.Text = "Only use attributes that";
             this.useAttributeFeatureFilterCheckBox.UseVisualStyleBackColor = true;
             this.useAttributeFeatureFilterCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
@@ -1225,6 +1217,7 @@
             // 
             // LearningMachineConfiguration
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
@@ -1236,12 +1229,10 @@
             this.Controls.Add(this.openMachineButton);
             this.Controls.Add(this.trainTestButton);
             this.Controls.Add(this.statusStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(572, 572);
             this.Name = "LearningMachineConfiguration";
             this.Text = "Learning Machine Editor";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HandleLearningMachineConfiguration_FormClosing);
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
             this.configurationTabControl.ResumeLayout(false);
             this.inputConfigurationTabPage.ResumeLayout(false);
             this.machineUsageGroupBox.ResumeLayout(false);

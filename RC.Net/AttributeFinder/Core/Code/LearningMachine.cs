@@ -9,10 +9,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
+using System.Threading;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
-using System.Threading;
+using AccuracyData = Extract.Utilities.Union<Accord.Statistics.Analysis.GeneralConfusionMatrix, Accord.Statistics.Analysis.ConfusionMatrix>;
 
 namespace Extract.AttributeFinder
 {
@@ -195,7 +196,8 @@ namespace Extract.AttributeFinder
         /// Trains and tests the machine using files specified with <see cref="InputConfig"/>
         /// </summary>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        public Tuple<double, double> TrainMachine()
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public Tuple<AccuracyData, AccuracyData> TrainMachine()
         {
             try
             {
@@ -213,7 +215,8 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        public Tuple<double, double> TrainMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public Tuple<AccuracyData, AccuracyData> TrainMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
             {
@@ -229,7 +232,8 @@ namespace Extract.AttributeFinder
         /// Tests the machine using files specified with <see cref="InputConfig"/>
         /// </summary>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        public Tuple<double, double> TestMachine()
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public Tuple<AccuracyData, AccuracyData> TestMachine()
         {
             try
             {
@@ -247,7 +251,8 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        public Tuple<double, double> TestMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public Tuple<AccuracyData, AccuracyData> TestMachine(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
             {
@@ -388,14 +393,14 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Computes the accuracy or F1 score of this machine
+        /// Computes accuracy score(s) of this machine
         /// </summary>
         /// <remarks>Unlike the static version of this method, the instance version is affected
         /// by <see cref="UseUnknownCategory"/> and <see cref="UnknownCategoryCutoff"/> settings</remarks>
         /// <param name="inputs">The feature vectors</param>
         /// <param name="outputs">The expected results</param>
-        /// <returns>The F1 score if there are two classes else the overall agreement</returns>
-        public double GetAccuracyScore(double[][] inputs, int[] outputs)
+        /// <returns>An <see cref="AccuracyData"/> instance </returns>
+        public AccuracyData GetAccuracyScore(double[][] inputs, int[] outputs)
         {
             try
             {
@@ -414,17 +419,20 @@ namespace Extract.AttributeFinder
                         })
 
                     .ToArray();
-                            
-                if (Classifier.NumberOfClasses == 2)
+
+                AccuracyData accuracyData;
+                if (Usage == LearningMachineUsage.Pagination)
                 {
-                    var cm = new ConfusionMatrix(predictions, outputs);
-                    return Double.IsNaN(cm.FScore) ? 0.0 : cm.FScore;
+                    var confusionMatrix = new ConfusionMatrix(predictions, outputs);
+                    accuracyData = new AccuracyData(confusionMatrix);
                 }
                 else
                 {
-                    var gc = new GeneralConfusionMatrix(Classifier.NumberOfClasses, predictions, outputs);
-                    return gc.OverallAgreement;
+                    var confusionMatrix = new GeneralConfusionMatrix(Classifier.NumberOfClasses, predictions, outputs);
+                    accuracyData = new AccuracyData(confusionMatrix);
                 }
+
+                return accuracyData;
             }
             catch (Exception e)
             {
@@ -596,7 +604,7 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         /// <returns>Tuple of training set accuracy score and testing set accuracy score</returns>
-        private Tuple<double, double> TrainAndTestMachine(bool testOnly, Action<StatusArgs> updateStatus,
+        private Tuple<AccuracyData, AccuracyData> TrainAndTestMachine(bool testOnly, Action<StatusArgs> updateStatus,
             CancellationToken cancellationToken)
         {
             ExtractException.Assert("ELI39840", "Machine is not fully configured", IsConfigured);
@@ -614,27 +622,37 @@ namespace Extract.AttributeFinder
                 updateStatus, cancellationToken);
 
             // Divide data into training and testing subsets
-            var rng = new Random(RandomNumberSeed);
-            List<int> trainIdx, testIdx;
-            GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2, InputConfig.TrainingSetPercentage / 100.0, out trainIdx, out testIdx, rng);
-
-            // Training set
-            double[][] trainInputs = featureVectorsAndAnswers.Item1.Submatrix(trainIdx);
-            int[] trainOutputs = featureVectorsAndAnswers.Item2.Submatrix(trainIdx);
-
-            // Testing set
-            double[][] testInputs = featureVectorsAndAnswers.Item1.Submatrix(testIdx);
-            int[] testOutputs = featureVectorsAndAnswers.Item2.Submatrix(testIdx);
-
-            // Train the classifier
-            if (!testOnly)
+            if (InputConfig.TrainingSetPercentage > 0)
             {
-                Classifier.TrainClassifier(trainInputs, trainOutputs, rng, updateStatus, cancellationToken);
+                var rng = new Random(RandomNumberSeed);
+                List<int> trainIdx, testIdx;
+                GetIndexesOfSubsetsByCategory(featureVectorsAndAnswers.Item2,
+                    InputConfig.TrainingSetPercentage / 100.0, out trainIdx, out testIdx, rng);
+
+                // Training set
+                double[][] trainInputs = featureVectorsAndAnswers.Item1.Submatrix(trainIdx);
+                int[] trainOutputs = featureVectorsAndAnswers.Item2.Submatrix(trainIdx);
+
+                // Testing set
+                double[][] testInputs = featureVectorsAndAnswers.Item1.Submatrix(testIdx);
+                int[] testOutputs = featureVectorsAndAnswers.Item2.Submatrix(testIdx);
+
+                // Train the classifier
+                if (!testOnly)
+                {
+                    Classifier.TrainClassifier(trainInputs, trainOutputs, rng, updateStatus, cancellationToken);
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                return Tuple.Create(GetAccuracyScore(trainInputs, trainOutputs), GetAccuracyScore(testInputs, testOutputs));
             }
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return Tuple.Create(GetAccuracyScore(trainInputs, trainOutputs), GetAccuracyScore(testInputs, testOutputs));
+            // If no training data, just test testing set
+            else
+            {
+                return Tuple.Create<AccuracyData, AccuracyData>
+                    (null, GetAccuracyScore(featureVectorsAndAnswers.Item1, featureVectorsAndAnswers.Item2));
+            }
         }
 
         #endregion Private Methods

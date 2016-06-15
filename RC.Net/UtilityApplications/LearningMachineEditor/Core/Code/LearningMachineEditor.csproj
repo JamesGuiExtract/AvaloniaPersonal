@@ -14,14 +14,10 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
+    <SccProjectName>LearningMachineEditor</SccProjectName>
+    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
+    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
+    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -54,7 +50,22 @@
   <PropertyGroup>
     <StartupObject>Extract.UtilityApplications.LearningMachineEditor.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\LearningMachineEditor.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Accord, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.3.0.2\lib\net40\Accord.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Accord.Math, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.Math.3.0.2\lib\net40\Accord.Math.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Accord.Statistics, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.Statistics.3.0.2\lib\net40\Accord.Statistics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -124,6 +135,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="App.config" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -166,6 +179,9 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\LearningMachineEditor.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>CALL CommonDebugPostBuild.bat "$(TargetPath)"
@@ -173,6 +189,13 @@ CALL "$(DevEnvDir)..\tools\vsvars32.bat"
 editbin /largeaddressaware "$(TargetPath)"
 sn -Ra "$(TargetPath)" "$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk"</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.3.0.2\build\Accord.targets" Condition="Exists('..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.3.0.2\build\Accord.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.3.0.2\build\Accord.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AFCoreTest\Code\packages\Accord.3.0.2\build\Accord.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

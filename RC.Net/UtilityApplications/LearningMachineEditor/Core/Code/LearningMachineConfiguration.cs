@@ -32,6 +32,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         private static readonly string _MATCH = "match";
         private static readonly string _DO_NOT_MATCH = "don't match";
         private static readonly string _DEFAULT_INPUT_LOCATION = @"K:\Common\Engineering\SecureSamples\";
+        private static readonly string _DRAG_FILE_EXT = ".lm";
 
         #endregion Constants
 
@@ -258,6 +259,13 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     HandleSaveMachineButton_Click(this, EventArgs.Empty);
                     return true;
                 }
+
+                // Ctrl+O = Open
+                if (keyData == (Keys.Control | Keys.O))
+                {
+                    HandleOpenMachineButton_Click(this, EventArgs.Empty);
+                    return true;
+                }
             }
             catch (Exception e)
             {
@@ -267,6 +275,98 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing" /> event.
+        /// </summary>
+        /// <remarks>Cancels computation before closing the dialog</remarks>
+        /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs" /> that contains the event data.</param>
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            try
+            {
+                if (!PromptForDirtyFile())
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40033");
+            }
+            
+            base.OnClosing(e);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.DragEnter"/> event.
+        /// </summary>
+        /// <param name="drgevent">A <see cref="T:System.Windows.Forms.DragEventArgs"/> that contains the event data.</param>
+        protected override void OnDragEnter(DragEventArgs drgevent)
+        {
+            try
+            {
+                // Check if this is a file drop
+                if (drgevent.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    // Get the files being dragged
+                    string[] fileNames = (string[])drgevent.Data.GetData(DataFormats.FileDrop);
+
+                    // Check that there is only 1 file and that the extension is .lm
+                    if (fileNames.Length == 1
+                        && Path.GetExtension(fileNames[0]).Equals(_DRAG_FILE_EXT,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        drgevent.Effect = DragDropEffects.Copy;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI40055", ex);
+            }
+            base.OnDragEnter(drgevent);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.DragDrop"/> event.
+        /// </summary>
+        /// <param name="drgevent">A <see cref="T:System.Windows.Forms.DragEventArgs"/> that contains the event data.</param>
+        protected override void OnDragDrop(DragEventArgs drgevent)
+        {
+            try
+            {
+                // Check if this is a file drop event
+                if (drgevent.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    // Get the files being dragged
+                    string[] fileNames = (string[])drgevent.Data.GetData(DataFormats.FileDrop);
+
+                    // Check that there is only 1 file and that the extension is .lm
+                    if (fileNames.Length == 1
+                        && Path.GetExtension(fileNames[0]).Equals(_DRAG_FILE_EXT,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!PromptForDirtyFile())
+                        {
+                            return;
+                        }
+
+                        // Treat saved machine as having non-default values
+                        _textValueOrCheckStateChangedSinceCreation = true;
+                        _savedLearningMachine = LearningMachine.Load(fileNames[0]);
+                        _previousLearningMachine = null;
+                        _fileName = fileNames[0];
+                        _valid = true;
+                        CurrentLearningMachine = _savedLearningMachine.DeepClone();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI40056", ex);
+            }
+            base.OnDragDrop(drgevent);
+        }
         #endregion Overrides
 
         #region Private Methods
@@ -615,7 +715,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 inputConfig.AnswerPath = answerPathTextBox.Text;
                 if (string.IsNullOrWhiteSpace(answerPathTextBox.Text))
                 {
-                    attributesPathTextBox.SetError(configurationErrorProvider,
+                    answerPathTextBox.SetError(configurationErrorProvider,
                         "Answer path required");
                     _valid = false;
                 }
@@ -1133,6 +1233,38 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
+        /// <summary>
+        /// Prompts for file save if the file is dirty, returns <see langword="true"/>
+        /// if the file is not dirty or is saved or if user declines to save changes.
+        /// </summary>
+        /// <returns></returns>
+        private bool PromptForDirtyFile()
+        {
+            bool confirm = true;
+            if (_dirty)
+            {
+                var response = MessageBox.Show(this,
+                    "Changes have not been saved, would you like to save now?",
+                    "Unsaved changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button3, 0);
+                if (response == System.Windows.Forms.DialogResult.Yes)
+                {
+                    var cancel = new CancelEventArgs();
+                    HandleSaveMachineButton_Click(this, cancel);
+                    if (cancel.Cancel)
+                    {
+                        confirm = false;
+                    }
+                }
+                else if (response == System.Windows.Forms.DialogResult.Cancel)
+                {
+                    confirm = false;
+                }
+            }
+
+            return confirm;
+        }
+
         #endregion Private Methods
 
         #region Event Handlers
@@ -1144,30 +1276,29 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
         private void HandleEditFeaturesButton_Click(object sender, EventArgs e)
         {
-            // Edit features not yet implemented
-            //try
-            //{
-            //    if (CurrentLearningMachine.Encoder.AreEncodingsComputed)
-            //    {
-            //        var tempLM = CurrentLearningMachine.DeepClone();
-            //        using (var win = new EditFeatures(tempLM.Encoder))
-            //        {
-            //            var result = win.ShowDialog();
+            try
+            {
+                if (CurrentLearningMachine.Encoder.AreEncodingsComputed)
+                {
+                    var tempLM = CurrentLearningMachine.DeepClone();
+                    using (var win = new EditFeatures(tempLM.Encoder))
+                    {
+                        var result = win.ShowDialog();
 
-            //            if (result == System.Windows.Forms.DialogResult.OK
-            //                && !tempLM.Encoder.IsConfigurationEqualTo(CurrentLearningMachine.Encoder))
-            //            {
-            //                // Clear training state
-            //                tempLM.Classifier.Clear();
-            //                CurrentLearningMachine = tempLM;
-            //            }
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    ex.ExtractDisplay("ELI39920");
-            //}
+                        if (result == System.Windows.Forms.DialogResult.OK
+                            && !tempLM.Encoder.IsConfigurationEqualTo(CurrentLearningMachine.Encoder))
+                        {
+                            // Clear training state
+                            tempLM.Classifier.Clear();
+                            CurrentLearningMachine = tempLM;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI39920");
+            }
         }
 
         /// <summary>
@@ -1240,11 +1371,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
         private void HandleViewAnswerListButton_Click(object sender, EventArgs e)
         {
-            // View answers not yet implemented
-            //using (var win = new ViewAnswers())
-            //{
-            //    win.Show();
-            //}
+            using (var win = new ViewAnswers(_currentLearningMachine.Encoder, _fileName == _NEW_FILE_NAME ? null : _fileName))
+            {
+                win.ShowDialog();
+            }
         }
 
         /// <summary>
@@ -1284,9 +1414,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 var textBox = sender as TextBox;
 
-                // Wait until edit is complete
+                // Wait until edit is complete before updating machine
                 if (textBox != null && textBox.Focused)
                 {
+                    // Set dirty flag regardless
+                    _dirty = true;
+
                     return;
                 }
                 if (!_suspendMachineUpdates && !_updatingMachine)
@@ -1356,7 +1489,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 // Don't allow saving if in invalid state
                 if (!_valid)
                 {
-                    // Set Cancel in case this is called from HandleOpenMachineButton_Click
+                    // Set Cancel in case this is called from PromptForDirtyFile()
                     var cancelEventArgs = e as CancelEventArgs;
                     if (cancelEventArgs != null)
                     {
@@ -1408,13 +1541,23 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         saveDialog.FileName = _fileName;
                     }
 
-                    if (saveDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    var result = saveDialog.ShowDialog();
+                    if (result == System.Windows.Forms.DialogResult.OK)
                     {
                         _currentLearningMachine.Save(saveDialog.FileName);
                         _savedLearningMachine = _currentLearningMachine.DeepClone();
                         _fileName = saveDialog.FileName;
                         Text = string.Format(CultureInfo.CurrentCulture, _TITLE_TEXT, _fileName);
                         _dirty = false;
+                    }
+                    else if (result == System.Windows.Forms.DialogResult.Cancel)
+                    {
+                        // Set Cancel in case this is called from PromptForDirtyFile()
+                        var cancelEventArgs = e as CancelEventArgs;
+                        if (cancelEventArgs != null)
+                        {
+                            cancelEventArgs.Cancel = true;
+                        }
                     }
                 }
             }
@@ -1433,25 +1576,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         {
             try
             {
-                if (_dirty)
+                if (!PromptForDirtyFile())
                 {
-                    var response = MessageBox.Show(this,
-                        "Changes have not been saved, would you like to save now?",
-                        "Unsaved changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
-                        MessageBoxDefaultButton.Button3, 0);
-                    if (response == System.Windows.Forms.DialogResult.Yes)
-                    {
-                        var cancel = new CancelEventArgs();
-                        HandleSaveMachineButton_Click(this, cancel);
-                        if (cancel.Cancel)
-                        {
-                            return;
-                        }
-                    }
-                    else if (response == System.Windows.Forms.DialogResult.Cancel)
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 SetDefaultValues();
@@ -1475,25 +1602,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         {
             try
             {
-                if (_dirty)
+                if (!PromptForDirtyFile())
                 {
-                    var response = MessageBox.Show(this,
-                        "Changes have not been saved, would you like to save now?",
-                        "Unsaved changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
-                        MessageBoxDefaultButton.Button3, 0);
-                    if (response == System.Windows.Forms.DialogResult.Yes)
-                    {
-                        var cancel = new CancelEventArgs();
-                        HandleSaveMachineButton_Click(this, cancel);
-                        if (cancel.Cancel)
-                        {
-                            return;
-                        }
-                    }
-                    else if (response == System.Windows.Forms.DialogResult.Cancel)
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 using (var openDialog = new OpenFileDialog())
@@ -1521,38 +1632,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
-
-        /// <summary>
-        /// Cancels computation before closing the dialog
-        /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleLearningMachineConfiguration_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            try
-            {
-                if (_dirty)
-                {
-                    var response = MessageBox.Show(this,
-                        "Changes have not been saved, would you like to save now?",
-                        "Unsaved changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
-                        MessageBoxDefaultButton.Button3, 0);
-                    if (response == System.Windows.Forms.DialogResult.Yes)
-                    {
-                        HandleSaveMachineButton_Click(this, EventArgs.Empty);
-                    }
-                    else if (response == System.Windows.Forms.DialogResult.Cancel)
-                    {
-                        e.Cancel = true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI40033");
-            }
-        }
-
         #endregion Event Handlers
+
     }
 }

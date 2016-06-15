@@ -204,8 +204,8 @@ namespace Extract.AttributeFinder.Test
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1, 0.99);
-            Assert.Greater(results.Item2, 0.99);
+            Assert.Greater(results.Item1.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(results.Item2.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
 
             // Test output
             string[] ussFiles, voaFiles, answers;
@@ -270,8 +270,8 @@ namespace Extract.AttributeFinder.Test
                 RandomNumberSeed = 10
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1, 0.90);
-            Assert.Greater(results.Item2, 0.6);
+            Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.90);
+            Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
         }
 
         [Test, Category("LearningMachine")]
@@ -296,8 +296,8 @@ namespace Extract.AttributeFinder.Test
                 RandomNumberSeed = 10
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1, 0.90);
-            Assert.Greater(results.Item2, 0.6);
+            Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.90);
+            Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
         }
 
         [Test, Category("LearningMachine")]
@@ -322,8 +322,8 @@ namespace Extract.AttributeFinder.Test
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1, 0.99);
-            Assert.Greater(results.Item2, 0.99);
+            Assert.Greater(results.Item1.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(results.Item2.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
         }
 
         [Test, Category("LearningMachine")]
@@ -349,8 +349,8 @@ namespace Extract.AttributeFinder.Test
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1, 0.99);
-            Assert.Greater(results.Item2, 0.99);
+            Assert.Greater(results.Item1.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(results.Item2.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
         }
 
         [Test, Category("LearningMachine")]
@@ -380,8 +380,8 @@ namespace Extract.AttributeFinder.Test
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1, 0.99);
-            Assert.Greater(results.Item2, 0.99);
+            Assert.Greater(results.Item1.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(results.Item2.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
         }
 
         // Test that the Document/Pages attributes are correctly created
@@ -732,8 +732,8 @@ namespace Extract.AttributeFinder.Test
 
             // Test output
             var results = lm2.TestMachine();
-            Assert.Greater(results.Item1, 0.90);
-            Assert.Greater(results.Item2, 0.6);
+            Assert.Greater(results.Item1.Match(_ => Double.NaN, cm => cm.FScore), 0.90);
+            Assert.Greater(results.Item2.Match(_ => Double.NaN, cm => cm.FScore), 0.6);
         }
 
         [Test, Category("Extended")]
@@ -753,8 +753,8 @@ namespace Extract.AttributeFinder.Test
                 Classifier = new MulticlassSupportVectorMachineClassifier()
             };
             var results = lm.TrainMachine();
-            Assert.Greater(results.Item1, 0.99);
-            Assert.Greater(results.Item2, 0.93);
+            Assert.Greater(results.Item1.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(results.Item2.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.93);
         }
 
         #endregion Tests

@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using AccuracyData = Extract.Utilities.Union<Accord.Statistics.Analysis.GeneralConfusionMatrix, Accord.Statistics.Analysis.ConfusionMatrix>;
 
 namespace Extract.UtilityApplications.LearningMachineEditor
 {
@@ -254,7 +255,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                       .ToString()
                 });
 
-            Func<Action<StatusArgs>, CancellationToken, Tuple<double, double>> operation = null;
+            Func<Action<StatusArgs>, CancellationToken, Tuple<AccuracyData, AccuracyData>> operation = null;
             if (testOnly)
             {
                 operation = learningMachine.TestMachine;
@@ -292,26 +293,49 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         _statusUpdates.Enqueue(
                             new StatusArgs { StatusMessage = "Completed. Time elapsed: " + elapsedTime });
 
-                        if (learningMachine.Classifier.NumberOfClasses == 2)
+                        Action<AccuracyData> writeAccuracyData =
+                            accuracyData => accuracyData.Match(
+                            gcm =>
+                            {
+                                _statusUpdates.Enqueue(new StatusArgs
+                                    {
+                                        StatusMessage = "Number of samples: {0:N0}",
+                                        Int32Value = gcm.Samples
+                                    });
+                                _statusUpdates.Enqueue(new StatusArgs
+                                    {
+                                        StatusMessage = "    Overall Agreement: {0:N4} (Chance Agreement: {1:N4})",
+                                        DoubleValues = new[] { gcm.OverallAgreement, gcm.ChanceAgreement }
+                                    });
+                            },
+                            cm =>
+                            {
+                                _statusUpdates.Enqueue(new StatusArgs
+                                    {
+                                        StatusMessage = "Number of samples: {0:N0}",
+                                        Int32Value = cm.Samples
+                                    });
+                                _statusUpdates.Enqueue(new StatusArgs
+                                    {
+                                        StatusMessage = "    F1 Score: {0:N4}" +
+                                        "\r\n    Precision: {1:N4}, Recall: {2:N4}" +
+                                        "\r\n    (IsFirstPage = positive case)",
+                                        DoubleValues = new[] { cm.FScore, cm.Precision, cm.Recall }
+                                    });
+                            });
+
+                        var trainingAccuracyData = task.Result.Item1;
+                        var testingAccuracyData = task.Result.Item2;
+
+                        // Training data may not be present (if training % was 0)
+                        if (trainingAccuracyData != null)
                         {
-                            _statusUpdates.Enqueue(
-                                new StatusArgs
-                                {
-                                    StatusMessage = "Training Set Accuracy (F1 score): {0:N4}"
-                                        + "\r\nTesting Set Accuracy (F1 score): {1:N4}",
-                                    DoubleValues = new[] { task.Result.Item1, task.Result.Item2 }
-                                });
+                            _statusUpdates.Enqueue(new StatusArgs { StatusMessage = "Training Set Accuracy:" });
+                            writeAccuracyData(trainingAccuracyData);
                         }
-                        else
-                        {
-                            _statusUpdates.Enqueue(
-                                new StatusArgs
-                                {
-                                    StatusMessage = "Training Set Accuracy: {0:N4}"
-                                        + "\r\nTesting Set Accuracy: {1:N4}",
-                                    DoubleValues = new[] { task.Result.Item1, task.Result.Item2 }
-                                });
-                        }
+
+                        _statusUpdates.Enqueue(new StatusArgs { StatusMessage = "Testing Set Accuracy:" });
+                        writeAccuracyData(testingAccuracyData);
                     }
                     else
                     {
@@ -369,7 +393,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             // Disable controls based on flags
             groupBox2.Enabled = _editor.CurrentLearningMachine.Encoder.AreEncodingsComputed;
 
-            trainTestButton.Enabled = true;
+            trainTestButton.Enabled = _editor.CurrentLearningMachine.InputConfig.TrainingSetPercentage > 0;
             _processing = false;
         }
 

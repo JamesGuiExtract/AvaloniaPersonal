@@ -52,15 +52,39 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
         protected override void OnLoad(EventArgs e)
         {
+            base.OnLoad(e);
+
             try
             {
-                base.OnLoad(e);
                 ComputeFeatures();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40023");
             }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing" /> event.
+        /// </summary>
+        /// <remarks>Cancels computation before closing the dialog</remarks>
+        /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs" /> that contains the event data.</param>
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+        
+            try
+            {
+                if (cancelButton.Enabled)
+                {
+                    HandleCancelButton_Click(this, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40025");
+            }
+
+            base.OnClosing(e);
         }
 
         #endregion Overrides
@@ -175,26 +199,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40024");
-            }
-        }
-
-        /// <summary>
-        /// Cancels computation before closing the dialog
-        /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleComputingFeaturesStatus_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            try
-            {
-                if (cancelButton.Enabled)
-                {
-                    HandleCancelButton_Click(sender, e);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI40025");
             }
         }
 
