@@ -149,7 +149,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 if (attributeVectorizer != null)
                 {
                     featureDetailsTextBox.Text = string.Format(CultureInfo.CurrentCulture,
-                        "Attribute feature. Multiple values: {0}. Numeric values: {1}. Non-numeric values: {2}.",
+                        "Attribute feature. Multiple values: {0:N0}. Numeric values: {1:N0}. Non-numeric values: {2:N0}.",
                         attributeVectorizer.CountOfMultipleValuesOccurred,
                         attributeVectorizer.CountOfNumericValuesOccurred,
                         attributeVectorizer.CountOfNonnumericValuesOccurred);
@@ -177,9 +177,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 summaryStatusStrip.Items.Clear();
                 this.summaryStatusStrip.Items.Add(string.Format(CultureInfo.CurrentCulture,
-                    "Total input features: {0}", _encoder.FeatureVectorLength));
+                    "Total input features: {0:N0}", _encoder.FeatureVectorLength));
                 this.summaryStatusStrip.Items.Add(string.Format(CultureInfo.CurrentCulture,
-                    "Total output categories: {0}", _encoder.AnswerCodeToName.Count));
+                    "Total output categories: {0:N0}", _encoder.AnswerCodeToName.Count));
             }
             catch (Exception ex)
             {

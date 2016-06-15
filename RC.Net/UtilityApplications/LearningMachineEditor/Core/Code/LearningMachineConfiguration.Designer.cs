@@ -1229,6 +1229,7 @@
             this.Controls.Add(this.openMachineButton);
             this.Controls.Add(this.trainTestButton);
             this.Controls.Add(this.statusStrip1);
+            this.Cursor = System.Windows.Forms.Cursors.Default;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(572, 572);
             this.Name = "LearningMachineConfiguration";

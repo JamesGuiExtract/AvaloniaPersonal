@@ -34,7 +34,6 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewAnswers));
             this.closeButton = new System.Windows.Forms.Button();
             this.compareToListButton = new System.Windows.Forms.Button();
             this.answerCategoriesDataGridView = new System.Windows.Forms.DataGridView();
@@ -113,9 +112,11 @@
             this.Controls.Add(this.answerCategoriesDataGridView);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.compareToListButton);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(300, 300);
             this.Name = "ViewAnswers";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Answer Categories";
             ((System.ComponentModel.ISupportInitialize)(this.answerCategoriesDataGridView)).EndInit();
             this.ResumeLayout(false);

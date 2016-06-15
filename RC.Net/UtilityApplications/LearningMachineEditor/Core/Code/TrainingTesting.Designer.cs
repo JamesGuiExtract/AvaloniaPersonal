@@ -39,7 +39,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TrainingTesting));
             this.trainTestButton = new System.Windows.Forms.Button();
             this.testButton = new System.Windows.Forms.Button();
             this.closeButton = new System.Windows.Forms.Button();
@@ -173,9 +172,10 @@
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.testButton);
             this.Controls.Add(this.trainTestButton);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(450, 300);
             this.Name = "TrainingTesting";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Training/Testing";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HandleTrainingTesting_FormClosing);
