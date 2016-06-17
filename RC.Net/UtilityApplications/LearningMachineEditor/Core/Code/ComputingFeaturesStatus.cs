@@ -128,7 +128,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         {
                             status.Combine(lastStatus);
                         }
-                        statusLabel.Text = status.FormattedValue;
+                        statusLabel.Text = status.GetFormattedValue(indent:false);
                         lastStatus = status;
                     }
                 }

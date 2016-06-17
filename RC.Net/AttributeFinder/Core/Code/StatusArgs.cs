@@ -57,6 +57,27 @@ namespace Extract.AttributeFinder
         public bool ReplaceLastStatus { get; set; }
 
         /// <summary>
+        /// Gets or sets the indent level
+        /// </summary>
+        public int Indent { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size of an indent level
+        /// </summary>
+        public static int IndentSize
+        {
+            get
+            {
+                return _indentSize;
+            }
+            set
+            {
+                _indentSize = value;
+            }
+        }
+        private static int _indentSize = 2;
+
+        /// <summary>
         /// Combine values from other <see cref="StatusArgs"/> with this one
         /// </summary>
         /// <param name="other">The other instance to combine values from</param>
@@ -80,34 +101,35 @@ namespace Extract.AttributeFinder
         /// Combines data values with message to produce formatted string
         /// </summary>
         /// <returns>The message formatted with data values</returns>
-        public string FormattedValue
+        public string GetFormattedValue(bool indent = true)
         {
-            get
+            string statusMessage = null;
+            try
             {
-                try
+                statusMessage = indent
+                    ? new string(' ', Indent * IndentSize) + StatusMessage
+                    : StatusMessage;
+                if (DoubleValues.Count() > 1)
                 {
-                    if (DoubleValues.Count() > 1)
-                    {
-                        object [] args = DoubleValues.Cast<object>().ToArray();
-                        return string.Format(CultureInfo.CurrentCulture, StatusMessage, args);
-                    }
-                    else if (DoubleValues.Count() == 1)
-                    {
-                        return string.Format(CultureInfo.CurrentCulture, StatusMessage, DoubleValues.First());
-                    }
-                    else
-                    {
-                        return string.Format(CultureInfo.CurrentCulture, StatusMessage, Int32Value);
-                    }
+                    object [] args = DoubleValues.Cast<object>().ToArray();
+                    return string.Format(CultureInfo.CurrentCulture, statusMessage, args);
                 }
-                catch (System.FormatException)
+                else if (DoubleValues.Count() == 1)
                 {
-                    return StatusMessage ?? "";
+                    return string.Format(CultureInfo.CurrentCulture, statusMessage, DoubleValues.First());
                 }
-                catch (Exception e)
+                else
                 {
-                    throw e.AsExtract("ELI39876");
+                    return string.Format(CultureInfo.CurrentCulture, statusMessage, Int32Value);
                 }
+            }
+            catch (System.FormatException)
+            {
+                return statusMessage ?? "";
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI39876");
             }
         }
     }

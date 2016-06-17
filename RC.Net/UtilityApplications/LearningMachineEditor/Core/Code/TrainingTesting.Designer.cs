@@ -39,17 +39,25 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.trainTestButton = new System.Windows.Forms.Button();
             this.testButton = new System.Windows.Forms.Button();
             this.closeButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.trainingLogContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.clearLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelButton = new System.Windows.Forms.Button();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.computeFeaturesGroupBox = new System.Windows.Forms.GroupBox();
             this.recomputeFeaturesRadioButton = new System.Windows.Forms.RadioButton();
             this.useCurrentFeaturesRadioButton = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            this.trainingLogContextMenuStrip.SuspendLayout();
+            this.computeFeaturesGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // trainTestButton
@@ -103,6 +111,8 @@
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox1.BackColor = System.Drawing.SystemColors.Window;
+            this.textBox1.ContextMenuStrip = this.trainingLogContextMenuStrip;
             this.textBox1.Location = new System.Drawing.Point(6, 19);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
@@ -110,6 +120,51 @@
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.textBox1.Size = new System.Drawing.Size(520, 456);
             this.textBox1.TabIndex = 0;
+            // 
+            // trainingLogContextMenuStrip
+            // 
+            this.trainingLogContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.selectAllToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.clearLogToolStripMenuItem});
+            this.trainingLogContextMenuStrip.Name = "trainingLogContextMenuStrip";
+            this.trainingLogContextMenuStrip.Size = new System.Drawing.Size(165, 82);
+            this.trainingLogContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.HandleTrainingLogContextMenuStrip_Opening);
+            // 
+            // copyToolStripMenuItem
+            // 
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.copyToolStripMenuItem.Text = "Copy";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.HandleCopyToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(161, 6);
+            // 
+            // selectAllToolStripMenuItem
+            // 
+            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+            this.selectAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.selectAllToolStripMenuItem.Text = "Select All";
+            this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.HandleSelectAllToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(161, 6);
+            // 
+            // clearLogToolStripMenuItem
+            // 
+            this.clearLogToolStripMenuItem.Name = "clearLogToolStripMenuItem";
+            this.clearLogToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.clearLogToolStripMenuItem.Text = "Clear";
+            this.clearLogToolStripMenuItem.Click += new System.EventHandler(this.HandleClearLogToolStripMenuItem_Click);
             // 
             // cancelButton
             // 
@@ -123,17 +178,17 @@
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.HandleCancelButton_Click);
             // 
-            // groupBox2
+            // computeFeaturesGroupBox
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.computeFeaturesGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.recomputeFeaturesRadioButton);
-            this.groupBox2.Controls.Add(this.useCurrentFeaturesRadioButton);
-            this.groupBox2.Location = new System.Drawing.Point(13, 493);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(531, 70);
-            this.groupBox2.TabIndex = 9;
-            this.groupBox2.TabStop = false;
+            this.computeFeaturesGroupBox.Controls.Add(this.recomputeFeaturesRadioButton);
+            this.computeFeaturesGroupBox.Controls.Add(this.useCurrentFeaturesRadioButton);
+            this.computeFeaturesGroupBox.Location = new System.Drawing.Point(13, 493);
+            this.computeFeaturesGroupBox.Name = "computeFeaturesGroupBox";
+            this.computeFeaturesGroupBox.Size = new System.Drawing.Size(531, 70);
+            this.computeFeaturesGroupBox.TabIndex = 9;
+            this.computeFeaturesGroupBox.TabStop = false;
             // 
             // recomputeFeaturesRadioButton
             // 
@@ -166,7 +221,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.closeButton;
             this.ClientSize = new System.Drawing.Size(556, 604);
-            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.computeFeaturesGroupBox);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.closeButton);
@@ -182,8 +237,9 @@
             this.Shown += new System.EventHandler(this.HandleTrainingTesting_Shown);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
+            this.trainingLogContextMenuStrip.ResumeLayout(false);
+            this.computeFeaturesGroupBox.ResumeLayout(false);
+            this.computeFeaturesGroupBox.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -196,8 +252,14 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button cancelButton;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox computeFeaturesGroupBox;
         private System.Windows.Forms.RadioButton recomputeFeaturesRadioButton;
         private System.Windows.Forms.RadioButton useCurrentFeaturesRadioButton;
+        private System.Windows.Forms.ContextMenuStrip trainingLogContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem clearLogToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }

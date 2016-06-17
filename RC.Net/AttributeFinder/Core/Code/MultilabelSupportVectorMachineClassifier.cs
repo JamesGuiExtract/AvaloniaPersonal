@@ -15,6 +15,14 @@ namespace Extract.AttributeFinder
     [Serializable]
     public class MultilabelSupportVectorMachineClassifier : SupportVectorMachineClassifier, IDisposable
     {
+        #region Fields
+
+        // Backing fields for properties
+        private bool _calibrateMachineToProduceProbabilities;
+        private bool _useClassProportionsForComplexityWeights;
+
+        #endregion Fields
+
         #region Properties
 
         /// <summary>
@@ -22,8 +30,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public bool CalibrateMachineToProduceProbabilities
         {
-            get;
-            set;
+            get
+            {
+                return _calibrateMachineToProduceProbabilities;
+            }
+            set
+            {
+                if (value != _calibrateMachineToProduceProbabilities)
+                {
+                    _calibrateMachineToProduceProbabilities = value;
+                }
+            }
         }
 
         /// <summary>
@@ -32,8 +49,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public bool UseClassProportionsForComplexityWeights
         {
-            get;
-            set;
+            get
+            {
+                return _useClassProportionsForComplexityWeights;
+            }
+            set
+            {
+                if (value != _useClassProportionsForComplexityWeights)
+                {
+                    _useClassProportionsForComplexityWeights = value;
+                }
+            }
         }
 
         #endregion Properties
@@ -99,6 +125,7 @@ namespace Extract.AttributeFinder
                     var calibration = new ProbabilisticOutputCalibration(machine, inputs, outputsForMachine);
                     calibration.Run();
                 }
+                updateStatus(new StatusArgs { StatusMessage = "Calibrated.", ReplaceLastStatus = true });
             }
             Classifier = classifier;
         }
@@ -168,6 +195,27 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39823");
+            }
+        }
+
+        /// <summary>
+        /// Pretty prints this object with supplied <see cref="System.CodeDom.Compiler.IndentedTextWriter"/>
+        /// </summary>
+        /// <param name="writer">The <see cref="System.CodeDom.Compiler.IndentedTextWriter"/> to use</param>
+        public override void PrettyPrint(System.CodeDom.Compiler.IndentedTextWriter writer)
+        {
+            try
+            {
+                base.PrettyPrint(writer);
+                var oldIndent = writer.Indent;
+                writer.Indent++;
+                writer.WriteLine("CalibrateMachineToProduceProbabilities: {0}", CalibrateMachineToProduceProbabilities);
+                writer.WriteLine("UseClassProportionsForComplexityWeights: {0}", UseClassProportionsForComplexityWeights);
+                writer.Indent = oldIndent;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40070");
             }
         }
 

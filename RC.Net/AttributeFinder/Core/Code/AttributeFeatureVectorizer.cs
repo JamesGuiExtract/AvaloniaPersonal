@@ -37,7 +37,6 @@ namespace Extract.AttributeFinder
 
         #endregion Fields
 
-
         #region Constructors
 
         /// <summary>
@@ -56,7 +55,6 @@ namespace Extract.AttributeFinder
         }
 
         #endregion Constructors
-
 
         #region Properties
 
@@ -224,7 +222,6 @@ namespace Extract.AttributeFinder
 
         #endregion Properties
 
-
         #region Public Methods
 
         /// <summary>
@@ -246,7 +243,6 @@ namespace Extract.AttributeFinder
         }
 
         #endregion Public Methods
-
 
         #region Internal Methods
 

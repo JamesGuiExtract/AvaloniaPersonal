@@ -209,6 +209,71 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
+        /// <summary>
+        /// Clears the training log
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleClearLogToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            textBox1.Text = _editor.CurrentLearningMachine.TrainingLog = "";
+        }
+
+        /// <summary>
+        /// Copies the selected training log text to the clipboard
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleCopyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                textBox1.Copy();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40078");
+            }
+        }
+
+        /// <summary>
+        /// Selects all training log text
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleSelectAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                textBox1.SelectAll();
+                textBox1.Focus();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40079");
+            }
+        }
+
+        /// <summary>
+        /// Handles the Opening event of the HandleTrainingLogContextMenuStrip control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.ComponentModel.CancelEventArgs"/> instance containing the event data.</param>
+        private void HandleTrainingLogContextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                trainingLogContextMenuStrip.Items["copyToolStripMenuItem"].Enabled = textBox1.SelectionLength > 0;
+                trainingLogContextMenuStrip.Items["selectAllToolStripMenuItem"].Enabled =
+                    trainingLogContextMenuStrip.Items["clearLogToolStripMenuItem"].Enabled =
+                    textBox1.TextLength > 0;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40080");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -221,6 +286,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         {
             testButton.Enabled = false;
             trainTestButton.Enabled = false;
+            computeFeaturesGroupBox.Enabled = false;
+            clearLogToolStripMenuItem.Enabled = false;
 
             _cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = _cancellationTokenSource.Token;
@@ -251,7 +318,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                       .Append("Time: ")
                       .AppendLine(DateTime.Now.ToString("s", CultureInfo.CurrentCulture))
                       .AppendLine(testOnly ? "Operation: Testing Machine" : "Operation: Training Machine")
-                      .Append(learningMachine.ToString())
+                      .AppendLine(learningMachine.ToString())
                       .ToString()
                 });
 
@@ -284,14 +351,19 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     if (cancellationToken.IsCancellationRequested)
                     {
                         _statusUpdates.Enqueue(
-                            new StatusArgs { StatusMessage = "Canceled. Time elapsed: " + elapsedTime });
+                            new StatusArgs
+                            {
+                                StatusMessage = "Canceled. Time elapsed: " + elapsedTime,
+                                ReplaceLastStatus = true
+                            });
                     }
                     else if (task.Exception == null)
                     {
                         _editor.CurrentLearningMachine = learningMachine;
 
+                        var completedMessage = testOnly ? "Testing Complete" : "Training Complete";
                         _statusUpdates.Enqueue(
-                            new StatusArgs { StatusMessage = "Completed. Time elapsed: " + elapsedTime });
+                            new StatusArgs { StatusMessage = completedMessage + ". Time elapsed: " + elapsedTime + "\r\n"});
 
                         Action<AccuracyData> writeAccuracyData =
                             accuracyData => accuracyData.Match(
@@ -299,12 +371,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             {
                                 _statusUpdates.Enqueue(new StatusArgs
                                     {
-                                        StatusMessage = "Number of samples: {0:N0}",
+                                        StatusMessage = "  Number of samples: {0:N0}",
                                         Int32Value = gcm.Samples
                                     });
                                 _statusUpdates.Enqueue(new StatusArgs
                                     {
-                                        StatusMessage = "    Overall Agreement: {0:N4} (Chance Agreement: {1:N4})",
+                                        StatusMessage = "  Overall Agreement: {0:N4} (Chance Agreement: {1:N4})",
                                         DoubleValues = new[] { gcm.OverallAgreement, gcm.ChanceAgreement }
                                     });
                             },
@@ -312,14 +384,14 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             {
                                 _statusUpdates.Enqueue(new StatusArgs
                                     {
-                                        StatusMessage = "Number of samples: {0:N0}",
+                                        StatusMessage = "  Number of samples: {0:N0}",
                                         Int32Value = cm.Samples
                                     });
                                 _statusUpdates.Enqueue(new StatusArgs
                                     {
-                                        StatusMessage = "    F1 Score: {0:N4}" +
-                                        "\r\n    Precision: {1:N4}, Recall: {2:N4}" +
-                                        "\r\n    (IsFirstPage = positive case)",
+                                        StatusMessage = "  F1 Score: {0:N4}" +
+                                        "\r\n  Precision: {1:N4}, Recall: {2:N4}" +
+                                        "\r\n  (IsFirstPage = positive case)",
                                         DoubleValues = new[] { cm.FScore, cm.Precision, cm.Recall }
                                     });
                             });
@@ -391,9 +463,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             testButton.Enabled = _editor.CurrentLearningMachine.Classifier.IsTrained;
 
             // Disable controls based on flags
-            groupBox2.Enabled = _editor.CurrentLearningMachine.Encoder.AreEncodingsComputed;
+            computeFeaturesGroupBox.Enabled = _editor.CurrentLearningMachine.Encoder.AreEncodingsComputed;
 
             trainTestButton.Enabled = _editor.CurrentLearningMachine.InputConfig.TrainingSetPercentage > 0;
+            clearLogToolStripMenuItem.Enabled = !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.TrainingLog);
             _processing = false;
         }
 
@@ -413,7 +486,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     textBox1.Text = string.Concat(sessions.Skip(1 + sessions.Length - _HISTORY_CUTOFF));
 
                     // Scroll to end
-                    textBox1.SelectionStart = textBox1.Text.Length;
+                    textBox1.SelectionStart = textBox1.TextLength;
                     textBox1.ScrollToCaret();
                 }
                 textBox1.AppendText("\r\n");
@@ -453,13 +526,13 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         // Else add last status to string pending write
                         else
                         {
-                            pendingWrite.AppendLine(lastStatus.FormattedValue);
+                            pendingWrite.AppendLine(lastStatus.GetFormattedValue());
                             lastStatus = status;
                         }
                     }
 
                     // update text box with history + latest status
-                    var lastStatusValue = lastStatus.FormattedValue;
+                    var lastStatusValue = lastStatus.GetFormattedValue();
                     textBox1.Select(textBox1.TextLength - overwriteLength, overwriteLength);
                     textBox1.SelectedText = pendingWrite.ToString() + lastStatusValue;
                     if (learningMachine != null)

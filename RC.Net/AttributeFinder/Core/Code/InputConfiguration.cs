@@ -33,20 +33,12 @@ namespace Extract.AttributeFinder
     {
         #region Fields
 
-        /// <summary>
-        /// Backing field for <see cref="AttributesPath"/>
-        /// </summary>
+        // Backing fields for properties
         private string _attributesPath;
-
-        /// <summary>
-        /// Backing field for <see cref="AnswerPath"/>
-        /// </summary>
         private string _answerPath;
-
-        /// <summary>
-        /// Backing field for <see cref="InputPath"/>
-        /// </summary>
         private string _inputPath;
+        private InputType _inputPathType;
+        private int _trainingSetPercentage;
 
         #endregion Fields
 
@@ -72,8 +64,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public InputType InputPathType
         {
-            get;
-            set;
+            get
+            {
+                return _inputPathType;
+            }
+            set
+            {
+                if (value != _inputPathType)
+                {
+                    _inputPathType = value;
+                }
+            }
         }
 
         /// <summary>
@@ -111,8 +112,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public int TrainingSetPercentage
         {
-            get;
-            set;
+            get
+            {
+                return _trainingSetPercentage;
+            }
+            set
+            {
+                if (value != _trainingSetPercentage)
+                {
+                    _trainingSetPercentage = value;
+                }
+            }
         }
 
         /// <summary>
@@ -173,7 +183,7 @@ namespace Extract.AttributeFinder
                     cancellationToken.ThrowIfCancellationRequested();
 
                     imageFiles.Add(imagePath);
-                    updateStatus(new StatusArgs { StatusMessage = "Getting input files... {0:N0} files", Int32Value = 1 });
+                    updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0} files", Int32Value = 1 });
                 };
 
                 answersOrAnswerFilePaths = new string[imageFiles.Count];
@@ -188,7 +198,7 @@ namespace Extract.AttributeFinder
                         cancellationToken.ThrowIfCancellationRequested();
 
                         imageFiles.Add(line.Trim());
-                        updateStatus(new StatusArgs { StatusMessage = "Getting input files... {0:N0} files", Int32Value = 1 });
+                        updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0} files", Int32Value = 1 });
                     }
                     answersOrAnswerFilePaths = new string[imageFiles.Count];
                 }
@@ -240,7 +250,7 @@ namespace Extract.AttributeFinder
                             ExtractException.Assert("ELI39759", "File doesn't exist", File.Exists(imageName));
                             imageFiles.Add(imageName);
                             answers.Add(answer);
-                            updateStatus(new StatusArgs { StatusMessage = "Getting input files... {0:N0} files", Int32Value = 1 });
+                            updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0} files", Int32Value = 1 });
                         }
                     }
                     answersOrAnswerFilePaths = answers.ToArray();
@@ -272,6 +282,29 @@ namespace Extract.AttributeFinder
                 {
                     answersOrAnswerFilePaths[i] = pathTags.Expand(AnswerPath);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Pretty prints this object with supplied <see cref="System.CodeDom.Compiler.IndentedTextWriter"/>
+        /// </summary>
+        /// <param name="writer">The <see cref="System.CodeDom.Compiler.IndentedTextWriter"/> to use</param>
+        public void PrettyPrint(System.CodeDom.Compiler.IndentedTextWriter writer)
+        {
+            try
+            {
+                var oldIndent = writer.Indent;
+                writer.Indent++;
+                writer.WriteLine("AnswerPath: " + AnswerPath);
+                writer.WriteLine("AttributesPath: " + AttributesPath);
+                writer.WriteLine("InputPath: " + InputPath);
+                writer.WriteLine("InputPathType: " + InputPathType);
+                writer.WriteLine("TrainingSetPercentage: " + TrainingSetPercentage);
+                writer.Indent = oldIndent;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40066");
             }
         }
 

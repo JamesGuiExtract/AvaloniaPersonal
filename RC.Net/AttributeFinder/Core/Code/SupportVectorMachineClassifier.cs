@@ -1,5 +1,5 @@
-﻿using Accord.Math;
-using Accord.MachineLearning.VectorMachines;
+﻿using Accord.MachineLearning.VectorMachines;
+using Accord.Math;
 using Accord.Statistics;
 using Accord.Statistics.Analysis;
 using System;
@@ -17,6 +17,8 @@ namespace Extract.AttributeFinder
     [Serializable]
     public abstract class SupportVectorMachineClassifier : ITrainableClassifier
     {
+        #region Fields
+
         /// <summary>
         /// Vector of feature means. These values will be subtracted from input feature vectors.
         /// </summary>
@@ -31,13 +33,35 @@ namespace Extract.AttributeFinder
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
         protected double[] FeatureScaleFactor;
 
+        // Backing fields for properties
+        private int _featureVectorLength;
+        private ISupportVectorMachine _classifier;
+        private double _complexity;
+        private bool _automaticallyChooseComplexityValue;
+        private int _numberOfClasses;
+        private bool _isTrained;
+        private DateTime _lastTrainedOn;
+
+        #endregion Fields
+
+        #region Properties
+
         /// <summary>
         /// The feature vector length that this classifier requires
         /// </summary>
         protected int FeatureVectorLength
         {
-            get;
-            set;
+            get
+            {
+                return _featureVectorLength;
+            }
+            set
+            {
+                if (value != _featureVectorLength)
+                {
+                    _featureVectorLength = value;
+                }
+            }
         }
 
         /// <summary>
@@ -45,8 +69,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         protected ISupportVectorMachine Classifier
         {
-            get;
-            set;
+            get
+            {
+                return _classifier;
+            }
+            set
+            {
+                if (value != _classifier)
+                {
+                    _classifier = value;
+                }
+            }
         }
 
         /// <summary>
@@ -54,8 +87,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public double Complexity
         {
-            get;
-            set;
+            get
+            {
+                return _complexity;
+            }
+            set
+            {
+                if (value != _complexity)
+                {
+                    _complexity = value;
+                }
+            }
         }
 
         /// <summary>
@@ -63,9 +105,20 @@ namespace Extract.AttributeFinder
         /// </summary>
         public bool AutomaticallyChooseComplexityValue
         {
-            get;
-            set;
+            get
+            {
+                return _automaticallyChooseComplexityValue;
+            }
+            set
+            {
+                if (value != _automaticallyChooseComplexityValue)
+                {
+                    _automaticallyChooseComplexityValue = value;
+                }
+            }
         }
+
+        #endregion Properties
 
         #region Constructors
 
@@ -87,8 +140,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public int NumberOfClasses
         {
-            get;
-            private set;
+            get
+            {
+                return _numberOfClasses;
+            }
+            private set
+            {
+                if (value != _numberOfClasses)
+                {
+                    _numberOfClasses = value;
+                }
+            }
         }
 
 
@@ -98,8 +160,17 @@ namespace Extract.AttributeFinder
         /// <returns>Whether this classifier has been trained and is ready to compute answers</returns>
         public bool IsTrained
         {
-            get;
-            private set;
+            get
+            {
+                return _isTrained;
+            }
+            private set
+            {
+                if (value != _isTrained)
+                {
+                    _isTrained = value;
+                }
+            }
         }
 
         /// <summary>
@@ -107,8 +178,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public DateTime LastTrainedOn
         {
-            get;
-            private set;
+            get
+            {
+                return _lastTrainedOn;
+            }
+            private set
+            {
+                if (value != _lastTrainedOn)
+                {
+                    _lastTrainedOn = value;
+                }
+            }
         }
 
         /// <summary>
@@ -145,11 +225,16 @@ namespace Extract.AttributeFinder
                 ExtractException.Assert("ELI39717", "No inputs given", inputs != null && inputs.Length > 0);
                 ExtractException.Assert("ELI39718", "Inputs and outputs are different lengths", inputs.Length == outputs.Length);
 
+                // Indent sub-status messages
+                Action<StatusArgs> updateStatus2 = args =>
+                    {
+                        args.Indent++;
+                        updateStatus(args);
+                    };
+
                 FeatureVectorLength = inputs[0].Length;
                 ExtractException.Assert("ELI39719", "Inputs are different lengths",
                     inputs.All(vector => vector.Length == FeatureVectorLength));
-
-                updateStatus(new StatusArgs { StatusMessage = "Building classifier..." });
 
                 NumberOfClasses = outputs.Max() + 1;
 
@@ -189,8 +274,8 @@ namespace Extract.AttributeFinder
                     for (int i = 0; i < complexitiesToTryAsc.Length; i++)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
-                        updateStatus(new StatusArgs
-                            { StatusMessage = "Choosing complexity value. Iteration {0}", Int32Value = 1 });
+                        updateStatus2(new StatusArgs
+                            { StatusMessage = "Choosing complexity value: Iteration {0}", Int32Value = 1 });
 
                         double complexity = complexitiesToTryAsc[i];
                         TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
@@ -222,8 +307,8 @@ namespace Extract.AttributeFinder
                     for (int i = 0; i < complexitiesToTryDesc.Length; i++)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
-                        updateStatus(new StatusArgs
-                            { StatusMessage = "Choosing complexity value. Iteration {0}", Int32Value = 1 });
+                        updateStatus2(new StatusArgs
+                            { StatusMessage = "Choosing complexity value: Iteration {0}", Int32Value = 1 });
 
                         double complexity = complexitiesToTryDesc[i];
                         TrainClassifier(trainInputs, trainOutputs, complexity, _ => { }, cancellationToken);
@@ -258,8 +343,8 @@ namespace Extract.AttributeFinder
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Train classifier
-                updateStatus(new StatusArgs { StatusMessage = "Training classifier..." });
-                TrainClassifier(inputs, outputs, Complexity, updateStatus, cancellationToken);
+                updateStatus(new StatusArgs { StatusMessage = "Training classifier:" });
+                TrainClassifier(inputs, outputs, Complexity, updateStatus2, cancellationToken);
 
                 IsTrained = true;
                 LastTrainedOn = DateTime.Now;
@@ -315,6 +400,34 @@ namespace Extract.AttributeFinder
             LastTrainedOn = DateTime.MinValue;
             IsTrained = false;
             Classifier = null;
+        }
+
+        /// <summary>
+        /// Pretty prints this object with supplied <see cref="System.CodeDom.Compiler.IndentedTextWriter"/>
+        /// </summary>
+        /// <param name="writer">The <see cref="System.CodeDom.Compiler.IndentedTextWriter"/> to use</param>
+        public virtual void PrettyPrint(System.CodeDom.Compiler.IndentedTextWriter writer)
+        {
+            try
+            {
+                var oldIndent = writer.Indent;
+                writer.Indent++;
+                if (IsTrained)
+                {
+                    writer.WriteLine("LastTrainedOn: {0:s}", LastTrainedOn);
+                }
+                else
+                {
+                    writer.WriteLine("LastTrainedOn: Never");
+                }
+                writer.WriteLine("AutomaticallyChooseComplexityValue: {0}", AutomaticallyChooseComplexityValue);
+                writer.WriteLine("Complexity: {0}", Complexity);
+                writer.Indent = oldIndent;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40068");
+            }
         }
 
         #endregion ITrainableClassifier

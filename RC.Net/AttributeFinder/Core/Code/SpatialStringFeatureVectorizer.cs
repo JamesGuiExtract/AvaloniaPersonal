@@ -25,7 +25,7 @@ namespace Extract.AttributeFinder
     [Serializable]
     public class SpatialStringFeatureVectorizer : IFeatureVectorizer
     {
-        #region Private Fields
+        #region Fields
 
         /// <summary>
         /// Bag-of-words object used to create this object's feature vector
@@ -36,8 +36,10 @@ namespace Extract.AttributeFinder
         private string _pagesToProcess;
         private string _name;
         private bool _enabled;
+        private int _shingleSize;
+        private int _maxFeatures;
 
-        #endregion Private Fields
+        #endregion Fields
 
         #region Constructors
 
@@ -68,7 +70,6 @@ namespace Extract.AttributeFinder
 
         #endregion Constructors
 
-
         #region Properties
 
         /// <summary>
@@ -83,6 +84,7 @@ namespace Extract.AttributeFinder
             set
             {
                 _name = string.IsNullOrWhiteSpace(value) ? null : value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -157,6 +159,7 @@ namespace Extract.AttributeFinder
                         }
 
                         _pagesToProcess = newValue;
+                        NotifyPropertyChanged();
                     }
                 }
                 catch (Exception e)
@@ -170,12 +173,40 @@ namespace Extract.AttributeFinder
         /// Gets/sets the maximum size of shingles (word-n-grams) to be considered for terms.
         /// If less than 2 then only single word terms will be used.
         /// </summary>
-        public int ShingleSize { get; set; }
+        public int ShingleSize
+        {
+            get
+            {
+                return _shingleSize;
+            }
+            set
+            {
+                if (value != _shingleSize)
+                {
+                    _shingleSize = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// Gets/sets the maximum size feature vector to produce
         /// </summary>
-        public int MaxFeatures { get; set; }
+        public int MaxFeatures
+        {
+            get
+            {
+                return _maxFeatures;
+            }
+            set
+            {
+                if (value != _maxFeatures)
+                {
+                    _maxFeatures = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// A collection of distinct attribute values seen during configuration
@@ -608,7 +639,6 @@ namespace Extract.AttributeFinder
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                updateStatus(new StatusArgs { StatusMessage = "Writing index..." });
                 writer.Optimize();
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -742,7 +772,6 @@ namespace Extract.AttributeFinder
         }
 
         #endregion Private Methods
-
 
         #region Private Classes
 

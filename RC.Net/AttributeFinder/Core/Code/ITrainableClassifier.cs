@@ -63,5 +63,11 @@ namespace Extract.AttributeFinder
         /// Clear training information
         /// </summary>
         void Clear();
+
+        /// <summary>
+        /// Pretty prints this object with supplied <see cref="System.CodeDom.Compiler.IndentedTextWriter"/>
+        /// </summary>
+        /// <param name="writer">The <see cref="System.CodeDom.Compiler.IndentedTextWriter"/> to use</param>
+        void PrettyPrint(System.CodeDom.Compiler.IndentedTextWriter writer);
     }
 }

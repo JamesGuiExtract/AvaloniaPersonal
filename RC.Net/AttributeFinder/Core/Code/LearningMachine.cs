@@ -14,6 +14,9 @@ using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 using AccuracyData = Extract.Utilities.Union<Accord.Statistics.Analysis.GeneralConfusionMatrix, Accord.Statistics.Analysis.ConfusionMatrix>;
+using Extract.Licensing;
+using Extract.Encryption;
+using System.CodeDom.Compiler;
 
 namespace Extract.AttributeFinder
 {
@@ -24,6 +27,33 @@ namespace Extract.AttributeFinder
     [Serializable]
     public class LearningMachine : IDisposable
     {
+        #region Constants
+
+        /// <summary>
+        /// Current version.
+        /// </summary>
+        const int _CURRENT_VERSION = 1;
+
+        #endregion Constants
+
+        #region Fields
+
+        /// <summary>
+        /// Persist the current version so to prevent newer, incompatible, versions from being loaded
+        /// </summary>
+        private int _version = _CURRENT_VERSION;
+
+        // Backing fields for properties
+        private InputConfiguration _inputConfig;
+        private LearningMachineDataEncoder _encoder;
+        private ITrainableClassifier _classifier;
+        private int _randomNumberSeed;
+        private bool _useUnknownCategory;
+        private double _unknownCategoryCutoff;
+        private string _trainingLog;
+
+        #endregion Fields
+
         #region Properties
 
         /// <summary>
@@ -31,8 +61,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public InputConfiguration InputConfig
         {
-            get;
-            set;
+            get
+            {
+                return _inputConfig;
+            }
+            set
+            {
+                if (value != _inputConfig)
+                {
+                    _inputConfig = value;
+                }
+            }
         }
 
         /// <summary>
@@ -40,8 +79,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public LearningMachineDataEncoder Encoder
         {
-            get;
-            set;
+            get
+            {
+                return _encoder;
+            }
+            set
+            {
+                if (value != _encoder)
+                {
+                    _encoder = value;
+                }
+            }
         }
 
         /// <summary>
@@ -49,8 +97,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public ITrainableClassifier Classifier
         {
-            get;
-            set;
+            get
+            {
+                return _classifier;
+            }
+            set
+            {
+                if (value != _classifier)
+                {
+                    _classifier = value;
+                }
+            }
         }
 
         /// <summary>
@@ -95,8 +152,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public int RandomNumberSeed
         {
-            get;
-            set;
+            get
+            {
+                return _randomNumberSeed;
+            }
+            set
+            {
+                if (value != _randomNumberSeed)
+                {
+                    _randomNumberSeed = value;
+                }
+            }
         }
 
         /// <summary>
@@ -115,8 +181,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public bool UseUnknownCategory
         {
-            get;
-            set;
+            get
+            {
+                return _useUnknownCategory;
+            }
+            set
+            {
+                if (value != _useUnknownCategory)
+                {
+                    _useUnknownCategory = value;
+                }
+            }
         }
 
         /// <summary>
@@ -124,8 +199,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public double UnknownCategoryCutoff
         {
-            get;
-            set;
+            get
+            {
+                return _unknownCategoryCutoff;
+            }
+            set
+            {
+                if (value != _unknownCategoryCutoff)
+                {
+                    _unknownCategoryCutoff = value;
+                }
+            }
         }
 
         /// <summary>
@@ -144,8 +228,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public string TrainingLog
         {
-            get;
-            set;
+            get
+            {
+                return _trainingLog;
+            }
+            set
+            {
+                if (value != _trainingLog)
+                {
+                    _trainingLog = value;
+                }
+            }
         }
 
         #endregion Properties
@@ -501,16 +594,34 @@ namespace Extract.AttributeFinder
         /// <param name="fileName">File name to save machine into.</param>
         public void Save(string fileName)
         {
+            string tempEncryptionFile = null;
+
             try
             {
-                using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
+                // Save to a temporary file
+                tempEncryptionFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                using (var stream = new FileStream(tempEncryptionFile, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     Save(stream);
                 }
+
+                // Encrypt the file
+                MapLabel mapLabel = new MapLabel();
+                ExtractEncryption.EncryptFile(tempEncryptionFile, tempEncryptionFile, overwrite:true, mapLabel:mapLabel);
+
+                 // Once the encryption process is complete, copy it into the real destination.
+                 File.Copy(tempEncryptionFile, fileName, overwrite:true);
             }
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39809");
+            }
+            finally
+            {
+                if (tempEncryptionFile != null)
+                {
+                    FileSystemMethods.DeleteFile(tempEncryptionFile);
+                }
             }
         }
 
@@ -540,10 +651,11 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                MapLabel mapLabel = new MapLabel();
+                var unencryptedBytes = ExtractEncryption.DecryptBinaryFile(fileName, mapLabel);
+                using (var stream = new MemoryStream(unencryptedBytes))
                 {
-                    LearningMachine machine = Load(stream);
-                    return machine;
+                    return Load(stream);
                 }
             }
             catch (Exception e)
@@ -563,8 +675,8 @@ namespace Extract.AttributeFinder
             {
                 var serializer = new NetDataContractSerializer();
                 serializer.AssemblyFormat = FormatterAssemblyStyle.Simple; // Allows for different assembly versions
-                LearningMachine network = (LearningMachine)serializer.Deserialize(stream);
-                return network;
+                LearningMachine machine = (LearningMachine)serializer.Deserialize(stream);
+                return machine;
             }
             catch (Exception e)
             {
@@ -594,6 +706,32 @@ namespace Extract.AttributeFinder
 
         #endregion Public Methods
 
+        #region Overrides
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            var baseWriter = new StringWriter(CultureInfo.CurrentCulture);
+            var writer = new IndentedTextWriter(baseWriter, "  ");
+            writer.WriteLine("LearningMachine:");
+            writer.Indent++;
+            writer.WriteLine("Usage: {0}", Usage);
+            writer.WriteLine("RandomNumberSeed: {0}", RandomNumberSeed);
+            writer.WriteLine("InputConfig:");
+            InputConfig.PrettyPrint(writer);
+            writer.WriteLine("Encoder:");
+            Encoder.PrettyPrint(writer);
+            writer.WriteLine("Classifier ({0}):", MachineType);
+            Classifier.PrettyPrint(writer);
+            return baseWriter.ToString().Trim();
+        }
+
+        #endregion Overrides
 
         #region Private Methods
 
@@ -655,8 +793,22 @@ namespace Extract.AttributeFinder
             }
         }
 
-        #endregion Private Methods
+        /// <summary>
+        /// Called when deserialized
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            // Don't support loading newer versions
+            ExtractException.Assert("ELI40071", "Cannot load newer version", _version <= _CURRENT_VERSION,
+                "Current version", _CURRENT_VERSION, "Version to load", _version);
 
+            // Update version number
+            _version = _CURRENT_VERSION;
+        }
+
+        #endregion Private Methods
 
         #region IDisposable Members
 
@@ -690,7 +842,6 @@ namespace Extract.AttributeFinder
         }
 
         #endregion IDisposable Members
-
 
         #region Static Methods
 

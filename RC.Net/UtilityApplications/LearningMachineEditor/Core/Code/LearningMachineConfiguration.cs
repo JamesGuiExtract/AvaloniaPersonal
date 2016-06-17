@@ -26,6 +26,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             "Configuration has changed since features were computed";
         private static readonly string _TRAINED_STATUS = "Machine is trained";
         private static readonly string _UNTRAINED_STATUS = "Machine is not trained";
+        private static readonly string _INVALID_STATUS = "Invalid configuration";
         private static readonly string _TITLE_TEXT = "{0} - Learning Machine Editor";
         private static readonly string _TITLE_TEXT_DIRTY = "*{0} - Learning Machine Editor";
         private static readonly string _NEW_FILE_NAME = "[Unsaved file]";
@@ -227,6 +228,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 if (_savedLearningMachine == null)
                 {
                     _savedLearningMachine = MakeNewMachine();
+                    _fileName = _NEW_FILE_NAME;
                 }
 
                 // Set default values for controls
@@ -318,6 +320,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     {
                         drgevent.Effect = DragDropEffects.Copy;
                     }
+                    else
+                    {
+                        drgevent.Effect = DragDropEffects.None;
+                    }
                 }
             }
             catch (Exception ex)
@@ -373,6 +379,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
         private void AfterCurrentLearningMachineChanged()
         {
+            if (_previousLearningMachine != null)
+            {
+                // Preserve training log
+                _currentLearningMachine.TrainingLog = _previousLearningMachine.TrainingLog;
+            }
+
             // If current machine is trained or no previous machine,
             // then set previous machine to clone of current machine
             if (_currentLearningMachine.IsTrained
@@ -418,9 +430,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         && _currentLearningMachine.Classifier.IsConfigurationEqualTo(_previousLearningMachine.Classifier))
                     {
                         _currentLearningMachine.Classifier = _previousLearningMachine.DeepClone().Classifier;
-
-                        // Preserve training log for comparison
-                        _currentLearningMachine.TrainingLog = _previousLearningMachine.TrainingLog;
                         toolStripStatusLabel1.Text = "";
                     }
                     else if (_previousLearningMachine.IsTrained)
@@ -631,6 +640,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     }
                 }
 
+                if (!_valid)
+                {
+                    toolStripStatusLabel1.Text = _INVALID_STATUS;
+                }
             }
             catch (Exception e)
             {
@@ -691,7 +704,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
 
             // Set input path
-            inputConfig.InputPath = inputPathTextBox.Text;
+            inputConfig.InputPath = inputPathTextBox.Text.Trim('"');
             if (string.IsNullOrWhiteSpace(inputPathTextBox.Text))
             {
                 inputPathTextBox.SetError(configurationErrorProvider, "Input path required");
@@ -1348,6 +1361,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 }
 
                 var machineClone = CurrentLearningMachine.DeepClone();
+
+                // Clear training state
+                machineClone.Classifier.Clear();
                 using (var win = new ComputingFeaturesStatus(machineClone))
                 {
                     var result = win.ShowDialog();

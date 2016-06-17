@@ -222,7 +222,7 @@ namespace Extract.AttributeFinder
 
         #endregion Constants
 
-        #region Private Fields
+        #region Fields
 
         /// <summary>
         /// <see cref="IAFUtility"/> to be used by this thread to resolve attribute queries
@@ -232,32 +232,93 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Regex used to parse page ranges of pagination expected VOA files
         /// </summary>
-        private static readonly ThreadLocal<Regex> _pageRangeRegex = new ThreadLocal<Regex>(() => new Regex(@"\b(?'start'\d+)\b(\s*-\s*(?'end'\d+\b))?"));
+        private static readonly ThreadLocal<Regex> _pageRangeRegex =
+            new ThreadLocal<Regex>(() => new Regex(@"\b(?'start'\d+)\b(\s*-\s*(?'end'\d+\b))?"));
 
-        #endregion Private Fields
+        // Backing fields for properties
+        private SpatialStringFeatureVectorizer _autoBagOfWords;
+        private IEnumerable<AttributeFeatureVectorizer> _attributeFeatureVectorizers;
+        private Dictionary<string, int> _answerNameToCode;
+        private Dictionary<int, string> _answerCodeToName;
+        private string _attributeFilter;
+        private bool _negateFilter;
+        private LearningMachineUsage _machineUsage;
 
+        #endregion Fields
 
         #region Properties
 
         /// <summary>
         /// Gets the <see cref="SpatialStringFeatureVectorizer"/> object.
         /// </summary>
-        public SpatialStringFeatureVectorizer AutoBagOfWords { get; private set; }
+        public SpatialStringFeatureVectorizer AutoBagOfWords
+        {
+            get
+            {
+                return _autoBagOfWords;
+            }
+            private set
+            {
+                if (value != _autoBagOfWords)
+                {
+                    _autoBagOfWords = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the <see cref="AttributeFeatureVectorizer"/> collection.
         /// </summary>
-        public IEnumerable<AttributeFeatureVectorizer> AttributeFeatureVectorizers { get; private set; }
+        public IEnumerable<AttributeFeatureVectorizer> AttributeFeatureVectorizers
+        {
+            get
+            {
+                return _attributeFeatureVectorizers;
+            }
+            private set
+            {
+                if (value != _attributeFeatureVectorizers)
+                {
+                    _attributeFeatureVectorizers = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the dictionary of category names to the numeric codes assigned to them
         /// </summary>
-        public Dictionary<string, int> AnswerNameToCode { get; private set; }
+        public Dictionary<string, int> AnswerNameToCode
+        {
+            get
+            {
+                return _answerNameToCode;
+            }
+            private set
+            {
+                if (value != _answerNameToCode)
+                {
+                    _answerNameToCode = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the dictionary of numeric codes to category names
         /// </summary>
-        public Dictionary<int, string> AnswerCodeToName { get; private set; }
+        public Dictionary<int, string> AnswerCodeToName
+        {
+            get
+            {
+                return _answerCodeToName;
+            }
+            private set
+            {
+                if (value != _answerCodeToName)
+                {
+                    _answerCodeToName = value;
+                }
+            }
+        }
 
         private int AttributeFeatureVectorLength
         {
@@ -287,18 +348,57 @@ namespace Extract.AttributeFinder
         /// Gets/sets the AFQuery to select proto-feature attributes. If <see langword="null"/>
         /// then all attributes will be used.
         /// </summary>
-        public string AttributeFilter { get; set; }
+        public string AttributeFilter
+        {
+            get
+            {
+                return _attributeFilter;
+            }
+            set
+            {
+                if (value != _attributeFilter)
+                {
+                    _attributeFilter = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets/sets whether to use only attributes that are not selected by
         /// <see cref="AttributeFilter"/> for proto-features
         /// </summary>
-        public bool NegateFilter { get; set; }
+        public bool NegateFilter
+        {
+            get
+            {
+                return _negateFilter;
+            }
+            set
+            {
+                if (value != _negateFilter)
+                {
+                    _negateFilter = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the <see cref="LearningMachineUsage"/> of this instance
         /// </summary>
-        public LearningMachineUsage MachineUsage { get; private set; }
+        public LearningMachineUsage MachineUsage
+        {
+            get
+            {
+                return _machineUsage;
+            }
+            private set
+            {
+                if (value != _machineUsage)
+                {
+                    _machineUsage = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets whether feature encodings have been computed successfully
@@ -313,7 +413,6 @@ namespace Extract.AttributeFinder
         }
 
         #endregion Properties
-
 
         #region Constructors
 
@@ -344,7 +443,6 @@ namespace Extract.AttributeFinder
         }
 
         #endregion Constructors
-
 
         #region Public Methods
 
@@ -580,7 +678,14 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                updateStatus(new StatusArgs { StatusMessage = "Building feature vector and answer collections..." });
+                updateStatus(new StatusArgs { StatusMessage = "Building feature vector and answer collections:" });
+
+                // Indent sub-status messages
+                Action<StatusArgs> updateStatus2 = args =>
+                    {
+                        args.Indent++;
+                        updateStatus(args);
+                    };
 
                 ExtractException.Assert("ELI39691", "Encodings have not been computed", AreEncodingsComputed);
 
@@ -599,12 +704,12 @@ namespace Extract.AttributeFinder
                 if (MachineUsage == LearningMachineUsage.DocumentCategorization)
                 {
                     return GetDocumentFeatureVectorAndAnswerCollection(ussFilePaths, inputVOAFilePaths,
-                        answersOrAnswerFiles, updateStatus, cancellationToken);
+                        answersOrAnswerFiles, updateStatus2, cancellationToken);
                 }
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
                     var results = GetPaginationFeatureVectorAndAnswerCollection(ussFilePaths, inputVOAFilePaths,
-                        answersOrAnswerFiles, updateStatus, cancellationToken);
+                        answersOrAnswerFiles, updateStatus2, cancellationToken);
 
                     double[][] featureVectors = new double[results.Length][];
                     int[] answers = new int[results.Length];
@@ -723,8 +828,39 @@ namespace Extract.AttributeFinder
             }
         }
 
-        #endregion Public Methods
+        /// <summary>
+        /// Pretty prints this object with supplied <see cref="System.CodeDom.Compiler.IndentedTextWriter"/>
+        /// </summary>
+        /// <param name="writer">The <see cref="System.CodeDom.Compiler.IndentedTextWriter"/> to use</param>
+        public void PrettyPrint(System.CodeDom.Compiler.IndentedTextWriter writer)
+        {
+            try
+            {
+                var oldIndent = writer.Indent;
+                writer.Indent++;
+                writer.WriteLine("AutoBagOfWordsEnabled: {0}", AutoBagOfWords != null && AutoBagOfWords.Enabled);
+                if (string.IsNullOrWhiteSpace(AttributeFilter))
+                {
+                    writer.WriteLine("AttributeFilter: None");
+                }
+                else
+                {
+                    writer.WriteLine("AttributeFilter: {0} {1}", NegateFilter ? "Not Matching" : "Matching",
+                        AttributeFilter);
+                }
+                if (AreEncodingsComputed)
+                {
+                    writer.WriteLine("FeatureVectorLength: {0:N0}", FeatureVectorLength);
+                }
+                writer.Indent = oldIndent;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40067");
+            }
+        }
 
+        #endregion Public Methods
 
         #region Private Methods
 
@@ -1066,11 +1202,18 @@ namespace Extract.AttributeFinder
         private void ComputeDocumentEncodings(string[] ussFilePaths, string[] inputVOAFilePaths, string[] answers,
             Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
         {
+            // Indent sub-status messages
+            Action<StatusArgs> updateStatus2 = args =>
+                {
+                    args.Indent++;
+                    updateStatus(args);
+                };
+
             // Configure SpatialStringFeatureVectorizer
             if (AutoBagOfWords != null)
             {
                 updateStatus(new StatusArgs { StatusMessage = "Computing auto-bag-of-words encodings:" });
-                AutoBagOfWords.ComputeEncodingsFromDocumentTrainingData(ussFilePaths, answers, updateStatus, cancellationToken);
+                AutoBagOfWords.ComputeEncodingsFromDocumentTrainingData(ussFilePaths, answers, updateStatus2, cancellationToken);
             }
 
             if (inputVOAFilePaths.Length > 0)
@@ -1087,7 +1230,7 @@ namespace Extract.AttributeFinder
             foreach (var example in protoFeatures)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                updateStatus(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
+                updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
 
                 foreach (var group in example)
                 {
@@ -1130,11 +1273,17 @@ namespace Extract.AttributeFinder
         private void ComputePaginationEncodings(string[] ussFilePaths, string[] inputVOAFilePaths, string[] answerFiles,
             Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
         {
+            // Indent sub-status messages
+            Action<StatusArgs> updateStatus2 = args =>
+                {
+                    args.Indent++;
+                    updateStatus(args);
+                };
             // Configure SpatialStringFeatureVectorizer
             if (AutoBagOfWords != null)
             {
                 updateStatus(new StatusArgs { StatusMessage = "Computing auto-bag-of-words encodings:" });
-                AutoBagOfWords.ComputeEncodingsFromPaginationTrainingData(ussFilePaths, answerFiles, updateStatus, cancellationToken);
+                AutoBagOfWords.ComputeEncodingsFromPaginationTrainingData(ussFilePaths, answerFiles, updateStatus2, cancellationToken);
             }
 
             if (inputVOAFilePaths.Length > 0)
@@ -1151,7 +1300,7 @@ namespace Extract.AttributeFinder
             foreach (var example in protoFeatures)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                updateStatus(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
+                updateStatus2(new StatusArgs { StatusMessage = "Pages processed: {0:N0}", Int32Value = 1 });
 
                 foreach (var group in example)
                 {

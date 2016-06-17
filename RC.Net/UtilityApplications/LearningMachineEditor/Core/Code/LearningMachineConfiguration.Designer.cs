@@ -148,6 +148,7 @@
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1109, 22);
             this.statusStrip1.TabIndex = 3;
+            this.statusStrip1.Items.Add(this.toolStripStatusLabel1);
             // 
             // toolStripStatusLabel1
             // 

@@ -4,9 +4,9 @@ using Accord.Statistics;
 using AForge.Neuro;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
-using System.Globalization;
 
 namespace Extract.AttributeFinder
 {
@@ -51,6 +51,13 @@ namespace Extract.AttributeFinder
         /// Backing field for <see cref="HiddenLayers"/>
         /// </summary>
         private int[] _hiddenLayers;
+        private int _maxTrainingIterations;
+        private int _numberOfCandidateNetworksToBuild;
+        private double _sigmoidAlpha;
+        private bool _useCrossValidationSets;
+        private int _numberOfClasses;
+        private bool _isTrained;
+        private DateTime _lastTrainedOn;
 
         #endregion Private Fields
 
@@ -77,8 +84,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public int MaxTrainingIterations
         {
-            get;
-            set;
+            get
+            {
+                return _maxTrainingIterations;
+            }
+            set
+            {
+                if (value != _maxTrainingIterations)
+                {
+                    _maxTrainingIterations = value;
+                }
+            }
         }
 
         /// <summary>
@@ -86,8 +102,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public int NumberOfCandidateNetworksToBuild
         {
-            get;
-            set;
+            get
+            {
+                return _numberOfCandidateNetworksToBuild;
+            }
+            set
+            {
+                if (value != _numberOfCandidateNetworksToBuild)
+                {
+                    _numberOfCandidateNetworksToBuild = value;
+                }
+            }
         }
         
         /// <summary>
@@ -95,8 +120,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public double SigmoidAlpha
         {
-            get;
-            set;
+            get
+            {
+                return _sigmoidAlpha;
+            }
+            set
+            {
+                if (value != _sigmoidAlpha)
+                {
+                    _sigmoidAlpha = value;
+                }
+            }
         }
 
         /// <summary>
@@ -104,8 +138,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public bool UseCrossValidationSets
         {
-            get;
-            set;
+            get
+            {
+                return _useCrossValidationSets;
+            }
+            set
+            {
+                if (value != _useCrossValidationSets)
+                {
+                    _useCrossValidationSets = value;
+                }
+            }
         }
 
         #endregion Properties
@@ -133,8 +176,17 @@ namespace Extract.AttributeFinder
         /// </summary>
         public int NumberOfClasses
         {
-            get;
-            private set;
+            get
+            {
+                return _numberOfClasses;
+            }
+            private set
+            {
+                if (value != _numberOfClasses)
+                {
+                    _numberOfClasses = value;
+                }
+            }
         }
 
         /// <summary>
@@ -143,8 +195,17 @@ namespace Extract.AttributeFinder
         /// <returns>Whether this classifier has been trained and is ready to compute answers</returns>
         public bool IsTrained
         {
-            get;
-            private set;
+            get
+            {
+                return _isTrained;
+            }
+            private set
+            {
+                if (value != _isTrained)
+                {
+                    _isTrained = value;
+                }
+            }
         }
 
         /// <summary>
@@ -152,10 +213,18 @@ namespace Extract.AttributeFinder
         /// </summary>
         public DateTime LastTrainedOn
         {
-            get;
-            private set;
+            get
+            {
+                return _lastTrainedOn;
+            }
+            private set
+            {
+                if (value != _lastTrainedOn)
+                {
+                    _lastTrainedOn = value;
+                }
+            }
         }
-
 
         /// <summary>
         /// Trains the classifier to recognize classifications
@@ -188,10 +257,15 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                // Indent sub-status messages
+                Action<StatusArgs> updateStatus2 = args =>
+                    {
+                        args.Indent++;
+                        updateStatus(args);
+                    };
+
                 ExtractException.Assert("ELI39717", "No inputs given", inputs != null && inputs.Length > 0);
                 ExtractException.Assert("ELI39718", "Inputs and outputs are different lengths", inputs.Length == outputs.Length);
-
-                updateStatus(new StatusArgs { StatusMessage = "Building classifier..." });
 
                 // If a random number generator was specified, then specify the random number generator
                 // for neuron initialization so that results are reproducible
@@ -227,17 +301,19 @@ namespace Extract.AttributeFinder
                 // Run training algorithm
                 if (!UseCrossValidationSets)
                 {
-                    updateStatus(new StatusArgs { StatusMessage = "Training classifier..." });
-                    _classifier = TrainClassifier(inputs, expandedOutputs, layers, updateStatus, cancellationToken);
+                    updateStatus(new StatusArgs { StatusMessage = "Training classifier:" });
+                    _classifier = TrainClassifier(inputs, expandedOutputs, layers, updateStatus2, cancellationToken);
                 }
                 else
                 {
+                    updateStatus(new StatusArgs { StatusMessage = "Building classifier:" });
+
                     int numberOfNetworks = Math.Max(1, NumberOfCandidateNetworksToBuild);
                     double lowestError = double.MaxValue;
                     for (int i = 0; i < numberOfNetworks; i++)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
-                        updateStatus(new StatusArgs
+                        updateStatus2(new StatusArgs
                         {
                             TaskName = "TrainCandidateNet",
                             ReplaceLastStatus = true,
@@ -260,7 +336,7 @@ namespace Extract.AttributeFinder
                         // Train the classifier
                         ActivationNetwork ann;
                         double cvError = TrainClassifier(trainInputs, trainOutputs, cvInputs, cvOutputs, layers, out ann,
-                            updateStatus, cancellationToken);
+                            updateStatus2, cancellationToken);
                         if (cvError < lowestError)
                         {
                             _classifier = ann;
@@ -347,6 +423,36 @@ namespace Extract.AttributeFinder
             LastTrainedOn = DateTime.MinValue;
             IsTrained = false;
             _classifier = null;
+        }
+
+        /// <summary>
+        /// Pretty prints this object with supplied <see cref="System.CodeDom.Compiler.IndentedTextWriter"/>
+        /// </summary>
+        /// <param name="writer">The <see cref="System.CodeDom.Compiler.IndentedTextWriter"/> to use</param>
+        public void PrettyPrint(System.CodeDom.Compiler.IndentedTextWriter writer)
+        {
+            try
+            {
+                var oldIndent = writer.Indent;
+                writer.Indent++;
+                if (IsTrained)
+                {
+                    writer.WriteLine("LastTrainedOn: {0:s}", LastTrainedOn);
+                }
+                else
+                {
+                    writer.WriteLine("LastTrainedOn: Never");
+                }
+                writer.WriteLine("Hidden Layers: {0}", string.Join(", ", HiddenLayers));
+                writer.WriteLine("SigmoidAlpha: {0}", SigmoidAlpha);
+                writer.WriteLine("NumberOfCandidateNetworksToBuild: {0}", NumberOfCandidateNetworksToBuild);
+                writer.WriteLine("UseCrossValidationSets: {0}", UseCrossValidationSets);
+                writer.Indent = oldIndent;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40069");
+            }
         }
 
         #endregion ITrainableClassifier
