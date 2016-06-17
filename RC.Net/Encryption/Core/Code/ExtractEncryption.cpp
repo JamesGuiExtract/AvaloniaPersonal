@@ -580,11 +580,8 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 	}
 	finally
 	{
-		// Close the streams and clear the encryption objects
-		if (cryptoStream != nullptr)
-		{
-			cryptoStream->Close();
-		}
+		// Clear the encryption objects
+		// Don't close the cryptoStream because that will close the underlying stream too
 		if (rjndl != nullptr)
 		{
 			rjndl->Clear();
@@ -770,11 +767,8 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
 			}
 			finally
 			{
-				// Close the streams and clear the encryption objects
-				if (cryptoStream != nullptr)
-				{
-					cryptoStream->Close();
-				}
+				// Clear the encryption objects
+				// Don't close the cryptoStream because that will close the underlying stream too
 				if (rjndl != nullptr)
 				{
 					rjndl->Clear();

@@ -34,6 +34,14 @@ namespace Extract.AttributeFinder
         /// </summary>
         const int _CURRENT_VERSION = 1;
 
+        // Encryption password for serialization
+        private static readonly byte[] _ENCRYPTION_PASSWORD = new byte[64]
+            {
+              185, 105, 109, 83, 148, 254, 79, 173, 128, 172, 12, 76, 61, 131, 66, 69, 236, 2, 76, 172, 158, 197, 70, 243, 131,
+              95, 163, 206, 89, 164, 145, 134, 6, 25, 175, 201, 97, 177, 190, 24, 163, 144, 141, 55, 75, 250, 20, 9, 176, 172,
+              0x37, 0x6b, 0xac, 0xe7, 0x45, 0x97, 0x22, 0x07, 0xe8, 0x1a, 0x70, 0x3f, 0xca, 0x21
+            };
+
         #endregion Constants
 
         #region Fields
@@ -43,8 +51,14 @@ namespace Extract.AttributeFinder
         /// </summary>
         private int _version = _CURRENT_VERSION;
 
+        /// <summary>
+        /// Persist the <see cref="LearningMachineDataEncoder"/> encrypted to hide potentially sensitive information
+        /// </summary>
+        private Byte[] _encryptedEncoder;
+
         // Backing fields for properties
         private InputConfiguration _inputConfig;
+        [NonSerialized]
         private LearningMachineDataEncoder _encoder;
         private ITrainableClassifier _classifier;
         private int _randomNumberSeed;
@@ -594,23 +608,19 @@ namespace Extract.AttributeFinder
         /// <param name="fileName">File name to save machine into.</param>
         public void Save(string fileName)
         {
-            string tempEncryptionFile = null;
+            string tempFile = null;
 
             try
             {
                 // Save to a temporary file
-                tempEncryptionFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                using (var stream = new FileStream(tempEncryptionFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                using (var stream = new FileStream(tempFile, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     Save(stream);
                 }
 
-                // Encrypt the file
-                MapLabel mapLabel = new MapLabel();
-                ExtractEncryption.EncryptFile(tempEncryptionFile, tempEncryptionFile, overwrite:true, mapLabel:mapLabel);
-
-                 // Once the encryption process is complete, copy it into the real destination.
-                 File.Copy(tempEncryptionFile, fileName, overwrite:true);
+                // Once the save process is complete, copy the file into the real destination.
+                File.Copy(tempFile, fileName, overwrite: true);
             }
             catch (Exception e)
             {
@@ -618,9 +628,9 @@ namespace Extract.AttributeFinder
             }
             finally
             {
-                if (tempEncryptionFile != null)
+                if (tempFile != null)
                 {
-                    FileSystemMethods.DeleteFile(tempEncryptionFile);
+                    FileSystemMethods.DeleteFile(tempFile);
                 }
             }
         }
@@ -651,9 +661,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                MapLabel mapLabel = new MapLabel();
-                var unencryptedBytes = ExtractEncryption.DecryptBinaryFile(fileName, mapLabel);
-                using (var stream = new MemoryStream(unencryptedBytes))
+                using (var stream = new FileStream(fileName, FileMode.Open))
                 {
                     return Load(stream);
                 }
@@ -794,6 +802,26 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Called when serializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnSerializing]
+        private void OnSerializing(StreamingContext context)
+        {
+            var ml = new MapLabel();
+            using (var unencryptedStream = new MemoryStream())
+            using (var encryptedStream = new MemoryStream())
+            {
+                var serializer = new NetDataContractSerializer();
+                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
+                serializer.Serialize(unencryptedStream, Encoder);
+                unencryptedStream.Position = 0;
+                ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _ENCRYPTION_PASSWORD, ml);
+                _encryptedEncoder = encryptedStream.ToArray();
+            }
+        }
+
+        /// <summary>
         /// Called when deserialized
         /// </summary>
         /// <param name="context">The context.</param>
@@ -806,6 +834,18 @@ namespace Extract.AttributeFinder
 
             // Update version number
             _version = _CURRENT_VERSION;
+
+            // Set 
+            var ml = new MapLabel();
+            using (var encryptedStream = new MemoryStream(_encryptedEncoder))
+            using (var unencryptedStream = new MemoryStream())
+            {
+                ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _ENCRYPTION_PASSWORD, ml);
+                unencryptedStream.Position = 0;
+                var serializer = new NetDataContractSerializer();
+                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
+                Encoder = (LearningMachineDataEncoder)serializer.Deserialize(unencryptedStream);
+            }
         }
 
         #endregion Private Methods
