@@ -115,6 +115,24 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="LearningMachineConfiguration" /> is dirty.
+        /// </summary>
+        private bool Dirty
+        {
+            get
+            {
+                return _dirty;
+            }
+            set
+            {
+                _dirty = value;
+                Text = _dirty
+                    ? string.Format(CultureInfo.CurrentCulture, _TITLE_TEXT_DIRTY, _fileName)
+                    : string.Format(CultureInfo.CurrentCulture, _TITLE_TEXT, _fileName);
+            }
+        }
+
         #endregion Properties
 
         #region Constructors
@@ -202,6 +220,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 attributeFeatureFilterComboBox.Items.Add(_MATCH);
                 attributeFeatureFilterComboBox.Items.Add(_DO_NOT_MATCH);
 
+                // Set default values for controls
+                SetDefaultValues();
+
                 // Open specified file if available
                 if (!_fileName.Equals(_NEW_FILE_NAME, StringComparison.Ordinal))
                 {
@@ -211,6 +232,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         {
                             _savedLearningMachine = LearningMachine.Load(_fileName);
                             _previousLearningMachine = null;
+
+                            // Ensure that corresponding text controls get updated
+                            _textValueOrCheckStateChangedSinceCreation = true;
                         }
                         else
                         {
@@ -230,9 +254,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     _savedLearningMachine = MakeNewMachine();
                     _fileName = _NEW_FILE_NAME;
                 }
-
-                // Set default values for controls
-                SetDefaultValues();
 
                 // Set current learning machine to be a clone of the saved copy
                 CurrentLearningMachine = _savedLearningMachine.DeepClone();
@@ -258,6 +279,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 // Ctrl+S = Save
                 if (keyData == (Keys.Control | Keys.S))
                 {
+                    saveMachineButton.Focus();
                     HandleSaveMachineButton_Click(this, EventArgs.Empty);
                     return true;
                 }
@@ -265,6 +287,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 // Ctrl+O = Open
                 if (keyData == (Keys.Control | Keys.O))
                 {
+                    openMachineButton.Focus();
                     HandleOpenMachineButton_Click(this, EventArgs.Empty);
                     return true;
                 }
@@ -357,9 +380,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             return;
                         }
 
-                        // Treat saved machine as having non-default values
-                        _textValueOrCheckStateChangedSinceCreation = true;
                         _savedLearningMachine = LearningMachine.Load(fileNames[0]);
+
+                        // Ensure that corresponding text controls get updated
+                        _textValueOrCheckStateChangedSinceCreation = true;
+
                         _previousLearningMachine = null;
                         _fileName = fileNames[0];
                         _valid = true;
@@ -465,16 +490,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 = CurrentLearningMachine.Encoder.AreEncodingsComputed;
 
             // Check against saved machine configuration
-            _dirty = !_currentLearningMachine.IsConfigurationEqualTo(_savedLearningMachine)
+            Dirty = !_currentLearningMachine.IsConfigurationEqualTo(_savedLearningMachine)
                 || (_currentLearningMachine.Encoder.AreEncodingsComputed
                     != _savedLearningMachine.Encoder.AreEncodingsComputed)
                 || (_currentLearningMachine.IsTrained != _savedLearningMachine.IsTrained)
                 || (_currentLearningMachine.IsTrained
                     && _currentLearningMachine.Classifier.LastTrainedOn != _savedLearningMachine.Classifier.LastTrainedOn);
-
-            Text = _dirty
-                ? string.Format(CultureInfo.CurrentCulture, _TITLE_TEXT_DIRTY, _fileName)
-                : string.Format(CultureInfo.CurrentCulture, _TITLE_TEXT, _fileName);
         }
 
         /// <summary>
@@ -635,8 +656,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     // If in an invalid state then must be dirty
                     else
                     {
-                        _dirty = true;
-                        Text = string.Format(CultureInfo.CurrentCulture, _TITLE_TEXT_DIRTY, _fileName);
+                        Dirty = true;
                     }
                 }
 
@@ -1254,7 +1274,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         private bool PromptForDirtyFile()
         {
             bool confirm = true;
-            if (_dirty)
+            if (Dirty)
             {
                 var response = MessageBox.Show(this,
                     "Changes have not been saved, would you like to save now?",
@@ -1334,8 +1354,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     win.ShowDialog();
                     if (string.CompareOrdinal(CurrentLearningMachine.TrainingLog, _savedLearningMachine.TrainingLog) != 0)
                     {
-                        _dirty = true;
-                        Text = string.Format(CultureInfo.CurrentCulture, _TITLE_TEXT_DIRTY, _fileName);
+                        Dirty = true;
                     }
                 }
             }
@@ -1434,7 +1453,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 if (textBox != null && textBox.Focused)
                 {
                     // Set dirty flag regardless
-                    _dirty = true;
+                    Dirty = true;
 
                     return;
                 }
@@ -1524,8 +1543,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 {
                     _currentLearningMachine.Save(_fileName);
                     _savedLearningMachine = _currentLearningMachine.DeepClone();
-                    Text = string.Format(CultureInfo.CurrentCulture, _TITLE_TEXT, _fileName);
-                    _dirty = false;
+                    Dirty = false;
                 }
             }
             catch (Exception ex)
@@ -1554,7 +1572,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     saveDialog.Filter = "Learning machine|*.lm|All files|*.*";
                     if (!_fileName.Equals(_NEW_FILE_NAME, StringComparison.Ordinal))
                     {
-                        saveDialog.FileName = _fileName;
+                        saveDialog.FileName = Path.GetFileName(_fileName);
+                        saveDialog.InitialDirectory = Path.GetDirectoryName(_fileName);
                     }
 
                     var result = saveDialog.ShowDialog();
@@ -1563,8 +1582,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         _currentLearningMachine.Save(saveDialog.FileName);
                         _savedLearningMachine = _currentLearningMachine.DeepClone();
                         _fileName = saveDialog.FileName;
-                        Text = string.Format(CultureInfo.CurrentCulture, _TITLE_TEXT, _fileName);
-                        _dirty = false;
+                        Dirty = false;
                     }
                     else if (result == System.Windows.Forms.DialogResult.Cancel)
                     {
