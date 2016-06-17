@@ -540,8 +540,8 @@ namespace Extract.AttributeFinder
 
                 if (i >= _WINDOW_SIZE)
                 {
-                    var avgCVLast = history.Take(_WINDOW_SIZE/2).Average(t => t.Item2);
-                    var avgCVPrevLast = history.Skip(_WINDOW_SIZE/2).Average(t => t.Item2);
+                    var avgCVLast = history.Skip(_WINDOW_SIZE/2).Average(t => t.Item2);
+                    var avgCVPrevLast = history.Take(_WINDOW_SIZE/2).Average(t => t.Item2);
 
                     // Break if CV error is trending upward
                     if (avgCVLast > avgCVPrevLast)
