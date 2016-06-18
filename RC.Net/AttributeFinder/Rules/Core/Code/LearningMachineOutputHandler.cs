@@ -78,7 +78,10 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         bool _dirty;
 
-        LearningMachine _learningMachine;
+        /// <summary>
+        /// The path to the saved <see cref="LearningMachine"/> with any tags/functions expanded
+        /// </summary>
+        private string _expandedPath;
 
         #endregion Fields
 
@@ -165,13 +168,13 @@ namespace Extract.AttributeFinder.Rules
                 // memory.
                 pAttributes.ReportMemoryUsage();
 
-                if (_learningMachine == null)
+                if (_expandedPath == null)
                 {
                     var pathTags = new AttributeFinderPathTags(pDoc);
-                    var fileName = pathTags.Expand(SavedMachinePath);
-                    _learningMachine = LearningMachine.Load(fileName);
+                    _expandedPath = pathTags.Expand(SavedMachinePath);
                 }
-                IUnknownVector result = _learningMachine.ComputeAnswer(pDoc.Text, pAttributes, PreserveInputAttributes);
+                IUnknownVector result = LearningMachine.ComputeAnswer(_expandedPath,
+                    pDoc.Text, pAttributes, PreserveInputAttributes);
                 pAttributes.CopyFrom(result);
             }
             catch (Exception ex)

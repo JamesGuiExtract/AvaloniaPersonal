@@ -17,6 +17,7 @@ using AccuracyData = Extract.Utilities.Union<Accord.Statistics.Analysis.GeneralC
 using Extract.Licensing;
 using Extract.Encryption;
 using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
 
 namespace Extract.AttributeFinder
 {
@@ -42,9 +43,14 @@ namespace Extract.AttributeFinder
                 141, 55, 75, 250, 20, 9, 176, 172, 55, 107, 172, 231, 69, 151, 34, 7, 232, 26, 112, 63, 202, 33
             };
 
+        private static long _CACHE_SIZE = 500000000;
+
         #endregion Constants
 
         #region Fields
+
+        private static ConcurrentDictionary<string, Tuple<LearningMachine, long>> _machineCache
+            = new ConcurrentDictionary<string, Tuple<LearningMachine, long>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Persist the current version so to prevent newer, incompatible, versions from being loaded
@@ -661,7 +667,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                using (var stream = new FileStream(fileName, FileMode.Open))
+                using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     return Load(stream);
                 }
@@ -952,6 +958,50 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39739");
+            }
+        }
+
+        /// <summary>
+        /// Computes an answer for the input data
+        /// </summary>
+        /// <remarks>If <see paramref="preserveInputAttributes"/>=<see langword="true"/> and
+        /// <see cref="Usage"/>=<see cref="LearningMachineUsage.Pagination"/> then the input Page <see cref="ComAttribute"/>s will be
+        /// returned as subattributes of the resulting Document <see cref="ComAttribute"/>s.</remarks>
+        /// <param name="learningMachinePath">Path to saved <see cref="LearningMachine"/></param>
+        /// <param name="document">The <see cref="SpatialString"/> used for encoding auto-BoW features</param>
+        /// <param name="protoFeaturesOrPagesOfProtoFeatures">The VOA used for encoding attribute features</param>
+        /// <param name="preserveInputAttributes">Whether to preserve the input <see cref="ComAttribute"/>s or not.</param>
+        /// <returns>A VOA representation of the computed answer</returns>
+        public static IUnknownVector ComputeAnswer(string learningMachinePath, SpatialString document,
+            IUnknownVector protoFeaturesOrPagesOfProtoFeatures, bool preserveInputAttributes)
+        {
+            try
+            {
+                string fullPath = Path.GetFullPath(learningMachinePath);
+                var machineAndSize = _machineCache.GetOrAdd(fullPath, path =>
+                    {
+                        long size = (new FileInfo(path)).Length;
+                        return Tuple.Create(Load(path), size);
+                    });
+                var machine = machineAndSize.Item1;
+
+                long currentCacheSize = _machineCache.Values.Sum(t => t.Item2);
+                while (currentCacheSize > _CACHE_SIZE)
+                {
+                    Tuple<LearningMachine, long> removed;
+                    if (_machineCache.TryRemove(_machineCache.Keys.FirstOrDefault(), out removed)
+                        && currentCacheSize - removed.Item2 <= _CACHE_SIZE)
+                    {
+                        break;
+                    }
+                    currentCacheSize = _machineCache.Values.Sum(t => t.Item2);
+                }
+
+                return machine.ComputeAnswer(document, protoFeaturesOrPagesOfProtoFeatures, preserveInputAttributes);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40156");
             }
         }
 
