@@ -309,6 +309,10 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                // Before Loading the state make sure the config is still valid
+                // https://extract.atlassian.net/browse/ISSUE-12830
+                UserConfigChecker.EnsureValidUserConfigFile();
+
                 // Establish image viewer connections prior to calling base.OnLoad which will
                 // potentially remove some IImageViewerControls.
                 _imageViewer.EstablishConnections(this);

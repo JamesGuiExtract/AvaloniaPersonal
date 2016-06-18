@@ -1227,6 +1227,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (!_standAloneMode && _settings.PaginationEnabled)
                 {
+                    _paginationPanel.LoadNextDocument += HandlePaginationPanel_LoadNextDocument;
+
                     LoadPaginationDocumentDataPanel();
 
                     // Show pagination tab before showing the data tab to trigger the pagination
@@ -3032,6 +3034,34 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Handles the <see cref="PaginationPanel.LoadNextDocument "/> event of the
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePaginationPanel_LoadNextDocument(object sender, EventArgs e)
+        {
+            try
+            {
+                int fileID = FileRequestHandler.CheckoutNextFile(false);
+                if (fileID > 0)
+                {
+                    string fileName = FileProcessingDB.GetFileNameFromFileID(fileID);
+                    LoadDocumentForPagination(fileName);
+                }
+                else
+                {
+                    UtilityMethods.ShowMessageBox("No more files are available.", "No more files", false);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40072");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="PaginationPanel.DocumentDataRequest"/> of the
         /// <see cref="_paginationPanel"/>.
         /// </summary>
@@ -3111,6 +3141,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 else if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
                 {
+                    // Produce a voa file for the paginated document using the data the rules suggested.
+                    var documentData = e.DocumentData as PaginationDocumentData;
+                    if (documentData != null)
+                    {
+                        AttributeMethods.TranslateAttributesToNewDocument(
+                            documentData.Attributes, e.OutputFileName, pageMap);
+
+                        documentData.Attributes.SaveTo(e.OutputFileName + ".voa", false,
+                            _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    }
+
                     EActionStatus oldStatus;
                     FileProcessingDB.SetStatusForFile(fileID,
                         _settings.PaginationSettings.PaginationOutputAction,
@@ -5328,7 +5369,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
                 _activeDataEntryConfig.Config.Settings.DataEntryPanelFileName);
 
-            // May be null if the DEP assembly does define an IPaginationDocumentDataPanel.
+            // May be null if the DEP assembly does not define an IPaginationDocumentDataPanel.
             _paginationDocumentDataPanel =
                 UtilityMethods.CreateTypeFromAssembly<IPaginationDocumentDataPanel>(
                     dataEntryPanelFileName);

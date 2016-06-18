@@ -72,10 +72,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         firstControl = false;
                     }
-                    else if (firstControl || previousSeparator != null)
+                    else if ((firstControl && parent.Controls.OfType<PageThumbnailControl>().Any())
+                        || previousSeparator != null)
                     {
                         // If this separator is preceded by another separator or is the first
-                        // control, it is redundant and should be ignored.
+                        // control (but not the only control), it is redundant and should be ignored.
                         redundantControls.Add(separator);
                         separator.Visible = false;
                         firstControl = false;

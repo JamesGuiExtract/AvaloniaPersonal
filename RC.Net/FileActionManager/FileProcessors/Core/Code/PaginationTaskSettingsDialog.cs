@@ -1,0 +1,181 @@
+﻿using Extract.FileActionManager.Forms;
+using Extract.Utilities;
+using Extract.Utilities.Forms;
+using System;
+using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
+
+namespace Extract.FileActionManager.FileProcessors
+{
+    /// <summary>
+    /// Displays and allows editing of a <see cref="PaginationTask"/> instance.
+    /// </summary>
+    [CLSCompliant(false)]
+    public partial class PaginationTaskSettingsDialog : Form
+    {
+        #region Constants
+
+        /// <summary>
+        /// A special action name option that 
+        /// </summary>
+        const string _NO_ACTION = "<None>";
+
+        #endregion Constants
+
+        #region Fields
+
+        /// <summary>
+        /// The <see cref="IFileProcessingDB"/> this instance is associated with.
+        /// </summary>
+        IFileProcessingDB _fileProcessingDB;
+
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PaginationTaskSettingsDialog"/> class.
+        /// </summary>
+        /// <param name="settings">The <see cref="PaginationTask"/> instance that is being
+        /// configured.</param>
+        /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/> this instance is
+        /// associated with.</param>
+        public PaginationTaskSettingsDialog(IPaginationTask settings,
+            IFileProcessingDB fileProcessingDB)
+        {
+            try
+            {
+                InitializeComponent();
+
+                var outputPathTags = new FileActionManagerPathTags();
+                outputPathTags.AddTag(PaginationSettings.SubDocIndexTag, "");
+                outputPathTags.AddTag(PaginationSettings.FirstPageTag, "");
+                outputPathTags.AddTag(PaginationSettings.LastPageTag, "");
+
+                _outputPathPathTags.PathTags = outputPathTags;
+
+                Settings = settings;
+                _fileProcessingDB = fileProcessingDB;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40142");
+            }
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the <see cref="IPaginationTask"/> represented in the configuration dialog.
+        /// </summary>
+        /// <value>
+        /// The <see cref="IPaginationTask"/>.
+        /// </value>
+        public IPaginationTask Settings
+        {
+            get;
+            private set;
+        }
+
+        #endregion Properties
+
+        #region Overrides
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Load"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        protected override void OnLoad(EventArgs e)
+        {
+            try
+            {
+                base.OnLoad(e);
+
+                _sourceActionComboBox.Items.Add(_NO_ACTION);
+                _outputActionComboBox.Items.Add(_NO_ACTION);
+
+                foreach (var actionName in _fileProcessingDB
+                    .GetActions()
+                    .GetKeys()
+                    .ToIEnumerable<string>())
+                {
+                    _sourceActionComboBox.Items.Add(actionName);
+                    _outputActionComboBox.Items.Add(actionName);
+                }
+
+                _outputPathTextBox.Text = Settings.OutputPath;
+                _sourceActionComboBox.Text = Settings.SourceAction;
+                _outputActionComboBox.Text = Settings.OutputAction;
+                _documentDataAssemblyTextBox.Text = Settings.DocumentDataPanelAssembly;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40143");
+            }
+        }
+
+        #endregion Overrides
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_okButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleOkButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(_outputPathTextBox.Text))
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "The pagination output path must be specified.",
+                        "Invalid configuration", true);
+
+                    return;
+                }
+
+                Settings.SourceAction = _sourceActionComboBox.Text;
+                Settings.OutputPath = _outputPathTextBox.Text;
+                Settings.OutputAction = _outputActionComboBox.Text;
+                Settings.DocumentDataPanelAssembly = _documentDataAssemblyTextBox.Text;
+
+                DialogResult = DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40144");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ComboBox.SelectedIndexChanged"/> event of
+        /// <see cref="_sourceActionComboBox"/> and  <see cref="_outputActionComboBox"/>
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleActionComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                ComboBox comboBox = (ComboBox)sender;
+                if (comboBox.Text == _NO_ACTION)
+                {
+                    // If "<None>" was selected, interpret that to mean the text should be cleared.
+                    this.SafeBeginInvoke("ELI40145", () => comboBox.Text = "");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40146");
+            }
+        }
+
+        #endregion Event Handlers
+    }
+}

@@ -2115,6 +2115,15 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Restores normal behavior of processing queue.
 		[id(6), helpstring("method ResumeProcessingQueue")] HRESULT ResumeProcessingQueue();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Requests that the current instance grab the next file in the queue for
+		//			processing.
+		// ARGS:	vbAllowQueuedStatusOverride - Whether QueuedActionStatusChange records
+		//				should be honored when this file comes out of processing.
+		//			pnFileID- The ID of the file that was checked out or -1 if there was no
+		//			available file in the queue.
+		[id(7), helpstring("method CheckoutNextFile")] HRESULT CheckoutNextFile(
+			[in] VARIANT_BOOL vbAllowQueuedStatusOverride, [out, retval] long* pnFileID);
 	};
 
 	[

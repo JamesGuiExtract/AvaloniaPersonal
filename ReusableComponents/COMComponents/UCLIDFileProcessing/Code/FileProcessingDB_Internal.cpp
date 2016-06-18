@@ -1535,6 +1535,7 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 			"VALUES('P', 'File was programmatically added without being queued')");
 
 		vecQueries.push_back(gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES);
+		vecQueries.push_back(gstrINSERT_PAGINATION_TASK_CLASS);
 
 		// Initialize the DB Info settings if necessary
 		if (bInitializeUserTables)

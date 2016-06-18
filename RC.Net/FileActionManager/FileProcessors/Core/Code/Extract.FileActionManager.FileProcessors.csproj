@@ -112,6 +112,26 @@
     </Compile>
     <Compile Include="ApplyBatesNumberTask.cs" />
     <Compile Include="BatesNumberGeneratorWithDatabase.cs" />
+    <Compile Include="IPaginationDocumentDataPanel.cs" />
+    <Compile Include="PaginationDataField.cs" />
+    <Compile Include="PaginationDocumentData.cs" />
+    <Compile Include="PaginationTaskForm.FormStateManager.cs">
+      <DependentUpon>PaginationTaskForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaginationTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaginationTaskSettingsDialog.Designer.cs">
+      <DependentUpon>PaginationTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PaginationTaskForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaginationTaskForm.Designer.cs">
+      <DependentUpon>PaginationTaskForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PaginationTask.cs" />
     <Compile Include="StoreAttributesInDBTask.cs" />
     <Compile Include="StoreAttributesInDBTaskSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -290,6 +310,10 @@
       <Project>{D2DD8D8F-E632-429E-8646-B9489D21295F}</Project>
       <Name>Extract.Utilities.Ftp</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj">
+      <Project>{A6CEC41C-8703-4687-9395-8B067AC03098}</Project>
+      <Name>PaginationUtility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Database\Core\Code\Extract.FileActionManager.Database.csproj">
       <Project>{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}</Project>
       <Name>Extract.FileActionManager.Database</Name>
@@ -395,6 +419,13 @@
       <SubType>Designer</SubType>
       <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="PaginationTaskSettingsDialog.resx">
+      <DependentUpon>PaginationTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaginationTaskForm.resx">
+      <DependentUpon>PaginationTaskForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="StoreAttributesInDBTaskSettingsDialog.resx">
       <DependentUpon>StoreAttributesInDBTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -474,6 +505,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ExtractImageViewer.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Accept.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RevertToSuggestion.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RevertToDisk.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Apply.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

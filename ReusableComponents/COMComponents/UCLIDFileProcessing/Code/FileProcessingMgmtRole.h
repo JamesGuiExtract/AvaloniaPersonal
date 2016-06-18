@@ -151,6 +151,7 @@ public:
 // IFileRequestHandler
 	STDMETHOD(CheckoutForProcessing)(long nFileID, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus* pPrevStatus, VARIANT_BOOL* pSucceeded);
+	STDMETHOD(CheckoutNextFile)(VARIANT_BOOL vbAllowQueuedStatusOverride, long* pnFileID);
 	STDMETHOD(MoveToFrontOfProcessingQueue)(long nFileID, VARIANT_BOOL* pSucceeded);
 	STDMETHOD(ReleaseFile)(long nFileID, VARIANT_BOOL* pSucceeded);
 	STDMETHOD(SetFallbackStatus)(long nFileID, EActionStatus esFallbackStatus,

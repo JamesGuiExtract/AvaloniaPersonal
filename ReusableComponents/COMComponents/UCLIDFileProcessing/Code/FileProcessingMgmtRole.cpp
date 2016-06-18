@@ -540,6 +540,28 @@ STDMETHODIMP CFileProcessingMgmtRole::raw_RequiresAdminAccess(VARIANT_BOOL* pbRe
 //-------------------------------------------------------------------------------------------------
 // IFileRequestHandler
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::CheckoutNextFile(VARIANT_BOOL vbAllowQueuedStatusOverride,
+													   long* pnFileID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI40153", pnFileID != __nullptr);
+
+		EActionStatus prevStatus;
+
+		// No process currently has the field; request the FPRecordManger to lock it for
+		// processing and add it to the internal queue.
+		*pnFileID = -1;
+		m_pRecordMgr->checkoutForProcessing(*pnFileID,
+			asCppBool(vbAllowQueuedStatusOverride), &prevStatus);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI40152");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingMgmtRole::CheckoutForProcessing(long nFileID,
 	VARIANT_BOOL vbAllowQueuedStatusOverride, EActionStatus* pPrevStatus, VARIANT_BOOL* pSucceeded)
 {
@@ -551,14 +573,19 @@ STDMETHODIMP CFileProcessingMgmtRole::CheckoutForProcessing(long nFileID,
 
 		bool bResult = false;
 
-		// Query for an existing record in the lock table.
-		string strLockedFileQuery =
+		_RecordsetPtr ipRecords(nullptr);
+
+		if (nFileID != gnGET_NEXT_QUEUED_FILE)
+		{
+			// Query for an existing record in the lock table.
+			string strLockedFileQuery =
 			"SELECT [ActiveFAMID] FROM [LockedFile] WHERE [FileID] = " + asString(nFileID);
 
-		_RecordsetPtr ipRecords = getFPMDB()->GetResultsForQuery(strLockedFileQuery.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI37471", ipRecords != __nullptr);
+			ipRecords = getFPMDB()->GetResultsForQuery(strLockedFileQuery.c_str());
+			ASSERT_RESOURCE_ALLOCATION("ELI37471", ipRecords != __nullptr);
+		}
 
-		if (ipRecords->adoEOF == VARIANT_FALSE)
+		if (ipRecords != nullptr && ipRecords->adoEOF == VARIANT_FALSE)
 		{
 			// The file is already locked. But is it locked by this process?
 			ipRecords->MoveFirst();

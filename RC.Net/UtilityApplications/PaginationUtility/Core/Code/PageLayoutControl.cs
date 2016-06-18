@@ -933,12 +933,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="outputDocument">The <see cref="OutputDocument"/> whose pages are to be
         /// removed.</param>
-        public void DeleteOutputDocument(OutputDocument outputDocument)
+        /// <returns>Returns the index at which the document existed.
+        /// <para><b>Note</b></para>
+        /// This is not a document index. The caller should not try to interpret this value;
+        /// it's use should be limited to passing as the position argument of
+        /// PaginationPanel.LoadFile or SelectDocumentAtPosition.
+        /// </returns>
+        public int DeleteOutputDocument(OutputDocument outputDocument)
         {
             try
             {
+                int docPosition = GetDocumentPosition(outputDocument);
                 DeleteControls(outputDocument.PageControls.ToArray());
                 outputDocument.DocumentOutput -= HandleOutputDocument_DocumentOutput;
+
+                return docPosition;
             }
             catch (Exception ex)
             {
@@ -1324,11 +1333,41 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Selected the document at the specified <see paramref="position"/>.
+        /// </summary>
+        /// <param name="position">The position of the document to select.
+        /// <para><b>Note</b></para>
+        /// This is not a document index. The value used here should be an index reported by
+        /// <see cref="GetDocumentPosition"/>.
+        /// </param>
+        public bool SelectDocumentAtPosition(int position)
+        {
+            try
+            {
+                if (position >= 0 && position < _flowLayoutPanel.Controls.Count)
+                {
+                    var pageControl = _flowLayoutPanel.Controls[position] as PageThumbnailControl;
+                    if (pageControl != null && pageControl.Document != null)
+                    {
+                        SelectDocument(pageControl.Document);
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40147");
+            }
+        }
+
+        /// <summary>
         /// Gets the position of the document in <see cref="PaginationPanel"/>.
         /// <para><b>Note</b></para>
         /// This is not a document index. The caller should not try to interpret this value;
         /// it's use should be limited to passing as the position argument of
-        /// PaginationPanel.LoadFile.
+        /// PaginationPanel.LoadFile or SelectDocumentAtPosition.
         /// </summary>
         /// <param name="outputDocument">The <see cref="OutputDocument"/> for which the position is
         /// needed.</param>
@@ -2360,7 +2399,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // distinguish it from the document above it.
             if (index == -1 && control is LoadNextDocumentButtonControl)
             {
-                var lastControl = _flowLayoutPanel.Controls.OfType<PaginationControl>().Last();
+                var lastControl = _flowLayoutPanel.Controls.OfType<PaginationControl>().LastOrDefault();
                 if (lastControl != null && !(lastControl is PaginationSeparator))
                 {
                     AddPaginationControl(new PaginationSeparator());
@@ -2982,9 +3021,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 bool controlIsSeparator = _commandTargetControl is PaginationSeparator;
                 _toggleDocumentSeparatorCommand.Enabled = contextMenuControlIndex != 0 &&
                     !controlIsSeparator && SelectedControls.Count() == 1;
+                var asPageThumbnailControl = _commandTargetControl as PageThumbnailControl;
 
                 if (_toggleDocumentSeparatorCommand.Enabled &&
-                    ((PageThumbnailControl)_commandTargetControl).PageNumber == 1)
+                    asPageThumbnailControl != null &&
+                    asPageThumbnailControl.PageNumber == 1)
                 {
                     _toggleDocumentSeparatorMenuItem.Text = "Merge with previous document";
                 }

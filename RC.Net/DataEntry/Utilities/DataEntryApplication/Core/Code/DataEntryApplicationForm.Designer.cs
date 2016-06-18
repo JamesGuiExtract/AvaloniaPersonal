@@ -247,6 +247,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationTab.Size = new System.Drawing.Size(176, 484);
             this._paginationTab.TabIndex = 1;
             this._paginationTab.Text = "Pagination";
+            this._paginationPanel.ToolBarVisible = true;
             this._paginationTab.UseVisualStyleBackColor = true;
             // 
             // _paginationPanel

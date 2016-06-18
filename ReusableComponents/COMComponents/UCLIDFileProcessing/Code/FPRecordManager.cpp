@@ -457,12 +457,12 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-bool FPRecordManager::checkoutForProcessing(long nFileId, bool bAllowQueuedStatusOverride,
+bool FPRecordManager::checkoutForProcessing(long &rnFileId, bool bAllowQueuedStatusOverride,
 											EActionStatus *peaPreviousStatus)
 {
 	ASSERT_ARGUMENT("ELI37489", peaPreviousStatus != __nullptr);
 
-	return loadTaskFromDB(nFileId, bAllowQueuedStatusOverride, peaPreviousStatus);
+	return loadTaskFromDB(rnFileId, bAllowQueuedStatusOverride, peaPreviousStatus);
 }
 //-------------------------------------------------------------------------------------------------
 bool FPRecordManager::moveToFrontOfQueue(long nFileId)
@@ -1101,11 +1101,32 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 	return nNumFilesAddedToQ;
 }
 //-------------------------------------------------------------------------------------------------
-bool FPRecordManager::loadTaskFromDB(long nFileId, bool bAllowQueuedStatusOverride,
+bool FPRecordManager::loadTaskFromDB(long &rnFileId, bool bAllowQueuedStatusOverride,
 									 EActionStatus *peaPreviousStatus)
 {
-	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipRecord = m_ipFPMDB->GetFileToProcess(nFileId,
-		m_strAction.c_str());
+	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipRecord(nullptr);
+
+	if (rnFileId == gnGET_NEXT_QUEUED_FILE)
+	{
+		// Get the list of file records
+		string strSkippedUser = 
+			m_bSkippedFilesForCurrentUser && m_bProcessSkippedFiles ? getCurrentUserName() : "";
+		IIUnknownVectorPtr ipFileList = m_ipFPMDB->GetFilesToProcess(m_strAction.c_str(), 1,
+			asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str());
+
+		if (ipFileList->Size() == 1)
+		{
+			ipRecord = ipFileList->At(0);
+			ASSERT_RESOURCE_ALLOCATION("ELI40154", ipRecord != __nullptr );
+
+			rnFileId = ipRecord->FileID;
+		}
+	}
+	else
+	{
+		ipRecord = m_ipFPMDB->GetFileToProcess(rnFileId, m_strAction.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI40155", ipRecord != __nullptr );
+	}
 
 	if (ipRecord != __nullptr)
 	{

@@ -1531,6 +1531,10 @@ static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006', 'Core: Store/Retrieve attributes in DB') \r\n";
 
+static const string gstrINSERT_PAGINATION_TASK_CLASS =
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('DF414AD2-742A-4ED7-AD20-C1A1C4993175', 'Core: Paginate files') \r\n";
+
 static const string gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE = 
 	"	SELECT [sc].[ID] "
 	"		,[sc].[CounterName] "

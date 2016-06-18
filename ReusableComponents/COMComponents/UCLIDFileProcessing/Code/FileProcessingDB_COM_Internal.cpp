@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 139;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 140;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1480,6 +1480,32 @@ int UpdateToSchemaVersion139(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40042");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion140(_ConnectionPtr ipConnection, 
+							 long* pnNumSteps, 
+							 IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 140;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrINSERT_PAGINATION_TASK_CLASS);
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI40057");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -1684,7 +1710,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				// Get the action ID and update the strActionName to stored value
 				long nActionID = getActionID(ipConnection, strActionName);
 				_lastCodePos = "45";
-				
+
 				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord = __nullptr;
 				FieldsPtr ipFields = __nullptr;
 
@@ -6616,7 +6642,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 136:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion137);
 				case 137:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion138);
 				case 138:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion139);
-				case 139:	break;
+				case 139:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion140);
+				case 140:	break;
 
 				default:
 					{

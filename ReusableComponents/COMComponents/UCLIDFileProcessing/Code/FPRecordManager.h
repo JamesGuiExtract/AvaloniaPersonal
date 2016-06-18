@@ -96,10 +96,12 @@ public:
 	bool pop(FileProcessingRecord& task, bool bWait, Win32Semaphore &processSemaphore, bool* pbProcessingActive = __nullptr);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Requests that the specified file be locked for processing and added to the queue.
+	//			If rnFileId == -1 it indicates the next file in the queue should be grabbed and will
+	//			updated with the ID of the file that was checked out.
 	//			peaPreviousStatus indicates the status of the file before being set to processing.
 	// RETURNS: true if the file was able to be checked out or it was already checked out, false
 	//			if another process already had the file checked out.
-	bool checkoutForProcessing(long nFileId, bool bAllowQueuedStatusOverride, EActionStatus *peaPreviousStatus);
+	bool checkoutForProcessing(long &rnFileId, bool bAllowQueuedStatusOverride, EActionStatus *peaPreviousStatus);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Moves the specified file to the front of the queue to ensure it is the next file
 	//			that starts processing.
@@ -357,8 +359,11 @@ private:
 	// returns the number of records loaded
 	long loadTasksFromDB(long nNumToLoad);
 	//---------------------------------------------------------------------------------------------
-	// Loads specified file from the database. Returns true if the file was loaded.
-	bool loadTaskFromDB(long nFileId, bool bAllowQueuedStatusOverride, EActionStatus *peaPreviousStatus);
+	// Loads specified nFileId from the database or the next file in the queue if rnFileId == -1.
+	// rnFileId will be set to the ID of the loaded file if -1 was passed in.
+	// Returns true if the file was loaded.
+	bool loadTaskFromDB(long &rnFileId, bool bAllowQueuedStatusOverride, EActionStatus *peaPreviousStatus);
+	//---------------------------------------------------------------------------------------------
 	// Loads max of nNumToLoad workitems from the database to the workItem processing queue
 	// returns the number of records loaded
 	long loadWorkItemsFromDB(long nNumToLoad, UCLID_FILEPROCESSINGLib::EFilePriority eMinPriority);
