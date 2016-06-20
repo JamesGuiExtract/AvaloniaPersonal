@@ -1,23 +1,23 @@
 ﻿using Accord.Math;
 using Accord.Statistics.Analysis;
+using Extract.Encryption;
+using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Threading;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
-using ComAttribute = UCLID_AFCORELib.Attribute;
 using AccuracyData = Extract.Utilities.Union<Accord.Statistics.Analysis.GeneralConfusionMatrix, Accord.Statistics.Analysis.ConfusionMatrix>;
-using Extract.Licensing;
-using Extract.Encryption;
-using System.CodeDom.Compiler;
-using System.Collections.Concurrent;
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder
 {
@@ -43,34 +43,34 @@ namespace Extract.AttributeFinder
                 141, 55, 75, 250, 20, 9, 176, 172, 55, 107, 172, 231, 69, 151, 34, 7, 232, 26, 112, 63, 202, 33
             };
 
-        private static long _CACHE_SIZE = 500000000;
-
         #endregion Constants
 
         #region Fields
-
-        private static ConcurrentDictionary<string, Tuple<LearningMachine, long>> _machineCache
-            = new ConcurrentDictionary<string, Tuple<LearningMachine, long>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Persist the current version so to prevent newer, incompatible, versions from being loaded
         /// </summary>
         private int _version = _CURRENT_VERSION;
 
-        /// <summary>
-        /// Persist the <see cref="LearningMachineDataEncoder"/> encrypted to hide potentially sensitive information
-        /// </summary>
-        private Byte[] _encryptedEncoder;
 
         // Backing fields for properties
-        private InputConfiguration _inputConfig;
-        [NonSerialized]
-        private LearningMachineDataEncoder _encoder;
         private ITrainableClassifier _classifier;
         private int _randomNumberSeed;
         private bool _useUnknownCategory;
         private double _unknownCategoryCutoff;
+
+        // Don't serialize fields with potentially sensitive information in them
+        [NonSerialized]
+        private InputConfiguration _inputConfig;
+        [NonSerialized]
+        private LearningMachineDataEncoder _encoder;
+        [NonSerialized]
         private string _trainingLog;
+
+        // Encrypted versions of potentially sensitive fields
+        private Byte[] _encryptedEncoder;
+        private byte[] _encryptedInputConfig;
+        private string _encryptedTrainingLog;
 
         #endregion Fields
 
@@ -626,7 +626,7 @@ namespace Extract.AttributeFinder
                 }
 
                 // Once the save process is complete, copy the file into the real destination.
-                File.Copy(tempFile, fileName, overwrite: true);
+                FileSystemMethods.MoveFile(tempFile, fileName, overwrite: true);
             }
             catch (Exception e)
             {
@@ -667,10 +667,16 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                LearningMachine machine = null;
+                FileSystemMethods.PerformFileOperationWithRetry(() =>
                 {
-                    return Load(stream);
-                }
+                    using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        machine = Load(stream);
+                    }
+                }, onlyOnSharingViolation: true);
+
+                return machine;
             }
             catch (Exception e)
             {
@@ -814,7 +820,20 @@ namespace Extract.AttributeFinder
         [OnSerializing]
         private void OnSerializing(StreamingContext context)
         {
+            // Encrypt input configuration
             var ml = new MapLabel();
+            using (var unencryptedStream = new MemoryStream())
+            using (var encryptedStream = new MemoryStream())
+            {
+                var serializer = new NetDataContractSerializer();
+                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
+                serializer.Serialize(unencryptedStream, InputConfig);
+                unencryptedStream.Position = 0;
+                ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _ENCRYPTION_PASSWORD, ml);
+                _encryptedInputConfig = encryptedStream.ToArray();
+            }
+
+            // Encrypt data encoder
             using (var unencryptedStream = new MemoryStream())
             using (var encryptedStream = new MemoryStream())
             {
@@ -824,6 +843,12 @@ namespace Extract.AttributeFinder
                 unencryptedStream.Position = 0;
                 ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _ENCRYPTION_PASSWORD, ml);
                 _encryptedEncoder = encryptedStream.ToArray();
+            }
+
+            // Encrypt training log
+            if (TrainingLog != null)
+            {
+                _encryptedTrainingLog = ExtractEncryption.EncryptString(TrainingLog, ml);
             }
         }
 
@@ -841,8 +866,19 @@ namespace Extract.AttributeFinder
             // Update version number
             _version = _CURRENT_VERSION;
 
-            // Set 
+            // Decrypt input configuration
             var ml = new MapLabel();
+            using (var encryptedStream = new MemoryStream(_encryptedInputConfig))
+            using (var unencryptedStream = new MemoryStream())
+            {
+                ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _ENCRYPTION_PASSWORD, ml);
+                unencryptedStream.Position = 0;
+                var serializer = new NetDataContractSerializer();
+                serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
+                InputConfig = (InputConfiguration)serializer.Deserialize(unencryptedStream);
+            }
+
+            // Decrypt data encoder
             using (var encryptedStream = new MemoryStream(_encryptedEncoder))
             using (var unencryptedStream = new MemoryStream())
             {
@@ -851,6 +887,12 @@ namespace Extract.AttributeFinder
                 var serializer = new NetDataContractSerializer();
                 serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
                 Encoder = (LearningMachineDataEncoder)serializer.Deserialize(unencryptedStream);
+            }
+
+            // Decrypt training log
+            if (_encryptedTrainingLog != null)
+            {
+                TrainingLog = ExtractEncryption.DecryptString(_encryptedTrainingLog, ml);
             }
         }
 
@@ -978,23 +1020,15 @@ namespace Extract.AttributeFinder
             try
             {
                 string fullPath = Path.GetFullPath(learningMachinePath);
-                var machineAndSize = _machineCache.GetOrAdd(fullPath, path =>
-                    {
-                        long size = (new FileInfo(path)).Length;
-                        return Tuple.Create(Load(path), size);
-                    });
-                var machine = machineAndSize.Item1;
 
-                long currentCacheSize = _machineCache.Values.Sum(t => t.Item2);
-                while (currentCacheSize > _CACHE_SIZE)
+                ObjectCache cache = MemoryCache.Default;
+                var machine = cache[fullPath] as LearningMachine;
+                if (machine == null)
                 {
-                    Tuple<LearningMachine, long> removed;
-                    if (_machineCache.TryRemove(_machineCache.Keys.FirstOrDefault(), out removed)
-                        && currentCacheSize - removed.Item2 <= _CACHE_SIZE)
-                    {
-                        break;
-                    }
-                    currentCacheSize = _machineCache.Values.Sum(t => t.Item2);
+                    CacheItemPolicy policy = new CacheItemPolicy();
+                    policy.ChangeMonitors.Add(new HostFileChangeMonitor(new[] { fullPath }));
+                    machine = Load(fullPath);
+                    cache.Set(fullPath, machine, policy);
                 }
 
                 return machine.ComputeAnswer(document, protoFeaturesOrPagesOfProtoFeatures, preserveInputAttributes);

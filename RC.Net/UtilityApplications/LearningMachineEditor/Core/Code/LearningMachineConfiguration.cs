@@ -214,7 +214,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 // Initialize Machine Type combo
                 machineTypeComboBox.InitializeWithReadableEnum<LearningMachineType>(true);
+
+                _suspendMachineUpdates = true;
                 machineTypeComboBox.SelectedIndex = 0;
+                _suspendMachineUpdates = false;
 
                 // Initialize feature filter
                 attributeFeatureFilterComboBox.Items.Add(_MATCH);
@@ -223,40 +226,46 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 // Set default values for controls
                 SetDefaultValues();
 
-                // Open specified file if available
-                if (!_fileName.Equals(_NEW_FILE_NAME, StringComparison.Ordinal))
+                BeginInvoke((MethodInvoker)(() =>
                 {
-                    try
+                    using (new TemporaryWaitCursor())
                     {
-                        if (File.Exists(_fileName))
+                        // Open specified file if available
+                        if (!_fileName.Equals(_NEW_FILE_NAME, StringComparison.Ordinal))
                         {
-                            _savedLearningMachine = LearningMachine.Load(_fileName);
-                            _previousLearningMachine = null;
+                            try
+                            {
+                                if (File.Exists(_fileName))
+                                {
+                                    _savedLearningMachine = LearningMachine.Load(_fileName);
+                                    _previousLearningMachine = null;
 
-                            // Ensure that corresponding text controls get updated
-                            _textValueOrCheckStateChangedSinceCreation = true;
+                                    // Ensure that corresponding text controls get updated
+                                    _textValueOrCheckStateChangedSinceCreation = true;
+                                }
+                                else
+                                {
+                                    var ue = new ExtractException("ELI39923", "File does not exist");
+                                    ue.AddDebugData("Filename", _fileName, false);
+                                    ue.Display();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ex.ExtractDisplay("ELI39924");
+                            }
                         }
-                        else
+
+                        if (_savedLearningMachine == null)
                         {
-                            var ue = new ExtractException("ELI39923", "File does not exist");
-                            ue.AddDebugData("Filename", _fileName, false);
-                            ue.Display();
+                            _savedLearningMachine = MakeNewMachine();
+                            _fileName = _NEW_FILE_NAME;
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.ExtractDisplay("ELI39924");
-                    }
-                }
 
-                if (_savedLearningMachine == null)
-                {
-                    _savedLearningMachine = MakeNewMachine();
-                    _fileName = _NEW_FILE_NAME;
-                }
-
-                // Set current learning machine to be a clone of the saved copy
-                CurrentLearningMachine = _savedLearningMachine.DeepClone();
+                        // Set current learning machine to be a clone of the saved copy
+                        CurrentLearningMachine = _savedLearningMachine.DeepClone();
+                    }
+                }));
             }
             catch (Exception ex)
             {
@@ -380,6 +389,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             return;
                         }
 
+                        Cursor.Current = Cursors.WaitCursor;
                         _savedLearningMachine = LearningMachine.Load(fileNames[0]);
 
                         // Ensure that corresponding text controls get updated
@@ -396,6 +406,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 ExtractException.Display("ELI40056", ex);
             }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
+
             base.OnDragDrop(drgevent);
         }
         #endregion Overrides
@@ -1541,6 +1556,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 }
                 else
                 {
+                    Cursor.Current = Cursors.WaitCursor;
                     _currentLearningMachine.Save(_fileName);
                     _savedLearningMachine = _currentLearningMachine.DeepClone();
                     Dirty = false;
@@ -1549,6 +1565,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39917");
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
             }
         }
 
@@ -1579,6 +1599,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     var result = saveDialog.ShowDialog();
                     if (result == System.Windows.Forms.DialogResult.OK)
                     {
+                        Cursor.Current = Cursors.WaitCursor;
                         _currentLearningMachine.Save(saveDialog.FileName);
                         _savedLearningMachine = _currentLearningMachine.DeepClone();
                         _fileName = saveDialog.FileName;
@@ -1598,6 +1619,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39918");
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
             }
         }
 
@@ -1652,6 +1677,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     {
                         // Treat saved machine as having non-default values
                         _textValueOrCheckStateChangedSinceCreation = true;
+                        Cursor.Current = Cursors.WaitCursor;
                         _savedLearningMachine = LearningMachine.Load(openDialog.FileName);
                         _previousLearningMachine = null;
                         _fileName = openDialog.FileName;
@@ -1663,6 +1689,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39926");
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
             }
         }
 
