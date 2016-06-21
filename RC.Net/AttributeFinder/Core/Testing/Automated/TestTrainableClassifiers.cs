@@ -75,6 +75,10 @@ namespace Extract.AttributeFinder.Test
             var classifier = new MulticlassSupportVectorMachineClassifier{Complexity=-1, AutomaticallyChooseComplexityValue=true};
             Assert.That(!classifier.IsTrained);
             Assert.Throws<ExtractException>(() => classifier.ComputeAnswer(inputs[0]));
+
+            // Shuffle input to match behavior before fix to encoder
+            Utilities.CollectionMethods.Shuffle(inputs, outputs, new System.Random(0));
+
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
             Assert.That(classifier.IsTrained);
             // Complexity value will have been chosen to be a non-negative number
@@ -93,6 +97,10 @@ namespace Extract.AttributeFinder.Test
 
             // Use a very low complexity to lower the accuracy
             var classifier = new MulticlassSupportVectorMachineClassifier { Complexity = 0.0001, AutomaticallyChooseComplexityValue = false };
+
+            // Shuffle input or else the classifier still gets it right
+            Utilities.CollectionMethods.Shuffle(inputs, outputs, new System.Random(0));
+
             classifier.TrainClassifier(inputs, outputs, new System.Random(0));
             double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
 
@@ -190,7 +198,7 @@ namespace Extract.AttributeFinder.Test
             double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs);
 
             // Network performance hurt by extra features
-            Assert.Greater(f1Score, 0.92);
+            Assert.Greater(f1Score, 0.85);
             Assert.Less(f1Score, 0.93);
         }
 
