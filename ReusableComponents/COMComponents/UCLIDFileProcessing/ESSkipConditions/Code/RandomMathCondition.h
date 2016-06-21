@@ -5,6 +5,7 @@
 
 #include "..\..\Code\FPCategories.h"
 #include "ESSkipConditions.h"
+#include <random>
 
 /////////////////////////////////////////////////////////////////////////////
 // CRandomMathCondition
@@ -85,6 +86,15 @@ private:
 
 	// The modulus value to use
 	long m_nPercent;
+
+	// Random seed generator
+	static std::random_device m_randDev;
+
+	// Random generator
+	std::mt19937 m_generator;
+
+	// Distribution object
+	std::uniform_int_distribution<int> m_distribution;
 
 	/////////////
 	// Methods

@@ -17,12 +17,18 @@
 const unsigned long gnCurrentVersion = 1;
 
 //--------------------------------------------------------------------------------------------------
+// Static Members
+//--------------------------------------------------------------------------------------------------
+std::random_device CRandomMathCondition::m_randDev;
+
+//--------------------------------------------------------------------------------------------------
 // CRandomMathCondition
 //--------------------------------------------------------------------------------------------------
 CRandomMathCondition::CRandomMathCondition()
 :m_bDirty(false),
 m_nPercent(-1),
-m_bSeeded(false)
+m_bSeeded(false),
+m_distribution(1,100)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -310,12 +316,13 @@ STDMETHODIMP CRandomMathCondition::raw_CheckCondition(IFileRecord* pFileRecord,
 		if (!m_bSeeded)
 		{
 			// Seed the random number generator
-			srand((unsigned int) time(NULL));
+			DWORD seed = (unsigned int) time(NULL) + m_randDev();
+			m_generator.seed(seed);
 			m_bSeeded = true;
 		}
 			
 		// Get a random number between 1 and 100 (inclusive)
-		int nNum = rand() % 100 + 1;
+		int nNum = m_distribution(m_generator);
 
 		// Return true if the nNum <= m_nPercent
 		*pbResult = asVariantBool(nNum <= m_nPercent);
