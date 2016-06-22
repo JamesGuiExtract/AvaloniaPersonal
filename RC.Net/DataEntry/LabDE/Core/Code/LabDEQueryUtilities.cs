@@ -7,6 +7,7 @@ using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Extract.DataEntry.LabDE
@@ -384,6 +385,185 @@ namespace Extract.DataEntry.LabDE
                 throw ex.AsExtract("ELI39269");
             }
         }
+
+        /// <summary>
+        /// Accepts a date in a variety of formats, and returns a normalized date.
+        /// </summary>
+        /// <param name="inputDate">The date.</param>
+        /// <returns>Returns the date in a normalized format, or on error just returns the original date</returns>
+        public static string FormatDate(string inputDate)
+        {
+            string tempDate;
+            string month;
+            string day;
+            string year;
+
+            string date = inputDate.Trim();
+
+            try
+            {
+                string generalDatePattern = @"^\d{1,2}[-/\\\.]\d{1,2}[-/\\\.](\d{2}|\d{4})$";
+                if (Regex.IsMatch(date, generalDatePattern))
+                {
+                    var match = Regex.Match(date, @"^\d{1,2}(?=[-/\\\.])");
+                    month = match.Length == 2 ? match.Value : '0' + match.Value;
+
+                    match = Regex.Match(date, @"(?<=^\d{1,2}[-/\\\.])\d{1,2}(?=[-/\\\.])");
+                    day = match.Length == 2 ? match.Value : '0' + match.Value;
+
+                    match = Regex.Match(date,
+                                        @"(?<=\d{1,2}[-/\\\.])(\d{2}|\d{4})$");
+                    year = match.Value;
+                    if (match.Length < 4)
+                    {
+                        year = ConvertTwoDigitYearToFourDigits(match.Value);
+                    }
+                }
+                else
+                {
+                    // 8 digit date match attempted here - no separators
+                    var match = Regex.Match(date, @"^\d{8}$");
+                    if (match.Success)
+                    {
+                        month = match.Value.Substring(startIndex: 0, length: 2);
+                        day = match.Value.Substring(startIndex: 2, length: 2);
+                        year = match.Value.Substring(startIndex: 4);
+                    }
+                    else
+                    {
+                        // 6 digit date match attempted here - no separators
+                        var match_ = Regex.Match(date, @"^\d{6}$");
+                        if (match_.Success)
+                        {
+                            month = match_.Value.Substring(startIndex: 0, length: 2);
+                            day = match_.Value.Substring(startIndex: 2, length: 2);
+                            year = ConvertTwoDigitYearToFourDigits(match_.Value.Substring(startIndex: 4, length: 2));
+                        }
+                        else
+                        {
+                            return "";
+                        }
+                    }
+                }
+
+                // Now make sure that the date is valid.
+                int iMonth = Convert.ToInt32(month, CultureInfo.InvariantCulture);
+                int iDay = Convert.ToInt32(day, CultureInfo.InvariantCulture);
+                int iYear = Convert.ToInt32(year, CultureInfo.InvariantCulture);
+                try
+                {
+                    DateTime checkDate = new DateTime(iYear, iMonth, iDay);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return "";
+                }
+
+                tempDate = month + '/' + day + '/' + year;
+                return tempDate;
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Formats the date which may have an optional time portion.
+        /// </summary>
+        /// <param name="inputDate">The date.</param>
+        /// <returns>returns the formatted date, or "" on error</returns>
+        static public string FormatDateWithOptionalTime(string inputDate)
+        {
+            try
+            {
+                var date = inputDate.Trim();
+                string[] parts = date.Split(' ');
+                foreach (var part in parts)
+                {
+                    var processed = FormatDate(part);
+                    if (!String.IsNullOrWhiteSpace(processed))
+                    {
+                        return processed;
+                    }
+                }
+
+                return "";
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Formats the time.
+        /// </summary>
+        /// <param name="time">string with an embedded time value somewhere in it - maybe.</param>
+        /// <returns>returns any recognized time string</returns>
+        public static string FormatTime(string time)
+        {
+            try
+            {
+                var trimmedTime = time.Trim();
+                int hours;
+                int minutes;
+                string matchedTime = "";
+                string anteOrPostMeridian = "";
+
+                var matches = Regex.Matches(trimmedTime, @"(\d?\d:?[0-5]\d\s?(?:AM|PM)?)", RegexOptions.None);
+                var count = matches.Count;
+                if (count == 0)
+                {
+                    return matchedTime;
+                }
+                else if (count == 1)
+                {
+                    matchedTime = matches[0].Value;
+                }
+                else
+                {
+                    string bestMatch = matches[0].Value;
+                    for (int i = 1; i < count; ++i)
+                    {
+                        bestMatch = PickBestMatchforTimeValue(bestMatch, matches[i].Value);
+                    }
+
+                    matchedTime = bestMatch;
+                }
+
+                var hoursMinutes = GetHoursAndMinutesAndIndicator(matchedTime);
+                hours = hoursMinutes.Item1;
+                minutes = hoursMinutes.Item2;
+                anteOrPostMeridian = hoursMinutes.Item3;
+                if (anteOrPostMeridian == "PM")
+                {
+                    hours += 12;
+                }
+
+                DateTime dt = new DateTime(year: 2000, month: 1, day: 1, hour: hours, minute: minutes, second: 0);
+                if (String.IsNullOrWhiteSpace(anteOrPostMeridian) || anteOrPostMeridian == "PM")
+                {
+                    return String.Format(CultureInfo.InvariantCulture,
+                                         "{0}:{1}", 
+                                         dt.Hour.ToString("D2", CultureInfo.InvariantCulture), 
+                                         dt.Minute.ToString("D2", CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    return String.Format(CultureInfo.InvariantCulture,
+                                         "{0}:{1} {2}", 
+                                         dt.Hour.ToString("D2", CultureInfo.InvariantCulture), 
+                                         dt.Minute.ToString("D2", CultureInfo.InvariantCulture), 
+                                         anteOrPostMeridian);
+                }
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
         #endregion Public Methods
 
         #region Private Members
@@ -569,6 +749,113 @@ namespace Extract.DataEntry.LabDE
                 return null;
             }
         }
+
+        /// <summary>
+        /// Converts a two digit year to four digits.
+        /// </summary>
+        /// <param name="inYear">The year value to convert.</param>
+        /// <returns>4 digit year</returns>
+        static string ConvertTwoDigitYearToFourDigits(string inYear)
+        {
+            string year;
+            int value = Convert.ToInt32(inYear, CultureInfo.InvariantCulture);
+            if (value <= DateTime.Now.Year % 100)
+            {
+                year = "20" + inYear;
+            }
+            else
+            {
+                year = "19" + inYear;
+            }
+
+            return year;
+        }
+
+        /// <summary>
+        /// Picks the best match for time value, preferring AM|PM markers, using ':' as a second choice.
+        /// </summary>
+        /// <param name="lhs">The LHS candidate time.</param>
+        /// <param name="rhs">The RHS candidate time.</param>
+        /// <returns>the "better" match, or lhs if equivalent</returns>
+        static string PickBestMatchforTimeValue(string lhs, string rhs)
+        {
+            bool lhsHasColon = lhs.Contains(":");
+            bool rhsHasColon = rhs.Contains(":");
+
+            bool lhsHasAMPM = Regex.Match(lhs, @"(AM|PM)").Success;
+            bool rhsHasAMPM = Regex.Match(rhs, @"(AM|PM)").Success;
+
+            if (lhsHasAMPM && !rhsHasAMPM)
+            {
+                return lhs;
+            }
+            else if (rhsHasAMPM && !lhsHasAMPM)
+            {
+                return rhs;
+            }
+
+            if (lhsHasColon && !rhsHasColon)
+            {
+                return lhs;
+            }
+            else if (rhsHasColon && !lhsHasColon)
+            {
+                return rhs;
+            }
+
+            // Here when both sides are equivalent, so just pick one as neither is a better match)
+            return lhs;
+        }
+
+        /// <summary>
+        /// Picks apart a string and returns the numeric values of hours and minutes, and the AM/PM
+        /// indicator if it exists.
+        /// </summary>
+        /// <param name="time">input time string</param>
+        /// <returns>Tuple of hours, minutes, and meridion indicator</returns>
+        static Tuple<int, int, string> GetHoursAndMinutesAndIndicator(string time)
+        {
+            int hours = -1;
+            int minutes = -1;
+
+            // AM or PM
+            string meridianIndicator = "";
+
+            string[] parts = time.Split(new char[] { ':', ' ' });
+            if (parts.Count() > 1)
+            {
+                hours = Convert.ToInt32(parts[0], CultureInfo.InvariantCulture);
+
+                // Handle the case where the input value was e.g. 9:00AM, or 9:00 AM.
+                var mins = parts[1];
+                string sMinutes = mins;
+                if (mins.Count() > 2)
+                {
+                    sMinutes = mins.Substring(startIndex: 0, length: 2);
+                    meridianIndicator = mins.Substring(startIndex: 2);
+                }
+
+                minutes = Convert.ToInt32(sMinutes, CultureInfo.InvariantCulture);
+                if (parts.Count() >= 3)
+                {
+                    meridianIndicator = parts[2];
+                }
+            }
+            else if (time.Length >= 4)
+            {
+                var Hours = time.Substring(startIndex: 0, length: 2);
+                var Minutes = time.Substring(startIndex: 2, length: 2);
+                hours = Convert.ToInt32(Hours, CultureInfo.InvariantCulture);
+                minutes = Convert.ToInt32(Minutes, CultureInfo.InvariantCulture);
+            }
+
+            return new Tuple<int, int, string>(hours, minutes, meridianIndicator);
+        }
+
+
+
+
+
 
         #endregion Private Members
     }
