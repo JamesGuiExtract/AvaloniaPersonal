@@ -1365,13 +1365,16 @@ namespace Extract.SQLCDBEditor
                     var modifiedTableName = importForm.ModifiedTableName;
                     if (!String.IsNullOrWhiteSpace(modifiedTableName))
                     {
-                        var tableNames = _tableNames.ToList();
-                        int index = tableNames.BinarySearch(modifiedTableName);
-                        if (index >= 0)
+                        // If data has been changed in one table, refresh the data in all other visible
+                        // tables immediately.
+                        foreach (var queryAndResultsControl in _sandDockManager.GetDockControls()
+                            .OfType<TabbedDocument>()
+                            .Where(tab => tab.Controls.Count == 1)
+                            .Select(tab => (QueryAndResultsControl)tab.Controls[0])
+                            .Where(control => control != sender))
                         {
-                            _tablesListBox.SelectedIndex = index;
-                            var item = _tablesListBox.SelectedItem as QueryAndResultsControl;
-                            item.RefreshQueryResults();
+                            // Use true here so that queries are automatically refreshed.
+                            queryAndResultsControl.RefreshData(updateQueryResult: true, forceQueryExcecution: false);
                         }
 
                         _dirty = true;
