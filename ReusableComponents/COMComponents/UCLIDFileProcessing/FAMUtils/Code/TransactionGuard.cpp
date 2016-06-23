@@ -8,6 +8,8 @@
 
 std::map<_ConnectionPtr, DWORD> TransactionGuard::m_mapExistingTransactions;
 
+CCriticalSection TransactionGuard::m_sCSExistingTrans;
+
 //-------------------------------------------------------------------------------------------------
 // TransactionGuard
 //-------------------------------------------------------------------------------------------------
@@ -24,18 +26,23 @@ TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection,
 	{
 		DWORD dwThreadId = GetCurrentThreadId();
 
-		if (m_mapExistingTransactions.find(ipConnection) != m_mapExistingTransactions.end())
+		// Scope the critical section lock for using the m_mapExistingTransaction
 		{
-			if (dwThreadId != m_mapExistingTransactions[ipConnection])
+			CSingleLock csLock(&m_sCSExistingTrans, TRUE);
+
+			if (m_mapExistingTransactions.find(ipConnection) != m_mapExistingTransactions.end())
 			{
-				THROW_LOGIC_ERROR_EXCEPTION("ELI39572");
-			}
-			else
-			{
-				// There is already a transaction open on this connection; trying to start another
-				// would fail.
-				m_bNestedTransaction = true;
-				return;
+				if (dwThreadId != m_mapExistingTransactions[ipConnection])
+				{
+					THROW_LOGIC_ERROR_EXCEPTION("ELI39572");
+				}
+				else
+				{
+					// There is already a transaction open on this connection; trying to start another
+					// would fail.
+					m_bNestedTransaction = true;
+					return;
+				}
 			}
 		}
 
@@ -50,7 +57,13 @@ TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection,
 		ipConnection->BeginTrans();
 		m_bTransactionStarted = true;
 
-		m_mapExistingTransactions[ipConnection] = dwThreadId;
+		// Scope the critical section lock for using the m_mapExistingTransaction
+		{
+			CSingleLock csLock(&m_sCSExistingTrans, TRUE);
+
+			m_mapExistingTransactions[ipConnection] = dwThreadId;
+
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38458");
 }
@@ -62,8 +75,13 @@ TransactionGuard::~TransactionGuard()
 	{
 		return;
 	}
+	try
+	{
+		CSingleLock csLock(&m_sCSExistingTrans, TRUE);
 
-	m_mapExistingTransactions.erase(m_ipConnection);
+		m_mapExistingTransactions.erase(m_ipConnection);
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI40190");
 
 	// Need to catch any exceptions and log them because this could be called within a catch
 	// and don't want to throw an exception from a catch

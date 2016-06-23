@@ -683,20 +683,37 @@ STDMETHODIMP CIDShieldProductDBMgr::Initialize(IFileProcessingDB* pFAMDB)
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-ADODB::_ConnectionPtr CIDShieldProductDBMgr::getDBConnection()
+ADODB::_ConnectionPtr CIDShieldProductDBMgr::getDBConnection(bool bReset)
 {
-	// Check if connection has been created
-	if (m_ipDBConnection == __nullptr)
-	{
-		m_ipDBConnection.CreateInstance(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI19795", m_ipDBConnection != __nullptr);
-	}
-
 	// If the FAMDB is not set throw an exception
 	if (m_ipFAMDB == __nullptr)
 	{
 		UCLIDException ue("ELI18935", "FAMDB pointer has not been initialized! Unable to open connection.");
 		throw ue;
+	}
+
+	// Check if the connection should be reset
+	if (bReset)
+	{
+		// if the database is not closed close it
+		if (m_ipDBConnection->State != adStateClosed)
+		{
+			// Do the close in a try catch so that if there is an exception it will be logged
+			try
+			{
+				m_ipDBConnection->Close();
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI40162");
+		}
+		// Create a new connection
+		m_ipDBConnection = __nullptr;
+	}
+
+	// Check if connection has been created
+	if (m_ipDBConnection == __nullptr)
+	{
+		m_ipDBConnection.CreateInstance(__uuidof( Connection ));
+		ASSERT_RESOURCE_ALLOCATION("ELI19795", m_ipDBConnection != __nullptr);
 	}
 
 	// if closed and Database server and database name are defined,  open the database connection

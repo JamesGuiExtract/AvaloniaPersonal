@@ -100,7 +100,9 @@ private:
 	
 	// Returns the m_ipDBConnection value, if it is NULL it is created using the 
 	// DatabaseServer and DatabaseName from the m_ipFAMDB
-	ADODB::_ConnectionPtr getDBConnection();
+	// if bReset is true the current connection in m_ipDBConnection is set to NULL and recreated
+	// and make the default false
+	ADODB::_ConnectionPtr getDBConnection(bool bReset = false);
 
 	// Puts all of the tables managed in the rvecTables vector
 	void getIDShieldTables(std::vector<std::string>& rvecTables);

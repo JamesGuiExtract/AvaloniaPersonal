@@ -65,6 +65,9 @@ private:
 	// Keeps track of any existing TransactionGuards for each DB connection.
 	static std::map<_ConnectionPtr, DWORD> m_mapExistingTransactions;
 
+	// Critical section to synchronize access to m_mapExistingTransactions
+	static CCriticalSection m_sCSExistingTrans;
+
 	// Connection Pointer
 	ADODB::_ConnectionPtr m_ipConnection;
 };

@@ -650,7 +650,7 @@ STDMETHODIMP CDataEntryProductDBMgr::Initialize(IFileProcessingDB* pFAMDB)
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection()
+ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection(bool bReset)
 {
 	// If the FAMDB is not set throw an exception
 	if (m_ipFAMDB == __nullptr)
@@ -659,6 +659,24 @@ ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection()
 			"FAMDB pointer has not been initialized! Unable to open connection.");
 		throw ue;
 	}
+
+	// Check if the connection should be reset
+	if (bReset)
+	{
+		// if the database is not closed close it
+		if (m_ipDBConnection->State != adStateClosed)
+		{
+			// Do the close in a try catch so that if there is an exception it will be logged
+			try
+			{
+				m_ipDBConnection->Close();
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI40164");
+		}
+		// Create a new connection
+		m_ipDBConnection = __nullptr;
+	}
+
 
 	// Check if connection has been created
 	if (m_ipDBConnection == __nullptr)

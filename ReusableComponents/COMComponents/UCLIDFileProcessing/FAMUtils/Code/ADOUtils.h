@@ -91,21 +91,9 @@ static const string& gstrINITIAL_CATALOG = "Initial Catalog";
 					{ \
 						try \
 						{ \
-							/* Do the close within a try catch because an exception on the close */ \
-							/* could just mean the connection is in a bad state and recreating and */ \
-							/* opening will put it in a good state */ \
-							try \
-							{ \
-								if (ipRetryConnection != __nullptr && ipRetryConnection->State != adStateClosed) \
-								{ \
-									ipRetryConnection->Close(); \
-								} \
-							} \
-							CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29857") \
-							\
 							/* This will create a new connection for this thread and initialize */ \
 							/* the schema */ \
-							ipRetryConnection = getDBConnection(); \
+							ipRetryConnection = getDBConnection(true); \
 							\
 							UCLIDException ueConnected("ELI29854", "Application trace: Connection retry successful."); \
 							ueConnected.log(); \
