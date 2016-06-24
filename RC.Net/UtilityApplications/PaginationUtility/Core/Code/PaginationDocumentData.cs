@@ -5,14 +5,12 @@ using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
-namespace Extract.FileActionManager.FileProcessors
+namespace Extract.UtilityApplications.PaginationUtility
 {
     /// <summary>
-    /// A extension of <see cref="IDocumentData"/> for use in data entry verification that will
-    /// be based on the VOA data for the associated file.
+    /// Represents data associated with an <see cref="OutputDocument"/>.
     /// </summary>
-    [CLSCompliant(false)]
-    public abstract class PaginationDocumentData : IDocumentData
+    public abstract class PaginationDocumentData
     {
         #region Fields
 
@@ -103,6 +101,17 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     throw ex.AsExtract("ELI39777");
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual string Summary
+        {
+            get
+            {
+                return "";
             }
         }
 
@@ -320,7 +329,6 @@ namespace Extract.FileActionManager.FileProcessors
     /// The type of <see cref="EventArgs"/> used for the
     /// <see cref="PaginationDocumentData.AttributeValueChanged"/> event.
     /// </summary>
-    [CLSCompliant(false)]
     public class AttributeValueChangedEventArgs : EventArgs
     {
         /// <summary>

@@ -150,8 +150,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentDataRequestEventArgs"/> class.
         /// </summary>
-        /// <param name="originalDocument"></param>
-        /// <param name="newDocument"></param>
+        /// <param name="originalDocument">The <see cref="OutputDocument"/> that has been split.
+        /// </param>
+        /// <param name="newDocument">The <see cref="OutputDocument"/> that represents what had been
+        /// part of <see paramref="originalDocument"/>, but that is now separate.</param>
         public DocumentSplitEventArgs(OutputDocument originalDocument, OutputDocument newDocument)
         {
             OriginalDocument = originalDocument;
@@ -159,7 +161,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets 
+        /// Gets or sets the <see cref="OutputDocument"/> that has been split.
         /// </summary>
         public OutputDocument OriginalDocument
         {
@@ -168,7 +170,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets 
+        /// Gets or sets the <see cref="OutputDocument"/> that represents what had been part of
+        /// <see cref="OriginalDocument"/>, but that is now separate.
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public OutputDocument NewDocument
@@ -186,8 +189,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentsMergedEventArgs"/> class.
         /// </summary>
-        /// <param name="resultingDocument"></param>
-        /// <param name="discardedDocument"></param>
+        /// <param name="resultingDocument">The <see cref="OutputDocument"/> that has been added to.
+        /// </param>
+        /// <param name="discardedDocument">The <see cref="OutputDocument"/> that was merged into
+        /// <see paramref="resultingDocument"/>.</param>
         public DocumentsMergedEventArgs(OutputDocument resultingDocument, OutputDocument discardedDocument)
         {
             ResultingDocument = resultingDocument;
@@ -195,7 +200,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets 
+        /// Gets or sets the <see cref="OutputDocument"/> that has been added to.
         /// </summary>
         public OutputDocument ResultingDocument
         {
@@ -204,7 +209,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets 
+        /// Gets or sets the <see cref="OutputDocument"/> that was merged into
+        /// <see paramref="ResultingDocument"/>.
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public OutputDocument DiscardedDocument
@@ -238,7 +244,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="documentData">Data that has been associated with the document.</param>
         public CreatingOutputDocumentEventArgs(IEnumerable<PageInfo> sourcePageInfo,
             int pageCount, long fileSize, bool? suggestedPaginationAccepted, int position,
-            IDocumentData documentData)
+            PaginationDocumentData documentData)
             : base()
         {
             SourcePageInfo = sourcePageInfo.ToList().AsReadOnly();
@@ -305,7 +311,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Gets data that has been associated with the document data.
         /// </summary>
-        public IDocumentData DocumentData
+        public PaginationDocumentData DocumentData
         {
             get;
             private set;
@@ -359,12 +365,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="disregardedPaginationSources">All documents applied as they exist on disk
         /// but for which there was differing suggested pagination.</param>
         /// <param name="modifiedDocumentData">All documents names and associated
-        /// <see cref="IDocumentData"/> where data was modified, but the document pages have not
-        /// been modified compared to pagination on disk.</param>   
+        /// <see cref="PaginationDocumentData"/> where data was modified, but the document pages
+        /// have not been modified compared to pagination on disk.</param>   
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public PaginatedEventArgs(IEnumerable<string> paginatedDocumentSources,
             IEnumerable<string> disregardedPaginationSources,
-            IEnumerable<KeyValuePair<string, IDocumentData>> modifiedDocumentData)
+            IEnumerable<KeyValuePair<string, PaginationDocumentData>> modifiedDocumentData)
             : base()
         {
             PaginatedDocumentSources = paginatedDocumentSources.ToList().AsReadOnly();
@@ -393,11 +399,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets all documents names and associated <see cref="IDocumentData"/> where data was
-        /// modified, but the document pages have not been modified compared to pagination on disk.
+        /// Gets all documents names and associated <see cref="PaginationDocumentData"/> where data
+        /// was modified, but the document pages have not been modified compared to pagination on
+        /// disk.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public ReadOnlyCollection<KeyValuePair<string, IDocumentData>> ModifiedDocumentData
+        public ReadOnlyCollection<KeyValuePair<string, PaginationDocumentData>> ModifiedDocumentData
         {
             get;
             private set;
@@ -427,7 +434,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Gets the names of the source documents of (documents that contributed pages to) the
+        /// <see cref="OutputDocument"/> for which data is needed.
         /// </summary>
         public ReadOnlyCollection<string> SourceDocNames
         {
@@ -436,9 +444,52 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="OutputDocument"/> to be associated with the new document.
+        /// Gets or sets the <see cref="PaginationDocumentData"/> instance to use.
         /// </summary>
-        public IDocumentData DocumentData
+        public PaginationDocumentData DocumentData
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
+    /// The event arguments for the <see cref="PageLayoutControl.DocumentDataPanelRequest"/>
+    /// event.
+    /// </summary>
+    internal class DocumentDataPanelRequestEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentDataRequestEventArgs"/> class.
+        /// </summary>
+        /// <param name="outputDocument"></param>
+        public DocumentDataPanelRequestEventArgs(OutputDocument outputDocument)
+        {
+            try
+            {
+                OutputDocument = outputDocument;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39791");
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="OutputDocument"/> to which the requested
+        /// <see cref="IPaginationDocumentDataPanel"/> is to relate.
+        /// </summary>
+        public OutputDocument OutputDocument
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IPaginationDocumentDataPanel"/> to use to display and edit
+        /// document data.
+        /// </summary>
+        public IPaginationDocumentDataPanel DocumentDataPanel
         {
             get;
             set;

@@ -34,6 +34,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         HashSet<Page> _originalDeletedPages = null;
 
+        /// <summary>
+        /// The document data that is associated with this instance (VOA file data, for instance).
+        /// </summary>
+        PaginationDocumentData _documentData;
+
+        /// <summary>
+        /// Indicates whether the document should appear collapsed (with only header showing).
+        /// </summary>
+        bool _collapsed;
+
         #endregion Fields
 
         #region Constructors
@@ -68,6 +78,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<EventArgs> DocumentOutput;
 
+        /// <summary>
+        /// Raised to indicate the document has been altered and UI indications may need to change.
+        /// </summary>
+        public event EventHandler<EventArgs> Invalidated;
+
+        /// <summary>
+        /// Raised when the <see cref="DocumentData"/> for this instance is modified.
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentDataChanged;
+
         #endregion Events
 
         #region Properties
@@ -100,6 +120,47 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether the document should appear collapsed (with only header showing).
+        /// </summary>
+        public bool Collapsed
+        {
+            get
+            {
+                return _collapsed;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _collapsed)
+                    {
+                        _collapsed = value;
+
+                        var parentControl = PageControls.First().Parent;
+                        parentControl.SuspendLayout();
+
+                        try
+                        {
+                            foreach (var pageControl in PageControls)
+                            {
+                                pageControl.Visible = !value;
+                            }
+                        }
+                        finally
+                        {
+                            parentControl.ResumeLayout(true);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40172");
+                }
+            }
         }
 
         /// <summary>
@@ -217,6 +278,90 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets or sets document data that is associated with this instance (VOA file data,
+        /// for instance).
+        /// </summary>
+        /// <value>
+        /// The document data that is associated with this instance.
+        /// </value>
+        public PaginationDocumentData DocumentData
+        {
+            get
+            {
+                return _documentData;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _documentData)
+                    {
+                        if (_documentData != null)
+                        {
+                            _documentData.ModifiedChanged -= HandleDocumentData_ModifiedChanged;
+                        }
+
+                        _documentData = value;
+
+                        if (_documentData != null)
+                        {
+                            _documentData.ModifiedChanged += HandleDocumentData_ModifiedChanged;
+                        }
+
+                        OnDocumentDataChanged();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39795");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the data for this document has been modified by the user.
+        /// </summary>
+        public bool DataModified
+        {
+            get
+            {
+                return (_documentData != null) && _documentData.Modified;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating the there was pagination suggested for the current
+        /// document.
+        /// </summary>
+        /// <value> <see langword="true"/> if pagination was suggested for the current document;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool PaginationSuggested
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets a brief summary of the document.
+        /// </summary>
+        public string Summary
+        {
+            get
+            {
+                if (DocumentData == null)
+                {
+                    return "";
+                }
+                else
+                {
+                    return DocumentData.Summary;
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -291,6 +436,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _pageControls.Add(pageControl);
                 }
 
+                pageControl.AddStylist(new NewOutputPageStylist(pageControl),
+                    replaceExistingTypeInstances: true);
+
                 pageControl.Document = this;
             }
             catch (Exception ex)
@@ -308,10 +456,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                foreach (var pageControl in _pageControls)
-                {
-                    pageControl.Invalidate();
-                }
+                Invalidate();
             }
             catch (Exception ex)
             {
@@ -422,7 +567,51 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Use to indicate the document has been altered in some way and related UI indications may
+        /// need to change.
+        /// </summary>
+        public void Invalidate()
+        {
+            try
+            {
+                foreach (var pageControl in _pageControls)
+                {
+                    pageControl.Invalidate();
+                }
+
+                OnInvalidated();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40170");
+            }
+        }
+
         #endregion Methods
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles the <see cref="PaginationDocumentData.ModifiedChanged"/> event for
+        /// <see cref="DocumentData"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleDocumentData_ModifiedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                OnDocumentDataChanged();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39796");
+            }
+        }
+
+        #endregion Event Handlers
 
         #region Private Members
 
@@ -446,6 +635,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         void OnDocumentOutput()
         {
             var eventHandler = DocumentOutput;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Invalidated"/> event.
+        /// </summary>
+        void OnInvalidated()
+        {
+            var eventHandler = Invalidated;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DocumentDataChanged"/> event.
+        /// </summary>
+        void OnDocumentDataChanged()
+        {
+            var eventHandler = DocumentDataChanged;
             if (eventHandler != null)
             {
                 eventHandler(this, new EventArgs());

@@ -45,7 +45,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._shrinkRedactionToolStripMenuItem = new Extract.Imaging.Forms.ShrinkSelectionToolStripMenuItem();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._nextDocumentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._printImageToolStripMenuItem = new Extract.Imaging.Forms.PrintImageToolStripMenuItem();
             this._printViewToolStripMenuItem = new Extract.Imaging.Forms.PrintViewToolStripMenuItem();
             this._stopProcessingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -77,7 +76,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._zoomWindowToolStripMenuItem = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
             this._panToolStripMenuItem = new Extract.Imaging.Forms.PanToolStripMenuItem();
             this._basicDataGridToolStrip = new System.Windows.Forms.ToolStrip();
-            this._nextDocumentToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._applyToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToSuggestedToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToDiskToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -156,6 +154,7 @@ namespace Extract.FileActionManager.FileProcessors
             // _splitContainer
             // 
             this._splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._splitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this._splitContainer.Location = new System.Drawing.Point(0, 0);
             this._splitContainer.Name = "_splitContainer";
             // 
@@ -356,7 +355,6 @@ namespace Extract.FileActionManager.FileProcessors
             // _fileToolStripMenuItem
             // 
             this._fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._nextDocumentToolStripMenuItem,
             toolStripSeparator7,
             this._printImageToolStripMenuItem,
             this._printViewToolStripMenuItem,
@@ -366,18 +364,10 @@ namespace Extract.FileActionManager.FileProcessors
             this._fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this._fileToolStripMenuItem.Text = "File";
             // 
-            // _nextDocumentToolStripMenuItem
-            // 
-            this._nextDocumentToolStripMenuItem.Name = "_nextDocumentToolStripMenuItem";
-            this._nextDocumentToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+Tab";
-            this._nextDocumentToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this._nextDocumentToolStripMenuItem.Text = "Next document";
-            this._nextDocumentToolStripMenuItem.Click += new System.EventHandler(this.HandleNextDocumentToolStripMenuItemClick);
-            // 
             // toolStripSeparator7
             // 
             toolStripSeparator7.Name = "toolStripSeparator7";
-            toolStripSeparator7.Size = new System.Drawing.Size(207, 6);
+            toolStripSeparator7.Size = new System.Drawing.Size(155, 6);
             // 
             // _printImageToolStripMenuItem
             // 
@@ -386,7 +376,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._printImageToolStripMenuItem.ImageViewer = null;
             this._printImageToolStripMenuItem.Name = "_printImageToolStripMenuItem";
             this._printImageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._printImageToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this._printImageToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this._printImageToolStripMenuItem.Text = "&Print...";
             // 
             // _printViewToolStripMenuItem
@@ -397,18 +387,18 @@ namespace Extract.FileActionManager.FileProcessors
             this._printViewToolStripMenuItem.ImageViewer = null;
             this._printViewToolStripMenuItem.Name = "_printViewToolStripMenuItem";
             this._printViewToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._printViewToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this._printViewToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this._printViewToolStripMenuItem.Text = "Print view...";
             // 
             // toolStripSeparator8
             // 
             toolStripSeparator8.Name = "toolStripSeparator8";
-            toolStripSeparator8.Size = new System.Drawing.Size(207, 6);
+            toolStripSeparator8.Size = new System.Drawing.Size(155, 6);
             // 
             // _stopProcessingToolStripMenuItem
             // 
             this._stopProcessingToolStripMenuItem.Name = "_stopProcessingToolStripMenuItem";
-            this._stopProcessingToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this._stopProcessingToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this._stopProcessingToolStripMenuItem.Text = "Stop processing";
             this._stopProcessingToolStripMenuItem.Click += new System.EventHandler(this.HandleStopProcessingToolStripMenuItemClick);
             // 
@@ -678,26 +668,13 @@ namespace Extract.FileActionManager.FileProcessors
             this._basicDataGridToolStrip.Dock = System.Windows.Forms.DockStyle.None;
             this._basicDataGridToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._basicDataGridToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._nextDocumentToolStripButton,
             this._applyToolStripButton,
             this._revertToSuggestedToolStripButton,
             this._revertToDiskToolStripButton});
             this._basicDataGridToolStrip.Location = new System.Drawing.Point(3, 24);
             this._basicDataGridToolStrip.Name = "_basicDataGridToolStrip";
-            this._basicDataGridToolStrip.Size = new System.Drawing.Size(156, 39);
+            this._basicDataGridToolStrip.Size = new System.Drawing.Size(120, 39);
             this._basicDataGridToolStrip.TabIndex = 0;
-            // 
-            // _nextDocumentToolStripButton
-            // 
-            this._nextDocumentToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._nextDocumentToolStripButton.Enabled = false;
-            this._nextDocumentToolStripButton.Image = global::Extract.FileActionManager.FileProcessors.Properties.Resources.NextDocument;
-            this._nextDocumentToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._nextDocumentToolStripButton.Name = "_nextDocumentToolStripButton";
-            this._nextDocumentToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._nextDocumentToolStripButton.Text = "Next document";
-            this._nextDocumentToolStripButton.ToolTipText = "Next document";
-            this._nextDocumentToolStripButton.Click += new System.EventHandler(this.HandleNextDocumentToolStripButtonClick);
             // 
             // _applyToolStripButton
             // 
@@ -737,7 +714,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._printImageToolStripButton,
             this._zoomWindowToolStripButton,
             this._panToolStripButton});
-            this._basicImageViewerToolStrip.Location = new System.Drawing.Point(159, 24);
+            this._basicImageViewerToolStrip.Location = new System.Drawing.Point(123, 24);
             this._basicImageViewerToolStrip.Name = "_basicImageViewerToolStrip";
             this._basicImageViewerToolStrip.Size = new System.Drawing.Size(120, 39);
             this._basicImageViewerToolStrip.TabIndex = 0;
@@ -790,7 +767,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._rotateCounterclockwiseToolStripButton,
             this._rotateClockwiseToolStripButton,
             toolStripSeparator10});
-            this._viewCommandsToolStrip.Location = new System.Drawing.Point(279, 24);
+            this._viewCommandsToolStrip.Location = new System.Drawing.Point(243, 24);
             this._viewCommandsToolStrip.Name = "_viewCommandsToolStrip";
             this._viewCommandsToolStrip.Size = new System.Drawing.Size(354, 39);
             this._viewCommandsToolStrip.TabIndex = 2;
@@ -969,7 +946,6 @@ namespace Extract.FileActionManager.FileProcessors
         private Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton _rotateCounterclockwiseToolStripButton;
         private Extract.Imaging.Forms.RotateClockwiseToolStripButton _rotateClockwiseToolStripButton;
         private System.Windows.Forms.ToolStrip _basicDataGridToolStrip;
-        private System.Windows.Forms.ToolStripButton _nextDocumentToolStripButton;
         private Extract.Imaging.Forms.ThumbnailViewer _thumbnailViewer;
         private Extract.Imaging.Forms.ImageViewerStatusStrip _imageViewerStatusStrip;
         private System.Windows.Forms.ContextMenuStrip _imageViewerContextMenu;
@@ -987,7 +963,6 @@ namespace Extract.FileActionManager.FileProcessors
         private Imaging.Forms.OneToOneZoomToolStripButton _oneToOneZoomToolStripButton;
         private System.Windows.Forms.MenuStrip _menuStrip;
         private System.Windows.Forms.ToolStripMenuItem _fileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _nextDocumentToolStripMenuItem;
         private Imaging.Forms.PrintImageToolStripMenuItem _printImageToolStripMenuItem;
         private Imaging.Forms.PrintViewToolStripMenuItem _printViewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _stopProcessingToolStripMenuItem;

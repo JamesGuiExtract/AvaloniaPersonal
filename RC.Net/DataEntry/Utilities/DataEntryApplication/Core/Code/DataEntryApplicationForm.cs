@@ -3222,7 +3222,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // treated as essentially new output that needs to be reprocessed by rules
                         // since what the rules originally found doesn't apply to the source
                         // document as a whole.
-                        if (e.DisregardedPaginationSources.Contains(sourceFileName))
+                        if (e.DisregardedPaginationSources.Contains(sourceFileName) &&
+                            !string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
                         {
                             EActionStatus oldStatus;
                             FileProcessingDB.SetStatusForFile(_fileId,

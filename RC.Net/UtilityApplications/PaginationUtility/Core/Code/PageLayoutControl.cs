@@ -482,14 +482,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<EventArgs> LoadNextDocumentRequest;
 
         /// <summary>
-        /// 
+        /// Raised when a document is split into two via the addition of a
+        /// <see cref="PaginationSeparator"/>.
         /// </summary>
         public event EventHandler<DocumentSplitEventArgs> DocumentSplit;
 
         /// <summary>
-        /// 
+        /// Raised when another document is merged into this one via the deletion of a
+        /// <see cref="PaginationSeparator"/>.
         /// </summary>
         public event EventHandler<DocumentsMergedEventArgs> DocumentsMerged;
+
+        /// <summary>
+        /// Raised when a new <see cref="IPaginationDocumentDataPanel"/> instance is needed to allow
+        /// editing of the data associated with an <see cref="OutputDocument"/>.
+        /// </summary>
+        public event EventHandler<DocumentDataPanelRequestEventArgs> DocumentDataPanelRequest;
 
         #endregion Events
 
@@ -726,114 +734,110 @@ namespace Extract.UtilityApplications.PaginationUtility
             IEnumerable<int> pages, int position, bool insertSeparator)
         {
             bool removedLoadNextDocumentButton = false;
+            PageLayoutControlUpdateLock updateLock = null;
 
             try
             {
-                using (new PageLayoutControlUpdateLock(this))
+                updateLock = new PageLayoutControlUpdateLock(this);
+                if (position == -1)
                 {
-                    if (position == -1)
-                    {
-                        // While new pages are being added, remove the load next document control.
-                        RemovePaginationControl(_loadNextDocumentButtonControl, false);
-                        removedLoadNextDocumentButton = true;
-                    }
-
-                    if (sourceDocument == null)
-                    {
-                        return null;
-                    }
-
-                    // Find the page control immediately before the current location. Will be null
-                    // if position == 0 or there are no documents currently loaded.
-                    var lastPageControl = _flowLayoutPanel.Controls.OfType<PageThumbnailControl>()
-                        .Where(c => position == -1 ||
-                            _flowLayoutPanel.Controls.GetChildIndex(c) < position)
-                        .OrderBy(c => _flowLayoutPanel.Controls.GetChildIndex(c))
-                        .LastOrDefault();
-
-                    OutputDocument outputDocument = null;
-                    bool usingExistingDocument = false;
-                    int pageIndex = position;
-
-                    // If insertSeparator == true and the last control is currently a page control,
-                    // we need to add a separator.
-                    if (insertSeparator)
-                    {
-                        // lastPageControl means the document is being inserted at the front; place
-                        // the separator ahead of any existing documents
-                        if (lastPageControl == null)
-                        {
-                            pageIndex = 0;
-                            if (Documents.Any())
-                            {
-                                InsertPaginationControl(new PaginationSeparator(), index: 0);
-                            }
-                        }
-                        // Otherwise, place the separator immediately after the previous document.
-                        else
-                        {
-                            pageIndex = _flowLayoutPanel.Controls.GetChildIndex(lastPageControl) + 1;
-                            InsertPaginationControl(new PaginationSeparator(), index: pageIndex);
-                            pageIndex++;
-                        }
-                    }
-                    else if (lastPageControl != null)
-                    {
-                        // [DotNetRCAndUtils:1049]
-                        // If separators are not being inserted, but the last control is a document
-                        // page, append to that page's document rather than create a new
-                        // OutputDocument.
-                        outputDocument = lastPageControl.Document;
-                        usingExistingDocument = true;
-                    }
-
-                    outputDocument = outputDocument ??
-                        GetOutputDocumentFromUtility(sourceDocument.FileName);
-
-                    var pagesSet = (pages == null) ? null : new HashSet<int>(pages);
-                    var pagesToLoad = (pagesSet == null)
-                        ? sourceDocument.Pages.ToArray()
-                        : sourceDocument.Pages.Where(page =>
-                            pagesSet
-                                .Contains(page.OriginalPageNumber))
-                                .ToArray();
-
-                    bool allPagesCanBeLoaded = true;
-                    if (position == -1)
-                    {
-                        // Handle case that loading pagesToLoad would exceed _MAX_LOADED_PAGES.
-                        allPagesCanBeLoaded = CanAllPagesBeLoaded(ref pagesToLoad);
-                    }
-
-                    // Create a page control for every page in sourceDocument.
-                    foreach (Page page in pagesToLoad)
-                    {
-                        InsertPaginationControl(new PageThumbnailControl(outputDocument, page),
-                            pageIndex);
-
-                        if (pageIndex != -1)
-                        {
-                            pageIndex++;
-                        }
-                    }
-
-                    // As long as all pages could be loaded and we haven't appended to the end of an
-                    // existing document, indicate that if the document is output in its present
-                    // form, it can simply be copied to the output path rather than require it to be
-                    // re-assembled.
-                    if (allPagesCanBeLoaded && !usingExistingDocument)
-                    {
-                        outputDocument.SetOriginalForm();
-                    }
-
-                    this.SafeBeginInvoke("ELI35612", () =>
-                    {
-                        // Ensure this control has keyboard focus after loading a document.
-                        Focus();
-                    });
-
-                    return outputDocument;
+                    // While new pages are being added, remove the load next document control.
+                    RemovePaginationControl(_loadNextDocumentButtonControl, false);
+                    removedLoadNextDocumentButton = true;
                 }
+
+                if (sourceDocument == null)
+                {
+                    return null;
+                }
+
+                // Find the page control immediately before the current location. Will be null
+                // if position == 0 or there are no documents currently loaded.
+                var lastPageControl = _flowLayoutPanel.Controls.OfType<PageThumbnailControl>()
+                    .Where(c => position == -1 ||
+                        _flowLayoutPanel.Controls.GetChildIndex(c) < position)
+                    .OrderBy(c => _flowLayoutPanel.Controls.GetChildIndex(c))
+                    .LastOrDefault();
+
+                OutputDocument outputDocument = null;
+                bool usingExistingDocument = false;
+                int pageIndex = position;
+
+                // If insertSeparator == true and the last control is currently a page control,
+                // we need to add a separator.
+                if (insertSeparator)
+                {
+                    // lastPageControl means the document is being inserted at the front; place
+                    // the separator ahead of any existing documents
+                    if (lastPageControl == null)
+                    {
+                        InsertPaginationControl(new PaginationSeparator(), index: 0);
+                        pageIndex = 1;
+                    }
+                    // Otherwise, place the separator immediately after the previous document.
+                    else
+                    {
+                        pageIndex = _flowLayoutPanel.Controls.GetChildIndex(lastPageControl) + 1;
+                        InsertPaginationControl(new PaginationSeparator(), index: pageIndex);
+                        pageIndex++;
+                    }
+                }
+                else if (lastPageControl != null)
+                {
+                    // [DotNetRCAndUtils:1049]
+                    // If separators are not being inserted, but the last control is a document
+                    // page, append to that page's document rather than create a new
+                    // OutputDocument.
+                    outputDocument = lastPageControl.Document;
+                    usingExistingDocument = true;
+                }
+
+                outputDocument = outputDocument ??
+                    GetOutputDocumentFromUtility(sourceDocument.FileName);
+
+                var pagesSet = (pages == null) ? null : new HashSet<int>(pages);
+                var pagesToLoad = (pagesSet == null)
+                    ? sourceDocument.Pages.ToArray()
+                    : sourceDocument.Pages.Where(page =>
+                        pagesSet
+                            .Contains(page.OriginalPageNumber))
+                            .ToArray();
+
+                bool allPagesCanBeLoaded = true;
+                if (position == -1)
+                {
+                    // Handle case that loading pagesToLoad would exceed _MAX_LOADED_PAGES.
+                    allPagesCanBeLoaded = CanAllPagesBeLoaded(ref pagesToLoad);
+                }
+
+                // Create a page control for every page in sourceDocument.
+                foreach (Page page in pagesToLoad)
+                {
+                    InsertPaginationControl(new PageThumbnailControl(outputDocument, page),
+                        pageIndex);
+
+                    if (pageIndex != -1)
+                    {
+                        pageIndex++;
+                    }
+                }
+
+                // As long as all pages could be loaded and we haven't appended to the end of an
+                // existing document, indicate that if the document is output in its present
+                // form, it can simply be copied to the output path rather than require it to be
+                // re-assembled.
+                if (allPagesCanBeLoaded && !usingExistingDocument)
+                {
+                    outputDocument.SetOriginalForm();
+                }
+
+                this.SafeBeginInvoke("ELI35612", () =>
+                {
+                    // Ensure this control has keyboard focus after loading a document.
+                    Focus();
+                });
+
+                return outputDocument;
             }
             catch (Exception ex)
             {
@@ -851,6 +855,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     ex.ExtractDisplay("ELI35624");
+                }
+
+                try
+                {
+                    if (updateLock != null)
+                    {
+                        updateLock.Dispose();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI40176");
                 }
             }
         }
@@ -1114,6 +1130,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var separator = control as PaginationSeparator;
                 if (separator != null)
                 {
+                    separator.DocumentDataPanelRequest -=
+                        HandlePaginationSeparator_DocumentDataPanelRequest;
+
                     if (nextPageControl != null)
                     {
                         if (previousPageControl != null)
@@ -1307,6 +1326,41 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Selects the specified <see paramref="pageControls"/>.
+        /// </summary>
+        /// <param name="pageControls">The <see cref="PageThumbnailControl"/>s to select.</param>
+        /// <param name="expandSelection"><see langword="true"/> to add to any current selection;
+        /// <see langword="false"/> to reset the selection to <see paramref="pageControls"/> only.
+        /// </param>
+        public void SelectPages(IEnumerable<PageThumbnailControl> pageControls,
+            bool expandSelection)
+        {
+            try
+            {
+                var firstPage = PrimarySelection as PageThumbnailControl;
+                if (firstPage == null)
+                {
+                    firstPage = pageControls.FirstOrDefault();
+                }
+
+                if (!expandSelection)
+                {
+                    ClearSelection();
+                }
+
+                ProcessControlSelection(
+                    activeControl: firstPage,
+                    additionalControls: pageControls,
+                    select: true,
+                    modifierKeys: expandSelection? Keys.Control : Keys.None);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39646");
+            }
+        }
+
+        /// <summary>
         /// Selects all pages of the specified <see paramref="outputDocument"/>.
         /// </summary>
         /// <param name="outputDocument">The <see cref="OutputDocument"/> whose pages are to be
@@ -1319,11 +1373,22 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (outputDocument != null && outputDocument.PageControls.Any())
                 {
+                    var firstControl = outputDocument.PageControls.First();
+                    List<PaginationControl> selectedControls =
+                        outputDocument.PageControls.ToList<PaginationControl>();
+                    var separator = firstControl.PreviousControl as PaginationSeparator;
+                    if (separator != null)
+                    {
+                        selectedControls.Add(separator);
+                    }
+
                     ProcessControlSelection(
-                        activeControl: outputDocument.PageControls.First(),
-                        additionalControls: outputDocument.PageControls,
+                        activeControl: firstControl,
+                        additionalControls: selectedControls,
                         select: true,
                         modifierKeys: Keys.None);
+
+                    
                 }
             }
             catch (Exception ex)
@@ -1387,6 +1452,51 @@ namespace Extract.UtilityApplications.PaginationUtility
             else
             {
                 return -1;
+            }
+        }
+
+        /// <summary>
+        /// Gets the loaded <see cref="PageThumbnailControl"/>s.
+        /// </summary>
+        /// <returns>The loaded <see cref="PageThumbnailControl"/>s.</returns>
+        public IEnumerable<PageThumbnailControl> PageControls
+        {
+            get
+            {
+                try
+                {
+                    var selectedControls = _flowLayoutPanel.Controls
+                        .OfType<PageThumbnailControl>();
+
+                    return selectedControls;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40173");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the currently selected <see cref="PageThumbnailControl"/>s. 
+        /// </summary>
+        /// <returns>The currently selected <see cref="PageThumbnailControl"/>s.</returns>
+        public IEnumerable<PageThumbnailControl> SelectedPageControls
+        {
+            get
+            {
+                try
+                {
+                    var selectedControls = _flowLayoutPanel.Controls
+                        .OfType<PageThumbnailControl>()
+                        .Where(control => control.Selected);
+
+                    return selectedControls;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40174");
+                }
             }
         }
 
@@ -1839,8 +1949,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 Point dragLocation = PointToClient(new Point(e.X, e.Y));
-                var control = _flowLayoutPanel.GetChildAtPoint(dragLocation) as PaginationControl;
-                if (control != null)
+                var control = _flowLayoutPanel
+                    .Controls
+                    .OfType<PageThumbnailControl>()
+                    .Where(c => c.Visible && c.Bounds.Contains(dragLocation))
+                    .FirstOrDefault();
+
+                if (control != null && control.Visible)
                 {
                     _dropLocationIndex = _flowLayoutPanel.Controls.IndexOf(control);
                     Point location;
@@ -1852,9 +1967,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     int right = control.Right - control.Padding.Right;
                     int center = (right - left) / 2;
 
-                    // Do not allow dropping after the load next document button.
-                    if (control != _loadNextDocumentButtonControl &&
-                        (dragLocation.X - control.Left) > center)
+                    if ((dragLocation.X - control.Left) > center)
                     {
                         _dropLocationIndex++;
                         location = control.TrailingInsertionPoint;
@@ -1865,11 +1978,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     ShowDropLocationIndicator(location, control.Height);
+                    e.Effect = e.AllowedEffect;
                 }
                 else
                 {
                     _dropLocationIndex = -1;
                     Controls.Remove(_dropLocationIndicator);
+                    e.Effect = DragDropEffects.None;
                 }
             }
             catch (Exception ex)
@@ -2266,6 +2381,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="DocumentDataPanelRequest"/> event of a
+        /// <see cref="PaginationSeparator"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DocumentDataPanelRequestEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandlePaginationSeparator_DocumentDataPanelRequest(object sender,
+            DocumentDataPanelRequestEventArgs e)
+        {
+            try
+            {
+                OnDocumentDataPanelRequest(e);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40175");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -2334,25 +2469,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets the currently selected "Valid" <see cref="PaginationControl"/>s. The "Valid"
-        /// controls are all controls EXCEPT the _loadNextDocumentButtonControl control.
-        /// </summary>
-        /// <returns>The currently selected <see cref="PaginationControl"/>s.</returns>
-        IEnumerable<PaginationControl> SelectedPageControls
-        {
-            get
-            {
-                var selectedControls = _flowLayoutPanel.Controls
-                    .OfType<PaginationControl>()
-                    .Where(control => control.Selected && 
-                           control != _loadNextDocumentButtonControl &&
-                           control.GetType() != typeof(PaginationSeparator));
-
-                return selectedControls;
-            }
-        }
-
-        /// <summary>
         /// Gets the active <see cref="PaginationControl"/>.
         /// </summary>
         /// <param name="first"><see langword="true"/> to select the first of multiple selected
@@ -2379,7 +2495,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see cref="PaginationControl"/> as the last control
         /// </summary>
         /// <param name="control">The <see cref="PaginationControl"/> to add.</param>
-        /// <returns></returns>
+        /// <returns><see langword="true"/> if the pagination control was added; otherwise,
+        /// <see langword="false"/> (such as if the control is redundant).</returns>
         bool AddPaginationControl(PaginationControl control)
         {
             return InsertPaginationControl(control, index: -1);
@@ -2392,7 +2509,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="index">The index at which the control should be added or -1 to add it to
         /// the end.</param>
         /// <param name="control">The <see cref="PaginationControl"/> to add.</param>
-        /// <returns></returns>
+        /// <returns><see langword="true"/> if the pagination control was added; otherwise,
+        /// <see langword="false"/>. (such as if the control is redundant).</returns>
         bool InsertPaginationControl(PaginationControl control, int index = -1)
         {
             // Always place a pagination separator ahead of the load next document button to help
@@ -2407,6 +2525,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             bool isPageControl = control is PageThumbnailControl;
+
+            // Precede the first page with a separator to serve as a header for the document.
+            if (isPageControl && _flowLayoutPanel.Controls.Count == 0)
+            {
+                AddPaginationControl(new PaginationSeparator());
+            }
 
             // A pagination separator is meaningless as the first control.
             if (!isPageControl && index > 0 &&
@@ -2429,18 +2553,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             control.MouseMove += HandlePaginationControl_MouseMove;
             control.KeyUp += HandlePaginationControl_KeyUp;
 
+            var asPaginationSeparator = control as PaginationSeparator;
+
             if (isPageControl)
             {
                 control.DoubleClick += HandleThumbnailControl_DoubleClick;
             }
-            else if (control is PaginationSeparator)
+            else if (asPaginationSeparator != null)
             {
-                if (index == 0)
-                {
-                    // A separator control is meaningless as the first control, so don't bother
-                    // adding one as the first control).
-                    return false;
-                }
+                asPaginationSeparator.DocumentDataPanelRequest +=
+                    HandlePaginationSeparator_DocumentDataPanelRequest;
             }
 
             return true;
@@ -2460,7 +2582,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 var primarySelection = PrimarySelection;
                 var selectedControls = sourceLayoutControl.SelectedControls
-                    .Where(control => control != _loadNextDocumentButtonControl)
+                    .OfType<PageThumbnailControl>()
                     .ToArray();
 
                 foreach (PaginationControl control in selectedControls)
@@ -2609,9 +2731,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ClearSelection((modifierKeys & Keys.Shift) == 0);
             }
 
+            // If a document separator is selected, all related document pages should also be
+            // selected.
+            additionalControls = additionalControls ?? new PaginationControl[0];
+            var includedDocumentPages = new[] { activeControl }
+                .Union(additionalControls)
+                .OfType<PaginationSeparator>()
+                .SelectMany(c => (c.GetDocument() ?? new OutputDocument("")).PageControls);
             var additionalControlSet = (additionalControls == null)
                 ? new HashSet<PaginationControl>()
-                : new HashSet<PaginationControl>(additionalControls);
+                : new HashSet<PaginationControl>(additionalControls.Concat(includedDocumentPages));
 
             // If the shift key is down and activeControl is not the same as the lastSelectedControl,
             // select all controls between activeControl and lastSelectedControl.
@@ -2649,6 +2778,33 @@ namespace Extract.UtilityApplications.PaginationUtility
             foreach (var control in additionalControlSet.Except(new[] { activeControl }))
             {
                 SetSelected(control, select, true);
+            }
+
+            // Ensure all document pages are selected along with a document separator and
+            // vice-versa.
+            if (select)
+            {
+                foreach (var separator in _flowLayoutPanel.Controls.OfType<PaginationSeparator>())
+                {
+                    var document = separator.GetDocument();
+                    if (document != null)
+                    {
+                        if (!separator.Selected)
+                        {
+                            if (document.PageControls.All(c => c.Selected))
+                            {
+                                SelectControl(separator, select: true, resetLastSelected: true);
+                            }
+                        }
+                        else
+                        {
+                            foreach (var control in document.PageControls.Where(c => !c.Selected))
+                            {
+                                SetSelected(control, select: true, resetLastSelected: true);
+                            }
+                        }
+                    }
+                }
             }
 
             // Then select activeControl, making it the new active control if necessary.
@@ -2719,21 +2875,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="resetLastSelected"><see langword="true"/> if
         /// <see cref="_lastSelectedControl"/> should be reset if it is deselected;
         /// otherwise, <see langword="false"/>.</param>
-        /// <returns><see langword="true"/> if selection was applied, <see langword="false"/> if
-        /// selection could not be applied (such as because the control was of a different type than
-        /// controls already in the current selection.</returns>
-        bool SetSelected(PaginationControl control, bool select, bool resetLastSelected)
+        void SetSelected(PaginationControl control, bool select, bool resetLastSelected)
         {
-            if (select)
-            {
-                if (SelectedControls
-                    .Any(c => control.GetType() != c.GetType()))
-                {
-                    // Only controls of the same type should be able to be selected at once.
-                    return false;
-                }
-            }
-
             control.Selected = select;
 
             if (!select)
@@ -2755,8 +2898,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             OnSelectionChanged();
-
-            return true;
         }
 
         /// <summary>
@@ -3019,13 +3160,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Separators cannot be added next to other separators, cannot be the first control
                 // and should only be able to be toggle when there is a single selection.
                 bool controlIsSeparator = _commandTargetControl is PaginationSeparator;
-                _toggleDocumentSeparatorCommand.Enabled = contextMenuControlIndex != 0 &&
-                    !controlIsSeparator && SelectedControls.Count() == 1;
+                OutputDocument singlySelectedDocument =
+                    (FullySelectedDocuments.Count() == 1 && PartiallySelectedDocuments.Count() == 1)
+                    ? FullySelectedDocuments.Single()
+                    : (SelectedPageControls.Count() == 1)
+                        ? SelectedPageControls.Single().Document
+                        : null;
+                _toggleDocumentSeparatorCommand.Enabled = 
+                    (contextMenuControlIndex > 1 && singlySelectedDocument != null);
                 var asPageThumbnailControl = _commandTargetControl as PageThumbnailControl;
 
                 if (_toggleDocumentSeparatorCommand.Enabled &&
-                    asPageThumbnailControl != null &&
-                    asPageThumbnailControl.PageNumber == 1)
+                    (controlIsSeparator ||
+                        (asPageThumbnailControl != null && asPageThumbnailControl.PageNumber == 1)))
                 {
                     _toggleDocumentSeparatorMenuItem.Text = "Merge with previous document";
                 }
@@ -3088,12 +3235,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 .Where(control => control != _loadNextDocumentButtonControl))
             {
                 PageThumbnailControl pageControl = control as PageThumbnailControl;
-                if (pageControl == null)
-                {
-                    // Add null as the page reference to represent a document boundary (separator).
-                    copiedPages.Add(new KeyValuePair<Page, bool>(null, false));
-                }
-                else
+                if (pageControl != null)
                 {
                     copiedPages.Add(
                         new KeyValuePair<Page, bool>(pageControl.Page, pageControl.Deleted));
@@ -3945,7 +4087,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="pageImage">The RasterImage object to print.</param>
         /// <param name="e">The PrintPageEventArgs associated with the print task.</param>
-        /// <returns></returns>
         static void PrintOnePage( RasterImage pageImage, PrintPageEventArgs e )
         {
             // [IDSD #318], [DotNetRCAndUtils:1078]
@@ -3982,11 +4123,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The Handle Print Page event handler. This handler is responsible for retrieving and tracking 
         /// the correct image, printing the current page, and tracking whether there are more pages 
         /// to process. 
-        ///  
         /// </summary>
         /// <param name="sender">Not used</param>
         /// <param name="e">PrintPageEventArgs, passed to page print function</param>
-        /// <returns></returns>
         void HandlePrintPage(object sender, PrintPageEventArgs e)
         {
             try
@@ -4010,7 +4149,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="sender">Unused</param>
         /// <param name="e">Unused</param>
-        /// <returns></returns>
         void HandlePrintHasEnded(object sender, PrintEventArgs e)
         {
             try
@@ -4039,8 +4177,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_commandTargetControl != null)
                     {
-                        PaginationSeparator targetSeparator =
-                            _commandTargetControl.PreviousControl as PaginationSeparator;
+                        PaginationSeparator targetSeparator = _commandTargetControl as PaginationSeparator;
+                        if (targetSeparator == null)
+                        {
+                            targetSeparator = _commandTargetControl.PreviousControl as PaginationSeparator;
+                        }
 
                         if (targetSeparator != null)
                         {
@@ -4155,10 +4296,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Raises the <see cref="DocumentSplit"/> event.
         /// </summary>
-        /// <param name="originalDocument"></param>
-        /// <param name="newDocument"></param>
+        /// <param name="originalDocument">The <see cref="OutputDocument"/> that has been split.
+        /// </param>
+        /// <param name="newDocument">The <see cref="OutputDocument"/> that represents what had been
+        /// part of <see paramref="originalDocument"/>, but that is now separate.</param>
         void OnDocumentSplit(OutputDocument originalDocument, OutputDocument newDocument)
         {
             var eventHandler = DocumentSplit;
@@ -4169,16 +4312,32 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Raises the <see cref="DocumentsMerged"/> event.
         /// </summary>
-        /// <param name="resultingDocument"></param>
-        /// <param name="discardedDocument"></param>
+        /// <param name="resultingDocument">The <see cref="OutputDocument"/> that has been added to.
+        /// </param>
+        /// <param name="discardedDocument">The <see cref="OutputDocument"/> that was merged into
+        /// <see paramref="resultingDocument"/>.</param>
         void OnDocumentsMerged(OutputDocument resultingDocument, OutputDocument discardedDocument)
         {
             var eventHandler = DocumentsMerged;
             if (eventHandler != null)
             {
                 eventHandler(this, new DocumentsMergedEventArgs(resultingDocument, discardedDocument));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DocumentDataPanelRequest"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="DocumentDataPanelRequestEventArgs"/> instance containing
+        /// the event data.</param>
+        void OnDocumentDataPanelRequest(DocumentDataPanelRequestEventArgs e)
+        {
+            var eventHandler = DocumentDataPanelRequest;
+            if (eventHandler != null)
+            {
+                eventHandler(this, e);
             }
         }
 

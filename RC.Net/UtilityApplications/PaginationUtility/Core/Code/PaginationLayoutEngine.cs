@@ -49,11 +49,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 Point nextControlLocation = parentDisplayRectangle.Location;
 
                 List<PaginationControl> redundantControls = new List<PaginationControl>();
-                bool firstControl = true;
+                PaginationSeparator lastSeparator = null;
 
                 // Layout all PaginationControls (ignore any other kind of control).
                 foreach (PaginationControl control in parent.Controls.OfType<PaginationControl>())
                 {
+                    var separator = control as PaginationSeparator;
+                    PaginationControl previousControl = control.PreviousControl as PaginationControl;
+                    PaginationControl previousSeparator = previousControl as PaginationSeparator;
+
                     // Only apply layout to visible controls.
                     if (!control.Visible)
                     {
@@ -64,22 +68,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                         "The PaginationLayoutEngine does not respect margins.",
                         control.Margin == Padding.Empty);
 
-                    var separator = control as PaginationSeparator;
-
-                    PaginationControl previousControl = control.PreviousControl as PaginationControl;
-                    PaginationControl previousSeparator = previousControl as PaginationSeparator;
-                    if (separator == null)
+                    if (separator != null && previousSeparator != null)
                     {
-                        firstControl = false;
-                    }
-                    else if ((firstControl && parent.Controls.OfType<PageThumbnailControl>().Any())
-                        || previousSeparator != null)
-                    {
-                        // If this separator is preceded by another separator or is the first
-                        // control (but not the only control), it is redundant and should be ignored.
+                        // If this separator is preceded by another separator, it is redundant and
+                        // should be ignored.
                         redundantControls.Add(separator);
                         separator.Visible = false;
-                        firstControl = false;
                         continue;
                     }
                     
@@ -95,10 +89,27 @@ namespace Extract.UtilityApplications.PaginationUtility
                             var padding = previousControl.Padding;
                             padding.Right = newPadding;
                             previousControl.Padding = padding;
+
+                            nextControlLocation.X = parentDisplayRectangle.Left;
+
+                            PageThumbnailControl previousPageControl = previousControl as PageThumbnailControl;
+                            if (previousPageControl != null)
+                            {
+                                if (previousPageControl.Document.Collapsed)
+                                {
+                                    if (lastSeparator != null)
+                                    {
+                                        nextControlLocation.Y += lastSeparator.Height + 1;
+                                    }
+                                }
+                                else
+                                {
+                                    nextControlLocation.Y += PageThumbnailControl.UniformSize.Height;
+                                }
+                            }
                         }
 
-                        nextControlLocation.X = parentDisplayRectangle.Left;
-                        nextControlLocation.Y += PageThumbnailControl.UniformSize.Height;
+                        lastSeparator = separator;
                     }
                     else
                     {
@@ -119,7 +130,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Size the control properly.
                     if (separator != null)
                     {
-                        control.Size = new Size(parentDisplayRectangle.Width, PaginationSeparator.UniformSize.Height);
+                        control.Size = new Size(parentDisplayRectangle.Width, control.Height);
                     }
                     else
                     {
@@ -130,10 +141,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     control.Location = nextControlLocation;
 
                     nextControlLocation.X += control.Width;
-                    control.Invalidate();
                 }
 
                 OnRedundantControlsFound(redundantControls.ToArray());
+
+                foreach (var control in parent.Controls.OfType<PaginationSeparator>())
+                {
+                    control.Invalidate();
+                }
             }
             catch (Exception ex)
             {

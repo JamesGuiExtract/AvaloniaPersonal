@@ -6,12 +6,11 @@ using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 
-namespace Extract.FileActionManager.FileProcessors
+namespace Extract.UtilityApplications.PaginationUtility
 {
     /// <summary>
     /// Represents a data field in an <see cref="PaginationDocumentData"/> instance.
     /// </summary>
-    [CLSCompliant(false)]
     public class PaginationDataField
     {
         /// <summary>

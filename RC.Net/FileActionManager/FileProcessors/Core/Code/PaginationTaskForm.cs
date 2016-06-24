@@ -471,46 +471,6 @@ namespace Extract.FileActionManager.FileProcessors
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="ToolStripItem.Click"/> event of the
-        /// <see cref="_nextDocumentToolStripMenuItem"/>.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="ToolStripItem.Click"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="ToolStripItem.Click"/> event.</param>
-        void HandleNextDocumentToolStripMenuItemClick(object sender, EventArgs e)
-        {
-            try
-            {
-                GoToNextDocument();
-            }
-            catch (Exception ex)
-            {
-                RaiseVerificationException("ELI40085", ex, true);
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ToolStripItem.Click"/> event of the
-        /// <see cref="_nextDocumentToolStripButton"/>.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="ToolStripItem.Click"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="ToolStripItem.Click"/> event.</param>
-        void HandleNextDocumentToolStripButtonClick(object sender, EventArgs e)
-        {
-            try
-            {
-                GoToNextDocument();
-            }
-            catch (Exception ex)
-            {
-                RaiseVerificationException("ELI40086", ex, true);
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="ToolStripItem.Click"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
@@ -640,8 +600,6 @@ namespace Extract.FileActionManager.FileProcessors
                     string dataFileName = e.OutputFileName + ".voa";
                     documentData.Attributes.SaveTo(dataFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
                 }
-
-                GrabDocumentForVerification(fileID, e, pageMap);
             }
             catch (Exception ex)
             {
@@ -686,12 +644,9 @@ namespace Extract.FileActionManager.FileProcessors
                     documentData.SetOriginalForm();
                 }
 
-                ReleaseFiles(e.PaginatedDocumentSources);
-
-                foreach (string sourceFileName in e.DisregardedPaginationSources)
-                {
-                    _paginationPanel.SetOriginalDocumentForm();
-                }
+                ReleaseFiles(e.PaginatedDocumentSources.Union(
+                    e.ModifiedDocumentData.Select(i => i.Key).Union(
+                    e.DisregardedPaginationSources)));
             }
             catch (Exception ex)
             {
@@ -730,11 +685,51 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                _paginationPanel.CommitPendingChanges();
+                _paginationPanel.SuspendLayout();
+                _changingDocuments = true;
+
+                if (_paginationPanel.PendingChanges)
+                {
+                    if (!_paginationPanel.CommitPendingChanges(true))
+                    {
+                        _changingDocuments = false;
+                        UpdateControls();
+                    }
+                }
+                else
+                {
+                    _lastDocumentPosition = ReleaseFiles(_paginationPanel.FullySelectedSourceDocuments);
+                }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40094");
+            }
+            finally
+            {
+                try
+                {
+                    _paginationPanel.ResumeLayout(true);
+
+                    if (_changingDocuments)
+                    {
+                        _changingDocuments = false;
+
+                        // If a new document was loaded in place of the released document(s), document
+                        // selection will already have been defaulted. Otherwise, go ahead and default now.
+                        this.SafeBeginInvoke("ELI40141", () =>
+                        {
+                            if (_lastDocumentPosition != -1)
+                            {
+                                DefaultDocumentSelection();
+                            }
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI40168");
+                }
             }
         }
 
@@ -926,15 +921,17 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         void UpdateControls()
         {
-            bool enabledNextDocument = false;
+            bool enableApply = false;
 
             if (_paginationPanel.SourceDocuments.Any())
             {
                 Text = _FORM_TASK_TITLE;
 
-                if (_paginationPanel.FullySelectedSourceDocuments.Any())
+                if (_paginationPanel.CommitEnabled ||
+                    _paginationPanel.FullySelectedSourceDocuments.Any())
+                    
                 {
-                    enabledNextDocument = true;
+                    enableApply = true;
                 }
             }
             else
@@ -942,9 +939,7 @@ namespace Extract.FileActionManager.FileProcessors
                 Text = "(Waiting for file) - " + _FORM_TASK_TITLE;
             }
 
-            _nextDocumentToolStripButton.Enabled = enabledNextDocument;
-            _nextDocumentToolStripMenuItem.Enabled = enabledNextDocument;
-            _applyToolStripButton.Enabled = !_changingDocuments && _paginationPanel.CommitEnabled;
+            _applyToolStripButton.Enabled = !_changingDocuments && enableApply;
             _revertToSuggestedToolStripButton.Enabled =
                 !_changingDocuments && _paginationPanel.RevertToOriginalEnabled;
             _revertToDiskToolStripButton.Enabled =
@@ -1068,105 +1063,114 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="fileName">Name of the file.</param>
         void LoadDocumentForPagination(string fileName)
         {
-            if (_paginationPanel == null || _paginationPanel.SourceDocuments.Contains(fileName))
+            try
             {
-                return;
-            }
+                _paginationPanel.SuspendLayout();
 
-            // Look in the voa file for rules-suggested pagination.
-            // TODO: Warn if the document was previously paginated.
-            string dataFilename = fileName + ".voa";
-            if (File.Exists(dataFilename))
-            {
-                // If an image was loaded, look for and attempt to load corresponding data.
-                var voaFileLock = new ExtractFileLock();
-                voaFileLock.GetLock(dataFilename, "Paginate files task");
-                _voaFileLocks[dataFilename] = voaFileLock;
-                
-                IUnknownVector attributes = new IUnknownVectorClass();
-                attributes.LoadFrom(dataFilename, false);
-
-                PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes);
-
-                var attributeArray = attributes
-                    .ToIEnumerable<IAttribute>()
-                    .ToArray();
-                var rootAttributeNames = attributeArray
-                    .Select(attribute => attribute.Name)
-                    .Distinct();
-
-                // If only "Document" attributes exist at the root of the VOA file, there is
-                // rules-suggested pagination.
-                // TODO: If there is only a single document, extract the document data and don't
-                // show suggested pagination.
-                if (rootAttributeNames.Count() == 1 &&
-                    rootAttributeNames.Single().Equals("Document", StringComparison.OrdinalIgnoreCase))
+                if (_paginationPanel == null || _paginationPanel.SourceDocuments.Contains(fileName))
                 {
-                    int pageCount = 0;
-                    using (var codecs = new ImageCodecs())
-                    using (var reader = codecs.CreateReader(fileName))
-                    {
-                        pageCount = reader.PageCount;
-                    }
-
-                    bool? suggestedPagination = null;
-
-                    // Iterate each virtual document suggested by the rules and add as a separate
-                    // document as far as the _paginationPanel is concerned.
-                    foreach (var documentAttribute in attributeArray)
-                    {
-                        // There should be two attributes under the root Document attribute:
-                        // Pages- The range/list specification of pages to be included.
-                        // DocumentData- The data (redaction or indexing() the rules found for the
-                        //  virtual document.
-                        var pages =
-                            UtilityMethods.GetPageNumbersFromString(
-                                documentAttribute.SubAttributes
-                                .ToIEnumerable<IAttribute>()
-                                .Single(attribute => attribute.Name.Equals(
-                                    "Pages", StringComparison.OrdinalIgnoreCase))
-                                .Value.String, pageCount, true);
-
-                        var documentAttributes = documentAttribute.SubAttributes
-                            .ToIEnumerable<IAttribute>()
-                            .Where(attribute => attribute.Name.Equals(
-                                "DocumentData", StringComparison.OrdinalIgnoreCase))
-                            .Select(data => data.SubAttributes)
-                            .SingleOrDefault() ?? new IUnknownVector();
-
-                        documentData = GetAsPaginationDocumentData(documentAttributes);
-
-                        if (!suggestedPagination.HasValue)
-                        {
-                            if (attributeArray.Length == 1 &&
-                                pages.Count() == pageCount)
-                            {
-                                suggestedPagination = false;
-                            }
-                            else
-                            {
-                                suggestedPagination = true;
-                            }
-                        }
-
-                        _paginationPanel.LoadFile(
-                            fileName, -1, pages, suggestedPagination.Value, documentData);
-                        DefaultDocumentSelection();
-                    }
-
                     return;
                 }
 
-                // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
-                _paginationPanel.LoadFile(fileName, -1, null, false, documentData);
-                DefaultDocumentSelection();
-                return;
-            }
+                // Look in the voa file for rules-suggested pagination.
+                // TODO: Warn if the document was previously paginated.
+                string dataFilename = fileName + ".voa";
+                if (File.Exists(dataFilename))
+                {
+                    // If an image was loaded, look for and attempt to load corresponding data.
+                    var voaFileLock = new ExtractFileLock();
+                    voaFileLock.GetLock(dataFilename, "Paginate files task");
+                    _voaFileLocks[dataFilename] = voaFileLock;
 
-            // If there was no rules-suggested pagination, go ahead and load the physical document
-            // into the _paginationPanel
-            _paginationPanel.LoadFile(fileName, -1);
-            DefaultDocumentSelection();
+                    IUnknownVector attributes = new IUnknownVectorClass();
+                    attributes.LoadFrom(dataFilename, false);
+
+                    PaginationDocumentData documentData = GetAsPaginationDocumentData(attributes);
+
+                    var attributeArray = attributes
+                        .ToIEnumerable<IAttribute>()
+                        .ToArray();
+                    var rootAttributeNames = attributeArray
+                        .Select(attribute => attribute.Name)
+                        .Distinct();
+
+                    // If only "Document" attributes exist at the root of the VOA file, there is
+                    // rules-suggested pagination.
+                    // TODO: If there is only a single document, extract the document data and don't
+                    // show suggested pagination.
+                    if (rootAttributeNames.Count() == 1 &&
+                        rootAttributeNames.Single().Equals("Document", StringComparison.OrdinalIgnoreCase))
+                    {
+                        int pageCount = 0;
+                        using (var codecs = new ImageCodecs())
+                        using (var reader = codecs.CreateReader(fileName))
+                        {
+                            pageCount = reader.PageCount;
+                        }
+
+                        bool? suggestedPagination = null;
+
+                        // Iterate each virtual document suggested by the rules and add as a separate
+                        // document as far as the _paginationPanel is concerned.
+                        foreach (var documentAttribute in attributeArray)
+                        {
+                            // There should be two attributes under the root Document attribute:
+                            // Pages- The range/list specification of pages to be included.
+                            // DocumentData- The data (redaction or indexing() the rules found for the
+                            //  virtual document.
+                            var pages =
+                                UtilityMethods.GetPageNumbersFromString(
+                                    documentAttribute.SubAttributes
+                                    .ToIEnumerable<IAttribute>()
+                                    .Single(attribute => attribute.Name.Equals(
+                                        "Pages", StringComparison.OrdinalIgnoreCase))
+                                    .Value.String, pageCount, true);
+
+                            var documentAttributes = documentAttribute.SubAttributes
+                                .ToIEnumerable<IAttribute>()
+                                .Where(attribute => attribute.Name.Equals(
+                                    "DocumentData", StringComparison.OrdinalIgnoreCase))
+                                .Select(data => data.SubAttributes)
+                                .SingleOrDefault() ?? new IUnknownVector();
+
+                            documentData = GetAsPaginationDocumentData(documentAttributes);
+
+                            if (!suggestedPagination.HasValue)
+                            {
+                                if (attributeArray.Length == 1 &&
+                                    pages.Count() == pageCount)
+                                {
+                                    suggestedPagination = false;
+                                }
+                                else
+                                {
+                                    suggestedPagination = true;
+                                }
+                            }
+
+                            _paginationPanel.LoadFile(
+                                fileName, -1, pages, suggestedPagination.Value, documentData);
+                            DefaultDocumentSelection();
+                        }
+
+                        return;
+                    }
+
+                    // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
+                    _paginationPanel.LoadFile(fileName, -1, null, false, documentData);
+                    DefaultDocumentSelection();
+                    return;
+                }
+
+                // If there was no rules-suggested pagination, go ahead and load the physical document
+                // into the _paginationPanel
+                _paginationPanel.LoadFile(fileName, -1);
+                DefaultDocumentSelection();
+            }
+            finally
+            {
+                _paginationPanel.ResumeLayout(true);
+            }
         }
 
         /// <summary>
@@ -1380,88 +1384,6 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40108");
-            }
-        }
-
-        /// <summary>
-        /// Grabs the specified document for immediate verification in the current session. Any
-        /// indexing data included in <see paramref="e"/> will be saved to VOA and used by
-        /// verification.
-        /// </summary>
-        /// <param name="fileID">The FAM file ID of the document.</param>
-        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance containing
-        /// data about the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this
-        /// call is being made.</param>
-        /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number in 
-        /// <see paramref="newDocumentName"/>.</param>
-        void GrabDocumentForVerification(int fileID, CreatingOutputDocumentEventArgs e,
-            Dictionary<Tuple<string, int>, int> pageMap)
-        {
-            try
-            {
-                // Produce a voa file for the paginated document using the data the rules suggested.
-                var documentData = e.DocumentData as PaginationDocumentData;
-                if (documentData != null)
-                {
-                    AttributeMethods.TranslateAttributesToNewDocument(
-                        documentData.Attributes, e.OutputFileName, pageMap);
-
-                    documentData.Attributes.SaveTo(e.OutputFileName + ".voa", false,
-                        _ATTRIBUTE_STORAGE_MANAGER_GUID);
-                    // Though saved out to file, it is this object that will be used for the
-                    // newly paginated document; it should not be marked dirty at this point.
-                    documentData.SetOriginalForm();
-                }
-
-                EActionStatus previousStatus;
-                bool success =
-                    FileRequestHandler.CheckoutForProcessing(fileID, false, out previousStatus);
-                ExtractException.Assert("ELI40109", "Failed to check out file", success,
-                    "FileID", fileID);
-                success = FileRequestHandler.SetFallbackStatus(fileID, EActionStatus.kActionPending);
-                ExtractException.Assert("ELI40110", "Failed to set fallback status", success,
-                    "FileID", fileID);
-                _paginationOutputToReload.Add(
-                    new Tuple<string, int, PaginationDocumentData>(
-                        e.OutputFileName, e.Position, documentData));
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI40111");
-            }
-        }
-
-        /// <summary>
-        /// Closes the selected document(s) and advances to the next document in the FAM queue.
-        /// </summary>
-        void GoToNextDocument()
-        {
-            try
-            {
-                _changingDocuments = true;
-
-                _lastDocumentPosition = ReleaseFiles(_paginationPanel.FullySelectedSourceDocuments);
-            }
-            catch (Exception ex)
-            {
-                // This method can be called directly via a keyboard shortcut, so need to deal with
-                // exceptions here rather than trusting that the outer scope will do so.
-                RaiseVerificationException("ELI40112", ex, true);
-            }
-            finally
-            {
-                _changingDocuments = false;
-
-                // If a new document was loaded in place of the released document(s), document
-                // selection will already have been defaulted. Otherwise, go ahead and default now.
-                this.SafeBeginInvoke("ELI40141", () =>
-                {
-                    if (_lastDocumentPosition != -1)
-                    {
-                        DefaultDocumentSelection();
-                    }
-                });
             }
         }
 

@@ -112,9 +112,6 @@
     </Compile>
     <Compile Include="ApplyBatesNumberTask.cs" />
     <Compile Include="BatesNumberGeneratorWithDatabase.cs" />
-    <Compile Include="IPaginationDocumentDataPanel.cs" />
-    <Compile Include="PaginationDataField.cs" />
-    <Compile Include="PaginationDocumentData.cs" />
     <Compile Include="PaginationTaskForm.FormStateManager.cs">
       <DependentUpon>PaginationTaskForm.cs</DependentUpon>
       <SubType>Form</SubType>

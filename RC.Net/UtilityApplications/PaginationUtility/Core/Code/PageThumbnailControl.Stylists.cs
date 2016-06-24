@@ -1,9 +1,8 @@
 ﻿using Extract.Drawing;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -216,13 +215,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         Alignment = StringAlignment.Center,
                         LineAlignment = StringAlignment.Center
                     };
-                    // Hack fix for ModifiedPageStylist. The asterisk seems to insist to draw to
-                    // high (50% above the top of drawRectangle).
-                    if (Text == "*")
-                    {
-                        drawRectangle.Offset(0, 6);
-                        drawRectangle.Inflate(0, 6);
-                    }
+
                     e.Graphics.DrawString(Text, font, brush, drawRectangle, format);
                 }
             }
@@ -325,68 +318,6 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
-    /// A <see cref="PageStylist"/> that uses a red asterisk to indicated pages that have been
-    /// "modified" (that are part of a pending <see cref="OutputDocument"/> that does not match
-    /// the document as it currently exists on disk).
-    /// </summary>
-    internal class ModifiedPageStylist : OverlayTextStylist
-    {
-        /// <summary>
-        /// The <see cref="Font"/> to use to draw the asterisk.
-        /// </summary>
-        static readonly Font _INDICATOR_FONT = new Font("Sans Serif", 25);
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ModifiedPageStylist"/> class.
-        /// </summary>
-        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which this stylist
-        /// is responsible.</param>
-        public ModifiedPageStylist(PageThumbnailControl pageControl)
-            : base(pageControl, "*", Color.Red, _INDICATOR_FONT, null)
-        {
-        }
-
-        /// <summary>
-        /// Gets the tooltip text to display for this stylist.
-        /// </summary>
-        protected override string ToolTipText
-        {
-            get
-            {
-                return "Manual pagination has been applied; reprocessing required.";
-            }
-        }
-
-        /// <summary>
-        /// Gets whether the stylist is visible
-        /// </summary>
-        /// <returns><see langword="true"/> if visible.</returns>
-        protected override bool IsVisible
-        {
-            get
-            {
-                return !PageControl.Deleted && !PageControl.Document.InOriginalForm;
-            }
-        }
-
-        /// <summary>
-        /// Gets the area of <see paramref="hostingControl"/> to which the stylist will do any
-        /// foreground drawing.
-        /// </summary>
-        /// <param name="hostingControl">The <see cref="Control"/> on which the stylist will do any
-        /// foreground drawing.</param>
-        /// <returns>A <see cref="Rectangle"/> describing the area to which the stylist will draw.
-        /// </returns>
-        protected override Rectangle GetDrawRectangle(Control hostingControl)
-        {
-            // Top icon
-            Size size = new Size(16, 16);
-            Point location = new Point(hostingControl.ClientRectangle.Right - size.Width - 3, 4);
-            return new Rectangle(location, size);
-        }
-    }
-
-    /// <summary>
     /// A <see cref="PageStylist"/> that uses a green page number to indicate pages that will be
     /// output as part of a new document.
     /// </summary>
@@ -445,9 +376,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </returns>
         protected override Rectangle GetDrawRectangle(Control hostingControl)
         {
-            // 2nd icon to top
             Size size = new Size(_textWidth, 16);
-            Point location = new Point(hostingControl.ClientRectangle.Right - size.Width - 4, size.Height + 4);
+            Point location = new Point(hostingControl.ClientRectangle.Right - size.Width - 4, 4);
             return new Rectangle(location, size);
         }
 

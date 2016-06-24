@@ -90,9 +90,22 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="IDocumentData.cs" />
+    <Compile Include="NewDocumentGlyph.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NewDocumentGlyph.Designer.cs">
+      <DependentUpon>NewDocumentGlyph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditedPaginationGlyph.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EditedPaginationGlyph.Designer.cs">
+      <DependentUpon>EditedPaginationGlyph.cs</DependentUpon>
+    </Compile>
     <Compile Include="IPaginationUtility.cs" />
-    <Compile Include="IDocumentDataPanel.cs" />
+    <Compile Include="IPaginationDocumentDataPanel.cs" />
+    <Compile Include="PaginationDataField.cs" />
+    <Compile Include="PaginationDocumentData.cs" />
     <Compile Include="PaginationLayoutEngine.cs" />
     <Compile Include="PageLayoutControl.ClipboardData.cs">
       <DependentUpon>PageLayoutControl.cs</DependentUpon>
@@ -103,10 +116,6 @@
     </Compile>
     <Compile Include="PaginationPanel.Designer.cs">
       <DependentUpon>PaginationPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PaginationPanel.EditedDataPageStylist.cs">
-      <DependentUpon>PaginationPanel.cs</DependentUpon>
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="PaginationUtilityForm.FormStateManager.cs">
       <SubType>Form</SubType>
@@ -182,6 +191,12 @@
       <DependentUpon>AboutBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="NewDocumentGlyph.resx">
+      <DependentUpon>NewDocumentGlyph.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditedPaginationGlyph.resx">
+      <DependentUpon>EditedPaginationGlyph.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoadNextDocumentButtonControl.resx">
       <DependentUpon>LoadNextDocumentButtonControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -218,10 +233,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <Compile Include="PaginationPanel.ExtendedOutputDocument.cs">
-      <DependentUpon>PaginationPanel.cs</DependentUpon>
-      <SubType>UserControl</SubType>
-    </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -285,7 +296,76 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Edit.png" />
+    <None Include="Resources\Expand.png" />
+    <None Include="Resources\Edit16.png" />
+    <None Include="Resources\Collapse.png" />
+    <Content Include="Resources\Edit11.png" />
     <Content Include="Resources\PaginationUtility.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="UCLID_AFCORELib">
+      <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFUTILSLib">
+      <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_INPUTFUNNELLib">
+      <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_TESTINGFRAMEWORKINTERFACESLib">
+      <Guid>{B12E5F5E-6EC2-4D38-A57A-D55C4BE683C8}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
