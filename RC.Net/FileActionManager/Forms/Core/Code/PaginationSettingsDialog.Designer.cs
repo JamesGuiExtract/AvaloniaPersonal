@@ -114,6 +114,7 @@
             infoTip3.Name = "infoTip3";
             infoTip3.Size = new System.Drawing.Size(16, 16);
             infoTip3.TabIndex = 13;
+            infoTip3.TabStop = false;
             infoTip3.TipText = resources.GetString("infoTip3.TipText");
             // 
             // infoTip1
@@ -125,6 +126,7 @@
             infoTip1.Name = "infoTip1";
             infoTip1.Size = new System.Drawing.Size(16, 16);
             infoTip1.TabIndex = 2;
+            infoTip1.TabStop = false;
             infoTip1.TipText = resources.GetString("infoTip1.TipText");
             // 
             // infoTip5
@@ -136,6 +138,7 @@
             infoTip5.Name = "infoTip5";
             infoTip5.Size = new System.Drawing.Size(16, 16);
             infoTip5.TabIndex = 17;
+            infoTip5.TabStop = false;
             infoTip5.TipText = "These VOA files will not be output for documents created via pagination";
             // 
             // _sourceActionComboBox

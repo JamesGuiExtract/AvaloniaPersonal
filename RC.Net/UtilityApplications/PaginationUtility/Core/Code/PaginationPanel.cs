@@ -1368,6 +1368,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 tempFile = _tempFiles[outputDocument];
 
                 var sourcePageInfo = outputDocument.PageControls
+                    .Where(c => !c.Deleted)
                     .Select(c => new PageInfo()
                     {
                         DocumentName = c.Page.OriginalDocumentName,

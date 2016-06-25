@@ -747,6 +747,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (_paginationPanel != null)
                 {
                     _paginationPanel.ImageViewer = _imageViewer;
+                    _paginationPanel.ExpectedPaginationAttributesPath =
+                        _settings.PaginationSettings.ExpectedPaginationAttributesOutputPath;
                     _paginationPanel.OutputExpectedPaginationAttributesFile =
                         _settings.PaginationSettings.OutputExpectedPaginationAttributesFiles;
                     _paginationPanel.FileProcessingDB = FileProcessingDB;
