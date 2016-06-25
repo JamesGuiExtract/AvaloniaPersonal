@@ -56,12 +56,21 @@ namespace Extract.Utilities.Test
 
             // Write the embedded dll's to the disk. These files will be cleaned
             // up when the unit tests are exited
-            GeneralMethods.WriteEmbeddedResourceToFile<TestUtilityMethods>(
-                _TEST_INTERFACE_ONLY_DLL, _interfaceOnlyDll);
-            GeneralMethods.WriteEmbeddedResourceToFile<TestUtilityMethods>(
-                _TEST_NO_INTERFACE_DLL, _noInterfaceDll);
-            GeneralMethods.WriteEmbeddedResourceToFile<TestUtilityMethods>(
-                _TEST_ONE_CLASS_INTERFACE_DLL, _oneClassInterfaceDll);
+            if (!File.Exists(_interfaceOnlyDll))
+            {
+                GeneralMethods.WriteEmbeddedResourceToFile<TestUtilityMethods>(
+                    _TEST_INTERFACE_ONLY_DLL, _interfaceOnlyDll);
+            }
+            if (!File.Exists(_noInterfaceDll))
+            {
+                GeneralMethods.WriteEmbeddedResourceToFile<TestUtilityMethods>(
+                    _TEST_NO_INTERFACE_DLL, _noInterfaceDll);
+            }
+            if (!File.Exists(_oneClassInterfaceDll))
+            {
+                GeneralMethods.WriteEmbeddedResourceToFile<TestUtilityMethods>(
+                    _TEST_ONE_CLASS_INTERFACE_DLL, _oneClassInterfaceDll);
+            }
         }
 
         /// <summary>
