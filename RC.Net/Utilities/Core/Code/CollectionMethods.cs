@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using UCLID_COMUTILSLib;
@@ -528,15 +529,15 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Converts a list of int into a range string; e.g.: 1,2,3,4,7,8,9,12 = "1-4, 7-9, 12"
+        /// Converts a collection of int into a range string; e.g.: 1,2,3,4,7,8,9,12 = "1-4, 7-9, 12"
         /// </summary>
-        /// <param name="listOfNumbers">The list of numbers.</param>
+        /// <param name="numbers">The collection of numbers.</param>
         /// <returns>a string representation of the range values</returns>
-        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
-        static public string ToRangeString(this List<int> listOfNumbers)
+        static public string ToRangeString(this IEnumerable<int> numbers)
         {
             try
             {
+                var listOfNumbers = numbers.ToList();
                 StringBuilder result = new StringBuilder();
 
                 for (int i = 0; i < listOfNumbers.Count; i++)

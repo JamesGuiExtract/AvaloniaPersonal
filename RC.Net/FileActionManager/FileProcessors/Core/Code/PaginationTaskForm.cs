@@ -250,6 +250,10 @@ namespace Extract.FileActionManager.FileProcessors
 
                 _imageViewer.CacheImages = true;
                 _paginationPanel.ImageViewer = _imageViewer;
+                _paginationPanel.OutputExpectedPaginationAttributesFile
+                    = settings.OutputExpectedPaginationAttributesFiles;
+                _paginationPanel.ExpectedPaginationAttributesPath = settings.ExpectedPaginationAttributesOutputPath;
+                _paginationPanel.FileProcessingDB = FileProcessingDB;
             }
             catch (Exception ex)
             {

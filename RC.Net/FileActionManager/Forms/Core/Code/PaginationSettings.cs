@@ -14,8 +14,16 @@ namespace Extract.FileActionManager.Forms
 
         /// <summary>
         /// The current version number for this object
+        /// Versions:
+        /// 1. Initial version
+        /// 2. Added OutputExpectedPaginationAttributesFiles and ExpectedPaginationAttributesOutputPath
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
+
+        /// <summary>
+        /// The default path for expected pagination attributes file
+        /// </summary>
+        const string _DEFAULT_EXPECTED_OUTPUT_PATH = "<SourceDocName>.pagination.evoa";
 
         /// <summary>
         /// A special path tag used for paginated output doc name that is a iterator of the number
@@ -48,7 +56,9 @@ namespace Extract.FileActionManager.Forms
             paginationSourceAction: null,
             paginationOutputPath: "$InsertBeforeExtension(<SourceDocName>,_<SubDocIndex>)",
             paginationOutputAction: null,
-            paginatedOutputPriority: EFilePriority.kPriorityAboveNormal)
+            paginatedOutputPriority: EFilePriority.kPriorityAboveNormal,
+            outputExpectedPaginationAttributesFiles: false,
+            expectedPaginationAttributesOutputPath: _DEFAULT_EXPECTED_OUTPUT_PATH)
         {
         }
 
@@ -62,12 +72,14 @@ namespace Extract.FileActionManager.Forms
             paginationSourceAction: source.PaginationSourceAction,
             paginationOutputPath: source.PaginationOutputPath,
             paginationOutputAction: source.PaginationOutputAction,
-            paginatedOutputPriority: source.PaginatedOutputPriority)
+            paginatedOutputPriority: source.PaginatedOutputPriority,
+            outputExpectedPaginationAttributesFiles: source.OutputExpectedPaginationAttributesFiles,
+            expectedPaginationAttributesOutputPath: source.ExpectedPaginationAttributesOutputPath)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PaginationSettings"/> class.
+        /// Initializes a new instance of the <see cref="PaginationSettings" /> class.
         /// </summary>
         /// <param name="paginationSourceAction">The action (if any) into which paginated sources
         /// should be moved to pending.</param>
@@ -78,14 +90,21 @@ namespace Extract.FileActionManager.Forms
         /// <param name="paginatedOutputPriority">The minimum priority that should be assigned a
         /// pagination output document. The priority assigned may be higher than this if one of the
         /// source documents had a higher priority.</param>
+        /// <param name="outputExpectedPaginationAttributesFiles">Whether to output expected
+        /// pagination attributes.</param>
+        /// <param name="expectedPaginationAttributesOutputPath">The expected pagination attributes
+        /// path.</param>
         public PaginationSettings(string paginationSourceAction,
             string paginationOutputPath, string paginationOutputAction,
-            EFilePriority paginatedOutputPriority)
+            EFilePriority paginatedOutputPriority, bool outputExpectedPaginationAttributesFiles,
+            string expectedPaginationAttributesOutputPath)
         {
             PaginationSourceAction = paginationSourceAction;
             PaginationOutputPath = paginationOutputPath;
             PaginationOutputAction = paginationOutputAction;
             PaginatedOutputPriority = paginatedOutputPriority;
+            OutputExpectedPaginationAttributesFiles = outputExpectedPaginationAttributesFiles;
+            ExpectedPaginationAttributesOutputPath = expectedPaginationAttributesOutputPath;
         }
 
         #endregion Constructors
@@ -130,6 +149,24 @@ namespace Extract.FileActionManager.Forms
             private set;
         }
 
+        /// <summary>
+        /// Gets whether to output expected pagination attributes.
+        /// </summary>
+        public bool OutputExpectedPaginationAttributesFiles
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the file path to output expected pagination attributes to
+        /// </summary>
+        public string ExpectedPaginationAttributesOutputPath
+        {
+            get;
+            private set;
+        }
+
         #endregion Properties
 
         #region Methods
@@ -161,8 +198,18 @@ namespace Extract.FileActionManager.Forms
                 string paginationOutputAction = reader.ReadString();
                 EFilePriority paginatedOutputPriority = (EFilePriority)reader.ReadInt32();
 
+                bool outputExpectedPaginationAttributesFiles = false;
+                string expectedPaginationAttributesOutputPath = _DEFAULT_EXPECTED_OUTPUT_PATH;
+
+                if (version >= 2)
+                {
+                    outputExpectedPaginationAttributesFiles = reader.ReadBoolean();
+                    expectedPaginationAttributesOutputPath = reader.ReadString();
+                }
+
                 return new PaginationSettings(paginationSourceAction,
-                    paginationOutputPath, paginationOutputAction, paginatedOutputPriority);
+                    paginationOutputPath, paginationOutputAction, paginatedOutputPriority,
+                    outputExpectedPaginationAttributesFiles, expectedPaginationAttributesOutputPath);
             }
             catch (Exception ex)
             {
@@ -185,6 +232,8 @@ namespace Extract.FileActionManager.Forms
                 writer.Write(PaginationOutputPath);
                 writer.Write(PaginationOutputAction);
                 writer.Write((int)PaginatedOutputPriority);
+                writer.Write(OutputExpectedPaginationAttributesFiles);
+                writer.Write(ExpectedPaginationAttributesOutputPath);
             }
             catch (Exception ex)
             {

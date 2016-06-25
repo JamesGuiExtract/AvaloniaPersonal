@@ -1713,7 +1713,7 @@ namespace Extract.Redaction
             {
                 // child attributes
                 ComAttribute pages = _comAttribute.Create("_VisitedPages");
-                List<int> visitedPagesOnesRelative = visitedPages.Select(page => page + 1).ToList();
+                IEnumerable<int> visitedPagesOnesRelative = visitedPages.Select(page => page + 1);
                 string pageRange = visitedPagesOnesRelative.ToRangeString();
                 AddPersistedContext(pages, pageRange);
 

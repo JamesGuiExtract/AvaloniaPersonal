@@ -244,6 +244,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
+      <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
+      <Name>Extract.AttributeFinder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
@@ -303,6 +307,16 @@
     <Content Include="Resources\PaginationUtility.ico" />
   </ItemGroup>
   <ItemGroup>
+    <COMReference Include="ADODB">
+      <Guid>{EF53050B-882E-4776-B643-EDA472E8E3F2}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>7</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </COMReference>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -332,6 +346,15 @@
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_FILEPROCESSINGLib">
+      <Guid>{5FBC9199-D162-4F14-BAD9-090F6AB576C5}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>

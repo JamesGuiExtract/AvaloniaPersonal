@@ -59,6 +59,24 @@ namespace Extract.FileActionManager.FileProcessors
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets/sets whether to output expected pagination attributes.
+        /// </summary>
+        bool OutputExpectedPaginationAttributesFiles
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets/sets the file path to output expected pagination attributes to
+        /// </summary>
+        string ExpectedPaginationAttributesOutputPath
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
@@ -79,13 +97,21 @@ namespace Extract.FileActionManager.FileProcessors
 
         /// <summary>
         /// Current task version.
+        /// Versions:
+        /// 1. Initial version
+        /// 2. Added OutputExpectedPaginationAttributesFiles and ExpectedPaginationAttributesOutputPath
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.PaginationUIObject;
+
+        /// <summary>
+        /// The default path for expected pagination attributes file
+        /// </summary>
+        const string _DEFAULT_EXPECTED_OUTPUT_PATH = "<SourceDocName>.pagination.evoa";
         
         #endregion Constants
 
@@ -155,6 +181,16 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         bool _dirty;
 
+        /// <summary>
+        /// Gets/sets the file path to output expected pagination attributes to
+        /// </summary>
+        private bool _outputExpectedPaginationAttributesFiles;
+
+        /// <summary>
+        /// Gets/sets the file path to output expected pagination attributes to
+        /// </summary>
+        private string _expectedPaginationAttributesOutputPath;
+
         #endregion Fields
 
         #region Constructors
@@ -174,6 +210,7 @@ namespace Extract.FileActionManager.FileProcessors
                         _form = new VerificationForm<PaginationTaskForm>();
                     }
                 }
+                _expectedPaginationAttributesOutputPath = _DEFAULT_EXPECTED_OUTPUT_PATH;
             }
             catch (Exception ex)
             {
@@ -314,6 +351,45 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Gets/sets whether to output expected pagination attributes to a file
+        /// </summary>
+        public bool OutputExpectedPaginationAttributesFiles
+        {
+            get
+            {
+                return _outputExpectedPaginationAttributesFiles;
+            }
+            set
+            {
+                if (value != _outputExpectedPaginationAttributesFiles)
+                {
+                    _outputExpectedPaginationAttributesFiles = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets the file path to output expected pagination attributes to
+        /// </summary>
+        public string ExpectedPaginationAttributesOutputPath
+        {
+            get
+            {
+                return _expectedPaginationAttributesOutputPath;
+            }
+            set
+            {
+                if (value != _expectedPaginationAttributesOutputPath)
+                {
+                    _expectedPaginationAttributesOutputPath = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+
         #endregion Properties
 
         #region Methods
@@ -352,6 +428,8 @@ namespace Extract.FileActionManager.FileProcessors
             OutputPath = task.OutputPath;
             OutputAction = task.OutputAction;
             DocumentDataPanelAssembly = task.DocumentDataPanelAssembly;
+            OutputExpectedPaginationAttributesFiles = task.OutputExpectedPaginationAttributesFiles;
+            ExpectedPaginationAttributesOutputPath = task.ExpectedPaginationAttributesOutputPath;
 
             _dirty = true;
         }
@@ -683,6 +761,12 @@ namespace Extract.FileActionManager.FileProcessors
                     OutputPath = reader.ReadString();
                     OutputAction = reader.ReadString();
                     DocumentDataPanelAssembly = reader.ReadString();
+
+                    if (reader.Version >= 2)
+                    {
+                        OutputExpectedPaginationAttributesFiles = reader.ReadBoolean();
+                        ExpectedPaginationAttributesOutputPath = reader.ReadString();
+                    }
                 }
 
                 // Freshly loaded object is not dirty
@@ -715,6 +799,8 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(OutputPath);
                     writer.Write(OutputAction);
                     writer.Write(DocumentDataPanelAssembly);
+                    writer.Write(OutputExpectedPaginationAttributesFiles);
+                    writer.Write(ExpectedPaginationAttributesOutputPath);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);

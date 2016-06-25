@@ -16,7 +16,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Mark assembly as CLS compliant.
+// Mark assembly as non CLS compliant.
 [assembly: CLSCompliant(false)]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

@@ -43,6 +43,11 @@ namespace Extract.AttributeFinder
                 141, 55, 75, 250, 20, 9, 176, 172, 55, 107, 172, 231, 69, 151, 34, 7, 232, 26, 112, 63, 202, 33
             };
 
+        /// <summary>
+        /// Text to use for otherwise empty Document attribute values in pagination hierarchy
+        /// </summary>
+        private static readonly string _DOCUMENT_PLACEHOLDER_TEXT = "N/A";
+
         #endregion Constants
 
         #region Fields
@@ -429,10 +434,11 @@ namespace Extract.AttributeFinder
                 }
                 else if (Usage == LearningMachineUsage.Pagination)
                 {
-                    var inputPageAttributes = new List<ComAttribute>();
-                    var resultingAttributes = new List<ComAttribute>();
+                    List<ComAttribute> inputPageAttributes = null;
+                    List<ComAttribute> resultingAttributes = new List<ComAttribute>();
                     if (preserveInputAttributes)
                     {
+                        inputPageAttributes = new List<ComAttribute>();
                         foreach (var attribute in protoFeaturesOrPagesOfProtoFeatures.ToIEnumerable<ComAttribute>())
                         {
                             if (attribute.Name.Equals(LearningMachineDataEncoder.PageAttributeName, StringComparison.OrdinalIgnoreCase))
@@ -446,51 +452,17 @@ namespace Extract.AttributeFinder
                         }
                     }
 
-                    List<bool> isFirstPage = outputs.Select(answerAndScore =>
-                        answerAndScore.Item1 == LearningMachineDataEncoder.FirstPageCategoryCode)
+                    List<bool> isFirstPageList = outputs
+                        .Select(answerAndScore => answerAndScore.Item1 == LearningMachineDataEncoder.FirstPageCategoryCode)
                         .ToList();
-                    int numberOfPages = isFirstPage.Count + 1;
-                    int firstPageInRange = 1;
+                    int numberOfPages = isFirstPageList.Count + 1;
 
-                    // Calculate where each document ends by checking to see if the next page number is a predicted
-                    // first page or is greater than the number of pages in the image.
-                    for (int nextPageNumber = 2; nextPageNumber <= numberOfPages + 1; nextPageNumber++)
-                    {
-                        // isFirstPage is zero-indexed and does not include the first page of the image
-                        if (nextPageNumber > numberOfPages || isFirstPage[nextPageNumber - 2])
-                        {
-                            int lastPageInRange = nextPageNumber - 1;
+                    // - 2 because isFirstPageList is zero-indexed and does not include the first page of the image
+                    Func<int, bool> isFirstPage = sourcePage => isFirstPageList[sourcePage - 2];
 
-                            // Get OCRed text for the page range for the Document value
-                            var ss = document.GetSpecifiedPages(firstPageInRange, lastPageInRange);
-                            // Prevent empty value that could result in the attribute getting thrown away
-                            if (string.IsNullOrEmpty(ss.String))
-                            {
-                                ss.CreateNonSpatialString(" ", ss.SourceDocName);
-                            }
-                            var documentAttribute = new ComAttribute { Name = "Document", Value = ss };
-
-                            // Add a Pages attribute to denote the range of pages in this document
-                            ss = new SpatialStringClass();
-                            ss.CreateNonSpatialString(string.Format(CultureInfo.CurrentCulture, "{0}-{1}", firstPageInRange, lastPageInRange),
-                                document.SourceDocName);
-                            documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
-                            resultingAttributes.Add(documentAttribute);
-
-                            // Add input page attributes that are in this range
-                            if (preserveInputAttributes)
-                            {
-                                for (int i = firstPageInRange - 1;
-                                    i < lastPageInRange && i < inputPageAttributes.Count; i++)
-                                {
-                                    documentAttribute.SubAttributes.PushBack(inputPageAttributes[i]);
-                                }
-                            }
-
-                            // Set up next page range
-                            firstPageInRange = nextPageNumber;
-                        }
-                    }
+                    var paginationAttributes = CreatePaginationAttributes(document.SourceDocName,
+                        numberOfPages, isFirstPage, document, inputPageAttributes);
+                    resultingAttributes.AddRange(paginationAttributes);
 
                     return resultingAttributes.ToIUnknownVector();
                 }
@@ -893,6 +865,85 @@ namespace Extract.AttributeFinder
             if (_encryptedTrainingLog != null)
             {
                 TrainingLog = ExtractEncryption.DecryptString(_encryptedTrainingLog, ml);
+            }
+        }
+
+        /// <summary> Creates a collection of document <see cref="ComAttribute"/>s that represents pagination boundaries
+        /// (Document/Pages|start-end).
+        /// </summary>
+        /// <param name="sourceDocName">Name of the source document</param>
+        /// <param name="numberOfPages">The number of pages in the source document</param>
+        /// <param name="isFirstPage">Function used to determine whether a source page number is
+        /// the first page of a paginated document</param>
+        /// <param name="sourceDocument">Optional source document <see cref="SpatialString"/></param>
+        /// <param name="inputPageAttributes">Optional collection of one attribute per page to be
+        /// added as subattributes to the appropriate Document attribute in the output</param>
+        /// <returns>A collection of Document/Page attributes</returns>
+        private static IEnumerable<ComAttribute> CreatePaginationAttributes(
+            string sourceDocName,
+            int numberOfPages,
+            Func<int, bool> isFirstPage,
+            ISpatialString sourceDocument = null,
+            IList<ComAttribute> inputPageAttributes = null)
+        {
+            try
+            {
+                ExtractException.Assert("ELI40157", "Incorrect number of inputPageAttributes",
+                    inputPageAttributes == null || inputPageAttributes.Count == numberOfPages);
+
+                var resultingAttributes = new List<ComAttribute>();
+                int firstPageInRange = 1;
+                for (int nextPageNumber = 2; nextPageNumber <= numberOfPages + 1; nextPageNumber++)
+                {
+                    if (nextPageNumber > numberOfPages || isFirstPage(nextPageNumber))
+                    {
+                        int lastPageInRange = nextPageNumber - 1;
+                        string range = Enumerable.Range(firstPageInRange, lastPageInRange).ToRangeString();
+                        SpatialString ss;
+                        if (sourceDocument != null)
+                        {
+                            // Get OCRed text for the page range for the Document value
+                            ss = sourceDocument.GetSpecifiedPages(firstPageInRange, lastPageInRange);
+                        }
+                        else
+                        {
+                            ss = new SpatialStringClass();
+                        }
+
+                        // Prevent empty value that could result in the attribute getting thrown away
+                        if (string.IsNullOrEmpty(ss.String))
+                        {
+                            ss.CreateNonSpatialString(_DOCUMENT_PLACEHOLDER_TEXT, sourceDocName);
+                        }
+
+                        var documentAttribute = new ComAttribute { Name = "Document", Value = ss };
+
+                        // Add a Pages attribute to denote the range of pages in this document
+                        ss = new SpatialStringClass();
+                        ss.CreateNonSpatialString(range, sourceDocName);
+                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
+                        resultingAttributes.Add(documentAttribute);
+
+                        // Add input page attributes that are in this range
+                        if (inputPageAttributes != null)
+                        {
+                            for (int i = firstPageInRange - 1;
+                                i < lastPageInRange && i < inputPageAttributes.Count; i++)
+                            {
+                                documentAttribute.SubAttributes.PushBack(inputPageAttributes[i]);
+                            }
+                        }
+
+                        // Set up next page range
+                        firstPageInRange = nextPageNumber;
+                    }
+                }
+
+                return resultingAttributes;
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40158");
             }
         }
 

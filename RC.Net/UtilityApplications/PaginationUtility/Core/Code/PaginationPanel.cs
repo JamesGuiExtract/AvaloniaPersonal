@@ -1,4 +1,6 @@
-﻿using Extract.Imaging;
+﻿using ADODB;
+using Extract.AttributeFinder;
+using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -7,10 +9,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using UCLID_RASTERANDOCRMGMTLib;
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -20,6 +25,15 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// </summary>
     public partial class PaginationPanel : UserControl, IPaginationUtility, IImageViewerControl
     {
+        #region Constants
+
+        /// <summary>
+        /// Text to use for otherwise empty Document attribute values in pagination hierarchy
+        /// </summary>
+        private static readonly string _DOCUMENT_PLACEHOLDER_TEXT = "N/A";
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -438,6 +452,33 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether to output expected pagination attributes
+        /// </summary>
+        public bool OutputExpectedPaginationAttributesFile
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the expected pagination attributes path.
+        /// </summary>
+        public string ExpectedPaginationAttributesPath
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the file processing database.
+        /// </summary>
+        public UCLID_FILEPROCESSINGLib.FileProcessingDB FileProcessingDB
+        {
+            get;
+            set;
         }
 
         #endregion Properties
@@ -892,6 +933,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     ApplyOrderOfLoadedSourceDocuments();
                 });
+
+                // Output expected voa if so configured
+                if (OutputExpectedPaginationAttributesFile)
+                {
+                    var pathTags = new SourceDocumentPathTags(fileName);
+                    var outputFileName = pathTags.Expand(ExpectedPaginationAttributesPath);
+                    WriteExpectedAttributes(fileName, outputFileName);
+                }
 
                 return position;
             }
@@ -1943,5 +1992,124 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Private Members
+
+        #region Static Methods
+
+        /// <summary>
+        /// Creates the expected attributes.
+        /// </summary>
+        /// <param name="sourceDocName">Path of the source image file</param>
+        /// <param name="outputFileName">Path to write the expected attributes to</param>
+        private void WriteExpectedAttributes(string sourceDocName, string outputFileName)
+        {
+            try
+            {
+                // Select records for the file only if the file was not created as a result of pagination
+                string query = string.Format(CultureInfo.CurrentCulture,
+                    @"SELECT [Pages],[SourcePage],[DestFileID],[DestPage],[FileTaskSessionID] " +
+                     "FROM [FAMFile] LEFT OUTER JOIN [Pagination] " +
+                     "ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
+                     "WHERE [FileName] = '{0}' " +
+                     "AND [FamFile].[ID] NOT IN (SELECT [DestFileID] FROM [Pagination])",
+                     sourceDocName.Replace("'", "''"));
+
+                var records = GetResultsForQuery(query).Rows.Cast<DataRow>();
+
+                if (!records.Any())
+                {
+                    return;
+                }
+
+                var documents = new List<string>();
+                var lastSession = records.Max(r => r["FileTaskSessionID"] as int?);
+
+                // If no pagination occurred, then the expected data should be a single document for
+                // the entire range
+                if (lastSession == null)
+                {
+                    int numberOfPages = (int)records.First()["Pages"];
+                    documents.Add(Enumerable.Range(1, numberOfPages).ToRangeString());
+                }
+                // Otherwise, output one document for each destination file
+                else
+                {
+                    var outputDocuments = records
+                        .Where(r => r["FileTaskSessionID"] as int? == lastSession
+                            && r["DestPage"] as int? != null)
+                        .OrderBy(r => (int)r["DestPage"])
+                        .GroupBy(r => r["DestFileID"] as int?,
+                                 r => (int)r["SourcePage"]);
+
+                    foreach (var documentPages in outputDocuments)
+                    {
+                        documents.Add(documentPages.ToRangeString());
+                    }
+                }
+
+                // Create the hierarchy
+                documents.Select(pages =>
+                    {
+                        var ss = new SpatialStringClass();
+                        ss.CreateNonSpatialString(_DOCUMENT_PLACEHOLDER_TEXT, sourceDocName);
+                        var documentAttribute = new ComAttribute { Name = "Document", Value = ss };
+
+                        // Add a Pages attribute to denote the range of pages in this document
+                        ss = new SpatialStringClass();
+                        ss.CreateNonSpatialString(pages, sourceDocName);
+                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
+                        return documentAttribute;
+                    })
+                    .SaveToIUnknownVector(outputFileName);
+
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40159");
+            }
+        }
+
+
+        /// <summary>
+        /// Gets the results for the specified query from <see cref="FileProcessingDB"/>.
+        /// <para><b>NOTE</b></para>
+        /// The caller is responsible for disposing of the returned <see cref="DataTable"/>.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>A <see cref="DataTable"/> with the results of the specified query.</returns>
+        private DataTable GetResultsForQuery(string query)
+        {
+            DataTable queryResults = new DataTable();
+            queryResults.Locale = CultureInfo.CurrentCulture;
+            Recordset adoRecordset = null;
+
+            try
+            {
+                // Populate all pre-defined search terms from the database's FieldSearch table.
+                adoRecordset = FileProcessingDB.GetResultsForQuery(query);
+
+                // Convert the ADODB Recordset to a DataTable.
+                using (var adapter = new System.Data.OleDb.OleDbDataAdapter())
+                {
+                    adapter.Fill(queryResults, adoRecordset);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40160");
+            }
+            finally
+            {
+                // If the recordset is not currently closed, close it. Some queries that do not
+                // produce results will potentially result in a recordset that is closed right away.
+                if (adoRecordset != null && adoRecordset.State != 0)
+                {
+                    adoRecordset.Close();
+                }
+            }
+
+            return queryResults;
+        }
+
+        #endregion Static Methods
     }
 }

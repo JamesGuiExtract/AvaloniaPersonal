@@ -2,6 +2,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -15,6 +16,16 @@ namespace Extract.AttributeFinder
     [CLSCompliant(false)]
     public static class AttributeMethods
     {
+        #region Constants
+
+        /// <summary>
+        /// A string representation of the GUID for <see cref="AttributeStorageManagerClass"/> 
+        /// </summary>
+        static readonly string _ATTRIBUTE_STORAGE_MANAGER_GUID =
+            typeof(AttributeStorageManagerClass).GUID.ToString("B");
+
+        #endregion Constants
+
         #region Public Methods
 
         /// <summary>
@@ -161,6 +172,25 @@ namespace Extract.AttributeFinder
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39708");
+            }
+        }
+
+        /// <summary>
+        /// Converts <see paramref="enumerable" /> into an <see cref="IIUnknownVector" /> and
+        /// saves it to <see paramref="fileName" /> using <see cref="AttributeStorageManagerClass" />
+        /// </summary>
+        /// <param name="enumerable">The <see cref="IEnumerable{ComAttribute}" /> to convert.</param>
+        /// <param name="fileName">Full path of the file to be saved.</param>
+        [CLSCompliant(false)]
+        public static void SaveToIUnknownVector(this IEnumerable<ComAttribute> enumerable, string fileName)
+        {
+            try
+            {
+                enumerable.ToIUnknownVector().SaveTo(fileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI40167", ex);
             }
         }
 

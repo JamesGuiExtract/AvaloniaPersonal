@@ -67,6 +67,8 @@ namespace Extract.FileActionManager.Forms
 
                 _outputPathPathTags.PathTags = outputPathTags;
 
+                _expectedPaginationAttributesPathTagButton.PathTags = new FileActionManagerPathTags();
+
                 Settings = settings;
                 _fileProcessingDB = fileProcessingDB;
             }
@@ -125,6 +127,12 @@ namespace Extract.FileActionManager.Forms
                 _sourceActionComboBox.Text = Settings.PaginationSourceAction;
                 _outputActionComboBox.Text = Settings.PaginationOutputAction;
                 _outputPriorityComboBox.SelectEnumValue<EFilePriority>(Settings.PaginatedOutputPriority);
+                _expectedPaginationAttributesCheckBox.Checked = Settings.OutputExpectedPaginationAttributesFiles;
+                _expectedPaginationAttributesTextBox.Text = Settings.ExpectedPaginationAttributesOutputPath;
+                _expectedPaginationAttributesTextBox.Enabled
+                    = _expectedPaginationAttributesBrowseButton.Enabled
+                    = _expectedPaginationAttributesPathTagButton.Enabled
+                    = _expectedPaginationAttributesCheckBox.Checked;
             }
             catch (Exception ex)
             {
@@ -150,12 +158,24 @@ namespace Extract.FileActionManager.Forms
                     _sourceActionComboBox.Text,
                     _outputPathTextBox.Text,
                     _outputActionComboBox.Text,
-                    _outputPriorityComboBox.ToEnumValue<EFilePriority>());
+                    _outputPriorityComboBox.ToEnumValue<EFilePriority>(),
+                    _expectedPaginationAttributesCheckBox.Checked,
+                    _expectedPaginationAttributesTextBox.Text);
 
                 if (string.IsNullOrWhiteSpace(_outputPathTextBox.Text))
                 {
                     UtilityMethods.ShowMessageBox(
                         "The pagination output path must be specified.",
+                        "Invalid configuration", true);
+
+                    return;
+                }
+
+                if (_expectedPaginationAttributesCheckBox.Checked
+                    && string.IsNullOrWhiteSpace(_expectedPaginationAttributesTextBox.Text))
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "The expected pagination VOA output path must be specified.",
                         "Invalid configuration", true);
 
                     return;
@@ -195,6 +215,27 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
+        /// <summary>
+        /// Handles the CheckedChanged event of the _expectedPaginationAttributesCheckBox control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleExpectedPaginationAttributesCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _expectedPaginationAttributesTextBox.Enabled
+                    = _expectedPaginationAttributesBrowseButton.Enabled
+                    = _expectedPaginationAttributesPathTagButton.Enabled
+                    = _expectedPaginationAttributesCheckBox.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40193");
+            }
+        }
+
         #endregion Event Handlers
+
     }
 }

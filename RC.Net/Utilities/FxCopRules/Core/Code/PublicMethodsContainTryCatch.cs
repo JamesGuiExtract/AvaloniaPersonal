@@ -1,5 +1,6 @@
 using Microsoft.FxCop.Sdk;
 using System;
+using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Text;
@@ -80,10 +81,10 @@ namespace Extract.Utilities.FxCopRules
             if (MethodRequiresTryCatch(method))
             {
                 // Get the instructions collection
-                InstructionCollection instructions = method.Instructions;
+                var instructions = method.Instructions.Where(inst => inst.OpCode != OpCode.Nop);
 
                 // Ignore small methods (less than 20 instructions)
-                if (instructions.Count < 20)
+                if (instructions.Count() < 20)
                 {
                     return this.Problems;
                 }
@@ -126,8 +127,10 @@ namespace Extract.Utilities.FxCopRules
                 return false;
             }
 
+            string methodName = method.Name.Name;
+
             // Only public methods require try catch
-            if (!method.IsPublic)
+            if (!method.IsPublic && !methodName.StartsWith("Handle", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -139,7 +142,6 @@ namespace Extract.Utilities.FxCopRules
             }
 
             // Skip methods that shouldn't throw exceptions.
-            string methodName = method.Name.Name;
             if (!MethodShouldThrow(methodName))
             {
                 return false;

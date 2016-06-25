@@ -185,6 +185,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this.Controls.Add(this._fileBrowseButton);
             this.Controls.Add(this._configFileNameTextBox);
             this.Controls.Add(this._label1);
+            this.MinimumSize = new System.Drawing.Size(511, 227);
             this.Name = "ConfigurationForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

@@ -747,6 +747,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (_paginationPanel != null)
                 {
                     _paginationPanel.ImageViewer = _imageViewer;
+                    _paginationPanel.OutputExpectedPaginationAttributesFile =
+                        _settings.PaginationSettings.OutputExpectedPaginationAttributesFiles;
+                    _paginationPanel.FileProcessingDB = FileProcessingDB;
                 }
 
                 _invoker = new ControlInvoker(this);
@@ -3256,6 +3259,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                                 EActionStatus.kActionPending, false, true, out oldStatus);
                         }
                     }
+
                 }
 
                 if (completeActiveFile)

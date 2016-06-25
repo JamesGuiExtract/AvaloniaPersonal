@@ -54,6 +54,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                 _outputPathPathTags.PathTags = outputPathTags;
 
+                _expectedPaginationAttributesPathTagButton.PathTags = new FileActionManagerPathTags();
+
                 Settings = settings;
                 _fileProcessingDB = fileProcessingDB;
             }
@@ -109,6 +111,12 @@ namespace Extract.FileActionManager.FileProcessors
                 _sourceActionComboBox.Text = Settings.SourceAction;
                 _outputActionComboBox.Text = Settings.OutputAction;
                 _documentDataAssemblyTextBox.Text = Settings.DocumentDataPanelAssembly;
+                _expectedPaginationAttributesCheckBox.Checked = Settings.OutputExpectedPaginationAttributesFiles;
+                _expectedPaginationAttributesTextBox.Text = Settings.ExpectedPaginationAttributesOutputPath;
+                _expectedPaginationAttributesTextBox.Enabled
+                    = _expectedPaginationAttributesBrowseButton.Enabled
+                    = _expectedPaginationAttributesPathTagButton.Enabled
+                    = _expectedPaginationAttributesCheckBox.Checked;
             }
             catch (Exception ex)
             {
@@ -143,6 +151,8 @@ namespace Extract.FileActionManager.FileProcessors
                 Settings.OutputPath = _outputPathTextBox.Text;
                 Settings.OutputAction = _outputActionComboBox.Text;
                 Settings.DocumentDataPanelAssembly = _documentDataAssemblyTextBox.Text;
+                Settings.OutputExpectedPaginationAttributesFiles = _expectedPaginationAttributesCheckBox.Checked;
+                Settings.ExpectedPaginationAttributesOutputPath = _expectedPaginationAttributesTextBox.Text;
 
                 DialogResult = DialogResult.OK;
             }
@@ -173,6 +183,26 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40146");
+            }
+        }
+
+        /// <summary>
+        /// Handles the CheckedChanged event of the _expectedPaginationAttributesCheckBox control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void HandleExpectedPaginationAttributesCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _expectedPaginationAttributesTextBox.Enabled
+                    = _expectedPaginationAttributesBrowseButton.Enabled
+                    = _expectedPaginationAttributesPathTagButton.Enabled
+                    = _expectedPaginationAttributesCheckBox.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40194");
             }
         }
 
