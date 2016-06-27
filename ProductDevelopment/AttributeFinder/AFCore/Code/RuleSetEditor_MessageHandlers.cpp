@@ -719,6 +719,10 @@ BOOL CRuleSetEditor::OnInitDialog()
 			m_nMinWidth = rectDlg.Width();
 			m_nMinHeight = rectDlg.Height();
 
+			// Call resize so that status bar gets sized correctly
+			// https://extract.atlassian.net/browse/ISSUE-13474
+			doResize();
+
 			// Restore previous position if available
 			m_wMgr.RestoreWindowPosition();
 
