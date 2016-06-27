@@ -461,102 +461,170 @@ namespace Extract.FileActionManager.Utilities
                     _startThreads.WaitOne();
                 }
 
+                // Flag that will be set to true to indicate initialization completed, so the loop
+                // to create the process will retry
+                bool processInitialized;
+
                 // Run FAMProcesses in a loop respawning them if needed
                 do
                 {
-                    // Create the FAM process
-                    famProcess = new FileProcessingManagerProcessClass();
-                    processID = famProcess.ProcessID;
-                    process = Process.GetProcessById(processID);
-
-                    // Provide the service authentication
-                    famProcess.AuthenticateService(LicenseUtilities.GetMapLabelValue(new MapLabel()));
-
-                    // Set the FPS file name
-                    fpsFileName = arguments.FpsFileName;
-                    famProcess.FPSFile = fpsFileName;
-
-                    // Check if authentication is required
-                    if (famProcess.AuthenticationRequired)
+                    processInitialized = false;
+                    try
                     {
-                        // Mutex around incrementing _threadsThatRequireAuthentication
-                        lock (_lock)
+                        // Create the FAM process
+                        famProcess = new FileProcessingManagerProcessClass();
+                        processID = famProcess.ProcessID;
+                        process = Process.GetProcessById(processID);
+
+                        // Provide the service authentication
+                        famProcess.AuthenticateService(LicenseUtilities.GetMapLabelValue(new MapLabel()));
+
+                        // Set the FPS file name
+                        fpsFileName = arguments.FpsFileName;
+                        famProcess.FPSFile = fpsFileName;
+
+                        // Check if authentication is required
+                        if (famProcess.AuthenticationRequired)
                         {
-                            _threadsThatRequireAuthentication++;
+                            // Do not keep trying to start process since it requires authentication
+                            // which requires a configuration change
+                            processInitialized = true;
+
+                            // Mutex around incrementing _threadsThatRequireAuthentication
+                            lock (_lock)
+                            {
+                                _threadsThatRequireAuthentication++;
+                            }
+
+                            ExtractException ee = new ExtractException("ELI29208",
+                                "Authentication is required to launch this FPS file.");
+                            ee.AddDebugData("FPS File Name", fpsFileName, false);
+                            throw ee;
+                        }
+                        
+                        // [LegacyRCAndUtils:6389]
+                        // Check for whether the process wants to keep processing now rather than after
+                        // it is done with this batch of files, when it is not at risk of having been
+                        // shut down unexpectedly.
+                        keepProcessing = famProcess.KeepProcessingAsFilesAdded;
+                        
+                        // Everything should be initialized now
+                        processInitialized = true;
+
+                        // Log an exception if keepProcessing is not enabled since it is not a 
+                        // recommended setting when running fps file in a service
+                        // https://extract.atlassian.net/browse/ISSUE-2039
+                        if (!keepProcessing)
+                        {
+                            ExtractException keepProcessingEx = new ExtractException("ELI38370",
+                                "Application Trace: Inadvisable configuration -- It is not recommended to " +
+                                "configure a FPS file used by a service to stop processing once the queue is empty.");
+                            keepProcessingEx.AddDebugData("FPSFile", fpsFileName, false);
+                            keepProcessingEx.Log();
                         }
 
-                        ExtractException ee = new ExtractException("ELI29208",
-                            "Authentication is required to launch this FPS file.");
-                        ee.AddDebugData("FPS File Name", fpsFileName, false);
-                        throw ee;
-                    }
+                        // Ensure that processing has not been stopped before starting processing
+                        if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
+                        {
+                            // Start processing
+                            famProcess.Start(numberOfFilesToProcess);
 
-                    // [LegacyRCAndUtils:6389]
-                    // Check for whether the process wants to keep processing now rather than after
-                    // it is done with this batch of files, when it is not at risk of having been
-                    // shut down unexpectedly.
-                    keepProcessing = famProcess.KeepProcessingAsFilesAdded;
-                    
-                    // Log an exception if keepProcessing is not enabled since it is not a 
-                    // recommended setting when running fps file in a service
-                    // https://extract.atlassian.net/browse/ISSUE-2039
-                    if (!keepProcessing)
+                            ExtractException ee = new ExtractException("ELI29808",
+                                "Application trace: Started new FAM instance.");
+                            ee.AddDebugData("FPS Filename", fpsFileName, false);
+                            ee.AddDebugData("Process ID", processID, false);
+                            ee.AddDebugData("Number Of Files To Process", numberOfFilesToProcess, false);
+                            ee.Log();
+                        }
+
+                        // Wait until the process has exited, a stop is requested or processing has stopped
+                        ProcessWaitResult waitResult = new ProcessWaitResult();
+                        do
+                        {
+                            waitResult = WaitForProcessExitOrStopRequest(process, 2000);
+                        }
+                        while (waitResult == ProcessWaitResult.ProcessTimeOut && famProcess.IsRunning);
+
+                        // [LegacyRCAndUtils:6367]
+                        // If stop processing has been called, don't bother to check whether famProcess
+                        // has ended naturally because we already know we need the process to stop.
+                        if (waitResult == ProcessWaitResult.StopRequested)
+                        {
+                            break;
+                        }
+
+                        // [DotNetRCAndUtils:835]
+                        // Avoid calling ProcessShouldRestart when the FAM process is configured to keep
+                        // processing as files are added to ensure that processing does not stop.
+                        if (!keepProcessing)
+                        {
+                            // [LegacyRCAndUtils:6389]
+                            // Safely check the running process to see if it should be restarted.
+                            // If any exceptions are caught, they are logged rather than thrown to ensure
+                            // processing doesn't stop unexpectedly. If the FAMProcess was supposed to
+                            // stop because the queue was empty, this should not have any ill effects as
+                            // the queue will be empty and the new process will get another chance to
+                            // exit cleanly.
+                            keepProcessing = ProcessShouldRestart(famProcess, process, numberOfFilesToProcess, fpsFileName);
+                        }
+
+                        // Safely close the running process (any exceptions logged rather than thrown).
+                        CloseProcess(ref famProcess, ref process);
+                    }
+                    catch (Exception ex)
                     {
-                        ExtractException keepProcessingEx = new ExtractException("ELI38370",
-                            "Application Trace: Inadvisable configuration -- It is not recommended to " +
-                            "configure a FPS file used by a service to stop processing once the queue is empty.");
-                        keepProcessingEx.AddDebugData("FPSFile", fpsFileName, false);
-                        keepProcessingEx.Log();
+                        if (ex.Message.Contains("The remote procedure call failed") ||
+                            ex.Message.Contains("The RPC server is unavailable."))
+                        {
+                            ExtractException ee = new ExtractException("ELI29823",
+                                "Unable to communicate with the underlying FAM process.", ex);
+                            ee.Log();
+                        }
+                        else
+                        {
+                            // Just log any exceptions from the process threads
+                            ExtractException.Log("ELI28498", ex);
+                        }
                     }
-
-                    // Ensure that processing has not been stopped before starting processing
-                    if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
+                    finally
                     {
-                        // Start processing
-                        famProcess.Start(numberOfFilesToProcess);
+                        if (process != null)
+                        {
+                            // Wrap in a try/catch and log to ensure no exceptions thrown
+                            // from the finally block.
+                            try
+                            {
+                                // Ensure stop has been called on the fam process
+                                if (!process.HasExited && famProcess != null && famProcess.IsRunning)
+                                {
+                                    famProcess.Stop();
+                                }
 
-                        ExtractException ee = new ExtractException("ELI29808",
-                            "Application trace: Started new FAM instance.");
-                        ee.AddDebugData("FPS Filename", fpsFileName, false);
-                        ee.AddDebugData("Process ID", processID, false);
-                        ee.AddDebugData("Number Of Files To Process", numberOfFilesToProcess, false);
-                        ee.Log();
+                                // Wait for the famprocess to stop
+                                while (!process.HasExited && famProcess != null && famProcess.IsRunning)
+                                {
+                                    Thread.Sleep(1000);
+                                }
+
+                                // [DNRCAU #876] 
+                                // Release the COM object so the FAMProcess.exe is cleaned up
+                                Marshal.FinalReleaseComObject(famProcess);
+
+                                // Perform a GC to force the object to clean up
+                                GC.Collect();
+                                GC.WaitForPendingFinalizers();
+                            }
+                            catch (Exception ex)
+                            {
+                                ExtractException.Log("ELI28505", ex);
+                            }
+                            finally
+                            {
+                                WaitForProcessToExitAndDispose(ref process, fpsFileName);
+                                famProcess = null;
+                            }
+                        }
                     }
-
-                    // Wait until the process has exited, a stop is requested or processing has stopped
-                    ProcessWaitResult waitResult = new ProcessWaitResult();
-                    do
-                    {
-                        waitResult = WaitForProcessExitOrStopRequest(process, 2000);
-                    }
-                    while (waitResult == ProcessWaitResult.ProcessTimeOut && famProcess.IsRunning);
-
-                    // [LegacyRCAndUtils:6367]
-                    // If stop processing has been called, don't bother to check whether famProcess
-                    // has ended naturally because we already know we need the process to stop.
-                    if (waitResult == ProcessWaitResult.StopRequested)
-                    {
-                        break;
-                    }
-
-                    // [DotNetRCAndUtils:835]
-                    // Avoid calling ProcessShouldRestart when the FAM process is configured to keep
-                    // processing as files are added to ensure that processing does not stop.
-                    if (!keepProcessing)
-                    {
-                        // [LegacyRCAndUtils:6389]
-                        // Safely check the running process to see if it should be restarted.
-                        // If any exceptions are caught, they are logged rather than thrown to ensure
-                        // processing doesn't stop unexpectedly. If the FAMProcess was supposed to
-                        // stop because the queue was empty, this should not have any ill effects as
-                        // the queue will be empty and the new process will get another chance to
-                        // exit cleanly.
-                        keepProcessing = ProcessShouldRestart(famProcess, process, numberOfFilesToProcess, fpsFileName);
-                    }
-
-                    // Safely close the running process (any exceptions logged rather than thrown).
-                    CloseProcess(ref famProcess, ref process);
-                    
 					// Log Application trace to show that the FAM instance is stopped
                     ExtractException eeClosed = 
                         new ExtractException("ELI39764", "Application Trace: FAM instance has stopped.");
@@ -565,62 +633,15 @@ namespace Extract.FileActionManager.Utilities
                     eeClosed.AddDebugData("Number Of Files To Process", numberOfFilesToProcess, false);
                     eeClosed.Log();
                 }
-                while (keepProcessing && _stopProcessing != null && !_stopProcessing.WaitOne(0));
+                while ((keepProcessing || !processInitialized) && _stopProcessing != null && !_stopProcessing.WaitOne(0));
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("The remote procedure call failed") ||
-                    ex.Message.Contains("The RPC server is unavailable."))
-                {
-                    ExtractException ee = new ExtractException("ELI29823",
-                        "Unable to communicate with the underlying FAM process.", ex);
-                    ee.Log();
-                }
-                else
-                {
-                    // Just log any exceptions from the process threads
-                    ExtractException.Log("ELI28498", ex);
-                }
+                // Just log any exceptions from the process threads
+                ExtractException.Log("ELI40192", ex);
             }
             finally
             {
-                if (process != null)
-                {
-                    // Wrap in a try/catch and log to ensure no exceptions thrown
-                    // from the finally block.
-                    try
-                    {
-                        // Ensure stop has been called on the fam process
-                        if (!process.HasExited && famProcess != null && famProcess.IsRunning)
-                        {
-                            famProcess.Stop();
-                        }
-
-                        // Wait for the famprocess to stop
-                        while (!process.HasExited && famProcess != null && famProcess.IsRunning)
-                        {
-                            Thread.Sleep(1000);
-                        }
-
-                        // [DNRCAU #876] 
-                        // Release the COM object so the FAMProcess.exe is cleaned up
-                        Marshal.FinalReleaseComObject(famProcess);
-
-                        // Perform a GC to force the object to clean up
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-                    }
-                    catch (Exception ex)
-                    {
-                        ExtractException.Log("ELI28505", ex);
-                    }
-                    finally
-                    {
-                        WaitForProcessToExitAndDispose(ref process, fpsFileName);
-                        famProcess = null;
-                    }
-                }
-
                 // [DotNetRCAndUtils:695]
                 // Stop will require the ProcessFiles thread to lock _lock, so don't call Stop from
                 // within the lock; Only check if we should stop within the lock.
