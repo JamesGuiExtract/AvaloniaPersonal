@@ -406,17 +406,19 @@ namespace Extract.LabResultsCustomComponents
         /// This should only be called as the last step before adding this list to the final
         /// order grouping collection.
         /// </summary>
-        internal void AddOfficialNameAndTestCode(OrderMappingDBCache dbCache)
+        internal void AddOfficialNameAndTestCode(OrderMappingDBCache dbCache,
+            bool addESNamesAttribute,
+            bool addESTestCodesAttribute,
+            bool setFuzzyType)
         {
-            // Only perform mapping if the LabOrder has been set (this group may be
-            // an unknown order)
-            if (_labOrder != null)
+            foreach (LabTest test in _labTests)
             {
-                //foreach (IAttribute attribute in tests)
-                foreach (LabTest test in _labTests)
-                {
-                    IAttribute attribute = test.Attribute;
+                IAttribute attribute = test.Attribute;
 
+                // Only perform mapping if the LabOrder has been set (this group may be
+                // an unknown order)
+                if (_labOrder != null)
+                {
                     // Create the official name subattribute
                     IAttribute officialName = new AttributeClass();
                     officialName.Name = "OfficialName";
@@ -437,17 +439,41 @@ namespace Extract.LabResultsCustomComponents
                     attribute.SubAttributes.PushBack(testCode);
 
                     // Create the ESName subattribute
-                    HashSet<string> esNames;
-                    if (dbCache.TryGetESNames(test.TestCode, out esNames))
+                    if (addESNamesAttribute)
                     {
-                        IAttribute esNamesAttribute = new AttributeClass();
-                        esNamesAttribute.Name = "ESNames";
-                        esNamesAttribute.Value.CreateNonSpatialString
-                            (String.Join(";", esNames), attribute.Value.SourceDocName);
+                        HashSet<string> esNames;
+                        if (dbCache.TryGetESNames(test.TestCode, out esNames))
+                        {
+                            IAttribute esNamesAttribute = new AttributeClass();
+                            esNamesAttribute.Name = "ESNames";
+                            esNamesAttribute.Value.CreateNonSpatialString
+                                (String.Join(";", esNames), attribute.Value.SourceDocName);
 
-                        // Add the ESName subattribute
-                        attribute.SubAttributes.PushBack(esNamesAttribute);
+                            // Add the ESName subattribute
+                            attribute.SubAttributes.PushBack(esNamesAttribute);
+                        }
                     }
+
+                }
+
+                if (addESTestCodesAttribute)
+                {
+                    var esTestCodes = dbCache.GetESTestCodesForName(test.Name);
+                    if (esTestCodes.Any())
+                    {
+                        IAttribute esCodesAttribute = new AttributeClass();
+                        esCodesAttribute.Name = "ESTestCodes";
+                        esCodesAttribute.Value.CreateNonSpatialString
+                            (String.Join(";", esTestCodes), attribute.Value.SourceDocName);
+
+                        // Add the ESTestCodes subattribute
+                        attribute.SubAttributes.PushBack(esCodesAttribute);
+                    }
+                }
+
+                if (setFuzzyType && test.FuzzyMatch)
+                {
+                    attribute.Type = "Fuzzy";
                 }
             }
         }

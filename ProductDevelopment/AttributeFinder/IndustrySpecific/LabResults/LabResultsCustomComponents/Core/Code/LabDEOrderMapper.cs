@@ -59,6 +59,28 @@ namespace Extract.LabResultsCustomComponents
         /// Gets whether to prefer orders with codes matching known, outstanding order codes
         /// </summary>
         bool UseOutstandingOrders { get; set; }
+
+        /// <summary>
+        /// Whether to skip second pass of the order mapping algorithm
+        /// </summary>
+        bool SkipSecondPass { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether add an ESNames attribute to mapped components
+        /// </summary>
+        bool AddESNamesAttribute { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to add an ESTestCodes attribute to components
+        /// to show all mappings that were available
+        /// </summary>
+        bool AddESTestCodesAttribute { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether set type of components to Fuzzy if they were mapped using a fuzzy
+        /// regex pattern
+        /// </summary>
+        bool SetFuzzyType { get; set; }
     }
 
     /// <summary>
@@ -88,8 +110,9 @@ namespace Extract.LabResultsCustomComponents
         /// Added support for eliminating duplicate subattributes after mapping.
         /// Version 4: Added requirements are optional setting.
         /// Changed default values of RequireMandatoryTests and EliminateDuplicateTestSubattributes to true
+        /// Version 5: Added SkipSecondPass, AddESNamesAttribute, AddESTestCodesAttribute and SetFuzzyType options
         /// </summary>
-        static readonly int _CURRENT_VERSION = 4;
+        static readonly int _CURRENT_VERSION = 5;
 
         /// <summary>
         /// A couple algorithms used in the order mapper to find the best combinations of objects
@@ -240,6 +263,28 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         bool _eliminateDuplicateTestSubAttributes = true;
 
+        /// <summary>
+        /// Whether to skip second pass of the order mapping algorithm
+        /// </summary>
+        bool _skipSecondPass = false;
+
+        /// <summary>
+        /// Gets or sets whether add an ESNames attribute to mapped components
+        /// </summary>
+        private bool _addESNamesAttribute;
+
+        /// <summary>
+        /// Gets or sets whether to add an ESTestCodes attribute to components
+        /// to show all mappings that were available
+        /// </summary>
+        private bool _addESTestCodesAttribute;
+
+        /// <summary>
+        /// Gets or sets whether set type of components to Fuzzy if they were mapped using a fuzzy
+        /// regex pattern
+        /// </summary>
+        private bool _setFuzzyType;
+
         #endregion Fields
 
         #region Constructors
@@ -251,12 +296,16 @@ namespace Extract.LabResultsCustomComponents
         /// Initializes a new instance of the <see cref="LabDEOrderMapper"/> class.
         /// </summary>
         public LabDEOrderMapper()
-            : this(null, true, true, false, true, true)
+            : this(databaseFile: null, requireMandatory: true,
+                useFilledRequirement: true, useOutstandingOrders: false,
+                requirementsAreOptional: true, eliminateDuplicateTestSubAttributes: true,
+                skipSecondPass: false, addESNamesAttribute: true, addESTestCodesAttribute: false,
+                setFuzzyType: false)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LabDEOrderMapper"/> class.
+        /// Initializes a new instance of the <see cref="LabDEOrderMapper" /> class.
         /// </summary>
         /// <param name="databaseFile">The name of the database file to attach to.</param>
         /// <param name="requireMandatory">Whether or not mandatory tests are required
@@ -268,13 +317,23 @@ namespace Extract.LabResultsCustomComponents
         /// in order to increase the number of mapped result components</param>
         /// <param name="eliminateDuplicateTestSubAttributes">Whether to remove any duplicate Test
         /// subattributes after the mapping is finished. (Prevents lots of extra ResultDate attributes, e.g.)</param>
+        /// <param name="skipSecondPass">Whether to skip the second pass of the order mapping algorithm</param>
+        /// <param name="addESNamesAttribute">Whether add an ESNames attribute to mapped components</param>
+        /// <param name="addESTestCodesAttribute">Whether to add an ESTestCodes attribute to components to show
+        /// all mappings that were available</param>
+        /// <param name="setFuzzyType">Whether set type of components to Fuzzy if they were mapped using a fuzzy
+        /// regex pattern</param>
         public LabDEOrderMapper(
             string databaseFile,
             bool requireMandatory,
             bool useFilledRequirement,
             bool useOutstandingOrders,
             bool requirementsAreOptional,
-            bool eliminateDuplicateTestSubAttributes)
+            bool eliminateDuplicateTestSubAttributes,
+            bool skipSecondPass,
+            bool addESNamesAttribute,
+            bool addESTestCodesAttribute,
+            bool setFuzzyType)
         {
             try
             {
@@ -285,6 +344,10 @@ namespace Extract.LabResultsCustomComponents
                 _useOutstandingOrders = useOutstandingOrders;
                 _requirementsAreOptional = requirementsAreOptional;
                 _eliminateDuplicateTestSubAttributes = eliminateDuplicateTestSubAttributes;
+                SkipSecondPass = skipSecondPass;
+                AddESNamesAttribute = addESNamesAttribute;
+                AddESTestCodesAttribute = addESTestCodesAttribute;
+                SetFuzzyType = setFuzzyType;
                 _dirty = true;
             }
             catch (Exception ex)
@@ -444,6 +507,84 @@ namespace Extract.LabResultsCustomComponents
             }
         }
 
+        /// <summary>
+        /// Whether to skip second pass of the order mapping algorithm
+        /// </summary>
+        public bool SkipSecondPass
+        {
+            get
+            {
+                return _skipSecondPass;
+            }
+            set
+            {
+                if (value != _skipSecondPass)
+                {
+                    _skipSecondPass = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether add an ESNames attribute to mapped components
+        /// </summary>
+        public bool AddESNamesAttribute
+        {
+            get
+            {
+                return _addESNamesAttribute;
+            }
+            set
+            {
+                if (value != _addESNamesAttribute)
+                {
+                    _addESNamesAttribute = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether to add an ESTestCodes attribute to components to show all mappings
+        /// that were available
+        /// </summary>
+        public bool AddESTestCodesAttribute
+        {
+            get
+            {
+                return _addESTestCodesAttribute;
+            }
+            set
+            {
+                if (value != _addESTestCodesAttribute)
+                {
+                    _addESTestCodesAttribute = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether set type of components to Fuzzy if they were mapped using a fuzzy
+        /// regex pattern
+        /// </summary>
+        public bool SetFuzzyType
+        {
+            get
+            {
+                return _setFuzzyType;
+            }
+            set
+            {
+                if (value != _setFuzzyType)
+                {
+                    _setFuzzyType = value;
+                    _dirty = true;
+                }
+            }
+        }
+
         #endregion Properties
 
         #region IOutputHandler Members
@@ -500,7 +641,7 @@ namespace Extract.LabResultsCustomComponents
 
                     // Perform order mapping on the list of test attributes
                     IEnumerable<IAttribute> mappedAttributes = MapOrders(testAttributes, dbCache,
-                        requireMandatory, useFilledRequirement, _useOutstandingOrders, _requirementsAreOptional);
+                        requireMandatory, useFilledRequirement);
 
                     // Create an attribute sorter for sorting sub attributes
                     ISortCompare attributeSorter =
@@ -569,7 +710,9 @@ namespace Extract.LabResultsCustomComponents
             {
                 LabDEOrderMapper newMapper = new LabDEOrderMapper(_databaseFile, _requireMandatory,
                     _useFilledRequirement, _useOutstandingOrders, _requirementsAreOptional,
-                    _eliminateDuplicateTestSubAttributes);
+                    _eliminateDuplicateTestSubAttributes, _skipSecondPass, _addESNamesAttribute,
+                    _addESTestCodesAttribute, _setFuzzyType
+                    );
 
                 return newMapper;
             }
@@ -620,6 +763,10 @@ namespace Extract.LabResultsCustomComponents
                 _useOutstandingOrders = orderMapper.UseOutstandingOrders;
                 _requirementsAreOptional = orderMapper._requirementsAreOptional;
                 _eliminateDuplicateTestSubAttributes = orderMapper.EliminateDuplicateTestSubAttributes;
+                SkipSecondPass = orderMapper.SkipSecondPass;
+                AddESNamesAttribute = orderMapper.AddESNamesAttribute;
+                AddESTestCodesAttribute = orderMapper.AddESTestCodesAttribute;
+                SetFuzzyType = orderMapper.SetFuzzyType;
             }
             catch (Exception ex)
             {
@@ -734,6 +881,14 @@ namespace Extract.LabResultsCustomComponents
                     {
                         _requirementsAreOptional = false;
                     }
+
+                    if (reader.Version >= 5)
+                    {
+                        SkipSecondPass = reader.ReadBoolean();
+                        AddESNamesAttribute = reader.ReadBoolean();
+                        AddESTestCodesAttribute = reader.ReadBoolean();
+                        SetFuzzyType = reader.ReadBoolean();
+                    }
                 }
 
                 // False since a new object was just loaded
@@ -763,6 +918,10 @@ namespace Extract.LabResultsCustomComponents
                     writer.Write(_useOutstandingOrders);
                     writer.Write(_eliminateDuplicateTestSubAttributes);
                     writer.Write(_requirementsAreOptional);
+                    writer.Write(SkipSecondPass);
+                    writer.Write(AddESNamesAttribute);
+                    writer.Write(AddESTestCodesAttribute);
+                    writer.Write(SetFuzzyType);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -818,7 +977,9 @@ namespace Extract.LabResultsCustomComponents
                 using (LabDEOrderMapperConfigurationForm configureForm =
                     new LabDEOrderMapperConfigurationForm(_databaseFile, _requireMandatory,
                         _useFilledRequirement, _useOutstandingOrders,
-                        _requirementsAreOptional, _eliminateDuplicateTestSubAttributes))
+                        _requirementsAreOptional, _eliminateDuplicateTestSubAttributes,
+                        _skipSecondPass, _addESNamesAttribute, _addESTestCodesAttribute,
+                        _setFuzzyType))
                 {
                     // If the user clicked OK then set fields
                     if (configureForm.ShowDialog() == DialogResult.OK)
@@ -829,6 +990,10 @@ namespace Extract.LabResultsCustomComponents
                         _useOutstandingOrders = configureForm.UseOutstandingOrders;
                         _requirementsAreOptional = configureForm.RequirementsAreOptional;
                         _eliminateDuplicateTestSubAttributes = configureForm.EliminateDuplicateTestSubAttributes;
+                        SkipSecondPass = configureForm.SkipSecondPass;
+                        AddESNamesAttribute = configureForm.AddESNamesAttribute;
+                        AddESTestCodesAttribute = configureForm.AddESTestCodesAttribute;
+                        SetFuzzyType = configureForm.SetFuzzyType;
 
                         _dirty = true;
 
@@ -957,12 +1122,8 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="requireMandatory">Whether or not mandatory tests are required
         /// in the second pass of the order mapping algorithm.</param>
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
-        /// <param name="useOutstandingOrders">Whether to prefer orders that match known,
-        /// outstanding order code attributes.</param>
-        /// <param name="requirementsAreOptional">Whether filled/mandatory requirements can be
-        /// disregarded in order to increase the number of mapped tests.</param>
-        static IEnumerable<IAttribute> MapOrders(List<IAttribute> tests, OrderMappingDBCache dbCache,
-            bool requireMandatory, bool useFilledRequirement, bool useOutstandingOrders, bool requirementsAreOptional)
+        IEnumerable<IAttribute> MapOrders(List<IAttribute> tests, OrderMappingDBCache dbCache,
+            bool requireMandatory, bool useFilledRequirement)
         {
             // If there are no tests then just return the input
             if (tests.Count == 0)
@@ -979,15 +1140,24 @@ namespace Extract.LabResultsCustomComponents
 
             // Perform the first pass
             var firstPassResult = FirstPassGrouping(
-                tests, dbCache, labOrders, sourceDocName, useFilledRequirement, useOutstandingOrders);
+                tests, dbCache, labOrders, sourceDocName, useFilledRequirement, _useOutstandingOrders, !_skipSecondPass);
+
+            if (_skipSecondPass)
+            {
+                return firstPassResult.Select(g =>
+                    {
+                        g.AddOfficialNameAndTestCode(dbCache, AddESNamesAttribute, AddESTestCodesAttribute, SetFuzzyType);
+                        return g.Attribute;
+                    });
+            }
 
             // Limit to outstanding orders if useOutstandingOrders and there actually are any outstanding orders
-            bool limitToOutstandingOrders = useOutstandingOrders ?
+            bool limitToOutstandingOrders = _useOutstandingOrders ?
                 firstPassResult.Any(g => g.OutstandingOrderCodes.Any()) : false;
 
             // Perform the second pass
             var secondPassResult = GetFinalGrouping(firstPassResult, dbCache, labOrders,
-               requireMandatory, useFilledRequirement, requirementsAreOptional, limitToOutstandingOrders);
+               requireMandatory, useFilledRequirement, _requirementsAreOptional, limitToOutstandingOrders);
 
             // If first attempt was trying to limit to outstanding orders,
             // try unknown orders again without limiting
@@ -1012,7 +1182,7 @@ namespace Extract.LabResultsCustomComponents
                             unknown, dbCache, labOrders, sourceDocName, useFilledRequirement, false);
 
                     secondPassResult = GetFinalGrouping(firstPassResult, dbCache, labOrders,
-                            requireMandatory, useFilledRequirement, requirementsAreOptional, false);
+                            requireMandatory, useFilledRequirement, _requirementsAreOptional, false);
 
                     // Return the final groupings
                     return known.Concat(secondPassResult.Item1.Concat(secondPassResult.Item2));
@@ -1033,6 +1203,8 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="sourceDocName">The sourcedoc name to use in the grouping.</param>
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
         /// <param name="limitToOutstandingOrders">Whether to limit orders to be considered based
+        /// <param name="separateUnknownTests">Whether to separate unknown tests into one Unknown
+        /// Order per test or to leave in groups (zero or one per Test hierarchy).</param>
         /// on known, outstanding order codes.</param>
         /// <returns>
         /// A tuple representing the first order mapping pass as a list of mapped groups and a list
@@ -1044,7 +1216,8 @@ namespace Extract.LabResultsCustomComponents
             Dictionary<string, LabOrder> labOrders,
             string sourceDocName,
             bool useFilledRequirement,
-            bool limitToOutstandingOrders)
+            bool limitToOutstandingOrders,
+            bool separateUnknownTests = true)
         {
             var firstPassMapping = new List<OrderGrouping>();
 
@@ -1092,6 +1265,8 @@ namespace Extract.LabResultsCustomComponents
 
                 if (components != null && components.Count > 0)
                 {
+                    List<LabTest> unknownOrderTests = null;
+
                     // All attributes are unmatched at this point
                     List<LabTest> unmatchedTests = BuildTestList(components);
                     while (unmatchedTests.Count > 0)
@@ -1105,16 +1280,48 @@ namespace Extract.LabResultsCustomComponents
                         if (!labOrders.TryGetValue(matchedOrder.Key, out labOrder))
                         {
                             labOrder = null;
+                            var orderGroup = new OrderGrouping(null, matchedOrder.Value,
+                                limitToOutstandingOrders, sourceDocName, nonComponents);
+
+                            if (unknownOrderTests == null)
+                            {
+                                unknownOrderTests = matchedOrder.Value;
+                            }
+                            else
+                            {
+                                unknownOrderTests.AddRange(matchedOrder.Value);
+                            }
                         }
+                        else
+                        {
+                            var orderGroup = new OrderGrouping(labOrder, matchedOrder.Value,
+                                limitToOutstandingOrders, sourceDocName, nonComponents);
 
-                        var orderGroup = new OrderGrouping(labOrder, matchedOrder.Value,
-                            limitToOutstandingOrders, sourceDocName, nonComponents);
-
-                        firstPassMapping.Add(orderGroup);
+                            firstPassMapping.Add(orderGroup);
+                        }
 
                         // Update the unmatched test list by removing the now matched tests
                         var matchedAttributes = new HashSet<IAttribute>(matchedOrder.Value.Select(test => test.Attribute));
                         unmatchedTests = unmatchedTests.Where(test => !matchedAttributes.Contains(test.Attribute)).ToList();
+                    }
+                    if (unknownOrderTests != null)
+                    {
+                        if (separateUnknownTests)
+                        {
+                            foreach (var test in unknownOrderTests)
+                            {
+                                var testList = new List<LabTest>(1) {test};
+                                var orderGroup = new OrderGrouping(null, testList,
+                                    limitToOutstandingOrders, sourceDocName, nonComponents);
+                                firstPassMapping.Add(orderGroup);
+                            }
+                        }
+                        else
+                        {
+                            var orderGroup = new OrderGrouping(null, unknownOrderTests,
+                                limitToOutstandingOrders, sourceDocName, nonComponents);
+                            firstPassMapping.Add(orderGroup);
+                        }
                     }
                 }
             }
@@ -1144,7 +1351,7 @@ namespace Extract.LabResultsCustomComponents
         /// A tuple representing the second order mapping pass as a list of mapped groups and a list
         /// of unmapped groups.
         /// </returns>
-        static Tuple<List<IAttribute>, List<IAttribute>> GetFinalGrouping(
+        Tuple<List<IAttribute>, List<IAttribute>> GetFinalGrouping(
             IEnumerable<OrderGrouping> firstPassGrouping,
             OrderMappingDBCache dbCache,
             Dictionary<string, LabOrder> labOrders,
@@ -1208,13 +1415,13 @@ namespace Extract.LabResultsCustomComponents
             var finalGrouping = Tuple.Create(new List<IAttribute>(), new List<IAttribute>());
             foreach (OrderGrouping orderGroup in bestGroups)
             {
+                // Add subattributes for the official name and test code
+                orderGroup.AddOfficialNameAndTestCode(dbCache, AddESNamesAttribute, AddESTestCodesAttribute, SetFuzzyType);
+
                 // Add the mapped group to the final grouping
                 if (orderGroup.LabOrder != null)
                 {
                     finalGrouping.Item1.Add(orderGroup.Attribute);
-
-                    // Add subattributes for the official name and test code
-                    orderGroup.AddOfficialNameAndTestCode(dbCache);
                 }
                 else
                 {

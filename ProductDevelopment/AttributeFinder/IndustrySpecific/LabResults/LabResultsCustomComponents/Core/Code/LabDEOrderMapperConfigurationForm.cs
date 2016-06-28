@@ -24,7 +24,12 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Initializes a new instance of the <see cref="LabDEOrderMapperConfigurationForm"/> class.
         /// </summary>
-        public LabDEOrderMapperConfigurationForm() : this(null, false, true, false, true, true)
+        public LabDEOrderMapperConfigurationForm()
+            : this(databaseFile: null, requireMandatoryTests: false,
+                useFilledRequirement: true, useOutstandingOrders: false,
+                requirementsAreOptional: true, eliminateDuplicateTestSubAttributes: true,
+                skipSecondPass: false, addESNamesAttribute: true, addESTestCodesAttribute: false,
+                setFuzzyType: false)
         {
         }
 
@@ -43,9 +48,19 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="requirementsAreOptional">Whether filled/mandatory requirements can be disregarded if necessary</param>
         /// <param name="eliminateDuplicateTestSubAttributes">Whether to eliminate duplicate Test
         /// subattributes after mapping is finished.</param>
+        /// <param name="skipSecondPass">Whether to skip the second pass of the mapping algorithm</param>
+        /// <param name="addESNamesAttribute">Whether add an ESName attribute to mapped components</param>
+        /// <param name="addESTestCodesAttribute">Whether to add an ESTestCodes attribute to components to show
+        /// all mappings that were available</param>
+        /// <param name="setFuzzyType">Whether set type of components to Fuzzy if they were mapped using a fuzzy
+        /// regex pattern</param>
         public LabDEOrderMapperConfigurationForm(string databaseFile, bool requireMandatoryTests,
             bool useFilledRequirement, bool useOutstandingOrders,
-            bool requirementsAreOptional, bool eliminateDuplicateTestSubAttributes)
+            bool requirementsAreOptional, bool eliminateDuplicateTestSubAttributes,
+            bool skipSecondPass,
+            bool addESNamesAttribute,
+            bool addESTestCodesAttribute,
+            bool setFuzzyType)
         {
             try
             {
@@ -58,6 +73,10 @@ namespace Extract.LabResultsCustomComponents
                 _checkUseOutstandingOrders.Checked = useOutstandingOrders;
                 _checkRequirementsAreOptional.Checked = requirementsAreOptional;
                 _checkEliminateDuplicateTestSubAttributes.Checked = eliminateDuplicateTestSubAttributes;
+                _checkSkipSecondPass.Checked = skipSecondPass;
+                _checkAddESNamesAttribute.Checked = addESNamesAttribute;
+                _checkAddESTestCodesAttribute.Checked = addESTestCodesAttribute;
+                _checkSetFuzzyType.Checked = setFuzzyType;
                 SetEnabledStates();
             }
             catch (Exception ex)
@@ -134,6 +153,52 @@ namespace Extract.LabResultsCustomComponents
             }
         }
 
+        /// <summary>
+        /// Whether to skip second pass of the order mapping algorithm
+        /// </summary>
+        public bool SkipSecondPass
+        {
+            get
+            {
+                return _checkSkipSecondPass.Checked;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether add an ESName attribute to mapped components
+        /// </summary>
+        public bool AddESNamesAttribute
+        {
+            get
+            {
+                return _checkAddESNamesAttribute.Checked;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether to add an ESTestCodes attribute to components to show all mappings
+        /// that were available
+        /// </summary>
+        public bool AddESTestCodesAttribute
+        {
+            get
+            {
+                return _checkAddESTestCodesAttribute.Checked;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether set type of components to Fuzzy if they were mapped using a fuzzy
+        /// regex pattern
+        /// </summary>
+        public bool SetFuzzyType
+        {
+            get
+            {
+                return _checkSetFuzzyType.Checked;
+            }
+        }
+
         #endregion Properties
 
         #region Event Handlers
@@ -154,26 +219,6 @@ namespace Extract.LabResultsCustomComponents
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39144");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        private void HandlePathTagsButtonSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                // Set the selected text based on the tag
-                _textDatabaseFile.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI26199", ex);
             }
         }
 

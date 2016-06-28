@@ -338,6 +338,36 @@ namespace Extract.LabResultsCustomComponents
             }
         }
 
+        /// <summary>
+        /// Gets the ES test codes for a test name/AKA
+        /// </summary>
+        /// <remarks>Used to add ESTestCodes subattributes for debugging purposes</remarks>
+        /// <param name="testName">The test name/AKA</param>
+        /// <returns>A collection of ES test codes for the test name/AKA</returns>
+        public IEnumerable<string> GetESTestCodesForName(string testName)
+        {
+            try
+            {
+                HashSet<Tuple<string, int>> esTestCodes;
+                if (_normalizedNameToESTestCodes.TryGetValue(_getNormalizedName(testName), out esTestCodes)
+                    && esTestCodes.Count > 0)
+                {
+                    return esTestCodes
+                        .OrderByDescending(p => p.Item2)
+                        .Select(p => p.Item1)
+                        .Distinct();
+                }
+                else
+                {
+                    return Enumerable.Empty<string>();
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40199");
+            }
+        }
+
         #endregion Public Methods
 
         #region Private Methods

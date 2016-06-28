@@ -51,6 +51,24 @@ namespace Extract.AttributeFinder.Rules
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets whether to run an output handler on resulting trees.
+        /// </summary>
+        public bool RunOutputHandler
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the output handler to run on resulting trees
+        /// </summary>
+        public IOutputHandler OutputHandler
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
