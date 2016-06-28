@@ -32,6 +32,10 @@ namespace Extract.Utilities.Forms
         /// </summary>
         bool _settingText;
 
+        bool _required;
+
+        bool _useSystemPasswordChar;
+
         #endregion Fields
 
         #region Constructors
@@ -56,8 +60,19 @@ namespace Extract.Utilities.Forms
         [DefaultValue(false)]
         public bool Required
         {
-            get;
-            set;
+            get
+            {
+                return _required;
+            }
+            set
+            {
+                if (value != _required)
+                {
+                    _required = value;
+
+                    UpdateRequiredMarker(hasFocus: Focused);
+                }
+            }
         }
 
         /// <summary>
@@ -198,7 +213,12 @@ namespace Extract.Utilities.Forms
             {
                 base.OnLeave(e);
 
-                UpdateRequiredMarker(hasFocus: false);
+                // BeginInvoke allows tab navigation out of password field
+                // https://extract.atlassian.net/browse/ISSUE-13824
+                BeginInvoke((MethodInvoker)delegate
+                {
+                    UpdateRequiredMarker(hasFocus: false);
+                });
             }
             catch (Exception ex)
             {
@@ -225,6 +245,24 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="Control.EnabledChanged" /> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+        protected override void OnEnabledChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnEnabledChanged(e);
+
+                UpdateRequiredMarker(hasFocus: Focused);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40197");
+            }
+        }
+
         #endregion Overrides
 
         #region Private Members
@@ -239,7 +277,7 @@ namespace Extract.Utilities.Forms
         /// focus state.</param>
         void UpdateRequiredMarker(bool hasFocus)
         {
-            if (_updatingMarker)
+            if (_updatingMarker || !IsHandleCreated)
             {
                 return;
             }
@@ -250,11 +288,22 @@ namespace Extract.Utilities.Forms
 
                 if (!hasFocus && Enabled && Required && string.IsNullOrWhiteSpace(base.Text))
                 {
+                    if (UseSystemPasswordChar)
+                    {
+                        _useSystemPasswordChar = true;
+                        UseSystemPasswordChar = false;
+                    }
+
                     this.SetRequiredMarker();
                 }
                 else
                 {
                     this.RemoveRequiredMarker();
+
+                    if (_useSystemPasswordChar)
+                    {
+                        UseSystemPasswordChar = true;
+                    }
                 }
             }
             catch (Exception ex)

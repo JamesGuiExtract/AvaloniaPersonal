@@ -840,4 +840,56 @@ namespace Extract.Utilities
             }
         }
     }
+
+    /// <summary>
+    /// Class to subscribe to events for debugging purposes
+    /// http://stackoverflow.com/a/701831
+    /// </summary>
+    public class EventSubscriber
+    {
+        private static readonly MethodInfo HandleMethod = 
+            typeof(EventSubscriber)
+                .GetMethod("HandleEvent", 
+                           BindingFlags.Instance | 
+                           BindingFlags.NonPublic);
+
+        private readonly EventInfo evt;
+
+        private EventSubscriber(EventInfo evt)
+        {
+            this.evt = evt;
+        }
+
+        private void HandleEvent(object sender, EventArgs args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.CurrentCulture,"Event {0} fired", evt.Name));
+        }
+
+        private void Subscribe(object target)
+        {
+            Delegate handler = Delegate.CreateDelegate(
+                evt.EventHandlerType, this, HandleMethod);
+            evt.AddEventHandler(target, handler);
+        }
+
+        /// <summary>
+        /// Subscribes to all events
+        /// </summary>
+        /// <param name="target">The target.</param>
+        public static void SubscribeAll(object target)
+        {
+            try
+            {
+                foreach (EventInfo evt in target.GetType().GetEvents())
+                {
+                    EventSubscriber subscriber = new EventSubscriber(evt);
+                    subscriber.Subscribe(target);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI40198");
+            }
+        }
+    }
 }

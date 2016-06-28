@@ -42,12 +42,7 @@ namespace Extract.Utilities.Email
                 // checkbox control background is transparent, and I can't find any way to make it opaque!
                 _groupBox1.Text = "                                    ";
 
-                SmtpServerNameError(String.Empty);
-                SmtpPortError(String.Empty);
-                AuthenticationUserNameError(String.Empty);
-                AuthenticationPasswordError(String.Empty);
-                SenderNameError(String.Empty);
-                SenderEmailAddressError(String.Empty);
+                ClearErrors();
 
                 _textSmtpServer.SetErrorGlyphPosition(_emailSettingsControlErrorProvider);
                 _textPort.SetErrorGlyphPosition(_emailSettingsControlErrorProvider);
@@ -266,28 +261,13 @@ namespace Extract.Utilities.Email
         /// <param name="enabled">if set to <c>true</c> [enabled].</param>
         void SetAllControlsEnabledState(bool enabled)
         {
-            _textSmtpServer.Enabled = enabled;
-            _textPort.Enabled = enabled;
-            _textSenderName.Enabled = enabled;
-            _textSenderEmail.Enabled = enabled;
-
-            if (_checkRequireAuthentication.Checked)
+            foreach (var control in this.GetAllControls()
+                .Where(c => c != this && c != _enableEmailSettingsCheckBox && c != _groupBox1))
             {
-                _checkRequireAuthentication.Enabled = enabled;
-                _textUserName.Enabled = enabled;
-                _textPassword.Enabled = enabled;
-                _checkUseSsl.Enabled = enabled;
-                if (enabled)
-                {
-                    _textUserName.SetRequiredMarker();
-                    _textPassword.SetRequiredMarker();
-                }
-                else
-                {
-                    _textUserName.RemoveRequiredMarker();
-                    _textPassword.RemoveRequiredMarker();
-                }
+                control.Enabled = enabled;
             }
+
+            UpdateAuthenticationEnabledStates();
         }
 
         /// <summary>
@@ -491,7 +471,7 @@ namespace Extract.Utilities.Email
                 settings.Server = _textSmtpServer.TextValue();
                 settings.Port = _textPort.Int32Value;
 
-                // There is legacy code that uses the presence or absense of a username setting to
+                // There is legacy code that uses the presence or absence of a username setting to
                 // determine whether authentication is required rather than persisting a separate
                 // boolean.
                 settings.UserName = _checkRequireAuthentication.Checked ? _textUserName.TextValue() : "";
@@ -562,142 +542,9 @@ namespace Extract.Utilities.Email
             }
         }
 
-        /// <summary>
-        /// Updates the required markers.
-        /// </summary>
-        /// <param name="displayMarkers">if set to <c>true</c> display markers, otherwise remove markers.</param>
-        void UpdateRequiredMarkers(bool displayMarkers)
-        {
-            if (true == displayMarkers)
-            {
-                if (String.IsNullOrWhiteSpace(_textSmtpServer.Text))
-                {
-                    _textSmtpServer.SetRequiredMarker();
-                }
-
-                if (String.IsNullOrWhiteSpace(_textSenderName.Text))
-                {
-                    _textSenderName.SetRequiredMarker();
-                }
-
-                if (String.IsNullOrWhiteSpace(_textSenderEmail.Text))
-                {
-                    _textSenderEmail.SetRequiredMarker();
-                }
-            }
-            else
-            {
-                if (_textSmtpServer.EmptyOrRequiredMarkerIsSet())
-                {
-                    _textSmtpServer.RemoveRequiredMarker();
-                }
-
-                if (_textSenderName.EmptyOrRequiredMarkerIsSet())
-                {
-                    _textSenderName.RemoveRequiredMarker();
-                }
-
-                if (_textSenderEmail.EmptyOrRequiredMarkerIsSet())
-                {
-                    _textSenderEmail.RemoveRequiredMarker();
-                }
-            }
-        }
-
-        /// <summary>
-        /// On load method, sets required markers on the form
-        /// </summary>
-        public void DoLoad()
-        {
-            try
-            {
-                if (!_enableEmailSettingsCheckBox.Checked)
-                {
-                    return;
-                }
-
-                UpdateRequiredMarkers(displayMarkers: true);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39214");
-            }
-        }
-
         #endregion Methods
 
         #region Event Handlers
-
-        /// <summary>
-        /// Handles the OnLoad event to mark text fields as required. Note that this event is triggered
-        /// from the property page when teh Email tab is selected.
-        /// </summary>
-        private void HandleOnLoad(object sender, EventArgs e)
-        {
-            try
-            {
-                DoLoad();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39208");
-            }
-        }
-
-        /// <summary>
-        /// Handles (focus) enter event, to remove the required field marker while user is entering text.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void HandleFocusEnter(object sender, EventArgs e)
-        {
-            try
-            {
-                var textbox = (TextBox)sender;
-                if (textbox.IsRequiredMarkerSet())
-                {
-                    textbox.RemoveRequiredMarker();
-
-                    if (textbox == _textPassword)
-                    {
-                        // Re-enable password chars for input - disabled previously to set required marker
-                        // as a plain-text string (not password chars).
-                        _textPassword.UseSystemPasswordChar = true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39206");
-            }
-        }
-
-        /// <summary>
-        /// Handles the leave (focus) event to mark the field as required iff no other text exists in the field.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void HandleFocusLeave(object sender, EventArgs e)
-        {
-            try
-            {
-                var textbox = (TextBox)sender;
-                var text = textbox.Text;
-                if (String.IsNullOrWhiteSpace(text))
-                {
-                    if (textbox == _textPassword)
-                    {
-                        _textPassword.UseSystemPasswordChar = false;
-                    }   
-                 
-                    textbox.SetRequiredMarker();
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39207");
-            }
-        }
 
         /// <summary>
         /// Handles the text box text changed.
@@ -709,8 +556,7 @@ namespace Extract.Utilities.Email
         {
             try
             {
-                UpdateEnabledStates();
-
+                OnSettingsChanged();
                 TextBox textbox = (TextBox)sender;
                 textbox.SetError(_emailSettingsControlErrorProvider, String.Empty);
 
@@ -738,35 +584,9 @@ namespace Extract.Utilities.Email
         {
             try
             {
-                UpdateEnabledStates();
+                UpdateAuthenticationEnabledStates();
 
-                if (_checkRequireAuthentication.Checked)
-                {
-                    if (String.IsNullOrWhiteSpace(_textUserName.Text))
-                    {
-                        _textUserName.SetRequiredMarker();
-                    }
-
-                    // Turn off password chars to set cue so that it won't be shown as dots...
-                    if (String.IsNullOrWhiteSpace(_textPassword.Text))
-                    {
-                        _textPassword.UseSystemPasswordChar = false;
-                        _textPassword.SetRequiredMarker();
-                    }
-                }
-                else
-                {
-                    if (_textUserName.EmptyOrRequiredMarkerIsSet())
-                    {
-                        _textUserName.RemoveRequiredMarker();
-                    }
-
-                    if (_textPassword.EmptyOrRequiredMarkerIsSet())
-                    {
-                        _textPassword.UseSystemPasswordChar = true;
-                        _textPassword.RemoveRequiredMarker();
-                    }
-                }
+                OnSettingsChanged();
             }
             catch (Exception ex)
             {
@@ -784,7 +604,12 @@ namespace Extract.Utilities.Email
             try
             {
                 SetAllControlsEnabledState(_enableEmailSettingsCheckBox.Checked);
-                UpdateRequiredMarkers(_enableEmailSettingsCheckBox.Checked);
+
+                // Clear error glyphs if option is off
+                if (!_enableEmailSettingsCheckBox.Checked)
+                {
+                    ClearErrors();
+                }
             }
             catch (Exception ex)
             {
@@ -797,16 +622,15 @@ namespace Extract.Utilities.Email
         #region Private Members
 
         /// <summary>
-        /// Updates the enables state of all controls
+        /// Updates the enables state of authentication controls
         /// </summary>
-        void UpdateEnabledStates()
+        void UpdateAuthenticationEnabledStates()
         {
-            bool enableUserAndPass = _checkRequireAuthentication.Checked;
+            bool enableUserAndPass = _checkRequireAuthentication.Checked
+                && _checkRequireAuthentication.Enabled;
             _textUserName.Enabled = enableUserAndPass;
             _textPassword.Enabled = enableUserAndPass;
             _checkUseSsl.Enabled = enableUserAndPass;
-
-            OnSettingsChanged();
         }
 
         /// <summary>
@@ -819,6 +643,19 @@ namespace Extract.Utilities.Email
             {
                 eventHandler(this, new EventArgs());
             }
+        }
+
+        /// <summary>
+        /// Clears the errors from all controls
+        /// </summary>
+        private void ClearErrors()
+        {
+            SmtpServerNameError(String.Empty);
+            SmtpPortError(String.Empty);
+            AuthenticationUserNameError(String.Empty);
+            AuthenticationPasswordError(String.Empty);
+            SenderNameError(String.Empty);
+            SenderEmailAddressError(String.Empty);
         }
 
         #endregion Private Members

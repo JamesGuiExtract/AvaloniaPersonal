@@ -64,7 +64,6 @@ namespace Extract.Utilities.Email
                 Icon = Resources.EmailSettings;
 
                 _emailSettingsControl.LoadSettings(_settings);
-                _emailSettingsControl.DoLoad();
             }
             catch (Exception ex)
             {

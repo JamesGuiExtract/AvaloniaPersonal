@@ -38,14 +38,14 @@
             System.Windows.Forms.Label label4;
             System.Windows.Forms.Label label3;
             this._textEmailSignature = new System.Windows.Forms.TextBox();
-            this._textSenderEmail = new System.Windows.Forms.TextBox();
-            this._textSenderName = new System.Windows.Forms.TextBox();
+            this._textSenderEmail = new Extract.Utilities.Forms.BetterTextBox();
+            this._textSenderName = new Extract.Utilities.Forms.BetterTextBox();
             this._groupBox1 = new System.Windows.Forms.GroupBox();
             this._textPort = new Extract.Utilities.Forms.NumericEntryTextBox();
-            this._textUserName = new System.Windows.Forms.TextBox();
-            this._textSmtpServer = new System.Windows.Forms.TextBox();
+            this._textUserName = new Extract.Utilities.Forms.BetterTextBox();
+            this._textSmtpServer = new Extract.Utilities.Forms.BetterTextBox();
             this._checkUseSsl = new System.Windows.Forms.CheckBox();
-            this._textPassword = new System.Windows.Forms.TextBox();
+            this._textPassword = new Extract.Utilities.Forms.BetterTextBox();
             this._checkRequireAuthentication = new System.Windows.Forms.CheckBox();
             this._enableEmailSettingsCheckBox = new System.Windows.Forms.CheckBox();
             this._emailSettingsControlErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
@@ -121,8 +121,7 @@
             this._textSenderEmail.Size = new System.Drawing.Size(226, 20);
             this._textSenderEmail.TabIndex = 1;
             this._textSenderEmail.TextChanged += new System.EventHandler(this.HandleTextBoxTextChanged);
-            this._textSenderEmail.Enter += new System.EventHandler(this.HandleFocusEnter);
-            this._textSenderEmail.Leave += new System.EventHandler(this.HandleFocusLeave);
+            this._textSenderEmail.Required = true;
             // 
             // _textSenderName
             // 
@@ -134,8 +133,7 @@
             this._textSenderName.Size = new System.Drawing.Size(226, 20);
             this._textSenderName.TabIndex = 0;
             this._textSenderName.TextChanged += new System.EventHandler(this.HandleTextBoxTextChanged);
-            this._textSenderName.Enter += new System.EventHandler(this.HandleFocusEnter);
-            this._textSenderName.Leave += new System.EventHandler(this.HandleFocusLeave);
+            this._textSenderName.Required = true;
             // 
             // label2
             // 
@@ -230,8 +228,7 @@
             this._textUserName.Size = new System.Drawing.Size(184, 20);
             this._textUserName.TabIndex = 3;
             this._textUserName.TextChanged += new System.EventHandler(this.HandleTextBoxTextChanged);
-            this._textUserName.Enter += new System.EventHandler(this.HandleFocusEnter);
-            this._textUserName.Leave += new System.EventHandler(this.HandleFocusLeave);
+            this._textUserName.Required = true;
             // 
             // _textSmtpServer
             // 
@@ -243,8 +240,7 @@
             this._textSmtpServer.Size = new System.Drawing.Size(296, 20);
             this._textSmtpServer.TabIndex = 1;
             this._textSmtpServer.TextChanged += new System.EventHandler(this.HandleTextBoxTextChanged);
-            this._textSmtpServer.Enter += new System.EventHandler(this.HandleFocusEnter);
-            this._textSmtpServer.Leave += new System.EventHandler(this.HandleFocusLeave);
+            this._textSmtpServer.Required = true;
             // 
             // _checkUseSsl
             // 
@@ -269,8 +265,8 @@
             this._textPassword.TabIndex = 4;
             this._textPassword.UseSystemPasswordChar = true;
             this._textPassword.TextChanged += new System.EventHandler(this.HandleTextBoxTextChanged);
-            this._textPassword.Enter += new System.EventHandler(this.HandleFocusEnter);
-            this._textPassword.Leave += new System.EventHandler(this.HandleFocusLeave);
+            this._textPassword.Required = true;
+
             // 
             // _checkRequireAuthentication
             // 
@@ -307,7 +303,6 @@
             this.Controls.Add(this._groupBox1);
             this.Name = "EmailSettingsControl";
             this.Size = new System.Drawing.Size(363, 363);
-            this.Load += new System.EventHandler(this.HandleOnLoad);
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
             this._groupBox1.ResumeLayout(false);
@@ -320,13 +315,13 @@
         #endregion
 
         private System.Windows.Forms.TextBox _textEmailSignature;
-        private System.Windows.Forms.TextBox _textSenderEmail;
-        private System.Windows.Forms.TextBox _textSenderName;
+        private Extract.Utilities.Forms.BetterTextBox _textSenderEmail;
+        private Extract.Utilities.Forms.BetterTextBox _textSenderName;
         private Forms.NumericEntryTextBox _textPort;
-        private System.Windows.Forms.TextBox _textUserName;
-        private System.Windows.Forms.TextBox _textSmtpServer;
+        private Extract.Utilities.Forms.BetterTextBox _textUserName;
+        private Extract.Utilities.Forms.BetterTextBox _textSmtpServer;
         private System.Windows.Forms.CheckBox _checkUseSsl;
-        private System.Windows.Forms.TextBox _textPassword;
+        private Extract.Utilities.Forms.BetterTextBox _textPassword;
         private System.Windows.Forms.CheckBox _checkRequireAuthentication;
         private System.Windows.Forms.ErrorProvider _emailSettingsControlErrorProvider;
         private System.Windows.Forms.CheckBox _enableEmailSettingsCheckBox;

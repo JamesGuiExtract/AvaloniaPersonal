@@ -125,7 +125,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(254, 99);
+            label1.Location = new System.Drawing.Point(256, 99);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(35, 13);
             label1.TabIndex = 20;
@@ -431,7 +431,7 @@
             // 
             // _upDownInputEventHistory
             // 
-            this._upDownInputEventHistory.Location = new System.Drawing.Point(208, 97);
+            this._upDownInputEventHistory.Location = new System.Drawing.Point(210, 97);
             this._upDownInputEventHistory.Maximum = new decimal(new int[] {
             365,
             0,
