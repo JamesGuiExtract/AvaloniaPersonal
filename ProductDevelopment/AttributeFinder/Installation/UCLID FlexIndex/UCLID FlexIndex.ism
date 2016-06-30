@@ -1118,7 +1118,7 @@
 		<row><td>PATH_TO_COMPONENTDATA_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\ComponentData</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DOTNETGAC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\Help</td><td/><td>2</td></row>
-		<row><td>PATH_TO_ML_PACKAGES_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\AFCore\AFCoreTest\Code\packages</td><td/><td>2</td></row>
+		<row><td>PATH_TO_ML_PACKAGES_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\RC.Net\APIs</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMMON_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOREC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGSDKCO_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\NonSelfRegSDKComponents</td><td/><td>2</td></row>
