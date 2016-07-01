@@ -64,6 +64,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     _waitCursor = new TemporaryWaitCursor();
 
+                    _pageLayoutControl.SuspendLayout();
                     _pageLayoutControl._flowLayoutPanel.SuspendLayout();
 
                     _controlUpdateLock =
@@ -128,6 +129,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             _pageLayoutControl._inUpdateOperation = false;
                             _pageLayoutControl._flowLayoutPanel.ResumeLayout(true);
+                            _pageLayoutControl.ResumeLayout(true);
                             _pageLayoutControl.UpdateCommandStates();
                             _pageLayoutControl = null;
                         }
@@ -388,6 +390,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         ShortcutsManager _shortcuts;
 
+        /// <summary>
+        /// Prevents UI updates of this control.
+        /// </summary>
+        PageLayoutControlUpdateLock _updateLock = null;
+
+        /// <summary>
+        /// Indicates whether <see cref="UpdateCommandStates"/> has been invoked to execute on a
+        /// following windows message.
+        /// </summary>
+        bool _updateCommandStatesInvoked;
+
         #endregion Fields
 
         #region Constructors
@@ -480,18 +493,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Raised when the next input document should be loaded per explicit request from user.
         /// </summary>
         public event EventHandler<EventArgs> LoadNextDocumentRequest;
-
-        /// <summary>
-        /// Raised when a document is split into two via the addition of a
-        /// <see cref="PaginationSeparator"/>.
-        /// </summary>
-        public event EventHandler<DocumentSplitEventArgs> DocumentSplit;
-
-        /// <summary>
-        /// Raised when another document is merged into this one via the deletion of a
-        /// <see cref="PaginationSeparator"/>.
-        /// </summary>
-        public event EventHandler<DocumentsMergedEventArgs> DocumentsMerged;
 
         /// <summary>
         /// Raised when a new <see cref="IPaginationDocumentDataPanel"/> instance is needed to allow
@@ -668,6 +669,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
 
                         _enablePageDisplay = value;
+
+                        if (value)
+                        {
+                            var primaryPage = PrimarySelection as PageThumbnailControl;
+                            if (primaryPage != null)
+                            {
+                                primaryPage.DisplayPage(ImageViewer, true);
+                            }
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -707,6 +717,44 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value whether UI updates are currently suspended.
+        /// </summary>
+        /// <value><see langword="true"/> if UI updates suspended; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool UIUpdatesSuspended
+        {
+            get
+            {
+                return _updateLock != null;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value && _updateLock == null)
+                    {
+                        _updateLock = new PageLayoutControlUpdateLock(this);
+                        RemovePaginationControl(_loadNextDocumentButtonControl, false);
+                    }
+                    else if (!value && _updateLock != null)
+                    {
+                        AddPaginationControl(_loadNextDocumentButtonControl);
+                        _updateLock.Dispose();
+                        _updateLock = null;
+                        UpdateCommandStates();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40220");
+                }
+            }
+        }
+        
+
         #endregion Properties
 
         #region Methods
@@ -734,16 +782,17 @@ namespace Extract.UtilityApplications.PaginationUtility
             IEnumerable<int> pages, int position, bool insertSeparator)
         {
             bool removedLoadNextDocumentButton = false;
-            PageLayoutControlUpdateLock updateLock = null;
 
             try
             {
-                updateLock = new PageLayoutControlUpdateLock(this);
                 if (position == -1)
                 {
                     // While new pages are being added, remove the load next document control.
-                    RemovePaginationControl(_loadNextDocumentButtonControl, false);
-                    removedLoadNextDocumentButton = true;
+                    if (_flowLayoutPanel.Controls.Contains(_loadNextDocumentButtonControl))
+                    {
+                        RemovePaginationControl(_loadNextDocumentButtonControl, false);
+                        removedLoadNextDocumentButton = true;
+                    }
                 }
 
                 if (sourceDocument == null)
@@ -855,18 +904,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     ex.ExtractDisplay("ELI35624");
-                }
-
-                try
-                {
-                    if (updateLock != null)
-                    {
-                        updateLock.Dispose();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI40176");
                 }
             }
         }
@@ -1130,18 +1167,26 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var separator = control as PaginationSeparator;
                 if (separator != null)
                 {
+                    if (separator.DocumentDataPanel != null)
+                    {
+                        separator.CloseDataPanel(false);
+                    }
+
                     separator.DocumentDataPanelRequest -=
                         HandlePaginationSeparator_DocumentDataPanelRequest;
+                    separator.DocumentDataPanelClosed -=
+                        HandlePaginationSeparator_DocumentDataPanelClosed;
+                    separator.DocumentCollapsedChanged -=
+                        HandlePaginationSeparator_DocumentCollapsedChanged;
+                    separator.DocumentSelectedToCommitChanged -=
+                        HandlePaginationSeparator_DocumentSelectedChanged;
 
                     if (nextPageControl != null)
                     {
                         if (previousPageControl != null)
                         {
-                            OutputDocument oldDocument = nextPageControl.Document;
                             OutputDocument firstDocument = previousPageControl.Document;
                             MovePagesToDocument(firstDocument, nextPageControl);
-
-                            OnDocumentsMerged(firstDocument, oldDocument);
 
                             OnSelectionChanged();
                         }
@@ -1248,8 +1293,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         nextPageControl.Page.OriginalDocumentName);
 
                     MovePagesToDocument(newDocument, nextPageControl);
-
-                    OnDocumentSplit(previousPageControl.Document, newDocument);
                 }
 
                 OnSelectionChanged();
@@ -1387,8 +1430,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         additionalControls: selectedControls,
                         select: true,
                         modifierKeys: Keys.None);
-
-                    
                 }
             }
             catch (Exception ex)
@@ -1500,6 +1541,22 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Performs a full layout of this control
+        /// </summary>
+        public void PerformFullLayout()
+        {
+            try
+            {
+                _flowLayoutPanel.PerformLayout();
+                PerformLayout();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40221");
+            }
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -1578,55 +1635,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 Shortcuts[Keys.Escape] = ClearSelection;
 
-                Shortcuts[Keys.Tab] = HandleSelectNextPage;
-                Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
-                // [DotNetRCAndUtils:984]
-                // Don't allow the shift key to expand selection when used in conjunction with tab.
-                Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousPageNoShift;
-                Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = HandleSelectPreviousDocument;
-
-                Shortcuts[Keys.Left] = HandleSelectPreviousPage;
-                Shortcuts[Keys.Left | Keys.Control] = HandleSelectPreviousPage;
-                Shortcuts[Keys.Left | Keys.Shift] = HandleSelectPreviousPage;
-                Shortcuts[Keys.Left | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
-
-                Shortcuts[Keys.Right] = HandleSelectNextPage;
-                Shortcuts[Keys.Right | Keys.Control] = HandleSelectNextPage;
-                Shortcuts[Keys.Right | Keys.Shift] = HandleSelectNextPage;
-                Shortcuts[Keys.Right | Keys.Control | Keys.Shift] = HandleSelectNextPage;
-
-                Shortcuts[Keys.PageUp] = HandleSelectPreviousPage;
-                Shortcuts[Keys.PageUp | Keys.Control] = HandleSelectPreviousPage;
-                Shortcuts[Keys.PageUp | Keys.Shift] = HandleSelectPreviousPage;
-                Shortcuts[Keys.PageUp | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
-
-                Shortcuts[Keys.PageDown] = HandleSelectNextPage;
-                Shortcuts[Keys.PageDown | Keys.Control] = HandleSelectNextPage;
-                Shortcuts[Keys.PageDown | Keys.Shift] = HandleSelectNextPage;
-                Shortcuts[Keys.PageDown | Keys.Control | Keys.Shift] = HandleSelectNextPage;
-
-                Shortcuts[Keys.Up] = HandleSelectPreviousRowPage;
-                Shortcuts[Keys.Up | Keys.Control] = HandleSelectPreviousRowPage;
-                Shortcuts[Keys.Up | Keys.Shift] = HandleSelectPreviousRowPage;
-                Shortcuts[Keys.Up | Keys.Control | Keys.Shift] = HandleSelectPreviousRowPage;
-
-                Shortcuts[Keys.Down] = HandleSelectNextRowPage;
-                Shortcuts[Keys.Down | Keys.Control] = HandleSelectNextRowPage;
-                Shortcuts[Keys.Down | Keys.Shift] = HandleSelectNextRowPage;
-                Shortcuts[Keys.Down | Keys.Control | Keys.Shift] = HandleSelectNextRowPage;
-
-                Shortcuts[Keys.Home] = HandleSelectFirstPage;
-                Shortcuts[Keys.Home | Keys.Control] = HandleSelectFirstPage;
-                Shortcuts[Keys.Home | Keys.Shift] = HandleSelectFirstPage;
-                Shortcuts[Keys.Home | Keys.Control | Keys.Shift] = HandleSelectFirstPage;
-
-                Shortcuts[Keys.End] = HandleSelectLastPage;
-                Shortcuts[Keys.End | Keys.Control] = HandleSelectLastPage;
-                Shortcuts[Keys.End | Keys.Shift] = HandleSelectLastPage;
-                Shortcuts[Keys.End | Keys.Control | Keys.Shift] = HandleSelectLastPage;
-
-                Shortcuts[Keys.Oemcomma] = HandleSelectPreviousPage;
-                Shortcuts[Keys.OemPeriod] = HandleSelectNextPage;
+                EnableKeyboardNavigationOfPages(true);
 
                 // Clear shortcuts that don't apply to this application.
                 Shortcuts[Keys.O | Keys.Control] = null;
@@ -1665,6 +1674,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
+                    if (_updateLock != null)
+                    {
+                        _updateLock.Dispose();
+                        _updateLock = null;
+                    }
+
                     // Allows a much quick response to remove and dispose of the controls first
                     // rather than disposing with the controls still loaded.
                     PaginationControl[] controls = _flowLayoutPanel.Controls
@@ -1777,6 +1792,41 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.VisibleChanged"/> event of
+        /// <see cref="PageThumbnailControl"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleThumbnailControl_VisibleChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                var pageControl = (PageThumbnailControl)sender;
+                if (!pageControl.Visible && pageControl == _commandTargetControl)
+                {
+                    // If the selected page was collapsed, select the next visible page instead.
+                    this.SafeBeginInvoke("ELI40223", () =>
+                    {
+                        for (PaginationControl c = pageControl.NextControl; c != null; c = c.NextControl)
+                        {
+                            PageThumbnailControl nextPageControl = c as PageThumbnailControl;
+                            if (nextPageControl != null && nextPageControl.Visible)
+                            {
+                                ProcessControlSelection(nextPageControl);
+                                break;
+                            }
+                        }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40222");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.MouseMove"/> event of a <see cref="PaginationControl"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -1787,6 +1837,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var originControl = sender as PaginationControl;
+
+                // Do not allow drag events to start by dragging over a separator.
+                if (originControl is PaginationSeparator)
+                {
+                    return;
+                }
 
                 // Assigning a ToolTip instance for all page controls uses a lot of GDI handles.
                 // Instead, dynamically assign a single _toolTip instance the control the mouse is
@@ -1810,14 +1866,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // drag-and-drop operation.
                 if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
                 {
-                    
                     if (originControl != null && originControl != _loadNextDocumentButtonControl)
                     {
                         // Don't start a drag and drop operation unless the user has dragged out of
                         // the origin control to help prevent accidental drag/drops.
                         Point mouseLocation = PointToClient(Control.MousePosition);
-                        var currentControl =
-                            _flowLayoutPanel.GetChildAtPoint(mouseLocation) as PaginationControl;
+                        var currentControl = GetPaginationControlAtPoint(mouseLocation);
 
                         if (currentControl != null && currentControl != originControl)
                         {
@@ -1949,11 +2003,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 Point dragLocation = PointToClient(new Point(e.X, e.Y));
-                var control = _flowLayoutPanel
-                    .Controls
-                    .OfType<PageThumbnailControl>()
-                    .Where(c => c.Visible && c.Bounds.Contains(dragLocation))
-                    .FirstOrDefault();
+                var control = GetPaginationControlAtPoint(dragLocation);
 
                 if (control != null && control.Visible)
                 {
@@ -2174,8 +2224,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Whenever the context menu opens, use the current mouse position as the target of
                 // any context menu command rather than the active control.
                 Point mouseLocation = PointToClient(MousePosition);
-                _commandTargetControl =
-                    _flowLayoutPanel.GetChildAtPoint(mouseLocation) as PaginationControl;
+                _commandTargetControl = GetPaginationControlAtPoint(mouseLocation);
                 if (_commandTargetControl != null && !_commandTargetControl.Selected)
                 {
                     ProcessControlSelection(_commandTargetControl);
@@ -2394,10 +2443,69 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 OnDocumentDataPanelRequest(e);
+
+                EnableKeyboardNavigationOfPages(false);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40175");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationSeparator.DocumentDataPanelClosed"/> event of a
+        /// <see cref="PaginationSeparator"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DocumentDataPanelRequestEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandlePaginationSeparator_DocumentDataPanelClosed(object sender, EventArgs e)
+        {
+            try
+            {
+                EnableKeyboardNavigationOfPages(true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40229");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationSeparator.DocumentSelectedToCommitChanged"/> event of a
+        /// <see cref="PaginationSeparator"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePaginationSeparator_DocumentSelectedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateCommandStates();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40224");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationSeparator.DocumentCollapsedChanged"/> event of a
+        /// <see cref="PaginationSeparator"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePaginationSeparator_DocumentCollapsedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateCommandStates();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40219");
             }
         }
 
@@ -2558,11 +2666,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (isPageControl)
             {
                 control.DoubleClick += HandleThumbnailControl_DoubleClick;
+                control.VisibleChanged += new EventHandler(HandleThumbnailControl_VisibleChanged);
             }
             else if (asPaginationSeparator != null)
             {
                 asPaginationSeparator.DocumentDataPanelRequest +=
                     HandlePaginationSeparator_DocumentDataPanelRequest;
+                asPaginationSeparator.DocumentDataPanelClosed +=
+                    HandlePaginationSeparator_DocumentDataPanelClosed;
+                asPaginationSeparator.DocumentCollapsedChanged +=
+                    HandlePaginationSeparator_DocumentCollapsedChanged;
+                asPaginationSeparator.DocumentSelectedToCommitChanged +=
+                    HandlePaginationSeparator_DocumentSelectedChanged;
             }
 
             return true;
@@ -2737,7 +2852,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             var includedDocumentPages = new[] { activeControl }
                 .Union(additionalControls)
                 .OfType<PaginationSeparator>()
-                .SelectMany(c => (c.GetDocument() ?? new OutputDocument("")).PageControls);
+                .SelectMany(c => (c.Document ?? new OutputDocument("")).PageControls);
             var additionalControlSet = (additionalControls == null)
                 ? new HashSet<PaginationControl>()
                 : new HashSet<PaginationControl>(additionalControls.Concat(includedDocumentPages));
@@ -2780,25 +2895,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                 SetSelected(control, select, true);
             }
 
-            // Ensure all document pages are selected along with a document separator and
-            // vice-versa.
+            // Ensure all document pages are selected along with a document separator
             if (select)
             {
                 foreach (var separator in _flowLayoutPanel.Controls.OfType<PaginationSeparator>())
                 {
-                    var document = separator.GetDocument();
-                    if (document != null)
+                    if (separator.Document != null)
                     {
-                        if (!separator.Selected)
+                        if (separator.Selected)
                         {
-                            if (document.PageControls.All(c => c.Selected))
-                            {
-                                SelectControl(separator, select: true, resetLastSelected: true);
-                            }
-                        }
-                        else
-                        {
-                            foreach (var control in document.PageControls.Where(c => !c.Selected))
+                            foreach (var control in separator.Document.PageControls.
+                                Where(c => !c.Selected))
                             {
                                 SetSelected(control, select: true, resetLastSelected: true);
                             }
@@ -3102,6 +3209,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         internal void UpdateCommandStates()
         {
+            if (UIUpdatesSuspended)
+            {
+                return;
+            }
+
+            if (!_updateCommandStatesInvoked)
+            {
+                // Allow whatever else is occurring in the context of this event before proceeding
+                // with the update so that we can be sure we are update command states against the
+                // final control configuration.
+                _updateCommandStatesInvoked = true;
+                this.SafeBeginInvoke("ELI40225", () => UpdateCommandStates());
+
+                return;
+            }
+
+            _updateCommandStatesInvoked = false;
+
             int contextMenuControlIndex = (_commandTargetControl == null)
                 ? _flowLayoutPanel.Controls.Count
                 : _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
@@ -3205,6 +3330,117 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Enables or disables the keyboard navigation of pages.
+        /// </summary>
+        /// <param name="enableNavigation"><see langword="true"/> to allow keyboard navigation of
+        /// pages or <see langword="false"/> to prevent it.</param>
+        void EnableKeyboardNavigationOfPages(bool enableNavigation)
+        {
+            if (enableNavigation)
+            {
+                Shortcuts[Keys.Tab] = HandleSelectNextPage;
+                Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
+                // [DotNetRCAndUtils:984]
+                // Don't allow the shift key to expand selection when used in conjunction with tab.
+                Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousPageNoShift;
+                Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = HandleSelectPreviousDocument;
+
+                Shortcuts[Keys.Left] = HandleSelectPreviousPage;
+                Shortcuts[Keys.Left | Keys.Control] = HandleSelectPreviousPage;
+                Shortcuts[Keys.Left | Keys.Shift] = HandleSelectPreviousPage;
+                Shortcuts[Keys.Left | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
+
+                Shortcuts[Keys.Right] = HandleSelectNextPage;
+                Shortcuts[Keys.Right | Keys.Control] = HandleSelectNextPage;
+                Shortcuts[Keys.Right | Keys.Shift] = HandleSelectNextPage;
+                Shortcuts[Keys.Right | Keys.Control | Keys.Shift] = HandleSelectNextPage;
+
+                Shortcuts[Keys.PageUp] = HandleSelectPreviousPage;
+                Shortcuts[Keys.PageUp | Keys.Control] = HandleSelectPreviousPage;
+                Shortcuts[Keys.PageUp | Keys.Shift] = HandleSelectPreviousPage;
+                Shortcuts[Keys.PageUp | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
+
+                Shortcuts[Keys.PageDown] = HandleSelectNextPage;
+                Shortcuts[Keys.PageDown | Keys.Control] = HandleSelectNextPage;
+                Shortcuts[Keys.PageDown | Keys.Shift] = HandleSelectNextPage;
+                Shortcuts[Keys.PageDown | Keys.Control | Keys.Shift] = HandleSelectNextPage;
+
+                Shortcuts[Keys.Up] = HandleSelectPreviousRowPage;
+                Shortcuts[Keys.Up | Keys.Control] = HandleSelectPreviousRowPage;
+                Shortcuts[Keys.Up | Keys.Shift] = HandleSelectPreviousRowPage;
+                Shortcuts[Keys.Up | Keys.Control | Keys.Shift] = HandleSelectPreviousRowPage;
+
+                Shortcuts[Keys.Down] = HandleSelectNextRowPage;
+                Shortcuts[Keys.Down | Keys.Control] = HandleSelectNextRowPage;
+                Shortcuts[Keys.Down | Keys.Shift] = HandleSelectNextRowPage;
+                Shortcuts[Keys.Down | Keys.Control | Keys.Shift] = HandleSelectNextRowPage;
+
+                Shortcuts[Keys.Home] = HandleSelectFirstPage;
+                Shortcuts[Keys.Home | Keys.Control] = HandleSelectFirstPage;
+                Shortcuts[Keys.Home | Keys.Shift] = HandleSelectFirstPage;
+                Shortcuts[Keys.Home | Keys.Control | Keys.Shift] = HandleSelectFirstPage;
+
+                Shortcuts[Keys.End] = HandleSelectLastPage;
+                Shortcuts[Keys.End | Keys.Control] = HandleSelectLastPage;
+                Shortcuts[Keys.End | Keys.Shift] = HandleSelectLastPage;
+                Shortcuts[Keys.End | Keys.Control | Keys.Shift] = HandleSelectLastPage;
+
+                Shortcuts[Keys.Oemcomma] = HandleSelectPreviousPage;
+                Shortcuts[Keys.OemPeriod] = HandleSelectNextPage;
+            }
+            else
+            {
+                Shortcuts[Keys.Tab] = null;
+                Shortcuts[Keys.Tab | Keys.Control] = null;
+                Shortcuts[Keys.Tab | Keys.Shift] = null;
+                Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = null;
+
+                Shortcuts[Keys.Left] = null;
+                Shortcuts[Keys.Left | Keys.Control] = null;
+                Shortcuts[Keys.Left | Keys.Shift] = null;
+                Shortcuts[Keys.Left | Keys.Control | Keys.Shift] = null;
+
+                Shortcuts[Keys.Right] = null;
+                Shortcuts[Keys.Right | Keys.Control] = null;
+                Shortcuts[Keys.Right | Keys.Shift] = null;
+                Shortcuts[Keys.Right | Keys.Control | Keys.Shift] = null;
+
+                Shortcuts[Keys.PageUp] = null;
+                Shortcuts[Keys.PageUp | Keys.Control] = null;
+                Shortcuts[Keys.PageUp | Keys.Shift] = null;
+                Shortcuts[Keys.PageUp | Keys.Control | Keys.Shift] = null;
+
+                Shortcuts[Keys.PageDown] = null;
+                Shortcuts[Keys.PageDown | Keys.Control] = null;
+                Shortcuts[Keys.PageDown | Keys.Shift] = null;
+                Shortcuts[Keys.PageDown | Keys.Control | Keys.Shift] = null;
+
+                Shortcuts[Keys.Up] = null;
+                Shortcuts[Keys.Up | Keys.Control] = null;
+                Shortcuts[Keys.Up | Keys.Shift] = null;
+                Shortcuts[Keys.Up | Keys.Control | Keys.Shift] = null;
+
+                Shortcuts[Keys.Down] = null;
+                Shortcuts[Keys.Down | Keys.Control] = null;
+                Shortcuts[Keys.Down | Keys.Shift] = null;
+                Shortcuts[Keys.Down | Keys.Control | Keys.Shift] = null;
+
+                Shortcuts[Keys.Home] = null;
+                Shortcuts[Keys.Home | Keys.Control] = null;
+                Shortcuts[Keys.Home | Keys.Shift] = null;
+                Shortcuts[Keys.Home | Keys.Control | Keys.Shift] = null;
+
+                Shortcuts[Keys.End] = null;
+                Shortcuts[Keys.End | Keys.Control] = null;
+                Shortcuts[Keys.End | Keys.Shift] = null;
+                Shortcuts[Keys.End | Keys.Control | Keys.Shift] = null;
+
+                Shortcuts[Keys.Oemcomma] = null;
+                Shortcuts[Keys.OemPeriod] = null;
+            }
+        }
+
+        /// <summary>
         /// Clears any selection and closes the currently displayed page in the
         /// <see cref="ImageViewer"/> if specified by <see paramref="closeDisplayedPage"/>.
         /// </summary>
@@ -3231,20 +3467,34 @@ namespace Extract.UtilityApplications.PaginationUtility
         void CopySelectionToClipboard()
         {
             var copiedPages = new List<KeyValuePair<Page, bool>>();
-            foreach (PaginationControl control in SelectedControls
-                .Where(control => control != _loadNextDocumentButtonControl))
+            foreach (var pageControl in SelectedControls
+                .OfType<PageThumbnailControl>())
             {
-                PageThumbnailControl pageControl = control as PageThumbnailControl;
-                if (pageControl != null)
-                {
-                    copiedPages.Add(
-                        new KeyValuePair<Page, bool>(pageControl.Page, pageControl.Deleted));
-                }
+                copiedPages.Add(
+                    new KeyValuePair<Page, bool>(pageControl.Page, pageControl.Deleted));
             }
 
             SetClipboardData(copiedPages);
 
             UpdateCommandStates();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="PaginationControl"/> that exists at the specified
+        /// <see paramref="location"/>.
+        /// </summary>
+        /// <param name="location">The location to check for a <see cref="PaginationControl"/>.
+        /// </param>
+        /// <returns>The <see cref="PaginationControl"/> that exists at the specified
+        /// <see paramref="location"/> or <see langword="null"/> if no control exists at the
+        /// specified location.</returns>
+        PaginationControl GetPaginationControlAtPoint(Point location)
+        {
+            return _flowLayoutPanel
+                .Controls
+                .OfType<PageThumbnailControl>()
+                .Where(c => c.Visible && c.Bounds.Contains(location))
+                .FirstOrDefault();
         }
 
         /// <summary>
@@ -3390,7 +3640,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         void ShowHoverPage()
         {
             Point mouseLocation = PointToClient(Control.MousePosition);
-            var pageControl = _flowLayoutPanel.GetChildAtPoint(mouseLocation) as PageThumbnailControl;
+            var pageControl = GetPaginationControlAtPoint(mouseLocation) as PageThumbnailControl;
 
             if (pageControl != null && pageControl != _hoverPageControl)
             {
@@ -4292,38 +4542,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (eventHandler != null)
             {
                 eventHandler(this, new EventArgs());
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="DocumentSplit"/> event.
-        /// </summary>
-        /// <param name="originalDocument">The <see cref="OutputDocument"/> that has been split.
-        /// </param>
-        /// <param name="newDocument">The <see cref="OutputDocument"/> that represents what had been
-        /// part of <see paramref="originalDocument"/>, but that is now separate.</param>
-        void OnDocumentSplit(OutputDocument originalDocument, OutputDocument newDocument)
-        {
-            var eventHandler = DocumentSplit;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new DocumentSplitEventArgs(originalDocument, newDocument));
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="DocumentsMerged"/> event.
-        /// </summary>
-        /// <param name="resultingDocument">The <see cref="OutputDocument"/> that has been added to.
-        /// </param>
-        /// <param name="discardedDocument">The <see cref="OutputDocument"/> that was merged into
-        /// <see paramref="resultingDocument"/>.</param>
-        void OnDocumentsMerged(OutputDocument resultingDocument, OutputDocument discardedDocument)
-        {
-            var eventHandler = DocumentsMerged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new DocumentsMergedEventArgs(resultingDocument, discardedDocument));
             }
         }
 

@@ -55,7 +55,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Gets or sets a value indicating whether this instance is highlighted.
         /// </summary>
-        /// <value><see langword="true"/> if this instance is hilighted; otherwise,
+        /// <value><see langword="true"/> if this instance is highlighted; otherwise,
         /// <see langword="false"/>.
         /// </value>
         public override bool Highlighted
@@ -72,7 +72,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _loadNextDocumentButton.Focus();
                 }
-                else
+                else if (Parent != null)
                 {
                     // Ensure this button doesn't have focus once it is no longer highlighted.
                     Parent.Focus();

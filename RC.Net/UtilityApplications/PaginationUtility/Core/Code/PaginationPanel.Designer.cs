@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PaginationPanel));
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._topToolStrip = new System.Windows.Forms.ToolStrip();
+            this._collapseAllToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._applyToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToSourceToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToOriginalToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -82,40 +82,50 @@
             this._topToolStrip.Dock = System.Windows.Forms.DockStyle.None;
             this._topToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._topToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._collapseAllToolStripButton,
             this._applyToolStripButton,
             this._revertToSourceToolStripButton,
             this._revertToOriginalToolStripButton});
             this._topToolStrip.Location = new System.Drawing.Point(3, 0);
             this._topToolStrip.Name = "_topToolStrip";
-            this._topToolStrip.Size = new System.Drawing.Size(379, 25);
+            this._topToolStrip.Size = new System.Drawing.Size(363, 25);
             this._topToolStrip.TabIndex = 0;
+            // 
+            // _collapseAllToolStripButton
+            // 
+            this._collapseAllToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._collapseAllToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.Collapse;
+            this._collapseAllToolStripButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this._collapseAllToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._collapseAllToolStripButton.Name = "_collapseAllToolStripButton";
+            this._collapseAllToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this._collapseAllToolStripButton.Click += new System.EventHandler(this.HandleCollapseAllToolStripButton_Click);
             // 
             // _applyToolStripButton
             // 
-            this._applyToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this._applyToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.Accept;
             this._applyToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._applyToolStripButton.Name = "_applyToolStripButton";
-            this._applyToolStripButton.Size = new System.Drawing.Size(42, 22);
+            this._applyToolStripButton.Size = new System.Drawing.Size(58, 22);
             this._applyToolStripButton.Text = "Apply";
             this._applyToolStripButton.Click += new System.EventHandler(this.HandleApplyToolStripButton_Click);
             // 
             // _revertToSourceToolStripButton
             // 
-            this._revertToSourceToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this._revertToSourceToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.RevertToDisk;
             this._revertToSourceToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._revertToSourceToolStripButton.Name = "_revertToSourceToolStripButton";
-            this._revertToSourceToolStripButton.Size = new System.Drawing.Size(159, 22);
-            this._revertToSourceToolStripButton.Text = "Revert to pagination on disk";
+            this._revertToSourceToolStripButton.Size = new System.Drawing.Size(117, 22);
+            this._revertToSourceToolStripButton.Text = "Revert to original";
             this._revertToSourceToolStripButton.Click += new System.EventHandler(this.HandleRevertToSourceToolStripButton_Click);
             // 
             // _revertToOriginalToolStripButton
             // 
-            this._revertToOriginalToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this._revertToOriginalToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_revertToOriginalToolStripButton.Image")));
+            this._revertToOriginalToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.RevertToSuggestion;
             this._revertToOriginalToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._revertToOriginalToolStripButton.Name = "_revertToOriginalToolStripButton";
-            this._revertToOriginalToolStripButton.Size = new System.Drawing.Size(175, 22);
-            this._revertToOriginalToolStripButton.Text = "Revert to suggested pagination";
+            this._revertToOriginalToolStripButton.Size = new System.Drawing.Size(131, 22);
+            this._revertToOriginalToolStripButton.Text = "Revert to suggested";
             this._revertToOriginalToolStripButton.Click += new System.EventHandler(this.HandleRevertToOriginalToolStripButton_Click);
             // 
             // PaginationPanel
@@ -144,5 +154,6 @@
         private System.Windows.Forms.ToolStripButton _revertToSourceToolStripButton;
         private System.Windows.Forms.ToolStripButton _revertToOriginalToolStripButton;
         private System.Windows.Forms.TableLayoutPanel _tableLayoutPanel;
+        private System.Windows.Forms.ToolStripButton _collapseAllToolStripButton;
     }
 }

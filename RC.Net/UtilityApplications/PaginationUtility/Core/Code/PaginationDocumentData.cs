@@ -105,6 +105,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets whether this instances data has been modified.
+        /// </summary>
+        public virtual bool DataError
+        {
+            get
+            {
+                // Unless overridden, the data is never considered to have an error.
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         public virtual string Summary
@@ -313,7 +325,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Raises the <see cref="ModifiedChanged"/> event.
         /// </summary>
-        void OnModifiedChanged()
+        protected void OnModifiedChanged()
         {
             var eventHandler = ModifiedChanged;
             if (eventHandler != null)

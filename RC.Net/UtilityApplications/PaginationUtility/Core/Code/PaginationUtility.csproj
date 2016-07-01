@@ -299,11 +299,15 @@
     <None Include="Resources\office_128.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\RevertToSuggestion.png" />
+    <None Include="Resources\RevertToDisk.png" />
     <None Include="Resources\Edit.png" />
     <None Include="Resources\Expand.png" />
     <None Include="Resources\Edit16.png" />
     <None Include="Resources\Collapse.png" />
+    <None Include="Resources\Accept.png" />
     <Content Include="Resources\Edit11.png" />
+    <None Include="Resources\Error.png" />
     <Content Include="Resources\PaginationUtility.ico" />
   </ItemGroup>
   <ItemGroup>

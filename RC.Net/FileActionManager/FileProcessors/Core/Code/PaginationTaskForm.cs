@@ -539,6 +539,60 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Handles the <see cref="PaginationPanel.CommittingChanges"/> event of the
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CommittingChangesEventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePaginationPanel_CommittingChanges(object sender, CommittingChangesEventArgs e)
+        {
+            try
+            {
+                e.Handled = true;
+
+                _paginationPanel.SuspendLayout();
+                _changingDocuments = true;
+
+                if (!_paginationPanel.CommitSelectedChanges())
+                {
+                    _changingDocuments = false;
+                    UpdateControls();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40094");
+            }
+            finally
+            {
+                try
+                {
+                    _paginationPanel.ResumeLayout(true);
+
+                    if (_changingDocuments)
+                    {
+                        _changingDocuments = false;
+
+                        // If a new document was loaded in place of the released document(s), document
+                        // selection will already have been defaulted. Otherwise, go ahead and default now.
+                        this.SafeBeginInvoke("ELI40141", () =>
+                        {
+                            if (_lastDocumentPosition != -1)
+                            {
+                                DefaultDocumentSelection();
+                            }
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI40168");
+                }
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="PaginationPanel.CreatingOutputDocument"/> of the
         /// <see cref="_paginationPanel"/>.
         /// </summary>
@@ -589,9 +643,19 @@ namespace Extract.FileActionManager.FileProcessors
                 // Produce a uss file for the paginated document using the uss data from the
                 // source documents
                 int pageCounter = 1;
-                var pageMap = e.SourcePageInfo.ToDictionary(
-                    pageInfo => new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page),
-                    _ => pageCounter++);
+                var pageMap = new Dictionary<Tuple<string, int>, List<int>>();
+                foreach (var pageInfo in e.SourcePageInfo)
+                {
+                    var sourcePage = new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page);
+                    var destPages = new List<int>();
+                    if (!pageMap.TryGetValue(sourcePage, out destPages))
+                    {
+                        destPages = new List<int>();
+                        pageMap[sourcePage] = destPages;
+                    }
+
+                    destPages.Add(pageCounter++);
+                }
 
                 CreateUSSForPaginatedDocument(e.OutputFileName, pageMap);
 
@@ -648,9 +712,9 @@ namespace Extract.FileActionManager.FileProcessors
                     documentData.SetOriginalForm();
                 }
 
-                ReleaseFiles(e.PaginatedDocumentSources.Union(
-                    e.ModifiedDocumentData.Select(i => i.Key).Union(
-                    e.DisregardedPaginationSources)));
+                ReleaseFiles(
+                    e.PaginatedDocumentSources.Union(
+                    e.UnmodifiedPaginationSources));
             }
             catch (Exception ex)
             {
@@ -694,7 +758,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 if (_paginationPanel.PendingChanges)
                 {
-                    if (!_paginationPanel.CommitPendingChanges(true))
+                    if (!_paginationPanel.CommitSelectedChanges())
                     {
                         _changingDocuments = false;
                         UpdateControls();
@@ -925,29 +989,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         void UpdateControls()
         {
-            bool enableApply = false;
-
             if (_paginationPanel.SourceDocuments.Any())
             {
                 Text = _FORM_TASK_TITLE;
-
-                if (_paginationPanel.CommitEnabled ||
-                    _paginationPanel.FullySelectedSourceDocuments.Any())
-                    
-                {
-                    enableApply = true;
-                }
             }
             else
             {
                 Text = "(Waiting for file) - " + _FORM_TASK_TITLE;
             }
-
-            _applyToolStripButton.Enabled = !_changingDocuments && enableApply;
-            _revertToSuggestedToolStripButton.Enabled =
-                !_changingDocuments && _paginationPanel.RevertToOriginalEnabled;
-            _revertToDiskToolStripButton.Enabled =
-                !_changingDocuments && _paginationPanel.RevertToSourceEnabled;
         }
 
         /// <summary>
@@ -1069,7 +1118,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                _paginationPanel.SuspendLayout();
+                _paginationPanel.SuspendUIUpdates = true;
 
                 if (_paginationPanel == null || _paginationPanel.SourceDocuments.Contains(fileName))
                 {
@@ -1154,8 +1203,9 @@ namespace Extract.FileActionManager.FileProcessors
 
                             _paginationPanel.LoadFile(
                                 fileName, -1, pages, suggestedPagination.Value, documentData);
-                            DefaultDocumentSelection();
                         }
+
+                        DefaultDocumentSelection();
 
                         return;
                     }
@@ -1173,7 +1223,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             finally
             {
-                _paginationPanel.ResumeLayout(true);
+                _paginationPanel.SuspendUIUpdates = false;
             }
         }
 
@@ -1188,7 +1238,8 @@ namespace Extract.FileActionManager.FileProcessors
         PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes)
         {
             return (_paginationDocumentDataPanel != null)
-                ? _paginationDocumentDataPanel.GetDocumentData(attributes)
+                ? _paginationDocumentDataPanel.GetDocumentData(
+                    attributes, FileProcessingDB, _imageViewer)
                 : null;
         }
 
@@ -1339,10 +1390,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="newDocumentName">The name of the document for which the uss file is being
         /// created.</param>
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number in 
-        /// <see paramref="newDocumentName"/>.</param>
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
         static void CreateUSSForPaginatedDocument(string newDocumentName,
-            Dictionary<Tuple<string, int>, int> pageMap)
+            Dictionary<Tuple<string, int>, List<int>> pageMap)
         {
             try
             {
@@ -1365,14 +1416,16 @@ namespace Extract.FileActionManager.FileProcessors
                     if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData) &&
                         sourceDocData.HasSpatialInfo())
                     {
-                        int sourcePage = pageInfo.Key.Item2;
-                        int destPage = pageInfo.Value;
-                        var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
-                        if (pageData.HasSpatialInfo())
+                        foreach (int destPage in pageInfo.Value)
                         {
-                            pageData.UpdatePageNumber(destPage);
+                            int sourcePage = pageInfo.Key.Item2;
+                            var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
+                            if (pageData.HasSpatialInfo())
+                            {
+                                pageData.UpdatePageNumber(destPage);
 
-                            newPageData.PushBack(pageData);
+                                newPageData.PushBack(pageData);
+                            }
                         }
                     }
                 }
@@ -1397,11 +1450,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         void DefaultDocumentSelection()
         {
-            _paginationPanel.SelectDocumentAtPosition(
-                (_lastDocumentPosition == -1)
-                    ? 0
-                    : _lastDocumentPosition);
-            _lastDocumentPosition = -1;
+            this.SafeBeginInvoke("ELI40228", () =>
+                {
+                    _paginationPanel.SelectDocumentAtPosition(
+                        (_lastDocumentPosition == -1)
+                            ? 0
+                            : _lastDocumentPosition);
+                    _lastDocumentPosition = -1;
+                });
         }
 
         /// <summary>

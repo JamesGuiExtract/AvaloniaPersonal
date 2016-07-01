@@ -1,6 +1,7 @@
-﻿using System.Windows.Forms;
-using System;
+﻿using Extract.Imaging.Forms;
+using System.Windows.Forms;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -45,8 +46,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="attributes">The VOA data for while a <see cref="PaginationDocumentData"/>
         /// instance is needed.</param>
+        /// <param name="fileProcessingDB"></param>
+        /// <param name="imageViewer"></param>
         /// <returns>The <see cref="PaginationDocumentData"/> instance.</returns>
-        PaginationDocumentData GetDocumentData(IUnknownVector attributes);
+        PaginationDocumentData GetDocumentData(IUnknownVector attributes,
+            FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
 
         /// <summary>
         /// Provides a message to be displayed.

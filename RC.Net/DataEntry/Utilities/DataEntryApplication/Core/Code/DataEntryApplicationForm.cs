@@ -3131,9 +3131,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Produce a uss file for the paginated document using the uss data from the
                 // source documents
                 int pageCounter = 1;
-                var pageMap = e.SourcePageInfo.ToDictionary(
-                    pageInfo => new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page),
-                    _ => pageCounter++);
+                var pageMap = new Dictionary<Tuple<string, int>, List<int>>();
+                foreach (var pageInfo in e.SourcePageInfo)
+                {
+                    var sourcePage = new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page);
+                    var destPages = new List<int>();
+                    if (!pageMap.TryGetValue(sourcePage, out destPages))
+                    {
+                        destPages = new List<int>();
+                        pageMap[sourcePage] = destPages;
+                    }
+
+                    destPages.Add(pageCounter++);
+                }
 
                 CreateUSSForPaginatedDocument(e.OutputFileName, pageMap);
 
@@ -3261,7 +3271,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                                 EActionStatus.kActionPending, false, true, out oldStatus);
                         }
                     }
-
                 }
 
                 if (completeActiveFile)
@@ -5373,7 +5382,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         void LoadPaginationDocumentDataPanel()
         {
-            string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
+            var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, "");
+            string dataEntryPanelFileName = pathTags.Expand(
                 _activeDataEntryConfig.Config.Settings.DataEntryPanelFileName);
 
             // May be null if the DEP assembly does not define an IPaginationDocumentDataPanel.
@@ -5559,7 +5569,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         PaginationDocumentData GetAsPaginationDocumentData(IUnknownVector attributes)
         {
             return (_paginationDocumentDataPanel != null)
-                ? _paginationDocumentDataPanel.GetDocumentData(attributes)
+                ? _paginationDocumentDataPanel.GetDocumentData(
+                    attributes, FileProcessingDB, _imageViewer)
                 : null;
         }
 
@@ -5744,10 +5755,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="newDocumentName">The name of the document for which the uss file is being
         /// created.</param>
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number in 
-        /// <see paramref="newDocumentName"/>.</param>
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
         static void CreateUSSForPaginatedDocument(string newDocumentName,
-            Dictionary<Tuple<string, int>, int> pageMap)
+            Dictionary<Tuple<string, int>, List<int>> pageMap)
         {
             try
             {
@@ -5770,14 +5781,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData) &&
                         sourceDocData.HasSpatialInfo())
                     {
-                        int sourcePage = pageInfo.Key.Item2;
-                        int destPage = pageInfo.Value;
-                        var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
-                        if (pageData.HasSpatialInfo())
+                        foreach (int destPage in pageInfo.Value)
                         {
-                            pageData.UpdatePageNumber(destPage);
+                            int sourcePage = pageInfo.Key.Item2;
+                            var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
+                            if (pageData.HasSpatialInfo())
+                            {
+                                pageData.UpdatePageNumber(destPage);
 
-                            newPageData.PushBack(pageData);
+                                newPageData.PushBack(pageData);
+                            }
                         }
                     }
                 }
@@ -5806,10 +5819,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// data about the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this
         /// call is being made.</param>
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number in 
-        /// <see paramref="newDocumentName"/>.</param>
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
         void GrabDocumentForVerification(int fileID, CreatingOutputDocumentEventArgs e,
-            Dictionary<Tuple<string, int>, int> pageMap)
+            Dictionary<Tuple<string, int>, List<int>> pageMap)
         {
             try
             {

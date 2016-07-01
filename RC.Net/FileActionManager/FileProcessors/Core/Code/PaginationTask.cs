@@ -629,10 +629,16 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI40129", _COMPONENT_DESCRIPTION);
 
+                _fileProcessingDB = pDB;
+                _actionID = nActionID;
+                _tagManager = pFAMTM;
+                _fileRequestHandler = pFileRequestHandler;
+
                 if (!string.IsNullOrWhiteSpace(DocumentDataPanelAssembly))
                 {
+                    var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagManager, "");
                     string paginationDocumentDataPanelAssembly =
-                        FileSystemMethods.GetAbsolutePath(DocumentDataPanelAssembly);
+                        pathTags.Expand(DocumentDataPanelAssembly);
 
                     // May be null if the an IPaginationDocumentDataPanel is not specified to be used in
                     // this workflow.
@@ -640,11 +646,6 @@ namespace Extract.FileActionManager.FileProcessors
                         UtilityMethods.CreateTypeFromAssembly<IPaginationDocumentDataPanel>(
                             paginationDocumentDataPanelAssembly);
                 }
-
-                _fileProcessingDB = pDB;
-                _actionID = nActionID;
-                _tagManager = pFAMTM;
-                _fileRequestHandler = pFileRequestHandler;
 
                 _form.ShowForm(CreatePaginationTaskForm);
             }

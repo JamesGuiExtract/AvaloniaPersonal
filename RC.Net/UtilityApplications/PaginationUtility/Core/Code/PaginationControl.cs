@@ -19,13 +19,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _raisingEvent;
 
         /// <summary>
-        /// Indicates whether this control is currently visible in the PageLayoutControl; layout
-        /// calls can be postponed for controls that are not currently visible to improve
-        /// performance when a lot of pages are loaded into the UI.
-        /// </summary>
-        bool _isVisible;
-
-        /// <summary>
         /// Indicates whether there is a postponed layout call that should be made when the control
         /// again becomes visible.
         /// </summary>
@@ -204,7 +197,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 // To improve performance, when a lot of pages are loaded, skip any layout calls for
                 // controls that aren't currently visible. 
-                if (_isVisible)
+                if (this is PaginationSeparator ||
+                    Parent == null ||
+                    Parent.ClientRectangle.IntersectsWith(Bounds))
                 {
                     _pendingLayout = false;
 
@@ -229,16 +224,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// event data.</param>
         protected override void OnPaint(PaintEventArgs e)
         {
-            if (e.ClipRectangle.IsEmpty)
+            if (!e.ClipRectangle.IsEmpty)
             {
-                // If ClipRectangle is empty, this control is not currently visible in the
-                // PageLayoutControl. 
-                _isVisible = false;
-            }
-            else
-            {
-                _isVisible = true;
-
                 // If one or more layout calls were skipped while the control was not visible,
                 // perform a layout now.
                 if (_pendingLayout)

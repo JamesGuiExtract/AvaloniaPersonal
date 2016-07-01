@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -111,6 +112,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// The <see cref="PaginationSeparator"/> representing this document in the UI.
+        /// </summary>
+        public PaginationSeparator PaginationSeparator
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the filename that the document is to be saved as.
         /// </summary>
         /// <value>
@@ -140,8 +150,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _collapsed = value;
 
-                        var parentControl = PageControls.First().Parent;
-                        parentControl.SuspendLayout();
+                        Control parentControl = null;
+                        if (PageControls.Any())
+                        {
+                            parentControl = PageControls.First().Parent;
+                            parentControl.SuspendLayout();
+                        }
 
                         try
                         {
@@ -152,7 +166,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
                         finally
                         {
-                            parentControl.ResumeLayout(true);
+                            if (parentControl != null)
+                            {
+                                parentControl.ResumeLayout(true);
+                            }
                         }
                     }
                 }
@@ -161,6 +178,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                     throw ex.AsExtract("ELI40172");
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="OutputDocument"/> is selected
+        /// to be committed.
+        /// </summary>
+        /// <value><see langword="true"/> if selected; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Selected
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -328,6 +357,20 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return (_documentData != null) && _documentData.Modified;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the document's data currently has an error
+        /// </summary>
+        /// <value><see langword="true"/> if the document data contains an error; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool DataError
+        {
+            get
+            {
+                return (_documentData != null) && _documentData.DataError;
             }
         }
 

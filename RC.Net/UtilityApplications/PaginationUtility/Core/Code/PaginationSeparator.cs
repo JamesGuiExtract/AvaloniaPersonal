@@ -1,4 +1,4 @@
-﻿using Extract.Drawing;
+﻿using Extract.Utilities.Forms;
 using System;
 using System.Drawing;
 using System.Globalization;
@@ -21,12 +21,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         static Size? _uniformSize;
 
         /// <summary>
-        /// The color of the separator when not selected.
-        /// </summary>
-        Color _normalColor;
-
-        /// <summary>
-        /// The panel to house any <see cref="IPaginationDocumentDataPanel"/> that is displayed.
+        /// The panel to display for editing any <see cref="PaginationDocumentData"/>
         /// </summary>
         Control _documentDataPanelControl;
 
@@ -39,6 +34,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Used to prevent recursion while trying to update the current selection state.
         /// </summary>
         bool _changingSelection;
+
+        /// <summary>
+        /// Indicates whether the view of the associated <see cref="OutputDocument"/> should be hidden.
+        /// </summary>
+        bool _collapsed;
+
+        /// <summary>
+        /// Indicates whether the associated <see cref="OutputDocument"/> has been selected to
+        /// be committed.
+        /// </summary>
+        bool _documentSelectedToCommit;
+
+        /// <summary>
+        /// Indicates when a click event has been handled internal to this class and should not be
+        /// raised.
+        /// </summary>
+        bool _clickEventHandledInternally;
 
         #endregion Fields
 
@@ -57,8 +69,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _toolTip.SetToolTip(_editedPaginationGlyph, "Manual pagination has been applied");
                 _toolTip.SetToolTip(_newDocumentGlyph, "This is a new document that will be created");
                 _toolTip.SetToolTip(_editedDataPictureBox, "The data for this document has been modified");
-
-                _normalColor = _tableLayoutPanel.BackColor;
+                _toolTip.SetToolTip(_dataErrorPictureBox, "The data for this document has error(s)");
             }
             catch (Exception ex)
             {
@@ -110,7 +121,80 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<DocumentDataPanelRequestEventArgs> DocumentDataPanelRequest;
 
+        /// <summary>
+        /// Raised when a <see cref="IPaginationDocumentDataPanel"/> is closed.
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentDataPanelClosed;
+
+        /// <summary>
+        /// Raised when the view of the associated <see cref="OutputDocument"/> pages have either
+        /// been collapsed or re-displayed.
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentCollapsedChanged;
+
+        /// <summary>
+        /// Raised when the value of <see cref="DocumentSelectedToCommit"/> has been changed.
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentSelectedToCommitChanged;
+
         #endregion Events
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets whether the associated <see cref="OutputDocument"/> has been selected to be
+        /// committed.
+        /// </summary>
+        /// <value><see langword="true"/> if the document selected to be committed; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool DocumentSelectedToCommit
+        {
+            get
+            {
+                return _documentSelectedToCommit;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _documentSelectedToCommit)
+                    {
+                        if (Document != null)
+                        {
+                            Document.Selected = value;
+                        }
+                        else
+                        {
+                            value = false;
+                        }
+
+                        _documentSelectedToCommit = value;
+                        _selectedCheckBox.Checked = value;
+
+                        OnDocumentSelectedToCommitChanged();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40202");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IPaginationDocumentDataPanel DocumentDataPanel
+        {
+            get
+            {
+                return _documentDataPanelControl as IPaginationDocumentDataPanel;
+            }
+        }
+
+        #endregion Properties
 
         #region Public Members
 
@@ -118,36 +202,113 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets the <see cref="OutputDocument"/> with which this separator is associated.
         /// </summary>
         /// <returns></returns>
-        public OutputDocument GetDocument()
+        public OutputDocument Document
         {
-            try
+            get
             {
-                var firstPageControl = NextControl as PageThumbnailControl;
-                var document = (firstPageControl != null)
-                    ? firstPageControl.Document
-                    : null;
-
-                if (document != _outputDocument)
+                try
                 {
-                    if (_outputDocument != null)
+                    var firstPageControl = NextControl as PageThumbnailControl;
+                    var document = (firstPageControl != null)
+                        ? firstPageControl.Document
+                        : null;
+
+                    if (document != _outputDocument)
                     {
-                        _outputDocument.Invalidated -= HandleDocument_Invalidated;
+                        if (_outputDocument != null)
+                        {
+                            _outputDocument.Invalidated -= HandleDocument_Invalidated;
+                        }
+
+                        _outputDocument = document;
+
+                        if (_outputDocument != null)
+                        {
+                            _collapsed = _outputDocument.PageControls.Any(c => !c.Visible);
+                            _outputDocument.Invalidated += HandleDocument_Invalidated; 
+                        }
+                        else
+                        {
+                            _collapsed = false;
+                        }
                     }
 
-                    _outputDocument = document;
+                    return document;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40179");
+                }
+            }
+        }
 
-                    if (_outputDocument != null)
+        /// <summary>
+        /// Gets or sets whether the view of the associated <see cref="OutputDocument"/> should be hidden.
+        /// </summary>
+        public bool Collapsed
+        {
+            get
+            {
+                return _collapsed;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != Collapsed)
                     {
-                        _outputDocument.Invalidated += HandleDocument_Invalidated; 
+                        if (Document != null)
+                        {
+                            if (value)
+                            {
+                                if (!CloseDataPanel(true))
+                                {
+                                    return;
+                                }
+                            }
+
+                            _collapsed = value;
+
+                            Document.Collapsed = value;
+
+                            OnDocumentCollapsedChanged();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40203");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Closes the <see cref="DocumentDataPanel"/> (if visible), applying any changed data in
+        /// the process.
+        /// </summary>
+        /// <param name="saveData"></param>
+        public bool CloseDataPanel(bool saveData)
+        {
+            if (_documentDataPanelControl != null && _tableLayoutPanel.Controls.Contains(_documentDataPanelControl))
+            {
+                var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
+                if (Document != null && _outputDocument.DocumentData != null)
+                {
+                    if (saveData && !documentDataPanel.SaveData(_outputDocument.DocumentData))
+                    {
+                        return false;
                     }
                 }
 
-                return document;
+                _tableLayoutPanel.Controls.Remove(_documentDataPanelControl);
+                _documentDataPanelControl = null;
+                UpdateSize();
+
+                OnDocumentDataPanelClosed();
             }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI40179");
-            }
+
+            return true;
         }
 
         #endregion Public Members
@@ -181,10 +342,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         base.Selected = value;
 
-                        _tableLayoutPanel.BackColor = value
-                            ? ControlPaint.Dark(_normalColor)
-                            : _normalColor;
-
                         // Invalidate so that paint occurs and new selection state is indicated.
                         Invalidate();
                     }
@@ -197,6 +354,41 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _changingSelection = false;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.Layout"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.LayoutEventArgs"/> that contains the
+        /// event data.</param>
+        protected override void OnLayout(LayoutEventArgs e)
+        {
+            try
+            {
+                
+
+                if (Parent != null)
+                {
+                    var parentPanel = (ScrollableControl)Parent;
+
+                    int rightPadding = parentPanel.VerticalScroll.Visible
+                        ? 0
+                        : SystemInformation.VerticalScrollBarWidth;
+
+                    if (Padding.Right != rightPadding)
+                    {
+                        Padding = new Padding(0, 0, rightPadding, 0);
+                    }
+
+                }
+
+                base.OnLayout(e);
+
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40204");
             }
         }
 
@@ -220,39 +412,27 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Paints the background of the control.
+        /// Raises the <see cref="E:System.Windows.Forms.Control.Click"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="T:System.Windows.Forms.PaintEventArgs"/> that contains the
-        /// event data.</param>
-        protected override void OnPaintBackground(PaintEventArgs e)
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
+        /// </param>
+        protected override void OnClick(EventArgs e)
         {
             try
             {
-                // Doing all the control painting here prevents flicker when the drop indicator is
-                // drawn over this separator.
-
-                // Clears the background of the control.
-                var brush = ExtractBrushes.GetSolidBrush(SystemColors.Control);
-                Rectangle paintRectangle = ClientRectangle;
-                e.Graphics.FillRectangle(brush, paintRectangle);
-
-                // If selected, indicate selection with a darker back color except for 1 pixel
-                // of border.
-                paintRectangle.Inflate(-1, -1);
-                if (Selected)
+                if (_clickEventHandledInternally)
                 {
-                    brush = ExtractBrushes.GetSolidBrush(SystemColors.ControlDark);
-                    e.Graphics.FillRectangle(brush, paintRectangle);
+                    _clickEventHandledInternally = false;
                 }
+                else
+                {
+                    base.OnClick(e);
 
-                // Draw the black bar in the middle.
-                brush = ExtractBrushes.GetSolidBrush(Color.Black);
-                paintRectangle.Inflate(-3, -1);
-                e.Graphics.FillRectangle(brush, paintRectangle);
+                }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35677");
+                ex.ExtractDisplay("ELI40206");
             }
         }
 
@@ -270,24 +450,41 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var document = GetDocument();
-
-                if (document != null)
-                {
-                    if (!document.Collapsed && _documentDataPanelControl != null &&
-                        _tableLayoutPanel.Controls.Contains(_documentDataPanelControl))
-                    {
-                        _tableLayoutPanel.Controls.Remove(_documentDataPanelControl);
-                        _documentDataPanelControl = null;
-                        UpdateSize();
-                    }
-
-                    document.Collapsed = !document.Collapsed;
-                }
+                _clickEventHandledInternally = true;
+                Collapsed = !Collapsed;
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40184");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
+        /// <see cref="_selectedCheckBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSelectedCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _clickEventHandledInternally = true;
+
+                if (DocumentSelectedToCommit != _selectedCheckBox.Checked)
+                {
+                    DocumentSelectedToCommit = _selectedCheckBox.Checked;
+
+                    if (DocumentSelectedToCommit)
+                    {
+                        Collapsed = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40207");
             }
         }
 
@@ -300,28 +497,29 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void HandleEditDocumentDataButton_Click(object sender, EventArgs e)
         {
+            bool locked = false;
+
             try
             {
-                _tableLayoutPanel.SuspendLayout();
+                _clickEventHandledInternally = true;
 
                 if (_documentDataPanelControl != null && _tableLayoutPanel.Controls.Contains(_documentDataPanelControl))
                 {
-                    _tableLayoutPanel.Controls.Remove(_documentDataPanelControl);
-                    _documentDataPanelControl = null;
-                    UpdateSize();
+                    CloseDataPanel(true);
                 }
                 else
                 {
-                    var document = GetDocument();
-
-                    if (document != null)
+                    if (Document != null)
                     {
-                        var args = new DocumentDataPanelRequestEventArgs(document);
+                        var args = new DocumentDataPanelRequestEventArgs(Document);
                         OnDocumentDataPanelRequest(args);
 
                         if (args.DocumentDataPanel != null)
                         {
+                            FormsMethods.LockControlUpdate(this, true);
+                            locked = true;
                             _documentDataPanelControl = (Control)args.DocumentDataPanel;
+                            _documentDataPanelControl.Width = _tableLayoutPanel.Width;
                             _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
                             _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
                             UpdateSize();
@@ -335,13 +533,17 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                try
+                if (locked)
                 {
-                    _tableLayoutPanel.ResumeLayout(true);
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI40178");
+                    try
+                    {
+                        FormsMethods.LockControlUpdate(this, false);
+                        Refresh();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI40208");
+                    }
                 }
             }
         }
@@ -395,32 +597,43 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void UpdateControls()
         {
-            var document = GetDocument();
-            if (document != null)
+            if (Document != null)
             {
+                if (Document.PaginationSeparator != this)
+                {
+                    Document.PaginationSeparator = this;
+
+                    // Force a follow-up layout to occur after assigning this separator to a new document.
+                    this.SafeBeginInvoke("ELI40209", () => PerformLayout());
+                }
                 _collapseDocumentButton.Visible = true;
-                _collapseDocumentButton.Image = document.Collapsed
+                _selectedCheckBox.Visible = true;
+                _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
                 _editDocumentDataButton.Visible = true;
-                _summaryLabel.Text = document.Summary;
+                _summaryLabel.Text = Document.Summary;
+                int pageCount = Document.PageControls.Count(c => !c.Deleted);
                 _pagesLabel.Text = string.Format(CultureInfo.CurrentCulture,
-                    "{0} pages", document.PageControls.Count(c => !c.Deleted));
-                _newDocumentGlyph.Visible = !document.InSourceDocForm;
-                _editedPaginationGlyph.Visible = !document.InOriginalForm;
-                _editedDataPictureBox.Visible = document.DataModified;
+                    "{0} page{1}", pageCount, (pageCount == 1) ? "" : "s");
+                _newDocumentGlyph.Visible = !Document.InSourceDocForm;
+                _editedPaginationGlyph.Visible = !Document.InOriginalForm;
+                _editedDataPictureBox.Visible = Document.DataModified;
+                _dataErrorPictureBox.Visible = Document.DataError;
 
                 return;
             }
             else
             {
                 _collapseDocumentButton.Visible = false;
+                _selectedCheckBox.Visible = false;
                 _editDocumentDataButton.Visible = false;
                 _summaryLabel.Text = "";
                 _pagesLabel.Text = "";
                 _newDocumentGlyph.Visible = false;
                 _editedPaginationGlyph.Visible = false;
                 _editedDataPictureBox.Visible = false;
+                _dataErrorPictureBox.Visible = false;
             }
         }
 
@@ -447,6 +660,42 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (eventHandler != null)
             {
                 eventHandler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DocumentDataPanelClosed"/> event.
+        /// </summary>
+        void OnDocumentDataPanelClosed()
+        {
+            var eventHandler = DocumentDataPanelClosed;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DocumentCollapsedChanged"/> event.
+        /// </summary>
+        void OnDocumentCollapsedChanged()
+        {
+            var eventHandler = DocumentCollapsedChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DocumentSelectedToCommit"/> event.
+        /// </summary>
+        void OnDocumentSelectedToCommitChanged()
+        {
+            var eventHandler = DocumentSelectedToCommitChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
             }
         }
 

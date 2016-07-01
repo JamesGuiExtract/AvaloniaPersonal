@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Utilities.Forms;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -20,6 +21,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<RedundantControlsFoundEventArgs> RedundantControlsFound;
 
+        /// <summary>
+        /// Indicates when a layout operation has been invoked. (Layout operations are delayed to be
+        /// able to perform one layout rather than many as individual control properties change).
+        /// </summary>
+        bool _layoutInvoked;
+
         #endregion Events
 
         #region Overrides
@@ -39,116 +46,41 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // Delay all triggered layouts to occur as part of one layout invoked to occur on the
+                // next windows message to avoid unnecessary layout work.
+                if (_layoutInvoked)
+                {
+                    return false;
+                }
+
                 Control parent = container as Control;
-
-                // Use DisplayRectangle so that parent.Padding is honored.
-                Rectangle parentDisplayRectangle = parent.DisplayRectangle;
-                // But use ClientRectangle width so that the vertical scrollbar is accounted for
-                // (when visible).
-                parentDisplayRectangle.Width = parent.ClientRectangle.Width;
-                Point nextControlLocation = parentDisplayRectangle.Location;
-
-                List<PaginationControl> redundantControls = new List<PaginationControl>();
-                PaginationSeparator lastSeparator = null;
-
-                // Layout all PaginationControls (ignore any other kind of control).
-                foreach (PaginationControl control in parent.Controls.OfType<PaginationControl>())
+                if (parent.Handle == null)
                 {
-                    var separator = control as PaginationSeparator;
-                    PaginationControl previousControl = control.PreviousControl as PaginationControl;
-                    PaginationControl previousSeparator = previousControl as PaginationSeparator;
-
-                    // Only apply layout to visible controls.
-                    if (!control.Visible)
-                    {
-                        continue;
-                    }
-
-                    ExtractException.Assert("ELI35655",
-                        "The PaginationLayoutEngine does not respect margins.",
-                        control.Margin == Padding.Empty);
-
-                    if (separator != null && previousSeparator != null)
-                    {
-                        // If this separator is preceded by another separator, it is redundant and
-                        // should be ignored.
-                        redundantControls.Add(separator);
-                        separator.Visible = false;
-                        continue;
-                    }
-                    
-                    if (separator != null)
-                    {
-                        // Resize the last page control before each separator so that it extends all
-                        // the way to the right edge of the panel. This allows for the drops to
-                        // occur anywhere to the right of that page.
-                        if (previousControl != null)
-                        {
-                            var newPadding = parentDisplayRectangle.Right - previousControl.Right;
-                            previousControl.Width = parentDisplayRectangle.Right - previousControl.Left;
-                            var padding = previousControl.Padding;
-                            padding.Right = newPadding;
-                            previousControl.Padding = padding;
-
-                            nextControlLocation.X = parentDisplayRectangle.Left;
-
-                            PageThumbnailControl previousPageControl = previousControl as PageThumbnailControl;
-                            if (previousPageControl != null)
-                            {
-                                if (previousPageControl.Document.Collapsed)
-                                {
-                                    if (lastSeparator != null)
-                                    {
-                                        nextControlLocation.Y += lastSeparator.Height + 1;
-                                    }
-                                }
-                                else
-                                {
-                                    nextControlLocation.Y += PageThumbnailControl.UniformSize.Height;
-                                }
-                            }
-                        }
-
-                        lastSeparator = separator;
-                    }
-                    else
-                    {
-                        // Calculate the X position the next control would be at.
-                        int nextXPosition = 
-                            nextControlLocation.X + PageThumbnailControl.UniformSize.Width;
-
-                        // If the next control would start beyond parentDisplayRectangle, wrap.
-                        if (nextXPosition > parentDisplayRectangle.Right)
-                        {
-                            nextControlLocation.X = parentDisplayRectangle.Left;
-                            nextControlLocation.Y += (previousSeparator != null)
-                                ? previousSeparator.Height
-                                : PageThumbnailControl.UniformSize.Height;
-                        }
-                    }
-
-                    // Size the control properly.
-                    if (separator != null)
-                    {
-                        control.Size = new Size(parentDisplayRectangle.Width, control.Height);
-                    }
-                    else
-                    {
-                        control.Padding = ((NavigablePaginationControl)control).NormalPadding;
-                        control.Size = PageThumbnailControl.UniformSize;
-                    }
-
-                    control.Location = nextControlLocation;
-
-                    nextControlLocation.X += control.Width;
+                    return false;
                 }
 
-                OnRedundantControlsFound(redundantControls.ToArray());
-
-                foreach (var control in parent.Controls.OfType<PaginationSeparator>())
+                parent.SafeBeginInvoke("ELI40230", () =>
                 {
-                    control.Invalidate();
-                }
+                    DoLayout(parent);
+
+                    foreach (var control in parent.Controls.OfType<PaginationSeparator>())
+                    {
+                        control.Invalidate();
+                    }
+                    parent.Invalidate();
+
+                    parent.ResumeLayout();
+                    _layoutInvoked = false;
+                }, 
+                true, 
+                (e) => 
+                    {
+                        parent.ResumeLayout();
+                        _layoutInvoked = false;
+                    });
+
+                parent.SuspendLayout();
+                _layoutInvoked = true;
             }
             catch (Exception ex)
             {
@@ -161,6 +93,117 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Overrides
 
         #region Private Members
+
+        /// <summary>
+        /// Does the layout.
+        /// </summary>
+        /// <param name="parent">The parent.</param>
+        void DoLayout(Control parent)
+        {
+            // Use DisplayRectangle so that parent.Padding is honored.
+            Rectangle parentDisplayRectangle = parent.DisplayRectangle;
+            // But use ClientRectangle width so that the vertical scrollbar is accounted for
+            // (when visible).
+            parentDisplayRectangle.Width = parent.ClientRectangle.Width;
+            Point nextControlLocation = parentDisplayRectangle.Location;
+
+            List<PaginationControl> redundantControls = new List<PaginationControl>();
+            PaginationSeparator lastSeparator = null;
+
+            // Layout all PaginationControls (ignore any other kind of control).
+            foreach (PaginationControl control in parent.Controls.OfType<PaginationControl>())
+            {
+                var separator = control as PaginationSeparator;
+                PaginationControl previousControl = control.PreviousControl as PaginationControl;
+                PaginationControl previousSeparator = previousControl as PaginationSeparator;
+
+                // Only apply layout to visible controls.
+                if (!control.Visible)
+                {
+                    continue;
+                }
+
+                ExtractException.Assert("ELI35655",
+                    "The PaginationLayoutEngine does not respect margins.",
+                    control.Margin == Padding.Empty);
+
+                if (separator != null && previousSeparator != null)
+                {
+                    // If this separator is preceded by another separator, it is redundant and
+                    // should be ignored.
+                    redundantControls.Add(separator);
+                    separator.Visible = false;
+                    continue;
+                }
+
+                if (separator != null)
+                {
+                    // Resize the last page control before each separator so that it extends all
+                    // the way to the right edge of the panel. This allows for the drops to
+                    // occur anywhere to the right of that page.
+                    if (previousControl != null)
+                    {
+                        var newPadding = parentDisplayRectangle.Right - previousControl.Right;
+                        previousControl.Width = parentDisplayRectangle.Right - previousControl.Left;
+                        var padding = previousControl.Padding;
+                        padding.Right = newPadding;
+                        previousControl.Padding = padding;
+
+                        nextControlLocation.X = parentDisplayRectangle.Left;
+
+                        PageThumbnailControl previousPageControl = previousControl as PageThumbnailControl;
+                        if (previousPageControl != null)
+                        {
+                            if (previousPageControl.Document.Collapsed)
+                            {
+                                if (lastSeparator != null)
+                                {
+                                    nextControlLocation.Y += lastSeparator.Height + 1;
+                                }
+                            }
+                            else
+                            {
+                                nextControlLocation.Y += PageThumbnailControl.UniformSize.Height;
+                            }
+                        }
+                    }
+
+                    lastSeparator = separator;
+                }
+                else
+                {
+                    // Calculate the X position the next control would be at.
+                    int nextXPosition =
+                        nextControlLocation.X + PageThumbnailControl.UniformSize.Width;
+
+                    // If the next control would start beyond parentDisplayRectangle, wrap.
+                    if (nextXPosition > parentDisplayRectangle.Right)
+                    {
+                        nextControlLocation.X = parentDisplayRectangle.Left;
+                        nextControlLocation.Y += (previousSeparator != null)
+                            ? previousSeparator.Height
+                            : PageThumbnailControl.UniformSize.Height;
+                    }
+                }
+
+                // Size the control properly.
+                if (separator != null)
+                {
+                    control.Size = new Size(parentDisplayRectangle.Width, control.Height);
+                }
+                else
+                {
+                    control.Padding = ((NavigablePaginationControl)control).NormalPadding;
+                    control.Size = PageThumbnailControl.UniformSize;
+                }
+
+                control.Location = nextControlLocation;
+
+                nextControlLocation.X += control.Width;
+            }
+
+            OnRedundantControlsFound(redundantControls.ToArray());
+        }
 
         /// <summary>
         /// Raises the <see cref="RedundantControlsFound"/> event.

@@ -53,7 +53,7 @@ namespace Extract.FileActionManager.FileProcessors
                 outputPathTags.AddTag(PaginationSettings.LastPageTag, "");
 
                 _outputPathPathTags.PathTags = outputPathTags;
-
+                _documentDataAssemblyPathTags.PathTags = new FileActionManagerPathTags();
                 _expectedPaginationAttributesPathTagButton.PathTags = new FileActionManagerPathTags();
 
                 Settings = settings;

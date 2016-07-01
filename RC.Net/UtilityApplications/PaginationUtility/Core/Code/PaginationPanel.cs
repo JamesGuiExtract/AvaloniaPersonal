@@ -86,7 +86,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Keeps track of the names of documents that have been output as part of the current
-        /// <see cref="CommitPendingChanges"/> call.
+        /// <see cref="CommitSelectedChanges"/> call.
         /// </summary>
         List<string> _outputDocumentNames = new List<string>();
 
@@ -106,24 +106,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             new Dictionary<string, Tuple<bool, PaginationDocumentData>>();
 
         /// <summary>
-        /// Indicates the actively selected document. (the document reflected in
-        /// <see cref="DocumentDataPanel"/>)
+        /// Indicates the <see cref="OutputDocument"/> whose <see cref="PaginationDocumentData"/>
+        /// is reflected in <see cref="DocumentDataPanel"/>.
         /// </summary>
-        OutputDocument _activeDocument;
+        OutputDocument _documentWithDataInEdit;
 
-        /// <summary>
-        /// Indicates a document for which data could not be successfully saved. This data will need
-        /// to be corrected before doing anything else.
-        /// <see cref="DocumentDataPanel"/>)
-        /// </summary>
-        OutputDocument _invalidDocumentData;
-
-        /// <summary>
-        /// Indicates an <see cref="PaginationDocumentData"/> instance that is open for active
-        /// editing.
-        /// </summary>
-        PaginationDocumentData _documentDataInEdit;
-        
         /// <summary>
         /// Indicated a manually overridden value for <see cref="PendingChanges"/> or
         /// <see langword="null"/> if there is no manually overridden value
@@ -145,6 +132,32 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The <see cref="ShortcutsManager"/> managing all keyboard shortcuts for this instance.
         /// </summary>
         ShortcutsManager _shortcuts = new ShortcutsManager();
+
+        /// <summary>
+        /// A <see cref="CheckBox"/> to set or clear the
+        /// <see cref="PaginationSeparator.DocumentSelectedToCommit"/> flag for all documents.
+        /// Added via code since toolstrips to not natively support checkboxes.
+        /// </summary>
+        CheckBox _selectAllToCommitCheckBox = new CheckBox();
+
+        /// <summary>
+        /// Indicates whether the <see cref="UpdateCommandStates"/> is in the process of being
+        /// called so that controls modifications aren't mistaken for user input.
+        /// </summary>
+        bool _updatingCommandStates;
+
+        /// <summary>
+        /// Indicates whether UI updates are currently suspended for performance reasons during an
+        /// operation.
+        /// </summary>
+        bool _uiUpdatesSuspended;
+
+        /// <summary>
+        /// Indicates whether the <see cref="CommittingChanges"/> event is currently being raised in
+        /// order to prevent recursive raising of the event when a handler calls back into
+        /// <see cref="CommitSelectedChanges"/>.
+        /// </summary>
+        bool _raisingCommittingChanges;
 
         #endregion Fields
 
@@ -198,6 +211,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Raised when the state of any pages, documents or data has changed.
         /// </summary>
         public event EventHandler<EventArgs> StateChanged;
+
+        /// <summary>
+        /// Raised as selected <see cref="OutputDocument"/>s are being committed.
+        /// </summary>
+        public event EventHandler<CommittingChangesEventArgs> CommittingChanges;
 
         #endregion Events
 
@@ -426,12 +444,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets whether there are pending changes available for <see cref="CommitPendingChanges"/>.
+        /// Gets whether there are pending changes available for <see cref="CommitSelectedChanges"/>.
         /// </summary>
         public bool CommitEnabled
         {
-            get;
-            private set;
+            get
+            {
+                return _primaryPageLayoutControl != null &&
+                    _primaryPageLayoutControl.Documents.Any(doc => doc.Selected);
+            }
         }
 
         /// <summary>
@@ -519,6 +540,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 FormsMethods.ExecuteInUIThread(this, () =>
                 {
+                    SuspendUIUpdatesForOperation();
+
                     // The OutputDocument doesn't get created directly by this method. Use
                     // _documentData to be able to pass this info to when it is needed in
                     // IPaginationUtility.CreateOutputDocument.
@@ -615,57 +638,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Commits any pending document pagination changes.
+        /// Commits the selected changes.
         /// </summary>
-        /// <param name="selectedDocsOnly"><see langword="true"/> if only the selected documents are
-        /// to be committed, <see langword="false"/> if all documents are to be committed.</param>
-        /// <returns><see langword="true"/> if the pending changes were committed; otherwise,
+        /// <returns><see langword="true"/> if changes were able to be committed; otherwise,
         /// <see langword="false"/>.</returns>
-        public bool CommitPendingChanges(bool selectedDocsOnly)
+        public bool CommitSelectedChanges()
         {
-            LockControlUpdates controlUpdateLock = null;
-
             try
             {
-                // If document data could not be saved, abort the commit operation.
-                if (_invalidDocumentData != null || !SaveActiveDocumentData())
+                SuspendUIUpdatesForOperation();
+
+                if (!CanSelectedDocumentsBeCommitted())
                 {
                     return false;
-                }
-
-                if (selectedDocsOnly)
-                {
-                    var affectedSourceDocuments = new HashSet<string>(
-                        _primaryPageLayoutControl.SelectedPageControls
-                            .Select(page => page.Page.OriginalDocumentName));
-                    var unIncludedPages = _primaryPageLayoutControl.PageControls
-                        .Where(c =>
-                            !c.Selected && affectedSourceDocuments.Contains(c.Page.OriginalDocumentName));
-
-                    if (unIncludedPages.Any())
-                    {
-                        var unselectedSourceDocuments = unIncludedPages
-                            .Select(c => Path.GetFileName(c.Page.OriginalDocumentName))
-                            .Distinct();
-
-                        using (var msgBox = new CustomizableMessageBox())
-                        {
-                            msgBox.Caption = "Commit error";
-                            msgBox.StandardIcon = MessageBoxIcon.Error;
-                            msgBox.Text = string.Format(CultureInfo.CurrentCulture,
-                                "Cannot commit because the following document(s) were not fully selected: {0}\r\n\r\n" +
-                                "Expand selection to include all affected source document pages?",
-                                string.Join(", ", unselectedSourceDocuments));
-                            msgBox.AddButton("Expand selection", "expand", false);
-                            msgBox.AddButton("Cancel", "cancel", false);
-                            if (msgBox.Show(this) == "expand")
-                            {
-                                _primaryPageLayoutControl.SelectPages(unIncludedPages, true);
-                            }
-                        }
-
-                        return false;
-                    }
                 }
 
                 _commitingChanges = true;
@@ -673,8 +658,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Prevent the UI from trying to load/close pages in the image viewer as the
                 // operation is taking place.
                 _primaryPageLayoutControl.ClearSelection();
-                EnablePageDisplay = false;
-                controlUpdateLock = new LockControlUpdates(_primaryPageLayoutControl);
 
                 _outputDocumentNames.Clear();
 
@@ -689,7 +672,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 var outputDocuments = _pendingDocuments
-                    .Where(document => !document.InSourceDocForm)
+                    .Where(document => document.Selected && !document.InSourceDocForm)
                     .ToList();
 
                 _outputDocumentPositions = _primaryPageLayoutControl.Documents
@@ -711,22 +694,27 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 var disregardedPagination = _pendingDocuments
-                    .Where(doc => doc.InSourceDocForm &&
+                    .Where(doc => doc.Selected && doc.InSourceDocForm &&
                         doc.PaginationSuggested &&
                         !doc.InOriginalForm)
                     .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
 
                 var sourcesWithModifiedData = _pendingDocuments
-                    .Where(doc => doc.InSourceDocForm &&
+                    .Where(doc => doc.Selected && doc.InSourceDocForm &&
                         doc.DocumentData != null && doc.DocumentData.Modified)
                     .Select(doc => new KeyValuePair<string, PaginationDocumentData>(
                         doc.PageControls.First().Page.OriginalDocumentName, doc.DocumentData));
 
+                var unmodifiedPagination = _pendingDocuments
+                    .Where(doc => doc.Selected && doc.InSourceDocForm)
+                    .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
+
                 OnPaginated(sourceDocuments.Select(doc => doc.FileName),
                     disregardedPagination,
-                    sourcesWithModifiedData);
+                    sourcesWithModifiedData,
+                    unmodifiedPagination);
 
-                foreach (var document in _pendingDocuments)
+                foreach (var document in _pendingDocuments.Where(doc => doc.Selected))
                 {
                     document.PaginationSuggested = false;
                     document.SetOriginalForm();
@@ -740,6 +728,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _pendingChangesOverride = null;
 
+                SelectAllToCommit(false);
+
                 UpdateCommandStates();
 
                 return true;
@@ -750,17 +740,87 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                if (controlUpdateLock != null)
+                try
                 {
-                    controlUpdateLock.Dispose();
+                    _commitingChanges = false;
+                    if (_outputDocumentPositions != null)
+                    {
+                        _outputDocumentPositions.Clear();
+                    }
                 }
-                EnablePageDisplay = true;
-                _commitingChanges = false;
-                if (_outputDocumentPositions != null)
+                catch (Exception ex)
                 {
-                    _outputDocumentPositions.Clear();
+                    ex.ExtractLog("ELI40210");
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks if the selected documents can be submitted.
+        /// </summary>
+        /// <returns><see langword="true"/> if the selected documents can be submitted or
+        /// <see langword="false"/> if there is a reason they cannot be. This method will have
+        /// displayed an necessary message to the user explaining why the document could not be
+        /// submitted.
+        /// </returns>
+        bool CanSelectedDocumentsBeCommitted()
+        {
+            // If document data could not be saved, abort the commit operation.
+            if (!SaveSelectedDocumentData())
+            {
+                return false;
+            }
+
+            if (_pendingDocuments.Any(document => document.Selected && document.DataError))
+            {
+                UtilityMethods.ShowMessageBox("Data errors must be corrected before saving", "Data Error", true);
+                return false;
+            }
+
+            var affectedSourceDocuments = new HashSet<string>(
+                _pendingDocuments
+                    .Where(doc => doc.Selected)
+                    .SelectMany(doc => doc.PageControls
+                        .Select(c => c.Page.OriginalDocumentName)));
+
+            var unIncludedPagesControls = 
+                _pendingDocuments
+                    .Where(doc => !doc.Selected)
+                    .SelectMany(doc => doc.PageControls
+                        .Where(c => 
+                            affectedSourceDocuments.Contains(c.Page.OriginalDocumentName)));
+
+            if (unIncludedPagesControls.Any())
+            {
+                var unselectedSourceDocuments = unIncludedPagesControls
+                    .Select(c => Path.GetFileName(c.Page.OriginalDocumentName))
+                    .Distinct();
+
+                using (var msgBox = new CustomizableMessageBox())
+                {
+                    msgBox.Caption = "Commit error";
+                    msgBox.StandardIcon = MessageBoxIcon.Error;
+                    msgBox.Text = string.Format(CultureInfo.CurrentCulture,
+                        "Cannot commit because the following document(s) were not fully selected: {0}\r\n\r\n" +
+                        "Expand selection to include all affected source document pages?",
+                        string.Join(", ", unselectedSourceDocuments));
+                    msgBox.AddButton("Expand selection", "expand", false);
+                    msgBox.AddButton("Cancel", "cancel", false);
+                    if (msgBox.Show(this) == "expand")
+                    {
+                        foreach (var separator in unIncludedPagesControls
+                            .Select(c => c.Document.PaginationSeparator)
+                            .Distinct())
+                        {
+                            separator.DocumentSelectedToCommit = true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -771,15 +831,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// presented (will differ from source state if pagination was suggested).</param>
         public void RevertPendingChanges(bool revertToSource)
         {
-            LockControlUpdates controlUpdateLock = null;
-
             try
             {
-                // Prevent the UI from trying to load/close pages in the image viewer as the
-                // operation is taking place.
+                SuspendUIUpdates = true;
+
                 _primaryPageLayoutControl.ClearSelection();
-                controlUpdateLock = new LockControlUpdates(_primaryPageLayoutControl);
-                EnablePageDisplay = false;
 
                 foreach (var outputDocument in _pendingDocuments.ToArray())
                 {
@@ -837,6 +893,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                             .OrderBy(doc => doc.OriginalPages.Select(
                                 page => page.OriginalPageNumber).Min())))
                     {
+                        outputDocument.Collapsed = false;
+                        outputDocument.Selected = false;
+
                         _primaryPageLayoutControl.LoadOutputDocument(outputDocument,
                             outputDocument.OriginalPages, outputDocument.OriginalDeletedPages);
                         if (!_pendingDocuments.Contains(outputDocument))
@@ -851,6 +910,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
+                SuspendUIUpdates = false;
+                _primaryPageLayoutControl.PerformFullLayout();
                 _primaryPageLayoutControl.SelectFirstPage();
                 _primaryPageLayoutControl.Focus();
 
@@ -858,15 +919,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
+                SuspendUIUpdates = false;
+
                 throw ex.AsExtract("ELI40018");
-            }
-            finally
-            {
-                if (controlUpdateLock != null)
-                {
-                    controlUpdateLock.Dispose();
-                }
-                EnablePageDisplay = true;
             }
         }
 
@@ -902,9 +957,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                         foreach (var outputDocument in documentsToDelete)
                         {
                             // If the document's data is open for editing, close the panel.
-                            if (_documentDataInEdit == outputDocument.DocumentData)
+                            if (_documentWithDataInEdit == outputDocument)
                             {
-                                CloseDataPanel();
+                                if (!CloseDataPanel())
+                                {
+                                    _primaryPageLayoutControl.SelectDocument(outputDocument);
+
+                                    throw new ExtractException("ELI40211",
+                                        "Failed to save document data");
+                                }
                             }
 
                             int docPosition =
@@ -976,7 +1037,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SaveActiveDocumentData();
+                SaveSelectedDocumentData();
                 EnablePageDisplay = false;
                 _primaryPageLayoutControl.ClearSelection();
             }
@@ -1283,6 +1344,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _imageViewer.EstablishConnections(this);
                 }
 
+                // Since toolstrips to not natively support checkboxes, add the select all checkbox
+                // manually.
+                var host = new ToolStripControlHost(_selectAllToCommitCheckBox);
+                // Pad a couple of pixels to align with separator check boxes.
+                host.Margin = new Padding(0, 0, 2, 0);
+                _topToolStrip.Items.Insert(1, host);
+                _selectAllToCommitCheckBox.CheckedChanged += HandleSelectAllToCommitCheckBox_CheckedChanged;
+
                 ResetPrimaryPageLayoutControl();
             }
             catch (Exception ex)
@@ -1425,7 +1494,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                CommitPendingChanges(false);
+                // Allow ability of external event handler to handle the apply action.
+                var committingChangesArgs = new CommittingChangesEventArgs();
+                OnCommittingChanges(committingChangesArgs);
+                if (!committingChangesArgs.Handled)
+                {
+                    CommitSelectedChanges();
+                }
             }
             catch (Exception ex)
             {
@@ -1511,90 +1586,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="PageLayoutControl.SelectionChanged"/> event.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandlePageLayoutControl_SelectionChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                OutputDocument newActiveDocument = null;
-                if (_primaryPageLayoutControl.PartiallySelectedDocuments.Count() == 1)
-                {
-                    newActiveDocument =
-                        _primaryPageLayoutControl.PartiallySelectedDocuments.Single();
-                }
-
-                if (_invalidDocumentData != null && newActiveDocument != _invalidDocumentData)
-                {
-                    return;
-                }
-
-                _activeDocument = newActiveDocument;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39714");
-            }
-        }
-
-        /// <summary>
-        /// Handles the DocumentSplit event of the _primaryPageLayoutControl control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="DocumentSplitEventArgs"/> instance containing the event data.</param>
-        void HandlePrimaryPageLayoutControl_DocumentSplit(object sender, DocumentSplitEventArgs e)
-        {
-            try
-            {
-                _activeDocument = null;
-
-                var args = new DocumentDataRequestEventArgs(
-                    e.OriginalDocument.PageControls
-                        .Where(c => !c.Deleted)
-                        .Select(c => c.Page.OriginalDocumentName)
-                        .Distinct()
-                        .ToArray());
-                OnDocumentDataRequest(args);
-
-                UpdateDocumentData(e.OriginalDocument, args.DocumentData);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39817");
-            }
-        }
-
-        /// <summary>
-        /// Handles the DocumentsMerged event of the _primaryPageLayoutControl control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="DocumentsMergedEventArgs"/> instance containing the event data.</param>
-        void HandlePrimaryPageLayoutControl_DocumentsMerged(object sender, DocumentsMergedEventArgs e)
-        {
-            try
-            {
-                _activeDocument = null;
-
-                var args = new DocumentDataRequestEventArgs(
-                    e.ResultingDocument.PageControls
-                        .Where(c => !c.Deleted)
-                        .Select(c => c.Page.OriginalDocumentName)
-                        .Distinct()
-                        .ToArray());
-                OnDocumentDataRequest(args);
-
-                UpdateDocumentData(e.ResultingDocument, args.DocumentData);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39818");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="PageLayoutControl.LoadNextDocumentRequest"/> event of the
         /// <see cref="_primaryPageLayoutControl"/>.
         /// </summary>
@@ -1626,11 +1617,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (DocumentDataPanel != null)
                 {
-                    CloseDataPanel();
+                    if (!CloseDataPanel())
+                    {
+                        _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
 
-                    var document = e.OutputDocument;
-                    _documentDataInEdit = document.DocumentData;
-                    DocumentDataPanel.LoadData(_documentDataInEdit);
+                        throw new ExtractException("ELI40212", "Failed to save document data");
+                    }
+
+                    _documentWithDataInEdit = e.OutputDocument;
+                    DocumentDataPanel.LoadData(_documentWithDataInEdit.DocumentData);
                     e.DocumentDataPanel = DocumentDataPanel;
                 }
             }
@@ -1690,6 +1685,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     pageControl.Invalidate();
                 }
+
+                if (document.PaginationSeparator != null)
+                {
+                    document.PaginationSeparator.Invalidate();
+                }
             }
             catch (Exception ex)
             {
@@ -1697,9 +1697,120 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the
+        /// <see cref="_collapseAllToolStripButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleCollapseAllToolStripButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SuspendUIUpdatesForOperation();
+
+                bool collapse = !AllDocumentsCollapsed;
+
+                CollapseAll(collapse);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40216");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
+        /// <see cref="_selectAllToCommitCheckBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleSelectAllToCommitCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!_updatingCommandStates)
+                {
+                    SuspendUIUpdatesForOperation();
+
+                    bool select = _selectAllToCommitCheckBox.Checked;
+
+                    SelectAllToCommit(select);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI40217");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
+
+        /// <summary>
+        /// Gets a value indicating whether all documents are currently collapsed (pages hidden).
+        /// </summary>
+        /// <value><see langword="true"/> if all documents are collapsed; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool AllDocumentsCollapsed
+        {
+            get
+            {
+                return _pendingDocuments.All(doc => doc.Collapsed
+                    || !doc.PageControls.Any());
+            }
+        }
+
+        /// <summary>
+        /// Collapses or expands all documents. (shows/hides all document pages).
+        /// </summary>
+        /// <param name="collapse"><see langword="true"/> to collapse all documents to hide their
+        /// pages of <see langword="false"/> to expand them to display all pages.</param>
+        void CollapseAll(bool collapse)
+        {
+            foreach (var document in _pendingDocuments)
+            {
+                var separator = document.PaginationSeparator;
+                if (separator != null)
+                {
+                    separator.Collapsed = collapse;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether all documents are currently selected for committal.
+        /// </summary>
+        /// <value><see langword="true"/> if all documents selected for committal; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool AllDocumentsSelected
+        {
+            get
+            {
+                return _pendingDocuments.All(doc => doc.PageControls.Count == 0 || doc.Selected);
+            }
+        }
+
+        /// <summary>
+        /// Selects or un-selects all documents for committal.
+        /// </summary>
+        /// <param name="select"><see langword="true"/> to select all documents for committal or
+        /// <see langword="false"/> to clear all the check boxes.</param>
+        void SelectAllToCommit(bool select)
+        {
+            foreach (var document in _pendingDocuments)
+            {
+                var separator = document.PaginationSeparator;
+                if (separator != null)
+                {
+                    separator.DocumentSelectedToCommit = select;
+                }
+            }
+        }
 
         /// <summary>
         /// Clears and disposes of any existing <see cref="_primaryPageLayoutControl"/> and
@@ -1710,9 +1821,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (_primaryPageLayoutControl != null)
             {
                 _primaryPageLayoutControl.StateChanged -= HandlePageLayoutControl_StateChanged;
-                _primaryPageLayoutControl.SelectionChanged -= HandlePageLayoutControl_SelectionChanged;
-                _primaryPageLayoutControl.DocumentSplit -= HandlePrimaryPageLayoutControl_DocumentSplit;
-                _primaryPageLayoutControl.DocumentsMerged -= HandlePrimaryPageLayoutControl_DocumentsMerged;
                 // If the control contains a lot of pagination controls, it can take a long time to
                 // remove-- I am unclear why (it has to do with more than just whether thumbnails
                 // are still being loaded. Disposing of the control first allows it to be quickly
@@ -1731,9 +1839,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.Dock = DockStyle.Fill;
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
-            _primaryPageLayoutControl.SelectionChanged += HandlePageLayoutControl_SelectionChanged;
-            _primaryPageLayoutControl.DocumentSplit += HandlePrimaryPageLayoutControl_DocumentSplit;
-            _primaryPageLayoutControl.DocumentsMerged += HandlePrimaryPageLayoutControl_DocumentsMerged;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandlePrimaryPageLayoutControl_LoadNextDocumentRequest;
             _primaryPageLayoutControl.DocumentDataPanelRequest += HandlePrimaryPageLayoutControl_DocumentDataPanelRequest;
             _tableLayoutPanel.Controls.Add(_primaryPageLayoutControl, 0, 1);
@@ -1812,47 +1917,27 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Saves the data from any defined <see cref="DocumentDataPanel"/> into the
-        /// <see cref=" _activeDocument"/> (if there is one).
+        /// Saves the data from any defined <see cref="DocumentDataPanel"/> if currently active.
         /// </summary>
-        /// <returns><see langword="true"/> if the data was save or <see langword="false"/> if the
+        /// <returns><see langword="true"/> if the data was saved or <see langword="false"/> if the
         /// data could not be saved and needs to be corrected.
         /// <para><b>Note</b></para>
         /// It is the responsibility of the DocumentDataPanel to inform the user of any data issues
         /// that need correction.
         /// </returns>
-        bool SaveActiveDocumentData()
+        bool SaveSelectedDocumentData()
         {
-            if (DocumentDataPanel == null || _activeDocument == null)
+            if (_documentWithDataInEdit == null || 
+                _documentWithDataInEdit.Selected ||
+                CloseDataPanel())
             {
-                return true;
-            }
-            else if (DocumentDataPanel.SaveData(_activeDocument.DocumentData))
-            {
-                _invalidDocumentData = null;
-
-                var panelControl = (Control)DocumentDataPanel;
-                if (panelControl.Parent != null)
-                {
-                    panelControl.Parent.Controls.Remove(panelControl);
-                    DocumentDataPanel.SaveData(_documentDataInEdit);
-                }
-
                 return true;
             }
             else
             {
-                _invalidDocumentData = _activeDocument;
                 this.SafeBeginInvoke("ELI39721", () =>
                 {
-                    try
-                    {
-                        _primaryPageLayoutControl.SelectDocument(_activeDocument);
-                    }
-                    finally
-                    {
-                        _invalidDocumentData = null;
-                    }
+                     _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
                 });
                 return false;
             }
@@ -1881,17 +1966,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Closes the <see cref="DocumentDataPanel"/> (if visible), applying any changed data in
         /// the process.
         /// </summary>
-        void CloseDataPanel()
+        bool CloseDataPanel()
         {
             if (DocumentDataPanel != null)
             {
                 var panelControl = (Control)DocumentDataPanel;
                 if (panelControl.Parent != null)
                 {
-                    panelControl.Parent.Controls.Remove(panelControl);
-                    DocumentDataPanel.SaveData(_documentDataInEdit);
+                    if (_documentWithDataInEdit == null ||
+                        (DocumentDataPanel.SaveData(_documentWithDataInEdit.DocumentData) &&
+                         !_documentWithDataInEdit.DataError))
+                    {
+                        panelControl.Parent.Controls.Remove(panelControl);
+                        _documentWithDataInEdit = null;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
+
+            return true;
         }
 
         /// <summary>
@@ -1899,102 +1995,97 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void UpdateCommandStates()
         {
-            var nonEmptyDocs = _pendingDocuments.Where(doc =>
-                doc.PageControls.Any(c => !c.Deleted));
-            bool isDocDataEdited = nonEmptyDocs.Any(doc =>
-                doc.DocumentData != null && doc.DocumentData.Modified);
-
-            RevertToOriginalEnabled =
-                nonEmptyDocs.Any(doc => !doc.InOriginalForm || isDocDataEdited);
-            _revertToOriginalToolStripButton.Enabled = RevertToOriginalEnabled;
-            RevertToSourceEnabled =
-                nonEmptyDocs.Any(doc => !doc.InSourceDocForm || isDocDataEdited);
-            _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
-            CommitEnabled =
-                PendingChanges || // Value can be overridden; need to enabled apply whenever true.
-                _revertToOriginalToolStripButton.Enabled ||
-                _revertToSourceToolStripButton.Enabled;
-            _applyToolStripButton.Enabled = CommitEnabled;
-        }
-
-        /// <summary>
-        /// Raises the <see cref="DocumentDataRequest"/> event.
-        /// </summary>
-        /// <param name="eventArgs">The <see cref="DocumentDataRequestEventArgs"/> instance containing
-        /// the event data.</param>
-        void OnDocumentDataRequest(DocumentDataRequestEventArgs eventArgs)
-        {
-            var eventHandler = DocumentDataRequest;
-            if (eventHandler != null)
+            try
             {
-                eventHandler(this, eventArgs);
+                _updatingCommandStates = true;
+
+                var nonEmptyDocs = _pendingDocuments.Where(doc =>
+                    doc.PageControls.Any(c => !c.Deleted));
+                bool isDocDataEdited = nonEmptyDocs.Any(doc =>
+                    doc.DocumentData != null && doc.DocumentData.Modified);
+
+                RevertToOriginalEnabled =
+                    nonEmptyDocs.Any(doc => !doc.InOriginalForm || isDocDataEdited);
+                _revertToOriginalToolStripButton.Enabled = RevertToOriginalEnabled;
+                RevertToSourceEnabled =
+                    nonEmptyDocs.Any(doc => !doc.InSourceDocForm || isDocDataEdited);
+                _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
+                _applyToolStripButton.Enabled = CommitEnabled;
+                _collapseAllToolStripButton.Image =
+                    AllDocumentsCollapsed
+                        ? Properties.Resources.Expand
+                        : Properties.Resources.Collapse;
+                _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
+            }
+            finally
+            {
+                _updatingCommandStates = false;
             }
         }
 
         /// <summary>
-        /// Raises the <see cref="LoadNextDocument"/> event.
+        /// Gets or sets whether UI updates are currently suspended for performance reasons during
+        /// an operation.
         /// </summary>
-        void OnLoadNextDocument()
+        public bool SuspendUIUpdates
         {
-            var eventHandler = LoadNextDocument;
-            if (eventHandler != null)
+            get
             {
-                eventHandler(this, new EventArgs());
+                return _uiUpdatesSuspended;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _uiUpdatesSuspended)
+                    {
+                        if (value)
+                        {
+                            _uiUpdatesSuspended = true;
+                            SuspendLayout();
+                            _primaryPageLayoutControl.UIUpdatesSuspended = true;
+                            EnablePageDisplay = false;
+                        }
+                        else
+                        {
+                            _uiUpdatesSuspended = false;
+                            EnablePageDisplay = true;
+                            _primaryPageLayoutControl.UIUpdatesSuspended = false;
+                            ResumeLayout(true);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI40226");
+                }
             }
         }
 
         /// <summary>
-        /// Raises the <see cref="CreatingOutputDocument"/> event.
+        /// Temporarily suspends UI updates for the context of the current message handler. UI
+        /// updates will automatically be resumed with the next windows message.
         /// </summary>
-        /// <param name="eventArgs">The <see cref="CreatingOutputDocumentEventArgs"/> instance to
-        /// use when raising the event.</param>
-        void OnCreatingOutputDocument(CreatingOutputDocumentEventArgs eventArgs)
+        public void SuspendUIUpdatesForOperation()
         {
-            var eventHandler = CreatingOutputDocument;
-            if (eventHandler != null)
+            try
             {
-                eventHandler(this, eventArgs);
+                if (!_uiUpdatesSuspended)
+                {
+                    SuspendUIUpdates = true;
+
+                    this.SafeBeginInvoke("ELI40218", () =>
+                    {
+                        SuspendUIUpdates = false;
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40227");
             }
         }
-
-        /// <summary>
-        /// Raises the <see cref="Paginated"/> event.
-        /// </summary>
-        /// <param name="paginatedDocumentSources">The source documents that were used to generate
-        /// the paginated output. These documents will no longer be referenced by the
-        /// <see cref="PaginationPanel"/>.</param>
-        /// <param name="disregardedPaginationSources">All documents applied as they exist on disk
-        /// but for which there was differing suggested pagination.</param>
-        /// <param name="modifiedDocumentData">All documents names and associated
-        /// <see cref="PaginationDocumentData"/> where data was modified, but the document pages
-        /// have not been modified compared to pagination on disk.</param>   
-        void OnPaginated(IEnumerable<string> paginatedDocumentSources,
-            IEnumerable<string> disregardedPaginationSources,
-            IEnumerable<KeyValuePair<string, PaginationDocumentData>> modifiedDocumentData)
-        {
-            var eventHandler = Paginated;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new PaginatedEventArgs(
-                    paginatedDocumentSources, disregardedPaginationSources, modifiedDocumentData));
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="StateChanged"/> event.
-        /// </summary>
-        void OnStateChanged()
-        {
-            var eventHandler = StateChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
-        }
-
-        #endregion Private Members
-
-        #region Static Methods
 
         /// <summary>
         /// Creates the expected attributes.
@@ -2049,17 +2140,17 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // Create the hierarchy
                 documents.Select(pages =>
-                    {
-                        var ss = new SpatialStringClass();
-                        ss.CreateNonSpatialString(_DOCUMENT_PLACEHOLDER_TEXT, sourceDocName);
-                        var documentAttribute = new ComAttribute { Name = "Document", Value = ss };
+                {
+                    var ss = new SpatialStringClass();
+                    ss.CreateNonSpatialString(_DOCUMENT_PLACEHOLDER_TEXT, sourceDocName);
+                    var documentAttribute = new ComAttribute { Name = "Document", Value = ss };
 
-                        // Add a Pages attribute to denote the range of pages in this document
-                        ss = new SpatialStringClass();
-                        ss.CreateNonSpatialString(pages, sourceDocName);
-                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
-                        return documentAttribute;
-                    })
+                    // Add a Pages attribute to denote the range of pages in this document
+                    ss = new SpatialStringClass();
+                    ss.CreateNonSpatialString(pages, sourceDocName);
+                    documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
+                    return documentAttribute;
+                })
                     .SaveToIUnknownVector(outputFileName);
 
             }
@@ -2111,6 +2202,111 @@ namespace Extract.UtilityApplications.PaginationUtility
             return queryResults;
         }
 
-        #endregion Static Methods
+        /// <summary>
+        /// Raises the <see cref="DocumentDataRequest"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="DocumentDataRequestEventArgs"/> instance containing
+        /// the event data.</param>
+        void OnDocumentDataRequest(DocumentDataRequestEventArgs eventArgs)
+        {
+            var eventHandler = DocumentDataRequest;
+            if (eventHandler != null)
+            {
+                eventHandler(this, eventArgs);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="LoadNextDocument"/> event.
+        /// </summary>
+        void OnLoadNextDocument()
+        {
+            var eventHandler = LoadNextDocument;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="CreatingOutputDocument"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="CreatingOutputDocumentEventArgs"/> instance to
+        /// use when raising the event.</param>
+        void OnCreatingOutputDocument(CreatingOutputDocumentEventArgs eventArgs)
+        {
+            var eventHandler = CreatingOutputDocument;
+            if (eventHandler != null)
+            {
+                eventHandler(this, eventArgs);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Paginated"/> event.
+        /// </summary>
+        /// <param name="paginatedDocumentSources">The source documents that were used to generate
+        /// the paginated output. These documents will no longer be referenced by the
+        /// <see cref="PaginationPanel"/>.</param>
+        /// <param name="disregardedPaginationSources">All documents applied as they exist on disk
+        /// but for which there was differing suggested pagination.</param>
+        /// <param name="modifiedDocumentData">All documents names and associated
+        /// <see cref="PaginationDocumentData"/> where data was modified, but the document pages
+        /// have not been modified compared to pagination on disk.</param>
+        /// <param name="unmodifiedPaginationSources"></param>
+        void OnPaginated(IEnumerable<string> paginatedDocumentSources,
+            IEnumerable<string> disregardedPaginationSources,
+            IEnumerable<KeyValuePair<string, PaginationDocumentData>> modifiedDocumentData,
+            IEnumerable<string> unmodifiedPaginationSources)
+        {
+            var eventHandler = Paginated;
+            if (eventHandler != null)
+            {
+                eventHandler(this, 
+                    new PaginatedEventArgs(
+                        paginatedDocumentSources, disregardedPaginationSources,
+                        modifiedDocumentData, unmodifiedPaginationSources));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="StateChanged"/> event.
+        /// </summary>
+        void OnStateChanged()
+        {
+            var eventHandler = StateChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="CommittingChanges"/> event.
+        /// </summary>
+        /// <param name="e"></param>
+        void OnCommittingChanges(CommittingChangesEventArgs e)
+        {
+            if (_raisingCommittingChanges)
+            {
+                return;
+            }
+
+            try
+            {
+                var eventHandler = CommittingChanges;
+                if (eventHandler != null)
+                {
+                    _raisingCommittingChanges = true;
+                    eventHandler(this, e);
+                }
+            }
+            finally
+            {
+                _raisingCommittingChanges = false;
+            }
+        }
+
+        #endregion Private Members
     }
 }

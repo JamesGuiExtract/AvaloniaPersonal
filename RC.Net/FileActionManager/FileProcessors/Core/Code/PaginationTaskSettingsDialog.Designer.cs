@@ -224,7 +224,6 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._documentDataAssemblyTextBox.Location = new System.Drawing.Point(16, 167);
             this._documentDataAssemblyTextBox.Name = "_documentDataAssemblyTextBox";
-            this._documentDataAssemblyTextBox.Required = true;
             this._documentDataAssemblyTextBox.Size = new System.Drawing.Size(470, 20);
             this._documentDataAssemblyTextBox.TabIndex = 10;
             // 
@@ -288,7 +287,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(555, 330);
+            this.ClientSize = new System.Drawing.Size(555, 331);
             this.Controls.Add(this._expectedPaginationAttributesCheckBox);
             this.Controls.Add(infoTip5);
             this.Controls.Add(this._expectedPaginationAttributesPathTagButton);

@@ -143,11 +143,11 @@ namespace Extract.AttributeFinder
         /// <param name="newDocumentName">The name of the file with which the attribute values
         /// should now be associated.</param>
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number in 
-        /// <see paramref="newDocumentName"/>.</param>
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static void TranslateAttributesToNewDocument(IIUnknownVector attributes,
-            string newDocumentName, Dictionary<Tuple<string, int>, int> pageMap)
+            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap)
         {
             try
             {
@@ -208,10 +208,10 @@ namespace Extract.AttributeFinder
         /// <param name="newDocumentName">The name of the file with which the value should now be
         /// associated.</param>
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number in 
-        /// <see paramref="newDocumentName"/>.</param>
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
         static SpatialString TranslateSpatialStringToNewDocument(SpatialString value,
-            string newDocumentName, Dictionary<Tuple<string, int>, int> pageMap)
+            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap)
         {
             ExtractException.Assert("ELI39709", "Unexpected spatial mode.",
                 value.GetMode() == ESpatialStringMode.kSpatialMode);
@@ -224,13 +224,16 @@ namespace Extract.AttributeFinder
             {
                 int oldPageNum = page.GetFirstPageNumber();
 
-                int newPageNum;
-                if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum), 
-                        out newPageNum))
+                List<int> newPageNums = null;
+                if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum),
+                    out newPageNums))
                 {
-                    page.UpdatePageNumber(newPageNum);
-                    page.SourceDocName = newDocumentName;
-                    updatedPages.Add(page);
+                    foreach (int newPageNum in newPageNums)
+                    {
+                        page.UpdatePageNumber(newPageNum);
+                        page.SourceDocName = newDocumentName;
+                        updatedPages.Add(page);
+                    }
                 }
             }
 
@@ -257,10 +260,10 @@ namespace Extract.AttributeFinder
         /// <param name="newDocumentName">The name of the file with which the value should now be
         /// associated.</param>
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number in 
-        /// <see paramref="newDocumentName"/>.</param>
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
         static SpatialString TranslateHybridStringToNewDocument(SpatialString value,
-            string newDocumentName, Dictionary<Tuple<string, int>, int> pageMap)
+            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap)
         {
             ExtractException.Assert("ELI39710", "Unexpected spatial mode.",
                 value.GetMode() == ESpatialStringMode.kHybridMode);
@@ -273,18 +276,21 @@ namespace Extract.AttributeFinder
                 .ToIEnumerable<IRasterZone>())
             {
                 int oldPageNum = rasterZone.PageNumber;
-                int newPageNum;
-                if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum), 
-                        out newPageNum))
+                List<int> newPageNums = null;
+                if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum),
+                    out newPageNums))
                 {
-                    rasterZone.PageNumber = newPageNum;
-                    updatedRasterZones.Add(rasterZone);
-                    if (!updatedPageInfoMap.Contains(newPageNum))
+                    foreach (int newPageNum in newPageNums)
                     {
-                        var copyable = (ICopyableObject)value.GetPageInfo(oldPageNum);
-                        var newPageInfo = (SpatialPageInfo)copyable.Clone();
+                        rasterZone.PageNumber = newPageNum;
+                        updatedRasterZones.Add(rasterZone);
+                        if (!updatedPageInfoMap.Contains(newPageNum))
+                        {
+                            var copyable = (ICopyableObject)value.GetPageInfo(oldPageNum);
+                            var newPageInfo = (SpatialPageInfo)copyable.Clone();
 
-                        updatedPageInfoMap.Set(newPageNum, newPageInfo);
+                            updatedPageInfoMap.Set(newPageNum, newPageInfo);
+                        }
                     }
                 }
             }

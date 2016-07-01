@@ -143,84 +143,6 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
-    /// The event arguments for the <see cref="PageLayoutControl.DocumentSplit"/> event.
-    /// </summary>
-    internal class DocumentSplitEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentDataRequestEventArgs"/> class.
-        /// </summary>
-        /// <param name="originalDocument">The <see cref="OutputDocument"/> that has been split.
-        /// </param>
-        /// <param name="newDocument">The <see cref="OutputDocument"/> that represents what had been
-        /// part of <see paramref="originalDocument"/>, but that is now separate.</param>
-        public DocumentSplitEventArgs(OutputDocument originalDocument, OutputDocument newDocument)
-        {
-            OriginalDocument = originalDocument;
-            NewDocument = newDocument;
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="OutputDocument"/> that has been split.
-        /// </summary>
-        public OutputDocument OriginalDocument
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="OutputDocument"/> that represents what had been part of
-        /// <see cref="OriginalDocument"/>, but that is now separate.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        public OutputDocument NewDocument
-        {
-            get;
-            private set;
-        }
-    }
-
-    /// <summary>
-    /// The event arguments for the <see cref="PageLayoutControl.DocumentsMerged"/> event.
-    /// </summary>
-    internal class DocumentsMergedEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentsMergedEventArgs"/> class.
-        /// </summary>
-        /// <param name="resultingDocument">The <see cref="OutputDocument"/> that has been added to.
-        /// </param>
-        /// <param name="discardedDocument">The <see cref="OutputDocument"/> that was merged into
-        /// <see paramref="resultingDocument"/>.</param>
-        public DocumentsMergedEventArgs(OutputDocument resultingDocument, OutputDocument discardedDocument)
-        {
-            ResultingDocument = resultingDocument;
-            DiscardedDocument = discardedDocument;
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="OutputDocument"/> that has been added to.
-        /// </summary>
-        public OutputDocument ResultingDocument
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="OutputDocument"/> that was merged into
-        /// <see paramref="ResultingDocument"/>.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        public OutputDocument DiscardedDocument
-        {
-            get;
-            private set;
-        }
-    }
-
-    /// <summary>
     /// Event args for a <see cref="PaginationPanel.CreatingOutputDocument"/> event.
     /// </summary>
     public class CreatingOutputDocumentEventArgs : EventArgs
@@ -366,16 +288,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// but for which there was differing suggested pagination.</param>
         /// <param name="modifiedDocumentData">All documents names and associated
         /// <see cref="PaginationDocumentData"/> where data was modified, but the document pages
-        /// have not been modified compared to pagination on disk.</param>   
+        /// have not been modified compared to pagination on disk.</param>
+        /// <param name="unmodifiedPaginationSources"></param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public PaginatedEventArgs(IEnumerable<string> paginatedDocumentSources,
             IEnumerable<string> disregardedPaginationSources,
-            IEnumerable<KeyValuePair<string, PaginationDocumentData>> modifiedDocumentData)
+            IEnumerable<KeyValuePair<string, PaginationDocumentData>> modifiedDocumentData,
+            IEnumerable<string> unmodifiedPaginationSources)
             : base()
         {
             PaginatedDocumentSources = paginatedDocumentSources.ToList().AsReadOnly();
             DisregardedPaginationSources = disregardedPaginationSources.ToList().AsReadOnly();
             ModifiedDocumentData = modifiedDocumentData.ToList().AsReadOnly();
+            UnmodifiedPaginationSources = unmodifiedPaginationSources.ToList().AsReadOnly();
         }
 
         /// <summary>
@@ -405,6 +330,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public ReadOnlyCollection<KeyValuePair<string, PaginationDocumentData>> ModifiedDocumentData
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// All documents applied as they exist on disk (including documents referenced in
+        /// <see cref="DisregardedPaginationSources"/> and <see cref="ModifiedDocumentData"/>)
+        /// </summary>
+        public ReadOnlyCollection<string> UnmodifiedPaginationSources
         {
             get;
             private set;
@@ -490,6 +425,26 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// document data.
         /// </summary>
         public IPaginationDocumentDataPanel DocumentDataPanel
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
+    /// The event arguments for the <see cref="PaginationPanel.CommittingChanges"/>
+    /// event.
+    /// </summary>
+    public class CommittingChangesEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets or sets a value indicating whether the
+        /// <see cref="PaginationPanel.CommittingChanges"/> event was handled.
+        /// </summary>
+        /// <value><see langword="true"/> if the changes have been committed by the object receiving
+        /// the event; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Handled
         {
             get;
             set;

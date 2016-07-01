@@ -75,10 +75,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._zoomWindowToolStripMenuItem = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
             this._panToolStripMenuItem = new Extract.Imaging.Forms.PanToolStripMenuItem();
-            this._basicDataGridToolStrip = new System.Windows.Forms.ToolStrip();
-            this._applyToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this._revertToSuggestedToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this._revertToDiskToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._basicImageViewerToolStrip = new System.Windows.Forms.ToolStrip();
             this._printImageToolStripButton = new Extract.Imaging.Forms.PrintImageToolStripButton();
             this._zoomWindowToolStripButton = new Extract.Imaging.Forms.ZoomWindowToolStripButton();
@@ -112,7 +108,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._splitContainer.SuspendLayout();
             this._imageViewerContextMenu.SuspendLayout();
             this._menuStrip.SuspendLayout();
-            this._basicDataGridToolStrip.SuspendLayout();
             this._basicImageViewerToolStrip.SuspendLayout();
             this._viewCommandsToolStrip.SuspendLayout();
             this.SuspendLayout();
@@ -138,7 +133,6 @@ namespace Extract.FileActionManager.FileProcessors
             // imageViewerToolStripContainer.TopToolStripPanel
             // 
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._menuStrip);
-            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._basicDataGridToolStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._basicImageViewerToolStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsToolStrip);
             // 
@@ -179,11 +173,12 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.Name = "_paginationPanel";
             this._paginationPanel.Size = new System.Drawing.Size(528, 839);
             this._paginationPanel.TabIndex = 1;
-            this._paginationPanel.ToolBarVisible = false;
+            this._paginationPanel.ToolBarVisible = true;
             this._paginationPanel.DocumentDataRequest += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.DocumentDataRequestEventArgs>(this.HandlePaginationPanel_DocumentDataRequest);
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
             this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
             this._paginationPanel.StateChanged += new System.EventHandler<System.EventArgs>(this.HandlePaginationPanel_StateChanged);
+            this._paginationPanel.CommittingChanges += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CommittingChangesEventArgs>(this.HandlePaginationPanel_CommittingChanges);
             // 
             // _imageViewer
             // 
@@ -663,49 +658,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._panToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             this._panToolStripMenuItem.Text = "P&an";
             // 
-            // _basicDataGridToolStrip
-            // 
-            this._basicDataGridToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._basicDataGridToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._basicDataGridToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._applyToolStripButton,
-            this._revertToSuggestedToolStripButton,
-            this._revertToDiskToolStripButton});
-            this._basicDataGridToolStrip.Location = new System.Drawing.Point(3, 24);
-            this._basicDataGridToolStrip.Name = "_basicDataGridToolStrip";
-            this._basicDataGridToolStrip.Size = new System.Drawing.Size(120, 39);
-            this._basicDataGridToolStrip.TabIndex = 0;
-            // 
-            // _applyToolStripButton
-            // 
-            this._applyToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._applyToolStripButton.Image = global::Extract.FileActionManager.FileProcessors.Properties.Resources.Apply;
-            this._applyToolStripButton.ImageTransparentColor = System.Drawing.SystemColors.Control;
-            this._applyToolStripButton.Name = "_applyToolStripButton";
-            this._applyToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._applyToolStripButton.Text = "Apply pagination changes";
-            this._applyToolStripButton.Click += new System.EventHandler(this.HandleApplyToolStripButton_Click);
-            // 
-            // _revertToSuggestedToolStripButton
-            // 
-            this._revertToSuggestedToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._revertToSuggestedToolStripButton.Image = global::Extract.FileActionManager.FileProcessors.Properties.Resources.RevertToSuggestion;
-            this._revertToSuggestedToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._revertToSuggestedToolStripButton.Name = "_revertToSuggestedToolStripButton";
-            this._revertToSuggestedToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._revertToSuggestedToolStripButton.Text = "Revert to suggested pagination";
-            this._revertToSuggestedToolStripButton.Click += new System.EventHandler(this.RevertToSuggestedToolStripButton_Click);
-            // 
-            // _revertToDiskToolStripButton
-            // 
-            this._revertToDiskToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._revertToDiskToolStripButton.Image = global::Extract.FileActionManager.FileProcessors.Properties.Resources.RevertToDisk;
-            this._revertToDiskToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._revertToDiskToolStripButton.Name = "_revertToDiskToolStripButton";
-            this._revertToDiskToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._revertToDiskToolStripButton.Text = "Revert to pagination on disk";
-            this._revertToDiskToolStripButton.Click += new System.EventHandler(this.RevertToDiskToolStripButton_Click);
-            // 
             // _basicImageViewerToolStrip
             // 
             this._basicImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -714,7 +666,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._printImageToolStripButton,
             this._zoomWindowToolStripButton,
             this._panToolStripButton});
-            this._basicImageViewerToolStrip.Location = new System.Drawing.Point(123, 24);
+            this._basicImageViewerToolStrip.Location = new System.Drawing.Point(3, 24);
             this._basicImageViewerToolStrip.Name = "_basicImageViewerToolStrip";
             this._basicImageViewerToolStrip.Size = new System.Drawing.Size(120, 39);
             this._basicImageViewerToolStrip.TabIndex = 0;
@@ -767,7 +719,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._rotateCounterclockwiseToolStripButton,
             this._rotateClockwiseToolStripButton,
             toolStripSeparator10});
-            this._viewCommandsToolStrip.Location = new System.Drawing.Point(243, 24);
+            this._viewCommandsToolStrip.Location = new System.Drawing.Point(123, 24);
             this._viewCommandsToolStrip.Name = "_viewCommandsToolStrip";
             this._viewCommandsToolStrip.Size = new System.Drawing.Size(354, 39);
             this._viewCommandsToolStrip.TabIndex = 2;
@@ -919,8 +871,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._imageViewerContextMenu.ResumeLayout(false);
             this._menuStrip.ResumeLayout(false);
             this._menuStrip.PerformLayout();
-            this._basicDataGridToolStrip.ResumeLayout(false);
-            this._basicDataGridToolStrip.PerformLayout();
             this._basicImageViewerToolStrip.ResumeLayout(false);
             this._basicImageViewerToolStrip.PerformLayout();
             this._viewCommandsToolStrip.ResumeLayout(false);
@@ -945,7 +895,6 @@ namespace Extract.FileActionManager.FileProcessors
         private Extract.Imaging.Forms.FitToWidthToolStripButton _fitToWidthToolStripButton;
         private Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton _rotateCounterclockwiseToolStripButton;
         private Extract.Imaging.Forms.RotateClockwiseToolStripButton _rotateClockwiseToolStripButton;
-        private System.Windows.Forms.ToolStrip _basicDataGridToolStrip;
         private Extract.Imaging.Forms.ThumbnailViewer _thumbnailViewer;
         private Extract.Imaging.Forms.ImageViewerStatusStrip _imageViewerStatusStrip;
         private System.Windows.Forms.ContextMenuStrip _imageViewerContextMenu;
@@ -995,8 +944,5 @@ namespace Extract.FileActionManager.FileProcessors
         private Imaging.Forms.PanToolStripMenuItem _panToolStripMenuItem;
         private System.Windows.Forms.SplitContainer _splitContainer;
         private UtilityApplications.PaginationUtility.PaginationPanel _paginationPanel;
-        private System.Windows.Forms.ToolStripButton _applyToolStripButton;
-        private System.Windows.Forms.ToolStripButton _revertToSuggestedToolStripButton;
-        private System.Windows.Forms.ToolStripButton _revertToDiskToolStripButton;
     }
 }
