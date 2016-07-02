@@ -208,6 +208,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<PaginatedEventArgs> Paginated;
 
         /// <summary>
+        /// Raised when a pagination operation has failed.
+        /// </summary>
+        public event EventHandler<ExtractExceptionEventArgs> PaginationError;
+
+        /// <summary>
         /// Raised when the state of any pages, documents or data has changed.
         /// </summary>
         public event EventHandler<EventArgs> StateChanged;
@@ -724,19 +729,26 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                ApplyOrderOfLoadedSourceDocuments();
-
                 _pendingChangesOverride = null;
 
                 SelectAllToCommit(false);
-
-                UpdateCommandStates();
 
                 return true;
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI39571");
+                var ee = ex.AsExtract("ELI39571");
+
+                try
+                {
+                    OnPaginationError(ee);
+                }
+                catch (Exception ex2)
+                {
+                    ex2.ExtractLog("ELI40231");
+                }
+
+                throw ee;
             }
             finally
             {
@@ -747,6 +759,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _outputDocumentPositions.Clear();
                     }
+
+                    ApplyOrderOfLoadedSourceDocuments();
+
+                    UpdateCommandStates();
                 }
                 catch (Exception ex)
                 {
@@ -2266,6 +2282,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                     new PaginatedEventArgs(
                         paginatedDocumentSources, disregardedPaginationSources,
                         modifiedDocumentData, unmodifiedPaginationSources));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="PaginationError"/> event.
+        /// </summary>
+        /// <param name="ee">The exception that has been thrown from pagination.
+        /// </param>
+        void OnPaginationError(ExtractException ee)
+        {
+            var eventHandler = PaginationError;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new ExtractExceptionEventArgs(ee));
             }
         }
 

@@ -3327,6 +3327,30 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Handles the <see cref="PaginationPanel.PaginationError"/> event of the
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="ExtractExceptionEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandlePaginationPanel_PaginationError(object sender, ExtractExceptionEventArgs e)
+        {
+            try
+            {
+                // https://extract.atlassian.net/browse/ISSUE-13831
+                // If an exception is thrown creating the output document, the Paginated event will
+                // not be raised (which is ordinarily what would resume the processing queue).
+                _paginating = false;
+                _paginationOutputToReload.Clear();
+                FileRequestHandler.ResumeProcessingQueue();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40232");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="PaginationDocumentData.AttributeValueChanged"/> event.
         /// </summary>
         /// <param name="sender">The source of the event.</param>

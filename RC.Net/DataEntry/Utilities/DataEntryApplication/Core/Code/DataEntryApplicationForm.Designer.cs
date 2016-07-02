@@ -261,6 +261,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationPanel.TabIndex = 0;
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
             this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
+            this._paginationPanel.PaginationError += new EventHandler<Extract.ExtractExceptionEventArgs>(this.HandlePaginationPanel_PaginationError);
             // 
             // _dockContainer
             // 

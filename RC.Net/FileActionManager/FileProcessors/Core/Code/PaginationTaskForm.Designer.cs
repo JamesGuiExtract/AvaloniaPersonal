@@ -177,6 +177,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.DocumentDataRequest += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.DocumentDataRequestEventArgs>(this.HandlePaginationPanel_DocumentDataRequest);
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
             this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
+            this._paginationPanel.PaginationError += new EventHandler<Extract.ExtractExceptionEventArgs>(this.HandlePaginationPanel_PaginationError);
             this._paginationPanel.StateChanged += new System.EventHandler<System.EventArgs>(this.HandlePaginationPanel_StateChanged);
             this._paginationPanel.CommittingChanges += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CommittingChangesEventArgs>(this.HandlePaginationPanel_CommittingChanges);
             // 

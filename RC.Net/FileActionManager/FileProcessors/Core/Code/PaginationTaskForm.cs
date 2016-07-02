@@ -124,14 +124,6 @@ namespace Extract.FileActionManager.FileProcessors
         IPaginationDocumentDataPanel _paginationDocumentDataPanel;
 
         /// <summary>
-        /// During a pagination operation in the <see cref="_paginationPanel"/>, the name, position
-        /// in the panel, and data of documents that have been output and are to be immediately
-        /// loaded back in for verification.
-        /// </summary>
-        List<Tuple<string, int, PaginationDocumentData>> _paginationOutputToReload =
-            new List<Tuple<string, int, PaginationDocumentData>>();
-
-        /// <summary>
         /// Used to prevent simultaneous modification of a voa file from multiple Extract Systems
         /// processes.
         /// </summary>
@@ -690,18 +682,6 @@ namespace Extract.FileActionManager.FileProcessors
                 // queue in most cases, but not if the applied pagination matched source doc form.
                 FileRequestHandler.PauseProcessingQueue();
 
-                // Reload all output files back into pagination.
-                foreach (var output in _paginationOutputToReload)
-                {
-                    string fileName = output.Item1;
-                    // Position is the index of the first page of the controls out of all pagination
-                    // controls, though what position means doesn't really need to be interpreted in
-                    // this scope.
-                    int position = output.Item2;
-                    PaginationDocumentData documentData = output.Item3;
-                    _paginationPanel.LoadFile(fileName, position, null, false, documentData);
-                }
-
                 foreach (var item in e.ModifiedDocumentData)
                 {
                     string sourceFileName = item.Key;
@@ -722,8 +702,29 @@ namespace Extract.FileActionManager.FileProcessors
             }
             finally
             {
-                _paginationOutputToReload.Clear();
                 FileRequestHandler.ResumeProcessingQueue();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationPanel.PaginationError"/> event of the
+        /// <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="ExtractExceptionEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandlePaginationPanel_PaginationError(object sender, ExtractExceptionEventArgs e)
+        {
+            try
+            {
+                // https://extract.atlassian.net/browse/ISSUE-13831
+                // If an exception is thrown creating the output document, the Paginated event will
+                // not be raised (which is ordinarily what would resume the processing queue).
+                FileRequestHandler.ResumeProcessingQueue();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40233");
             }
         }
 
