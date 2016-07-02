@@ -1148,7 +1148,7 @@ namespace Extract.LabResultsCustomComponents
                     {
                         g.AddOfficialNameAndTestCode(dbCache, AddESNamesAttribute, AddESTestCodesAttribute, SetFuzzyType);
                         return g.Attribute;
-                    });
+                    }).ToList();
             }
 
             // Limit to outstanding orders if useOutstandingOrders and there actually are any outstanding orders
@@ -1518,11 +1518,18 @@ namespace Extract.LabResultsCustomComponents
             // Variables to hold the best match seen thus far (will be modified as the
             // best matching algorithm does its work
             int bestGroupCount = 0;
+            int bestMatchScoreSum = 0;
             string bestTieBreakerString = "";
             OrderGroupingPermutation bestGroup = null;
 
             // Get possible orders for the first group
-            var potentialOrderCodes = GetPotentialOrderCodes(unmatchedGroups.First().LabTests, dbCache);
+            var potentialOrderCodes = GetPotentialOrderCodes(unmatchedGroups.First().LabTests, dbCache)
+                .ToList();
+
+            // Only the first group will be used to generate matchScoreSums to avoid bias towards
+            // permutations that include more tests with defined MatchScoringQueries
+            var attributesToScore = new HashSet<IAttribute>(
+                unmatchedGroups.First().LabTests.Select(labTest => labTest.Attribute));
 
             // Loop through the potential orders attempting to match the order
             foreach (string orderCode in potentialOrderCodes)
@@ -1545,7 +1552,7 @@ namespace Extract.LabResultsCustomComponents
                 }
 
                 var currentPermutation = new OrderGroupingPermutation(unmatchedGroups.First());
-                var skipped = 0;
+                int skipped = 0;
                 foreach (var nextGroup in unmatchedGroups.Skip(1))
                 {
                     bool compatibleDates;
@@ -1611,24 +1618,49 @@ namespace Extract.LabResultsCustomComponents
                 }
 
                 int groupCount = currentPermutation.ContainedGroups.Count;
-                string tieBreakerString = (group.LabOrder == null) ? "" : group.LabOrder.TieBreakerString;
+                string tieBreakerString = "";
+                bool isBetterMatch = false;
+                int matchScoreSum = 0;
+
+                if (group.LabOrder != null)
+                {
+                    tieBreakerString = group.LabOrder.TieBreakerString;
+                    if (potentialOrderCodes.Count > 1)
+                    {
+                        matchScoreSum = currentPermutation
+                            .ContainedTests
+                            .Where(labTest => attributesToScore.Contains(labTest.Attribute))
+                            .Sum(labTest => dbCache.GetMappingScore(labTest.TestCode, labTest.Attribute));
+                    }
+                }
 
                 // Best match if:
                 // 1. Has more contained groups than other grouping OR
                 if (bestGroup == null || groupCount > bestGroupCount)
                 {
-                    bestGroup = currentPermutation;
-                    bestGroupCount = groupCount;
-                    bestTieBreakerString = tieBreakerString;
+                    isBetterMatch = true;
                 }
-                // 2. Has same number of contained groups AND a lesser TieBreakerString.
-                else if (groupCount == bestGroupCount &&
-                         string.Compare(
+                // 2. Has same number of contained groups AND better match score sum or a lesser TieBreakerString.
+                else if (groupCount == bestGroupCount)
+                {
+                    if (matchScoreSum > bestMatchScoreSum)
+                    {
+                        isBetterMatch = true;
+                    }
+                    else if (matchScoreSum == bestMatchScoreSum &&
+                        string.Compare(
                             tieBreakerString, bestTieBreakerString, StringComparison.Ordinal) < 0)
+                    {
+                        isBetterMatch = true;
+                    }
+                }
+
+                if (isBetterMatch)
                 {
                     bestGroup = currentPermutation;
                     bestGroupCount = groupCount;
                     bestTieBreakerString = tieBreakerString;
+                    bestMatchScoreSum = matchScoreSum;
                 }
             }
 
@@ -1736,11 +1768,12 @@ namespace Extract.LabResultsCustomComponents
             int bestMatchCount = 0;
             string bestTieBreakerString = "";
             string bestOrderId = "UnknownOrder";
+            int bestMatchScoreSum = 0;
             List<LabTest> bestMatchedTests = new List<LabTest>();
 
             // Check to see if the first test is part of any valid order
-            ReadOnlyCollection<string> potentialOrderCodes =
-                dbCache.GetPotentialOrderCodes(unmatchedTests[0].Name);
+            var potentialOrderCodes = dbCache.GetPotentialOrderCodes(unmatchedTests[0].Name)
+                .ToList();
 
             // Loop through the potential orders attempting to match the order
             foreach (string orderCode in potentialOrderCodes)
@@ -1771,25 +1804,45 @@ namespace Extract.LabResultsCustomComponents
                 List<LabTest> matchedTests = labOrder.GetMatchingTests(unmatchedTests, dbCache,
                     finalPass, requireMandatory);
 
+                // If using this order is possible
                 if (matchedTests != null && (!useFilledRequirement || matchedTests.Count >= labOrder.FilledRequirement))
                 {
-                    // Best match if more tests matched OR
+                    bool isBetterOrder = false;
+                    int matchScoreSum = 0;
+                    if (potentialOrderCodes.Count > 1)
+                    {
+                        matchScoreSum = matchedTests
+                            .Sum(labTest => dbCache.GetMappingScore(labTest.TestCode, labTest.Attribute));
+                    }
+
+
+                    // Better match if more tests matched
                     if (matchedTests.Count > bestMatchCount)
                     {
-                        bestMatchCount = matchedTests.Count;
-                        bestMatchedTests = matchedTests;
-                        bestOrderId = labOrder.OrderCode;
-                        bestTieBreakerString = labOrder.TieBreakerString;
+                        isBetterOrder = true;
                     }
-                    // ...equal test count AND a lesser TieBreakerString.
-                    else if (matchedTests.Count == bestMatchCount &&
-                             string.Compare(labOrder.TieBreakerString, bestTieBreakerString,
+                    // Or equal test count and better match score sum or a lesser TieBreakerString.
+                    else if (matchedTests.Count == bestMatchCount)
+                    {
+                        if (matchScoreSum > bestMatchScoreSum)
+                        {
+                            isBetterOrder = true;
+                        }
+                        else if (matchScoreSum == bestMatchScoreSum &&
+                            string.Compare(labOrder.TieBreakerString, bestTieBreakerString,
                                             StringComparison.Ordinal) < 0)
+                        {
+                            isBetterOrder = true;
+                        }
+                    }
+
+                    if (isBetterOrder)
                     {
                         bestMatchCount = matchedTests.Count;
                         bestMatchedTests = matchedTests;
                         bestOrderId = labOrder.OrderCode;
                         bestTieBreakerString = labOrder.TieBreakerString;
+                        bestMatchScoreSum = matchScoreSum;
                     }
                 }
             }

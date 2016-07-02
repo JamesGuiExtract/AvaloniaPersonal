@@ -2,6 +2,7 @@
 using Extract.DataEntry;
 using Extract.Licensing;
 using Extract.Utilities;
+using Spring.Core.TypeResolution;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -91,6 +92,11 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI34458", _OBJECT_NAME);
+
+                TypeRegistry.RegisterType("Regex", typeof(System.Text.RegularExpressions.Regex));
+                TypeRegistry.RegisterType("StringUtils", typeof(Spring.Util.StringUtils));
+                TypeRegistry.RegisterType("CultureInfo", typeof(System.Globalization.CultureInfo));
+                TypeRegistry.RegisterType("LabDEUtils", typeof(DataEntry.LabDE.LabDEQueryUtilities));
 
                 InitializeComponent();
             }

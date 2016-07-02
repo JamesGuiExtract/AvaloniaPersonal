@@ -438,7 +438,7 @@ namespace Extract.LabResultsCustomComponents
                     // Add the test code subattribute
                     attribute.SubAttributes.PushBack(testCode);
 
-                    // Create the ESName subattribute
+                    // Create the ESNames subattribute
                     if (addESNamesAttribute)
                     {
                         HashSet<string> esNames;

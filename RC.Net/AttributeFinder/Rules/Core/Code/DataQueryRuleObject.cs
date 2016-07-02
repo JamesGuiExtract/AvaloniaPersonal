@@ -204,6 +204,7 @@ namespace Extract.AttributeFinder.Rules
                 TypeRegistry.RegisterType("Regex", typeof(System.Text.RegularExpressions.Regex));
                 TypeRegistry.RegisterType("StringUtils", typeof(Spring.Util.StringUtils));
                 TypeRegistry.RegisterType("CultureInfo", typeof(System.Globalization.CultureInfo));
+                TypeRegistry.RegisterType("LabDEUtils", typeof(DataEntry.LabDE.LabDEQueryUtilities));
             }
             catch (Exception ex)
             {
