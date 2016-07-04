@@ -446,8 +446,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _flowLayoutPanel.ClientSizeChanged += HandleFlowLayoutPanel_ClientSizeChanged;
                 ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).RedundantControlsFound +=
                     PaginationLayoutEngine_RedundantControlsFound;
-                _loadNextDocumentButtonControl.ButtonClick +=
-                    HandleLoadNextDocumentButtonControl_ButtonClick;
 
                 _printPageCounter = 0;
             }
@@ -603,6 +601,27 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets whether the load next document button should be available.
+        /// </summary>
+        public bool LoadNextDocumentVisible
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether changes should be committed only for the selected documents.
+        /// </summary>
+        /// <value><see langword="true"/> if changes should be committed only for the selected
+        /// document(s) or <see langword="false"/> if changes should be committed for all documents
+        /// loaded into this instance.</value>
+        public bool CommitOnlySelection
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the <see cref="LoadNextDocumentButtonControl"/>
         /// is enabled.
         /// </summary>
@@ -737,11 +756,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (value && _updateLock == null)
                     {
                         _updateLock = new PageLayoutControlUpdateLock(this);
-                        RemovePaginationControl(_loadNextDocumentButtonControl, false);
+                        if (LoadNextDocumentVisible)
+                        {
+                            RemovePaginationControl(_loadNextDocumentButtonControl, false);
+                        }
                     }
                     else if (!value && _updateLock != null)
                     {
-                        AddPaginationControl(_loadNextDocumentButtonControl);
+                        if (LoadNextDocumentVisible)
+                        {
+                            AddPaginationControl(_loadNextDocumentButtonControl);
+                        }
                         _updateLock.Dispose();
                         _updateLock = null;
                         UpdateCommandStates();
@@ -753,7 +778,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
             }
         }
-        
 
         #endregion Properties
 
@@ -768,6 +792,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see cref="OutputDocument"/>.</param>
         /// <param name="pages">The page numbers from <see paramref="sourceDocument"/> that should
         /// be used or <see landword="null"/> to us all pages.</param>
+        /// <param name="deletedPages">The page numbers from <see paramref="fileName"/> to be
+        /// loaded but shown as deleted.</param>
         /// <param name="position">The position at which a document should be loaded. 0 = Load at
         /// the front (top), -1 = load at the end (bottom). Any other value should be a value
         /// passed via <see cref="CreatingOutputDocumentEventArgs"/> and not a value the caller
@@ -779,7 +805,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// before creating the new; otherwise, <see langword="false"/>.</param>
         /// <returns>The <see cref="OutputDocument"/> that was created.</returns>
         public OutputDocument CreateOutputDocument(SourceDocument sourceDocument,
-            IEnumerable<int> pages, int position, bool insertSeparator)
+            IEnumerable<int> pages, IEnumerable<int> deletedPages, int position,
+            bool insertSeparator)
         {
             bool removedLoadNextDocumentButton = false;
 
@@ -788,7 +815,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (position == -1)
                 {
                     // While new pages are being added, remove the load next document control.
-                    if (_flowLayoutPanel.Controls.Contains(_loadNextDocumentButtonControl))
+                    if (LoadNextDocumentVisible &&
+                        _flowLayoutPanel.Controls.Contains(_loadNextDocumentButtonControl))
                     {
                         RemovePaginationControl(_loadNextDocumentButtonControl, false);
                         removedLoadNextDocumentButton = true;
@@ -820,14 +848,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // the separator ahead of any existing documents
                     if (lastPageControl == null)
                     {
-                        InsertPaginationControl(new PaginationSeparator(), index: 0);
+                        InsertPaginationControl(
+                            new PaginationSeparator(CommitOnlySelection), index: 0);
                         pageIndex = 1;
                     }
                     // Otherwise, place the separator immediately after the previous document.
                     else
                     {
                         pageIndex = _flowLayoutPanel.Controls.GetChildIndex(lastPageControl) + 1;
-                        InsertPaginationControl(new PaginationSeparator(), index: pageIndex);
+                        InsertPaginationControl(
+                            new PaginationSeparator(CommitOnlySelection), index: pageIndex);
                         pageIndex++;
                     }
                 }
@@ -844,13 +874,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 outputDocument = outputDocument ??
                     GetOutputDocumentFromUtility(sourceDocument.FileName);
 
-                var pagesSet = (pages == null) ? null : new HashSet<int>(pages);
+                var pagesSet = (pages == null && deletedPages == null)
+                    ? null
+                    : new HashSet<int>((pages ?? new int[0]).Union(deletedPages ?? new int[0]));
                 var pagesToLoad = (pagesSet == null)
                     ? sourceDocument.Pages.ToArray()
-                    : sourceDocument.Pages.Where(page =>
-                        pagesSet
+                    : sourceDocument.Pages
+                        .Where(page => pagesSet
                             .Contains(page.OriginalPageNumber))
-                            .ToArray();
+                        .ToArray();
 
                 bool allPagesCanBeLoaded = true;
                 if (position == -1)
@@ -862,8 +894,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Create a page control for every page in sourceDocument.
                 foreach (Page page in pagesToLoad)
                 {
-                    InsertPaginationControl(new PageThumbnailControl(outputDocument, page),
-                        pageIndex);
+                    var pageControl = new PageThumbnailControl(outputDocument, page);
+                    if (deletedPages != null && deletedPages.Contains(page.OriginalPageNumber))
+                    {
+                        pageControl.Deleted = true;
+                    }
+                    
+                    InsertPaginationControl(pageControl, pageIndex);
 
                     if (pageIndex != -1)
                     {
@@ -896,7 +933,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    if (removedLoadNextDocumentButton)
+                    if (LoadNextDocumentVisible && removedLoadNextDocumentButton)
                     {
                         AddPaginationControl(_loadNextDocumentButtonControl);
                     }
@@ -926,8 +963,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 using (new PageLayoutControlUpdateLock(this))
                 {
                     // While new pages are being added, remove the load next document control.
-                    RemovePaginationControl(_loadNextDocumentButtonControl, false);
-                    removedLoadNextDocumentButton = true;
+                    if (LoadNextDocumentVisible)
+                    {
+                        RemovePaginationControl(_loadNextDocumentButtonControl, false);
+                        removedLoadNextDocumentButton = true;
+                    }
 
                     Control lastPageControl = _flowLayoutPanel.Controls
                         .OfType<PageThumbnailControl>()
@@ -937,7 +977,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // we need to add a separator.
                     if (lastPageControl != null)
                     {
-                        InsertPaginationControl(new PaginationSeparator(), index: -1);
+                        InsertPaginationControl(
+                            new PaginationSeparator(CommitOnlySelection), index: -1);
                     }
 
                     // Create a page control for every page in sourceDocument.
@@ -1049,7 +1090,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 using (new PageLayoutControlUpdateLock(this))
                 {
                     // While new pages are being added, remove the load next document control.
-                    RemovePaginationControl(_loadNextDocumentButtonControl, false);
+                    if (LoadNextDocumentVisible)
+                    {
+                        RemovePaginationControl(_loadNextDocumentButtonControl, false);
+                    }
 
                     foreach (Page page in pages)
                     {
@@ -1072,7 +1116,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    AddPaginationControl(_loadNextDocumentButtonControl);
+                    if (LoadNextDocumentVisible)
+                    {
+                        AddPaginationControl(_loadNextDocumentButtonControl);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1654,6 +1701,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ContextMenuStrip.Items.Add(_toggleDocumentSeparatorMenuItem);
                 ContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
                 ContextMenuStrip.Closing += HandleContextMenuStrip_Closing;
+
+                if (LoadNextDocumentVisible)
+                {
+                    _loadNextDocumentButtonControl.ButtonClick +=
+                        HandleLoadNextDocumentButtonControl_ButtonClick;
+                }
 
                 UpdateCommandStates();
             }
@@ -2628,7 +2681,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var lastControl = _flowLayoutPanel.Controls.OfType<PaginationControl>().LastOrDefault();
                 if (lastControl != null && !(lastControl is PaginationSeparator))
                 {
-                    AddPaginationControl(new PaginationSeparator());
+                    AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
                 }
             }
 
@@ -2637,7 +2690,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // Precede the first page with a separator to serve as a header for the document.
             if (isPageControl && _flowLayoutPanel.Controls.Count == 0)
             {
-                AddPaginationControl(new PaginationSeparator());
+                AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
             }
 
             // A pagination separator is meaningless as the first control.
@@ -3596,7 +3649,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // A null page represents a document boundary; insert a separator.
                 if (page.Key == null)
                 {
-                    var separator = new PaginationSeparator();
+                    var separator = new PaginationSeparator(CommitOnlySelection);
                     insertedPaginationControls.Add(separator);
 
                     if (InitializePaginationControl(separator, ref index))
@@ -4441,7 +4494,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             int index = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
-                            InitializePaginationControl(new PaginationSeparator(), ref index);
+                            InitializePaginationControl(
+                                new PaginationSeparator(CommitOnlySelection), ref index);
                         }
                     }
                 }

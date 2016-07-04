@@ -166,8 +166,10 @@ namespace Extract.FileActionManager.FileProcessors
             // _paginationPanel
             // 
             this._paginationPanel.BackColor = System.Drawing.Color.Transparent;
+            this._paginationPanel.CommitOnlySelection = true;
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._paginationPanel.ImageViewer = null;
+            this._paginationPanel.LoadNextDocumentVisible = true;
             this._paginationPanel.Location = new System.Drawing.Point(0, 0);
             this._paginationPanel.Margin = new System.Windows.Forms.Padding(0);
             this._paginationPanel.Name = "_paginationPanel";

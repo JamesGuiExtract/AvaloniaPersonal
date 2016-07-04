@@ -536,13 +536,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         HashSet<IAttribute> _paginagionAttributesToRefresh = new HashSet<IAttribute>();
 
         /// <summary>
-        /// During a pagination operation in the <see cref="_paginationPanel"/>, the name, position
-        /// in the panel, and data of documents that have been output exactly as suggested and,
-        /// therefore, should be immediately loaded back in for verification.
-        /// <see cref="_paginationPanel"/>.
+        /// Keeps track of suggested pagination output that was accepted and should be loaded ahead
+        /// of any documents currently processing in this instance.
         /// </summary>
-        List<Tuple<string, int, PaginationDocumentData>> _paginationOutputToReload =
-            new List<Tuple<string, int, PaginationDocumentData>>();
+        Queue<string> _paginationOutputOrder = new Queue<string>();
 
         /// <summary>
         /// Indicates whether a pagination event from the <see cref="_paginationPanel"/> is
@@ -1151,13 +1148,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 _imageViewer.CacheImage(fileName);
 
-                if (_paginationPanel != null)
-                {
-                    // This method must be run in the UI thread since it is loading attributes for
-                    // use in the UI thread.
-                    FormsMethods.ExecuteInUIThread(this, () => LoadDocumentForPagination(fileName));
-                }
-
                 // [DataEntry:1151]
                 // It appears in some cases the image viewer ends up trying to display highlights
                 // being loaded via prefetch. I don't feel comfortable that I can make a low-risk
@@ -1232,8 +1222,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (!_standAloneMode && _settings.PaginationEnabled)
                 {
-                    _paginationPanel.LoadNextDocument += HandlePaginationPanel_LoadNextDocument;
-
                     LoadPaginationDocumentDataPanel();
 
                     // Show pagination tab before showing the data tab to trigger the pagination
@@ -2990,14 +2978,32 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
 
                     _dataEntryControlHost.ImageViewer = _imageViewer;
+                    _dataEntryControlHost.DisableKeyboardInput = false;
+                    _imageViewer.AllowHighlight = true;
                     _imageViewer.ImageFileChanged += HandleImageFileChanged;
                     _imageViewer.ImageFileClosing += HandleImageFileClosing;
                     _imageViewer.LoadingNewImage += HandleLoadingNewImage;
 
-                    // Skip, save and commit are only available while the data tab is active.
-                    _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                    _printMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                    _pageNavigationToolStripMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                    _pageNavigationImageViewerToolStrip.Enabled = _imageViewer.IsImageAvailable;
+                    _gotoNextInvalidCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _gotoNextUnviewedCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _fileCommandsToolStrip.Enabled = _imageViewer.IsImageAvailable;
+                    _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _acceptSpatialInfoCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _removeSpatialInfoCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _undoCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _redoCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _selectAngularHighlightCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _selectRectangularHighlightCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _selectWordHighlightCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _toggleHighlightCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _toggleShowAllHighlightsCommand.Enabled = _imageViewer.IsImageAvailable;
+                    _selectLayerObjectMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                    _selectLayerObjectToolStripButton.Enabled = _imageViewer.IsImageAvailable;
 
                     // Refresh any attributes that were modified in the _paginationDocumentDataPanel
                     // so that it's value stays in sync.
@@ -3017,17 +3023,35 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     // These events are handled in the context of data entry verification. If
                     // pagination is active these events should be ignored.
+                    _imageViewer.AllowHighlight = false;
                     _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                     _imageViewer.ImageFileClosing -= HandleImageFileClosing;
                     _imageViewer.LoadingNewImage -= HandleLoadingNewImage;
                     // Setting ImageViewer to null will unregister image viewer events we shouldn't
                     // handle while in pagination.
+                    _dataEntryControlHost.DisableKeyboardInput = true;
                     _dataEntryControlHost.ImageViewer = null;
 
-                    // Skip, save and commit are only available while the data tab is active.
-                    _skipProcessingMenuItem.Enabled = false;
                     _saveAndCommitFileCommand.Enabled = false;
                     _saveMenuItem.Enabled = false;
+                    _printMenuItem.Enabled = false;
+                    _pageNavigationToolStripMenuItem.Enabled = false;
+                    _pageNavigationImageViewerToolStrip.Enabled = false;
+                    _gotoNextInvalidCommand.Enabled = false;
+                    _gotoNextUnviewedCommand.Enabled = false;
+                    _fileCommandsToolStrip.Enabled = false;
+                    _hideToolTipsCommand.Enabled = false;
+                    _acceptSpatialInfoCommand.Enabled = false;
+                    _removeSpatialInfoCommand.Enabled = false;
+                    _undoCommand.Enabled = false;
+                    _redoCommand.Enabled = false;
+                    _selectAngularHighlightCommand.Enabled = false;
+                    _selectRectangularHighlightCommand.Enabled = false;
+                    _selectWordHighlightCommand.Enabled = false;
+                    _toggleHighlightCommand.Enabled = false;
+                    _toggleShowAllHighlightsCommand.Enabled = false;
+                    _selectLayerObjectMenuItem.Enabled = false;
+                    _selectLayerObjectToolStripButton.Enabled = false;
 
                     _paginationPanel.Resume();
                 }
@@ -3035,34 +3059,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI39546");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="PaginationPanel.LoadNextDocument "/> event of the
-        /// <see cref="_paginationPanel"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandlePaginationPanel_LoadNextDocument(object sender, EventArgs e)
-        {
-            try
-            {
-                int fileID = FileRequestHandler.CheckoutNextFile(false);
-                if (fileID > 0)
-                {
-                    string fileName = FileProcessingDB.GetFileNameFromFileID(fileID);
-                    LoadDocumentForPagination(fileName);
-                }
-                else
-                {
-                    UtilityMethods.ShowMessageBox("No more files are available.", "No more files", false);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI40072");
             }
         }
 
@@ -3196,19 +3192,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // queue in most cases, but not if the applied pagination matched source doc form.
                 FileRequestHandler.PauseProcessingQueue();
 
-                // Reload files into the pagination pane that were generated using rules-suggested
-                // breaks.
-                foreach (var output in _paginationOutputToReload)
-                {
-                    string fileName = output.Item1;
-                    // Position is the index of the first page of the controls out of all pagination
-                    // controls, though what position means doesn't really need to be interpreted in
-                    // this scope.
-                    int position = output.Item2;
-                    PaginationDocumentData documentData = output.Item3;
-                    _paginationPanel.LoadFile(fileName, position, null, false, documentData);
-                }
-
                 foreach (var item in e.ModifiedDocumentData)
                 {
                     string sourceFileName = item.Key;
@@ -3321,7 +3304,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             finally
             {
-                _paginationOutputToReload.Clear();
                 FileRequestHandler.ResumeProcessingQueue();
             }
         }
@@ -3341,7 +3323,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // If an exception is thrown creating the output document, the Paginated event will
                 // not be raised (which is ordinarily what would resume the processing queue).
                 _paginating = false;
-                _paginationOutputToReload.Clear();
+                _paginationOutputOrder.Clear();
                 FileRequestHandler.ResumeProcessingQueue();
             }
             catch (Exception ex)
@@ -5435,37 +5417,51 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// out to correspond with the order of documents in pagination.</returns>
         bool ReorderAccordingToPagination(string fileName)
         {
-            // The _paginationControl will ensure documents are processed in the order they are
-            // displayed in the pagination control. Occasionally it will force a different file
-            // to come up in place of the fileName. In this case, return immediately to allow
+            // As suggested pagination is accepted, processes the generated output in order ahead
+            // of any other document in the queue
             // the file it wants to come up.
-            var expectedDocumentOrder = (_paginationPanel == null)
-                ? null
-                : _paginationPanel.SourceDocuments;
-            if (expectedDocumentOrder != null && expectedDocumentOrder.Count > 0)
+            if (_paginationOutputOrder.Any())
             {
-                if (expectedDocumentOrder[0] != fileName)
+                if (_paginationOutputOrder.Peek() != fileName)
                 {
                     try
                     {
                         FileRequestHandler.PauseProcessingQueue();
-                        int neededFileId = FileProcessingDB.GetFileID(expectedDocumentOrder[0]);
+                        int neededFileId = FileProcessingDB.GetFileID(_paginationOutputOrder.Peek());
                         RequestFile(neededFileId);
+                    }
+                    catch (Exception ex)
+                    {
+                        _paginationOutputOrder.Clear();
+
+                        throw ex.AsExtract("ELI40234");
                     }
                     finally
                     {
                         FileRequestHandler.ResumeProcessingQueue();
                     }
+
                     return true;
                 }
+
+                _paginationOutputOrder.Dequeue();
 
                 // To help prevent that we might need to swap out the next file that attempts to
                 // load, request the subsequent document so that it is what comes into
                 // verification after this file.
-                if (expectedDocumentOrder.Count > 1)
+                if (_paginationOutputOrder.Any())
                 {
-                    int nextFileID = FileProcessingDB.GetFileID(expectedDocumentOrder[1]);
-                    RequestFile(nextFileID);
+                    try
+                    {
+                        int nextFileID = FileProcessingDB.GetFileID(_paginationOutputOrder.Peek());
+                        RequestFile(nextFileID);
+                    }
+                    catch (Exception ex)
+                    {
+                        _paginationOutputOrder.Clear();
+
+                        throw ex.AsExtract("ELI40235");
+                    }
                 }
             }
 
@@ -5525,17 +5521,28 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // document as far as the _paginationPanel is concerned.
                     foreach (var documentAttribute in attributeArray)
                     {
-                        // There should be two attributes under the root Document attribute:
+                        // There are three attributes that may be under the root Document attribute:
                         // Pages- The range/list specification of pages to be included.
+                        // DeletedPages- The range/list specification of pages to be shown as deleted.
                         // DocumentData- The data (redaction or indexing() the rules found for the
                         //  virtual document.
                         var pages =
                             UtilityMethods.GetPageNumbersFromString(
                                 documentAttribute.SubAttributes
                                 .ToIEnumerable<IAttribute>()
-                                .Single(attribute => attribute.Name.Equals(
+                                .Where(attribute => attribute.Name.Equals(
                                     "Pages", StringComparison.OrdinalIgnoreCase))
-                                .Value.String, pageCount, true);
+                                .Select(attribute => attribute.Value.String)
+                                .SingleOrDefault() ?? "", pageCount, true);
+
+                        var deletedPages =
+                            UtilityMethods.GetPageNumbersFromString(
+                                documentAttribute.SubAttributes
+                                .ToIEnumerable<IAttribute>()
+                                .Where(attribute => attribute.Name.Equals(
+                                    "DeletedPages", StringComparison.OrdinalIgnoreCase))
+                                .Select(attribute => attribute.Value.String)
+                                .SingleOrDefault() ?? "", pageCount, true);
 
                         var documentAttributes = documentAttribute.SubAttributes
                             .ToIEnumerable<IAttribute>()
@@ -5549,6 +5556,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         if (!suggestedPagination.HasValue)
                         {
                             if (attributeArray.Length == 1 &&
+                                !deletedPages.Any() &&
                                 pages.Count() == pageCount)
                             {
                                 suggestedPagination = false;
@@ -5566,14 +5574,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _paginationPanel.LoadFile(
-                            fileName, -1, pages, suggestedPagination.Value, documentData);
+                            fileName, -1, pages, deletedPages, suggestedPagination.Value, documentData);
                     }
 
                     return;
                 }
 
                 // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
-                _paginationPanel.LoadFile(fileName, -1, null, false, documentData);
+                _paginationPanel.LoadFile(fileName, -1, null, null, false, documentData);
                 return;
             }
 
@@ -5872,9 +5880,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 success = FileRequestHandler.SetFallbackStatus(fileID, EActionStatus.kActionPending);
                 ExtractException.Assert("ELI39622", "Failed to set fallback status", success,
                     "FileID", fileID);
-                _paginationOutputToReload.Add(
-                    new Tuple<string, int, PaginationDocumentData>(
-                        e.OutputFileName, e.Position, documentData));
+                _paginationOutputOrder.Enqueue(e.OutputFileName);
             }
             catch (Exception ex)
             {

@@ -86,7 +86,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Keeps track of the names of documents that have been output as part of the current
-        /// <see cref="CommitSelectedChanges"/> call.
+        /// <see cref="CommitChanges"/> call.
         /// </summary>
         List<string> _outputDocumentNames = new List<string>();
 
@@ -138,7 +138,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see cref="PaginationSeparator.DocumentSelectedToCommit"/> flag for all documents.
         /// Added via code since toolstrips to not natively support checkboxes.
         /// </summary>
-        CheckBox _selectAllToCommitCheckBox = new CheckBox();
+        CheckBox _selectAllToCommitCheckBox;
 
         /// <summary>
         /// Indicates whether the <see cref="UpdateCommandStates"/> is in the process of being
@@ -155,7 +155,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Indicates whether the <see cref="CommittingChanges"/> event is currently being raised in
         /// order to prevent recursive raising of the event when a handler calls back into
-        /// <see cref="CommitSelectedChanges"/>.
+        /// <see cref="CommitChanges"/>.
         /// </summary>
         bool _raisingCommittingChanges;
 
@@ -224,7 +224,66 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Events
 
-        #region Properties
+        #region Configuration Properties
+
+        /// <summary>
+        /// Gets or sets whether the panel's toolbar button should be displayed.
+        /// </summary>
+        public bool ToolBarVisible
+        {
+            get
+            {
+                return _toolStripContainer.TopToolStripPanelVisible;
+            }
+
+            set
+            {
+                _toolStripContainer.TopToolStripPanelVisible = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the load next document button should be available.
+        /// </summary>
+        public bool LoadNextDocumentVisible
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether changes should be committed only for the selected documents.
+        /// </summary>
+        /// <value><see langword="true"/> if changes should be committed only for the selected
+        /// document(s) or <see langword="false"/> if changes should be committed for all documents
+        /// loaded into this instance.</value>
+        public bool CommitOnlySelection
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether to output expected pagination attributes
+        /// </summary>
+        public bool OutputExpectedPaginationAttributesFile
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the expected pagination attributes path.
+        /// </summary>
+        public string ExpectedPaginationAttributesPath
+        {
+            get;
+            set;
+        }
+
+        #endregion Configuration Properties
+
+        #region Runtime Properties
 
         /// <summary>
         /// Gets a value indicating whether there are any uncommitted changes to document pagination.
@@ -317,55 +376,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets whether pagination has been suggested for the specified
-        /// <see paramref="sourceFileName"/>.
-        /// </summary>
-        /// <param name="sourceFileName">Name of the source file to which this query relates.</param>
-        /// <returns><see langword="true"/> if pagination has been suggested; otherwise, 
-        /// <see langword="false"/>.
-        /// </returns>
-        public bool IsPaginationSuggested(string sourceFileName)
-        {
-            try
-            {
-                return _primaryPageLayoutControl.Documents
-                    .Where(doc => doc.PageControls.Any(
-                        c => c.Page.OriginalDocumentName == sourceFileName))
-                    .Any(doc => doc.PaginationSuggested);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39665");
-            }
-        }
-
-        /// <summary>
-        /// Gets whether the pagination pane depicts the document in the same form it exists on disk.
-        /// <see paramref="sourceFileName"/>.
-        /// </summary>
-        /// <param name="sourceFileName">Name of the source file to which this query relates.</param>
-        /// <returns><see langword="true"/> if the document is unmodified compared to how it exists
-        /// on disk; otherwise, <see langword="false"/>.
-        /// </returns>
-        public bool IsInOriginalForm(string sourceFileName)
-        {
-            try
-            {
-                var matchingDocuments = _primaryPageLayoutControl.Documents
-                    .Where(doc => doc.InOriginalForm &&
-                        doc.PageControls.First().Page.OriginalDocumentName.Equals(sourceFileName,
-                            StringComparison.OrdinalIgnoreCase));
-
-                return (matchingDocuments.Count() == 1) &&
-                    matchingDocuments.Single().InOriginalForm;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39816");
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the <see cref="IPaginationDocumentDataPanel"/> to display and allow editing
         /// of data associated with any singly selected document or <see langword="null"/> if no
         /// such panel is available.
@@ -399,6 +409,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets the fully selected source documents. These are documents that are in their source
         /// doc forms.
         /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
         public ReadOnlyCollection<string> FullySelectedSourceDocuments
         {
             get
@@ -433,30 +445,25 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets whether the panel's toolbar button should be displayed.
+        /// Gets whether there are pending changes available for <see cref="CommitChanges"/>.
         /// </summary>
-        public bool ToolBarVisible
-        {
-            get
-            {
-                return _toolStripContainer.TopToolStripPanelVisible;
-            }
-
-            set
-            {
-                _toolStripContainer.TopToolStripPanelVisible = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets whether there are pending changes available for <see cref="CommitSelectedChanges"/>.
-        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
         public bool CommitEnabled
         {
             get
             {
-                return _primaryPageLayoutControl != null &&
-                    _primaryPageLayoutControl.Documents.Any(doc => doc.Selected);
+                if (CommitOnlySelection)
+                {
+                    return _primaryPageLayoutControl != null &&
+                        _primaryPageLayoutControl.Documents.Any(doc => doc.Selected);
+                }
+                else
+                {
+                    return PendingChanges || // Value can be overridden; need to enabled apply whenever true.
+                        _revertToOriginalToolStripButton.Enabled ||
+                        _revertToSourceToolStripButton.Enabled;
+                }
             }
         }
 
@@ -464,6 +471,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets whether there are any documents that differ from their original loaded form
         /// available for <see cref="RevertPendingChanges"/>.
         /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
         public bool RevertToOriginalEnabled
         {
             get;
@@ -474,6 +483,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets whether there are any documents that differ from their source form available for
         /// available for <see cref="RevertPendingChanges"/>.
         /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
         public bool RevertToSourceEnabled
         {
             get;
@@ -481,33 +492,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets whether to output expected pagination attributes
-        /// </summary>
-        public bool OutputExpectedPaginationAttributesFile
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the expected pagination attributes path.
-        /// </summary>
-        public string ExpectedPaginationAttributesPath
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the file processing database.
         /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
         public UCLID_FILEPROCESSINGLib.FileProcessingDB FileProcessingDB
         {
             get;
             set;
         }
 
-        #endregion Properties
+        #endregion Runtime Properties
 
         #region Methods
 
@@ -521,7 +516,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// should expect to be able to calculate.</param>
         public void LoadFile(string fileName, int position)
         {
-            LoadFile(fileName, position, null, false, null);
+            LoadFile(fileName, position, null, null, false, null);
         }
 
         /// <summary>
@@ -534,12 +529,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// should expect to be able to calculate.</param>
         /// <param name="pages">The page numbers from <see paramref="fileName"/> to be loaded or
         /// <see langword="null"/> to load all pages.</param>
+        /// <param name="deletedPages">The page numbers from <see paramref="fileName"/> to be
+        /// loaded but shown as deleted.</param>
         /// <param name="paginationSuggested"><see langword="true"/> if pagination has been
         /// suggested for this document; <see langword="false"/> if it has not been.</param>
         /// <param name="documentData">The VOA file data associated with <see paramref="fileName"/>.
         /// </param>
         public void LoadFile(string fileName, int position, IEnumerable<int> pages,
-            bool paginationSuggested, PaginationDocumentData documentData)
+            IEnumerable<int> deletedPages, bool paginationSuggested,
+            PaginationDocumentData documentData)
         {
             try
             {
@@ -564,7 +562,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // keep the UI responsive as pages are loaded. This allows an opportunity
                         // for there to be multiple calls into LoadNextDocument at the same time.
                         var outputDocument = _primaryPageLayoutControl.CreateOutputDocument(
-                                sourceDocument, pages, position, true);
+                            sourceDocument, pages, deletedPages, position, true);
 
                         _originalDocuments.Add(outputDocument);
                         var setOutputDocs = _sourceToOriginalDocuments.GetOrAdd(
@@ -623,6 +621,55 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets whether pagination has been suggested for the specified
+        /// <see paramref="sourceFileName"/>.
+        /// </summary>
+        /// <param name="sourceFileName">Name of the source file to which this query relates.</param>
+        /// <returns><see langword="true"/> if pagination has been suggested; otherwise, 
+        /// <see langword="false"/>.
+        /// </returns>
+        public bool IsPaginationSuggested(string sourceFileName)
+        {
+            try
+            {
+                return _primaryPageLayoutControl.Documents
+                    .Where(doc => doc.PageControls.Any(
+                        c => c.Page.OriginalDocumentName == sourceFileName))
+                    .Any(doc => doc.PaginationSuggested);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39665");
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the pagination pane depicts the document in the same form it exists on disk.
+        /// <see paramref="sourceFileName"/>.
+        /// </summary>
+        /// <param name="sourceFileName">Name of the source file to which this query relates.</param>
+        /// <returns><see langword="true"/> if the document is unmodified compared to how it exists
+        /// on disk; otherwise, <see langword="false"/>.
+        /// </returns>
+        public bool IsInOriginalForm(string sourceFileName)
+        {
+            try
+            {
+                var matchingDocuments = _primaryPageLayoutControl.Documents
+                    .Where(doc => doc.InOriginalForm &&
+                        doc.PageControls.First().Page.OriginalDocumentName.Equals(sourceFileName,
+                            StringComparison.OrdinalIgnoreCase));
+
+                return (matchingDocuments.Count() == 1) &&
+                    matchingDocuments.Single().InOriginalForm;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39816");
+            }
+        }
+
+        /// <summary>
         /// Redefines the current state of all documents as the original form.
         /// </summary>
         public void SetOriginalDocumentForm()
@@ -643,11 +690,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Commits the selected changes.
+        /// Commits changes (either for all document or just selected documents depending on the
+        /// value of <see cref="CommitOnlySelection"/>.
         /// </summary>
         /// <returns><see langword="true"/> if changes were able to be committed; otherwise,
         /// <see langword="false"/>.</returns>
-        public bool CommitSelectedChanges()
+        public bool CommitChanges()
         {
             try
             {
@@ -669,18 +717,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Depending upon the manipulations that occurred, there may be some pending
                 // documents that have been left without any pages. Disregard these.
                 var documentsToRemove = _pendingDocuments
-                    .Where(doc => !doc.PageControls.Any(c => !c.Deleted))
+                    .Where(doc => !doc.PageControls.Any())
                     .ToArray();
                 foreach (var document in documentsToRemove)
                 {
                     _pendingDocuments.Remove(document);
                 }
 
-                var outputDocuments = _pendingDocuments
-                    .Where(document => document.Selected && !document.InSourceDocForm)
+                var documentsToCommit = _pendingDocuments
+                    .Where(document => !CommitOnlySelection || document.Selected);
+
+                var outputDocuments = documentsToCommit
+                    .Where(document => !document.InSourceDocForm)
                     .ToList();
 
-                _outputDocumentPositions = _primaryPageLayoutControl.Documents
+                _outputDocumentPositions = outputDocuments
                     .ToDictionary(
                         doc => doc, doc => _primaryPageLayoutControl.GetDocumentPosition(doc));
 
@@ -694,24 +745,32 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // that have been output.
                 foreach (var outputDocument in outputDocuments)
                 {
-                    outputDocument.Output();
-                    _pendingDocuments.Remove(outputDocument);
+                    if (outputDocument.PageControls.Any(c => !c.Deleted))
+                    {
+                        outputDocument.Output();
+                    }
+                    else
+                    {
+                        // There are no undeleted pages to output; simply remove the document.
+                        _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
+                        _pendingDocuments.Remove(outputDocument);
+                    }
                 }
 
-                var disregardedPagination = _pendingDocuments
-                    .Where(doc => doc.Selected && doc.InSourceDocForm &&
+                var disregardedPagination = documentsToCommit
+                    .Where(doc => documentsToCommit.Contains(doc) && doc.InSourceDocForm &&
                         doc.PaginationSuggested &&
                         !doc.InOriginalForm)
                     .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
 
-                var sourcesWithModifiedData = _pendingDocuments
-                    .Where(doc => doc.Selected && doc.InSourceDocForm &&
+                var sourcesWithModifiedData = documentsToCommit
+                    .Where(doc => documentsToCommit.Contains(doc) && doc.InSourceDocForm &&
                         doc.DocumentData != null && doc.DocumentData.Modified)
                     .Select(doc => new KeyValuePair<string, PaginationDocumentData>(
                         doc.PageControls.First().Page.OriginalDocumentName, doc.DocumentData));
 
-                var unmodifiedPagination = _pendingDocuments
-                    .Where(doc => doc.Selected && doc.InSourceDocForm)
+                var unmodifiedPagination = documentsToCommit
+                    .Where(doc => documentsToCommit.Contains(doc) && doc.InSourceDocForm)
                     .Select(doc => doc.PageControls.First().Page.OriginalDocumentName);
 
                 OnPaginated(sourceDocuments.Select(doc => doc.FileName),
@@ -719,7 +778,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     sourcesWithModifiedData,
                     unmodifiedPagination);
 
-                foreach (var document in _pendingDocuments.Where(doc => doc.Selected))
+                // For any documents did not have either manual or suggested pagination, reset all
+                // data about these documents so that nothing about the document is marked dirty.
+                foreach (var document in _pendingDocuments
+                    .Where(doc => documentsToCommit.Contains(doc)))
                 {
                     document.PaginationSuggested = false;
                     document.SetOriginalForm();
@@ -731,7 +793,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _pendingChangesOverride = null;
 
-                SelectAllToCommit(false);
+                if (CommitOnlySelection)
+                {
+                    SelectAllToCommit(false);
+                }
 
                 return true;
             }
@@ -772,9 +837,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Checks if the selected documents can be submitted.
+        /// Checks if changes can be committed.
         /// </summary>
-        /// <returns><see langword="true"/> if the selected documents can be submitted or
+        /// <returns><see langword="true"/> if the documents can be submitted or
         /// <see langword="false"/> if there is a reason they cannot be. This method will have
         /// displayed an necessary message to the user explaining why the document could not be
         /// submitted.
@@ -782,7 +847,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool CanSelectedDocumentsBeCommitted()
         {
             // If document data could not be saved, abort the commit operation.
-            if (!SaveSelectedDocumentData())
+            if (!SaveDocumentData(true))
             {
                 return false;
             }
@@ -791,6 +856,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 UtilityMethods.ShowMessageBox("Data errors must be corrected before saving", "Data Error", true);
                 return false;
+            }
+
+            if (!CommitOnlySelection)
+            {
+                return true;
             }
 
             var affectedSourceDocuments = new HashSet<string>(
@@ -1053,7 +1123,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SaveSelectedDocumentData();
+                SaveDocumentData(false);
                 EnablePageDisplay = false;
                 _primaryPageLayoutControl.ClearSelection();
             }
@@ -1360,13 +1430,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _imageViewer.EstablishConnections(this);
                 }
 
-                // Since toolstrips to not natively support checkboxes, add the select all checkbox
-                // manually.
-                var host = new ToolStripControlHost(_selectAllToCommitCheckBox);
-                // Pad a couple of pixels to align with separator check boxes.
-                host.Margin = new Padding(0, 0, 2, 0);
-                _topToolStrip.Items.Insert(1, host);
-                _selectAllToCommitCheckBox.CheckedChanged += HandleSelectAllToCommitCheckBox_CheckedChanged;
+                if (CommitOnlySelection)
+                {
+                    // Since toolstrips to not natively support checkboxes, add the select all checkbox
+                    // manually.
+                    _selectAllToCommitCheckBox = new CheckBox();
+                    var host = new ToolStripControlHost(_selectAllToCommitCheckBox);
+                    // Pad a couple of pixels to align with separator check boxes.
+                    host.Margin = new Padding(0, 0, 2, 0);
+                    _topToolStrip.Items.Insert(1, host);
+                    _selectAllToCommitCheckBox.CheckedChanged += HandleSelectAllToCommitCheckBox_CheckedChanged;
+                }
 
                 ResetPrimaryPageLayoutControl();
             }
@@ -1515,7 +1589,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 OnCommittingChanges(committingChangesArgs);
                 if (!committingChangesArgs.Handled)
                 {
-                    CommitSelectedChanges();
+                    CommitChanges();
                 }
             }
             catch (Exception ex)
@@ -1746,7 +1820,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!_updatingCommandStates)
+                if (CommitOnlySelection && !_updatingCommandStates)
                 {
                     SuspendUIUpdatesForOperation();
 
@@ -1807,7 +1881,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _pendingDocuments.All(doc => doc.PageControls.Count == 0 || doc.Selected);
+                return CommitOnlySelection &&
+                    _pendingDocuments.All(doc => doc.PageControls.Count == 0 || doc.Selected);
             }
         }
 
@@ -1854,6 +1929,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.Shortcuts = _shortcuts;
             _primaryPageLayoutControl.Dock = DockStyle.Fill;
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
+            _primaryPageLayoutControl.CommitOnlySelection = CommitOnlySelection;
+            _primaryPageLayoutControl.LoadNextDocumentVisible = LoadNextDocumentVisible;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandlePrimaryPageLayoutControl_LoadNextDocumentRequest;
             _primaryPageLayoutControl.DocumentDataPanelRequest += HandlePrimaryPageLayoutControl_DocumentDataPanelRequest;
@@ -1935,16 +2012,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Saves the data from any defined <see cref="DocumentDataPanel"/> if currently active.
         /// </summary>
+        /// <param name="onlyIfSelected"></param>
         /// <returns><see langword="true"/> if the data was saved or <see langword="false"/> if the
         /// data could not be saved and needs to be corrected.
         /// <para><b>Note</b></para>
         /// It is the responsibility of the DocumentDataPanel to inform the user of any data issues
         /// that need correction.
         /// </returns>
-        bool SaveSelectedDocumentData()
+        bool SaveDocumentData(bool onlyIfSelected)
         {
             if (_documentWithDataInEdit == null || 
-                _documentWithDataInEdit.Selected ||
+                (onlyIfSelected && !_documentWithDataInEdit.Selected) ||
                 CloseDataPanel())
             {
                 return true;
@@ -2031,7 +2109,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     AllDocumentsCollapsed
                         ? Properties.Resources.Expand
                         : Properties.Resources.Collapse;
-                _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
+                if (CommitOnlySelection)
+                {
+                    _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
+                }
             }
             finally
             {

@@ -1773,6 +1773,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl = new PageLayoutControl(this);
             _primaryPageLayoutControl.Dock = DockStyle.Fill;
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
+            _primaryPageLayoutControl.LoadNextDocumentVisible = true;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
             _primaryPageLayoutControl.PagesPendingLoad += HandlePageLayoutControl_PagesPendingLoad;
@@ -2066,7 +2067,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             // keep the UI responsive as pages are loaded. This allows an opportunity
                             // for there to be multiple calls into LoadNextDocument at the same time.
                             _primaryPageLayoutControl.CreateOutputDocument(sourceDocument,
-                                pages: null, position: -1,
+                                pages: null, deletedPages: null, position: -1,
                                 insertSeparator: _config.Settings.AutoInsertDocumentBoundaries);
 
                             return true;
@@ -2229,7 +2230,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If no documents were loaded, call CreateOutputDocument so that the load next
                 // document button gets added.
                 _primaryPageLayoutControl.CreateOutputDocument(null,
-                    pages: null, position: -1,
+                    pages: null, deletedPages: null, position: -1,
                     insertSeparator: _config.Settings.AutoInsertDocumentBoundaries);
             }
 

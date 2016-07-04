@@ -900,6 +900,17 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether keyboard input should be disabled.
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool DisableKeyboardInput
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Indicates whether all data must be viewed before saving and, if not, whether a prompt
         /// will be displayed before allowing unviewed data to be saved.
         /// </summary>
@@ -1082,7 +1093,6 @@ namespace Extract.DataEntry
                 }
             }
         }
-
         
         /// <summary>
         /// Gets or sets a comma separated list of names of <see cref="IDataEntryControl"/>s on

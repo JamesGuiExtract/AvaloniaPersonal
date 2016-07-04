@@ -202,6 +202,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 nextControlLocation.X += control.Width;
             }
 
+            // Prevent unneeded separator when load next document button isn't available.
+            var lastControl = parent.Controls
+                .OfType<PaginationControl>()
+                .LastOrDefault();
+            if (lastControl != null && lastControl is PaginationSeparator)
+            {
+                redundantControls.Add(lastControl);
+            }
+
             OnRedundantControlsFound(redundantControls.ToArray());
         }
 

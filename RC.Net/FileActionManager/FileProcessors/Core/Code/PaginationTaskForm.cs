@@ -546,7 +546,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _paginationPanel.SuspendLayout();
                 _changingDocuments = true;
 
-                if (!_paginationPanel.CommitSelectedChanges())
+                if (!_paginationPanel.CommitChanges())
                 {
                     _changingDocuments = false;
                     UpdateControls();
@@ -759,7 +759,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 if (_paginationPanel.PendingChanges)
                 {
-                    if (!_paginationPanel.CommitSelectedChanges())
+                    if (!_paginationPanel.CommitChanges())
                     {
                         _changingDocuments = false;
                         UpdateControls();
@@ -1176,9 +1176,19 @@ namespace Extract.FileActionManager.FileProcessors
                                 UtilityMethods.GetPageNumbersFromString(
                                     documentAttribute.SubAttributes
                                     .ToIEnumerable<IAttribute>()
-                                    .Single(attribute => attribute.Name.Equals(
+                                    .Where(attribute => attribute.Name.Equals(
                                         "Pages", StringComparison.OrdinalIgnoreCase))
-                                    .Value.String, pageCount, true);
+                                    .Select(attribute => attribute.Value.String)
+                                    .SingleOrDefault() ?? "", pageCount, true);
+
+                            var deletedPages =
+                                UtilityMethods.GetPageNumbersFromString(
+                                    documentAttribute.SubAttributes
+                                    .ToIEnumerable<IAttribute>()
+                                    .Where(attribute => attribute.Name.Equals(
+                                        "DeletedPages", StringComparison.OrdinalIgnoreCase))
+                                    .Select(attribute => attribute.Value.String)
+                                    .SingleOrDefault() ?? "", pageCount, true);
 
                             var documentAttributes = documentAttribute.SubAttributes
                                 .ToIEnumerable<IAttribute>()
@@ -1202,8 +1212,8 @@ namespace Extract.FileActionManager.FileProcessors
                                 }
                             }
 
-                            _paginationPanel.LoadFile(
-                                fileName, -1, pages, suggestedPagination.Value, documentData);
+                            _paginationPanel.LoadFile(fileName, -1, pages, deletedPages,
+                                suggestedPagination.Value, documentData);
                         }
 
                         DefaultDocumentSelection();
@@ -1212,7 +1222,7 @@ namespace Extract.FileActionManager.FileProcessors
                     }
 
                     // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
-                    _paginationPanel.LoadFile(fileName, -1, null, false, documentData);
+                    _paginationPanel.LoadFile(fileName, -1, null, null, false, documentData);
                     DefaultDocumentSelection();
                     return;
                 }

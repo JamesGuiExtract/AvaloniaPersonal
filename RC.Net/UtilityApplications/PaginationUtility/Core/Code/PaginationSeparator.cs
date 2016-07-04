@@ -52,6 +52,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _clickEventHandledInternally;
 
+        /// <summary>
+        /// Indicates whether the selection check box should be visible.
+        /// </summary>
+        bool _showSelectionCheckBox;
+
         #endregion Fields
 
         #region Constructors
@@ -59,12 +64,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="PaginationSeparator"/> class.
         /// </summary>
-        public PaginationSeparator()
+        /// <param name="showSelectionCheckBox"><see langword="true"/> if the selection check box
+        /// should be visible; otherwise, <see langword="false"/>.</param>
+        public PaginationSeparator(bool showSelectionCheckBox)
             : base()
         {
             try
             {
                 InitializeComponent();
+
+                _showSelectionCheckBox = showSelectionCheckBox;
+                if (!_showSelectionCheckBox)
+                {
+                    // If the selection check box is not to be displayed, allow the checkbox column
+                    // to collapse.
+                    _tableLayoutPanel.ColumnStyles[2].Width = 0;
+                }
 
                 _toolTip.SetToolTip(_editedPaginationGlyph, "Manual pagination has been applied");
                 _toolTip.SetToolTip(_newDocumentGlyph, "This is a new document that will be created");
@@ -96,7 +111,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_uniformSize == null)
                     {
-                        using (var separator = new PaginationSeparator())
+                        using (var separator = new PaginationSeparator(false))
                         {
                             _uniformSize = new Size(-1, separator.Height);
                         }
@@ -159,7 +174,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    if (value != _documentSelectedToCommit)
+                    if (_showSelectionCheckBox &&
+                        value != _documentSelectedToCommit)
                     {
                         if (Document != null)
                         {
@@ -607,7 +623,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     this.SafeBeginInvoke("ELI40209", () => PerformLayout());
                 }
                 _collapseDocumentButton.Visible = true;
-                _selectedCheckBox.Visible = true;
+                _selectedCheckBox.Visible = _showSelectionCheckBox;
                 _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
