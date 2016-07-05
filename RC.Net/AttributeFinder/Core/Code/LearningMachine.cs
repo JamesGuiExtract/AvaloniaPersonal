@@ -898,7 +898,9 @@ namespace Extract.AttributeFinder
                     if (nextPageNumber > numberOfPages || isFirstPage(nextPageNumber))
                     {
                         int lastPageInRange = nextPageNumber - 1;
-                        string range = Enumerable.Range(firstPageInRange, lastPageInRange).ToRangeString();
+                        string range = Enumerable
+                            .Range(firstPageInRange, lastPageInRange - firstPageInRange + 1)
+                            .ToRangeString();
                         SpatialString ss;
                         if (sourceDocument != null)
                         {
