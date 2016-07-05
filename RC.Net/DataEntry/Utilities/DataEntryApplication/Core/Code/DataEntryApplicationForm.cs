@@ -1256,7 +1256,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 _magnifierToolStripButton.DockableWindow = _magnifierDockableWindow;
-                _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
+                if (_paginationPanel == null)
+                {
+                    _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
+                }
+                else
+                {
+                    // If pagination is available, the thumbnail pane is redundant and does not
+                    // currently play well with the pagination panel. Disallow use of the thumbnail
+                    // window in this configuration.
+                    _thumbnailsToolStripButton.Visible = false;
+                }
 
                 // Establish shortcut keys
 
@@ -1519,6 +1529,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _thumbnailDockableWindow.Close();
                     
                     _sandDockManager.LoadLayout();
+
+                    // If pagination is available, the thumbnail pane is redundant and does not
+                    // currently play well with the pagination panel. Disallow use of the thumbnail
+                    // window in this configuration.
+                    if (_paginationPanel != null && _thumbnailDockableWindow.IsOpen)
+                    {
+                        _thumbnailDockableWindow.Close();
+                    }
                 }
 
                 // Adjust UI elements to reflect the current configuration.
