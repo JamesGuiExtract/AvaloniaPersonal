@@ -2943,6 +2943,9 @@ bool CTestSpatialString::testCase26Helper(string strExpectedPagesFile, IIUnknown
 			ISpatialStringPtr ipPage = ipPages->At(i);
 			ISpatialStringPtr ipExpectedPage = ipExpectedPages->At(i);
 
+			// Set source doc to be the same so that comparisons succeed
+			ipExpectedPage->SourceDocName = ipPage->SourceDocName;
+
 			if (!compareSpatialStrings(ipPage, ipExpectedPage))
 			{
 				m_ipResultLogger->AddTestCaseNote(("Page " + asString(i) + " did not match expected.").c_str());
