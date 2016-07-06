@@ -727,6 +727,10 @@ namespace Extract.FileActionManager.Forms
                 // Whether or not there were any errors closing the verification form,
                 // cut it loose at this point so that a new one is able to be created.
                 _uiThread = null;
+
+                // Reset closing flag
+                // https://extract.atlassian.net/browse/ISSUE-13854
+                _closing = false;
             }
         }
 
