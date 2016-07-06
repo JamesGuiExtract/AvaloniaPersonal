@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
@@ -13,6 +14,8 @@ namespace Extract.AttributeFinder
     /// </summary>
     [CLSCompliant(false)]
     [Serializable]
+    // Don't rename because it could break serialization
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class AttributeFeatureVectorizer : IFeatureVectorizer
     {
         #region Fields

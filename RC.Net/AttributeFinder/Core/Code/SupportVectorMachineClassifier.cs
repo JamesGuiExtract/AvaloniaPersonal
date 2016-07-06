@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 
 namespace Extract.AttributeFinder
@@ -15,6 +16,8 @@ namespace Extract.AttributeFinder
     /// </summary>
     [CLSCompliant(false)]
     [Serializable]
+    // Don't rename because it could break serialization
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public abstract class SupportVectorMachineClassifier : ITrainableClassifier
     {
         #region Fields

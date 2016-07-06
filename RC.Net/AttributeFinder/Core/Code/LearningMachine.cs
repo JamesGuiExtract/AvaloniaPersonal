@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Caching;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
@@ -26,6 +27,8 @@ namespace Extract.AttributeFinder
     /// </summary>
     [CLSCompliant(false)]
     [Serializable]
+    // Don't rename because it could break serialization
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class LearningMachine : IDisposable
     {
         #region Constants
@@ -35,8 +38,8 @@ namespace Extract.AttributeFinder
         /// </summary>
         const int _CURRENT_VERSION = 1;
 
-        // Encryption password for serialization
-        private static readonly byte[] _ENCRYPTION_PASSWORD = new byte[64]
+        // Encryption password for serialization, renamed to obfuscate purpose
+        private static readonly byte[] _CONVERGENCE_MATRIX = new byte[64]
             {
                 185, 105, 109, 83, 148, 254, 79, 173, 128, 172, 12, 76, 61, 131, 66, 69, 236, 2, 76, 172, 158,
                 197, 70, 243, 131, 95, 163, 206, 89, 164, 145, 134, 6, 25, 175, 201, 97, 177, 190, 24, 163, 144,
@@ -801,7 +804,7 @@ namespace Extract.AttributeFinder
                 serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
                 serializer.Serialize(unencryptedStream, InputConfig);
                 unencryptedStream.Position = 0;
-                ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _ENCRYPTION_PASSWORD, ml);
+                ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _CONVERGENCE_MATRIX, ml);
                 _encryptedInputConfig = encryptedStream.ToArray();
             }
 
@@ -813,7 +816,7 @@ namespace Extract.AttributeFinder
                 serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
                 serializer.Serialize(unencryptedStream, Encoder);
                 unencryptedStream.Position = 0;
-                ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _ENCRYPTION_PASSWORD, ml);
+                ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _CONVERGENCE_MATRIX, ml);
                 _encryptedEncoder = encryptedStream.ToArray();
             }
 
@@ -843,7 +846,7 @@ namespace Extract.AttributeFinder
             using (var encryptedStream = new MemoryStream(_encryptedInputConfig))
             using (var unencryptedStream = new MemoryStream())
             {
-                ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _ENCRYPTION_PASSWORD, ml);
+                ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _CONVERGENCE_MATRIX, ml);
                 unencryptedStream.Position = 0;
                 var serializer = new NetDataContractSerializer();
                 serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
@@ -854,7 +857,7 @@ namespace Extract.AttributeFinder
             using (var encryptedStream = new MemoryStream(_encryptedEncoder))
             using (var unencryptedStream = new MemoryStream())
             {
-                ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _ENCRYPTION_PASSWORD, ml);
+                ExtractEncryption.DecryptStream(encryptedStream, unencryptedStream, _CONVERGENCE_MATRIX, ml);
                 unencryptedStream.Position = 0;
                 var serializer = new NetDataContractSerializer();
                 serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;

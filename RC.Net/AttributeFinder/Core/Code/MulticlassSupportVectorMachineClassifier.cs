@@ -2,8 +2,9 @@
 using Accord.MachineLearning.VectorMachines.Learning;
 using Accord.Math;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 
 namespace Extract.AttributeFinder
@@ -13,6 +14,8 @@ namespace Extract.AttributeFinder
     /// </summary>
     [CLSCompliant(false)]
     [Serializable]
+    // Don't rename because it could break serialization
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class MulticlassSupportVectorMachineClassifier : SupportVectorMachineClassifier, IDisposable
     {
         #region Overrides

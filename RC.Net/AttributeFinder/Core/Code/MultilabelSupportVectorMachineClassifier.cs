@@ -3,6 +3,7 @@ using Accord.MachineLearning.VectorMachines.Learning;
 using Accord.Math;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Threading;
 
 namespace Extract.AttributeFinder
@@ -13,6 +14,8 @@ namespace Extract.AttributeFinder
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multilabel")]
     [CLSCompliant(false)]
     [Serializable]
+    // Don't rename because it could break serialization
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class MultilabelSupportVectorMachineClassifier : SupportVectorMachineClassifier, IDisposable
     {
         #region Fields

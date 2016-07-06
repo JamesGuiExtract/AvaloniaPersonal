@@ -9,12 +9,13 @@ using Lucene.Net.Search;
 using Lucene.Net.Store;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using UCLID_RASTERANDOCRMGMTLib;
-using System.Threading;
-using System.ComponentModel;
 
 namespace Extract.AttributeFinder
 {
@@ -23,6 +24,8 @@ namespace Extract.AttributeFinder
     /// </summary>
     [CLSCompliant(false)]
     [Serializable]
+    // Don't rename because it could break serialization
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class SpatialStringFeatureVectorizer : IFeatureVectorizer
     {
         #region Fields

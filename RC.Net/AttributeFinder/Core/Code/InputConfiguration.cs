@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using UCLID_RASTERANDOCRMGMTLib;
+using System.Reflection;
 using System.Threading;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.AttributeFinder
 {
@@ -29,6 +30,8 @@ namespace Extract.AttributeFinder
     /// Class to hold specification of input files and to build the actual arrays
     /// </summary>
     [Serializable]
+    // Don't rename because it could break serialization
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class InputConfiguration
     {
         #region Fields
