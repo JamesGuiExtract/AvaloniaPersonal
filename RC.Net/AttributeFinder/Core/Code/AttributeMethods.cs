@@ -2,6 +2,8 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -216,7 +218,7 @@ namespace Extract.AttributeFinder
             ExtractException.Assert("ELI39709", "Unexpected spatial mode.",
                 value.GetMode() == ESpatialStringMode.kSpatialMode);
 
-            string sourceDocName = value.SourceDocName;
+            string sourceDocName = GetSourceDocName(value, pageMap);
 
             var updatedPages = new List<SpatialString>();
             foreach (SpatialString page in value.GetPages(false, "")
@@ -268,7 +270,7 @@ namespace Extract.AttributeFinder
             ExtractException.Assert("ELI39710", "Unexpected spatial mode.",
                 value.GetMode() == ESpatialStringMode.kHybridMode);
 
-            string sourceDocName = value.SourceDocName;
+            string sourceDocName = GetSourceDocName(value, pageMap);
 
             var updatedRasterZones = new List<IRasterZone>();
             var updatedPageInfoMap = new LongToObjectMap();
@@ -306,6 +308,40 @@ namespace Extract.AttributeFinder
                     value.String, newDocumentName, updatedPageInfoMap);
             }
             return updatedValue;
+        }
+
+        /// <summary>
+        /// Gets the SourceDocName property from <see paramref="value"/>. In order to account for
+        /// files that have been moved from their original location, in the case that the
+        /// SourceDocName does not appear in <see paramref="pageMap"/>, it will instead return the
+        /// only distinct file path from <see paramref="pageMap"/> that shares the same filename
+        /// (excluding the directory).
+        /// </summary>
+        /// <param name="value">The <see cref="SpatialString"/> for which the SourceDocName is
+        /// needed.</param>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <returns>The SourceDocName property from <see paramref="value"/>.</returns>
+        static string GetSourceDocName(SpatialString value, Dictionary<Tuple<string, int>, List<int>> pageMap)
+        {
+            string sourceDocName = value.SourceDocName;
+            if (!pageMap.Keys.Any(key => key.Item1 == sourceDocName))
+            {
+                string sourceFileName = Path.GetFileName(sourceDocName);
+                var matchingFileNames = pageMap.Keys
+                    .Select(key => key.Item1)
+                    .Where(fileName => Path.GetFileName(fileName).Equals(
+                        sourceFileName, StringComparison.CurrentCultureIgnoreCase))
+                    .Distinct()
+                    .ToArray();
+
+                if (matchingFileNames.Length == 1)
+                {
+                    sourceDocName = matchingFileNames[0];
+                }
+            }
+            return sourceDocName;
         }
 
         /// <summary>

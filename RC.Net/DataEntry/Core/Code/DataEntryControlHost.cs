@@ -1458,6 +1458,11 @@ namespace Extract.DataEntry
 
                 if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp)
                 {
+                    if (DisableKeyboardInput)
+                    {
+                        return false;
+                    }
+
                     if (m.Msg == WindowsMessage.KeyDown)
                     {
                         _depressedKeys.Add((Keys)m.WParam);
@@ -2680,6 +2685,26 @@ namespace Extract.DataEntry
             finally
             {
                 _changingData = false;
+            }
+        }
+
+        /// <summary>
+        /// Ensures a field is selected by selecting the first field if necessary.
+        /// </summary>
+        public void EnsureFieldSelection()
+        {
+            try
+            {
+                Stack<IAttribute> currentlySelectedAttribute = ActiveAttributeGenealogy(true, null);
+                if (currentlySelectedAttribute == null || !currentlySelectedAttribute.Any())
+                {
+                    AdvanceToNextTabStop(true);
+                    OnItemSelectionChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40236");
             }
         }
 

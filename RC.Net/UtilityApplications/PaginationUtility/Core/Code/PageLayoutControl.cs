@@ -1682,7 +1682,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 Shortcuts[Keys.Escape] = ClearSelection;
 
-                EnableKeyboardNavigationOfPages(true);
+                EnableKeyboardPageOperations(true);
 
                 // Clear shortcuts that don't apply to this application.
                 Shortcuts[Keys.O | Keys.Control] = null;
@@ -2497,7 +2497,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 OnDocumentDataPanelRequest(e);
 
-                EnableKeyboardNavigationOfPages(false);
+                EnableKeyboardPageOperations(false);
             }
             catch (Exception ex)
             {
@@ -2516,7 +2516,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                EnableKeyboardNavigationOfPages(true);
+                EnableKeyboardPageOperations(true);
             }
             catch (Exception ex)
             {
@@ -3383,14 +3383,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Enables or disables the keyboard navigation of pages.
+        /// Enables or disables the page navigation and operations associated with keystrokes. This
+        /// can be used to prevents page navigation, deletions, etc from occurring when data is
+        /// being edited in a data panel.
         /// </summary>
-        /// <param name="enableNavigation"><see langword="true"/> to allow keyboard navigation of
-        /// pages or <see langword="false"/> to prevent it.</param>
-        void EnableKeyboardNavigationOfPages(bool enableNavigation)
+        /// <param name="enableOperations"><see langword="true"/> to allow page operations and
+        /// navigation; <see langword="false"/> to prevent it.</param>
+        void EnableKeyboardPageOperations(bool enableOperations)
         {
-            if (enableNavigation)
+            if (enableOperations)
             {
+                Shortcuts[Keys.Control | Keys.X] = HandleCutSelectedControls;
+                Shortcuts[Keys.Control | Keys.C] = HandleCopySelectedControls;
+                Shortcuts[Keys.Control | Keys.V] = HandlePaste;
+                Shortcuts[Keys.Delete] = HandleDeleteSelectedItems;
+                Shortcuts[Keys.Shift | Keys.Delete] = HandleUnDeleteSelectedItems;
+                Shortcuts[Keys.Space] = HandleToggleDocumentSeparator;
+
                 Shortcuts[Keys.Tab] = HandleSelectNextPage;
                 Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
                 // [DotNetRCAndUtils:984]
@@ -3443,6 +3452,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             else
             {
+                Shortcuts[Keys.Control | Keys.X] = null;
+                Shortcuts[Keys.Control | Keys.C] = null;
+                Shortcuts[Keys.Control | Keys.V] = null;
+                Shortcuts[Keys.Delete] = null;
+                Shortcuts[Keys.Shift | Keys.Delete] = null;
+                Shortcuts[Keys.Space] = null;
+
                 Shortcuts[Keys.Tab] = null;
                 Shortcuts[Keys.Tab | Keys.Control] = null;
                 Shortcuts[Keys.Tab | Keys.Shift] = null;

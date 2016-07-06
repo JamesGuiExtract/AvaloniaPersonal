@@ -1961,6 +1961,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // processed for a document change in verification are registered.
                 if (_dataTab != null)
                 {
+                    if (!string.IsNullOrEmpty(_fileName) &&
+                        _paginationPanel.SourceDocuments.Contains(_fileName))
+                    {
+                        _paginationPanel.Park();
+                        _paginationPanel.RemoveSourceFile(_fileName);
+                        _paginationPanel.PendingChanges = false;
+                    }
                     _tabControl.SelectedTab = _dataTab;
                 }
 
@@ -3036,6 +3043,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
 
                     _paginagionAttributesToRefresh.Clear();
+
+                    _dataEntryControlHost.EnsureFieldSelection();
                 }
                 else if (_tabControl.SelectedTab != _dataTab && _dataEntryControlHost.ImageViewer != null)
                 {
@@ -3903,6 +3912,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // processed for a document change in verification are registered.
             if (_dataTab != null)
             {
+                // https://extract.atlassian.net/browse/ISSUE-13838
+                // Prevent dialog insisting on committing pagination changes if data is not being
+                // committed.
+                if (!commitData &&
+                    !string.IsNullOrEmpty(_fileName) &&
+                    _paginationPanel.SourceDocuments.Contains(_fileName))
+                {
+                    _paginationPanel.Park();
+                    _paginationPanel.RemoveSourceFile(_fileName);
+                    _paginationPanel.PendingChanges = false;
+                }
                 _tabControl.SelectedTab = _dataTab;
             }
 
@@ -3988,11 +4008,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Since data has been saved, prevent any other attempts that might be triggered
                 // by events raised during this process.
                 PreventSaveOfDirtyData = true;
-
-                if (_paginationPanel != null && processingResult != EFileProcessingResult.kProcessingDelayed)
-                {
-                    _paginationPanel.RemoveSourceFile(_fileName);
-                }
 
                 _imageViewer.CloseImage();
 

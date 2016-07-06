@@ -1928,6 +1928,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl = new PageLayoutControl(this);
             _primaryPageLayoutControl.Shortcuts = _shortcuts;
             _primaryPageLayoutControl.Dock = DockStyle.Fill;
+            _primaryPageLayoutControl.ExternalOutputOnly = true;
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
             _primaryPageLayoutControl.CommitOnlySelection = CommitOnlySelection;
             _primaryPageLayoutControl.LoadNextDocumentVisible = LoadNextDocumentVisible;
