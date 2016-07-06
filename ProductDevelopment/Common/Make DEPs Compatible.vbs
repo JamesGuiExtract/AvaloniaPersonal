@@ -3,7 +3,7 @@ targetApplications(0) = "ProcessFiles.exe"
 targetApplications(1) = "DataEntryApplication.exe"
 targetApplications(2) = "RunFPSFile.exe"
 
-Dim dependentAssemblies(14)
+Dim dependentAssemblies(15)
 dependentAssemblies(0) = "Extract"
 dependentAssemblies(1) = "Extract.Database"
 dependentAssemblies(2) = "Extract.DataEntry"
@@ -19,6 +19,7 @@ dependentAssemblies(11) = "Extract.Utilities"
 dependentAssemblies(12) = "Extract.Utilities.Forms"
 dependentAssemblies(13) = "FAMFileInspector"
 dependentAssemblies(14) = "LeadTools.WinForms"
+dependentAssemblies(15) = "PaginationUtility"
 
 Const namespaceURI = "urn:schemas-microsoft-com:asm.v1"
 
