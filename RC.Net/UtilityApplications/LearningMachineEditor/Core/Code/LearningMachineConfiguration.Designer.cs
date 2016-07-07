@@ -126,6 +126,7 @@
             this.openMachineButton = new System.Windows.Forms.Button();
             this.saveMachineButton = new System.Windows.Forms.Button();
             this.newMachineButton = new System.Windows.Forms.Button();
+            this.statusStrip1.SuspendLayout();
             this.configurationTabControl.SuspendLayout();
             this.inputConfigurationTabPage.SuspendLayout();
             this.machineUsageGroupBox.SuspendLayout();
@@ -144,11 +145,12 @@
             // 
             // statusStrip1
             // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 711);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1109, 22);
             this.statusStrip1.TabIndex = 3;
-            this.statusStrip1.Items.Add(this.toolStripStatusLabel1);
             // 
             // toolStripStatusLabel1
             // 
@@ -239,6 +241,8 @@
             // 
             // documentCategorizationFolderInputPanel
             // 
+            this.documentCategorizationFolderInputPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.documentCategorizationFolderInputPanel.Controls.Add(this.documentCategorizationFolderFeatureVoaLabel);
             this.documentCategorizationFolderInputPanel.Controls.Add(this.documentCategorizationFolderFeatureVoaPathTagButton);
             this.documentCategorizationFolderInputPanel.Controls.Add(this.documentCategorizationFolderFeatureVoaTextBox);
@@ -274,6 +278,7 @@
             this.documentCategorizationFolderFeatureVoaPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("documentCategorizationFolderFeatureVoaPathTagButton.Image")));
             this.documentCategorizationFolderFeatureVoaPathTagButton.Location = new System.Drawing.Point(501, 75);
             this.documentCategorizationFolderFeatureVoaPathTagButton.Name = "documentCategorizationFolderFeatureVoaPathTagButton";
+            this.documentCategorizationFolderFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.documentCategorizationFolderFeatureVoaPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.documentCategorizationFolderFeatureVoaPathTagButton.TabIndex = 5;
             this.documentCategorizationFolderFeatureVoaPathTagButton.TextControl = this.documentCategorizationFolderFeatureVoaTextBox;
@@ -343,6 +348,7 @@
             this.documentCategorizationFolderAnswerPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("documentCategorizationFolderAnswerPathTagButton.Image")));
             this.documentCategorizationFolderAnswerPathTagButton.Location = new System.Drawing.Point(501, 121);
             this.documentCategorizationFolderAnswerPathTagButton.Name = "documentCategorizationFolderAnswerPathTagButton";
+            this.documentCategorizationFolderAnswerPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.documentCategorizationFolderAnswerPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.documentCategorizationFolderAnswerPathTagButton.TabIndex = 8;
             this.documentCategorizationFolderAnswerPathTagButton.TextControl = this.documentCategorizationFolderAnswerTextBox;
@@ -406,6 +412,8 @@
             // 
             // paginationInputPanel
             // 
+            this.paginationInputPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.paginationInputPanel.Controls.Add(this.paginationAnswerVoaLabel);
             this.paginationInputPanel.Controls.Add(this.paginationAnswerVoaPathTagButton);
             this.paginationInputPanel.Controls.Add(this.paginationAnswerVoaTextBox);
@@ -440,6 +448,7 @@
             this.paginationAnswerVoaPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("paginationAnswerVoaPathTagButton.Image")));
             this.paginationAnswerVoaPathTagButton.Location = new System.Drawing.Point(501, 121);
             this.paginationAnswerVoaPathTagButton.Name = "paginationAnswerVoaPathTagButton";
+            this.paginationAnswerVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.paginationAnswerVoaPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.paginationAnswerVoaPathTagButton.TabIndex = 8;
             this.paginationAnswerVoaPathTagButton.TextControl = this.paginationAnswerVoaTextBox;
@@ -510,6 +519,7 @@
             this.paginationFeatureVoaPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("paginationFeatureVoaPathTagButton.Image")));
             this.paginationFeatureVoaPathTagButton.Location = new System.Drawing.Point(501, 75);
             this.paginationFeatureVoaPathTagButton.Name = "paginationFeatureVoaPathTagButton";
+            this.paginationFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.paginationFeatureVoaPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.paginationFeatureVoaPathTagButton.TabIndex = 5;
             this.paginationFeatureVoaPathTagButton.TextControl = this.paginationFeatureVoaTextBox;
@@ -585,7 +595,7 @@
             this.documentCategorizationCsvInputPanel.Controls.Add(this.documentCategorizationCsvTextBox);
             this.documentCategorizationCsvInputPanel.Location = new System.Drawing.Point(6, 67);
             this.documentCategorizationCsvInputPanel.Name = "documentCategorizationCsvInputPanel";
-            this.documentCategorizationCsvInputPanel.Size = new System.Drawing.Size(536, 496);
+            this.documentCategorizationCsvInputPanel.Size = new System.Drawing.Size(532, 496);
             this.documentCategorizationCsvInputPanel.TabIndex = 2;
             // 
             // documentCategorizationCsvFeatureVoaLabel
@@ -602,8 +612,9 @@
             // 
             this.documentCategorizationCsvFeatureVoaPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.documentCategorizationCsvFeatureVoaPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("documentCategorizationCsvFeatureVoaPathTagButton.Image")));
-            this.documentCategorizationCsvFeatureVoaPathTagButton.Location = new System.Drawing.Point(501, 75);
+            this.documentCategorizationCsvFeatureVoaPathTagButton.Location = new System.Drawing.Point(497, 75);
             this.documentCategorizationCsvFeatureVoaPathTagButton.Name = "documentCategorizationCsvFeatureVoaPathTagButton";
+            this.documentCategorizationCsvFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this.documentCategorizationCsvFeatureVoaPathTagButton.Size = new System.Drawing.Size(24, 24);
             this.documentCategorizationCsvFeatureVoaPathTagButton.TabIndex = 5;
             this.documentCategorizationCsvFeatureVoaPathTagButton.TextControl = this.documentCategorizationCsvFeatureVoaTextBox;
@@ -615,7 +626,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.documentCategorizationCsvFeatureVoaTextBox.Location = new System.Drawing.Point(10, 77);
             this.documentCategorizationCsvFeatureVoaTextBox.Name = "documentCategorizationCsvFeatureVoaTextBox";
-            this.documentCategorizationCsvFeatureVoaTextBox.Size = new System.Drawing.Size(485, 20);
+            this.documentCategorizationCsvFeatureVoaTextBox.Size = new System.Drawing.Size(481, 20);
             this.documentCategorizationCsvFeatureVoaTextBox.TabIndex = 4;
             this.documentCategorizationCsvFeatureVoaTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.documentCategorizationCsvFeatureVoaTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
@@ -642,7 +653,7 @@
             // documentCategorizationCsvBrowseButton
             // 
             this.documentCategorizationCsvBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.documentCategorizationCsvBrowseButton.Location = new System.Drawing.Point(501, 30);
+            this.documentCategorizationCsvBrowseButton.Location = new System.Drawing.Point(497, 30);
             this.documentCategorizationCsvBrowseButton.Name = "documentCategorizationCsvBrowseButton";
             this.documentCategorizationCsvBrowseButton.Size = new System.Drawing.Size(24, 24);
             this.documentCategorizationCsvBrowseButton.TabIndex = 2;
@@ -657,7 +668,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.documentCategorizationCsvTextBox.Location = new System.Drawing.Point(10, 32);
             this.documentCategorizationCsvTextBox.Name = "documentCategorizationCsvTextBox";
-            this.documentCategorizationCsvTextBox.Size = new System.Drawing.Size(485, 20);
+            this.documentCategorizationCsvTextBox.Size = new System.Drawing.Size(481, 20);
             this.documentCategorizationCsvTextBox.TabIndex = 1;
             this.documentCategorizationCsvTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.documentCategorizationCsvTextBox.LostFocus += new System.EventHandler(this.HandleValueChanged);
@@ -1235,6 +1246,8 @@
             this.MinimumSize = new System.Drawing.Size(572, 572);
             this.Name = "LearningMachineConfiguration";
             this.Text = "Learning Machine Editor";
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.configurationTabControl.ResumeLayout(false);
             this.inputConfigurationTabPage.ResumeLayout(false);
             this.machineUsageGroupBox.ResumeLayout(false);
