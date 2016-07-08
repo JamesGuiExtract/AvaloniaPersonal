@@ -314,8 +314,9 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>AFCoreTest.dll</td><td>{ACD1E282-CEF2-4AAE-A6EA-846C6D6AB632}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFCoreTest.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Binaries</td><td>{8F19E4E8-C671-43BF-A610-541055BFC7C6}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AFCoreTest.dll</td><td>{ACD1E282-CEF2-4AAE-A6EA-846C6D6AB632}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>AFCoreTest.dll</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Binaries</td><td>{8F19E4E8-C671-43BF-A610-541055BFC7C6}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldcustomerrdt.rl</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.AttributeFinder.Forms.dll</td><td>{0A75FB81-E0BB-4F26-9919-9163950A9391}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.attributefinder.form</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{80F8B8EA-4FC3-4BEB-A725-3420A9439B18}</td><td>HELP</td><td>8</td><td/><td/><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISRegistryComponent</td><td>{775BB93C-F45F-4CDA-B0EF-7634480DA491}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NonSelfRegCommon</td><td>{4CEEF54D-9017-40FC-BB20-28BA50FC1090}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1142,6 +1143,7 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>Documentation</td><td>Extract.AttributeFinder.Forms.dll</td></row>
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>RDTComponents</td><td>AFCoreTest.dll</td></row>
 		<row><td>RDTComponents</td><td>Binaries</td></row>
@@ -1163,6 +1165,7 @@
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>AFCoreTest.dll</td><td>AFCoreTest.dll</td><td>AFCORE~1.DLL|AFCoreTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\AFCoreTest.dll</td><td>17</td><td/></row>
+		<row><td>extract.attributefinder.form</td><td>Extract.AttributeFinder.Forms.dll</td><td>EXTRAC~1.DLL|Extract.AttributeFinder.Forms.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGRDTNETCO_FILES&gt;\Extract.AttributeFinder.Forms.dll</td><td>1</td><td/></row>
 		<row><td>idshieldcustomerrdt.rl</td><td>Binaries</td><td>IDSHIE~1.RL|IDShieldCustomerRDT.rl</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE&gt;\IDShieldCustomerRDT.rl</td><td>1</td><td/></row>
 		<row><td>modifyvoa.exe</td><td>Binaries</td><td>MODIFY~1.EXE|ModifyVOA.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE&gt;\ModifyVOA.exe</td><td>1</td><td/></row>
 		<row><td>redactiontester.dll</td><td>RedactionTester.dll</td><td>REDACT~1.DLL|RedactionTester.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RedactionTester.dll</td><td>17</td><td/></row>
@@ -1308,6 +1311,7 @@
 		<col def="S0">Miscellaneous</col>
 		<row><td>AFCoreTest.dll</td><td/><td/><td>_E2D855E9_FB10_4485_A43F_17799C3190E0_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Binaries</td><td/><td/><td>_4DA596EB_D030_476D_9DFB_B301700AE020_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Extract.AttributeFinder.Forms.dll</td><td/><td/><td>_48430BB8_B40C_4307_B3A4_34128A7D3E99_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_12B08BDC_03DC_4E89_BC73_8FCD4BE2BB79_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISRegistryComponent</td><td/><td/><td>_8F9E7157_C911_4639_A6E5_B5069B7CBB1D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NonSelfRegCommon</td><td/><td/><td>_D6198984_8972_4217_BDA2_B23267AA1193_FILTER</td><td/><td/><td/><td/></row>
@@ -1624,6 +1628,7 @@
 		<row><td>PATH_TO_RELEASE</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\..\..\Binaries\Release</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGCOMMONCO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegCommonComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGRDTCOMPO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegRDTComponents</td><td/><td>2</td></row>
+		<row><td>PATH_TO_SELFREGRDTNETCO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegRDTNetCommon</td><td/><td>2</td></row>
 		<row><td>PATH_TO_TESTFILES_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\TestFiles</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>

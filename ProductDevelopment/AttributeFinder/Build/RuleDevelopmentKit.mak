@@ -62,12 +62,14 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 CreateDestinationFolders:
 	@IF NOT EXIST "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents" @MKDIR "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
 	@IF NOT EXIST "$(RDTInstallFilesRootDir)\SelfRegRDTComponents" @MKDIR "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
+	@IF NOT EXIST "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon" @MKDIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon"
 	@IF NOT EXIST "$(RDTInstallFilesRootDir)\SelfRegCommonComponents" @MKDIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents"
 	@IF NOT EXIST "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" @MKDIR "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 
 CopyFilesToInstallFolder: CreateDestinationFolders
     @ECHO Copying the TCL files to installation directory...
 	@DeleteFiles "$(RDTInstallFilesRootDir)\SelfRegRDTComponents\*.*" /S
+	@DeleteFiles "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /S
 	@DeleteFiles "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents\*.*" /S
 	@DeleteFiles "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /S
 	@DeleteFiles "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\*.*" /S
@@ -103,14 +105,16 @@ CopyFilesToInstallFolder: CreateDestinationFolders
  	@COPY /V  "$(BinariesFolder)\OcrSingleDocument.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V  "$(BinariesFolder)\GetWordLengthDist.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V  "$(BinariesFolder)\CopyNumberedFiles.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
- 	@COPY /V  "$(BinariesFolder)\LearningMachineEditor.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"	
+ 	@COPY /V  "$(BinariesFolder)\LearningMachineEditor.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V  "$(BinariesFolder)\ExpressionAndQueryTester.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(BinariesFolder)\Extract*test*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(RCDotNetDir)\Core\Testing\Automated\*.nunit" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(BinariesFolder)\Extract.DataEntry.DEP.*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@COPY /V  "$(BinariesFolder)\Extract.AttributeFinder.Forms.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon"
 	
-	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents\RDT.rl"
+	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"
+	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents\RDT.rl"
 	@DIR "$(BinariesFolder)\AFCoreTest.dll" /b >"$(BinariesFolder)\CustomerRDT.rl"
 	@DIR "$(BinariesFolder)\RedactionTester.dll" /b >"$(BinariesFolder)\IDShieldCustomerRDT.rl"
   
