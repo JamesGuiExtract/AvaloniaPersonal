@@ -35,12 +35,12 @@
             this._okButton = new System.Windows.Forms.Button();
             this._voaFileNameTextBox = new System.Windows.Forms.TextBox();
             this._attributeSetNameComboBox = new System.Windows.Forms.ComboBox();
-            this._voaFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._storeRasterZonesCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._RetrieveRadioButton = new System.Windows.Forms.RadioButton();
             this._StoreRadioButton = new System.Windows.Forms.RadioButton();
             this._doNotSaveEmptyCheckBox = new System.Windows.Forms.CheckBox();
+            this._voaFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._attributeSetNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._voaFileNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             label1 = new System.Windows.Forms.Label();
@@ -73,7 +73,7 @@
             this._cancelButton.Location = new System.Drawing.Point(361, 227);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 7;
+            this._cancelButton.TabIndex = 8;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -83,7 +83,7 @@
             this._okButton.Location = new System.Drawing.Point(280, 227);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 6;
+            this._okButton.TabIndex = 7;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -109,17 +109,6 @@
             this._attributeSetNameComboBox.TabIndex = 3;
             this._attributeSetNameComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleAttributeSetNameComboBox_SelectedIndexChanged);
             // 
-            // _voaFileNameBrowseButton
-            // 
-            this._voaFileNameBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._voaFileNameBrowseButton.FileFilter = "XSD Files (*.xsd)|*.xsd|All files (*.*)|*.*";
-            this._voaFileNameBrowseButton.Location = new System.Drawing.Point(410, 24);
-            this._voaFileNameBrowseButton.Name = "_voaFileNameBrowseButton";
-            this._voaFileNameBrowseButton.Size = new System.Drawing.Size(26, 21);
-            this._voaFileNameBrowseButton.TabIndex = 2;
-            this._voaFileNameBrowseButton.Text = "...";
-            this._voaFileNameBrowseButton.UseVisualStyleBackColor = true;
-            // 
             // _storeRasterZonesCheckBox
             // 
             this._storeRasterZonesCheckBox.AutoSize = true;
@@ -139,7 +128,7 @@
             this.groupBox1.Location = new System.Drawing.Point(12, 97);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(424, 63);
-            this.groupBox1.TabIndex = 10;
+            this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Mode";
             // 
@@ -175,9 +164,20 @@
             this._doNotSaveEmptyCheckBox.Location = new System.Drawing.Point(12, 201);
             this._doNotSaveEmptyCheckBox.Name = "_doNotSaveEmptyCheckBox";
             this._doNotSaveEmptyCheckBox.Size = new System.Drawing.Size(161, 17);
-            this._doNotSaveEmptyCheckBox.TabIndex = 11;
+            this._doNotSaveEmptyCheckBox.TabIndex = 6;
             this._doNotSaveEmptyCheckBox.Text = "Do not store empty attributes";
             this._doNotSaveEmptyCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _voaFileNameBrowseButton
+            // 
+            this._voaFileNameBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._voaFileNameBrowseButton.FileFilter = "XSD Files (*.xsd)|*.xsd|All files (*.*)|*.*";
+            this._voaFileNameBrowseButton.Location = new System.Drawing.Point(410, 24);
+            this._voaFileNameBrowseButton.Name = "_voaFileNameBrowseButton";
+            this._voaFileNameBrowseButton.Size = new System.Drawing.Size(26, 21);
+            this._voaFileNameBrowseButton.TabIndex = 2;
+            this._voaFileNameBrowseButton.Text = "...";
+            this._voaFileNameBrowseButton.UseVisualStyleBackColor = true;
             // 
             // _attributeSetNamePathTagButton
             // 
