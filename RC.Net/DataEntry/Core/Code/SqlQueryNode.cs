@@ -60,7 +60,6 @@ namespace Extract.DataEntry
             public DbConnectionWrapper(DbConnection dbConnection)
             {
                 DbConnection = dbConnection;
-                AttributeStatusInfo.QueryCacheCleared += (o, e) => CachedResults.Clear();
             }
         }
 
@@ -293,6 +292,22 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI26755");
+            }
+        }
+
+        /// <summary>
+        /// Handles the query cache cleared event
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        protected override void HandleQueryCacheCleared(object sender, EventArgs e)
+        {
+            base.HandleQueryCacheCleared(sender, e);
+
+            // Clear the db wrapper's cache too
+            if (_currentConnection != null)
+            {
+                _currentConnection.CachedResults.Clear();
             }
         }
 

@@ -468,9 +468,13 @@ namespace Extract.LabResultsCustomComponents
                         return 0;
                     }
 
+                    QueryResult result = null;
                     AttributeStatusInfo.InitializeForQuery(testAttribute.SubAttributes, testAttribute.Value.SourceDocName, null);
-                    DataEntryQuery query = DataEntryQuery.Create(testScoringQuery, testAttribute);
-                    QueryResult result = query.Evaluate();
+                    using (var query = DataEntryQuery.Create(testScoringQuery, testAttribute))
+                    {
+                        result = query.Evaluate();
+                    }
+                    AttributeStatusInfo.ResetData(null, null, null);
 
                     int retVal = 0;
                     return result.Max(r => Int32.TryParse(result.FirstString, out retVal) ? retVal : 0);

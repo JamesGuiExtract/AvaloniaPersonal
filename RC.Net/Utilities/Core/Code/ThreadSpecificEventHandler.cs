@@ -136,7 +136,9 @@ namespace Extract.Utilities
                 EventHandler<T> existingEventHandler = null;
                 if (_eventHandlers.TryGetValue(CurrentThreadID, out existingEventHandler))
                 {
-                    existingEventHandler -= eventHandler;
+                    // The -= operator creates a new instance rather than updating the original
+                    // instance. The dictionary needs to be updated with the new value.
+                    _eventHandlers[CurrentThreadID] = existingEventHandler -= eventHandler;
                 }
             }
             catch (Exception ex)

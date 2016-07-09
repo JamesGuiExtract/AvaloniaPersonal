@@ -977,11 +977,13 @@ namespace Extract.AttributeFinder.Rules
                     }
                 }
 
+                QueryResult result = null;
                 AttributeStatusInfo.InitializeForQuery(sourceAttributes, sourceDocName, dbConnection);
-
-                DataEntryQuery query = DataEntryQuery.Create(Query, null, dbConnection);
-
-                QueryResult result = query.Evaluate();
+                using (var query = DataEntryQuery.Create(Query, null, dbConnection))
+                {
+                    result = query.Evaluate();
+                }
+                AttributeStatusInfo.ResetData(null, null, null);
 
                 // Close the database connection if one was opened.
                 if (dbConnection != null)

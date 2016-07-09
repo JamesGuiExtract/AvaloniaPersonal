@@ -147,7 +147,7 @@ namespace Extract.DataEntry
                 _rootAttribute = rootAttribute;
                 _dbConnections = dbConnections;
 
-                AttributeStatusInfo.QueryCacheCleared += (o, e) => { CachedResult = null; };
+                AttributeStatusInfo.QueryCacheCleared += HandleQueryCacheCleared;
             }
             catch (Exception ex)
             {
@@ -452,6 +452,16 @@ namespace Extract.DataEntry
             {
                 _handlingQueryValueChange = false;
             }
+        }
+
+        /// <summary>
+        /// Handles the query cache cleared event
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        protected virtual void HandleQueryCacheCleared(object sender, EventArgs e)
+        {
+            CachedResult = null;
         }
 
         #endregion Virtuals
@@ -1142,6 +1152,10 @@ namespace Extract.DataEntry
                 {
                     childNode.Dispose();
                 }
+
+                // Unregister for query cached cleared event to prevent memory leak
+                // https://extract.atlassian.net/browse/ISSUE-13855
+                AttributeStatusInfo.QueryCacheCleared -= HandleQueryCacheCleared;
             }
         }
 
