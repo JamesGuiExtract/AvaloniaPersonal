@@ -4501,6 +4501,44 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Removes all <see cref="IAttribute"/>s not marked as persistable from the provided
+        /// attribute hierarchy.
+        /// </summary>
+        /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
+        /// non-persistable attributes should be removed.</param>
+        internal static void PruneNonPersistingAttributes(IUnknownVector attributes)
+        {
+            try
+            {
+                int count = attributes.Size();
+                for (int i = 0; i < count; i++)
+                {
+                    IAttribute attribute = (IAttribute)attributes.At(i);
+                    if (AttributeStatusInfo.IsAttributePersistable(attribute))
+                    {
+                        PruneNonPersistingAttributes(attribute.SubAttributes);
+                    }
+                    else
+                    {
+                        attributes.Remove(i);
+                        count--;
+                        i--;
+
+                        // [DataEntry:693]
+                        // Since these attributes will no longer be accessed by the DataEntry,
+                        // they need to be released with FinalReleaseComObject to prevent handle
+                        // leaks.
+                        Marshal.FinalReleaseComObject(attribute);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40243");
+            }
+        }
+
         #endregion Internal Members
 
         #region Protected Members
@@ -7767,37 +7805,6 @@ namespace Extract.DataEntry
             }
 
             return viewableAttributes;
-        }
-
-        /// <summary>
-        /// Removes all <see cref="IAttribute"/>s not marked as persistable from the provided
-        /// attribute hierarchy.
-        /// </summary>
-        /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
-        /// non-persistable attributes should be removed.</param>
-        static void PruneNonPersistingAttributes(IUnknownVector attributes)
-        {
-            int count = attributes.Size();
-            for (int i = 0; i < count; i++)
-            {
-                IAttribute attribute = (IAttribute)attributes.At(i);
-                if (AttributeStatusInfo.IsAttributePersistable(attribute))
-                {
-                    PruneNonPersistingAttributes(attribute.SubAttributes);
-                }
-                else
-                {
-                    attributes.Remove(i);
-                    count--;
-                    i--;
-
-                    // [DataEntry:693]
-                    // Since these attributes will no longer be accessed by the DataEntry,
-                    // they need to be released with FinalReleaseComObject to prevent handle
-                    // leaks.
-                    Marshal.FinalReleaseComObject(attribute);
-                }
-            }
         }
 
         /// <summary>

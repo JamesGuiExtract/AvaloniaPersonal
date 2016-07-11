@@ -36,9 +36,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// can be saved.
         /// </summary>
         /// <param name="data">The data to save.</param>
+        /// <param name="validateData"><see langword="true"/> if the <see paramref="data"/> should
+        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
         /// <returns><see langword="true"/> if the data was saved correctly or
         /// <see langword="false"/> if corrections are needed before it can be saved.</returns>
-        bool SaveData(PaginationDocumentData data);
+        bool SaveData(PaginationDocumentData data, bool validateData);
 
         /// <summary>
         /// Gets a <see cref="PaginationDocumentData"/> instance based on the provided

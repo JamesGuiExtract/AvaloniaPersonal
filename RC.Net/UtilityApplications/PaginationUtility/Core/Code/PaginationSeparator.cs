@@ -278,7 +278,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             if (value)
                             {
-                                if (!CloseDataPanel(true))
+                                if (!CloseDataPanel(true, true))
                                 {
                                     return;
                                 }
@@ -300,18 +300,73 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Opens the <see cref="DocumentDataPanel"/>, populating it with the
+        /// <see cref="Document"/>'s data.
+        /// </summary>
+        public void OpenDataPanel()
+        {
+            bool locked = false;
+
+            try
+            {
+                if (Document != null &&
+                    (_documentDataPanelControl == null || 
+                        !_tableLayoutPanel.Controls.Contains(_documentDataPanelControl)))
+                {
+                    var args = new DocumentDataPanelRequestEventArgs(Document);
+                    OnDocumentDataPanelRequest(args);
+
+                    if (args.DocumentDataPanel != null)
+                    {
+                        FormsMethods.LockControlUpdate(this, true);
+                        locked = true;
+                        _documentDataPanelControl = (Control)args.DocumentDataPanel;
+                        _documentDataPanelControl.Width = _tableLayoutPanel.Width;
+                        _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
+                        _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
+                        UpdateSize();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40237");
+            }
+            finally
+            {
+                if (locked)
+                {
+                    try
+                    {
+                        FormsMethods.LockControlUpdate(this, false);
+                        Refresh();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI40208");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Closes the <see cref="DocumentDataPanel"/> (if visible), applying any changed data in
         /// the process.
         /// </summary>
-        /// <param name="saveData"></param>
-        public bool CloseDataPanel(bool saveData)
+        /// <param name="saveData"><param name="validateData"><see langword="true"/> to save the
+        /// document's data; otherwise, <see langwor="false"/>.</param>
+        /// <param name="validateData"><see langword="true"/> if the document's data should
+        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
+        /// <returns><see langword="true"/> if the data was saved or <see langword="false"/> if the
+        /// data could not be saved and needs to be corrected.</returns>
+        public bool CloseDataPanel(bool saveData, bool validateData)
         {
             if (_documentDataPanelControl != null && _tableLayoutPanel.Controls.Contains(_documentDataPanelControl))
             {
                 var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
                 if (Document != null && _outputDocument.DocumentData != null)
                 {
-                    if (saveData && !documentDataPanel.SaveData(_outputDocument.DocumentData))
+                    if (saveData && !documentDataPanel.SaveData(_outputDocument.DocumentData, validateData))
                     {
                         return false;
                     }
@@ -513,54 +568,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void HandleEditDocumentDataButton_Click(object sender, EventArgs e)
         {
-            bool locked = false;
-
             try
             {
                 _clickEventHandledInternally = true;
 
                 if (_documentDataPanelControl != null && _tableLayoutPanel.Controls.Contains(_documentDataPanelControl))
                 {
-                    CloseDataPanel(true);
+                    CloseDataPanel(true, true);
                 }
                 else
                 {
-                    if (Document != null)
-                    {
-                        var args = new DocumentDataPanelRequestEventArgs(Document);
-                        OnDocumentDataPanelRequest(args);
-
-                        if (args.DocumentDataPanel != null)
-                        {
-                            FormsMethods.LockControlUpdate(this, true);
-                            locked = true;
-                            _documentDataPanelControl = (Control)args.DocumentDataPanel;
-                            _documentDataPanelControl.Width = _tableLayoutPanel.Width;
-                            _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
-                            _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
-                            UpdateSize();
-                        }
-                    }
+                    OpenDataPanel();
                 }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40185");
-            }
-            finally
-            {
-                if (locked)
-                {
-                    try
-                    {
-                        FormsMethods.LockControlUpdate(this, false);
-                        Refresh();
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.ExtractLog("ELI40208");
-                    }
-                }
             }
         }
 

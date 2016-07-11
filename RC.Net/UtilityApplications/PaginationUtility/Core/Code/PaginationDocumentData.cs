@@ -130,7 +130,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Reverts the data back to its original values.
         /// </summary>
-        public void Revert()
+        public virtual void Revert()
         {
             try
             {

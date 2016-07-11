@@ -147,27 +147,29 @@ namespace Extract.AttributeFinder
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
         /// number while the value represents the new page number(s) in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static void TranslateAttributesToNewDocument(IIUnknownVector attributes,
-            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap)
+            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap,
+            LongToObjectMap newSpatialPageInfos)
         {
             try
             {
                 foreach (IAttribute attribute in attributes.ToIEnumerable<IAttribute>())
                 {
                     TranslateAttributesToNewDocument(attribute.SubAttributes,
-                        newDocumentName, pageMap);
+                        newDocumentName, pageMap, newSpatialPageInfos);
 
                     SpatialString value = attribute.Value;
                     if (value.GetMode() == ESpatialStringMode.kSpatialMode)
                     {
                         attribute.Value = TranslateSpatialStringToNewDocument(
-                            value, newDocumentName, pageMap);
+                            value, newDocumentName, pageMap, newSpatialPageInfos);
                     }
                     else if (value.GetMode() == ESpatialStringMode.kHybridMode)
                     {
                         attribute.Value = TranslateHybridStringToNewDocument(
-                            value, newDocumentName, pageMap);
+                            value, newDocumentName, pageMap, newSpatialPageInfos);
                     }
                 }
             }
@@ -212,11 +214,25 @@ namespace Extract.AttributeFinder
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
         /// number while the value represents the new page number(s) in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
+        /// <returns>The translated spatial string</returns>
         static SpatialString TranslateSpatialStringToNewDocument(SpatialString value,
-            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap)
+            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap,
+            LongToObjectMap newSpatialPageInfos)
         {
             ExtractException.Assert("ELI39709", "Unexpected spatial mode.",
                 value.GetMode() == ESpatialStringMode.kSpatialMode);
+
+            // https://extract.atlassian.net/browse/ISSUE-13873
+            // To avoid issues with pages being output to a new document in a different order than
+            // they came in, downgrade any multi-page attributes to hybrid strings so that
+            // unexpected page order doesn't cause errors.
+            if (value.GetFirstPageNumber() != value.GetLastPageNumber())
+            {
+                value.DowngradeToHybridMode();
+                return TranslateHybridStringToNewDocument(
+                    value, newDocumentName, pageMap, newSpatialPageInfos);
+            }
 
             string sourceDocName = GetSourceDocName(value, pageMap);
 
@@ -230,12 +246,13 @@ namespace Extract.AttributeFinder
                 if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum),
                     out newPageNums))
                 {
-                    foreach (int newPageNum in newPageNums)
-                    {
-                        page.UpdatePageNumber(newPageNum);
-                        page.SourceDocName = newDocumentName;
-                        updatedPages.Add(page);
-                    }
+                    // If for some reason same source page is copied to multiple destination pages,
+                    // only copy attribute value to the first of those pages.
+                    int newPageNum = newPageNums.Min();
+                    page.SpatialPageInfos = newSpatialPageInfos;
+                    page.UpdatePageNumber(newPageNum);
+                    page.SourceDocName = newDocumentName;
+                    updatedPages.Add(page);
                 }
             }
 
@@ -264,8 +281,11 @@ namespace Extract.AttributeFinder
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
         /// number while the value represents the new page number(s) in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
+        /// <returns>The translated spatial string</returns>
         static SpatialString TranslateHybridStringToNewDocument(SpatialString value,
-            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap)
+            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap,
+            LongToObjectMap newSpatialPageInfos)
         {
             ExtractException.Assert("ELI39710", "Unexpected spatial mode.",
                 value.GetMode() == ESpatialStringMode.kHybridMode);
@@ -273,7 +293,6 @@ namespace Extract.AttributeFinder
             string sourceDocName = GetSourceDocName(value, pageMap);
 
             var updatedRasterZones = new List<IRasterZone>();
-            var updatedPageInfoMap = new LongToObjectMap();
             foreach (IRasterZone rasterZone in value.GetOCRImageRasterZones()
                 .ToIEnumerable<IRasterZone>())
             {
@@ -282,18 +301,11 @@ namespace Extract.AttributeFinder
                 if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum),
                     out newPageNums))
                 {
-                    foreach (int newPageNum in newPageNums)
-                    {
-                        rasterZone.PageNumber = newPageNum;
-                        updatedRasterZones.Add(rasterZone);
-                        if (!updatedPageInfoMap.Contains(newPageNum))
-                        {
-                            var copyable = (ICopyableObject)value.GetPageInfo(oldPageNum);
-                            var newPageInfo = (SpatialPageInfo)copyable.Clone();
-
-                            updatedPageInfoMap.Set(newPageNum, newPageInfo);
-                        }
-                    }
+                    // If for some reason same source page is copied to multiple destination pages,
+                    // only copy attribute value to the first of those pages.
+                    int newPageNum = newPageNums.Min();
+                    rasterZone.PageNumber = newPageNum;
+                    updatedRasterZones.Add(rasterZone);
                 }
             }
 
@@ -305,7 +317,7 @@ namespace Extract.AttributeFinder
             else
             {
                 updatedValue.CreateHybridString(updatedRasterZones.ToIUnknownVector<IRasterZone>(),
-                    value.String, newDocumentName, updatedPageInfoMap);
+                    value.String, newDocumentName, newSpatialPageInfos);
             }
             return updatedValue;
         }

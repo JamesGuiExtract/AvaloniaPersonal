@@ -3168,14 +3168,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     destPages.Add(pageCounter++);
                 }
 
-                CreateUSSForPaginatedDocument(e.OutputFileName, pageMap);
+                var newSpatialPageInfos = CreateUSSForPaginatedDocument(e.OutputFileName, pageMap);
 
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
                 // everything we would expect them to find for this document).
                 if (grabForImmediateVerification)
                 {
-                    GrabDocumentForVerification(fileID, e, pageMap);
+                    GrabDocumentForVerification(fileID, e, pageMap, newSpatialPageInfos);
                 }
                 else if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
                 {
@@ -3183,10 +3183,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     var documentData = e.DocumentData as PaginationDocumentData;
                     if (documentData != null)
                     {
-                        AttributeMethods.TranslateAttributesToNewDocument(
-                            documentData.Attributes, e.OutputFileName, pageMap);
+                        if (e.SourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
+                        {
+                            DataEntryControlHost.PruneNonPersistingAttributes(documentData.Attributes);
+                        }
 
-                        documentData.Attributes.SaveTo(e.OutputFileName + ".voa", false,
+                        var copyThis = (ICopyableObject)documentData.Attributes;
+                        var attributesCopy = (IUnknownVector)copyThis.Clone();
+
+                        AttributeMethods.TranslateAttributesToNewDocument(
+                            attributesCopy, e.OutputFileName, pageMap, newSpatialPageInfos);
+
+                        attributesCopy.SaveTo(e.OutputFileName + ".voa", false,
                             _ATTRIBUTE_STORAGE_MANAGER_GUID);
                     }
 
@@ -3229,99 +3237,46 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     documentData.SetOriginalForm();
                 }
 
-                bool completeActiveFile = false;
-
-                // Once the newly paginated files are loaded, the source documents for the newly
-                // paginated output or any documents for which suggested pagination was ignored
-                // should be completed.
-                foreach (var sourceFileName in
-                     e.PaginatedDocumentSources.Union(e.DisregardedPaginationSources))
+                // If suggested pagination was disregarded, the source document should be
+                // treated as essentially new output that needs to be reprocessed by rules
+                // since what the rules originally found doesn't apply to the source
+                // document as a whole.
+                if (e.DisregardedPaginationSources.SingleOrDefault() == _fileName)
                 {
-                    _paginationPanel.RemoveSourceFile(sourceFileName);
-
-                    // If sourceFileName is the current file in verification, complete the file
-                    // normally.
-                    if (sourceFileName == _fileName)
+                    if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
                     {
-                        // If suggested pagination was disregarded, the source document should be
-                        // treated as essentially new output that needs to be reprocessed by rules
-                        // since what the rules originally found doesn't apply to the source
-                        // document as a whole.
-                        if (e.DisregardedPaginationSources.Contains(sourceFileName) &&
-                            !string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationOutputAction))
-                        {
-                            EActionStatus oldStatus;
-                            FileProcessingDB.SetStatusForFile(_fileId,
-                                _settings.PaginationSettings.PaginationOutputAction,
-                                EActionStatus.kActionPending, false, false, out oldStatus);
-                        }
-
-                        completeActiveFile = true;
-                    }
-                    // If sourceFileName is not the current file in verification, it needs to be
-                    // manually released from the current process and directed to "complete" via
-                    // fallback status.
-                    else
-                    {
-                        int sourceFileID = FileProcessingDB.GetFileID(sourceFileName);
-                        var success = FileRequestHandler.SetFallbackStatus(
-                            sourceFileID, EActionStatus.kActionCompleted);
-                        ExtractException.Assert("ELI39623", "Failed to set fallback status", success,
-                            "FileID", sourceFileID);
-                        ReleaseFile(sourceFileID);
-
-                        // PaginationSourceAction allows a paginated source to be moved into a
-                        // cleanup action even when it is completed for this action without actually
-                        // having completed all FAM tasks.
-                        if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationSourceAction))
-                        {
-                            EActionStatus oldStatus;
-                            FileProcessingDB.SetStatusForFile(sourceFileID,
-                                _settings.PaginationSettings.PaginationSourceAction,
-                                EActionStatus.kActionPending, false, true, out oldStatus);
-                        }
+                        EActionStatus oldStatus;
+                        FileProcessingDB.SetStatusForFile(_fileId,
+                            _settings.PaginationSettings.PaginationOutputAction,
+                            EActionStatus.kActionPending, false, false, out oldStatus);
                     }
                 }
-
-                if (completeActiveFile)
+                // PaginationSourceAction allows a paginated source to be moved into a
+                // cleanup action even when it is completed for this action without actually
+                // having completed all FAM tasks.
+                else if (!string.IsNullOrWhiteSpace(_settings.PaginationSettings.PaginationSourceAction))
                 {
-                    // If file completion is not invoked in a subsequent message handle, the current
-                    // file is not always completed as intended.
-                    this.SafeBeginInvoke("ELI39995", () =>
-                    {
-                        // In order for files to be completed (and any prompting or other UI tasks
-                        // accomplished by the DEP), the data tab must be given back focus.
-                        _tabControl.SelectedTab = _dataTab;
-
-                        _imageViewer.CloseImage();
-
-                        // Record statistics to database that need to happen when a file is closed.
-                        RecordCounts(onLoad: false, attributes: null);
-                        EndFileTaskSession();
-
-                        OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
-
-                        if (string.IsNullOrEmpty(_actionName))
-                        {
-                            base.Text = _brandingResources.ApplicationTitle;
-                        }
-                        else
-                        {
-                            base.Text = "Waiting - " + _brandingResources.ApplicationTitle +
-                                " (" + _actionName + ")";
-                        }
-
-                        if (_dataEntryControlHost != null)
-                        {
-                            _dataEntryControlHost.LoadData(null);
-                        }
-
-                        _paginating = false;
-                    }, 
-                    true,
-                    // Ensure _paginating is reset in the case of an error completing the file.
-                    (ex) => _paginating = false);
+                    EActionStatus oldStatus;
+                    FileProcessingDB.SetStatusForFile(_fileId,
+                        _settings.PaginationSettings.PaginationSourceAction,
+                        EActionStatus.kActionPending, false, true, out oldStatus);
                 }
+
+                // In order for files to be completed (and any prompting or other UI tasks
+                // accomplished by the DEP), the data tab must be given back focus.
+                _tabControl.SelectedTab = _dataTab;
+
+                _paginationPanel.RemoveSourceFile(_fileName);
+
+                var success = FileRequestHandler.SetFallbackStatus(
+                    _fileId, EActionStatus.kActionCompleted);
+                ExtractException.Assert("ELI39623", "Failed to set fallback status", success,
+                    "FileID", _fileId);
+
+                ReleaseFile(_fileId);
+                DelayFile();
+
+                _paginating = false;
             }
             catch (Exception ex)
             {
@@ -5822,7 +5777,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
         /// number while the value represents the new page number(s) in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
-        static void CreateUSSForPaginatedDocument(string newDocumentName,
+        /// <returns>New spatial page info map</returns>
+        static LongToObjectMap CreateUSSForPaginatedDocument(string newDocumentName,
             Dictionary<Tuple<string, int>, List<int>> pageMap)
         {
             try
@@ -5838,7 +5794,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         return ussData;
                     });
 
-                var newPageData = new IUnknownVector();
+                int destPageCount = pageMap.Values.SelectMany(value => value).Count();
+                var newPageDataArray = new SpatialString[destPageCount];
+
                 foreach (var pageInfo in pageMap)
                 {
                     string sourceDocName = pageInfo.Key.Item1;
@@ -5854,19 +5812,22 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             {
                                 pageData.UpdatePageNumber(destPage);
 
-                                newPageData.PushBack(pageData);
+                                newPageDataArray[destPage - 1] = pageData;
                             }
                         }
                     }
                 }
 
                 var newUSSData = new SpatialString();
-                if (newPageData.Size() > 0)
+                if (newPageDataArray.Length > 0)
                 {
+                    var newPageData = newPageDataArray.ToIUnknownVector<SpatialString>();
                     newUSSData.CreateFromSpatialStrings(newPageData);
                 }
                 newUSSData.SourceDocName = newDocumentName;
                 newUSSData.SaveTo(newDocumentName + ".uss", true, false);
+
+                return newUSSData.SpatialPageInfos;
             }
             catch (Exception ex)
             {
@@ -5886,8 +5847,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
         /// number while the value represents the new page number(s) in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with produced VOA.</param>
         void GrabDocumentForVerification(int fileID, CreatingOutputDocumentEventArgs e,
-            Dictionary<Tuple<string, int>, List<int>> pageMap)
+            Dictionary<Tuple<string, int>, List<int>> pageMap, LongToObjectMap newSpatialPageInfos)
         {
             try
             {
@@ -5895,10 +5857,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 var documentData = e.DocumentData as PaginationDocumentData;
                 if (documentData != null)
                 {
-                    AttributeMethods.TranslateAttributesToNewDocument(
-                        documentData.Attributes, e.OutputFileName, pageMap);
+                    var copyThis = (ICopyableObject)documentData.Attributes;
+                    var attributesCopy = (IUnknownVector)copyThis.Clone();
 
-                    documentData.Attributes.SaveTo(e.OutputFileName + ".voa", false,
+                    AttributeMethods.TranslateAttributesToNewDocument(
+                        attributesCopy, e.OutputFileName, pageMap, newSpatialPageInfos);
+
+                    attributesCopy.SaveTo(e.OutputFileName + ".voa", false,
                         _ATTRIBUTE_STORAGE_MANAGER_GUID);
                     // Though saved out to file, it is this object that will be used for the
                     // newly paginated document; it should not be marked dirty at this point.

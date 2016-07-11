@@ -1216,7 +1216,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (separator.DocumentDataPanel != null)
                     {
-                        separator.CloseDataPanel(false);
+                        separator.CloseDataPanel(false, false);
                     }
 
                     separator.DocumentDataPanelRequest -=

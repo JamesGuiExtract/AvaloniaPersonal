@@ -847,14 +847,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool CanSelectedDocumentsBeCommitted()
         {
             // If document data could not be saved, abort the commit operation.
-            if (!SaveDocumentData(true))
+            if (!SaveDocumentData(true, true))
             {
                 return false;
             }
 
-            if (_pendingDocuments.Any(document => document.Selected && document.DataError))
+            var documentWithError = _pendingDocuments
+                .FirstOrDefault(document =>
+                    document.DataError &&
+                    document.PageControls.Any(c => !c.Deleted) &&
+                    (!CommitOnlySelection || document.Selected));
+
+            if (documentWithError != null && documentWithError.PageControls.Any(c => !c.Deleted))
             {
+                _primaryPageLayoutControl.SelectDocument(documentWithError);
+                documentWithError.PaginationSeparator.OpenDataPanel();
                 UtilityMethods.ShowMessageBox("Data errors must be corrected before saving", "Data Error", true);
+
                 return false;
             }
 
@@ -1045,7 +1054,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             // If the document's data is open for editing, close the panel.
                             if (_documentWithDataInEdit == outputDocument)
                             {
-                                if (!CloseDataPanel())
+                                if (!CloseDataPanel(true))
                                 {
                                     _primaryPageLayoutControl.SelectDocument(outputDocument);
 
@@ -1123,7 +1132,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SaveDocumentData(false);
+                SaveDocumentData(false, false);
                 EnablePageDisplay = false;
                 _primaryPageLayoutControl.ClearSelection();
             }
@@ -1707,7 +1716,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (DocumentDataPanel != null)
                 {
-                    if (!CloseDataPanel())
+                    if (!CloseDataPanel(true))
                     {
                         _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
 
@@ -2013,18 +2022,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Saves the data from any defined <see cref="DocumentDataPanel"/> if currently active.
         /// </summary>
-        /// <param name="onlyIfSelected"></param>
+        /// <param name="onlyIfSelected"><see langword="true"/> if data should be saved only if
+        /// the document is selected for commit, <see langword="false"/> if the data should be saved
+        /// regardless.</param>
+        /// <param name="validateData"><see langword="true"/> if the document's data should
+        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
         /// <returns><see langword="true"/> if the data was saved or <see langword="false"/> if the
         /// data could not be saved and needs to be corrected.
         /// <para><b>Note</b></para>
         /// It is the responsibility of the DocumentDataPanel to inform the user of any data issues
         /// that need correction.
         /// </returns>
-        bool SaveDocumentData(bool onlyIfSelected)
+        bool SaveDocumentData(bool onlyIfSelected, bool validateData)
         {
             if (_documentWithDataInEdit == null || 
-                (onlyIfSelected && !_documentWithDataInEdit.Selected) ||
-                CloseDataPanel())
+                (onlyIfSelected && CommitOnlySelection && !_documentWithDataInEdit.Selected) ||
+                CloseDataPanel(validateData))
             {
                 return true;
             }
@@ -2032,7 +2045,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 this.SafeBeginInvoke("ELI39721", () =>
                 {
-                     _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
+                    if (_documentWithDataInEdit != null)
+                    {
+                        _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
+                        _documentWithDataInEdit.PaginationSeparator.OpenDataPanel();
+                    }
                 });
                 return false;
             }
@@ -2061,7 +2078,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Closes the <see cref="DocumentDataPanel"/> (if visible), applying any changed data in
         /// the process.
         /// </summary>
-        bool CloseDataPanel()
+        /// <param name="validateData"><see langword="true"/> if the document's data should
+        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
+        /// <returns><see langword="true"/> if the data panel was successfully closed,
+        /// <see langwor="false"/> if it could not be closed due to an error in the data.</returns>
+        bool CloseDataPanel(bool validateData)
         {
             if (DocumentDataPanel != null)
             {
@@ -2069,8 +2090,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (panelControl.Parent != null)
                 {
                     if (_documentWithDataInEdit == null ||
-                        (DocumentDataPanel.SaveData(_documentWithDataInEdit.DocumentData) &&
-                         !_documentWithDataInEdit.DataError))
+                        (DocumentDataPanel.SaveData(_documentWithDataInEdit.DocumentData, validateData) &&
+                         (!validateData || !_documentWithDataInEdit.DataError)))
                     {
                         panelControl.Parent.Controls.Remove(panelControl);
                         _documentWithDataInEdit = null;

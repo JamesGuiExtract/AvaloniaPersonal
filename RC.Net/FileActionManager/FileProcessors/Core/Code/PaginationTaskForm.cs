@@ -649,13 +649,13 @@ namespace Extract.FileActionManager.FileProcessors
                     destPages.Add(pageCounter++);
                 }
 
-                CreateUSSForPaginatedDocument(e.OutputFileName, pageMap);
+                var newSpatialPageInfos = CreateUSSForPaginatedDocument(e.OutputFileName, pageMap);
 
                 var documentData = e.DocumentData as PaginationDocumentData;
                 if (documentData != null)
                 {
                     AttributeMethods.TranslateAttributesToNewDocument(
-                        documentData.Attributes, e.OutputFileName, pageMap);
+                        documentData.Attributes, e.OutputFileName, pageMap, newSpatialPageInfos);
 
                     string dataFileName = e.OutputFileName + ".voa";
                     documentData.Attributes.SaveTo(dataFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
@@ -1403,7 +1403,8 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
         /// number while the value represents the new page number(s) in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
-        static void CreateUSSForPaginatedDocument(string newDocumentName,
+        /// <returns>New spatial page info map</returns>
+        static LongToObjectMap CreateUSSForPaginatedDocument(string newDocumentName,
             Dictionary<Tuple<string, int>, List<int>> pageMap)
         {
             try
@@ -1448,6 +1449,8 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 newUSSData.SourceDocName = newDocumentName;
                 newUSSData.SaveTo(newDocumentName + ".uss", true, false);
+
+                return newUSSData.SpatialPageInfos;
             }
             catch (Exception ex)
             {
