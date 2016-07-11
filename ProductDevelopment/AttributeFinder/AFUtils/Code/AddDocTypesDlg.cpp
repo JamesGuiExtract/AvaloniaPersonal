@@ -10,8 +10,10 @@
 #include <UCLIDException.h>
 #include <ExtractMFCUtils.h>
 #include <cpputil.h>
+#include <CommentedTextFileReader.h>
 #include <comutils.h>
 #include <DocTagUtils.h>
+#include <FileIterator.h>
 #include "SpecialStringDefinitions.h"
 #include <XBrowseForFolder.h>
 
@@ -88,6 +90,63 @@ namespace
 		ASSERT_RUNTIME_CONDITION("ELI40008", !folder.empty(), "Could not resolve the component data folder");
 
 		return folder;
+	}
+
+	// In this context, a "valid" idx file is one that does not contain a folder path in it.
+	bool FolderContainsValidIdxFile(const std::string& subFolder)
+	{
+		std::string completeName = subFolder + "\\" + "DocTypes.idx";
+		if (!isFileOrFolderValid(completeName))
+		{
+			return false;
+		}
+
+		// The file exists, BUT is it valid? It is NOT valid if it contains a folder path.
+		// open the file
+		ifstream ifs(completeName.c_str());
+		if (!ifs.is_open())
+		{
+			return false;
+		}
+
+		// use CommentedTextFileReader to read the file line by line
+		const char dirSeparator = '\\';
+		CommentedTextFileReader fileReader(ifs);
+		while (!fileReader.reachedEndOfStream())
+		{
+			std::string text = fileReader.getLineText();
+			if (text.find(dirSeparator) != std::string::npos)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	std::string GetDocTypesIdxContents(const std::string& folder)
+	{
+		if (FolderContainsValidIdxFile(folder))
+		{
+			std::string filename = Util::Format("%s\\%s", folder.c_str(), "DocTypes.Idx");
+			ifstream ifs(filename.c_str());
+			if (!ifs.is_open())
+			{
+				return "";
+			}
+
+			ifs.seekg(0, ifs.end);
+			size_t length = static_cast<size_t>(ifs.tellg());
+			ifs.seekg(0, ifs.beg);
+
+			std::vector<char> contents(length, 0);
+
+			ifs.read(contents.data(), contents.size());
+
+			return std::string(contents.data());
+		}
+
+		return "";
 	}
 }
 
@@ -266,29 +325,27 @@ void AddDocTypesDlg::populateComboBox()
 	// Clear combo box before populating
 	m_cmbIndustry.ResetContent();
 
-	// Get vector of Industry names
-	m_ipIndustries = m_ipDocUtils->GetDocumentIndustries();
+	ASSERT_RUNTIME_CONDITION("ELI40240", !m_currentPath.empty(), "Internal: m_currentPath is empty");
+	std::vector<string> industryNames = GetDocumentIndustries(m_currentPath);
 
 	// Add Industries from vector
-	long lCount = m_ipIndustries->Size;
-	int iSelected = -1;
-	int i, j;
-	for (i = 0; i < lCount; i++)
+	int index = 0;
+	int selectedIndex = -1;
+	for (size_t i = 0; i < industryNames.size(); ++i)
 	{
-		string strTemp = asString(_bstr_t( m_ipIndustries->GetItem( i )));
-		j = m_cmbIndustry.AddString( strTemp.c_str() );
+		index = m_cmbIndustry.AddString(industryNames[i].c_str());
 
 		// Check for match to input Industry
-		if (strTemp.compare( m_strCategory.c_str() ) == 0)
+		if (0 == _stricmp(m_strCategory.c_str(), industryNames[i].c_str()))
 		{
-			iSelected = j;
+			selectedIndex = index;
 		}
 	}
 
 	// Select input item
-	if (iSelected != -1)
+	if (selectedIndex != -1)
 	{
-		m_cmbIndustry.SetCurSel( iSelected );
+		m_cmbIndustry.SetCurSel( selectedIndex );
 	}
 	// else no input Industry provided, just default selection to first item
 	else
@@ -308,38 +365,22 @@ void AddDocTypesDlg::populateComboBox()
 		m_cmbIndustry.EnableWindow( FALSE );
 	}
 }
+
 //-------------------------------------------------------------------------------------------------
 void AddDocTypesDlg::populateListBox()
 {
 	// Clear list box before populating
 	m_listTypes.ResetContent();
 
-	// Get vector of document types
-	IVariantVectorPtr ipTypes = nullptr;
-	try
-	{
-		ipTypes = m_ipDocUtils->GetDocumentTypes( _bstr_t( m_strCategory.c_str() ) );
-		ASSERT_RESOURCE_ALLOCATION("ELI11938", ipTypes != __nullptr);
-	}
-	catch (_com_error&)
-	{
-		// This will happen when there are no document types associated with the category, 
-		// possibly because the category is dynamic.
-		m_listTypes.InsertString(0, notFoundText.c_str());
-		return;
-	}
-
 	// Get vector of Special types
-	int i;
-	long lCount;
 	if (m_bAllowSpecial)
 	{
 		IVariantVectorPtr ipSpecial =
 			m_ipDocUtils->GetSpecialDocTypeTags(asVariantBool(m_bAllowMultiplyClassified));
 		ASSERT_RESOURCE_ALLOCATION("ELI11939", ipSpecial != __nullptr);
 
-		lCount = ipSpecial->Size;
-		for (i = 0; i < lCount; i++)
+		long lCount = ipSpecial->Size;
+		for (int i = 0; i < lCount; i++)
 		{
 			string strType = asString(_bstr_t( ipSpecial->GetItem( i )));
 			m_listTypes.InsertString( i, strType.c_str() );
@@ -347,14 +388,15 @@ void AddDocTypesDlg::populateListBox()
 	}
 
 	// Add types from vector - after any Special types
-	long lBase = m_listTypes.GetCount();
-	lCount = ipTypes->Size;
-	for (i = 0; i < lCount; i++)
+	auto docTypes = GetDocumentTypes();
+	int baseCount = m_listTypes.GetCount();
+	for (int i = 0; i < static_cast<int>(docTypes.size()); ++i)
 	{
-		string strType = asString(_bstr_t( ipTypes->GetItem( i )));
-		m_listTypes.InsertString( i + lBase, strType.c_str() );
+		int index = baseCount + i;
+		m_listTypes.InsertString(index, docTypes[i].c_str());
 	}
 }
+
 //-------------------------------------------------------------------------------------------------
 void AddDocTypesDlg::SetDocTagButton()
 {
@@ -392,6 +434,7 @@ void AddDocTypesDlg::OnClickedCustomFiltersDocTag()
 	{
 		ChooseDocTagForEditBox(m_ipTagManager, m_btnCustomFiltersDocTag, m_editRootFolder);
 
+		m_initialFkbPath = GetRootFolderValue();
 		SetFkbVersion();
 		UpdateCategoriesAndTypes();
 	}
@@ -420,17 +463,8 @@ void AddDocTypesDlg::OnButtonBrowseFile()
 			}
 		}
 
-		std::string startFolder;
-		if (m_initialFkbPath.empty())
-		{
-			std::string folder = GetRootFolderValue();
-			startFolder = ExpandFileName(folder);
-		}
-		else
-		{
-			startFolder = ExpandFileName(m_initialFkbPath);
-		}
-
+		ASSERT_RUNTIME_CONDITION("ELI40239", !m_initialFkbPath.empty(), "Internal: m_initialFkbPath is empty");
+		std::string startFolder = ExpandFileName(m_initialFkbPath);
 
 		// Display the folder browser
 		char pszPath[MAX_PATH + 1] = {0};
@@ -472,36 +506,40 @@ std::string AddDocTypesDlg::GetRootFolderValue()
 //-------------------------------------------------------------------------------------------------
 void AddDocTypesDlg::SetFkbVersion()
 {
-	std::string folder = GetRootFolderValue();
-	folder = ExpandFileName(folder);
+	std::string folder = GetExpandedRootFolderValue();
 	std::string folderVersion = FindFkbVersionInPath(folder);
 	m_fkbVersion.SetWindowText(folderVersion.c_str());
 }
 //-------------------------------------------------------------------------------------------------
 void AddDocTypesDlg::UpdateCategoriesAndTypes()
 {
-	std::string folder = GetRootFolderValue();
-	folder = ExpandFileName(folder);
-	std::string classifierSubfolderName = asString(m_ipDocUtils->DocumentClassifiersSubfolderName);
-
-	std::string lcFolder(folder);
-	std::string lcSubfolder(classifierSubfolderName);
-	makeLowerCase(lcFolder);
-	makeLowerCase(lcSubfolder);
-
-	if (Contains(lcFolder, lcSubfolder) && isValidFolder(folder))
+	std::string folder = GetExpandedRootFolderValue();
+	if (ContainsValidDocTypeSubfolders(folder))
 	{
-		m_ipDocUtils->DocumentClassifiersPath = folder.c_str();
-
-		populateComboBox();
-		populateListBox();
+		m_currentPath = folder;
 	}
 	else
 	{
-		m_cmbIndustry.ResetContent();
-		m_listTypes.ResetContent();
-		m_listTypes.InsertString(0, notFoundText.c_str());
+		// Try adding "DocumentClassifiers" to the path
+		std::string dcFolder = Util::Format("%s\\DocumentClassifiers", folder.c_str());
+		if (ContainsValidDocTypeSubfolders(dcFolder))
+		{
+			m_currentPath = dcFolder;
+		}
+		else
+		{
+			m_cmbIndustry.ResetContent();
+			m_listTypes.ResetContent();
+			m_listTypes.InsertString(0, notFoundText.c_str());
+			m_currentPath = "";
+
+			return;
+		}
 	}
+
+	// here on valid folder (m_currentPath) that contains doctype index files.
+	populateComboBox();
+	populateListBox();
 }
 //-------------------------------------------------------------------------------------------------
 std::string AddDocTypesDlg::ExpandFileName(const std::string& folder)
@@ -544,4 +582,125 @@ int AddDocTypesDlg::GetPreviousComboboxIndex()
 std::string AddDocTypesDlg::GetDocumentClassifiersFolder()
 {
 	return m_initialFkbPath;
+}
+//-------------------------------------------------------------------------------------------------
+namespace
+{
+	bool FolderContainsSubfoldersWithValidIdxFiles(const std::string& folder, 
+												   const std::string& subFolderSearch)
+	{
+		FileIterator fi(subFolderSearch);
+		while (fi.moveNext())
+		{
+			if (fi.isDirectory())
+			{
+				std::string subSubName = fi.getFileName();
+				std::string subFolderName = folder + "\\" + subSubName;	
+				if (FolderContainsValidIdxFile(subFolderName))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+}
+
+bool AddDocTypesDlg::ContainsValidDocTypeSubfolders(const std::string& folder)
+{
+	if (directoryExists(folder))
+	{
+		auto subFolderSearch = Util::Format("%s\\*.*", folder.c_str());
+
+		return FolderContainsSubfoldersWithValidIdxFiles(folder, subFolderSearch);
+	}
+
+	return false;
+}
+
+namespace
+{
+	std::string ValidDocumentIndustriesPath(const std::string& folder)
+	{
+		if (directoryExists(folder))
+		{
+			auto subFolderSearch = Util::Format("%s\\*.*", folder.c_str());
+			if (FolderContainsSubfoldersWithValidIdxFiles(folder, subFolderSearch))
+			{
+				return folder;
+			}
+			else
+			{
+				return "";
+			}
+		}
+
+		return "";
+	}
+}
+
+std::vector<std::string> AddDocTypesDlg::GetDocumentIndustries(const std::string& folder)
+{
+	std::vector<std::string> industries;
+
+	std::string path = ValidDocumentIndustriesPath(folder);
+	if (path.empty())
+	{
+		return industries;
+	}
+
+	std::string folderSearch = Util::Format("%s\\*.*", path.c_str());
+	FileIterator fi(folderSearch);
+	while (fi.moveNext())
+	{
+		if (fi.isDirectory())
+		{
+			std::string industry = fi.getFileName();
+			std::string subFolder = Util::Format("%s\\%s", folder.c_str(), industry.c_str());
+			if (FolderContainsValidIdxFile(subFolder))
+			{
+				industries.push_back(industry);
+			}
+		}
+	}
+
+	return industries;
+}
+
+std::vector<std::string> AddDocTypesDlg::GetDocumentTypes()
+{
+	std::vector<std::string> docTypes;
+
+	if (m_strCategory.empty())
+	{
+		return docTypes;
+	}
+
+	ASSERT_RUNTIME_CONDITION("ELI40241", !m_currentPath.empty(), "Internal: m_currentPath is empty");
+
+	std::string subfolder = Util::Format("%s\\%s", 
+										 m_currentPath.c_str(), 
+										 m_strCategory.c_str());
+
+	std::string contents = GetDocTypesIdxContents(subfolder);
+	if (contents.empty())
+	{
+		return docTypes;
+	}
+
+	auto lines = Split(contents, '\n');
+	CommentedTextFileReader fileReader(lines);
+	while (!fileReader.reachedEndOfStream())
+	{
+		docTypes.emplace_back(fileReader.getLineText());
+	}
+
+	return docTypes;
+}
+
+std::string AddDocTypesDlg::GetExpandedRootFolderValue()
+{
+	std::string folder = GetRootFolderValue();
+	return ExpandFileName(folder);
 }

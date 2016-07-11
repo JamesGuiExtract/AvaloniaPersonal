@@ -85,6 +85,8 @@ private:
 	void SetRootFolderValue(const std::string& value);
 
 	std::string GetRootFolderValue();
+	std::string GetExpandedRootFolderValue();
+
 
 	void SetFkbVersion();
 
@@ -96,15 +98,17 @@ private:
 
 	int GetPreviousComboboxIndex();
 
+	bool ContainsValidDocTypeSubfolders(const std::string& folder);
+
+	std::vector<std::string> GetDocumentIndustries(const std::string& folder);
+	std::vector<std::string> GetDocumentTypes();
+
 	///////////////
 	// Variables
 	///////////////
 	std::vector<std::string> m_vecTypes;
 
 	UCLID_AFUTILSLib::IDocumentClassificationUtilsPtr m_ipDocUtils;
-
-	// Collection of available Industry names
-	IVariantVectorPtr	m_ipIndustries;
 
 	// Selected industry
 	std::string	m_strCategory;
@@ -127,6 +131,8 @@ private:
 	bool m_isFamContext;
 
 	ITagUtilityPtr m_ipTagManager;
+
+	std::string m_currentPath;
 };
 
 //{{AFX_INSERT_LOCATION}}

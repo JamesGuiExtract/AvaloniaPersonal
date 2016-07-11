@@ -645,9 +645,6 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 		// Validate the Industry name
 		string strName = asString( *pbstrIndustry );
 
-		// Load the document types
-		loadDocTypeFiles( strName );
-
 		// Create the VariantVector to contain selected document type(s)
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
 		ASSERT_RESOURCE_ALLOCATION("ELI11925", ipVec != __nullptr);
@@ -728,11 +725,8 @@ STDMETHODIMP CDocumentClassifier::put_DocumentClassifiersPath(BSTR bstrDocumentC
 	try
 	{
 		std::string path = asString(bstrDocumentClassifiersPath);
-		if (Contains(path, DOC_CLASSIFIERS_FOLDER))
-		{
-			m_documentClassifiersPath = asString(bstrDocumentClassifiersPath);
-			m_bDirty = true;
-		}
+		m_documentClassifiersPath = asString(bstrDocumentClassifiersPath);
+		m_bDirty = true;
 
 		return S_OK;
 	}
@@ -923,13 +917,16 @@ std::string CDocumentClassifier::GetDocumentClassifierFolder()
 		ASSERT_RESOURCE_ALLOCATION("ELI39895", m_ipAFUtility != __nullptr);
 	}
 
-	if (!m_documentClassifiersPath.empty() && isValidFolder(m_documentClassifiersPath))
+	if (!m_documentClassifiersPath.empty())
 	{
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
 		ASSERT_RESOURCE_ALLOCATION("ELI39996", ipAFDoc);
 
 		std::string path = m_ipAFUtility->ExpandTagsAndFunctions(m_documentClassifiersPath.c_str(), ipAFDoc);
-		return path + "\\";
+		if (isValidFolder(path))
+		{
+			return path + "\\";
+		}
 	}
 
 	string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder();
