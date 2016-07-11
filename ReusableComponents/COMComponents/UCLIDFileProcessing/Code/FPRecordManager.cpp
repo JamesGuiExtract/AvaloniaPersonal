@@ -924,7 +924,7 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 					_lastCodePos = "210";
 					// Notify the DB that the file was processed
 					m_ipFPMDB->NotifyFileProcessed(nTaskID, m_strAction.c_str(),
-						task.getAllowedQueuedStatusOverride());
+						asVariantBool(task.getAllowedQueuedStatusOverride()));
 					m_nNumberOfFilesProcessedSuccessfully++;
 				}
 				else if ( eNewStatus == kRecordFailed )
@@ -932,7 +932,7 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 					_lastCodePos = "220";
 					// Notify the DB that the file failed to process
 					m_ipFPMDB->NotifyFileFailed(nTaskID, m_strAction.c_str(), task.m_strException.c_str(),
-						task.getAllowedQueuedStatusOverride());
+						asVariantBool(task.getAllowedQueuedStatusOverride()));
 
 					m_nNumberOfFilesFailed++;
 				}
@@ -940,7 +940,7 @@ void FPRecordManager::changeState(const FileProcessingRecord& task)
 				{
 					_lastCodePos = "225";
 					m_ipFPMDB->NotifyFileSkipped(nTaskID, m_nActionID,
-						task.getAllowedQueuedStatusOverride());
+						asVariantBool(task.getAllowedQueuedStatusOverride()));
 					m_nNumberOfFilesProcessedSuccessfully++;
 				}
 
