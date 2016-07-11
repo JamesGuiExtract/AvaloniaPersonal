@@ -353,7 +353,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Closes the <see cref="DocumentDataPanel"/> (if visible), applying any changed data in
         /// the process.
         /// </summary>
-        /// <param name="saveData"><param name="validateData"><see langword="true"/> to save the
+        /// <param name="saveData"><see langword="true"/> to save the
         /// document's data; otherwise, <see langwor="false"/>.</param>
         /// <param name="validateData"><see langword="true"/> if the document's data should
         /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>

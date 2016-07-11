@@ -56,6 +56,14 @@ ExtractFileLock::ExtractFileLock(std::string strFileName, bool bThrowIfLocked,
 
 			m_strLockFileName = strFileName + gszLOCK_FILE_EXTENSION;
 
+			// Before creating the files need to make sure the directory exists
+			// Fixes https://extract.atlassian.net/browse/ISSUE-13870
+			string strDirectory = getDirectoryFromFullPath(m_strLockFileName);
+			if (!directoryExists(strDirectory))
+			{
+				createDirectory(strDirectory);
+			}
+
 			// Creates lock file if it doesn't already exist
 			// FILE_SHARE_READ allows other extract processes to read metadata info
 			// FILE_SHARE_DELETE must be specified with FILE_FLAG_DELETE_ON_CLOSE for other extract processes to open.
