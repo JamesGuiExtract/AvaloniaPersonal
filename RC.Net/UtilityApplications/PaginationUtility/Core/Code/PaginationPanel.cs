@@ -10,10 +10,12 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
@@ -1156,6 +1158,82 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39788");
+            }
+        }
+
+        /// <summary>
+        /// Creates a new uss file for the specified <see paramref="newDocumentName"/> based upon
+        /// the specified <see paramref="pageMap"/> that relates the source pages to the
+        /// corresponding pages in <see paramref="newDocumentName"/>.
+        /// </summary>
+        /// <param name="newDocumentName">The name of the document for which the uss file is being
+        /// created.</param>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <returns>The spatial page info map for the output document</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
+        public static LongToObjectMap CreateUSSForPaginatedDocument(string newDocumentName,
+            Dictionary<Tuple<string, int>, List<int>> pageMap)
+        {
+            try
+            {
+                var sourceUSSData = pageMap.Keys
+                    .Select(sourcePage => sourcePage.Item1)
+                    .Distinct()
+                    .Where(sourceFileName => File.Exists(sourceFileName + ".uss"))
+                    .ToDictionary(sourceFileName => sourceFileName, sourceFileName =>
+                    {
+                        var ussData = new SpatialString();
+                        ussData.LoadFrom(sourceFileName + ".uss", false);
+                        return ussData;
+                    });
+                    
+                var newSpatialPageInfos = new LongToObjectMapClass();
+                int destPageCount = pageMap.Values.SelectMany(value => value).Count();
+                var newPageDataArray = new SpatialString[destPageCount];
+                foreach (var pageInfo in pageMap)
+                {
+                    string sourceDocName = pageInfo.Key.Item1;
+                    SpatialString sourceDocData;
+                    if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData) &&
+                        sourceDocData.HasSpatialInfo())
+                    {
+                        var oldPageInfos = sourceDocData.SpatialPageInfos;
+                        foreach (int destPage in pageInfo.Value)
+                        {
+                            int sourcePage = pageInfo.Key.Item2;
+                            var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
+                            newPageDataArray[destPage - 1] = pageData;
+
+                            if (pageData.HasSpatialInfo())
+                            {
+                                pageData.UpdatePageNumber(destPage);
+                            }
+                            if (oldPageInfos.Contains(sourcePage))
+                            {
+                                newSpatialPageInfos.Set(destPage, oldPageInfos.GetValue(sourcePage));
+                            }
+                        }
+                    }
+                }
+
+                var newUSSData = new SpatialString();
+                if (newPageDataArray.Length > 0)
+                {
+                    var newPageData = newPageDataArray.ToIUnknownVector<SpatialString>();
+                    newUSSData.CreateFromSpatialStrings(newPageData);
+                }
+                newUSSData.SourceDocName = newDocumentName;
+                newUSSData.SpatialPageInfos = newSpatialPageInfos;
+                newUSSData.SaveTo(newDocumentName + ".uss", true, false);
+
+                return newSpatialPageInfos;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39708");
             }
         }
 

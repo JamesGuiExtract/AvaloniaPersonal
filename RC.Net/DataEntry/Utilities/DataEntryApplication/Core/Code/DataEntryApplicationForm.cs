@@ -3168,7 +3168,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     destPages.Add(pageCounter++);
                 }
 
-                var newSpatialPageInfos = CreateUSSForPaginatedDocument(e.OutputFileName, pageMap);
+                var newSpatialPageInfos = PaginationPanel.CreateUSSForPaginatedDocument(e.OutputFileName, pageMap);
 
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
@@ -5765,74 +5765,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
 
             return fileID;
-        }
-
-        /// <summary>
-        /// Creates a new uss file for the specified <see paramref="newDocumentName"/> based upon
-        /// the specified <see paramref="pageMap"/> that relates the source pages to the
-        /// corresponding pages in <see paramref="newDocumentName"/>.
-        /// </summary>
-        /// <param name="newDocumentName">The name of the document for which the uss file is being
-        /// created.</param>
-        /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number(s) in 
-        /// <see paramref="newDocumentName"/> associated with that source page.</param>
-        /// <returns>New spatial page info map</returns>
-        static LongToObjectMap CreateUSSForPaginatedDocument(string newDocumentName,
-            Dictionary<Tuple<string, int>, List<int>> pageMap)
-        {
-            try
-            {
-                var sourceUSSData = pageMap.Keys
-                    .Select(sourcePage => sourcePage.Item1)
-                    .Distinct()
-                    .Where(sourceFileName => File.Exists(sourceFileName + ".uss"))
-                    .ToDictionary(sourceFileName => sourceFileName, sourceFileName =>
-                    {
-                        var ussData = new SpatialString();
-                        ussData.LoadFrom(sourceFileName + ".uss", false);
-                        return ussData;
-                    });
-
-                int destPageCount = pageMap.Values.SelectMany(value => value).Count();
-                var newPageDataArray = new SpatialString[destPageCount];
-
-                foreach (var pageInfo in pageMap)
-                {
-                    string sourceDocName = pageInfo.Key.Item1;
-                    SpatialString sourceDocData;
-                    if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData) &&
-                        sourceDocData.HasSpatialInfo())
-                    {
-                        foreach (int destPage in pageInfo.Value)
-                        {
-                            int sourcePage = pageInfo.Key.Item2;
-                            var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
-                            if (pageData.HasSpatialInfo())
-                            {
-                                pageData.UpdatePageNumber(destPage);
-
-                                newPageDataArray[destPage - 1] = pageData;
-                            }
-                        }
-                    }
-                }
-
-                var newUSSData = new SpatialString();
-                if (newPageDataArray.Length > 0)
-                {
-                    var newPageData = newPageDataArray.ToIUnknownVector<SpatialString>();
-                    newUSSData.CreateFromSpatialStrings(newPageData);
-                }
-                newUSSData.SourceDocName = newDocumentName;
-                newUSSData.SaveTo(newDocumentName + ".uss", true, false);
-
-                return newUSSData.SpatialPageInfos;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39708");
-            }
         }
 
         /// <summary>
