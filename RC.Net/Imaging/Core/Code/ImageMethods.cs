@@ -449,7 +449,7 @@ namespace Extract.Imaging
         }
 
         /// <summary>
-        /// Extracts a sub image from from the specified <paramref name="source"/>.
+        /// Extracts a sub image from the specified <paramref name="source"/>.
         /// </summary>
         /// <param name="bounds">The bounds of the sub image to extract.</param>
         /// <param name="source">The source image to extract the sub image from.</param>
@@ -555,7 +555,7 @@ namespace Extract.Imaging
         /// <item><b>180</b>: Upside down.</item>
         /// <item><b>270</b>: Rotated 90 degrees to the left.</item>
         /// </list></param>
-        /// <param name="skew">The angle (in degress) the raster zone has been rotated compared to
+        /// <param name="skew">The angle (in degrees) the raster zone has been rotated compared to
         /// the source image.</param>
         /// <param name="offset">The distance any image coordinate in the resulting raster zone 
         /// image would need to be offset to be at the corresponding location in the source image.
@@ -597,7 +597,7 @@ namespace Extract.Imaging
                     endPoint = GeometryMethods.GetClippedEndPoint(startPoint, endPoint, pageArea);
                 }
 
-                // Find the smallest rectangle from the image that completely encompases the raster
+                // Find the smallest rectangle from the image that completely encompasses the raster
                 // zone defined by the (possibly clipped) raster zone.  Note this bounding rectangle
                 // may extend offpage.
                 Rectangle boundingRectangle = GeometryMethods.GetBoundingRectangle(
@@ -698,7 +698,7 @@ namespace Extract.Imaging
                     }
 
                     // Account for the skew by rotating about the center of the image. At this point
-                    // all steps nessary to move a point from the original image's coordinate system
+                    // all steps necessary to move a point from the original image's coordinate system
                     // into the coordinate system of the extracted image have been completed.
                     PointF imageCenter = new PointF((float)page.Width / 2, (float)page.Height / 2);
                     transform.RotateAt((float)-skew, imageCenter);
@@ -957,7 +957,7 @@ namespace Extract.Imaging
                 if (exitCode != 0)
                 {
                     var ee = new ExtractException("ELI35266",
-                        "PDF conversion process terminiated abnormally.");
+                        "PDF conversion process terminated abnormally.");
                     ee.AddDebugData("Exit code", exitCode, false);
                     throw ee;
                 }
@@ -1011,7 +1011,7 @@ namespace Extract.Imaging
                 if (exitCode != 0)
                 {
                     var ee = new ExtractException("ELI35639",
-                        "Tif conversion process terminiated abnormally.");
+                        "Tif conversion process terminated abnormally.");
                     ee.AddDebugData("Exit code", exitCode, false);
                     throw ee;
                 }
@@ -1098,7 +1098,7 @@ namespace Extract.Imaging
                         // If the output format is PDF, first output a tif to a
                         // temporary file, then we will convert to a PDF at the end.
                         // Theoretically, this shouldn't be necessary, but I was
-                        // not otherwise able able to get the LeadTools .Net API
+                        // not otherwise able to get the LeadTools .Net API
                         // to output an acceptable quality color PDF that was not
                         // too large (PdfCompressor tended to produce unsightly
                         // blocks on areas with light shading and I could not get
