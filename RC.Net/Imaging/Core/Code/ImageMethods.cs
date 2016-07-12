@@ -1243,7 +1243,7 @@ namespace Extract.Imaging
                                     conversionCommand.SetPalette(imagePage.GetPalette());
 
                                     outputBitsPerPixel = bitsPerPixel;
-                                    outputFormat = imageReader.Format;
+                                    outputFormat = imagePage.OriginalFormat;
                                 }
                             }
                         }

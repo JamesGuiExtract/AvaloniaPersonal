@@ -146,22 +146,42 @@
   <ItemGroup>
     <Compile Include="AttributeComparer.cs" />
     <Compile Include="AttributeCreator.cs" />
-    <Compile Include="AttributeFeatureVectorizer.cs" />
     <Compile Include="AttributeFinderPathTags.cs" />
     <Compile Include="AttributeMethods.cs" />
-    <Compile Include="InputConfiguration.cs" />
-    <Compile Include="ITrainableClassifier.cs" />
     <Compile Include="LearningMachine.cs" />
-    <Compile Include="LearningMachineDataEncoder.cs" />
-    <Compile Include="MemoryManagerExtensionMethods.cs" />
-    <Compile Include="MulticlassSupportVectorMachineClassifier.cs" />
-    <Compile Include="MultilabelSupportVectorMachineClassifier.cs" />
-    <Compile Include="NeuralNetworkClassifier.cs" />
+    <Compile Include="AttributeFeatureVectorizer.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InputConfiguration.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ITrainableClassifier.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LearningMachineDataEncoder.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MulticlassSupportVectorMachineClassifier.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MultilabelSupportVectorMachineClassifier.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NeuralNetworkClassifier.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SpatialStringFeatureVectorizer.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SupportVectorMachineClassifier.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MemoryManagerExtensionMethods.cs">
+      <DependentUpon>LearningMachine.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AttributesFile.cs" />
-    <Compile Include="SpatialStringFeatureVectorizer.cs" />
     <Compile Include="StatusArgs.cs" />
-    <Compile Include="SupportVectorMachineClassifier.cs" />
     <Compile Include="XPathContext.cs" />
     <Compile Include="XPathContextFunctions.cs">
       <DependentUpon>XPathContext.cs</DependentUpon>
