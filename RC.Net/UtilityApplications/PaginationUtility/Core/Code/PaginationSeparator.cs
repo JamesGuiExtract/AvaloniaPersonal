@@ -31,6 +31,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         OutputDocument _outputDocument;
 
         /// <summary>
+        /// Used to prevent recursion while trying to update the current Document.
+        /// </summary>
+        bool _changingDocument;
+
+        /// <summary>
         /// Used to prevent recursion while trying to update the current selection state.
         /// </summary>
         bool _changingSelection;
@@ -222,8 +227,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
+                if (_changingDocument)
+                {
+                    return _outputDocument;
+                }
+
                 try
                 {
+                    _changingDocument = true;
+
                     var firstPageControl = NextControl as PageThumbnailControl;
                     var document = (firstPageControl != null)
                         ? firstPageControl.Document
@@ -231,6 +243,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (document != _outputDocument)
                     {
+                        CloseDataPanel(false, false);
+
                         if (_outputDocument != null)
                         {
                             _outputDocument.Invalidated -= HandleDocument_Invalidated;
@@ -241,7 +255,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_outputDocument != null)
                         {
                             _collapsed = _outputDocument.PageControls.Any(c => !c.Visible);
-                            _outputDocument.Invalidated += HandleDocument_Invalidated; 
+                            _outputDocument.Invalidated += HandleDocument_Invalidated;
                         }
                         else
                         {
@@ -254,6 +268,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI40179");
+                }
+                finally
+                {
+                    _changingDocument = false;
                 }
             }
         }
@@ -437,8 +455,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                
-
                 if (Parent != null)
                 {
                     var parentPanel = (ScrollableControl)Parent;

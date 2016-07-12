@@ -1797,8 +1797,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (!CloseDataPanel(true))
                     {
                         _primaryPageLayoutControl.SelectDocument(_documentWithDataInEdit);
-
-                        throw new ExtractException("ELI40212", "Failed to save document data");
                     }
 
                     _documentWithDataInEdit = e.OutputDocument;

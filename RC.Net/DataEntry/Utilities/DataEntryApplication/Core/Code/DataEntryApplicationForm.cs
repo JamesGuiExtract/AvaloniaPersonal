@@ -1101,6 +1101,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _tabControl.SelectedTab = _paginationTab;
                         _paginationPanel.PendingChanges = true;
 
+                        _skipProcessingMenuItem.Enabled = true;
+
                         // If pagination has been suggested, don't bother loading the data for the
                         // current document; either the suggestion will be accepted trigger new
                         // files to be loaded or the suggestion will be rejected triggering the
@@ -3027,8 +3029,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _selectWordHighlightCommand.Enabled = _imageViewer.IsImageAvailable;
                     _toggleHighlightCommand.Enabled = _imageViewer.IsImageAvailable;
                     _toggleShowAllHighlightsCommand.Enabled = _imageViewer.IsImageAvailable;
-                    _selectLayerObjectMenuItem.Enabled = _imageViewer.IsImageAvailable;
-                    _selectLayerObjectToolStripButton.Enabled = _imageViewer.IsImageAvailable;
+
+                    // The select layer object tool becomes available based on the ImageViewer state.
+                    // The only way to control the enabled state is by changing the ImageViewer property.
+                    _selectLayerObjectMenuItem.ImageViewer = _imageViewer;
+                    _selectLayerObjectToolStripButton.ImageViewer = _imageViewer;
 
                     // Refresh any attributes that were modified in the _paginationDocumentDataPanel
                     // so that it's value stays in sync.
@@ -3077,8 +3082,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _selectWordHighlightCommand.Enabled = false;
                     _toggleHighlightCommand.Enabled = false;
                     _toggleShowAllHighlightsCommand.Enabled = false;
-                    _selectLayerObjectMenuItem.Enabled = false;
-                    _selectLayerObjectToolStripButton.Enabled = false;
+
+                    // The select layer object tool becomes available based on the ImageViewer state.
+                    // The only way to control the enabled state is by changing the ImageViewer property.
+                    _selectLayerObjectMenuItem.ImageViewer = null;
+                    _selectLayerObjectToolStripButton.ImageViewer = null;
 
                     _paginationPanel.Resume();
                 }

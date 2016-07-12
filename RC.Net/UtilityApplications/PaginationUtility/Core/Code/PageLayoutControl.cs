@@ -2495,6 +2495,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                var activePage = PrimarySelection as PageThumbnailControl;
+                if (activePage == null || activePage.Document != e.OutputDocument)
+                {
+                    ProcessControlSelection(e.OutputDocument.PageControls
+                        .FirstOrDefault(c => !c.Deleted));
+                }
+
                 OnDocumentDataPanelRequest(e);
 
                 EnableKeyboardPageOperations(false);
