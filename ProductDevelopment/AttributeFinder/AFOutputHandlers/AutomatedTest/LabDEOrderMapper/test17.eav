@@ -40,7 +40,7 @@ Test|N/A
 ..TestCode|MCHC
 ..ESNames|MCHC
 .Component|RDW
-..Flag| H
+..Flag|H
 ..Range|11.5-14.5
 ..Units|%
 ..Value|17.9
@@ -117,7 +117,7 @@ Test|N/A
 .OrderCode|CBC
 Test|N/A
 .Component|WBC
-..Flag| H
+..Flag|H
 ..Range|4.0-10.0
 ..Units|Thou/uL
 ..Value|11.6
@@ -157,7 +157,7 @@ Test|N/A
 ..TestCode|MCHC
 ..ESNames|MCHC
 .Component|RDW
-..Flag| H
+..Flag|H
 ..Range|11.5-14.5
 ..Units|%
 ..Value|18.3
@@ -257,7 +257,7 @@ Test|N/A
 ..TestCode|CO2
 ..ESNames|Bicarbonate;CO2
 .Component|GLUCOSE
-..Flag| H
+..Flag|H
 ..Range|74-99
 ..Units|mg/dL
 ..Value|138
@@ -271,7 +271,7 @@ Test|N/A
 ..TestCode|BUN
 ..ESNames|BUN
 .Component|CREATININE
-..Flag| H
+..Flag|H
 ..Range|0.60-1.10
 ..Units|mg/dL
 ..Value|3.27
@@ -339,7 +339,7 @@ Test|N/A
 ..TestCode|CO2
 ..ESNames|Bicarbonate;CO2
 .Component|GLUCOSE
-..Flag| H
+..Flag|H
 ..Range|74-99
 ..Units|mg/dL
 ..Value|113
@@ -353,7 +353,7 @@ Test|N/A
 ..TestCode|BUN
 ..ESNames|BUN
 .Component|CREATININE
-..Flag| H
+..Flag|H
 ..Range|0.60-1.10
 ..Units|mg/dL
 ..Value|3.30
